@@ -1,8 +1,8 @@
 <template>
     <v-container fluid grid-list-md>
         <v-layout row wrap>
-            <v-flex lg3 md4 sm4 xs6 v-for="(app, index) in apps" :key="index">
-                <app-block :openApp="openApp" :appDetails="app.details"></app-block>
+            <v-flex lg3 md4 sm4 xs6 v-for="(appDetail, index) in appDetails" :key="index">
+                <app-block :openApp="openApp" :appDetails="appDetail"></app-block>
             </v-flex>
             <v-flex lg4 md4 sm4 xs4>
             </v-flex>
@@ -11,6 +11,7 @@
 </template>
 
 <script>
+    import ApplicationDetailsHelper from  '@/libs/system/application/application-details-helper.js';
     import app_block from '@/components/Main/Apps/app_block.vue';
 
     export default {
@@ -20,12 +21,14 @@
         },
         data() {
             return {
-                apps: []
+                appDetails: [],
+                applicationDetailsHelper: null
             }
         },
         created() {
             let self = this;
-            self.apps = require('@/assets/manifest/app_manifest.json');
+            self.applicationDetailsHelper = new ApplicationDetailsHelper();
+            self.appDetails = self.applicationDetailsHelper.getAllApplicationDetails();
         },
         methods: {
             openApp() {

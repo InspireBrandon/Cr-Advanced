@@ -1,0 +1,10 @@
+[
+    {
+        "id": 1,
+        "system_code": "Range_Planning"
+    },
+    {
+        "id": 2,
+        "system_code": "Space_Planning"
+    }
+]
