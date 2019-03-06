@@ -81,6 +81,11 @@
                         title: 'User',
                         icon: 'account_circle',
                         route: '/User'
+                    }),
+                    new NavigationItem({
+                        title: 'Logout',
+                        icon: 'exit_to_app',
+                        route: '/Login'
                     })
                 ]
             }
