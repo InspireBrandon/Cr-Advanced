@@ -78,9 +78,9 @@
                         route: '/Settings'
                     }),
                     new NavigationItem({
-                        title: 'Account',
+                        title: 'User',
                         icon: 'account_circle',
-                        route: '/Account'
+                        route: '/User'
                     })
                 ]
             }
