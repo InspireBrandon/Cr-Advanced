@@ -1,9 +1,10 @@
+
 {
     "id": 1,
-    "details": {
-        "name": "Range Planning",
-        "sys_code": "RANGE_PLANNING",
-        "imgSrc": "https://www.icagruppen.se/globalassets/4.-hallbarhet/4.-hallbarhetsarbete/6.-historiskt-material/99.-halsa/halso-sortiment-lx-ny.jpg",
-        "version": "1.0.0.0"
-    }
+    "name": "Range Planning",
+    "system_code": "RANGE_PLANNING",
+    "version": "1.0.0.0",
+    
+    "hasReport":true
+
 }
