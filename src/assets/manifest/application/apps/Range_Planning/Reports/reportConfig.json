@@ -1,0 +1,14 @@
+[{
+    "name": "Ranfge reports",
+    "components": [{
+            "title": "port 1 1",
+            "icon": "account_circle",
+            "route": "/Reports/SpacePlanning/Report1"
+        },
+        {
+            "title": "application report 32",
+            "icon": "account_circle",
+            "route": "/Reports/SpacePlanning/Report1"
+        }
+    ]
+}]

@@ -5,15 +5,17 @@
                 <app-block :openApp="openApp" :appDetails="appDetail"></app-block>
             </v-flex>
             <v-flex lg4 md4 sm4 xs4>
+                
+            
             </v-flex>
         </v-layout>
     </v-container>
 </template>
 
 <script>
-    import ApplicationDetailsHelper from  '@/libs/system/application/application-details-helper.js';
+    import ApplicationDetailsHelper from '@/libs/system/application/application-details-helper.js';
     import app_block from '@/components/Main/Apps/app_block.vue';
-
+   
     export default {
         name: 'apps',
         components: {
@@ -22,13 +24,16 @@
         data() {
             return {
                 appDetails: [],
-                applicationDetailsHelper: null
+                applicationDetailsHelper: null,
+               
             }
         },
         created() {
             let self = this;
             self.applicationDetailsHelper = new ApplicationDetailsHelper();
             self.appDetails = self.applicationDetailsHelper.getAllApplicationDetails();
+
+            
         },
         methods: {
             openApp() {

@@ -1,0 +1,14 @@
+[{
+    "name": "Application name",
+    "components": [{
+            "title": "application report 1",
+            "icon": "account_circle",
+            "route": "/Reports/SpacePlanning/Report1"
+        },
+        {
+            "title": "application report 2",
+            "icon": "account_circle",
+            "route": "/Reports/SpacePlanning/Report1"
+        }
+    ]
+}]

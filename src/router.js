@@ -16,8 +16,9 @@ import RangePlanning from '@/components/Apps/RangePlanning/Index.vue'
 import Space_Planning_Details from '@/views/App_Details/SPACE_PLANNING.vue'
 import Range_Planning_Details from '@/views/App_Details/RANGE_PLANNING.vue'
 
-
-
+//reports
+import ReportShell from '@/views/Reports/Index.vue'
+import spaceReport1 from '@/views/Reports/SpacePlanningReports/Report1/Report1.vue'
 Vue.use(Router)
 
 export default new Router({
@@ -54,5 +55,15 @@ export default new Router({
     path: '/RangePlanning',
     name: 'range_planning',
     component: RangePlanning,
-  }]
+  }, {
+    path: '/Reports',
+    name: 'Reports',
+    component: ReportShell,
+    children: [{
+      path: '/Reports/SpacePlanning/Report1',
+      name: 'spaceReport1',
+      component: spaceReport1
+    }]
+ 
+  },]
 })
