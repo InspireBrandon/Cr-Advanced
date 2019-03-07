@@ -9,6 +9,8 @@ import Main from '@/components/Main/Index.vue'
 import Home from '@/components/Main/Home/Index.vue'
 import Apps from '@/components/Main/Apps/Index.vue'
 import User from '@/components/Main/User/Index.vue'
+import Store from '@/components/Main/Store/Index.vue'
+import ReportShell from '@/views/Reports/Index.vue'
 
 // Apps
 import RangePlanning from '@/components/Apps/RangePlanning/Index.vue'
@@ -18,8 +20,8 @@ import Space_Planning_Details from '@/views/App_Details/SPACE_PLANNING.vue'
 import Range_Planning_Details from '@/views/App_Details/RANGE_PLANNING.vue'
 
 //reports
-import ReportShell from '@/views/Reports/Index.vue'
 import spaceReport1 from '@/views/Reports/SpacePlanningReports/Report1/Report1.vue'
+
 Vue.use(Router)
 
 export default new Router({
@@ -44,6 +46,10 @@ export default new Router({
       name: 'apps',
       component: Apps,
     }, {
+      path: '/Store',
+      name: 'store',
+      component: Store,
+    }, {
       path: '/User',
       name: 'user',
       component: User,
@@ -57,10 +63,6 @@ export default new Router({
       component: Range_Planning_Details
     }]
   }, {
-    path: '/RangePlanning',
-    name: 'range_planning',
-    component: RangePlanning,
-  }, {
     path: '/Reports',
     name: 'Reports',
     component: ReportShell,
@@ -69,6 +71,6 @@ export default new Router({
       name: 'spaceReport1',
       component: spaceReport1
     }]
- 
-  },]
+
+  }, ]
 })

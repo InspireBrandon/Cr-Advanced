@@ -49,17 +49,17 @@
                     <v-btn icon slot="activator">
                         <v-avatar size="40">
                             <!-- <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John"> -->
-                            <v-img src="data:image/png;base64,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"></v-img>
+                            <v-img :src="'data:image/png;base64,' + profile.image"></v-img>
                         </v-avatar>
                     </v-btn>
                     <v-card>
                         <v-list>
                             <v-list-tile avatar>
                                 <v-list-tile-avatar>
-                                    <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John">
+                                    <img :src="'data:image/png;base64,' + profile.image" alt="John">
                                 </v-list-tile-avatar>
                                 <v-list-tile-content>
-                                    <v-list-tile-title>John Dorfling</v-list-tile-title>
+                                    <v-list-tile-title>{{ profile.firstname }} {{ profile.lastname }}</v-list-tile-title>
                                 </v-list-tile-content>
                             </v-list-tile>
                         </v-list>
@@ -76,7 +76,7 @@
 
                             <v-divider></v-divider>
 
-                            <v-list-tile  @click="$router.push('/Account')">
+                            <v-list-tile @click="$router.push('/Account')">
                                 <v-list-tile-avatar>
                                     <v-icon>lock</v-icon>
                                 </v-list-tile-avatar>
@@ -85,7 +85,16 @@
 
                             <v-divider></v-divider>
 
-                            <v-list-tile  @click="$router.push('/Login')">
+                            <v-list-tile @click="$router.push('/Account')">
+                                <v-list-tile-avatar>
+                                    <v-icon>notifications</v-icon>
+                                </v-list-tile-avatar>
+                                <v-list-tile-title>Notifications</v-list-tile-title>
+                            </v-list-tile>
+
+                            <v-divider></v-divider>
+
+                            <v-list-tile @click="$router.push('/Login')">
                                 <v-list-tile-avatar>
                                     <v-icon>exit_to_app</v-icon>
                                 </v-list-tile-avatar>
@@ -104,11 +113,17 @@
 </template>
 
 <script>
+    import Axios from 'axios';
+    import jwt from 'jsonwebtoken';
+
     export default {
         name: 'main-page',
         data() {
             return {
                 drawer: false,
+                profile: {
+                    image: ''
+                },
                 topList: [
                     new NavigationItem({
                         title: 'Home',
@@ -121,9 +136,19 @@
                         route: '/Apps'
                     }),
                     new NavigationItem({
+                        title: "Store",
+                        icon: "local_grocery_store",
+                        route: "store",
+                    }),
+                    new NavigationItem({
                         title: 'Reports',
                         icon: 'bar_chart',
                         route: '/Reports'
+                    }),
+                    new NavigationItem({
+                        title: 'Files',
+                        icon: 'cloud',
+                        route: '/Files'
                     })
                 ],
                 bottomList: [
@@ -149,6 +174,20 @@
                     // })
                 ]
             }
+        },
+        created() {
+            this.getAccountDetails()
+        },
+        methods: {
+            getAccountDetails() {
+                let self = this;
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+
+                Axios.get(process.env.VUE_APP_API + `SystemUser?id=${encoded_details.USER_ID}`)
+                    .then(r => {
+                        self.profile = r.data;
+                    })
+            },
         }
     }
 
