@@ -1,8 +1,8 @@
 <template>
     <v-container fluid grid-list-md>
         <v-layout row wrap>
-            <v-flex lg3 md4 sm4 xs12 v-for="(appDetail, index) in appDetails" :key="index">
-                <app-block :openApp="openApp" :appDetails="appDetail"></app-block>
+            <v-flex lg3 md4 sm4 xs12 v-for="(appConfigDetail, index) in appConfigDetail" :key="index">
+                <app-block :appConfigDetail="appConfigDetail"></app-block>
             </v-flex>
             <v-flex lg4 md4 sm4 xs4>
             </v-flex>
@@ -21,28 +21,31 @@
         },
         data() {
             return {
-                appDetails: [],
+                apps: [],
+                appConfigDetail: [],
+                applicationHelper: null,
+                applicationConfigHelper: null,
                 applicationDetailsHelper: null,
             }
         },
         created() {
             let self = this;
             self.applicationDetailsHelper = new ApplicationDetailsHelper();
-            self.appDetails = self.applicationDetailsHelper.getAllApplicationDetails();
+            self.apps = self.applicationDetailsHelper.getAllApplications();
+
+            self.apps.forEach(app => {
+                self.appConfigDetail.push(new ConfigDetail(
+                    self.applicationDetailsHelper.getApplicationConfigBySystemCode(app.system_code),
+                    self.applicationDetailsHelper.getApplicationDetailsBySystemCode(app.system_code)
+                ));
+            })
         },
         methods: {
-            openApp(appDetail) {
-
-                console.log(appDetail);
-
-                // let routeData = this.$router.resolve({
-                //     name: 'range_planning',
-                //     // query: {
-                //     //     data: "someData"
-                //     // }
-                // });
-                // window.open(routeData.href, '_blank');
-            }
         }
+    }
+
+    function ConfigDetail(config, detail) {
+        this.config = config;
+        this.detail = detail;
     }
 </script>

@@ -1,4 +1,14 @@
 {
-    "openInNewWindow": false,
-    "report": true
+    "report": true,
+    "routes": [{
+        "route": "/SpacePlanning",
+        "routeName": "/space_planning",
+        "title": "Space Planning",
+        "openInNewWindow": true
+    }, {
+        "route": "/Fixtures",
+        "routeName": "/fixtures",
+        "title": "Default Fixtures",
+        "openInNewWindow": false
+    }]
 }

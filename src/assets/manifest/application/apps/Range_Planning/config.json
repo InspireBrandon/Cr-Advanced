@@ -1,5 +1,13 @@
 
 {
     "openInNewWindow": false,
-    "report":true
+    "report":true,
+    "routes": [
+        {
+            "route": "/RangePlanning",
+            "routeName": "/range_planning",
+            "title": "Range Planning",
+            "openInNewWindow": false
+        }
+    ]
 }

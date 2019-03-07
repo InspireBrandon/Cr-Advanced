@@ -1,6 +1,6 @@
-import ApplicationHelper from "./application-helper";
+import ApplicationConfigHelper from "./application-config-helper";
 
-class ApplicationDetailsHelper extends ApplicationHelper {
+class ApplicationDetailsHelper extends ApplicationConfigHelper {
     constructor() {
         super()
     }

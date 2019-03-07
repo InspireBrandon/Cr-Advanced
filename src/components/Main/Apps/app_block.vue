@@ -1,8 +1,8 @@
 <template>
     <div>
-        <span class="app_name">{{ appDetails.name }}</span>
+        <span class="app_name">{{ appConfigDetail.detail.name }}</span>
         <v-card class="elevation-0">
-            <v-img :src="appDetails.imgSrc" height="200px">
+            <v-img :src="appConfigDetail.detail.imgSrc" height="200px">
                 <v-container fill-height fluid pa-2>
                     <v-layout fill-height>
                         <v-flex xs12 align-end flexbox>
@@ -13,9 +13,22 @@
             </v-img>
 
             <v-card-actions>
-                <v-btn flat @click="openApp(appDetails)">
+                <v-btn @click="openApp(appConfigDetail.config.routes[0])" v-if="appConfigDetail.config.routes.length == 1"
+                    flat>
                     Launch
                 </v-btn>
+                <v-menu offset-y v-if="appConfigDetail.config.routes.length > 1">
+                    <v-btn slot="activator" flat>
+                        Launch
+                    </v-btn>
+                    <v-list>
+                        <v-list-tile @click="openApp(routeItem)" v-for="(routeItem, index) in appConfigDetail.config.routes"
+                            :key="index">
+                            <v-list-tile-title>{{ routeItem.title }}</v-list-tile-title>
+                            <v-divider></v-divider>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
                 <v-spacer></v-spacer>
                 <v-menu :close-on-content-click="false" offset-y bottom>
                     <v-btn slot="activator" icon>
@@ -37,7 +50,7 @@
                             </v-list-tile>
                         </v-list>
                         <v-divider></v-divider>
-                        <div class="app_version">version: {{ appDetails.version }}</div>
+                        <div class="app_version">version: {{ appConfigDetail.detail.version }}</div>
                     </v-card>
                 </v-menu>
             </v-card-actions>
@@ -48,7 +61,22 @@
 <script>
     export default {
         name: 'app_block',
-        props: ['appDetails', 'openApp']
+        props: ['appConfigDetail'],
+        methods: {
+            openApp(routeItem) {
+                let self = this;
+
+                if (routeItem.openInNewWindow) {
+                    let routeData = this.$router.resolve({
+                        name: routeItem.routeName
+                    });
+
+                    window.open(routeData.href, '_blank');
+                } else {
+                    self.$router.push(routeItem.route)
+                }
+            }
+        }
     }
 </script>
 
