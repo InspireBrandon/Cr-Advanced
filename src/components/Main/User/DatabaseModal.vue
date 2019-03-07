@@ -2,22 +2,15 @@
     <v-dialog transition="dialog-bottom-transition" fullscreen persistent v-model="modalShow">
         <v-card>
             <v-toolbar>
-                <v-toolbar-title>Account Details</v-toolbar-title>
+                <v-toolbar-title>Database Details</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-btn color="error" @click="close"> close
                 </v-btn>
             </v-toolbar>
             <v-container grid-list-md>
                 <v-layout row wrap>
-                    <v-flex lg12 md12 sm12 xs12>
-                        <h3>General</h3>
-                    </v-flex>
                     <v-flex lg6 md6 sm12 xs12>
-                        <v-text-field label="Domain" v-model="domain"> </v-text-field>
-                    </v-flex>
-                    <v-flex lg6 md6 sm12 xs12></v-flex>
-                    <v-flex lg6 md6 sm12 xs12>
-                        <v-text-field label="Country" v-model="country"> </v-text-field>
+                        <v-text-field label="Database Name" v-model="databaseFriendly"> </v-text-field>
                     </v-flex>
                 </v-layout>
                 <v-divider></v-divider>
@@ -36,12 +29,13 @@
 
         data() {
             return {
-                accountProfileID: -1,
-                accountProfileUID: '',
-                accountID: -1,
-                domain: '',
-                country: '',
-                image: '',
+                tenantID: -1,
+                tenantUID: '',
+                databaseName: '',
+                databaseFriendly: '',
+                licenseID: -1,
+                created: false,
+                retryCount: 0,
                 userID: -1,
                 displayImage: 'https://vuetifyjs.com/apple-touch-icon-180x180.png',
                 modalShow: false,
@@ -54,14 +48,16 @@
                 let self = this
 
                 let request = {
-                    accountProfileID: self.accountProfileID,
-                    accountProfileUID: self.accountProfileUID,
-                    accountID: self.accountID,
-                    domain: self.domain,
-                    country: self.country
+                    tenantID: self.tenantID,
+                    tenantUID: self.tenantUID,
+                    databaseName: self.databaseName,
+                    databaseFriendly: self.databaseFriendly,
+                    licenseID: self.licenseID,
+                    created: self.created,
+                    retryCount: self.retryCount
                 };
 
-                Axios.post(process.env.VUE_APP_API + `AccountProfile?userID=${self.userID}`, request)
+                Axios.post(process.env.VUE_APP_API + `Tenant?userID=${self.userID}`, request)
                     .then(r => {
                         if (r.data) {
                             self.afterClose(request)

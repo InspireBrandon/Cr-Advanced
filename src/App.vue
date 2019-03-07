@@ -7,8 +7,11 @@
 </template>
 
 <script>
-export default {
-  created() {
+  export default {
+    created() {
+      if (sessionStorage.accessToken == undefined) {
+        this.$router.push('/Login');
+      }
+    }
   }
-}
 </script>

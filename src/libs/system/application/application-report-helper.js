@@ -12,7 +12,7 @@ class ApplicationReportHelper extends ApplicationConfigHelper {
         self.applicationList.forEach(application => {
             // Get application config
             let applicationConfig = self.getApplicationConfigBySystemCode(application.system_code);
-            if (applicationConfig.hasReport == true) {
+            if (applicationConfig.report == true) {
                 reportList.push(self.getReportConfig(application.system_code));
             }
         });

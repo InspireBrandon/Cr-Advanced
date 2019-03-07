@@ -2,7 +2,6 @@
     <v-container fluid grid-list-md>
         <v-layout row wrap>
             <v-flex lg8 md8 sm8 xs8>
-                News
                 <v-container fluid grid-list-md>
                     <v-layout row wrap>
                         <v-flex lg12 md12 sm12 xs12 v-for="i in 5" :key="i">

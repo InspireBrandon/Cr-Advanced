@@ -1,10 +1,5 @@
 
 {
-    "id": 1,
-    "name": "Range Planning",
-    "system_code": "RANGE_PLANNING",
-    "version": "1.0.0.0",
-    
-    "hasReport":true
-
+    "openInNewWindow": false,
+    "report":true
 }

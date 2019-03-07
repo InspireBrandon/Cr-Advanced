@@ -1,6 +1,6 @@
 <template>
     <div>
-        <span @click="$router.push(`/${appDetails.sys_code}_DETAILS`)" class="app_name">{{ appDetails.name }}</span>
+        <span class="app_name">{{ appDetails.name }}</span>
         <v-card class="elevation-0">
             <v-img :src="appDetails.imgSrc" height="200px">
                 <v-container fill-height fluid pa-2>
@@ -13,7 +13,7 @@
             </v-img>
 
             <v-card-actions>
-                <v-btn flat @click="openApp">
+                <v-btn flat @click="openApp(appDetails)">
                     Launch
                 </v-btn>
                 <v-spacer></v-spacer>

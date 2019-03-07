@@ -7,7 +7,7 @@
                 <v-btn color="error" @click="close"> close
                 </v-btn>
             </v-toolbar>
-            <v-container grid-list-md class="text-md-center">
+            <v-container grid-list-md>
                 <v-layout row wrap>
                     <v-flex lg12 md12 sm12 xs12>
                         <v-avatar :tile="false" :size="150" color="grey lighten-4">
