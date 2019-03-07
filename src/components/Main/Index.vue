@@ -76,7 +76,7 @@
 
                             <v-divider></v-divider>
 
-                            <v-list-tile  @click="$router.push('/Account')">
+                            <v-list-tile @click="$router.push('/Account')">
                                 <v-list-tile-avatar>
                                     <v-icon>lock</v-icon>
                                 </v-list-tile-avatar>
@@ -85,7 +85,16 @@
 
                             <v-divider></v-divider>
 
-                            <v-list-tile  @click="$router.push('/Login')">
+                            <v-list-tile @click="$router.push('/Account')">
+                                <v-list-tile-avatar>
+                                    <v-icon>notifications</v-icon>
+                                </v-list-tile-avatar>
+                                <v-list-tile-title>Notifications</v-list-tile-title>
+                            </v-list-tile>
+
+                            <v-divider></v-divider>
+
+                            <v-list-tile @click="$router.push('/Login')">
                                 <v-list-tile-avatar>
                                     <v-icon>exit_to_app</v-icon>
                                 </v-list-tile-avatar>
@@ -119,6 +128,11 @@
                         title: 'Apps',
                         icon: 'apps',
                         route: '/Apps'
+                    }),
+                    new NavigationItem({
+                        title: "Store",
+                        icon: "local_grocery_store",
+                        route: "store",
                     }),
                     new NavigationItem({
                         title: 'Reports',
