@@ -11,6 +11,7 @@ import Apps from '@/components/Main/Apps/Index.vue'
 import User from '@/components/Main/User/Index.vue'
 import Store from '@/components/Main/Store/Index.vue'
 import ReportShell from '@/views/Reports/Index.vue'
+import Account from '@/components/Main/Account/Index.vue'
 
 // Apps
 import RangePlanning from '@/components/Apps/RangePlanning/Index.vue'
@@ -38,30 +39,36 @@ export default new Router({
     name: 'main',
     component: Main,
     children: [{
-      path: '/Home',
-      name: 'home',
-      component: Home
-    }, {
-      path: '/Apps',
-      name: 'apps',
-      component: Apps,
-    }, {
-      path: '/Store',
-      name: 'store',
-      component: Store,
-    }, {
-      path: '/User',
-      name: 'user',
-      component: User,
-    }, {
-      path: '/SpacePlanning_Details',
-      name: 'space_planning_details',
-      component: Space_Planning_Details
-    }, {
-      path: '/RangePlanning_Details',
-      name: 'range_planning_details',
-      component: Range_Planning_Details
-    }]
+        path: '/Home',
+        name: 'home',
+        component: Home
+      }, {
+        path: '/Account',
+        name: 'account',
+        component: Account,
+      },
+      {
+        path: '/Apps',
+        name: 'apps',
+        component: Apps,
+      }, {
+        path: '/Store',
+        name: 'store',
+        component: Store,
+      }, {
+        path: '/User',
+        name: 'user',
+        component: User,
+      }, {
+        path: '/SpacePlanning_Details',
+        name: 'space_planning_details',
+        component: Space_Planning_Details
+      }, {
+        path: '/RangePlanning_Details',
+        name: 'range_planning_details',
+        component: Range_Planning_Details
+      }
+    ]
   }, {
     path: '/Reports',
     name: 'Reports',
