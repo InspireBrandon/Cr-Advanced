@@ -1,18 +1,21 @@
 <template>
-    <v-container fluid grid-list-md>
-        <v-toolbar dense flat>
-            <v-toolbar-title>New</v-toolbar-title>
-        </v-toolbar>
-        <v-layout row wrap>
-            <v-flex>
-                <v-card color="grey darken-4">
-                    <v-card-text>
-                        <store-carousel :appConfigDetail="appConfigDetail"></store-carousel>
-                    </v-card-text>
-                </v-card>
-            </v-flex>
-        </v-layout>
-    </v-container>
+    <div>
+        <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear>
+        <v-container v-if="!showLoader" fluid grid-list-md>
+            <v-toolbar dense flat>
+                <v-toolbar-title>New</v-toolbar-title>
+            </v-toolbar>
+            <v-layout row wrap>
+                <v-flex>
+                    <v-card flat color="grey darken-4">
+                        <v-card-text>
+                            <store-carousel :appConfigDetail="appConfigDetail"></store-carousel>
+                        </v-card-text>
+                    </v-card>
+                </v-flex>
+            </v-layout>
+        </v-container>
+    </div>
 </template>
 
 <script>
@@ -26,6 +29,7 @@
         },
         data() {
             return {
+                showLoader: true,
                 apps: [],
                 appConfigDetail: [],
                 applicationHelper: null,
@@ -44,6 +48,10 @@
                     self.applicationDetailsHelper.getApplicationDetailsBySystemCode(app.system_code)
                 ));
             })
+
+            setTimeout(() => {
+                    self.showLoader = false;
+            }, 1000);
         },
         methods: {}
     }

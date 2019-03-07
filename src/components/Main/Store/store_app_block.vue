@@ -13,12 +13,8 @@
             </v-img>
 
             <v-card-actions>
-                <v-btn flat>
+                <v-btn style="width: 100%;" flat>
                     Install
-                </v-btn>
-                <v-spacer></v-spacer>
-                <v-btn icon small>
-                    <v-icon color="info">info</v-icon>
                 </v-btn>
             </v-card-actions>
         </v-card>
