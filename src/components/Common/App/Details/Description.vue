@@ -3,7 +3,29 @@
         <v-layout row wrap>
             <v-flex lg4 md4 sm4 xs4 offset-lg2 offset-md2 offset-sm2 offset-xs2>
                 <h1>{{ data.headline }}</h1>
-                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+                <br>
+                <p>Description:</p>
+                <hr>
+                <p>{{data.desciption.desciption}}</p>
+                <br>
+                <div v-for="(patch,count) in data.patchNotes" :key="count">
+                    <p>Patch Notes: {{patch.version}}</p>
+                    <hr>
+                    <div flat v-for="(item,index) in patch.notes" :key="index">
+                        <v-card flat dark>
+                            <v-card-title>
+                                {{item.type}}:
+                            </v-card-title>
+                            <v-divider></v-divider>
+                            <v-container>
+                                <v-layout>
+                                    * {{item.details}}
+                                </v-layout>
+                            </v-container>
+                        </v-card>
+                        <br>
+                    </div>
+                </div>
             </v-flex>
             <v-flex lg4 md4 sm4 xs4>
                 <v-img :aspect-ratio="16/9" :src="data.imgSrc"></v-img>
@@ -13,9 +35,12 @@
 </template>
 
 <script>
-export default {
-    name: 'app_details_description',
-    props: ['data']
-}
+    export default {
+        name: 'app_details_description',
+        props: ['data']
+    }
 </script>
+<style>
 
+
+</style>

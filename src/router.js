@@ -48,11 +48,11 @@ export default new Router({
       name: 'user',
       component: User,
     }, {
-      path: '/SPACE_PLANNING_DETAILS',
+      path: '/SpacePlanning_Details',
       name: 'space_planning_details',
       component: Space_Planning_Details
     }, {
-      path: '/RANGE_PLANNING_DETAILS',
+      path: '/RangePlanning_Details',
       name: 'range_planning_details',
       component: Range_Planning_Details
     }]

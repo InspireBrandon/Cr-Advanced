@@ -48,14 +48,12 @@
                                 <v-menu open-on-hover offset-x right>
                                     <template v-slot:activator="{ on }">
                                         <v-list-tile-content v-on="on">
-                                            <v-list-tile-title>{{ item.name }}</v-list-tile-title>
+                                            <v-list-tile-title>{{ item.component }}</v-list-tile-title>
                                         </v-list-tile-content>
-                                        <v-btn icon flat dark v-on="on">
-                                            <v-icon>list</v-icon>
-                                        </v-btn>
+                                       
                                     </template>
                                     <v-list>
-                                        <v-list-tile v-for="(e, index2) in item.components" :key="index2" @click="$router.push(e.route)">
+                                        <v-list-tile v-for="(e, index2) in item.reports" :key="index2" @click="$router.push(e.route)">
                                             <v-list-tile-title>{{ e.title }}</v-list-tile-title>
                                         </v-list-tile>
                                     </v-list>
@@ -89,7 +87,7 @@
 </template>
 <script>
     import ApplicationReportHelper from '@/libs/system/application/application-report-helper.js'
-
+    
     export default {
 
         data() {
@@ -112,7 +110,10 @@
                         route: '/Reports'
                     }
                 ],
-                applicationReports: []
+                categories: [],
+                applicationReports: [
+
+                ]
             }
 
 
@@ -120,17 +121,38 @@
         created() {
             var self = this
             self.applicationReportHelper = new ApplicationReportHelper();
-            self.appReports = self.applicationReportHelper.getAllReports()
-
-            self.appReports.forEach(element => {
-                for (let index = 0; index < element.length; index++) {
-                    const e = element[index];
-                    self.applicationReports.push(e)
+            let tmp = self.applicationReportHelper.applicationList
+            tmp.forEach(element => {
+                let config = self.applicationReportHelper.getApplicationConfigBySystemCode(element.system_code)
+                if (config.report) {
+                    let detail = self.applicationReportHelper.getApplicationDetailsBySystemCode(element.system_code)
+                    let reports = self.applicationReportHelper.getApplicationReports(element.system_code)
+                    let reportDetails = []
+                    reports.forEach(report=>{
+                        
+                        reportDetails.push(self.applicationReportHelper.getReportConfig(element.system_code,report.system_report_code))
+                    })
+                    self.applicationReports.push(new  ReportDetail(reportDetails,detail))
                 }
             });
+
         },
         methods: {
 
         }
+
+    }
+
+    function ReportDetail(reports, detail) {
+        let self = this;
+        self.component = detail.name;
+        self.reports = [];
+
+        reports.forEach(report => {
+            self.reports.push({
+                title: report.title,
+                route: report.route
+            })
+        })
     }
 </script>

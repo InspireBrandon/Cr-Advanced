@@ -21,6 +21,36 @@
                     imgSrc: 'https://cdn.vuetifyjs.com/images/parallax/material.jpg'
                 },
                 details_description_data: {
+                    desciption:{
+                        patchNotes:"No Change",
+                        desciption:"This app is used to build up store clustering and manipulate data, It is also used to obtain ranking as well as view general sales data",
+                    },
+                      patchNotes: [{
+                        version: "v1.2.0",
+                        notes: [{
+                                type: "Improvement",
+                                details: "Added patch Notes cause memes"
+                            },
+                           
+                        ]
+
+                    },{
+                        version: "v1.0.0",
+                        notes: [{
+                                type: "Improvement",
+                                details: "Added patch Notes"
+                            },
+                            {
+                                type: "Bug Fix",
+                                details: "Fixed patch notes not loading corretly"
+                            },
+                            {
+                                type: "improvement",
+                                details: "Added style to patch notes and repositioned the layout"
+                            }
+                        ]
+
+                    }],
                     headline: 'Range Planning',
                     imgSrc: 'https://www.icagruppen.se/globalassets/4.-hallbarhet/4.-hallbarhetsarbete/6.-historiskt-material/99.-halsa/halso-sortiment-lx-ny.jpg'
                 }

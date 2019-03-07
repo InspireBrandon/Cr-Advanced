@@ -1,6 +1,6 @@
-import ApplicationConfigHelper from "./application-config-helper";
+import ApplicationDetailsHelper from "./application-details-helper";
 
-class ApplicationReportHelper extends ApplicationConfigHelper {
+class ApplicationReportHelper extends ApplicationDetailsHelper {
     constructor() {
         super()
     }
@@ -13,17 +13,26 @@ class ApplicationReportHelper extends ApplicationConfigHelper {
             // Get application config
             let applicationConfig = self.getApplicationConfigBySystemCode(application.system_code);
             if (applicationConfig.report == true) {
-                reportList.push(self.getReportConfig(application.system_code));
+                let cfg = self.getReportConfig(application.system_code)
+                cfg.forEach(element => {
+                    reportList.push(self.getReport(application.system_code, element.system_report_code))
+                })
             }
+
         });
 
         return reportList
     }
 
-    getReportConfig(system_code) {
+    getApplicationReports(system_code) {
 
         return require(`@/assets/manifest/application/apps/${system_code}/Reports/reportConfig.json`);
 
     }
+    getReportConfig(system_code, system_report_code) {
+        return require(`@/assets/manifest/application/apps/${system_code}/Reports/${system_report_code}.json`);
+
+    }
+    
 }
 export default ApplicationReportHelper;
