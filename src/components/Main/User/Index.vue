@@ -19,7 +19,7 @@
                                         </v-layout>
                                     </v-card-title>
                                     <v-card-text>
-                                        <v-form @submit.prevent="">
+                                        <v-form >
                                             <v-layout row wrap>
                                                 <v-flex md6>
                                                     <v-text-field label="First Name" v-model="profile.firstname"></v-text-field>
