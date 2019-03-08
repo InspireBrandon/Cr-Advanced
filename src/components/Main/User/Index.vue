@@ -55,7 +55,9 @@
 <script>
     import Axios from 'axios';
     import jwt from 'jsonwebtoken';
-    import { EventBus } from '@/libs/events/event-bus.js';
+    import {
+        EventBus
+    } from '@/libs/events/event-bus.js';
 
     import ProfileModal from "./ProfileModal.vue"
     import AccountModal from "./AccountModal.vue"
@@ -104,10 +106,8 @@
 
                 Axios.put(process.env.VUE_APP_API + `SystemUser`, request)
                     .then(() => {
-                        setTimeout(() => {
-                            self.loading = false;
-                            EventBus.$emit('display-picture-changed', self.$refs.avatarImage.src);
-                        }, 1000);
+                        self.loading = false;
+                        EventBus.$emit('display-picture-changed', self.$refs.avatarImage.src);
                     })
             },
             getAccountDetails() {
@@ -118,9 +118,7 @@
                     .then(r => {
                         self.profile = r.data;
                         self.displayImage = 'data:image/png;base64,' + r.data.image;
-                        setTimeout(() => {
-                            self.showLoader = false;
-                        }, 1000);
+                        self.showLoader = false;
                     })
             },
             openFileDialog() {

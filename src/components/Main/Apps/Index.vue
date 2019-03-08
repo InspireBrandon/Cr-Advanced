@@ -44,9 +44,7 @@
                 ));
             })
 
-            setTimeout(() => {
-                    self.showLoader = false;
-            }, 1000);
+            self.showLoader = false;
         },
         methods: {}
     }

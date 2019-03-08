@@ -29,10 +29,7 @@
         },
         created() {
             let self = this;
-
-            setTimeout(() => {
-                self.showLoader = false;
-            }, 1000);
+            self.showLoader = false;
         },
         data() {
             return {

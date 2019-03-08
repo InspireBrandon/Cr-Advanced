@@ -80,9 +80,7 @@
                             }
                         }
 
-                        setTimeout(() => {
-                            self.showLoader = false;
-                        }, 1000);
+                        self.showLoader = false;
                     })
             },
             openFileDialog() {
@@ -130,10 +128,8 @@
 
                 Axios.post(process.env.VUE_APP_API + `SystemUserSetting`, request)
                     .then(() => {
-                        setTimeout(() => {
-                            self.loading = false;
-                            EventBus.$emit('background-picture-changed', self.$refs.backgroundImage.src);
-                        }, 1000);
+                        self.loading = false;
+                        EventBus.$emit('background-picture-changed', self.$refs.backgroundImage.src);
                     })
             }
         }
