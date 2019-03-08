@@ -13,7 +13,7 @@ import Store from '@/components/Main/Store/Index.vue'
 import Settings from '@/components/Main/Settings/Index.vue'
 import ReportShell from '@/views/Reports/Index.vue'
 import Account from '@/components/Main/Account/Index.vue'
-
+import Notifications from '@/components/Main/Notifications/Index.vue'
 // Apps
 import RangePlanning from '@/components/Apps/RangePlanning/Index.vue'
 
@@ -47,6 +47,10 @@ export default new Router({
       path: '/Apps',
       name: 'apps',
       component: Apps,
+    }, {
+      path: '/Notifications',
+      name: 'notifications',
+      component: Notifications,
     }, {
       path: '/Account',
       name: 'account',
