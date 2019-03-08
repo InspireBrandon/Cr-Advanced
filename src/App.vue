@@ -15,3 +15,14 @@
     }
   }
 </script>
+
+<style>
+  html {
+    overflow: hidden;
+  }
+
+  .main-main {
+    overflow: auto;
+    height: calc(100vh - 60px);
+  }
+</style>

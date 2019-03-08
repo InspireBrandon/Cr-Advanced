@@ -3,7 +3,7 @@
         <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear>
         <v-container v-if="!showLoader" fluid grid-list-md>
             <v-layout row wrap>
-                <v-flex lg3 md4 sm4 xs12 v-for="(appConfigDetail, index) in appConfigDetail" :key="index">
+                <v-flex lg3 md4 sm6 xs12 v-for="(appConfigDetail, index) in appConfigDetail" :key="index">
                     <app-block :appConfigDetail="appConfigDetail"></app-block>
                 </v-flex>
                 <v-flex lg4 md4 sm4 xs4>

@@ -116,8 +116,8 @@
             </v-badge>
         </v-toolbar>
         <v-content>
-            <v-img height="calc(100vh - 65px)" :src="backgroundImage">
-                <router-view></router-view>
+            <v-img height="calc(100vh - 55px)" :src="backgroundImage">
+                <router-view class="main-main"></router-view>
             </v-img>
         </v-content>
     </div>
