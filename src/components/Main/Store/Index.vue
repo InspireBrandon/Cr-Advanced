@@ -15,6 +15,9 @@
 </template>
 
 <script>
+    import Axios from 'axios';
+    import jwt from 'jsonwebtoken';
+
     import ApplicationDetailsHelper from '@/libs/system/application/application-details-helper.js';
     import store_carousel from '@/components/Main/Store/store_carousel.vue';
 
@@ -35,23 +38,50 @@
         },
         created() {
             let self = this;
-            self.applicationDetailsHelper = new ApplicationDetailsHelper();
-            self.apps = self.applicationDetailsHelper.getAllApplications();
-
-            self.apps.forEach(app => {
-                self.appConfigDetail.push(new ConfigDetail(
-                    self.applicationDetailsHelper.getApplicationConfigBySystemCode(app.system_code),
-                    self.applicationDetailsHelper.getApplicationDetailsBySystemCode(app.system_code)
-                ));
-            })
-
-            self.showLoader = false;
+            self.getInstalledApps();
         },
-        methods: {}
+        methods: {
+            getInstalledApps() {
+                let self = this;
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+
+                Axios.get(process.env.VUE_APP_API + `Features?systemUserID=${encoded_details.USER_ID}`)
+                    .then(r => {
+                        self.getAppsFromManifest(r.data)
+                        console.log(r.data);
+                    })
+            },
+            getAppsFromManifest(installedApps) {
+                let self = this;
+
+                self.applicationDetailsHelper = new ApplicationDetailsHelper();
+                self.apps = self.applicationDetailsHelper.getAllApplications();
+
+                self.apps.forEach(app => {
+                    let appInstalled = false
+
+                    installedApps.forEach(installedApp => {
+                        if(app.system_code == installedApp.systemCode)
+                            appInstalled = true;
+                    })
+
+                    self.appConfigDetail.push(new ConfigDetail(
+                        self.applicationDetailsHelper.getApplicationConfigBySystemCode(app.system_code),
+                        self.applicationDetailsHelper.getApplicationDetailsBySystemCode(app.system_code),
+                        app.system_code,
+                        appInstalled
+                    ));
+                })
+
+                self.showLoader = false;
+            }
+        }
     }
 
-    function ConfigDetail(config, detail) {
+    function ConfigDetail(config, detail, system_code, installed) {
         this.config = config;
         this.detail = detail;
+        this.system_code = system_code;
+        this.installed = installed
     }
 </script>

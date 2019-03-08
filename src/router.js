@@ -22,7 +22,7 @@ import Space_Planning_Details from '@/views/App_Details/SPACE_PLANNING.vue'
 import Range_Planning_Details from '@/views/App_Details/RANGE_PLANNING.vue'
 
 //reports
-import spaceReport1 from '@/views/Reports/SpacePlanningReports/Report1/Report1.vue'
+import spaceReport1 from '@/views/Reports/SPACE-PLANNING-REPORTS/Report1/Report1.vue'
 
 Vue.use(Router)
 

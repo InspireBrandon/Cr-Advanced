@@ -1,10 +1,10 @@
 [
     {
         "id": 1,
-        "system_code": "Range_Planning"
+        "system_code": "RANGE-PLANNING"
     },
     {
         "id": 2,
-        "system_code": "Space_Planning"
+        "system_code": "SPACE-PLANNING"
     }
 ]

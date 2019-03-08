@@ -1,5 +1,5 @@
 {
-    "configName":"SpacePlanning",
+    "configName":"SPACE-PLANNING",
     "report": true,
     "routes": [{
         "route": "/SpacePlanning",

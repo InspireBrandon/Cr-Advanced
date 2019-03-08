@@ -2,8 +2,7 @@
 {
     "configName":"RangePlanning",
     "openInNewWindow": false,
-    "report":true,
-
+    "report":false,
     "routes": [
         {
             "route": "/RangePlanning",

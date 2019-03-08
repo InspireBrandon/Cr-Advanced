@@ -13,8 +13,11 @@
             </v-img>
 
             <v-card-actions>
-                <v-btn style="width: 100%;" flat>
+                <v-btn v-if="!appConfigDetail.installed" @click="installApp" :loading="loading" style="width: 100%;" flat>
                     Install
+                </v-btn>
+                <v-btn v-else @click="uninstallApp" :loading="loading" style="width: 100%;">
+                    Uninstall
                 </v-btn>
             </v-card-actions>
         </v-card>
@@ -22,22 +25,43 @@
 </template>
 
 <script>
+    import Axios from 'axios';
+    import jwt from 'jsonwebtoken';
+
     export default {
+        data() {
+            return {
+                loading: false
+            }
+        },
         name: 'app_block',
         props: ['appConfigDetail'],
         methods: {
-            openApp(routeItem) {
+            installApp() {
                 let self = this;
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                self.loading = true;
 
-                if (routeItem.openInNewWindow) {
-                    let routeData = this.$router.resolve({
-                        name: routeItem.routeName
-                    });
+                Axios.post(process.env.VUE_APP_API +
+                        `Features/Install?systemUserID=${encoded_details.USER_ID}&systemCode=${self.appConfigDetail.system_code}`
+                    )
+                    .then(r => {
+                        self.loading = false;
+                        self.appConfigDetail.installed = true;
+                    })
+            },
+            uninstallApp() {
+                let self = this;
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                self.loading = true;
 
-                    window.open(routeData.href, '_blank');
-                } else {
-                    self.$router.push(routeItem.route)
-                }
+                Axios.post(process.env.VUE_APP_API +
+                        `Features/Uninstall?systemUserID=${encoded_details.USER_ID}&systemCode=${self.appConfigDetail.system_code}`
+                    )
+                    .then(r => {
+                        self.loading = false;
+                        self.appConfigDetail.installed = false;
+                    })
             }
         }
     }
