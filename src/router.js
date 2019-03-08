@@ -48,6 +48,10 @@ export default new Router({
       name: 'apps',
       component: Apps,
     }, {
+      path: '/Account',
+      name: 'account',
+      component: Account,
+    }, {
       path: '/Store',
       name: 'store',
       component: Store,
