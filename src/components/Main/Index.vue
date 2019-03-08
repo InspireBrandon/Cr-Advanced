@@ -137,7 +137,7 @@
                 avatarImage: '',
                 backgroundImage: '',
                 eventBus: null,
-                drawer: false,
+                drawer: true,
                 profile: {
                     image: ''
                 },
