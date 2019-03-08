@@ -3,56 +3,42 @@
         <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear>
         <v-container grid-list-md v-if="!showLoader">
             <v-layout row wrap>
-                <v-flex lg8 md8 sm12 xs12>
-                    <v-container grid-list-md>
-                        <v-layout row wrap>
-                            <v-flex lg12 md12 sm12 xs12>
-                                <v-toolbar flat color="secondary">
-                                    <v-toolbar-title>Databases</v-toolbar-title>
-                                    <v-spacer></v-spacer>
-                                    <v-btn @click="openDatabaseModal" :disabled="profile.accountID == null" color="primary">Add
-                                        New Database</v-btn>
-                                </v-toolbar>
-                            </v-flex>
-                            <v-flex lg12 md12 sm12 xs12 v-for="(item,index) in dataBases" :key=index>
-                                <v-card flat>
-                                    <v-container>
-                                        <v-layout>
-                                            <v-flex> {{item.databaseName}}</v-flex>
-                                            <v-spacer></v-spacer>
-                                            <v-btn class="pa-0 ma-0" icon>
-                                                <v-icon>edit</v-icon>
-                                            </v-btn>
-                                        </v-layout>
-                                    </v-container>
-                                </v-card>
-                            </v-flex>
-                            <v-flex lg12 md12 sm12 xs12 v-if="profile.accountID == null">
-                                <p>In order to create a database you must first register an account. Please <a href="#"
-                                        @click.prevent="openAccountModal">click here</a> to register.</p>
-                            </v-flex>
-                        </v-layout>
-                    </v-container>
-                </v-flex>
-                <v-flex lg4 md4 sm12 xs12>
+                <v-flex lg12 md12 sm12 xs12>
                     <v-container grid-list-md>
                         <v-layout row wrap>
                             <v-flex lg12 md12 sm12 xs12>
                                 <v-card flat>
                                     <v-card-title primary-title>
-                                        <v-layout class="header text-md-center" row wrap>
+                                        <v-layout class="header text-xs-center" row wrap>
                                             <v-flex lg12 md12 sm12 xs12>
                                                 <v-avatar :tile="false" :size="150" color="grey lighten-4">
-                                                    <img :src="'data:image/png;base64,' + profile.image" alt="avatar">
+                                                    <img @click="openFileDialog" ref="avatarImage" :src="displayImage"
+                                                        alt="avatar">
                                                 </v-avatar>
-                                                <h3 class="headline">{{profile.firstname}} {{profile.lastname}}</h3>
-                                            </v-flex>
-                                            <v-divider />
-                                            <v-flex lg12 md12 sm12 xs12>
-                                                <v-btn @click="openProfileModal" color="info" flat>Update profile</v-btn>
                                             </v-flex>
                                         </v-layout>
                                     </v-card-title>
+                                    <v-card-text>
+                                        <v-form @submit.prevent="">
+                                            <v-layout row wrap>
+                                                <v-flex md6>
+                                                    <v-text-field label="First Name" v-model="profile.firstname"></v-text-field>
+                                                </v-flex>
+                                                <v-flex md6>
+                                                    <v-text-field label="Last Name" v-model="profile.lastname"></v-text-field>
+                                                </v-flex>
+                                                <v-flex md6>
+                                                    <v-text-field label="Email Address" v-model="profile.emailAddress"></v-text-field>
+                                                </v-flex>
+                                                <input @change="onImageChange" type="file" style="display: none;" ref="fileInput">
+                                            </v-layout>
+                                        </v-form>
+                                    </v-card-text>
+                                    <v-card-actions>
+                                        <v-spacer></v-spacer>
+                                        <v-btn color="primary" :loading="loading" @click="submit">save</v-btn>
+                                        <v-btn color="grey darken-1" @click="$router.go(-1)">cancel</v-btn>
+                                    </v-card-actions>
                                 </v-card>
                             </v-flex>
                         </v-layout>
@@ -69,6 +55,7 @@
 <script>
     import Axios from 'axios';
     import jwt from 'jsonwebtoken';
+    import { EventBus } from '@/libs/events/event-bus.js';
 
     import ProfileModal from "./ProfileModal.vue"
     import AccountModal from "./AccountModal.vue"
@@ -82,19 +69,47 @@
         },
         data() {
             return {
+                loading: false,
                 account: true,
                 profile: {
                     image: ''
                 },
                 features: [],
                 dataBases: [],
-                showLoader: true
+                showLoader: true,
+                displayImage: '',
             }
         },
         created() {
             this.getAccountDetails()
         },
         methods: {
+            submit() {
+                let self = this
+
+                self.loading = true;
+
+                let request = {
+                    systemUserID: self.profile.systemUserID,
+                    systemUserUID: self.profile.systemUserUID,
+                    accountID: self.profile.accountID,
+                    firstname: self.profile.firstname,
+                    lastname: self.profile.lastname,
+                    emailAddress: self.profile.emailAddress,
+                    username: self.profile.username,
+                    password: self.profile.password,
+                    superUser: self.profile.superUser,
+                    image: self.profile.image
+                };
+
+                Axios.put(process.env.VUE_APP_API + `SystemUser`, request)
+                    .then(() => {
+                        setTimeout(() => {
+                            self.loading = false;
+                            EventBus.$emit('display-picture-changed', self.$refs.avatarImage.src);
+                        }, 1000);
+                    })
+            },
             getAccountDetails() {
                 let self = this;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
@@ -102,53 +117,43 @@
                 Axios.get(process.env.VUE_APP_API + `SystemUser?id=${encoded_details.USER_ID}`)
                     .then(r => {
                         self.profile = r.data;
-
-                        if (self.profile.accountID != null) {
-                            self.getDatabases(encoded_details.USER_ID);
-                        } else {
-                            setTimeout(() => {
-                                self.showLoader = false;
-                            }, 1000);
-                        }
-                    })
-            },
-            getDatabases(userID) {
-                let self = this;
-
-                Axios.get(process.env.VUE_APP_API + `Tenant?userID=${userID}`)
-                    .then(r => {
-                        self.dataBases = r.data;
+                        self.displayImage = 'data:image/png;base64,' + r.data.image;
                         setTimeout(() => {
                             self.showLoader = false;
                         }, 1000);
                     })
             },
-            openProfileModal() {
-                let self = this
-                self.$refs.ProfileModal.open(self.profile, function () {
-                    self.getAccountDetails();
-                    self.$refs.ProfileModal.close();
-                })
-            },
-            openAccountModal() {
-                let self = this
-
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
-
-                self.$refs.AccountModal.open(encoded_details.USER_ID, function () {
-                    self.getAccountDetails();
-                    self.$refs.AccountModal.close();
-                })
-            },
-            openDatabaseModal() {
+            openFileDialog() {
                 let self = this;
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                self.$refs.fileInput.value = null
+                self.$refs.fileInput.click();
+            },
+            onImageChange(e) {
+                let self = this;
 
-                self.$refs.DatabaseModal.open(encoded_details.USER_ID, function () {
-                    self.getAccountDetails();
-                    self.$refs.DatabaseModal.close();
+                const files = e.target.files;
+                let file = files[0];
+                self.blobToDataUrl(file, url => {
+                    self.$refs.avatarImage.src = url;
+                    self.blobToArrayBuffer(file, result => {
+                        self.profile.image = Array.from(new Uint8Array(result));
+                    })
                 })
-            }
+            },
+            blobToArrayBuffer(blob, callback) {
+                var a = new FileReader();
+                a.onload = function () {
+                    callback(a.result);
+                }
+                a.readAsArrayBuffer(blob);
+            },
+            blobToDataUrl(blob, callback) {
+                var a = new FileReader();
+                a.onload = function () {
+                    callback(a.result);
+                }
+                a.readAsDataURL(blob);
+            },
         }
     }
 </script>

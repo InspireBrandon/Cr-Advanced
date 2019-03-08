@@ -37,7 +37,7 @@
                 </v-list>
             </v-layout>
         </v-navigation-drawer>
-        <v-toolbar app flat clipped-left>
+        <v-toolbar app clipped-left>
             <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
             <span class="title ml-3 mr-5">Chain&nbsp;<span class="font-weight-light">Research</span></span>
             <v-spacer></v-spacer>
@@ -49,14 +49,14 @@
                     <v-btn icon slot="activator">
                         <v-avatar size="40">
                             <!-- <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John"> -->
-                            <v-img :src="'data:image/png;base64,' + profile.image"></v-img>
+                            <img ref="avatar" v-if="profile.image != ''" :src="avatarImage">
                         </v-avatar>
                     </v-btn>
                     <v-card>
                         <v-list>
                             <v-list-tile avatar>
                                 <v-list-tile-avatar>
-                                    <img :src="'data:image/png;base64,' + profile.image" alt="John">
+                                    <img v-if="profile.image != ''" :src="avatarImage">
                                 </v-list-tile-avatar>
                                 <v-list-tile-content>
                                     <v-list-tile-title>{{ profile.firstname }} {{ profile.lastname }}</v-list-tile-title>
@@ -94,6 +94,15 @@
 
                             <v-divider></v-divider>
 
+                            <v-list-tile @click="$router.push('/Settings')">
+                                <v-list-tile-avatar>
+                                    <v-icon>settings</v-icon>
+                                </v-list-tile-avatar>
+                                <v-list-tile-title>Settings</v-list-tile-title>
+                            </v-list-tile>
+
+                            <v-divider></v-divider>
+
                             <v-list-tile @click="$router.push('/Login')">
                                 <v-list-tile-avatar>
                                     <v-icon>exit_to_app</v-icon>
@@ -107,7 +116,9 @@
             </v-badge>
         </v-toolbar>
         <v-content>
-            <router-view></router-view>
+            <v-img height="calc(100vh - 65px)" :src="backgroundImage">
+                <router-view></router-view>
+            </v-img>
         </v-content>
     </div>
 </template>
@@ -115,14 +126,23 @@
 <script>
     import Axios from 'axios';
     import jwt from 'jsonwebtoken';
+    import {
+        EventBus
+    } from '@/libs/events/event-bus.js';
 
     export default {
         name: 'main-page',
         data() {
             return {
+                avatarImage: '',
+                backgroundImage: '',
+                eventBus: null,
                 drawer: false,
                 profile: {
                     image: ''
+                },
+                settings: {
+                    backgroundImage: ''
                 },
                 topList: [
                     new NavigationItem({
@@ -176,7 +196,24 @@
             }
         },
         created() {
+            let self = this;
             this.getAccountDetails()
+            self.eventBus = EventBus;
+            self.eventBus.$off('display-picture-changed');
+            self.eventBus.$off('background-picture-changed');
+        },
+        mounted() {
+            let self = this;
+
+            self.eventBus.$on('display-picture-changed', newPicture => {
+                self.avatarImage = newPicture;
+                self.$router.go(-1);
+            })
+
+            self.eventBus.$on('background-picture-changed', newPicture => {
+                self.backgroundImage = newPicture;
+                self.$router.go(-1);
+            })
         },
         methods: {
             getAccountDetails() {
@@ -186,8 +223,19 @@
                 Axios.get(process.env.VUE_APP_API + `SystemUser?id=${encoded_details.USER_ID}`)
                     .then(r => {
                         self.profile = r.data;
+                        self.avatarImage = 'data:image/png;base64,' + self.profile.image;
+                        self.getUserSettings(encoded_details.USER_ID);
                     })
             },
+            getUserSettings(userID) {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API + `SystemUserSetting?systemUserID=${userID}`)
+                    .then(r => {
+                        self.settings = r.data;
+                        self.backgroundImage = 'data:image/png;base64,' + self.settings.backgroundImage;
+                    })
+            }
         }
     }
 

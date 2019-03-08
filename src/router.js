@@ -10,6 +10,7 @@ import Home from '@/components/Main/Home/Index.vue'
 import Apps from '@/components/Main/Apps/Index.vue'
 import User from '@/components/Main/User/Index.vue'
 import Store from '@/components/Main/Store/Index.vue'
+import Settings from '@/components/Main/Settings/Index.vue'
 import ReportShell from '@/views/Reports/Index.vue'
 
 // Apps
@@ -50,9 +51,17 @@ export default new Router({
       name: 'store',
       component: Store,
     }, {
+      path: '/Settings',
+      name: 'settings',
+      component: Settings,
+    }, {
       path: '/User',
       name: 'user',
       component: User,
+    }, {
+      path: '/RangePlanning',
+      name: 'range_planning',
+      component: RangePlanning,
     }, {
       path: '/SpacePlanning_Details',
       name: 'space_planning_details',
