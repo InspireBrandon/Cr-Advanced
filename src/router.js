@@ -12,6 +12,7 @@ import User from '@/components/Main/User/Index.vue'
 import Store from '@/components/Main/Store/Index.vue'
 import Settings from '@/components/Main/Settings/Index.vue'
 import ReportShell from '@/views/Reports/Index.vue'
+import Account from '@/components/Main/Account/Index.vue'
 
 // Apps
 import RangePlanning from '@/components/Apps/RangePlanning/Index.vue'
