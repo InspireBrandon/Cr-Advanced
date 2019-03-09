@@ -84,7 +84,7 @@
 
                             <v-divider></v-divider>
 
-                            <v-list-tile @click="$router.push('/Account')">
+                            <v-list-tile @click="$router.push('/Notifications')">
                                 <v-list-tile-avatar>
                                     <v-icon>notifications</v-icon>
                                 </v-list-tile-avatar>
