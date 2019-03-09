@@ -47,16 +47,15 @@
                 </template>
                 <v-menu>
                     <v-btn icon slot="activator">
-                        <v-avatar size="40">
-                            <!-- <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John"> -->
-                            <img ref="avatar" v-if="profile.image != ''" :src="avatarImage">
+                        <v-avatar style="padding: 2px;" color="white" size="42">
+                            <v-img ref="avatar" v-if="profile.image != ''" :src="avatarImage"></v-img>
                         </v-avatar>
                     </v-btn>
                     <v-card>
                         <v-list>
                             <v-list-tile avatar>
-                                <v-list-tile-avatar>
-                                    <img v-if="profile.image != ''" :src="avatarImage">
+                                <v-list-tile-avatar style="padding: 2px;" color="white">
+                                    <v-img ref="avatar" v-if="profile.image != ''" :src="avatarImage"></v-img>
                                 </v-list-tile-avatar>
                                 <v-list-tile-content>
                                     <v-list-tile-title>{{ profile.firstname }} {{ profile.lastname }}</v-list-tile-title>
@@ -117,6 +116,7 @@
         </v-toolbar>
         <v-content>
             <v-img height="calc(100vh - 55px)" :src="backgroundImage">
+                <!-- <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear> -->
                 <router-view class="main-main"></router-view>
             </v-img>
         </v-content>
@@ -138,6 +138,7 @@
                 backgroundImage: '',
                 eventBus: null,
                 drawer: true,
+                showLoader: true,
                 profile: {
                     image: ''
                 },
@@ -201,6 +202,7 @@
             self.eventBus = EventBus;
             self.eventBus.$off('display-picture-changed');
             self.eventBus.$off('background-picture-changed');
+            self.eventBus.$off('show-loader');
         },
         mounted() {
             let self = this;
@@ -213,6 +215,10 @@
             self.eventBus.$on('background-picture-changed', newPicture => {
                 self.backgroundImage = newPicture;
                 self.$router.go(-1);
+            })
+
+            self.eventBus.$on('show-loader', show => {
+                self.showLoader = show;
             })
         },
         methods: {

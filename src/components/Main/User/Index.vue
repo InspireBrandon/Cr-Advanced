@@ -11,9 +11,9 @@
                                     <v-card-title primary-title>
                                         <v-layout class="header text-xs-center" row wrap>
                                             <v-flex lg12 md12 sm12 xs12>
-                                                <v-avatar :tile="false" :size="150" color="grey lighten-4">
-                                                    <img @click="openFileDialog" ref="avatarImage" :src="displayImage"
-                                                        alt="avatar">
+                                                <v-avatar :tile="false" :size="150" color="white lighten-4">
+                                                    <v-img @click="openFileDialog" ref="avatarImage" :src="displayImage"
+                                                        alt="avatar"></v-img>
                                                 </v-avatar>
                                             </v-flex>
                                         </v-layout>
@@ -132,7 +132,7 @@
                 const files = e.target.files;
                 let file = files[0];
                 self.blobToDataUrl(file, url => {
-                    self.$refs.avatarImage.src = url;
+                    self.displayImage = url;
                     self.blobToArrayBuffer(file, result => {
                         self.profile.image = Array.from(new Uint8Array(result));
                     })

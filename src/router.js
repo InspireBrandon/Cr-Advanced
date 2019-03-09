@@ -16,6 +16,7 @@ import Account from '@/components/Main/Account/Index.vue'
 
 // Apps
 import RangePlanning from '@/components/Apps/RangePlanning/Index.vue'
+import Fixtures from '@/components/Apps/SpacePlanning/Fixtures/Index.vue'
 
 // App Details
 import Space_Planning_Details from '@/views/App_Details/SPACE_PLANNING.vue'
@@ -67,6 +68,10 @@ export default new Router({
       path: '/RangePlanning',
       name: 'range_planning',
       component: RangePlanning,
+    }, {
+      path: '/Fixtures',
+      name: 'fixtures',
+      component: Fixtures
     }, {
       path: '/SpacePlanning_Details',
       name: 'space_planning_details',
