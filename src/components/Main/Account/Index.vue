@@ -27,7 +27,7 @@
                                                 <v-icon>more_vert</v-icon>
                                             </v-btn>
                                             <v-list dense>
-                                                <v-list-tile avatar @click="maintainUsers">
+                                                <v-list-tile avatar @click="maintainUsers(item)">
                                                     <v-list-tile-avatar>
                                                         <v-icon>share</v-icon>
                                                     </v-list-tile-avatar>
@@ -157,7 +157,9 @@
             maintainUsers(database) {
                 let self = this;
 
-                self.$refs.DatabaseUserModal.open();
+                self.$refs.DatabaseUserModal.open(database.tenantID, function() {
+
+                });
             },
             deleteDatabase() {
                 let self = this;
@@ -251,10 +253,10 @@
                     self.domain = callback.domain
                 })
             },
-            openDatabaseModal() {
+            openDatabaseModal(database) {
                 let self = this;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
-                self.$refs.DatabaseModal.open(encoded_details.USER_ID, function () {
+                self.$refs.DatabaseModal.open(database.USER_ID, function () {
                     self.getAccountDetails(self.accountID);
                     self.$refs.DatabaseModal.close();
                 })

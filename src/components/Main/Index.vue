@@ -25,7 +25,7 @@
                     </v-list-tile>
                 </v-list>
                 <v-spacer></v-spacer>
-                <v-list>
+                <!-- <v-list>
                     <v-list-tile v-for="(item, idx) in bottomList" :key="idx" @click="$router.push(item.route)">
                         <v-list-tile-action>
                             <v-icon>{{ item.icon }}</v-icon>
@@ -34,7 +34,7 @@
                             <v-list-tile-title>{{ item.title }}</v-list-tile-title>
                         </v-list-tile-content>
                     </v-list-tile>
-                </v-list>
+                </v-list> -->
             </v-layout>
         </v-navigation-drawer>
         <v-toolbar app clipped-left>
@@ -63,7 +63,7 @@
                             </v-list-tile>
                         </v-list>
 
-                        <v-list dense>
+                        <v-list dense offset-x right>
                             <v-divider></v-divider>
 
                             <v-list-tile @click="$router.push('/User')">
@@ -102,6 +102,15 @@
 
                             <v-divider></v-divider>
 
+                            <v-list-tile @click="sheet = true">
+                                <v-list-tile-avatar>
+                                    <v-icon>storage</v-icon>
+                                </v-list-tile-avatar>
+                                <v-list-tile-title>Databases</v-list-tile-title>
+                            </v-list-tile>
+
+                            <v-divider></v-divider>
+
                             <v-list-tile @click="$router.push('/Login')">
                                 <v-list-tile-avatar>
                                     <v-icon>exit_to_app</v-icon>
@@ -120,6 +129,27 @@
                 <router-view class="main-main"></router-view>
             </v-img>
         </v-content>
+        <div class="text-xs-center">
+            <v-bottom-sheet v-model="sheet">
+                <v-list>
+                    <v-subheader>Select database</v-subheader>
+                    <v-list-tile  v-for="(database, idx) in databases" :key="idx" @click="selectDatabase(database)">
+                        <!-- <v-list-tile-avatar>
+                            <v-avatar size="32px" tile>
+                                <img :src="`https://cdn.vuetifyjs.com/images/bottom-sheets/${tile.img}`" :alt="tile.title">
+                            </v-avatar>
+                        </v-list-tile-avatar> -->
+                        <v-list-tile-title>{{ database.databaseFriendly }}</v-list-tile-title>
+                    </v-list-tile>
+                </v-list>
+            </v-bottom-sheet>
+        </div>
+        <v-snackbar :timeout="3000" v-model="snackbar" right>
+            {{ snackbarText }}
+            <v-btn dark flat @click="snackbar = false">
+                Close
+            </v-btn>
+        </v-snackbar>
     </div>
 </template>
 
@@ -134,11 +164,15 @@
         name: 'main-page',
         data() {
             return {
+                snackbarText: "",
+                snackbar: false,
+                sheet: false,
                 avatarImage: '',
                 backgroundImage: '',
                 eventBus: null,
                 drawer: true,
                 showLoader: true,
+                databases: [],
                 profile: {
                     image: ''
                 },
@@ -172,27 +206,26 @@
                         route: '/Files'
                     })
                 ],
-                bottomList: [
-                    // new NavigationItem({
-                    //     title: 'Files',
-                    //     icon: 'cloud',
-                    //     route: '/Files'
-                    // }),
-                    // new NavigationItem({
-                    //     title: 'Settings',
-                    //     icon: 'settings',
-                    //     route: '/Settings'
-                    // }),
-                    // new NavigationItem({
-                    //     title: 'User',
-                    //     icon: 'account_circle',
-                    //     route: '/User'
-                    // }),
-                    // new NavigationItem({
-                    //     title: 'Logout',
-                    //     icon: 'exit_to_app',
-                    //     route: '/Login'
-                    // })
+                tiles: [{
+                        img: 'keep.png',
+                        title: 'Keep'
+                    },
+                    {
+                        img: 'inbox.png',
+                        title: 'Inbox'
+                    },
+                    {
+                        img: 'hangouts.png',
+                        title: 'Hangouts'
+                    },
+                    {
+                        img: 'messenger.png',
+                        title: 'Messenger'
+                    },
+                    {
+                        img: 'google.png',
+                        title: 'Google+'
+                    }
                 ]
             }
         },
@@ -249,10 +282,23 @@
                             }
                         }
 
-
-
-
+                        self.getDatabases(userID);
                     })
+            },
+            getDatabases(userID) {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API + `TenantAccess?systemUserID=${userID}`)
+                    .then(r => {
+                        self.databases = r.data;
+                        console.log(r.data);
+                    })
+            },
+            selectDatabase(database) {
+                let self = this;
+                self.sheet = false;
+                self.snackbarText = "You've entered " + database.databaseFriendly;
+                self.snackbar = true;
             }
         }
     }

@@ -6,26 +6,33 @@
                     <v-icon>arrow_back</v-icon>
                 </v-btn>
                 <v-spacer></v-spacer>
-                <v-btn :loading="loading" icon @click="addUser">
+                <v-btn :disabled="selectedUser == null" :loading="loading" icon @click="addUser">
                     <v-icon>check</v-icon>
                 </v-btn>
             </v-toolbar>
-            <!-- <v-container class="pt-0">
-                <v-select v-model="selectedUser" :items="people" label="find a user" chips item-text="text" item-value="value"></v-select>
-                <v-list dense>
+            <v-container class="pt-0">
+                <v-autocomplete v-model="selectedUser" :items="users" label="find a user"></v-autocomplete>
+                <v-list dense style="height: calc(100vh - 148px); overflow: auto;">
                     <template v-for="(item, index) in items">
                         <div :key="index">
                             <v-list-tile color="grey-darken-4" avatar>
-                                <v-list-tile-avatar>
-                                    <v-img :src="item.avatar"></v-img>
+                                <v-list-tile-avatar v-if="item.image == '' || item.image == null">
+                                    <v-img :src="'http://oakclifffilmfestival.com/assets/placeholder-user.png'"></v-img>
                                 </v-list-tile-avatar>
 
-                    <v-list-tile color="grey-darken-4" :key="item.title" avatar >
-                        <v-list-tile-avatar>
-                            <v-img :src="item.avatar"></v-img>
-                        </v-list-tile-avatar>
+                                <v-list-tile-avatar v-else>
+                                    <v-img :src="'data:image/png;base64,' + item.image"></v-img>
+                                </v-list-tile-avatar>
+
+                                <v-list-tile-content>
+                                    <v-list-tile-title>{{ item.firstname }} {{ item.lastname }}</v-list-tile-title>
+                                </v-list-tile-content>
 
                                 <v-spacer></v-spacer>
+
+                                <!-- <v-list-tile-content class="hidden-md">
+                                    <v-list-tile-title>{{ item.emailAddress }}</v-list-tile-title>
+                                </v-list-tile-content> -->
 
                                 <v-list-tile-action>
                                     <v-menu>
@@ -44,7 +51,7 @@
                         </div>
                     </template>
                 </v-list>
-            </v-container> -->
+            </v-container>
         </v-card>
     </v-dialog>
 </template>
@@ -63,33 +70,44 @@
                 autoUpdate: true,
                 friends: null,
                 isUpdating: false,
-                people: [],
+                userDetails: [],
+                users: [],
                 selectedUser: null,
-                items: [
-                    'Programming',
-                    'Design',
-                    'Vue',
-                    'Vuetify'
-                ]
+                items: [],
+                tenantID: null
             }
         },
         created() {
-            this.getUsers();
+            //this.getUsers();
         },
         methods: {
             getUsers() {
                 let self = this;
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
 
                 Axios.get(process.env.VUE_APP_API + `SystemUser`)
                     .then(r => {
 
+                        self.userDetails = r.data;
+
                         r.data.forEach(element => {
-                            self.people.push({
-                                text: element.emailAddress,
-                                value: element.systemUserID
-                            })
+
+                            if (element.emailAddress != null) {
+                                self.users.push({
+                                    text: element.emailAddress.toString(),
+                                    value: element.systemUserID
+                                })
+                            }
                         });
+                    })
+            },
+            getDatabaseUsers() {
+                let self = this;
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+
+                Axios.get(process.env.VUE_APP_API + `TenantAccess/User?tenantID=${self.tenantID}`)
+                    .then(r => {
+
+                        console.log(r.data);
                     })
             },
             addUser() {
@@ -97,28 +115,41 @@
 
                 self.extended = true;
                 self.loading = true;
+                let userObj = null;
+
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
 
                 setTimeout(() => {
-                    self.select = [];
-                    self.loading = false;
-                }, 2000);
+                    self.userDetails.forEach(element => {
+                        if (element.systemUserID == self.selectedUser) {
+                            userObj = element;
+                        }
+                    })
 
-                // console.log(self.friends);
+                    self.users.forEach((element, idx) => {
+                        if (element.value == self.selectedUser) {
+                            self.users.splice(idx, 1);
+                        }
+                    })
 
-                // self.items.push({
-                //     avatar: '',
-                //     title: self.friends,
-                //     subtitle: "Genral Manager"
-                // })
+                    Axios.post(process.env.VUE_APP_API +
+                            `TenantAccess?systemUserID=${encoded_details.USER_ID}&tenantID=${self.tenantID}`)
+                        .then(r => {
+                            self.items.push(userObj);
+                            self.selectedUser = null;
+                            self.loading = false;
+                        })
+                }, 200);
             },
             close() {
                 let self = this
                 self.modalShow = false
             },
-            open(userID, callback) {
+            open(tenantID, callback) {
                 let self = this
                 self.afterClose = callback;
-                self.userID = userID;
+                self.tenantID = tenantID;
+                this.getDatabaseUsers();
                 self.modalShow = true
             },
             remove(item) {
