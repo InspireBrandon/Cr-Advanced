@@ -6,8 +6,32 @@
                     <v-icon>arrow_back</v-icon>
                 </v-btn>
                 <v-spacer></v-spacer>
-                <v-text-field label="Email Address"></v-text-field>
-                <v-btn icon color="primary">
+
+                <v-autocomplete hide-selected v-model="friends" :disabled="isUpdating" :items="people" box chips color="blue-grey lighten-2"
+                    label="Select" item-text="name" item-value="name">
+                    <template v-slot:selection="data">
+                        <v-chip :selected="data.selected" close class="chip--select-multi" @input="remove(data.item)">
+                            <v-avatar>
+                                <img :src="data.item.avatar">
+                            </v-avatar>
+                            {{ data.item.name }}
+                        </v-chip>
+                    </template>
+                    <template v-slot:item="data">
+                        <template>
+                            <v-list-tile-avatar>
+                                <img :src="data.item.avatar">
+                            </v-list-tile-avatar>
+                            <v-list-tile-content>
+                                <v-list-tile-title v-html="data.item.name"></v-list-tile-title>
+                                <v-list-tile-sub-title v-html="data.item.group"></v-list-tile-sub-title>
+                            </v-list-tile-content>
+                        </template>
+                    </template>
+                </v-autocomplete>
+
+                <!-- <v-text-field v-model="inviteText" label="Email Address"></v-text-field> -->
+                <v-btn @click="inviteUser" fab small color="primary">
                     <v-icon>add</v-icon>
                 </v-btn>
             </v-toolbar>
@@ -46,12 +70,19 @@
 </template>
 <script>
     import Axios from 'axios';
-    export default {
+    import jwt from 'jsonwebtoken';
 
+    export default {
         data() {
             return {
                 modalShow: false,
+                inviteText: '',
                 afterClose: null,
+                autoUpdate: true,
+                friends: ['Sandra Adams', 'Britta Holt'],
+                isUpdating: false,
+                people: [
+                ],
                 items: [{
                         avatar: 'https://vignette.wikia.nocookie.net/starwars/images/2/20/LukeTLJ.jpg/revision/latest?cb=20170927034529',
                         title: 'Luke Skywalker',
@@ -70,27 +101,27 @@
                 ]
             }
         },
-        created() {},
+        created() {
+            this.getUsers();
+        },  
         methods: {
-            submit() {
-                let self = this
+            getUsers() {
+                let self = this;
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
 
-                let request = {
-                    tenantID: self.tenantID,
-                    tenantUID: self.tenantUID,
-                    databaseName: self.databaseName,
-                    databaseFriendly: self.databaseFriendly,
-                    licenseID: self.licenseID,
-                    created: self.created,
-                    retryCount: self.retryCount
-                };
-
-                Axios.post(process.env.VUE_APP_API + `Tenant?userID=${self.userID}`, request)
+                Axios.get(process.env.VUE_APP_API + `SystemUser`)
                     .then(r => {
-                        if (r.data) {
-                            self.afterClose(request)
-                        }
+
+                        r.data.forEach(element => {
+                            self.people.push({
+                                name: element.firstname + " " + element.lastname,
+                                avatar: 'data:image/png;base64,' + element.image
+                            })
+                        });
                     })
+            },
+            inviteUser() {
+                let self = this;
             },
             close() {
                 let self = this
@@ -101,7 +132,18 @@
                 self.afterClose = callback;
                 self.userID = userID;
                 self.modalShow = true
+            },
+            remove(item) {
+                const index = this.friends.indexOf(item.name)
+                if (index >= 0) this.friends.splice(index, 1)
             }
-        }
+        },
+        watch: {
+            isUpdating(val) {
+                if (val) {
+                    setTimeout(() => (this.isUpdating = false), 3000)
+                }
+            }
+        },
     }
 </script>
