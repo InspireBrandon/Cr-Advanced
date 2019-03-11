@@ -23,11 +23,16 @@
                             <v-list-tile-title>{{ item.title }}</v-list-tile-title>
                         </v-list-tile-content>
                     </v-list-tile>
-                    <v-expansion-panel class="elevation-0"  icon="bar_chart">
+                  
+
+                </v-list>
+                  <v-expansion-panel class="elevation-0">
                         <v-expansion-panel-content class="elevation-0">
-                            <template v-slot:header
-                           >
-                                <div>Reports</div>
+                            <template v-slot:header>
+                                <div>
+                                    <v-icon dark left>bar_chart</v-icon>
+                                    Reports
+                                </div>
                             </template>
                             <v-list-tile v-for="(item, idx) in reports" :key="idx" @click="$router.push(item.route)">
                                 <v-list-tile-action>
@@ -39,8 +44,6 @@
                             </v-list-tile>
                         </v-expansion-panel-content>
                     </v-expansion-panel>
-
-                </v-list>
                 <v-spacer></v-spacer>
                 <v-list>
                     <v-list-tile v-for="(item, idx) in bottomList" :key="idx" @click="$router.push(item.route)">
@@ -162,7 +165,7 @@
                 settings: {
                     backgroundImage: ''
                 },
-                reports:[ new NavigationItem({
+                reports: [new NavigationItem({
                         title: 'Apps',
                         icon: 'bar_chart',
                         route: '/AppsReportList'
@@ -171,7 +174,8 @@
                         title: 'System',
                         icon: 'bar_chart',
                         route: '/SystemReportList'
-                    })],
+                    })
+                ],
                 topList: [
                     new NavigationItem({
                         title: 'Home',
@@ -188,7 +192,7 @@
                         icon: "local_grocery_store",
                         route: "store",
                     }),
-                    
+
                     new NavigationItem({
                         title: 'Files',
                         icon: 'cloud',

@@ -11,7 +11,7 @@
                 <v-flex lg12 md12 sm12 xs12 v-if="appConfigDetail.length <= 0">
                     <v-card>
                         <v-card-text>
-                            <p>It appears that you dont have any apps installed. <a href="#" @click.prevent="$router.push('/Store')">Click
+                            <p>It appears that you dont have any apps installed that support reports. <a href="#" @click.prevent="$router.push('/Store')">Click
                                     Here</a> to go and install some.</p>
                         </v-card-text>
                     </v-card>
