@@ -1,8 +1,10 @@
 <template>
-    <div>
-        <details-header :data="details_header_data"></details-header>
-        <details-description :data="details_description_data"></details-description>
-    </div>
+    <v-card>
+        <div>
+            <details-header :data="details_header_data"></details-header>
+            <details-description :data="details_description_data"></details-description>
+        </div>
+    </v-card>
 </template>
 
 <script>
@@ -21,20 +23,20 @@
                     imgSrc: 'https://cdn.vuetifyjs.com/images/parallax/material.jpg'
                 },
                 details_description_data: {
-                    desciption:{
-                        patchNotes:"No Change",
-                        desciption:"With the range planning toolkit you will be able to build up a foundational layer of products in no time.",
+                    desciption: {
+                        patchNotes: "No Change",
+                        desciption: "With the range planning toolkit you will be able to build up a foundational layer of products in no time.",
                     },
-                      patchNotes: [{
+                    patchNotes: [{
                         version: "v1.2.0",
                         notes: [{
                                 type: "Improvement",
                                 details: "Added patch Notes"
                             },
-                           
+
                         ]
 
-                    },{
+                    }, {
                         version: "v1.0.0",
                         notes: [{
                                 type: "Improvement",

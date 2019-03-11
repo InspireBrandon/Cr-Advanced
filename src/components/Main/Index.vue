@@ -48,7 +48,7 @@
                 <v-menu>
                     <v-btn icon slot="activator">
                         <v-avatar style="padding: 2px;" color="white" size="42">
-                            <v-img ref="avatar" v-if="profile.image != ''" :src="avatarImage"></v-img>
+                            <v-img ref="avatar" v-if="profile.image != ''" :src="avatarImage" :alt="''"></v-img>
                         </v-avatar>
                     </v-btn>
                     <v-card>
@@ -115,7 +115,7 @@
             </v-badge>
         </v-toolbar>
         <v-content>
-            <v-img height="calc(100vh - 55px)" :src="backgroundImage">
+            <v-img height="calc(100vh - 55px)" :src="backgroundImage" :alt="''">
                 <!-- <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear> -->
                 <router-view class="main-main"></router-view>
             </v-img>
@@ -229,7 +229,10 @@
                 Axios.get(process.env.VUE_APP_API + `SystemUser?id=${encoded_details.USER_ID}`)
                     .then(r => {
                         self.profile = r.data;
-                        self.avatarImage = 'data:image/png;base64,' + self.profile.image;
+                        if (self.profile.image != undefined || self.profile.image != null) {
+                            self.avatarImage = 'data:image/png;base64,' + self.profile.image;
+
+                        }
                         self.getUserSettings(encoded_details.USER_ID);
                     })
             },
@@ -239,7 +242,16 @@
                 Axios.get(process.env.VUE_APP_API + `SystemUserSetting?systemUserID=${userID}`)
                     .then(r => {
                         self.settings = r.data;
-                        self.backgroundImage = 'data:image/png;base64,' + self.settings.backgroundImage;
+                        if (r.data != null || r.data != undefined) {
+                            if (self.settings.backgroundImage != undefined || self.settings.backgroundImage != null) {
+                                self.backgroundImage = 'data:image/png;base64,' + self.settings.backgroundImage;
+
+                            }
+                        }
+
+
+
+
                     })
             }
         }

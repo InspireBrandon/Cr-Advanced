@@ -29,8 +29,8 @@
         data() {
             return {
                 notifications: [{
-                    sender: "ballie plakeies",
-                    message: "whos your daddy"
+                    sender: "sender",
+                    message: "message"
 
                 }],
             }

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <span class="app_name">{{ appConfigDetail.detail.name }}</span>
+        <span class="app_name" @click="$router.push(appConfigDetail.config.configName + '_Details')">{{ appConfigDetail.detail.name }}</span>
         <v-card class="elevation-10">
             <v-img :src="appConfigDetail.detail.imgSrc" height="200px">
                 <v-container fill-height fluid pa-2>

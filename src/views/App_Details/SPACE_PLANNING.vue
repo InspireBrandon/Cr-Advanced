@@ -1,8 +1,10 @@
 <template>
-    <div>
-        <details-header :data="details_header_data"></details-header>
-        <details-description :data="details_description_data"></details-description>
-    </div>
+    <v-card>
+        <div>
+            <details-header :data="details_header_data"></details-header>
+            <details-description :data="details_description_data"></details-description>
+        </div>
+    </v-card>
 </template>
 
 <script>
@@ -23,7 +25,7 @@
                 details_description_data: {
                     desciption: {
 
-                        desciption: "This app is used to build up store shelf facings and distrubute products in a way that is rprofitable and basically plan out your store layout.",
+                        desciption: "This app is used to build up store shelf facings and distrubute products in a way that is profitable and basically plan out your store layout.",
                     },
                     patchNotes: [{
                         version: "v1.2.0",
@@ -31,10 +33,10 @@
                                 type: "Improvement",
                                 details: "Added patch Notes cause memes 2.0"
                             },
-                           
+
                         ]
 
-                    },{
+                    }, {
                         version: "v1.0.0",
                         notes: [{
                                 type: "Improvement",
@@ -51,7 +53,7 @@
                         ]
 
                     }],
-                    
+
                     headline: 'Space Planning',
                     imgSrc: 'https://i.ytimg.com/vi/L4hK7jXGxg0/maxresdefault.jpg',
                     background: "transparent"

@@ -38,7 +38,7 @@
             <v-list dense>
                 <template v-for="(item, index) in items">
 
-                    <v-list-tile color="grey-darken-4" :key="item.title" avatar @click="">
+                    <v-list-tile color="grey-darken-4" :key="item.title" avatar >
                         <v-list-tile-avatar>
                             <v-img :src="item.avatar"></v-img>
                         </v-list-tile-avatar>

@@ -21,7 +21,7 @@ import Fixtures from '@/components/Apps/SpacePlanning/Fixtures/Index.vue'
 // App Details
 import Space_Planning_Details from '@/views/App_Details/SPACE_PLANNING.vue'
 import Range_Planning_Details from '@/views/App_Details/RANGE_PLANNING.vue'
-
+import Product_Maintainance_Details from '@/views/App_Details/PRODUCT_MAINTAINANCE.vue'
 //reports
 import spaceReport1 from '@/views/Reports/SPACE-PLANNING-REPORTS/Report1/Report1.vue'
 
@@ -84,6 +84,10 @@ export default new Router({
       path: '/RangePlanning_Details',
       name: 'range_planning_details',
       component: Range_Planning_Details
+    }, {
+      path: '/ProductMaintenance_Details',
+      name: 'product_maintainance_details',
+      component: Product_Maintainance_Details
     }]
   }, {
     path: '/Reports',

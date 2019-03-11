@@ -103,12 +103,19 @@
                 let self = this
                 self.modalShow = false
             },
-            open(userID, callback) {
+            open(userID, country, domain, callback) {
                 let self = this
+                if (country!=null||country!=undefined) {
+                    self.country = country
+                }
+                if (domain!=null||domain!=undefined) {
+                    self.domain = domain
+                }
                 self.afterClose = callback;
                 self.userID = userID;
                 self.modalShow = true
-                            
+
+
             }
         }
     }

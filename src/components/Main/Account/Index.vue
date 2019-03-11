@@ -1,6 +1,8 @@
 <template>
+
     <v-card>
-        <v-flex lg12 md12 sm12 xs12>
+        <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear>
+        <v-flex v-if="!showLoader && profile.accountID != null" lg12 md12 sm12 xs12>
             <v-container grid-list-md>
                 <v-layout row wrap>
                     <v-flex lg8 md12 sm12 xs12>
@@ -47,10 +49,7 @@
                                 </v-container>
                             </v-card>
                         </v-flex>
-                        <v-flex lg8 md12 sm12 xs12 v-if="profile.accountID == null">
-                            <p>In order to create a database you must first register an account. Please <a href="#"
-                                    @click.prevent="openAccountModal">click here</a> to register.</p>
-                        </v-flex>
+
                     </v-flex>
                     <v-flex lg4 md4 sm12 xs12>
                         <v-flex lg12 md12 sm12 xs12>
@@ -99,19 +98,21 @@
                             </v-card>
                         </v-flex>
 
-                        <v-flex lg8 md12 sm12 xs12 v-if="profile.accountID == null">
-                            <p>In order to create a database you must first register an account. Please <a href="#"
-                                    @click.prevent="openAccountModal">click here</a> to register.</p>
-                        </v-flex>
+
                     </v-flex>
                 </v-layout>
             </v-container>
+
         </v-flex>
         <DatabaseModal ref="DatabaseModal"></DatabaseModal>
         <AccountModal ref="AccountModal"></AccountModal>
         <DatabaseUserModal ref="DatabaseUserModal"></DatabaseUserModal>
+        <v-flex lg8 md12 sm12 xs12 v-if="profile.accountID == null">
+           <br>
+            <p>In order to create a database you must first register an account. Please <a href="#" @click.prevent="openAccountModal">click
+                    here</a> to register.</p>
+        </v-flex>
     </v-card>
-
 </template>
 
 <script>
@@ -134,6 +135,7 @@
         },
         data() {
             return {
+                showLoader: true,
                 domain: null,
                 country: null,
                 account: true,
@@ -160,7 +162,7 @@
             deleteDatabase() {
                 let self = this;
             },
-            getUserFeatures(userID) {
+            getUserFeatures(userID, callback) {
                 let self = this
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
 
@@ -168,22 +170,29 @@
                     `Features?systemUserID=${userID}`
 
                 ).then(r => {
-                    self.features = r.data
 
-                    self.features.forEach(el => {
-                        self.totalPrice += el.price;
-                    })
+                    callback(self.features = r.data,
+
+                        self.features.forEach(el => {
+                            self.totalPrice += el.price;
+                        })
+                    )
                 })
             },
-            getAccountDetails(accountID) {
+            getAccountDetails(accountID, callback) {
                 let self = this;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 self.accountID = accountID
                 Axios.get(process.env.VUE_APP_API + `AccountProfile?accountID=${accountID}`)
                     .then(r => {
                         if (r.data) {
-                            self.country = r.data.country
-                            self.domain = r.data.domain
+                            callback(
+
+                                self.country = r.data.country,
+                                self.domain = r.data.domain
+                            )
+
+
                         }
                     })
             },
@@ -199,9 +208,11 @@
                         if (self.profile.accountID != null) {
                             self.domain = r.data.domain
                             self.country = r.data.country
-                            self.getAccountDetails(self.profile.accountID)
-                            self.getUserFeatures(encoded_details.USER_ID)
-                            self.getDatabases(encoded_details.USER_ID);
+                            self.getAccountDetails(self.profile.accountID, callback => {
+                                self.getUserFeatures(encoded_details.USER_ID, callback2 => {
+                                    self.getDatabases(encoded_details.USER_ID, callback3 => {});
+                                })
+                            })
                         } else {
                             setTimeout(() => {
                                 self.showLoader = false;
@@ -209,12 +220,13 @@
                         }
                     })
             },
-            getDatabases(userID) {
+            getDatabases(userID, callback3) {
                 let self = this;
 
                 Axios.get(process.env.VUE_APP_API + `Tenant?userID=${userID}`)
                     .then(r => {
-                        self.dataBases = r.data;
+                        callback3(self.dataBases = r.data,
+                            self.showLoader = false, )
                         setTimeout(() => {
                             self.showLoader = false;
                         }, 1000);
@@ -232,7 +244,7 @@
 
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
 
-                self.$refs.AccountModal.open(encoded_details.USER_ID, callback => {
+                self.$refs.AccountModal.open(encoded_details.USER_ID, self.country, self.domain, callback => {
                     self.getAccountDetails(self.accountID);
                     self.$refs.AccountModal.close();
                     self.country = callback.country
@@ -242,7 +254,6 @@
             openDatabaseModal() {
                 let self = this;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
-
                 self.$refs.DatabaseModal.open(encoded_details.USER_ID, function () {
                     self.getAccountDetails(self.accountID);
                     self.$refs.DatabaseModal.close();
