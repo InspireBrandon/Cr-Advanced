@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <v-card>
         <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear>
         <v-container grid-list-md v-if="!showLoader">
             <v-layout row wrap>
@@ -40,7 +40,7 @@
                 </v-flex>
             </v-layout>
         </v-container>
-    </div>
+    </v-card>
 </template>
 
 <script>
@@ -71,6 +71,8 @@
 
                 Axios.get(process.env.VUE_APP_API + "SystemUserSetting?systemUserID=" + encoded_details.USER_ID)
                     .then(r => {
+                        console.log(r.data)
+
                         if (r.data == null) {
                             self.settings.systemUserID = encoded_details.USER_ID;
                         } else {

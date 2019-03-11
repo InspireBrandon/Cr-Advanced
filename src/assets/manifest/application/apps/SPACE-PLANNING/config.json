@@ -1,15 +1,20 @@
 {
-    "configName":"SPACE-PLANNING",
+    "configName": "SPACE-PLANNING",
     "report": true,
     "routes": [{
         "route": "/SpacePlanning",
-        "routeName": "/space_planning",
+        "routeName": "space_planning",
         "title": "Space Planning",
         "openInNewWindow": true
     }, {
         "route": "/Fixtures",
-        "routeName": "/fixtures",
+        "routeName": "fixtures",
         "title": "Default Fixtures",
+        "openInNewWindow": false
+    }, {
+        "route": "/PlannogramImplementation",
+        "routeName": "plannogram_implementation",
+        "title": "Plannogram Implementation",
         "openInNewWindow": false
     }]
 }

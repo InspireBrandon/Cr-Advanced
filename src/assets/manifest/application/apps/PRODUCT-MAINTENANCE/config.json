@@ -1,0 +1,13 @@
+
+{
+    "configName":"ProductMaintenance",
+    "report":false,
+    "routes": [
+        {
+            "route": "/ProductMaintenance",
+            "routeName": "product_maintenance",
+            "title": "Product Maintenance",
+            "openInNewWindow": false
+        }
+    ]
+}

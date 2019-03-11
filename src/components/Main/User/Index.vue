@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <v-card>
         <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear>
         <v-container grid-list-md v-if="!showLoader">
             <v-layout row wrap>
@@ -19,7 +19,7 @@
                                         </v-layout>
                                     </v-card-title>
                                     <v-card-text>
-                                        <v-form >
+                                        <v-form>
                                             <v-layout row wrap>
                                                 <v-flex md6>
                                                     <v-text-field label="First Name" v-model="profile.firstname"></v-text-field>
@@ -49,7 +49,7 @@
             <AccountModal ref="AccountModal"></AccountModal>
             <DatabaseModal ref="DatabaseModal"></DatabaseModal>
         </v-container>
-    </div>
+    </v-card>
 </template>
 
 <script>

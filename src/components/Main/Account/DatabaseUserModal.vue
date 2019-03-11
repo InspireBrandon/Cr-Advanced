@@ -1,0 +1,107 @@
+<template>
+    <v-dialog transition="dialog-bottom-transition" fullscreen persistent v-model="modalShow">
+        <v-card>
+            <v-toolbar prominent>
+                <v-btn icon @click="modalShow = false">
+                    <v-icon>arrow_back</v-icon>
+                </v-btn>
+                <v-spacer></v-spacer>
+                <v-text-field label="Email Address"></v-text-field>
+                <v-btn icon color="primary">
+                    <v-icon>add</v-icon>
+                </v-btn>
+            </v-toolbar>
+            <v-list dense>
+                <template v-for="(item, index) in items">
+
+                    <v-list-tile color="grey-darken-4" :key="item.title" avatar @click="">
+                        <v-list-tile-avatar>
+                            <v-img :src="item.avatar"></v-img>
+                        </v-list-tile-avatar>
+
+                        <v-list-tile-content>
+                            <v-list-tile-title v-html="item.title"></v-list-tile-title>
+                        </v-list-tile-content>
+
+                        <v-spacer></v-spacer>
+
+                        <v-list-tile-action>
+                            <v-menu>
+                                <v-btn slot="activator" icon>
+                                    <v-icon>more_vert</v-icon>
+                                </v-btn>
+                                <v-list>
+                                    <v-list-tile>Revoke Access</v-list-tile>
+                                </v-list>
+                            </v-menu>
+                        </v-list-tile-action>
+
+                    </v-list-tile>
+
+                    <v-divider :key="index" :inset="item.inset"></v-divider>
+                </template>
+            </v-list>
+        </v-card>
+    </v-dialog>
+</template>
+<script>
+    import Axios from 'axios';
+    export default {
+
+        data() {
+            return {
+                modalShow: false,
+                afterClose: null,
+                items: [{
+                        avatar: 'https://vignette.wikia.nocookie.net/starwars/images/2/20/LukeTLJ.jpg/revision/latest?cb=20170927034529',
+                        title: 'Luke Skywalker',
+                        subtitle: "Genral Manager"
+                    },
+                    {
+                        avatar: 'https://cdn-images-1.medium.com/max/1200/1*BRJuVwF0LHlmiLT5dB5BWA.png',
+                        title: 'Yoda',
+                        subtitle: "Buyer"
+                    },
+                    {
+                        avatar: 'http://static1.squarespace.com/static/55bdd8e1e4b003dc5b7da717/55bf4150e4b026c66de5c764/5628c277e4b001a55c3d9c76/1445513526709/?format=1500w',
+                        title: 'C-3PO',
+                        subtitle: "Something Weird"
+                    }
+                ]
+            }
+        },
+        created() {},
+        methods: {
+            submit() {
+                let self = this
+
+                let request = {
+                    tenantID: self.tenantID,
+                    tenantUID: self.tenantUID,
+                    databaseName: self.databaseName,
+                    databaseFriendly: self.databaseFriendly,
+                    licenseID: self.licenseID,
+                    created: self.created,
+                    retryCount: self.retryCount
+                };
+
+                Axios.post(process.env.VUE_APP_API + `Tenant?userID=${self.userID}`, request)
+                    .then(r => {
+                        if (r.data) {
+                            self.afterClose(request)
+                        }
+                    })
+            },
+            close() {
+                let self = this
+                self.modalShow = false
+            },
+            open(userID, callback) {
+                let self = this
+                self.afterClose = callback;
+                self.userID = userID;
+                self.modalShow = true
+            }
+        }
+    }
+</script>

@@ -23,13 +23,13 @@
                 details_description_data: {
                     desciption:{
                         patchNotes:"No Change",
-                        desciption:"This app is used to build up store clustering and manipulate data, It is also used to obtain ranking as well as view general sales data",
+                        desciption:"With the range planning toolkit you will be able to build up a foundational layer of products in no time.",
                     },
                       patchNotes: [{
                         version: "v1.2.0",
                         notes: [{
                                 type: "Improvement",
-                                details: "Added patch Notes cause memes"
+                                details: "Added patch Notes"
                             },
                            
                         ]

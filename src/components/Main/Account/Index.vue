@@ -1,99 +1,116 @@
 <template>
-    <v-container>
-        <v-card>
-            <v-flex lg12 md12 sm12 xs12>
-                <v-container grid-list-md>
-                    <v-layout row wrap>
-                        <v-flex lg8 md12 sm12 xs12>
-                            <v-flex lg12 md12 sm12 xs12>
-                                <v-toolbar flat color="grey darken-2">
-                                    <v-toolbar-title>Databases</v-toolbar-title>
-                                    <v-spacer></v-spacer>
-                                    <v-btn icon @click="openDatabaseModal" :disabled="profile.accountID == null" color="secondary">
-                                        <v-icon>add</v-icon>
-                                    </v-btn>
-                                </v-toolbar>
-                            </v-flex>
+    <v-card>
+        <v-flex lg12 md12 sm12 xs12>
+            <v-container grid-list-md>
+                <v-layout row wrap>
+                    <v-flex lg8 md12 sm12 xs12>
+                        <v-flex lg12 md12 sm12 xs12>
+                            <v-toolbar color="grey darken-2">
+                                <v-toolbar-title>Databases</v-toolbar-title>
+                                <v-spacer></v-spacer>
+                                <v-btn icon @click="openDatabaseModal" :disabled="profile.accountID == null" color="secondary">
+                                    <v-icon>add</v-icon>
+                                </v-btn>
+                            </v-toolbar>
+                        </v-flex>
 
-                            <v-flex lg12 md12 sm12 xs12>
-                                <v-card v-for="(item,index) in dataBases" :key=index flat color="grey darken-2">
-                                    <v-container class="pa-2 mb-2">
-                                        <v-layout>
-                                            <v-flex> {{item.databaseName}}</v-flex>
-                                            <v-spacer></v-spacer>
-                                            <v-btn class="pa-0 ma-0" icon>
+                        <v-flex lg12 md12 sm12 xs12>
+                            <v-card v-for="(item,index) in dataBases" :key=index color="grey darken-2">
+                                <v-container class="pa-2 mb-2">
+                                    <v-layout>
+                                        <v-flex> {{item.databaseName}}</v-flex>
+                                        <v-spacer></v-spacer>
+                                        <v-menu>
+                                            <v-btn slot="activator" class="pa-0 ma-0" icon>
                                                 <v-icon>more_vert</v-icon>
                                             </v-btn>
-                                        </v-layout>
-                                    </v-container>
-                                </v-card>
-                            </v-flex>
-                            <v-flex lg8 md12 sm12 xs12 v-if="profile.accountID == null">
-                                <p>In order to create a database you must first register an account. Please <a href="#"
-                                        @click.prevent="openAccountModal">click here</a> to register.</p>
-                            </v-flex>
+                                            <v-list dense>
+                                                <v-list-tile avatar @click="maintainUsers">
+                                                    <v-list-tile-avatar>
+                                                        <v-icon>share</v-icon>
+                                                    </v-list-tile-avatar>
+                                                    <v-list-tile-content>
+                                                        <v-list-tile-title>Share</v-list-tile-title>
+                                                    </v-list-tile-content>
+                                                </v-list-tile>
+                                                <v-list-tile avatar @click="deleteDatabase">
+                                                    <v-list-tile-avatar>
+                                                        <v-icon>delete</v-icon>
+                                                    </v-list-tile-avatar>
+                                                    <v-list-tile-content>
+                                                        <v-list-tile-title>Delete</v-list-tile-title>
+                                                    </v-list-tile-content>
+                                                </v-list-tile>
+                                            </v-list>
+                                        </v-menu>
+                                    </v-layout>
+                                </v-container>
+                            </v-card>
                         </v-flex>
-                        <v-flex lg4 md4 sm12 xs12>
-                            <v-flex lg12 md12 sm12 xs12>
-                                <v-card color="grey darken-2" flat>
-                                    <v-toolbar flat color="grey darken-2">
-                                        <v-toolbar-title>Account</v-toolbar-title>
-                                        <v-spacer></v-spacer>
-                                        <v-btn icon @click.prevent="openAccountModal" color="secondary">
-                                            <v-icon>edit</v-icon>
-                                        </v-btn>
-                                    </v-toolbar>
-                                    <v-card-title primary-title>
-                                        <v-flex lg12 md12 sm12 xs12>
-                                            <v-text-field label="Domain" v-model="domain" disabled> </v-text-field>
-                                        </v-flex>
-                                        <v-flex lg12 md12 sm12 xs12>
-                                            <v-text-field label="Country" v-model="country" disabled> </v-text-field>
-                                        </v-flex>
-                                    </v-card-title>
-                                </v-card>
-                            </v-flex>
+                        <v-flex lg8 md12 sm12 xs12 v-if="profile.accountID == null">
+                            <p>In order to create a database you must first register an account. Please <a href="#"
+                                    @click.prevent="openAccountModal">click here</a> to register.</p>
                         </v-flex>
+                    </v-flex>
+                    <v-flex lg4 md4 sm12 xs12>
                         <v-flex lg12 md12 sm12 xs12>
-                            <v-flex lg12 md12 sm12 xs12>
-                                <v-toolbar flat color="grey darken-2">
-                                    <v-toolbar-title>Account Summary</v-toolbar-title>
+                            <v-card color="grey darken-2">
+                                <v-toolbar color="grey darken-2">
+                                    <v-toolbar-title>Account</v-toolbar-title>
+                                    <v-spacer></v-spacer>
+                                    <v-btn icon @click.prevent="openAccountModal" color="secondary">
+                                        <v-icon>edit</v-icon>
+                                    </v-btn>
                                 </v-toolbar>
-                            </v-flex>
-
-                            <v-flex lg12 md12 sm12 xs12>
-                                <v-card v-for="(item,index) in features" :key=index flat color="grey darken-2">
-                                    <v-container class="pa-2 mb-2">
-                                        <v-layout>
-                                            <v-flex md6>{{item.name}}</v-flex>
-                                            <v-flex md6>{{item.price}}</v-flex>
-                                        </v-layout>
-                                    </v-container>
-                                </v-card>
-                                <v-card flat color="grey darken-4">
-                                    <v-container class="pa-2 mb-2">
-                                        <v-layout>
-                                            <v-flex md6>Total</v-flex>
-                                            <v-flex md6>R{{totalPrice}} pm</v-flex>
-                                        </v-layout>
-                                    </v-container>
-                                </v-card>
-                            </v-flex>
-
-                            <v-flex lg8 md12 sm12 xs12 v-if="profile.accountID == null">
-                                <p>In order to create a database you must first register an account. Please <a href="#"
-                                        @click.prevent="openAccountModal">click here</a> to register.</p>
-                            </v-flex>
+                                <v-card-title primary-title>
+                                    <v-flex lg12 md12 sm12 xs12>
+                                        <v-text-field label="Domain" v-model="domain" disabled> </v-text-field>
+                                    </v-flex>
+                                    <v-flex lg12 md12 sm12 xs12>
+                                        <v-text-field label="Country" v-model="country" disabled> </v-text-field>
+                                    </v-flex>
+                                </v-card-title>
+                            </v-card>
                         </v-flex>
-                    </v-layout>
-                </v-container>
-            </v-flex>
+                    </v-flex>
+                    <v-flex lg12 md12 sm12 xs12>
+                        <v-flex lg12 md12 sm12 xs12>
+                            <v-toolbar color="grey darken-2">
+                                <v-toolbar-title>Account Summary</v-toolbar-title>
+                            </v-toolbar>
+                        </v-flex>
 
-        </v-card>
+                        <v-flex lg12 md12 sm12 xs12>
+                            <v-card v-for="(item,index) in features" :key=index color="grey darken-2">
+                                <v-container class="pa-2 mb-2">
+                                    <v-layout>
+                                        <v-flex md6>{{item.name}}</v-flex>
+                                        <v-flex md6>{{item.price}}</v-flex>
+                                    </v-layout>
+                                </v-container>
+                            </v-card>
+                            <v-card color="grey darken-4">
+                                <v-container class="pa-2 mb-2">
+                                    <v-layout>
+                                        <v-flex md6>Total</v-flex>
+                                        <v-flex md6>R{{totalPrice}} pm</v-flex>
+                                    </v-layout>
+                                </v-container>
+                            </v-card>
+                        </v-flex>
 
+                        <v-flex lg8 md12 sm12 xs12 v-if="profile.accountID == null">
+                            <p>In order to create a database you must first register an account. Please <a href="#"
+                                    @click.prevent="openAccountModal">click here</a> to register.</p>
+                        </v-flex>
+                    </v-flex>
+                </v-layout>
+            </v-container>
+        </v-flex>
         <DatabaseModal ref="DatabaseModal"></DatabaseModal>
         <AccountModal ref="AccountModal"></AccountModal>
-    </v-container>
+        <DatabaseUserModal ref="DatabaseUserModal"></DatabaseUserModal>
+    </v-card>
 
 </template>
 
@@ -104,13 +121,16 @@
 
     import DatabaseModal from "./DatabaseModal.vue"
     import AccountModal from "./AccountModal.vue"
+    import DatabaseUserModal from './DatabaseUserModal.vue'
+
     import {
         throws
     } from 'assert';
     export default {
         components: {
             AccountModal,
-            DatabaseModal
+            DatabaseModal,
+            DatabaseUserModal
         },
         data() {
             return {
@@ -132,6 +152,14 @@
             self.getUserDetails()
         },
         methods: {
+            maintainUsers(database) {
+                let self = this;
+
+                self.$refs.DatabaseUserModal.open();
+            },
+            deleteDatabase() {
+                let self = this;
+            },
             getUserFeatures(userID) {
                 let self = this
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
