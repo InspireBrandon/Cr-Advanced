@@ -20,7 +20,7 @@
                 </v-card-actions>
             </v-container>
             <input @change="onImageChange" type="file" style="display: none;" ref="fileInput">
-        </v-card>
+        </v-card> 
     </v-dialog>
 </template>
 <script>

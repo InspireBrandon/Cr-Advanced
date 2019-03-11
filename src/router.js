@@ -23,7 +23,12 @@ import Space_Planning_Details from '@/views/App_Details/SPACE_PLANNING.vue'
 import Range_Planning_Details from '@/views/App_Details/RANGE_PLANNING.vue'
 import Product_Maintainance_Details from '@/views/App_Details/PRODUCT_MAINTAINANCE.vue'
 //reports
+import AppsReportList from '@/components/Main/Reports/Apps/Index.vue'
+import SystemReportList from '@/components/Main/Reports/System/Index.vue'
+
+import SpacePlanningReportList from '@/components/Main/Reports/Apps/SpacePlanning/Index.vue'
 import spaceReport1 from '@/views/Reports/SPACE-PLANNING-REPORTS/Report1/Report1.vue'
+
 
 Vue.use(Router)
 
@@ -88,16 +93,32 @@ export default new Router({
       path: '/ProductMaintenance_Details',
       name: 'product_maintainance_details',
       component: Product_Maintainance_Details
-    }]
-  }, {
-    path: '/Reports',
-    name: 'Reports',
-    component: ReportShell,
-    children: [{
-      path: '/Reports/SpacePlanning/Report1',
-      name: 'spaceReport1',
-      component: spaceReport1
-    }]
+    }, {
+      path: '/AppsReportList',
+      name: 'apps_report_list',
+      component: AppsReportList
+    }, {
+      path: '/SystemReportList',
+      name: 'system_report_list',
+      component: SystemReportList
+    }
+    , {
+      path: '/SpacePlanningReportList',
+      name: 'space_planning_report_list',
+      component: SpacePlanningReportList
+    },{
+          path: '/Reports/SpacePlanning/Report1',
+          name: 'spaceReport1',
+          component: spaceReport1
+        }
+  ]
+  }, 
+  // {
+  //   path: '/Reports',
+  //   name: 'Reports',
+  //   component: ReportShell,
+  //   children: []
 
-  }, ]
+  // }, 
+]
 })

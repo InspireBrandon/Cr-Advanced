@@ -16,5 +16,11 @@
         "routeName": "plannogram_implementation",
         "title": "Plannogram Implementation",
         "openInNewWindow": false
-    }]
+    }],
+    "ReportListRoute":{
+        "route": "/SpacePlanningReportList",
+        "routeName": "space_planning_report_list",
+        "title": "Space Planning Report List",
+        "openInNewWindow": false
+    }
 }

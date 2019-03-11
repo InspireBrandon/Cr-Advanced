@@ -133,6 +133,8 @@
                         reportDetails.push(self.applicationReportHelper.getReportConfig(element.system_code,report.system_report_code))
                     })
                     self.applicationReports.push(new  ReportDetail(reportDetails,detail))
+                   
+                    
                 }
             });
 
