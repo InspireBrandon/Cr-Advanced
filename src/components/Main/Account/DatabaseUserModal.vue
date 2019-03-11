@@ -10,7 +10,7 @@
                     <v-icon>check</v-icon>
                 </v-btn>
             </v-toolbar>
-            <v-container class="pt-0">
+            <!-- <v-container class="pt-0">
                 <v-select v-model="selectedUser" :items="people" label="find a user" chips item-text="text" item-value="value"></v-select>
                 <v-list dense>
                     <template v-for="(item, index) in items">
@@ -44,7 +44,7 @@
                         </div>
                     </template>
                 </v-list>
-            </v-container>
+            </v-container> -->
         </v-card>
     </v-dialog>
 </template>
