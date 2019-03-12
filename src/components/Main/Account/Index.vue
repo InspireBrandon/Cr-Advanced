@@ -97,8 +97,6 @@
                                 </v-container>
                             </v-card>
                         </v-flex>
-
-
                     </v-flex>
                 </v-layout>
             </v-container>
@@ -107,7 +105,7 @@
         <DatabaseModal ref="DatabaseModal"></DatabaseModal>
         <AccountModal ref="AccountModal"></AccountModal>
         <DatabaseUserModal ref="DatabaseUserModal"></DatabaseUserModal>
-        <v-flex lg8 md12 sm12 xs12 v-if="profile.accountID == null">
+        <v-flex lg8 md12 sm12 xs12 v-if="profile.accountID == null  && !showLoader">
            <br>
             <p>In order to create a database you must first register an account. Please <a href="#" @click.prevent="openAccountModal">click
                     here</a> to register.</p>

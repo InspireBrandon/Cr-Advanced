@@ -2,15 +2,13 @@
         <v-card>
 
             <v-toolbar color="primary">
+                <v-btn color="primary" fab dark small @click="$router.go(-1)">
+                        <v-icon dark>arrow_back_ios</v-icon>
+                    </v-btn>
                 <v-toolbar-title>
                     Space Planning Report 1
                 </v-toolbar-title>
-                <v-spacer>
-                </v-spacer>
-                <v-btn @click="$router.go(-1)" flat>
-                    <v-icon>arrow_back_ios</v-icon>
-                    <span>back</span>
-                </v-btn>
+                
             </v-toolbar>
             <ag-grid-vue :columnDefs="columnDefs" :rowData="rowData" class="ag-theme-balham" :gridOptions="gridOptions "
                 :sideBar='true' style="width: 100%;height: calc(70vh - 25px)">

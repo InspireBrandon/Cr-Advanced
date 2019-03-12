@@ -4,14 +4,13 @@
             <v-layout row wrap>
 
                 <v-toolbar>
+                    <v-btn fab dark small @click="$router.go(-1)">
+                        <v-icon dark>arrow_back_ios</v-icon>
+                    </v-btn>
                     <v-toolbar-title>
                         Space Plan Reports
                     </v-toolbar-title>
-                    <v-spacer></v-spacer>
-                    <v-btn @click="$router.go(-1)" flat>
-                        <v-icon>arrow_back_ios</v-icon>
-                        <span>back</span>
-                    </v-btn>
+                   
                 </v-toolbar>
                 <v-flex lg12 md12 sm12 xs12>
                     <v-list dense two-line>
