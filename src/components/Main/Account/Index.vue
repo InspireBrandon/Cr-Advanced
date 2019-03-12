@@ -35,7 +35,7 @@
                                                         <v-list-tile-title>Share</v-list-tile-title>
                                                     </v-list-tile-content>
                                                 </v-list-tile>
-                                                <v-list-tile avatar @click="deleteDatabase">
+                                                <v-list-tile avatar @click="deleteDatabase(item)">
                                                     <v-list-tile-avatar>
                                                         <v-icon>delete</v-icon>
                                                     </v-list-tile-avatar>
@@ -106,7 +106,7 @@
         <AccountModal ref="AccountModal"></AccountModal>
         <DatabaseUserModal ref="DatabaseUserModal"></DatabaseUserModal>
         <v-flex lg8 md12 sm12 xs12 v-if="profile.accountID == null  && !showLoader">
-           <br>
+            <br>
             <p>In order to create a database you must first register an account. Please <a href="#" @click.prevent="openAccountModal">click
                     here</a> to register.</p>
         </v-flex>
@@ -155,12 +155,22 @@
             maintainUsers(database) {
                 let self = this;
 
-                self.$refs.DatabaseUserModal.open(database.tenantID, function() {
+                self.$refs.DatabaseUserModal.open(database.tenantID, function () {
 
                 });
             },
-            deleteDatabase() {
+            deleteDatabase(item) {
                 let self = this;
+                
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+
+                Axios.delete(process.env.VUE_APP_API +
+                    `Tenant?tenantID=${item.tenantID}`
+
+                ).then(r=>{
+                self.getDatabases(encoded_details.USER_ID, callback3 => {});
+
+                })
             },
             getUserFeatures(userID, callback) {
                 let self = this
@@ -182,12 +192,12 @@
             getAccountDetails(accountID, callback) {
                 let self = this;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
+
                 self.accountID = accountID
                 Axios.get(process.env.VUE_APP_API + `AccountProfile?accountID=${accountID}`)
                     .then(r => {
                         if (r.data) {
                             callback(
-
                                 self.country = r.data.country,
                                 self.domain = r.data.domain
                             )
@@ -210,6 +220,7 @@
                             self.country = r.data.country
                             self.getAccountDetails(self.profile.accountID, callback => {
                                 self.getUserFeatures(encoded_details.USER_ID, callback2 => {
+
                                     self.getDatabases(encoded_details.USER_ID, callback3 => {});
                                 })
                             })
@@ -226,7 +237,10 @@
                 Axios.get(process.env.VUE_APP_API + `Tenant?userID=${userID}`)
                     .then(r => {
                         callback3(self.dataBases = r.data,
+
+
                             self.showLoader = false, )
+
                         setTimeout(() => {
                             self.showLoader = false;
                         }, 1000);
@@ -235,8 +249,10 @@
             openProfileModal() {
                 let self = this
                 self.$refs.ProfileModal.open(self.profile, function () {
-                    self.getAccountDetails(self.accountID);
-                    self.$refs.ProfileModal.close();
+                    self.getAccountDetails(self.accountID, callback => {
+                        self.$refs.ProfileModal.close();
+                    });
+
                 })
             },
             openAccountModal() {
@@ -245,17 +261,20 @@
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
 
                 self.$refs.AccountModal.open(encoded_details.USER_ID, self.country, self.domain, callback => {
-                    self.getAccountDetails(self.accountID);
-                    self.$refs.AccountModal.close();
-                    self.country = callback.country
-                    self.domain = callback.domain
+                    self.getAccountDetails(self.accountID, callback2 => {
+                        self.$refs.AccountModal.close();
+                        self.country = callback.country
+                        self.domain = callback.domain
+                    });
+
                 })
             },
-            openDatabaseModal(database) {
+            openDatabaseModal() {
                 let self = this;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
-                self.$refs.DatabaseModal.open(database.USER_ID, function () {
-                    self.getAccountDetails(self.accountID);
+                self.$refs.DatabaseModal.open(encoded_details.USER_ID, function () {
+                    self.getAccountDetails(self.accountID,callback=>{});
+                    self.getDatabases(encoded_details.USER_ID, callback3 => {});
                     self.$refs.DatabaseModal.close();
                 })
             }

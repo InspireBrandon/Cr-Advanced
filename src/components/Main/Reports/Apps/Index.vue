@@ -84,7 +84,6 @@
                                 self.appConfigDetail.push(t)
                             }
                         })
-
                     }
                 })
 
