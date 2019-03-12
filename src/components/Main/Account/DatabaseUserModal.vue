@@ -30,17 +30,14 @@
 
                                 <v-spacer></v-spacer>
 
-                                <v-list-tile-content class="hidden-md">
-                                    <v-list-tile-title>{{ item.emailAddress }}</v-list-tile-title>
-                                </v-list-tile-content>
-
                                 <v-list-tile-action>
                                     <v-menu>
                                         <v-btn slot="activator" icon>
                                             <v-icon>more_vert</v-icon>
                                         </v-btn>
-                                        <v-list>
-                                            <v-list-tile>Revoke Access</v-list-tile>
+                                        <v-list dense>
+                                            <v-list-tile>set rights</v-list-tile>
+                                            <v-list-tile>revoke access</v-list-tile>
                                         </v-list>
                                     </v-menu>
                                 </v-list-tile-action>

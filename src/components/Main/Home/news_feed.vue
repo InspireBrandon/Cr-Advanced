@@ -1,18 +1,24 @@
 <template>
-    <v-card flat>
-        <v-img src="https://cdn.vuetifyjs.com/images/cards/desert.jpg" aspect-ratio="2.75"></v-img>
+    <v-card>
+        <v-img src="https://picsum.photos/1920/1080" :lazy-src="`https://picsum.photos/1920/1080`" aspect-ratio="2.75">
+            <template v-slot:placeholder>
+                <v-layout fill-height align-center justify-center ma-0>
+                    <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
+                </v-layout>
+            </template>
+        </v-img>
 
         <v-card-title primary-title>
             <div>
-                <h3 class="headline mb-0">Kangaroo Valley Safari</h3>
+                <h3 class="headline mb-0">News feed title</h3>
                 <div> {{ card_text }} </div>
             </div>
         </v-card-title>
 
-        <v-card-actions>
+        <!-- <v-card-actions>
             <v-btn flat color="orange">Share</v-btn>
             <v-btn flat color="orange">Explore</v-btn>
-        </v-card-actions>
+        </v-card-actions> -->
     </v-card>
 </template>
 
@@ -21,7 +27,7 @@
         name: 'news_feed',
         data() {
             return {
-                card_text: 'Lorem ipsum dolor sit amet, brute iriure accusata ne mea. Eos suavitate referrentur ad, te duo agam libris qualisque, utroque quaestio accommodare no qui. Et percipit laboramus usu, no invidunt verterem nominati mel. Dolorem ancillae an mei, ut putant invenire splendide mel, ea nec propriae adipisci. Ignota salutandi accusamus in sed, et per malis fuisset, qui id ludus appareat.'
+                card_text: 'news feed text'
             }
         }
     }
