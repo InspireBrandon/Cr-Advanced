@@ -1,64 +1,71 @@
 <template>
     <v-dialog transition="dialog-bottom-transition" fullscreen persistent v-model="modalShow">
         <v-card>
-            <v-toolbar prominent>
-                <v-btn icon @click="modalShow = false">
-                    <v-icon>arrow_back</v-icon>
-                </v-btn>
-                <v-spacer></v-spacer>
-                <v-btn :disabled="selectedUser == null" :loading="loading" icon @click="addUser">
-                    <v-icon>check</v-icon>
-                </v-btn>
-            </v-toolbar>
-            <v-container class="pt-0">
-                <v-autocomplete v-model="selectedUser" :items="users" label="find a user"></v-autocomplete>
-                <v-list dense style="height: calc(100vh - 148px); overflow: auto;">
-                    <template v-for="(item, index) in databaseUsers">
-                        <div :key="index">
-                            <v-list-tile color="grey-darken-4" avatar>
-                                <v-list-tile-avatar v-if="item.image == '' || item.image == null">
-                                    <v-img :src="'http://oakclifffilmfestival.com/assets/placeholder-user.png'"></v-img>
-                                </v-list-tile-avatar>
+            <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear>
+            <div v-if="!showLoader"> 
+                <v-toolbar prominent>
+                    <v-btn icon @click="modalShow = false">
+                        <v-icon>arrow_back</v-icon>
+                    </v-btn>
+                    <v-spacer></v-spacer>
+                    <v-btn :disabled="selectedUser == null" :loading="loading" icon @click="addUser">
+                        <v-icon>check</v-icon>
+                    </v-btn>
+                </v-toolbar>
+                <v-container class="pt-0">
+                    <v-autocomplete v-model="selectedUser" :items="users" label="find a user"></v-autocomplete>
+                    <v-list dense style="height: calc(100vh - 148px); overflow: auto;">
+                        <template v-for="(item, index) in databaseUsers">
+                            <div :key="index">
+                                <v-list-tile color="grey-darken-4" avatar>
+                                    <v-list-tile-avatar v-if="item.image == '' || item.image == null">
+                                        <v-img :src="'http://oakclifffilmfestival.com/assets/placeholder-user.png'"></v-img>
+                                    </v-list-tile-avatar>
 
-                                <v-list-tile-avatar v-else>
-                                    <v-img :src="'data:image/png;base64,' + item.image"></v-img>
-                                </v-list-tile-avatar>
+                                    <v-list-tile-avatar v-else>
+                                        <v-img :src="'data:image/png;base64,' + item.image"></v-img>
+                                    </v-list-tile-avatar>
 
-                                <v-list-tile-content>
-                                    <v-list-tile-title>{{ item.firstname }} {{ item.lastname }}</v-list-tile-title>
-                                </v-list-tile-content>
+                                    <v-list-tile-content>
+                                        <v-list-tile-title>{{ item.firstname }} {{ item.lastname }}</v-list-tile-title>
+                                    </v-list-tile-content>
 
-                                <v-spacer></v-spacer>
+                                    <v-spacer></v-spacer>
 
-                                <v-list-tile-action>
-                                    <v-menu>
-                                        <v-btn slot="activator" icon>
-                                            <v-icon>more_vert</v-icon>
-                                        </v-btn>
-                                        <v-list dense>
-                                            <v-list-tile>set rights</v-list-tile>
-                                            <v-list-tile>revoke access</v-list-tile>
-                                        </v-list>
-                                    </v-menu>
-                                </v-list-tile-action>
+                                    <v-list-tile-action>
+                                        <v-menu>
+                                            <v-btn slot="activator" icon>
+                                                <v-icon>more_vert</v-icon>
+                                            </v-btn>
+                                            <v-list dense>
+                                                <v-list-tile @click="openFeatureAccessModal(item.systemUserID)">set rights</v-list-tile>
+                                                <v-list-tile>revoke access</v-list-tile>
+                                            </v-list>
+                                        </v-menu>
+                                    </v-list-tile-action>
 
-                            </v-list-tile>
+                                </v-list-tile>
 
-                            <v-divider :inset="item.inset"></v-divider>
-                        </div>
-                    </template>
-                </v-list>
-            </v-container>
+                                <v-divider :inset="item.inset"></v-divider>
+                            </div>
+                        </template>
+                    </v-list>
+                </v-container>
+            </div>
         </v-card>
+        <DatabaseFeatureAccessModal ref="DatabaseFeatureAccessModal"></DatabaseFeatureAccessModal>
     </v-dialog>
 </template>
 <script>
     import Axios from 'axios';
     import jwt from 'jsonwebtoken';
 
+    import DatabaseFeatureAccessModal from './DatabaseFeatureAccessModal';
+
     export default {
         data() {
             return {
+                showLoader: true,
                 loading: false,
                 extended: false,
                 modalShow: false,
@@ -66,7 +73,6 @@
                 afterClose: null,
                 autoUpdate: true,
                 friends: null,
-                isUpdating: false,
                 userDetails: [],
                 users: [],
                 selectedUser: null,
@@ -74,8 +80,8 @@
                 tenantID: null
             }
         },
-        created() {
-            //this.getUsers();
+        components: {
+            DatabaseFeatureAccessModal
         },
         methods: {
             getUsers() {
@@ -113,6 +119,8 @@
                                 }
                             }
                         });
+
+                        self.showLoader = false;
                     })
             },
             getDatabaseUsers() {
@@ -160,6 +168,7 @@
             },
             open(tenantID, callback) {
                 let self = this
+                self.showLoader = true;
                 self.afterClose = callback;
                 self.tenantID = tenantID;
                 this.getDatabaseUsers();
@@ -168,14 +177,13 @@
             remove(item) {
                 const index = this.friends.indexOf(item.name)
                 if (index >= 0) this.friends.splice(index, 1)
+            },
+            openFeatureAccessModal(systemUserID) {
+                let self = this;
+                self.$refs.DatabaseFeatureAccessModal.open(self.tenantID, systemUserID, function() {
+                    
+                });
             }
-        },
-        watch: {
-            isUpdating(val) {
-                if (val) {
-                    setTimeout(() => (this.isUpdating = false), 3000)
-                }
-            }
-        },
+        }
     }
 </script>

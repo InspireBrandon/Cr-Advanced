@@ -318,7 +318,6 @@
                 Axios.get(process.env.VUE_APP_API + `TenantAccess?systemUserID=${userID}`)
                     .then(r => {
                         self.databases = r.data;
-                        console.log(r.data);
                     })
             },
             selectDatabase(database) {
