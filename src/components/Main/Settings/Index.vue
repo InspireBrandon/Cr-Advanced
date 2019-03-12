@@ -28,6 +28,7 @@
                                             <input @change="onImageChange" type="file" style="display: none;" ref="fileInput">
                                         </v-form>
                                     </v-card-text>
+
                                     <v-card-actions>
                                         <v-spacer></v-spacer>
                                         <v-btn color="primary" :loading="loading" @click="submit">save</v-btn>
@@ -36,6 +37,7 @@
                                 </v-card>
                             </v-flex>
                         </v-layout>
+                        <HelpFile></HelpFile>
                     </v-container>
                 </v-flex>
             </v-layout>
@@ -46,11 +48,15 @@
 <script>
     import Axios from 'axios';
     import jwt from 'jsonwebtoken';
-    import {
+    import {   
         EventBus
     } from '@/libs/events/event-bus.js';
+    import HelpFile from '@/components/Main/HelpFile/Index.vue'
 
     export default {
+        components: {
+            HelpFile
+        },
         data() {
             return {
                 loading: false,
@@ -65,6 +71,10 @@
             this.getSystemUserSetting();
         },
         methods: {
+            openRoute(routeItem) {
+                let self = this;
+                self.$router.push(routeItem)
+            },
             getSystemUserSetting() {
                 let self = this;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);

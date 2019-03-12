@@ -4,10 +4,17 @@
     "report":false,
     "routes": [
         {
-            "route": "/ProductMaintenance",
+            "route": "/DataPreparation",
             "routeName": "product_maintenance",
             "title": "Product Maintenance",
             "openInNewWindow": false
+        },
+        {
+            "route": "/PlanogramMaintenance",
+            "routeName": "planogram_maintenance",
+            "title": "Planogram Maintenance",
+            "openInNewWindow": false
         }
+
     ]
 }
