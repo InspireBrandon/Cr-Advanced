@@ -108,18 +108,12 @@
         </v-flex>
       </v-layout>
     </v-toolbar>
-    <v-container class="pa-0">
-      <v-layout>
-          <v-flex md12>
-            <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%; height: calc(100vh - 176px);"
-              :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs" :selectionChanged="onSelectionChanged"
-              :rowData="rowData" :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true"
-              :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true" :enableColResize="true"
-              :floatingFilter="true" :gridReady="onGridReady" :groupMultiAutoColumn="true">
-            </ag-grid-vue>
-          </v-flex>
-      </v-layout>
-    </v-container>
+    <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100vw; height: calc(100vh - 176px);"
+      :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs" :selectionChanged="onSelectionChanged"
+      :rowData="rowData" :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true"
+      :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true" :enableColResize="true"
+      :floatingFilter="true" :gridReady="onGridReady" :groupMultiAutoColumn="true">
+    </ag-grid-vue>
     <!-- <PlanogramSelector ref="planogramSelector"></PlanogramSelector>
     <Spinner ref="spinner"></Spinner>
     <StoreIndicatorSelector ref="storeIndicatorSelector"></StoreIndicatorSelector>

@@ -13,7 +13,7 @@
             <v-container class="pt-0">
                 <v-autocomplete v-model="selectedUser" :items="users" label="find a user"></v-autocomplete>
                 <v-list dense style="height: calc(100vh - 148px); overflow: auto;">
-                    <template v-for="(item, index) in items">
+                    <template v-for="(item, index) in databaseUsers">
                         <div :key="index">
                             <v-list-tile color="grey-darken-4" avatar>
                                 <v-list-tile-avatar v-if="item.image == '' || item.image == null">
@@ -30,9 +30,9 @@
 
                                 <v-spacer></v-spacer>
 
-                                <!-- <v-list-tile-content class="hidden-md">
+                                <v-list-tile-content class="hidden-md">
                                     <v-list-tile-title>{{ item.emailAddress }}</v-list-tile-title>
-                                </v-list-tile-content> -->
+                                </v-list-tile-content>
 
                                 <v-list-tile-action>
                                     <v-menu>
@@ -73,7 +73,7 @@
                 userDetails: [],
                 users: [],
                 selectedUser: null,
-                items: [],
+                databaseUsers: [],
                 tenantID: null
             }
         },
@@ -84,6 +84,8 @@
             getUsers() {
                 let self = this;
 
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+
                 Axios.get(process.env.VUE_APP_API + `SystemUser`)
                     .then(r => {
 
@@ -92,10 +94,26 @@
                         r.data.forEach(element => {
 
                             if (element.emailAddress != null) {
-                                self.users.push({
-                                    text: element.emailAddress.toString(),
-                                    value: element.systemUserID
+                                let isDatabaseUser = false;
+
+                                self.databaseUsers.forEach((dbu, idx) => {
+                                    if (dbu.systemUserID == element.systemUserID) {
+                                        isDatabaseUser = true;
+                                    }
+
+                                    if (dbu.systemUserID == encoded_details.USER_ID) {
+                                        self.databaseUsers.splice(idx, 1);
+                                    }
                                 })
+
+                                if (!isDatabaseUser) {
+                                    if (element.systemUserID != encoded_details.USER_ID) {
+                                        self.users.push({
+                                            text: element.emailAddress.toString(),
+                                            value: element.systemUserID
+                                        })
+                                    }
+                                }
                             }
                         });
                     })
@@ -106,8 +124,8 @@
 
                 Axios.get(process.env.VUE_APP_API + `TenantAccess/User?tenantID=${self.tenantID}`)
                     .then(r => {
-
-                        console.log(r.data);
+                        self.databaseUsers = r.data;
+                        self.getUsers();
                     })
             },
             addUser() {
@@ -119,27 +137,25 @@
 
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
 
-                setTimeout(() => {
-                    self.userDetails.forEach(element => {
-                        if (element.systemUserID == self.selectedUser) {
-                            userObj = element;
-                        }
-                    })
+                self.userDetails.forEach(element => {
+                    if (element.systemUserID == self.selectedUser) {
+                        userObj = element;
+                    }
+                })
 
-                    self.users.forEach((element, idx) => {
-                        if (element.value == self.selectedUser) {
-                            self.users.splice(idx, 1);
-                        }
-                    })
+                self.users.forEach((element, idx) => {
+                    if (element.value == self.selectedUser) {
+                        self.users.splice(idx, 1);
+                    }
+                })
 
-                    Axios.post(process.env.VUE_APP_API +
-                            `TenantAccess?systemUserID=${encoded_details.USER_ID}&tenantID=${self.tenantID}`)
-                        .then(r => {
-                            self.items.push(userObj);
-                            self.selectedUser = null;
-                            self.loading = false;
-                        })
-                }, 200);
+                Axios.post(process.env.VUE_APP_API +
+                        `TenantAccess?systemUserID=${self.selectedUser}&tenantID=${self.tenantID}`)
+                    .then(r => {
+                        self.databaseUsers.push(userObj);
+                        self.selectedUser = null;
+                        self.loading = false;
+                    })
             },
             close() {
                 let self = this

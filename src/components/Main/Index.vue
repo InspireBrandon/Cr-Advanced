@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-navigation-drawer clipped v-model="drawer" floating app>
+        <v-navigation-drawer temporary hide-overlay clipped v-model="drawer" floating app>
             <v-layout column fill-height>
                 <v-toolbar flat class="transparent">
                     <v-list class="pa-0">
@@ -59,9 +59,9 @@
             <span class="title ml-3 mr-5">Chain&nbsp;<span class="font-weight-light">Research</span></span>
             <v-spacer></v-spacer>
             <v-badge color="red" overlap>
-                <template v-slot:badge>
+                <!-- <template v-slot:badge>
                     <span>3</span>
-                </template>
+                </template> -->
                 <v-menu>
                     <v-btn icon slot="activator">
                         <v-avatar style="padding: 2px;" color="white" size="42">
@@ -156,7 +156,7 @@
                                 <img :src="`https://cdn.vuetifyjs.com/images/bottom-sheets/${tile.img}`" :alt="tile.title">
                             </v-avatar>
                         </v-list-tile-avatar> -->
-                        <v-list-tile-title>{{ database.databaseFriendly }}</v-list-tile-title>
+                        <v-list-tile-title>{{ database.databaseName }}</v-list-tile-title>
                     </v-list-tile>
                 </v-list>
             </v-bottom-sheet>
@@ -187,7 +187,7 @@
                 avatarImage: '',
                 backgroundImage: '',
                 eventBus: null,
-                drawer: true,
+                drawer: false,
                 showLoader: true,
                 databases: [],
                 profile: {
@@ -320,7 +320,7 @@
             selectDatabase(database) {
                 let self = this;
                 self.sheet = false;
-                self.snackbarText = "You've entered " + database.databaseFriendly;
+                self.snackbarText = "You've entered " + database.databaseName;
                 self.snackbar = true;
             }
         }
