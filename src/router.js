@@ -34,6 +34,9 @@ import Shrink from '@/components/Main/DataPreparation/Views/ImagePreparation/Shr
 import Space_Planning_Details from '@/views/App_Details/SPACE_PLANNING.vue'
 import Range_Planning_Details from '@/views/App_Details/RANGE_PLANNING.vue'
 import Product_Maintainance_Details from '@/views/App_Details/PRODUCT_MAINTAINANCE.vue'
+//spacePLanning
+import  SpacePlanning from '@/components/Main/Planogram/spaceplanning/src/views/Main'
+
 
 //reports
 import AppsReportList from '@/components/Main/Reports/Apps/Index.vue'
@@ -55,6 +58,10 @@ export default new Router({
       name: 'register',
       component: Register
     }, {
+      path: '/SpacePlanning',
+      name: 'space_planning',
+      component: SpacePlanning
+    },{
       path: '/Menu',
       name: 'main',
       component: Main,
@@ -136,30 +143,10 @@ export default new Router({
           name: 'spaceReport1',
           component: spaceReport1
         }, {
-          path: '/DataPreparation',
-          component: DataPreparation,
-          children: [{
-              path: '',
-              name: 'DataPreparationSelector',
-              component: DataPreparationViewSelection,
-            },
-            {
-              path: 'ProductCatalogue',
-              name: 'ProductCatalogue',
-              component: ProductCatalogue
-            },
-            {
-              path: 'Tray',
-              name: 'Tray',
-              component: Tray
-            },
-            {
-              path: 'Shrink',
-              name: 'Shrink',
-              component: Shrink
-            },
-          ]
-        },
+          path: '/ProductCatalogue',
+          name: 'ProductCatalogue',
+          component: ProductCatalogue
+        }
       ]
     },
     // {

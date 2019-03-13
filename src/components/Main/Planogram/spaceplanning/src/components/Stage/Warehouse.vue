@@ -250,7 +250,7 @@
   import RangeSelectorModal from '@/components/Common/RangeSelectorModal';
   import SpacePlanSelector from '@/components/Common/SpacePlanSelector';
   import Spinner from '@/components/Common/Spinner';
-  import RangingController from '@/components/Main/RangePlanning/ranging-controller'
+  import RangingController from '@/components/Apps/RangePlanning/ranging-controller'
   import LoadSavePlanogramBase from '@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/LoadSavePlanogramBase'
   import YesNoModal from '@/components/Common/YesNoModal';
   import StoreHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/StoreHelper/StoreHelper.js";
@@ -363,7 +363,7 @@
       };
     },
     created() {
-      this.planogramHelper = new LoadSavePlanogramBase(process.env.ServerAddress, true, null);
+      this.planogramHelper = new LoadSavePlanogramBase(process.env.VUE_APP_API, true, null);
       // EventBus.$on("TOGGLE_WAREHOUSE_IMAGES", this.updateImageOnProperty);
       // EventBus.$on("PLANOGRAM_LOADED", this.FilterFromEvent);
     },
@@ -539,7 +539,7 @@
 
         self.$refs.rangeSelectorModal.show(fileID => {
           self.$store.commit("setRangeID", fileID);
-          axios.get(process.env.ServerAddress + `SystemFile/JSON?db=CR-Devinspire&id=${fileID}`)
+          axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fileID}`)
             .then(r => {
               if (r.data) {
                 self.rangingData.dateFromString = r.data.dateFromString;
@@ -597,7 +597,7 @@
         self.bins = dimension == undefined || dimension.bins == undefined ? 0 : dimension.bins;
 
         if (clusterData.rangeID != null) {
-          axios.get(process.env.ServerAddress + `SystemFile/JSON?db=CR-Devinspire&id=${clusterData.rangeID}`)
+          axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${clusterData.rangeID}`)
             .then(r => {
               self.$store.commit("setRangeID", clusterData.rangeID);
               self.$store.commit("setPlanogramName", r.data.planogramName);
@@ -660,7 +660,7 @@
 
           let rangingFileUpdated = self.rangingController.getRangingFile();
 
-          axios.put(process.env.ServerAddress + "SystemFile/JSON/NoRename?db=CR-Devinspire&id=" + vscd.rangeID,
+          axios.put(process.env.VUE_APP_API + "SystemFile/JSON/NoRename?db=CR-Devinspire&id=" + vscd.rangeID,
               rangingFileUpdated)
             .then(r => {
               self.planogramHelper.setCreate(self.spacePlanID == null || isNew);

@@ -1,17 +1,17 @@
 import Konva from 'konva';
 import StoreHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/StoreHelper/StoreHelper.js";
-import GondolaNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/GondolaBase.js";
-import TextHeaderNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/TextHeaderBase.js";
-import PaletteNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/PaletteBase.js";
-import ShelfNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/ShelfBase.js";
-import BaseNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/BaseShelf.js";
-import PegboardNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/PegboardBase.js";
-import PegBarNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/PegBarBase.js";
-import ProductGroupNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/ProductBase.js";
-import BasketNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/BasketBase.js";
-import PlanogramNamer from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/PlanogramNamer.js";
+import GondolaNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/GondolaBase.js";
+import TextHeaderNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/TextHeaderBase.js";
+import PaletteNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PaletteBase.js";
+import ShelfNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/ShelfBase.js";
+import BaseNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/BaseShelf.js";
+import PegboardNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PegboardBase.js";
+import PegBarNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PegBarBase.js";
+import ProductGroupNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/ProductBase.js";
+import BasketNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/BasketBase.js";
+import PlanogramNamer from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PlanogramNamer.js";
 import axios from 'axios';
-import StageWarehouseMiddleware from '@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/stage-warehouse-middleware.js';
+import StageWarehouseMiddleware from '@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/stage-warehouse-middleware.js';
 import ParentTreeRedraw from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/RedrawParentChildBase.js";
 
 class LoadSavePlanogramBase {
@@ -106,7 +106,7 @@ class LoadSavePlanogramBase {
     } else {
       axios
         .put(
-          process.env.ServerAddress +
+          process.env.VUE_APP_API +
           `SystemFile/Json?db=CR-Devinspire&id=${spacePlanID}&name=${planogramName}`,
           output
         )

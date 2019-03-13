@@ -65,8 +65,9 @@
         methods: {
             openApp(routeItem) {
                 let self = this;
-
                 if (routeItem.openInNewWindow) {
+                   
+                    
                     let routeData = this.$router.resolve({
                         name: routeItem.routeName
                     });

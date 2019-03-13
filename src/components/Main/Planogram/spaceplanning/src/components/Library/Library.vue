@@ -333,7 +333,7 @@ export default {
       let self = this;
 
       axios
-        .get(process.env.ServerAddress + "fixtureAdvanced?db=cr-devinspire")
+        .get(process.env.VUE_APP_API + "fixtureAdvanced?db=cr-devinspire")
         .then(result => {
           // console.log(result);
           if (result.data == null) {
@@ -486,7 +486,7 @@ export default {
 }
 
 .inactive-item {
-  background-color: white;
+  
 }
 
 .list-item {

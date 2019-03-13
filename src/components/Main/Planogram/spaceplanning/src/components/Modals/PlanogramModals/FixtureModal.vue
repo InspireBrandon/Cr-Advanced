@@ -510,7 +510,7 @@
 
       EventBus.$on("MODAL_LOAD", this.open);
 
-      axios.get(process.env.ServerAddress + "Fixture?db=CR-Devinspire&type=3&subType=0")
+      axios.get(process.env.VUE_APP_API + "Fixture?db=CR-Devinspire&type=3&subType=0")
         .then(r => {
           let pegs = r.data;
           self.pegs = [];
@@ -559,7 +559,7 @@
             self.viewRender.depth = 0
             return
           }
-          axios.get(process.env.ServerAddress + "/FixtureImage?db=cr-devinspire&id=" + self.newData.renderImage)
+          axios.get(process.env.VUE_APP_API + "/FixtureImage?db=cr-devinspire&id=" + self.newData.renderImage)
             .then(Response => {
 
               self.newData.renderings.forEach(element => {
@@ -601,7 +601,7 @@
             self.viewRenderLabel.depth = 0
             return
           }
-          axios.get(process.env.ServerAddress + "/FixtureImage?db=cr-devinspire&id=" + self.newData.labelType)
+          axios.get(process.env.VUE_APP_API + "/FixtureImage?db=cr-devinspire&id=" + self.newData.labelType)
             .then(Response => {
 
 
@@ -643,7 +643,7 @@
             self.viewRenderShelfEdge.depth = 0
             return
           }
-          axios.get(process.env.ServerAddress + "/FixtureImage?db=cr-devinspire&id=" + self.newData.ShelfEdgeType)
+          axios.get(process.env.VUE_APP_API + "/FixtureImage?db=cr-devinspire&id=" + self.newData.ShelfEdgeType)
             .then(Response => {
 
               if (self.newData.renderings != undefined && self.newData.renderings != null) {
@@ -683,7 +683,7 @@
             self.RenderBackModel.depth = 0
             return
           }
-          axios.get(process.env.ServerAddress + "/FixtureImage?db=cr-devinspire&id=" + self.newData.RenderingsItems
+          axios.get(process.env.VUE_APP_API + "/FixtureImage?db=cr-devinspire&id=" + self.newData.RenderingsItems
               .Backs)
             .then(Response => {
 

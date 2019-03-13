@@ -53,16 +53,16 @@
   //#endregion Modals
 
   import EventBus from "@/components/Main/Planogram/spaceplanning/src/libs/EventBus/EventBus.js";
-  import GondolaNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/GondolaBase.js";
-  import PaletteNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/PaletteBase.js";
-  import ShelfNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/ShelfBase.js";
-  import BaseNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/BaseShelf.js";
-  import PegboardNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/PegboardBase.js";
-  import PegBarNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/PegBarBase.js";
+  import GondolaNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/GondolaBase.js";
+  import PaletteNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PaletteBase.js";
+  import ShelfNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/ShelfBase.js";
+  import BaseNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/BaseShelf.js";
+  import PegboardNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PegboardBase.js";
+  import PegBarNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PegBarBase.js";
   import ProductGroup from "@/components/Main/Planogram/spaceplanning/src/libs/Product/ProductGroup.js";
-  import ProductGroupNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/ProductBase.js";
-  import BasketNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/BasketBase.js";
-  import TextHeaderNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/TextHeaderBase.js";
+  import ProductGroupNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/ProductBase.js";
+  import BasketNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/BasketBase.js";
+  import TextHeaderNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/TextHeaderBase.js";
 
   //calculations
   import CalculationHandler from "@/components/Main/Planogram/spaceplanning/src/libs/CalculationLib/calculationHandler.js";
@@ -313,7 +313,7 @@
           FileName: ""
         }
 
-        let ctrl_loadSavePlanogram = new LoadSavePlanogramBase(process.env.ServerAddress, state.toUpperCase() == "NEW" ?
+        let ctrl_loadSavePlanogram = new LoadSavePlanogramBase(process.env.VUE_APP_API, state.toUpperCase() == "NEW" ?
           true : false, planogramID);
         ctrl_loadSavePlanogram.savePlanogram(self.$store, stage, rangeFileData_ToPlanaogram);
 
@@ -392,7 +392,7 @@
                 let d = new Date();
                 axios
                 .post(
-                  process.env.ServerAddress + "SystemFile/Json?db=CR-Devinspire", {
+                  process.env.VUE_APP_API + "SystemFile/Json?db=CR-Devinspire", {
                     systemFile: {
                       systemUserID: 10,
                       folder: "Space Planning",
@@ -417,7 +417,7 @@
               {
                 axios
                 .put(
-                  process.env.ServerAddress +
+                  process.env.VUE_APP_API +
                   `SystemFile/Json?db=CR-Devinspire&id=${planogramID}&name=${planogramName}`,
                   output
                 )
@@ -440,7 +440,7 @@
         let self = this;
 
         return new Promise((resolve, reject) => {
-          axios.get(process.env.ServerAddress + "SystemFile?db=CR-Devinspire&id=" + fileID)
+          axios.get(process.env.VUE_APP_API + "SystemFile?db=CR-Devinspire&id=" + fileID)
             .then(r => {
               resolve(r.data.name);
             })
@@ -472,7 +472,7 @@
           FileName: ""
         }
 
-        // let ctrl_loadSavePlanogram = new LoadSavePlanogramBase(process.env.ServerAddress, state.toUpperCase() == "NEW" ?
+        // let ctrl_loadSavePlanogram = new LoadSavePlanogramBase(process.env.VUE_APP_API, state.toUpperCase() == "NEW" ?
         //   true : false, planogramID);
         // ctrl_loadSavePlanogram.loadPlanogram(self.$store, stage, this);
 

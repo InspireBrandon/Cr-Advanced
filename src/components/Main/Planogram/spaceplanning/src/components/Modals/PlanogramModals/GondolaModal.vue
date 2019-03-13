@@ -370,7 +370,7 @@
             self.viewRender.depth = 0
             return
           }
-          axios.get(process.env.ServerAddress + "/FixtureImage?db=cr-devinspire&id=" + self.newData.renderImage)
+          axios.get(process.env.VUE_APP_API + "/FixtureImage?db=cr-devinspire&id=" + self.newData.renderImage)
             .then(Response => {
 
               self.newData.renderings.forEach(element => {

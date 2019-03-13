@@ -2,14 +2,14 @@ import Konva from 'konva';
 import StoreHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/StoreHelper/StoreHelper.js";
 import IntersectionTester from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/intersection/IntersectionTester.js";
 import PlanogramItemBase from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PlanogramItemBase.js";
-import GondolaNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/GondolaBase.js";
-import PaletteNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/PaletteBase.js";
-import ShelfNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/ShelfBase.js";
-import BaseNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/BaseShelf.js";
-import PegboardNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/PegboardBase.js";
-import PegBarNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/PegBarBase.js";
-import BasketNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/BasketBase.js";
-import ProductGroupNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Base/ProductBase.js";
+import GondolaNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/GondolaBase.js";
+import PaletteNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PaletteBase.js";
+import ShelfNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/ShelfBase.js";
+import BaseNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/BaseShelf.js";
+import PegboardNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PegboardBase.js";
+import PegBarNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PegBarBase.js";
+import BasketNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/BasketBase.js";
+import ProductGroupNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/ProductBase.js";
 
 class CloneBase {
   constructor(cloneType) {
