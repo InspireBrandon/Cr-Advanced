@@ -16,6 +16,7 @@ import Account from '@/components/Main/Account/Index.vue'
 import Notifications from '@/components/Main/Notifications/Index.vue'
 // Apps
 import RangePlanning from '@/components/Apps/RangePlanning/Index.vue'
+//import SpacePlanning from '@/components/Main/Planogram/spaceplanning/src/views/Main.vue'
 import Fixtures from '@/components/Apps/SpacePlanning/Fixtures/Index.vue'
 
 //Product maintainence
@@ -150,11 +151,9 @@ export default new Router({
       ]
     },
     // {
-    //   path: '/Reports',
-    //   name: 'Reports',
-    //   component: ReportShell,
-    //   children: []
-
-    // }, 
+    //   path: '/SpacePlanning',
+    //   name: 'space_planning',
+    //   component: SpacePlanning,
+    // }
   ]
 })
