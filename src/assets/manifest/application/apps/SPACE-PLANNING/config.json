@@ -12,9 +12,9 @@
         "title": "Default Fixtures",
         "openInNewWindow": false
     }, {
-        "route": "/PlannogramImplementation",
+        "route": "/PlanogramImplementation",
         "routeName": "plannogram_implementation",
-        "title": "Plannogram Implementation",
+        "title": "Planogram Implementation",
         "openInNewWindow": false
     }],
     "ReportListRoute":{

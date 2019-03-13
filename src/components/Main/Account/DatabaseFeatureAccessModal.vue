@@ -6,7 +6,7 @@
                     <v-icon>arrow_back</v-icon>
                 </v-btn>
                 <v-spacer></v-spacer>
-                <v-btn icon @click="submit">
+                <v-btn :loading="loading" icon @click="submit">
                     <v-icon>check</v-icon>
                 </v-btn>
             </v-toolbar>
@@ -81,7 +81,8 @@
                 features: [],
                 featureAccessItems: [],
                 tenantID: null,
-                systemUserID: null
+                systemUserID: null,
+                loading: false
             }
         },
         methods: {
@@ -131,11 +132,12 @@
                     SystemUserFeatureAccessList: self.featureAccessItems
                 }
 
-                console.log(request);
+                self.loading = true;
 
                 Axios.post(process.env.VUE_APP_API + `SystemUserFeatureAccess`, request)
                     .then(r => {
-                        console.log(r.data);
+                        self.loading = false;
+                        self.modalShow = false
                     })
             },
             onAccessChange(accessItem) {
@@ -155,7 +157,7 @@
         self.systemUserFeatureAccessID = -1;
         self.systemUserFeatureAccessUID = "";
         self.systemUserTenantLinkID = -1;
-        self.featureID = -1;
+        self.featureID = data.featureID;
         self.access = false;
         self.crud_Create = false;
         self.crud_Update = false;
