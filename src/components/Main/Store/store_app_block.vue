@@ -1,7 +1,10 @@
 <template>
     <div>
-        <span class="app_name" @click="$router.push(appConfigDetail.config.configName + '_Details')">{{ appConfigDetail.detail.name }}</span>
         <v-card class="elevation-10">
+            <v-toolbar flat dense color="primary" dark>
+                <span class="app_name" @click="$router.push(appConfigDetail.config.configName + '_Details')">{{
+                    appConfigDetail.detail.name }}</span>
+            </v-toolbar>
             <v-img :src="appConfigDetail.detail.imgSrc" height="200px">
                 <v-container fill-height fluid pa-2>
                     <v-layout fill-height>
@@ -13,7 +16,7 @@
             </v-img>
 
             <v-card-actions>
-                <v-btn v-if="!appConfigDetail.installed" @click="installApp" :loading="loading" style="width: 100%;" flat>
+                <v-btn color="primary" v-if="!appConfigDetail.installed" @click="installApp" :loading="loading" style="width: 100%;">
                     Install
                 </v-btn>
                 <v-btn v-else @click="uninstallApp" :loading="loading" style="width: 100%;">

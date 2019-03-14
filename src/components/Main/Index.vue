@@ -23,27 +23,27 @@
                             <v-list-tile-title>{{ item.title }}</v-list-tile-title>
                         </v-list-tile-content>
                     </v-list-tile>
-                  
+
 
                 </v-list>
-                  <v-expansion-panel class="elevation-0">
-                        <v-expansion-panel-content class="elevation-0">
-                            <template v-slot:header>
-                                <div>
-                                    <v-icon dark left>bar_chart</v-icon>
-                                    Reports
-                                </div>
-                            </template>
-                            <v-list-tile v-for="(item, idx) in reports" :key="idx" @click="$router.push(item.route)">
-                                <v-list-tile-action>
-                                    <v-icon>{{ item.icon }}</v-icon>
-                                </v-list-tile-action>
-                                <v-list-tile-content>
-                                    <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-                                </v-list-tile-content>
-                            </v-list-tile>
-                        </v-expansion-panel-content>
-                    </v-expansion-panel>
+                <v-expansion-panel class="elevation-0">
+                    <v-expansion-panel-content class="elevation-0">
+                        <template v-slot:header>
+                            <div>
+                                <v-icon dark left>bar_chart</v-icon>
+                                Reports
+                            </div>
+                        </template>
+                        <v-list-tile v-for="(item, idx) in reports" :key="idx" @click="$router.push(item.route)">
+                            <v-list-tile-action>
+                                <v-icon>{{ item.icon }}</v-icon>
+                            </v-list-tile-action>
+                            <v-list-tile-content>
+                                <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+                            </v-list-tile-content>
+                        </v-list-tile>
+                    </v-expansion-panel-content>
+                </v-expansion-panel>
                 <v-spacer></v-spacer>
                 <!-- <v-list>
                     <v-list-tile v-for="(item, idx) in bottomList" :key="idx" @click="$router.push(item.route)">
@@ -145,15 +145,19 @@
         </v-toolbar>
         <v-content>
             <v-img height="calc(100vh - 55px)" :src="backgroundImage" :alt="''">
+                <v-card class="elevation-1" style="background: url('./banner.png'); background-size: cover; background-position: center;">
+                    <v-card-text style="height: 150px; position: relative; padding-top: 0px">
+                        <router-view class="main-main"></router-view>
+                    </v-card-text>
+                </v-card>
                 <!-- <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear> -->
-                <router-view class="main-main"></router-view>
             </v-img>
         </v-content>
         <div class="text-xs-center">
             <v-bottom-sheet v-model="sheet">
                 <v-list>
                     <v-subheader>Select database</v-subheader>
-                    <v-list-tile  v-for="(database, idx) in databases" :key="idx" @click="selectDatabase(database)">
+                    <v-list-tile v-for="(database, idx) in databases" :key="idx" @click="selectDatabase(database)">
                         <!-- <v-list-tile-avatar>
                             <v-avatar size="32px" tile>
                                 <img :src="`https://cdn.vuetifyjs.com/images/bottom-sheets/${tile.img}`" :alt="tile.title">
