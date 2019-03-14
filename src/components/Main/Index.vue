@@ -57,7 +57,7 @@
                 </v-list> -->
             </v-layout>
         </v-navigation-drawer>
-        <v-toolbar app clipped-left>
+        <v-toolbar dark color="primary" app clipped-left>
             <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
             <span class="title ml-3 mr-5">Chain&nbsp;<span class="font-weight-light">Research</span></span>
             <v-spacer></v-spacer>

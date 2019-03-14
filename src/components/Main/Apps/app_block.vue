@@ -1,7 +1,9 @@
 <template>
     <div>
-        <span @click="$router.push(appConfigDetail.config.configName + '_Details')" class="app_name">{{ appConfigDetail.detail.name }}</span>
         <v-card class="elevation-10">
+            <v-toolbar dense color="primary" dark>
+                <span @click="$router.push(appConfigDetail.config.configName + '_Details')" class="app_name">{{ appConfigDetail.detail.name }}</span>
+            </v-toolbar>
             <v-img :src="appConfigDetail.detail.imgSrc" height="200px">
                 <v-container fill-height fluid pa-2>
                     <v-layout fill-height>
@@ -13,12 +15,11 @@
             </v-img>
 
             <v-card-actions>
-                <v-btn @click="openApp(appConfigDetail.config.routes[0])" v-if="appConfigDetail.config.routes.length == 1"
-                    flat>
+                <v-btn @click="openApp(appConfigDetail.config.routes[0])" v-if="appConfigDetail.config.routes.length == 1">
                     Launch
                 </v-btn>
                 <v-menu offset-y v-if="appConfigDetail.config.routes.length > 1">
-                    <v-btn slot="activator" flat>
+                    <v-btn slot="activator">
                         Launch
                     </v-btn>
                     <v-list>
