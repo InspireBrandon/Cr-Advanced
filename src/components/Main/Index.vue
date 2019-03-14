@@ -145,11 +145,13 @@
         </v-toolbar>
         <v-content>
             <v-img height="calc(100vh - 55px)" :src="backgroundImage" :alt="''">
-                <v-card class="elevation-1" style="background: url('./banner.png'); background-size: cover; background-position: center;">
+                <!-- <v-card class="elevation-1" style="background: url('./banner.png'); background-size: cover; background-position: center;">
                     <v-card-text style="height: 150px; position: relative; padding-top: 0px">
                         <router-view class="main-main"></router-view>
                     </v-card-text>
-                </v-card>
+                </v-card> -->
+
+                <router-view class="main-main"></router-view>
                 <!-- <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear> -->
             </v-img>
         </v-content>
