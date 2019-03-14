@@ -114,7 +114,7 @@
       :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true" :enableColResize="true"
       :floatingFilter="true" :gridReady="onGridReady" :groupMultiAutoColumn="true">
     </ag-grid-vue>
-    <!-- <PlanogramSelector ref="planogramSelector"></PlanogramSelector>
+    <PlanogramSelector ref="planogramSelector"></PlanogramSelector>
     <Spinner ref="spinner"></Spinner>
     <StoreIndicatorSelector ref="storeIndicatorSelector"></StoreIndicatorSelector>
     <DateRangeSelector ref="dateRangeSelector"></DateRangeSelector>
@@ -123,23 +123,23 @@
     <Prompt ref="prompt"></Prompt>
     <Dialog ref="dialog"></Dialog>
     <YesNoModal ref="yesNo"></YesNoModal>
-    <ProductMaintModal ref="productMaint"></ProductMaintModal> -->
+    <ProductMaintModal ref="productMaint"></ProductMaintModal>
   </v-card>
 </template>
 
 <script>
   import RangingController from './ranging-controller';
 
-  // import SoftwareToolbar from "@/components/Common/SoftwareToolbar"
-  // import PlanogramSelector from '@/components/Common/PlanogramSelector';
-  // import DateRangeSelector from '@/components/Common/DateRangeSelector';
-  // import StoreIndicatorSelector from '@/components/Common/StoreIndicatorSelector';
-  // import RangeSelectorModal from '@/components/Common/RangeSelectorModal';
-  // import Spinner from '@/components/Common/Spinner';
-  // import Snackbar from '@/components/Common/Snackbar';
-  // import Prompt from '@/components/Common/Prompt';
-  // import YesNoModal from '@/components/Common/YesNoModal'
-  // import ProductMaintModal from '@/components/Main/DataPreparation/Views/ImagePreparation/ProductMaintModal'
+  import SoftwareToolbar from "@/components/Common/SoftwareToolbar"
+  import PlanogramSelector from '@/components/Common/PlanogramSelector';
+  import DateRangeSelector from '@/components/Common/DateRangeSelector';
+  import StoreIndicatorSelector from '@/components/Common/StoreIndicatorSelector';
+  import RangeSelectorModal from '@/components/Common/RangeSelectorModal';
+  import Spinner from '@/components/Common/Spinner';
+  import Snackbar from '@/components/Common/Snackbar';
+  import Prompt from '@/components/Common/Prompt';
+  import YesNoModal from '@/components/Common/YesNoModal'
+  import ProductMaintModal from '@/components/Main/DataPreparation/Views/ImagePreparation/ProductMaintModal'
 
   import {
     AgGridVue
@@ -155,17 +155,17 @@
   export default {
     name: 'Ranging',
     components: {
-      // YesNoModal,
-      // ProductMaintModal,
-      // SoftwareToolbar,
+      YesNoModal,
+      ProductMaintModal,
+      SoftwareToolbar,
       AgGridVue,
-      // PlanogramSelector,
-      // Spinner,
-      // StoreIndicatorSelector,
-      // DateRangeSelector,
-      // RangeSelectorModal,
-      // Snackbar,
-      // Prompt,
+      PlanogramSelector,
+      Spinner,
+      StoreIndicatorSelector,
+      DateRangeSelector,
+      RangeSelectorModal,
+      Snackbar,
+      Prompt,
       optionsComponent: {
         template: `<div style="text-align: center; cursor: pointer;">
                       <a href="#" @click.prevent="openEdit">Edit</a>
@@ -306,7 +306,7 @@
             self.fileData.monthsBetween = dateRange.monthsBetween;
             self.fileData.tag = "";
 
-            Axios.get(process.env.ServerAddress +
+            Axios.get(process.env.VUE_APP_API +
                 `RangingAdvanced?planogramID=${planogram.planogram_ID}&dateFromID=${dateRange.dateFrom}&dateToID=${dateRange.dateTo}`
               )
               .then(r => {
@@ -329,7 +329,7 @@
         self.isAdd = false;
 
         self.$refs.rangeSelectorModal.show(fileID => {
-          Axios.get(process.env.ServerAddress + `SystemFile/JSON?db=CR-Devinspire&id=${fileID}`)
+          Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fileID}`)
             .then(r => {
               self.fileData.planogramName = r.data.planogramName;
               self.fileData.planogramID = r.data.planogramID;
@@ -376,7 +376,7 @@
           self.fileData.monthsBetween = dateRange.monthsBetween;
 
           self.$refs.spinner.show();
-          Axios.get(process.env.ServerAddress +
+          Axios.get(process.env.VUE_APP_API +
               `RangingAdvanced?planogramID=${self.fileData.planogramID}&dateFromID=${self.fileData.dateFrom}&dateToID=${self.fileData.dateTo}`
             )
             .then(r => {
@@ -411,7 +411,7 @@
           alert("No indicators to update");
         } else {
           self.$refs.spinner.show();
-          Axios.put(process.env.ServerAddress + `Ranging/UpdateIndicators?db=CR-Hinterland-Live`, updatedIndicators)
+          Axios.put(process.env.VUE_APP_API + `Ranging/UpdateIndicators?db=CR-Hinterland-Live`, updatedIndicators)
             .then(r => {
               if (r.data) {
 
@@ -431,7 +431,7 @@
           el["id"] = el.productID;
         })
 
-        Axios.put(process.env.ServerAddress + "Product/UpdateProductList?db=CR-Hinterland-Live", updatedProducts)
+        Axios.put(process.env.VUE_APP_API + "Product/UpdateProductList?db=CR-Hinterland-Live", updatedProducts)
           .then(r => {
             if (r.data) {
               alert("Successfully updated product details");
@@ -557,7 +557,7 @@
         self.$refs.prompt.show(self.fileData.tag.replace(" - ", ""), "Optional File Name Tag", 'Tag', tag => {
 
           if (self.isAdd) {
-            Axios.post(process.env.ServerAddress + "SystemFile/Exists?db=CR-Devinspire", {
+            Axios.post(process.env.VUE_APP_API + "SystemFile/Exists?db=CR-Devinspire", {
               SystemFile: {
                 SystemUser_ID: -1,
                 Folder: "Ranging",
@@ -600,7 +600,7 @@
         fileData["monthsBetween"] = self.fileData.monthsBetween;
         fileData["tag"] = tag;
 
-        Axios.post(process.env.ServerAddress + "SystemFile/JSON?db=CR-Devinspire", {
+        Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
             SystemFile: {
               SystemUser_ID: -1,
               Folder: "Ranging",

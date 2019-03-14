@@ -2,11 +2,11 @@
         <v-card>
 
             <v-toolbar color="primary">
-                <v-btn color="primary" fab dark small @click="$router.go(-1)">
+                <v-btn color="primary" icon @click="$router.go(-1)">
                         <v-icon dark>arrow_back_ios</v-icon>
                     </v-btn>
                 <v-toolbar-title>
-                    Space Planning Report 1
+                    Space Planning Product Report
                 </v-toolbar-title>
                 
             </v-toolbar>

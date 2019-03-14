@@ -1,0 +1,7 @@
+{
+    "title": "Product Fixture Report",
+    "icon": "account_circle",
+    "route": "/Reports/SpacePlanning/ProductFixtureReport",
+    "category":"Space_Planning"
+    
+}

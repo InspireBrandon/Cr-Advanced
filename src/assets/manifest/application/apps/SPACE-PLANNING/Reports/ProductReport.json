@@ -1,0 +1,7 @@
+{
+    "title": "Product Report",
+    "icon": "account_circle",
+    "route": "/Reports/SpacePlanning/ProductReport",
+    "category":"Space_Planning"
+    
+}

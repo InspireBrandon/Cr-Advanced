@@ -44,7 +44,10 @@ import AppsReportList from '@/components/Main/Reports/Apps/Index.vue'
 import SystemReportList from '@/components/Main/Reports/System/Index.vue'
 
 import SpacePlanningReportList from '@/components/Main/Reports/Apps/SpacePlanning/Index.vue'
-import spaceReport1 from '@/views/Reports/SPACE-PLANNING-REPORTS/Report1/Report1.vue'
+import FixtureReport from '@/views/Reports/SPACE-PLANNING-REPORTS/FixtureReport/Index.vue'
+import ProductFixtureReport from '@/views/Reports/SPACE-PLANNING-REPORTS/ProductFixtureReport/Index.vue'
+import ProductReport from '@/views/Reports/SPACE-PLANNING-REPORTS/ProductReport/Index.vue'
+
 
 import HelpFileView from '@/components/Main/HelpFile/Index.vue'
 Vue.use(Router)
@@ -140,9 +143,17 @@ export default new Router({
           name: 'space_planning_report_list',
           component: SpacePlanningReportList
         }, {
-          path: '/Reports/SpacePlanning/Report1',
-          name: 'spaceReport1',
-          component: spaceReport1
+          path: '/Reports/SpacePlanning/FixtureReport',
+          name: 'fixture_Report',
+          component: FixtureReport
+        }, {
+          path: '/Reports/SpacePlanning/ProductFixtureReport',
+          name: 'product_fixture_report',
+          component: ProductFixtureReport
+        }, {
+          path: '/Reports/SpacePlanning/ProductReport',
+          name: 'product_report',
+          component: ProductReport
         }, {
           path: '/ProductCatalogue',
           name: 'ProductCatalogue',
