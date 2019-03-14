@@ -1,17 +1,22 @@
 <template>
-    <v-app dark id="inspire">
+    <v-app light id="inspire">
         <v-content>
-            <v-img height="calc(100vh)" src="https://i.gifer.com/56tk.gif">
+            <v-img :aspect-ratio="9/16"  height="calc(100vh)" src="./bg.png">
                 <v-container fluid fill-height>
                     <v-layout align-center justify-center>
                         <v-flex xs12 sm8 md4>
                             <v-card class="elevation-3">
+                                <v-toolbar dark flat color="primary">
+                                    <v-toolbar-title>
+                                        <span class="title ml-3 mr-5">CR&nbsp;<span class="font-weight-light">Solutions</span></span>
+                                    </v-toolbar-title>
+                                </v-toolbar>
                                 <v-card-text>
                                     <v-form @submit.prevent="login">
-                                        <div style="text-align: center;">
-                                            <img style="max-height: 200px; max-width: 200px;" src="http://project1.devinspire.co.za/static/img/Chain-Research-Logo1.a3c73b4.png"
-                                                alt="">
-                                        </div>
+                                        <!-- <div style="text-align: center;">
+                                            <v-img style="max-height: 200px; max-width: 200px;" src="./logo.png"
+                                                alt=""></v-img>
+                                        </div> -->
                                         <v-text-field v-model="username" prepend-icon="person" name="login" label="Username"
                                             type="text"></v-text-field>
                                         <v-text-field v-model="password" :append-icon="showPassword ? 'visibility' : 'visibility_off'"
