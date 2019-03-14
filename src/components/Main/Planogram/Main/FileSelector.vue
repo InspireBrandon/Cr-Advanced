@@ -79,7 +79,7 @@
     created() {
       let self = this;
 
-      axios.get(process.env.ServerAddress + 'SystemFile/JSON?db=CR-Devinspire&folder=Space Planning')
+      axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-Devinspire&folder=Space Planning')
         .then(r => {
           self.ImportedFiles = r.data;
         })

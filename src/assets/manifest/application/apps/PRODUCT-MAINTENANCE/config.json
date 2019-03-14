@@ -4,8 +4,8 @@
     "report":false,
     "routes": [
         {
-            "route": "/DataPreparation",
-            "routeName": "product_maintenance",
+            "route": "/ProductCatalogue",
+            "routeName": "ProductCatalogue",
             "title": "Product Maintenance",
             "openInNewWindow": false
         },
