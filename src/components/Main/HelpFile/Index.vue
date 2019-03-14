@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-toolbar dark dense>
+    <v-toolbar dark dense color="primary">
       <v-toolbar-title>Help files</v-toolbar-title>
     </v-toolbar>
     <v-container fluid grid-list-lg>

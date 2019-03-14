@@ -3,8 +3,8 @@
         <v-container grid-list-md>
             <v-layout row wrap>
 
-                <v-toolbar>
-                    <v-btn fab dark small @click="$router.go(-1)">
+                <v-toolbar color="primary" dark>
+                    <v-btn icon @click="$router.go(-1)">
                         <v-icon dark>arrow_back_ios</v-icon>
                     </v-btn>
                     <v-toolbar-title>

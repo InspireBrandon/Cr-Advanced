@@ -1,8 +1,8 @@
 <template>
   <v-dialog fullscreen persistent v-model="dialog" width="90vw">
 
-    <v-card dark>
-      <v-toolbar>
+    <v-card >
+      <v-toolbar color="primary" dark>
         <v-toolbar-title> Help File Maintenance - {{ component }}</v-toolbar-title>
         <v-spacer></v-spacer>
   <v-btn color="error" @click="dialog = false">Cancel</v-btn>

@@ -1,7 +1,7 @@
 <template>
     <v-card>
 
-        <v-toolbar color="primary">
+        <v-toolbar color="primary" dark>
             <v-btn color="primary" icon @click="$router.go(-1)">
                 <v-icon dark>arrow_back_ios</v-icon>
             </v-btn>

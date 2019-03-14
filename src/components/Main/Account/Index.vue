@@ -7,7 +7,7 @@
                 <v-layout row wrap>
                     <v-flex lg8 md12 sm12 xs12>
                         <v-flex lg12 md12 sm12 xs12>
-                            <v-toolbar color="grey darken-2">
+                            <v-toolbar dark color="primary">
                                 <v-toolbar-title>Databases</v-toolbar-title>
                                 <v-spacer></v-spacer>
                                 <v-btn icon @click="openDatabaseModal" :disabled="profile.accountID == null" color="secondary">
@@ -17,7 +17,7 @@
                         </v-flex>
 
                         <v-flex lg12 md12 sm12 xs12>
-                            <v-card v-for="(item,index) in dataBases" :key=index color="grey darken-2">
+                            <v-card v-for="(item,index) in dataBases" :key=index color="grey lighten-5">
                                 <v-container class="pa-2 mb-2">
                                     <v-layout>
                                         <v-flex> {{item.databaseName}}</v-flex>
@@ -53,8 +53,8 @@
                     </v-flex>
                     <v-flex lg4 md4 sm12 xs12>
                         <v-flex lg12 md12 sm12 xs12>
-                            <v-card color="grey darken-2">
-                                <v-toolbar color="grey darken-2">
+                            <v-card color="grey lighten-5">
+                                <v-toolbar dark color="primary">
                                     <v-toolbar-title>Account</v-toolbar-title>
                                     <v-spacer></v-spacer>
                                     <v-btn icon @click.prevent="openAccountModal" color="secondary">
@@ -74,13 +74,13 @@
                     </v-flex>
                     <v-flex lg12 md12 sm12 xs12>
                         <v-flex lg12 md12 sm12 xs12>
-                            <v-toolbar color="grey darken-2">
+                            <v-toolbar dark color="primary">
                                 <v-toolbar-title>Account Summary</v-toolbar-title>
                             </v-toolbar>
                         </v-flex>
 
                         <v-flex lg12 md12 sm12 xs12>
-                            <v-card v-for="(item,index) in features" :key=index color="grey darken-2">
+                            <v-card v-for="(item,index) in features" :key=index color="grey lighten-5">
                                 <v-container class="pa-2 mb-2">
                                     <v-layout>
                                         <v-flex md6>{{item.name}}</v-flex>
@@ -88,7 +88,7 @@
                                     </v-layout>
                                 </v-container>
                             </v-card>
-                            <v-card color="grey darken-4">
+                            <v-card color="grey lighten-5">
                                 <v-container class="pa-2 mb-2">
                                     <v-layout>
                                         <v-flex md6>Total</v-flex>

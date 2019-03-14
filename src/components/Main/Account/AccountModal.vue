@@ -1,7 +1,7 @@
 <template>
     <v-dialog transition="dialog-bottom-transition" fullscreen persistent v-model="modalShow">
         <v-card>
-            <v-toolbar>
+            <v-toolbar dark color="primary">
                 <v-toolbar-title>Account Details</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-btn color="error" @click="close"> close

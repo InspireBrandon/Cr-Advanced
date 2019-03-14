@@ -2,10 +2,12 @@
     <div>
         <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear>
         <v-container v-if="!showLoader" fluid grid-list-md>
-            <v-toolbar color="secondary" dense>
+            <v-toolbar color="primary" dark dense>
                 <v-toolbar-title>New</v-toolbar-title>
             </v-toolbar>
+            <br>
             <v-layout row wrap>
+                
                 <v-flex>
                     <store-carousel :appConfigDetail="appConfigDetail"></store-carousel>
                 </v-flex>
