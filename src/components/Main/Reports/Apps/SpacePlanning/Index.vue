@@ -10,7 +10,7 @@
                     <v-toolbar-title>
                         Space Plan Reports
                     </v-toolbar-title>
-                   
+
                 </v-toolbar>
                 <v-flex lg12 md12 sm12 xs12>
                     <v-list dense two-line>
@@ -18,10 +18,12 @@
                             Reports
                         </v-list-tile>
                         <hr>
-                        <v-list-tile v-for="(item,index) in appReports" :key="index" @click.prevent="$router.push(item.route)">
-                            {{item.title}}
-                        </v-list-tile>
-                        <v-divider></v-divider>
+                        <div v-for="(item,index) in appReports" :key="index">
+                            <v-list-tile  @click.prevent="$router.push(item.route)">
+                                {{item.title}}
+                            </v-list-tile>
+                            <v-divider></v-divider>
+                        </div>
                     </v-list>
                 </v-flex>
 

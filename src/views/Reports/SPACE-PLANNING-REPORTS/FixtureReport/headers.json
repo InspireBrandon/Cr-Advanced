@@ -1,0 +1,26 @@
+[{
+        "headerName": "ParentID",
+        "field": "ParentID",
+        "rowGroup": true,
+        "hide": true
+    }, {
+        "headerName": "Type",
+        "field": "Type"
+    },
+    {
+        "headerName": "Height",
+        "field": "Data.Data.height"
+    },
+    {
+        "headerName": "Width",
+        "field": "Data.Data.width"
+    },
+    {
+        "headerName": "Depth",
+        "field": "Data.Data.depth"
+    },
+    {
+        "headerName": "Cost",
+        "field": "Data.Data.cost"
+    }
+]

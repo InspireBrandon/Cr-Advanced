@@ -1,0 +1,7 @@
+{
+    "title": "Fixture Report",
+    "icon": "account_circle",
+    "route": "/Reports/SpacePlanning/FixtureReport",
+    "category":"Space_Planning"
+    
+}

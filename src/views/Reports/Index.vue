@@ -1,7 +1,7 @@
 <template>
     <div>
 
-        <v-navigation-drawer floating fixed app>
+        <!-- <v-navigation-drawer floating fixed app>
             <v-layout column fill-height>
                 <v-toolbar flat class="transparent">
                     <v-list class="pa-0">
@@ -78,7 +78,7 @@
                 </v-list>
 
             </v-layout>
-        </v-navigation-drawer>
+        </v-navigation-drawer> -->
 
         <v-content>
             <router-view></router-view>

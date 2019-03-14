@@ -1,4 +1,7 @@
-
 [{
-    "system_report_code": "Report1"
+    "system_report_code": "FixtureReport"
+}, {
+    "system_report_code": "ProductFixtureReport"
+}, {
+    "system_report_code": "ProductReport"
 }]
