@@ -1,34 +1,34 @@
 <template>
     <div>
         <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear>
-        <v-container v-if="!showLoader" fluid grid-list-md>
-            <v-layout row wrap>
-                <v-flex lg12 md12 sm12 xs12>
+        <v-container v-if="!showLoader" fluid grid-list-md align-center justify-center>
+            <v-layout row wrap justify-center>
+                <v-flex lg8 md12 sm12 xs12>
                     <v-card flat color="transparent">
-                        <h3>Features</h3>
+                        <h3>Frequently Used Features</h3>
                         <v-layout class="pa-0" row wrap>
-                            <v-flex lg2 md3 sm4 xs6 v-for="i in 6">
+                            <v-flex lg2 md3 sm4 xs6 v-for="app in apps" :key="app">
                                 <v-card color="transparent" class="elevation-0" style="text-align: center;">
                                     <div>
-                                        <img style="width: 45px; height: 45px;" src="https://icons-for-free.com/free-icons/png/512/2697649.png">
+                                        <v-img style="height: 45px; width: 45px;" :src="'./' + app.icon + '.png'"></v-img>
                                     </div>
-                                    App Name
+                                    {{ app.name }}
                                 </v-card>
                             </v-flex>
                         </v-layout>
                     </v-card>
                 </v-flex>
-                <v-flex lg12 md12 sm12 xs12>
+                <v-flex lg8 md12 sm12 xs12 class="mt-5">
                     <v-card flat color="transparent">
                         <h3>Documents</h3>
-                        <v-tabs v-model="active" color="transparent" slider-color="red darken-3">
+                        <v-tabs class="elevation-5" v-model="active" color="primary" dark slider-color="yellow">
                             <v-tab ripple>Recent</v-tab>
                             <v-tab ripple>Pinned</v-tab>
                             <v-tab ripple>Shared with me</v-tab>
                             <v-tab-item v-for="n in 3" :key="n">
                                 <v-card color="transparent" flat>
-                                    <v-data-table color="transparent" :headers="headers" :items="desserts" :search="search" hide-actions
-                                        :pagination.sync="pagination" class="elevation-0">
+                                    <v-data-table color="transparent" :headers="headers" :items="desserts" :search="search"
+                                        hide-actions :pagination.sync="pagination">
                                         <template v-slot:items="props">
                                             <td>
                                                 <v-icon color="grey lighten-1">file_copy</v-icon>
@@ -93,6 +93,19 @@
                     }, {
                         name: 'File 5',
                         lo: '14 March',
+                    }
+                ],
+                apps: [{
+                        icon: 'PB',
+                        name: "Space Planning"
+                    },
+                    {
+                        icon: 'PS',
+                        name: "Range Planning"
+                    },
+                    {
+                        icon: 'PG',
+                        name: "Product Maintenence"
                     }
                 ]
             }
