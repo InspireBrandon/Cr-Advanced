@@ -2,7 +2,7 @@
   <div>
     <v-layout row justify-center>
       <v-dialog v-model="dialog" persistent width="80vw">
-        <v-card dark>
+        <v-card >
           <v-card-title style="text-align: center; display: block;" class="headline">{{ title }}</v-card-title>
           <v-card-text style="text-align: center;">
             <v-btn-toggle v-model="toggle_asc">

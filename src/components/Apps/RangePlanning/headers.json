@@ -1,5 +1,4 @@
-[
-    {
+[{
         "headerName": "Product System ID",
         "field": "product_System_ID",
         "headerCheckboxSelection": true,
@@ -24,7 +23,7 @@
     {
         "headerName": "Description",
         "field": "description"
-    },{
+    }, {
         "headerName": "Item Sales Rank",
         "field": "item_sales_rank"
     },
@@ -63,7 +62,9 @@
         "cellEditorParams": {
             "values": ["YES", "NO", "SELECTED", "SELECT"]
         },
-        "cellStyle": {"background-color": "#E3F2FD"}
+        "cellStyle": {
+            "background-color": "#E3F2FD"
+        }
     },
     {
         "headerName": "Numeric Distribution",
@@ -72,7 +73,7 @@
     {
         "headerName": "Weighted Distribution",
         "field": "weighted_Distribution"
-    },{
+    }, {
         "headerName": "Sales Potential Rank",
         "field": "sales_potential_rank"
     },
@@ -103,16 +104,10 @@
     {
         "headerName": "Profit",
         "field": "sales_Profit"
-    }
-    ,
+    },
     {
         "headerName": "Item Profit Rank",
         "field": "item_profit_rank"
-    },
-    {
-        "headerName": "Options",
-        "field": "barcode",
-        "cellRendererFramework": "optionsComponent",
-        "pinned": "right"
     }
+    
 ]
