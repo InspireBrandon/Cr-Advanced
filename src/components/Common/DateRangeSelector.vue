@@ -2,16 +2,16 @@
   <div>
     <v-layout row justify-center>
       <v-dialog v-model="dialog" persistent width="80vw">
-        <v-card dark>
+        <v-card >
           <v-card-title style="text-align: center; display: block;" class="headline">Date Range Selector</v-card-title>
           <v-card-text style="text-align: center;">
             <v-container fluid grid-list-lg>
               <v-layout row wrap>
                 <v-flex md6 xs12>
-                  <v-select dark :items="periodsFrom" v-model="dateFrom" label="Date From:"></v-select>
+                  <v-select  :items="periodsFrom" v-model="dateFrom" label="Date From:"></v-select>
                 </v-flex>
                 <v-flex md6 xs12>
-                  <v-select dark :items="periodsTo" v-model="dateTo" label="Date To:"></v-select>
+                  <v-select  :items="periodsTo" v-model="dateTo" label="Date To:"></v-select>
                 </v-flex>
                 <v-flex md6 xs12>
                   <v-checkbox label="Keep up to date" v-model="periodic" color="primary"></v-checkbox>

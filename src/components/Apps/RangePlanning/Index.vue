@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-toolbar dense flat color="primary">
+    <v-toolbar dense flat dark color="primary">
       <v-toolbar-items>
         <v-menu light offset-y style="margin-bottom: 10px;">
           <v-btn small slot="activator" flat>
@@ -166,17 +166,17 @@
       RangeSelectorModal,
       Snackbar,
       Prompt,
-      optionsComponent: {
-        template: `<div style="text-align: center; cursor: pointer;">
-                      <a href="#" @click.prevent="openEdit">Edit</a>
-                  </div>`,
-        methods: {
-          openEdit() {
-            let product = this.params;
-            this.params.context.componentParent.openEdit(product);
-          },
-        }
-      },
+      // optionsComponent: {
+      //   template: `<div style="text-align: center; cursor: pointer;">
+      //                 <a href="#" @click.prevent="openEdit">Edit</a>
+      //             </div>`,
+      //   methods: {
+      //     openEdit() {
+      //       let product = this.params;
+      //       this.params.context.componentParent.openEdit(product);
+      //     },
+      //   }
+      // },
     },
     data() {
       return {
@@ -395,7 +395,25 @@
         let self = this;
         return new Promise((resolve, reject) => {
           try {
+
+            let component = {
+              template: `<div style="text-align: center; cursor: pointer;">
+                      <a href="#" @click.prevent="openEdit">Edit</a>
+                  </div>`,
+              methods: {
+                openEdit() {
+                  let product = this.params;
+                  this.params.context.componentParent.openEdit(product);
+                },
+              }
+            }
             self.columnDefs = require('./headers.json');
+            self.columnDefs.push({
+              headerName: "Options",
+              field: "component",
+              cellRendererFramework: 'component'
+             
+            })
             resolve(true);
           } catch (exc) {
             reject();
