@@ -105,7 +105,10 @@
         },
         methods: {
             goToReport(reportName) {
-                alert("Go to " + reportName + " report");
+               let self = this
+               alert("Go to " + reportName + " report");
+               self.$router.push('/Reports/SpacePlanning/ProductReport/:SystemFileID')
+
             },
             openImage() {
                 this.imageModal = true;

@@ -143,15 +143,15 @@ export default new Router({
           name: 'space_planning_report_list',
           component: SpacePlanningReportList
         }, {
-          path: '/Reports/SpacePlanning/FixtureReport',
+          path: '/Reports/SpacePlanning/FixtureReport/:SystemFileID',
           name: 'fixture_Report',
           component: FixtureReport
         }, {
-          path: '/Reports/SpacePlanning/ProductFixtureReport',
+          path: '/Reports/SpacePlanning/ProductFixtureReport/:SystemFileID',
           name: 'product_fixture_report',
           component: ProductFixtureReport
         }, {
-          path: '/Reports/SpacePlanning/ProductReport',
+          path: '/Reports/SpacePlanning/ProductReport/:SystemFileID',
           name: 'product_report',
           component: ProductReport
         }, {

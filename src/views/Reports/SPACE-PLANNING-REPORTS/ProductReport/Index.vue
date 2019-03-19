@@ -72,6 +72,13 @@
                 })
             });
         },
+        mounted() {
+            let self = this
+            console.log(self.$router.params);
+            if (self.$router.params != null || self.$router.params != null) {
+                self.LoadReport(self.$router.params)
+            }
+        },
         methods: {
             onGridReady(params) {
                 let self = this;
@@ -109,7 +116,7 @@
                     //     }
                     // }
                     console.log(self.gondolas);
-                    
+
                     self.rowData = self.gondolas
                 })
 

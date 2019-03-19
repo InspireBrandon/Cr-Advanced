@@ -10,24 +10,39 @@
         "field": "Data.Data.description"
     },
     {
-        "headerName": "Volume Potential rank",
-        "field": "Data.Data.volume_potential_rank"
+        "headerName": "Capacity",
+        "field": "Data.CalcData.Capacity"
     },
+
     {
-        "headerName": "Sales",
-        "field": "Data.Data.sales_Retail"
+        "headerName": "Days Of Supply",
+        "field": "Data.CalcData.DaysOfSupply"
     },
+
     {
-        "headerName": "Volume",
-        "field": "Data.Data.sales_Units"
+        "headerName": "Weekly Profit",
+        "field": "Data.CalcData.Weekly_Profit"
     },
+
     {
-        "headerName": "Profit",
-        "field": "Data.Data.sales_Profit"
+        "headerName": "Weekly Sales Cost",
+        "field": "Data.CalcData.Weekly_Sales_Cost"
     },
+
     {
-        "headerName": "Item Profit Rank",
-        "field": "Data.Data.item_profit_rank"
+        "headerName": "Weekly Sales Retail",
+        "field": "Data.CalcData.Weekly_Sales_Retail"
+    },
+
+    {
+        "headerName": "Weekly Sales Units",
+        "field": "Data.CalcData.Weekly_Sales_Units"
+    },
+
+    {
+        "headerName": "X Facings",
+        "field": "Data.CalcData.XFacings"
     }
+
 
 ]
