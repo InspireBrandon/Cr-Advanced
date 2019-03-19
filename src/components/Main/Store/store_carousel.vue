@@ -2,7 +2,7 @@
     <v-layout row wrap>
         <v-flex lg10 md8 sm4 xs12>
             <v-layout row wrap>
-                <v-flex lg3 md4 sm4 xs12 v-for="(appConfigDetail, index) in appConfigDetail" :key="index">
+                <v-flex lg4 md4 sm4 xs12 v-for="(appConfigDetail, index) in appConfigDetail" :key="index">
                     <store-app-block :appConfigDetail="appConfigDetail"></store-app-block>
                 </v-flex>
             </v-layout>

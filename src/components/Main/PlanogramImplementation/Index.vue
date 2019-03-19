@@ -5,21 +5,28 @@
         <v-container grid-list-md>
             <v-layout row wrap>
                 <v-flex lg3 md4 sm12 xs12>
-                    Stores
-                    <v-autocomplete @change="getPlanogramsByStore" v-model="selectedStore" :items="storesDropdown" solo
-                        light></v-autocomplete>
+                    Store
+                    <v-autocomplete placeholder="Please select a store..." @change="getPlanogramsByStore" v-model="selectedStore"
+                        :items="storesDropdown" solo light></v-autocomplete>
                 </v-flex>
                 <!-- <v-flex lg3 md4 sm12 xs12>
                     Category Cluster
                     <v-autocomplete :items="categoryClusters" solo light></v-autocomplete>
                 </v-flex> -->
                 <v-flex lg9 md8 sm12 xs12></v-flex>
-                <v-flex lg9 md4 sm12 xs12>
+                <v-flex v-if="selectedStore != null && planogramsList.length == 0" lg9 md4 sm12 xs12>
+                    No planograms found for selected store
+                </v-flex>
+                <v-flex v-if="selectedStore != null && planogramsList.length > 0" lg9 md4 sm12 xs12>
                     <v-card>
-                        <v-toolbar dense>Planograms</v-toolbar>
+                        <v-toolbar dark flat dense>Planograms</v-toolbar>
                         <v-list light dense>
                             <template v-for="(planogram, index) in planogramsList">
-                                <v-list-tile active-class="poo" :key="index" @click="selectPlanogram(planogram)">
+                                <v-list-tile style="background: lightgrey;" v-if="selectedPlanogram == planogram" :key="index"
+                                    @click="selectPlanogram(planogram)">
+                                    <v-list-tile-title>{{ planogram.name }}</v-list-tile-title>
+                                </v-list-tile>
+                                <v-list-tile v-else :key="index" @click="selectPlanogram(planogram)">
                                     <v-list-tile-title>{{ planogram.name }}</v-list-tile-title>
                                 </v-list-tile>
                                 <v-divider :key="'d' + index"></v-divider>
@@ -27,10 +34,11 @@
                         </v-list>
                     </v-card>
                 </v-flex>
-                <v-flex lg3 md4 sm12 xs12 @click="openImage">
+                <v-flex lg3 md4 sm12 xs12></v-flex>
+                <v-flex v-if="selectedPlanogram != null" lg3 md4 sm12 xs12 @click="openImage">
                     <v-card light>
-                        <v-toolbar dark dense>
-                            <v-toolbar-title>Planogram Image</v-toolbar-title>
+                        <v-toolbar dark flat dense>
+                            Planogram Image
                             <v-spacer></v-spacer>
                             <v-tooltip bottom>
                                 <v-btn icon slot="activator" @click="downloadImage">
@@ -40,17 +48,13 @@
                             </v-tooltip>
                         </v-toolbar>
                         <v-card-text>
-                            <v-img :aspect-ratio="16/9" aspect :src="image"></v-img>
+                            <v-img style="max-width: 200px; max-height: 200px;" :src="image"></v-img>
                         </v-card-text>
                     </v-card>
                 </v-flex>
-                <v-flex v-if="selectedPlanogram != null" lg12 md12 sm12 xs12>
-                    <h3>{{ selectedPlanogram.name }}</h3>
-                </v-flex>
-                <v-flex lg9 md8 sm12 xs12></v-flex>
-                <v-flex lg6 md4 sm12 xs12 class="mt-4">
+                <v-flex v-if="selectedPlanogram != null" lg6 md4 sm12 xs12>
                     <v-card>
-                        <v-toolbar dense>Reports</v-toolbar>
+                        <v-toolbar dark flat dense>Reports</v-toolbar>
                         <v-list light dense>
                             <v-list-tile @click="goToReport('Product')">
                                 <v-list-tile-title>Product Report</v-list-tile-title>
@@ -70,14 +74,16 @@
             </v-layout>
         </v-container>
         <v-dialog fullscreen v-model="imageModal">
-            <v-toolbar prominent>
-                <v-spacer></v-spacer>
-                <v-btn @click="imageModal = false" icon>
-                    <v-icon>close</v-icon>
-                </v-btn>
-            </v-toolbar>
             <v-card>
-                <v-img :src="image"></v-img>
+                <v-toolbar prominent>
+                    <v-spacer></v-spacer>
+                    <v-btn @click="imageModal = false" icon>
+                        <v-icon>close</v-icon>
+                    </v-btn>
+                </v-toolbar>
+                <v-card flat style="padding: 5px;">
+                    <img style="max-height: calc(100vh - 80px); max-width: 1000px;" :src="image">
+                </v-card>
             </v-card>
         </v-dialog>
     </v-card>
@@ -142,6 +148,8 @@
             getPlanogramsByStore() {
                 let self = this;
 
+                self.selectedPlanogram = null;
+
                 self.$nextTick(() => {
                     let cluster = "";
 
@@ -169,8 +177,8 @@
 
                 Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&id=' + planogram.id)
                     .then(r => {
-                        console.log(r.data);
-                        self.image = "https://picsum.photos/200/300/?random?rng=" + Math.random();
+                        console.log(r.data)
+                        self.image = r.data.image;
                     })
             },
             downloadImage() {
@@ -181,7 +189,7 @@
 </script>
 
 <style>
-    .poo {
-        background-image: 'black';
+    .selected-planogram {
+        background: 'black';
     }
 </style>
