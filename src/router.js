@@ -25,6 +25,7 @@ import DataPreparationViewSelection from '@/components/Main/DataPreparation/View
 
 import PlanogramMaintenance from '@/components/Main/PlanogramMaintenance/Index.vue';
 import PlanogramImplementation from '@/components/Main/PlanogramImplementation/Index.vue'
+import RequestNewPlanogram from '@/components/Main/PlanogramImplementation/RequestNewPlanogram.vue'
 
 // Images
 import ProductCatalogue from '@/components/Main/DataPreparation/Views/ImagePreparation/ProductCatalogue';
@@ -129,6 +130,10 @@ export default new Router({
           path: "/PlanogramImplementation",
           name: "planogram_implementation",
           component: PlanogramImplementation
+        }, {
+          path: "/PlanogramImplementation/RequestNewPlanogram/:IsNew",
+          name: "request_new_planogram",
+          component: RequestNewPlanogram
         },
         {
           path: "/PlanogramMaintenance",

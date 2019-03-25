@@ -71,13 +71,12 @@
                     field: element.field
                 })
             });
+
         },
         mounted() {
             let self = this
-            console.log(self.$router.params);
-            if (self.$router.params != null || self.$router.params != null) {
-                self.LoadReport(self.$router.params)
-            }
+
+
         },
         methods: {
             onGridReady(params) {
@@ -94,10 +93,17 @@
                             value: element.id
                         })
                     })
+                    if (self.$route.params.SystemFileID != null && self.$route.params.SystemFileID != undefined) {
+                        self.planogram = parseInt(self.$route.params.SystemFileID)
+                        self.LoadReport(self.$route.params.SystemFileID)
+                    }
                 })
             },
             LoadReport(planogram) {
                 let self = this
+                self.gondolas = []
+
+                
                 let planogramFetcher = new PlanogramFetcher()
                 let tmp = planogramFetcher.getPlanoData("CR-devinspire", planogram, callback => {
                     self.data = callback.data
@@ -115,7 +121,7 @@
                     //         self.gondolas.push(e)
                     //     }
                     // }
-                    console.log(self.gondolas);
+
 
                     self.rowData = self.gondolas
                 })

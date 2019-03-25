@@ -10,7 +10,7 @@
                             <v-toolbar dark color="primary">
                                 <v-toolbar-title>Databases</v-toolbar-title>
                                 <v-spacer></v-spacer>
-                                <v-btn icon @click="openDatabaseModal" :disabled="profile.accountID == null" color="secondary">
+                                <v-btn icon @click="openDatabaseModal" :disabled="profile.accountID == null" color="primary">
                                     <v-icon>add</v-icon>
                                 </v-btn>
                             </v-toolbar>
@@ -57,7 +57,7 @@
                                 <v-toolbar dark color="primary">
                                     <v-toolbar-title>Account</v-toolbar-title>
                                     <v-spacer></v-spacer>
-                                    <v-btn icon @click.prevent="openAccountModal" color="secondary">
+                                    <v-btn icon @click.prevent="openAccountModal" color="primary">
                                         <v-icon>edit</v-icon>
                                     </v-btn>
                                 </v-toolbar>
