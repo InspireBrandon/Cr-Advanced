@@ -116,7 +116,8 @@
                         </v-card>
                         <v-card-text class="py-0">
                             <v-timeline align-top dense>
-                                <v-timeline-item v-for="(item,index) in timelineItems" :key="index" color="pink" small>
+                                <v-timeline-item v-for="(item,index) in timelineItems" :key="index" :color="status[item.status].color"
+                                    small>
                                     <v-layout pt-3>
                                         <v-flex xs3>
                                             <div class="caption">{{item.date}}</div>
@@ -162,21 +163,27 @@
             return {
                 status: [{
                     type: 0,
-                    friendy: "New"
+                    friendy: "New",
+                    color: "blue"
                 }, {
                     type: 1,
+                    color: "blue",
                     friendy: "In Progress"
                 }, {
                     type: 2,
+                    color: "blue",
                     friendy: "Requsting Approval"
                 }, {
                     type: 3,
+                    color: "red",
                     friendy: "Variation Requested"
                 }, {
                     type: 4,
+                    color: "green",
                     friendy: "Approved"
                 }, {
                     type: 5,
+                    color: "green",
                     friendy: "Implemented"
                 }],
                 timelineItems: [],
@@ -314,6 +321,14 @@
                                     date: element.transactionDateTime
                                 })
                             })
+                            self.timelineItems.sort(function (a, b) {
+
+
+                                a = new Date(a.date);
+                                b = new Date(b.date);
+                                return a > b ? -1 : a < b ? 1 : 0;
+                            });
+
                         })
                     })
             },

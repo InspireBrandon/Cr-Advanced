@@ -93,7 +93,7 @@
         } else {
           self.dialog = false;
 
-          self.afterComplete(self.selectedSpacePlan.id);
+          self.afterComplete(self.selectedSpacePlan.id,self.selectedSpacePlan);
         }
       },
       deleteSpacePlanFile() {
