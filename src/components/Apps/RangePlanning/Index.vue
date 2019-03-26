@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-toolbar dense flat dark color="primary">
+    <v-toolbar dense flat dark color="grey darken-1">
       <v-toolbar-items>
         <v-menu light offset-y style="margin-bottom: 10px;">
           <v-btn small slot="activator" flat>
@@ -74,14 +74,14 @@
         <!-- <HelpFileViewer component="Ranging"></HelpFileViewer> -->
       </v-toolbar-title>
     </v-toolbar>
-    <v-toolbar color="grey darken-4" flat>
+    <v-toolbar color="grey lighten-1" dark flat>
       <v-layout row wrap v-if="gotData">
         <v-flex lg2 md3>
           <v-select placeholder="Select cluster type" @change="onClusterTypeChange" dense :items="clusterTypes" v-model="selectedClusterType"
-            solo hide-details></v-select>
+            solo hide-details light></v-select>
         </v-flex>
         <v-flex lg2 md3>
-          <v-select @change="onClusterOptionChange" v-if="selectedClusterType != null" :placeholder="'Select ' + selectedClusterType + ' cluster'"
+          <v-select light @change="onClusterOptionChange" v-if="selectedClusterType != null" :placeholder="'Select ' + selectedClusterType + ' cluster'"
             dense :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" solo hide-details></v-select>
         </v-flex>
         <v-flex lg4 md4 style="margin-top: 15px;">
@@ -93,7 +93,7 @@
         <v-flex lg4 md2 style="text-align: right;">
           <v-menu offset-y>
             <v-btn :disabled="selectedItems.length == 0" slot="activator" color="primary" dark>Set Indicator</v-btn>
-            <v-list dark>
+            <v-list >
               <v-list-tile @click="setIndicator('YES')">
                 <v-list-tile-title>YES</v-list-tile-title>
               </v-list-tile>
@@ -166,17 +166,17 @@
       RangeSelectorModal,
       Snackbar,
       Prompt,
-      // optionsComponent: {
-      //   template: `<div style="text-align: center; cursor: pointer;">
-      //                 <a href="#" @click.prevent="openEdit">Edit</a>
-      //             </div>`,
-      //   methods: {
-      //     openEdit() {
-      //       let product = this.params;
-      //       this.params.context.componentParent.openEdit(product);
-      //     },
-      //   }
-      // },
+      optionsComponent: {
+        template: `<div style="text-align: center; cursor: pointer;">
+                      <a href="#" @click.prevent="openEdit">Edit</a>
+                  </div>`,
+        methods: {
+          openEdit() {
+            let product = this.params;
+            this.params.context.componentParent.openEdit(product);
+          },
+        }
+      },
     },
     data() {
       return {
@@ -262,8 +262,11 @@
     },
     methods: {
       onGridReady(params) {
-        this.gridApi = params.api;
-        this.columnApi = params.columnApi;
+                let self = this;
+                setTimeout(() => {
+                    self.gridApi = params.api;
+                    self.columnApi = params.columnApi;
+                }, 1000)
       },
       openEdit(product) {
         let self = this
@@ -397,24 +400,12 @@
         let self = this;
         return new Promise((resolve, reject) => {
           try {
-
-            let component = {
-              template: `<div style="text-align: center; cursor: pointer;">
-                      <a href="#" @click.prevent="openEdit">Edit</a>
-                  </div>`,
-              methods: {
-                openEdit() {
-                  let product = this.params;
-                  this.params.context.componentParent.openEdit(product);
-                },
-              }
-            }
             self.columnDefs = require('./headers.json');
             self.columnDefs.push({
-              headerName: "Options",
-              field: "component",
-              cellRendererFramework: 'component'
-             
+              headerName: 'Options',
+              field: 'barcode',
+              cellRendererFramework: 'Spinner',
+              pinned: 'right'
             })
             resolve(true);
           } catch (exc) {

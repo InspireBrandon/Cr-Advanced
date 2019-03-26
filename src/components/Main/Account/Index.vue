@@ -20,13 +20,21 @@
                             <v-card v-for="(item,index) in dataBases" :key=index color="grey lighten-5">
                                 <v-container class="pa-2 mb-2">
                                     <v-layout>
-                                        <v-flex> {{item.databaseName}}</v-flex>
+                                        <v-flex> {{item.databaseFriendly}}</v-flex>
                                         <v-spacer></v-spacer>
                                         <v-menu>
                                             <v-btn slot="activator" class="pa-0 ma-0" icon>
                                                 <v-icon>more_vert</v-icon>
                                             </v-btn>
                                             <v-list dense>
+                                                   <v-list-tile avatar @click="editDatabase(item)">
+                                                    <v-list-tile-avatar>
+                                                        <v-icon>share</v-icon>
+                                                    </v-list-tile-avatar>
+                                                    <v-list-tile-content>
+                                                        <v-list-tile-title>Edit</v-list-tile-title>
+                                                    </v-list-tile-content>
+                                                </v-list-tile>
                                                 <v-list-tile avatar @click="maintainUsers(item)">
                                                     <v-list-tile-avatar>
                                                         <v-icon>share</v-icon>
@@ -152,6 +160,9 @@
             self.getUserDetails()
         },
         methods: {
+            editDatabase(item){
+                
+            },
             maintainUsers(database) {
                 let self = this;
 
@@ -196,7 +207,6 @@
                 self.accountID = accountID
                 Axios.get(process.env.VUE_APP_API + `AccountProfile?accountID=${accountID}`)
                     .then(r => {
-                         console.log(r);
                         if (r.data) {
                             callback(
                                 self.country = r.data.country,
@@ -237,6 +247,8 @@
 
                 Axios.get(process.env.VUE_APP_API + `Tenant?userID=${userID}`)
                     .then(r => {
+                            console.log(r);
+                            
                         callback3(self.dataBases = r.data,
 
 

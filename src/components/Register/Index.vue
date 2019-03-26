@@ -1,7 +1,7 @@
 <template>
-    <v-app dark id="inspire">
+    <v-app  id="inspire">
         <v-content>
-            <v-img height="calc(100vh)" src="https://i.gifer.com/56tk.gif">
+            <v-img height="calc(100vh)" src="./bg.png">
                 <v-container fluid fill-height>
                     <v-layout align-center justify-center>
                         <v-flex xs12 sm8 md4>

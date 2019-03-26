@@ -1,18 +1,16 @@
 <template>
   <v-card>
-   
-      <v-toolbar dense dark>
+      <v-toolbar dense color="grey  darken-1" dark>
         <v-spacer></v-spacer>
         <v-toolbar-title>Product Catalogue</v-toolbar-title>
       </v-toolbar>
-
-      <v-container  >
+    
         <v-layout row wrap>
           <v-flex lg12 md12 sm12>
-          <v-toolbar color="primary">
+          <v-toolbar color="grey lighten-1">
             <v-dialog persistent v-model="FilterDialog" width="80vw"> FilterScanBarcode
-              <v-card dark>
-                <v-card-title class="headline">Set Filters</v-card-title>
+              <v-card>
+                <v-card-title class="headline" >Set Filters</v-card-title>
                 <v-card-text>
                   <v-container  grid-list-lg>
                     <v-layout row wrap>
@@ -79,7 +77,7 @@
 
             <v-spacer></v-spacer>
             <v-menu offset-y>
-              <v-btn slot="activator" color="primary">
+              <v-btn slot="activator" dark  color="primary">
                 Action
               </v-btn>
               <v-list>
@@ -112,7 +110,7 @@
           </div>
           </v-flex>
         </v-layout>
-      </v-container>
+     
       <div class="text-xs-center">
         <v-dialog v-model="dialog" width="500">
           <v-card dark>

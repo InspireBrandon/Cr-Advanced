@@ -1,10 +1,10 @@
 <template>
   <div>
     <v-dialog v-model="dialog" fullscreen persistent scrollable>
-      <v-card dark height="400px" style="overflow: auto;">
+      <v-card  height="400px" style="overflow: auto;">
 
         <v-card-title style="text-align: center; display: block;" class="headline pa-0">
-          <v-toolbar>
+          <v-toolbar dark color="primary" >
             <v-toolbar-title>Select A Planogram</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-text-field v-model="searchText" append-icon="search"></v-text-field>

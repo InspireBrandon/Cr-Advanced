@@ -21,8 +21,8 @@
             </v-flex>
 
         </v-toolbar>
-        <ag-grid-vue :columnDefs="columnDefs" :rowData="rowData" class="ag-theme-balham" :gridOptions="gridOptions"
-            :sideBar='true' style="width: 100%;height: calc(70vh - 25px)" @grid-ready="onGridReady">
+        <ag-grid-vue :columnDefs="columnDefs" enableRowGroup="true" :rowData="rowData" class="ag-theme-balham"
+            :gridOptions="gridOptions" :sideBar='true' style="width: 100%;height: calc(70vh - 25px)" @grid-ready="onGridReady">
         </ag-grid-vue>
         <!-- :gridOptions="gridOptions" :sideBar='true' style="  height: calc(70vh - 25px);"
                     :defaultColDef="defaultColDef"  :columnDefs="columnDefs" :selectionChanged="onSelectionChanged"
@@ -41,6 +41,9 @@
     import {
         exists
     } from 'fs';
+    import {
+        setTimeout
+    } from 'timers';
     export default {
         components: {
             AgGridVue,
@@ -51,12 +54,18 @@
                 gondolas: [],
                 planograms: [],
                 planogram: null,
-                columnDefs: [],
+                columnDefs: [{
+                    "headerName": "ParentID",
+                    "field": "ParentID",
+                    "rowGroup": true,
+                    "hide": true
+                }],
                 rowData: [],
                 gridOptions: {
                     context: {
                         componentParent: this
                     },
+
                     groupMultiAutoColumn: true,
                 },
             }
@@ -75,8 +84,11 @@
         methods: {
             onGridReady(params) {
                 let self = this;
-                self.gridApi = params.api;
-                self.columnApi = params.columnApi;
+                setTimeout(() => {
+                    self.gridApi = params.api;
+                    self.columnApi = params.columnApi;
+                }, 1000)
+
             },
             getData() {
                 var self = this
@@ -87,7 +99,7 @@
                             value: element.id
                         })
                     })
-                     if (self.$route.params.SystemFileID != null && self.$route.params.SystemFileID != undefined) {
+                    if (self.$route.params.SystemFileID != null && self.$route.params.SystemFileID != undefined) {
                         self.planogram = parseInt(self.$route.params.SystemFileID)
                         self.LoadReport(self.$route.params.SystemFileID)
                     }
@@ -113,7 +125,7 @@
                         }
                     }
                     console.log(self.gondolas);
-                    
+
                     self.rowData = self.gondolas
                 })
 
