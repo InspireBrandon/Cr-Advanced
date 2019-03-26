@@ -25,6 +25,7 @@ import DataPreparationViewSelection from '@/components/Main/DataPreparation/View
 
 import PlanogramMaintenance from '@/components/Main/PlanogramMaintenance/Index.vue';
 import PlanogramImplementation from '@/components/Main/PlanogramImplementation/Index.vue'
+import RequestNewPlanogram from '@/components/Main/PlanogramImplementation/RequestNewPlanogram.vue'
 
 // Images
 import ProductCatalogue from '@/components/Main/DataPreparation/Views/ImagePreparation/ProductCatalogue';
@@ -129,6 +130,10 @@ export default new Router({
           path: "/PlanogramImplementation",
           name: "planogram_implementation",
           component: PlanogramImplementation
+        }, {
+          path: "/PlanogramImplementation/RequestNewPlanogram/:IsNew",
+          name: "request_new_planogram",
+          component: RequestNewPlanogram
         },
         {
           path: "/PlanogramMaintenance",
@@ -143,15 +148,15 @@ export default new Router({
           name: 'space_planning_report_list',
           component: SpacePlanningReportList
         }, {
-          path: '/Reports/SpacePlanning/FixtureReport',
+          path: '/Reports/SpacePlanning/FixtureReport/:SystemFileID',
           name: 'fixture_Report',
           component: FixtureReport
         }, {
-          path: '/Reports/SpacePlanning/ProductFixtureReport',
+          path: '/Reports/SpacePlanning/ProductFixtureReport/:SystemFileID',
           name: 'product_fixture_report',
           component: ProductFixtureReport
         }, {
-          path: '/Reports/SpacePlanning/ProductReport',
+          path: '/Reports/SpacePlanning/ProductReport/:SystemFileID',
           name: 'product_report',
           component: ProductReport
         }, {

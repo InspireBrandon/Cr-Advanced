@@ -87,6 +87,10 @@
                             value: element.id
                         })
                     })
+                     if (self.$route.params.SystemFileID != null && self.$route.params.SystemFileID != undefined) {
+                        self.planogram = parseInt(self.$route.params.SystemFileID)
+                        self.LoadReport(self.$route.params.SystemFileID)
+                    }
                 })
             },
             LoadReport(planogram) {

@@ -58,6 +58,9 @@
             <v-list-tile @click="planogramToRange">
               <v-list-tile-title>Planogram To Range</v-list-tile-title>
             </v-list-tile>
+            <v-list-tile @click="submitPlanogram">
+              <v-list-tile-title>Submit For Approval</v-list-tile-title>
+            </v-list-tile>
             <v-list-tile @click="closeFile">
               <v-list-tile-title>Close</v-list-tile-title>
             </v-list-tile>
@@ -238,6 +241,7 @@
     <SpacePlanSelector ref="spacePlanSelector"></SpacePlanSelector>
     <Spinner ref="spinner"></Spinner>
     <YesNoModal ref="yesNoModal"></YesNoModal>
+    <PlanogramAprovalModal ref="PlanogramAprovalModal"></PlanogramAprovalModal>
   </div>
 </template>
 
@@ -254,6 +258,7 @@
   import LoadSavePlanogramBase from '@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/LoadSavePlanogramBase'
   import YesNoModal from '@/components/Common/YesNoModal';
   import StoreHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/StoreHelper/StoreHelper.js";
+  import PlanogramAprovalModal from '@/components/Main/Planogram/spaceplanning/src/components/Modals/PlanogramAproval/PlanogramAprovalModal';
 
   function textValue(data) {
     let self = this;
@@ -271,7 +276,8 @@
       RangeSelectorModal,
       SpacePlanSelector,
       Spinner,
-      YesNoModal
+      YesNoModal,
+      PlanogramAprovalModal
     },
     data() {
       let width = 0;
@@ -426,6 +432,28 @@
       }
     },
     methods: {
+      submitPlanogram() {
+        let self = this
+        self.$refs.PlanogramAprovalModal.show('Submit planogram for aproval?', (value,notesModal) => {
+         
+          if (value == true) {
+            if (self.spacePlanID != null) {
+              
+              let systemFileApproval = {
+                systemFile_ID: self.spacePlanID,
+                status: 2,
+                transactionDateTime: new Date(),
+                notes: notesModal
+              }
+              
+              axios.post(process.env.VUE_APP_API + "SystemFileApproval?db=CR-Devinspire", { systemFileApproval: systemFileApproval }).then(
+                r => {
+                })
+            }
+          }
+        })
+
+      },
       rangeToPlanogram() {
         let self = this;
         let ctrl_store = new StoreHelper();
@@ -690,7 +718,7 @@
               }
             })
         } else {
-          self.planogramHelper.setCreate(self.spacePlanID == null  || isNew);
+          self.planogramHelper.setCreate(self.spacePlanID == null || isNew);
 
           if (self.spacePlanID == null) {
             self.planogramHelper.save(self.$store, stage, clusterData, {
@@ -876,7 +904,6 @@
       }
     }
   };
-
 </script>
 
 <style scoped>
@@ -891,5 +918,4 @@
   .details_closed {
     max-height: calc(100vh - 235px)
   }
-
 </style>
