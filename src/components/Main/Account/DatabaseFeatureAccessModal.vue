@@ -1,7 +1,7 @@
 <template>
     <v-dialog transition="dialog-bottom-transition" fullscreen persistent v-model="modalShow">
         <v-card>
-            <v-toolbar prominent>
+            <v-toolbar dark color="primary" prominent>
                 <v-btn icon @click="modalShow = false">
                     <v-icon>arrow_back</v-icon>
                 </v-btn>

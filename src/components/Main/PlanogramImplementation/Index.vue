@@ -19,7 +19,7 @@
                 </v-flex>
                 <v-flex v-if="selectedStore != null && planogramsList.length > 0" lg9 md4 sm12 xs12>
                     <v-card>
-                        <v-toolbar dark flat dense>Planograms</v-toolbar>
+                        <v-toolbar color="primary" dark flat dense>Planograms</v-toolbar>
                         <v-list light dense>
                             <template v-for="(planogram, index) in planogramsList">
                                 <v-list-tile style="background: lightgrey;" v-if="selectedPlanogram == planogram" :key="index"
@@ -37,7 +37,7 @@
                 <v-flex lg3 md4 sm12 xs12></v-flex>
                 <v-flex v-if="selectedPlanogram != null" lg3 md4 sm12 xs12 @click="openImage">
                     <v-card light>
-                        <v-toolbar dark flat dense>
+                        <v-toolbar color="primary" dark flat dense>
                             Planogram Image
                             <v-spacer></v-spacer>
                             <v-tooltip bottom>
@@ -54,7 +54,7 @@
                 </v-flex>
                 <v-flex v-if="selectedPlanogram != null" lg6 md4 sm12 xs12>
                     <v-card>
-                        <v-toolbar dark flat dense>Reports</v-toolbar>
+                        <v-toolbar color="primary" dark flat dense>Reports</v-toolbar>
                         <v-list light dense>
                             <v-list-tile @click="goToReport('Product')">
                                 <v-list-tile-title>Product Report</v-list-tile-title>
@@ -75,7 +75,7 @@
         </v-container>
         <v-dialog fullscreen v-model="imageModal">
             <v-card>
-                <v-toolbar prominent>
+                <v-toolbar dark color="primary" prominent>
                     <v-spacer></v-spacer>
                     <v-btn @click="imageModal = false" icon>
                         <v-icon>close</v-icon>
@@ -102,7 +102,7 @@
                 planograms: [],
                 planogramsList: [],
                 selectedPlanogram: null,
-                image: 'https://picsum.photos/200/300/?random'
+                image: ''
             }
         },
         created() {
