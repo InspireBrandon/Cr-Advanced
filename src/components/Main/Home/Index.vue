@@ -89,11 +89,11 @@
                                 <v-card-text>
                                     <v-layout row wrap>
                                         <v-flex md2>
-                                            <v-img @click="$router.push('RangePlanning')" src="https://image.flaticon.com/icons/svg/172/172122.svg">
+                                            <v-img @click="$router.push('ProductCatalogue')" src="https://image.flaticon.com/icons/svg/1591/1591037.svg">
                                             </v-img>
                                         </v-flex>
                                         <v-flex md2>
-                                            <v-img src="https://image.flaticon.com/icons/svg/1591/1591037.svg">
+                                            <v-img @click="$router.push('RangePlanning')" src="https://image.flaticon.com/icons/svg/172/172122.svg">
                                             </v-img>
                                         </v-flex>
                                         <v-flex md2>
