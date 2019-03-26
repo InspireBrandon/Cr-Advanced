@@ -13,8 +13,8 @@
                                         <v-spacer></v-spacer>
                                         <v-flex shrink style="margin-left: 20px;">
                                             <h2>Welcome Back John</h2>
-                                            <div class="subheading">You are currently connected to CR-Hinterland-Live
-                                            </div>
+                                            <div class="subheading font-weight-light">Current Database:
+                                                CR-Hinterland-Live</div>
                                         </v-flex>
                                         <v-spacer></v-spacer>
                                     </v-layout>
@@ -35,13 +35,17 @@
                                 <v-list class="pa-0">
                                     <template>
                                         <template v-for="(item, index) in items">
-                                            <v-list-tile :key="item.title" @click="">
+                                            <v-list-tile avatar :key="index" @click="">
+                                                <v-list-tile-avatar tile>
+                                                    <v-img :src="item.avatar">
+                                                    </v-img>
+                                                </v-list-tile-avatar>
                                                 <v-list-tile-content>
                                                     <v-list-tile-title v-html="item.title"></v-list-tile-title>
                                                 </v-list-tile-content>
                                                 <v-spacer></v-spacer>
                                                 <v-list-tile-action>
-                                                    <div class="subheading">2019-01-01</div>
+                                                    <div class="subheading font-weight-thin">2019-01-01</div>
                                                 </v-list-tile-action>
                                             </v-list-tile>
                                             <v-divider :key="'d' + item.title"></v-divider>
@@ -62,9 +66,16 @@
                                 </v-card-title>
                                 <v-divider></v-divider>
                                 <v-card-text>
-                                    <span>Planograms Approved</span>
-                                    <span style="margin-left: 5px;">(1/4)</span>
-                                    <v-progress-linear class="my-1" v-model="valueDeterminate"></v-progress-linear>
+                                    <div>
+                                        <span>Planograms Approved</span>
+                                        <span style="margin-left: 5px;">(2/6)</span>
+                                        <v-progress-linear class="my-1" v-model="valueDeterminate"></v-progress-linear>
+                                    </div>
+                                    <div style="margin-top: 20px;">
+                                        <span>Products Captured</span>
+                                        <span style="margin-left: 5px;">(8/12)</span>
+                                        <v-progress-linear class="my-1" v-model="valueDeterminate2"></v-progress-linear>
+                                    </div>
                                 </v-card-text>
                             </v-card>
                         </v-flex>
@@ -78,28 +89,19 @@
                                 <v-card-text>
                                     <v-layout row wrap>
                                         <v-flex md2>
-                                            <v-img
-                                                src="https://99designs-blog.imgix.net/wp-content/uploads/2017/04/attachment_82290822-e1492536097660.png?auto=format&q=60&fit=max&w=930">
+                                            <v-img @click="$router.push('RangePlanning')" src="https://image.flaticon.com/icons/svg/172/172122.svg">
                                             </v-img>
                                         </v-flex>
                                         <v-flex md2>
-                                            <v-img
-                                                src="https://99designs-blog.imgix.net/wp-content/uploads/2017/04/attachment_82290822-e1492536097660.png?auto=format&q=60&fit=max&w=930">
+                                            <v-img src="https://image.flaticon.com/icons/svg/1591/1591037.svg">
                                             </v-img>
                                         </v-flex>
                                         <v-flex md2>
-                                            <v-img
-                                                src="https://99designs-blog.imgix.net/wp-content/uploads/2017/04/attachment_82290822-e1492536097660.png?auto=format&q=60&fit=max&w=930">
+                                            <v-img src="https://image.flaticon.com/icons/svg/1583/1583811.svg">
                                             </v-img>
                                         </v-flex>
                                         <v-flex md2>
-                                            <v-img
-                                                src="https://99designs-blog.imgix.net/wp-content/uploads/2017/04/attachment_82290822-e1492536097660.png?auto=format&q=60&fit=max&w=930">
-                                            </v-img>
-                                        </v-flex>
-                                        <v-flex md2>
-                                            <v-img
-                                                src="https://99designs-blog.imgix.net/wp-content/uploads/2017/04/attachment_82290822-e1492536097660.png?auto=format&q=60&fit=max&w=930">
+                                            <v-img src="https://image.flaticon.com/icons/svg/1584/1584570.svg">
                                             </v-img>
                                         </v-flex>
                                     </v-layout>
@@ -128,7 +130,8 @@
         },
         data() {
             return {
-                valueDeterminate: 25,
+                valueDeterminate: 33,
+                valueDeterminate2: 66,
                 showLoader: true,
                 active: null,
                 text: "ASDF",
@@ -166,22 +169,27 @@
                 checking: false,
                 heartbeats: [],
                 items: [{
+                        avatar: 'https://image.flaticon.com/icons/svg/1591/1591037.svg',
                         title: 'File 1',
                         subtitle: "<span class='text--primary'>Ali Connors</span> &mdash; I'll be in your neighborhood doing errands this weekend. Do you want to hang out?"
                     },
                     {
+                        avatar: 'https://image.flaticon.com/icons/svg/1591/1591037.svg',
                         title: 'File 2',
                         subtitle: "<span class='text--primary'>to Alex, Scott, Jennifer</span> &mdash; Wish I could come, but I'm out of town this weekend."
                     },
                     {
+                        avatar: 'https://image.flaticon.com/icons/svg/1591/1591037.svg',
                         title: 'File 3',
                         subtitle: "<span class='text--primary'>Sandra Adams</span> &mdash; Do you have Paris recommendations? Have you ever been?"
                     },
                     {
+                        avatar: 'https://image.flaticon.com/icons/svg/1583/1583811.svg',
                         title: 'File 4',
                         subtitle: "<span class='text--primary'>Trevor Hansen</span> &mdash; Have any ideas about what we should get Heidi for her birthday?"
                     },
                     {
+                        avatar: 'https://image.flaticon.com/icons/svg/1584/1584570.svg',
                         title: 'File 5',
                         subtitle: "<span class='text--primary'>Britta Holt</span> &mdash; We should eat this: Grate, Squash, Corn, and tomatillo Tacos."
                     }

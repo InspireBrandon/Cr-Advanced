@@ -1,7 +1,5 @@
 <template>
     <v-card>
-        <!-- <v-toolbar>
-        </v-toolbar> -->
         <v-container grid-list-md>
             <v-layout row wrap>
                 <v-flex lg3 md4 sm12 xs12>
@@ -9,10 +7,6 @@
                     <v-autocomplete placeholder="Please select a store..." @change="getPlanogramsByStore" v-model="selectedStore"
                         :items="storesDropdown" solo light></v-autocomplete>
                 </v-flex>
-                <!-- <v-flex lg3 md4 sm12 xs12>
-                    Category Cluster
-                    <v-autocomplete :items="categoryClusters" solo light></v-autocomplete>
-                </v-flex> -->
                 <v-flex lg9 md8 sm12 xs12></v-flex>
                 <v-flex v-if="selectedStore != null && planogramsList.length == 0" lg9 md4 sm12 xs12>
                     No planograms found for selected store
@@ -142,7 +136,6 @@
                         </v-card-text>
                     </v-card>
                 </v-flex>
-
             </v-layout>
         </v-container>
         <v-dialog fullscreen v-model="imageModal">
