@@ -58,7 +58,7 @@
             <v-list-tile @click="planogramToRange">
               <v-list-tile-title>Planogram To Range</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile v-if="spacePlanStatus==3||spacePlanStatus==1||spacePlanStatus==0"  @click="submitPlanogram">
+            <v-list-tile v-if="spacePlanStatus==3||spacePlanStatus==1||spacePlanStatus==0" @click="submitPlanogram">
               <v-list-tile-title>Submit For Approval</v-list-tile-title>
             </v-list-tile>
             <v-list-tile @click="closeFile">
@@ -121,6 +121,9 @@
         <v-flex v-if="rangingData.planogramID != null" md6 style="padding: 2px;">
           <v-select :disabled="!gotData" light placeholder="Clusters" @change="onClusterTypeChange" dense :items="clusterTypes"
             v-model="selectedClusterType" solo hide-details></v-select>
+          <v-select :disabled="!gotData" v-if="showCategoryCluster==true" light placeholder="Category Cluster" @change="onCategoryClusterChange"
+            dense :items="categoryCluster" v-model="selectedCategoryCluster" solo hide-details></v-select>
+
         </v-flex>
         <v-flex v-if="rangingData.planogramID != null && gotData" md6 style="padding: 2px;">
           <v-select light @change="onClusterOptionChange" v-if="selectedClusterType != null" :placeholder="'Select ' + selectedClusterType + ' cluster'"
@@ -283,7 +286,7 @@
       let width = 0;
       width = window.innerWidth * 0.4;
       return {
-        spacePlanStatus:null,
+        spacePlanStatus: null,
         toggle: 0,
         spacePlanID: null,
         spacePlanName: null,
@@ -312,6 +315,10 @@
         clusterTypes: [{
             text: "All Stores Cluster",
             value: "allStores"
+          },
+           {
+            text: "Select Stores",
+            value: "stores"
           },
           {
             text: "Store Cluster",
@@ -435,21 +442,22 @@
     methods: {
       submitPlanogram() {
         let self = this
-        self.$refs.PlanogramAprovalModal.show('Submit planogram for aproval?', (value,notesModal) => {
-         
+        self.$refs.PlanogramAprovalModal.show('Submit planogram for aproval?', (value, notesModal) => {
+
           if (value == true) {
             if (self.spacePlanID != null) {
-              
+
               let systemFileApproval = {
                 systemFile_ID: self.spacePlanID,
                 status: 2,
                 transactionDateTime: new Date(),
                 notes: notesModal
               }
-              self.spacePlanStatus=2
-              axios.post(process.env.VUE_APP_API + "SystemFileApproval?db=CR-Devinspire", { systemFileApproval: systemFileApproval }).then(
-                r => {
-                })
+              self.spacePlanStatus = 2
+              axios.post(process.env.VUE_APP_API + "SystemFileApproval?db=CR-Devinspire", {
+                systemFileApproval: systemFileApproval
+              }).then(
+                r => {})
             }
           }
         })
@@ -605,11 +613,11 @@
 
         let pxlRatio = 3; // TODO: Figure out why this is 1 and not 3, perhaps a timing issue?
 
-        self.$refs.spacePlanSelector.show((spacePlanID,item) => {
-          
+        self.$refs.spacePlanSelector.show((spacePlanID, item) => {
+
           console.log("item");
-            console.log(item);
-            self.spacePlanStatus=item.status
+          console.log(item);
+          self.spacePlanStatus = item.status
           self.$refs.spinner.show();
           self.spacePlanID = spacePlanID;
           self.planogramHelper.loadPlanogram(spacePlanID, self.$store, masterLayer, stage, pxlRatio, self.setClusterAndDimensionData,

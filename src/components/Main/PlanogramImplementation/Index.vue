@@ -164,7 +164,8 @@
 
 <script>
     import Axios from 'axios';
-
+    import jwt from 'jsonwebtoken';
+    
     export default {
         data: () => {
             return {
@@ -217,8 +218,26 @@
         created() {
             let self = this;
             self.getStores();
+            self.getAccount()
         },
         methods: {
+            getAccount() {
+                let self = this
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                   Axios.get(process.env.VUE_APP_API +
+                        `TenantLink_AccessType?systemUserID=${encoded_details.USER_ID}&tenantID=${sessionStorage.currentDatabase}`)
+                    .then(r => {
+                        console.log(r.data);
+                        
+                        if (r.data.tenantLink_AccessTypeList.length > 0) {
+                            let item = r.data.tenantLink_AccessTypeList[0];
+                            console.log(item);
+                            
+                        }
+                      
+                        
+                    })
+            },
             goToReport(reportName) {
                 let self = this
                 self.$router.push(`/Reports/SpacePlanning/${reportName}/` + self.selectedPlanogram.id)
@@ -317,9 +336,8 @@
 
                         Axios.get(process.env.VUE_APP_API +
                             `SystemFileApproval?db=CR-DEVINSPIRE&systemFileID=${planogram.id}`).then(resp => {
-                            console.log("resp");
-                            console.log(resp);
 
+                            self.timelineItems = []
 
                             resp.data.systemFileApprovalList.forEach(element => {
                                 self.timelineItems.push({

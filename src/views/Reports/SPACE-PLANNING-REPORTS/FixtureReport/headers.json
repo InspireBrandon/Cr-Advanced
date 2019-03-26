@@ -1,9 +1,4 @@
-[{
-        "headerName": "ParentID",
-        "field": "ParentID",
-        "rowGroup": true,
-        "hide": true
-    }, {
+[ {
         "headerName": "Type",
         "field": "Type"
     },

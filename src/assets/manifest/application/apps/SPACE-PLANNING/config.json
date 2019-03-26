@@ -5,7 +5,7 @@
         "route": "/SpacePlanning",
         "routeName": "space_planning",
         "title": "Space Planning",
-        "openInNewWindow": true
+        "openInNewWindow": false
     }, {
         "route": "/Fixtures",
         "routeName": "fixtures",

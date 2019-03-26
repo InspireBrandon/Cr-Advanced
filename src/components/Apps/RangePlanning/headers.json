@@ -1,113 +1,113 @@
 [{
-        "headerName": "Product System ID",
-        "field": "product_System_ID",
-        "headerCheckboxSelection": true,
-        "headerCheckboxSelectionFilteredOnly": true,
-        "checkboxSelection": true
+    "headerName": "Product System ID",
+    "field": "product_System_ID",
+    "headerCheckboxSelection": true,
+    "headerCheckboxSelectionFilteredOnly": true,
+    "checkboxSelection": true
+},
+{
+    "headerName": "Barcode",
+    "field": "barcode"
+},
+{
+    "headerName": "Brand",
+    "field": "brand",
+    "editable": true,
+    "hide": true
+},
+{
+    "headerName": "Manufacturer",
+    "field": "manufacturer",
+    "hide": true
+},
+{
+    "headerName": "Description",
+    "field": "description"
+}, {
+    "headerName": "Item Sales Rank",
+    "field": "item_sales_rank"
+},
+{
+    "headerName": "Size Description",
+    "field": "size_Description",
+    "editable": true,
+    "hide": true
+},
+{
+    "headerName": "Category",
+    "field": "category",
+    "hide": true
+},
+{
+    "headerName": "Subcategory",
+    "field": "subcategory",
+    "editable": true,
+    "hide": true
+},
+{
+    "headerName": "Segment",
+    "field": "segment",
+    "editable": true,
+    "hide": true
+},
+{
+    "headerName": "Active Shop Code",
+    "field": "active_Shop_Code"
+},
+{
+    "headerName": "Indicator",
+    "field": "store_Range_Indicator",
+    "editable": true,
+    "cellEditor": "agRichSelectCellEditor",
+    "cellEditorParams": {
+        "values": ["YES", "NO", "SELECTED", "SELECT"]
     },
-    {
-        "headerName": "Barcode",
-        "field": "barcode"
-    },
-    {
-        "headerName": "Brand",
-        "field": "brand",
-        "editable": true,
-        "hide": true
-    },
-    {
-        "headerName": "Manufacturer",
-        "field": "manufacturer",
-        "hide": true
-    },
-    {
-        "headerName": "Description",
-        "field": "description"
-    }, {
-        "headerName": "Item Sales Rank",
-        "field": "item_sales_rank"
-    },
-    {
-        "headerName": "Size Description",
-        "field": "size_Description",
-        "editable": true,
-        "hide": true
-    },
-    {
-        "headerName": "Category",
-        "field": "category",
-        "hide": true
-    },
-    {
-        "headerName": "Subcategory",
-        "field": "subcategory",
-        "editable": true,
-        "hide": true
-    },
-    {
-        "headerName": "Segment",
-        "field": "segment",
-        "editable": true,
-        "hide": true
-    },
-    {
-        "headerName": "Active Shop Code",
-        "field": "active_Shop_Code"
-    },
-    {
-        "headerName": "Indicator",
-        "field": "store_Range_Indicator",
-        "editable": true,
-        "cellEditor": "agRichSelectCellEditor",
-        "cellEditorParams": {
-            "values": ["YES", "NO", "SELECTED", "SELECT"]
-        },
-        "cellStyle": {
-            "background-color": "#E3F2FD"
-        }
-    },
-    {
-        "headerName": "Numeric Distribution",
-        "field": "number_Distribution"
-    },
-    {
-        "headerName": "Weighted Distribution",
-        "field": "weighted_Distribution"
-    }, {
-        "headerName": "Sales Potential Rank",
-        "field": "sales_potential_rank"
-    },
-    {
-        "headerName": "Sales Potential",
-        "field": "sales_potential"
-    },
-    {
-        "headerName": "Item Volume Rank",
-        "field": "item_volume_rank"
-    },
-    {
-        "headerName": "Volume Potential",
-        "field": "volume_potential"
-    },
-    {
-        "headerName": "Volume Potential rank",
-        "field": "volume_potential_rank"
-    },
-    {
-        "headerName": "Sales",
-        "field": "sales_Retail"
-    },
-    {
-        "headerName": "Volume",
-        "field": "sales_Units"
-    },
-    {
-        "headerName": "Profit",
-        "field": "sales_Profit"
-    },
-    {
-        "headerName": "Item Profit Rank",
-        "field": "item_profit_rank"
+    "cellStyle": {
+        "background-color": "#E3F2FD"
     }
-    
+},
+{
+    "headerName": "Numeric Distribution",
+    "field": "number_Distribution"
+},
+{
+    "headerName": "Weighted Distribution",
+    "field": "weighted_Distribution"
+}, {
+    "headerName": "Sales Potential Rank",
+    "field": "sales_potential_rank"
+},
+{
+    "headerName": "Sales Potential",
+    "field": "sales_potential"
+},
+{
+    "headerName": "Item Volume Rank",
+    "field": "item_volume_rank"
+},
+{
+    "headerName": "Volume Potential",
+    "field": "volume_potential"
+},
+{
+    "headerName": "Volume Potential rank",
+    "field": "volume_potential_rank"
+},
+{
+    "headerName": "Sales",
+    "field": "sales_Retail"
+},
+{
+    "headerName": "Volume",
+    "field": "sales_Units"
+},
+{
+    "headerName": "Profit",
+    "field": "sales_Profit"
+},
+{
+    "headerName": "Item Profit Rank",
+    "field": "item_profit_rank"
+}
+
 ]
