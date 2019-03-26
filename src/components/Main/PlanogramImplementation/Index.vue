@@ -148,7 +148,7 @@
         </v-container>
         <v-dialog fullscreen v-model="imageModal">
             <v-card>
-                <v-toolbar prominent>
+                <v-toolbar dark color="primary" prominent>
                     <v-spacer></v-spacer>
                     <v-btn @click="imageModal = false" icon>
                         <v-icon>close</v-icon>
@@ -211,7 +211,7 @@
                 planograms: [],
                 planogramsList: [],
                 selectedPlanogram: null,
-                image: 'https://picsum.photos/200/300/?random'
+                image: ''
             }
         },
         created() {

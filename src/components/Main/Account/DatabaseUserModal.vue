@@ -1,9 +1,10 @@
 <template>
     <v-dialog transition="dialog-bottom-transition" fullscreen persistent v-model="modalShow">
         <v-card>
-            <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear>
-            <div v-if="!showLoader"> 
-                <v-toolbar prominent>
+            <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5">
+            </v-progress-linear>
+            <div v-if="!showLoader">
+                <v-toolbar dark color="primary" prominent>
                     <v-btn icon @click="modalShow = false">
                         <v-icon>arrow_back</v-icon>
                     </v-btn>
@@ -12,48 +13,38 @@
                         <v-icon>check</v-icon>
                     </v-btn>
                 </v-toolbar>
-                <v-container class="pt-0">
-                    <v-autocomplete v-model="selectedUser" :items="users" label="find a user"></v-autocomplete>
-                    <v-list dense style="height: calc(100vh - 148px); overflow: auto;">
-                        <template v-for="(item, index) in databaseUsers">
-                            <div :key="index">
-                                <v-list-tile color="grey-darken-4" avatar>
-                                    <v-list-tile-avatar v-if="item.image == '' || item.image == null">
-                                        <v-img :src="'http://oakclifffilmfestival.com/assets/placeholder-user.png'"></v-img>
-                                    </v-list-tile-avatar>
-
-                                    <v-list-tile-avatar v-else>
-                                        <v-img :src="'data:image/png;base64,' + item.image"></v-img>
-                                    </v-list-tile-avatar>
-
-                                    <v-list-tile-content>
-                                        <v-list-tile-title>{{ item.firstname }} {{ item.lastname }}</v-list-tile-title>
-                                    </v-list-tile-content>
-
-                                    <v-spacer></v-spacer>
-
-                                    <v-list-tile-action>
+                <v-container class="pt-5">
+                    <v-autocomplete style="max-width: 400px;" dense v-model="selectedUser" :items="users" label="find a user"></v-autocomplete>
+                    <v-card>
+                        <v-card-text>
+                            <v-data-table class="elevation-0" hide-actions :items="databaseUsers" :headers="headers">
+                                <template v-slot:items="props">
+                                    <td>{{ props.item.firstname + " " + props.item.lastname }}</td>
+                                    <td>
                                         <v-menu>
                                             <v-btn slot="activator" icon>
                                                 <v-icon>more_vert</v-icon>
                                             </v-btn>
                                             <v-list dense>
-                                                <v-list-tile @click="openFeatureAccessModal(item.systemUserID)">set rights</v-list-tile>
-                                                <v-list-tile>revoke access</v-list-tile>
+                                                <v-list-tile @click="setAccessType(props)">Set access
+                                                    type</v-list-tile>
+                                                <v-divider></v-divider>
+                                                <v-list-tile @click="openFeatureAccessModal(props.item.systemUserID)">
+                                                    Set rights</v-list-tile>
+                                                <v-divider></v-divider>
+                                                <v-list-tile>Revoke access</v-list-tile>
                                             </v-list>
                                         </v-menu>
-                                    </v-list-tile-action>
-
-                                </v-list-tile>
-
-                                <v-divider :inset="item.inset"></v-divider>
-                            </div>
-                        </template>
-                    </v-list>
+                                    </td>
+                                </template>
+                            </v-data-table>
+                        </v-card-text>
+                    </v-card>
                 </v-container>
             </div>
         </v-card>
         <DatabaseFeatureAccessModal ref="DatabaseFeatureAccessModal"></DatabaseFeatureAccessModal>
+        <AccessTypeModal ref="AccessTypeModal"></AccessTypeModal>
     </v-dialog>
 </template>
 <script>
@@ -61,10 +52,29 @@
     import jwt from 'jsonwebtoken';
 
     import DatabaseFeatureAccessModal from './DatabaseFeatureAccessModal';
+    import AccessTypeModal from './AccessTypeModal';
 
     export default {
         data() {
             return {
+                accessTypes: [
+                    "Super User",
+                    "General",
+                    "Store"
+                ],
+                headers: [{
+                        text: 'User name',
+                        align: 'left',
+                        sortable: false,
+                        value: 'firstname'
+                    },
+                    {
+                        text: '',
+                        value: 'iron',
+                        width: "10px",
+                        sortable: false,
+                    }
+                ],
                 showLoader: true,
                 loading: false,
                 extended: false,
@@ -81,7 +91,8 @@
             }
         },
         components: {
-            DatabaseFeatureAccessModal
+            DatabaseFeatureAccessModal,
+            AccessTypeModal
         },
         methods: {
             getUsers() {
@@ -180,8 +191,12 @@
             },
             openFeatureAccessModal(systemUserID) {
                 let self = this;
-                self.$refs.DatabaseFeatureAccessModal.open(self.tenantID, systemUserID, function() {
-                    
+                self.$refs.DatabaseFeatureAccessModal.open(self.tenantID, systemUserID, function () {});
+            },
+            setAccessType(props) {
+                let self = this;
+
+                self.$refs.AccessTypeModal.open(props.item.systemUserID, self.tenantID, accessType => {
                 });
             }
         }

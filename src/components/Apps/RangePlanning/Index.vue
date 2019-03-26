@@ -257,6 +257,8 @@
     created() {
       let self = this;
       self.getColumnDefenitions();
+
+      Axios.defaults.headers.common['TenantID'] = sessionStorage.currentDatabase;
     },
     methods: {
       onGridReady(params) {
