@@ -147,18 +147,25 @@
                 let self = this
 
                 if (self.isNew == false) {
-                    
-                    let request = {
+                    let self = this
+
+
+
+                    let systemFileApproval = {
                         systemFile_ID: self.$route.params.IsNew,
                         status: 3,
                         transactionDateTime: new Date(),
                         notes: self.form.notes
                     }
-                    Axios.post(process.env.VUE_APP_API + `SystemFileApproval?db=CR-DEVINSPIRE`, request).then(r => {
+                    Axios.post(process.env.VUE_APP_API + `SystemFileApproval?db=CR-DEVINSPIRE`, {
+                        systemFileApproval: systemFileApproval
+                    }).then(r => {
+                        console.log(r);
+
                     }).catch(e => {
                         console.log(e);
                     })
-
+                    self.$router.go(-1)
                 }
                 if (self.isNew == true) {
                     alert("create request saved")

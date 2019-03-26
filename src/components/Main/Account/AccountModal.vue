@@ -63,6 +63,8 @@
 
                 Axios.post(process.env.VUE_APP_API + `AccountProfile?userID=${self.userID}`, request)
                     .then(r => {
+                        console.log(r);
+                        
                         if (r.data) {
                             self.afterClose(request)
                         }

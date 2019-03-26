@@ -196,6 +196,7 @@
                 self.accountID = accountID
                 Axios.get(process.env.VUE_APP_API + `AccountProfile?accountID=${accountID}`)
                     .then(r => {
+                         console.log(r);
                         if (r.data) {
                             callback(
                                 self.country = r.data.country,

@@ -58,7 +58,7 @@
             <v-list-tile @click="planogramToRange">
               <v-list-tile-title>Planogram To Range</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile @click="submitPlanogram">
+            <v-list-tile v-if="spacePlanStatus==3||spacePlanStatus==1||spacePlanStatus==0"  @click="submitPlanogram">
               <v-list-tile-title>Submit For Approval</v-list-tile-title>
             </v-list-tile>
             <v-list-tile @click="closeFile">
@@ -283,6 +283,7 @@
       let width = 0;
       width = window.innerWidth * 0.4;
       return {
+        spacePlanStatus:null,
         toggle: 0,
         spacePlanID: null,
         spacePlanName: null,
@@ -445,7 +446,7 @@
                 transactionDateTime: new Date(),
                 notes: notesModal
               }
-              
+              self.spacePlanStatus=2
               axios.post(process.env.VUE_APP_API + "SystemFileApproval?db=CR-Devinspire", { systemFileApproval: systemFileApproval }).then(
                 r => {
                 })
@@ -604,7 +605,11 @@
 
         let pxlRatio = 3; // TODO: Figure out why this is 1 and not 3, perhaps a timing issue?
 
-        self.$refs.spacePlanSelector.show(spacePlanID => {
+        self.$refs.spacePlanSelector.show((spacePlanID,item) => {
+          
+          console.log("item");
+            console.log(item);
+            self.spacePlanStatus=item.status
           self.$refs.spinner.show();
           self.spacePlanID = spacePlanID;
           self.planogramHelper.loadPlanogram(spacePlanID, self.$store, masterLayer, stage, pxlRatio, self.setClusterAndDimensionData,
