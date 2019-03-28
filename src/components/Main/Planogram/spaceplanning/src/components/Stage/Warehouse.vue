@@ -58,7 +58,7 @@
             <v-list-tile @click="planogramToRange">
               <v-list-tile-title>Planogram To Range</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile v-if="spacePlanStatus==3||spacePlanStatus==1||spacePlanStatus==0" @click="submitPlanogram">
+            <v-list-tile v-if="spacePlanStatus==3||spacePlanStatus==1||spacePlanStatus==0 || spacePlanStatus== null" @click="submitPlanogram">
               <v-list-tile-title>Submit For Approval</v-list-tile-title>
             </v-list-tile>
             <v-list-tile @click="closeFile">

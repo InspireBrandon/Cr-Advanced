@@ -5,8 +5,9 @@
             <v-layout row wrap>
                 <v-flex lg3 md4 sm12 xs12>
                     Store
-                    <v-autocomplete placeholder="Please select a store..." @change="getPlanogramsByStore" v-model="selectedStore"
-                        :items="storesDropdown" solo light :disabled="storeDisabled"></v-autocomplete>
+                    <v-autocomplete placeholder="Please select a store..." @change="getPlanogramsByStore"
+                        v-model="selectedStore" :items="storesDropdown" solo light :disabled="storeDisabled">
+                    </v-autocomplete>
                 </v-flex>
                 <v-flex lg9 md8 sm12 xs12></v-flex>
                 <v-flex v-if="selectedStore != null && planogramsList.length == 0" lg9 md4 sm12 xs12>
@@ -22,7 +23,7 @@
                             <template v-slot:items="props">
                                 <tr @click.prevent="selectPlanogram(props.item)">
                                     <td>{{ props.item.name }}</td>
-                                    <td>{{status[props.item.status].friendy}}</td>
+                                    <td>{{status[props.item.status == null ? 2 : props.item.status].friendy}}</td>
                                     <td>
                                         <v-menu>
                                             <v-btn slot="activator" class="pa-0 ma-0" icon>
@@ -37,7 +38,8 @@
                                                         <v-list-tile-title>No options</v-list-tile-title>
                                                     </v-list-tile-content>
                                                 </v-list-tile>
-                                                <v-list-tile avatar v-if="props.item.status==4" @click="implementPlano(props.item)">
+                                                <v-list-tile avatar v-if="props.item.status==4"
+                                                    @click="implementPlano(props.item)">
                                                     <v-list-tile-avatar>
                                                         <v-icon>share</v-icon>
                                                     </v-list-tile-avatar>
@@ -45,7 +47,8 @@
                                                         <v-list-tile-title>Implement Planogram</v-list-tile-title>
                                                     </v-list-tile-content>
                                                 </v-list-tile>
-                                                <v-list-tile avatar v-if="props.item.status==2" @click="ApprovePlano(props.item)">
+                                                <v-list-tile avatar v-if="props.item.status==2"
+                                                    @click="ApprovePlano(props.item)">
                                                     <v-list-tile-avatar>
                                                         <v-icon>share</v-icon>
                                                     </v-list-tile-avatar>
@@ -53,7 +56,8 @@
                                                         <v-list-tile-title>Approve</v-list-tile-title>
                                                     </v-list-tile-content>
                                                 </v-list-tile>
-                                                <v-list-tile v-if="props.item.status==2" avatar @click="$router.push(`/PlanogramImplementation/RequestNewPlanogram/`+props.item.id)">
+                                                <v-list-tile v-if="props.item.status==2" avatar
+                                                    @click="$router.push(`/PlanogramImplementation/RequestNewPlanogram/`+props.item.id)">
                                                     <v-list-tile-avatar>
                                                         <v-icon>share</v-icon>
                                                     </v-list-tile-avatar>
@@ -117,8 +121,8 @@
                         </v-card>
                         <v-card-text class="py-0">
                             <v-timeline align-top dense>
-                                <v-timeline-item v-for="(item,index) in timelineItems" :key="index" :color="status[item.status].color"
-                                    small>
+                                <v-timeline-item v-for="(item,index) in timelineItems" :key="index"
+                                    :color="status[item.status].color" small>
                                     <v-layout pt-3>
                                         <v-flex xs3>
                                             <div class="caption">{{item.date}}</div>
@@ -159,7 +163,7 @@
 <script>
     import Axios from 'axios';
     import jwt from 'jsonwebtoken';
-    
+
     export default {
         data: () => {
             return {
@@ -219,15 +223,20 @@
             getAccessType() {
                 let self = this
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
-                   Axios.get(process.env.VUE_APP_API +
-                        `TenantLink_AccessType?systemUserID=${encoded_details.USER_ID}&tenantID=${sessionStorage.currentDatabase}`)
+                Axios.get(process.env.VUE_APP_API +
+                        `TenantLink_AccessType?systemUserID=${encoded_details.USER_ID}&tenantID=${sessionStorage.currentDatabase}`
+                    )
                     .then(r => {
-                        if (r.data.tenantLink_AccessTypeList.length > 0) {
+                        if (r.data.isDatabaseOwner) {
+                            self.getPlanogramsByStore();
+                        } else {
                             let item = r.data.tenantLink_AccessTypeList[0];
 
-                            if(item.accessType == 3) {
+                            if (item.accessType == 3) {
                                 self.selectedStore = item.storeID;
                                 self.storeDisabled = true;
+                                self.getPlanogramsByStore();
+                            } else {
                                 self.getPlanogramsByStore();
                             }
                         }
