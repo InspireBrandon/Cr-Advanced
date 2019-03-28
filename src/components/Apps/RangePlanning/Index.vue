@@ -1,12 +1,13 @@
 <template>
-  <v-card>
-    <v-toolbar dense flat dark color="grey darken-1">
+  <div class="ranging">
+    <v-toolbar dense dark>
+
       <v-toolbar-items>
-        <v-menu light offset-y style="margin-bottom: 10px;">
-          <v-btn small slot="activator" flat>
+        <v-menu dark offset-y style="margin-bottom: 10px;">
+          <v-btn slot="activator" flat>
             File
           </v-btn>
-          <v-list dense>
+          <v-list>
             <v-list-tile @click="newRange">
               <v-list-tile-title>New</v-list-tile-title>
             </v-list-tile>
@@ -25,21 +26,24 @@
             </v-list-tile>
           </v-list>
         </v-menu>
-        <!-- <v-menu light offset-y style="margin-bottom: 10px;">
+        <v-menu dark offset-y style="margin-bottom: 10px;">
           <v-btn slot="activator" flat>
             Options
           </v-btn>
-          <v-list dense>
-            <v-list-tile @click="fitColumns">
+          <v-list>
+            <v-list-tile @click="fitColumns" >
               <v-list-tile-title>Fit Columns</v-list-tile-title>
             </v-list-tile>
+            <!-- <v-list-tile @click="saveRange">
+              <v-list-tile-title>Save</v-list-tile-title>
+            </v-list-tile> -->
           </v-list>
-        </v-menu> -->
-        <v-menu light offset-y style="margin-bottom: 10px;">
-          <v-btn small slot="activator" flat>
+        </v-menu>
+        <v-menu dark offset-y style="margin-bottom: 10px;">
+          <v-btn slot="activator" flat>
             Database
           </v-btn>
-          <v-list dense>
+          <v-list>
             <v-list-tile :disabled="rowData.length < 1" @click="updateStoreIndicators">
               <v-list-tile-title>Update Indicators</v-list-tile-title>
             </v-list-tile>
@@ -48,11 +52,11 @@
             </v-list-tile>
           </v-list>
         </v-menu>
-        <v-menu light v-if="selectedClusterOption != null" offset-y style="margin-bottom: 10px;">
-          <v-btn small slot="activator" flat>
+        <v-menu v-if="selectedClusterOption != null" dark offset-y style="margin-bottom: 10px;">
+          <v-btn slot="activator" flat>
             View
           </v-btn>
-          <v-list dense>
+          <v-list>
             <v-list-tile :disabled="selectedClusterOption == null" @click="setViewType('CLUSTER')">
               <v-list-tile-title>Cluster</v-list-tile-title>
             </v-list-tile>
@@ -71,49 +75,59 @@
 
       <v-toolbar-title>
         <span>Range Planning</span>
-        <!-- <HelpFileViewer component="Ranging"></HelpFileViewer> -->
+        <HelpFileViewer component="Ranging"></HelpFileViewer>
       </v-toolbar-title>
     </v-toolbar>
-    <v-toolbar color="grey lighten-1" dark flat>
-      <v-layout row wrap v-if="gotData">
-        <v-flex lg2 md3>
-          <v-select placeholder="Select cluster type" @change="onClusterTypeChange" dense :items="clusterTypes" v-model="selectedClusterType"
-            solo hide-details light></v-select>
-        </v-flex>
-        <v-flex lg2 md3>
-          <v-select light @change="onClusterOptionChange" v-if="selectedClusterType != null" :placeholder="'Select ' + selectedClusterType + ' cluster'"
-            dense :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" solo hide-details></v-select>
-        </v-flex>
-        <v-flex lg4 md4 style="margin-top: 15px;">
-          <span v-show="storesInCluster > -1">{{ storesInCluster }} Stores </span>
-          <span v-show="getItemsToAudit() > 0" style="font-weight: bold; color: red;"> - {{ getItemsToAudit() }}
-            product(s) need auditing</span>
-        </v-flex>
-        <!-- <v-flex lg2 md-and-down></v-flex> -->
-        <v-flex lg4 md2 style="text-align: right;">
-          <v-menu offset-y>
-            <v-btn :disabled="selectedItems.length == 0" slot="activator" color="primary" dark>Set Indicator</v-btn>
-            <v-list >
-              <v-list-tile @click="setIndicator('YES')">
-                <v-list-tile-title>YES</v-list-tile-title>
-              </v-list-tile>
-              <v-list-tile @click="setIndicator('NO')">
-                <v-list-tile-title>NO</v-list-tile-title>
-              </v-list-tile>
-              <v-list-tile @click="setSelectedStores">
-                <v-list-tile-title>SELECTED</v-list-tile-title>
-              </v-list-tile>
-            </v-list>
-          </v-menu>
-        </v-flex>
+    <v-container fluid grid-list-lg>
+      <v-layout row wrap>
+        <v-toolbar dark>
+          <v-layout row wrap v-if="gotData">
+            <v-flex lg2 md3>
+              <v-select placeholder="Select cluster type" @change="onClusterTypeChange" dense :items="clusterTypes"
+                v-model="selectedClusterType" solo hide-details></v-select>
+            </v-flex>
+            <v-flex lg2 md3>
+              <v-select @change="onClusterOptionChange" v-if="selectedClusterType != null" :placeholder="'Select ' + selectedClusterType + ' cluster'"
+                dense :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" solo hide-details></v-select>
+            </v-flex>
+            <v-flex lg4 md4 style="margin-top: 15px;">
+              <span v-show="storesInCluster > -1">{{ storesInCluster }} Stores </span>
+              <span v-show="getItemsToAudit() > 0" style="font-weight: bold; color: red;"> - {{ getItemsToAudit() }}
+                product(s) need auditing</span>
+            </v-flex>
+            <!-- <v-flex lg2 md-and-down></v-flex> -->
+            <v-flex lg4 md2 style="text-align: right;">
+              <v-menu offset-y>
+                <v-btn :disabled="selectedItems.length == 0" slot="activator" color="primary" dark>Set Indicator</v-btn>
+                <v-list dark>
+                  <v-list-tile @click="setIndicator('YES')">
+                    <v-list-tile-title>YES</v-list-tile-title>
+                  </v-list-tile>
+                  <v-list-tile @click="setIndicator('NO')">
+                    <v-list-tile-title>NO</v-list-tile-title>
+                  </v-list-tile>
+                  <v-list-tile @click="setSelectedStores">
+                    <v-list-tile-title>SELECTED</v-list-tile-title>
+                  </v-list-tile>
+                </v-list>
+              </v-menu>
+            </v-flex>
+          </v-layout>
+        </v-toolbar>
+        <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%;  height: calc(70vh - 25px);"
+          :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs" :selectionChanged="onSelectionChanged"
+          :rowData="rowData" :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true"
+          :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true" :enableColResize="true"
+          :floatingFilter="true" :gridReady="onGridReady" :groupMultiAutoColumn="true">
+        </ag-grid-vue>
+        <div>
+          <p>{{ rowData.length }} Rows</p>
+        </div>
+        <div style="margin-left: 10px;">
+          <p>{{ selectedItems.length }} Selected</p>
+        </div>
       </v-layout>
-    </v-toolbar>
-    <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100vw; height: calc(100vh - 176px);"
-      :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs" :selectionChanged="onSelectionChanged"
-      :rowData="rowData" :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true"
-      :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true" :enableColResize="true"
-      :floatingFilter="true" :gridReady="onGridReady" :groupMultiAutoColumn="true">
-    </ag-grid-vue>
+    </v-container>
     <PlanogramSelector ref="planogramSelector"></PlanogramSelector>
     <Spinner ref="spinner"></Spinner>
     <StoreIndicatorSelector ref="storeIndicatorSelector"></StoreIndicatorSelector>
@@ -124,18 +138,18 @@
     <Dialog ref="dialog"></Dialog>
     <YesNoModal ref="yesNo"></YesNoModal>
     <ProductMaintModal ref="productMaint"></ProductMaintModal>
-  </v-card>
+  </div>
 </template>
 
 <script>
-  import RangingController from './ranging-controller';
-
   import SoftwareToolbar from "@/components/Common/SoftwareToolbar"
   import PlanogramSelector from '@/components/Common/PlanogramSelector';
   import DateRangeSelector from '@/components/Common/DateRangeSelector';
   import StoreIndicatorSelector from '@/components/Common/StoreIndicatorSelector';
   import RangeSelectorModal from '@/components/Common/RangeSelectorModal';
   import Spinner from '@/components/Common/Spinner';
+  import RangingController from './ranging-controller';
+  import HelpFileViewer from '@/components/Main/HelpFile/HelpFileViewer'
   import Snackbar from '@/components/Common/Snackbar';
   import Prompt from '@/components/Common/Prompt';
   import YesNoModal from '@/components/Common/YesNoModal'
@@ -145,7 +159,7 @@
     AgGridVue
   } from "ag-grid-vue";
   import Axios from "axios"
-
+  import optionsComponent from "./button.vue"
   function textValue(data) {
     let self = this;
     self.text = data.clusterName;
@@ -166,17 +180,8 @@
       RangeSelectorModal,
       Snackbar,
       Prompt,
-      optionsComponent: {
-        template: `<div style="text-align: center; cursor: pointer;">
-                      <a href="#" @click.prevent="openEdit">Edit</a>
-                  </div>`,
-        methods: {
-          openEdit() {
-            let product = this.params;
-            this.params.context.componentParent.openEdit(product);
-          },
-        }
-      },
+      optionsComponent,
+      HelpFileViewer
     },
     data() {
       return {
@@ -257,16 +262,11 @@
     created() {
       let self = this;
       self.getColumnDefenitions();
-
-      Axios.defaults.headers.common['TenantID'] = sessionStorage.currentDatabase;
     },
     methods: {
       onGridReady(params) {
-                let self = this;
-                setTimeout(() => {
-                    self.gridApi = params.api;
-                    self.columnApi = params.columnApi;
-                }, 1000)
+        this.gridApi = params.api;
+        this.columnApi = params.columnApi;
       },
       openEdit(product) {
         let self = this
@@ -404,7 +404,7 @@
             self.columnDefs.push({
               headerName: 'Options',
               field: 'barcode',
-              cellRendererFramework: 'Spinner',
+              cellRendererFramework: 'optionsComponent',
               pinned: 'right'
             })
             resolve(true);
@@ -583,7 +583,8 @@
                     self.saveRange(tag);
                   }
                 })
-              } else {
+              }
+              else {
                 self.saveRange(tag);
               }
             })
@@ -711,10 +712,12 @@
       }
     }
   }
+
 </script>
 
 <style>
   .ag-theme-balham .audit-image-breach {
     background-color: lightcoral !important;
   }
+
 </style>

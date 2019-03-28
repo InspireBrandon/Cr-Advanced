@@ -114,8 +114,6 @@
                 self.afterClose = callback;
                 self.userID = userID;
                 self.modalShow = true
-
-
             }
         }
     }

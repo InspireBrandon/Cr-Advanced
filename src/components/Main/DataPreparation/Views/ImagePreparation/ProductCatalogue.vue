@@ -1,143 +1,141 @@
 <template>
-  <v-card>
-      <v-toolbar dense color="grey  darken-1" dark>
-        <v-spacer></v-spacer>
-        <v-toolbar-title>Product Catalogue</v-toolbar-title>
-      </v-toolbar>
-    
-        <v-layout row wrap>
-          <v-flex lg12 md12 sm12>
-          <v-toolbar color="grey lighten-1">
-            <v-dialog persistent v-model="FilterDialog" width="80vw"> FilterScanBarcode
-              <v-card>
-                <v-card-title class="headline" >Set Filters</v-card-title>
-                <v-card-text>
-                  <v-container  grid-list-lg>
-                    <v-layout row wrap>
-                      <v-flex lg6 md6 sm12>
-                        <v-autocomplete dense menu-props="auto" :items="activeShopCodesDropdown" label="Active Shop Code"
-                          v-model="activeShopCode"></v-autocomplete>
-                      </v-flex>
-                      <v-flex lg6 md6 sm12>
-                        <v-autocomplete dense menu-props="auto" :items="departments" label="Department" v-model="department"></v-autocomplete>
-                      </v-flex>
-                      <v-flex lg6 md6 sm12>
-                        <v-autocomplete dense menu-props="auto" :items="subdepartments" label="Sub Department" v-model="subdepartment"></v-autocomplete>
-                      </v-flex>
-                      <v-flex lg6 md6 sm12>
-                        <v-autocomplete dense menu-props="auto" :items="categories" label="Category" v-model="category"></v-autocomplete>
-                      </v-flex>
-                    </v-layout>
-                  </v-container>
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
+  <div>
+    <v-toolbar dense dark>
+      <v-spacer></v-spacer>
+      <v-toolbar-title>Product Catalogue</v-toolbar-title>
+    </v-toolbar>
 
-                  <v-btn color="error" @click="FilterDialog = false">
-                    Cancel
-                  </v-btn>
+    <v-container fluid grid-list-lg>
+      <v-layout row wrap>
+        <v-toolbar dark>
+          <v-dialog persistent v-model="FilterDialog" width="80vw"> FilterScanBarcode
+            <v-card dark>
+              <v-card-title class="headline">Set Filters</v-card-title>
+              <v-card-text>
+                <v-container fluid grid-list-lg>
+                  <v-layout row wrap>
+                    <v-flex lg6 md6 sm12>
+                      <v-autocomplete dense menu-props="auto" :items="activeShopCodesDropdown" label="Active Shop Code"
+                        v-model="activeShopCode"></v-autocomplete>
+                    </v-flex>
+                    <v-flex lg6 md6 sm12>
+                      <v-autocomplete dense menu-props="auto" :items="departments" label="Department" v-model="department"></v-autocomplete>
+                    </v-flex>
+                    <v-flex lg6 md6 sm12>
+                      <v-autocomplete dense menu-props="auto" :items="subdepartments" label="Sub Department" v-model="subdepartment"></v-autocomplete>
+                    </v-flex>
+                    <v-flex lg6 md6 sm12>
+                      <v-autocomplete dense menu-props="auto" :items="categories" label="Category" v-model="category"></v-autocomplete>
+                    </v-flex>
+                  </v-layout>
+                </v-container>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
 
-                  <v-btn color="primary" @click="filter">
-                    Filter
-                  </v-btn>
+                <v-btn color="error" @click="FilterDialog = false">
+                  Cancel
+                </v-btn>
 
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-            <v-dialog persistent v-model="FilterScanBarcode" width="80vw">
-              <v-card dark>
-                <v-card-title class="headline">Scan Barcode</v-card-title>
-                <v-card-text>
-                  <v-container fluid grid-list-lg>
-                    <v-layout row wrap>
-                      <v-flex lg6 md6 sm12>
-                        <v-text-field v-model="ScanBarcodeTextfield" label="ScanBarcode"></v-text-field>
-                      </v-flex>
-                    </v-layout>
-                  </v-container>
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
+                <v-btn color="primary" @click="filter">
+                  Filter
+                </v-btn>
 
-                  <v-btn color="error" @click="FilterScanBarcode = false">
-                    Cancel
-                  </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+          <v-dialog persistent v-model="FilterScanBarcode" width="80vw">
+            <v-card dark>
+              <v-card-title class="headline">Scan Barcode</v-card-title>
+              <v-card-text>
+                <v-container fluid grid-list-lg>
+                  <v-layout row wrap>
+                    <v-flex lg6 md6 sm12>
+                      <v-text-field v-model="ScanBarcodeTextfield" label="ScanBarcode"></v-text-field>
+                    </v-flex>
+                  </v-layout>
+                </v-container>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
 
-                  <v-btn color="primary" @click="ScanBarcode">
-                    Scan
-                  </v-btn>
+                <v-btn color="error" @click="FilterScanBarcode = false">
+                  Cancel
+                </v-btn>
 
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
+                <v-btn color="primary" @click="ScanBarcode">
+                  Scan
+                </v-btn>
+
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
 
 
-            <v-text-field style="margin-top: 8px; max-width: 400px" @input="onFilterTextBoxChanged" v-model="searchFilter"
-              light solo label="Search"></v-text-field>
+          <v-text-field style="margin-top: 8px; max-width: 400px" @input="onFilterTextBoxChanged" v-model="searchFilter"
+            light solo label="Search"></v-text-field>
 
-            <v-spacer></v-spacer>
-            <v-menu offset-y>
-              <v-btn slot="activator" dark  color="primary">
-                Action
-              </v-btn>
-              <v-list>
-                <v-list-tile @click="FilterDialog = true">
-                  <v-list-tile-title>Set Filters</v-list-tile-title>
-                </v-list-tile>
-                <v-list-tile @click="FilterScanBarcode = true">
-                  <v-list-tile-title>Scan Barcode</v-list-tile-title>
-                </v-list-tile>
-                <v-list-tile @click="openAdd">
-                  <v-list-tile-title>Add</v-list-tile-title>
-                </v-list-tile>
-              </v-list>
-            </v-menu>
-
-            <v-btn color="primary" v-if="rowData.length > 0" @click="downloadImages">
-              Download Images
+          <v-spacer></v-spacer>
+          <v-menu offset-y>
+            <v-btn slot="activator" color="primary">
+              Action
             </v-btn>
+            <v-list>
+              <v-list-tile @click="FilterDialog = true">
+                <v-list-tile-title>Set Filters</v-list-tile-title>
+              </v-list-tile>
+              <v-list-tile @click="FilterScanBarcode = true">
+                <v-list-tile-title>Scan Barcode</v-list-tile-title>
+              </v-list-tile>
+              <v-list-tile @click="openAdd">
+                <v-list-tile-title>Add</v-list-tile-title>
+              </v-list-tile>
+            </v-list>
+          </v-menu>
 
-          </v-toolbar>
-          <ag-grid-vue style="width: 100%; height: calc(70vh - 25px);" class="ag-theme-balham" :columnDefs="columnDefs"
-            :rowData="rowData" :enableSorting="true" :enableFilter="true" rowSelection="multiple" :rowDeselection="true"
-            :gridReady="onGridReady" :enableColResize="true" :floatingFilter="true" :gridOptions="gridOptions"
-            :suppressDragLeaveHidesColumns="true" :suppressMakeColumnVisibleAfterUnGroup="true"
-            :suppressRowClickSelection="true" rowGroupPanelShow="always" :enableRangeSelection="true" :defaultColDef="defaultColDef"
-            :filterChanged="filterChanged" :sideBar='sideBar' :rowClicked="rowClicked">
-          </ag-grid-vue>
-          <div>
-            <p>{{ rowData.length }} Rows</p>
-          </div>
-          </v-flex>
-        </v-layout>
-     
-      <div class="text-xs-center">
-        <v-dialog v-model="dialog" width="500">
-          <v-card dark>
+          <v-btn color="primary" v-if="rowData.length > 0" @click="downloadImages">
+            Download Images
+          </v-btn>
 
-            <v-card-text style="text-align: center;">
-              <img style="max-width: 250px; max-height: 250px;" :src="imgSrc" alt="">
-            </v-card-text>
+        </v-toolbar>
+        <ag-grid-vue style="width: 100%; height: calc(70vh - 25px);" class="ag-theme-balham" :columnDefs="columnDefs"
+          :rowData="rowData" :enableSorting="true" :enableFilter="true" rowSelection="multiple" :rowDeselection="true"
+          :gridReady="onGridReady" :enableColResize="true" :floatingFilter="true" :gridOptions="gridOptions"
+          :suppressDragLeaveHidesColumns="true" :suppressMakeColumnVisibleAfterUnGroup="true"
+          :suppressRowClickSelection="true" rowGroupPanelShow="always" :enableRangeSelection="true" :defaultColDef="defaultColDef"
+          :filterChanged="filterChanged" :sideBar='sideBar' :rowClicked="rowClicked">
+        </ag-grid-vue>
+        <div>
+          <p>{{ rowData.length }} Rows</p>
+        </div>
+      </v-layout>
+    </v-container>
+    <div class="text-xs-center">
+      <v-dialog v-model="dialog" width="500">
+        <v-card dark>
 
-            <v-divider></v-divider>
+          <v-card-text style="text-align: center;">
+            <img style="max-width: 250px; max-height: 250px;" :src="imgSrc" alt="">
+          </v-card-text>
 
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="error" @click="dialog = false">
-                close
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-      </div>
-      <ProductMaintModal ref="productMaint"></ProductMaintModal>
-      <Dialog ref="dialog"></Dialog>
-      <Prompt ref="prompt"></Prompt>
-      <Spinner ref="spinner"></Spinner>
-      <ProgressDialog ref="progressDialog"></ProgressDialog>
-      <a style="display: none;" ref="anchor" href=""></a>
-    
-  </v-card>
+          <v-divider></v-divider>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="error" @click="dialog = false">
+              close
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </div>
+    <ProductMaintModal ref="productMaint"></ProductMaintModal>
+    <Dialog ref="dialog"></Dialog>
+    <Prompt ref="prompt"></Prompt>
+    <Spinner ref="spinner"></Spinner>
+    <ProgressDialog ref="progressDialog"></ProgressDialog>
+    <a style="display: none;" ref="anchor" href=""></a>
+  </div>
 </template>
 
 <script>
@@ -153,6 +151,9 @@
   import ProgressDialog from '@/components/Common/ProgressDialog'
   import ProductMaintModal from '@/components/Main/DataPreparation/Views/ImagePreparation/ProductMaintModal'
   import Axios from 'axios';
+  import optionsComponent from './options.vue';
+  import sideBarComponent from './SideBar'
+  import imageComponent from './Image.vue'
 
   export default {
     name: 'Main',
@@ -163,93 +164,8 @@
       Prompt,
       Spinner,
       ProgressDialog,
-      imageComponent: {
-        template: `<div @dblclick="openImage" style="text-align: center; cursor: pointer;">
-                      <img class="grid-image" :src="getImage()">
-                  </div>`,
-        methods: {
-          getImage() {
-            if (this.params.colDef.headerName == "Front") {
-              return process.env.VUE_APP_API + BarcodeHandler.imageFromBarcode(this.params.data.barcode, 1,
-                "")
-            }
-            if (this.params.colDef.headerName == "Side") {
-              return process.env.VUE_APP_API + BarcodeHandler.imageFromBarcode(this.params.data.barcode, 2,
-                "")
-            }
-            if (this.params.colDef.headerName == "Top") {
-              return process.env.VUE_APP_API + BarcodeHandler.imageFromBarcode(this.params.data.barcode, 3,
-                "")
-            }
-          },
-          openImage() {
-            this.params.context.componentParent.imgSrc = this.getImage();
-            this.params.context.componentParent.dialog = true;
-          }
-        }
-      },
-      optionsComponent: {
-        template: `<div style="text-align: center; cursor: pointer;">
-                      <a href="#" @click.prevent="openEdit">Edit</a>
-                      <a v-if="params.data.product_System_ID == 'Generate_SYS_Product_ID'" href="#" @click.prevent="updateSysCode" style="margin-left: 5px; color: green;">Set System ID</a>
-                      <a href="#" @click.prevent="deleteProduct" style="margin-left: 5px; color: red;">Delete</a>
-                  </div>`,
-        methods: {
-          openEdit() {
-            let product = this.params;
-            this.params.context.componentParent.openEdit(product);
-          },
-          updateSysCode() {
-            let product = this.params;
-            this.params.context.componentParent.updateProductSysID(product);
-          },
-          deleteProduct() {
-            let product = this.params;
-            this.params.context.componentParent.removeSelected(product);
-          }
-        }
-      },
-      sideBarComponent: {
-        template: `<div style="text-align: center; width: 100%; padding: 10px;">
-                      <h2>Images</h2>
-                      <v-card class="elevation-5" style="margin-top: 10px" v-if="image1 != ''">
-                        <h3>Front</h3>
-                        <img :src="image1" class="side-image" />
-                      </v-card>
-                      <v-card class="elevation-5" style="margin-top: 10px" v-if="image2 != ''">
-                        <h3>Side</h3>
-                        <img :src="image2" class="side-image" />
-                      </v-card>
-                      <v-card class="elevation-5" style="margin-top: 10px" v-if="image3 != ''">
-                        <h3>Top</h3>
-                        <img :src="image3" class="side-image" />
-                      </v-card>
-                  </div>`,
-        created() {
-          this.params.api.addEventListener('rowClicked', this.getImage);
-        },
-        data() {
-          return {
-            image1: '',
-            image2: '',
-            image3: ''
-          }
-        },
-        methods: {
-          getImage(num) {
-            let self = this;
-
-            this.$nextTick(() => {
-              let rangingComponent = self.$parent.$parent;
-              let barcode = rangingComponent.selectedItem.data.barcode;
-
-              self.image1 = process.env.VUE_APP_API + BarcodeHandler.imageFromBarcode(barcode, 1, "")
-              self.image2 = process.env.VUE_APP_API + BarcodeHandler.imageFromBarcode(barcode, 2, "")
-              self.image3 = process.env.VUE_APP_API + BarcodeHandler.imageFromBarcode(barcode, 3, "")
-            })
-          }
-        }
-      }
+      sideBarComponent,
+      optionsComponent,
     },
     data() {
       return {
@@ -485,6 +401,29 @@
         {
           headerName: 'Description',
           field: 'description',
+          filter: "agTextColumnFilter",
+          editable: true
+        },
+        {
+          headerName: 'Planogram',
+          field: 'planogram',
+          filter: "agTextColumnFilter",
+          editable: true
+        },
+        {
+          headerName: 'Category',
+          field: 'category',
+          filter: "agTextColumnFilter"
+        },
+        {
+          headerName: 'Subcategory',
+          field: 'subcategory',
+          filter: "agTextColumnFilter",
+          editable: true
+        },
+        {
+          headerName: 'Segment',
+          field: 'segment',
           filter: "agTextColumnFilter",
           editable: true
         },
