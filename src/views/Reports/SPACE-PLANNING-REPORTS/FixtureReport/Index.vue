@@ -54,9 +54,16 @@
                 gondolas: [],
                 planograms: [],
                 planogram: null,
-                columnDefs: [{
+                columnDefs: [
+                    {
                     "headerName": "ParentID",
                     "field": "ParentID",
+                    "rowGroup": true,
+                    "hide": true
+                },
+                {
+                    "headerName": "ParentID",
+                    "field": "Data.ParentID",
                     "rowGroup": true,
                     "hide": true
                 }],
