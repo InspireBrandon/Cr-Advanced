@@ -1,11 +1,12 @@
 <template>
     <v-card>
-        <v-container grid-list-md>
+        <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear>
+        <v-container v-show="!showLoader" grid-list-md>
             <v-layout row wrap>
                 <v-flex lg3 md4 sm12 xs12>
                     Store
                     <v-autocomplete placeholder="Please select a store..." @change="getPlanogramsByStore" v-model="selectedStore"
-                        :items="storesDropdown" solo light></v-autocomplete>
+                        :items="storesDropdown" solo light :disabled="storeDisabled"></v-autocomplete>
                 </v-flex>
                 <v-flex lg9 md8 sm12 xs12></v-flex>
                 <v-flex v-if="selectedStore != null && planogramsList.length == 0" lg9 md4 sm12 xs12>
@@ -162,6 +163,7 @@
     export default {
         data: () => {
             return {
+                showLoader: true,
                 status: [{
                     type: 0,
                     friendy: "New",
@@ -205,30 +207,32 @@
                 planograms: [],
                 planogramsList: [],
                 selectedPlanogram: null,
-                image: ''
+                image: '',
+                storeDisabled: false
             }
         },
         created() {
             let self = this;
             self.getStores();
-            self.getAccount()
         },
         methods: {
-            getAccount() {
+            getAccessType() {
                 let self = this
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                    Axios.get(process.env.VUE_APP_API +
                         `TenantLink_AccessType?systemUserID=${encoded_details.USER_ID}&tenantID=${sessionStorage.currentDatabase}`)
                     .then(r => {
-                        console.log(r.data);
-                        
                         if (r.data.tenantLink_AccessTypeList.length > 0) {
                             let item = r.data.tenantLink_AccessTypeList[0];
-                            console.log(item);
-                            
+
+                            if(item.accessType == 3) {
+                                self.selectedStore = item.storeID;
+                                self.storeDisabled = true;
+                                self.getPlanogramsByStore();
+                            }
                         }
-                      
-                        
+
+                        self.showLoader = false;
                     })
             },
             goToReport(reportName) {
@@ -262,6 +266,8 @@
                 Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&folder=SPACE PLANNING')
                     .then(r => {
                         self.planograms = r.data;
+
+                        self.getAccessType();
                     })
             },
             getPlanogramsByStore() {
@@ -283,7 +289,6 @@
                             tmpPlanograms.push(planogram);
                         }
                     })
-                    console.log(tmpPlanograms);
 
                     self.planogramsList = tmpPlanograms;
                 })

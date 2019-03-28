@@ -11,7 +11,8 @@
                 <v-flex lg12 md12 sm12 xs12 v-if="appConfigDetail.length <= 0">
                     <v-card>
                         <v-card-text>
-                            <p>It appears that you dont have any apps installed. <a href="#" @click.prevent="$router.push('/Store')">Click Here</a> to go and install some.</p>
+                            <p>It appears that you dont have any apps installed. <a href="#"
+                                    @click.prevent="$router.push('/Store')">Click Here</a> to go and install some.</p>
                         </v-card-text>
                     </v-card>
                 </v-flex>
@@ -44,7 +45,38 @@
         },
         created() {
             let self = this;
-            self.getInstalledApps();
+            //self.getInstalledApps();
+            self.checkAccessType(accessType => {
+                console.log(accessType);
+
+                switch (accessType) {
+                    case "DATABASE-OWNER":
+                        {
+                            self.getAppsTmpAll();
+                        }
+                        break;
+                    case "SUPERUSER":
+                        {
+                            self.getAppsTmpAll();
+                        }
+                        break;
+                    case "GENERAL":
+                        {
+                            self.getAppsTmpAll();
+                        }
+                        break;
+                    case "RETAILER":
+                        {
+                            self.getAppsTmpAll();
+                        }
+                        break;
+                    case "STORE":
+                        {
+                            self.getAppsTmpStore();
+                        }
+                        break;
+                }
+            });
         },
         methods: {
             getInstalledApps() {
@@ -72,8 +104,88 @@
 
                     if (appInstalled) {
                         self.appConfigDetail.push(new ConfigDetail(
-                            self.applicationDetailsHelper.getApplicationConfigBySystemCode(app.system_code),
-                            self.applicationDetailsHelper.getApplicationDetailsBySystemCode(app.system_code)
+                            self.applicationDetailsHelper.getApplicationConfigBySystemCode(app
+                                .system_code),
+                            self.applicationDetailsHelper.getApplicationDetailsBySystemCode(app
+                                .system_code)
+                        ));
+                    }
+                })
+
+                self.showLoader = false;
+            },
+            checkAccessType(callback) {
+                let self = this;
+
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+
+                Axios.get(process.env.VUE_APP_API +
+                        `TenantLink_AccessType?systemUserID=${encoded_details.USER_ID}&tenantID=${sessionStorage.currentDatabase}`
+                    )
+                    .then(r => {
+                        if (r.data.isDatabaseOwner) {
+                            callback("DATABASE-OWNER");
+                            return;
+                        }
+
+                        console.log(r.data)
+
+                        let tenantType = r.data.tenantLink_AccessTypeList[0].accessType;
+
+                        switch (tenantType) {
+                            case 0:
+                                {
+                                    callback("SUPERUSER");
+                                }
+                                break;
+                            case 1:
+                                {
+                                    callback("GENERAL");
+                                }
+                                break;
+                            case 2:
+                                {
+                                    callback("RETAILER");
+                                }
+                                break;
+                            case 3:
+                                {
+                                    callback("STORE");
+                                }
+                                break;
+                        }
+                    })
+            },
+            getAppsTmpAll() {
+                let self = this;
+
+                self.applicationDetailsHelper = new ApplicationDetailsHelper();
+                self.apps = self.applicationDetailsHelper.getAllApplications();
+
+                self.apps.forEach(app => {
+                    self.appConfigDetail.push(new ConfigDetail(
+                        self.applicationDetailsHelper.getApplicationConfigBySystemCode(app
+                            .system_code),
+                        self.applicationDetailsHelper.getApplicationDetailsBySystemCode(app
+                            .system_code)
+                    ));
+                })
+
+                self.showLoader = false;
+            },
+            getAppsTmpStore() {
+                let self = this;
+
+                self.applicationDetailsHelper = new ApplicationDetailsHelper();
+                self.apps = self.applicationDetailsHelper.getAllApplications();
+
+                self.apps.forEach(app => {
+                    if (app.system_code == "SPACE-PLANNING") {
+                        self.appConfigDetail.push(new ConfigDetail(
+                            self.applicationDetailsHelper.getApplicationConfigBySystemCode(app
+                                .system_code),
+                            self.applicationDetailsHelper.getApplicationDetailsBySystemCode(app
+                                .system_code)
                         ));
                     }
                 })
