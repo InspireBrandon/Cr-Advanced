@@ -10,7 +10,8 @@
                             <v-toolbar dark color="primary">
                                 <v-toolbar-title>Databases</v-toolbar-title>
                                 <v-spacer></v-spacer>
-                                <v-btn icon @click="openDatabaseModal" :disabled="profile.accountID == null" color="primary">
+                                <v-btn icon @click="openDatabaseModal" :disabled="profile.accountID == null"
+                                    color="primary">
                                     <v-icon>add</v-icon>
                                 </v-btn>
                             </v-toolbar>
@@ -27,14 +28,14 @@
                                                 <v-icon>more_vert</v-icon>
                                             </v-btn>
                                             <v-list dense>
-                                                   <v-list-tile avatar @click="editDatabase(item)">
+                                                <!-- <v-list-tile avatar @click="editDatabase(item)">
                                                     <v-list-tile-avatar>
                                                         <v-icon>share</v-icon>
                                                     </v-list-tile-avatar>
                                                     <v-list-tile-content>
                                                         <v-list-tile-title>Edit</v-list-tile-title>
                                                     </v-list-tile-content>
-                                                </v-list-tile>
+                                                </v-list-tile> -->
                                                 <v-list-tile avatar @click="maintainUsers(item)">
                                                     <v-list-tile-avatar>
                                                         <v-icon>share</v-icon>
@@ -43,14 +44,14 @@
                                                         <v-list-tile-title>Share</v-list-tile-title>
                                                     </v-list-tile-content>
                                                 </v-list-tile>
-                                                <v-list-tile avatar @click="deleteDatabase(item)">
+                                                <!-- <v-list-tile avatar @click="deleteDatabase(item)">
                                                     <v-list-tile-avatar>
                                                         <v-icon>delete</v-icon>
                                                     </v-list-tile-avatar>
                                                     <v-list-tile-content>
                                                         <v-list-tile-title>Delete</v-list-tile-title>
                                                     </v-list-tile-content>
-                                                </v-list-tile>
+                                                </v-list-tile> -->
                                             </v-list>
                                         </v-menu>
                                     </v-layout>
@@ -115,7 +116,8 @@
         <DatabaseUserModal ref="DatabaseUserModal"></DatabaseUserModal>
         <v-flex lg8 md12 sm12 xs12 v-if="profile.accountID == null  && !showLoader">
             <br>
-            <p>In order to create a database you must first register an account. Please <a href="#" @click.prevent="openAccountModal">click
+            <p>In order to create a database you must first register an account. Please <a href="#"
+                    @click.prevent="openAccountModal">click
                     here</a> to register.</p>
         </v-flex>
     </v-card>
@@ -160,8 +162,8 @@
             self.getUserDetails()
         },
         methods: {
-            editDatabase(item){
-                
+            editDatabase(item) {
+
             },
             maintainUsers(database) {
                 let self = this;
@@ -172,14 +174,14 @@
             },
             deleteDatabase(item) {
                 let self = this;
-                
+
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
 
                 Axios.delete(process.env.VUE_APP_API +
                     `Tenant?tenantID=${item.tenantID}`
 
-                ).then(r=>{
-                self.getDatabases(encoded_details.USER_ID, callback3 => {});
+                ).then(r => {
+                    self.getDatabases(encoded_details.USER_ID, callback3 => {});
 
                 })
             },
@@ -247,8 +249,8 @@
 
                 Axios.get(process.env.VUE_APP_API + `Tenant?userID=${userID}`)
                     .then(r => {
-                            console.log(r);
-                            
+                        console.log(r);
+
                         callback3(self.dataBases = r.data,
 
 
@@ -286,7 +288,7 @@
                 let self = this;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 self.$refs.DatabaseModal.open(encoded_details.USER_ID, function () {
-                    self.getAccountDetails(self.accountID,callback=>{});
+                    self.getAccountDetails(self.accountID, callback => {});
                     self.getDatabases(encoded_details.USER_ID, callback3 => {});
                     self.$refs.DatabaseModal.close();
                 })

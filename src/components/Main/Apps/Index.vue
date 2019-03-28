@@ -46,37 +46,39 @@
         created() {
             let self = this;
             //self.getInstalledApps();
-            self.checkAccessType(accessType => {
-                console.log(accessType);
+            // self.checkAccessType(accessType => {
+            //     console.log(accessType);
 
-                switch (accessType) {
-                    case "DATABASE-OWNER":
-                        {
-                            self.getAppsTmpAll();
-                        }
-                        break;
-                    case "SUPERUSER":
-                        {
-                            self.getAppsTmpAll();
-                        }
-                        break;
-                    case "GENERAL":
-                        {
-                            self.getAppsTmpAll();
-                        }
-                        break;
-                    case "RETAILER":
-                        {
-                            self.getAppsTmpAll();
-                        }
-                        break;
-                    case "STORE":
-                        {
-                            self.getAppsTmpStore();
-                        }
-                        break;
-                }
-            });
+            //     switch (accessType) {
+            //         case "DATABASE-OWNER":
+            //             {
+            //                 self.getAppsTmpAll();
+            //             }
+            //             break;
+            //         case "SUPERUSER":
+            //             {
+            //                 self.getAppsTmpAll();
+            //             }
+            //             break;
+            //         case "GENERAL":
+            //             {
+            //                 self.getAppsTmpAll();
+            //             }
+            //             break;
+            //         case "RETAILER":
+            //             {
+            //                 self.getAppsTmpAll();
+            //             }
+            //             break;
+            //         case "STORE":
+            //             {
+            //                 self.getAppsTmpStore();
+            //             }
+            //             break;
+            //     }
+            // });
+
+            self.getAppsTmpAll();
         },
         methods: {
             getInstalledApps() {
