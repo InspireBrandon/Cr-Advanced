@@ -67,7 +67,7 @@
                     .then(r => {
                         sessionStorage.accessToken = r.data.accessToken;
                         sessionStorage.refreshToken = r.data.refreshToken;
-                        self.$router.push("/Home")
+                        self.$router.push("/Apps")
                     })
                     .catch(e => {
                         self.loading = false;

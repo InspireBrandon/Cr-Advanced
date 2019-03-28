@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-navigation-drawer temporary hide-overlay clipped v-model="drawer" floating app>
+        <!-- <v-navigation-drawer temporary hide-overlay clipped v-model="drawer" floating app>
             <v-layout column fill-height>
                 <v-toolbar flat class="transparent">
                     <v-list class="pa-0">
@@ -27,7 +27,7 @@
 
 
                 </v-list>
-                <!-- <v-expansion-panel class="elevation-0">
+                <v-expansion-panel class="elevation-0">
                     <v-expansion-panel-content class="elevation-0">
                         <template v-slot:header>
                             <div>
@@ -44,9 +44,9 @@
                             </v-list-tile-content>
                         </v-list-tile>
                     </v-expansion-panel-content>
-                </v-expansion-panel> -->
+                </v-expansion-panel>
                 <v-spacer></v-spacer>
-                <!-- <v-list>
+                <v-list>
                     <v-list-tile v-for="(item, idx) in bottomList" :key="idx" @click="$router.push(item.route)">
                         <v-list-tile-action>
                             <v-icon>{{ item.icon }}</v-icon>
@@ -55,11 +55,14 @@
                             <v-list-tile-title>{{ item.title }}</v-list-tile-title>
                         </v-list-tile-content>
                     </v-list-tile>
-                </v-list> -->
+                </v-list>
             </v-layout>
-        </v-navigation-drawer>
+        </v-navigation-drawer> -->
         <v-toolbar dark color="primary" app clipped-left>
-            <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
+            <v-btn icon @click="$router.push('/Apps')">
+                <v-icon>home</v-icon>
+            </v-btn>
+            <!-- <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon> -->
             <span class="title ml-3 mr-5">Chain&nbsp;<span class="font-weight-light">Research</span></span>
             <v-spacer></v-spacer>
             <v-badge color="red" overlap>

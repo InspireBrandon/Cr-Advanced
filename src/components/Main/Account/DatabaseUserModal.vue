@@ -9,12 +9,19 @@
                         <v-icon>arrow_back</v-icon>
                     </v-btn>
                     <v-spacer></v-spacer>
-                    <v-btn :disabled="selectedUser == null" :loading="loading" icon @click="addUser">
-                        <v-icon>check</v-icon>
-                    </v-btn>
                 </v-toolbar>
                 <v-container class="pt-5">
-                    <v-autocomplete style="max-width: 400px;" dense v-model="selectedUser" :items="users" label="find a user"></v-autocomplete>
+                    <v-layout row wrap>
+                        <v-flex md3>
+                            <v-autocomplete style="max-width: 400px;" dense v-model="selectedUser" :items="users"
+                                label="find a user"></v-autocomplete>
+                        </v-flex>
+                        <v-flex md9>
+                            <v-btn :disabled="selectedUser == null" :loading="loading" icon @click="addUser">
+                                <v-icon>check</v-icon>
+                            </v-btn>
+                        </v-flex>
+                    </v-layout>
                     <v-card>
                         <v-card-text>
                             <v-data-table class="elevation-0" hide-actions :items="databaseUsers" :headers="headers">
@@ -28,11 +35,11 @@
                                             <v-list dense>
                                                 <v-list-tile @click="setAccessType(props)">Set access
                                                     type</v-list-tile>
-                                                <v-divider></v-divider>
+                                                <!-- <v-divider></v-divider>
                                                 <v-list-tile @click="openFeatureAccessModal(props.item.systemUserID)">
                                                     Set rights</v-list-tile>
                                                 <v-divider></v-divider>
-                                                <v-list-tile>Revoke access</v-list-tile>
+                                                <v-list-tile>Revoke access</v-list-tile> -->
                                             </v-list>
                                         </v-menu>
                                     </td>
@@ -196,8 +203,7 @@
             setAccessType(props) {
                 let self = this;
 
-                self.$refs.AccessTypeModal.open(props.item.systemUserID, self.tenantID, accessType => {
-                });
+                self.$refs.AccessTypeModal.open(props.item.systemUserID, self.tenantID, accessType => {});
             }
         }
     }
