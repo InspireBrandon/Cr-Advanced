@@ -64,7 +64,11 @@
                 Axios.post(process.env.VUE_APP_API + `AccountProfile?userID=${self.userID}`, request)
                     .then(r => {
                         if (r.data) {
+                            console.log(r.data);
+                            self.accountID=r.data
                             self.afterClose(request)
+                            self.close()
+
                         }
                     })
             },
@@ -111,7 +115,9 @@
                 if (domain!=null||domain!=undefined) {
                     self.domain = domain
                 }
-                self.afterClose = callback;
+
+                self.afterafterClose = callback;
+                // self.accountID=accountID
                 self.userID = userID;
                 self.modalShow = true
             }
