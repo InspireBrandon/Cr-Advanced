@@ -8,7 +8,7 @@
                     <v-flex lg8 md12 sm12 xs12>
                         <v-flex lg12 md12 sm12 xs12>
                             <v-toolbar dark color="primary">
-                                <v-toolbar-title>Databases</v-toolbar-title>
+                                <v-toolbar-title>Databases</v-toolbar-title> 
                                 <v-spacer></v-spacer>
                                 <v-btn icon @click="openDatabaseModal" :disabled="profile.accountID == null" color="primary">
                                     <v-icon>add</v-icon>
@@ -225,7 +225,7 @@
                 Axios.get(process.env.VUE_APP_API + `SystemUser?id=${encoded_details.USER_ID}`)
                     .then(r => {
                         self.profile = r.data;
-
+                            
                         if (self.profile.accountID != null) {
                             self.domain = r.data.domain
                             self.country = r.data.country
@@ -247,7 +247,6 @@
 
                 Axios.get(process.env.VUE_APP_API + `Tenant?userID=${userID}`)
                     .then(r => {
-                        console.log(r);
 
                         callback3(self.dataBases = r.data,
 
@@ -274,17 +273,20 @@
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
 
                 self.$refs.AccountModal.open(encoded_details.USER_ID, self.country, self.domain, callback => {
-                    self.accountID = callback.accountID
+                     self.accountID=callback.accountID 
+                    self.profile.accountID=callback.accountID 
                     self.getAccountDetails(self.accountID, callback2 => {
 
                         self.$refs.AccountModal.close();
-                        
+
                         self.country = callback.country
                         self.domain = callback.domain
+                      
 
                     });
-
+                   
                 })
+
             },
             openDatabaseModal() {
                 let self = this;
