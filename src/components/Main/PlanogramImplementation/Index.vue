@@ -276,7 +276,7 @@
             },
             goToReport(reportName) {
                 let self = this
-                self.$router.push(`/Reports/SpacePlanning/${reportName}/` + self.selectedPlanogram.id)
+                self.$router.push(`/Reports/SpacePlanning/${reportName}/` + self.selectedPlanogram)
 
             },
             openImage() {
