@@ -171,7 +171,7 @@
                                 <img :src="`https://cdn.vuetifyjs.com/images/bottom-sheets/${tile.img}`" :alt="tile.title">
                             </v-avatar>
                         </v-list-tile-avatar> -->
-                        <v-list-tile-title>{{ database.databaseName }}</v-list-tile-title>
+                        <v-list-tile-title>{{ database.databaseFriendly }}</v-list-tile-title>
                     </v-list-tile>
                 </v-list>
             </v-bottom-sheet>
@@ -331,6 +331,7 @@
                     .then(r => {
                         if (r.data.length > 0) {
                             self.databases = r.data;
+
                             if (r.data.length == 1) { 
                                 sessionStorage.currentDatabase = r.data[0].tenantID;
                             }

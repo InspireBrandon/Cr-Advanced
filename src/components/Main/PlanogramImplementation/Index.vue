@@ -239,8 +239,10 @@
                 storeDisabled: false
             }
         },
-        created() {
+        created() {},
+        mounted() {
             let self = this;
+
             self.getStores();
         },
         methods: {
@@ -254,12 +256,16 @@
                         if (r.data.isDatabaseOwner) {
                             self.getPlanogramsByStore();
                         } else {
-                            let item = r.data.tenantLink_AccessTypeList[0];
+                            if (r.data.tenantLink_AccessTypeList != null && r.data.tenantLink_AccessTypeList.length > 1) {
+                                let item = r.data.tenantLink_AccessTypeList[0];
 
-                            if (item.accessType == 3) {
-                                self.selectedStore = item.storeID;
-                                self.storeDisabled = true;
-                                self.getPlanogramsByStore();
+                                if (item.accessType == 3) {
+                                    self.selectedStore = item.storeID;
+                                    self.storeDisabled = true;
+                                    self.getPlanogramsByStore();
+                                } else {
+                                    self.getPlanogramsByStore();
+                                }
                             } else {
                                 self.getPlanogramsByStore();
                             }
@@ -278,6 +284,7 @@
             },
             getStores() {
                 let self = this;
+
                 Axios.get(process.env.VUE_APP_API + 'Store?db=CR-DEVINSPIRE')
                     .then(r => {
                         self.stores = r.data;
@@ -298,14 +305,15 @@
 
                 Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&folder=SPACE PLANNING')
                     .then(r => {
+                        console.log(r.data)
                         self.planograms = r.data;
-
                         self.getAccessType();
                     })
             },
             getPlanogramsByStore() {
                 let self = this;
                 self.selectedPlanogram = null;
+
                 self.$nextTick(() => {
                     let cluster = "";
 
