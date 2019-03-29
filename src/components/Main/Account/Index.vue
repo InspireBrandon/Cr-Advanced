@@ -20,7 +20,7 @@
                             <v-card v-for="(item,index) in dataBases" :key=index color="grey lighten-5">
                                 <v-container class="pa-2 mb-2">
                                     <v-layout>
-                                        <v-flex> {{item.databaseFriendly}}</v-flex>
+                                        <v-flex> {{item.databaseName}}</v-flex>
                                         <v-spacer></v-spacer>
                                         <v-menu>
                                             <v-btn slot="activator" class="pa-0 ma-0" icon>
