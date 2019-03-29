@@ -5,8 +5,8 @@
             <v-layout row wrap>
                 <v-flex lg3 md4 sm12 xs12>
                     Store
-                    <v-autocomplete placeholder="Please select a store..." @change="getPlanogramsByStore"
-                        v-model="selectedStore" :items="storesDropdown" solo light :disabled="storeDisabled">
+                    <v-autocomplete placeholder="Please select a store..." @change="getPlanogramsByStore" v-model="selectedStore"
+                        :items="storesDropdown" solo light :disabled="storeDisabled">
                     </v-autocomplete>
                 </v-flex>
                 <v-flex lg9 md8 sm12 xs12></v-flex>
@@ -19,7 +19,31 @@
                             <!-- <v-btn flat outline @click="$router.push(`/PlanogramImplementation/RequestNewPlanogram/`+null)">Request
                                 new</v-btn> -->
                         </v-toolbar>
-                        <v-data-table hide-actions :headers="headers" :items="planogramsList" class="elevation-1">
+                        <v-autocomplete placeholder="Please select a store..." @change="selectPlanogram(selectedPlanogram)"
+                            v-model="selectedPlanogram" :items="planogramsList" solo light :disabled="storeDisabled">
+                        </v-autocomplete>
+                        <div v-if="selectedPlanoList!=null">
+                            
+
+
+                            <v-flex v-if="selectedPlanoList!=null">Status: {{status[selectedPlanoList.status == null ? 2 :
+                                selectedPlanoList.status].friendy}} </v-flex>
+                            <v-btn v-if="selectedPlanoList.status==4" @click="implementPlano(selectedPlanoList)">
+                                Implement Planogram
+                            </v-btn>
+                            <v-flex>
+                                <v-btn v-if="selectedPlanoList.status==2 ||selectedPlanoList.status==null" @click="ApprovePlano(selectedPlanoList)">
+                                    Approve
+                                </v-btn>
+                                <v-btn v-if="selectedPlanoList.status==2 ||selectedPlanoList.status==null" avatar
+                                    @click="$router.push(`/PlanogramImplementation/RequestNewPlanogram/`+selectedPlanoList.id)">
+                                    Request Variation
+                                </v-btn>
+                            </v-flex>
+
+                        </div>
+
+                        <!-- <v-data-table hide-actions :headers="headers" :items="planogramsList" class="elevation-1">
                             <template v-slot:items="props">
                                 <tr @click.prevent="selectPlanogram(props.item)">
                                     <td>{{ props.item.name }}</td>
@@ -29,6 +53,7 @@
                                             <v-btn slot="activator" class="pa-0 ma-0" icon>
                                                 <v-icon>more_vert</v-icon>
                                             </v-btn>
+
                                             <v-list dense>
                                                 <v-list-tile avatar v-if="props.item.status==0">
                                                     <v-list-tile-avatar>
@@ -38,8 +63,7 @@
                                                         <v-list-tile-title>No options</v-list-tile-title>
                                                     </v-list-tile-content>
                                                 </v-list-tile>
-                                                <v-list-tile avatar v-if="props.item.status==4"
-                                                    @click="implementPlano(props.item)">
+                                                <v-list-tile avatar v-if="props.item.status==4" @click="implementPlano(props.item)">
                                                     <v-list-tile-avatar>
                                                         <v-icon>share</v-icon>
                                                     </v-list-tile-avatar>
@@ -47,8 +71,7 @@
                                                         <v-list-tile-title>Implement Planogram</v-list-tile-title>
                                                     </v-list-tile-content>
                                                 </v-list-tile>
-                                                <v-list-tile avatar v-if="props.item.status==2"
-                                                    @click="ApprovePlano(props.item)">
+                                                <v-list-tile avatar v-if="props.item.status==2" @click="ApprovePlano(props.item)">
                                                     <v-list-tile-avatar>
                                                         <v-icon>share</v-icon>
                                                     </v-list-tile-avatar>
@@ -56,8 +79,7 @@
                                                         <v-list-tile-title>Approve</v-list-tile-title>
                                                     </v-list-tile-content>
                                                 </v-list-tile>
-                                                <v-list-tile v-if="props.item.status==2" avatar
-                                                    @click="$router.push(`/PlanogramImplementation/RequestNewPlanogram/`+props.item.id)">
+                                                <v-list-tile v-if="props.item.status==2" avatar @click="$router.push(`/PlanogramImplementation/RequestNewPlanogram/`+props.item.id)">
                                                     <v-list-tile-avatar>
                                                         <v-icon>share</v-icon>
                                                     </v-list-tile-avatar>
@@ -70,7 +92,7 @@
                                     </td>
                                 </tr>
                             </template>
-                        </v-data-table>
+                        </v-data-table> -->
 
                     </v-card>
                     <v-layout>
@@ -121,8 +143,8 @@
                         </v-card>
                         <v-card-text class="py-0">
                             <v-timeline align-top dense>
-                                <v-timeline-item v-for="(item,index) in timelineItems" :key="index"
-                                    :color="status[item.status].color" small>
+                                <v-timeline-item v-for="(item,index) in timelineItems" :key="index" :color="status[item.status].color"
+                                    small>
                                     <v-layout pt-3>
                                         <v-flex xs3>
                                             <div class="caption">{{item.date}}</div>
@@ -205,6 +227,8 @@
                     value: name
                 }],
                 imageModal: false,
+                PlanoList: [],
+                selectedPlanoList: null,
                 stores: [],
                 storesDropdown: [],
                 selectedStore: null,
@@ -295,7 +319,11 @@
 
                     self.planograms.forEach(planogram => {
                         if (planogram.name.includes(cluster)) {
-                            tmpPlanograms.push(planogram);
+                            tmpPlanograms.push({
+                                text: planogram.name,
+                                value: planogram.id
+                            });
+                            self.PlanoList.push(planogram)
                         }
                     })
 
@@ -335,14 +363,21 @@
                 let self = this;
 
                 self.selectedPlanogram = planogram;
+                self.PlanoList.forEach(item => {
+                    if (item.id = planogram) {
 
-                Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&id=' + planogram.id)
+
+                        self.selectedPlanoList = item
+                    }
+                })
+                console.log(self.selectedPlanoList);
+                Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&id=' + planogram)
                     .then(r => {
-                        console.log(r.data)
+                        // console.log(r.data)
                         self.image = r.data.image;
 
                         Axios.get(process.env.VUE_APP_API +
-                            `SystemFileApproval?db=CR-DEVINSPIRE&systemFileID=${planogram.id}`).then(resp => {
+                            `SystemFileApproval?db=CR-DEVINSPIRE&systemFileID=${planogram}`).then(resp => {
 
                             self.timelineItems = []
 

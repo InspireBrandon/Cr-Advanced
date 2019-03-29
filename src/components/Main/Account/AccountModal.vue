@@ -66,9 +66,9 @@
                         if (r.data) {
                             console.log(r.data);
                             self.accountID=r.data
+                            request.accountID=r.data
                             self.afterClose(request)
-                            self.close()
-
+                          
                         }
                     })
             },
@@ -116,7 +116,7 @@
                     self.domain = domain
                 }
 
-                self.afterafterClose = callback;
+               callback= self.afterafterClose;
                 // self.accountID=accountID
                 self.userID = userID;
                 self.modalShow = true
