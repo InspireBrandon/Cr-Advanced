@@ -10,8 +10,7 @@
                             <v-toolbar dark color="primary">
                                 <v-toolbar-title>Databases</v-toolbar-title>
                                 <v-spacer></v-spacer>
-                                <v-btn icon @click="openDatabaseModal" :disabled="profile.accountID == null"
-                                    color="primary">
+                                <v-btn icon @click="openDatabaseModal" :disabled="profile.accountID == null" color="primary">
                                     <v-icon>add</v-icon>
                                 </v-btn>
                             </v-toolbar>
@@ -116,8 +115,7 @@
         <DatabaseUserModal ref="DatabaseUserModal"></DatabaseUserModal>
         <v-flex lg8 md12 sm12 xs12 v-if="profile.accountID == null  && !showLoader">
             <br>
-            <p>In order to create a database you must first register an account. Please <a href="#"
-                    @click.prevent="openAccountModal">click
+            <p>In order to create a database you must first register an account. Please <a href="#" @click.prevent="openAccountModal">click
                     here</a> to register.</p>
         </v-flex>
     </v-card>
@@ -276,10 +274,14 @@
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
 
                 self.$refs.AccountModal.open(encoded_details.USER_ID, self.country, self.domain, callback => {
+                    self.accountID = callback.accountID
                     self.getAccountDetails(self.accountID, callback2 => {
+
                         self.$refs.AccountModal.close();
+                        
                         self.country = callback.country
                         self.domain = callback.domain
+
                     });
 
                 })
