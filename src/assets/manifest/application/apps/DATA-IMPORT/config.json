@@ -1,0 +1,13 @@
+
+{
+    "configName":"DataImport",
+    "report":false,
+    "routes": [
+        {
+            "route": "/DataImport",
+            "routeName": "DataImport",
+            "title": "Data Import",
+            "openInNewWindow": false
+        }
+    ]
+}

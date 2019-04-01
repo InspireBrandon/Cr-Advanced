@@ -10,5 +10,9 @@
     {
         "id": 3,
         "system_code": "PRODUCT-MAINTENANCE"
+    },
+    {
+        "id": 4,
+        "system_code": "DATA-IMPORT"
     }
 ]

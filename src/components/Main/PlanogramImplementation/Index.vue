@@ -5,8 +5,8 @@
             <v-layout row wrap>
                 <v-flex lg3 md4 sm12 xs12>
                     Store
-                    <v-autocomplete placeholder="Please select a store..." @change="getPlanogramsByStore" v-model="selectedStore"
-                        :items="storesDropdown" solo light :disabled="storeDisabled">
+                    <v-autocomplete placeholder="Please select a store..." @change="getPlanogramsByStore"
+                        v-model="selectedStore" :items="storesDropdown" solo light :disabled="storeDisabled">
                     </v-autocomplete>
                 </v-flex>
                 <v-flex lg9 md8 sm12 xs12></v-flex>
@@ -144,8 +144,8 @@
                         </v-card>
                         <v-card-text class="py-0">
                             <v-timeline align-top dense>
-                                <v-timeline-item v-for="(item,index) in timelineItems" :key="index" :color="status[item.status].color"
-                                    small>
+                                <v-timeline-item v-for="(item,index) in timelineItems" :key="index"
+                                    :color="status[item.status].color" small>
                                     <v-layout pt-3>
                                         <v-flex xs3>
                                             <div class="caption">{{item.date}}</div>
@@ -431,8 +431,7 @@
                     }
                 })
             },
-            implementPlano(item, index) {
-                let self = this
+            implementPlano(item) {
                 let systemFileApproval = {
                     systemFile_ID: item.id,
                     status: 5,

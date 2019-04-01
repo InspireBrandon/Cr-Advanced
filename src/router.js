@@ -39,6 +39,8 @@ import Product_Maintainance_Details from '@/views/App_Details/PRODUCT_MAINTAINAN
 //spacePLanning
 import  SpacePlanning from '@/components/Main/Planogram/spaceplanning/src/views/Main'
 
+import DataImport from '@/components/Apps/DataImport/Index.vue'
+
 
 //reports
 import AppsReportList from '@/components/Main/Reports/Apps/Index.vue'
@@ -48,7 +50,6 @@ import SpacePlanningReportList from '@/components/Main/Reports/Apps/SpacePlannin
 import FixtureReport from '@/views/Reports/SPACE-PLANNING-REPORTS/FixtureReport/Index.vue'
 import ProductFixtureReport from '@/views/Reports/SPACE-PLANNING-REPORTS/ProductFixtureReport/Index.vue'
 import ProductReport from '@/views/Reports/SPACE-PLANNING-REPORTS/ProductReport/Index.vue'
-
 
 import HelpFileView from '@/components/Main/HelpFile/Index.vue'
 Vue.use(Router)
@@ -163,6 +164,11 @@ export default new Router({
           path: '/ProductCatalogue',
           name: 'ProductCatalogue',
           component: ProductCatalogue
+        },
+        {
+          path: '/DataImport',
+          name: 'DataImport',
+          component: DataImport
         }
       ]
     },
