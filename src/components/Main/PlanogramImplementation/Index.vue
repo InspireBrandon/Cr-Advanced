@@ -5,8 +5,8 @@
             <v-layout row wrap>
                 <v-flex lg3 md4 sm12 xs12>
                     Store
-                    <v-autocomplete placeholder="Please select a store..." @change="getPlanogramsByStore" v-model="selectedStore"
-                        :items="storesDropdown" solo light :disabled="storeDisabled">
+                    <v-autocomplete placeholder="Please select a store..." @change="getPlanogramsByStore"
+                        v-model="selectedStore" :items="storesDropdown" solo light :disabled="storeDisabled">
                     </v-autocomplete>
                 </v-flex>
                 <v-flex lg9 md8 sm12 xs12></v-flex>
@@ -19,11 +19,12 @@
                             <!-- <v-btn flat outline @click="$router.push(`/PlanogramImplementation/RequestNewPlanogram/`+null)">Request
                                 new</v-btn> -->
                         </v-toolbar>
-                        <v-autocomplete placeholder="Please select a store..." @change="selectPlanogram(selectedPlanogram)"
-                            v-model="selectedPlanogram" :items="planogramsList" solo light :disabled="storeDisabled">
+                        <v-autocomplete placeholder="Please select a store..."
+                            @change="selectPlanogram(selectedPlanogram)" v-model="selectedPlanogram"
+                            :items="planogramsList" solo light :disabled="storeDisabled">
                         </v-autocomplete>
                         <div v-if="selectedPlanoList!=null">
-                            
+
 
 
                             <v-flex v-if="selectedPlanoList!=null">Status: {{status[selectedPlanoList.status == null ? 2 :
@@ -32,7 +33,8 @@
                                 Implement Planogram
                             </v-btn>
                             <v-flex>
-                                <v-btn v-if="selectedPlanoList.status==2 ||selectedPlanoList.status==null" @click="ApprovePlano(selectedPlanoList)">
+                                <v-btn v-if="selectedPlanoList.status==2 ||selectedPlanoList.status==null"
+                                    @click="ApprovePlano(selectedPlanoList)">
                                     Approve
                                 </v-btn>
                                 <v-btn v-if="selectedPlanoList.status==2 ||selectedPlanoList.status==null" avatar
@@ -143,8 +145,8 @@
                         </v-card>
                         <v-card-text class="py-0">
                             <v-timeline align-top dense>
-                                <v-timeline-item v-for="(item,index) in timelineItems" :key="index" :color="status[item.status].color"
-                                    small>
+                                <v-timeline-item v-for="(item,index) in timelineItems" :key="index"
+                                    :color="status[item.status].color" small>
                                     <v-layout pt-3>
                                         <v-flex xs3>
                                             <div class="caption">{{item.date}}</div>
@@ -256,7 +258,8 @@
                         if (r.data.isDatabaseOwner) {
                             self.getPlanogramsByStore();
                         } else {
-                            if (r.data.tenantLink_AccessTypeList != null && r.data.tenantLink_AccessTypeList.length > 1) {
+                            if (r.data.tenantLink_AccessTypeList != null && r.data.tenantLink_AccessTypeList
+                                .length > 1) {
                                 let item = r.data.tenantLink_AccessTypeList[0];
 
                                 if (item.accessType == 3) {
@@ -305,7 +308,6 @@
 
                 Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&folder=SPACE PLANNING')
                     .then(r => {
-                        console.log(r.data)
                         self.planograms = r.data;
                         self.getAccessType();
                     })
@@ -338,8 +340,7 @@
                     self.planogramsList = tmpPlanograms;
                 })
             },
-            ApprovePlano(item, index) {
-                let self = this
+            ApprovePlano(item) {
                 let systemFileApproval = {
                     systemFile_ID: item.id,
                     status: 4,
@@ -351,10 +352,9 @@
                 Axios.post(process.env.VUE_APP_API + "SystemFileApproval?db=CR-Devinspire", {
                     systemFileApproval: systemFileApproval
                 }).then(
-                    r => {})
+                    () => {})
             },
-            implementPlano(item, index) {
-                let self = this
+            implementPlano(item) {
                 let systemFileApproval = {
                     systemFile_ID: item.id,
                     status: 5,
@@ -364,24 +364,19 @@
                 item.status = 5
                 Axios.post(process.env.VUE_APP_API + "SystemFileApproval?db=CR-Devinspire", {
                     systemFileApproval: systemFileApproval
-                }).then(
-                    r => {})
+                }).then(() => {})
             },
             selectPlanogram(planogram) {
                 let self = this;
 
                 self.selectedPlanogram = planogram;
                 self.PlanoList.forEach(item => {
-                    if (item.id = planogram) {
-
-
+                    if (item.id == planogram) {
                         self.selectedPlanoList = item
                     }
                 })
-                console.log(self.selectedPlanoList);
                 Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&id=' + planogram)
                     .then(r => {
-                        // console.log(r.data)
                         self.image = r.data.image;
 
                         Axios.get(process.env.VUE_APP_API +
@@ -406,9 +401,6 @@
 
                         })
                     })
-            },
-            downloadImage() {
-                let self = this;
             }
         }
     }

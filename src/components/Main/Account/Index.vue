@@ -130,9 +130,6 @@
     import AccountModal from "./AccountModal.vue"
     import DatabaseUserModal from './DatabaseUserModal.vue'
 
-    import {
-        throws
-    } from 'assert';
     export default {
         components: {
             AccountModal,
@@ -151,7 +148,6 @@
                 },
                 features: [],
                 dataBases: [],
-                showLoader: true,
                 totalPrice: 0
             }
         },
@@ -160,9 +156,6 @@
             self.getUserDetails()
         },
         methods: {
-            editDatabase(item) {
-
-            },
             maintainUsers(database) {
                 let self = this;
 
@@ -178,22 +171,15 @@
                 Axios.delete(process.env.VUE_APP_API +
                     `Tenant?tenantID=${item.tenantID}`
 
-                ).then(r => {
-                    self.getDatabases(encoded_details.USER_ID, callback3 => {});
-
+                ).then(() => {
+                    self.getDatabases(encoded_details.USER_ID, () => {});
                 })
             },
             getUserFeatures(userID, callback) {
                 let self = this
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
 
-                Axios.get(process.env.VUE_APP_API +
-                    `Features?systemUserID=${userID}`
-
-                ).then(r => {
-
+                Axios.get(process.env.VUE_APP_API + `Features?systemUserID=${userID}`).then(r => {
                     callback(self.features = r.data,
-
                         self.features.forEach(el => {
                             self.totalPrice += el.price;
                         })
@@ -202,7 +188,6 @@
             },
             getAccountDetails(accountID, callback) {
                 let self = this;
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
 
                 self.accountID = accountID
                 Axios.get(process.env.VUE_APP_API + `AccountProfile?accountID=${accountID}`)
@@ -229,10 +214,9 @@
                         if (self.profile.accountID != null) {
                             self.domain = r.data.domain
                             self.country = r.data.country
-                            self.getAccountDetails(self.profile.accountID, callback => {
-                                self.getUserFeatures(encoded_details.USER_ID, callback2 => {
-
-                                    self.getDatabases(encoded_details.USER_ID, callback3 => {});
+                            self.getAccountDetails(self.profile.accountID, () => {
+                                self.getUserFeatures(encoded_details.USER_ID, () => {
+                                    self.getDatabases(encoded_details.USER_ID, () => {});
                                 })
                             })
                         } else {
@@ -261,7 +245,7 @@
             openProfileModal() {
                 let self = this
                 self.$refs.ProfileModal.open(self.profile, function () {
-                    self.getAccountDetails(self.accountID, callback => {
+                    self.getAccountDetails(self.accountID, () => {
                         self.$refs.ProfileModal.close();
                     });
 
@@ -275,7 +259,7 @@
                 self.$refs.AccountModal.open(encoded_details.USER_ID, self.country, self.domain, callback => {
                      self.accountID=callback.accountID 
                     self.profile.accountID=callback.accountID 
-                    self.getAccountDetails(self.accountID, callback2 => {
+                    self.getAccountDetails(self.accountID, () => {
 
                         self.$refs.AccountModal.close();
 
@@ -292,8 +276,8 @@
                 let self = this;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 self.$refs.DatabaseModal.open(encoded_details.USER_ID, function () {
-                    self.getAccountDetails(self.accountID, callback => {});
-                    self.getDatabases(encoded_details.USER_ID, callback3 => {});
+                    self.getAccountDetails(self.accountID, () => {});
+                    self.getDatabases(encoded_details.USER_ID, () => {});
                     self.$refs.DatabaseModal.close();
                 })
             }
