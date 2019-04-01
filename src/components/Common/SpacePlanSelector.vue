@@ -1,23 +1,29 @@
 <template>
   <div>
     <v-dialog v-model="dialog" fullscreen persistent scrollable>
-      <v-card  height="400px" style="overflow: auto;">
+      <v-card height="400px" style="overflow: auto;">
 
-        <v-card-title style="text-align: center; display: block;" class="headline pa-0">
-          <v-toolbar dark color="primary" >
+        <v-card-title style=" display: block;" class="headline pa-0">
+          <v-toolbar dark color="primary">
             <v-toolbar-title>Select A Planogram</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-text-field v-model="searchText" append-icon="search"></v-text-field>
           </v-toolbar>
         </v-card-title>
 
-        <v-card-text style=" display: block;">
+        <v-card-text style="display: block;">
           <v-list dense hover v-for="(sp, idx) in filteredSpacePlans" :key="idx">
             <v-divider></v-divider>
             <v-list-tile :class="{ 'highlighted': selectedSpacePlan == sp  }" avatar @click="selectedSpacePlan = sp">
+
+
               <v-list-tile-content>
                 <v-list-tile-title v-text="sp.name"></v-list-tile-title>
               </v-list-tile-content>
+              <v-spacer></v-spacer>
+              <v-list-tile-action>
+                {{status[sp.status == null ? 2 : sp.status].friendy}}
+              </v-list-tile-action>
             </v-list-tile>
           </v-list>
         </v-card-text>
@@ -53,7 +59,33 @@
         dialog: false,
         spaceData: [],
         afterComplete: null,
-        selectedSpacePlan: null
+        selectedSpacePlan: null,
+
+        status: [{
+          type: 0,
+          friendy: "New",
+          color: "blue"
+        }, {
+          type: 1,
+          color: "blue",
+          friendy: "In Progress"
+        }, {
+          type: 2,
+          color: "blue",
+          friendy: "Requsting Approval"
+        }, {
+          type: 3,
+          color: "red",
+          friendy: "Variation Requested"
+        }, {
+          type: 4,
+          color: "green",
+          friendy: "Approved"
+        }, {
+          type: 5,
+          color: "green",
+          friendy: "Implemented"
+        }],
       }
     },
     computed: {
@@ -73,6 +105,8 @@
         Axios.get(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire&folder=Space Planning")
           .then(r => {
             self.spaceData = r.data;
+            console.log(self.spaceData);
+
             callback();
           })
           .catch(e => {
@@ -93,7 +127,7 @@
         } else {
           self.dialog = false;
 
-          self.afterComplete(self.selectedSpacePlan.id,self.selectedSpacePlan);
+          self.afterComplete(self.selectedSpacePlan.id, self.selectedSpacePlan);
         }
       },
       deleteSpacePlanFile() {

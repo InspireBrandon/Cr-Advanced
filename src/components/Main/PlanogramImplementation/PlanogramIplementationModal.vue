@@ -80,8 +80,6 @@
                                 }
                             }
                         });
-                        console.log(self.users);
-                        
 
                     })
             },
@@ -106,7 +104,7 @@
         self.title = title;
         self.dialog = true;
          self.afterRuturn = afterRuturn;
-        
+        self.getSpacePlans()
         self.getUsers()
 
 

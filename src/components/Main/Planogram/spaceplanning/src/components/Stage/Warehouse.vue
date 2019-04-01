@@ -58,7 +58,8 @@
             <v-list-tile @click="planogramToRange">
               <v-list-tile-title>Planogram To Range</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile v-if="spacePlanStatus==3||spacePlanStatus==1||spacePlanStatus==0 || spacePlanStatus== null" @click="submitPlanogram">
+              <!-- v-if="spacePlanStatus==3||spacePlanStatus==1||spacePlanStatus==0 || spacePlanStatus== null" -->
+            <v-list-tile @click="submitPlanogram">
               <v-list-tile-title>Submit For Approval</v-list-tile-title>
             </v-list-tile>
             <v-list-tile @click="closeFile">
@@ -121,8 +122,8 @@
         <v-flex v-if="rangingData.planogramID != null" md6 style="padding: 2px;">
           <v-select :disabled="!gotData" light placeholder="Clusters" @change="onClusterTypeChange" dense :items="clusterTypes"
             v-model="selectedClusterType" solo hide-details></v-select>
-          <v-select :disabled="!gotData" v-if="showCategoryCluster==true" light placeholder="Category Cluster" @change="onCategoryClusterChange"
-            dense :items="categoryCluster" v-model="selectedCategoryCluster" solo hide-details></v-select>
+          <!-- <v-select :disabled="!gotData" v-if="showCategoryCluster==true" light placeholder="Category Cluster" @change="onCategoryClusterChange"
+            dense :items="categoryCluster" v-model="selectedCategoryCluster" solo hide-details></v-select> -->
 
         </v-flex>
         <v-flex v-if="rangingData.planogramID != null && gotData" md6 style="padding: 2px;">
@@ -373,7 +374,8 @@
             };
           }
         },
-        details_panel: null
+        details_panel: null,
+        PlanogramObject:null
       };
     },
     created() {
@@ -442,8 +444,9 @@
     methods: {
       submitPlanogram() {
         let self = this
-        self.$refs.PlanogramAprovalModal.show('Submit planogram for aproval?', (value, notesModal) => {
-
+        self.$refs.PlanogramAprovalModal.show('Submit planogram for aproval?', (value, notesModal,selectedUser) => {
+          console.log(selectedUser);
+          
           if (value == true) {
             if (self.spacePlanID != null) {
 
@@ -451,13 +454,22 @@
                 systemFile_ID: self.spacePlanID,
                 status: 2,
                 transactionDateTime: new Date(),
-                notes: notesModal
+                notes: notesModal,
+                buyerID:selectedUser
               }
+                 
+                  
+              // axios.put(process.env.VUE_APP_API+`SystemFileApproval?db=CR-Devinspire&buyerID=`+self.spacePlanID,{})
+
               self.spacePlanStatus = 2
-              axios.post(process.env.VUE_APP_API + "SystemFileApproval?db=CR-Devinspire", {
+             
+              
+              axios.post(process.env.VUE_APP_API + "SystemFileApproval?db=CR-Devinspire&buyerID="+selectedUser+"&storeID="+self.PlanogramObject.storeID, {
                 systemFileApproval: systemFileApproval
               }).then(
-                r => {})
+                r => {
+              
+                })
             }
           }
         })
@@ -615,8 +627,8 @@
 
         self.$refs.spacePlanSelector.show((spacePlanID, item) => {
 
-          console.log("item");
-          console.log(item);
+          
+          self.PlanogramObject=item
           self.spacePlanStatus = item.status
           self.$refs.spinner.show();
           self.spacePlanID = spacePlanID;

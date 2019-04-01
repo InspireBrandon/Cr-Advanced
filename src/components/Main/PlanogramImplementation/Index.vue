@@ -19,20 +19,21 @@
                             <!-- <v-btn flat outline @click="$router.push(`/PlanogramImplementation/RequestNewPlanogram/`+null)">Request
                                 new</v-btn> -->
                         </v-toolbar>
-                        <v-autocomplete placeholder="Please select a store..." @change="selectPlanogram(selectedPlanogram)"
+                        <v-autocomplete placeholder="Please select a Planogram..." @change="selectPlanogram(selectedPlanogram)"
                             v-model="selectedPlanogram" :items="planogramsList" solo light :disabled="storeDisabled">
                         </v-autocomplete>
                         <div v-if="selectedPlanoList!=null">
-                            
 
 
-                            <v-flex v-if="selectedPlanoList!=null">Status: {{status[selectedPlanoList.status == null ? 2 :
+
+                            <v-flex v-if="selectedPlanoList!=null">Status: {{status[selectedPlanoList.status == null ?
+                                2 :
                                 selectedPlanoList.status].friendy}} </v-flex>
                             <v-btn v-if="selectedPlanoList.status==4" @click="implementPlano(selectedPlanoList)">
                                 Implement Planogram
                             </v-btn>
                             <v-flex>
-                                <v-btn v-if="selectedPlanoList.status==2 ||selectedPlanoList.status==null" @click="ApprovePlano(selectedPlanoList)">
+                                <v-btn v-if="selectedPlanoList.status==2 " @click="ApprovePlano(selectedPlanogram)">
                                     Approve
                                 </v-btn>
                                 <v-btn v-if="selectedPlanoList.status==2 ||selectedPlanoList.status==null" avatar
@@ -179,16 +180,24 @@
                 </v-card>
             </v-card>
         </v-dialog>
+        <PlanogramAprovalModal ref="PlanogramAprovalModal"></PlanogramAprovalModal>
     </v-card>
+
 </template>
 
 <script>
     import Axios from 'axios';
     import jwt from 'jsonwebtoken';
+    import PlanogramAprovalModal from '@/components/Main/Planogram/spaceplanning/src/components/Modals/PlanogramAproval/PlanogramAprovalModal';
+
 
     export default {
+        components: {
+            PlanogramAprovalModal
+        },
         data: () => {
             return {
+                accessType: null,
                 showLoader: true,
                 status: [{
                     type: 0,
@@ -236,7 +245,8 @@
                 planogramsList: [],
                 selectedPlanogram: null,
                 image: '',
-                storeDisabled: false
+                storeDisabled: false,
+                spacePlanID: null,
             }
         },
         created() {},
@@ -246,6 +256,7 @@
             self.getStores();
         },
         methods: {
+
             getAccessType() {
                 let self = this
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
@@ -253,13 +264,22 @@
                         `TenantLink_AccessType?systemUserID=${encoded_details.USER_ID}&tenantID=${sessionStorage.currentDatabase}`
                     )
                     .then(r => {
+                        console.log(r.data);
+
+
+                        self.accessType = r.data.tenantLink_AccessTypeList[0]
                         if (r.data.isDatabaseOwner) {
-                            self.getPlanogramsByStore();
+                            self.getPlanogramsByStore("SUPER");
                         } else {
-                            if (r.data.tenantLink_AccessTypeList != null && r.data.tenantLink_AccessTypeList.length > 1) {
+                            if (r.data.tenantLink_AccessTypeList != null && r.data.tenantLink_AccessTypeList.length >
+                                1) {
                                 let item = r.data.tenantLink_AccessTypeList[0];
 
-                                if (item.accessType == 3) {
+
+
+
+                                if (item.accessType == 2) {
+                                    // store
                                     self.selectedStore = item.storeID;
                                     self.storeDisabled = true;
                                     self.getPlanogramsByStore();
@@ -305,17 +325,18 @@
 
                 Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&folder=SPACE PLANNING')
                     .then(r => {
-                        console.log(r.data)
                         self.planograms = r.data;
                         self.getAccessType();
                     })
             },
-            getPlanogramsByStore() {
+            getPlanogramsByStore(type) {
                 let self = this;
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
                 self.selectedPlanogram = null;
 
                 self.$nextTick(() => {
                     let cluster = "";
+
 
                     self.stores.forEach(store => {
                         if (store.storeID == self.selectedStore) {
@@ -324,34 +345,91 @@
                     })
 
                     let tmpPlanograms = [];
-
+                    
                     self.planograms.forEach(planogram => {
                         if (planogram.name.includes(cluster)) {
-                            tmpPlanograms.push({
-                                text: planogram.name,
-                                value: planogram.id
-                            });
+                            if (self.accessType.accessType == 3 && (planogram.status == 4||planogram.status == 5)) {
+                                console.log("Store User");
+                                if (encoded_details.USER_ID == planogram.storeID) {
+                                    tmpPlanograms.push({
+                                        text: planogram.name,
+                                        value: planogram.id
+                                    });
+                                }
+
+                            }
+                            if (self.accessType.accessType == 1 && (planogram.status == 2||planogram.status == 5)) {
+                                console.log("buyer User");
+                                if (encoded_details.USER_ID == planogram.buyerID) {
+                                    tmpPlanograms.push({
+                                        text: planogram.name,
+                                        value: planogram.id
+                                    });
+                                }
+                            }
+                            if (type == "SUPER") {
+
+                                tmpPlanograms.push({
+                                    text: planogram.name,
+                                    value: planogram.id
+                                });
+
+
+                            }
+
                             self.PlanoList.push(planogram)
                         }
                     })
 
+
+                    console.log(self.planograms);
+
+
                     self.planogramsList = tmpPlanograms;
                 })
             },
-            ApprovePlano(item, index) {
+            ApprovePlano(item) {
                 let self = this
-                let systemFileApproval = {
-                    systemFile_ID: item.id,
-                    status: 4,
-                    transactionDateTime: new Date(),
-                    notes: null
-                }
+                var tmp = null
+                self.planograms.forEach(p => {
+                    if (p.id == item) {
+                        tmp = p
+                    }
+                })
 
-                item.status = 4
-                Axios.post(process.env.VUE_APP_API + "SystemFileApproval?db=CR-Devinspire", {
-                    systemFileApproval: systemFileApproval
-                }).then(
-                    r => {})
+                self.$refs.PlanogramAprovalModal.show('Submit planogram for aproval?', (value, notesModal, selectedUser) => {
+
+                    if (value == true) {
+                        if (item != null) {
+
+
+                            let systemFileApproval = {
+                                systemFile_ID: item,
+                                status: 4,
+                                transactionDateTime: new Date(),
+                                notes: notesModal,
+
+                            }
+
+                            // axios.put(process.env.VUE_APP_API+`SystemFileApproval?db=CR-Devinspire&buyerID=`+self.spacePlanID,{})
+
+
+                            Axios.post(process.env.VUE_APP_API + "SystemFileApproval?db=CR-Devinspire&buyerID=" +
+                                tmp.buyerID + "&storeID=" +
+                                selectedUser, {
+                                    systemFileApproval: systemFileApproval
+                                }).then(
+                                r => {
+                                   
+                                    self.planograms.forEach(p => {
+                                        if (p.id == systemFileApproval.systemFile_ID) {
+                                            p.status = systemFileApproval.status
+                                        }
+                                    })
+                                })
+                        }
+                    }
+                })
             },
             implementPlano(item, index) {
                 let self = this
@@ -361,51 +439,58 @@
                     transactionDateTime: new Date(),
                     notes: null
                 }
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
                 item.status = 5
-                Axios.post(process.env.VUE_APP_API + "SystemFileApproval?db=CR-Devinspire", {
-                    systemFileApproval: systemFileApproval
-                }).then(
+                Axios.post(process.env.VUE_APP_API + "SystemFileApproval?db=CR-Devinspire&buyerID=" +
+                    item.buyerID + "&storeID=" +
+                    encoded_details.USER_ID, {
+                        systemFileApproval: systemFileApproval
+                    }).then(
                     r => {})
             },
             selectPlanogram(planogram) {
                 let self = this;
-
-                self.selectedPlanogram = planogram;
-                self.PlanoList.forEach(item => {
-                    if (item.id = planogram) {
+                self.$nextTick(() => {
+                    self.selectedPlanogram = planogram;
 
 
-                        self.selectedPlanoList = item
-                    }
-                })
-                console.log(self.selectedPlanoList);
-                Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&id=' + planogram)
-                    .then(r => {
-                        // console.log(r.data)
-                        self.image = r.data.image;
 
-                        Axios.get(process.env.VUE_APP_API +
-                            `SystemFileApproval?db=CR-DEVINSPIRE&systemFileID=${planogram}`).then(resp => {
-
-                            self.timelineItems = []
-
-                            resp.data.systemFileApprovalList.forEach(element => {
-                                self.timelineItems.push({
-                                    status: element.status,
-                                    notes: element.notes,
-                                    date: element.transactionDateTime
-                                })
-                            })
-                            self.timelineItems.sort(function (a, b) {
+                    self.PlanoList.forEach(item => {
+                       
+                        if (item.id == planogram) {
 
 
-                                a = new Date(a.date);
-                                b = new Date(b.date);
-                                return a > b ? -1 : a < b ? 1 : 0;
-                            });
-
-                        })
+                            self.selectedPlanoList = item
+                        }
                     })
+                    Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&id=' + planogram)
+                        .then(r => {
+                            self.image = r.data.image;
+
+                            Axios.get(process.env.VUE_APP_API +
+                                `SystemFileApproval?db=CR-DEVINSPIRE&systemFileID=${planogram}`).then(
+                                resp => {
+
+                                    self.timelineItems = []
+
+                                    resp.data.systemFileApprovalList.forEach(element => {
+                                        self.timelineItems.push({
+                                            status: element.status,
+                                            notes: element.notes,
+                                            date: element.transactionDateTime
+                                        })
+                                    })
+                                    self.timelineItems.sort(function (a, b) {
+
+
+                                        a = new Date(a.date);
+                                        b = new Date(b.date);
+                                        return a > b ? -1 : a < b ? 1 : 0;
+                                    });
+
+                                })
+                        })
+                })
             },
             downloadImage() {
                 let self = this;
