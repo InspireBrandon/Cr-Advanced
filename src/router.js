@@ -37,10 +37,16 @@ import Space_Planning_Details from '@/views/App_Details/SPACE_PLANNING.vue'
 import Range_Planning_Details from '@/views/App_Details/RANGE_PLANNING.vue'
 import Product_Maintainance_Details from '@/views/App_Details/PRODUCT_MAINTAINANCE.vue'
 //spacePLanning
-import  SpacePlanning from '@/components/Main/Planogram/spaceplanning/src/views/Main'
+import SpacePlanning from '@/components/Main/Planogram/spaceplanning/src/views/Main'
 
 import DataImport from '@/components/Apps/DataImport/Index.vue'
+import DataImportSections from '@/components/Apps/DataImport/Sections.vue'
+import ProductImport from '@/components/Apps/DataImport/Types/Product/Index.vue'
+import SalesImport from '@/components/Apps/DataImport/Types/Sales/Index.vue'
 
+import DataPrep from '@/components/Apps/DataPreparation/Index.vue'
+import DataPrepSections from '@/components/Apps/DataPreparation/Sections.vue'
+import ManufacturerMaint from '@/components/Apps/DataPreparation/Types/Manufacturer/Index.vue'
 
 //reports
 import AppsReportList from '@/components/Main/Reports/Apps/Index.vue'
@@ -67,7 +73,7 @@ export default new Router({
       path: '/SpacePlanning',
       name: 'space_planning',
       component: SpacePlanning
-    },{
+    }, {
       path: '/Menu',
       name: 'main',
       component: Main,
@@ -168,7 +174,33 @@ export default new Router({
         {
           path: '/DataImport',
           name: 'DataImport',
-          component: DataImport
+          component: DataImport,
+          children: [{
+            path: '',
+            name: 'DataImportSections',
+            component: DataImportSections,
+          }, {
+            path: 'Product',
+            name: 'Product',
+            component: ProductImport
+          }, {
+            path: 'Sales',
+            name: 'Sales',
+            component: SalesImport
+          }]
+        },        {
+          path: '/DataPreparation',
+          name: 'DataPrep',
+          component: DataPrep,
+          children: [{
+            path: '',
+            name: 'DataPrep',
+            component: DataPrepSections,
+          }, {
+            path: 'Manufacturer',
+            name: 'Manufacturer',
+            component: ManufacturerMaint
+          }]
         }
       ]
     },
