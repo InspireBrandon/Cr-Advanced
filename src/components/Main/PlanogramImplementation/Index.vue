@@ -5,8 +5,8 @@
             <v-layout row wrap>
                 <v-flex lg3 md4 sm12 xs12>
                     Store
-                    <v-autocomplete placeholder="Please select a store..." @change="getPlanogramsByStore"
-                        v-model="selectedStore" :items="storesDropdown" solo light :disabled="storeDisabled">
+                    <v-autocomplete placeholder="Please select a store..." @change="getPlanogramsByStore" v-model="selectedStore"
+                        :items="storesDropdown" solo light :disabled="storeDisabled">
                     </v-autocomplete>
                 </v-flex>
                 <v-flex lg9 md8 sm12 xs12></v-flex>
@@ -144,8 +144,8 @@
                         </v-card>
                         <v-card-text class="py-0">
                             <v-timeline align-top dense>
-                                <v-timeline-item v-for="(item,index) in timelineItems" :key="index"
-                                    :color="status[item.status].color" small>
+                                <v-timeline-item v-for="(item,index) in timelineItems" :key="index" :color="status[item.status].color"
+                                    small>
                                     <v-layout pt-3>
                                         <v-flex xs3>
                                             <div class="caption">{{item.date}}</div>
@@ -266,10 +266,15 @@
                     .then(r => {
                         console.log(r.data);
 
-
-                        self.accessType = r.data.tenantLink_AccessTypeList[0]
                         if (r.data.isDatabaseOwner) {
-                            self.getPlanogramsByStore("SUPER");
+                            self.accessType = 0
+                        } else {
+                            self.accessType = r.data.tenantLink_AccessTypeList[0]
+
+                        }
+
+                        if (r.data.isDatabaseOwner) {
+                            self.getPlanogramsByStore();
                         } else {
                             if (r.data.tenantLink_AccessTypeList != null && r.data.tenantLink_AccessTypeList.length >
                                 1) {
@@ -291,6 +296,9 @@
                             }
                         }
 
+                        self.showLoader = false;
+                    }).catch(e => {
+                        self.accessType = -1
                         self.showLoader = false;
                     })
             },
@@ -345,10 +353,11 @@
                     })
 
                     let tmpPlanograms = [];
-                    
+
                     self.planograms.forEach(planogram => {
                         if (planogram.name.includes(cluster)) {
-                            if (self.accessType.accessType == 3 && (planogram.status == 4||planogram.status == 5)) {
+                            if (self.accessType.accessType == 3 && (planogram.status == 4 || planogram.status ==
+                                    5)) {
                                 console.log("Store User");
                                 if (encoded_details.USER_ID == planogram.storeID) {
                                     tmpPlanograms.push({
@@ -358,7 +367,8 @@
                                 }
 
                             }
-                            if (self.accessType.accessType == 1 && (planogram.status == 2||planogram.status == 5)) {
+                            if (self.accessType.accessType == 1 && (planogram.status == 2 || planogram.status ==
+                                    5)) {
                                 console.log("buyer User");
                                 if (encoded_details.USER_ID == planogram.buyerID) {
                                     tmpPlanograms.push({
@@ -367,7 +377,7 @@
                                     });
                                 }
                             }
-                            if (type == "SUPER") {
+                            if (self.accessType == 0) {
 
                                 tmpPlanograms.push({
                                     text: planogram.name,
@@ -420,7 +430,7 @@
                                     systemFileApproval: systemFileApproval
                                 }).then(
                                 r => {
-                                   
+
                                     self.planograms.forEach(p => {
                                         if (p.id == systemFileApproval.systemFile_ID) {
                                             p.status = systemFileApproval.status
@@ -455,7 +465,7 @@
 
 
                     self.PlanoList.forEach(item => {
-                       
+
                         if (item.id == planogram) {
 
 
