@@ -68,7 +68,11 @@
         methods: {
             openEdit(item) {
                 let self = this;
-                self.$refs.maint.show(false,item);
+                self.$refs.maint.show(false, item, newItem => {
+                    for(var prop in item) {
+                        item[prop] = newItem[prop];
+                    }
+                });
             },
             getItems() {
                 let self = this;

@@ -33,7 +33,7 @@
 
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="primary" @click="dialog = false">
+                    <v-btn color="primary" @click="save">
                         Submit
                     </v-btn>
                 </v-card-actions>
@@ -43,34 +43,57 @@
 </template>
 
 <script>
+    import Axios from 'axios';
+
+    function lowercaseName(name) {
+        return name.charAt(0).toLowerCase() + name.slice(1)
+    }
+
     export default {
         props: ['name'],
         data() {
             return {
                 dialog: false,
-                form: {
-                    displayname: null,
-                    props: null,
-                    props_Code: null,
-                }
-
+                isAdd: true,
+                form: {},
+                callback: null
             }
         },
         methods: {
-            show(isAdd, item) {
+            show(isAdd, item, callback) {
                 let self = this;
-                console.log(item);
 
-                if (isAdd == true) {
+                self.isAdd = isAdd;
+                self.callback = callback;
 
-                }
-                if (isAdd == false) {
-                    self.form.displayname = item.displayname
-                    self.form.manufacturer = item.manufacturer
-                    self.form.manufacturer_Code = item.manufacturer_Code
+                if (isAdd) {
+                    self.form.id = null;
+                    self.form.displayname = null;
+                    self.form[lowercaseName(self.name)] = null;
+                    self.form[lowercaseName(self.name) + "_Code"] = null;
+                    self.form.temporary = false;
+                } else {
+                    self.form.id = item.id;
+                    self.form.displayname = item.displayname;
+                    self.form[lowercaseName(self.name)] = item[lowercaseName(self.name)];
+                    self.form[lowercaseName(self.name) + "_Code"] = item[lowercaseName(self.name) + "_Code"];
+                    self.form.temporary = item.temporary;
                 }
 
                 self.dialog = true;
+            },
+            save() {
+                let self = this;
+                let type = self.isAdd ? "post" : "put";
+
+                Axios[type](process.env.VUE_APP_API + `Retailer/${self.name}`, self.form)
+                    .then(r => {
+                        if (self.isAdd)
+                            self.form.id = r.data.id;
+
+                        self.callback(self.form)
+                        self.dialog = false;
+                    })
             }
         }
     }
