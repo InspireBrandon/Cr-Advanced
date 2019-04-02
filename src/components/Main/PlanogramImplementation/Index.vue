@@ -97,7 +97,7 @@
 
                     </v-card>
                     <v-layout>
-                        <v-flex v-if="selectedPlanogram != null" lg4 md4 sm12 xs12 @click="openImage">
+                        <v-flex v-if="selectedPlanogram != null" lg8 md8 sm12 xs12 @click="openImage">
                             <v-card light>
                                 <v-toolbar color="primary" dark flat dense>
                                     Planogram Image
@@ -114,7 +114,7 @@
                                 </v-card-text>
                             </v-card>
                         </v-flex>
-                        <v-flex v-if="selectedPlanogram != null" lg8 md4 sm12 xs12>
+                        <v-flex v-if="selectedPlanogram != null" lg4 md4 sm12 xs12>
                             <v-card>
                                 <v-toolbar dark color="primary" flat dense>Reports</v-toolbar>
                                 <v-list light dense>
@@ -359,7 +359,7 @@
                             if (self.accessType.accessType == 3 && (planogram.status == 4 || planogram.status ==
                                     5)) {
                                 console.log("Store User");
-                                if (encoded_details.USER_ID == planogram.storeID) {
+                                if (self.accessType.storeID == planogram.storeID) {
                                     tmpPlanograms.push({
                                         text: planogram.name,
                                         value: planogram.id
@@ -475,7 +475,8 @@
                     Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&id=' + planogram)
                         .then(r => {
                             self.image = r.data.image;
-
+                            console.log(r.data);
+                            
                             Axios.get(process.env.VUE_APP_API +
                                 `SystemFileApproval?db=CR-DEVINSPIRE&systemFileID=${planogram}`).then(
                                 resp => {

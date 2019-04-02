@@ -5,14 +5,13 @@
         <v-card>
           <v-card-title style="text-align: center; display: block;" class="headline">{{ title }}
             <v-textarea v-model="modalNotes" label="Notes"></v-textarea>
+            <v-flex md3>
+              <v-autocomplete style="max-width: 400px;" dense v-model="selectedUser" :items="users" label="find a user"></v-autocomplete>
+            </v-flex>
           </v-card-title>
-          <v-flex md3>
-            <v-autocomplete style="max-width: 400px;" dense v-model="selectedUser" :items="users" label="find a user"></v-autocomplete>
-          </v-flex>
+
           <v-flex md9>
-            <v-btn :disabled="selectedUser == null" icon @click="''">
-              <v-icon>check</v-icon>
-            </v-btn>
+
           </v-flex>
           <v-card-actions style="text-align: center; display: block;">
             <v-spacer></v-spacer>
@@ -39,52 +38,52 @@
         spaceData: null,
         users: [],
         selectedUser: null,
-         databaseUsers: [],
+        databaseUsers: [],
       }
     },
     methods: {
       getUsers(callback) {
-                let self = this;
+        let self = this;
 
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
+        let encoded_details = jwt.decode(sessionStorage.accessToken);
 
-                Axios.get(process.env.VUE_APP_API + `SystemUser`)
-                    .then(r => {
-                     
-                        
-                        self.userDetails = r.data;
+        Axios.get(process.env.VUE_APP_API + `SystemUser`)
+          .then(r => {
 
-                        r.data.forEach(element => {
 
-                            if (element.emailAddress != null) {
-                                let isDatabaseUser = false;
+            self.userDetails = r.data;
 
-                                self.databaseUsers.forEach((dbu, idx) => {
-                                    if (dbu.systemUserID == element.systemUserID) {
-                                        isDatabaseUser = true;
-                                    }
+            r.data.forEach(element => {
 
-                                    if (dbu.systemUserID == encoded_details.USER_ID) {
-                                        self.databaseUsers.splice(idx, 1);
-                                    }
-                                })
+              if (element.emailAddress != null) {
+                let isDatabaseUser = false;
 
-                                if (!isDatabaseUser) {
-                                    if (element.systemUserID != encoded_details.USER_ID) {
-                                        
-                                        self.users.push({
-                                            text: element.emailAddress.toString(),
-                                            value: element.systemUserID
-                                        })
-                                    }
-                                }
-                            }
-                        });
-                        console.log(self.users);
-                        
+                self.databaseUsers.forEach((dbu, idx) => {
+                  if (dbu.systemUserID == element.systemUserID) {
+                    isDatabaseUser = true;
+                  }
 
+                  if (dbu.systemUserID == encoded_details.USER_ID) {
+                    self.databaseUsers.splice(idx, 1);
+                  }
+                })
+
+                if (!isDatabaseUser) {
+                  if (element.systemUserID != encoded_details.USER_ID) {
+
+                    self.users.push({
+                      text: element.emailAddress.toString(),
+                      value: element.systemUserID
                     })
-            },
+                  }
+                }
+              }
+            });
+            console.log(self.users);
+
+
+          })
+      },
       getSpacePlans(callback) {
         let self = this;
 
@@ -93,7 +92,7 @@
         Axios.get(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire&folder=Space Planning")
           .then(r => {
             self.spaceData = r.data;
-           
+
             callback();
           })
           .catch(e => {
@@ -105,20 +104,20 @@
         let self = this;
         self.title = title;
         self.dialog = true;
-         self.afterRuturn = afterRuturn;
-        
+        self.afterRuturn = afterRuturn;
+
         self.getUsers()
 
 
       },
-    
-       returnValue(value) {
+
+      returnValue(value) {
         let self = this;
-        
-        self.afterRuturn(value,self.modalNotes,self.selectedUser);
+
+        self.afterRuturn(value, self.modalNotes, self.selectedUser);
         self.dialog = false;
       }
     }
-    
+
   }
 </script>

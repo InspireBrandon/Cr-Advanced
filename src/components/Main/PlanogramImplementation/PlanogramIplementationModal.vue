@@ -5,14 +5,13 @@
         <v-card>
           <v-card-title style="text-align: center; display: block;" class="headline">{{ title }}
             <v-textarea v-model="modalNotes" label="Notes"></v-textarea>
+            <v-flex md3>
+              <v-autocomplete style="max-width: 400px;" dense v-model="selectedUser" :items="users" label="Select A Store"></v-autocomplete>
+            </v-flex>
           </v-card-title>
-          <v-flex md3>
-            <v-autocomplete style="max-width: 400px;" dense v-model="selectedUser" :items="users" label="Select A Store"></v-autocomplete>
-          </v-flex>
+
           <v-flex md9>
-            <v-btn :disabled="selectedUser == null" icon @click="''">
-              <v-icon>check</v-icon>
-            </v-btn>
+
           </v-flex>
           <v-card-actions style="text-align: center; display: block;">
             <v-spacer></v-spacer>
