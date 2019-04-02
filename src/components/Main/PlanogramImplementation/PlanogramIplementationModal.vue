@@ -7,7 +7,7 @@
             <v-textarea v-model="modalNotes" label="Notes"></v-textarea>
           </v-card-title>
           <v-flex md3>
-            <v-autocomplete style="max-width: 400px;" dense v-model="selectedUser" :items="users" label="find a user"></v-autocomplete>
+            <v-autocomplete style="max-width: 400px;" dense v-model="selectedUser" :items="users" label="Select A Store"></v-autocomplete>
           </v-flex>
           <v-flex md9>
             <v-btn :disabled="selectedUser == null" icon @click="''">
@@ -39,50 +39,50 @@
         spaceData: null,
         users: [],
         selectedUser: null,
-         databaseUsers: [],
+        databaseUsers: [],
       }
     },
     methods: {
       getUsers(callback) {
-                let self = this;
+        let self = this;
 
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
+        let encoded_details = jwt.decode(sessionStorage.accessToken);
 
-                Axios.get(process.env.VUE_APP_API + `SystemUser`)
-                    .then(r => {
-                     
-                        
-                        self.userDetails = r.data;
+        Axios.get(process.env.VUE_APP_API + `SystemUser`)
+          .then(r => {
 
-                        r.data.forEach(element => {
 
-                            if (element.emailAddress != null) {
-                                let isDatabaseUser = false;
+            self.userDetails = r.data;
 
-                                self.databaseUsers.forEach((dbu, idx) => {
-                                    if (dbu.systemUserID == element.systemUserID) {
-                                        isDatabaseUser = true;
-                                    }
+            r.data.forEach(element => {
 
-                                    if (dbu.systemUserID == encoded_details.USER_ID) {
-                                        self.databaseUsers.splice(idx, 1);
-                                    }
-                                })
+              if (element.emailAddress != null) {
+                let isDatabaseUser = false;
 
-                                if (!isDatabaseUser) {
-                                    if (element.systemUserID != encoded_details.USER_ID) {
-                                        
-                                        self.users.push({
-                                            text: element.emailAddress.toString(),
-                                            value: element.systemUserID
-                                        })
-                                    }
-                                }
-                            }
-                        });
+                self.databaseUsers.forEach((dbu, idx) => {
+                  if (dbu.systemUserID == element.systemUserID) {
+                    isDatabaseUser = true;
+                  }
 
+                  if (dbu.systemUserID == encoded_details.USER_ID) {
+                    self.databaseUsers.splice(idx, 1);
+                  }
+                })
+
+                if (!isDatabaseUser) {
+                  if (element.systemUserID != encoded_details.USER_ID) {
+
+                    self.users.push({
+                      text: element.emailAddress.toString(),
+                      value: element.systemUserID
                     })
-            },
+                  }
+                }
+              }
+            });
+
+          })
+      },
       getSpacePlans(callback) {
         let self = this;
 
@@ -91,7 +91,7 @@
         Axios.get(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire&folder=Space Planning")
           .then(r => {
             self.spaceData = r.data;
-           
+
             callback();
           })
           .catch(e => {
@@ -103,20 +103,40 @@
         let self = this;
         self.title = title;
         self.dialog = true;
-         self.afterRuturn = afterRuturn;
-        self.getSpacePlans()
-        self.getUsers()
+        self.getStores()
 
+        self.afterRuturn = afterRuturn;
+        self.getSpacePlans()
+        // self.getUsers()
 
       },
-    
-       returnValue(value) {
+      getStores() {
+        let self = this
+        Axios.get(process.env.VUE_APP_API + "Store?db=CR-Devinspire").then(r => {
+
+
+          r.data.forEach(s => {
+
+            self.users.push({
+              text: s.storeName,
+              value: s.storeID
+            })
+
+          })
+          console.log("stores");
+          console.log(self.users);
+
+        })
+
+      },
+
+      returnValue(value) {
         let self = this;
-        
-        self.afterRuturn(value,self.modalNotes,self.selectedUser);
+
+        self.afterRuturn(value, self.modalNotes, self.selectedUser);
         self.dialog = false;
       }
     }
-    
+
   }
 </script>

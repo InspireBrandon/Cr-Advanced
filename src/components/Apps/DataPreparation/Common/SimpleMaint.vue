@@ -11,13 +11,13 @@
                         <v-container grid-list-md>
                             <v-layout row wrap>
                                 <v-flex md6>
-                                    <v-text-field :label="name"></v-text-field>
+                                    <v-text-field :label="name" v-model="form.manufacturer"></v-text-field>
                                 </v-flex>
                                 <v-flex md6>
-                                    <v-text-field label="Display Name"></v-text-field>
+                                    <v-text-field label="Display Name" v-model="form.displayname"></v-text-field>
                                 </v-flex>
                                 <v-flex md6>
-                                    <v-text-field label="Code"></v-text-field>
+                                    <v-text-field label="Code" v-model="form.manufacturer_Code"></v-text-field>
                                 </v-flex>
                                 <v-flex md6>
                                 </v-flex>
@@ -47,12 +47,29 @@
         props: ['name'],
         data() {
             return {
-                dialog: false
+                dialog: false,
+                form: {
+                    displayname: null,
+                    props: null,
+                    props_Code: null,
+                }
+
             }
         },
         methods: {
-            show() {
+            show(isAdd, item) {
                 let self = this;
+                console.log(item);
+
+                if (isAdd == true) {
+
+                }
+                if (isAdd == false) {
+                    self.form.displayname = item.displayname
+                    self.form.manufacturer = item.manufacturer
+                    self.form.manufacturer_Code = item.manufacturer_Code
+                }
+
                 self.dialog = true;
             }
         }

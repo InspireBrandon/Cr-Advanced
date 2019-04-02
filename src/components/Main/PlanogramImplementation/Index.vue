@@ -188,7 +188,7 @@
 <script>
     import Axios from 'axios';
     import jwt from 'jsonwebtoken';
-    import PlanogramAprovalModal from '@/components/Main/Planogram/spaceplanning/src/components/Modals/PlanogramAproval/PlanogramAprovalModal';
+    import PlanogramAprovalModal from './PlanogramIplementationModal';
 
 
     export default {

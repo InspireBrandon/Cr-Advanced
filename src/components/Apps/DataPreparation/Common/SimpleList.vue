@@ -28,7 +28,7 @@
                                                 <v-icon>more_vert</v-icon>
                                             </v-btn>
                                             <v-list dense>
-                                                <v-list-tile>Edit</v-list-tile>
+                                                <v-list-tile @click="openEdit(item)">Edit</v-list-tile>
                                                 <v-divider></v-divider>
                                                 <v-list-tile>Delete</v-list-tile>
                                             </v-list>
@@ -66,17 +66,22 @@
             this.getItems();
         },
         methods: {
+            openEdit(item) {
+                let self = this;
+                self.$refs.maint.show(false,item);
+            },
             getItems() {
                 let self = this;
 
                 Axios.get(process.env.VUE_APP_API + `Retailer/${self.name}`)
                     .then(r => {
                         self.items = r.data;
+                        
                     })
             },
             openAdd() {
                 let self = this;
-                self.$refs.maint.show();
+                self.$refs.maint.show(true);
             }
         }
     }

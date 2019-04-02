@@ -449,7 +449,8 @@
           
           if (value == true) {
             if (self.spacePlanID != null) {
-
+              console.log(selectedUser);
+              
               let systemFileApproval = {
                 systemFile_ID: self.spacePlanID,
                 status: 2,
@@ -462,9 +463,12 @@
               // axios.put(process.env.VUE_APP_API+`SystemFileApproval?db=CR-Devinspire&buyerID=`+self.spacePlanID,{})
 
               self.spacePlanStatus = 2
-             
+              let storeID = self.PlanogramObject.storeID
+             if (storeID==null) {
+               storeID=-1
+             }
               
-              axios.post(process.env.VUE_APP_API + "SystemFileApproval?db=CR-Devinspire&buyerID="+selectedUser+"&storeID="+self.PlanogramObject.storeID, {
+              axios.post(process.env.VUE_APP_API + "SystemFileApproval?db=CR-Devinspire&buyerID="+selectedUser+"&storeID="+storeID, {
                 systemFileApproval: systemFileApproval
               }).then(
                 r => {
