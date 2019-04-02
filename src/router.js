@@ -47,6 +47,7 @@ import SalesImport from '@/components/Apps/DataImport/Types/Sales/Index.vue'
 import DataPrep from '@/components/Apps/DataPreparation/Index.vue'
 import DataPrepSections from '@/components/Apps/DataPreparation/Sections.vue'
 import ManufacturerMaint from '@/components/Apps/DataPreparation/Types/Manufacturer/Index.vue'
+import BrandMaint from '@/components/Apps/DataPreparation/Types/Brand/Index.vue'
 
 //reports
 import AppsReportList from '@/components/Main/Reports/Apps/Index.vue'
@@ -188,7 +189,7 @@ export default new Router({
             name: 'Sales',
             component: SalesImport
           }]
-        },        {
+        }, {
           path: '/DataPreparation',
           name: 'DataPrep',
           component: DataPrep,
@@ -200,6 +201,10 @@ export default new Router({
             path: 'Manufacturer',
             name: 'Manufacturer',
             component: ManufacturerMaint
+          }, {
+            path: 'Brand',
+            name: 'Brand',
+            component: BrandMaint
           }]
         }
       ]

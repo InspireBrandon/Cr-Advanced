@@ -42,7 +42,7 @@
                 </v-flex>
             </v-layout>
         </v-container>
-        <SimpleMaint :name="name" ref="maint"></SimpleMaint>
+        <SimpleMaint :name="name" :headerName="headerName" ref="maint"></SimpleMaint>
     </div>
 </template>
 
@@ -52,7 +52,7 @@
 
     export default {
         name: 'common-import-list',
-        props: ['name', 'maint'],
+        props: ['name', 'headerName'],
         components: {
             SimpleMaint
         },

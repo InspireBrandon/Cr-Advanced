@@ -44,6 +44,10 @@
                     new cardItem({
                         name: 'Product',
                         route: 'Product'
+                    }),
+                                        new cardItem({
+                        name: 'Brand',
+                        route: 'Brand'
                     })
                 ]
             }
