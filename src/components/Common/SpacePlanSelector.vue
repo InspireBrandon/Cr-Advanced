@@ -4,10 +4,12 @@
       <v-card height="400px" style="overflow: auto;">
 
         <v-card-title style=" display: block;" class="headline pa-0">
-          <v-toolbar dark >
+          <v-toolbar dark color="primary">
             <v-toolbar-title>Select A Planogram</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-text-field v-model="searchText" append-icon="search"></v-text-field>
+              <v-btn icon @click.native="dialog = false"><v-icon>close</v-icon></v-btn>
+
           </v-toolbar>
         </v-card-title>
 

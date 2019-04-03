@@ -7,11 +7,12 @@
             <v-toolbar-title >Select A Range</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-text-field v-model="searchText" append-icon="search"></v-text-field>
+            <v-btn icon @click.native="dialog = false"><v-icon>close</v-icon></v-btn>
           </v-toolbar>
         </v-card-title>
 
         <v-card-text>
-          <v-list dense hover v-for="(range, idx) in filteredList" :key="idx">
+          <v-list  dense hover v-for="(range, idx) in filteredList" :key="idx">
              <v-divider></v-divider>
             <v-list-tile  :class="{ 'highlighted': selectedRange == range  }"
               avatar @click="selectedRange = range">
@@ -30,7 +31,7 @@
           <v-spacer></v-spacer>
 
           <v-btn color="primary" @click="returnRangeFile">Continue</v-btn>
-          <v-btn flat @click="dialog = false">Cancel</v-btn>
+          <!-- <v-btn flat @click="dialog = false">Cancel</v-btn> -->
 
         </v-card-actions>
       </v-card>
@@ -124,6 +125,7 @@
 <style>
   .highlighted {
     background-color: #1976d2;
+    -webkit-text-fill-color: aliceblue
   }
 
 </style>

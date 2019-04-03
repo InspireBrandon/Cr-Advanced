@@ -7,10 +7,16 @@
 
     <v-container fluid grid-list-lg>
       <v-layout row wrap>
-        <v-toolbar dark>
+        <v-toolbar>
           <v-dialog persistent v-model="FilterDialog" width="80vw"> FilterScanBarcode
-            <v-card dark>
-              <v-card-title class="headline">Set Filters</v-card-title>
+            <v-card>
+              <v-toolbar flat dark color="primary">
+                <v-toolbar-title>Set Filters</v-toolbar-title>
+                <v-spacer></v-spacer>
+              <v-btn icon @click.native="FilterDialog = false"><v-icon>close</v-icon></v-btn>
+
+              </v-toolbar>
+              <!-- <v-card-title class="headline">Set Filters</v-card-title> -->
               <v-card-text>
                 <v-container fluid grid-list-lg>
                   <v-layout row wrap>
@@ -33,9 +39,7 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
 
-                <v-btn color="error" @click="FilterDialog = false">
-                  Cancel
-                </v-btn>
+                
 
                 <v-btn color="primary" @click="filter">
                   Filter
@@ -112,7 +116,7 @@
     </v-container>
     <div class="text-xs-center">
       <v-dialog v-model="dialog" width="500">
-        <v-card dark>
+        <v-card>
 
           <v-card-text style="text-align: center;">
             <img style="max-width: 250px; max-height: 250px;" :src="imgSrc" alt="">
