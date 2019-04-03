@@ -3,22 +3,22 @@
     <v-layout row justify-center>
       <v-dialog v-model="dialog" persistent width="80vw">
         <v-card >
-          <v-card-title style="text-align: center; display: block;" class="headline">{{ title }}</v-card-title>
+          <v-card-title dark style="text-align: center; display: block;" class="headline">{{ title }}</v-card-title>
           <v-card-text style="text-align: center;">
             <v-btn-toggle v-model="toggle_asc">
-              <v-btn color="primary">
+              <v-btn dark color="primary">
                 Active
               </v-btn>
-              <v-btn color="primary">
+              <v-btn  dark color="primary">
                 New
               </v-btn>
-              <v-btn color="primary">
+              <v-btn dark color="primary">
                 De-Listed
               </v-btn>
-              <v-btn style="display: none;" color="primary">
+              <v-btn dark style="display: none;" color="primary">
                 De-Listed
               </v-btn>
-              <v-btn color="primary">
+              <v-btn dark  color="primary">
                 Active And New
               </v-btn>
             </v-btn-toggle>
