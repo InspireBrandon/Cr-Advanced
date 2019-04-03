@@ -41,8 +41,10 @@ import SpacePlanning from '@/components/Main/Planogram/spaceplanning/src/views/M
 
 import DataImport from '@/components/Apps/DataImport/Index.vue'
 import DataImportSections from '@/components/Apps/DataImport/Sections.vue'
-import ProductImport from '@/components/Apps/DataImport/Types/Product/Index.vue'
-import SalesImport from '@/components/Apps/DataImport/Types/Sales/Index.vue'
+
+import ProductImport from '@/components/Apps/DataImport/Types/Product Master/Index.vue'
+import SalesImport from '@/components/Apps/DataImport/Types/Product Sales/Index.vue'
+import NewProducts from '@/components/Apps/DataImport/Types/New Products/Index.vue'
 
 import DataPrep from '@/components/Apps/DataPreparation/Index.vue'
 import DataPrepSections from '@/components/Apps/DataPreparation/Sections.vue'
@@ -181,13 +183,17 @@ export default new Router({
             name: 'DataImportSections',
             component: DataImportSections,
           }, {
-            path: 'Product',
+            path: 'Product Master',
             name: 'Product',
             component: ProductImport
           }, {
-            path: 'Sales',
+            path: 'Product Sales',
             name: 'Sales',
             component: SalesImport
+          },{
+            path: 'New Products',
+            name: 'new products',
+            component: NewProducts
           }]
         }, {
           path: '/DataPreparation',

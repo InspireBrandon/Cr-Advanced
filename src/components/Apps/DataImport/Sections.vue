@@ -27,7 +27,6 @@
 </template>
 
 <script>
-
     function cardItem(data) {
         this.name = data.name;
         this.icon = data.icon;
@@ -40,14 +39,19 @@
             return {
                 cards: [
                     new cardItem({
-                        name: 'Products',
+                        name: 'Product Master',
                         icon: 'store',
-                        route: 'Product'
+                        route: 'Product Master'
                     }),
                     new cardItem({
-                        name: 'Store Sales',
+                        name: 'Product Sales',
                         icon: 'shopping_basket',
-                        route: 'Sales'
+                        route: 'Product Sales'
+                    }),
+                    new cardItem({
+                        name: 'New Products',
+                        icon: 'new_releases',
+                        route: 'New Products'
                     })
                 ]
             }

@@ -64,45 +64,39 @@
 
 <script>
 
+    import Axios from 'axios';
+
     export default {
         name: 'common-import-list',
         props: ['name'],
         data: () => {
             return {
                 selected: [],
-                items: [{
-                        name: 'Data Import',
-                        status: 0
-                    },
-                    {
-                        name: 'Data Import',
-                        status: 0
-                    },
-                    {
-                        name: 'Data Import',
-                        status: 1
-                    },
-                    {
-                        name: 'Data Import',
-                        status: 2
-                    },
-                    {
-                        name: 'Data Import',
-                        status: 0
-                    }
-                ],
+                items: [],
                 value: 0,
                 query: false,
                 show: false,
                 interval: 0
             }
         },
-        mounted() {
+        created() {
+            let self = this;
+            self.getFilesByFolder();
         },
         beforeDestroy() {
             clearInterval(this.interval)
         },
         methods: {
+            getFilesByFolder() {
+                let self = this;
+                Axios.get(process.env.VUE_APP_API + "DataImport/ImportDatabase?importFolder=" + self.name)
+                    .then(r => {
+                        console.log(r);
+                    })
+                    .catch(e => {
+                        console.log(e);
+                    })
+            },
             toggle(index) {
                 const i = this.selected.indexOf(index)
 
@@ -136,7 +130,6 @@
                 a.readAsArrayBuffer(blob);
             },
             uploadImportFile() {
-
             },
             queryAndIndeterminate(name) {
                 let self = this;
