@@ -1,31 +1,27 @@
 import Konva from 'konva';
 import GeneralPositionHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/positioning/GeneralPosition.js";
 import LabelHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Labeling/LabelingBase.js";
-import PalettePosition from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/positioning/PalettePosition.js";
 import StoreHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/StoreHelper/StoreHelper.js";
 import PlanogramItemBase from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PlanogramItemBase.js";
 import CloneBase from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/CloneBase.js";
+import ParentTreeRedraw from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/RedrawParentChildBase.js";
 
-class PaletteBase extends PlanogramItemBase {
-  constructor(vueStore, stage, layer, data, ratio, type, parentID) {
-    super(vueStore, stage, layer, data, ratio, type, parentID);
+class AreaBase extends PlanogramItemBase {
+  constructor(vueStore, stage, layer, data, ratio, type, gondolaID) {
+    super(vueStore, stage, layer, data, ratio, type, gondolaID);
 
-    // AREA
     this.Area = null;
-
-    // TAG
-    this.Text = null;
+    this.ParentTreeRedraw = new ParentTreeRedraw();
   }
 
-  /**
-   * Initialises a new instance of the gondola and will call the build aspect to stage
-   */
   Initialise(dropPos, positionElementRequired = true) {
     let self = this;
     // add it to the store immediately
     self.AddToStore();
 
     self.BuildBase(dropPos);
+    self.SetBaseDraggable(true);
+
     // set width heights
     self.SetObjectDimensions();
 
@@ -46,10 +42,10 @@ class PaletteBase extends PlanogramItemBase {
 
   Build(dropPos, positionElementRequired = true) {
     let self = this;
-
     // TODO: add the extended method calls here
-    self.AddRenderings();
-    self.AddPanel();
+    self.AddShelfCosmetic();
+
+    self.AddArea();
     self.AddTextCosmetic();
     self.GetLabelValue();
 
@@ -58,6 +54,8 @@ class PaletteBase extends PlanogramItemBase {
     }
 
     self.HideShowLabels();
+    self.AddRenderings();
+    self.ApplyZIndexing();
 
     self.Layer.draw();
   }
@@ -75,8 +73,10 @@ class PaletteBase extends PlanogramItemBase {
     let ctrl_store = new StoreHelper();
 
     if (ctrl_store.getCloneItem(self.VueStore) == self.ID) {
-      let ctrl_clone = new CloneBase("PALETTE");
-      ctrl_clone.Clone(self.VueStore, self.Stage, self, null, null);
+      let ctrl_clone = new CloneBase("AREA");
+      ctrl_clone.Clone(self.VueStore, self.Stage, self, null, null, function () {
+        // self.ParentTreeRedraw.RedrawParentDirectChildren(self.VueStore, self.ID);
+      });
       ctrl_store.setCloneItem(self.VueStore, null);
       return;
     }
@@ -90,8 +90,6 @@ class PaletteBase extends PlanogramItemBase {
           if (prevParent != null && prevParent != null) {
             prevParent.PositionElement();
           }
-
-          ctrl_position.PositionToParent(self.VueStore, null, self.ParentID) // IMPORTANT!
 
           self.ParentID = intersects.ID;
           // move this item to the new group
@@ -108,16 +106,25 @@ class PaletteBase extends PlanogramItemBase {
       self.Group.setX(self.LastPositionRelative.x)
     }
 
-    self.PositionPalette();
+    self.PositionArea();
   }
 
-  PositionPalette() {
+  PositionArea() {
     let self = this;
+
+    let ctrl_position = new GeneralPositionHelper();
+    ctrl_position.PositionToParent(self.VueStore, self, self.ParentID) // IMPORTANT!
+
     self.Group.setX(0);
 
     // adjust label values + fixture positions
     let ctrl_label = new LabelHelper();
     ctrl_label.SetNewLabelAndPositionNumbers(self.VueStore);
+
+    self.LastPositionRelative = self.Group.position();
+    self.LastPositionAbsolute = self.Group.getAbsolutePosition();
+
+    self.ApplyZIndexing();
 
     self.Layer.draw();
   }
@@ -133,6 +140,7 @@ class PaletteBase extends PlanogramItemBase {
     self.AdjustElementPosition(deltaChangeObj.deltaX, deltaChangeObj.deltaY);
 
     self.Data = newData;
+
     self.SetObjectDimensions();
     self.Area.fill(self.Data.color);
     self.Area.setWidth(self.TotalWidth); // sample
@@ -145,56 +153,139 @@ class PaletteBase extends PlanogramItemBase {
     // call position element
     self.PositionElement();
 
-    // call direct children to reposition
-    let childrenItems = ctrl_store.getAllPlanogramItems(self.VueStore, self.ID);
-    childrenItems.forEach(child => {
-      child.AdjustElementPosition(deltaChangeObj.deltaX, deltaChangeObj.deltaY, true);
-      child.PositionElement();
-    });
-
+    self.AddRenderings();
+    self.ApplyZIndexing();
   }
 
   AddRenderings() {
     let self = this;
 
-    if (self.Renderings.length > 0) {
-      // TODO: Add the specified renderings by type
+    self.RemoveRenderings();
 
+    if (self.Data.RenderingsItems == undefined || self.Data.RenderingsItems == null) {
+      return;
     }
+
+    if (self.Data.RenderingsItems.Front != undefined || self.Data.RenderingsItems.Front != null) {
+      console.log("[AREA RENDERING] FRONT", self.Data.RenderingsItems.Front);
+
+      // add shelf edge rendering
+      let w = self.Data.RenderingsItems.Front.width * self.Ratio;
+      let h = self.Data.RenderingsItems.Front.height * self.Ratio;
+      let offset = 0;
+
+      if (self.Data.RenderingsItems.Front.yOffset != undefined) {
+        offset = parseFloat(self.Data.RenderingsItems.Front.yOffset) * self.Ratio
+      }
+
+      let front = new Konva.Image({
+        x: 0,
+        y: 0 + offset,
+        width: w,
+        height: h,
+        color: 'transparent',
+        listening: false
+      })
+
+      self.LoadImage(front, self.Data.RenderingsItems.Front.image);
+
+      self.Renderings.push({
+        type: 'FRONTRENDERING',
+        konva: front
+      });
+
+      self.Group.add(front);
+    }
+
+    if (self.Data.RenderingsItems.Back != undefined || self.Data.RenderingsItems.Back != null) {
+      // add shelf edge rendering
+      console.log("[AREA RENDERING] BACK RENDERING", self.Data.RenderingsItems.Back);
+      let w = self.Data.RenderingsItems.Back.width * self.Ratio;
+      let h = self.Data.RenderingsItems.Back.height * self.Ratio;
+      let offset = 0;
+
+      if (self.Data.RenderingsItems.Back.yOffset != undefined) {
+        offset = parseFloat(self.Data.RenderingsItems.Back.yOffset) * self.Ratio
+      }
+
+      var areaBack = new Konva.Image({
+        x: 0,
+        y: (h * -1) - offset,
+        width: w,
+        height: h,
+        color: 'transparent',
+        listening: false
+      })
+
+      self.LoadImage(areaBack, self.Data.RenderingsItems.Back.image);
+
+      self.Renderings.push({
+        type: 'BACKRENDERING',
+        konva: areaBack
+      });
+
+      self.Group.add(areaBack);
+    }
+
+    self.Layer.draw();
   }
 
-  // AddAreaCosmetic() {
-  //   let self = this;
-  //   self.Area = new Konva.Rect({
-  //     x: 0,
-  //     y: 0,
-  //     width: self.Width,
-  //     height: self.Height,
-  //     fill: self.Data.color,
-  //     stroke: 'black',
-  //     strokeWidth: 0.5,
-  //     transformsEnabled: 'position'
-  //   })
+  RemoveRenderings() {
+    let self = this;
 
-  //   self.Group.add(self.Area);
-  // }
+    self.Renderings.forEach(element => {
+      element.konva.destroy();
+    });
 
-  AddPanel() {
+    self.Renderings = [];
+  }
+
+  AddShelfCosmetic() {
+    let self = this;
+  }
+
+  AddArea() {
     let self = this;
 
     self.Area = new Konva.Image({
       x: 0,
       y: 0,
-      width: self.TotalWidth,
-      height: self.TotalHeight,
-      fill: self.Data.color,
-      transformsEnabled: 'position'
+      width: self.Data.width * self.Ratio,
+      height: self.Data.height * self.Ratio,
+      fill: self.Data.color
     })
 
     self.LoadImage(self.Area, self.Data.image);
 
     self.Group.add(self.Area);
   }
+
+  AddTextCosmetic() {
+    let self = this;
+
+    self.Text = new Konva.Text({
+      x: 0,
+      y: 0,
+      text: "AREA " + self.Position.toString(),
+      fontFamily: 'Arial Black',
+      fontSize: 12,
+      padding: 1,
+      fill: 'black'
+    })
+
+    self.Group.add(self.Text);
+  }
+
+  SetTextLabel(number) {
+    let self = this;
+    self.Position = number;
+    self.Text.text(self.Data.label + " " + number);
+    self.Group.draw();
+  }
+
+  AdjustBarPosition() {
+
+  }
 }
 
-export default PaletteBase;
+export default AreaBase;

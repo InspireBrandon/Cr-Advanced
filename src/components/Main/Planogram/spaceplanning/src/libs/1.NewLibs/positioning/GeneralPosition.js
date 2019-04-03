@@ -17,6 +17,8 @@ class GeneralPosition {
     let pID = parentID;
     let parent = null;
 
+    // console.log("[GERNEAL POSITIONING] CALLED");
+
     // get the parent
     if (pID == null) {
       if (currentItem != null) {
@@ -42,6 +44,7 @@ class GeneralPosition {
 
     // get the spread type of the fixture
     let spreadType = parent.Data.spreadProducts;
+    let merchOffset = (parent.Data.merchandisingOffset == undefined ? 0 : parent.Data.merchandisingOffset) * 3; // TODO: PASS THIS IN ITS THE RATIO;
 
     switch (parent.Type.toUpperCase()) {
       case "PALETTE":
@@ -59,18 +62,38 @@ class GeneralPosition {
           // }
         }
         break;
+      case "AREA":
+        {
+          if (currentItem != null) {
+            let y = parent.Group.getHeight() - (currentItem.TotalHeight);
+            currentItem.Group.setY(y);
+
+            currentItem.LastPositionRelative = currentItem.Group.position();
+            currentItem.LastPositionAbsolute = currentItem.Group.getAbsolutePosition();
+          }
+        }
+        break;
       case "BASE":
         {
           switch (spreadType.toUpperCase()) {
             case "L2R":
               {
-                let x = 0;
+                let squish = parent.GetSquishValue(parent.ID);
+
+                let x = merchOffset;
                 sortedArr.forEach((item, idx) => {
+                  let actualWidth = item.Orientation_Width * item.Facings_X;
                   item.Position = idx + 1;
                   item.Group.setX(x);
                   item.LastPositionRelative = item.Group.position();
                   item.LastPositionAbsolute = item.Group.getAbsolutePosition();
-                  x += item.TotalWidth + 0.1;
+
+                  if (item.Type == "PRODUCT") {
+                    x += ((actualWidth - (item.Facings_X * squish))) + 0.1;
+                  } else {
+                    x += (actualWidth - (item.Facings_X * squish)) + 0.1;
+                  }
+
                 });
 
                 if (currentItem != null) {
@@ -84,7 +107,7 @@ class GeneralPosition {
               break;
             case "R2L":
               {
-                let x = parent.TotalWidth;
+                let x = parent.TotalWidth - merchOffset;
                 sortedArr.reverse();
                 sortedArr.forEach((item, idx) => {
                   x -= item.TotalWidth + 0.1;
@@ -105,7 +128,7 @@ class GeneralPosition {
               break;
             case "SE":
               {
-                let x = 0;
+                let x = merchOffset;
                 let totalItemWidths = 0;
                 let totalItems = 0;
                 let parentWidth = parent.TotalWidth;
@@ -144,26 +167,46 @@ class GeneralPosition {
 
               }
               break;
-              // case "SFE":
-              //   {
-              //     let x = 0;
-              //     sortedArr.forEach((item, idx) => {
-              //       item.Position = idx + 1;
-              //       item.Group.setX(x);
-              //       item.LastPositionRelative = item.Group.position();
-              //       item.LastPositionAbsolute = item.Group.getAbsolutePosition();
-              //       x += item.TotalWidth + 0.1;
-              //     });
+            case "SFE":
+              {
+                let x = merchOffset;
+                let totalItemWidths = 0;
+                let totalItems = 0;
+                let parentWidth = parent.TotalWidth;
+                let spacing = 0;
+                let squish = 0;
 
-              //     if (currentItem != null) {
-              //       let y = (currentItem.TotalHeight) * -1;
-              //       currentItem.Group.setY(y);
+                parent.TotalChildren.forEach(element => {
+                  totalItems += element.Count;
+                  totalItemWidths += (element.Width * element.Count);
+                });
 
-              //       currentItem.LastPositionRelative = currentItem.Group.position();
-              //       currentItem.LastPositionAbsolute = currentItem.Group.getAbsolutePosition();
-              //     }
-              //   }
-              //   break;
+                spacing = parent.GetSpreadSpacing(parent.ID);
+                // squish = parent.GetSpreadSpacing(parent.ID);
+
+                parent.TotalChildren.sort((a, b) => a.Item.Group.getX() - b.Item.Group.getX())
+
+                parent.TotalChildren.forEach((item, idx) => {
+                  let groupWidth = (item.Width * item.Count) + ((item.Count - 1) * (spacing));
+
+                  item.Item.Position = idx + 1;
+
+                  item.Item.Group.setX(x);
+                  item.Item.LastPositionRelative = item.Item.Group.position();
+                  item.Item.LastPositionAbsolute = item.Item.Group.getAbsolutePosition();
+
+                  x = x + groupWidth + (spacing);
+                });
+
+                if (currentItem != null) {
+                  let y = (currentItem.TotalHeight) * -1;
+                  currentItem.Group.setY(y);
+
+                  currentItem.LastPositionRelative = currentItem.Group.position();
+                  currentItem.LastPositionAbsolute = currentItem.Group.getAbsolutePosition();
+                }
+              }
+              break;
             case "PWD":
               {
                 if (currentItem != null) {
@@ -177,13 +220,22 @@ class GeneralPosition {
               break;
             default:
               {
-                let x = 0;
+                let squish = parent.GetSquishValue(parent.ID);
+
+                let x = merchOffset;
                 sortedArr.forEach((item, idx) => {
+                  let actualWidth = item.Orientation_Width * item.Facings_X;
                   item.Position = idx + 1;
                   item.Group.setX(x);
                   item.LastPositionRelative = item.Group.position();
                   item.LastPositionAbsolute = item.Group.getAbsolutePosition();
-                  x += item.TotalWidth + 0.1;
+
+                  if (item.Type == "PRODUCT") {
+                    x += ((actualWidth - (item.Facings_X * squish))) + 0.1;
+                  } else {
+                    x += (actualWidth - (item.Facings_X * squish)) + 0.1;
+                  }
+
                 });
 
                 if (currentItem != null) {
@@ -203,13 +255,21 @@ class GeneralPosition {
           switch (spreadType.toUpperCase()) {
             case "L2R":
               {
-                let x = 0;
+                let squish = parent.GetSquishValue(parent.ID);
+
+                let x = merchOffset;
                 sortedArr.forEach((item, idx) => {
+                  let actualWidth = item.Orientation_Width * item.Facings_X;
                   item.Position = idx + 1;
                   item.Group.setX(x);
                   item.LastPositionRelative = item.Group.position();
                   item.LastPositionAbsolute = item.Group.getAbsolutePosition();
-                  x += item.TotalWidth + 0.1;
+
+                  if (item.Type == "PRODUCT") {
+                    x += ((actualWidth - (item.Facings_X * squish))) + 0.1;
+                  } else {
+                    x += (actualWidth - (item.Facings_X * squish)) + 0.1;
+                  }
                 });
 
                 if (currentItem != null) {
@@ -223,7 +283,7 @@ class GeneralPosition {
               break;
             case "R2L":
               {
-                let x = parent.TotalWidth;
+                let x = parent.TotalWidth - merchOffset;
                 sortedArr.reverse();
                 sortedArr.forEach((item, idx) => {
                   x -= item.TotalWidth + 0.1;
@@ -244,7 +304,7 @@ class GeneralPosition {
               break;
             case "SE":
               {
-                let x = 0;
+                let x = merchOffset;
                 let totalItemWidths = 0;
                 let totalItems = 0;
                 let parentWidth = parent.TotalWidth;
@@ -283,6 +343,46 @@ class GeneralPosition {
 
               }
               break;
+            case "SFE":
+              {
+                let x = merchOffset;
+                let totalItemWidths = 0;
+                let totalItems = 0;
+                let parentWidth = parent.TotalWidth;
+                let spacing = 0;
+                let squish = 0;
+
+                parent.TotalChildren.forEach(element => {
+                  totalItems += element.Count;
+                  totalItemWidths += (element.Width * element.Count);
+                });
+
+                spacing = parent.GetSpreadSpacing(parent.ID);
+                // squish = parent.GetSpreadSpacing(parent.ID);
+
+                parent.TotalChildren.sort((a, b) => a.Item.Group.getX() - b.Item.Group.getX())
+
+                parent.TotalChildren.forEach((item, idx) => {
+                  let groupWidth = (item.Width * item.Count) + ((item.Count - 1) * (spacing));
+
+                  item.Item.Position = idx + 1;
+
+                  item.Item.Group.setX(x);
+                  item.Item.LastPositionRelative = item.Item.Group.position();
+                  item.Item.LastPositionAbsolute = item.Item.Group.getAbsolutePosition();
+
+                  x = x + groupWidth + (spacing);
+                });
+
+                if (currentItem != null) {
+                  let y = (currentItem.TotalHeight) * -1;
+                  currentItem.Group.setY(y);
+
+                  currentItem.LastPositionRelative = currentItem.Group.position();
+                  currentItem.LastPositionAbsolute = currentItem.Group.getAbsolutePosition();
+                }
+              }
+              break;
             case "PWD":
               {
                 if (currentItem != null) {
@@ -296,13 +396,21 @@ class GeneralPosition {
               break;
             default:
               {
-                let x = 0;
+                let squish = parent.GetSquishValue(parent.ID);
+
+                let x = merchOffset;
                 sortedArr.forEach((item, idx) => {
+                  let actualWidth = item.Orientation_Width * item.Facings_X;
                   item.Position = idx + 1;
                   item.Group.setX(x);
                   item.LastPositionRelative = item.Group.position();
                   item.LastPositionAbsolute = item.Group.getAbsolutePosition();
-                  x += item.TotalWidth + 0.1;
+
+                  if (item.Type == "PRODUCT") {
+                    x += ((actualWidth - (item.Facings_X * squish))) + 0.1;
+                  } else {
+                    x += (actualWidth - (item.Facings_X * squish)) + 0.1;
+                  }
                 });
 
                 if (currentItem != null) {
@@ -322,13 +430,22 @@ class GeneralPosition {
           switch (spreadType.toUpperCase()) {
             case "L2R":
               {
-                let x = 0;
+                let squish = parent.GetSquishValue(parent.ID);
+
+                let x = merchOffset;
                 sortedArr.forEach((item, idx) => {
+                  let actualWidth = item.Orientation_Width * item.Facings_X;
                   item.Position = idx + 1;
                   item.Group.setX(x);
                   item.LastPositionRelative = item.Group.position();
                   item.LastPositionAbsolute = item.Group.getAbsolutePosition();
-                  x += item.TotalWidth + 0.1;
+
+                  if (item.Type == "PRODUCT") {
+                    x += ((actualWidth - (item.Facings_X * squish))) + 0.1;
+                  } else {
+                    x += (actualWidth - (item.Facings_X * squish)) + 0.1;
+                  }
+
                 });
 
                 if (currentItem != null) {
@@ -342,7 +459,7 @@ class GeneralPosition {
               break;
             case "R2L":
               {
-                let x = parent.TotalWidth;
+                let x = parent.TotalWidth - merchOffset;
                 sortedArr.reverse();
                 sortedArr.forEach((item, idx) => {
                   x -= item.TotalWidth + 0.1;
@@ -363,7 +480,7 @@ class GeneralPosition {
               break;
             case "SE":
               {
-                let x = 0;
+                let x = merchOffset;
                 let totalItemWidths = 0;
                 let totalItems = 0;
                 let parentWidth = parent.TotalWidth;
@@ -402,6 +519,46 @@ class GeneralPosition {
 
               }
               break;
+            case "SFE":
+              {
+                let x = merchOffset;
+                let totalItemWidths = 0;
+                let totalItems = 0;
+                let parentWidth = parent.TotalWidth;
+                let spacing = 0;
+                let squish = 0;
+
+                parent.TotalChildren.forEach(element => {
+                  totalItems += element.Count;
+                  totalItemWidths += (element.Width * element.Count);
+                });
+
+                spacing = parent.GetSpreadSpacing(parent.ID);
+                // squish = parent.GetSpreadSpacing(parent.ID);
+
+                parent.TotalChildren.sort((a, b) => a.Item.Group.getX() - b.Item.Group.getX())
+
+                parent.TotalChildren.forEach((item, idx) => {
+                  let groupWidth = (item.Width * item.Count) + ((item.Count - 1) * (spacing));
+
+                  item.Item.Position = idx + 1;
+
+                  item.Item.Group.setX(x);
+                  item.Item.LastPositionRelative = item.Item.Group.position();
+                  item.Item.LastPositionAbsolute = item.Item.Group.getAbsolutePosition();
+
+                  x = x + groupWidth + (spacing);
+                });
+
+                if (currentItem != null) {
+                  let y = parent.Group.getHeight() - (currentItem.TotalHeight);
+                  currentItem.Group.setY(y);
+
+                  currentItem.LastPositionRelative = currentItem.Group.position();
+                  currentItem.LastPositionAbsolute = currentItem.Group.getAbsolutePosition();
+                }
+              }
+              break;
             case "PWD":
               {
                 if (currentItem != null) {
@@ -415,13 +572,22 @@ class GeneralPosition {
               break;
             default:
               {
-                let x = 0;
+                let squish = parent.GetSquishValue(parent.ID);
+
+                let x = merchOffset;
                 sortedArr.forEach((item, idx) => {
+                  let actualWidth = item.Orientation_Width * item.Facings_X;
                   item.Position = idx + 1;
                   item.Group.setX(x);
                   item.LastPositionRelative = item.Group.position();
                   item.LastPositionAbsolute = item.Group.getAbsolutePosition();
-                  x += item.TotalWidth + 0.1;
+
+                  if (item.Type == "PRODUCT") {
+                    x += ((actualWidth - (item.Facings_X * squish))) + 0.1;
+                  } else {
+                    x += (actualWidth - (item.Facings_X * squish)) + 0.1;
+                  }
+
                 });
 
                 if (currentItem != null) {
@@ -441,13 +607,23 @@ class GeneralPosition {
           switch (spreadType.toUpperCase()) {
             case "L2R":
               {
-                let x = 0;
+                let squish = parent.GetSquishValue(parent.ID);
+
+                let x = merchOffset;
                 sortedArr.forEach((item, idx) => {
+                  let actualWidth = item.Orientation_Width * item.Facings_X;
+
                   item.Position = idx + 1;
                   item.Group.setX(x);
                   item.LastPositionRelative = item.Group.position();
                   item.LastPositionAbsolute = item.Group.getAbsolutePosition();
-                  x += item.TotalWidth + 0.1;
+
+                  if (item.Type == "PRODUCT") {
+                    x += ((actualWidth - (item.Facings_X * squish))) + 0.1;
+                  } else {
+                    x += (actualWidth - (item.Facings_X * squish)) + 0.1;
+                  }
+
                 });
 
                 if (currentItem != null) {
@@ -462,7 +638,7 @@ class GeneralPosition {
               break;
             case "R2L":
               {
-                let x = parent.TotalWidth;
+                let x = parent.TotalWidth - merchOffset;
                 sortedArr.reverse();
                 sortedArr.forEach((item, idx) => {
                   x -= item.TotalWidth + 0.1;
@@ -484,7 +660,7 @@ class GeneralPosition {
               break;
             case "SE":
               {
-                let x = 0;
+                let x = merchOffset;
                 let totalItemWidths = 0;
                 let totalItems = 0;
                 let parentWidth = parent.TotalWidth;
@@ -524,6 +700,47 @@ class GeneralPosition {
 
               }
               break;
+            case "SFE":
+              {
+                let x = merchOffset;
+                let totalItemWidths = 0;
+                let totalItems = 0;
+                let parentWidth = parent.TotalWidth;
+                let spacing = 0;
+                let squish = 0;
+
+                parent.TotalChildren.forEach(element => {
+                  totalItems += element.Count;
+                  totalItemWidths += (element.Width * element.Count);
+                });
+
+                spacing = parent.GetSpreadSpacing(parent.ID);
+                // squish = parent.GetSpreadSpacing(parent.ID);
+
+                parent.TotalChildren.sort((a, b) => a.Item.Group.getX() - b.Item.Group.getX())
+
+                parent.TotalChildren.forEach((item, idx) => {
+                  let groupWidth = (item.Width * item.Count) + ((item.Count - 1) * (spacing));
+
+                  item.Item.Position = idx + 1;
+
+                  item.Item.Group.setX(x);
+                  item.Item.LastPositionRelative = item.Item.Group.position();
+                  item.Item.LastPositionAbsolute = item.Item.Group.getAbsolutePosition();
+
+                  x = x + groupWidth + (spacing);
+                });
+
+                if (currentItem != null) {
+                  // let y = (parent.TotalHeight / 2);
+                  let y = (parent.Data.productOffset == undefined ? 0 : parent.Data.productOffset) * -1;
+                  currentItem.Group.setY(y);
+
+                  currentItem.LastPositionRelative = currentItem.Group.position();
+                  currentItem.LastPositionAbsolute = currentItem.Group.getAbsolutePosition();
+                }
+              }
+              break;
             case "PWD":
               {
                 if (currentItem != null) {
@@ -536,7 +753,7 @@ class GeneralPosition {
                 }
               }
               break;
-              case "PWDXY":
+            case "PWDXY":
               {
                 // if (currentItem != null) {
                 //   // let y = (parent.TotalHeight / 2);
@@ -550,13 +767,23 @@ class GeneralPosition {
               break;
             default:
               {
-                let x = 0;
+                let squish = parent.GetSquishValue(parent.ID);
+
+                let x = merchOffset;
                 sortedArr.forEach((item, idx) => {
+                  let actualWidth = item.Orientation_Width * item.Facings_X;
+
                   item.Position = idx + 1;
                   item.Group.setX(x);
                   item.LastPositionRelative = item.Group.position();
                   item.LastPositionAbsolute = item.Group.getAbsolutePosition();
-                  x += item.TotalWidth + 0.1;
+
+                  if (item.Type == "PRODUCT") {
+                    x += ((actualWidth - (item.Facings_X * squish))) + 0.1;
+                  } else {
+                    x += (actualWidth - (item.Facings_X * squish)) + 0.1;
+                  }
+
                 });
 
                 if (currentItem != null) {
@@ -575,6 +802,203 @@ class GeneralPosition {
       case "PEGBOARD":
         {
 
+        }
+        break;
+      case "LABELHOLDER":
+        {
+          switch (spreadType.toUpperCase()) {
+            case "L2R":
+              {
+                let squish = parent.GetSquishValue(parent.ID);
+
+                let x = merchOffset;
+                sortedArr.forEach((item, idx) => {
+                  let actualWidth = item.Orientation_Width * item.Facings_X;
+
+                  item.Position = idx + 1;
+                  item.Group.setX(x);
+                  item.LastPositionRelative = item.Group.position();
+                  item.LastPositionAbsolute = item.Group.getAbsolutePosition();
+
+                  if (item.Type == "PRODUCT") {
+                    x += ((actualWidth - (item.Facings_X * squish))) + 0.1;
+                  } else {
+                    x += (actualWidth - (item.Facings_X * squish)) + 0.1;
+                  }
+
+                });
+
+                if (currentItem != null) {
+                  // let y = (parent.TotalHeight / 2);
+                  let y = (parent.Data.productOffset == undefined ? 0 : parent.Data.productOffset) * -1;
+                  currentItem.Group.setY(y);
+
+                  currentItem.LastPositionRelative = currentItem.Group.position();
+                  currentItem.LastPositionAbsolute = currentItem.Group.getAbsolutePosition();
+                }
+              }
+              break;
+            case "R2L":
+              {
+                let x = parent.TotalWidth - merchOffset;
+                sortedArr.reverse();
+                sortedArr.forEach((item, idx) => {
+                  x -= item.TotalWidth + 0.1;
+                  item.Position = idx + 1;
+                  item.Group.setX(x);
+                  item.LastPositionRelative = item.Group.position();
+                  item.LastPositionAbsolute = item.Group.getAbsolutePosition();
+                });
+
+                if (currentItem != null) {
+                  // let y = (parent.TotalHeight / 2);
+                  let y = (parent.Data.productOffset == undefined ? 0 : parent.Data.productOffset) * -1;
+                  currentItem.Group.setY(y);
+
+                  currentItem.LastPositionRelative = currentItem.Group.position();
+                  currentItem.LastPositionAbsolute = currentItem.Group.getAbsolutePosition();
+                }
+              }
+              break;
+            case "SE":
+              {
+                let x = merchOffset;
+                let totalItemWidths = 0;
+                let totalItems = 0;
+                let parentWidth = parent.TotalWidth;
+                let spacing = 0;
+
+                if (sortedArr.length > 1) {
+                  totalItems = sortedArr.length - 1;
+                } else {
+                  totalItems = 1;
+                }
+
+                sortedArr.forEach((item, idx) => {
+                  totalItemWidths += item.TotalWidth;
+                });
+
+                spacing = (parentWidth - totalItemWidths) / totalItems;
+
+                // x = spacing;
+                sortedArr.forEach((item, idx) => {
+
+                  item.Position = idx + 1;
+                  item.Group.setX(x);
+                  item.LastPositionRelative = item.Group.position();
+                  item.LastPositionAbsolute = item.Group.getAbsolutePosition();
+
+                  x += (item.TotalWidth) + spacing;
+                });
+
+                if (currentItem != null) {
+                  // let y = (parent.TotalHeight / 2);
+                  let y = (parent.Data.productOffset == undefined ? 0 : parent.Data.productOffset) * -1;
+                  currentItem.Group.setY(y);
+
+                  currentItem.LastPositionRelative = currentItem.Group.position();
+                  currentItem.LastPositionAbsolute = currentItem.Group.getAbsolutePosition();
+                }
+
+              }
+              break;
+            case "SFE":
+              {
+                let x = merchOffset;
+                let totalItemWidths = 0;
+                let totalItems = 0;
+                let parentWidth = parent.TotalWidth;
+                let spacing = 0;
+                let squish = 0;
+
+                parent.TotalChildren.forEach(element => {
+                  totalItems += element.Count;
+                  totalItemWidths += (element.Width * element.Count);
+                });
+
+                spacing = parent.GetSpreadSpacing(parent.ID);
+                // squish = parent.GetSpreadSpacing(parent.ID);
+
+                parent.TotalChildren.sort((a, b) => a.Item.Group.getX() - b.Item.Group.getX())
+
+                parent.TotalChildren.forEach((item, idx) => {
+                  let groupWidth = (item.Width * item.Count) + ((item.Count - 1) * (spacing));
+
+                  item.Item.Position = idx + 1;
+
+                  item.Item.Group.setX(x);
+                  item.Item.LastPositionRelative = item.Item.Group.position();
+                  item.Item.LastPositionAbsolute = item.Item.Group.getAbsolutePosition();
+
+                  x = x + groupWidth + (spacing);
+                });
+
+                if (currentItem != null) {
+                  // let y = (parent.TotalHeight / 2);
+                  let y = (parent.Data.productOffset == undefined ? 0 : parent.Data.productOffset) * -1;
+                  currentItem.Group.setY(y);
+
+                  currentItem.LastPositionRelative = currentItem.Group.position();
+                  currentItem.LastPositionAbsolute = currentItem.Group.getAbsolutePosition();
+                }
+              }
+              break;
+            case "PWD":
+              {
+                if (currentItem != null) {
+                  // let y = (parent.TotalHeight / 2);
+                  let y = (parent.Data.productOffset == undefined ? 0 : parent.Data.productOffset) * -1;
+                  currentItem.Group.setY(y);
+
+                  currentItem.LastPositionRelative = currentItem.Group.position();
+                  currentItem.LastPositionAbsolute = currentItem.Group.getAbsolutePosition();
+                }
+              }
+              break;
+            case "PWDXY":
+              {
+                // if (currentItem != null) {
+                //   // let y = (parent.TotalHeight / 2);
+                //   let y = (parent.Data.productOffset == undefined ? 0 : parent.Data.productOffset) * -1;
+                //   currentItem.Group.setY(y);
+
+                //   currentItem.LastPositionRelative = currentItem.Group.position();
+                //   currentItem.LastPositionAbsolute = currentItem.Group.getAbsolutePosition();
+                // }
+              }
+              break;
+            default:
+              {
+                let squish = parent.GetSquishValue(parent.ID);
+
+                let x = merchOffset;
+                sortedArr.forEach((item, idx) => {
+                  let actualWidth = item.Orientation_Width * item.Facings_X;
+
+                  item.Position = idx + 1;
+                  item.Group.setX(x);
+                  item.LastPositionRelative = item.Group.position();
+                  item.LastPositionAbsolute = item.Group.getAbsolutePosition();
+
+                  if (item.Type == "PRODUCT") {
+                    x += ((actualWidth - (item.Facings_X * squish))) + 0.1;
+                  } else {
+                    x += (actualWidth - (item.Facings_X * squish)) + 0.1;
+                  }
+
+                });
+
+                if (currentItem != null) {
+                  // let y = (parent.TotalHeight / 2);
+                  let y = (parent.Data.productOffset == undefined ? 0 : parent.Data.productOffset) * -1;
+                  currentItem.Group.setY(y);
+
+                  currentItem.LastPositionRelative = currentItem.Group.position();
+                  currentItem.LastPositionAbsolute = currentItem.Group.getAbsolutePosition();
+                }
+              }
+              break;
+          }
         }
         break;
     }
@@ -657,6 +1081,17 @@ class GeneralPosition {
           return retVal;
         }
         break;
+      case "LABELHOLDER":
+        {
+          // retVal.y = (parentItem.Group.getHeight() / 2);
+          // retVal.x = (xFacings * productGroup.Orientation_Width);
+          // return retVal;
+
+          retVal.y = productGroup.Group.getHeight() - ((yFacings + 1) * productGroup.Orientation_Height);
+          retVal.x = (xFacings * productGroup.Orientation_Width);
+          return retVal;
+        }
+        break;
       case "BASKET":
         {
           retVal.y = productGroup.Group.getHeight() - ((yFacings + 1) * productGroup.Orientation_Height);
@@ -678,6 +1113,7 @@ class GeneralPosition {
           retVal.x = (xFacings * productGroup.Orientation_Width);
           return retVal;
         }
+        break;
     }
 
   }

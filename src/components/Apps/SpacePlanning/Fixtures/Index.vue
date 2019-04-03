@@ -1,406 +1,411 @@
 <template>
   <div>
-    <v-container class="container-height " grid-list-md absolute dark fab top>
-      <v-tabs class="elevation-4" centered dark fixed-tabs justify-content: center>
-        <v-tabs-slider color="white"></v-tabs-slider>
+    <v-card class="elevation-1" style="background: url('../../../static/img/banner.png'); background-size: cover; background-position: center;">
+      <v-card-text style="height: 150px; position: relative; padding-top: 0px">
+        <v-container class="container-height " grid-list-md absolute dark fab top>
+          <v-tabs class="elevation-4" centered dark fixed-tabs justify-content: center>
+            <v-tabs-slider color="white"></v-tabs-slider>
 
-        <v-tab href="#tab-1" justify-content: center fixed-tabs>
-          Gondola
-        </v-tab>
-        <v-tab href="#tab-2" justify-content: center fixed-tabs>
-          Obstruction
-        </v-tab>
-        <v-tab href="#tab-3" justify-content: center fixed-tabs>
-          Fixture
-        </v-tab>
-        <v-tab href="#tab-4" justify-content: center fixed-tabs>
-          Sub Fixture
-        </v-tab>
-        <v-tab href="#tab-5" justify-content: center fixed-tabs>
-          Palette
-        </v-tab>
-        <v-tab href="#tab-6" justify-content: center fixed-tabs>
-          Renderings
-        </v-tab>
+            <v-tab href="#tab-1" justify-content: center fixed-tabs>
+              Gondola
+            </v-tab>
+            <v-tab href="#tab-2" justify-content: center fixed-tabs>
+              Obstruction
+            </v-tab>
+            <v-tab href="#tab-3" justify-content: center fixed-tabs>
+              Fixture
+            </v-tab>
+            <v-tab href="#tab-4" justify-content: center fixed-tabs>
+              Sub Fixture
+            </v-tab>
+            <v-tab href="#tab-5" justify-content: center fixed-tabs>
+              Palette
+            </v-tab>
+            <v-tab href="#tab-6" justify-content: center fixed-tabs>
+              Renderings
+            </v-tab>
 
-        <v-tab-item id="tab-1" justify-content: center>
-          <v-card justify-content: center class="tab-item-wrapper back-height">
-            <v-card-title>
-              <v-spacer></v-spacer>
-              <v-text-field v-model="searchGondola" append-icon="search" label="Search" single-line hide-details></v-text-field>
-            </v-card-title>
-            <v-card-text>
-              <v-flex xs12>
-                <v-list dense class="elevation-5 pa-2">
-                  <v-list-tile>
-                    <v-list-tile-content>
-                      <v-list-tile-title>Image</v-list-tile-title>
-                    </v-list-tile-content>
-                    <v-list-tile-content>
-                      <v-list-tile-title>Name</v-list-tile-title>
-                    </v-list-tile-content>
-                    <v-spacer></v-spacer>
-                    <v-list-tile-action>
-                      <v-btn style="margin-bottom: 10px;" @click="$refs.fixturesModal.openAdd(0, afterAdd)" color="primary">
-                        add
-                      </v-btn>
-                    </v-list-tile-action>
-                  </v-list-tile>
-                  <hr>
-                  <template v-for="(item,index) in filteredgondolas">
-                    <div :key="index">
+            <v-tab-item id="tab-1" class="elevation-2" justify-content: center>
+              <v-card justify-content: center class="tab-item-wrapper elevation-2 back-height">
+                <v-card-title>
+                  <v-spacer></v-spacer>
+                  <v-text-field v-model="searchGondola" append-icon="search" label="Search" single-line hide-details></v-text-field>
+                </v-card-title>
+                <v-card-text>
+                  <v-flex xs12>
+                    <v-list dense>
                       <v-list-tile style="padding:2px">
-                        <v-list-tile-avatar tile>
-                          <img :src="'data:image/png;base64,' + item.image" alt="">
-                        </v-list-tile-avatar>
                         <v-list-tile-content>
-                          <v-list-tile-title>{{item.name}}</v-list-tile-title>
+                          <v-list-tile-title>Image</v-list-tile-title>
                         </v-list-tile-content>
-
+                        <v-list-tile-content>
+                          <v-list-tile-title>Name</v-list-tile-title>
+                        </v-list-tile-content>
                         <v-spacer></v-spacer>
                         <v-list-tile-action>
-                          <v-menu bottom offset-y transition="scale-transition">
-                            <v-btn small slot="activator" flat>
-                              <v-icon>more_horiz</v-icon>
-                            </v-btn>
-                            <v-list>
-                              <v-list-tile @click="editItem(item, 'gondolas')">
-                                <v-list-tile-title>modify</v-list-tile-title>
-                              </v-list-tile>
-                              <v-list-tile @click="remove('gondolas', item,index)">
-                                <v-list-tile-title>delete</v-list-tile-title>
-                              </v-list-tile>
-                            </v-list>
-                          </v-menu>
+                          <v-btn style="margin-bottom: 10px;" @click="$refs.fixturesModal.openAdd(0, afterAdd)" color="primary">
+                            add
+                          </v-btn>
                         </v-list-tile-action>
-
                       </v-list-tile>
-                      <v-divider></v-divider>
-                    </div>
-                  </template>
+                      <hr>
+                      <template v-for="(item,index) in filteredgondolas">
+                        <div :key="index">
+                          <v-list-tile style="padding:2px">
+                            <v-list-tile-avatar tile>
+                              <img :src="'data:image/png;base64,' + item.image" alt="">
+                            </v-list-tile-avatar>
+                            <v-list-tile-content>
+                              <v-list-tile-title>{{item.name}}</v-list-tile-title>
+                            </v-list-tile-content>
 
-                </v-list>
+                            <v-spacer></v-spacer>
+                            <v-list-tile-action>
+                              <v-menu bottom offset-y transition="scale-transition">
+                                <v-btn small slot="activator" flat>
+                                  <v-icon>more_horiz</v-icon>
+                                </v-btn>
+                                <v-list>
+                                  <v-list-tile @click="editItem(item, 'gondolas')">
+                                    <v-list-tile-title>modify</v-list-tile-title>
+                                  </v-list-tile>
+                                  <v-list-tile @click="remove('gondolas', item,index)">
+                                    <v-list-tile-title>delete</v-list-tile-title>
+                                  </v-list-tile>
+                                </v-list>
+                              </v-menu>
+                            </v-list-tile-action>
 
-              </v-flex>
-            </v-card-text>
-          </v-card>
-        </v-tab-item>
-        <v-tab-item id="tab-2" class="elevation-2" justify-content: center>
-          <v-card justify-content: center class="tab-item-wrapper elevation-2 back-height">
-            <v-card-title>
-              <v-spacer></v-spacer>
-              <v-text-field v-model="searchObstruction" append-icon="search" label="Search" single-line hide-details></v-text-field>
-            </v-card-title>
-            <v-card-text>
-              <v-flex xs12>
+                          </v-list-tile>
+                          <v-divider></v-divider>
+                        </div>
+                      </template>
 
-                <v-list dense>
-                  <v-list-tile style="padding:2px">
-                    <v-list-tile-content>
-                      <v-list-tile-title>Image</v-list-tile-title>
-                    </v-list-tile-content>
-                    <v-list-tile-content>
-                      <v-list-tile-title>Name</v-list-tile-title>
-                    </v-list-tile-content>
-                    <v-spacer></v-spacer>
-                    <v-list-tile-action>
-                      <v-btn @click="$refs.fixturesModal.openAdd(1, afterAdd)" color="primary">
+                    </v-list>
+
+                  </v-flex>
+                </v-card-text>
+              </v-card>
+            </v-tab-item>
+            <v-tab-item id="tab-2" class="elevation-2" justify-content: center>
+              <v-card justify-content: center class="tab-item-wrapper elevation-2 back-height">
+                <v-card-title>
+                  <v-spacer></v-spacer>
+                  <v-text-field v-model="searchObstruction" append-icon="search" label="Search" single-line
+                    hide-details></v-text-field>
+                </v-card-title>
+                <v-card-text>
+                  <v-flex xs12>
+                    
+                    <v-list dense>
+                      <v-list-tile style="padding:2px">
+                        <v-list-tile-content>
+                          <v-list-tile-title>Image</v-list-tile-title>
+                        </v-list-tile-content>
+                        <v-list-tile-content>
+                          <v-list-tile-title>Name</v-list-tile-title>
+                        </v-list-tile-content>
+                        <v-spacer></v-spacer>
+                        <v-list-tile-action>
+                          <v-btn @click="$refs.fixturesModal.openAdd(1, afterAdd)" color="primary">
                         Add
                       </v-btn>
-                    </v-list-tile-action>
-                  </v-list-tile>
-                  <hr>
-                  <template v-for="(item,index) in filteredObstruction">
-                    <div :key="index">
+                        </v-list-tile-action>
+                      </v-list-tile>
+                      <hr>
+                      <template v-for="(item,index) in filteredObstruction">
+                        <div :key="index">
+                          <v-list-tile style="padding:2px">
+                            <v-list-tile-avatar tile>
+                              <img :src="'data:image/png;base64,' + item.image" alt="">
+                            </v-list-tile-avatar>
+                            <v-list-tile-content>
+                              <v-list-tile-title>{{item.name}}</v-list-tile-title>
+                            </v-list-tile-content>
+                            <v-spacer></v-spacer>
+                            <v-list-tile-action>
+                              <v-menu bottom offset-y transition="scale-transition">
+                                <v-btn small slot="activator" flat>
+                                  <v-icon>more_horiz</v-icon>
+                                </v-btn>
+                                <v-list>
+                                  <v-list-tile @click="editItem(item, 'obstruction')">
+                                    <v-list-tile-title>modify</v-list-tile-title>
+                                  </v-list-tile>
+                                  <v-list-tile @click="remove('obstruction', item,index)">
+                                    <v-list-tile-title>delete</v-list-tile-title>
+                                  </v-list-tile>
+                                </v-list>
+                              </v-menu>
+                            </v-list-tile-action>
+
+                          </v-list-tile>
+                          <v-divider></v-divider>
+                        </div>
+                      </template>
+
+                    </v-list>
+
+                  </v-flex>
+                </v-card-text>
+              </v-card>
+            </v-tab-item>
+            <v-tab-item id="tab-3" class="elevation-2" justify-content: center>
+              <v-card justify-content: center class="tab-item-wrapper elevation-2 back-height">
+                <v-card-title>
+                  <v-spacer></v-spacer>
+                  <v-text-field v-model="searchFixture" append-icon="search" label="Search" single-line hide-details></v-text-field>
+                </v-card-title>
+                <v-card-text>
+                  <v-flex xs12>
+                    
+                    <v-list dense>
+                     
                       <v-list-tile style="padding:2px">
-                        <v-list-tile-avatar tile>
-                          <img :src="'data:image/png;base64,' + item.image" alt="">
-                        </v-list-tile-avatar>
                         <v-list-tile-content>
-                          <v-list-tile-title>{{item.name}}</v-list-tile-title>
+                          <v-list-tile-title>Image</v-list-tile-title>
+                        </v-list-tile-content>
+                        <v-list-tile-content>
+                          <v-list-tile-title>Name</v-list-tile-title>
                         </v-list-tile-content>
                         <v-spacer></v-spacer>
                         <v-list-tile-action>
-                          <v-menu bottom offset-y transition="scale-transition">
-                            <v-btn small slot="activator" flat>
-                              <v-icon>more_horiz</v-icon>
-                            </v-btn>
-                            <v-list>
-                              <v-list-tile @click="editItem(item, 'obstruction')">
-                                <v-list-tile-title>modify</v-list-tile-title>
-                              </v-list-tile>
-                              <v-list-tile @click="remove('obstruction', item,index)">
-                                <v-list-tile-title>delete</v-list-tile-title>
-                              </v-list-tile>
-                            </v-list>
-                          </v-menu>
-                        </v-list-tile-action>
-
-                      </v-list-tile>
-                      <v-divider></v-divider>
-                    </div>
-                  </template>
-
-                </v-list>
-
-              </v-flex>
-            </v-card-text>
-          </v-card>
-        </v-tab-item>
-        <v-tab-item id="tab-3" class="elevation-2" justify-content: center>
-          <v-card justify-content: center class="tab-item-wrapper elevation-2 back-height">
-            <v-card-title>
-              <v-spacer></v-spacer>
-              <v-text-field v-model="searchFixture" append-icon="search" label="Search" single-line hide-details></v-text-field>
-            </v-card-title>
-            <v-card-text>
-              <v-flex xs12>
-
-                <v-list dense>
-
-                  <v-list-tile style="padding:2px">
-                    <v-list-tile-content>
-                      <v-list-tile-title>Image</v-list-tile-title>
-                    </v-list-tile-content>
-                    <v-list-tile-content>
-                      <v-list-tile-title>Name</v-list-tile-title>
-                    </v-list-tile-content>
-                    <v-spacer></v-spacer>
-                    <v-list-tile-action>
-                      <v-btn @click="$refs.fixturesModal.openAdd(2, afterAdd)" color="primary">
+                          <v-btn @click="$refs.fixturesModal.openAdd(2, afterAdd)" color="primary">
                         Add
                       </v-btn>
-                    </v-list-tile-action>
-                  </v-list-tile>
-                  <hr>
-                  <template v-for="(item,index) in filteredfixture">
-                    <div :key="index">
+                        </v-list-tile-action>
+                      </v-list-tile>
+                      <hr>
+                      <template v-for="(item,index) in filteredfixture">
+                        <div :key="index">
+                          <v-list-tile style="padding:2px">
+                            <v-list-tile-avatar tile>
+                              <img :src="'data:image/png;base64,' + item.image" alt="">
+                            </v-list-tile-avatar>
+                            <v-list-tile-content>
+                              <v-list-tile-title>{{item.name}}</v-list-tile-title>
+                            </v-list-tile-content>
+                            <v-spacer></v-spacer>
+                            <v-list-tile-action>
+                              <v-menu bottom offset-y transition="scale-transition">
+                                <v-btn small slot="activator" flat>
+                                  <v-icon>more_horiz</v-icon>
+                                </v-btn>
+                                <v-list>
+                                  <v-list-tile @click="editItem(item, 'fixture')">
+                                    <v-list-tile-title>modify</v-list-tile-title>
+                                  </v-list-tile>
+                                  <v-list-tile @click="remove('fixture', item,index)">
+                                    <v-list-tile-title>delete</v-list-tile-title>
+                                  </v-list-tile>
+                                </v-list>
+                              </v-menu>
+                            </v-list-tile-action>
+
+                          </v-list-tile>
+                          <v-divider></v-divider>
+                        </div>
+                      </template>
+
+                    </v-list>
+
+                  </v-flex>
+                </v-card-text>
+              </v-card>
+            </v-tab-item>
+            <v-tab-item id="tab-4" class="elevation-2" justify-content: center>
+              <v-card justify-content: center class="tab-item-wrapper elevation-2 back-height">
+                <v-card-title>
+                  <v-spacer></v-spacer>
+                  <v-text-field v-model="searchSubFixture" append-icon="search" label="Search" single-line hide-details></v-text-field>
+                </v-card-title>
+                <v-card-text>
+                  <v-flex xs12>
+                    
+                    <v-list dense>
                       <v-list-tile style="padding:2px">
-                        <v-list-tile-avatar tile>
-                          <img :src="'data:image/png;base64,' + item.image" alt="">
-                        </v-list-tile-avatar>
                         <v-list-tile-content>
-                          <v-list-tile-title>{{item.name}}</v-list-tile-title>
+                          <v-list-tile-title>Image</v-list-tile-title>
+                        </v-list-tile-content>
+                        <v-list-tile-content>
+                          <v-list-tile-title>Name</v-list-tile-title>
                         </v-list-tile-content>
                         <v-spacer></v-spacer>
                         <v-list-tile-action>
-                          <v-menu bottom offset-y transition="scale-transition">
-                            <v-btn small slot="activator" flat>
-                              <v-icon>more_horiz</v-icon>
-                            </v-btn>
-                            <v-list>
-                              <v-list-tile @click="editItem(item, 'fixture')">
-                                <v-list-tile-title>modify</v-list-tile-title>
-                              </v-list-tile>
-                              <v-list-tile @click="remove('fixture', item,index)">
-                                <v-list-tile-title>delete</v-list-tile-title>
-                              </v-list-tile>
-                            </v-list>
-                          </v-menu>
-                        </v-list-tile-action>
-
-                      </v-list-tile>
-                      <v-divider></v-divider>
-                    </div>
-                  </template>
-
-                </v-list>
-
-              </v-flex>
-            </v-card-text>
-          </v-card>
-        </v-tab-item>
-        <v-tab-item id="tab-4" class="elevation-2" justify-content: center>
-          <v-card justify-content: center class="tab-item-wrapper elevation-2 back-height">
-            <v-card-title>
-              <v-spacer></v-spacer>
-              <v-text-field v-model="searchSubFixture" append-icon="search" label="Search" single-line hide-details></v-text-field>
-            </v-card-title>
-            <v-card-text>
-              <v-flex xs12>
-
-                <v-list dense>
-                  <v-list-tile style="padding:2px">
-                    <v-list-tile-content>
-                      <v-list-tile-title>Image</v-list-tile-title>
-                    </v-list-tile-content>
-                    <v-list-tile-content>
-                      <v-list-tile-title>Name</v-list-tile-title>
-                    </v-list-tile-content>
-                    <v-spacer></v-spacer>
-                    <v-list-tile-action>
-                      <v-btn @click="$refs.fixturesModal.openAdd(3, afterAdd)" color="primary">
+                          <v-btn @click="$refs.fixturesModal.openAdd(3, afterAdd)" color="primary">
                         Add
                       </v-btn>
-                    </v-list-tile-action>
-                  </v-list-tile>
-                  <hr>
-                  <template v-for="(item,index) in filteredSubFixture">
+                        </v-list-tile-action>
+                      </v-list-tile>
+                      <hr>
+                      <template v-for="(item,index) in filteredSubFixture">
 
-                    <div :key="index">
+                        <div :key="index">
+                          <v-list-tile style="padding:2px">
+                            <v-list-tile-avatar tile>
+                              <img :src="'data:image/png;base64,' + item.image" alt="">
+                            </v-list-tile-avatar>
+                            <v-list-tile-content>
+                              <v-list-tile-title>{{item.name}}</v-list-tile-title>
+                            </v-list-tile-content>
+                            <v-spacer></v-spacer>
+                            <v-list-tile-action>
+                              <v-menu bottom offset-y transition="scale-transition">
+                                <v-btn small slot="activator" flat>
+                                  <v-icon>more_horiz</v-icon>
+                                </v-btn>
+                                <v-list>
+                                  <v-list-tile @click="editItem(item, 'subFixture')">
+                                    <v-list-tile-title>modify</v-list-tile-title>
+                                  </v-list-tile>
+                                  <v-list-tile @click="remove('subFixture', item,index)">
+                                    <v-list-tile-title>delete</v-list-tile-title>
+                                  </v-list-tile>
+                                </v-list>
+                              </v-menu>
+                            </v-list-tile-action>
+
+                          </v-list-tile>
+                          <v-divider></v-divider>
+                        </div>
+                      </template>
+
+                    </v-list>
+
+                  </v-flex>
+                </v-card-text>
+              </v-card>
+            </v-tab-item>
+            <v-tab-item id="tab-5" class="elevation-2" justify-content: center>
+              <v-card justify-content: center class="tab-item-wrapper elevation-2 back-height">
+                <v-card-title>
+                  <v-spacer></v-spacer>
+                  <v-text-field v-model="searchPalette" append-icon="search" label="Search" single-line hide-details></v-text-field>
+                </v-card-title>
+                <v-card-text>
+                  <v-flex xs12>
+                   
+                    <v-list dense>
                       <v-list-tile style="padding:2px">
-                        <v-list-tile-avatar tile>
-                          <img :src="'data:image/png;base64,' + item.image" alt="">
-                        </v-list-tile-avatar>
                         <v-list-tile-content>
-                          <v-list-tile-title>{{item.name}}</v-list-tile-title>
+                          <v-list-tile-title>Image</v-list-tile-title>
+                        </v-list-tile-content>
+                        <v-list-tile-content>
+                          <v-list-tile-title>Name</v-list-tile-title>
                         </v-list-tile-content>
                         <v-spacer></v-spacer>
                         <v-list-tile-action>
-                          <v-menu bottom offset-y transition="scale-transition">
-                            <v-btn small slot="activator" flat>
-                              <v-icon>more_horiz</v-icon>
-                            </v-btn>
-                            <v-list>
-                              <v-list-tile @click="editItem(item, 'subFixture')">
-                                <v-list-tile-title>modify</v-list-tile-title>
-                              </v-list-tile>
-                              <v-list-tile @click="remove('subFixture', item,index)">
-                                <v-list-tile-title>delete</v-list-tile-title>
-                              </v-list-tile>
-                            </v-list>
-                          </v-menu>
-                        </v-list-tile-action>
-
-                      </v-list-tile>
-                      <v-divider></v-divider>
-                    </div>
-                  </template>
-
-                </v-list>
-
-              </v-flex>
-            </v-card-text>
-          </v-card>
-        </v-tab-item>
-        <v-tab-item id="tab-5" class="elevation-2" justify-content: center>
-          <v-card justify-content: center class="tab-item-wrapper elevation-2 back-height">
-            <v-card-title>
-              <v-spacer></v-spacer>
-              <v-text-field v-model="searchPalette" append-icon="search" label="Search" single-line hide-details></v-text-field>
-            </v-card-title>
-            <v-card-text>
-              <v-flex xs12>
-
-                <v-list dense>
-                  <v-list-tile style="padding:2px">
-                    <v-list-tile-content>
-                      <v-list-tile-title>Image</v-list-tile-title>
-                    </v-list-tile-content>
-                    <v-list-tile-content>
-                      <v-list-tile-title>Name</v-list-tile-title>
-                    </v-list-tile-content>
-                    <v-spacer></v-spacer>
-                    <v-list-tile-action>
-                      <v-btn @click="$refs.fixturesModal.openAdd(4, afterAdd)" color="primary">
+                          <v-btn @click="$refs.fixturesModal.openAdd(4, afterAdd)" color="primary">
                         Add
                       </v-btn>
-                    </v-list-tile-action>
-                  </v-list-tile>
-                  <hr>
-                  <template v-for="(item,index) in filteredpalette">
+                        </v-list-tile-action>
+                      </v-list-tile>
+                      <hr>
+                      <template v-for="(item,index) in filteredpalette">
 
-                    <div :key="index">
+                        <div :key="index">
+                          <v-list-tile style="padding:2px">
+                            <v-list-tile-avatar tile>
+                              <img :src="'data:image/png;base64,' + item.image" alt="">
+                            </v-list-tile-avatar>
+                            <v-list-tile-content>
+                              <v-list-tile-title>{{item.name}}</v-list-tile-title>
+                            </v-list-tile-content>
+                            <v-spacer></v-spacer>
+                            <v-list-tile-action>
+                              <v-menu bottom offset-y transition="scale-transition">
+                                <v-btn small slot="activator" flat>
+                                  <v-icon>more_horiz</v-icon>
+                                </v-btn>
+                                <v-list>
+                                  <v-list-tile @click="editItem(item, 'palette')">
+                                    <v-list-tile-title>modify</v-list-tile-title>
+                                  </v-list-tile>
+                                  <v-list-tile @click="remove('palette', item,index)">
+                                    <v-list-tile-title>delete</v-list-tile-title>
+                                  </v-list-tile>
+                                </v-list>
+                              </v-menu>
+                            </v-list-tile-action>
+
+                          </v-list-tile>
+                          <v-divider></v-divider>
+                        </div>
+                      </template>
+
+                    </v-list>
+
+                  </v-flex>
+                </v-card-text>
+              </v-card>
+            </v-tab-item>
+            <v-tab-item id="tab-6" class="elevation-2" justify-content: center>
+              <v-card justify-content: center class="tab-item-wrapper elevation-2 back-height">
+                <v-card-title>
+                  <v-spacer></v-spacer>
+                  <v-text-field v-model="searchRenderings" append-icon="search" label="Search" single-line hide-details></v-text-field>
+                </v-card-title>
+                <v-card-text>
+                  <v-flex xs12>
+                  
+                    <v-list dense>
                       <v-list-tile style="padding:2px">
-                        <v-list-tile-avatar tile>
-                          <img :src="'data:image/png;base64,' + item.image" alt="">
-                        </v-list-tile-avatar>
                         <v-list-tile-content>
-                          <v-list-tile-title>{{item.name}}</v-list-tile-title>
+                          <v-list-tile-title>Image</v-list-tile-title>
+                        </v-list-tile-content>
+                        <v-list-tile-content>
+                          <v-list-tile-title>Name</v-list-tile-title>
                         </v-list-tile-content>
                         <v-spacer></v-spacer>
                         <v-list-tile-action>
-                          <v-menu bottom offset-y transition="scale-transition">
-                            <v-btn small slot="activator" flat>
-                              <v-icon>more_horiz</v-icon>
-                            </v-btn>
-                            <v-list>
-                              <v-list-tile @click="editItem(item, 'palette')">
-                                <v-list-tile-title>modify</v-list-tile-title>
-                              </v-list-tile>
-                              <v-list-tile @click="remove('palette', item,index)">
-                                <v-list-tile-title>delete</v-list-tile-title>
-                              </v-list-tile>
-                            </v-list>
-                          </v-menu>
-                        </v-list-tile-action>
-
-                      </v-list-tile>
-                      <v-divider></v-divider>
-                    </div>
-                  </template>
-
-                </v-list>
-
-              </v-flex>
-            </v-card-text>
-          </v-card>
-        </v-tab-item>
-        <v-tab-item id="tab-6" class="elevation-2" justify-content: center>
-          <v-card justify-content: center class="tab-item-wrapper elevation-2 back-height">
-            <v-card-title>
-              <v-spacer></v-spacer>
-              <v-text-field v-model="searchRenderings" append-icon="search" label="Search" single-line hide-details></v-text-field>
-            </v-card-title>
-            <v-card-text>
-              <v-flex xs12>
-
-                <v-list dense>
-                  <v-list-tile style="padding:2px">
-                    <v-list-tile-content>
-                      <v-list-tile-title>Image</v-list-tile-title>
-                    </v-list-tile-content>
-                    <v-list-tile-content>
-                      <v-list-tile-title>Name</v-list-tile-title>
-                    </v-list-tile-content>
-                    <v-spacer></v-spacer>
-                    <v-list-tile-action>
-                      <v-btn @click="$refs.fixturesModal.openAdd(5, afterAdd)" color="primary">
+                          <v-btn @click="$refs.fixturesModal.openAdd(5, afterAdd)" color="primary">
                         Add
                       </v-btn>
-                    </v-list-tile-action>
-                  </v-list-tile>
-                  <hr>
-                  <template v-for="(item,index) in filteredrendering">
-
-                    <div :key="index">
-                      <v-list-tile style="padding:2px">
-                        <v-list-tile-avatar tile>
-                          <img :src="'data:image/png;base64,' + item.image" alt="">
-                        </v-list-tile-avatar>
-                        <v-list-tile-content>
-                          <v-list-tile-title>{{item.name}}</v-list-tile-title>
-                        </v-list-tile-content>
-                        <v-spacer></v-spacer>
-                        <v-list-tile-action>
-                          <v-menu bottom offset-y transition="scale-transition">
-                            <v-btn small slot="activator" flat>
-                              <v-icon>more_horiz</v-icon>
-                            </v-btn>
-                            <v-list>
-                              <v-list-tile @click="editItem(item, 'rendering')">
-                                <v-list-tile-title>modify</v-list-tile-title>
-                              </v-list-tile>
-                              <v-list-tile @click="remove('rendering', item,index)">
-                                <v-list-tile-title>delete</v-list-tile-title>
-                              </v-list-tile>
-                            </v-list>
-                          </v-menu>
                         </v-list-tile-action>
-
                       </v-list-tile>
-                      <v-divider></v-divider>
-                    </div>
-                  </template>
+                      <hr>
+                      <template v-for="(item,index) in filteredrendering">
 
-                </v-list>
-              </v-flex>
-            </v-card-text>
-          </v-card>
-        </v-tab-item>
-      </v-tabs>
-    </v-container>
-    <!-- <Dialog ref="dialog"></Dialog> -->
+                        <div :key="index">
+                          <v-list-tile style="padding:2px">
+                            <v-list-tile-avatar tile>
+                              <img :src="'data:image/png;base64,' + item.image" alt="">
+                            </v-list-tile-avatar>
+                            <v-list-tile-content>
+                              <v-list-tile-title>{{item.name}}</v-list-tile-title>
+                            </v-list-tile-content>
+                            <v-spacer></v-spacer>
+                            <v-list-tile-action>
+                              <v-menu bottom offset-y transition="scale-transition">
+                                <v-btn small slot="activator" flat>
+                                  <v-icon>more_horiz</v-icon>
+                                </v-btn>
+                                <v-list>
+                                  <v-list-tile @click="editItem(item, 'rendering')">
+                                    <v-list-tile-title>modify</v-list-tile-title>
+                                  </v-list-tile>
+                                  <v-list-tile @click="remove('rendering', item,index)">
+                                    <v-list-tile-title>delete</v-list-tile-title>
+                                  </v-list-tile>
+                                </v-list>
+                              </v-menu>
+                            </v-list-tile-action>
+
+                          </v-list-tile>
+                          <v-divider></v-divider>
+                        </div>
+                      </template>
+
+                    </v-list>
+                  </v-flex>
+                </v-card-text>
+              </v-card>
+            </v-tab-item>
+          </v-tabs>
+        </v-container>
+      </v-card-text>
+    </v-card>
+    <Dialog ref="dialog"></Dialog>
     <FixturesModal ref="fixturesModal"></FixturesModal>
   </div>
 </template>
@@ -408,14 +413,14 @@
 
 <script>
   import Axios from 'axios';
-  import FixturesModal from '@/components/Apps/SpacePlanning/Fixtures/Modal';
-  // import Dialog from '@/components/Common/Dialog';
+  import FixturesModal from './Modal';
+  import Dialog from '@/components/Common/Dialog';
 
   export default {
     name: 'List',
     components: {
       FixturesModal,
-      // Dialog
+      Dialog
     },
     data() {
       return {

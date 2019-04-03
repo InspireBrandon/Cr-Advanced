@@ -36,13 +36,18 @@ class ProductBase extends ProductItemBase {
 
     if (milkCrateData == null) {
       let parentSpreadSpacer = self.GetSpreadSpacing(self.ParentID);
-      if (parentSpreadSpacer > 0) {
-        self.TotalWidth = (self.Orientation_Width * self.Facings_X) + parentSpreadSpacer;
-      } else {
-        self.TotalWidth = (self.Orientation_Width * self.Facings_X);
-      }
+      let parentSquish = self.GetSquishValue(self.ParentID);
+
+      // if (parentSpreadSpacer > 0) {
+      //   self.TotalWidth = (self.Orientation_Width * self.Facings_X) + parentSpreadSpacer;
+      // } else if (parentSquish > 0) {
+      //   self.TotalWidth = ((self.Orientation_Width - parentSpreadSpacer) * self.Facings_X);
+      // } else {
+      
+      // }
       self.Height = self.Data.height * self.Ratio;
       self.TotalHeight = self.Orientation_Height * self.Facings_Y + (self.Caps_Count * self.Cap_Orientation_Height);
+      self.TotalWidth = (self.Orientation_Width * self.Facings_X);
       self.Group.setWidth(self.TotalWidth)
       self.Group.setHeight(self.TotalHeight)
     } else {
@@ -68,16 +73,11 @@ class ProductBase extends ProductItemBase {
     self.AddProductDisplay();
     // self.Update();
 
+    self.IncreaseParentChildrenCounter(positionElementRequired);
+    
     if (positionElementRequired == true) {
       self.UpdateMilkCrate(self.ParentID);
       self.Update();
-      self.PositionElement();      
-      let parentData = ctrl_store.getPlanogramItemById(self.VueStore, self.ParentID);
-      if (parentData.Data.spreadProducts == "SE" || parentData.Data.spreadProducts == "SFE") {
-        self.ParentTreeRedraw.RedrawParentDirectChildren(self.VueStore, self.ParentID);
-      }
-    } else {
-      //
     }
 
     self.SetSelected(true);
@@ -95,7 +95,9 @@ class ProductBase extends ProductItemBase {
 
     if (ctrl_store.getCloneItem(self.VueStore) == self.ID) {
       let ctrl_clone = new CloneBase("PRODUCT");
-      ctrl_clone.Clone(self.VueStore, self.Stage, self, null, null);
+      ctrl_clone.Clone(self.VueStore, self.Stage, self, null, null, function() {
+        
+      });
       ctrl_store.setCloneItem(self.VueStore, null);
       return;
     }
@@ -121,8 +123,8 @@ class ProductBase extends ProductItemBase {
       let parentItem = ctrl_store.getPlanogramItemById(self.VueStore, intersects.ID);
       self.MoveToParentGroup(parentItem);
 
-      // force redraw before hand of previous parent
-      self.ParentTreeRedraw.RedrawParentDirectChildren(self.VueStore, self.ParentID);
+      // force re-position
+      // self.ParentTreeRedraw.PositionDirectChildren(self.VueStore, self.ParentID);
 
       self.ParentID = intersects.ID;
       // move this item to the new group
@@ -136,10 +138,10 @@ class ProductBase extends ProductItemBase {
 
       self.Update(); // update the display of products so that it can determine the new CAP
 
-      let parentData = ctrl_store.getPlanogramItemById(self.VueStore, self.ParentID);
-      if (parentData.Data.spreadProducts == "SE" || parentData.Data.spreadProducts == "SFE") {
-        self.ParentTreeRedraw.RedrawParentDirectChildren(self.VueStore, self.ParentID);
-      }
+      // let parentData = ctrl_store.getPlanogramItemById(self.VueStore, self.ParentID);
+      // if (parentData.Data.spreadProducts == "SE" || parentData.Data.spreadProducts == "SFE") {
+      //   self.ParentTreeRedraw.RedrawParentDirectChildren(self.VueStore, self.ParentID);
+      // }
     } else {
       self.LastPositionRelative = self.Group.position();
       self.LastPositionAbsolute = self.Group.getAbsolutePosition();
@@ -282,12 +284,17 @@ class ProductBase extends ProductItemBase {
       self.Indicator2.destroy();
     }
 
+    let spreadFacingSpacer = self.GetSpreadSpacing(self.ParentID);
+    let squish = self.GetSquishValue(self.ParentID);
+    let totalWidth = (self.Orientation_Width * self.Facings_X) + ((spreadFacingSpacer) * (self.Facings_X - 1)) - ((squish) * (self.Facings_X));
+    // (self.Orientation_Width + (((spreadFacingSpacer - squish) * (self.Facings_X - 1)) * self.Facings_X));
+
     if (storeResult.Data.store_Range_Indicator == "NO") {
 
       self.Indicator1 = new Konva.Line({
         x: 0,
         y: 0,
-        points: [0, 0, self.TotalWidth / 2, self.TotalHeight / 2, self.TotalWidth, self.TotalHeight],
+        points: [0, 0, totalWidth / 2, self.TotalHeight / 2, totalWidth, self.TotalHeight],
         stroke: 'red',
         strokeWidth: 2,
         // lineCap: 'round',
@@ -297,7 +304,7 @@ class ProductBase extends ProductItemBase {
       self.Indicator2 = new Konva.Line({
         x: 0,
         y: 0,
-        points: [self.TotalWidth, 0, self.TotalWidth / 2, self.TotalHeight / 2, 0, self.TotalHeight],
+        points: [totalWidth, 0, totalWidth / 2, self.TotalHeight / 2, 0, self.TotalHeight],
         stroke: 'red',
         strokeWidth: 2,
         //lineCap: 'round',
@@ -531,6 +538,8 @@ class ProductBase extends ProductItemBase {
 
     self.UpdateMilkCrate(self.ParentID);
     self.Update();
+
+    self.UpdateParent(self.ParentID);
 
     self.ParentTreeRedraw.RedrawParentDirectChildren(self.VueStore, self.ParentID);
     // self.AddProductDisplay();

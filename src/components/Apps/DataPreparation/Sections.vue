@@ -26,7 +26,6 @@
 </template>
 
 <script>
-
     function cardItem(data) {
         this.name = data.name;
         this.route = data.route;
@@ -45,9 +44,25 @@
                         name: 'Product',
                         route: 'Product'
                     }),
-                                        new cardItem({
+                    new cardItem({
                         name: 'Brand',
                         route: 'Brand'
+                    }),
+                     new cardItem({
+                        name: 'Supergroup_A',
+                        route: 'Supergroup_A'
+                    }),new cardItem({
+                        name: 'Supergroup_B',
+                        route: 'Supergroup_B'
+                    }),new cardItem({
+                        name: 'Department',
+                        route: 'Department'
+                    }),new cardItem({
+                        name: 'Supplier',
+                        route: 'Supplier'
+                    }),new cardItem({
+                        name: 'Segment',
+                        route: 'Segment'
                     })
                 ]
             }

@@ -6,13 +6,14 @@ import PlanogramItemBase from "@/components/Main/Planogram/spaceplanning/src/lib
 import CloneBase from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/CloneBase.js";
 import ParentTreeRedraw from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/RedrawParentChildBase.js";
 
-class PegboardBase extends PlanogramItemBase {
-  constructor(vueStore, stage, layer, data, ratio, type, gondolaID) {
-    super(vueStore, stage, layer, data, ratio, type, gondolaID);
+class LabelHolderBase extends PlanogramItemBase {
+  constructor(vueStore, stage, layer, data, ratio, type, parentID) {
+    super(vueStore, stage, layer, data, ratio, type, parentID);
 
+    this.ParentID = parentID;
     this.ParentTreeRedraw = new ParentTreeRedraw();
-    this.Holes = [];
     this.Area = null;
+    this.HangingBar = null;
   }
 
   Initialise(dropPos, positionElementRequired = true) {
@@ -44,12 +45,9 @@ class PegboardBase extends PlanogramItemBase {
   Build(dropPos, positionElementRequired = true) {
     let self = this;
     // TODO: add the extended method calls here
-    self.AddRenderings();
     self.AddPegBarCosmetic();
 
-    self.AddPanel();
-    self.AddHoles();
-
+    self.AddHangingBar();
     self.AddTextCosmetic();
 
     if (positionElementRequired == true) {
@@ -57,7 +55,9 @@ class PegboardBase extends PlanogramItemBase {
     }
 
     self.HideShowLabels();
+    self.AddRenderings();
     self.ApplyZIndexing();
+
     self.Layer.draw();
   }
 
@@ -68,49 +68,52 @@ class PegboardBase extends PlanogramItemBase {
     let ctrl_store = new StoreHelper();
 
     if (ctrl_store.getCloneItem(self.VueStore) == self.ID) {
-      let ctrl_clone = new CloneBase("PEGBOARD");
+      let ctrl_clone = new CloneBase("PEGBAR");
       ctrl_clone.Clone(self.VueStore, self.Stage, self, null, null);
       ctrl_store.setCloneItem(self.VueStore, null);
       return;
     }
+    
+    if (intersects != null && intersects != undefined && intersects.intersects == true) {
+      if (intersects.ID != self.ParentID && intersects.ID != self.ID) {
 
-    if (intersects != null) {
-
-      if (intersects != undefined && intersects.intersects == true) {
-        if (intersects.ID != self.ParentID && intersects.ID != self.ID) {
-
-          // adust the previous parent after a move
-          let prevParent = ctrl_store.getPlanogramItemById(self.VueStore, self.ParentID);
-          if (prevParent != null && prevParent != null) {
-            prevParent.PositionElement();
-          }
-
-          ctrl_position.PositionToParent(self.VueStore, null, self.ParentID) // IMPORTANT!
-
-          self.ParentID = intersects.ID;
-          // move this item to the new group
-          let gondolaItem = ctrl_store.getPlanogramItemById(self.VueStore, self.ParentID);
-          self.MoveToParentGroup(gondolaItem);
+        // adust the previous parent after a move
+        let prevParent = ctrl_store.getPlanogramItemById(self.VueStore, self.ParentID);
+        if (prevParent != null && prevParent != null) {
+          prevParent.PositionElement();
         }
+
+        ctrl_position.PositionToParent(self.VueStore, null, self.ParentID) // IMPORTANT!
+
+        self.ParentID = intersects.ID;
+        // move this item to the new group
+        let gondolaItem = ctrl_store.getPlanogramItemById(self.VueStore, self.ParentID);
+        self.MoveToParentGroup(gondolaItem);
       }
     } else {
       self.Group.setY(self.LastPositionRelative.y)
       self.Group.setX(self.LastPositionRelative.x)
     }
 
-    self.PositionPegboard();
+    self.PositionPegbar();
   }
 
-  PositionPegboard() {
+  PositionPegbar() {
     let self = this;
-    self.Group.setX(0);
+
+    if (self.Data.float != undefined && self.Data.float != null && self.Data.float == true) {
+      // self.Group.setX(0);
+    } else {
+      self.Group.setX(0);
+    }
+
     // adjust label values + fixture positions
     let ctrl_label = new LabelHelper();
     ctrl_label.SetNewLabelAndPositionNumbers(self.VueStore);
 
     self.LastPositionRelative = self.Group.position();
     self.LastPositionAbsolute = self.Group.getAbsolutePosition();
-    
+
     self.Layer.draw();
   }
 
@@ -126,14 +129,13 @@ class PegboardBase extends PlanogramItemBase {
 
     self.Data = newData;
     self.SetObjectDimensions();
-    self.AddHoles();
-    self.Area.fill(self.Data.color);
-    self.Area.setWidth(self.TotalWidth); // sample
-    self.Area.setHeight(self.TotalHeight); // sample
+    self.HangingBar.fill(self.Data.color);
+    self.HangingBar.setWidth(self.TotalWidth); // sample
+    self.HangingBar.setHeight(self.TotalHeight); // sample
     self.Group.setWidth(self.TotalWidth);
     self.Group.setHeight(self.TotalHeight);
     self.HideShowLabels();
-    self.LoadImage(self.Area, self.Data.image);
+    self.LoadImage(self.HangingBar, self.Data.image);
 
     // call position element
     self.PositionElement();
@@ -145,100 +147,84 @@ class PegboardBase extends PlanogramItemBase {
       child.PositionElement();
     });
 
-    self.ParentTreeRedraw.RedrawParentDirectChildren(self.VueStore, self.ID, true);
+    self.ParentTreeRedraw.RedrawParentDirectChildren(self.VueStore, self.ID);
+
+    self.AddRenderings();
+    self.ApplyZIndexing();
   }
 
   AddRenderings() {
     let self = this;
 
-    if (self.Renderings.length > 0) {
-      // TODO: Add the specified renderings
-
+    self.RemoveRenderings();
+    
+    if (self.Data.RenderingsItems == undefined || self.Data.RenderingsItems == null) {
+      return;
     }
+
+    if (self.Data.RenderingsItems.LabelHolder != undefined || self.Data.RenderingsItems.LabelHolder != null) {
+      console.log("[LABEL HOLDER RENDERING] LABEL HOLDER", self.Data.RenderingsItems.LabelHolder);
+      // add shelf edge rendering
+      let w = self.Data.RenderingsItems.LabelHolder.width * self.Ratio;
+      let h = self.Data.RenderingsItems.LabelHolder.height * self.Ratio;
+      let offset = 0;
+
+      if (self.Data.RenderingsItems.LabelHolder.yOffset != undefined) {
+        offset = parseFloat(self.Data.RenderingsItems.LabelHolder.yOffset) * self.Ratio
+      }
+
+      let shelfLabelHolder = new Konva.Image({
+        x: 0,
+        y: 0 + offset,
+        width: w,
+        height: h,
+        color: 'transparent',
+        listening: false
+      })
+
+      self.LoadImage(shelfLabelHolder, self.Data.RenderingsItems.LabelHolder.image);
+
+      self.Renderings.push({
+        type: 'LABELHOLDER',
+        konva: shelfLabelHolder
+      });
+
+      self.Group.add(shelfLabelHolder);
+    }
+
+    self.Layer.draw();
+    // self.Group.draw();
   }
 
   RemoveRenderings() {
     let self = this;
 
-    if (self.Renderings.length > 0) {
-      // TODO: Remove the specified renderings
+    self.Renderings.forEach(element => {
+      element.konva.destroy();
+    });
 
-    }
+    self.Renderings = [];
   }
 
   AddPegBarCosmetic() {
     let self = this;
   }
 
-  AddPanel() {
+  AddHangingBar() {
     let self = this;
 
-    self.Area = new Konva.Image({
+    self.HangingBar = new Konva.Image({
       x: 0,
       y: 0,
-      width: self.TotalWidth,
-      height: self.TotalHeight,
+      width: self.Data.width * self.Ratio,
+      height: self.Data.height * self.Ratio,
       fill: self.Data.color,
       transformsEnabled: 'position'
     })
 
-    self.LoadImage(self.Area, self.Data.image);
+    self.LoadImage(self.HangingBar, self.Data.image);
 
-    self.Group.add(self.Area);
-  }
-
-  AddHoles() {
-    let self = this;
-    return new Promise((resolve) => {
-        let ySpace = self.Data.yHoleSpacing * self.Ratio;
-        let xSpace = self.Data.xHoleSpacing * self.Ratio;
-        let radius = self.Data.pegRadius * self.Ratio;
-        let xHoles = parseInt(self.TotalWidth / ((xSpace) + (radius * 2)))
-        let yHoles = parseInt(self.TotalHeight / ((ySpace) + (radius * 2)))
-
-        // destroy first
-        // if (self.Holes.length > 0) {
-        //   self.Holes.forEach(hole => {
-        //     hole.destroy();
-        //   });
-        // }
-
-        self.Holes = [];
-
-        let xPos = 0;
-        let yPos = 0;
-
-        for (var y = 0; y < yHoles; y++) {
-          yPos = ((y) * ySpace) + ((y) * (radius * 2));
-          for (var x = 0; x < xHoles; x++) {
-            xPos = ((x + 1) * xSpace) + ((x + 1) * (radius * 2));
-            // let holeKonva = new Konva.Circle({
-            //   id: "pegboard_hole_id_x_y" + self.ID + "_" + x + "_" + y,
-            //   name: "pegboard_peg",
-            //   x: xPos,
-            //   y: yPos,
-            //   radius: radius,
-            //   fill: 'black',
-            //   listening: false
-            // })
-            // self.Group.add(holeKonva);
-            
-            let hole = {
-              x: xPos,
-              y: yPos
-            }
-
-
-            // hole.cache();
-            self.Holes.push(hole);
-            xPos += xSpace + (radius * 2);
-          }
-          xPos = xSpace + (radius);
-        }
-
-        self.Group.draw();
-        resolve(true);
-    });
+    self.Group.add(self.HangingBar);
   }
 
   AdjustBarPosition() {
@@ -246,4 +232,4 @@ class PegboardBase extends PlanogramItemBase {
   }
 }
 
-export default PegboardBase;
+export default LabelHolderBase;

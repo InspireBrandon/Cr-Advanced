@@ -63,6 +63,8 @@
   import ProductGroupNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/ProductBase.js";
   import BasketNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/BasketBase.js";
   import TextHeaderNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/TextHeaderBase.js";
+  import AreaNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/AreaBase.js";
+  import LabelHolderNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/LabelHolderBase.js";
 
   //calculations
   import CalculationHandler from "@/components/Main/Planogram/spaceplanning/src/libs/CalculationLib/calculationHandler.js";
@@ -821,13 +823,13 @@
         });
         return blob;
       },
-      downloadImage(ratio) {
+      getImageBytes(ratio) {
         var self = this;
         let ctrl_store = new StoreHelper();
 
         self.ShowAllGondolas();
         var stage = self.$refs.stage.getStage();
-        // stage.find('Shape').strokeWidth(1 / stage.scale());
+
         stage.scaleX(1);
         stage.scaleY(1);
         stage.position({
@@ -853,6 +855,58 @@
         var dataURL = this.$refs.stage.getStage().toDataURL({
           x: 0,
           y: 0,
+          width: width,
+          height: height,
+          mimeType: "image/png",
+          quality: 1.0,
+          pixelRatio: ratio
+        });
+
+        return dataURL;
+      },
+      downloadImage(ratio) {
+        var self = this;
+        let ctrl_store = new StoreHelper();
+
+        self.ShowAllGondolas();
+        var stage = self.$refs.stage.getStage();
+        // stage.find('Shape').strokeWidth(1 / stage.scale());
+        stage.scaleX(1);
+        stage.scaleY(1);
+        stage.position({
+          x: 0,
+          y: 0
+        });
+        stage.batchDraw();
+
+        let width = 0;
+
+        let allProducts = ctrl_store.getAllPlanogramItemsByType(self.$store, "PRODUCT");
+        allProducts.forEach(element => {
+          element.Quality = ratio;
+          element.Cache();
+        });
+
+        let allGondolas = ctrl_store.getAllPlanogramItemsByType(self.$store, "GONDOLA");
+        allGondolas.forEach(element => {
+          width += (element.Group.getWidth() + 1);
+        });
+
+        let allItems = ctrl_store.getAllPlanogramItems(self.$store);
+        let lastY = 0;
+        allItems.forEach(element => {
+          if (element.Group.getAbsolutePosition().y < lastY) {
+            lastY = element.Group.getAbsolutePosition().y();
+          }
+        });
+
+        let height = stage.getHeight() - lastY;
+
+        console.log("[download parameters]", "R", ratio, "Last Y", lastY, "TTL H DWN", height, "stage H", stage.getHeight())
+
+        var dataURL = this.$refs.stage.getStage().toDataURL({
+          x: 0,
+          y: lastY,
           width: width,
           height: height,
           mimeType: "image/png",
@@ -978,7 +1032,8 @@
         let dropPos = ctrl_positioning.GetTransformedMousePoint(stage)
         console.log("TEXT HEADER ADD - STAGE", dropPos, self.MasterLayer);
 
-        let ctrl_textHeader = new TextHeaderNew(self.$store, stage, self.MasterLayer, JSON.parse(JSON.stringify(data)), self.$PixelToCmRatio,
+        let ctrl_textHeader = new TextHeaderNew(self.$store, stage, self.MasterLayer, JSON.parse(JSON.stringify(data)),
+          self.$PixelToCmRatio,
           "TEXTHEADER", scale, 'HEADER TEXT');
 
         ctrl_textHeader.Initialise(dropPos);
@@ -1100,6 +1155,23 @@
           ctrl_product.TurnLabelsOn();
         else
           ctrl_product.TurnLabelsOff();
+
+        ctrl_product.UpdateParent(ctrl_product.ParentID);
+      },
+      addNewArea(gondolaID, data, dropPos) {
+        let self = this;
+        let stage = self.$refs.stage.getStage();
+
+        let ctrl_area = new AreaNew(
+          self.$store,
+          stage,
+          self.MasterLayer,
+          JSON.parse(JSON.stringify(data)),
+          self.$PixelToCmRatio,
+          "AREA",
+          gondolaID
+        );
+        ctrl_area.Initialise(dropPos);
       },
       addNewShelf(gondolaID, data, dropPos) {
         let self = this;
@@ -1179,6 +1251,22 @@
           gondolaID
         );
         ctrl_pegBar.Initialise(dropPos);
+      },
+      addNewLabelHolder(fixtureID, data, dropPos) {
+
+        let self = this;
+        let stage = self.$refs.stage.getStage();
+
+        let ctrl_labelHolder = new LabelHolderNew(
+          self.$store,
+          stage,
+          self.MasterLayer,
+          JSON.parse(JSON.stringify(data)),
+          self.$PixelToCmRatio,
+          "LABELHOLDER",
+          fixtureID
+        );
+        ctrl_labelHolder.Initialise(dropPos);
       },
       //#region CAPS
       ToggleCapsOnOff(value) {
@@ -1289,7 +1377,7 @@
             {
               let ctrl_store = new StoreHelper();
               let changed_product = ctrl_store.getPlanogramItemById(this.$store, data.id);
-              console.log('Product Changed',  changed_product)
+              console.log('Product Changed', changed_product)
               changed_product.ChangeDimensions(data.object);
             }
         }
@@ -1410,7 +1498,8 @@
         console.log("SHELF ADD - STAGE", dropPos);
         ctrl_intersectionTester.TestIntersectsWithMany(stage, "PRODUCT", ["SHELF", "BASE", "PEGBAR", "PEGBOARD",
               "BASKET",
-              "PALETTE"
+              "PALETTE",
+              "LABELHOLDER"
             ], self.$store,
             dropPos)
           .then(result => {
@@ -1441,9 +1530,46 @@
               self.addNewGondola(data.data);
             }
             break;
+            case "LABELHOLDER": {
+              data.data["Type"] = "LABELHOLDER";
+
+              let ctrl_intersectionTester = new IntersectionTester();
+
+              let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
+
+              console.log("LABELHOLDER ADD - STAGE", dropPos);
+              ctrl_intersectionTester.TestIntersectsWithMany(stage, "LABELHOLDER", ["PEGBOARD"], self.$store, dropPos)
+              .then(result => {
+                console.log("[LIBARY ADD] LABELHOLDER", result)
+                if (result.intersects == true) {
+                  self.addNewLabelHolder(result.ID, data.data, result.ContainerPosition);
+                }
+              })
+            } break;
+            case "AREA":
+            {
+              data.data["Type"] = "AREA";
+
+              let ctrl_intersectionTester = new IntersectionTester();
+
+              let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
+
+              console.log("AREA ADD - STAGE", dropPos);
+              ctrl_intersectionTester.TestIntersectsWithMany(stage, "AREA", ["GONDOLA"], self.$store, dropPos)
+              .then(result => {
+                console.log("[LIBARY ADD] AREA", result)
+                if (result.intersects == true) {
+                  self.addNewArea(result.ID, data.data, result.ContainerPosition);
+                }
+              })
+            }
+            break;
           case "TEXTHEADER":
             {
-              self.addNewTextHeader(data.data, {ScaleX: 1, ScaleY: 1})
+              self.addNewTextHeader(data.data, {
+                ScaleX: 1,
+                ScaleY: 1
+              })
             }
             break;
           case "PALETTE":
@@ -1505,7 +1631,7 @@
               let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
 
               console.log("SHELF ADD - STAGE", dropPos);
-              ctrl_intersectionTester.TestIntersectsWithItem(stage, "SHELF", "GONDOLA", dropPos)
+              ctrl_intersectionTester.TestIntersectsWithMany(stage, "SHELF", ["GONDOLA", "AREA"], dropPos)
               .then(result => {
                 console.log("[LIBARY ADD] SHELF", result)
                 if (result.intersects == true) {
@@ -1526,7 +1652,8 @@
               let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
 
               console.log("SHELF ADD - STAGE", dropPos);
-              ctrl_intersectionTester.TestIntersectsWithItem(stage, "BASE", "GONDOLA", dropPos)
+              ctrl_intersectionTester.TestIntersectsWithMany(stage, "BASE", ["GONDOLA", "AREA"], dropPos)
+              // ctrl_intersectionTester.TestIntersectsWithItem(stage, "BASE", "GONDOLA", dropPos)
               .then(result => {
                 console.log("[LIBARY ADD] SHELF", result)
                 if (result.intersects == true) {
@@ -1565,7 +1692,8 @@
               let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
 
               console.log("PEGBOARD ADD - STAGE", dropPos);
-              ctrl_intersectionTester.TestIntersectsWithItem(stage, "PEGBOARD", "GONDOLA", dropPos)
+              // ctrl_intersectionTester.TestIntersectsWithItem(stage, "PEGBOARD", "GONDOLA", dropPos)
+              ctrl_intersectionTester.TestIntersectsWithMany(stage, "PEGBOARD", ["GONDOLA", "AREA"], dropPos)
               .then(result => {
                 console.log("[LIBARY ADD] PEGBOARD", result)
                 if (result.intersects == true) {
@@ -1583,7 +1711,8 @@
               let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
 
               console.log("PEGBAR ADD - STAGE", dropPos);
-              ctrl_intersectionTester.TestIntersectsWithItem(stage, "PEGBAR", "GONDOLA", dropPos)
+              ctrl_intersectionTester.TestIntersectsWithMany(stage, "PEGBAR", ["GONDOLA", "AREA"], dropPos)
+              // ctrl_intersectionTester.TestIntersectsWithItem(stage, "PEGBAR", "GONDOLA", dropPos)
               .then(result => {
                 console.log("[LIBARY ADD] PEGBAR", result)
                 if (result.intersects == true) {
@@ -1621,6 +1750,7 @@
       }
     }
   };
+
 </script>
 <style scoped>
   .canvasOperations {
@@ -1633,4 +1763,5 @@
     overflow-y: hidden;
     overflow-x: hidden;
   }
+
 </style>

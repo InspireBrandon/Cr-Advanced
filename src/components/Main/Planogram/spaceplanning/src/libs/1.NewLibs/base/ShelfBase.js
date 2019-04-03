@@ -74,7 +74,9 @@ class ShelfBase extends PlanogramItemBase {
 
     if (ctrl_store.getCloneItem(self.VueStore) == self.ID) {
       let ctrl_clone = new CloneBase("SHELF");
-      ctrl_clone.Clone(self.VueStore, self.Stage, self, null, null);
+      ctrl_clone.Clone(self.VueStore, self.Stage, self, null, null, function() {
+        // self.UpdateParent(self.ID);
+      });
       ctrl_store.setCloneItem(self.VueStore, null);
       return;
     }
@@ -176,10 +178,15 @@ class ShelfBase extends PlanogramItemBase {
       // add shelf edge rendering
       let w = self.Data.RenderingsItems.ShelfEdge.width * self.Ratio;
       let h = self.Data.RenderingsItems.ShelfEdge.height * self.Ratio;
+      let offset = 0;
+
+      if (self.Data.RenderingsItems.ShelfEdge.yOffset != undefined) {
+        offset = parseFloat(self.Data.RenderingsItems.ShelfEdge.yOffset) * self.Ratio
+      }
 
       let shelfEdge = new Konva.Image({
         x: 0,
-        y: (h * -1),
+        y: (h * -1) - offset,
         width: w,
         height: h,
         color: 'transparent',
@@ -201,10 +208,15 @@ class ShelfBase extends PlanogramItemBase {
       // add shelf edge rendering
       let w = self.Data.RenderingsItems.LabelHolder.width * self.Ratio;
       let h = self.Data.RenderingsItems.LabelHolder.height * self.Ratio;
+      let offset = 0;
+
+      if (self.Data.RenderingsItems.LabelHolder.yOffset != undefined) {
+        offset = parseFloat(self.Data.RenderingsItems.LabelHolder.yOffset) * self.Ratio
+      }
 
       let shelfLabelHolder = new Konva.Image({
         x: 0,
-        y: 0,
+        y: 0 + offset,
         width: w,
         height: h,
         color: 'transparent',
@@ -226,10 +238,15 @@ class ShelfBase extends PlanogramItemBase {
       console.log("[SHELF RENDERING] BACK RENDERING", self.Data.RenderingsItems.Back);
       let w = self.Data.RenderingsItems.Back.width * self.Ratio;
       let h = self.Data.RenderingsItems.Back.height * self.Ratio;
+      let offset = 0;
+
+      if (self.Data.RenderingsItems.Back.yOffset != undefined) {
+        offset = parseFloat(self.Data.RenderingsItems.Back.yOffset) * self.Ratio
+      }
 
       var shelfBack = new Konva.Image({
         x: 0,
-        y: (h * -1),
+        y: (h * -1) - offset,
         width: w,
         height: h,
         color: 'transparent',
@@ -278,29 +295,6 @@ class ShelfBase extends PlanogramItemBase {
     self.LoadImage(self.Bar, self.Data.image);
 
     self.Group.add(self.Bar);
-  }
-
-  AddTextCosmetic() {
-    let self = this;
-
-    self.Text = new Konva.Text({
-      x: 0,
-      y: 0,
-      text: "SHELF " + self.Position.toString(),
-      fontFamily: 'Arial Black',
-      fontSize: 12,
-      padding: 1,
-      fill: 'black'
-    })
-
-    self.Group.add(self.Text);
-  }
-
-  SetTextLabel(number) {
-    let self = this;
-    self.Position = number;
-    self.Text.text(self.Data.label + " " + number);
-    self.Group.draw();
   }
 
   AdjustBarPosition() {

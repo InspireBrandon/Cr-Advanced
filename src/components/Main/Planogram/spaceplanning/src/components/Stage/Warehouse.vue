@@ -58,10 +58,6 @@
             <v-list-tile @click="planogramToRange">
               <v-list-tile-title>Planogram To Range</v-list-tile-title>
             </v-list-tile>
-              <!-- v-if="spacePlanStatus==3||spacePlanStatus==1||spacePlanStatus==0 || spacePlanStatus== null" -->
-            <v-list-tile @click="submitPlanogram">
-              <v-list-tile-title>Submit For Approval</v-list-tile-title>
-            </v-list-tile>
             <v-list-tile @click="closeFile">
               <v-list-tile-title>Close</v-list-tile-title>
             </v-list-tile>
@@ -81,7 +77,8 @@
                     }}</div>
                   <div v-if="rangingData.planogramID != null" class="details">File Name Tag: {{
                     rangingData.tag.replace('-', "") }}</div>
-                  <div v-if="rangingData.planogramID != null" class="details">Store Cluster: {{ getClusterName() }}</div>
+                  <div v-if="rangingData.planogramID != null" class="details">Store Cluster: {{ getClusterName() }}
+                  </div>
                   <div v-if="rangingData.planogramID != null" class="details">Category Cluster: XXX</div>
                   <div v-if="rangingData.planogramID != null">
                     <div v-if="rangingData.periodic" class="details">Range: {{ rangingData.monthsBetween }}MMA</div>
@@ -91,10 +88,12 @@
                   <v-container class="pa-0" grid-list-md>
                     <v-layout row wrap>
                       <v-flex xs4>
-                        <v-text-field v-model="height" type="number" suffix="M" hide-details label="Height"></v-text-field>
+                        <v-text-field v-model="height" type="number" suffix="M" hide-details label="Height">
+                        </v-text-field>
                       </v-flex>
                       <v-flex xs4>
-                        <v-text-field v-model="width" type="number" suffix="M" hide-details label="Width"></v-text-field>
+                        <v-text-field v-model="width" type="number" suffix="M" hide-details label="Width">
+                        </v-text-field>
                       </v-flex>
                       <v-flex xs4></v-flex>
                       <v-flex xs4>
@@ -107,7 +106,8 @@
                         <v-text-field v-model="pallettes" type="number" hide-details label="Pallettes"></v-text-field>
                       </v-flex>
                       <v-flex xs4>
-                        <v-text-field v-model="supplierStands" type="number" hide-details label="Supplier Stands"></v-text-field>
+                        <v-text-field v-model="supplierStands" type="number" hide-details label="Supplier Stands">
+                        </v-text-field>
                       </v-flex>
                       <v-flex xs4>
                         <v-text-field v-model="bins" type="number" hide-details label="Bins"></v-text-field>
@@ -120,22 +120,24 @@
           </v-expansion-panel>
         </v-flex>
         <v-flex v-if="rangingData.planogramID != null" md6 style="padding: 2px;">
-          <v-select :disabled="!gotData" light placeholder="Clusters" @change="onClusterTypeChange" dense :items="clusterTypes"
-            v-model="selectedClusterType" solo hide-details></v-select>
-          <!-- <v-select :disabled="!gotData" v-if="showCategoryCluster==true" light placeholder="Category Cluster" @change="onCategoryClusterChange"
-            dense :items="categoryCluster" v-model="selectedCategoryCluster" solo hide-details></v-select> -->
-
+          <v-select :disabled="!gotData" light placeholder="Clusters" @change="onClusterTypeChange" dense
+            :items="clusterTypes" v-model="selectedClusterType" solo hide-details></v-select>
+          <!-- <v-select :disabled="!gotData" light placeholder="Category Cluster" @change="onCategoryClusterChange" dense
+            :items="categoryCluster" v-model="selectedCategoryCluster" solo hide-details></v-select> -->
+          <!-- v-if="showCategoryCluster==true" -->
         </v-flex>
         <v-flex v-if="rangingData.planogramID != null && gotData" md6 style="padding: 2px;">
-          <v-select light @change="onClusterOptionChange" v-if="selectedClusterType != null" :placeholder="'Select ' + selectedClusterType + ' cluster'"
-            dense :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" solo hide-details></v-select>
+          <v-select light @change="onClusterOptionChange" v-if="selectedClusterType != null"
+            :placeholder="'Select ' + selectedClusterType + ' cluster'" dense
+            :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" solo hide-details></v-select>
         </v-flex>
         <v-flex xs12 v-if="rangingData.planogramID != null">
           <div>
             <v-layout row wrap>
               <v-flex md8>
                 <v-toolbar color="primary" dense>
-                  <v-text-field dense solo flat hide-details label="Search" v-model="searchText" prepend-inner-icon="search"></v-text-field>
+                  <v-text-field dense solo flat hide-details label="Search" v-model="searchText"
+                    prepend-inner-icon="search"></v-text-field>
                 </v-toolbar>
               </v-flex>
               <v-flex md4 style="text-align: center;">
@@ -149,7 +151,8 @@
                 </v-btn-toggle>
               </v-flex>
               <v-flex md12 v-if="view_type == 0">
-                <v-list dark dense three-line :class="{ 'details_closed': details_panel != 0, 'details_open': details_panel == 0 }"
+                <v-list dark dense three-line
+                  :class="{ 'details_closed': details_panel != 0, 'details_open': details_panel == 0 }"
                   class="scroll-y">
                   <template v-for="(item, index) in filteredItems">
                     <div :key="index">
@@ -164,9 +167,9 @@
                           :src="warehouseCtrl.getProductImageURL(item.barcode)" draggable="true" @drag="dragProduct"
                           @dragstart="dragProductStart($event, item)" @dragend="clearDrag" contain></v-img>
 
-                        <v-img v-else style="width:50px !important; height:50px !important" src="/static/img/image-placeholder.png"
-                          draggable="true" @drag="dragProduct" @dragstart="dragProductStart($event, item)" @dragend="clearDrag"
-                          contain></v-img>
+                        <v-img v-else style="width:50px !important; height:50px !important"
+                          src="/static/img/image-placeholder.png" draggable="true" @drag="dragProduct"
+                          @dragstart="dragProductStart($event, item)" @dragend="clearDrag" contain></v-img>
 
                         <v-list-tile-content class="ml-2" style="width: 100%">
                           <v-list-tile-title>{{item.description}}</v-list-tile-title>
@@ -180,7 +183,8 @@
                             <v-btn slot="activator" small fab flat dark>
                               <v-icon v-if="item.store_Range_Indicator == 'YES'" color="green">done</v-icon>
                               <v-icon v-if="item.store_Range_Indicator == 'NO'" color="red">close</v-icon>
-                              <v-icon v-if="item.store_Range_Indicator == 'SELECTED' || item.store_Range_Indicator == 'SELECT'"
+                              <v-icon
+                                v-if="item.store_Range_Indicator == 'SELECTED' || item.store_Range_Indicator == 'SELECT'"
                                 color="blue">group_work</v-icon>
                             </v-btn>
                             <v-list>
@@ -211,12 +215,13 @@
                     <v-card>
                       <v-card-text style="text-align: center;">
                         <h4>{{ item.barcode }}</h4>
-                        <v-img v-if="warehouse_data.imagesOn" style="width:50px !important; height:50px !important; margin: 0 auto;"
+                        <v-img v-if="warehouse_data.imagesOn"
+                          style="width:50px !important; height:50px !important; margin: 0 auto;"
                           :src="warehouseCtrl.getProductImageURL(item.barcode)" draggable="true" @drag="dragProduct"
                           @dragstart="dragProductStart($event, item)" @dragend="clearDrag" contain></v-img>
-                        <v-img v-else style="width:50px !important; height:50px !important; margin: 0 auto;" src="/static/img/image-placeholder.png"
-                          draggable="true" @drag="dragProduct" @dragstart="dragProductStart($event, item)" @dragend="clearDrag"
-                          contain></v-img>
+                        <v-img v-else style="width:50px !important; height:50px !important; margin: 0 auto;"
+                          src="/static/img/image-placeholder.png" draggable="true" @drag="dragProduct"
+                          @dragstart="dragProductStart($event, item)" @dragend="clearDrag" contain></v-img>
                       </v-card-text>
                     </v-card>
                   </v-flex>
@@ -245,7 +250,6 @@
     <SpacePlanSelector ref="spacePlanSelector"></SpacePlanSelector>
     <Spinner ref="spinner"></Spinner>
     <YesNoModal ref="yesNoModal"></YesNoModal>
-    <PlanogramAprovalModal ref="PlanogramAprovalModal"></PlanogramAprovalModal>
   </div>
 </template>
 
@@ -262,7 +266,6 @@
   import LoadSavePlanogramBase from '@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/LoadSavePlanogramBase'
   import YesNoModal from '@/components/Common/YesNoModal';
   import StoreHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/StoreHelper/StoreHelper.js";
-  import PlanogramAprovalModal from '@/components/Main/Planogram/spaceplanning/src/components/Modals/PlanogramAproval/PlanogramAprovalModal';
 
   function textValue(data) {
     let self = this;
@@ -280,14 +283,12 @@
       RangeSelectorModal,
       SpacePlanSelector,
       Spinner,
-      YesNoModal,
-      PlanogramAprovalModal
+      YesNoModal
     },
     data() {
       let width = 0;
       width = window.innerWidth * 0.4;
       return {
-        spacePlanStatus: null,
         toggle: 0,
         spacePlanID: null,
         spacePlanName: null,
@@ -312,22 +313,21 @@
         },
         gotData: false,
         products: [],
+
+        categoryCluster: [],
+        selectedCategoryCluster: null,
+        showCategoryCluster: false,
         selectedClusterType: null,
         clusterTypes: [{
             text: "All Stores Cluster",
             value: "allStores"
-          },
-           {
+          }, {
             text: "Select Stores",
             value: "stores"
           },
           {
             text: "Store Cluster",
             value: "store"
-          },
-          {
-            text: "Category Cluster",
-            value: "category"
           },
           {
             text: "Department Cluster",
@@ -349,7 +349,8 @@
           custom: [],
           department: [],
           regional: [],
-          store: []
+          store: [],
+          stores: [],
         },
         selectedPlanogram: 1,
         customEmitter: new CustomEmitter(),
@@ -374,8 +375,7 @@
             };
           }
         },
-        details_panel: null,
-        PlanogramObject:null
+        details_panel: null
       };
     },
     created() {
@@ -442,43 +442,6 @@
       }
     },
     methods: {
-      submitPlanogram() {
-        let self = this
-        self.$refs.PlanogramAprovalModal.show('Submit planogram for aproval?', (value, notesModal,selectedUser) => {
-          console.log(selectedUser);
-          
-          if (value == true) {
-            if (self.spacePlanID != null) {
-              console.log(selectedUser);
-              
-              let systemFileApproval = {
-                systemFile_ID: self.spacePlanID,
-                status: 2,
-                transactionDateTime: new Date(),
-                notes: notesModal,
-                buyerID:selectedUser
-              }
-                 
-                  
-              // axios.put(process.env.VUE_APP_API+`SystemFileApproval?db=CR-Devinspire&buyerID=`+self.spacePlanID,{})
-
-              self.spacePlanStatus = 2
-              let storeID = self.PlanogramObject.storeID
-             if (storeID==null) {
-               storeID=-1
-             }
-              
-              axios.post(process.env.VUE_APP_API + "SystemFileApproval?db=CR-Devinspire&buyerID="+selectedUser+"&storeID="+storeID, {
-                systemFileApproval: systemFileApproval
-              }).then(
-                r => {
-              
-                })
-            }
-          }
-        })
-
-      },
       rangeToPlanogram() {
         let self = this;
         let ctrl_store = new StoreHelper();
@@ -528,7 +491,8 @@
         })
       },
       dimensionChange(planoProduct, rangeProduct) {
-        if (planoProduct.height == rangeProduct.height && planoProduct.width == rangeProduct.width && planoProduct.depth ==
+        if (planoProduct.height == rangeProduct.height && planoProduct.width == rangeProduct.width && planoProduct
+          .depth ==
           rangeProduct.depth) {
           return false;
         } else {
@@ -585,6 +549,23 @@
 
         return retval;
       },
+      getCategoryCluster(planogramID) {
+        var self = this
+        axios.get(process.env.VUE_APP_API + `Clusters/CategoryCluster?planogramID=${planogramID}`).then(r => {
+
+          r.data.forEach(element => {
+            self.categoryCluster.push({
+              text: element.displayname,
+              value: element.id,
+            })
+          })
+
+        }).catch(e => {
+          console.log(e);
+
+        })
+
+      },
       importRange() {
         let self = this;
 
@@ -595,6 +576,7 @@
           axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fileID}`)
             .then(r => {
               if (r.data) {
+                self.getCategoryCluster(r.data.planogramID)
                 self.rangingData.dateFromString = r.data.dateFromString;
                 self.rangingData.dateToString = r.data.dateToString;
                 self.rangingData.monthsBetween = r.data.monthsBetween;
@@ -604,9 +586,11 @@
                 self.rangingData.tag = r.data.tag;
                 self.$store.commit("setPlanogramName", r.data.planogramName);
                 self.setRangingClusterData(r.data.clusterData);
+
                 self.rangingController = new RangingController(r.data);
                 if (self.selectedClusterType != null && self.selectedClusterOption != null) {
-                  self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self.selectedClusterOption);
+                  self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
+                    .selectedClusterOption);
                 }
                 self.gotData = true;
               } else {
@@ -621,22 +605,20 @@
       openFile() {
         let self = this;
 
-        self.planogramHelper.setCreate(false);
-        let stage = self.$parent.$children[0].$children[2].getStage();
-        stage.destroyChildren(); // destroy first
-        self.$parent.$children[0].createNewLayer("LoadInit");
-        let masterLayer = self.$parent.$children[0].MasterLayer;
+        self.$refs.spacePlanSelector.show(spacePlanID => {
 
-        let pxlRatio = 3; // TODO: Figure out why this is 1 and not 3, perhaps a timing issue?
+          self.planogramHelper.setCreate(false);
+          let stage = self.$parent.$children[0].$children[2].getStage();
+          stage.destroyChildren(); // destroy first
+          self.$parent.$children[0].createNewLayer("LoadInit");
+          let masterLayer = self.$parent.$children[0].MasterLayer;
 
-        self.$refs.spacePlanSelector.show((spacePlanID, item) => {
+          let pxlRatio = 3; // TODO: Figure out why this is 1 and not 3, perhaps a timing issue?
 
-          
-          self.PlanogramObject=item
-          self.spacePlanStatus = item.status
           self.$refs.spinner.show();
           self.spacePlanID = spacePlanID;
-          self.planogramHelper.loadPlanogram(spacePlanID, self.$store, masterLayer, stage, pxlRatio, self.setClusterAndDimensionData,
+          self.planogramHelper.loadPlanogram(spacePlanID, self.$store, masterLayer, stage, pxlRatio, self
+            .setClusterAndDimensionData,
             self.$refs.spinner.hide);
         })
       },
@@ -650,7 +632,8 @@
         self.width = dimension == undefined || dimension.width == undefined ? 0 : dimension.width;
         self.displays = dimension == undefined || dimension.displays == undefined ? 0 : dimension.displays;
         self.pallettes = dimension == undefined || dimension.pallettes == undefined ? 0 : dimension.pallettes;
-        self.supplierStands = dimension == undefined || dimension.supplierStands == undefined ? 0 : dimension.supplierStands;
+        self.supplierStands = dimension == undefined || dimension.supplierStands == undefined ? 0 : dimension
+          .supplierStands;
         self.bins = dimension == undefined || dimension.bins == undefined ? 0 : dimension.bins;
 
         if (clusterData.rangeID != null) {
@@ -659,6 +642,7 @@
               self.$store.commit("setRangeID", clusterData.rangeID);
               self.$store.commit("setPlanogramName", r.data.planogramName);
               self.setRangingClusterData(r.data.clusterData);
+              self.getCategoryCluster(r.data.planogramID)
               self.gotData = true;
               self.rangingController = new RangingController(r.data);
               self.selectedClusterType = clusterData.clusterType;
@@ -675,9 +659,26 @@
               self.rangingData.planogramName = clusterData.planogramName;
               self.rangingData.tag = clusterData.tag;
 
+              if (clusterData.storeID != null || clusterData.storeID != undefined) {
+
+
+                self.getStores()
+                self.selectedClusterType = "stores"
+                // self.clusterOptions[stores]=clusterData.storeID
+
+                self.selectedClusterOption = clusterData.storeID
+
+                self.onClusterOptionChange()
+
+
+              }
               setTimeout(() => {
-                self.selectedClusterOption = clusterData.clusterID;
-                self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self.selectedClusterOption);
+                if (clusterData.clusterType != null && clusterData.storeID == null || clusterData.clusterType !=
+                  undefined && clusterData.storeID == undefined) {
+                  self.selectedClusterOption = clusterData.clusterID;
+                  self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
+                    .selectedClusterOption);
+                }
                 updatePlanoDataCallback(self.products);
               }, 60)
             })
@@ -691,16 +692,25 @@
       closeFile() {
         let self = this;
 
-        window.location.reload();
+        // window.location.reload();
 
-        // console.log(self.$parent.$children[0].$refs.stage.getStage().content.innerHTML = "")
-        // self.$parent.$children[0].forceUpdate()
-        // self.$parent.$children[0].$children[2].$refs.stage = undefined;
+        let stage = self.$parent.$children[0].$children[2].getStage();
+        stage.destroyChildren(); // destroy first
+        self.$parent.$children[0].createNewLayer("LoadInit");
+        let masterLayer = self.$parent.$children[0].MasterLayer;
+        this.planogramHelper.resetStage(self.$store, masterLayer, stage);
+        self.products = [];
+        self.selectedClusterType = null;
+        self.selectedClusterOption = null;
+        self.rangingData.planogramID = null;
       },
       saveFile(isNew) {
         let self = this;
 
-        let stage = self.$parent.$children[0].$children[2].getStage();
+        let parent = self.$parent.$children[0].$children[2];
+        let stage = parent.getStage();
+
+        let image = parent.$parent.getImageBytes(5);
 
         let clusterData = self.rangingData;
         let vscd = self.$store.getters.getClusterData;
@@ -709,6 +719,9 @@
         clusterData["clusterType"] = vscd.clusterType;
         clusterData["clusterName"] = vscd.clusterName;
         clusterData["rangeID"] = vscd.rangeID;
+        clusterData["storeID"] = vscd.storeID;
+        clusterData["storeName"] = vscd.storeName;
+        clusterData["categoryCluster"] = vscd.categoryCluster;
 
         if (vscd.rangeID != null) {
           self.$store.getters.getAllPlanogramActiveProducts.forEach(el => {
@@ -731,7 +744,7 @@
                   pallettes: self.pallettes,
                   supplierStands: self.supplierStands,
                   bins: self.bins
-                }, self.spacePlanID, self.spacePlanName, true)
+                }, self.spacePlanID, self.spacePlanName, true, image)
               } else {
                 self.$refs.yesNoModal.show('Update file name with latest configuration?', value => {
                   self.planogramHelper.save(self.$store, stage, clusterData, {
@@ -742,7 +755,7 @@
                     pallettes: self.pallettes,
                     supplierStands: self.supplierStands,
                     bins: self.bins
-                  }, self.spacePlanID, self.spacePlanName, value)
+                  }, self.spacePlanID, self.spacePlanName, value, image)
                 })
               }
             })
@@ -754,20 +767,21 @@
               modules: self.modules,
               height: self.height,
               width: self.width
-            }, self.spacePlanID, self.spacePlanName, true)
+            }, self.spacePlanID, self.spacePlanName, true, image)
           } else {
             self.$refs.yesNoModal.show('Update file name with latest configuration?', value => {
               self.planogramHelper.save(self.$store, stage, clusterData, {
                 modules: self.modules,
                 height: self.height,
                 width: self.width
-              }, self.spacePlanID, self.spacePlanName, value)
+              }, self.spacePlanID, self.spacePlanName, value, image)
             })
           }
         }
       },
       setRangingClusterData(data) {
         let self = this;
+
 
         data.allStoresClusters.forEach(element => {
           self.clusterOptions.allStores.push(new textValue(element));
@@ -873,37 +887,105 @@
       },
       onClusterTypeChange() {
         let self = this;
+        self.$nextTick(() => {
 
-        self.selectedClusterOption = null;
+          if (self.selectedClusterType == "stores") {
+            self.getStores()
+
+          }
+          self.selectedClusterOption = null;
+          self.showCategoryCluster = false
+        })
       },
+      onCategoryClusterChange() {
+        let self = this;
+
+        self.$nextTick(() => {
+          if (self.selectedClusterOption != null) {
+            self.$store.commit("setCategoryCluster", self.selectedCategoryCluster)
+          }
+        })
+      },
+
       onClusterOptionChange() {
         let self = this;
 
         self.$nextTick(() => {
           if (self.selectedClusterOption != null) {
-            self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self.selectedClusterOption);
+            if (self.selectedClusterType != "stores") {
+              self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
+                .selectedClusterOption);
 
-            self.$store.commit("setClusterName", self.getClusterName());
-            self.$store.commit("setClusterType", self.selectedClusterType);
-            self.$store.commit("setClusterID", self.selectedClusterOption);
+              self.$store.commit("setClusterName", self.getClusterName());
+              self.$store.commit("setClusterType", self.selectedClusterType);
+              self.$store.commit("setClusterID", self.selectedClusterOption);
 
-            let storeProducts = self.$store.state.activePlanogramProducts;
+              let storeProducts = self.$store.state.activePlanogramProducts;
 
-            if (storeProducts.length > 0) {
-              storeProducts.forEach(storeProduct => {
-                self.products.forEach(product => {
-                  if (storeProduct.Data.productID == product.productID) {
-                    for (var prop in product) {
-                      storeProduct.Data[prop] = product[prop];
+              if (storeProducts.length > 0) {
+                storeProducts.forEach(storeProduct => {
+                  self.products.forEach(product => {
+                    if (storeProduct.Data.productID == product.productID) {
+                      for (var prop in product) {
+                        storeProduct.Data[prop] = product[prop];
+                      }
                     }
-                  }
-                })
-              });
+                  })
+                });
+              }
+
+              self.customEmitter.notify_cluster_change(EventBus);
             }
 
-            self.customEmitter.notify_cluster_change(EventBus);
+            if (self.selectedClusterType == "stores") {
+              let store = []
+              store.push({
+                storeID: self.selectedClusterOption
+              })
+
+              self.$store.commit("setStoreID", self.selectedClusterOption)
+              self.$store.commit("setStoreName", self.getStoreName())
+
+
+              // self.$store.commit("setClusterName", self.getClusterName());
+              // self.$store.commit("setClusterType", self.selectedClusterType);
+              // self.$store.commit("setClusterID", self.selectedClusterOption);
+
+              let clusterType = "store"
+              self.products = self.rangingController.getSalesDataBySingleStore(store, clusterType, self
+                .clusterOptions
+                .stores.storeClusterID)
+            }
           }
         })
+      },
+      getStores() {
+        let self = this
+        self.showCategoryCluster = true
+        axios.get(process.env.VUE_APP_API + `Store?db=CR-Devinspire`).then(r => {
+          // console.log(r.data);
+          r.data.forEach(store => {
+            self.clusterOptions.stores.push({
+              text: store.storeName,
+              value: store.storeID,
+            })
+          })
+        })
+      },
+      getStoreName() {
+        let self = this;
+        let clusters = self.clusterOptions[self.selectedClusterType];
+        let retval = "";
+
+        if (self.selectedClusterType != null && self.selectedClusterOption != null) {
+          for (let index = 0; index < clusters.length; index++) {
+            const element = clusters[index];
+            if (element.value == self.selectedClusterOption)
+              retval = element.text;
+          }
+        }
+
+        return retval;
       },
       getClusterName() {
         let self = this;
@@ -924,15 +1006,18 @@
         let self = this;
 
         if (indicator != "SELECTED") {
-          self.rangingController.setClusterIndicator(self.selectedClusterType, self.selectedClusterOption, product.productID,
+          self.rangingController.setClusterIndicator(self.selectedClusterType, self.selectedClusterOption, product
+            .productID,
             indicator);
-          self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self.selectedClusterOption);
+          self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
+            .selectedClusterOption);
         } else {
           alert("This feature is still coming");
         }
       }
     }
   };
+
 </script>
 
 <style scoped>
@@ -947,4 +1032,5 @@
   .details_closed {
     max-height: calc(100vh - 235px)
   }
+
 </style>

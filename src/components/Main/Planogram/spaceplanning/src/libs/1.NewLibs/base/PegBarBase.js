@@ -162,10 +162,15 @@ class PegBarBase extends PlanogramItemBase {
       // add shelf edge rendering
       let w = self.Data.RenderingsItems.LabelHolder.width * self.Ratio;
       let h = self.Data.RenderingsItems.LabelHolder.height * self.Ratio;
+      let offset = 0;
+
+      if (self.Data.RenderingsItems.LabelHolder.yOffset != undefined) {
+        offset = parseFloat(self.Data.RenderingsItems.LabelHolder.yOffset) * self.Ratio
+      }
 
       let shelfLabelHolder = new Konva.Image({
         x: 0,
-        y: 0,
+        y: 0 + offset,
         width: w,
         height: h,
         color: 'transparent',
@@ -215,30 +220,6 @@ class PegBarBase extends PlanogramItemBase {
     self.LoadImage(self.HangingBar, self.Data.image);
 
     self.Group.add(self.HangingBar);
-  }
-
-  AddTextCosmetic() {
-    let self = this;
-
-    self.Text = new Konva.Text({
-      x: 0,
-      y: 0,
-      text: "PEGBAR " + self.Position.toString(),
-      fontFamily: 'Arial Black',
-      fontSize: 12,
-      padding: 1,
-      fill: 'black',
-      transformsEnabled: 'position'
-    })
-
-    self.Group.add(self.Text);
-  }
-
-  SetTextLabel(number) {
-    let self = this;
-    self.Position = number;
-    self.Text.text(self.Data.label + " " + number);
-    self.Group.draw();
   }
 
   AdjustBarPosition() {

@@ -168,10 +168,24 @@ class IntersectionTester {
             return;
           }
 
+          var labelHolderIntrsct = results.find(x => x.Type == "LABELHOLDER");
+          if (labelHolderIntrsct != undefined && labelHolderIntrsct.intersects == true) {
+            hasIntersection = true;
+            resolve(labelHolderIntrsct);
+            return;
+          }
+
           var pegboardIntrsct = results.find(x => x.Type == "PEGBOARD");
           if (pegboardIntrsct != undefined && pegboardIntrsct.intersects == true) {
             hasIntersection = true;
             resolve(pegboardIntrsct);
+            return;
+          }
+
+          var areaIntrsct = results.find(x => x.Type == "AREA");
+          if (areaIntrsct != undefined && areaIntrsct.intersects == true) {
+            hasIntersection = true;
+            resolve(areaIntrsct);
             return;
           }
 
@@ -199,7 +213,7 @@ class IntersectionTester {
             console.log("BASKET/PRODUCT TEST INTRSCT", ItemType, TypeArr)
 
             if (ItemType == "BASKET" || ItemType == "PRODUCT") {
-              console.log("BASKET TEST INTRSCT", ItemType)
+              // console.log("BASKET TEST INTRSCT", ItemType)
               self.Internal_TestForIntersectionBelow(VueStore, dropPos, stage)
                 .then(finalTestResult => {
                   if (finalTestResult.intersects == false) {
@@ -352,13 +366,15 @@ class IntersectionTester {
 
     return new Promise((resolve) => {
       let promiseArr = [];
-      let types = ["GONDOLA", "SHELF", "BASE", "BASKET", "PEGBAR", "PEGBOARD", "DIVIDER"];
+      let types = ["GONDOLA", "SHELF", "BASE", "BASKET", "PEGBAR", "PEGBOARD", "DIVIDER", "AREA"];
 
       promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "GONDOLA", dropPos));
+      promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "AREA", dropPos));
       promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "PALETTE", dropPos));
       promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "SHELF", dropPos));
       promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "BASE", dropPos));
       promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "PEGBAR", dropPos));
+      promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "LABELHOLDER", dropPos));
       promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "PEGBOARD", dropPos));
       promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "BASKET", dropPos));
       promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "DIVIDER", dropPos));

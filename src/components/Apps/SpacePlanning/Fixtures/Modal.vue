@@ -12,7 +12,7 @@
           <v-icon>close</v-icon>
         </v-btn>
       </v-toolbar>
-      <v-container style="height: calc(100vh - 65px); overflow-x: auto;" grid-list-md>
+      <v-container style="form: calc(100vh - 65px); overflow-x: auto;" grid-list-md>
         <v-layout row wrap>
           <v-flex lg4 md12>
             <v-card class="elevation-5">
@@ -44,40 +44,65 @@
                     <v-select placeholder="please select" v-if="form.rendering" :items="types" v-model="form.type"
                       label="Type:">
                     </v-select>
-                    <v-select placeholder="please select" v-if="form.type == 2" :items="fixtureTypes" v-model="form.fixtureType"
-                      label="Type:">
+                    <v-select placeholder="please select" v-if="form.type == 2" :items="fixtureTypes"
+                      v-model="form.fixtureType" label="Type:">
                     </v-select>
-                    <v-select placeholder="please select" v-if="form.type == 3" :items="subTypes" v-model="form.fixtureType"
-                      label="Subtype:">
+                    <v-select placeholder="please select" v-if="form.type == 3" :items="subTypes"
+                      v-model="form.fixtureType" label="Subtype:">
                     </v-select>
-                    <v-select placeholder="please select" v-if="form.type == 0  && form.rendering" :items="renderingTypeGondola"
-                      v-model="form.renderingType" label="Rendering Type:">
+                    <v-select placeholder="please select" v-if="form.type == 0  && form.rendering"
+                      :items="renderingTypeGondola" v-model="form.renderingType" label="Rendering Type:">
                     </v-select>
-                    <v-select placeholder="please select" v-if="form.type == 2 && form.fixtureType == 1 && form.rendering"
+                    <v-select placeholder="please select"
+                      v-if="form.type == 2 && form.fixtureType == 1 || form.type == 3 && form.fixtureType == 4 && form.rendering"
                       :items="renderingTypeShelf" v-model="form.renderingType" label="Rendering Type:">
                     </v-select>
 
-                    <v-select placeholder="please select" v-if="form.type == 2 && form.fixtureType == 0 && form.rendering"
-                      :items="renderingTypeBase" v-model="form.renderingType" label="Rendering Type:">
+                    <v-select placeholder="please select"
+                      v-if="form.type == 3 && form.fixtureType == 3 && form.rendering" :items="renderingTypeArea"
+                      v-model="form.renderingType" label="Rendering Type:">
                     </v-select>
-                    <v-select placeholder="please select" v-if="form.type == 2 && form.fixtureType == 3 && form.rendering"
-                      :items="renderingTypePegBar" v-model="form.renderingType" label="Rendering Type:">
+
+                    <v-select placeholder="please select"
+                      v-if="form.type == 2 && form.fixtureType == 0 && form.rendering" :items="renderingTypeBase"
+                      v-model="form.renderingType" label="Rendering Type:">
                     </v-select>
-                    <v-select placeholder="please select" v-if="form.type == 3 && form.fixtureType == 1 && form.rendering"
-                      :items="renderingTypeBasket" v-model="form.renderingType" label="Rendering Type:">
+                    <v-select placeholder="please select"
+                      v-if="form.type == 2 && form.fixtureType == 3 && form.rendering" :items="renderingTypePegBar"
+                      v-model="form.renderingType" label="Rendering Type:">
+                    </v-select>
+                    <v-select placeholder="please select"
+                      v-if="form.type == 3 && form.fixtureType == 1 && form.rendering" :items="renderingTypeBasket"
+                      v-model="form.renderingType" label="Rendering Type:">
                     </v-select>
                   </v-flex>
                   <v-flex lg8 md12 sm12 xs12 v-if="!form.rendering">
-                    <v-select placeholder="please select" v-if="(form.fixtureType == 2 || form.fixtureType == 3) && form.type == 2"
-                      :items="pegs" v-model="form.defaultPeg" label="Default peg:">
+                    <v-select placeholder="please select"
+                      v-if="(form.fixtureType == 2 || form.fixtureType == 3) && form.type == 2" :items="pegs"
+                      v-model="form.defaultPeg" label="Default peg:">
                     </v-select>
                   </v-flex>
                   <v-flex lg8 md12 sm12 xs12 v-if="!form.rendering">
-                    <v-select placeholder="please select" :items="SpreadProducts" v-model="form.spreadProducts" label="Spread products:">
+                    <v-select placeholder="please select" :items="SpreadProducts" v-model="form.spreadProducts"
+                      label="Spread products:">
                     </v-select>
                   </v-flex>
-                   <v-flex lg8 md12 sm12 xs12 >
-                   <v-text-field type="number" label="Cost of Fixture" prefix="R" v-model="form.cost"></v-text-field>
+                  <v-flex lg8 md12 sm12 xs12
+                    v-if="!form.rendering && form.type == 2 && form.fixtureType != 2 || form.fixtureType==4&&form.type==3">
+                    <v-checkbox hide-details label="Squish" v-model="form.squish"></v-checkbox>
+                  </v-flex>
+
+                  <v-flex lg8 md12 sm12 xs12
+                    v-if="(!form.rendering && form.squish) && (form.type == 2 && form.fixtureType != 2 || form.fixtureType==4&&form.type==3)">
+                    <v-checkbox hide-details label="Auto Squish" v-model="form.autoSquish"></v-checkbox>
+                  </v-flex>
+                  <v-flex lg8 md12 sm12 xs12
+                    v-if="(!form.rendering && form.squish && !form.autoSquish) && (form.type == 2 && form.fixtureType != 2 || form.fixtureType==4&&form.type==3)">
+                    <v-text-field hide-details v-if="!form.rendering" v-model="form.squishAmount"
+                      label="Squish Amount:"></v-text-field>
+                  </v-flex>
+                  <v-flex lg8 md12 sm12 xs12>
+                    <v-text-field type="number" label="Cost of Fixture" prefix="R" v-model="form.cost"></v-text-field>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -91,7 +116,7 @@
               <v-container grid-list-md>
                 <v-layout row wrap>
                   <v-flex lg8 md12>
-                    <v-text-field type="number" v-model="form.height" label="Height:" suffix="cm"></v-text-field>
+                    <v-text-field type="number" v-model="form.form" label="form:" suffix="cm"></v-text-field>
                   </v-flex>
                   <v-flex lg8 md12>
                     <v-text-field type="number" v-model="form.width" label="Width:" suffix="cm"></v-text-field>
@@ -99,17 +124,35 @@
                   <v-flex lg8 md12 v-if="!form.rendering">
                     <v-text-field type="number" v-model="form.depth" label="Depth:" suffix="cm"></v-text-field>
                   </v-flex>
-                  <v-flex lg8 md12 v-if="!form.rendering && (form.type == 2 && (form.fixtureType == 0 || form.fixtureType == 1))">
+                  <!-- <v-flex lg8 md12 sm12 xs12
+                    v-if="(form.fixtureType==1&&form.type==2||form.fixtureType==0&&form.type==2 ||form.fixtureType==1&&form.type==3 ||form.fixtureType==3&&form.type==2 || form.fixtureType==4&&form.type==3)">
+                    <v-text-field type="number" v-model="form.form" suffix="cm"
+                      label="Merchandising Offset:"></v-text-field>
+                  </v-flex> -->
+                  <v-flex lg8 md12
+                    v-if="!form.rendering && (form.type == 2 && (form.fixtureType == 0 || form.fixtureType == 1))">
+                    <v-text-field type="number" v-model="form.overhang" label="Overhang:" suffix="cm"></v-text-field>
+                  </v-flex>
+                  <v-flex lg8 md12
+                    v-if="!form.rendering && form.fixtureType == 3 || form.fixtureType==4&&form.type==3">
+                    <v-text-field type="number" v-model="form.productOffset" label="Product offset:" suffix="cm">
+                    </v-text-field>
+                  </v-flex>
+                  <v-flex lg8 md12
+                    v-if="!form.rendering && (form.type == 2 && (form.fixtureType == 0 || form.fixtureType == 1))">
                     <v-text-field type="number" v-model="form.overhang" label="Overhang:" suffix="cm"></v-text-field>
                   </v-flex>
                   <v-flex lg8 md12 v-if="!form.rendering && form.fixtureType == 3">
-                    <v-text-field type="number" v-model="form.productOffset" label="Product offset:" suffix="cm"></v-text-field>
+                    <v-text-field type="number" v-model="form.productOffset" label="Product offset:" suffix="cm">
+                    </v-text-field>
                   </v-flex>
                   <v-flex lg8 md12 v-if="form.fixtureType == 2 && !form.rendering">
-                    <v-text-field type="number" v-model="form.xHoleSpacing" label="X hole spacing:" suffix="cm"></v-text-field>
+                    <v-text-field type="number" v-model="form.xHoleSpacing" label="X hole spacing:" suffix="cm">
+                    </v-text-field>
                   </v-flex>
                   <v-flex lg8 md12 v-if="form.fixtureType == 2 && !form.rendering">
-                    <v-text-field type="number" v-model="form.yHoleSpacing" label="Y hole spacing:" suffix="cm"></v-text-field>
+                    <v-text-field type="number" v-model="form.yHoleSpacing" label="Y hole spacing:" suffix="cm">
+                    </v-text-field>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -124,16 +167,18 @@
                 <v-layout row wrap>
                   <v-flex lg12 md12 sm12 xs12>
                     <h3>Image</h3>
-                    <v-card class="elevation-5" @click="openFileExplorer" style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
-                      <img ref="changeImage" style="max-height: 150px; max-width: 150px;" src="" alt="">
+                    <v-card class="elevation-5" @click="openFileExplorer"
+                      style="width: 150px; form: 150px; background: white; cursor: pointer; margin: 0 auto;">
+                      <img ref="changeImage" style="max-form: 150px; max-width: 150px;" src="" alt="">
                     </v-card>
                     <input ref="fileInput" style="display: none" @change="imageChange" type="file">
                   </v-flex>
                   <v-flex lg12 md12 sm12 xs12>
                     <div v-show="form.type == 2 && (form.fixtureType == 0 || form.fixtureType == 1) && !form.rendering">
                       <h3>Bar image</h3>
-                      <v-card class="elevation-5" @click="openFileExplorerBar" style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
-                        <img ref="changeImageBar" style="max-height: 150px; max-width: 150px;" src="" alt="">
+                      <v-card class="elevation-5" @click="openFileExplorerBar"
+                        style="width: 150px; form: 150px; background: white; cursor: pointer; margin: 0 auto;">
+                        <img ref="changeImageBar" style="max-form: 150px; max-width: 150px;" src="" alt="">
                       </v-card>
                       <input ref="fileInputBar" style="display: none" @change="imageChangeBar" type="file">
                     </div>
@@ -273,6 +318,14 @@
           {
             text: 'Divider',
             value: 2
+          },
+          {
+            text: 'Area',
+            value: 3
+          },
+          {
+            text: 'Label Holder',
+            value: 4,
           }
         ],
         renderingTypeShelf: [{
@@ -286,11 +339,21 @@
             text: 'Back Face',
             value: 2
           }
-        ],renderingTypeBase: [{
+        ],
+        renderingTypeBase: [{
             text: 'Label Holder',
             value: 0
           },
-           {
+          {
+            text: 'Back Face',
+            value: 2
+          }
+        ],
+        renderingTypeArea: [{
+            text: 'Front Face',
+            value: 3
+          },
+          {
             text: 'Back Face',
             value: 2
           }
@@ -303,17 +366,16 @@
           text: 'Label Holder',
           value: 0
         }],
-        renderingTypeBasket: [ 
+        renderingTypeBasket: [
           // {
-        //   text: 'Back Face',
-        //   value: 2
-        // },
-         {
-          text: 'Front Face',
-          value: 3
-        }, ],
-
-
+          //   text: 'Back Face',
+          //   value: 2
+          // },
+          {
+            text: 'Front Face',
+            value: 3
+          },
+        ],
         pegs: [],
         fixtureLabelOrders: [{
           text: "Top to bottom",
@@ -333,11 +395,11 @@
           image: "",
           barImage: "",
           labelPlacement: "sample string 7",
-          height: 8.0,
+          form: 8.0,
           width: 9.0,
           depth: 10.0,
           fixtureSpacing: 11.0,
-          merchHeight: 12.0,
+          merchform: 12.0,
           xPegsCount: 13,
           yPegsCount: 14,
           xHoleSpacing: 15.0,
@@ -358,7 +420,10 @@
           rendering: false,
           overhang: null,
           productOffset: null,
-          cost:null
+          cost: null,
+          squish: null,
+          autoSquish: null,
+          squishAmount: null
         },
         showModal: false
       }
@@ -394,7 +459,7 @@
       openEdit(fixture, afterEdit) {
         let self = this;
         console.log(fixture);
-        
+
         for (var prop in this.form) {
           this.form[prop] = fixture[prop];
         }
@@ -513,25 +578,29 @@
         if (self.form.xHoleSpacing == null || self.form.pegDiameter == null || self.form.width == null) {
           return 0;
         } else {
-          return Math.round((parseInt(self.form.width) / (parseInt(self.form.xHoleSpacing) + parseInt(self.form.pegDiameter))));
+          return Math.round((parseInt(self.form.width) / (parseInt(self.form.xHoleSpacing) + parseInt(self.form
+            .pegDiameter))));
         }
       },
       calculateHolesY() {
         let self = this;
-        if (self.form.yHoleSpacing == null || self.form.pegDiameter == null || self.form.height == null) {
+        if (self.form.yHoleSpacing == null || self.form.pegDiameter == null || self.form.form == null) {
           return 0;
         } else {
-          return Math.round((parseInt(self.form.height) / (parseInt(self.form.yHoleSpacing) + parseInt(self.form.pegDiameter))));
+          return Math.round((parseInt(self.form.form) / (parseInt(self.form.yHoleSpacing) + parseInt(self.form
+            .pegDiameter))));
         }
       }
     }
   }
+
 </script>
 
 <style>
   .toolbar-title {
     text-align: center;
   }
+
 </style>
 
 
@@ -539,4 +608,5 @@
   .Modal {
     overflow-y: auto;
   }
+
 </style>

@@ -50,6 +50,13 @@ import DataPrep from '@/components/Apps/DataPreparation/Index.vue'
 import DataPrepSections from '@/components/Apps/DataPreparation/Sections.vue'
 import ManufacturerMaint from '@/components/Apps/DataPreparation/Types/Manufacturer/Index.vue'
 import BrandMaint from '@/components/Apps/DataPreparation/Types/Brand/Index.vue'
+import Supergroup_AMaint from '@/components/Apps/DataPreparation/Types/Supergroup_A/Index.vue'
+import Supergroup_BMaint from '@/components/Apps/DataPreparation/Types/Supergroup_B/Index.vue'
+import DepartmentMaint from '@/components/Apps/DataPreparation/Types/Department/Index.vue'
+import SupplierMaint from '@/components/Apps/DataPreparation/Types/Supplier/Index.vue'
+import SegmentMaint from '@/components/Apps/DataPreparation/Types/Segment/Index.vue'
+
+
 
 //reports
 import AppsReportList from '@/components/Main/Reports/Apps/Index.vue'
@@ -211,7 +218,29 @@ export default new Router({
             path: 'Brand',
             name: 'Brand',
             component: BrandMaint
-          }]
+          },{
+            path: 'Supergroup_A',
+            name: 'Supergroup_A',
+            component: Supergroup_AMaint
+          },{
+            path: 'Supergroup_B',
+            name: 'Supergroup_B',
+            component: Supergroup_BMaint
+          },{
+            path: 'Department',
+            name: 'Department',
+            component: DepartmentMaint
+          },{
+            path: 'Supplier',
+            name: 'Supplier',
+            component: SupplierMaint
+          },{
+            path: 'Segment',
+            name: 'Segment',
+            component: SegmentMaint
+          }
+        
+        ]
         }
       ]
     },

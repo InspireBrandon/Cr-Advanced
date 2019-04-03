@@ -57,6 +57,8 @@ class BasketBase extends PlanogramItemBase {
     self.AddRenderings();
     self.ApplyZIndexing();
 
+    self.IncreaseParentChildrenCounter();
+
     self.Layer.draw();
   }
 
@@ -252,7 +254,7 @@ class BasketBase extends PlanogramItemBase {
       let offset = 0;
 
       if (self.Data.RenderingsItems.Front.yOffset != undefined) {
-        offset = parseInt(self.Data.RenderingsItems.Front.yOffset)
+        offset = parseFloat(self.Data.RenderingsItems.Front.yOffset) * self.Ratio
       }
 
       let front = new Konva.Image({
@@ -301,38 +303,12 @@ class BasketBase extends PlanogramItemBase {
       width: self.Data.width * self.Ratio,
       height: self.Data.height * self.Ratio,
       fill: self.Data.color,
-      stroke: 'black',
-      strokeWidth: 0.5,
       transformsEnabled: 'position'
     })
 
     self.LoadImage(self.Area, self.Data.image);
 
     self.Group.add(self.Area);
-  }
-
-  AddTextCosmetic() {
-    let self = this;
-
-    self.Text = new Konva.Text({
-      x: 0,
-      y: 0,
-      text: "BASKET " + self.Position.toString(),
-      fontFamily: 'Arial Black',
-      fontSize: 10,
-      padding: 1,
-      fill: 'black',
-      transformsEnabled: 'position'
-    })
-
-    self.Group.add(self.Text);
-  }
-
-  SetTextLabel(number) {
-    let self = this;
-    self.Position = number;
-    self.Text.text(self.Data.label + " " + number);
-    self.Group.draw();
   }
 
   AdjustBarPosition() {

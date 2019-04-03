@@ -124,6 +124,11 @@ class StoreHelper {
 
   }
 
+  getPlanogramSettings(VueStore) {
+    let tmp = VueStore.getters.getPlanogramProperties;
+    return tmp;
+  }
+
   getLabelConfig(VueStore) {
     let tmp = VueStore.getters.getLabelConfig;
     return tmp.Order;
@@ -152,6 +157,11 @@ class StoreHelper {
       data,
       barcode
     });
+  }
+
+  getFixtures(VueStore) {
+    let tmp = VueStore.getters.getFixtures;
+    return tmp;
   }
 }
 

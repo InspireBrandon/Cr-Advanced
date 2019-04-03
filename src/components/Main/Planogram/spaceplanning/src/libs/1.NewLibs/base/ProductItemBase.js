@@ -379,6 +379,8 @@ class ProductItemBase extends PlanogramItemBase {
 
     let parentItem = ctrl_store.getPlanogramItemById(self.VueStore, self.ParentID);
     let parentSpreadSpacer = self.GetSpreadSpacing(self.ParentID);
+    let parentSquishValue = self.GetSquishValue(self.ParentID);
+    let parentFacingOffset = self.GetFacingOffset(self.ParentID);
 
     self.SetObjectDimensions();
 
@@ -390,18 +392,22 @@ class ProductItemBase extends PlanogramItemBase {
         let placeY = ctrl_position.PositionProductItems(y, x, self).y;
         let placeX = ctrl_position.PositionProductItems(y, x, self).x;
 
-        // console.log("[PRODUCT] SPREAD EVEN FACINGS", parentSpreadSpacer, placeX);
         if (parentSpreadSpacer > 0) {
-          placeX += (x * parentSpreadSpacer) / (self.Facings_X > 1 ? self.Facings_X - 1 : self.Facings_X); // ADD SPACING FOR SPREAD
-          // console.log("[PRODUCT] SPREAD EVEN FACINGS AFTER ADJ", parentSpreadSpacer, placeX);
+          placeX += (x * (parentSpreadSpacer - parentSquishValue));
+        } else if (parentSquishValue > 0) {
+          placeX -= (x * parentSquishValue);
         }
-        // placeX += 30;// ADD SPACING FOR SPREAD
+
+        if (parentFacingOffset.enabled == true) {
+          placeX += (x * (parentFacingOffset.x - parentSquishValue));
+          placeY -= ((y - 1) * (parentFacingOffset.y));
+        }
 
         let rect = new Konva.Image({
           name: 'nromal-facing',
           x: placeX,
           y: placeY,
-          width: w,
+          width: w - parentSquishValue,
           height: h,
           fill: self.RandomColor,
           stroke: 'black',
@@ -522,15 +528,16 @@ class ProductItemBase extends PlanogramItemBase {
           placeY -= (y + 1) * self.Cap_Orientation_Height
 
           if (parentSpreadSpacer > 0) {
-            placeX += (x * parentSpreadSpacer) / (self.Facings_X > 1 ? self.Facings_X - 1 : self.Facings_X); // ADD SPACING FOR SPREAD
-            // console.log("[PRODUCT] SPREAD EVEN FACINGS AFTER ADJ", parentSpreadSpacer, placeX);
+            placeX += (x * (parentSpreadSpacer - parentSquishValue));
+          } else if (parentSquishValue > 0) {
+            placeX -= (x * parentSquishValue);
           }
 
           let rect = new Konva.Image({
             name: 'cap-facing',
             x: placeX,
             y: placeY,
-            width: self.Cap_Orientation_Width,
+            width: self.Cap_Orientation_Width - parentSquishValue,
             height: self.Cap_Orientation_Height,
             fill: self.RandomColor,
             stroke: 'black',
@@ -618,7 +625,7 @@ class ProductItemBase extends PlanogramItemBase {
 
     parentItem.Layer.batchDraw();
 
-    self.PositionElement();
+    // self.PositionElement();
     self.ToggleGroups();
     self.AddRemoveBordersAndBackground();
 
@@ -637,13 +644,17 @@ class ProductItemBase extends PlanogramItemBase {
 
   IncreaseFacingsX() {
     let self = this;
+
     self.Facings_X++;
-    //TODO: Recreate products or draw them again
+
+    self.IncreaseParentChildrenCounter(true, self.ParentID); // SFE
     self.UpdateMilkCrate(self.ParentID);
     self.Update();
-    // self.ParentTreeRedraw.RedrawParentDirectChildren(self.VueStore, self.ParentID);
-    // self.AddProductDisplay();
-    self.ApplyZIndexing(self.ParentID);
+
+    self.UpdateParent(self.ParentID);
+
+    // self.ApplyZIndexing(self.ParentID);
+
     self.Group.draw();
   }
 
@@ -654,9 +665,10 @@ class ProductItemBase extends PlanogramItemBase {
     //TODO: Recreate products or draw them again
     self.UpdateMilkCrate(self.ParentID);
     self.Update();
-    // self.ParentTreeRedraw.RedrawParentDirectChildren(self.VueStore, self.ParentID);
-    // self.AddProductDisplay();
-    self.ApplyZIndexing(self.ParentID);
+    // self.ApplyZIndexing(self.ParentID);
+
+    self.UpdateParent(self.ParentID);
+
     self.Group.draw();
   }
 
@@ -666,11 +678,14 @@ class ProductItemBase extends PlanogramItemBase {
     if (self.Facings_X > 1) {
       self.Facings_X--;
       //TODO: Recreate products or draw them again
+
+      self.IncreaseParentChildrenCounter(true, self.ParentID); // SFE
       self.UpdateMilkCrate(self.ParentID);
       self.Update();
-      // self.ParentTreeRedraw.RedrawParentDirectChildren(self.VueStore, self.ParentID);
-      // self.AddProductDisplay();
-      self.ApplyZIndexing(self.ParentID);
+
+      self.UpdateParent(self.ParentID);
+
+      // self.ApplyZIndexing(self.ParentID);
       self.Group.draw();
     }
   }
@@ -685,7 +700,10 @@ class ProductItemBase extends PlanogramItemBase {
       self.Update();
       // self.ParentTreeRedraw.RedrawParentDirectChildren(self.VueStore, self.ParentID);
       // self.AddProductDisplay();
-      self.ApplyZIndexing(self.ParentID);
+      // self.ApplyZIndexing(self.ParentID);
+
+      self.UpdateParent(self.ParentID);
+
       self.Group.draw();
     }
   }
@@ -699,7 +717,10 @@ class ProductItemBase extends PlanogramItemBase {
     self.Update();
     // self.ParentTreeRedraw.RedrawParentDirectChildren(self.VueStore, self.ParentID);
     // self.AddProductDisplay();
-    self.ApplyZIndexing(self.ParentID);
+    // self.ApplyZIndexing(self.ParentID);
+
+    self.UpdateParent(self.ParentID);
+
     self.Group.draw();
   }
 
@@ -711,9 +732,11 @@ class ProductItemBase extends PlanogramItemBase {
       //TODO: Recreate products or draw them again
       self.UpdateMilkCrate(self.ParentID);
       self.Update();
+
+      self.UpdateParent(self.ParentID);
       // self.ParentTreeRedraw.RedrawParentDirectChildren(self.VueStore, self.ParentID);
       // self.AddProductDisplay();
-      self.ApplyZIndexing(self.ParentID);
+      // self.ApplyZIndexing(self.ParentID);
       self.Group.draw();
     }
   }
@@ -1007,11 +1030,14 @@ class ProductItemBase extends PlanogramItemBase {
         break;
     }
 
+    self.IncreaseParentChildrenCounter(true, self.ParentID);
     self.UpdateMilkCrate(self.ParentID);
     self.Update();
-    self.ParentTreeRedraw.RedrawParentDirectChildren(self.VueStore, self.ParentID);
+
+    self.UpdateParent(self.ParentID);
+
     // self.AddProductDisplay();
-    self.ApplyZIndexing(self.ParentID);
+    // self.ApplyZIndexing(self.ParentID);
     self.ToggleGroups();
     self.Group.draw();
   }
@@ -1025,7 +1051,8 @@ class ProductItemBase extends PlanogramItemBase {
     // TODO: recreate products in new orientation
     self.UpdateMilkCrate(self.ParentID);
     self.Update();
-    self.ParentTreeRedraw.RedrawParentDirectChildren(self.VueStore, self.ParentID);
+
+    self.UpdateParent(self.ParentID);
     self.ApplyZIndexing(self.ParentID);
     // self.AddProductDisplay();
   }
@@ -1094,6 +1121,23 @@ class ProductItemBase extends PlanogramItemBase {
 
 
     } else if (parentItem.Type.toUpperCase() === "SHELF") {
+
+      let actualDepth = (parentItem.Data.depth + parentItem.Data.overhang) * self.Ratio;
+
+      self.Facings_Z = Math.floor((actualDepth) / (self.Orientation_Depth));
+      self.TotalFacings = self.Facings_X * self.Facings_Y * self.Facings_Z * qty;
+
+      // caps
+      if (self.Caps_Enabled) {
+        let cap_facings_y = self.Caps_Count;
+        let cap_facings_x = self.Facings_X;
+        let cap_facings_z = Math.floor((actualDepth) / (self.Cap_Orientation_Depth));
+        let totalCapsFacings = self.Facings_X * cap_facings_y * cap_facings_z * qty;
+
+        self.TotalFacings += totalCapsFacings;
+      }
+    }
+    else if (parentItem.Type.toUpperCase() === "LABELHOLDER") {
 
       let actualDepth = (parentItem.Data.depth + parentItem.Data.overhang) * self.Ratio;
 
