@@ -21,7 +21,10 @@
                             <v-progress-linear class="ma-0" v-model="value" :active="show" :indeterminate="query"
                                 :query="true">
                             </v-progress-linear>
-                            <template v-for="(item, index) in items">
+                            <template v-if="items != null && items.length == 0">
+                                <v-list-tile>No Items Found</v-list-tile>
+                            </template>
+                            <template v-else v-for="(item, index) in items">
                                 <v-list-tile :key="item.title" avatar ripple @click="toggle(index)">
                                     <v-list-tile-avatar>
                                         <v-avatar>
@@ -72,7 +75,7 @@
         data: () => {
             return {
                 selected: [],
-                items: [],
+                items: null,
                 value: 0,
                 query: false,
                 show: false,
@@ -89,12 +92,24 @@
         methods: {
             getFilesByFolder() {
                 let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
                 Axios.get(process.env.VUE_APP_API + "DataImport/ImportDatabase?importFolder=" + self.name)
                     .then(r => {
-                        console.log(r);
+                        if(r.data.success) {
+                            self.items = r.data.importTransactionItemList;
+                        }
+                        else {
+                            self.items = [];
+                            alert(e.data.clientError);
+                        }
+                        delete Axios.defaults.headers.common["TenantID"];
                     })
                     .catch(e => {
+                        alert("Failed to get imported files");
                         console.log(e);
+                        delete Axios.defaults.headers.common["TenantID"];
                     })
             },
             toggle(index) {

@@ -622,10 +622,10 @@
             Data: fileData
           })
           .then(r => {
-            self.$refs.snackbar.show("Successfully saved: " + self.generateFileName() + tag);
+            alert("Successfully saved: " + self.generateFileName() + tag)
           })
           .catch(e => {
-
+            console.log(e);
           })
       },
       setSelectedStores() {

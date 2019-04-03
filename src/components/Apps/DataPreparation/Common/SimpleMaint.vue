@@ -119,12 +119,15 @@
                 let self = this;
                 let type = self.isAdd ? "post" : "put";
 
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
                 Axios[type](process.env.VUE_APP_API + `Retailer/${self.name}`, self.form)
                     .then(r => {
                         if (self.isAdd)
                             self.form.id = r.data.id;
 
                         self.callback(self.form)
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                         self.dialog = false;
                     })
             },
