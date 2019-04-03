@@ -1,6 +1,6 @@
 <template>
     <div>
-        <ImportList name="Product"></ImportList>
+        <ImportList name="New Products"></ImportList>
     </div>
 </template>
 
