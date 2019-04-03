@@ -8,10 +8,10 @@
             <v-container fluid grid-list-lg>
               <v-layout row wrap>
                 <v-flex md6 xs12>
-                  <v-select  :items="periodsFrom" v-model="dateFrom" label="Date From:"></v-select>
+                  <v-autocomplete  :items="periodsFrom" v-model="dateFrom" label="Date From:"></v-autocomplete>
                 </v-flex>
                 <v-flex md6 xs12>
-                  <v-select  :items="periodsTo" v-model="dateTo" label="Date To:"></v-select>
+                  <v-autocomplete  :items="periodsTo" v-model="dateTo" label="Date To:"></v-autocomplete>
                 </v-flex>
                 <v-flex md6 xs12>
                   <v-checkbox label="Keep up to date" v-model="periodic" color="primary"></v-checkbox>

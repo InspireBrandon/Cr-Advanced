@@ -8,11 +8,18 @@
                 </v-flex>
             </v-layout>
             <v-layout row wrap v-else>
-                <v-flex lg12 md12 sm12 xs12 v-if="appConfigDetail.length <= 0">
+                <!-- <v-flex lg12 md12 sm12 xs12 v-if="appConfigDetail.length <= 0">
                     <v-card>
                         <v-card-text>
                             <p>It appears that you dont have any apps installed. <a href="#"
                                     @click.prevent="$router.push('/Store')">Click Here</a> to go and install some.</p>
+                        </v-card-text>
+                    </v-card>
+                </v-flex> -->
+                <v-flex lg12 md12 sm12 xs12 v-if="appConfigDetail.length <= 0">
+                    <v-card>
+                        <v-card-text>
+                            It appears as though you do not have access to any databases. Please request access to continue...
                         </v-card-text>
                     </v-card>
                 </v-flex>
@@ -161,19 +168,29 @@
             getAppsTmpAll() {
                 let self = this;
 
-                self.applicationDetailsHelper = new ApplicationDetailsHelper();
-                self.apps = self.applicationDetailsHelper.getAllApplications();
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
 
-                self.apps.forEach(app => {
-                    self.appConfigDetail.push(new ConfigDetail(
-                        self.applicationDetailsHelper.getApplicationConfigBySystemCode(app
-                            .system_code),
-                        self.applicationDetailsHelper.getApplicationDetailsBySystemCode(app
-                            .system_code)
-                    ));
-                })
+                Axios.get(process.env.VUE_APP_API + `SystemUser?id=${encoded_details.USER_ID}`)
+                    .then(r => {
+                        if (r.data.accountID != null) {
+                            self.applicationDetailsHelper = new ApplicationDetailsHelper();
+                            self.apps = self.applicationDetailsHelper.getAllApplications();
 
-                self.showLoader = false;
+                            self.apps.forEach(app => {
+                                self.appConfigDetail.push(new ConfigDetail(
+                                    self.applicationDetailsHelper.getApplicationConfigBySystemCode(
+                                        app
+                                        .system_code),
+                                    self.applicationDetailsHelper.getApplicationDetailsBySystemCode(
+                                        app
+                                        .system_code)
+                                ));
+                            })
+
+                        }
+
+                        self.showLoader = false;
+                    })
             },
             getAppsTmpStore() {
                 let self = this;
