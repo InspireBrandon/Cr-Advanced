@@ -3,7 +3,12 @@
     <v-layout row justify-center>
       <v-dialog v-model="dialog" persistent max-width="400">
         <v-card>
-          <v-card-title style="text-align: center; display: block;" class="headline">{{ title }}</v-card-title>
+          <v-toolbar dark flat color="primary">
+            <v-toolbar-title>
+              {{ title }}
+            </v-toolbar-title>
+          </v-toolbar>
+          <!-- <v-card-title style="text-align: center; display: block;" class="headline"></v-card-title> -->
           <v-card-actions style="text-align: center; display: block;">
             <v-spacer></v-spacer>
             <v-btn color="primary darken-1" @click.native="returnValue(true)">Yes</v-btn>
@@ -38,5 +43,4 @@
       }
     }
   }
-
 </script>

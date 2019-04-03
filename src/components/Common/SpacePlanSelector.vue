@@ -37,7 +37,7 @@
           <v-spacer></v-spacer>
 
           <v-btn color="primary" @click="returnSpacePlanFile">Continue</v-btn>
-          <v-btn flat @click="dialog = false">Cancel</v-btn>
+         
 
         </v-card-actions>
       </v-card>

@@ -58,7 +58,7 @@
             <v-list-tile @click="planogramToRange">
               <v-list-tile-title>Planogram To Range</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile v-if="PlanogramObject.status==0||PlanogramObject.status==1||PlanogramObject.status==3||PlanogramObject.status==6"
+            <v-list-tile v-if="PlanogramObject.status == null||PlanogramObject.status==0||PlanogramObject.status==1||PlanogramObject.status==3||PlanogramObject.status==6"
               @click="submitForApprovalPlano">
               <v-list-tile-title>Submit For Aproval</v-list-tile-title>
             </v-list-tile>
@@ -469,9 +469,9 @@
               notes: notesModal,
 
             }
-            self.PlanogramObject.status=6
-            console.log(            self.PlanogramObject);
-            
+            self.PlanogramObject.status = 6
+            console.log(self.PlanogramObject);
+
             // axios.put(process.env.VUE_APP_API+`SystemFileApproval?db=CR-Devinspire&buyerID=`+self.spacePlanID,{})
             let storeID = self.PlanogramObject.storeID
             let buyerID = self.PlanogramObject.buyerID
@@ -503,7 +503,7 @@
 
             // axios.put(process.env.VUE_APP_API+`SystemFileApproval?db=CR-Devinspire&buyerID=`+self.spacePlanID,{})
             let storeID = self.PlanogramObject.storeID
-             self.PlanogramObject.status=2
+            self.PlanogramObject.status = 2
             if (storeID == null || storeID == undefined) {
               storeID = -1
             }
@@ -681,8 +681,7 @@
         self.$refs.spacePlanSelector.show((spacePlanID, item) => {
 
           self.PlanogramObject = item
-          console.log("self.PlanogramObject");
-          console.log(self.PlanogramObject);
+          
 
           self.planogramHelper.setCreate(false);
           let stage = self.$parent.$children[0].$children[2].getStage();
