@@ -2,7 +2,7 @@
   <div>
     <v-layout row justify-center>
       <v-dialog v-model="dialog" persistent max-width="400">
-        <v-card dark>
+        <v-card>
           <v-card-title style="text-align: center; display: block;" class="headline">{{ title }}</v-card-title>
           <v-card-actions style="text-align: center; display: block;">
             <v-spacer></v-spacer>
