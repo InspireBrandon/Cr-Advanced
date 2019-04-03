@@ -82,16 +82,17 @@ class GeneralPosition {
 
                 let x = merchOffset;
                 sortedArr.forEach((item, idx) => {
-                  let actualWidth = item.Orientation_Width * item.Facings_X;
                   item.Position = idx + 1;
                   item.Group.setX(x);
                   item.LastPositionRelative = item.Group.position();
                   item.LastPositionAbsolute = item.Group.getAbsolutePosition();
 
                   if (item.Type == "PRODUCT") {
+                    let actualWidth = item.Orientation_Width * item.Facings_X;
                     x += ((actualWidth - (item.Facings_X * squish))) + 0.1;
                   } else {
-                    x += (actualWidth - (item.Facings_X * squish)) + 0.1;
+                    let actualWidth = item.TotalWidth;
+                    x += (actualWidth) + 0.1;
                   }
 
                 });
@@ -259,16 +260,17 @@ class GeneralPosition {
 
                 let x = merchOffset;
                 sortedArr.forEach((item, idx) => {
-                  let actualWidth = item.Orientation_Width * item.Facings_X;
                   item.Position = idx + 1;
                   item.Group.setX(x);
                   item.LastPositionRelative = item.Group.position();
                   item.LastPositionAbsolute = item.Group.getAbsolutePosition();
 
                   if (item.Type == "PRODUCT") {
+                    let actualWidth = item.Orientation_Width * item.Facings_X;
                     x += ((actualWidth - (item.Facings_X * squish))) + 0.1;
                   } else {
-                    x += (actualWidth - (item.Facings_X * squish)) + 0.1;
+                    let actualWidth = item.TotalWidth;
+                    x += (actualWidth) + 0.1;
                   }
                 });
 
@@ -434,16 +436,17 @@ class GeneralPosition {
 
                 let x = merchOffset;
                 sortedArr.forEach((item, idx) => {
-                  let actualWidth = item.Orientation_Width * item.Facings_X;
                   item.Position = idx + 1;
                   item.Group.setX(x);
                   item.LastPositionRelative = item.Group.position();
                   item.LastPositionAbsolute = item.Group.getAbsolutePosition();
 
                   if (item.Type == "PRODUCT") {
+                    let actualWidth = item.Orientation_Width * item.Facings_X;
                     x += ((actualWidth - (item.Facings_X * squish))) + 0.1;
                   } else {
-                    x += (actualWidth - (item.Facings_X * squish)) + 0.1;
+                    let actualWidth = item.TotalWidth;
+                    x += (actualWidth) + 0.1;
                   }
 
                 });
@@ -611,17 +614,17 @@ class GeneralPosition {
 
                 let x = merchOffset;
                 sortedArr.forEach((item, idx) => {
-                  let actualWidth = item.Orientation_Width * item.Facings_X;
-
                   item.Position = idx + 1;
                   item.Group.setX(x);
                   item.LastPositionRelative = item.Group.position();
                   item.LastPositionAbsolute = item.Group.getAbsolutePosition();
 
                   if (item.Type == "PRODUCT") {
+                    let actualWidth = item.Orientation_Width * item.Facings_X;
                     x += ((actualWidth - (item.Facings_X * squish))) + 0.1;
                   } else {
-                    x += (actualWidth - (item.Facings_X * squish)) + 0.1;
+                    let actualWidth = item.TotalWidth;
+                    x += (actualWidth) + 0.1;
                   }
 
                 });
