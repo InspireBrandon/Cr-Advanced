@@ -4,7 +4,7 @@
             <v-layout row wrap>
                 <v-flex>
                     <v-card>
-                        <v-toolbar dark dense>
+                        <v-toolbar flat dark dense>
                             <v-toolbar-title>Data Import</v-toolbar-title>
                         </v-toolbar>
                         <v-card-text>

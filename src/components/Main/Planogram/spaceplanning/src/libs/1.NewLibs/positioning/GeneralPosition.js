@@ -1,4 +1,3 @@
-import Konva from 'konva';
 import StoreHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/StoreHelper/StoreHelper.js";
 class GeneralPosition {
   constructor() {
@@ -12,7 +11,6 @@ class GeneralPosition {
    * @param {*} parentObject - Optional
    */
   PositionToParent(VueStore, currentItem, parentID = null) {
-    let self = this;
     let ctrl_store = new StoreHelper();
     let pID = parentID;
     let parent = null;
@@ -141,7 +139,7 @@ class GeneralPosition {
                   totalItems = 1;
                 }
 
-                sortedArr.forEach((item, idx) => {
+                sortedArr.forEach((item) => {
                   totalItemWidths += item.TotalWidth;
                 });
 
@@ -171,16 +169,7 @@ class GeneralPosition {
             case "SFE":
               {
                 let x = merchOffset;
-                let totalItemWidths = 0;
-                let totalItems = 0;
-                let parentWidth = parent.TotalWidth;
                 let spacing = 0;
-                let squish = 0;
-
-                parent.TotalChildren.forEach(element => {
-                  totalItems += element.Count;
-                  totalItemWidths += (element.Width * element.Count);
-                });
 
                 spacing = parent.GetSpreadSpacing(parent.ID);
                 // squish = parent.GetSpreadSpacing(parent.ID);
@@ -318,7 +307,7 @@ class GeneralPosition {
                   totalItems = 1;
                 }
 
-                sortedArr.forEach((item, idx) => {
+                sortedArr.forEach((item) => {
                   totalItemWidths += item.TotalWidth;
                 });
 
@@ -348,16 +337,7 @@ class GeneralPosition {
             case "SFE":
               {
                 let x = merchOffset;
-                let totalItemWidths = 0;
-                let totalItems = 0;
-                let parentWidth = parent.TotalWidth;
                 let spacing = 0;
-                let squish = 0;
-
-                parent.TotalChildren.forEach(element => {
-                  totalItems += element.Count;
-                  totalItemWidths += (element.Width * element.Count);
-                });
 
                 spacing = parent.GetSpreadSpacing(parent.ID);
                 // squish = parent.GetSpreadSpacing(parent.ID);
@@ -495,7 +475,7 @@ class GeneralPosition {
                   totalItems = 1;
                 }
 
-                sortedArr.forEach((item, idx) => {
+                sortedArr.forEach((item) => {
                   totalItemWidths += item.TotalWidth;
                 });
 
@@ -525,16 +505,7 @@ class GeneralPosition {
             case "SFE":
               {
                 let x = merchOffset;
-                let totalItemWidths = 0;
-                let totalItems = 0;
-                let parentWidth = parent.TotalWidth;
                 let spacing = 0;
-                let squish = 0;
-
-                parent.TotalChildren.forEach(element => {
-                  totalItems += element.Count;
-                  totalItemWidths += (element.Width * element.Count);
-                });
 
                 spacing = parent.GetSpreadSpacing(parent.ID);
                 // squish = parent.GetSpreadSpacing(parent.ID);
@@ -675,7 +646,7 @@ class GeneralPosition {
                   totalItems = 1;
                 }
 
-                sortedArr.forEach((item, idx) => {
+                sortedArr.forEach((item) => {
                   totalItemWidths += item.TotalWidth;
                 });
 
@@ -706,16 +677,7 @@ class GeneralPosition {
             case "SFE":
               {
                 let x = merchOffset;
-                let totalItemWidths = 0;
-                let totalItems = 0;
-                let parentWidth = parent.TotalWidth;
                 let spacing = 0;
-                let squish = 0;
-
-                parent.TotalChildren.forEach(element => {
-                  totalItems += element.Count;
-                  totalItemWidths += (element.Width * element.Count);
-                });
 
                 spacing = parent.GetSpreadSpacing(parent.ID);
                 // squish = parent.GetSpreadSpacing(parent.ID);
@@ -804,7 +766,7 @@ class GeneralPosition {
         break;
       case "PEGBOARD":
         {
-
+          //
         }
         break;
       case "LABELHOLDER":
@@ -877,7 +839,7 @@ class GeneralPosition {
                   totalItems = 1;
                 }
 
-                sortedArr.forEach((item, idx) => {
+                sortedArr.forEach((item) => {
                   totalItemWidths += item.TotalWidth;
                 });
 
@@ -908,16 +870,7 @@ class GeneralPosition {
             case "SFE":
               {
                 let x = merchOffset;
-                let totalItemWidths = 0;
-                let totalItems = 0;
-                let parentWidth = parent.TotalWidth;
                 let spacing = 0;
-                let squish = 0;
-
-                parent.TotalChildren.forEach(element => {
-                  totalItems += element.Count;
-                  totalItemWidths += (element.Width * element.Count);
-                });
 
                 spacing = parent.GetSpreadSpacing(parent.ID);
                 // squish = parent.GetSpreadSpacing(parent.ID);
@@ -1020,13 +973,6 @@ class GeneralPosition {
 
     let ctrl_store = new StoreHelper();
     let parentItem = ctrl_store.getPlanogramItemById(productGroup.VueStore, productGroup.ParentID);
-    let spreadType = parentItem.Data.spreadProducts;
-
-    // get all items within this parent
-    let allParentItems = ctrl_store.getAllPlanogramItems(productGroup.VueStore, productGroup.ParentID);
-    // let sortedArr = allParentItems.filter((el) => el.Type.toUpperCase() == "BASKET" || el.Type.toUpperCase() == "PRODUCT")
-    // sort them by x/y
-    let sortedArr = allParentItems.sort((a, b) => a.Group.getX() - b.Group.getX());
 
     switch (parentItem.Type.toUpperCase()) {
       case "SHELF":
@@ -1065,14 +1011,12 @@ class GeneralPosition {
           retVal.x = (xFacings * productGroup.Orientation_Width);
           return retVal;
         }
-        break;
       case "BASE":
         {
           retVal.y = productGroup.Group.getHeight() - ((yFacings + 1) * productGroup.Orientation_Height);
           retVal.x = (xFacings * productGroup.Orientation_Width);
           return retVal;
         }
-        break;
       case "PEGBAR":
         {
           // retVal.y = (parentItem.Group.getHeight() / 2);
@@ -1083,7 +1027,6 @@ class GeneralPosition {
           retVal.x = (xFacings * productGroup.Orientation_Width);
           return retVal;
         }
-        break;
       case "LABELHOLDER":
         {
           // retVal.y = (parentItem.Group.getHeight() / 2);
@@ -1094,14 +1037,12 @@ class GeneralPosition {
           retVal.x = (xFacings * productGroup.Orientation_Width);
           return retVal;
         }
-        break;
       case "BASKET":
         {
           retVal.y = productGroup.Group.getHeight() - ((yFacings + 1) * productGroup.Orientation_Height);
           retVal.x = (xFacings * productGroup.Orientation_Width);
           return retVal;
         }
-        break;
       case "PEGBOARD":
         {
 
@@ -1109,14 +1050,12 @@ class GeneralPosition {
           retVal.x = (xFacings * productGroup.Orientation_Width);
           return retVal;
         }
-        break;
       case "PALETTE":
         {
           retVal.y = productGroup.Group.getHeight() - ((yFacings + 1) * productGroup.Orientation_Height);
           retVal.x = (xFacings * productGroup.Orientation_Width);
           return retVal;
         }
-        break;
     }
 
   }
