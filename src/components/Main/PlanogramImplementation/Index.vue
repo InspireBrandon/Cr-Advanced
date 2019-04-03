@@ -96,7 +96,7 @@
                         </v-data-table> -->
 
                     </v-card>
-                    <v-layout>
+                    <v-layout row wrap>
                         <v-flex v-if="selectedPlanogram != null" lg8 md8 sm12 xs12 @click="openImage">
                             <v-card light>
                                 <v-toolbar color="primary" dark flat dense>
@@ -110,7 +110,7 @@
                                     </v-tooltip>
                                 </v-toolbar>
                                 <v-card-text>
-                                    <v-img style="max-width: 200px; max-height: 200px;" :src="image"></v-img>
+                                    <v-img contain style="max-height: 400px;" :src="image"></v-img>
                                 </v-card-text>
                             </v-card>
                         </v-flex>
@@ -176,7 +176,7 @@
                     </v-btn>
                 </v-toolbar>
                 <v-card flat style="padding: 5px;">
-                    <img style="max-height: calc(100vh - 80px); max-width: 1000px;" :src="image">
+                    <v-img contain style="max-height: calc(100vh - 80px); width: 100%;" :src="image"></v-img>
                 </v-card>
             </v-card>
         </v-dialog>
