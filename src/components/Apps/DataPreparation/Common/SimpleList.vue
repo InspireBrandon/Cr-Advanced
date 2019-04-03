@@ -62,7 +62,6 @@
             }
         },
         created() {
-            Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
             this.getItems();
         },
         methods: {
@@ -77,10 +76,12 @@
             getItems() {
                 let self = this;
 
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
                 Axios.get(process.env.VUE_APP_API + `Retailer/${self.name}`)
                     .then(r => {
                         self.items = r.data;
-                        
+                        delete Axios.defaults.headers.common["TenantID"];
                     })
             },
             openAdd() {
