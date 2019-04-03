@@ -469,7 +469,9 @@
               notes: notesModal,
 
             }
-
+            self.PlanogramObject.status=6
+            console.log(            self.PlanogramObject);
+            
             // axios.put(process.env.VUE_APP_API+`SystemFileApproval?db=CR-Devinspire&buyerID=`+self.spacePlanID,{})
             let storeID = self.PlanogramObject.storeID
             let buyerID = self.PlanogramObject.buyerID
@@ -501,6 +503,7 @@
 
             // axios.put(process.env.VUE_APP_API+`SystemFileApproval?db=CR-Devinspire&buyerID=`+self.spacePlanID,{})
             let storeID = self.PlanogramObject.storeID
+             self.PlanogramObject.status=2
             if (storeID == null || storeID == undefined) {
               storeID = -1
             }

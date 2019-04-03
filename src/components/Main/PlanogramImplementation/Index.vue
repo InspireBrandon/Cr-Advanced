@@ -225,7 +225,7 @@
                     friendy: "Implemented"
                 },{
                     type: 6,
-                    color: "green",
+                    color: "black",
                     friendy: "Retracted"
                 }],
                 timelineItems: [],
