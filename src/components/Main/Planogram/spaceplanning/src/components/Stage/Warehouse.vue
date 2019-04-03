@@ -58,6 +58,14 @@
             <v-list-tile @click="planogramToRange">
               <v-list-tile-title>Planogram To Range</v-list-tile-title>
             </v-list-tile>
+            <v-list-tile v-if="PlanogramObject.status==0||PlanogramObject.status==1||PlanogramObject.status==3||PlanogramObject.status==6"
+              @click="submitForApprovalPlano">
+              <v-list-tile-title>Submit For Aproval</v-list-tile-title>
+            </v-list-tile>
+            <v-list-tile v-if="PlanogramObject.status==5||PlanogramObject.status==4||PlanogramObject.status==3||PlanogramObject.status==2||PlanogramObject.status==1"
+              @click="RetractPlanogram">
+              <v-list-tile-title>Retract Planogram</v-list-tile-title>
+            </v-list-tile>
             <v-list-tile @click="closeFile">
               <v-list-tile-title>Close</v-list-tile-title>
             </v-list-tile>
@@ -120,24 +128,22 @@
           </v-expansion-panel>
         </v-flex>
         <v-flex v-if="rangingData.planogramID != null" md6 style="padding: 2px;">
-          <v-select :disabled="!gotData" light placeholder="Clusters" @change="onClusterTypeChange" dense
-            :items="clusterTypes" v-model="selectedClusterType" solo hide-details></v-select>
+          <v-select :disabled="!gotData" light placeholder="Clusters" @change="onClusterTypeChange" dense :items="clusterTypes"
+            v-model="selectedClusterType" solo hide-details></v-select>
           <!-- <v-select :disabled="!gotData" light placeholder="Category Cluster" @change="onCategoryClusterChange" dense
             :items="categoryCluster" v-model="selectedCategoryCluster" solo hide-details></v-select> -->
           <!-- v-if="showCategoryCluster==true" -->
         </v-flex>
         <v-flex v-if="rangingData.planogramID != null && gotData" md6 style="padding: 2px;">
-          <v-select light @change="onClusterOptionChange" v-if="selectedClusterType != null"
-            :placeholder="'Select ' + selectedClusterType + ' cluster'" dense
-            :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" solo hide-details></v-select>
+          <v-select light @change="onClusterOptionChange" v-if="selectedClusterType != null" :placeholder="'Select ' + selectedClusterType + ' cluster'"
+            dense :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" solo hide-details></v-select>
         </v-flex>
         <v-flex xs12 v-if="rangingData.planogramID != null">
           <div>
             <v-layout row wrap>
               <v-flex md8>
                 <v-toolbar color="primary" dense>
-                  <v-text-field dense solo flat hide-details label="Search" v-model="searchText"
-                    prepend-inner-icon="search"></v-text-field>
+                  <v-text-field dense solo flat hide-details label="Search" v-model="searchText" prepend-inner-icon="search"></v-text-field>
                 </v-toolbar>
               </v-flex>
               <v-flex md4 style="text-align: center;">
@@ -151,8 +157,7 @@
                 </v-btn-toggle>
               </v-flex>
               <v-flex md12 v-if="view_type == 0">
-                <v-list dark dense three-line
-                  :class="{ 'details_closed': details_panel != 0, 'details_open': details_panel == 0 }"
+                <v-list dark dense three-line :class="{ 'details_closed': details_panel != 0, 'details_open': details_panel == 0 }"
                   class="scroll-y">
                   <template v-for="(item, index) in filteredItems">
                     <div :key="index">
@@ -167,9 +172,9 @@
                           :src="warehouseCtrl.getProductImageURL(item.barcode)" draggable="true" @drag="dragProduct"
                           @dragstart="dragProductStart($event, item)" @dragend="clearDrag" contain></v-img>
 
-                        <v-img v-else style="width:50px !important; height:50px !important"
-                          src="/static/img/image-placeholder.png" draggable="true" @drag="dragProduct"
-                          @dragstart="dragProductStart($event, item)" @dragend="clearDrag" contain></v-img>
+                        <v-img v-else style="width:50px !important; height:50px !important" src="/static/img/image-placeholder.png"
+                          draggable="true" @drag="dragProduct" @dragstart="dragProductStart($event, item)" @dragend="clearDrag"
+                          contain></v-img>
 
                         <v-list-tile-content class="ml-2" style="width: 100%">
                           <v-list-tile-title>{{item.description}}</v-list-tile-title>
@@ -183,8 +188,7 @@
                             <v-btn slot="activator" small fab flat dark>
                               <v-icon v-if="item.store_Range_Indicator == 'YES'" color="green">done</v-icon>
                               <v-icon v-if="item.store_Range_Indicator == 'NO'" color="red">close</v-icon>
-                              <v-icon
-                                v-if="item.store_Range_Indicator == 'SELECTED' || item.store_Range_Indicator == 'SELECT'"
+                              <v-icon v-if="item.store_Range_Indicator == 'SELECTED' || item.store_Range_Indicator == 'SELECT'"
                                 color="blue">group_work</v-icon>
                             </v-btn>
                             <v-list>
@@ -215,13 +219,12 @@
                     <v-card>
                       <v-card-text style="text-align: center;">
                         <h4>{{ item.barcode }}</h4>
-                        <v-img v-if="warehouse_data.imagesOn"
-                          style="width:50px !important; height:50px !important; margin: 0 auto;"
+                        <v-img v-if="warehouse_data.imagesOn" style="width:50px !important; height:50px !important; margin: 0 auto;"
                           :src="warehouseCtrl.getProductImageURL(item.barcode)" draggable="true" @drag="dragProduct"
                           @dragstart="dragProductStart($event, item)" @dragend="clearDrag" contain></v-img>
-                        <v-img v-else style="width:50px !important; height:50px !important; margin: 0 auto;"
-                          src="/static/img/image-placeholder.png" draggable="true" @drag="dragProduct"
-                          @dragstart="dragProductStart($event, item)" @dragend="clearDrag" contain></v-img>
+                        <v-img v-else style="width:50px !important; height:50px !important; margin: 0 auto;" src="/static/img/image-placeholder.png"
+                          draggable="true" @drag="dragProduct" @dragstart="dragProductStart($event, item)" @dragend="clearDrag"
+                          contain></v-img>
                       </v-card-text>
                     </v-card>
                   </v-flex>
@@ -250,6 +253,9 @@
     <SpacePlanSelector ref="spacePlanSelector"></SpacePlanSelector>
     <Spinner ref="spinner"></Spinner>
     <YesNoModal ref="yesNoModal"></YesNoModal>
+    <PlanogramAprovalModal ref="PlanogramAprovalModal"></PlanogramAprovalModal>
+    <PlanogramRetractionModal ref="PlanogramRetractionModal"></PlanogramRetractionModal>
+
   </div>
 </template>
 
@@ -266,6 +272,8 @@
   import LoadSavePlanogramBase from '@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/LoadSavePlanogramBase'
   import YesNoModal from '@/components/Common/YesNoModal';
   import StoreHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/StoreHelper/StoreHelper.js";
+  import PlanogramAprovalModal from "@/components/Main/Planogram/spaceplanning/src/components/Modals/PlanogramAproval/PlanogramAprovalModal.vue";
+  import PlanogramRetractionModal from "@/components/Main/Planogram/spaceplanning/src/components/Modals/PlanogramAproval/PlanogramRetractionModal.vue";
 
   function textValue(data) {
     let self = this;
@@ -283,7 +291,10 @@
       RangeSelectorModal,
       SpacePlanSelector,
       Spinner,
-      YesNoModal
+      YesNoModal,
+      PlanogramAprovalModal,
+      PlanogramRetractionModal
+
     },
     data() {
       let width = 0;
@@ -313,7 +324,9 @@
         },
         gotData: false,
         products: [],
-
+        PlanogramObject: {
+          status: null,
+        },
         categoryCluster: [],
         selectedCategoryCluster: null,
         showCategoryCluster: false,
@@ -393,6 +406,7 @@
       );
     },
     computed: {
+
       filteredItems() {
         let self = this;
         let tmp = [];
@@ -442,6 +456,62 @@
       }
     },
     methods: {
+      RetractPlanogram() {
+        let self = this
+        self.$refs.PlanogramRetractionModal.show('Retract Planogram?', (value, notesModal, selectedUser) => {
+
+          if (value == true) {
+
+            let systemFileApproval = {
+              systemFile_ID: self.spacePlanID,
+              status: 6,
+              transactionDateTime: new Date(),
+              notes: notesModal,
+
+            }
+
+            // axios.put(process.env.VUE_APP_API+`SystemFileApproval?db=CR-Devinspire&buyerID=`+self.spacePlanID,{})
+            let storeID = self.PlanogramObject.storeID
+            let buyerID = self.PlanogramObject.buyerID
+            if (storeID == null || storeID == undefined) {
+              storeID = -1
+            }
+            axios.post(process.env.VUE_APP_API + "SystemFileApproval?db=CR-Devinspire&buyerID=" +
+              buyerID + "&storeID=" +
+              storeID, {
+                systemFileApproval: systemFileApproval
+              })
+          }
+        })
+      },
+
+      submitForApprovalPlano(item) {
+        let self = this
+        self.$refs.PlanogramAprovalModal.show('Submit planogram for aproval?', (value, notesModal, selectedUser) => {
+
+          if (value == true) {
+
+            let systemFileApproval = {
+              systemFile_ID: self.spacePlanID,
+              status: 2,
+              transactionDateTime: new Date(),
+              notes: notesModal,
+              buyerID: selectedUser
+            }
+
+            // axios.put(process.env.VUE_APP_API+`SystemFileApproval?db=CR-Devinspire&buyerID=`+self.spacePlanID,{})
+            let storeID = self.PlanogramObject.storeID
+            if (storeID == null || storeID == undefined) {
+              storeID = -1
+            }
+            axios.post(process.env.VUE_APP_API + "SystemFileApproval?db=CR-Devinspire&buyerID=" +
+              selectedUser + "&storeID=" +
+              storeID, {
+                systemFileApproval: systemFileApproval
+              })
+          }
+        })
+      },
       rangeToPlanogram() {
         let self = this;
         let ctrl_store = new StoreHelper();
@@ -605,7 +675,11 @@
       openFile() {
         let self = this;
 
-        self.$refs.spacePlanSelector.show(spacePlanID => {
+        self.$refs.spacePlanSelector.show((spacePlanID, item) => {
+
+          self.PlanogramObject = item
+          console.log("self.PlanogramObject");
+          console.log(self.PlanogramObject);
 
           self.planogramHelper.setCreate(false);
           let stage = self.$parent.$children[0].$children[2].getStage();
@@ -1016,8 +1090,7 @@
         }
       }
     }
-  };
-
+  }
 </script>
 
 <style scoped>
@@ -1032,5 +1105,4 @@
   .details_closed {
     max-height: calc(100vh - 235px)
   }
-
 </style>

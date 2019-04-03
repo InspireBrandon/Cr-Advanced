@@ -223,6 +223,10 @@
                     type: 5,
                     color: "green",
                     friendy: "Implemented"
+                },{
+                    type: 6,
+                    color: "green",
+                    friendy: "Retracted"
                 }],
                 timelineItems: [],
                 headers: [{

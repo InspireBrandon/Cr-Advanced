@@ -1,5 +1,6 @@
 <template>
   <v-toolbar dense dark>
+
     <library ref="library"></library>
     <v-divider class="mx-2" vertical></v-divider>
     <v-toolbar-items>
@@ -19,6 +20,12 @@ export default {
     library,
     ProductControls,
     PlanogramControls
+  },
+  methods: {
+    goHome() {
+      let self = this;
+      self.$router.push('/Apps');
+    }
   }
 };
 </script>
