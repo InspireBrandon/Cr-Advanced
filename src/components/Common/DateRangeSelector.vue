@@ -3,7 +3,14 @@
     <v-layout row justify-center>
       <v-dialog v-model="dialog" persistent width="80vw">
         <v-card >
-          <v-card-title style="text-align: center; display: block;" class="headline">Date Range Selector</v-card-title>
+          <v-toolbar color="primary" dark flat dense>
+            <v-toolbar-title>
+              Date Range Selector
+            </v-toolbar-title>
+            <v-spacer></v-spacer>
+              <v-btn icon @click.native="dialog = false"><v-icon>close</v-icon></v-btn>
+          </v-toolbar>
+          <!-- <v-card-title style="text-align: center; display: block;" class="headline"></v-card-title> -->
           <v-card-text style="text-align: center;">
             <v-container fluid grid-list-lg>
               <v-layout row wrap>
@@ -21,7 +28,7 @@
           </v-card-text>
           <v-card-actions style="text-align: right; display: block;">
             <v-spacer></v-spacer>
-            <v-btn color="error" @click.native="dialog = false">Cancel</v-btn>
+            <!-- <v-btn color="error" @click.native="dialog = false">Cancel</v-btn> -->
             <v-btn color="primary" @click.native="returnDateRange">Continue</v-btn>
           </v-card-actions>
         </v-card>

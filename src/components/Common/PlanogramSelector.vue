@@ -3,9 +3,16 @@
     <v-layout row justify-center>
       <v-dialog v-model="dialog" persistent width="80vw">
         <v-card >
-          <v-card-title dark style="text-align: center; display: block;" class="headline">{{ title }}</v-card-title>
+          <v-toolbar color="primary" dark flat dense>
+            <v-toolbar-title>
+              {{ title }}
+            </v-toolbar-title>
+            <v-spacer></v-spacer>
+              <v-btn icon @click.native="dialog = false"><v-icon>close</v-icon></v-btn>
+          </v-toolbar>
+          <!-- <v-card-title dark style="text-align: center; display: block;" class="headline">{{ title }}</v-card-title> -->
           <v-card-text style="text-align: center;">
-            <v-btn-toggle v-model="toggle_asc">
+            <v-btn-toggle dark v-model="toggle_asc">
               <v-btn dark color="primary">
                 Active
               </v-btn>
@@ -15,7 +22,7 @@
               <v-btn dark color="primary">
                 De-Listed
               </v-btn>
-              <v-btn dark style="display: none;" color="primary">
+              <v-btn style="display: none;" color="primary">
                 De-Listed
               </v-btn>
               <v-btn dark  color="primary">
@@ -24,10 +31,10 @@
             </v-btn-toggle>
             <v-form v-if="toggle_asc == 0" @submit.prevent="returnText">
               <v-text-field label="Search" append-icon="search" v-model="filterText"></v-text-field>
-              <v-card height="300" style="overflow: auto;">
+              <v-card flat height="300" style="overflow: auto;">
                 <v-layout row>
                   <v-flex overflow-y-hidden>
-                    <v-list hover dense v-for="Planogram in filteredActiveItems" :key="Planogram.ID" v-model="Planogram.active">
+                    <v-list hover flat dense v-for="Planogram in filteredActiveItems" :key="Planogram.ID" v-model="Planogram.active">
                       <v-divider></v-divider>
                       <v-list-tile :class="{ 'highlighted': selectedPlanogram == Planogram  }" active-class="highlighted"
                         @click="addSelected(Planogram)">
@@ -101,7 +108,6 @@
           </v-card-text>
           <v-card-actions style="text-align: right; display: block;">
             <v-spacer></v-spacer>
-            <v-btn color="error" @click.native="dialog = false">Cancel</v-btn>
             <v-btn color="primary" @click.native="returnText">Continue</v-btn>
           </v-card-actions>
         </v-card>

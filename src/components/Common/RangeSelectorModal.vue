@@ -3,7 +3,7 @@
     <v-dialog v-model="dialog" fullscreen persistent scrollable>
       <v-card  height="400px" style="overflow: auto;">
         <v-card-title style="text-align: center; display: block;" class="headline pa-0">
-          <v-toolbar dark >
+          <v-toolbar dark color="primary">
             <v-toolbar-title >Select A Range</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-text-field v-model="searchText" append-icon="search"></v-text-field>
