@@ -21,7 +21,7 @@
                                     <v-text-field label="Display Name" v-model="form.displayname"></v-text-field>
                                 </v-flex>
                                 <v-flex md6>
-                                    <v-text-field label="Code" v-model="form[lowercaseName(name) + '_Code']">
+                                    <v-text-field v-if="code!=true" label="Code" v-model="form[lowercaseName(name) + '_Code']">
                                     </v-text-field>
                                 </v-flex>
                                 <v-flex md6>
@@ -56,9 +56,10 @@
     }
 
     export default {
-        props: ['name', 'headerName'],
+        props: ['name', 'headerName' , 'hasCode'],
         data() {
             return {
+                code:true,
                 dialog: false,
                 isAdd: true,
                 form: {},
@@ -72,7 +73,9 @@
 
                 self.isAdd = isAdd;
                 self.callback = callback;
-
+                if(self.hasCode==false){
+                    self.code=false
+                }
                 if (isAdd) {
                     self.form.id = null;
                     self.form.displayname = null;

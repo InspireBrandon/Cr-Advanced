@@ -341,6 +341,8 @@ export default {
             return;
           }
 
+          self.$store.commit('setFixtures', result.data);
+
           this.gondolaDataArray = [];
           this.fixtureDataArray = [];
           this.obstructionDataArray = [];
@@ -378,6 +380,11 @@ export default {
                   // subfixture
                   self.paletteDataArray.push(libraryItem);
                 }
+                case 5:
+                {
+                  // subfixture
+                  self.subfixtureDataArray.push(libraryItem);
+                }
                 break;
             }
           });
@@ -391,7 +398,17 @@ export default {
             height: 20,
             depth: 100,
             color: 'transparent'
-          })
+          },
+          /*{
+            type:"area",
+            id: 99991,
+            name:'Area',
+            description: 'A container that allows for grouping fixtures',
+            width: 91.4,
+            height: 100,
+            depth: 100,
+            color: 'red'
+          }*/)
         });
     },
     selectLibraryItem(item) {
@@ -457,6 +474,18 @@ export default {
                   strType = "BASKET";
                 }
                 break;
+                case 3:
+                {
+                  // shelf
+                  strType = "AREA";
+                }
+                break;
+                case 4:
+                {
+                  // label holder
+                  strType = "LABELHOLDER";
+                }
+                break;
             }
           }
           break;
@@ -486,7 +515,7 @@ export default {
 }
 
 .inactive-item {
-  
+  background-color: white;
 }
 
 .list-item {

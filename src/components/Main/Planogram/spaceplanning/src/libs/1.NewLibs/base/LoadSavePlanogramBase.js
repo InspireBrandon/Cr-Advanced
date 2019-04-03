@@ -13,6 +13,10 @@ import PlanogramNamer from "@/components/Main/Planogram/spaceplanning/src/libs/1
 import axios from 'axios';
 import StageWarehouseMiddleware from '@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/stage-warehouse-middleware.js';
 import ParentTreeRedraw from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/RedrawParentChildBase.js";
+import AreaNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/AreaBase.js";
+import LabelHolderNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/LabelHolderBase.js";
+import CalculationHandler from "@/components/Main/Planogram/spaceplanning/src/libs/CalculationLib/calculationHandler.js";
+import LabelHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Labeling/LabelingBase.js";
 
 class LoadSavePlanogramBase {
   constructor(serverAddress, bCreate, planogramID) {
@@ -26,25 +30,38 @@ class LoadSavePlanogramBase {
     this.Create = create;
   }
 
-  save(vuex, stage, clusterData, dimensionData, spacePlanID, spacePlanName, updateName) {
+  save(vuex, stage, clusterData, dimensionData, spacePlanID, spacePlanName, updateName, image) {
     let self = this;
     let ctrl_store = new StoreHelper();
     let allItems = ctrl_store.getAllPlanogramItems(vuex);
+    let allProducts = ctrl_store.getAllPlanogramItemsByType(vuex, "PRODUCT");
 
     let output = {
       name: "",
       stage: null,
       planogramData: [],
+      planogramSettings: vuex.getters.getPlanogramProperties,
       clusterData: clusterData,
-      dimensionData: dimensionData
+      dimensionData: dimensionData,
+      image: image
     }
 
     allItems.forEach(item => {
       output.planogramData.push(item.ToObject());
     });
 
-    let planogramName = "";
+    allProducts.forEach(ap => {
+      output.planogramData.forEach(pdi => {
+        if(ap.ID == pdi.Data.ID) {
+          let calcData = calculate(ap, vuex);
+          pdi.Data["CalcData"] = calcData;
+        }
+      })
+    })
 
+    let planogramName = "";
+   
+    
     if (updateName) {
       if (clusterData.planogramName != null)
         planogramName += clusterData.planogramName
@@ -57,8 +74,15 @@ class LoadSavePlanogramBase {
       if (clusterData.tag != null && clusterData.tag != "")
         planogramName += clusterData.tag;
 
-      if (clusterData.storeCluster != null && clusterData.storeCluster != "")
-        planogramName += " - " + clusterData.clusterName;
+        console.log(clusterData);
+        console.log("clusterData");
+      if (clusterData.storeCluster != null && clusterData.storeCluster != "") {
+        planogramName += " - " + clusterData.storeCluster;
+      }
+
+      if (clusterData.storeName != null && clusterData.storeName != "") {
+        planogramName += " - " + clusterData.storeName;
+      }
 
       if (planogramName != "")
         planogramName += " - XXX";
@@ -74,13 +98,12 @@ class LoadSavePlanogramBase {
         planogramName += " - S" + dimensionData.supplierStands;
         planogramName += " - B" + dimensionData.bins;
       }
-    }
-    else {
+    } else {
       planogramName = spacePlanName;
     }
 
     output.name = planogramName;
-
+    console.log("PLANOGRAM OUTPUT", output)
     if (self.Create == true) {
       axios
         .post(
@@ -136,11 +159,13 @@ class LoadSavePlanogramBase {
 
     axios.get(self.ServerAddress + `SystemFile/JSON?db=CR-Devinspire&id=${spacePlanID}`)
       .then(r => {
+
+        console.log(r.data)
+
         afterGetSpacePlanFile(r.data.clusterData, r.data.dimensionData, r.data.name, rangeProducts => {
-          if(rangeProducts == null) {
+          if (rangeProducts == null) {
             self.startLoadingPlanogram(r.data, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
-          }
-          else {
+          } else {
             r.data.planogramData = StageWarehouseMiddleware.verifyIntegrityOfWarehouseData(r.data.planogramData, rangeProducts);
             self.startLoadingPlanogram(r.data, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
           }
@@ -181,6 +206,12 @@ class LoadSavePlanogramBase {
     let self = this;
     let MasterData = fileData.planogramData;
 
+    // Set Plangram settings
+    if (fileData.planogramSettings != undefined && fileData.planogramSettings != null) {
+       VueStore.commit("setPlanogramProperties", fileData.planogramSettings);
+       console.log('[LOAD PLANGRAM SETTINGS]', fileData.planogramSettings);
+    }
+
     // Init Gondolas
     let gondolaArr = MasterData.filter((el) => el.Type == "GONDOLA");
     gondolaArr.sort((a, b) => a.RelativePosition.x - b.RelativePosition.x);
@@ -199,6 +230,9 @@ class LoadSavePlanogramBase {
       // go into recursive function foreach gondola
       self.loadItemRecursive(MasterData, CurrentItem, null, Stage, MasterLayer, PxlRatio, VueStore);
     })
+
+    let ctrl_label = new LabelHelper();
+    ctrl_label.SetNewLabelAndPositionNumbers(VueStore);
 
     Stage.draw();
 
@@ -222,6 +256,24 @@ class LoadSavePlanogramBase {
             CurrentItem.Data.Data,
             PxlRatio,
             "GONDOLA",
+            ParentID
+          )
+
+          // set json data values to the object
+          ctrl_item.ID = CurrentItem.Data.ID;
+
+          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+        }
+        break;
+        case "AREA":
+        {
+          let ctrl_item = new AreaNew(
+            VueStore,
+            Stage,
+            MasterLayer,
+            CurrentItem.Data.Data,
+            PxlRatio,
+            "AREA",
             ParentID
           )
 
@@ -283,9 +335,12 @@ class LoadSavePlanogramBase {
           // set json data values to the object
           ctrl_item.ID = CurrentItem.Data.ID;
           ctrl_item.Config = CurrentItem.Data.Config;
+          if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
+            ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
+          }
 
           ctrl_item.Initialise(CurrentItem.RelativePosition, false);
-
+          ctrl_item.ApplyZIndexing();
         }
         break;
       case "BASE":
@@ -303,9 +358,12 @@ class LoadSavePlanogramBase {
           // set json data values to the object
           ctrl_item.ID = CurrentItem.Data.ID;
           ctrl_item.Config = CurrentItem.Data.Config;
+          if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
+            ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
+          }
 
           ctrl_item.Initialise(CurrentItem.RelativePosition, false);
-
+          ctrl_item.ApplyZIndexing();
         }
         break;
       case "BASKET":
@@ -323,9 +381,12 @@ class LoadSavePlanogramBase {
           // set json data values to the object
           ctrl_item.ID = CurrentItem.Data.ID;
           ctrl_item.Config = CurrentItem.Data.Config;
+          if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
+            ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
+          }
 
           ctrl_item.Initialise(CurrentItem.RelativePosition, false);
-
+          ctrl_item.ApplyZIndexing();
         }
         break;
       case "PEGBAR":
@@ -343,9 +404,35 @@ class LoadSavePlanogramBase {
           // set json data values to the object
           ctrl_item.ID = CurrentItem.Data.ID;
           ctrl_item.Config = CurrentItem.Data.Config;
+          if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
+            ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
+          }
 
           ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+          ctrl_item.ApplyZIndexing();
+        }
+        break;
+        case "LABELHOLDER":
+        {
+          let ctrl_item = new LabelHolderNew(
+            VueStore,
+            Stage,
+            MasterLayer,
+            CurrentItem.Data.Data,
+            PxlRatio,
+            "LABELHOLDER",
+            ParentID
+          )
 
+          // set json data values to the object
+          ctrl_item.ID = CurrentItem.Data.ID;
+          ctrl_item.Config = CurrentItem.Data.Config;
+          if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
+            ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
+          }
+
+          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+          ctrl_item.ApplyZIndexing();
         }
         break;
       case "PEGBOARD":
@@ -365,7 +452,7 @@ class LoadSavePlanogramBase {
           ctrl_item.Config = CurrentItem.Data.Config;
 
           ctrl_item.Initialise(CurrentItem.RelativePosition, false);
-
+          ctrl_item.ApplyZIndexing();
         }
         break;
       case "PRODUCT":
@@ -426,7 +513,6 @@ class LoadSavePlanogramBase {
       ctrl_item.Group.setY(CurrentItem.RelativePosition.y);
     }
 
-
     let itemArr = MasterData.filter((el) => el.Data.ParentID == CurrentItem.Data.ID);
     itemArr.sort((a, b) => a.RelativePosition.x - b.RelativePosition.x);
 
@@ -437,19 +523,65 @@ class LoadSavePlanogramBase {
         itemArr.forEach(child => {
           self.loadItemRecursive(MasterData, child, child.Data.ParentID, Stage, MasterLayer, PxlRatio, VueStore);
         });
-      } else {
-        // update the chilrend to sit correctly in terms of display for (product facings/spread even etc)
-        let parentData = MasterData.filter((el) => el.Data.ID == ParentID);
-        // console.log("[LOAD SAVE] REDRAW AFTER LAST CHILD IN PARENT ROOT", parentData, ParentID, parentData[0].Data.Data.spreadProducts);
-        if (parentData.length > 0) {
-          if (parentData[0].Data.Data.spreadProducts == "SE" || parentData[0].Data.Data.spreadProducts == "SFE") {
-            console.log("[LOAD SAVE] REDRAW AFTER LAST CHILD IN PARENT ROOT");
-            self.ParentTreeRedraw.RedrawParentDirectChildren(VueStore, ParentID);
-          }
-        }
       }
     }
   }
+}
+
+function calculate(productItem, vuex) {
+  let self = this;
+  let calculationHandler = new CalculationHandler();
+
+  var calcData = {
+    XFacings: null,
+    Capacity: null,
+    DaysOfSupply: null,
+    Weekly_Sales_Retail: null,
+    Weekly_Sales_Cost: null,
+    Weekly_Sales_Units: null,
+    Weekly_Profit: null
+  }
+
+  let productEventData = productItem;
+  let productID = productEventData.Data.productID;
+
+  let productData;
+
+  let ctrl_store = new StoreHelper();
+  let productStoreCopy = ctrl_store.getAllPlanogramItemsByType(vuex, "PRODUCT");
+
+  productStoreCopy = productStoreCopy.slice(0, productStoreCopy.length);
+
+  productData = {
+    ProductData: productEventData.Data,
+    Facings_X: 0,
+    Facings_Y: 0,
+    Facings_Z: 0,
+    TotalFacings: 0
+  };
+
+  productStoreCopy.forEach((element, index) => {
+    if (element.Data.productID == productID) {
+      productData.Facings_X += element.Facings_X;
+      productData.Facings_Y += element.Facings_Y;
+      productData.Facings_Z += element.Facings_Z;
+      productData.TotalFacings += element.TotalFacings;
+    }
+  });
+
+  calcData.DaysOfSupply = calculationHandler.Calculate_Days_Of_Supply_Potential(
+    productData.TotalFacings,
+    productData.ProductData.sales_Units
+  );
+
+  calcData.Weekly_Sales_Retail = calculationHandler.Calculate_Weekly_Sales_Retail(productData.ProductData.sales_Retail);
+  calcData.Weekly_Sales_Cost = calculationHandler.Calculate_Weekly_Sales_Cost(productData.ProductData.sales_Cost);
+  calcData.Weekly_Sales_Units = calculationHandler.Calculate_Weekly_Sales_Units(productData.ProductData.sales_Units);
+  calcData.Weekly_Profit = calculationHandler.Calculate_Weekly_Profit(productData.ProductData.sales_Profit);
+  calcData.XFacings = productData.Facings_X;
+  calcData.Capacity = productData.TotalFacings;
+
+  return calcData;
 }
 
 export default LoadSavePlanogramBase;

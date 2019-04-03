@@ -36,7 +36,7 @@ class LabelingBase {
     let ctrl_store = new StoreHelper();
     let allItems = ctrl_store.getAllPlanogramItems(VueStore);
 
-    let parentItems = allItems.filter((el) => (el.ParentID == null || el.ParentID == undefined));//allItems;//
+    let parentItems = allItems;//allItems.filter((el) => (el.ParentID == null || el.ParentID == undefined));//allItems;//
 
     // TODO: Check the store, add a call to store helper, get the current ordering of a label and sort accordingly.
     let labelOrder = ctrl_store.getLabelConfig(VueStore);
@@ -49,12 +49,14 @@ class LabelingBase {
       let allItems = ctrl_store.getAllPlanogramItems(VueStore, parent.ID);
 
       let filteredArr = allItems.filter((el) =>
+        el.Type.toUpperCase() == "AREA" ||
         el.Type.toUpperCase() == "SHELF" ||
         el.Type.toUpperCase() == "BASE" ||
         el.Type.toUpperCase() == "PEGBAR" ||
         el.Type.toUpperCase() == "PEGBOARD" ||
         el.Type.toUpperCase() == "PALETTE" ||
-        el.Type.toUpperCase() == "BASKET"
+        el.Type.toUpperCase() == "BASKET" ||
+        el.Type.toUpperCase() == "LABELHOLDER"
       )
 
       if (labelOrder.toUpperCase() == "T2B") {
@@ -66,7 +68,8 @@ class LabelingBase {
       filteredArr.forEach((fixture, idx) => {
         positionOverall += 1;
         fixture.SetTextLabel(positionOverall) // IMPORTANT : All fixtures that require labeling positions must have this call in their respective classes
-      });
+        fixture.SetTextLabelPosition();
+      }); 
     });
   }
 }

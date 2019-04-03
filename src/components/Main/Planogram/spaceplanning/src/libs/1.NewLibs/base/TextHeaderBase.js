@@ -44,7 +44,7 @@ class TextHeaderBase extends PlanogramItemBase {
 
     // TODO: add the extended method calls here
     // self.AddAreaCosmetic();
-    self.AddTextCosmetic();
+    self.AddCustomTextCosmetic();
 
     if (positionElementRequired == true) {
       self.PositionElement();
@@ -86,7 +86,7 @@ class TextHeaderBase extends PlanogramItemBase {
   //     self.Group.add(self.Area);
   //   }
 
-  AddTextCosmetic() {
+  AddCustomTextCosmetic() {
     let self = this;
 
     self.Text = new Konva.Text({
@@ -98,7 +98,7 @@ class TextHeaderBase extends PlanogramItemBase {
       padding: 5,
       fill: 'black',
       align: 'center',
-      verticalAlign: 'center'
+      verticalAlign: 'center',
     })
 
     var tr = new Konva.Transformer();

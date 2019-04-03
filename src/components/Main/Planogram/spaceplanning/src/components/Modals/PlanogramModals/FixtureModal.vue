@@ -33,8 +33,8 @@
                     <v-text-field v-if="!newData.rendering" v-model="newData.label" label="Label:"></v-text-field>
                   </v-flex>
                   <v-flex v-if="newData.type == 0 && !newData.rendering" lg8 md12 sm12 xs12>
-                    <v-select disabled placeholder="please select" :items="fixtureLabelOrders" v-model="newData.fixtureLabelOrder"
-                      label="Label order:">
+                    <v-select disabled placeholder="please select" :items="fixtureLabelOrders"
+                      v-model="newData.fixtureLabelOrder" label="Label order:">
                     </v-select>
                   </v-flex>
                   <v-flex v-if="newData.type == 0 && !newData.rendering" lg12 md12>
@@ -46,22 +46,24 @@
                     </v-radio-group>
                   </v-flex>
                   <v-flex lg8 md12 sm12 xs12>
-                    <v-select disabled placeholder="please select" v-if="newData.rendering" :items="types" v-model="newData.type"
-                      label="Type:">
+                    <v-select disabled placeholder="please select" v-if="newData.rendering" :items="types"
+                      v-model="newData.type" label="Type:">
                     </v-select>
                     <v-select disabled placeholder="please select" v-if="newData.type == 2" :items="fixtureTypes"
                       v-model="newData.fixtureType" label="Type:">
                     </v-select>
-                    <v-select disabled placeholder="please select" v-if="newData.type == 3" :items="subTypes" v-model="newData.fixtureType"
-                      label="Subtype:">
+                    <v-select disabled placeholder="please select" v-if="newData.type == 3" :items="subTypes"
+                      v-model="newData.fixtureType" label="Subtype:">
                     </v-select>
-                    <v-select disabled placeholder="please select" v-if="newData.type == 2 && newData.fixtureType == 1 && newData.rendering"
+                    <v-select disabled placeholder="please select"
+                      v-if="newData.type == 2 && newData.fixtureType == 1 && newData.rendering"
                       :items="renderingTypeShelf" v-model="newData.renderingType" label="Subtype:">
                     </v-select>
                   </v-flex>
                   <v-flex lg8 md12 sm12 xs12 v-if="!newData.rendering">
-                    <v-select placeholder="please select" v-if="(newData.fixtureType == 2 || newData.fixtureType == 3) && newData.type == 2"
-                      :items="pegs" v-model="newData.defaultPeg" label="Default peg:">
+                    <v-select placeholder="please select"
+                      v-if="(newData.fixtureType == 2 || newData.fixtureType == 3) && newData.type == 2" :items="pegs"
+                      v-model="newData.defaultPeg" label="Default peg:">
                     </v-select>
                   </v-flex>
                   <v-flex lg8 md12 sm12 xs12 v-if="!newData.rendering">
@@ -70,15 +72,22 @@
                     </v-select>
                   </v-flex>
 
-                  <v-flex lg8 md12 sm12 xs12 v-if="!newData.rendering && newData.type == 2 && newData.fixtureType != 2">
+                  <v-flex lg8 md12 sm12 xs12
+                    v-if="!newData.rendering && newData.type == 2 && newData.fixtureType != 2 || newData.fixtureType==4&&newData.type==3">
                     <v-checkbox hide-details label="Squish" v-model="newData.squish"></v-checkbox>
                   </v-flex>
 
-                  <v-flex lg8 md12 sm12 xs12 v-if="!newData.rendering && newData.squish && newData.type == 2 && newData.fixtureType != 2">
+                  <v-flex lg8 md12 sm12 xs12
+                    v-if="(!newData.rendering && newData.squish) && (newData.type == 2 && newData.fixtureType != 2 || newData.fixtureType==4&&newData.type==3)">
                     <v-checkbox hide-details label="Auto Squish" v-model="newData.autoSquish"></v-checkbox>
                   </v-flex>
-                  <v-flex lg8 md12 sm12 xs12 v-if="!newData.rendering && newData.squish && !newData.autoSquish && newData.type == 2 && newData.fixtureType != 2">
-                    <v-text-field hide-details v-if="!newData.rendering" v-model="newData.squishAmount" label="Squish Amount:"></v-text-field>
+                  <v-flex lg8 md12 sm12 xs12
+                    v-if="(!newData.rendering && newData.squish && !newData.autoSquish) && (newData.type == 2 && newData.fixtureType != 2 || newData.fixtureType==4&&newData.type==3)">
+                    <v-text-field hide-details v-if="!newData.rendering" v-model="newData.squishAmount"
+                      label="Squish Amount:"></v-text-field>
+                  </v-flex>
+                  <v-flex lg8 md12 sm12 xs12 v-if="!newData.rendering && newData.fixtureType==4&&newData.type==3">
+                    <v-checkbox hide-details label="Float" v-model="newData.float"></v-checkbox>
                   </v-flex>
                   <v-flex lg8 md12 sm12 xs12 v-if="!newData.rendering && newData.type == 2">
                     <v-checkbox hide-details label="Border" v-model="newData.border"></v-checkbox>
@@ -93,7 +102,8 @@
                     <v-checkbox hide-details label="Labels On" v-model="newData.labelsOn"></v-checkbox>
                   </v-flex>
                   <v-flex lg8 md12 sm12 xs12>
-                    <v-text-field type="number" label="Cost of Fixture" prefix="R" v-model="newData.cost"></v-text-field>
+                    <v-text-field type="number" label="Cost of Fixture" prefix="R" v-model="newData.cost">
+                    </v-text-field>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -115,20 +125,34 @@
                   <v-flex lg8 md12 v-if="!newData.rendering">
                     <v-text-field type="number" v-model="newData.depth" label="Depth:" suffix="cm"></v-text-field>
                   </v-flex>
-                  <v-flex lg8 md12 v-if="!newData.rendering && (newData.type == 2 && (newData.fixtureType == 0 || newData.fixtureType == 1))">
+                  <v-flex lg8 md12 sm12 xs12
+                    v-if="(newData.fixtureType==1&&newData.type==2||newData.fixtureType==0&&newData.type==2 ||newData.fixtureType==1&&newData.type==3 ||newData.fixtureType==3&&newData.type==2 || newData.fixtureType==4&&newData.type==3)">
+                    <v-text-field type="number" v-model="newData.merchandisingOffset" suffix="cm"
+                      label="Merchandising Offset:"></v-text-field>
+                  </v-flex>
+                  <v-flex lg8 md12
+                    v-if="!newData.rendering && (newData.type == 2 && (newData.fixtureType == 0 || newData.fixtureType == 1))">
                     <v-text-field type="number" v-model="newData.overhang" label="Overhang:" suffix="cm"></v-text-field>
                   </v-flex>
-                  <v-flex lg8 md12 v-if="!newData.rendering && newData.fixtureType == 3">
-                    <v-text-field type="number" v-model="newData.productOffset" label="Product offset:" suffix="cm"></v-text-field>
+                  <v-flex lg8 md12
+                    v-if="!newData.rendering && newData.fixtureType == 3 || newData.fixtureType==4&&newData.type==3">
+                    <v-text-field type="number" v-model="newData.productOffset" label="Product offset:" suffix="cm">
+                    </v-text-field>
                   </v-flex>
                   <v-flex lg8 md12 v-if="newData.fixtureType == 2 && !newData.rendering">
-                    <v-text-field type="number" v-model="newData.xHoleSpacing" label="X hole spacing:" suffix="cm"></v-text-field>
+                    <v-text-field type="number" v-model="newData.xHoleSpacing" label="X hole spacing:" suffix="cm">
+                    </v-text-field>
                   </v-flex>
                   <v-flex lg8 md12 v-if="newData.fixtureType == 2 && !newData.rendering">
-                    <v-text-field type="number" v-model="newData.yHoleSpacing" label="Y hole spacing:" suffix="cm"></v-text-field>
+                    <v-text-field type="number" v-model="newData.yHoleSpacing" label="Y hole spacing:" suffix="cm">
+                    </v-text-field>
                   </v-flex>
                   <v-flex lg8 md12 v-if="newData.fixtureType == 2 && !newData.rendering">
                     <v-text-field type="number" v-model="newData.facingOffsetX" label="Facing Offset Horizontal:"
+                      suffix="cm"></v-text-field>
+                  </v-flex>
+                  <v-flex lg8 md12 v-if="newData.fixtureType == 2 && !newData.rendering">
+                    <v-text-field type="number" v-model="newData.facingOffsetY" label="Facing Offset Vertical:"
                       suffix="cm"></v-text-field>
                   </v-flex>
                 </v-layout>
@@ -147,7 +171,8 @@
                       <div slot="header">General</div>
                       <v-flex lg12 md12 sm12 xs12>
                         <h3>Image</h3>
-                        <v-card class="elevation-5" @click="openFileExplorer" style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
+                        <v-card class="elevation-5" @click="openFileExplorer"
+                          style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
                           <img ref="changeImage" style="max-height: 150px; max-width: 150px;" src="" alt="">
                         </v-card>
                         <input ref="fileInput" style="display: none" @change="imageChange" type="file">
@@ -166,7 +191,8 @@
                           <h3>Colour</h3>
                           <compact-picker style="margin: 0 auto;" v-model="newData.color" />
                           <v-flex lg8 md12 sm12 xs12>
-                            <v-checkbox hide-details label="Transparent" v-model="newData.transparent" @change="handleTransparency"></v-checkbox>
+                            <v-checkbox hide-details label="Transparent" v-model="newData.transparent"
+                              @change="handleTransparency"></v-checkbox>
                           </v-flex>
                         </div>
                       </v-flex>
@@ -188,13 +214,15 @@
                         <br>
                         <p>Front Face Renderings</p>
                         <v-divider></v-divider>
-                        <v-expansion-panel inset expand v-model="renderingPanel2" v-if="newData.fixtureType==1&&newData.type==2||newData.fixtureType==3&&newData.type==2||newData.fixtureType==0&&newData.type==2">
+                        <v-expansion-panel inset expand v-model="renderingPanel2"
+                          v-if="newData.fixtureType==1 && newData.type==2||newData.fixtureType==3 && newData.type ==2 ||newData.fixtureType == 0 && newData.type==2 || (newData.fixtureType == 0 && newData.type==2) || newData.fixtureType==4&&newData.type==3">
                           <v-expansion-panel-content class="elevation-0 pa-0">
                             <div slot="header">Label Holder </div>
-                            <v-select placeholder="please select" :items="labelType" v-model="newData.labelType" label="Label Holder Type:"
-                              @change="changeLabelImage">
+                            <v-select placeholder="please select" :items="labelType" v-model="newData.labelType"
+                              label="Label Holder Type:" @change="changeLabelImage">
                             </v-select>
-                            <v-card class="elevation-5" @click="openFileExplorerLabel" style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
+                            <v-card class="elevation-5" @click="openFileExplorerLabel"
+                              style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
                               <img ref="changeImageLabel" style="max-height: 150px; max-width: 150px;" src="" alt="">
                             </v-card>
                             <input ref="fileInputLabel" style="display: none" @change="imageChangeLabel" type="file">
@@ -208,7 +236,8 @@
                                   :rules=numberRules></v-text-field>
                               </v-flex>
                               <v-flex>
-                                <v-text-field type="number" v-model="viewRenderLabel.yOffset" label="Y Offset:" suffix="cm"></v-text-field>
+                                <v-text-field type="number" v-model="viewRenderLabel.yOffset" label="Y Offset:"
+                                  suffix="cm"></v-text-field>
                               </v-flex>
                             </v-layout>
 
@@ -222,20 +251,22 @@
                             <v-select placeholder="please select" :items="ShelfEdgeType" v-model="newData.ShelfEdgeType"
                               label="Shelf Edge Rendering:" @change="changeShelfEdgeImage">
                             </v-select>
-                            <v-card class="elevation-5" @click="openFileExplorerShelfEdge" style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
-                              <img ref="changeImageShelfEdge" style="max-height: 150px; max-width: 150px;" src="" alt="">
+                            <v-card class="elevation-5" @click="openFileExplorerShelfEdge"
+                              style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
+                              <img ref="changeImageShelfEdge" style="max-height: 150px; max-width: 150px;" src=""
+                                alt="">
                             </v-card>
-                            <input ref="fileInputShelfEdge" style="display: none" @change="imageChangeShelfEdge" type="file">
+                            <input ref="fileInputShelfEdge" style="display: none" @change="imageChangeShelfEdge"
+                              type="file">
                             <v-layout>
                               <v-flex>
-                                <v-text-field type="number" v-model="viewRenderShelfEdge.height" label="Height:" suffix="cm"
-                                  :rules=numberRules></v-text-field>
+                                <v-text-field type="number" v-model="viewRenderShelfEdge.height" label="Height:"
+                                  suffix="cm" :rules=numberRules></v-text-field>
                               </v-flex>
 
-
                               <v-flex>
-                                <v-text-field type="number" v-model="viewRenderShelfEdge.width" label="Width:" suffix="cm"
-                                  :rules=numberRules></v-text-field>
+                                <v-text-field type="number" v-model="viewRenderShelfEdge.width" label="Width:"
+                                  suffix="cm" :rules=numberRules></v-text-field>
 
                               </v-flex>
                               <v-flex>
@@ -248,17 +279,20 @@
 
                       </v-flex>
                       <v-flex>
-                        <v-expansion-panel inset expand v-model="renderingPanel4" v-if="newData.fixtureType==1&&newData.type==3">
+                        <v-expansion-panel inset expand v-model="renderingPanel4"
+                          v-if="newData.fixtureType==1&&newData.type==3 || newData.fixtureType == 3 && newData.type == 3">
                           <v-expansion-panel-content class="elevation-0 pa-0">
                             <div slot="header"> Front rendering</div>
                             <v-flex>
-                              <v-select placeholder="Render Image" :items="renderingselect" v-model="newData.renderImage"
-                                label="Rendering:" @change="changeImageSelect">
+                              <v-select placeholder="Render Image" :items="renderingselect"
+                                v-model="newData.renderImage" label="Rendering:" @change="changeImageSelect">
                               </v-select>
-                              <v-card class="elevation-5" @click="openFileExplorerRender" style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
+                              <v-card class="elevation-5" @click="openFileExplorerRender"
+                                style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
                                 <img ref="changeRenderImage" style="max-height: 150px; max-width: 150px;" src="" alt="">
                               </v-card>
-                              <input ref="fileInputRender" style="display: none" @change="imageChangeRender" type="file">
+                              <input ref="fileInputRender" style="display: none" @change="imageChangeRender"
+                                type="file">
 
 
                               <v-layout>
@@ -271,7 +305,8 @@
                                     :rules=numberRules></v-text-field>
                                 </v-flex>
                                 <v-flex>
-                                  <v-text-field type="number" v-model="viewRender.yOffset" label="Y Offeset:" suffix="cm"></v-text-field>
+                                  <v-text-field type="number" v-model="viewRender.yOffset" label="Y Offeset:"
+                                    suffix="cm"></v-text-field>
                                 </v-flex>
                               </v-layout>
                             </v-flex>
@@ -280,20 +315,24 @@
                         </v-expansion-panel>
                       </v-flex>
                       <!-- data type for select box newData.fixtureType==1&&newData.type==3|| -->
-                      <v-flex v-if="newData.fixtureType==1&&newData.type==2||newData.fixtureType==0&&newData.type==2">
+                      <v-flex
+                        v-if="newData.fixtureType==1&&newData.type==2||newData.fixtureType==0&&newData.type==2 || newData.fixtureType == 3 && newData.type == 3">
                         <p>Back Face Renderings</p>
                         <v-divider></v-divider>
                         <v-expansion-panel inset expand v-model="BackFaceRenderingsPanel5">
                           <v-expansion-panel-content class="elevation-0 pa-0">
                             <div slot="header">Back Rendering </div>
-                            <v-select placeholder="please select" :items="RenderBacks" v-model="newData.RenderingsItems.Backs"
-                              label="Back Renderings:" @change="changeImageRenderBack">
+                            <v-select placeholder="please select" :items="RenderBacks"
+                              v-model="newData.RenderingsItems.Backs" label="Back Renderings:"
+                              @change="changeImageRenderBack">
                             </v-select>
 
-                            <v-card class="elevation-5" @click="openFileExplorerRenderBack" style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
+                            <v-card class="elevation-5" @click="openFileExplorerRenderBack"
+                              style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
                               <img ref="RenderBackImage" style="max-height: 150px; max-width: 150px;" src="" alt="">
                             </v-card>
-                            <input ref="fileInputRenderBack" style="display: none" @change="imageChangeBack" type="file">
+                            <input ref="fileInputRenderBack" style="display: none" @change="imageChangeBack"
+                              type="file">
                             <v-layout>
                               <v-flex>
                                 <v-text-field type="number" v-model="RenderBackModel.height" label="Height:" suffix="cm"
@@ -305,7 +344,8 @@
                                   :rules=numberRules></v-text-field>
                               </v-flex>
                               <v-flex>
-                                <v-text-field type="number" v-model="RenderBackModel.yOffset" label="Y Offset:" suffix="cm"></v-text-field>
+                                <v-text-field type="number" v-model="RenderBackModel.yOffset" label="Y Offset:"
+                                  suffix="cm"></v-text-field>
                               </v-flex>
                             </v-layout>
                           </v-expansion-panel-content>
@@ -471,6 +511,10 @@
           {
             text: 'Pegbar',
             value: 3
+          },
+          {
+            text: 'Label Holder',
+            value: 4,
           }
         ],
         subTypes: [{
@@ -484,6 +528,10 @@
           {
             text: 'Divider',
             value: 2
+          },
+          {
+            text: 'Area',
+            value: 3
           }
         ],
         renderingTypeShelf: [{
@@ -604,10 +652,7 @@
           axios.get(process.env.VUE_APP_API + "/FixtureImage?db=cr-devinspire&id=" + self.newData.labelType)
             .then(Response => {
 
-
               self.newData.renderings.forEach(element => {
-
-
 
                 if (element.id == self.newData.labelType) {
                   // self.newData.RenderingsItems.LabelHolder.width = element.width
@@ -736,16 +781,19 @@
         self.renderingPanel4 = [false]
         self.BackFaceRenderingsPanel5 = [false]
 
+        console.log(eventData.type);
+
         if (eventData.type.toUpperCase() === "FIXTURE") {
           self.newData = {}
           self.modalShow = true;
 
           self.newData = JSON.parse(JSON.stringify(eventData.data.Data));
-          console.log("[new data]");
 
-          console.log(self.newData);
+          self.newData.labelsOn = self.newData.labelsOn == undefined || self.newData.labelsOn == null ? true : self
+            .newData
+            .labelsOn;
 
-          self.newData.labelsOn = self.newData.labelsOn == undefined || self.newData.labelsOn == null ? true : self.newData.labelsOn;
+          console.log(self.newData)
 
           if (self.newData.RenderingsItems == undefined) {
             self.newData.RenderingsItems = {}
@@ -830,7 +878,6 @@
               self.RenderBackModel.height = self.newData.RenderingsItems.Back.height,
               self.RenderBackModel.depth = self.newData.RenderingsItems.Back.depth,
               self.RenderBackModel.yOffset = self.newData.RenderingsItems.Back.yOffset
-
           }
 
 
@@ -841,6 +888,8 @@
           self.fixtureObj = eventData.object;
 
           if (self.newData.renderings != null || self.newData.renderings != undefined) {
+
+            console.log(self.newData.renderings)
 
             self.newData.renderings.forEach(element => {
               if (element.renderingType == 3) {
@@ -869,7 +918,9 @@
               }
             })
           }
-
+          if (self.newData.merchandisingOffset == null || self.newData.merchandisingOffset == undefined) {
+            self.newData.merchandisingOffset = 0
+          }
           // self.newData.countsAs = {};
           // self.newData.countsAs.description = self.newData.name
           // self.newData.countsAs.value = 1
@@ -881,9 +932,11 @@
           }
           self.$nextTick(() => {
             if (self.newData.fixtureType == 1 && self.newData.type == 3) {
-              if (self.newData.RenderingsItems.Front.image != undefined && self.newData.RenderingsItems.Front.image !=
+              if (self.newData.RenderingsItems.Front.image != undefined && self.newData.RenderingsItems.Front
+                .image !=
                 null)
-                self.$refs.changeRenderImage.src = 'data:image/png;base64,' + self.newData.RenderingsItems.Front.image;
+                self.$refs.changeRenderImage.src = 'data:image/png;base64,' + self.newData.RenderingsItems.Front
+                .image;
               else
                 self.$refs.changeRenderImage.src = '';
             }
@@ -898,12 +951,15 @@
             // else
 
             //   self.$refs.changeImageBar.src = '';
-            if (self.newData.fixtureType == 1 && self.newData.type == 2 || self.newData.fixtureType == 3 && self.newData
+            if (self.newData.fixtureType == 1 && self.newData.type == 2 || self.newData.fixtureType == 3 && self
+              .newData
               .type == 2 ||
               self.newData.fixtureType == 0 && self.newData.type == 2) {
-              if (self.newData.RenderingsItems.LabelHolder.image != undefined && self.newData.RenderingsItems.LabelHolder
+              if (self.newData.RenderingsItems.LabelHolder.image != undefined && self.newData.RenderingsItems
+                .LabelHolder
                 .image != null)
-                self.$refs.changeImageLabel.src = 'data:image/png;base64,' + self.newData.RenderingsItems.LabelHolder
+                self.$refs.changeImageLabel.src = 'data:image/png;base64,' + self.newData.RenderingsItems
+                .LabelHolder
                 .image;
               else
 
@@ -911,16 +967,19 @@
             }
 
             if (self.newData.fixtureType == 1 && self.newData.type == 2) {
-              if (self.newData.RenderingsItems.ShelfEdge.image != undefined && self.newData.RenderingsItems.ShelfEdge
+              if (self.newData.RenderingsItems.ShelfEdge.image != undefined && self.newData.RenderingsItems
+                .ShelfEdge
                 .image != null)
-                self.$refs.changeImageShelfEdge.src = 'data:image/png;base64,' + self.newData.RenderingsItems.ShelfEdge
+                self.$refs.changeImageShelfEdge.src = 'data:image/png;base64,' + self.newData.RenderingsItems
+                .ShelfEdge
                 .image;
               else
 
                 self.$refs.changeImageShelfEdge.src = '';
             }
 
-            if (self.newData.fixtureType == 1 && self.newData.type == 3 || self.newData.fixtureType == 1 && self.newData
+            if (self.newData.fixtureType == 1 && self.newData.type == 3 || self.newData.fixtureType == 1 && self
+              .newData
               .type == 2 ||
               self.newData.fixtureType == 0 && self.newData.type == 2) {
               if (self.newData.RenderingsItems.Back.image != undefined && self.newData.RenderingsItems.Back.image !=
@@ -981,7 +1040,10 @@
             });
           }
         }
-
+        if (self.newData.merchandisingOffset == null || self.newData.merchandisingOffset == undefined) {
+          self.newData.merchandisingOffset = 0
+        }
+        self.newData.merchandisingOffset = returnFloat(self.newData.merchandisingOffset);
         self.newData.height = returnFloat(self.newData.height);
         self.newData.width = returnFloat(self.newData.width);
         self.newData.depth = returnFloat(self.newData.depth);
@@ -993,6 +1055,7 @@
         self.newData.productOffset = returnFloat(self.newData.productOffset);
         self.newData.squishAmount = returnFloat(self.newData.squishAmount);
         self.newData.facingOffsetX = returnFloat(self.newData.facingOffsetX);
+        self.newData.facingOffsetY = returnFloat(self.newData.facingOffsetY);
 
         var fixtureObj = {
           fixtureConfig: self.config,
@@ -1013,8 +1076,6 @@
             self.destroy();
           }
         })
-
-
       },
       destroy() {
         let self = this;

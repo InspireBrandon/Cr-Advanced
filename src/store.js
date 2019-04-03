@@ -8,7 +8,11 @@ export const store = new Vuex.Store({
     gondolas: [],
     planogramProperties: {
       LabelConfig: {
-        Order: "T2B"
+        Order: "T2B",
+        Position: 'left'
+      },
+      PriceLabels: {
+        Enabled: false
       }
     },
     fixutreCount: {
@@ -31,7 +35,10 @@ export const store = new Vuex.Store({
     clusterName: null,
     clusterType: null,
     clusterID: null,
+    storeID:null,
+    storeName:null,
     rangeID: null,
+    categoryCluster:null,
     daysBetween: 0
   },
   mutations: {
@@ -59,6 +66,9 @@ export const store = new Vuex.Store({
     setLabelConfigOrder(state, order) {
       state.planogramProperties.LabelConfig.Order = order;
     },
+    setPlanogramProperties(state, data) {
+      state.planogramProperties = data;
+    },
     removeActivePlanogramProduct(state, data) {
       var index = state.activePlanogramProducts.indexOf(data);
       if (index > -1) {
@@ -78,7 +88,7 @@ export const store = new Vuex.Store({
       state.CtrlDown = false;
       state.CloneItem = null;
       state.gondolas = [];
-      state.fixtures = [];
+      // state.fixtures = [];
       state.productGroups = [];
       state.allProducts = [];
       state.subFixtures = [];
@@ -97,6 +107,15 @@ export const store = new Vuex.Store({
     },
     setRangeID(state, rangeID) {
       state.rangeID = rangeID;
+    },
+    setStoreID(state, storeID) {
+      state.storeID = storeID;
+    },
+    setStoreName(state, storeName) {
+      state.storeName = storeName;
+    },
+    setCategoryCluster(state, categoryCluster) {
+      state.categoryCluster = categoryCluster;
     },
     setDaysBetween(state, days) {
       state.daysBetween = days;
@@ -167,6 +186,9 @@ export const store = new Vuex.Store({
           }
         }
       })
+    },
+    setFixtures(state, data) {
+      state.fixtures = data;
     }
   },
   getters: {
@@ -197,6 +219,9 @@ export const store = new Vuex.Store({
     getLabelConfig: (state) => {
       return state.planogramProperties.LabelConfig;
     },
+    getPlanogramProperties: (state) => {
+      return state.planogramProperties;
+    },
     getPlanogramItemById: (state) => (id) => {
       var found = state.allPlanogramItems.find(function (el) {
         return el.ID == id;
@@ -214,8 +239,14 @@ export const store = new Vuex.Store({
         planogramName: state.planogramName,
         clusterName: state.clusterName,
         clusterType: state.clusterType,
-        clusterID: state.clusterID
+        clusterID: state.clusterID,
+        storeID : state.storeID,
+        storeName:state.storeName,
+        categoryCluster:state.categoryCluster
       }
+    },
+    getFixtures: (state) => {
+      return state.fixtures;
     }
   }
 });

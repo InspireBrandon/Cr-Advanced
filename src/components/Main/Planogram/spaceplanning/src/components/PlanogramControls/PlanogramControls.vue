@@ -143,8 +143,8 @@
       resetStagePosition() {
         this.$parent.$parent.$parent.resetStagePosition();
       },
-      downloadImage() {
-        this.$parent.$parent.$parent.downloadImage();
+      downloadImage(ratio) {
+        this.$parent.$parent.$parent.downloadImage(ratio);
       },
       savePlanogram() {
         this.$parent.$parent.$parent.savePlanogram();

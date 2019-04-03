@@ -4,6 +4,7 @@ import LabelHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.Ne
 import IntersectionTester from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/intersection/IntersectionTester.js";
 import EventBus from '@/components/Main/Planogram/spaceplanning/src/libs/EventBus/EventBus.js';
 import CustomEmitter from '@/components/Main/Planogram/spaceplanning/src/libs/EventBus/CustomEmitter.js';
+import ParentTreeRedraw from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/RedrawParentChildBase.js";
 
 class PlanogramItemBase {
   constructor(vueStore, stage, layer, data, ratio, type, parentID) {
@@ -24,6 +25,10 @@ class PlanogramItemBase {
     this.Height = 0;
     this.TotalWidth = 0;
     this.TotalHeight = 0;
+
+    // children
+    this.TotalChildren = []; // array that includes the child and its counter;
+    this.SpacingEvenAmount = 0;
 
     // cosmetics
     this.LabelText = this.Type + " " + this.Position;
@@ -139,6 +144,14 @@ class PlanogramItemBase {
         y: dropPos.y,
         draggable: true
       })
+    } else if (self.Type.toUpperCase() == "AREA") {
+      self.Group = new Konva.Group({
+        id: self.Type + '_master_group_' + self.ID,
+        name: self.Type + '_master_group',
+        x: dropPos.x,
+        y: dropPos.y,
+        draggable: true
+      })
     } else if (self.Type.toUpperCase() == "TEXTHEADER") {
       self.Group = new Konva.Group({
         id: self.Type + '_master_group_' + self.ID,
@@ -147,7 +160,7 @@ class PlanogramItemBase {
         y: dropPos.y,
         draggable: true
       })
-    } else if (self.Type.toUpperCase() == "BASKET" || self.Type.toUpperCase() == "DIVIDER" || self.Type.toUpperCase() == "PRODUCT") {
+    } else if (self.Type.toUpperCase() == "BASKET" || self.Type.toUpperCase() == "DIVIDER" || self.Type.toUpperCase() == "PRODUCT" || self.Type.toUpperCase() == "LABELHOLDER") {
       self.Group = new Konva.Group({
         id: self.Type + '_master_group_' + self.ID,
         name: self.Type + '_master_group',
@@ -155,7 +168,8 @@ class PlanogramItemBase {
         y: dropPos.y,
         draggable: true
       })
-    } else {
+    } 
+    else {
       self.Group = new Konva.Group({
         id: self.Type + '_master_group_' + self.ID,
         name: self.Type + '_master_group',
@@ -199,7 +213,7 @@ class PlanogramItemBase {
           }
 
           // TEST LOWER BOUND
-          let yLowerBound = gondola.Group.getAbsolutePosition().y + ((gondola.Group.getHeight() * self.Stage.scaleY()) - (self.Data.height * self.Ratio));
+          let yLowerBound = gondola.Group.getAbsolutePosition().y + ((gondola.Group.getHeight() * self.Stage.scaleY()) - ((self.Data.height * self.Ratio) * self.Stage.scaleY()));
           if (pos.y > yLowerBound) {
             return {
               x: x,
@@ -277,7 +291,7 @@ class PlanogramItemBase {
         });
       })
 
-      self.ApplyZIndexing();
+      // self.ApplyZIndexing();
 
     });
 
@@ -293,6 +307,11 @@ class PlanogramItemBase {
 
           }
           break;
+        case "AREA":
+          {
+            typeArr = ["GONDOLA"];
+          }
+          break;
         case "PALETTE":
           {
             typeArr = ["GONDOLA"];
@@ -300,32 +319,37 @@ class PlanogramItemBase {
           break;
         case "PRODUCT":
           {
-            typeArr = ["SHELF", "BASE", "BASKET", "PEGBAR", "PEGBOARD", "PALETTE"];
+            typeArr = ["SHELF", "BASE", "BASKET", "PEGBAR", "PEGBOARD", "PALETTE", "LABELHOLDER"];
           }
           break;
         case "SHELF":
           {
-            typeArr = ["GONDOLA"];
+            typeArr = ["GONDOLA", "AREA"];
           }
           break;
         case "BASE":
           {
-            typeArr = ["GONDOLA"];
+            typeArr = ["GONDOLA", "AREA"];
           }
           break;
         case "BASKET":
           {
-            typeArr = ["SHELF", "BASE", "PEGBAR", "PEGBOARD", "DIVIDER", "PALETTE"];
+            typeArr = ["SHELF", "BASE", "PEGBAR", "PEGBOARD", "DIVIDER", "PALETTE", "LABELHOLDER"];
           }
           break;
         case "PEGBAR":
           {
-            typeArr = ["GONDOLA"];
+            typeArr = ["GONDOLA", "AREA"];
+          }
+          break;
+        case "LABELHOLDER":
+          {
+            typeArr = ["PEGBOARD"];
           }
           break;
         case "PEGBOARD":
           {
-            typeArr = ["GONDOLA"];
+            typeArr = ["GONDOLA", "AREA"];
           }
           break;
         case "DIVIDER":
@@ -386,10 +410,35 @@ class PlanogramItemBase {
     let self = this;
 
     let ctrl_store = new StoreHelper();
-    let shelves = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "SHELF", parentID);
 
     //#region Rendering
+    let areas = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "AREA", parentID);
+
+    // AREA
+    areas.forEach(area => {
+      if (area.Renderings && area.Renderings.length > 0) {
+        area.Renderings.forEach(rendering => {
+          switch (rendering.type.toUpperCase()) {
+            case "BACKRENDERING":
+              {
+                rendering.konva.moveToBottom();
+              }
+              break;
+            case "FRONTRENDERING":
+              {
+                rendering.konva.moveToTop();
+              }
+              break;
+          }
+        });
+      }
+
+      area.Group.draw();
+    });
+
     // SHELVES
+    let shelves = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "SHELF", parentID);
+
     shelves.forEach(shelf => {
       if (shelf.Renderings && shelf.Renderings.length > 0) {
         shelf.Renderings.forEach(rendering => {
@@ -473,6 +522,25 @@ class PlanogramItemBase {
       hangingBar.Group.draw();
     });
 
+    // LABEL HOLDERS
+    let labelHolders = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "LABELHOLDER", parentID);
+
+    labelHolders.forEach(labelHolder => {
+      if (labelHolder.Renderings && labelHolder.Renderings.length > 0) {
+        labelHolder.Renderings.forEach(rendering => {
+          switch (rendering.type.toUpperCase()) {
+            case "LABELHOLDER":
+              {
+                rendering.konva.moveToTop();
+              }
+              break;
+          }
+        });
+      }
+
+      labelHolder.Group.draw();
+    });
+
     // BASKETS
     let baskets = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "BASKET", parentID);
 
@@ -538,12 +606,60 @@ class PlanogramItemBase {
           element.Group.moveToTop();
         });
 
-        let gBases = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "PEGBAR", element.ID);
+        let gBases = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "BASE", element.ID);
         gBases.forEach(element => {
           element.Group.moveToTop();
         });
-
+      } else {
+        let gPegboards = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "PEGBOARD", element.ID);
+        gPegboards.forEach(element => {
+          element.Group.moveToTop();
+        });
       }
+    });
+    //#endregion
+
+    //#region IF ANY FIXTURE HAS A FRONT FACE RENDERING DRAW TO FRONT -- JOHN's REQUEST
+
+    gondolas.forEach(element => {
+      let allItems = ctrl_store.getAllPlanogramItems(self.VueStore, element.ID);
+      if (allItems.length > 1) {
+
+        let gShelves = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "SHELF", element.ID);
+        gShelves.forEach(element => {
+          if (element.Data.RenderingsItems != undefined || element.Data.RenderingsItems != null) {
+            if (element.Data.RenderingsItems.ShelfEdge != undefined || element.Data.RenderingsItems.ShelfEdge != null) {
+              //console.log("[SHELF] MOVING TO TOP")
+              element.Group.moveToTop();
+            }
+          }
+        });
+
+        let gBases = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "BASE", element.ID);
+        gBases.forEach(element => {
+          if (element.Data.RenderingsItems != undefined || element.Data.RenderingsItems != null) {
+            if (element.Data.RenderingsItems.ShelfEdge != undefined || element.Data.RenderingsItems.ShelfEdge != null) {
+              // console.log("[BASE] MOVING TO TOP")
+              element.Group.moveToTop();
+            }
+          }
+        });
+      }
+    });
+
+    //#endregion
+
+    //#region All labels to the top
+    let allFixtures = ctrl_store.getAllPlanogramItems(self.VueStore);
+    allFixtures = allFixtures.filter((el) =>
+      el.Type == "SHELF" ||
+      el.Type == "BASE" ||
+      el.Type == "PEGBAR" ||
+      el.Type == "PEGBORD" ||
+      el.Type == "LABELHOLDER");
+
+    allFixtures.forEach(element => {
+      element.Text.moveToTop();
     });
     //#endregion
   }
@@ -563,20 +679,13 @@ class PlanogramItemBase {
     self.Group.moveToTop();
   }
 
-  GetSpreadSpacing(parentID) {
+  GetSquishValue(parentID) {
     let self = this;
     let retVal = 0;
     let ctrl_store = new StoreHelper();
     let parentItem = ctrl_store.getPlanogramItemById(self.VueStore, parentID);
 
-    // console.log("PRODUCT PARENT FOR GetSpreadSpacing HAS AN ISSUE", parentItem, parentItem.Type, self)
-
     if (parentItem == null || parentItem.Type == null || parentItem.Type == undefined) {
-      // console.log("PRODUCT PARENT FOR GetSpreadSpacing HAS AN ISSUE", parentItem, parentItem.Type)
-      return retVal;
-    }
-
-    if (parentID == self.ID) {
       return retVal;
     }
 
@@ -584,21 +693,155 @@ class PlanogramItemBase {
       return retVal;
     }
 
+    if (parentItem.Data.squish == undefined || parentItem.Data.squish == null || parentItem.Data.squish == false) {
+      return retVal
+    }
+
     let totalItemWidths = 0;
     let totalItems = 0;
-    let parentWidth = parentItem.TotalWidth;
+    let merchOffset = (parentItem.Data.merchandisingOffset == undefined ? 0 : parentItem.Data.merchandisingOffset) * self.Ratio;
+    let parentWidth = parentItem.TotalWidth - merchOffset; // subtract merchandising offset
+    let squish = 0;
+
+    if (parentItem.TotalChildren.length == 0) {
+      // self.SpacingEvenAmount = 0;
+      return retVal;
+    }
+
+    parentItem.TotalChildren.forEach(element => {
+      totalItems += element.Count;
+      totalItemWidths += (element.Width * element.Count);
+    });
+
+    switch (parentItem.Type.toUpperCase()) {
+      case "BASE":
+        {
+          if (totalItemWidths > parentWidth) {
+            squish = (totalItemWidths - parentWidth) / (totalItems);
+          }
+
+          retVal = squish;
+        }
+        break;
+      case "SHELF":
+        {
+          if (totalItemWidths > parentWidth) {
+            squish = (totalItemWidths - parentWidth) / (totalItems);
+          }
+
+          retVal = squish;
+        }
+        break;
+      case "BASKET":
+        {
+          if (totalItemWidths > parentWidth) {
+            squish = (totalItemWidths - parentWidth) / (totalItems);
+          }
+
+          retVal = squish;
+        }
+        break;
+      case "PEGBAR":
+        {
+          if (totalItemWidths > parentWidth) {
+            squish = (totalItemWidths - parentWidth) / (totalItems);
+          }
+
+          retVal = squish;
+        }
+        break;
+      case "LABELHOLDER":
+        {
+          if (totalItemWidths > parentWidth) {
+            squish = (totalItemWidths - parentWidth) / (totalItems);
+          }
+
+          retVal = squish;
+        }
+        break;
+      default:
+        {
+          // self.SpacingEvenAmount = 0;
+          retVal = 0;
+        }
+        break;
+    }
+
+    return retVal;
+  }
+
+  /**
+   * Used primarily for pegboards
+   * facingOffsetX + facingOffsetY
+   */
+  GetFacingOffset(parentID) {
+    let self = this;
+
+    let retVal = {
+      enabled: false,
+      x: 0,
+      y: 0
+    };
+    let ctrl_store = new StoreHelper();
+    let parentItem = ctrl_store.getPlanogramItemById(self.VueStore, parentID);
+
+    if (parentItem == null || parentItem.Type == null || parentItem.Type == undefined) {
+      return retVal;
+    }
+
+    if (parentItem.Type.toUpperCase() == "PRODUCT") {
+      return retVal;
+    }
+
+    if ((parentItem.Data.facingOffsetX == undefined || parentItem.Data.facingOffsetX == null || parentItem.Data.facingOffsetX <= 0) && (parentItem.Data.facingOffsetY == undefined || parentItem.Data.facingOffsetY == null || parentItem.Data.facingOffsetY <= 0)) {
+      return retVal
+    }
+
+    retVal = {
+      enabled: true,
+      x: parentItem.Data.facingOffsetX * self.Ratio,
+      y: parentItem.Data.facingOffsetY * self.Ratio
+    }
+
+    return retVal;
+  }
+
+  /**
+   * Used for all fixtures except pegboard
+   */
+  GetSpreadSpacing(parentID) {
+    let self = this;
+    let retVal = 0;
+    let ctrl_store = new StoreHelper();
+    let parentItem = ctrl_store.getPlanogramItemById(self.VueStore, parentID);
+
+    if (parentItem == null || parentItem.Type == null || parentItem.Type == undefined) {
+      return retVal;
+    }
+
+    // if (parentID == self.ID) {
+    //   return retVal;
+    // }
+
+    if (parentItem.Type.toUpperCase() == "PRODUCT") {
+      return retVal;
+    }
+
+    let totalItemWidths = 0;
+    let totalItems = 0;
+    let merchOffset = (parentItem.Data.merchandisingOffset == undefined ? 0 : parentItem.Data.merchandisingOffset) * self.Ratio;
+    let parentWidth = parentItem.TotalWidth - merchOffset; // subtract merchandising offset
     let spacing = 0;
 
-    let allChildren = ctrl_store.getAllPlanogramItems(self.VueStore, parentID);
-    // let sortedArr = allParentItems.filter((el) => el.Type.toUpperCase() == "BASKET" || el.Type.toUpperCase() == "PRODUCT")
-    // sort them by x/y
-    let sortedArr = allChildren.sort((a, b) => a.Group.getX() - b.Group.getX());
-
-    if (sortedArr.length > 1) {
-      totalItems = sortedArr.length;
-    } else {
-      totalItems = 1;
+    if (parentItem.TotalChildren.length == 0) {
+      self.SpacingEvenAmount = 0;
+      return retVal;
     }
+
+    parentItem.TotalChildren.forEach(element => {
+      totalItems += element.Count;
+      totalItemWidths += (element.Width * element.Count);
+    });
 
     switch (parentItem.Type.toUpperCase()) {
       case "BASE":
@@ -609,11 +852,13 @@ class PlanogramItemBase {
             return retVal;
           }
 
-          sortedArr.forEach((item, idx) => {
-            totalItemWidths += item.GetActualSize().width;
-          });
+          if (totalItems == 1) {
+            spacing = 0;
+          } else {
+            spacing = (parentWidth - totalItemWidths) / (totalItems - 1);
+          }
 
-          spacing = (parentWidth - totalItemWidths) / totalItems;
+          self.SpacingEvenAmount = spacing;
           retVal = spacing;
         }
         break;
@@ -624,13 +869,14 @@ class PlanogramItemBase {
           if (spreadType.toUpperCase() != "SFE") {
             return retVal;
           }
-          // console.log("[GETSPREADSPACER]", sortedArr)
-          sortedArr.forEach((item, idx) => {
-            totalItemWidths += item.GetActualSize().width;
-          });
 
-          spacing = (parentWidth - totalItemWidths) / totalItems;
-          // console.log("[GETSPREADSPACER]", sortedArr, spacing, parentWidth, totalItemWidths, totalItems)
+          if (totalItems == 1) {
+            spacing = 0;
+          } else {
+            spacing = (parentWidth - totalItemWidths) / (totalItems - 1);
+          }
+
+          self.SpacingEvenAmount = spacing;
           retVal = spacing;
         }
         break;
@@ -642,11 +888,13 @@ class PlanogramItemBase {
             return retVal;
           }
 
-          sortedArr.forEach((item, idx) => {
-            totalItemWidths += item.GetActualSize().width;
-          });
+          if (totalItems == 1) {
+            spacing = 0;
+          } else {
+            spacing = (parentWidth - totalItemWidths) / (totalItems - 1);
+          }
 
-          spacing = (parentWidth - totalItemWidths) / totalItems;
+          self.SpacingEvenAmount = spacing;
           retVal = spacing;
         }
         break;
@@ -658,16 +906,37 @@ class PlanogramItemBase {
             return retVal;
           }
 
-          sortedArr.forEach((item, idx) => {
-            totalItemWidths += item.GetActualSize().width;
-          });
+          if (totalItems == 1) {
+            spacing = 0;
+          } else {
+            spacing = (parentWidth - totalItemWidths) / (totalItems - 1);
+          }
 
-          spacing = (parentWidth - totalItemWidths) / totalItems;
+          self.SpacingEvenAmount = spacing;
+          retVal = spacing;
+        }
+        break;
+      case "LABELHOLDER":
+        {
+          let spreadType = parentItem.Data.spreadProducts;
+
+          if (spreadType.toUpperCase() != "SFE") {
+            return retVal;
+          }
+
+          if (totalItems == 1) {
+            spacing = 0;
+          } else {
+            spacing = (parentWidth - totalItemWidths) / (totalItems - 1);
+          }
+
+          self.SpacingEvenAmount = spacing;
           retVal = spacing;
         }
         break;
       default:
         {
+          self.SpacingEvenAmount = 0;
           retVal = 0;
         }
         break;
@@ -799,15 +1068,11 @@ class PlanogramItemBase {
         break;
     }
 
-    // let allChildren = ctrl_store.getAllPlanogramItems(self.VueStore, parent.ID);
-
-    // allChildren.forEach(child => {
-    //   child.PositionElement();
-    // });
+    // let posRedrawTree = new ParentTreeRedraw();
+    // posRedrawTree.PositionDirectChildren(self.VueStore, self.ParentID);
 
     parent.ApplyZIndexing();
 
-    // console.log("[UPDATE] END", self.Type, self.ID, parent);
     self.Group.draw();
   }
   /**
@@ -999,6 +1264,174 @@ class PlanogramItemBase {
     ctrl_store.addPlanogramItem(self.VueStore, self);
   }
 
+  GetChildFromTotalChildrenArray(childID, parentID) {
+    let self = this;
+
+    let ctrl_store = new StoreHelper();
+    let parentItem = ctrl_store.getPlanogramItemById(self.VueStore, parentID);
+
+    let exists = parentItem.TotalChildren.filter((el) => el.ID == childID);
+
+    if (exists.length > 0) {
+      return exists[0];
+    } else {
+      return null;
+    }
+  }
+
+  RemoveChildFromTotalChildrenArray(childID, parentID) {
+    let self = this;
+    let ctrl_store = new StoreHelper();
+    let parentItem = ctrl_store.getPlanogramItemById(self.VueStore, parentID);
+
+    if (parentItem != null) {
+      for (var i = 0; i < parentItem.TotalChildren.length; i++) {
+        if (parentItem.TotalChildren[i].ID === childID) {
+          parentItem.TotalChildren.splice(i, 1);
+        }
+      }
+      // console.log("[FIXTURE TOTAL CHILDREN]", parentItem.Type, "REMOVED:", self.Type, "CHILDREN COUNT:", parentItem.TotalChildren);
+    }
+  }
+
+  IncreaseParentChildrenCounter(positionElementRequired, parentID = null) {
+    // get the parent item, increase the total children count
+    // ** BEWARE - you must also decrease the children count when moving it from fixture to fixture
+    let self = this;
+    let ctrl_store = new StoreHelper();
+
+    let parentItem = ctrl_store.getPlanogramItemById(self.VueStore, parentID == null ? self.ParentID : parentID);
+    let existing = self.GetChildFromTotalChildrenArray(self.ID, parentID == null ? self.ParentID : parentID);
+
+    if (parentItem != null && parentItem != undefined) {
+      // console.log("[CALLING UPDATE] CALLED");
+      switch (self.Type.toUpperCase()) {
+        case "PRODUCT":
+          {
+            if (existing == null) {
+              parentItem.TotalChildren.push({
+                ID: self.ID,
+                Type: self.Type,
+                Item: self,
+                Count: self.Facings_X,
+                Width: self.Orientation_Width
+              });
+
+            } else {
+              self.RemoveChildFromTotalChildrenArray(existing.ID, parentItem.ID);
+              parentItem.TotalChildren.push({
+                ID: self.ID,
+                Type: self.Type,
+                Item: self,
+                Count: self.Facings_X,
+                Width: self.Orientation_Width
+              });
+            }
+          }
+          break;
+        case "BASKET":
+          {
+            if (existing == null) {
+              parentItem.TotalChildren.push({
+                ID: self.ID,
+                Type: self.Type,
+                Item: self,
+                Count: 1,
+                Width: self.TotalWidth
+              });
+
+            } else {
+              self.RemoveChildFromTotalChildrenArray(existing.ID, parentItem.ID);
+              parentItem.TotalChildren.push({
+                ID: self.ID,
+                Type: self.Type,
+                Item: self,
+                Count: 1,
+                Width: self.TotalWidth
+              });
+            }
+          }
+          break;
+        case "DIVIDER":
+          {
+            if (existing == null) {
+              parentItem.TotalChildren.push({
+                ID: self.ID,
+                Type: self.Type,
+                Item: self,
+                Count: 1,
+                Width: self.TotalWidth
+              });
+
+            } else {
+              self.RemoveChildFromTotalChildrenArray(existing.ID, parentItem.ID);
+              parentItem.TotalChildren.push({
+                ID: self.ID,
+                Type: self.Type,
+                Item: self,
+                Count: 1,
+                Width: self.TotalWidth
+              });
+            }
+          }
+          break;
+      }
+
+      // TODO: Figure out a way not to redraw a million times.....
+
+
+      // if (ctrl_store.getCloneItem(self.VueStore) == null) {
+      //   let spreadType = parentItem.Data.spreadProducts;
+      //   if (spreadType == "SFE" || (parentItem.Data.squish != undefined && parentItem.Data.squish != null && parentItem.Data.squish == true)) {
+      //     let children = ctrl_store.getAllPlanogramItems(self.VueStore, parentItem.ID);
+      //     children.forEach(child => {
+
+      //       child.Update();
+      //       child.PositionElement();
+      //     });
+      //   }
+
+      // console.log("[FIXTURE TOTAL CHILDREN]", parentItem.Type, "ADDED:", self.Type, "CHILDREN COUNT:", parentItem.TotalChildren);
+    }
+  }
+
+  //#region Call Parent to redraw & or position its children
+  UpdateParent(parentID, redraw = false) {
+    let self = this;
+    let ctrl_store = new StoreHelper();
+
+    let parentItem = ctrl_store.getPlanogramItemById(self.VueStore, parentID);
+
+    if (parentItem == null) {
+      return;
+    }
+
+    let posRedrawTree = new ParentTreeRedraw();
+
+    // test SFE
+    let drawn = false;
+    let spreadType = parentItem.Data.spreadProducts;
+    if (spreadType == "SFE" || spreadType == "SE") {
+      posRedrawTree.PositionAndRedrawDirectChildren(self.VueStore, parentID);
+      drawn = true;
+    }
+
+    if (parentItem.Data.squish != undefined && parentItem.Data.squish != null && parentItem.Data.squish == true) {
+      posRedrawTree.PositionAndRedrawDirectChildren(self.VueStore, parentID);
+      drawn = true;
+    }
+
+    if (drawn == false) {
+      if (redraw == true) {
+        posRedrawTree.PositionAndRedrawDirectChildren(self.VueStore, parentID);
+      } else {
+        posRedrawTree.PositionDirectChildren(self.VueStore, self.ParentID);
+      }
+    }
+  }
+  //#endregion
+
+
   AddToParentGroup() {
     let self = this;
 
@@ -1060,6 +1493,9 @@ class PlanogramItemBase {
   MoveToParentGroup(parent) {
     let self = this;
     self.Group.moveTo(parent.Group);
+
+    self.RemoveChildFromTotalChildrenArray(self.ID, self.ParentID);
+    self.IncreaseParentChildrenCounter(true, parent.ID)
   }
 
   AddCloneToGroup(cloneItem) { // will be caled from cloning tool
@@ -1082,9 +1518,9 @@ class PlanogramItemBase {
     self.RemoveRenderings();
   }
 
-  HideShowLabels () {
+  HideShowLabels() {
     let self = this;
-    
+
     if (self.Data.labelsOn == false) {
       self.Text.hide();
     } else {
@@ -1183,10 +1619,66 @@ class PlanogramItemBase {
     }
   }
 
+  AddTextCosmetic() {
+    let self = this;
+
+    self.Text = new Konva.Text({
+      x: 0,
+      y: 0,
+      text: self.Data.label == undefined ? self.Type : self.Data.label + self.Position.toString(),
+      fontFamily: 'Arial',
+      fontSize: 10,
+      padding: 0.5,
+      fill: 'black',
+      transformsEnabled: 'position'
+    })
+
+    self.SetTextLabelPosition();
+
+    self.Group.add(self.Text);
+  }
+
+  SetTextLabel(number) {
+    let self = this;
+    self.Position = number;
+    self.Text.text(self.Data.label + " " + number);
+    self.Group.draw();
+  }
+
+  SetTextLabelPosition () {
+    let self = this;
+    let ctrl_store = new StoreHelper();
+    let planogramSettings = ctrl_store.getPlanogramSettings(self.VueStore);
+
+    let x = 0;
+    let y = 0;
+
+    if (planogramSettings != null && planogramSettings != undefined) {
+      if (planogramSettings.LabelConfig.Position == "left") {
+        self.Text.setX(x);
+        self.Text.setY(y);
+      } else {
+        let tw = self.Text.getTextWidth() + self.Text.padding();
+        x = self.TotalWidth - tw;
+        self.Text.setX(x);
+      }
+    }
+
+    self.Group.draw();
+  }
+
   //#region Modals + Dimensions
   Open_Modal() {
     let self = this;
     let event = new CustomEmitter();
+    let ctrl_store = new StoreHelper();
+    let allFixtures = ctrl_store.getFixtures(self.VueStore);
+
+    allFixtures.forEach(fixture => {
+      if (fixture.id == self.Data.id) {
+        self.Data.renderings = fixture.renderings;
+      }
+    });
 
     switch (self.Type.toUpperCase()) {
       case "GONDOLA":
@@ -1224,9 +1716,19 @@ class PlanogramItemBase {
           event.modal_load(EventBus, "FIXTURE", "BASKET", self, self.ID, self);
         }
         break;
+      case "AREA":
+        {
+          event.modal_load(EventBus, "FIXTURE", "AREA", self, self.ID, self);
+        }
+        break;
       case "PRODUCT":
         {
           event.modal_load(EventBus, "PRODUCT", "", self, self.ID, self);
+        }
+        break;
+      case "LABELHOLDER":
+        {
+          event.modal_load(EventBus, "FIXTURE", "LABELHOLDER", self, self.ID, self);
         }
         break;
     }
@@ -1239,11 +1741,34 @@ class PlanogramItemBase {
   Delete() {
     let self = this;
     let ctrl_store = new StoreHelper();
+    let parentItem = ctrl_store.getPlanogramItemById(self.VueStore, self.ParentID);
     ctrl_store.removePlanogramItem(self.VueStore, self);
     self.Group.destroy();
 
+    switch (self.Type.toUpperCase()) {
+      case "PRODUCT":
+        {
+          self.RemoveChildFromTotalChildrenArray(self.ID, self.ParentID);
+        }
+        break;
+      case "BASKET":
+        {
+          self.RemoveChildFromTotalChildrenArray(self.ID, self.ParentID);
+        }
+        break;
+      case "DIVIDER":
+        {
+          self.RemoveChildFromTotalChildrenArray(self.ID, self.ParentID);
+        }
+        break;
+    }
+
     // TODO: reposition elements
-    self.PositionElement();
+    if (parentItem != null) {
+      self.UpdateParent(parentItem.ID);
+    }
+
+    self.Stage.draw();
   }
 
   //#endregion
@@ -1252,6 +1777,18 @@ class PlanogramItemBase {
   ToObject() {
     let self = this;
     let retVal = null;
+    let newTotalChildren = [];
+
+    self.TotalChildren.forEach(element => {
+      newTotalChildren.push({
+        Count: element.Count,
+        ID: element.ID,
+        Item: null,
+        Type: element.Type,
+        Width: element.Width
+      });
+    });
+
     switch (self.Type.toUpperCase()) {
       case "PRODUCT":
         {
@@ -1308,7 +1845,7 @@ class PlanogramItemBase {
           }
         }
         break;
-      case "BASKET":
+      case "AREA":
         {
           retVal = {
             Type: self.Type.toUpperCase(),
@@ -1325,6 +1862,28 @@ class PlanogramItemBase {
               ID: self.ID,
               ParentID: self.ParentID,
               Config: self.Config
+            }
+          }
+        }
+        break;
+      case "BASKET":
+        {
+          retVal = {
+            Type: self.Type.toUpperCase(),
+            RelativePosition: {
+              x: self.Group.getX(),
+              y: self.Group.getY(),
+            },
+            AbsolutePosition: {
+              x: self.Group.getAbsolutePosition().x,
+              y: self.Group.getAbsolutePosition().y
+            },
+            Data: {
+              Data: self.Data,
+              ID: self.ID,
+              ParentID: self.ParentID,
+              Config: self.Config,
+              TotalChildren: newTotalChildren
             }
           }
         }
@@ -1345,7 +1904,8 @@ class PlanogramItemBase {
               Data: self.Data,
               ID: self.ID,
               ParentID: self.ParentID,
-              Config: self.Config
+              Config: self.Config,
+              TotalChildren: newTotalChildren
             }
           }
         }
@@ -1366,7 +1926,8 @@ class PlanogramItemBase {
               Data: self.Data,
               ID: self.ID,
               ParentID: self.ParentID,
-              Config: self.Config
+              Config: self.Config,
+              TotalChildren: newTotalChildren
             }
           }
         }
@@ -1408,7 +1969,8 @@ class PlanogramItemBase {
               Data: self.Data,
               ID: self.ID,
               ParentID: self.ParentID,
-              Config: self.Config
+              Config: self.Config,
+              TotalChildren: newTotalChildren
             }
           }
         }
@@ -1481,30 +2043,32 @@ class PlanogramItemBase {
           }
         }
         break;
+      case "LABELHOLDER":
+        {
+          retVal = {
+            Type: self.Type.toUpperCase(),
+            RelativePosition: {
+              x: self.Group.getX(),
+              y: self.Group.getY(),
+            },
+            AbsolutePosition: {
+              x: self.Group.getAbsolutePosition().x,
+              y: self.Group.getAbsolutePosition().y
+            },
+            Data: {
+              Data: self.Data,
+              ID: self.ID,
+              ParentID: self.ParentID,
+              Config: self.Config,
+              TotalChildren: newTotalChildren
+            }
+          }
+        }
+        break;
     }
 
     return retVal;
   }
-  //#endregion
-
-  //#region Conditonal drag bound functions - nice to haves
-
-  bindShelf() {
-
-  }
-
-  bindBase() {
-
-  }
-
-  bindProduct() {
-
-  }
-
-  bindBasket() {
-
-  }
-
   //#endregion
 
   guid() {
