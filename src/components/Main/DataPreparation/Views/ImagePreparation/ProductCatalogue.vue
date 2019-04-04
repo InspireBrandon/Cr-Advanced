@@ -102,7 +102,7 @@
           </v-btn>
 
         </v-toolbar>
-        <ag-grid-vue style="width: 100%; height: calc(70vh - 25px);" class="ag-theme-balham" :columnDefs="columnDefs"
+        <ag-grid-vue style="width: 100%; height: calc(100vh - 215px);" class="ag-theme-balham" :columnDefs="columnDefs"
           :rowData="rowData" :enableSorting="true" :enableFilter="true" rowSelection="multiple" :rowDeselection="true"
           :gridReady="onGridReady" :enableColResize="true" :floatingFilter="true" :gridOptions="gridOptions"
           :suppressDragLeaveHidesColumns="true" :suppressMakeColumnVisibleAfterUnGroup="true"

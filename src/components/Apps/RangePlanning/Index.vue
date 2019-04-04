@@ -114,7 +114,7 @@
             </v-flex>
           </v-layout>
         </v-toolbar>
-        <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%;  height: calc(70vh - 25px);"
+        <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%;  height: calc(100vh - 235px);"
           :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs" :selectionChanged="onSelectionChanged"
           :rowData="rowData" :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true"
           :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true" :enableColResize="true"
