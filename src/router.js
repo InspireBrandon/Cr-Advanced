@@ -55,6 +55,12 @@ import Supergroup_BMaint from '@/components/Apps/DataPreparation/Types/Supergrou
 import DepartmentMaint from '@/components/Apps/DataPreparation/Types/Department/Index.vue'
 import SupplierMaint from '@/components/Apps/DataPreparation/Types/Supplier/Index.vue'
 import SegmentMaint from '@/components/Apps/DataPreparation/Types/Segment/Index.vue'
+import Item_StatusMaint from '@/components/Apps/DataPreparation/Types/Item_Status/Index.vue'
+import Active_Shop_CodeMaint from '@/components/Apps/DataPreparation/Types/Active_Shop_Code/Index.vue'
+import Retail_ChainMaint from '@/components/Apps/DataPreparation/Types/Retail_Chain/Index.vue'
+import PeriodMaint from '@/components/Apps/DataPreparation/Types/Period/Index.vue'
+import StoreMaint from '@/components/Apps/DataPreparation/Types/Store/Index.vue'
+
 
 
 
@@ -238,6 +244,26 @@ export default new Router({
             path: 'Segment',
             name: 'Segment',
             component: SegmentMaint
+          },{
+            path: 'Item_Status',
+            name: 'Item_Status',
+            component: Item_StatusMaint
+          },{
+            path: 'Active_Shop_Code',
+            name: 'Active_Shop_Code',
+            component: Active_Shop_CodeMaint
+          },{
+            path: 'Retail_Chain',
+            name: 'Retail_Chain',
+            component: Retail_ChainMaint
+          },{
+            path: 'Period',
+            name: 'Period',
+            component: PeriodMaint
+          },{
+            path: 'Store',
+            name: 'Store',
+            component: StoreMaint
           }
         
         ]

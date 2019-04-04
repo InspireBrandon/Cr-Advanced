@@ -63,6 +63,18 @@
                     }),new cardItem({
                         name: 'Segment',
                         route: 'Segment'
+                    }),new cardItem({
+                        name: 'Item_Status',
+                        route: 'Item_Status'
+                    }),new cardItem({
+                        name: 'Active_Shop_Code',
+                        route: 'Active_Shop_Code'
+                    }),new cardItem({
+                        name: 'Retail_Chain',
+                        route: 'Retail_Chain'
+                    }),new cardItem({
+                        name: 'Period',
+                        route: 'Period'
                     })
                 ]
             }

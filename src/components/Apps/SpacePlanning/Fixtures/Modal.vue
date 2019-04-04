@@ -121,7 +121,7 @@
                     <v-text-field type="number" v-model="form.overhang" label="Overhang:" suffix="cm"></v-text-field>
                   </v-flex>
                     <v-flex lg8 md12 sm12 xs12
-                    v-if="!form.rendering && form.type == 2 && form.fixtureType != 2 || form.fixtureType==4&&form.type==3">
+                    v-if="form.spreadProducts!='SFE'&&(!form.rendering && form.type == 2 && form.fixtureType != 2 || form.fixtureType==4&&form.type==3)">
                     <v-checkbox hide-details label="Squish" v-model="form.squish"></v-checkbox>
                   </v-flex>
 
@@ -472,7 +472,12 @@
         this.form.pegHoleColor = {
           hex: fixture.color
         }
-
+        if(self.form.squish==true){
+            self.form.spreadProducts='L2R'
+        }
+        if(self.form.squish!=null&&self.form.spreadProducts!=null){
+         self.form.squish==false
+        }
         self.form.pegDiameter = self.form.pegRadius * 2;
 
         if (fixture.image != undefined && fixture.image != null)
