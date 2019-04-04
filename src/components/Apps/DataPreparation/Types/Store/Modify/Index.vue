@@ -13,6 +13,10 @@
                     <v-card-text>
                         <Name />
                         <Properties />
+                        <Contact />
+                        <Location />
+                        <Dimensions />
+                        <Store_Manager />
                     </v-card-text>
                 </v-card>
             </v-card-text>
@@ -29,11 +33,19 @@
 <script>
     import Name from '@/components/Apps/DataPreparation/Types/Store/Modify/Sections/Name.vue'
     import Properties from '@/components/Apps/DataPreparation/Types/Store/Modify/Sections/Properties.vue'
+    import Contact from '@/components/Apps/DataPreparation/Types/Store/Modify/Sections/Contact.vue'
+    import Location from '@/components/Apps/DataPreparation/Types/Store/Modify/Sections/Location.vue'
+    import Dimensions from '@/components/Apps/DataPreparation/Types/Store/Modify/Sections/Dimensions.vue'
+    import Store_Manager from '@/components/Apps/DataPreparation/Types/Store/Modify/Sections/Store_Manager.vue'
 
     export default {
         components: {
             Name,
-            Properties
+            Properties,
+            Contact,
+            Location,
+            Dimensions,
+            Store_Manager
         },
         data: () => {
             return {
