@@ -9,6 +9,8 @@
 <script>
   export default {
     created() {
+      localStorage.ServerAddress = process.env.VUE_APP_API;
+
       if (sessionStorage.accessToken == undefined) {
         this.$router.push('/Login');
       }
