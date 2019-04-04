@@ -114,10 +114,12 @@
         },
         data: () => {
             return {
+                isAdd:true,
                 menu: false,
                 menu2: false,
                 items: [],
                 form: {
+                    id:null,
                     period_Name: null,
                     period_To_Date: null,
                     period_From_Date: null
@@ -139,7 +141,9 @@
         methods: {
             openEdit(item) {
                 let self = this;
+                self.isAdd=false
                 self.dialog = true
+                self.form.id = item.id
                 self.form.period_Name = item.period_Name
                 self.form.period_To_Date = moment(item.period_To_Date).format('YYYY-MM-DD')
                 self.form.period_From_Date = moment(item.period_From_Date).format('YYYY-MM-DD')
@@ -152,13 +156,14 @@
                 Axios.get(process.env.VUE_APP_API + `Retailer/Period`)
                     .then(r => {
                         self.items = r.data;
-                        console.log(r.data);
 
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
             openAdd() {
                 let self = this;
+                self.isAdd=true
+
                 self.dialog = true
                 self.form.period_Name = null
                 self.form.period_To_Date = null
@@ -170,12 +175,12 @@
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios[type](process.env.VUE_APP_API + `Retailer/${self.name}`, self.form)
+                Axios[type](process.env.VUE_APP_API + `Retailer/Period`, self.form)
                     .then(r => {
-                        if (self.isAdd)
+                        if (!self.isAdd)
                             self.form.id = r.data.id;
 
-                        self.callback(self.form)
+                        
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                         self.dialog = false;
                     })

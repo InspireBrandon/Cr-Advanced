@@ -75,6 +75,9 @@
                     }),new cardItem({
                         name: 'Period',
                         route: 'Period'
+                    }),new cardItem({
+                        name: 'Store',
+                        route: 'Store'
                     })
                 ]
             }
