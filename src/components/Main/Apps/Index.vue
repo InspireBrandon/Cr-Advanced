@@ -2,7 +2,7 @@
     <div>
         <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear>
         <v-container v-if="!showLoader" fluid grid-list-md>
-            <v-layout row wrap v-if="appConfigDetail.length > 0">
+            <v-layout row wrap v-if="hasDatabases">
                 <v-flex lg3 md4 sm6 xs12 v-for="(appConfigDetail, index) in appConfigDetail" :key="index">
                     <app-block :appConfigDetail="appConfigDetail"></app-block>
                 </v-flex>
@@ -16,10 +16,11 @@
                         </v-card-text>
                     </v-card>
                 </v-flex> -->
-                <v-flex lg12 md12 sm12 xs12 v-if="appConfigDetail.length <= 0">
+                <v-flex lg12 md12 sm12 xs12 v-if="!hasDatabases">
                     <v-card>
                         <v-card-text>
-                            It appears as though you do not have access to any databases. Please request access to continue...
+                            It appears as though you do not have access to any databases. Please request access to
+                            continue...
                         </v-card-text>
                     </v-card>
                 </v-flex>
@@ -48,6 +49,7 @@
                 applicationHelper: null,
                 applicationConfigHelper: null,
                 applicationDetailsHelper: null,
+                hasDatabases: false
             }
         },
         created() {
@@ -92,7 +94,7 @@
                 let self = this;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
 
-                Axios.get(process.env.VUE_APP_API + `Features?systemUserID=${encoded_details.USER_ID}`)
+                Axios.get(process.env.VUE_APP_API + `TenantAccess?systemUserID=${encoded_details.USER_ID}`)
                     .then(r => {
                         self.getAppsFromManifest(r.data)
                     })
@@ -137,8 +139,6 @@
                             return;
                         }
 
-                        console.log(r.data)
-
                         let tenantType = r.data.tenantLink_AccessTypeList[0].accessType;
 
                         switch (tenantType) {
@@ -165,32 +165,44 @@
                         }
                     })
             },
+            getDatabases(userID, callback) {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API + `TenantAccess?systemUserID=${userID}`)
+                    .then(r => {
+                        console.log(r.data)
+
+                        if(r.data.length > 0)
+                            self.hasDatabases = true;
+                        callback();
+                    })
+            },
             getAppsTmpAll() {
                 let self = this;
 
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
 
-                Axios.get(process.env.VUE_APP_API + `SystemUser?id=${encoded_details.USER_ID}`)
-                    .then(r => {
-                        if (r.data.accountID != null) {
-                            self.applicationDetailsHelper = new ApplicationDetailsHelper();
-                            self.apps = self.applicationDetailsHelper.getAllApplications();
+                self.getDatabases(encoded_details.USER_ID, () => {
+                    Axios.get(process.env.VUE_APP_API + `SystemUser?id=${encoded_details.USER_ID}`)
+                        .then(r => {
+                                self.applicationDetailsHelper = new ApplicationDetailsHelper();
+                                self.apps = self.applicationDetailsHelper.getAllApplications();
 
-                            self.apps.forEach(app => {
-                                self.appConfigDetail.push(new ConfigDetail(
-                                    self.applicationDetailsHelper.getApplicationConfigBySystemCode(
-                                        app
-                                        .system_code),
-                                    self.applicationDetailsHelper.getApplicationDetailsBySystemCode(
-                                        app
-                                        .system_code)
-                                ));
-                            })
-
-                        }
-
-                        self.showLoader = false;
-                    })
+                                self.apps.forEach(app => {
+                                    self.appConfigDetail.push(new ConfigDetail(
+                                        self.applicationDetailsHelper
+                                        .getApplicationConfigBySystemCode(
+                                            app
+                                            .system_code),
+                                        self.applicationDetailsHelper
+                                        .getApplicationDetailsBySystemCode(
+                                            app
+                                            .system_code)
+                                    ));
+                                })
+                            self.showLoader = false;
+                        })
+                })
             },
             getAppsTmpStore() {
                 let self = this;
