@@ -8,7 +8,7 @@
                     <v-icon>close</v-icon>
                 </v-btn>
             </v-toolbar>
-            <v-card-text class="ma-0">
+            <v-card-text class="ma-0 pa-0">
                 <v-card>
                     <v-tabs v-model="active" grow centered dark>
                         <v-tab ripple>Details</v-tab>
@@ -16,12 +16,26 @@
                         <v-tab ripple>Areas</v-tab>
                         <v-tab-item>
                             <v-card-text class="component-container ma-0">
-                                <Name />
-                                <Location />
-                                <Contact />
-                                <Properties />
-                                <Configuration />
-                                <Observations />
+                                <v-layout row wrap>
+                                    <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
+                                        <Name ref="name" />
+                                    </v-flex>
+                                    <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
+                                        <Location />
+                                    </v-flex>
+                                    <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
+                                        <Contact />
+                                    </v-flex>
+                                    <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
+                                        <Properties />
+                                    </v-flex>
+                                    <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
+                                        <Configuration />
+                                    </v-flex>
+                                    <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
+                                        <Observations />
+                                    </v-flex>
+                                </v-layout>
                             </v-card-text>
                         </v-tab-item>
                         <v-tab-item>
@@ -43,8 +57,8 @@
             <v-card-actions class="pa-0">
                 <v-toolbar flat color="secondary">
                     <v-spacer></v-spacer>
-                    <v-btn color="primary">Save</v-btn>
-                </v-toolbar> 
+                    <v-btn color="primary" @click="processSave">Save</v-btn>
+                </v-toolbar>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -80,12 +94,48 @@
         data: () => {
             return {
                 dialog: false,
-                active: 0
+                active: 0,
+                componentRefs: [
+                    'name'
+                ]
             }
         },
         methods: {
             open() {
                 this.dialog = true;
+            },
+            validateComponents() {
+                let self = this;
+
+                let allValid = true;
+
+                self.componentRefs.forEach(element => {
+                    let componentValid = self.$refs[element].validate();
+
+                    if (allValid && !componentValid) {
+                        allValid = false;
+                    }
+                });
+
+                if (allValid) {
+                    self.save();
+                }
+            },
+            save() {
+                let self = this;
+
+                let finalFormObj = {};
+
+                self.componentRefs.forEach(element => {
+                    let componentForm = self.$refs[element].getForm();
+                    Object.assign(finalFormObj, componentForm);
+                });
+
+                console.log(finalFormObj);
+            },
+            processSave() {
+                let self = this;
+                self.validateComponents();
             }
         }
     }
@@ -93,7 +143,7 @@
 
 <style scoped>
     .component-container {
-        height: calc(100vh - 208px);
+        height: calc(100vh - 176px);
         overflow: auto;
     }
 </style>
