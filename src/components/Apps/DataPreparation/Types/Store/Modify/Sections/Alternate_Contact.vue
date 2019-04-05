@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-toolbar flat dense dark color="blue lighten-1">Alternate Contact</v-toolbar>
+        <v-toolbar flat dense color="grey lighten-3">Alternate Contact</v-toolbar>
         <v-form>
             <v-container grid-list-md>
                 <v-layout row wrap>

@@ -22,12 +22,12 @@
 </template>
 
 <script>
-    import SimpleList from '@/components/Apps/DataPreparation/Common/SimpleList.vue'
+    // import SimpleList from '@/components/Apps/DataPreparation/Common/SimpleList.vue'
     import ModifyStore from '@/components/Apps/DataPreparation/Types/Store/Modify/Index.vue'
 
     export default {
         components: {
-            SimpleList,
+            // SimpleList,
             ModifyStore
         },
         methods: {
