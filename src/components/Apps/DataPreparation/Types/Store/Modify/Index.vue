@@ -34,7 +34,7 @@
                         <v-tab-item>
                             <v-card-text class="component-container ma-0">
                                 <Dimensions />
-                                <AnnualDirectSalesArea />
+                                <!-- <AnnualDirectSalesArea /> -->
                             </v-card-text>
                         </v-tab-item>
                     </v-tabs>

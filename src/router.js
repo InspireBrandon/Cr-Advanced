@@ -23,12 +23,10 @@ import Fixtures from '@/components/Apps/SpacePlanning/Fixtures/Index.vue'
 import DataPreparation from '@/components/Main/DataPreparation';
 import DataPreparationViewSelection from '@/components/Main/DataPreparation/ViewSelection';
 
-import PlanogramMaintenance from '@/components/Main/PlanogramMaintenance/Index.vue';
 import PlanogramImplementation from '@/components/Main/PlanogramImplementation/Index.vue'
 import RequestNewPlanogram from '@/components/Main/PlanogramImplementation/RequestNewPlanogram.vue'
 
 // Images
-import ProductCatalogue from '@/components/Main/DataPreparation/Views/ImagePreparation/ProductCatalogue';
 import Tray from '@/components/Main/DataPreparation/Views/ImagePreparation/Tray';
 import Shrink from '@/components/Main/DataPreparation/Views/ImagePreparation/Shrink';
 
@@ -60,6 +58,10 @@ import Active_Shop_CodeMaint from '@/components/Apps/DataPreparation/Types/Activ
 import Retail_ChainMaint from '@/components/Apps/DataPreparation/Types/Retail_Chain/Index.vue'
 import PeriodMaint from '@/components/Apps/DataPreparation/Types/Period/Index.vue'
 import StoreMaint from '@/components/Apps/DataPreparation/Types/Store/Index.vue'
+import PlanogramMaintenance from '@/components/Apps/DataPreparation/Types/PlanogramMaintenance/Index.vue';
+import ProductCatalogue from '@/components/Apps/DataPreparation/Types/ProductCatalogue/ProductCatalogue.vue';
+
+
 
 
 
@@ -158,11 +160,7 @@ export default new Router({
           name: "request_new_planogram",
           component: RequestNewPlanogram
         },
-        {
-          path: "/PlanogramMaintenance",
-          name: "planogram_maintenance",
-          component: PlanogramMaintenance
-        }, {
+         {
           path: '/SystemReportList',
           name: 'system_report_list',
           component: SystemReportList
@@ -182,10 +180,6 @@ export default new Router({
           path: '/Reports/SpacePlanning/ProductReport/:SystemFileID',
           name: 'product_report',
           component: ProductReport
-        }, {
-          path: '/ProductCatalogue',
-          name: 'ProductCatalogue',
-          component: ProductCatalogue
         },
         {
           path: '/DataImport',
@@ -264,6 +258,14 @@ export default new Router({
             path: 'Store',
             name: 'Store',
             component: StoreMaint
+          },{
+            path: "PlanogramMaintenance",
+            name: "planogram_maintenance",
+            component: PlanogramMaintenance
+          }, {
+            path: 'ProductCatalogue',
+            name: 'ProductCatalogue',
+            component: ProductCatalogue
           }
         
         ]
