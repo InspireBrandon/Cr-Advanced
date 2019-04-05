@@ -5,7 +5,7 @@
                 <v-flex>
                     <v-card>
                         <v-toolbar dark dense>
-                            <v-toolbar-title>Data Import</v-toolbar-title>
+                            <v-toolbar-title>Data Preparation</v-toolbar-title>
                         </v-toolbar>
                         <v-card-text>
                             <v-layout row wrap>
@@ -78,6 +78,12 @@
                     }),new cardItem({
                         name: 'Store',
                         route: 'Store'
+                    }),new cardItem({
+                        name: 'Planogram Maintenance',
+                        route: 'PlanogramMaintenance'
+                    }),new cardItem({
+                        name: 'Product Catalogue',
+                        route: 'ProductCatalogue'
                     })
                 ]
             }
