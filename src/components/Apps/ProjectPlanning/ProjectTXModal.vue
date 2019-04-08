@@ -72,6 +72,8 @@
     export default {
         data() {
             return {
+                id: null,
+                uid: null,
                 Type: null,
                 Stores: [],
                 StoreClusters: [],
@@ -239,26 +241,36 @@
             },
             open(isAdd, item) {
                 var self = this
-                self.projectID = item.project_ID
+                console.log("isAdd");
+
+                console.log(item);
+
+
+
                 self.dialog = true
 
 
 
-                if (isAdd == true) {
-                    self.isAdd=true
-                    self.Type = item.type,
-                        self.selectedPlanogram = item.project_ID,
-                        self.date = item.dateTimeString
+                if (isAdd == false) {
+                    self.isAdd = false
+                    self.projectID = item.project_ID
+                    self.id = item.id
+                    self.uid = item.uid
+                    self.Type = item.type
+                    self.selectedPlanogram = item.planogram_ID
+                    self.date = item.dateTimeString
                     self.Status = item.status
                     self.Store = item.store_ID
                     self.StoreCluster = item.storeCluster_ID
                     self.CategoryCluster = item.storeCluster
                     self.AssignedUser = item.systemUserID
                 }
-                if (isAdd == false) {
-                      self.isAdd=false
-                    self.Type =null,
-                        self.selectedPlanogram = null,
+                if (isAdd == true) {
+                    self.projectID = item.id
+
+                    self.isAdd = true
+                    self.Type = null,
+                        self.selectedPlanogram = item.planogram_ID,
                         self.date = null
                     self.Status = null
                     self.Store = null
@@ -270,24 +282,37 @@
             submit() {
                 var self = this
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                let trans = {
-                    "project_ID": self.projectID,
-                    "storeCluster_ID": self.storeCluster,
-                    "store_ID": self.Store,
-                    "dateTime": self.date,
-                    "status": self.status,
-                    "Type": self.Type,
-                    "systemUserID": self.AssignedUser,
-                }
-                if (self.isAdd==false) {
+
+                if (self.isAdd == false) {
+                    let trans = {
+                        "id": self.id,
+                        "uid": self.uid,
+                        "project_ID": self.projectID,
+                        "storeCluster_ID": self.storeCluster,
+                        "store_ID": self.Store,
+                        "dateTime": self.date,
+                        "status": self.status,
+                        "Type": self.Type,
+                        "systemUserID": self.AssignedUser,
+                    }
                     Axios.put(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
                         console.log(res);
 
                         delete Axios.defaults.headers.common["TenantID"];
                     })
                 }
-                if (self.isAdd==true) {
+                if (self.isAdd == true) {
+                    let trans = {
+                        "project_ID": self.projectID,
+                        "storeCluster_ID": self.storeCluster,
+                        "store_ID": self.Store,
+                        "dateTime": self.date,
+                        "status": self.status,
+                        "Type": self.Type,
+                        "systemUserID": self.AssignedUser,
+                    }
                     Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
                         console.log(res);
 
