@@ -15,7 +15,7 @@
                             </v-btn>
                         </v-toolbar>
                         <v-list dense class="pa-0 list-height">
-                            <template v-for="(item, index) in items">
+                            <template v-if="index < 25" v-for="(item, index) in paginatedItems">
                                 <v-list-tile :key="item.title" avatar ripple>
                                     <v-list-tile-content>
                                         <v-list-tile-title>
@@ -38,6 +38,13 @@
                                 <v-divider v-if="index + 1 < items.length" :key="index"></v-divider>
                             </template>
                         </v-list>
+                        <v-toolbar flat dense dark>
+                            <v-spacer></v-spacer>
+                            <v-btn :disabled="pageNumber == 0" color="primary" @click="pageNumber--">back</v-btn>
+                            {{ pageNumber + 1 }} / {{ Math.round(items.length / allowedRecords) == 0 ? 1 : Math.round(items.length / allowedRecords) }}
+                            <v-btn :disabled="pageNumber == (Math.round(items.length / allowedRecords) - 1) " color="primary" @click="pageNumber++">next</v-btn>
+                            <v-spacer></v-spacer>
+                        </v-toolbar>
                     </v-card>
                 </v-flex>
             </v-layout>
@@ -58,11 +65,22 @@
         },
         data: () => {
             return {
-                items: []
+                items: [],
+                pageNumber: 0,
+                allowedRecords: 25
             }
         },
         created() {
             this.getItems();
+        },
+        computed: {
+            paginatedItems() {
+                let self = this;
+
+                let items = JSON.parse(JSON.stringify(self.items));
+                let tmp = items.splice(((self.pageNumber * self.allowedRecords)), self.allowedRecords)
+                return tmp;
+            }
         },
         methods: {
             openEdit(item) {
@@ -94,7 +112,7 @@
 
 <style scoped>
     .list-height {
-        height: calc(100vh - 200px);
+        height: calc(100vh - 220px);
         overflow: auto;
     }
 </style>
