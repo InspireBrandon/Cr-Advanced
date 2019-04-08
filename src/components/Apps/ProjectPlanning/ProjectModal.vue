@@ -64,14 +64,14 @@
             getPlanograms() {
                 let self = this;
 
-                Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&folder=SPACE PLANNING')
+                Axios.get(process.env.VUE_APP_API + 'Planogram')
                     .then(r => {
                         console.log(r.data);
 
-                        r.data.forEach(element => {
+                        r.data.planogramList.forEach(element => {
 
                             self.planogramsList.push({
-                                text: element.name,
+                                text: element.displayname,
                                 value: element.id
                             })
                         });
