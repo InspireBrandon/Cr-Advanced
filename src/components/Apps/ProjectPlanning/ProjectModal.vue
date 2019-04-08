@@ -16,8 +16,8 @@
             <v-container grid-list-md>
                 <v-layout row wrap>
                     <v-flex md12>
-                        <v-autocomplete placeholder="Please select a Spaceplan..." v-model="selectedPlanogram" :items="planogramsList"
-                            solo light>
+                        <v-autocomplete placeholder="Please select a Spaceplan..." v-model="selectedPlanogram"
+                            :items="planogramsList" solo light>
                         </v-autocomplete>
                     </v-flex>
 
@@ -64,11 +64,11 @@
             getPlanograms() {
                 let self = this;
 
-                Axios.get(process.env.VUE_APP_API + 'Planogram')
-                    .then(r => {
-                        console.log(r.data);
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                        r.data.planogramList.forEach(element => {
+                Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&folder=SPACE PLANNING')
+                    .then(r => {
+                        r.data.forEach(element => {
 
                             self.planogramsList.push({
                                 text: element.displayname,
@@ -76,8 +76,7 @@
                             })
                         });
 
-
-
+                        delete Axios.defaults.headers.common["TenantID"];
                     })
             },
             open(isAdd, item) {
@@ -104,10 +103,13 @@
                     "description": self.description,
                     "deleted": false
                 }
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
                 Axios.post(process.env.VUE_APP_API + 'Project', tmp).then(r => {
                     console.log(r);
                     self.dialog = false
-
+                    delete Axios.defaults.headers.common["TenantID"];
                 })
 
             }
