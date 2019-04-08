@@ -62,7 +62,8 @@ import PlanogramMaintenance from '@/components/Apps/DataPreparation/Types/Planog
 import ProductCatalogue from '@/components/Apps/DataPreparation/Types/ProductCatalogue/ProductCatalogue.vue';
 
 
-
+//projectPlanning
+import ProjectPlanning from '@/components/Apps/ProjectPlanning/Index.vue';
 
 
 
@@ -160,7 +161,8 @@ export default new Router({
           name: "request_new_planogram",
           component: RequestNewPlanogram
         },
-         {
+       
+        {
           path: '/SystemReportList',
           name: 'system_report_list',
           component: SystemReportList
@@ -182,6 +184,11 @@ export default new Router({
           component: ProductReport
         },
         {
+          path: "/ProjectPlanning",
+          name: "project_planning",
+          component: ProjectPlanning
+        },
+        {
           path: '/DataImport',
           name: 'DataImport',
           component: DataImport,
@@ -197,78 +204,79 @@ export default new Router({
             path: 'Product Sales',
             name: 'Sales',
             component: SalesImport
-          },{
+          }, {
             path: 'New Products',
             name: 'new products',
             component: NewProducts
           }]
-        }, {
+        }, 
+        {
           path: '/DataPreparation',
           name: 'DataPrep',
           component: DataPrep,
           children: [{
-            path: '',
-            name: 'DataPrep',
-            component: DataPrepSections,
-          }, {
-            path: 'Manufacturer',
-            name: 'Manufacturer',
-            component: ManufacturerMaint
-          }, {
-            path: 'Brand',
-            name: 'Brand',
-            component: BrandMaint
-          },{
-            path: 'Supergroup_A',
-            name: 'Supergroup_A',
-            component: Supergroup_AMaint
-          },{
-            path: 'Supergroup_B',
-            name: 'Supergroup_B',
-            component: Supergroup_BMaint
-          },{
-            path: 'Department',
-            name: 'Department',
-            component: DepartmentMaint
-          },{
-            path: 'Supplier',
-            name: 'Supplier',
-            component: SupplierMaint
-          },{
-            path: 'Segment',
-            name: 'Segment',
-            component: SegmentMaint
-          },{
-            path: 'Item_Status',
-            name: 'Item_Status',
-            component: Item_StatusMaint
-          },{
-            path: 'Active_Shop_Code',
-            name: 'Active_Shop_Code',
-            component: Active_Shop_CodeMaint
-          },{
-            path: 'Retail_Chain',
-            name: 'Retail_Chain',
-            component: Retail_ChainMaint
-          },{
-            path: 'Period',
-            name: 'Period',
-            component: PeriodMaint
-          },{
-            path: 'Store',
-            name: 'Store',
-            component: StoreMaint
-          },{
-            path: "PlanogramMaintenance",
-            name: "planogram_maintenance",
-            component: PlanogramMaintenance
-          }, {
-            path: 'ProductCatalogue',
-            name: 'ProductCatalogue',
-            component: ProductCatalogue
-          }
-        
-        ]
+              path: '',
+              name: 'DataPrep',
+              component: DataPrepSections,
+            }, {
+              path: 'Manufacturer',
+              name: 'Manufacturer',
+              component: ManufacturerMaint
+            }, {
+              path: 'Brand',
+              name: 'Brand',
+              component: BrandMaint
+            }, {
+              path: 'Supergroup_A',
+              name: 'Supergroup_A',
+              component: Supergroup_AMaint
+            }, {
+              path: 'Supergroup_B',
+              name: 'Supergroup_B',
+              component: Supergroup_BMaint
+            }, {
+              path: 'Department',
+              name: 'Department',
+              component: DepartmentMaint
+            }, {
+              path: 'Supplier',
+              name: 'Supplier',
+              component: SupplierMaint
+            }, {
+              path: 'Segment',
+              name: 'Segment',
+              component: SegmentMaint
+            }, {
+              path: 'Item_Status',
+              name: 'Item_Status',
+              component: Item_StatusMaint
+            }, {
+              path: 'Active_Shop_Code',
+              name: 'Active_Shop_Code',
+              component: Active_Shop_CodeMaint
+            }, {
+              path: 'Retail_Chain',
+              name: 'Retail_Chain',
+              component: Retail_ChainMaint
+            }, {
+              path: 'Period',
+              name: 'Period',
+              component: PeriodMaint
+            }, {
+              path: 'Store',
+              name: 'Store',
+              component: StoreMaint
+            }, {
+              path: "PlanogramMaintenance",
+              name: "planogram_maintenance",
+              component: PlanogramMaintenance
+            }, {
+              path: 'ProductCatalogue',
+              name: 'ProductCatalogue',
+              component: ProductCatalogue
+            }
+
+          ]
         }
       ]
     },

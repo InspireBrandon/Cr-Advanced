@@ -1,0 +1,13 @@
+
+{
+    "configName":"ProjectPlanning",
+    "report":false,
+    "routes": [
+        {
+            "route": "/ProjectPlanning",
+            "routeName": "ProjectPlanning",
+            "title": "Project Planning",
+            "openInNewWindow": false
+        }
+    ]
+}
