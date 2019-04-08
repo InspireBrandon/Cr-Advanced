@@ -272,10 +272,7 @@
                     .then(r => {
                         if (r.data.length > 0) {
                             self.databases = r.data;
-
-                            if (r.data.length == 1) {
-                                sessionStorage.currentDatabase = r.data[0].tenantID;
-                            }
+                            sessionStorage.currentDatabase = r.data[0].tenantID;
                         }
                     })
             },
