@@ -36,10 +36,7 @@
 
                 </v-card-actions>
             </v-container>
-
-
         </v-card>
-
     </v-dialog>
 
 </template>
@@ -53,6 +50,8 @@
     export default {
         data() {
             return {
+                project: null,
+                isAdd: false,
                 dialog: false,
                 planogramsList: [],
                 selectedPlanogram: null,
@@ -85,46 +84,65 @@
                 var self = this
                 self.dialog = true
                 console.log(item);
-                
-                if (isAdd == true) {
+
+                if (isAdd == false) {
+                    self.isAdd = false
+                    self.project=item
                     self.selectedPlanogram = item.planogram_ID,
                         self.name = item.name,
                         self.description = item.description
                 }
-                if (isAdd == false) {
+                if (isAdd == true) {
                     self.selectedPlanogram = null,
-                        self.name = null,
+                        self.isAdd = true
+                    self.name = null,
                         self.description = null
                 }
             },
             submit() {
                 var self = this
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
-                let tmp = {
-                    "systemUserID": encoded_details.USER_ID,
-                    "planogram_ID": self.selectedPlanogram,
-                    "name": self.name,
-                    "description": self.description,
-                    "deleted": false
-                }
-
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
-                Axios.post(process.env.VUE_APP_API + 'Project', tmp).then(r => {
-
-
-
-                    let trans = {
-                        "project_ID": r.data.project.id,
-                        "type": 0,
-                        "status": 0,
+                if (self.isAdd == true) {
+                    let tmp = {
                         "systemUserID": encoded_details.USER_ID,
+                        "planogram_ID": self.selectedPlanogram,
+                        "name": self.name,
+                        "description": self.description,
+                        "deleted": false
                     }
-                    Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
-                        delete Axios.defaults.headers.common["TenantID"];
+
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    Axios.post(process.env.VUE_APP_API + 'Project', tmp).then(r => {
+                        let trans = {
+                            "project_ID": r.data.project.id,
+                            "type": 0,
+                            "status": 0,
+                            "systemUserID": encoded_details.USER_ID,
+                        }
+                        Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
+                            delete Axios.defaults.headers.common["TenantID"];
+                        })
+                        self.dialog = false
                     })
-                    self.dialog = false
-                })
+                }
+                if (self.isAdd == false) {
+                    console.log(self.project);
+                    
+                    let tmp = {
+                        "id": self.project.id,
+                        "systemUserID": encoded_details.USER_ID,
+                        "planogram_ID": self.selectedPlanogram,
+                        "name": self.name,
+                        "description": self.description,
+                        "deleted": false
+                    }
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                    Axios.put(process.env.VUE_APP_API + 'Project', tmp).then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        self.dialog = false
+                    })
+                }
 
             }
         }

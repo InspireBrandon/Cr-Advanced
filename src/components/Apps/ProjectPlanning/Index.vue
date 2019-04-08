@@ -1,60 +1,47 @@
 <template>
     <div>
-        <v-layout wrap>
-            <v-flex md3>
-                <v-navigation-drawer>
-                    <v-list>
-                        <v-list-tile>
-
-                            <v-list-tile-content>Projects</v-list-tile-content>
-                            <v-list-tile-action>
-                                <v-btn icon @click="openProjectsModal">
-                                    <v-icon>
-                                        add
-                                    </v-icon>
-                                </v-btn>
-
-                            </v-list-tile-action>
-                        </v-list-tile>
-                    </v-list>
-                    <v-list class="pt-0" dense>
-                        <v-divider></v-divider>
-
-                        <v-list-tile v-for="item in Projects" :key="item.title" @click="getTransactions(item)">
-                            <v-list-tile-content>
-                                <v-list-tile-title>{{ item.name }}</v-list-tile-title>
-                            </v-list-tile-content>
-                            <v-menu left>
-                                <v-btn slot="activator" icon>
-                                    <v-icon>more_vert</v-icon>
-                                </v-btn>
-                                <v-list dense>
-                                    <v-list-tile @click="openProjectEdit(item)">Edit</v-list-tile>
-                                    <v-divider></v-divider>
-                                    <v-list-tile>Delete</v-list-tile>
-                                </v-list>
-                            </v-menu>
-                        </v-list-tile>
-                    </v-list>
-                </v-navigation-drawer>
-            </v-flex>
-            <v-flex md8>
-
+        <v-navigation-drawer style="padding-top: 4%;" app>
+            <v-list >
+                <v-list-tile>
+                    <v-list-tile-content>Projects</v-list-tile-content>
+                    <v-list-tile-action>
+                        <v-btn icon @click="openProjectAdd()">
+                            <v-icon>
+                                add
+                            </v-icon>
+                        </v-btn>
+                    </v-list-tile-action>
+                </v-list-tile>
+            </v-list>
+            <v-list class="pt-0" dense>
+                <v-divider></v-divider>
+                <v-list-tile v-for="item in Projects" :key="item.title" @click="getTransactions(item)">
+                    <v-list-tile-content>
+                        <v-list-tile-title>{{ item.name }}</v-list-tile-title>
+                    </v-list-tile-content>
+                    <v-menu left>
+                        <v-btn slot="activator" icon>
+                            <v-icon>more_vert</v-icon>
+                        </v-btn>
+                        <v-list dense>
+                            <v-list-tile @click="openProjectEdit(item)">Edit</v-list-tile>
+                            <v-divider></v-divider>
+                            <v-list-tile>Delete</v-list-tile>
+                        </v-list>
+                    </v-menu>
+                </v-list-tile>
+            </v-list>
+        </v-navigation-drawer>
+        <v-content class="ma-o pa-0">
                 <v-toolbar color="primary" dark flat>
                     <v-toolbar-title>
                         Project Planning
                     </v-toolbar-title>
                     <v-spacer></v-spacer>
-
-
                     <v-btn icon @click="$router.go(-1)">
                         <v-icon>arrow_back</v-icon>
                     </v-btn>
                 </v-toolbar>
-
-                <v-layout row wrap>
-                    <v-flex md12>
-
                         <v-data-table :headers="headers" :items="ProjectTXs" hide-actions>
                             <template v-slot:items="props">
                                 <td>{{ props.item.dateTimeString }} </td>
@@ -79,18 +66,18 @@
                                     </v-menu>
                                 </td>
                             </template>
-
                         </v-data-table>
                         <v-btn fab dark color="primary" v-if="project!=null" @click="openProjectTXAdd()">
                             <v-icon>add</v-icon>
                         </v-btn>
-                    </v-flex>
-                </v-layout>
-            </v-flex>
+                    
+               
 
-        </v-layout>
-        <ProjectModal ref="ProjectModal"> </ProjectModal>
+<ProjectModal ref="ProjectModal"> </ProjectModal>
         <ProjectTXModal ref="ProjectTXModal"> </ProjectTXModal>
+           
+        </v-content>
+        
     </div>
 </template>
 <script>
@@ -189,6 +176,10 @@
         methods: {
             openProjectEdit(item) {
                 var self = this
+                self.$refs.ProjectModal.open(false, item)
+            },
+            openProjectAdd(item) {
+                var self = this
                 self.$refs.ProjectModal.open(true, item)
             },
             openProjectTXAdd() {
@@ -222,9 +213,9 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.get(process.env.VUE_APP_API + `ProjectTX?projectID=${item.id}`).then(r => {
                     self.ProjectTXs = r.data.projectTXList
-console.log("self.ProjectTXs");
+                    console.log("self.ProjectTXs");
 
-console.log(self.ProjectTXs);
+                    console.log(self.ProjectTXs);
 
                     delete Axios.defaults.headers.common["TenantID"];
 
