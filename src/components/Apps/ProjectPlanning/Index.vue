@@ -58,7 +58,7 @@
                     <v-divider></v-divider>
 
                     <v-list-tile v-for="item in Projects" :key="item.title" @click="getProjectData(item)">
-                        <v-list-tile-content>
+                        <v-list-tile-content @click="getTransactions(item)">
                             <v-list-tile-title>{{ item.Name }}</v-list-tile-title>
                         </v-list-tile-content>
                     </v-list-tile>
@@ -72,6 +72,7 @@
 <script>
     import ProjectModal from './ProjectModal.vue'
     import ProjectTXModal from './ProjectTXModal.vue'
+    import Axios from 'axios'
     export default {
         components: {
             ProjectModal,
@@ -112,6 +113,9 @@
 
             }
         },
+        mounted() {
+            this.getProjects()
+        },
         methods: {
             getProjectData(item) {
 
@@ -120,11 +124,34 @@
                 var self = this
                 self.$refs.ProjectModal.open(false)
             },
-            getProjects(){
+            getProjects() {
                 var self = this
-            
-            },
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
+                Axios.get(process.env.VUE_APP_API + 'Project').then(r => {
+                     console.log('Project');
+                    console.log(r);
+                   self.Projects=r.data.projectList
+                    delete Axios.defaults.headers.common["TenantID"];
+
+
+                })
+
+
+            },
+            getTransactions(item) {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                if (item.id != undefined || item.id != null) {
+                    Axios.get(process.env.VUE_APP_API + `Project?projectID=${item.id}`).then(r => {
+                        self.ProjectTXs=r.data
+                        delete Axios.defaults.headers.common["TenantID"];
+
+                    })
+
+                }
+
+            }
         }
     }
 </script>
