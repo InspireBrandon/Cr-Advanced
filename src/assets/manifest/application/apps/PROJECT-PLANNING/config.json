@@ -4,8 +4,8 @@
     "report":false,
     "routes": [
         {
-            "route": "/ProjectPlanning",
-            "routeName": "ProjectPlanning",
+            "route": "/Drawer",
+            "routeName": "Drawer",
             "title": "Project Planning",
             "openInNewWindow": false
         }

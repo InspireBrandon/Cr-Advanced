@@ -64,6 +64,8 @@ import ProductCatalogue from '@/components/Apps/DataPreparation/Types/ProductCat
 
 //projectPlanning
 import ProjectPlanning from '@/components/Apps/ProjectPlanning/Index.vue';
+import Drawer from '@/components/Apps/ProjectPlanning/Drawer.vue';
+
 
 
 
@@ -186,7 +188,12 @@ export default new Router({
         {
           path: "/ProjectPlanning",
           name: "project_planning",
-          component: ProjectPlanning
+          component: ProjectPlanning,
+          children:[{ 
+            path: "/Drawer",
+            name: "Drawer",
+            component: Drawer
+          }]
         },
         {
           path: '/DataImport',
