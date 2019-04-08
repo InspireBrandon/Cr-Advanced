@@ -46,6 +46,9 @@
 <script>
     import jwt from 'jsonwebtoken';
     import Axios from 'axios'
+    import {
+        SSL_OP_SSLREF2_REUSE_CERT_TYPE_BUG
+    } from 'constants';
 
     export default {
         data() {
@@ -66,7 +69,6 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.get(process.env.VUE_APP_API + 'Planogram')
                     .then(r => {
-                        console.log(r.data);
 
                         r.data.planogramList.forEach(element => {
 
@@ -82,8 +84,10 @@
             open(isAdd, item) {
                 var self = this
                 self.dialog = true
+                console.log(item);
+                
                 if (isAdd == true) {
-                    self.selectedPlanogram = item.selectedPlanogram,
+                    self.selectedPlanogram = item.planogram_ID,
                         self.name = item.name,
                         self.description = item.description
                 }
@@ -107,10 +111,19 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.post(process.env.VUE_APP_API + 'Project', tmp).then(r => {
-                  
-                  console.log(r);
+
+
+
+                    let trans = {
+                        "project_ID": r.data.project.id,
+                        "type": 0,
+                        "status": 0,
+                        "systemUserID": encoded_details.USER_ID,
+                    }
+                    Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
                     self.dialog = false
-                    delete Axios.defaults.headers.common["TenantID"];
                 })
 
             }
