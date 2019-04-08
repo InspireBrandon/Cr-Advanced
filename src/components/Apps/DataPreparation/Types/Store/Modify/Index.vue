@@ -4,7 +4,7 @@
             <v-toolbar dark flat color="primary">
                 <v-toolbar-title>Maintain Store</v-toolbar-title>
                 <v-spacer></v-spacer>
-                <v-btn icon>
+                <v-btn icon @click="dialog=false">
                     <v-icon>close</v-icon>
                 </v-btn>
             </v-toolbar>
