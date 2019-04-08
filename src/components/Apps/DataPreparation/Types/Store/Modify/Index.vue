@@ -1,10 +1,10 @@
 <template>
-    <v-dialog v-model="dialog" fullscreen>
+    <v-dialog transition="dialog-bottom-transition" v-model="dialog" fullscreen>
         <v-card>
             <v-toolbar dark flat color="primary">
                 <v-toolbar-title>Maintain Store</v-toolbar-title>
                 <v-spacer></v-spacer>
-                <v-btn icon>
+                <v-btn icon @click="dialog = false">
                     <v-icon>close</v-icon>
                 </v-btn>
             </v-toolbar>
@@ -40,15 +40,26 @@
                         </v-tab-item>
                         <v-tab-item>
                             <v-card-text class="component-container ma-0">
-                                <StoreManager />
-                                <AssistantManager />
-                                <AlternateContact />
+                                <v-layout row wrap>
+                                    <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
+                                        <StoreManager />
+                                    </v-flex>
+                                    <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
+                                        <AssistantManager />
+                                    </v-flex>
+                                    <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
+                                        <AlternateContact />
+                                    </v-flex>
+                                </v-layout>
                             </v-card-text>
                         </v-tab-item>
                         <v-tab-item>
                             <v-card-text class="component-container ma-0">
-                                <Dimensions />
-                                <!-- <AnnualDirectSalesArea /> -->
+                                <v-layout row wrap>
+                                    <v-flex xl12 lg12 md12 sm12 xs12 class="pa-1">
+                                        <Dimensions />
+                                    </v-flex>
+                                </v-layout>
                             </v-card-text>
                         </v-tab-item>
                     </v-tabs>
