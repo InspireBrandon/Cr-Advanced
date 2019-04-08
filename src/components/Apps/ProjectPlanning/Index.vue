@@ -129,7 +129,9 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.get(process.env.VUE_APP_API + 'Project').then(r => {
+                     console.log('Project');
                     console.log(r);
+                   self.Projects=r.data.projectList
                     delete Axios.defaults.headers.common["TenantID"];
 
 
