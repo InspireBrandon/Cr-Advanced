@@ -131,7 +131,7 @@
                 let file = files[0];
 
                 self.createUploadTransaction(file.name, self.name, transactionID => {
-                    self.uploadImportFile(transactionID, () => {
+                    self.uploadImportFile(transactionID, file, () => {
 
                     })
                 })
@@ -152,14 +152,25 @@
                     .then(r => {
                         delete Axios.defaults.headers.common["TenantID"];
                         self.items.push(r.data.importTransactionItem);
-
+                        callback(r.data.importTransactionItem.id);
                     })
                     .catch(e => {
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
-            uploadImportFile(transactionID, callback) {
+            uploadImportFile(transactionID, file, callback) {
                 let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `DataImport/ImportDatabase/UploadFile?importTransactionID=` + transactionID, file)
+                    .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        console.log(r);
+                    })
+                    .catch(e => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
             },
             queryAndIndeterminate(name) {
                 let self = this;
