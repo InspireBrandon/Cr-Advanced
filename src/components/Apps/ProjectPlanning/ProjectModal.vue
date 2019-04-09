@@ -43,13 +43,12 @@
 <script>
     import jwt from 'jsonwebtoken';
     import Axios from 'axios'
-    import {
-        SSL_OP_SSLREF2_REUSE_CERT_TYPE_BUG
-    } from 'constants';
+   
 
     export default {
         data() {
             return {
+                afterClose:null,
                 project: null,
                 isAdd: false,
                 dialog: false,
@@ -80,10 +79,9 @@
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
-            open(isAdd, item) {
+            open(isAdd, item,callback) {
                 var self = this
                 self.dialog = true
-                console.log(item);
 
                 if (isAdd == false) {
                     self.isAdd = false
@@ -98,7 +96,9 @@
                     self.name = null,
                         self.description = null
                 }
+                self.afterClose=callback
             },
+
             submit() {
                 var self = this
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
@@ -122,12 +122,15 @@
                         }
                         Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
                             delete Axios.defaults.headers.common["TenantID"];
+                              self.dialog = false
+                              self.afterClose(r)
                         })
-                        self.dialog = false
+                        
+                        
+              
                     })
                 }
                 if (self.isAdd == false) {
-                    console.log(self.project);
                     
                     let tmp = {
                         "id": self.project.id,
@@ -141,6 +144,7 @@
                     Axios.put(process.env.VUE_APP_API + 'Project', tmp).then(r => {
                         delete Axios.defaults.headers.common["TenantID"];
                         self.dialog = false
+                              self.afterClose(tmp)
                     })
                 }
 

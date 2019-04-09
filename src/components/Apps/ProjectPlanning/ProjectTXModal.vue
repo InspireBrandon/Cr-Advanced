@@ -3,7 +3,7 @@
     <v-dialog fullscreen v-model="dialog">
         <v-card>
             <v-toolbar color="primary" flat dark>
-                <v-toolbar-title>Project Modal</v-toolbar-title>
+                <v-toolbar-title>Project Transaction Modal</v-toolbar-title>
                 <v-spacer></v-spacer>
 
                 <v-btn icon @click="dialog=false">
@@ -15,22 +15,37 @@
             </v-toolbar>
             <v-container grid-list-md>
                 <v-layout row wrap>
-                    <v-flex md12>
+                    <!-- <v-flex md12>
                         <v-autocomplete placeholder="Please select a Spaceplan..." v-model="selectedPlanogram" :items="planogramsList"
                             solo light>
                         </v-autocomplete>
-                    </v-flex>
+                    </v-flex> -->
 
-                    <v-flex md6>
-                        <v-text-field label="Date" placeholder="Date" v-model="date"></v-text-field>
-                    </v-flex>
                     <v-flex md6>
                         <v-select label="Status" placeholder="Status" :items="statusList" v-model="Status"></v-select>
 
                     </v-flex>
+
+                    <v-flex md6>
+                        <v-menu ref="menu" v-model="menu" :close-on-content-click="false" :nudge-right="40"
+                            :return-value.sync="date" lazy transition="scale-transition" offset-y full-width
+                            min-width="290px">
+                            <template v-slot:activator="{ on }">
+                                <v-text-field v-model="date" label="Picker in menu" prepend-icon="event" readonly
+                                    v-on="on"></v-text-field>
+                            </template>
+                            <v-date-picker v-model="date" no-title scrollable>
+                                <v-spacer></v-spacer>
+                                <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
+                                <v-btn flat color="primary" @click="$refs.menu.save(date)">OK</v-btn>
+                            </v-date-picker>
+                        </v-menu>
+                        <!-- <v-text-field label="Date" placeholder="Date" v-model="date"></v-text-field> -->
+                    </v-flex>
                     <v-flex md6>
                         <!-- <v-text-field label="Store" placeholder="Store" v-model="Store"></v-text-field> -->
-                        <v-autocomplete style="max-width: 400px;" dense v-model="Store" :items="Stores" label="select a Store"></v-autocomplete>
+                        <v-autocomplete style="max-width: 400px;" dense v-model="Store" :items="Stores"
+                            label="select a Store"></v-autocomplete>
                     </v-flex>
                     <v-flex md6>
                         <!-- <v-text-field label="StoreCluster" placeholder="StoreCluster" v-model="StoreCluster"></v-text-field> -->
@@ -39,15 +54,17 @@
                     </v-flex>
                     <v-flex md6>
                         <!-- <v-text-field label="CategoryCluster" placeholder="CategoryCluster" v-model="CategoryCluster"></v-text-field> -->
-                        <v-autocomplete disabled style="max-width: 400px;" dense v-model="CategoryCluster" :items="CategoryClusters"
-                            label="select a CategoryCluster"></v-autocomplete>
+                        <v-autocomplete disabled style="max-width: 400px;" dense v-model="CategoryCluster"
+                            :items="CategoryClusters" label="select a CategoryCluster"></v-autocomplete>
                     </v-flex>
                     <v-flex md6>
-                        <v-autocomplete style="max-width: 400px;" dense v-model="AssignedUser" :items="users" label="find a user"></v-autocomplete>
+                        <v-autocomplete style="max-width: 400px;" dense v-model="AssignedUser" :items="users"
+                            label="find a user"></v-autocomplete>
                         <!-- <v-text-field label="AssignedUser" placeholder="AssignedUser" v-model="AssignedUser"></v-text-field> -->
                     </v-flex>
                     <v-flex md6>
-                        <v-autocomplete style="max-width: 400px;" dense v-model="Type" :items="typeList" label="Select a Type"></v-autocomplete>
+                        <v-autocomplete style="max-width: 400px;" dense v-model="Type" :items="typeList"
+                            label="Select a Type"></v-autocomplete>
                         <!-- <v-text-field label="AssignedUser" placeholder="AssignedUser" v-model="AssignedUser"></v-text-field> -->
                     </v-flex>
                 </v-layout>
@@ -72,6 +89,7 @@
     export default {
         data() {
             return {
+                menu: null,
                 id: null,
                 uid: null,
                 Type: null,
@@ -241,15 +259,7 @@
             },
             open(isAdd, item) {
                 var self = this
-                console.log("isAdd");
-
-                console.log(item);
-
-
-
                 self.dialog = true
-
-
 
                 if (isAdd == false) {
                     self.isAdd = false
@@ -298,7 +308,6 @@
                         "systemUserID": self.AssignedUser,
                     }
                     Axios.put(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
-                        console.log(res);
 
                         delete Axios.defaults.headers.common["TenantID"];
                     })
@@ -314,8 +323,8 @@
                         "systemUserID": self.AssignedUser,
                     }
                     Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
-                        console.log(res);
-
+                            console.log(res);
+                            
                         delete Axios.defaults.headers.common["TenantID"];
                     })
                 }
