@@ -1,31 +1,26 @@
 <template>
     <v-card>
-        <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear>
-        <v-container v-show="!showLoader" grid-list-md>
+        <v-toolbar dense dark>
+            <v-spacer></v-spacer>
+            <v-toolbar-title>Planogram Implementation</v-toolbar-title>
+        </v-toolbar>
+        <v-container grid-list-md>
             <v-layout row wrap>
-                <v-flex lg3 md4 sm12 xs12>
-                    Store
-                    <v-autocomplete placeholder="Please select a store..." @change="getPlanogramsByStore" v-model="selectedStore"
-                        :items="storesDropdown" solo light :disabled="storeDisabled">
-                    </v-autocomplete>
+                <v-flex xl4 lg4 md6 sm12 xs12>
+                    <v-autocomplete @change="getPlanogramByID" placeholder="Select a project" v-model="project"
+                        :items="projects_dropdown" label="Current Project"></v-autocomplete>
                 </v-flex>
-                <v-flex lg9 md8 sm12 xs12></v-flex>
-                <v-flex v-if="selectedStore != null && planogramsList.length == 0" lg9 md4 sm12 xs12>
+                <v-flex v-if="project != null && planogramsList.length == 0" lg9 md4 sm12 xs12>
                     No planograms found for selected store
                 </v-flex>
-                <v-flex v-if="selectedStore != null && planogramsList.length > 0" lg9 md4 sm12 xs12>
+                <v-flex v-if="project != null && planogramsList.length > 0" lg9 md4 sm12 xs12>
                     <v-card>
                         <v-toolbar dark color="primary" flat dense>Planograms <v-spacer></v-spacer>
-                            <!-- <v-btn flat outline @click="$router.push(`/PlanogramImplementation/RequestNewPlanogram/`+null)">Request
-                                new</v-btn> -->
                         </v-toolbar>
-                        <v-autocomplete placeholder="Please select a Planogram..." @change="selectPlanogram(selectedPlanogram)"
-                            v-model="selectedPlanogram" :items="planogramsList" solo light :disabled="storeDisabled">
+                        <v-autocomplete @change="selectPlanogram" placeholder="Please select a Planogram..." v-model="selectedPlanogram"
+                            :items="planogramsList" solo light :disabled="storeDisabled">
                         </v-autocomplete>
                         <div v-if="selectedPlanoList!=null">
-
-
-
                             <v-flex v-if="selectedPlanoList!=null">Status: {{status[selectedPlanoList.status == null ?
                                 2 :
                                 selectedPlanoList.status].friendy}} </v-flex>
@@ -43,57 +38,6 @@
                             </v-flex>
 
                         </div>
-
-                        <!-- <v-data-table hide-actions :headers="headers" :items="planogramsList" class="elevation-1">
-                            <template v-slot:items="props">
-                                <tr @click.prevent="selectPlanogram(props.item)">
-                                    <td>{{ props.item.name }}</td>
-                                    <td>{{status[props.item.status == null ? 2 : props.item.status].friendy}}</td>
-                                    <td>
-                                        <v-menu>
-                                            <v-btn slot="activator" class="pa-0 ma-0" icon>
-                                                <v-icon>more_vert</v-icon>
-                                            </v-btn>
-
-                                            <v-list dense>
-                                                <v-list-tile avatar v-if="props.item.status==0">
-                                                    <v-list-tile-avatar>
-                                                        <v-icon>share</v-icon>
-                                                    </v-list-tile-avatar>
-                                                    <v-list-tile-content>
-                                                        <v-list-tile-title>No options</v-list-tile-title>
-                                                    </v-list-tile-content>
-                                                </v-list-tile>
-                                                <v-list-tile avatar v-if="props.item.status==4" @click="implementPlano(props.item)">
-                                                    <v-list-tile-avatar>
-                                                        <v-icon>share</v-icon>
-                                                    </v-list-tile-avatar>
-                                                    <v-list-tile-content>
-                                                        <v-list-tile-title>Implement Planogram</v-list-tile-title>
-                                                    </v-list-tile-content>
-                                                </v-list-tile>
-                                                <v-list-tile avatar v-if="props.item.status==2" @click="ApprovePlano(props.item)">
-                                                    <v-list-tile-avatar>
-                                                        <v-icon>share</v-icon>
-                                                    </v-list-tile-avatar>
-                                                    <v-list-tile-content>
-                                                        <v-list-tile-title>Approve</v-list-tile-title>
-                                                    </v-list-tile-content>
-                                                </v-list-tile>
-                                                <v-list-tile v-if="props.item.status==2" avatar @click="$router.push(`/PlanogramImplementation/RequestNewPlanogram/`+props.item.id)">
-                                                    <v-list-tile-avatar>
-                                                        <v-icon>share</v-icon>
-                                                    </v-list-tile-avatar>
-                                                    <v-list-tile-content>
-                                                        <v-list-tile-title>Request Variation</v-list-tile-title>
-                                                    </v-list-tile-content>
-                                                </v-list-tile>
-                                            </v-list>
-                                        </v-menu>
-                                    </td>
-                                </tr>
-                            </template>
-                        </v-data-table> -->
 
                     </v-card>
                     <v-layout row wrap>
@@ -135,7 +79,7 @@
                         </v-flex>
                     </v-layout>
                 </v-flex>
-                <v-flex v-if="selectedPlanogram != null" lg3 md4 sm12 xs12>
+                <v-flex v-if="project != null" lg3 md4 sm12 xs12>
                     <v-card class="mx-auto" max-width="400">
                         <v-card dark color="primary">
                             <v-card-title>
@@ -144,13 +88,10 @@
                         </v-card>
                         <v-card-text class="py-0">
                             <v-timeline align-top dense>
-                                <v-timeline-item v-for="(item,index) in timelineItems" :key="index" :color="status[item.status].color"
-                                    small>
+                                <v-timeline-item v-for="(item,index) in timelineItems" :key="index" small>
                                     <v-layout pt-3>
                                         <v-flex xs3>
                                             <div class="caption">{{item.date}}</div>
-
-
                                         </v-flex>
                                         <v-spacer></v-spacer>
                                         <v-flex>
@@ -159,37 +100,19 @@
                                         </v-flex>
                                     </v-layout>
                                 </v-timeline-item>
-
-
                             </v-timeline>
                         </v-card-text>
                     </v-card>
                 </v-flex>
             </v-layout>
         </v-container>
-        <v-dialog fullscreen v-model="imageModal">
-            <v-card>
-                <v-toolbar dark color="primary" prominent>
-                    <v-spacer></v-spacer>
-                    <v-btn @click="imageModal = false" icon>
-                        <v-icon>close</v-icon>
-                    </v-btn>
-                </v-toolbar>
-                <v-card flat style="padding: 5px;">
-                    <v-img contain style="max-height: calc(100vh - 80px); width: 100%;" :src="image"></v-img>
-                </v-card>
-            </v-card>
-        </v-dialog>
-        <PlanogramAprovalModal ref="PlanogramAprovalModal"></PlanogramAprovalModal>
     </v-card>
-
 </template>
 
 <script>
     import Axios from 'axios';
     import jwt from 'jsonwebtoken';
     import PlanogramAprovalModal from './PlanogramIplementationModal';
-
 
     export default {
         components: {
@@ -223,7 +146,7 @@
                     type: 5,
                     color: "green",
                     friendy: "Implemented"
-                },{
+                }, {
                     type: 6,
                     color: "black",
                     friendy: "Retracted"
@@ -251,16 +174,148 @@
                 image: '',
                 storeDisabled: false,
                 spacePlanID: null,
+                projects: [],
+                projects_dropdown: [],
+                project: null,
+                typeList: [{
+                        text: "DataPreparation",
+                        value: 0
+                    }, {
+                        text: "Ranging",
+                        value: 1
+                    },
+                    {
+                        text: "Planogram",
+                        value: 2
+                    }, {
+                        text: "Promotion",
+                        value: 3
+                    }
+                ],
+                status: [{
+                        text: "Project Start"
+                    },
+                    {
+                        text: "In Progress"
+                    },
+                    {
+                        text: "Complete"
+                    },
+                    {
+                        text: "Workshop"
+                    }, 
+                    {
+                        text: "Meeting"
+                    },
+                    {
+                        text: "Ranging Start"
+                    },
+                    {
+                        text: "Planogram Start"
+                    },
+                    {
+                        text: "Checking"
+                    },
+                    {
+                        text: "Requesting Approval"
+                    },
+                    {
+                        text: "Declined"
+                    },
+                    {
+                        text: "Approved"
+                    },
+                    {
+                        text: "Implementation Pending"
+                    },
+                    {
+                        text: 'Variation Request'
+                    },
+                    {
+                        text: "Implemented"
+                    },
+                    {
+                        text: "On Hold"
+                    }
+                ]
             }
         },
-        created() {},
         mounted() {
             let self = this;
-
-            self.getStores();
+            self.getPlanograms();
         },
         methods: {
+            getProjects() {
+                let self = this;
 
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + 'Project').then(r => {
+                    let projects = r.data.projectList;
+                    self.projects = projects;
+
+                    self.projects_dropdown = [];
+
+                    projects.forEach(element => {
+                        self.projects_dropdown.push({
+                            text: element.name,
+                            value: element.id
+                        })
+                    });
+
+                    delete Axios.defaults.headers.common["TenantID"];
+                })
+            },
+            getPlanogramByID() {
+                let self = this;
+
+                self.$nextTick(() => {
+                    // get planogram id from selected project
+                    let planogramID = -1;
+
+                    self.projects.forEach(el => {
+                        if (el.id == self.project)
+                            planogramID = el.planogram_ID
+                    })
+
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    Axios.get(process.env.VUE_APP_API + `ProjectTX?projectID=${self.project}`).then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+
+                        r.data.projectTXList.forEach(element => {
+                            self.timelineItems.push({
+                                status: element.type,
+                                notes: self.status[element.status].text,
+                                date: element.dateTimeString
+                            })
+                        })
+                    })
+
+                    Axios.get(process.env.VUE_APP_API + 'Planogram?planogramID=' + planogramID)
+                        .then(r => {
+                            self.populateSpacePlans(r.data[0]);
+                        })
+                        .catch(e => {
+
+                        })
+                })
+            },
+            populateSpacePlans(planogram) {
+                let self = this;
+
+                let tmpPlanograms = [];
+
+                self.planograms.forEach(el => {
+                    if (el.name.includes(planogram.displayname))
+                        tmpPlanograms.push({
+                            text: el.name,
+                            value: el.id
+                        })
+                })
+
+                self.planogramsList = tmpPlanograms;
+            },
             getAccessType() {
                 let self = this
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
@@ -268,8 +323,6 @@
                         `TenantLink_AccessType?systemUserID=${encoded_details.USER_ID}&tenantID=${sessionStorage.currentDatabase}`
                     )
                     .then(r => {
-                        console.log(r.data);
-
                         if (r.data.isDatabaseOwner) {
                             self.accessType = 0
                         } else {
@@ -280,7 +333,8 @@
                         if (r.data.isDatabaseOwner) {
                             self.getPlanogramsByStore();
                         } else {
-                            if (r.data.tenantLink_AccessTypeList != null && r.data.tenantLink_AccessTypeList.length >
+                            if (r.data.tenantLink_AccessTypeList != null && r.data.tenantLink_AccessTypeList
+                                .length >
                                 1) {
                                 let item = r.data.tenantLink_AccessTypeList[0];
 
@@ -309,7 +363,6 @@
             goToReport(reportName) {
                 let self = this
                 self.$router.push(`/Reports/SpacePlanning/${reportName}/` + self.selectedPlanogram)
-
             },
             openImage() {
                 this.imageModal = true;
@@ -338,7 +391,8 @@
                 Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&folder=SPACE PLANNING')
                     .then(r => {
                         self.planograms = r.data;
-                        self.getAccessType();
+                        self.getProjects();
+                        //self.getAccessType();
                     })
             },
             getPlanogramsByStore(type) {
@@ -360,9 +414,9 @@
 
                     self.planograms.forEach(planogram => {
                         if (planogram.name.includes(cluster)) {
-                            if (self.accessType.accessType == 3 && (planogram.status == 4 || planogram.status ==
+                            if (self.accessType.accessType == 3 && (planogram.status == 4 || planogram
+                                    .status ==
                                     5)) {
-                                console.log("Store User");
                                 if (self.accessType.storeID == planogram.storeID) {
                                     tmpPlanograms.push({
                                         text: planogram.name,
@@ -371,9 +425,9 @@
                                 }
 
                             }
-                            if (self.accessType.accessType == 1 && (planogram.status == 2 || planogram.status ==
+                            if (self.accessType.accessType == 1 && (planogram.status == 2 || planogram
+                                    .status ==
                                     5)) {
-                                console.log("buyer User");
                                 if (encoded_details.USER_ID == planogram.buyerID) {
                                     tmpPlanograms.push({
                                         text: planogram.name,
@@ -395,10 +449,6 @@
                         }
                     })
 
-
-                    console.log(self.planograms);
-
-
                     self.planogramsList = tmpPlanograms;
                 })
             },
@@ -411,7 +461,8 @@
                     }
                 })
 
-                self.$refs.PlanogramAprovalModal.show('Submit planogram for aproval?', (value, notesModal, selectedUser) => {
+                self.$refs.PlanogramAprovalModal.show('Submit planogram for aproval?', (value, notesModal,
+                    selectedUser) => {
 
                     if (value == true) {
                         if (item != null) {
@@ -428,7 +479,8 @@
                             // axios.put(process.env.VUE_APP_API+`SystemFileApproval?db=CR-Devinspire&buyerID=`+self.spacePlanID,{})
 
 
-                            Axios.post(process.env.VUE_APP_API + "SystemFileApproval?db=CR-Devinspire&buyerID=" +
+                            Axios.post(process.env.VUE_APP_API +
+                                "SystemFileApproval?db=CR-Devinspire&buyerID=" +
                                 tmp.buyerID + "&storeID=" +
                                 selectedUser, {
                                     systemFileApproval: systemFileApproval
@@ -471,38 +523,12 @@
                     self.PlanoList.forEach(item => {
 
                         if (item.id == planogram) {
-
-
                             self.selectedPlanoList = item
                         }
                     })
                     Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&id=' + planogram)
                         .then(r => {
                             self.image = r.data.image;
-                            console.log(r.data);
-                            
-                            Axios.get(process.env.VUE_APP_API +
-                                `SystemFileApproval?db=CR-DEVINSPIRE&systemFileID=${planogram}`).then(
-                                resp => {
-
-                                    self.timelineItems = []
-
-                                    resp.data.systemFileApprovalList.forEach(element => {
-                                        self.timelineItems.push({
-                                            status: element.status,
-                                            notes: element.notes,
-                                            date: element.transactionDateTime
-                                        })
-                                    })
-                                    self.timelineItems.sort(function (a, b) {
-
-
-                                        a = new Date(a.date);
-                                        b = new Date(b.date);
-                                        return a > b ? -1 : a < b ? 1 : 0;
-                                    });
-
-                                })
                         })
                 })
             },

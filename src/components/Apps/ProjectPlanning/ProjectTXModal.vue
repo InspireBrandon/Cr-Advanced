@@ -311,8 +311,6 @@
                     let tmpAssignedUser = null
 
                     if (self.Store != null || self.Store != undefined) {
-                        console.log("stores");
-                        
                         self.stores.forEach(e => {
                             if (e.value == self.store) {
                                  tmpStore=e.text   
@@ -320,8 +318,6 @@
                         })
                     }
                     if (self.StoreCluster != null || self.StoreCluster != undefined) {
-                        console.log("StoreCluster");
-                         
                          self.StoreClusters.forEach(e => {
                             if (e.value == self.StoreCluster) {
                                  
@@ -332,8 +328,6 @@
                     // if(self.CategoryCluster!=null||self.CategoryCluster!=undefined)
                     // {} 
                     if (self.AssignedUser != null || self.AssignedUser != undefined) {
-                        console.log("users");
-                        
                         self.users.forEach(e => {
                             if (e.value == self.AssignedUser) {
                                 
