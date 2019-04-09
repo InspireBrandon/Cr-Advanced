@@ -60,11 +60,11 @@
                     <td>
                         {{typeList[props.item.type == -1 ?  5 :  props.item.type].text}}
                         <!-- {{typeList[props.item.type].text }} -->
-                        </td>
+                    </td>
                     <td>
-                         
+
                         {{status[props.item.status].friendly }}
-                        </td>
+                    </td>
                     <td>{{ props.item.store }}</td>
                     <td>{{ props.item.storeCluster }}</td>
                     <td>{{ props.item.categoryCluster }}</td>
@@ -109,12 +109,11 @@
                 project: null,
                 Projects: [],
 
-                typeList: [
-                   {
+                typeList: [{
                         text: "Event",
                         value: 0
                     },
-                   {
+                    {
                         text: "DataPreparation",
                         value: 1
                     }, {
@@ -134,28 +133,28 @@
                 ],
                 headers: [{
                     text: "Date",
-                    sortable:false
+                    sortable: false
                 }, {
                     text: "Type",
-                    sortable:false
+                    sortable: false
                 }, {
                     text: "Status",
-                    sortable:false
+                    sortable: false
                 }, {
                     text: "Store",
-                    sortable:false
+                    sortable: false
                 }, {
                     text: "Store Cluster",
-                    sortable:false
+                    sortable: false
                 }, {
                     text: "Category Cluster",
-                    sortable:false
+                    sortable: false
                 }, {
                     text: "Assigned User",
-                    sortable:false
+                    sortable: false
                 }, {
                     text: "Actions",
-                    sortable:false
+                    sortable: false
                 }],
                 ProjectTXs: [],
                 status: [{
@@ -168,19 +167,18 @@
                         friendly: "Complete"
                     },
                     {
-                        friendly: "Ranging Start"
-                    },
-                     {
-                       
                         friendly: "Workshop"
                     },
                     {
-                        
+
                         friendly: "Meeting"
                     },
                     {
-                       
+
                         friendly: "DataPreparationStart"
+                    },
+                    {
+                        friendly: "Ranging Start"
                     },
                     {
                         friendly: "Planogram Start"
@@ -240,15 +238,16 @@
                 var self = this
                 self.$refs.ProjectTXModal.open(true, self.project, data => {
 
-
-                    self.ProjectTXs.push(data.data.projectTX)
+                     console.log(data);
+                        
+                    self.ProjectTXs.push(data)
                 })
             },
             openProjectTXEdit(item) {
                 var self = this
                 self.$refs.ProjectTXModal.open(false, item, data => {
 
-                    for(var prop in item) {
+                    for (var prop in item) {
                         item[prop] = data[prop];
                     }
 
@@ -256,7 +255,7 @@
                     //     const element = self.ProjectTXs[index];
                     //     if (element.id == item.id) {
                     //         console.log(index);
-                            
+
                     //         self.ProjectTXs[index] = data
                     //     }
                     // }
@@ -277,8 +276,8 @@
             getTransactions(item) {
 
                 let self = this
-               
-                
+
+
                 if (self.project == item) {
                     return
                 }

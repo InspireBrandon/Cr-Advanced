@@ -94,6 +94,7 @@
 
 </template>
 <script>
+import moment from 'moment'
     import jwt from 'jsonwebtoken';
     import Axios from 'axios'
 
@@ -327,6 +328,7 @@ let tmp = sessionStorage.currentDatabase
             },
             open(isAdd, item, callback) {
                 var self = this
+               
                 self.dialog = true
 
                 if (isAdd == false) {
@@ -347,6 +349,7 @@ let tmp = sessionStorage.currentDatabase
                     self.AssignedUser = item.systemUserID
                 }
                 if (isAdd == true) {
+                    self.valid=null
                     self.projectID = item.id
 
                     self.isAdd = true
@@ -362,14 +365,18 @@ let tmp = sessionStorage.currentDatabase
             },
             submit() {
                 var self = this
+                 if (self.datePicker==null&&self.timePicker==null &&self.isAdd==false) {
+                        alert("Please select a date and time")
+                    return
+                    }
                 if (this.$refs.form.validate()) {
+                   
                     let tmpStore = null
                     let tmpStoreCluster = null
                     let tmpCategoryCluster = null
                     let tmpAssignedUser = null
 
                     if (self.Store != null || self.Store != undefined) {
-                        console.log("stores");
                         
                         self.storeObjects.forEach(e => {
                           
@@ -381,17 +388,12 @@ let tmp = sessionStorage.currentDatabase
                         
                     }
                     if (self.StoreCluster != null || self.StoreCluster != undefined) {
-                        console.log("StoreCluster");
                          self.StoreClusters.forEach(e => {
-                             
-                          console.log(e,self.StoreCluster);
-
                             if (e.value == self.StoreCluster) {
                                  
                                  tmpStoreCluster=e.text   
                             }
                         })
-                        console.log(tmpStoreCluster);
 
                     }
                     // if(self.CategoryCluster!=null||self.CategoryCluster!=undefined)
@@ -436,8 +438,8 @@ let tmp = sessionStorage.currentDatabase
                             "project_ID": self.projectID,
                             "storeCluster_ID": self.StoreCluster,
                             "store_ID": self.Store,
-                            "dateTime": self.setDate,
-                            "dateTimeString":self.setDate,
+                            "dateTime": new Date,
+                            "dateTimeString":moment(new Date).format('YYYY-MM-DD hh:mm'),
 
                             "status": self.status,
                             "type": self.type,
@@ -447,6 +449,8 @@ let tmp = sessionStorage.currentDatabase
                             "systemUserID": self.AssignedUser,
                         }
                         Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
+                            console.log(res);
+                            
                             self.afterClose(trans)
 
                             delete Axios.defaults.headers.common["TenantID"];
