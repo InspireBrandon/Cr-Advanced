@@ -31,17 +31,18 @@
                         </v-flex>
                         <v-flex md4 v-if="isAdd==true"></v-flex>
                         <v-flex md4 v-if="isAdd==false">
-                            <v-menu ref="menu" v-model="menu" :close-on-content-click="false" :return-value.sync="date"
+                            <v-menu ref="menu" v-model="menu" :close-on-content-click="false" 
                                 lazy transition="scale-transition" offset-y full-width min-width="290px">
                                 <template v-slot:activator="{ on }">
-                                    <v-text-field v-model="date" label="Picker in menu" prepend-icon="event" readonly
+                                    <v-text-field v-model="setDate" label="please select a date" prepend-icon="event" readonly
                                         v-on="on"></v-text-field>
                                 </template>
-                                <v-date-picker v-model="date" no-title scrollable>
+                                <v-date-picker v-model="datePicker" no-title scrollable>
                                     <v-spacer></v-spacer>
                                     <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
                                     <v-btn flat color="primary" @click="$refs.menu.save(date)">OK</v-btn>
                                 </v-date-picker>
+                                 <v-time-picker v-model="timePicker" ></v-time-picker>
                             </v-menu>
                             <!-- <v-text-field label="Date" placeholder="Date" v-model="date"></v-text-field> -->
                         </v-flex>
@@ -99,6 +100,9 @@
     export default {
         data() {
             return {
+                datePicker:null,
+                timePicker:null,
+                date:this.datePicker+this.timePicker,
                 isAdd: null,
                 afterClose: null,
                 valid: true,
@@ -119,21 +123,29 @@
                 StoreCluster: null,
                 CategoryCluster: null,
                 AssignedUser: null,
-                typeList: [{
-                        text: "Data Preparation",
+                storeObjects:[],
+                typeList: [
+                    {
+                        text: "Event",
                         value: 0
+                    }, 
+                    {
+                        text: "Data Preparation",
+                        value: 1
                     }, {
                         text: "Ranging",
-                        value: 1
+                        value: 2
                     },
                     {
                         text: "Planogram",
-                        value: 2
+                        value: 3
                     }, {
                         text: "Promotion",
-                        value: 3
+                        value: 4
                     }
                 ],
+        
+        
                 statusList: [{
                         value: 0,
                         text: "Project Start"
@@ -148,63 +160,87 @@
                     },
                     {
                         value: 3,
-                        text: "Ranging Start"
+                        text: "Workshop"
                     },
                     {
                         value: 4,
-                        text: "Planogram Start"
+                        text: "Meeting"
                     },
                     {
                         value: 5,
-                        text: "Checking"
+                        text: "DataPreparationStart"
                     },
+        
                     {
                         value: 6,
-                        text: "Requesting Approval"
+                        text: "Ranging Start"
                     },
+                    
                     {
                         value: 7,
-                        text: "Declined"
+                        text: "Planogram Start"
                     },
                     {
                         value: 8,
-                        text: "Approved"
+                        text: "Checking"
                     },
                     {
                         value: 9,
-                        text: "Implementation Pending"
+                        text: "Requesting Approval"
                     },
                     {
                         value: 10,
-                        text: 'Variation Request'
+                        text: "Declined"
                     },
                     {
                         value: 11,
-                        text: "Implemented"
+                        text: "Approved"
                     },
                     {
                         value: 12,
+                        text: "Implementation Pending"
+                    },
+                    {
+                        value: 13,
+                        text: 'Variation Request'
+                    },
+                    {
+                        value: 14,
+                        text: "Implemented"
+                    },
+                    {
+                        value: 15,
                         text: "On Hold"
                     }
                 ]
             }
 
         },
+        computed: {
+    // a computed getter
+    setDate: function () {
+      // `this` points to the vm instance
+      return this.datePicker+' '+this.timePicker+':00'
+    //   return this.datePicker = this.datePicker+this.timePicker
+    }
+  },
+
         mounted() {
             this.getPlanograms()
-            this.getUsers()
+            this.getDatabaseUsers()
             this.getstores()
             this.getStoreClusters()
         },
         methods: {
+           
             getstores() {
                 let self = this
                 Axios.get(process.env.VUE_APP_API + `Store?db=CR-Hinterland-LIVE`).then(r => {
-
+                    self.storeObjects=r.data
                     r.data.forEach(element => {
                         self.stores.push({
                             text: element.storeName,
-                            value: element.id
+                            value: element.storeID
                         })
                     })
                 })
@@ -222,7 +258,7 @@
                     })
                 })
             },
-            getUsers() {
+           getUsers() {
                 let self = this;
 
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
@@ -237,11 +273,20 @@
                             if (element.emailAddress != null) {
                                 let isDatabaseUser = false;
 
+                                self.databaseUsers.forEach((dbu, idx) => {
+                                    if (dbu.systemUserID == element.systemUserID) {
+                                        isDatabaseUser = true;
+                                    }
 
-                                if (!isDatabaseUser) {
+                                    if (dbu.systemUserID == encoded_details.USER_ID) {
+                                        self.databaseUsers.splice(idx, 1);
+                                    }
+                                })
+
+                                if (isDatabaseUser) {
                                     if (element.systemUserID != encoded_details.USER_ID) {
                                         self.users.push({
-                                            text: element.emailAddress.toString(),
+                                            text: element.username.toString(),
                                             value: element.systemUserID
                                         })
                                     }
@@ -250,6 +295,16 @@
                         });
 
                         self.showLoader = false;
+                    })
+            },
+            getDatabaseUsers() {
+                let self = this;
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+let tmp = sessionStorage.currentDatabase
+                Axios.get(process.env.VUE_APP_API + `TenantAccess/User?tenantID=${tmp}`)
+                    .then(r => {
+                        self.databaseUsers = r.data;
+                        self.getUsers();
                     })
             },
             getPlanograms() {
@@ -281,11 +336,14 @@
                     self.uid = item.uid
                     self.type = item.type
                     self.selectedPlanogram = item.planogram_ID
-                    self.date = item.dateTimeString
+                    
+                    self.timePicker = item.dateTimeString.slice(11, 16);
+
+                    self.datePicker = item.dateTimeString.slice(0, 10);
                     self.status = item.status
                     self.Store = item.store_ID
-                    self.StoreCluster = item.storeCluster_ID
-                    self.CategoryCluster = item.storeCluster
+                    self.StoreCluster = item.StoreCluster_ID
+                    self.CategoryCluster = item.StoreCluster
                     self.AssignedUser = item.systemUserID
                 }
                 if (isAdd == true) {
@@ -311,19 +369,30 @@
                     let tmpAssignedUser = null
 
                     if (self.Store != null || self.Store != undefined) {
-                        self.stores.forEach(e => {
-                            if (e.value == self.store) {
-                                 tmpStore=e.text   
+                        console.log("stores");
+                        
+                        self.storeObjects.forEach(e => {
+                          
+                           
+                           if (e.storeID == self.Store) {
+                                 tmpStore=e.storeName   
                             }
                         })
+                        
                     }
                     if (self.StoreCluster != null || self.StoreCluster != undefined) {
+                        console.log("StoreCluster");
                          self.StoreClusters.forEach(e => {
+                             
+                          console.log(e,self.StoreCluster);
+
                             if (e.value == self.StoreCluster) {
                                  
                                  tmpStoreCluster=e.text   
                             }
                         })
+                        console.log(tmpStoreCluster);
+
                     }
                     // if(self.CategoryCluster!=null||self.CategoryCluster!=undefined)
                     // {} 
@@ -345,11 +414,12 @@
                             "uid": self.uid,
                             "project_ID": self.projectID,
                             "storeCluster": tmpStoreCluster,
-                            "storeCluster_ID": self.storeCluster,
+                            "storeCluster_ID": self.StoreCluster,
                             "store_ID": self.Store,
                             "store": tmpStore,
 
-                            "dateTime": self.date,
+                            "dateTime": self.setDate,
+                            "dateTimeString":self.setDate,
                             "status": self.status,
                             "type": self.type,
                             "username": tmpAssignedUser,
@@ -364,9 +434,11 @@
                     if (self.isAdd == true) {
                         let trans = {
                             "project_ID": self.projectID,
-                            "storeCluster_ID": self.storeCluster,
+                            "storeCluster_ID": self.StoreCluster,
                             "store_ID": self.Store,
-                            "dateTime": self.date,
+                            "dateTime": self.setDate,
+                            "dateTimeString":self.setDate,
+
                             "status": self.status,
                             "type": self.type,
                             "username": tmpAssignedUser,

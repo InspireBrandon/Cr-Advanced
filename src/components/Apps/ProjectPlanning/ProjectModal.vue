@@ -122,7 +122,7 @@
                         Axios.post(process.env.VUE_APP_API + 'Project', tmp).then(r => {
                             let trans = {
                                 "project_ID": r.data.project.id,
-                                "type": 0,
+                                "type": -1,
                                 "status": 0,
                                 "systemUserID": encoded_details.USER_ID,
                             }
