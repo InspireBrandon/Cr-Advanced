@@ -29,14 +29,14 @@
                                     <v-list-tile-avatar>
                                         <v-avatar>
                                             <v-icon v-if="item.status == 0" color="info">access_time</v-icon>
-                                            <v-icon v-if="item.status == 1" color="success">check_circle_outline</v-icon>
+                                            <v-icon v-if="item.status == 1" color="success">check_circle_outline
+                                            </v-icon>
                                             <v-icon v-if="item.status == 2" color="error">error_outline</v-icon>
                                         </v-avatar>
                                     </v-list-tile-avatar>
                                     <v-list-tile-content>
                                         <v-list-tile-title>
-                                            <span class="font-weight-light">2018-01-0{{ index + 1 }} - </span>
-                                            <span class="font-weight-medium">{{ item.name }}</span>
+                                            <span class="font-weight-medium">{{ item.fileName }}</span>
                                         </v-list-tile-title>
                                     </v-list-tile-content>
                                     <v-list-tile-action>
@@ -66,8 +66,8 @@
 </template>
 
 <script>
-
     import Axios from 'axios';
+    import jwt from 'jsonwebtoken';
 
     export default {
         name: 'common-import-list',
@@ -97,10 +97,9 @@
 
                 Axios.get(process.env.VUE_APP_API + "DataImport/ImportDatabase?importFolder=" + self.name)
                     .then(r => {
-                        if(r.data.success) {
+                        if (r.data.success) {
                             self.items = r.data.importTransactionItemList;
-                        }
-                        else {
+                        } else {
                             self.items = [];
                             alert(e.data.clientError);
                         }
@@ -128,23 +127,50 @@
             },
             onFileChange(e) {
                 let self = this;
-
                 const files = e.target.files;
                 let file = files[0];
 
-                self.blobToArrayBuffer(file, result => {
-                    var fileArray = Array.from(new Uint8Array(result));
-                    self.queryAndIndeterminate(file.name)
+                self.createUploadTransaction(file.name, self.name, transactionID => {
+                    self.uploadImportFile(transactionID, file, () => {
+
+                    })
                 })
             },
-            blobToArrayBuffer(blob, callback) {
-                var a = new FileReader();
-                a.onload = function () {
-                    callback(a.result);
-                }
-                a.readAsArrayBuffer(blob);
+            createUploadTransaction(fileName, importFolder, callback) {
+                let self = this;
+
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `DataImport/ImportDatabase`, {
+                        fileName: fileName,
+                        importFolder: importFolder,
+                        typeFolder: "1 - Import Ready",
+                        interactionUserID: encoded_details.USER_ID
+                    })
+                    .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        self.items.push(r.data.importTransactionItem);
+                        callback(r.data.importTransactionItem.id);
+                    })
+                    .catch(e => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
             },
-            uploadImportFile() {
+            uploadImportFile(transactionID, file, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `DataImport/ImportDatabase/UploadFile?importTransactionID=` + transactionID, file)
+                    .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        console.log(r);
+                    })
+                    .catch(e => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
             },
             queryAndIndeterminate(name) {
                 let self = this;
