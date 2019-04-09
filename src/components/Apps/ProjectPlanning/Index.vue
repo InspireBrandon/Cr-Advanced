@@ -58,17 +58,76 @@
                 <template v-slot:items="props">
                     <td>{{ props.item.dateTimeString }} </td>
                     <td>
-                        {{typeList[props.item.type == -1 ?  5 :  props.item.type].text}}
-                        <!-- {{typeList[props.item.type].text }} -->
+                        <v-edit-dialog :return-value.sync="props.item.type" large lazy persistent @save="saveLine(props.item)"
+                            @cancel="''" @open="''" @close="''">
+                            <div>{{typeList[props.item.type == -1 ?  5 :  props.item.type].text}}</div>
+                            <template v-slot:input>
+                                <div class="mt-3 title">Update Iron</div>
+                            </template>
+                            <template v-slot:input>
+                                <v-select v-model="props.item.type" :items="typeList" label="Edit" single-line counter
+                                    autofocus></v-select>
+                            </template>
+                        </v-edit-dialog>
                     </td>
                     <td>
 
-                        {{status[props.item.status].friendly }}
+                        <v-edit-dialog :return-value.sync="props.item.status" large lazy persistent @save="saveLine(props.item)"
+                            @cancel="''" @open="''" @close="''">
+                            <div>{{status[props.item.status].friendly }}</div>
+                            <template v-slot:input>
+                                <div class="mt-3 title">Update Iron</div>
+                            </template>
+                            <template v-slot:input>
+                                <v-select v-model="props.item.status" :items="status" label="Edit" single-line counter
+                                    autofocus></v-select>
+                            </template>
+                        </v-edit-dialog>
                     </td>
-                    <td>{{ props.item.store }}</td>
-                    <td>{{ props.item.storeCluster }}</td>
+
+                    <td>
+                        <!-- {{ props.item.store}} -->
+                        <v-edit-dialog :return-value.sync="props.item.store" large lazy persistent @save="saveLine(props.item)"
+                            @cancel="''" @open="''" @close="''">
+                            <div>{{ props.item.store}}</div>
+                            <template v-slot:input>
+                                <div class="mt-3 title">Update Iron</div>
+                            </template>
+                            <template v-slot:input>
+                                <v-select v-model="props.item.store" :items="stores" label="Edit" single-line counter
+                                    autofocus></v-select>
+                            </template>
+                        </v-edit-dialog>
+
+                    </td>
+                    <td>
+                        <v-edit-dialog :return-value.sync="props.item.storeCluster" large lazy persistent @save="saveLine(props.item)"
+                            @cancel="''" @open="''" @close="''">
+                            <div>{{ props.item.storeCluster}}</div>
+                            <template v-slot:input>
+                                <div class="mt-3 title">Update Iron</div>
+                            </template>
+                            <template v-slot:input>
+                                <v-select v-model="props.item.storeCluster" :items="StoreClusters" label="Edit" single-line counter
+                                    autofocus></v-select>
+                            </template>
+                        </v-edit-dialog>
+                    </td>
                     <td>{{ props.item.categoryCluster }}</td>
-                    <td>{{ props.item.username }}</td>
+
+                    <td>
+                        <v-edit-dialog :return-value.sync="props.item.username" large lazy persistent @save="saveLine(props.item)"
+                            @cancel="''" @open="''" @close="''">
+                            <div>{{ props.item.username}}</div>
+                            <template v-slot:input>
+                                <div class="mt-3 title">Update Iron</div>
+                            </template>
+                            <template v-slot:input>
+                                <v-select v-model="props.item.username" :items="users" label="Edit" single-line counter
+                                    autofocus></v-select>
+                            </template>
+                        </v-edit-dialog>
+                    </td>
                     <td>
                         <v-menu left>
                             <v-btn slot="activator" icon>
@@ -97,6 +156,8 @@
     import ProjectModal from './ProjectModal.vue'
     import ProjectTXModal from './ProjectTXModal.vue'
     import Axios from 'axios'
+    import jwt from 'jsonwebtoken';
+
 
     export default {
         components: {
@@ -133,13 +194,16 @@
                 ],
                 headers: [{
                     text: "Date",
-                    sortable: false
+                    sortable: true,
+                    value: "dateTimeString"
                 }, {
                     text: "Type",
-                    sortable: false
+                    sortable: false,
+                     value: "type"
                 }, {
                     text: "Status",
-                    sortable: false
+                    sortable: false,
+
                 }, {
                     text: "Store",
                     sortable: false
@@ -158,62 +222,185 @@
                 }],
                 ProjectTXs: [],
                 status: [{
+                        text: "Project Start",
+                        value: 0,
                         friendly: "Project Start"
                     },
                     {
+                        text: "In Progress",
+                        value: 1,
                         friendly: "InProgress"
                     },
                     {
+                        text: "Complete",
+                        value: 2,
                         friendly: "Complete"
                     },
                     {
-                        friendly: "Workshop"
+                        text: "Complete",
+                        value: 3,
+                        friendly: "Complete"
                     },
                     {
-
+                        text: "Meeting",
+                        value: 4,
                         friendly: "Meeting"
                     },
                     {
-
-                        friendly: "DataPreparationStart"
+                        text: "Data Preparation Start",
+                        value: 5,
+                        friendly: "Data Preparation Start"
                     },
                     {
+                        text: "Ranging Start",
+                        value: 6,
                         friendly: "Ranging Start"
                     },
                     {
+                        text: "Planogram Start",
+                        value: 7,
                         friendly: "Planogram Start"
                     },
                     {
+                        text: "Checking",
+                        value: 8,
                         friendly: "Checking"
                     },
                     {
+                        text: "Requesting Approval",
+                        value: 9,
                         friendly: "Requesting Approval"
                     },
                     {
+                        text: "Declined",
+                        value: 10,
                         friendly: "Declined"
                     },
                     {
+                        text: "Approved",
+                        value: 11,
                         friendly: "Approved"
                     },
                     {
+                        text: "Implementation Pending",
+                        value: 12,
                         friendly: "Implementation Pending"
                     },
                     {
+                        text: "Variation Request",
+                        value: 13,
                         friendly: 'Variation Request'
                     },
                     {
+                        text: "Implemented",
+                        value: 14,
                         friendly: "Implemented"
                     },
                     {
+                        text: "On Hold",
+                        value: 15,
                         friendly: "On Hold"
                     }
-                ]
+                ],
+                stores: [],
+                storeObjects: [],
+                StoreClusters:[],
+                databaseUsers:[],
+                users:[],
+
+
             }
         },
         mounted() {
             this.getProjects()
+            this.getstores()
+            this.getStoreClusters()
+            this.getDatabaseUsers()
         },
         methods: {
+            saveLine(item){
+                let self = this
+                console.log(item);
+                
+                let data = []
+                 for (var prop in item) {
+                        item[prop] = data[prop];
+                    }
+            },
+
+            getUsers() {
+                let self = this;
+
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+
+                Axios.get(process.env.VUE_APP_API + `SystemUser`)
+                    .then(r => {
+
+                        self.userDetails = r.data;
+
+                        r.data.forEach(element => {
+
+                            if (element.emailAddress != null) {
+                                let isDatabaseUser = false;
+
+                                self.databaseUsers.forEach((dbu, idx) => {
+                                    if (dbu.systemUserID == element.systemUserID) {
+                                        isDatabaseUser = true;
+                                    }
+
+                                    if (dbu.systemUserID == encoded_details.USER_ID) {
+                                        self.databaseUsers.splice(idx, 1);
+                                    }
+                                })
+
+                                if (isDatabaseUser) {
+                                    if (element.systemUserID != encoded_details.USER_ID) {
+                                        self.users.push({
+                                            text: element.username.toString(),
+                                            value: element.systemUserID
+                                        })
+                                    }
+                                }
+                            }
+                        });
+
+                        self.showLoader = false;
+                    })
+            },
+            getDatabaseUsers() {
+                let self = this;
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+let tmp = sessionStorage.currentDatabase
+                Axios.get(process.env.VUE_APP_API + `TenantAccess/User?tenantID=${tmp}`)
+                    .then(r => {
+                        self.databaseUsers = r.data;
+                        self.getUsers();
+                    })
+            },
+             getStoreClusters() {
+                let self = this
+                Axios.get(process.env.VUE_APP_API + `Cluster/Store`).then(r => {
+
+                    r.data.forEach(element => {
+                        self.StoreClusters.push({
+                            text: element.displayname,
+                            value: element.id
+                        })
+                    })
+                })
+            },
+            getstores() {
+                let self = this
+                Axios.get(process.env.VUE_APP_API + `Store?db=CR-Hinterland-LIVE`).then(r => {
+                    self.storeObjects = r.data
+                    r.data.forEach(element => {
+                        self.stores.push({
+                            text: element.storeName,
+                            value: element.storeID
+                        })
+                    })
+                })
+            },
             openProjectEdit(item) {
                 var self = this
                 self.$refs.ProjectModal.open(false, item, data => {
@@ -238,8 +425,8 @@
                 var self = this
                 self.$refs.ProjectTXModal.open(true, self.project, data => {
 
-                     console.log(data);
-                        
+                    console.log(data);
+
                     self.ProjectTXs.push(data)
                 })
             },
