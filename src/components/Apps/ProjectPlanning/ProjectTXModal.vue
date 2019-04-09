@@ -397,8 +397,6 @@ let tmp = sessionStorage.currentDatabase
                     // if(self.CategoryCluster!=null||self.CategoryCluster!=undefined)
                     // {} 
                     if (self.AssignedUser != null || self.AssignedUser != undefined) {
-                        console.log("users");
-                        
                         self.users.forEach(e => {
                             if (e.value == self.AssignedUser) {
                                 
