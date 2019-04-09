@@ -54,7 +54,7 @@
                 </v-btn>
 
             </v-toolbar>
-            <v-data-table :headers="headers" :items="ProjectTXs" hide-actions>
+            <v-data-table v-if="project!=null" :headers="headers" :items="ProjectTXs" hide-actions>
                 <template v-slot:items="props">
                     <td>{{ props.item.dateTimeString }} </td>
                     <td>
@@ -93,9 +93,7 @@
     import ProjectModal from './ProjectModal.vue'
     import ProjectTXModal from './ProjectTXModal.vue'
     import Axios from 'axios'
-    import {
-        callbackify
-    } from 'util';
+
     export default {
         components: {
             ProjectModal,
@@ -188,33 +186,54 @@
         methods: {
             openProjectEdit(item) {
                 var self = this
-                self.$refs.ProjectModal.open(false, item, afterClose => {
+                self.$refs.ProjectModal.open(false, item, data => {
                     for (let index = 0; index < self.Projects.length; index++) {
                         const element = self.Projects[index];
                         if (element.id == item.id) {
-                            self.Projects[index].description = afterClose.description
-                            self.Projects[index].name = afterClose.name
-                            self.Projects[index].planogram_ID = afterClose.planogram_ID
+                            self.Projects[index].description = data.description
+                            self.Projects[index].name = data.name
+                            self.Projects[index].planogram_ID = data.planogram_ID
                         }
                     }
                 })
             },
             openProjectAdd(item) {
                 var self = this
-                self.$refs.ProjectModal.open(true, item)
+                self.$refs.ProjectModal.open(true, item, data => {
+
+                    self.Projects.push(data.data.project)
+                })
             },
             openProjectTXAdd() {
                 var self = this
-                self.$refs.ProjectTXModal.open(true, self.project)
+                self.$refs.ProjectTXModal.open(true, self.project, data => {
+                    // console.log(data.data.project);
+
+                    console.log(data.data.projectTX);
+
+                    self.ProjectTXs.push(data.data.projectTX)
+                })
             },
             openProjectTXEdit(item) {
                 var self = this
-                self.$refs.ProjectTXModal.open(false, item)
+                self.$refs.ProjectTXModal.open(false, item, data => {
+                    console.log(data, item);
+
+                    for(var prop in item) {
+                        item[prop] = data[prop];
+                    }
+
+                    // for (let index = 0; index < self.ProjectTXs.length; index++) {
+                    //     const element = self.ProjectTXs[index];
+                    //     if (element.id == item.id) {
+                    //         console.log(index);
+                            
+                    //         self.ProjectTXs[index] = data
+                    //     }
+                    // }
+                })
             },
-            openProjectsModal() {
-                var self = this
-                self.$refs.ProjectModal.open(false)
-            },
+
             getProjects() {
                 var self = this
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -228,6 +247,9 @@
             },
             getTransactions(item) {
                 let self = this
+                if (self.project == item) {
+                    return
+                }
                 self.project = item
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.get(process.env.VUE_APP_API + `ProjectTX?projectID=${item.id}`).then(r => {

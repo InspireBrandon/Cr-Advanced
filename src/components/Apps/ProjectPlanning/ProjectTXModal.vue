@@ -14,64 +14,74 @@
 
             </v-toolbar>
             <v-container grid-list-md>
-                <v-layout row wrap>
-                    <!-- <v-flex md12>
+                <v-form ref="form" v-model="valid" lazy-validation>
+                    <v-layout row wrap>
+                        <!-- <v-flex md12>
                         <v-autocomplete placeholder="Please select a Spaceplan..." v-model="selectedPlanogram" :items="planogramsList"
                             solo light>
                         </v-autocomplete>
                     </v-flex> -->
+                        <v-flex md4>
+                            <v-autocomplete style="max-width: 400px;" dense v-model="type" :items="typeList"
+                                label="Component"></v-autocomplete>
+                            <!-- <v-text-field label="AssignedUser" placeholder="AssignedUser" v-model="AssignedUser"></v-text-field> -->
+                        </v-flex>
+                        <v-flex md4>
 
-                    <v-flex md6>
-                        <v-select label="Status" placeholder="Status" :items="statusList" v-model="Status"></v-select>
+                        </v-flex>
+                        <v-flex md4 v-if="isAdd==true"></v-flex>
+                        <v-flex md4 v-if="isAdd==false">
+                            <v-menu ref="menu" v-model="menu" :close-on-content-click="false" :return-value.sync="date"
+                                lazy transition="scale-transition" offset-y full-width min-width="290px">
+                                <template v-slot:activator="{ on }">
+                                    <v-text-field v-model="date" label="Picker in menu" prepend-icon="event" readonly
+                                        v-on="on"></v-text-field>
+                                </template>
+                                <v-date-picker v-model="date" no-title scrollable>
+                                    <v-spacer></v-spacer>
+                                    <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
+                                    <v-btn flat color="primary" @click="$refs.menu.save(date)">OK</v-btn>
+                                </v-date-picker>
+                            </v-menu>
+                            <!-- <v-text-field label="Date" placeholder="Date" v-model="date"></v-text-field> -->
+                        </v-flex>
+                        <v-flex md4>
+                            <v-select label="status" placeholder="status" :items="statusList" v-model="status">
+                            </v-select>
 
-                    </v-flex>
+                        </v-flex>
+                        <v-flex md4>
+                        </v-flex>
+                        <v-flex md4>
+                        </v-flex>
+                        <v-flex md4>
+                            <!-- <v-text-field label="StoreCluster" placeholder="StoreCluster" v-model="StoreCluster"></v-text-field> -->
+                            <v-autocomplete style="max-width: 400px;" dense v-model="StoreCluster"
+                                :items="StoreClusters" label="select a Store Cluster"></v-autocomplete>
+                        </v-flex>
+                        <v-flex md4>
+                            <!-- <v-text-field label="CategoryCluster" placeholder="CategoryCluster" v-model="CategoryCluster"></v-text-field> -->
+                            <v-autocomplete disabled style="max-width: 400px;" dense v-model="CategoryCluster"
+                                :items="CategoryClusters" label="select a Category Cluster"></v-autocomplete>
+                        </v-flex>
+                        <v-flex md4>
+                            <!-- <v-text-field label="Store" placeholder="Store" v-model="Store"></v-text-field> -->
+                            <v-autocomplete style="max-width: 400px;" dense v-model="Store" :items="stores"
+                                label="select a Store"></v-autocomplete>
+                        </v-flex>
 
-                    <v-flex md6>
-                        <v-menu ref="menu" v-model="menu" :close-on-content-click="false" :nudge-right="40"
-                            :return-value.sync="date" lazy transition="scale-transition" offset-y full-width
-                            min-width="290px">
-                            <template v-slot:activator="{ on }">
-                                <v-text-field v-model="date" label="Picker in menu" prepend-icon="event" readonly
-                                    v-on="on"></v-text-field>
-                            </template>
-                            <v-date-picker v-model="date" no-title scrollable>
-                                <v-spacer></v-spacer>
-                                <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
-                                <v-btn flat color="primary" @click="$refs.menu.save(date)">OK</v-btn>
-                            </v-date-picker>
-                        </v-menu>
-                        <!-- <v-text-field label="Date" placeholder="Date" v-model="date"></v-text-field> -->
-                    </v-flex>
-                    <v-flex md6>
-                        <!-- <v-text-field label="Store" placeholder="Store" v-model="Store"></v-text-field> -->
-                        <v-autocomplete style="max-width: 400px;" dense v-model="Store" :items="Stores"
-                            label="select a Store"></v-autocomplete>
-                    </v-flex>
-                    <v-flex md6>
-                        <!-- <v-text-field label="StoreCluster" placeholder="StoreCluster" v-model="StoreCluster"></v-text-field> -->
-                        <v-autocomplete style="max-width: 400px;" dense v-model="StoreCluster" :items="StoreClusters"
-                            label="select a StoreCluster"></v-autocomplete>
-                    </v-flex>
-                    <v-flex md6>
-                        <!-- <v-text-field label="CategoryCluster" placeholder="CategoryCluster" v-model="CategoryCluster"></v-text-field> -->
-                        <v-autocomplete disabled style="max-width: 400px;" dense v-model="CategoryCluster"
-                            :items="CategoryClusters" label="select a CategoryCluster"></v-autocomplete>
-                    </v-flex>
-                    <v-flex md6>
-                        <v-autocomplete style="max-width: 400px;" dense v-model="AssignedUser" :items="users"
-                            label="find a user"></v-autocomplete>
-                        <!-- <v-text-field label="AssignedUser" placeholder="AssignedUser" v-model="AssignedUser"></v-text-field> -->
-                    </v-flex>
-                    <v-flex md6>
-                        <v-autocomplete style="max-width: 400px;" dense v-model="Type" :items="typeList"
-                            label="Select a Type"></v-autocomplete>
-                        <!-- <v-text-field label="AssignedUser" placeholder="AssignedUser" v-model="AssignedUser"></v-text-field> -->
-                    </v-flex>
-                </v-layout>
+
+                        <v-flex md6>
+                            <v-autocomplete style="max-width: 400px;" dense v-model="AssignedUser" :items="users"
+                                label="find a user" :rules="[v => !!v || 'You must Select a User!']"></v-autocomplete>
+                            <!-- <v-text-field label="AssignedUser" placeholder="AssignedUser" v-model="AssignedUser"></v-text-field> -->
+                        </v-flex>
+
+                    </v-layout>
+                </v-form>
                 <v-card-actions>
-                    <v-btn @click="dialog = false">cancel</v-btn>
                     <v-spacer></v-spacer>
-                    <v-btn color="primary" @click="submit"> submit</v-btn>
+                    <v-btn color="primary" @click="submit" :disabled="!valid"> submit</v-btn>
 
                 </v-card-actions>
             </v-container>
@@ -89,11 +99,14 @@
     export default {
         data() {
             return {
+                isAdd: null,
+                afterClose: null,
+                valid: true,
                 menu: null,
                 id: null,
                 uid: null,
-                Type: null,
-                Stores: [],
+                type: 0,
+                stores: [],
                 StoreClusters: [],
                 CategoryClusters: [],
                 users: [],
@@ -101,13 +114,13 @@
                 planogramsList: [],
                 selectedPlanogram: null,
                 date: null,
-                Status: null,
+                status: 0,
                 Store: null,
                 StoreCluster: null,
                 CategoryCluster: null,
                 AssignedUser: null,
                 typeList: [{
-                        text: "DataPreparation",
+                        text: "Data Preparation",
                         value: 0
                     }, {
                         text: "Ranging",
@@ -117,7 +130,7 @@
                         text: "Planogram",
                         value: 2
                     }, {
-                        text: "DataPrePromotionparation",
+                        text: "Promotion",
                         value: 3
                     }
                 ],
@@ -127,7 +140,7 @@
                     },
                     {
                         value: 1,
-                        text: "InProgress"
+                        text: "In Progress"
                     },
                     {
                         value: 2,
@@ -180,16 +193,16 @@
         mounted() {
             this.getPlanograms()
             this.getUsers()
-            this.getStores()
+            this.getstores()
             this.getStoreClusters()
         },
         methods: {
-            getStores() {
+            getstores() {
                 let self = this
                 Axios.get(process.env.VUE_APP_API + `Store?db=CR-Hinterland-LIVE`).then(r => {
 
                     r.data.forEach(element => {
-                        self.Stores.push({
+                        self.stores.push({
                             text: element.storeName,
                             value: element.id
                         })
@@ -257,7 +270,7 @@
 
                     })
             },
-            open(isAdd, item) {
+            open(isAdd, item, callback) {
                 var self = this
                 self.dialog = true
 
@@ -266,10 +279,10 @@
                     self.projectID = item.project_ID
                     self.id = item.id
                     self.uid = item.uid
-                    self.Type = item.type
+                    self.type = item.type
                     self.selectedPlanogram = item.planogram_ID
                     self.date = item.dateTimeString
-                    self.Status = item.status
+                    self.status = item.status
                     self.Store = item.store_ID
                     self.StoreCluster = item.storeCluster_ID
                     self.CategoryCluster = item.storeCluster
@@ -279,59 +292,105 @@
                     self.projectID = item.id
 
                     self.isAdd = true
-                    self.Type = null,
-                        self.selectedPlanogram = item.planogram_ID,
+                    self.selectedPlanogram = item.planogram_ID,
                         self.date = null
-                    self.Status = null
+                    self.status = 0
                     self.Store = null
                     self.StoreCluster = null
                     self.CategoryCluster = null
                     self.AssignedUser = null
                 }
+                self.afterClose = callback
             },
             submit() {
                 var self = this
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                if (this.$refs.form.validate()) {
+                    let tmpStore = null
+                    let tmpStoreCluster = null
+                    let tmpCategoryCluster = null
+                    let tmpAssignedUser = null
 
-
-                if (self.isAdd == false) {
-                    let trans = {
-                        "id": self.id,
-                        "uid": self.uid,
-                        "project_ID": self.projectID,
-                        "storeCluster_ID": self.storeCluster,
-                        "store_ID": self.Store,
-                        "dateTime": self.date,
-                        "status": self.status,
-                        "Type": self.Type,
-                        "systemUserID": self.AssignedUser,
+                    if (self.Store != null || self.Store != undefined) {
+                        console.log("stores");
+                        
+                        self.stores.forEach(e => {
+                            if (e.value == self.store) {
+                                 tmpStore=e.text   
+                            }
+                        })
                     }
-                    Axios.put(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
-
-                        delete Axios.defaults.headers.common["TenantID"];
-                    })
-                }
-                if (self.isAdd == true) {
-                    let trans = {
-                        "project_ID": self.projectID,
-                        "storeCluster_ID": self.storeCluster,
-                        "store_ID": self.Store,
-                        "dateTime": self.date,
-                        "status": self.status,
-                        "Type": self.Type,
-                        "systemUserID": self.AssignedUser,
+                    if (self.StoreCluster != null || self.StoreCluster != undefined) {
+                        console.log("StoreCluster");
+                         
+                         self.StoreClusters.forEach(e => {
+                            if (e.value == self.StoreCluster) {
+                                 
+                                 tmpStoreCluster=e.text   
+                            }
+                        })
                     }
-                    Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
-                            console.log(res);
-                            
-                        delete Axios.defaults.headers.common["TenantID"];
-                    })
+                    // if(self.CategoryCluster!=null||self.CategoryCluster!=undefined)
+                    // {} 
+                    if (self.AssignedUser != null || self.AssignedUser != undefined) {
+                        console.log("users");
+                        
+                        self.users.forEach(e => {
+                            if (e.value == self.AssignedUser) {
+                                
+                                 tmpAssignedUser=e.text   
+                            }
+                        })
+                    }
+                    let encoded_details = jwt.decode(sessionStorage.accessToken);
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+
+                    if (self.isAdd == false) {
+                        let trans = {
+                            "id": self.id,
+                            "uid": self.uid,
+                            "project_ID": self.projectID,
+                            "storeCluster": tmpStoreCluster,
+                            "storeCluster_ID": self.storeCluster,
+                            "store_ID": self.Store,
+                            "store": tmpStore,
+
+                            "dateTime": self.date,
+                            "status": self.status,
+                            "type": self.type,
+                            "username": tmpAssignedUser,
+                            "systemUserID": self.AssignedUser,
+                        }
+                        Axios.put(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
+
+                            self.afterClose(trans)
+                            delete Axios.defaults.headers.common["TenantID"];
+                        })
+                    }
+                    if (self.isAdd == true) {
+                        let trans = {
+                            "project_ID": self.projectID,
+                            "storeCluster_ID": self.storeCluster,
+                            "store_ID": self.Store,
+                            "dateTime": self.date,
+                            "status": self.status,
+                            "type": self.type,
+                            "username": tmpAssignedUser,
+                            "store": tmpStore,
+                            "storeCluster": tmpStoreCluster,
+                            "systemUserID": self.AssignedUser,
+                        }
+                        Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
+                            self.afterClose(trans)
+
+                            delete Axios.defaults.headers.common["TenantID"];
+                        })
+                    }
+                    self.dialog = false
+
+                    self.dialog = false
+
                 }
-                self.dialog = false
-
-                self.dialog = false
-
             }
         }
     }
