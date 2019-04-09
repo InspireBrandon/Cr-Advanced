@@ -11,7 +11,7 @@
                         :items="projects_dropdown" label="Current Project"></v-autocomplete>
                 </v-flex>
                 <v-flex v-if="project != null && planogramsList.length == 0" lg9 md4 sm12 xs12>
-                    No planograms found for selected store
+                    No planograms found
                 </v-flex>
                 <v-flex v-if="project != null && planogramsList.length > 0" lg9 md4 sm12 xs12>
                     <v-card>
@@ -269,6 +269,8 @@
             getPlanogramByID() {
                 let self = this;
 
+                self.selectedPlanogram = null;
+
                 self.$nextTick(() => {
                     // get planogram id from selected project
                     let planogramID = -1;
@@ -282,6 +284,8 @@
 
                     Axios.get(process.env.VUE_APP_API + `ProjectTX?projectID=${self.project}`).then(r => {
                         delete Axios.defaults.headers.common["TenantID"];
+
+                        self.timelineItems = [];
 
                         r.data.projectTXList.forEach(element => {
                             self.timelineItems.push({
