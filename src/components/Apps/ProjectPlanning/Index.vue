@@ -28,20 +28,24 @@
                 <v-expansion-panel class="elevation-0" v-for="groups in ProjectsGroups" :key="groups.id">
                     <v-expansion-panel-content>
                         <template v-slot:header>
-                            <div> {{groups.name}}   
+                            <div> {{groups.name}}
                             </div>
                         </template>
                         <v-list>
 
                             <v-list-tile>
-                             
+
                                 <v-spacer></v-spacer>
-                                <v-btn flat icon @click="openGroupEdit(groups)">
-                                   <v-icon> edit </v-icon>
+                                <v-btn flat icon @click="deleteProjectGroup(groups)">
+                                    <v-icon>delete</v-icon>
                                 </v-btn>
-                                <v-btn flat icon  @click="openProjectAdd(groups)">
+                                <v-btn flat icon @click="openGroupEdit(groups)">
+                                    <v-icon> edit </v-icon>
+                                </v-btn>
+                                <v-btn flat icon @click="openProjectAdd(groups)">
                                     <v-icon>add</v-icon>
                                 </v-btn>
+
                             </v-list-tile>
 
                             <hr>
@@ -58,7 +62,7 @@
                                         <v-list dense>
                                             <v-list-tile @click="openProjectEdit(item)">Edit</v-list-tile>
                                             <v-divider></v-divider>
-                                            <v-list-tile>Archive</v-list-tile>
+                                            <v-list-tile @click="deleteProject(item,groups)">Archive</v-list-tile>
                                         </v-list>
                                     </v-menu>
                                 </v-list-tile>
@@ -91,7 +95,7 @@
                     </v-icon>
                 </v-btn>
                 <v-spacer></v-spacer>
-                <v-btn flat icon v-if="project!=null" @click="openProjectGroupAdd()">
+                <v-btn flat icon v-if="project!=null" @click="openProjectTXAdd()">
                     <v-icon>add</v-icon>
                 </v-btn>
 
@@ -403,20 +407,59 @@
             }
         },
         methods: {
+            deleteProject(item,group) {
+                let self = this
+               
+                
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.delete(process.env.VUE_APP_API + `Project?projectID=${item.id}`).then(r => {
+                    console.log(r);
+                    
+                    
+                    for (let index = 0; index < group.projectList.length; index++) {
+                        const element = group.projectList[index];
+                        if (element.id == item.id) {
+                            group.projectList.splice(index,1)
+                        }
+                    }
+                    delete Axios.defaults.headers.common["TenantID"];
+                })
+
+            },
+            deleteProjectGroup(item) {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.delete(process.env.VUE_APP_API + `ProjectGroup?projectGroupID=${item.id}`).then(r => {
+
+                    for (let index = 0; index < self.ProjectsGroups.length; index++) {
+                        const element = self.ProjectsGroups[index];
+                        if (element.id == item.id) {
+                            self.ProjectsGroups.splice(index,1)
+                        }
+                    }
+                    delete Axios.defaults.headers.common["TenantID"];
+                })
+
+            },
+
             getProjectGroups() {
                 let self = this
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.get(process.env.VUE_APP_API + 'ProjectGroup').then(r => {
-
-
-                    self.ProjectsGroups = r.data.projectGroupList
+                    r.data.projectGroupList.forEach(e => {
+                        if (e.deleted == false) {
+                            self.ProjectsGroups.push(e)
+                        }
+                    })
 
                     delete Axios.defaults.headers.common["TenantID"];
                 })
 
             },
-            openGroupEdit(item){
+            openGroupEdit(item) {
                 var self = this
                 self.$refs.ProjectGroupModal.open(false, item, data => {
                     self.ProjectsGroups.push(data)

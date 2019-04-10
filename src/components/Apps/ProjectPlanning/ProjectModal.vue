@@ -86,7 +86,6 @@
                         self.GroupList.push({
                             text:  e.name,
                             value:e.id,
-
                         })
                     })
 
