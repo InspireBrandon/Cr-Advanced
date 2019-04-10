@@ -1,12 +1,12 @@
 <template>
     <div>
-
         <v-navigation-drawer persistent :clipped="true" v-model="drawer" fixed app>
             <v-list>
                 <v-list-tile>
-                    <v-list-tile-content>Projects</v-list-tile-content>
+                    <v-list-tile-content>Project Groups
+                    </v-list-tile-content>
                     <v-list-tile-action>
-                        <v-btn icon @click="openProjectAdd()">
+                        <v-btn icon @click="openProjectGroupAdd()">
                             <v-icon>
                                 add
                             </v-icon>
@@ -14,24 +14,66 @@
                     </v-list-tile-action>
                 </v-list-tile>
             </v-list>
+            <!-- <v-menu left>
+                            <v-btn slot="activator" icon>
+                                <v-icon>more_vert</v-icon>
+                            </v-btn>
+                            <v-list dense>
+                                
+                                <v-divider></v-divider>
+                            </v-list>
+                        </v-menu> -->
             <v-list class="pt-0" dense>
-                <v-divider></v-divider>
-                <v-list-tile :class="{ 'highlighted': project == item  }" v-for="item in Projects" :key="item.title"
-                    @click="getTransactions(item)">
-                    <v-list-tile-content>
-                        <v-list-tile-title>{{ item.name }}</v-list-tile-title>
-                    </v-list-tile-content>
-                    <v-menu left>
-                        <v-btn slot="activator" icon>
-                            <v-icon>more_vert</v-icon>
-                        </v-btn>
-                        <v-list dense>
-                            <v-list-tile @click="openProjectEdit(item)">Edit</v-list-tile>
-                            <v-divider></v-divider>
-                            <v-list-tile>Archive</v-list-tile>
+
+                <v-expansion-panel class="elevation-0" v-for="groups in ProjectsGroups" :key="groups.id">
+                    <v-expansion-panel-content>
+                        <template v-slot:header>
+                            <div> {{groups.name}}   
+                            </div>
+                        </template>
+                        <v-list>
+
+                            <v-list-tile>
+                             
+                                <v-spacer></v-spacer>
+                                <v-btn flat icon @click="openGroupEdit(groups)">
+                                   <v-icon> edit </v-icon>
+                                </v-btn>
+                                <v-btn flat icon  @click="openProjectAdd()">
+                                    <v-icon>add</v-icon>
+                                </v-btn>
+                            </v-list-tile>
+
+                            <hr>
+                            <div v-for="(item,index) in groups.projectList" :key="index">
+                                <v-list-tile :class="{ 'highlighted': project == item  }"
+                                    @click="getTransactions(item)">
+                                    <v-list-tile-content>
+                                        <v-list-tile-title>{{ item.name }}</v-list-tile-title>
+                                    </v-list-tile-content>
+                                    <v-menu left>
+                                        <v-btn slot="activator" icon>
+                                            <v-icon>more_vert</v-icon>
+                                        </v-btn>
+                                        <v-list dense>
+                                            <v-list-tile @click="openProjectEdit(item)">Edit</v-list-tile>
+                                            <v-divider></v-divider>
+                                            <v-list-tile>Archive</v-list-tile>
+                                        </v-list>
+                                    </v-menu>
+                                </v-list-tile>
+                                <v-divider></v-divider>
+                            </div>
+                            <!-- <v-card>
+                            <v-card-text>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                                exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</v-card-text>
+                        </v-card> -->
                         </v-list>
-                    </v-menu>
-                </v-list-tile>
+                    </v-expansion-panel-content>
+                </v-expansion-panel>
+
+
             </v-list>
         </v-navigation-drawer>
 
@@ -49,7 +91,7 @@
                     </v-icon>
                 </v-btn>
                 <v-spacer></v-spacer>
-                <v-btn flat icon v-if="project!=null" @click="openProjectTXAdd()">
+                <v-btn flat icon v-if="project!=null" @click="openProjectGroupAdd()">
                     <v-icon>add</v-icon>
                 </v-btn>
 
@@ -58,7 +100,7 @@
                 <template v-slot:items="props">
                     <td>
                         <!-- {{ props.item.dateTimeString }} -->
-                       <v-edit-dialog :return-value.sync="props.item.type" large lazy persistent
+                        <v-edit-dialog :return-value.sync="props.item.type" large lazy persistent
                             @save="saveLine(props.item,0)" @cancel="''" @open="''" @close="''">
                             <div>{{ props.item.dateTimeString }}</div>
                             <template v-slot:input>
@@ -66,20 +108,20 @@
                             </template>
                             <template v-slot:input>
                                 <v-menu ref="menu" v-model="menu" :close-on-content-click="false" lazy
-                            transition="scale-transition" offset-y full-width min-width="290px">
-                            <template v-slot:activator="{ on }">
-                                <v-text-field v-model="setDate" label="please select a date" prepend-icon="event"
-                                    readonly v-on="on"></v-text-field>
-                            </template>
-                            <v-date-picker v-model="datePicker" no-title scrollable>
-                                <v-spacer></v-spacer>
-                                <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
-                                <v-btn flat color="primary" @click="$refs.menu.save(date)">OK</v-btn>
-                            </v-date-picker>
-                            <v-time-picker v-model="timePicker"></v-time-picker>
+                                    transition="scale-transition" offset-y full-width min-width="290px">
+                                    <template v-slot:activator="{ on }">
+                                        <v-text-field v-model="setDate" label="please select a date"
+                                            prepend-icon="event" readonly v-on="on"></v-text-field>
+                                    </template>
+                                    <v-date-picker v-model="datePicker" no-title scrollable>
+                                        <v-spacer></v-spacer>
+                                        <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
+                                        <v-btn flat color="primary" @click="$refs.menu.save(date)">OK</v-btn>
+                                    </v-date-picker>
+                                    <v-time-picker v-model="timePicker"></v-time-picker>
 
-                            
-                        </v-menu>
+
+                                </v-menu>
                             </template>
                         </v-edit-dialog>
                     </td>
@@ -169,6 +211,7 @@
 
 
 
+            <ProjectGroupModal ref="ProjectGroupModal"> </ProjectGroupModal>
 
             <ProjectModal ref="ProjectModal"> </ProjectModal>
             <ProjectTXModal ref="ProjectTXModal"> </ProjectTXModal>
@@ -180,20 +223,23 @@
 <script>
     import ProjectModal from './ProjectModal.vue'
     import ProjectTXModal from './ProjectTXModal.vue'
+    import ProjectGroupModal from './ProjectGroupModal.vue'
+
     import Axios from 'axios'
     import jwt from 'jsonwebtoken';
 
 
     export default {
         components: {
+            ProjectGroupModal,
             ProjectModal,
             ProjectTXModal
         },
         data() {
             return {
-                menu:null,
-                timePicker:null,
-                datePicker:null,
+                menu: null,
+                timePicker: null,
+                datePicker: null,
                 drawer: null,
                 project: null,
                 Projects: [],
@@ -331,36 +377,64 @@
                     }
                 ],
                 stores: [],
+                ProjectsGroups: [],
                 storeObjects: [],
                 StoreClusters: [],
                 databaseUsers: [],
                 users: [],
+                tmp: [],
 
 
             }
         },
         mounted() {
-            this.getProjects()
+
             this.getstores()
             this.getStoreClusters()
             this.getDatabaseUsers()
+            this.getProjectGroups()
         },
-          computed: {
-    // a computed getter
-    setDate: function () {
-      // `this` points to the vm instance
-      return this.datePicker+' '+this.timePicker
-    //   return this.datePicker = this.datePicker+this.timePicker
-    }
-  },
+        computed: {
+            // a computed getter
+            setDate: function () {
+                // `this` points to the vm instance
+                return this.datePicker + ' ' + this.timePicker
+                //   return this.datePicker = this.datePicker+this.timePicker
+            }
+        },
         methods: {
+            getProjectGroups() {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + 'ProjectGroup').then(r => {
+
+
+                    self.ProjectsGroups = r.data.projectGroupList
+
+                    delete Axios.defaults.headers.common["TenantID"];
+                })
+
+            },
+            openGroupEdit(item){
+                var self = this
+                self.$refs.ProjectGroupModal.open(false, item, data => {
+                    self.ProjectsGroups.push(data)
+                })
+            },
+            openProjectGroupAdd(item) {
+                var self = this
+                self.$refs.ProjectGroupModal.open(true, item, data => {
+                    self.ProjectsGroups.push(data)
+                })
+            },
             saveLine(item, editType) {
                 let self = this
                 console.log(item);
                 if (editType == 0) {
                     //date time edit
-                    item.dateTime=self.setDate
-                    item.dateTimeString=self.setDate
+                    item.dateTime = self.setDate
+                    item.dateTimeString = self.setDate
                     //  "dateTime": self.setDate,
                     //         "dateTimeString":self.setDate,
                 }
@@ -491,9 +565,10 @@
             },
             openProjectAdd(item) {
                 var self = this
-                self.$refs.ProjectModal.open(true, item, data => {
+                console.log(item);
 
-                    self.Projects.push(data.data.project)
+                self.$refs.ProjectModal.open(true, item, data => {
+                    item.projectList.push(data.data.project)
                 })
             },
             openProjectTXAdd() {
@@ -524,15 +599,17 @@
                 })
             },
 
-            getProjects() {
+            getProjects(group, callback) {
                 var self = this
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.get(process.env.VUE_APP_API + 'Project').then(r => {
-
-
-                    self.Projects = r.data.projectList
+                Axios.get(process.env.VUE_APP_API + `Project?projectGroupID=${group.id}`).then(r => {
                     delete Axios.defaults.headers.common["TenantID"];
+                    group.Projects = r.data.projectList
+                    callback()
+
+                    // self.Projects = r.data.projectList
+
                 })
             },
             getTransactions(item) {

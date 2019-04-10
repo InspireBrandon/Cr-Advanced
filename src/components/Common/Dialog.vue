@@ -1,7 +1,7 @@
 <template>
   <v-layout row justify-center>
     <v-dialog v-model="dialog" persistent max-width="290">
-      <v-card dark>
+      <v-card >
         <v-card-title style="text-align: center; display: block;" class="headline">{{ headline }}</v-card-title>
         <v-card-text style="text-align: center;">{{ text }}</v-card-text>
         <v-card-actions style="text-align: center; display: block;">

@@ -6,7 +6,7 @@
           <v-card-title style="text-align: center; display: block;" class="headline">{{ title }}</v-card-title>
           <v-card-text style="text-align: center;">
             <v-form @submit.prevent="returnText">
-              <v-select dark dense hide-details v-model="active_shope_code" :items="items" :label="label"></v-select>
+              <v-select  dense hide-details v-model="active_shope_code" :items="items" :label="label"></v-select>
             </v-form>
           </v-card-text>
           <v-card-actions style="text-align: center; display: block;">

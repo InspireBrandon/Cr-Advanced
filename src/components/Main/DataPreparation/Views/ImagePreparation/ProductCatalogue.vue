@@ -49,8 +49,8 @@
             </v-card>
           </v-dialog>
           <v-dialog persistent v-model="FilterScanBarcode" width="80vw">
-            <v-card dark>
-              <v-card-title class="headline">Scan Barcode</v-card-title>
+            <v-card >
+              <v-card-title class="headline">Scan Barcode </v-card-title>
               <v-card-text>
                 <v-container fluid grid-list-lg>
                   <v-layout row wrap>

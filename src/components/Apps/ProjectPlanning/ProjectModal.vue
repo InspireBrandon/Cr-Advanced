@@ -16,10 +16,17 @@
             <v-container grid-list-md>
                 <v-form ref="form" v-model="valid" lazy-validation>
                     <v-layout row wrap>
-                        <v-flex md12>
+                        <v-flex md6>
                             <v-autocomplete placeholder="Please select a Planogram..." v-model="selectedPlanogram"
                                 :items="planogramsList" solo light
                                 :rules="[v => !!v || 'You must select a Planogram!']">
+                            </v-autocomplete>
+                        </v-flex>
+
+                        <v-flex md6>
+                            <v-autocomplete placeholder="Please select a Project Group..." v-model="selectedGroup"
+                                :items="GroupList" solo light :rules="[v => !!v || 'You must select a Project Group!']">
+
                             </v-autocomplete>
                         </v-flex>
 
@@ -52,7 +59,9 @@
     export default {
         data() {
             return {
-                valid:null,
+                selectedGroup: null,
+                GroupList: [],
+                valid: null,
                 afterClose: null,
                 project: null,
                 isAdd: false,
@@ -65,8 +74,27 @@
         },
         mounted() {
             this.getPlanograms()
+            this.getProjectGroups()
         },
         methods: {
+            getProjectGroups() {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + 'ProjectGroup').then(r => {
+                    console.log(r);
+                    r.data.projectGroupList.forEach(e => {
+                        self.GroupList.push({
+                            text:  e.name,
+                            value:e.id,
+
+                        })
+                    })
+
+                    delete Axios.defaults.headers.common["TenantID"];
+                })
+
+            },
             getPlanograms() {
                 let self = this;
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -87,9 +115,10 @@
             open(isAdd, item, callback) {
                 var self = this
                 self.dialog = true
-                self.valid= null
+                self.valid = null
                 if (isAdd == false) {
                     self.isAdd = false
+                     self.selectedGroup=item.projectGroupID
                     self.project = item
                     self.selectedPlanogram = item.planogram_ID,
                         self.name = item.name,
@@ -98,6 +127,7 @@
                 if (isAdd == true) {
                     self.selectedPlanogram = null,
                         self.isAdd = true
+                        self.selectedGroup=item.id
                     self.name = null,
                         self.description = null
                 }
@@ -113,6 +143,7 @@
                             "systemUserID": encoded_details.USER_ID,
                             "planogram_ID": self.selectedPlanogram,
                             "name": self.name,
+                            "ProjectGroupID":self.selectedGroup,
                             "description": self.description,
                             "deleted": false
                         }
@@ -120,6 +151,10 @@
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                         Axios.post(process.env.VUE_APP_API + 'Project', tmp).then(r => {
+                            console.log("r");
+                            console.log(r);
+
+                            
                             let trans = {
                                 "project_ID": r.data.project.id,
                                 "type": -1,
@@ -142,6 +177,7 @@
                             "id": self.project.id,
                             "systemUserID": encoded_details.USER_ID,
                             "planogram_ID": self.selectedPlanogram,
+                            "ProjectGroupID":self.selectedGroup,
                             "name": self.name,
                             "description": self.description,
                             "deleted": false
@@ -149,7 +185,7 @@
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                         Axios.put(process.env.VUE_APP_API + 'Project', tmp).then(r => {
                             delete Axios.defaults.headers.common["TenantID"];
-                          
+
                             self.afterClose(tmp)
                             self.dialog = false
                         })
