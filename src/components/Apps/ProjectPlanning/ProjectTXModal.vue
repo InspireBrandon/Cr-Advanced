@@ -31,18 +31,18 @@
                         </v-flex>
                         <v-flex md4 v-if="isAdd==true"></v-flex>
                         <v-flex md4 v-if="isAdd==false">
-                            <v-menu ref="menu" v-model="menu" :close-on-content-click="false" 
-                                lazy transition="scale-transition" offset-y full-width min-width="290px">
+                            <v-menu ref="menu" v-model="menu" :close-on-content-click="false" lazy
+                                transition="scale-transition" offset-y full-width min-width="290px">
                                 <template v-slot:activator="{ on }">
-                                    <v-text-field v-model="setDate" label="please select a date" prepend-icon="event" readonly
-                                        v-on="on"></v-text-field>
+                                    <v-text-field v-model="setDate" label="please select a date" prepend-icon="event"
+                                        readonly v-on="on"></v-text-field>
                                 </template>
                                 <v-date-picker v-model="datePicker" no-title scrollable>
                                     <v-spacer></v-spacer>
                                     <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
                                     <v-btn flat color="primary" @click="$refs.menu.save(date)">OK</v-btn>
                                 </v-date-picker>
-                                 <v-time-picker v-model="timePicker" ></v-time-picker>
+                                <v-time-picker v-model="timePicker"></v-time-picker>
                             </v-menu>
                             <!-- <v-text-field label="Date" placeholder="Date" v-model="date"></v-text-field> -->
                         </v-flex>
@@ -94,16 +94,16 @@
 
 </template>
 <script>
-import moment from 'moment'
+    import moment from 'moment'
     import jwt from 'jsonwebtoken';
     import Axios from 'axios'
 
     export default {
         data() {
             return {
-                datePicker:null,
-                timePicker:null,
-                date:this.datePicker+this.timePicker,
+                datePicker: null,
+                timePicker: null,
+                date: this.datePicker + this.timePicker,
                 isAdd: null,
                 afterClose: null,
                 valid: true,
@@ -124,12 +124,11 @@ import moment from 'moment'
                 StoreCluster: null,
                 CategoryCluster: null,
                 AssignedUser: null,
-                storeObjects:[],
-                typeList: [
-                    {
+                storeObjects: [],
+                typeList: [{
                         text: "Event",
                         value: 0
-                    }, 
+                    },
                     {
                         text: "Data Preparation",
                         value: 1
@@ -145,8 +144,8 @@ import moment from 'moment'
                         value: 4
                     }
                 ],
-        
-        
+
+
                 statusList: [{
                         value: 0,
                         text: "Project Start"
@@ -171,12 +170,12 @@ import moment from 'moment'
                         value: 5,
                         text: "DataPreparationStart"
                     },
-        
+
                     {
                         value: 6,
                         text: "Ranging Start"
                     },
-                    
+
                     {
                         value: 7,
                         text: "Planogram Start"
@@ -218,13 +217,13 @@ import moment from 'moment'
 
         },
         computed: {
-    // a computed getter
-    setDate: function () {
-      // `this` points to the vm instance
-      return this.datePicker+' '+this.timePicker
-    //   return this.datePicker = this.datePicker+this.timePicker
-    }
-  },
+            // a computed getter
+            setDate: function () {
+                // `this` points to the vm instance
+                return this.datePicker + ' ' + this.timePicker
+                //   return this.datePicker = this.datePicker+this.timePicker
+            }
+        },
 
         mounted() {
             this.getPlanograms()
@@ -233,11 +232,11 @@ import moment from 'moment'
             this.getStoreClusters()
         },
         methods: {
-           
+
             getstores() {
                 let self = this
                 Axios.get(process.env.VUE_APP_API + `Store?db=CR-Hinterland-LIVE`).then(r => {
-                    self.storeObjects=r.data
+                    self.storeObjects = r.data
                     r.data.forEach(element => {
                         self.stores.push({
                             text: element.storeName,
@@ -259,7 +258,7 @@ import moment from 'moment'
                     })
                 })
             },
-           getUsers() {
+            getUsers() {
                 let self = this;
 
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
@@ -269,39 +268,40 @@ import moment from 'moment'
 
                         self.userDetails = r.data;
 
+                        self.users.push({
+                            text: r.data[0].username.toString(),
+                            value: r.data[0].systemUserID
+                        })
+
                         r.data.forEach(element => {
 
                             if (element.emailAddress != null) {
                                 let isDatabaseUser = false;
 
                                 self.databaseUsers.forEach((dbu, idx) => {
+
                                     if (dbu.systemUserID == element.systemUserID) {
                                         isDatabaseUser = true;
-                                    }
-
-                                    if (dbu.systemUserID == encoded_details.USER_ID) {
-                                        self.databaseUsers.splice(idx, 1);
                                     }
                                 })
 
                                 if (isDatabaseUser) {
-                                    if (element.systemUserID != encoded_details.USER_ID) {
-                                        self.users.push({
-                                            text: element.username.toString(),
-                                            value: element.systemUserID
-                                        })
-                                    }
+                                    self.users.push({
+                                        text: element.username.toString(),
+                                        value: element.systemUserID
+                                    })
                                 }
                             }
                         });
 
                         self.showLoader = false;
+                        self.AssignedUser = self.users[0].value;
                     })
             },
             getDatabaseUsers() {
                 let self = this;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
-let tmp = sessionStorage.currentDatabase
+                let tmp = sessionStorage.currentDatabase
                 Axios.get(process.env.VUE_APP_API + `TenantAccess/User?tenantID=${tmp}`)
                     .then(r => {
                         self.databaseUsers = r.data;
@@ -328,7 +328,7 @@ let tmp = sessionStorage.currentDatabase
             },
             open(isAdd, item, callback) {
                 var self = this
-               
+
                 self.dialog = true
 
                 if (isAdd == false) {
@@ -338,7 +338,7 @@ let tmp = sessionStorage.currentDatabase
                     self.uid = item.uid
                     self.type = item.type
                     self.selectedPlanogram = item.planogram_ID
-                    
+
                     self.timePicker = item.dateTimeString.slice(11, 16);
 
                     self.datePicker = item.dateTimeString.slice(0, 10);
@@ -349,7 +349,7 @@ let tmp = sessionStorage.currentDatabase
                     self.AssignedUser = item.systemUserID
                 }
                 if (isAdd == true) {
-                    self.valid=null
+                    self.valid = null
                     self.projectID = item.id
 
                     self.isAdd = true
@@ -359,39 +359,38 @@ let tmp = sessionStorage.currentDatabase
                     self.Store = null
                     self.StoreCluster = null
                     self.CategoryCluster = null
-                    self.AssignedUser = null
                 }
                 self.afterClose = callback
             },
             submit() {
                 var self = this
-                 if (self.datePicker==null&&self.timePicker==null &&self.isAdd==false) {
-                        alert("Please select a date and time")
+                if (self.datePicker == null && self.timePicker == null && self.isAdd == false) {
+                    alert("Please select a date and time")
                     return
-                    }
+                }
                 if (this.$refs.form.validate()) {
-                   
+
                     let tmpStore = null
                     let tmpStoreCluster = null
                     let tmpCategoryCluster = null
                     let tmpAssignedUser = null
 
                     if (self.Store != null || self.Store != undefined) {
-                        
+
                         self.storeObjects.forEach(e => {
-                          
-                           
-                           if (e.storeID == self.Store) {
-                                 tmpStore=e.storeName   
+
+
+                            if (e.storeID == self.Store) {
+                                tmpStore = e.storeName
                             }
                         })
-                        
+
                     }
                     if (self.StoreCluster != null || self.StoreCluster != undefined) {
-                         self.StoreClusters.forEach(e => {
+                        self.StoreClusters.forEach(e => {
                             if (e.value == self.StoreCluster) {
-                                 
-                                 tmpStoreCluster=e.text   
+
+                                tmpStoreCluster = e.text
                             }
                         })
 
@@ -401,8 +400,8 @@ let tmp = sessionStorage.currentDatabase
                     if (self.AssignedUser != null || self.AssignedUser != undefined) {
                         self.users.forEach(e => {
                             if (e.value == self.AssignedUser) {
-                                
-                                 tmpAssignedUser=e.text   
+
+                                tmpAssignedUser = e.text
                             }
                         })
                     }
@@ -421,7 +420,7 @@ let tmp = sessionStorage.currentDatabase
                             "store": tmpStore,
 
                             "dateTime": self.setDate,
-                            "dateTimeString":self.setDate,
+                            "dateTimeString": self.setDate,
                             "status": self.status,
                             "type": self.type,
                             "username": tmpAssignedUser,
@@ -439,7 +438,7 @@ let tmp = sessionStorage.currentDatabase
                             "storeCluster_ID": self.StoreCluster,
                             "store_ID": self.Store,
                             "dateTime": new Date,
-                            "dateTimeString":moment(new Date).format('YYYY-MM-DD hh:mm'),
+                            "dateTimeString": moment(new Date).format('YYYY-MM-DD hh:mm'),
 
                             "status": self.status,
                             "type": self.type,
@@ -450,7 +449,7 @@ let tmp = sessionStorage.currentDatabase
                         }
                         Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
                             console.log(res);
-                            
+
                             self.afterClose(trans)
 
                             delete Axios.defaults.headers.common["TenantID"];

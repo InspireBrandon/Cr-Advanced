@@ -111,7 +111,7 @@
                                 <div class="mt-3 title">Update Iron</div>
                             </template>
                             <template v-slot:input>
-                                <v-menu ref="menu" v-model="menu" :close-on-content-click="false" lazy
+                                <v-menu v-model="menu" :close-on-content-click="false" lazy
                                     transition="scale-transition" offset-y full-width min-width="290px">
                                     <template v-slot:activator="{ on }">
                                         <v-text-field v-model="setDate" label="please select a date"
