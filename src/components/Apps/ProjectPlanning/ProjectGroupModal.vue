@@ -15,11 +15,7 @@
             <v-container grid-list-md>
                 <v-form ref="form" v-model="valid" lazy-validation>
                     <v-layout row wrap>
-                        <v-flex md12>
-                            <v-autocomplete placeholder="Please select a Group..." v-model="selectedGroup"
-                                :items="projectGroups" solo light :rules="[v => !!v || 'You must select a Planogram!']">
-                            </v-autocomplete>
-                        </v-flex>
+
 
                         <v-flex md6>
                             <v-text-field label="Name" placeholder="Name" v-model="name"
@@ -42,9 +38,15 @@
     </v-dialog>
 </template>
 <script>
+    import jwt from 'jsonwebtoken';
+    import Axios from 'axios'
+    import {
+        SSL_OP_CIPHER_SERVER_PREFERENCE
+    } from 'constants';
     export default {
         data() {
             return {
+                item: null,
                 valid: null,
                 dialog: null,
                 projectGroups: [],
@@ -71,61 +73,45 @@
                 } else {
                     self.isAdd = true
                     self.valid = null
-                    // self.name = item.name
-                    // self.description = item.description
-                    // self.selectedGroup = item.projectGroup
+                    self.item = item
+                    self.name = item.name
+                    self.description = item.description
                 }
-                 self.afterClose = callback
+                self.afterClose = callback
             },
-             submit() {
+            submit() {
                 var self = this
                 if (this.$refs.form.validate()) {
-                    let encoded_details = jwt.decode(sessionStorage.accessToken);
                     if (self.isAdd == true) {
                         let tmp = {
-                            "systemUserID": encoded_details.USER_ID,
-                            "planogram_ID": self.selectedPlanogram,
                             "name": self.name,
                             "description": self.description,
-                            "deleted": false
                         }
 
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                        Axios.post(process.env.VUE_APP_API + 'Project', tmp).then(r => {
-                            let trans = {
-                                "project_ID": r.data.project.id,
-                                "type": -1,
-                                "status": 0,
-                                "systemUserID": encoded_details.USER_ID,
-                            }
-                            Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
-                                delete Axios.defaults.headers.common["TenantID"];
-                                self.dialog = false
-                                self.afterClose(r)
-                            })
+                        Axios.post(process.env.VUE_APP_API + 'ProjectGroup', tmp).then(r => {
+                            console.log(r);
+                            self.afterClose(r.data.projectGroup)
+                            self.dialog = false
+
                         })
                     }
                     if (self.isAdd == false) {
 
-                        let tmp = {
-                            "id": self.project.id,
-                            "systemUserID": encoded_details.USER_ID,
-                            "planogram_ID": self.selectedPlanogram,
-                            "name": self.name,
-                            "description": self.description,
-                            "deleted": false
-                        }
+                        self.item.name = self.name
+                        self.item.description = self.description
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                        Axios.put(process.env.VUE_APP_API + 'Project', tmp).then(r => {
-                            delete Axios.defaults.headers.common["TenantID"];
-                          
-                            self.afterClose(tmp)
+
+                        Axios.put(process.env.VUE_APP_API + 'ProjectGroup', self.item).then(r => {
+                            console.log(r);
+                            self.afterClose(r.data.projectGroup)
                             self.dialog = false
+
                         })
                     }
-
                 }
+
             }
         }
     }
