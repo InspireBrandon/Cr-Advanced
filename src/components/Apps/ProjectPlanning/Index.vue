@@ -249,7 +249,7 @@
                         value: 0
                     },
                     {
-                        text: "DataPreparation",
+                        text: "Data Preparation",
                         value: 1
                     }, {
                         text: "Ranging",
@@ -303,7 +303,7 @@
                     {
                         text: "In Progress",
                         value: 1,
-                        friendly: "InProgress"
+                        friendly: "In Progress"
                     },
                     {
                         text: "Complete",
@@ -313,7 +313,7 @@
                     {
                         text: "Workshop",
                         value: 3,
-                        friendly: "Complete"
+                        friendly: "Workshop"
                     },
                     {
                         text: "Meeting",
