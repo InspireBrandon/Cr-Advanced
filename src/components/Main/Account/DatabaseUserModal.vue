@@ -26,19 +26,21 @@
                         <v-card-text>
                             <v-data-table class="elevation-0" hide-actions :items="databaseUsers" :headers="headers">
                                 <template v-slot:items="props">
-                                    <td>{{ props.item.firstname + " " + props.item.lastname }}</td>
-                                    <td>
+                                    <td>{{ props.item.firstname }}</td>
+                                    <td>{{ props.item.lastname }}</td>
+                                    <td>{{ props.item.emailAddress }}</td>
+                                    <td>{{ props.item.username }}</td>
+                                    <td>{{ props.item.password }}
+                                    </td>
                                         <v-menu>
                                             <v-btn slot="activator" icon>
                                                 <v-icon>more_vert</v-icon>
                                             </v-btn>
                                             <v-list dense>
-                                                <v-list-tile @click="setAccessType(props)">Set access
-                                                    type</v-list-tile>
-                                                <!-- <v-divider></v-divider>
-                                                <v-list-tile @click="openFeatureAccessModal(props.item.systemUserID)">
-                                                    Set rights</v-list-tile>
+                                                <v-list-tile @click="setAccessType(props)">Set access type</v-list-tile>
                                                 <v-divider></v-divider>
+                                                <v-list-tile @click="openFeatureAccessModal(props.item.systemUserID)">Feature access</v-list-tile>
+                                                <!-- <v-divider></v-divider>
                                                 <v-list-tile>Revoke access</v-list-tile> -->
                                             </v-list>
                                         </v-menu>
@@ -70,14 +72,37 @@
                     "Store"
                 ],
                 headers: [{
-                        text: 'User name',
+                        text: 'First name',
                         align: 'left',
                         sortable: false,
                         value: 'firstname'
                     },
                     {
+                        text: 'Last name',
+                        align: 'left',
+                        sortable: false,
+                        value: 'lastname'
+                    },
+                    {
+                        text: 'Email',
+                        align: 'left',
+                        sortable: false,
+                        value: 'emailAddress'
+                    },
+                    {
+                        text: 'Username',
+                        align: 'left',
+                        sortable: false,
+                        value: 'username'
+                    },
+                    {
+                        text: 'Password (click to view)',
+                        align: 'left',
+                        sortable: false,
+                        value: 'password'
+                    },
+                    {
                         text: '',
-                        value: 'iron',
                         width: "10px",
                         sortable: false,
                     }
@@ -110,9 +135,16 @@
                 Axios.get(process.env.VUE_APP_API + `SystemUser`)
                     .then(r => {
 
-                        self.userDetails = r.data;
+                        let tmp = [];
 
-                        r.data.forEach(element => {
+                        r.data.forEach(el => {
+                            el["showPassword"] = false;
+                            tmp.push(el);
+                        })
+
+                        self.userDetails = tmp;
+
+                        tmp.forEach(element => {
 
                             if (element.emailAddress != null) {
                                 let isDatabaseUser = false;
@@ -202,7 +234,6 @@
             },
             setAccessType(props) {
                 let self = this;
-
                 self.$refs.AccessTypeModal.open(props.item.systemUserID, self.tenantID, accessType => {});
             }
         }

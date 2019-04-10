@@ -9,6 +9,50 @@
                         </v-toolbar>
                         <v-card-text>
                             <v-layout row wrap>
+                                <v-flex md12>
+                                    <v-card dark dense color="primary">
+                                        <v-card-title>Product</v-card-title>
+                                    </v-card>
+                                </v-flex>
+                                <v-flex md4 v-for="(card, idx) in cards" :key="idx">
+                                    <v-card @click="openDataImport(card.route)">
+                                        <v-card-text>
+                                            <v-icon>{{ card.icon }}</v-icon>
+                                            {{card.name}}
+                                        </v-card-text>
+                                    </v-card>
+                                </v-flex>
+                                <v-flex md12>
+                                    <v-card dark dense color="primary">
+                                        <v-card-title>Market</v-card-title>
+                                    </v-card>
+                                </v-flex>
+                                <v-flex md4 v-for="(card, idx) in cards" :key="idx">
+                                    <v-card @click="openDataImport(card.route)">
+                                        <v-card-text>
+                                            <v-icon>{{ card.icon }}</v-icon>
+                                            {{card.name}}
+                                        </v-card-text>
+                                    </v-card>
+                                </v-flex>
+                                <v-flex md12>
+                                    <v-card dark dense color="primary">
+                                        <v-card-title>Fact</v-card-title>
+                                    </v-card>
+                                </v-flex>
+                                <v-flex md4 v-for="(card, idx) in cards" :key="idx">
+                                    <v-card @click="openDataImport(card.route)">
+                                        <v-card-text>
+                                            <v-icon>{{ card.icon }}</v-icon>
+                                            {{card.name}}
+                                        </v-card-text>
+                                    </v-card>
+                                </v-flex>
+                                <v-flex md12>
+                                    <v-card dark dense color="primary">
+                                        <v-card-title>Period</v-card-title>
+                                    </v-card>
+                                </v-flex>
                                 <v-flex md4 v-for="(card, idx) in cards" :key="idx">
                                     <v-card @click="openDataImport(card.route)">
                                         <v-card-text>

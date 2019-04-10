@@ -9,7 +9,48 @@
                         </v-toolbar>
                         <v-card-text>
                             <v-layout row wrap>
-                                <v-flex md4 v-for="(card, idx) in cards" :key="idx">
+                                <v-flex md12>
+                                    <v-card dark dense color="primary">
+                                        <v-card-title>Product</v-card-title>
+                                    </v-card>
+                                </v-flex>
+                                <v-flex md4 v-for="(card, idx) in product" :key="idx">
+                                    <v-card @click="openDataImport(card.route)">
+                                        <v-card-text>
+                                            {{card.name}}
+                                        </v-card-text>
+                                    </v-card>
+                                </v-flex>
+                                <v-flex md12>
+                                    <v-card dark dense color="primary">
+                                        <v-card-title>Market</v-card-title>
+                                    </v-card>
+                                </v-flex>
+                                <v-flex md4 v-for="(card, idx) in market" :key="idx">
+                                    <v-card @click="openDataImport(card.route)">
+                                        <v-card-text>
+                                            {{card.name}}
+                                        </v-card-text>
+                                    </v-card>
+                                </v-flex>
+                                <v-flex md12>
+                                    <v-card dark dense color="primary">
+                                        <v-card-title>Fact</v-card-title>
+                                    </v-card>
+                                </v-flex>
+                                <v-flex md4 v-for="(card, idx) in fact" :key="idx">
+                                    <v-card @click="openDataImport(card.route)">
+                                        <v-card-text>
+                                            {{card.name}}
+                                        </v-card-text>
+                                    </v-card>
+                                </v-flex>
+                                <v-flex md12>
+                                    <v-card dark dense color="primary">
+                                        <v-card-title>Period</v-card-title>
+                                    </v-card>
+                                </v-flex>
+                                <v-flex md4 v-for="(card, idx) in period" :key="idx">
                                     <v-card @click="openDataImport(card.route)">
                                         <v-card-text>
                                             {{card.name}}
@@ -35,56 +76,65 @@
         name: 'DataImport',
         data: () => {
             return {
-                cards: [
+                product: [
+                    new cardItem({
+                        name: 'Brand',
+                        route: 'Brand'
+                    }),
                     new cardItem({
                         name: 'Manufacturer',
                         route: 'Manufacturer'
                     }),
                     new cardItem({
-                        name: 'Product',
-                        route: 'Product'
-                    }),
-                    new cardItem({
-                        name: 'Brand',
-                        route: 'Brand'
-                    }),
-                     new cardItem({
-                        name: 'Supergroup_A',
-                        route: 'Supergroup_A'
-                    }),new cardItem({
-                        name: 'Supergroup_B',
-                        route: 'Supergroup_B'
-                    }),new cardItem({
-                        name: 'Department',
-                        route: 'Department'
-                    }),new cardItem({
                         name: 'Supplier',
                         route: 'Supplier'
-                    }),new cardItem({
-                        name: 'Segment',
-                        route: 'Segment'
-                    }),new cardItem({
-                        name: 'Item_Status',
-                        route: 'Item_Status'
-                    }),new cardItem({
-                        name: 'Active_Shop_Code',
-                        route: 'Active_Shop_Code'
-                    }),new cardItem({
-                        name: 'Retail_Chain',
-                        route: 'Retail_Chain'
-                    }),new cardItem({
-                        name: 'Period',
-                        route: 'Period'
-                    }),new cardItem({
+                    }),
+                    new cardItem({
+                        name: 'Department',
+                        route: 'Department'
+                    }),
+                ],
+                market: [
+                    new cardItem({
                         name: 'Store',
                         route: 'Store'
-                    }),new cardItem({
+                    }),
+                ],
+                fact: [
+                    new cardItem({
                         name: 'Planogram Maintenance',
                         route: 'PlanogramMaintenance'
-                    }),new cardItem({
+                    }),
+                    new cardItem({
+                        name: 'Supergroup_A',
+                        route: 'Supergroup_A'
+                    }), new cardItem({
+                        name: 'Supergroup_B',
+                        route: 'Supergroup_B'
+                    }),
+                    new cardItem({
+                        name: 'Segment',
+                        route: 'Segment'
+                    }),
+                    new cardItem({
+                        name: 'Item_Status',
+                        route: 'Item_Status'
+                    }), new cardItem({
+                        name: 'Active_Shop_Code',
+                        route: 'Active_Shop_Code'
+                    }), new cardItem({
+                        name: 'Retail_Chain',
+                        route: 'Retail_Chain'
+                    }), new cardItem({
                         name: 'Product Catalogue',
                         route: 'ProductCatalogue'
                     })
+                ],
+                period: [
+                    new cardItem({
+                        name: 'Period',
+                        route: 'Period'
+                    }),
                 ]
             }
         },

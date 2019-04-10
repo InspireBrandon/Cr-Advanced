@@ -8,9 +8,10 @@
                     <v-flex lg8 md12 sm12 xs12>
                         <v-flex lg12 md12 sm12 xs12>
                             <v-toolbar dark color="primary">
-                                <v-toolbar-title>Databases</v-toolbar-title> 
+                                <v-toolbar-title>Databases</v-toolbar-title>
                                 <v-spacer></v-spacer>
-                                <v-btn icon @click="openDatabaseModal" :disabled="profile.accountID == null" color="primary">
+                                <v-btn icon @click="openDatabaseModal" :disabled="profile.accountID == null"
+                                    color="primary">
                                     <v-icon>add</v-icon>
                                 </v-btn>
                             </v-toolbar>
@@ -35,12 +36,9 @@
                                                         <v-list-tile-title>Edit</v-list-tile-title>
                                                     </v-list-tile-content>
                                                 </v-list-tile> -->
-                                                <v-list-tile avatar @click="maintainUsers(item)">
-                                                    <v-list-tile-avatar>
-                                                        <v-icon>share</v-icon>
-                                                    </v-list-tile-avatar>
+                                                <v-list-tile @click="maintainUsers(item)">
                                                     <v-list-tile-content>
-                                                        <v-list-tile-title>Share</v-list-tile-title>
+                                                        <v-list-tile-title>Users</v-list-tile-title>
                                                     </v-list-tile-content>
                                                 </v-list-tile>
                                                 <!-- <v-list-tile avatar @click="deleteDatabase(item)">
@@ -86,25 +84,28 @@
                                 <v-toolbar-title>Account Summary</v-toolbar-title>
                             </v-toolbar>
                         </v-flex>
-
-                        <v-flex lg12 md12 sm12 xs12>
-                            <v-card v-for="(item,index) in features" :key=index color="grey lighten-5">
-                                <v-container class="pa-2 mb-2">
-                                    <v-layout>
-                                        <v-flex md6>{{item.name}}</v-flex>
-                                        <v-flex md6>{{item.price}}</v-flex>
-                                    </v-layout>
-                                </v-container>
-                            </v-card>
-                            <v-card color="grey lighten-5">
-                                <v-container class="pa-2 mb-2">
-                                    <v-layout>
-                                        <v-flex md6>Total</v-flex>
-                                        <v-flex md6>R{{totalPrice}} pm</v-flex>
-                                    </v-layout>
-                                </v-container>
-                            </v-card>
-                        </v-flex>
+                        <v-layout row wrap>
+                            <v-flex lg3 md3 sm6 xs6 v-for="(item,index) in features" :key="index">
+                                <v-card color="grey lighten-5">
+                                    <v-container class="pa-2 mb-2">
+                                        <v-layout>
+                                            <v-flex md6>{{item.name}}</v-flex>
+                                            <v-flex md6>{{item.price}}</v-flex>
+                                        </v-layout>
+                                    </v-container>
+                                </v-card>
+                            </v-flex>
+                            <v-flex lg12 md12 sm12 xs12>
+                                <v-card color="grey lighten-5">
+                                    <v-container class="pa-2 mb-2">
+                                        <v-layout>
+                                            <v-flex md6>Total</v-flex>
+                                            <v-flex md6>R{{totalPrice}} pm</v-flex>
+                                        </v-layout>
+                                    </v-container>
+                                </v-card>
+                            </v-flex>
+                        </v-layout>
                     </v-flex>
                 </v-layout>
             </v-container>
@@ -115,7 +116,8 @@
         <DatabaseUserModal ref="DatabaseUserModal"></DatabaseUserModal>
         <v-flex lg8 md12 sm12 xs12 v-if="profile.accountID == null  && !showLoader">
             <br>
-            <p>In order to create a database you must first register an account. Please <a href="#" @click.prevent="openAccountModal">click
+            <p>In order to create a database you must first register an account. Please <a href="#"
+                    @click.prevent="openAccountModal">click
                     here</a> to register.</p>
         </v-flex>
     </v-card>
@@ -210,7 +212,7 @@
                 Axios.get(process.env.VUE_APP_API + `SystemUser?id=${encoded_details.USER_ID}`)
                     .then(r => {
                         self.profile = r.data;
-                            
+
                         if (self.profile.accountID != null) {
                             self.domain = r.data.domain
                             self.country = r.data.country
@@ -257,18 +259,18 @@
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
 
                 self.$refs.AccountModal.open(encoded_details.USER_ID, self.country, self.domain, callback => {
-                     self.accountID=callback.accountID 
-                    self.profile.accountID=callback.accountID 
+                    self.accountID = callback.accountID
+                    self.profile.accountID = callback.accountID
                     self.getAccountDetails(self.accountID, () => {
 
                         self.$refs.AccountModal.close();
 
                         self.country = callback.country
                         self.domain = callback.domain
-                      
+
 
                     });
-                   
+
                 })
 
             },
