@@ -125,6 +125,8 @@
                         self.description = item.description
                 }
                 if (isAdd == true) {
+                    console.log(item);
+                    
                     self.selectedPlanogram = null,
                         self.isAdd = true
                         self.selectedGroup=item.id

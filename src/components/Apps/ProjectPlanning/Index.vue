@@ -39,7 +39,7 @@
                                 <v-btn flat icon @click="openGroupEdit(groups)">
                                    <v-icon> edit </v-icon>
                                 </v-btn>
-                                <v-btn flat icon  @click="openProjectAdd()">
+                                <v-btn flat icon  @click="openProjectAdd(groups)">
                                     <v-icon>add</v-icon>
                                 </v-btn>
                             </v-list-tile>
