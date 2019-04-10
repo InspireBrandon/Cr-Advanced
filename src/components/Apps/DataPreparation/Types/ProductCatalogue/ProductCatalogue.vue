@@ -13,7 +13,9 @@
               <v-toolbar flat dark color="primary">
                 <v-toolbar-title>Set Filters</v-toolbar-title>
                 <v-spacer></v-spacer>
-              <v-btn icon @click.native="FilterDialog = false"><v-icon>close</v-icon></v-btn>
+                <v-btn icon @click.native="FilterDialog = false">
+                  <v-icon>close</v-icon>
+                </v-btn>
 
               </v-toolbar>
               <!-- <v-card-title class="headline">Set Filters</v-card-title> -->
@@ -25,13 +27,16 @@
                         v-model="activeShopCode"></v-autocomplete>
                     </v-flex>
                     <v-flex lg6 md6 sm12>
-                      <v-autocomplete dense menu-props="auto" :items="departments" label="Department" v-model="department"></v-autocomplete>
+                      <v-autocomplete dense menu-props="auto" :items="departments" label="Department"
+                        v-model="department"></v-autocomplete>
                     </v-flex>
                     <v-flex lg6 md6 sm12>
-                      <v-autocomplete dense menu-props="auto" :items="subdepartments" label="Sub Department" v-model="subdepartment"></v-autocomplete>
+                      <v-autocomplete dense menu-props="auto" :items="subdepartments" label="Sub Department"
+                        v-model="subdepartment"></v-autocomplete>
                     </v-flex>
                     <v-flex lg6 md6 sm12>
-                      <v-autocomplete dense menu-props="auto" :items="categories" label="Category" v-model="category"></v-autocomplete>
+                      <v-autocomplete dense menu-props="auto" :items="categories" label="Category" v-model="category">
+                      </v-autocomplete>
                     </v-flex>
                   </v-layout>
                 </v-container>
@@ -39,7 +44,7 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
 
-                
+
 
                 <v-btn color="primary" @click="filter">
                   Filter
@@ -49,8 +54,12 @@
             </v-card>
           </v-dialog>
           <v-dialog persistent v-model="FilterScanBarcode" width="80vw">
-            <v-card dark>
-              <v-card-title class="headline">Scan Barcode</v-card-title>
+            <v-card>
+              <v-toolbar dense flat dark color="primary">
+                <v-toolbar-title>
+                  Scan Barcode
+                </v-toolbar-title>
+              </v-toolbar>
               <v-card-text>
                 <v-container fluid grid-list-lg>
                   <v-layout row wrap>
@@ -106,8 +115,8 @@
           :rowData="rowData" :enableSorting="true" :enableFilter="true" rowSelection="multiple" :rowDeselection="true"
           :gridReady="onGridReady" :enableColResize="true" :floatingFilter="true" :gridOptions="gridOptions"
           :suppressDragLeaveHidesColumns="true" :suppressMakeColumnVisibleAfterUnGroup="true"
-          :suppressRowClickSelection="true" rowGroupPanelShow="always" :enableRangeSelection="true" :defaultColDef="defaultColDef"
-          :filterChanged="filterChanged" :sideBar='sideBar' :rowClicked="rowClicked">
+          :suppressRowClickSelection="true" rowGroupPanelShow="always" :enableRangeSelection="true"
+          :defaultColDef="defaultColDef" :filterChanged="filterChanged" :sideBar='sideBar' :rowClicked="rowClicked">
         </ag-grid-vue>
         <div>
           <p>{{ rowData.length }} Rows</p>
@@ -523,7 +532,8 @@
       ScanBarcode() {
         let self = this;
 
-        Axios.get(process.env.VUE_APP_API + 'Product/ProductByBarcode?db=CR-Hinterland-Live&barcode=' + self.ScanBarcodeTextfield)
+        Axios.get(process.env.VUE_APP_API + 'Product/ProductByBarcode?db=CR-Hinterland-Live&barcode=' + self
+            .ScanBarcodeTextfield)
           .then(r => {
             self.FilterScanBarcode = false;
             self.rowData = [];
