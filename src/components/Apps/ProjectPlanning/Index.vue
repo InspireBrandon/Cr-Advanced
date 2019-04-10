@@ -60,7 +60,7 @@
                                             <v-icon>more_vert</v-icon>
                                         </v-btn>
                                         <v-list dense>
-                                            <v-list-tile @click="openProjectEdit(item)">Edit</v-list-tile>
+                                            <v-list-tile @click="openProjectEdit(item,groups)">Edit</v-list-tile>
                                             <v-divider></v-divider>
                                             <v-list-tile @click="deleteProject(item,groups)">Archive</v-list-tile>
                                         </v-list>
@@ -111,8 +111,8 @@
                                 <div class="mt-3 title">Update Iron</div>
                             </template>
                             <template v-slot:input>
-                                <v-menu v-model="menu" :close-on-content-click="false" lazy
-                                    transition="scale-transition" offset-y full-width min-width="290px">
+                                <v-menu ref="menu" :close-on-content-click="false" lazy transition="scale-transition"
+                                    offset-y full-width min-width="290px">
                                     <template v-slot:activator="{ on }">
                                         <v-text-field v-model="setDate" label="please select a date"
                                             prepend-icon="event" readonly v-on="on"></v-text-field>
@@ -214,7 +214,7 @@
             </v-data-table>
 
 
-
+            <YesNoModal ref="yesNoModal"></YesNoModal>
             <ProjectGroupModal ref="ProjectGroupModal"> </ProjectGroupModal>
 
             <ProjectModal ref="ProjectModal"> </ProjectModal>
@@ -225,6 +225,8 @@
     </div>
 </template>
 <script>
+    import YesNoModal from '@/components/Common/YesNoModal';
+
     import ProjectModal from './ProjectModal.vue'
     import ProjectTXModal from './ProjectTXModal.vue'
     import ProjectGroupModal from './ProjectGroupModal.vue'
@@ -237,7 +239,8 @@
         components: {
             ProjectGroupModal,
             ProjectModal,
-            ProjectTXModal
+            ProjectTXModal,
+            YesNoModal
         },
         data() {
             return {
@@ -318,65 +321,74 @@
                         text: "Workshop",
                         value: 3,
                         friendly: "Workshop"
+                    }, {
+                        text: "Workshop Complete",
+                        value: 4,
+                        friendly: "WorkshopComplete"
                     },
                     {
                         text: "Meeting",
-                        value: 4,
+                        value: 5,
                         friendly: "Meeting"
                     },
                     {
                         text: "Data Preparation Start",
-                        value: 5,
+                        value: 6,
                         friendly: "Data Preparation Start"
                     },
                     {
                         text: "Ranging Start",
-                        value: 6,
+                        value: 7,
                         friendly: "Ranging Start"
                     },
                     {
                         text: "Planogram Start",
-                        value: 7,
+                        value: 8,
                         friendly: "Planogram Start"
                     },
                     {
                         text: "Checking",
-                        value: 8,
+                        value: 9,
                         friendly: "Checking"
                     },
                     {
+                        text: "Checking Ended",
+                        value: 10,
+                        friendly: "Checking Ended"
+                    },
+                    {
                         text: "Requesting Approval",
-                        value: 9,
+                        value: 11,
                         friendly: "Requesting Approval"
                     },
                     {
                         text: "Declined",
-                        value: 10,
+                        value: 12,
                         friendly: "Declined"
                     },
                     {
                         text: "Approved",
-                        value: 11,
+                        value: 13,
                         friendly: "Approved"
                     },
                     {
                         text: "Implementation Pending",
-                        value: 12,
+                        value: 14,
                         friendly: "Implementation Pending"
                     },
                     {
                         text: "Variation Request",
-                        value: 13,
+                        value: 15,
                         friendly: 'Variation Request'
                     },
                     {
                         text: "Implemented",
-                        value: 14,
+                        value: 16,
                         friendly: "Implemented"
                     },
                     {
                         text: "On Hold",
-                        value: 15,
+                        value: 17,
                         friendly: "On Hold"
                     }
                 ],
@@ -407,41 +419,51 @@
             }
         },
         methods: {
-            deleteProject(item,group) {
+            deleteProject(item, group) {
                 let self = this
-               
-                
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                self.$refs.yesNoModal.show('Delete project?', value => {
+                    if (value) {
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.delete(process.env.VUE_APP_API + `Project?projectID=${item.id}`).then(r => {
-                    console.log(r);
-                    
-                    
-                    for (let index = 0; index < group.projectList.length; index++) {
-                        const element = group.projectList[index];
-                        if (element.id == item.id) {
-                            group.projectList.splice(index,1)
-                        }
+                        Axios.delete(process.env.VUE_APP_API + `Project?projectID=${item.id}`).then(r => {
+                            console.log(r);
+
+
+                            for (let index = 0; index < group.projectList.length; index++) {
+                                const element = group.projectList[index];
+                                if (element.id == item.id) {
+                                    group.projectList.splice(index, 1)
+                                }
+                            }
+                            delete Axios.defaults.headers.common["TenantID"];
+                        })
                     }
-                    delete Axios.defaults.headers.common["TenantID"];
+
                 })
+
+
 
             },
             deleteProjectGroup(item) {
                 let self = this
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                self.$refs.yesNoModal.show('Delete Group?', value => {
+                    if (value) {
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.delete(process.env.VUE_APP_API + `ProjectGroup?projectGroupID=${item.id}`).then(r => {
+                        Axios.delete(process.env.VUE_APP_API + `ProjectGroup?projectGroupID=${item.id}`).then(
+                            r => {
 
-                    for (let index = 0; index < self.ProjectsGroups.length; index++) {
-                        const element = self.ProjectsGroups[index];
-                        if (element.id == item.id) {
-                            self.ProjectsGroups.splice(index,1)
-                        }
+                                for (let index = 0; index < self.ProjectsGroups.length; index++) {
+                                    const element = self.ProjectsGroups[index];
+                                    if (element.id == item.id) {
+                                        self.ProjectsGroups.splice(index, 1)
+                                    }
+                                }
+                                delete Axios.defaults.headers.common["TenantID"];
+                            })
                     }
-                    delete Axios.defaults.headers.common["TenantID"];
-                })
 
+                })
             },
 
             getProjectGroups() {
@@ -593,17 +615,26 @@
                     })
                 })
             },
-            openProjectEdit(item) {
+            openProjectEdit(item, group) {
                 var self = this
                 self.$refs.ProjectModal.open(false, item, data => {
-                    for (let index = 0; index < self.Projects.length; index++) {
-                        const element = self.Projects[index];
+                    for (let index = 0; index < group.projectList.length; index++) {
+                        const element = group.projectList[index];
                         if (element.id == item.id) {
-                            self.Projects[index].description = data.description
-                            self.Projects[index].name = data.name
-                            self.Projects[index].planogram_ID = data.planogram_ID
+                            group.projectList[index].description = data.description
+                            group.projectList[index].name = data.name
+                            group.projectList[index].planogram_ID = data.planogram_ID
                         }
                     }
+
+                    // for (let index = 0; index < self.Projects.length; index++) {
+                    //     const element = self.Projects[index];
+                    //     if (element.id == item.id) {
+                    //         self.Projects[index].description = data.description
+                    //         self.Projects[index].name = data.name
+                    //         self.Projects[index].planogram_ID = data.planogram_ID
+                    //     }
+                    // }
                 })
             },
             openProjectAdd(item) {

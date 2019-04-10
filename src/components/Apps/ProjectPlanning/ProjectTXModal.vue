@@ -147,70 +147,93 @@
 
 
                 statusList: [{
+                        text: "Project Start",
                         value: 0,
-                        text: "Project Start"
+                        friendly: "Project Start"
                     },
                     {
+                        text: "In Progress",
                         value: 1,
-                        text: "In Progress"
+                        friendly: "In Progress"
                     },
                     {
+                        text: "Complete",
                         value: 2,
-                        text: "Complete"
+                        friendly: "Complete"
                     },
                     {
+                        text: "Workshop",
                         value: 3,
-                        text: "Workshop"
-                    },
-                    {
+                        friendly: "Workshop"
+                    },  {
+                        text: "Workshop Complete",
                         value: 4,
-                        text: "Meeting"
+                        friendly: "WorkshopComplete"
                     },
                     {
+                        text: "Meeting",
                         value: 5,
-                        text: "DataPreparationStart"
+                        friendly: "Meeting"
                     },
-
                     {
+                        text: "Data Preparation Start",
                         value: 6,
-                        text: "Ranging Start"
+                        friendly: "Data Preparation Start"
                     },
-
                     {
+                        text: "Ranging Start",
                         value: 7,
-                        text: "Planogram Start"
+                        friendly: "Ranging Start"
                     },
                     {
+                        text: "Planogram Start",
                         value: 8,
-                        text: "Checking"
+                        friendly: "Planogram Start"
                     },
                     {
+                        text: "Checking",
                         value: 9,
-                        text: "Requesting Approval"
+                        friendly: "Checking"
                     },
                     {
+                        text: "Checking Ended",
                         value: 10,
-                        text: "Declined"
+                        friendly: "Checking Ended"
                     },
                     {
+                        text: "Requesting Approval",
                         value: 11,
-                        text: "Approved"
+                        friendly: "Requesting Approval"
                     },
                     {
+                        text: "Declined",
                         value: 12,
-                        text: "Implementation Pending"
+                        friendly: "Declined"
                     },
                     {
+                        text: "Approved",
                         value: 13,
-                        text: 'Variation Request'
+                        friendly: "Approved"
                     },
                     {
+                        text: "Implementation Pending",
                         value: 14,
-                        text: "Implemented"
+                        friendly: "Implementation Pending"
                     },
                     {
+                        text: "Variation Request",
                         value: 15,
-                        text: "On Hold"
+                        friendly: 'Variation Request'
+                    },
+                    {
+                        text: "Implemented",
+                        value: 16,
+                        friendly: "Implemented"
+                    },
+                    {
+                        text: "On Hold",
+                        value: 17,
+                        friendly: "On Hold"
                     }
                 ]
             }
@@ -349,7 +372,7 @@
                     self.AssignedUser = item.systemUserID
                 }
                 if (isAdd == true) {
-                    self.valid = null
+                   
                     self.projectID = item.id
 
                     self.isAdd = true
