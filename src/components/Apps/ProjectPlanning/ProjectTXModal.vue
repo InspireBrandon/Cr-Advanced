@@ -221,7 +221,7 @@ import moment from 'moment'
     // a computed getter
     setDate: function () {
       // `this` points to the vm instance
-      return this.datePicker+' '+this.timePicker+':00'
+      return this.datePicker+' '+this.timePicker
     //   return this.datePicker = this.datePicker+this.timePicker
     }
   },

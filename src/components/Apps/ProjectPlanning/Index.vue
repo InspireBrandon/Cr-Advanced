@@ -56,10 +56,36 @@
             </v-toolbar>
             <v-data-table v-if="project!=null" :headers="headers" :items="ProjectTXs" hide-actions>
                 <template v-slot:items="props">
-                    <td>{{ props.item.dateTimeString }} </td>
                     <td>
-                        <v-edit-dialog :return-value.sync="props.item.type" large lazy persistent @save="saveLine(props.item)"
-                            @cancel="''" @open="''" @close="''">
+                        <!-- {{ props.item.dateTimeString }} -->
+                       <v-edit-dialog :return-value.sync="props.item.type" large lazy persistent
+                            @save="saveLine(props.item,0)" @cancel="''" @open="''" @close="''">
+                            <div>{{ props.item.dateTimeString }}</div>
+                            <template v-slot:input>
+                                <div class="mt-3 title">Update Iron</div>
+                            </template>
+                            <template v-slot:input>
+                                <v-menu ref="menu" v-model="menu" :close-on-content-click="false" lazy
+                            transition="scale-transition" offset-y full-width min-width="290px">
+                            <template v-slot:activator="{ on }">
+                                <v-text-field v-model="setDate" label="please select a date" prepend-icon="event"
+                                    readonly v-on="on"></v-text-field>
+                            </template>
+                            <v-date-picker v-model="datePicker" no-title scrollable>
+                                <v-spacer></v-spacer>
+                                <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
+                                <v-btn flat color="primary" @click="$refs.menu.save(date)">OK</v-btn>
+                            </v-date-picker>
+                            <v-time-picker v-model="timePicker"></v-time-picker>
+
+                            
+                        </v-menu>
+                            </template>
+                        </v-edit-dialog>
+                    </td>
+                    <td>
+                        <v-edit-dialog :return-value.sync="props.item.type" large lazy persistent
+                            @save="saveLine(props.item)" @cancel="''" @open="''" @close="''">
                             <div>{{typeList[props.item.type == -1 ?  5 :  props.item.type].text}}</div>
                             <template v-slot:input>
                                 <div class="mt-3 title">Update Iron</div>
@@ -72,8 +98,8 @@
                     </td>
                     <td>
 
-                        <v-edit-dialog :return-value.sync="props.item.status" large lazy persistent @save="saveLine(props.item)"
-                            @cancel="''" @open="''" @close="''">
+                        <v-edit-dialog :return-value.sync="props.item.status" large lazy persistent
+                            @save="saveLine(props.item)" @cancel="''" @open="''" @close="''">
                             <div>{{status[props.item.status].friendly }}</div>
                             <template v-slot:input>
                                 <div class="mt-3 title">Update Iron</div>
@@ -87,8 +113,8 @@
 
                     <td>
                         <!-- {{ props.item.store}} -->
-                        <v-edit-dialog :return-value.sync="props.item.store" large lazy persistent @save="saveLine(props.item)"
-                            @cancel="''" @open="''" @close="''">
+                        <v-edit-dialog large lazy persistent @save="saveLine(props.item,3)" @cancel="''" @open="''"
+                            @close="''">
                             <div>{{ props.item.store}}</div>
                             <template v-slot:input>
                                 <div class="mt-3 title">Update Iron</div>
@@ -101,29 +127,28 @@
 
                     </td>
                     <td>
-                        <v-edit-dialog :return-value.sync="props.item.storeCluster" large lazy persistent @save="saveLine(props.item)"
-                            @cancel="''" @open="''" @close="''">
+                        <v-edit-dialog large lazy persistent @save="saveLine(props.item,4)" @cancel="''" @open="''"
+                            @close="''">
                             <div>{{ props.item.storeCluster}}</div>
                             <template v-slot:input>
                                 <div class="mt-3 title">Update Iron</div>
                             </template>
                             <template v-slot:input>
-                                <v-select v-model="props.item.storeCluster" :items="StoreClusters" label="Edit" single-line counter
-                                    autofocus></v-select>
+                                <v-select v-model="props.item.storeCluster" :items="StoreClusters" label="Edit"
+                                    single-line autofocus></v-select>
                             </template>
                         </v-edit-dialog>
                     </td>
                     <td>{{ props.item.categoryCluster }}</td>
 
                     <td>
-                        <v-edit-dialog :return-value.sync="props.item.username" large lazy persistent @save="saveLine(props.item)"
-                            @cancel="''" @open="''" @close="''">
+                        <v-edit-dialog large lazy persistent @save="saveLine(props.item,6)" @cancel="''" @open="''"
+                            @close="''">
                             <div>{{ props.item.username}}</div>
                             <template v-slot:input>
-                                <div class="mt-3 title">Update Iron</div>
                             </template>
                             <template v-slot:input>
-                                <v-select v-model="props.item.username" :items="users" label="Edit" single-line counter
+                                <v-select v-model="props.item.username" :items="users" label="Edit" single-line
                                     autofocus></v-select>
                             </template>
                         </v-edit-dialog>
@@ -166,6 +191,9 @@
         },
         data() {
             return {
+                menu:null,
+                timePicker:null,
+                datePicker:null,
                 drawer: null,
                 project: null,
                 Projects: [],
@@ -199,7 +227,7 @@
                 }, {
                     text: "Type",
                     sortable: false,
-                     value: "type"
+                    value: "type"
                 }, {
                     text: "Status",
                     sortable: false,
@@ -237,7 +265,7 @@
                         friendly: "Complete"
                     },
                     {
-                        text: "Complete",
+                        text: "Workshop",
                         value: 3,
                         friendly: "Complete"
                     },
@@ -304,9 +332,9 @@
                 ],
                 stores: [],
                 storeObjects: [],
-                StoreClusters:[],
-                databaseUsers:[],
-                users:[],
+                StoreClusters: [],
+                databaseUsers: [],
+                users: [],
 
 
             }
@@ -317,15 +345,62 @@
             this.getStoreClusters()
             this.getDatabaseUsers()
         },
+          computed: {
+    // a computed getter
+    setDate: function () {
+      // `this` points to the vm instance
+      return this.datePicker+' '+this.timePicker
+    //   return this.datePicker = this.datePicker+this.timePicker
+    }
+  },
         methods: {
-            saveLine(item){
+            saveLine(item, editType) {
                 let self = this
                 console.log(item);
-                
-                let data = []
-                 for (var prop in item) {
-                        item[prop] = data[prop];
-                    }
+                if (editType == 0) {
+                    //date time edit
+                    item.dateTime=self.setDate
+                    item.dateTimeString=self.setDate
+                    //  "dateTime": self.setDate,
+                    //         "dateTimeString":self.setDate,
+                }
+                if (editType == 3) {
+                    //store edit
+                    item.store_ID = item.store
+                    self.stores.forEach(e => {
+                        if (e.value == item.store_ID) {
+                            item.store = e.text
+                        }
+                    })
+                }
+                if (editType == 4) {
+                    //store cluster edit
+                    item.storeCluster_ID = item.storeCluster
+                    self.StoreClusters.forEach(e => {
+                        if (e.value == item.storeCluster_ID) {
+                            item.storeCluster = e.text
+                        }
+                    })
+                }
+                if (editType == 6) {
+                    //Assigned User edit
+                    item.systemUserID = item.username
+                    self.users.forEach(e => {
+                        if (e.value == item.systemUserID) {
+                            item.username = e.text
+                        }
+                    })
+                }
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.put(process.env.VUE_APP_API + 'ProjectTX', item).then(res => {
+
+                    console.log(res);
+
+                    delete Axios.defaults.headers.common["TenantID"];
+                })
+                console.log("editied item");
+                console.log(item);
             },
 
             getUsers() {
@@ -370,14 +445,14 @@
             getDatabaseUsers() {
                 let self = this;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
-let tmp = sessionStorage.currentDatabase
+                let tmp = sessionStorage.currentDatabase
                 Axios.get(process.env.VUE_APP_API + `TenantAccess/User?tenantID=${tmp}`)
                     .then(r => {
                         self.databaseUsers = r.data;
                         self.getUsers();
                     })
             },
-             getStoreClusters() {
+            getStoreClusters() {
                 let self = this
                 Axios.get(process.env.VUE_APP_API + `Cluster/Store`).then(r => {
 
