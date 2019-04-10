@@ -70,8 +70,10 @@
                     self.name = null
                     self.description = null
                     self.selectedGroup = null
-                } else {
-                    self.isAdd = true
+                }
+                if(isAdd=false) 
+                 {
+                    self.isAdd = false
                     self.valid = null
                     self.item = item
                     self.name = item.name

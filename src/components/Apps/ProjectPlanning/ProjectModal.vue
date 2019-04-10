@@ -74,7 +74,6 @@
         },
         mounted() {
             this.getPlanograms()
-            this.getProjectGroups()
         },
         methods: {
             getProjectGroups() {
@@ -113,6 +112,9 @@
                     })
             },
             open(isAdd, item, callback) {
+            this.getProjectGroups()
+
+                console.log(item);
                 var self = this
                 self.dialog = true
                 self.valid = null
@@ -125,7 +127,7 @@
                         self.description = item.description
                 }
                 if (isAdd == true) {
-                    console.log(item);
+                    
                     
                     self.selectedPlanogram = null,
                         self.isAdd = true
