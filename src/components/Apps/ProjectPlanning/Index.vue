@@ -245,7 +245,7 @@
         data() {
             return {
                 menu: null,
-                timePicker: null,
+                timePicker: "00:00",
                 datePicker: null,
                 drawer: null,
                 project: null,
@@ -414,6 +414,7 @@
             // a computed getter
             setDate: function () {
                 // `this` points to the vm instance
+                
                 return this.datePicker + ' ' + this.timePicker
                 //   return this.datePicker = this.datePicker+this.timePicker
             }
