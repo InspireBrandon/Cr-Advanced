@@ -2,7 +2,7 @@
     <v-dialog fullscreen v-model="dialog">
         <v-card>
             <v-toolbar color="primary" flat dark>
-                <v-toolbar-title>Project Group Modal</v-toolbar-title>
+                <v-toolbar-title>Project Group </v-toolbar-title>
                 <v-spacer></v-spacer>
 
                 <v-btn icon @click="dialog=false">
@@ -46,8 +46,8 @@
     export default {
         data() {
             return {
+                valid:null,
                 item: null,
-                valid: null,
                 dialog: null,
                 projectGroups: [],
                 selectedGroup: null,
@@ -66,7 +66,6 @@
                 self.dialog = true
                 if (isAdd == true) {
                     self.isAdd = true
-                    self.valid = null
                     self.name = null
                     self.description = null
                     self.selectedGroup = null
@@ -74,7 +73,6 @@
                 if(isAdd=false) 
                  {
                     self.isAdd = false
-                    self.valid = null
                     self.item = item
                     self.name = item.name
                     self.description = item.description

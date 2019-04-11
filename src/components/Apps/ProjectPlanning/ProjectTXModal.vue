@@ -3,7 +3,7 @@
     <v-dialog fullscreen v-model="dialog">
         <v-card>
             <v-toolbar color="primary" flat dark>
-                <v-toolbar-title>Project Transaction Modal</v-toolbar-title>
+                <v-toolbar-title>Project Transaction</v-toolbar-title>
                 <v-spacer></v-spacer>
 
                 <v-btn icon @click="dialog=false">
