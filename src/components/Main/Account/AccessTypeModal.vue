@@ -76,6 +76,14 @@
                     .then(r => {
                         if (r.data.tenantLink_AccessTypeList.length > 0) {
                             self.form = r.data.tenantLink_AccessTypeList[0];
+
+                            self.selectedPlanograms = [];
+
+                            if(self.form.accessType == 2) {
+                                self.form.supplierPlanogramList.forEach(element => {
+                                    self.selectedPlanograms.push(element.planogram_ID)
+                                });
+                            }
                         } else {
                             for (var prop in self.form) {
                                 self.form[prop] = null
@@ -117,6 +125,24 @@
             },
             submit() {
                 let self = this;
+
+                let tmp = [];
+
+                self.selectedPlanograms.forEach(selectedPlanogram => {
+                    var selected = false;
+                    self.planograms.forEach(planogram => {
+                        if(planogram.value == selectedPlanogram)
+                            selected = true;
+                    })
+
+                    if(selected) {
+                        tmp.push({
+                            planogram_ID: selectedPlanogram
+                        })
+                    }
+                });
+
+                self.form["supplierPlanogramList"] = tmp;
 
                 Axios.post(process.env.VUE_APP_API +
                         `TenantLink_AccessType?systemUserID=${self.systemUserID}&tenantID=${self.tenantID}`, self.form)
