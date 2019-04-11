@@ -99,6 +99,7 @@
             appAccess(apps, callback) {
                 var self = this
                 let storeapptmp = apps
+                let buyerapptmp = apps
                 let storeApps = []
                 let buyerApps = []
                 self.checkAccessType(accessType => {
@@ -113,38 +114,42 @@
                         console.log("isOwner");
                         return
                     } else {
-                        if (accessType.tenantLink_AccessTypeList[0].accessType == 3 ||accessType.tenantLink_AccessTypeList[0].accessType == 2) {
+                        if (accessType.tenantLink_AccessTypeList[0].accessType == 3 || accessType
+                            .tenantLink_AccessTypeList[0].accessType == 2) {
                             // store  or supplier
                             storeapptmp.forEach(e => {
                                 if (e.config.configName == "SpacePlanning") {
 
+                                    let tmpRoutes = [{
+                                        "route": "/PlanogramImplementation",
+                                        "routeName": "plannogram_implementation",
+                                        "title": "Planogram Implementation",
+                                        "openInNewWindow": false
+                                    }]
+
+                                    e.config.routes = tmpRoutes;
+
                                     storeApps.push(e)
-                                    for (let index = 0; index < e.config.routes.length; index++) {
-                                        const element = e.config.routes[index];
-                                        if (element.routeName != "plannogram_implementation") {
-                                            e.config.routes.splice(element, 1)
-                                        }
-
-                                    }
                                 }
-
                             })
+
                             self.appConfigDetail = storeApps
                         }
-                        
+
                         if (accessType.tenantLink_AccessTypeList[0].accessType == 1) {
                             // buyer  
-                            apps.forEach(e => {
-                                if (e.config.configName == "SpacePlanning" || e.config.configName == "ProductMaintenance" ||e.config.configName == "RangePlanning") {
+                            buyerapptmp.forEach(e => {
+                                if (e.config.configName == "SpacePlanning" || e.config.configName ==
+                                    "ProductMaintenance" || e.config.configName == "RangePlanning") {
 
                                     buyerApps.push(e)
                                     console.log(e);
-                                    
+
                                     // console.log("buyerApps");
                                     // console.log(buyerApps);
                                     // for (let index = 0; index < e.config.routes.length; index++) {
                                     //     const element = e.config.routes[index];
-                                        
+
                                     //     // if (element.routeName != "plannogram_implementation") {
                                     //     //     e.config.routes.splice(element, 1)
                                     //     // }
@@ -155,6 +160,7 @@
                             })
                             // console.log("edited buyerApps");
                             // console.log(buyerApps);
+
                             self.appConfigDetail = buyerApps
                         }
 
