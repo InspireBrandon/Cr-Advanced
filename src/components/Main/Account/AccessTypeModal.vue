@@ -13,6 +13,9 @@
                     <v-flex lg12 md12 sm12 xs12>
                         <v-select :items="types" v-model="form.accessType" label="Type"></v-select>
                     </v-flex>
+                    <v-flex v-if="form.accessType == 2" lg12 md12 sm12 xs12>
+                        <v-autocomplete multiple :items="planograms" v-model="selectedPlanograms" label="Planograms"></v-autocomplete>
+                    </v-flex>
                     <v-flex v-if="form.accessType == 3" lg12 md12 sm12 xs12>
                         <v-autocomplete :items="stores" v-model="form.storeID" label="Store"></v-autocomplete>
                     </v-flex>
@@ -39,13 +42,13 @@
                         value: 0
                     },
                     {
-                        text: 'General',
+                        text: 'Buyer',
                         value: 1
                     },
-                    // {
-                    //     text: 'Retailer',
-                    //     value: 2
-                    // },
+                    {
+                        text: 'Supplier',
+                        value: 2
+                    },
                     {
                         text: 'Store',
                         value: 3
@@ -54,7 +57,9 @@
                 type: null,
                 stores: [],
                 store: null,
-                form: {
+                planograms: [],
+                selectedPlanograms: [],
+              form: {
                     accessType: null,
                     storeID: null
                 },
@@ -71,9 +76,8 @@
                     .then(r => {
                         if (r.data.tenantLink_AccessTypeList.length > 0) {
                             self.form = r.data.tenantLink_AccessTypeList[0];
-                        }
-                        else {
-                            for(var prop in self.form) {
+                        } else {
+                            for (var prop in self.form) {
                                 self.form[prop] = null
                             }
                         }
@@ -92,6 +96,22 @@
                                 value: element.storeID
                             })
                         });
+                        self.getPlanograms(callback);
+                    })
+            },
+            getPlanograms(callback) {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API + "Planogram")
+                    .then(r => {
+                        self.planograms = [];
+                        
+                        r.data.planogramList.forEach(element => {
+                            self.planograms.push({
+                                text: element.displayname,
+                                value: element.id
+                            })
+                        });
                         callback();
                     })
             },
@@ -103,7 +123,7 @@
                     .then(r => {
                         let accessType = "";
 
-                        switch(self.form.accessType) {
+                        switch (self.form.accessType) {
                             case 0:
                                 {
                                     accessType = "Super User";
@@ -111,12 +131,12 @@
                                 break;
                             case 1:
                                 {
-                                    accessType = "General";
+                                    accessType = "Buyer";
                                 }
                                 break;
                             case 2:
                                 {
-                                    accessType = "Retailer";
+                                    accessType = "Supplier";
                                 }
                                 break;
                             case 3:
