@@ -167,7 +167,7 @@
                     }
 
                 })
-                callback()
+                callback(self.appConfigDetail)
             },
             getInstalledApps() {
                 let self = this;
@@ -262,7 +262,7 @@
             },
             getAppsTmpAll() {
                 let self = this;
-
+                self.appConfigDetail = []
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
 
                 self.getDatabases(encoded_details.USER_ID, () => {
@@ -285,9 +285,9 @@
                             })
 
                             self.appAccess(self.appConfigDetail, callback => {
-                                self.showLoader = false;
                                 console.log("self.appConfigDetail");
                                 console.log(self.appConfigDetail);
+                                self.showLoader = false;
 
                             })
 

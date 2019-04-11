@@ -457,12 +457,12 @@
                             console.log(r);
 
 
-                            // for (let index = 0; index < group.projectList.length; index++) {
-                            //     const element = group.projectList[index];
-                            //     if (element.id == item.id) {
-                            //         group.projectList.splice(index, 1)
-                            //     }
-                            // }
+                            for (let index = 0; index < self.ProjectTXs.length; index++) {
+                                const element = self.ProjectTXs[index];
+                                if (element.id == item.id) {
+                                    self.ProjectTXs.splice(index, 1)
+                                }
+                            }
                             delete Axios.defaults.headers.common["TenantID"];
                         })
                     }
