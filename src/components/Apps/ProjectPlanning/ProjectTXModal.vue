@@ -29,23 +29,19 @@
                         <v-flex md4>
 
                         </v-flex>
-                        <v-flex md4 v-if="isAdd==true"></v-flex>
-                        <v-flex md4 v-if="isAdd==false">
+                        <v-flex md4></v-flex>
+                        <!-- <v-flex md4 v-if="isAdd==true"></v-flex> -->
+                        <!-- <v-flex md4 v-if="isAdd==false">
                             <v-menu ref="menu" v-model="menu" :close-on-content-click="false" lazy
                                 transition="scale-transition" offset-y full-width min-width="290px">
                                 <template v-slot:activator="{ on }">
-                                    <v-text-field v-model="setDate" label="please select a date" prepend-icon="event"
+                                    <v-text-field v-model="date" label="please select a date" prepend-icon="event"
                                         readonly v-on="on"></v-text-field>
                                 </template>
-                                <v-date-picker v-model="datePicker" no-title scrollable>
-                                    <v-spacer></v-spacer>
-                                    <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
-                                    <v-btn flat color="primary" @click="$refs.menu.save(date)">OK</v-btn>
+                                <v-date-picker v-model="date" no-title scrollable>
                                 </v-date-picker>
-                                <v-time-picker v-model="timePicker"></v-time-picker>
                             </v-menu>
-                            <!-- <v-text-field label="Date" placeholder="Date" v-model="date"></v-text-field> -->
-                        </v-flex>
+                        </v-flex> -->
                         <v-flex md4>
                             <v-select label="status" placeholder="status" :items="statusList" v-model="status">
                             </v-select>
@@ -103,7 +99,6 @@
             return {
                 datePicker: null,
                 timePicker: null,
-                date: this.datePicker + this.timePicker,
                 isAdd: null,
                 afterClose: null,
                 valid: true,
@@ -432,7 +427,7 @@
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
 
-                    if (self.isAdd == false) {
+                    if (!self.isAdd) {
                         let trans = {
                             "id": self.id,
                             "uid": self.uid,
@@ -455,7 +450,7 @@
                             delete Axios.defaults.headers.common["TenantID"];
                         })
                     }
-                    if (self.isAdd == true) {
+                    if (self.isAdd) {
                         let trans = {
                             "project_ID": self.projectID,
                             "storeCluster_ID": self.StoreCluster,
@@ -471,17 +466,12 @@
                             "systemUserID": self.AssignedUser,
                         }
                         Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
-                            console.log(res);
-
-                            self.afterClose(trans)
+                            self.afterClose(res.data.projectTX)
 
                             delete Axios.defaults.headers.common["TenantID"];
                         })
                     }
                     self.dialog = false
-
-                    self.dialog = false
-
                 }
             }
         }
