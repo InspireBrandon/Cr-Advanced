@@ -35,13 +35,15 @@
 
                             <v-list-tile>
 
-                                <v-spacer></v-spacer>
+                                
                                 <v-btn flat icon @click="deleteProjectGroup(groups)">
                                     <v-icon>delete</v-icon>
                                 </v-btn>
                                 <v-btn flat icon @click="openGroupEdit(groups)">
                                     <v-icon> edit </v-icon>
                                 </v-btn>
+                                <v-spacer></v-spacer>
+                                <v-divider vertical></v-divider>
                                 <v-btn flat icon @click="openProjectAdd(groups)">
                                     <v-icon>add</v-icon>
                                 </v-btn>
