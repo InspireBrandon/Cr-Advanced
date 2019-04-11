@@ -324,7 +324,7 @@
                     }, {
                         text: "Workshop Complete",
                         value: 4,
-                        friendly: "WorkshopComplete"
+                        friendly: "Workshop Complete"
                     },
                     {
                         text: "Meeting",
