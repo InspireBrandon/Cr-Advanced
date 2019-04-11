@@ -116,7 +116,6 @@
                 console.log(item);
                 var self = this
                 self.dialog = true
-                self.valid = null
                 if (isAdd == false) {
                     self.isAdd = false
                      self.selectedGroup=item.projectGroupID

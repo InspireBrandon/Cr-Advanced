@@ -25,17 +25,17 @@
                         </v-menu> -->
             <v-list class="pt-0" dense>
 
-                <v-expansion-panel class="elevation-0" v-for="groups in ProjectsGroups" :key="groups.id">
-                    <v-expansion-panel-content>
-                        <template v-slot:header>
-                            <div> {{groups.name}}
-                            </div>
+                <v-expansion-panel class="elevation-0 ;" v-for="groups in ProjectsGroups" :key="groups.id" >
+                    <v-expansion-panel-content >
+                        <template v-slot:header >
+                            <v-flex > {{groups.name}}
+                            </v-flex>
                         </template>
                         <v-list>
 
-                            <v-list-tile>
+                            <v-list-tile class="buttons">
 
-                                
+
                                 <v-btn flat icon @click="deleteProjectGroup(groups)">
                                     <v-icon>delete</v-icon>
                                 </v-btn>
@@ -64,7 +64,7 @@
                                         <v-list dense>
                                             <v-list-tile @click="openProjectEdit(item,groups)">Edit</v-list-tile>
                                             <v-divider></v-divider>
-                                            <v-list-tile @click="deleteProject(item,groups)">Archive</v-list-tile>
+                                            <v-list-tile @click="deleteProject(item,groups)">Delete</v-list-tile>
                                         </v-list>
                                     </v-menu>
                                 </v-list-tile>
@@ -102,6 +102,8 @@
                 </v-btn>
 
             </v-toolbar>
+            
+                           
             <v-data-table v-if="project!=null" :headers="headers" :items="ProjectTXs" hide-actions>
                 <template v-slot:items="props">
                     <td>
@@ -122,7 +124,7 @@
                                     <v-date-picker v-model="datePicker" no-title scrollable>
                                         <v-spacer></v-spacer>
                                         <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
-                                        <v-btn flat color="primary" @click="$refs.menu.save(date)">OK</v-btn>
+                                        <v-btn flat color="primary" @click="$refs.menu.save()">OK</v-btn>
                                     </v-date-picker>
                                     <v-time-picker v-model="timePicker"></v-time-picker>
 
@@ -148,7 +150,9 @@
 
                         <v-edit-dialog :return-value.sync="props.item.status" large lazy persistent
                             @save="saveLine(props.item)" @cancel="''" @open="''" @close="''">
-                            <div>{{status[props.item.status].friendly }}</div>
+                            <div>
+                                <v-icon :color="status[props.item.status].color">fiber_manual_record</v-icon>
+                                {{status[props.item.status].friendly }}</div>
                             <template v-slot:input>
                                 <div class="mt-3 title">Update Iron</div>
                             </template>
@@ -208,6 +212,10 @@
                             </v-btn>
                             <v-list dense>
                                 <v-list-tile @click="openProjectTXEdit(props.item)">Edit</v-list-tile>
+                                <v-divider></v-divider>
+                            </v-list>
+                             <v-list dense>
+                                <v-list-tile @click="deleteProjectTX(props.item)">Delete</v-list-tile>
                                 <v-divider></v-divider>
                             </v-list>
                         </v-menu>
@@ -307,90 +315,109 @@
                 status: [{
                         text: "Project Start",
                         value: 0,
-                        friendly: "Project Start"
+                        friendly: "Project Start",
+                        color:"blue",
                     },
                     {
                         text: "In Progress",
                         value: 1,
+                        color:"blue",
                         friendly: "In Progress"
+                        
                     },
                     {
                         text: "Complete",
                         value: 2,
+                        color:"blue",
                         friendly: "Complete"
                     },
                     {
                         text: "Workshop",
                         value: 3,
+                        color:"yellow",
                         friendly: "Workshop"
                     }, {
                         text: "Workshop Complete",
                         value: 4,
-                        friendly: "WorkshopComplete"
+                        color:"yellow",
+                        friendly: "Workshop Complete"
                     },
                     {
                         text: "Meeting",
                         value: 5,
+                        color:"yellow",
                         friendly: "Meeting"
                     },
                     {
                         text: "Data Preparation Start",
                         value: 6,
+                        color:"red",
                         friendly: "Data Preparation Start"
                     },
                     {
                         text: "Ranging Start",
                         value: 7,
+                        color:"red",
                         friendly: "Ranging Start"
                     },
                     {
                         text: "Planogram Start",
                         value: 8,
+                        color:"green",
                         friendly: "Planogram Start"
                     },
                     {
                         text: "Checking",
                         value: 9,
+                        color:"green",
                         friendly: "Checking"
                     },
                     {
                         text: "Checking Ended",
                         value: 10,
+                        color:"green",
                         friendly: "Checking Ended"
                     },
                     {
                         text: "Requesting Approval",
                         value: 11,
+                        color:"green",
                         friendly: "Requesting Approval"
                     },
                     {
                         text: "Declined",
                         value: 12,
+                        color:"green",
                         friendly: "Declined"
                     },
                     {
                         text: "Approved",
                         value: 13,
+                        color:"green",
                         friendly: "Approved"
                     },
                     {
                         text: "Implementation Pending",
                         value: 14,
+                        color:"blue",
                         friendly: "Implementation Pending"
                     },
                     {
                         text: "Variation Request",
                         value: 15,
+                        color:"blue",
                         friendly: 'Variation Request'
                     },
                     {
                         text: "Implemented",
                         value: 16,
+                        color:"blue",
                         friendly: "Implemented"
                     },
                     {
                         text: "On Hold",
                         value: 17,
+                        color:"blue",
                         friendly: "On Hold"
                     }
                 ],
@@ -416,12 +443,37 @@
             // a computed getter
             setDate: function () {
                 // `this` points to the vm instance
-                
+
                 return this.datePicker + ' ' + this.timePicker
                 //   return this.datePicker = this.datePicker+this.timePicker
             }
         },
         methods: {
+            deleteProjectTX(item, group) {
+                let self = this
+                self.$refs.yesNoModal.show('Delete project transaction?', value => {
+                    if (value) {
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                        Axios.delete(process.env.VUE_APP_API + `ProjectTX?projectTXID=${item.id}`).then(r => {
+                            console.log(r);
+
+
+                            // for (let index = 0; index < group.projectList.length; index++) {
+                            //     const element = group.projectList[index];
+                            //     if (element.id == item.id) {
+                            //         group.projectList.splice(index, 1)
+                            //     }
+                            // }
+                            delete Axios.defaults.headers.common["TenantID"];
+                        })
+                    }
+
+                })
+
+
+
+            },
             deleteProject(item, group) {
                 let self = this
                 self.$refs.yesNoModal.show('Delete project?', value => {
@@ -498,6 +550,7 @@
             },
             saveLine(item, editType) {
                 let self = this
+                 console.log("item");
                 console.log(item);
                 if (editType == 0) {
                     //date time edit
@@ -536,7 +589,7 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.put(process.env.VUE_APP_API + 'ProjectTX', item).then(res => {
-
+                     console.log("res");
                     console.log(res);
 
                     delete Axios.defaults.headers.common["TenantID"];
@@ -692,7 +745,7 @@
             getTransactions(item) {
 
                 let self = this
-
+            self.ProjectTXs=[]
 
                 if (self.project == item) {
                     return
@@ -700,7 +753,15 @@
                 self.project = item
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.get(process.env.VUE_APP_API + `ProjectTX?projectID=${item.id}`).then(r => {
-                    self.ProjectTXs = r.data.projectTXList
+                    console.log(r);
+                    
+                    r.data.projectTXList.forEach(e => {
+                        console.log(e);
+                        
+                        if (e.deleted != true) {
+                            self.ProjectTXs.push(e)
+                        }
+                    })
                     delete Axios.defaults.headers.common["TenantID"];
                 })
 
@@ -712,5 +773,11 @@
 <style>
     .highlighted {
         background-color: #1976d2;
+    }
+    .buttons{
+        background-color:#BDBDBD;
+    }
+    .listHeaders{
+        background-color:#EEEEEE;
     }
 </style>
