@@ -118,17 +118,15 @@
                                 <v-menu ref="menu" :close-on-content-click="false" lazy transition="scale-transition"
                                     offset-y full-width min-width="290px">
                                     <template v-slot:activator="{ on }">
-                                        <v-text-field v-model="setDate" label="please select a date"
+                                        <v-text-field v-model="props.item.dateTimeString" label="please select a date"
                                             prepend-icon="event" readonly v-on="on"></v-text-field>
                                     </template>
-                                    <v-date-picker v-model="datePicker" no-title scrollable>
-                                        <v-spacer></v-spacer>
+                                    <v-date-picker v-model="props.item.dateTimeString" no-title scrollable>
+                                        <!-- <v-spacer></v-spacer>
                                         <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
-                                        <v-btn flat color="primary" @click="$refs.menu.save()">OK</v-btn>
+                                        <v-btn flat color="primary" @click="$refs.menu.save()">OK</v-btn> -->
                                     </v-date-picker>
-                                    <v-time-picker v-model="timePicker"></v-time-picker>
-
-
+                                    <!-- <v-time-picker v-model="timePicker"></v-time-picker> -->
                                 </v-menu>
                             </template>
                         </v-edit-dialog>
@@ -550,15 +548,12 @@
             },
             saveLine(item, editType) {
                 let self = this
-                 console.log("item");
-                console.log(item);
+
                 if (editType == 0) {
                     //date time edit
-                    item.dateTime = self.setDate
-                    item.dateTimeString = self.setDate
-                    //  "dateTime": self.setDate,
-                    //         "dateTimeString":self.setDate,
+                    item.dateTime = item.dateTimeString
                 }
+
                 if (editType == 3) {
                     //store edit
                     item.store_ID = item.store
@@ -589,13 +584,8 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.put(process.env.VUE_APP_API + 'ProjectTX', item).then(res => {
-                     console.log("res");
-                    console.log(res);
-
                     delete Axios.defaults.headers.common["TenantID"];
                 })
-                console.log("editied item");
-                console.log(item);
             },
 
             getUsers() {
