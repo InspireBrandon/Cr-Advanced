@@ -95,8 +95,9 @@
                                         </v-flex>
                                         <v-spacer></v-spacer>
                                         <v-flex>
-                                            <strong>{{status[item.status].friendy}}</strong>
-                                            <div class="caption">{{item.notes}}</div>
+                                        
+                                            <strong> {{status[item.status  == -1 ? 18 : item.status].text}} </strong>
+                                            <div class="caption">{{[item.status]}}   {{item.notes}}</div>
                                         </v-flex>
                                     </v-layout>
                                 </v-timeline-item>
@@ -193,49 +194,97 @@
                     }
                 ],
                 status: [{
-                        text: "Project Start"
+                        text: "Project Start",
+                        value: 0,
+                        friendly: "Project Start"
                     },
                     {
-                        text: "In Progress"
+                        text: "In Progress",
+                        value: 1,
+                        friendly: "In Progress"
                     },
                     {
-                        text: "Complete"
+                        text: "Complete",
+                        value: 2,
+                        friendly: "Complete"
                     },
                     {
-                        text: "Workshop"
-                    }, 
-                    {
-                        text: "Meeting"
+                        text: "Workshop",
+                        value: 3,
+                        friendly: "Workshop"
+                    },  {
+                        text: "Workshop Complete",
+                        value: 4,
+                        friendly: "WorkshopComplete"
                     },
                     {
-                        text: "Ranging Start"
+                        text: "Meeting",
+                        value: 5,
+                        friendly: "Meeting"
                     },
                     {
-                        text: "Planogram Start"
+                        text: "Data Preparation Start",
+                        value: 6,
+                        friendly: "Data Preparation Start"
                     },
                     {
-                        text: "Checking"
+                        text: "Ranging Start",
+                        value: 7,
+                        friendly: "Ranging Start"
                     },
                     {
-                        text: "Requesting Approval"
+                        text: "Planogram Start",
+                        value: 8,
+                        friendly: "Planogram Start"
                     },
                     {
-                        text: "Declined"
+                        text: "Checking",
+                        value: 9,
+                        friendly: "Checking"
                     },
                     {
-                        text: "Approved"
+                        text: "Checking Ended",
+                        value: 10,
+                        friendly: "Checking Ended"
                     },
                     {
-                        text: "Implementation Pending"
+                        text: "Requesting Approval",
+                        value: 11,
+                        friendly: "Requesting Approval"
                     },
                     {
-                        text: 'Variation Request'
+                        text: "Declined",
+                        value: 12,
+                        friendly: "Declined"
                     },
                     {
-                        text: "Implemented"
+                        text: "Approved",
+                        value: 13,
+                        friendly: "Approved"
                     },
                     {
-                        text: "On Hold"
+                        text: "Implementation Pending",
+                        value: 14,
+                        friendly: "Implementation Pending"
+                    },
+                    {
+                        text: "Variation Request",
+                        value: 15,
+                        friendly: 'Variation Request'
+                    },
+                    {
+                        text: "Implemented",
+                        value: 16,
+                        friendly: "Implemented"
+                    },
+                    {
+                        text: "On Hold",
+                        value: 17,
+                        friendly: "On Hold"
+                    }, {
+                        text: "",
+                        value: 18,
+                        friendly: ""
                     }
                 ]
             }
@@ -289,7 +338,7 @@
 
                         r.data.projectTXList.forEach(element => {
                             self.timelineItems.push({
-                                status: element.type,
+                                status: element.status,
                                 notes: self.status[element.status].text,
                                 date: element.dateTimeString
                             })
