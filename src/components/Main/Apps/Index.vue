@@ -54,7 +54,7 @@
         },
         created() {
             let self = this;
-            //self.getInstalledApps();
+            // self.getInstalledApps();
             // self.checkAccessType(accessType => {
             //     console.log(accessType);
 
@@ -87,9 +87,82 @@
             //     }
             // });
 
+            // super user - everything
+            // store - planogram implementation
+            // supplier - planogram implementation
+            // Buyer - Ranging, Space Planning, Data prep
+
             self.getAppsTmpAll();
+
         },
         methods: {
+            appAccess(apps, callback) {
+                var self = this
+                let storeapptmp = apps
+                let storeApps = []
+                let buyerApps = []
+                self.checkAccessType(accessType => {
+
+                    console.log("apps");
+                    console.log(apps);
+
+                    console.log("accessType", accessType)
+                    console.log(accessType)
+
+                    if (accessType.isDatabaseOwner == true) {
+                        console.log("isOwner");
+                        return
+                    } else {
+                        if (accessType.tenantLink_AccessTypeList[0].accessType == 3 ||accessType.tenantLink_AccessTypeList[0].accessType == 2) {
+                            // store  or supplier
+                            storeapptmp.forEach(e => {
+                                if (e.config.configName == "SpacePlanning") {
+
+                                    storeApps.push(e)
+                                    for (let index = 0; index < e.config.routes.length; index++) {
+                                        const element = e.config.routes[index];
+                                        if (element.routeName != "plannogram_implementation") {
+                                            e.config.routes.splice(element, 1)
+                                        }
+
+                                    }
+                                }
+
+                            })
+                            self.appConfigDetail = storeApps
+                        }
+                        
+                        if (accessType.tenantLink_AccessTypeList[0].accessType == 1) {
+                            // buyer  
+                            apps.forEach(e => {
+                                if (e.config.configName == "SpacePlanning" || e.config.configName == "ProductMaintenance" ||e.config.configName == "RangePlanning") {
+
+                                    buyerApps.push(e)
+                                    console.log(e);
+                                    
+                                    // console.log("buyerApps");
+                                    // console.log(buyerApps);
+                                    // for (let index = 0; index < e.config.routes.length; index++) {
+                                    //     const element = e.config.routes[index];
+                                        
+                                    //     // if (element.routeName != "plannogram_implementation") {
+                                    //     //     e.config.routes.splice(element, 1)
+                                    //     // }
+
+                                    // }
+                                }
+
+                            })
+                            // console.log("edited buyerApps");
+                            // console.log(buyerApps);
+                            self.appConfigDetail = buyerApps
+                        }
+
+                    }
+
+                })
+                callback()
+            },
             getInstalledApps() {
                 let self = this;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
@@ -121,6 +194,8 @@
                                 .system_code)
                         ));
                     }
+
+
                 })
 
                 self.showLoader = false;
@@ -134,35 +209,38 @@
                         `TenantLink_AccessType?systemUserID=${encoded_details.USER_ID}&tenantID=${sessionStorage.currentDatabase}`
                     )
                     .then(r => {
-                        if (r.data.isDatabaseOwner) {
-                            callback("DATABASE-OWNER");
-                            return;
-                        }
 
+
+
+                        // if (r.data.isDatabaseOwner) {
+                        //     callback("DATABASE-OWNER");
+                        //     return;
+                        // }
+                        callback(r.data)
                         let tenantType = r.data.tenantLink_AccessTypeList[0].accessType;
 
-                        switch (tenantType) {
-                            case 0:
-                                {
-                                    callback("SUPERUSER");
-                                }
-                                break;
-                            case 1:
-                                {
-                                    callback("GENERAL");
-                                }
-                                break;
-                            case 2:
-                                {
-                                    callback("RETAILER");
-                                }
-                                break;
-                            case 3:
-                                {
-                                    callback("STORE");
-                                }
-                                break;
-                        }
+                        // switch (tenantType) {
+                        //     case 0:
+                        //         {
+                        //             callback("SUPERUSER");
+                        //         }
+                        //         break;
+                        //     case 1:
+                        //         {
+                        //             callback("GENERAL");
+                        //         }
+                        //         break;
+                        //     case 2:
+                        //         {
+                        //             callback("RETAILER");
+                        //         }
+                        //         break;
+                        //     case 3:
+                        //         {
+                        //             callback("STORE");
+                        //         }
+                        //         break;
+                        // }
                     })
             },
             getDatabases(userID, callback) {
@@ -170,9 +248,8 @@
 
                 Axios.get(process.env.VUE_APP_API + `TenantAccess?systemUserID=${userID}`)
                     .then(r => {
-                        console.log(r.data)
 
-                        if(r.data.length > 0)
+                        if (r.data.length > 0)
                             self.hasDatabases = true;
                         callback();
                     })
@@ -185,22 +262,29 @@
                 self.getDatabases(encoded_details.USER_ID, () => {
                     Axios.get(process.env.VUE_APP_API + `SystemUser?id=${encoded_details.USER_ID}`)
                         .then(r => {
-                                self.applicationDetailsHelper = new ApplicationDetailsHelper();
-                                self.apps = self.applicationDetailsHelper.getAllApplications();
+                            self.applicationDetailsHelper = new ApplicationDetailsHelper();
+                            self.apps = self.applicationDetailsHelper.getAllApplications();
 
-                                self.apps.forEach(app => {
-                                    self.appConfigDetail.push(new ConfigDetail(
-                                        self.applicationDetailsHelper
-                                        .getApplicationConfigBySystemCode(
-                                            app
-                                            .system_code),
-                                        self.applicationDetailsHelper
-                                        .getApplicationDetailsBySystemCode(
-                                            app
-                                            .system_code)
-                                    ));
-                                })
-                            self.showLoader = false;
+                            self.apps.forEach(app => {
+                                self.appConfigDetail.push(new ConfigDetail(
+                                    self.applicationDetailsHelper
+                                    .getApplicationConfigBySystemCode(
+                                        app
+                                        .system_code),
+                                    self.applicationDetailsHelper
+                                    .getApplicationDetailsBySystemCode(
+                                        app
+                                        .system_code)
+                                ));
+                            })
+
+                            self.appAccess(self.appConfigDetail, callback => {
+                                self.showLoader = false;
+                                console.log("self.appConfigDetail");
+                                console.log(self.appConfigDetail);
+
+                            })
+
                         })
                 })
             },
