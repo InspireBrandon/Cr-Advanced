@@ -149,7 +149,7 @@
                         <v-edit-dialog :return-value.sync="props.item.status" large lazy persistent
                             @save="saveLine(props.item)" @cancel="''" @open="''" @close="''">
                             <div>
-                                <v-icon :color="status[props.item.status].color">fiber_manual_record</v-icon>
+                                <v-icon   :color="typeList[props.item.type== -1 ?  5 :  props.item.type].color">fiber_manual_record</v-icon>
                                 {{status[props.item.status].friendly }}</div>
                             <template v-slot:input>
                                 <div class="mt-3 title">Update Iron</div>
@@ -261,21 +261,30 @@
 
                 typeList: [{
                         text: "Event",
-                        value: 0
+                        value: 0,
+                        color:"yellow"
                     },
                     {
                         text: "Data Preparation",
-                        value: 1
+                        value: 1,
+                        color:"green"
+
                     }, {
                         text: "Ranging",
-                        value: 2
+                        value: 2,
+                        color:"red"
+
                     },
                     {
                         text: "Planogram",
-                        value: 3
+                        value: 3,
+                        color:"blue"
+
                     }, {
                         text: "Promotion",
-                        value: 4
+                        value: 4,
+                        color:"purple"
+
                     }, {
                         text: "",
                         value: 5
