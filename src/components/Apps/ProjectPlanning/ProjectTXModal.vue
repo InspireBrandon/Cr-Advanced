@@ -144,91 +144,115 @@
                 statusList: [{
                         text: "Project Start",
                         value: 0,
-                        friendly: "Project Start"
+                        friendly: "Project Start",
+                        color:"blue",
                     },
                     {
                         text: "In Progress",
                         value: 1,
+                        color:"blue",
                         friendly: "In Progress"
+                        
                     },
                     {
                         text: "Complete",
                         value: 2,
+                        color:"blue",
                         friendly: "Complete"
                     },
                     {
                         text: "Workshop",
                         value: 3,
+                        color:"yellow",
                         friendly: "Workshop"
-                    },  {
+                    }, {
                         text: "Workshop Complete",
                         value: 4,
-                        friendly: "WorkshopComplete"
+                        color:"yellow",
+                        friendly: "Workshop Complete"
                     },
                     {
                         text: "Meeting",
                         value: 5,
+                        color:"yellow",
                         friendly: "Meeting"
                     },
                     {
                         text: "Data Preparation Start",
                         value: 6,
+                        color:"red",
                         friendly: "Data Preparation Start"
                     },
                     {
                         text: "Ranging Start",
                         value: 7,
+                        color:"red",
                         friendly: "Ranging Start"
                     },
                     {
                         text: "Planogram Start",
                         value: 8,
+                        color:"green",
                         friendly: "Planogram Start"
                     },
                     {
-                        text: "Checking",
+                        text: "Meeting Supplier",
                         value: 9,
-                        friendly: "Checking"
-                    },
-                    {
-                        text: "Checking Ended",
-                        value: 10,
-                        friendly: "Checking Ended"
+                        color:"green",
+                        friendly: "Meeting Supplier"
                     },
                     {
                         text: "Requesting Approval",
-                        value: 11,
+                        value: 10,
+                        color:"green",
                         friendly: "Requesting Approval"
                     },
                     {
                         text: "Declined",
-                        value: 12,
+                        value: 11,
+                        color:"green",
                         friendly: "Declined"
                     },
                     {
                         text: "Approved",
-                        value: 13,
+                        value: 12,
+                        color:"green",
                         friendly: "Approved"
                     },
                     {
                         text: "Implementation Pending",
-                        value: 14,
+                        value: 13,
+                        color:"blue",
                         friendly: "Implementation Pending"
                     },
                     {
                         text: "Variation Request",
-                        value: 15,
+                        value: 14,
+                        color:"blue",
                         friendly: 'Variation Request'
                     },
                     {
                         text: "Implemented",
-                        value: 16,
+                        value: 15,
+                        color:"blue",
                         friendly: "Implemented"
                     },
                     {
                         text: "On Hold",
-                        value: 17,
+                        value: 16,
+                        color:"blue",
                         friendly: "On Hold"
+                    },
+                    {
+                        text: "Waiting Fixture Requirements",
+                        value: 17,
+                        color:"blue",
+                        friendly: "Waiting Fixture Requirements"
+                    }, {
+                        text: "Waiting Supplier",
+                        value: 18,
+                        color:"blue",
+                        friendly: "Waiting Supplier"
                     }
                 ]
             }
@@ -346,6 +370,7 @@
             },
             open(isAdd, item, callback) {
                 var self = this
+                this.$refs.form.reset()
 
                 self.dialog = true
 

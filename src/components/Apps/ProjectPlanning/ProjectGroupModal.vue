@@ -62,7 +62,10 @@
 
             },
             open(isAdd, item, callback) {
+
                 let self = this
+                this.$refs.form.reset()
+ 
                 self.dialog = true
                 if (isAdd == true) {
                     self.isAdd = true
@@ -77,7 +80,10 @@
                     self.name = item.name
                     self.description = item.description
                 }
+                self.valid=true
                 self.afterClose = callback
+                
+                
             },
             submit() {
                 var self = this
@@ -91,7 +97,6 @@
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                         Axios.post(process.env.VUE_APP_API + 'ProjectGroup', tmp).then(r => {
-                            console.log(r);
                             self.afterClose(r.data.projectGroup)
                             self.dialog = false
 
@@ -104,7 +109,6 @@
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                         Axios.put(process.env.VUE_APP_API + 'ProjectGroup', self.item).then(r => {
-                            console.log(r);
                             self.afterClose(r.data.projectGroup)
                             self.dialog = false
 

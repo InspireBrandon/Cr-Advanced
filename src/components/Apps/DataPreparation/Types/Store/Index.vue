@@ -62,9 +62,9 @@
             this.getStores()
         },
         methods: {
-            openEdit() {
+            openEdit(item) {
                 let self = this;
-                self.$refs.modifyStore.open();
+                self.$refs.modifyStore.open(item);
             },
             getStores() {
                 let self = this

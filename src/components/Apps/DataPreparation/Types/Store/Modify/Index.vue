@@ -21,19 +21,19 @@
                                         <Name ref="name" />
                                     </v-flex>
                                     <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
-                                        <Location />
+                                        <Location ref="Location"/>
                                     </v-flex>
                                     <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
-                                        <Contact />
+                                        <Contact ref="Contact"/>
                                     </v-flex>
                                     <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
-                                        <Properties />
+                                        <Properties ref="Properties"/>
                                     </v-flex>
                                     <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
-                                        <Configuration />
+                                        <Configuration ref="Configuration"/>
                                     </v-flex>
                                     <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
-                                        <Observations />
+                                        <Observations ref="Observations"/>
                                     </v-flex>
                                 </v-layout>
                             </v-card-text>
@@ -42,13 +42,13 @@
                             <v-card-text class="component-container ma-0">
                                 <v-layout row wrap>
                                     <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
-                                        <StoreManager />
+                                        <StoreManager ref="StoreManager" />
                                     </v-flex>
                                     <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
-                                        <AssistantManager />
+                                        <AssistantManager ref="AssistantManager"/>
                                     </v-flex>
                                     <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
-                                        <AlternateContact />
+                                        <AlternateContact ref="AlternateContact" />
                                     </v-flex>
                                 </v-layout>
                             </v-card-text>
@@ -57,7 +57,7 @@
                             <v-card-text class="component-container ma-0">
                                 <v-layout row wrap>
                                     <v-flex xl12 lg12 md12 sm12 xs12 class="pa-1">
-                                        <Dimensions />
+                                        <Dimensions ref="Dimensions"/>
                                     </v-flex>
                                 </v-layout>
                             </v-card-text>
@@ -100,20 +100,38 @@
             AlternateContact,
             Configuration,
             Observations,
-            AnnualDirectSalesArea
         },
         data: () => {
             return {
                 dialog: false,
                 active: 0,
                 componentRefs: [
-                    'name'
+                    'name',
+                    'AlternateContact',
+                    'Dimensions',
+                    'AssistantManager',
+                    'StoreManager',
+                    "Observations",
+                    'Configuration',
+                    'Properties',
+                    "Contact",
+                    'Location',
+
                 ]
             }
         },
         methods: {
-            open() {
+            open(item) {
+                let self = this;
+                self.populateComponents(item);
                 this.dialog = true;
+            },
+            populateComponents(item) {
+                let self = this;
+
+                self.componentRefs.forEach(element => {
+                    self.$refs[element].setForm(item);
+                })
             },
             validateComponents() {
                 let self = this;
