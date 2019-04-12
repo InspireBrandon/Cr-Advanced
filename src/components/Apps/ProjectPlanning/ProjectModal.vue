@@ -111,6 +111,8 @@
                     })
             },
             open(isAdd, item, callback) {
+                this.$refs.form.reset()
+            
             this.getProjectGroups()
 
                 console.log(item);

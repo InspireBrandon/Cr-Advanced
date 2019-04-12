@@ -374,59 +374,64 @@
                         friendly: "Planogram Start"
                     },
                     {
-                        text: "Checking",
+                        text: "Meeting Supplier",
                         value: 9,
                         color:"green",
-                        friendly: "Checking"
-                    },
-                    {
-                        text: "Checking Ended",
-                        value: 10,
-                        color:"green",
-                        friendly: "Checking Ended"
+                        friendly: "Meeting Supplier"
                     },
                     {
                         text: "Requesting Approval",
-                        value: 11,
+                        value: 10,
                         color:"green",
                         friendly: "Requesting Approval"
                     },
                     {
                         text: "Declined",
-                        value: 12,
+                        value: 11,
                         color:"green",
                         friendly: "Declined"
                     },
                     {
                         text: "Approved",
-                        value: 13,
+                        value: 12,
                         color:"green",
                         friendly: "Approved"
                     },
                     {
                         text: "Implementation Pending",
-                        value: 14,
+                        value: 13,
                         color:"blue",
                         friendly: "Implementation Pending"
                     },
                     {
                         text: "Variation Request",
-                        value: 15,
+                        value: 14,
                         color:"blue",
                         friendly: 'Variation Request'
                     },
                     {
                         text: "Implemented",
-                        value: 16,
+                        value: 15,
                         color:"blue",
                         friendly: "Implemented"
                     },
                     {
                         text: "On Hold",
-                        value: 17,
+                        value: 16,
                         color:"blue",
                         friendly: "On Hold"
-                    }
+                    },
+                    {
+                        text: "Waiting Fixture Requirements",
+                        value: 17,
+                        color:"blue",
+                        friendly: "Waiting Fixture Requirements"
+                    }, {
+                        text: "Waiting Supplier",
+                        value: 18,
+                        color:"blue",
+                        friendly: "Waiting Supplier"
+                    },
                 ],
                 stores: [],
                 ProjectsGroups: [],
