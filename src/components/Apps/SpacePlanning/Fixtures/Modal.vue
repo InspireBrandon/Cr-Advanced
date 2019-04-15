@@ -103,7 +103,7 @@
               <v-container grid-list-md>
                 <v-layout row wrap>
                   <v-flex lg8 md12>
-                    <v-text-field type="number" v-model="form.form" label="form:" suffix="cm"></v-text-field>
+                    <v-text-field type="number" v-model="form.height" label="Height:" suffix="cm"></v-text-field>
                   </v-flex>
                   <v-flex lg8 md12>
                     <v-text-field type="number" v-model="form.width" label="Width:" suffix="cm"></v-text-field>
@@ -113,7 +113,7 @@
                   </v-flex>
                   <!-- <v-flex lg8 md12 sm12 xs12
                     v-if="(form.fixtureType==1&&form.type==2||form.fixtureType==0&&form.type==2 ||form.fixtureType==1&&form.type==3 ||form.fixtureType==3&&form.type==2 || form.fixtureType==4&&form.type==3)">
-                    <v-text-field type="number" v-model="form.form" suffix="cm"
+                    <v-text-field type="number" v-model="form.height" suffix="cm"
                       label="Merchandising Offset:"></v-text-field>
                   </v-flex> -->
                   <v-flex lg8 md12
@@ -590,10 +590,10 @@
       },
       calculateHolesY() {
         let self = this;
-        if (self.form.yHoleSpacing == null || self.form.pegDiameter == null || self.form.form == null) {
+        if (self.form.yHoleSpacing == null || self.form.pegDiameter == null || self.form.height == null) {
           return 0;
         } else {
-          return Math.round((parseInt(self.form.form) / (parseInt(self.form.yHoleSpacing) + parseInt(self.form
+          return Math.round((parseInt(self.form.height) / (parseInt(self.form.yHoleSpacing) + parseInt(self.form
             .pegDiameter))));
         }
       }

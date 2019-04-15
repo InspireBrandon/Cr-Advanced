@@ -124,10 +124,10 @@
                         <div class="print-break-page"></div>
                         <v-card class="mb-3">
                             <v-toolbar flat dark dense>
-                                <v-toolbar-title>Product Fixture Report (by weekly sales)</v-toolbar-title>
+                                <v-toolbar-title>Product Fixture Report</v-toolbar-title>
                             </v-toolbar>
                             <v-card-text>
-                                <v-treeview :items="ProductFixtureReport" :open.sync="open" item-key="Data.ID"
+                                <!-- <v-treeview :items="ProductFixtureReport" :open.sync="open" item-key="Data.ID"
                                     item-text="Data.Data.name">
 
                                     <template v-slot:prepend="{ item }">
@@ -135,7 +135,10 @@
                                             v-text="`mdi-${item.id === 1 ? 'home-variant' : 'folder-network'}`">
                                         </v-icon>
                                     </template>
-                                </v-treeview>
+                                </v-treeview> -->
+                                <TreeVue style="border: 1px solid black; margin-bottom: 10px;"
+                                    v-for="(parent, idx) in productFixtureReport" :childdark="false" :key="idx"
+                                    :data="parent" />
                             </v-card-text>
                         </v-card>
                     </v-card-text>
@@ -149,6 +152,7 @@
 <script>
     import Axios from 'axios';
     import Spinner from '@/components/Common/Spinner';
+    import TreeVue from './TreeVue';
 
     function makeTree(data, parent = null) {
 
@@ -208,7 +212,8 @@
 
     export default {
         components: {
-            Spinner
+            Spinner,
+            TreeVue
         },
         data() {
             return {
@@ -218,7 +223,7 @@
                 open: [],
                 fixtureReport: [],
                 productReport: [],
-                ProductFixtureReport: []
+                productFixtureReport: []
             }
         },
         methods: {
@@ -235,6 +240,7 @@
                 self.planogramData = null;
                 self.fixtureReport = [];
                 self.productReport = [];
+                self.productFixtureReport = [];
 
                 self.planogramName = item.name;
 
@@ -266,14 +272,6 @@
                 self.generateFixtureReport();
                 self.generateProductReport();
                 self.generateProductFixtureReport();
-            },
-            generateProductFixtureReport() {
-                let self = this;
-
-                let tmp2 = makeTree(self.planogramData.planogramData)
-                console.log("tmp");
-                console.log(tmp2);
-                self.ProductFixtureReport = tmp2;
             },
             generateFixtureReport() {
                 let self = this;
@@ -319,10 +317,21 @@
 
                 self.productReport = tmp;
             },
+            generateProductFixtureReport() {
+                let self = this;
+                self.productFixtureReport = makeTree(self.planogramData.planogramData);
+            },
             print() {
                 var printContents = document.getElementById("planogram-report").innerHTML;
                 var printWindow = window.open('', 'PRINT');
-                printWindow.document.body.innerHTML = printContents;
+                printWindow.document.body.html = printContents;
+                // var styles = document.getElementsByTagName('style');
+                // var head = printWindow.document.getElementsByTagName('head')[0];
+
+                // for (var x = 0; x < styles.length; x++) {
+                //     head.appendChild(styles[x]);
+                // }
+
                 printWindow.document.close();
                 printWindow.focus();
                 printWindow.print();
