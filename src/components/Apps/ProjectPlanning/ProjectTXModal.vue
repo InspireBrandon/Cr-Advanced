@@ -43,7 +43,7 @@
                             </v-menu>
                         </v-flex> -->
                         <v-flex md4>
-                            <v-select label="status" placeholder="status" :items="statusList" v-model="status">
+                            <v-select label="status" placeholder="status" :items="filterStatus" v-model="status">
                             </v-select>
 
                         </v-flex>
@@ -145,114 +145,132 @@
                         text: "Project Start",
                         value: 0,
                         friendly: "Project Start",
-                        color:"blue",
+                        color: "blue",
+                        type: [0, 1, 2, 3, 4]
                     },
                     {
                         text: "In Progress",
                         value: 1,
-                        color:"blue",
-                        friendly: "In Progress"
-                        
+                        color: "blue",
+                        friendly: "In Progress",
+                        type: [0, 1, 2, 3, 4]
                     },
                     {
                         text: "Complete",
                         value: 2,
-                        color:"blue",
-                        friendly: "Complete"
+                        color: "blue",
+                        friendly: "Complete",
+                        type: [0, 1, 2, 3, 4]
                     },
                     {
                         text: "Workshop",
                         value: 3,
-                        color:"yellow",
-                        friendly: "Workshop"
+                        color: "yellow",
+                        friendly: "Workshop",
+                        type: [0]
                     }, {
                         text: "Workshop Complete",
                         value: 4,
-                        color:"yellow",
-                        friendly: "Workshop Complete"
+                        color: "yellow",
+                        friendly: "Workshop Complete",
+                        type: [0]
                     },
                     {
                         text: "Meeting",
                         value: 5,
-                        color:"yellow",
-                        friendly: "Meeting"
+                        color: "yellow",
+                        friendly: "Meeting",
+                        type: [0]
                     },
                     {
                         text: "Data Preparation Start",
                         value: 6,
-                        color:"red",
-                        friendly: "Data Preparation Start"
+                        color: "red",
+                        friendly: "Data Preparation Start",
+                        type: [1]
                     },
                     {
                         text: "Ranging Start",
                         value: 7,
-                        color:"red",
-                        friendly: "Ranging Start"
+                        color: "red",
+                        friendly: "Ranging Start",
+                        type: [2]
                     },
                     {
                         text: "Planogram Start",
                         value: 8,
-                        color:"green",
-                        friendly: "Planogram Start"
+                        color: "green",
+                        friendly: "Planogram Start",
+                        type: [3]
                     },
                     {
                         text: "Meeting Supplier",
                         value: 9,
-                        color:"green",
-                        friendly: "Meeting Supplier"
+                        color: "green",
+                        friendly: "Meeting Supplier",
+                        type: [0]
                     },
                     {
                         text: "Requesting Approval",
                         value: 10,
-                        color:"green",
-                        friendly: "Requesting Approval"
+                        color: "green",
+                        friendly: "Requesting Approval",
+                        type: [2, 3]
                     },
                     {
                         text: "Declined",
                         value: 11,
-                        color:"green",
-                        friendly: "Declined"
+                        color: "green",
+                        friendly: "Declined",
+                        type: [2, 3]
                     },
                     {
                         text: "Approved",
                         value: 12,
-                        color:"green",
-                        friendly: "Approved"
+                        color: "green",
+                        friendly: "Approved",
+                        type: [0, 1, 2, 3, 4]
                     },
                     {
                         text: "Implementation Pending",
                         value: 13,
-                        color:"blue",
-                        friendly: "Implementation Pending"
+                        color: "blue",
+                        friendly: "Implementation Pending",
+                        type: [0]
                     },
                     {
                         text: "Variation Request",
                         value: 14,
-                        color:"blue",
-                        friendly: 'Variation Request'
+                        color: "blue",
+                        friendly: 'Variation Request',
+                        type: [2, 3]
                     },
                     {
                         text: "Implemented",
                         value: 15,
-                        color:"blue",
-                        friendly: "Implemented"
+                        color: "blue",
+                        friendly: "Implemented",
+                        type: [3]
                     },
                     {
                         text: "On Hold",
                         value: 16,
-                        color:"blue",
-                        friendly: "On Hold"
+                        color: "blue",
+                        friendly: "On Hold",
+                        type: [0]
                     },
                     {
                         text: "Waiting Fixture Requirements",
                         value: 17,
-                        color:"blue",
-                        friendly: "Waiting Fixture Requirements"
+                        color: "blue",
+                        friendly: "Waiting Fixture Requirements",
+                        type: [3]
                     }, {
                         text: "Waiting Supplier",
                         value: 18,
-                        color:"blue",
-                        friendly: "Waiting Supplier"
+                        color: "blue",
+                        friendly: "Waiting Supplier",
+                        type: 0
                     }
                 ]
             }
@@ -264,6 +282,13 @@
                 // `this` points to the vm instance
                 return this.datePicker + ' ' + this.timePicker
                 //   return this.datePicker = this.datePicker+this.timePicker
+            },
+
+            filterStatus: function () {
+                return this.statusList.filter(function () {
+                    status => status.type.includes(this.type)
+                })
+
             }
         },
 
@@ -392,7 +417,7 @@
                     self.AssignedUser = item.systemUserID
                 }
                 if (isAdd == true) {
-                   
+
                     self.projectID = item.id
 
                     self.isAdd = true

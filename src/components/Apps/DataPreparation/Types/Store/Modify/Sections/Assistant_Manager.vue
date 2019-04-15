@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-toolbar flat dense dark color="primary">Assistant Manager</v-toolbar>
-        <v-form>
+        <v-form ref="form">
             <v-container grid-list-md>
                 <v-layout row wrap>
                     <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">

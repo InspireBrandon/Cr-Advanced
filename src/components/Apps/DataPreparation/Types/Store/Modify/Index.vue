@@ -14,26 +14,26 @@
                         <v-tab ripple>Details</v-tab>
                         <v-tab ripple>Personale</v-tab>
                         <v-tab ripple>Areas</v-tab>
-                        <v-tab-item>
+                        <v-tab-item> 
                             <v-card-text class="component-container ma-0">
                                 <v-layout row wrap>
                                     <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
                                         <Name ref="name" />
                                     </v-flex>
                                     <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
-                                        <Location ref="Location"/>
+                                        <Location ref="Location" />
                                     </v-flex>
                                     <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
-                                        <Contact ref="Contact"/>
+                                        <Contact ref="Contact" />
                                     </v-flex>
                                     <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
-                                        <Properties ref="Properties"/>
+                                        <Properties ref="Properties" />
                                     </v-flex>
                                     <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
-                                        <Configuration ref="Configuration"/>
+                                        <Configuration ref="Configuration" />
                                     </v-flex>
                                     <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
-                                        <Observations ref="Observations"/>
+                                        <Observations ref="Observations" />
                                     </v-flex>
                                 </v-layout>
                             </v-card-text>
@@ -45,7 +45,7 @@
                                         <StoreManager ref="StoreManager" />
                                     </v-flex>
                                     <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
-                                        <AssistantManager ref="AssistantManager"/>
+                                        <AssistantManager ref="AssistantManager" />
                                     </v-flex>
                                     <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
                                         <AlternateContact ref="AlternateContact" />
@@ -57,7 +57,7 @@
                             <v-card-text class="component-container ma-0">
                                 <v-layout row wrap>
                                     <v-flex xl12 lg12 md12 sm12 xs12 class="pa-1">
-                                        <Dimensions ref="Dimensions"/>
+                                        <Dimensions ref="Dimensions" />
                                     </v-flex>
                                 </v-layout>
                             </v-card-text>
@@ -87,6 +87,7 @@
     import Configuration from '@/components/Apps/DataPreparation/Types/Store/Modify/Sections/Configuration.vue'
     import Observations from '@/components/Apps/DataPreparation/Types/Store/Modify/Sections/Observations.vue'
     import AnnualDirectSalesArea from '@/components/Apps/DataPreparation/Types/Store/Modify/Sections/Annual_Direct_Sales_Area.vue'
+    import Axios from 'axios';
 
     export default {
         components: {
@@ -103,6 +104,7 @@
         },
         data: () => {
             return {
+                id: null,
                 dialog: false,
                 active: 0,
                 componentRefs: [
@@ -124,11 +126,12 @@
             open(item) {
                 let self = this;
                 self.populateComponents(item);
+
                 this.dialog = true;
             },
             populateComponents(item) {
                 let self = this;
-
+                self.id = item.id
                 self.componentRefs.forEach(element => {
                     self.$refs[element].setForm(item);
                 })
@@ -160,7 +163,15 @@
                     Object.assign(finalFormObj, componentForm);
                 });
 
-                console.log(finalFormObj);
+                finalFormObj.id = self.id
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.put(process.env.VUE_APP_API + 'Retailer/Store', finalFormObj).then(res => {
+
+                    delete Axios.defaults.headers.common["TenantID"];
+                    this.dialog = false;
+
+                })
             },
             processSave() {
                 let self = this;

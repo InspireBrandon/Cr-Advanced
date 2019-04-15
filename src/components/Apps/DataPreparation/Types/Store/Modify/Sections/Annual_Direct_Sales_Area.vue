@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-toolbar flat dense color="grey lighten-3">Annual Direct Sales Area</v-toolbar>
-        <v-form>
+        <v-form ref="form">
             <v-container grid-list-md>
                 <v-layout row wrap>
                     <v-flex md6>
