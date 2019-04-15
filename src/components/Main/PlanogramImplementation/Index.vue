@@ -11,6 +11,7 @@
                         :items="projectGroupsSelect" hide-details label="Project Group">
                     </v-autocomplete>
                 </v-flex>
+
                 <v-flex v-else xl3 lg6 md6 sm12 xs12>
                     <v-autocomplete @change="getUserProjectsByProjectGroup" v-model="selectedProjectGroup"
                         :items="projectGroupsSelect" hide-details label="Project Group">
@@ -51,8 +52,6 @@
                                                         <v-divider
                                                             v-if="((authorityType == 0 || authorityType == 1)&&(projectsStatus.status==10))">
                                                         </v-divider>
-                                                        status:{{ timelineItems[0].status }}
-                                                        auth:{{authorityType}}
                                                         <v-list-tile
                                                             v-if="(( authorityType == 1)&&(projectsStatus.status==10))"
                                                             @click="openImplementationModal(projectsStatus.status,0)">
@@ -338,10 +337,10 @@
                                     "project_ID": self.projectID,
                                     "dateTime": new Date,
                                     "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
-                                    "username": self.projectsStatus.user,
+                                    "username": self.timelineItems[self.timelineItems.length - 1].user,
                                     "status": 12,
                                     "type": 3,
-                                    "systemUserID": self.projectsStatus.userID,
+                                    "systemUserID": self.timelineItems[self.timelineItems.length - 1].userID,
                                 }
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
@@ -365,10 +364,10 @@
                                     "project_ID": self.projectID,
                                     "dateTime": new Date,
                                     "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
-                                    "username": self.projectsStatus.user,
+                                    "username": self.timelineItems[self.timelineItems.length - 1].user,
                                     "status": 11,
                                     "type": 3,
-                                    "systemUserID": self.projectsStatus.userID,
+                                    "systemUserID": self.timelineItems[self.timelineItems.length - 1].userID,
                                 }
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
@@ -388,15 +387,16 @@
 
                                 console.log("data");
                                 console.log(data);
-
+                                console.log("self.timelineItems[self.timelineItems.length-1].user");
+                                console.log(self.timelineItems[self.timelineItems.length - 1].user);
                                 let trans = {
                                     "project_ID": self.projectID,
                                     "dateTime": new Date,
                                     "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
-                                    "username": self.projectsStatus.user,
+                                    "username": self.timelineItems[self.timelineItems.length - 1].user,
                                     "status": 14,
                                     "type": 3,
-                                    "systemUserID": self.timelineItems[self.timelineItems.length-1].userID,
+                                    "systemUserID": self.timelineItems[self.timelineItems.length - 1].userID,
                                 }
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
@@ -443,24 +443,24 @@
 
                                 console.log("data");
                                 console.log(data);
-                                
-                                    let trans = {
-                                        "project_ID": self.projectID,
-                                        "dateTime": new Date,
-                                        "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
-                                        "store_ID": data.stores,
-                                        "username": self.projectsStatus.user,
-                                        "status": 13,
-                                        "type": 3,
-                                        "systemUserID": data.users,
-                                    }
-                                    Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
-                                        res => {
 
-                                            console.log(res);
+                                let trans = {
+                                    "project_ID": self.projectID,
+                                    "dateTime": new Date,
+                                    "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
+                                    "store_ID": data.stores,
+                                    "username": self.projectsStatus.user,
+                                    "status": 13,
+                                    "type": 3,
+                                    "systemUserID": data.users,
+                                }
+                                Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                                    res => {
 
-                                            delete Axios.defaults.headers.common["TenantID"];
-                                })
+                                        console.log(res);
+
+                                        delete Axios.defaults.headers.common["TenantID"];
+                                    })
 
                             }
                         })
