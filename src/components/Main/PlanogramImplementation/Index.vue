@@ -48,10 +48,47 @@
                                                         <v-list-tile @click="$refs.PlanogramReportModal.show(item)">
                                                             <v-list-tile-title>Show</v-list-tile-title>
                                                         </v-list-tile>
-                                                        <v-divider v-if="(authorityType == 0 || authorityType == 1)"></v-divider>
-                                                        {{ timelineItems[0].status }}
-                                                        <v-list-tile v-if="(authorityType == 0 || authorityType == 1)" @click="$refs.PlanogramReportModal.show(item)">
+                                                        <v-divider
+                                                            v-if="((authorityType == 0 || authorityType == 1)&&(projectsStatus.status==10))">
+                                                        </v-divider>
+                                                        status:{{ timelineItems[0].status }}
+                                                        auth:{{authorityType}}
+                                                        <v-list-tile
+                                                            v-if="(( authorityType == 1)&&(projectsStatus.status==10))"
+                                                            @click="openImplementationModal(projectsStatus.status,0)">
                                                             <v-list-tile-title>Approve</v-list-tile-title>
+                                                        </v-list-tile>
+                                                        <v-divider
+                                                            v-if="(( authorityType == 1)&&(projectsStatus.status==10))">
+                                                        </v-divider>
+                                                        <v-list-tile
+                                                            v-if="((authorityType == 1)&&(projectsStatus.status==10))"
+                                                            @click="openImplementationModal(projectsStatus.status,1)">
+                                                            <v-list-tile-title>Decline</v-list-tile-title>
+                                                        </v-list-tile>
+                                                        <v-divider
+                                                            v-if="((authorityType == 1)&&(projectsStatus.status==10))">
+                                                        </v-divider>
+                                                        <v-list-tile
+                                                            v-if="((authorityType == 1)&&(projectsStatus.status==10))"
+                                                            @click="openImplementationModal(projectsStatus.status,2)">
+                                                            <v-list-tile-title>Request Variation</v-list-tile-title>
+                                                        </v-list-tile>
+                                                        <v-divider
+                                                            v-if="(( authorityType == 1)&&(projectsStatus.status==13))">
+                                                        </v-divider>
+                                                        <v-list-tile
+                                                            v-if="(( authorityType == 3)&&(projectsStatus.status==13))"
+                                                            @click="openImplementationModal(projectsStatus.status,3)">
+                                                            <v-list-tile-title>Implement Planogram</v-list-tile-title>
+                                                        </v-list-tile>
+                                                        <v-divider
+                                                            v-if="(( authorityType == 1)&&(projectsStatus.status==19))">
+                                                        </v-divider>
+                                                        <v-list-tile
+                                                            v-if="(( authorityType == 1)&&(projectsStatus.status==19))"
+                                                            @click="openImplementationModal(projectsStatus.status,4)">
+                                                            <v-list-tile-title>Distribute Planograms</v-list-tile-title>
                                                         </v-list-tile>
                                                     </v-list>
 
@@ -89,6 +126,7 @@
             </v-layout>
         </v-container>
         <PlanogramReportModal ref="PlanogramReportModal"></PlanogramReportModal>
+        <PlanogramIplementationModal ref="PlanogramIplementationModal"></PlanogramIplementationModal>
     </v-card>
 </template>
 
@@ -96,15 +134,19 @@
     import Axios from 'axios';
     import jwt from 'jsonwebtoken';
     import PlanogramReportModal from './PlanogramReportModal';
+    import PlanogramIplementationModal from './PlanogramIplementationModal'
+    import moment from 'moment'
 
     let _MODULE = "Planogram Implementation";
 
     export default {
         components: {
-            PlanogramReportModal
+            PlanogramReportModal,
+            PlanogramIplementationModal
         },
         data: () => {
             return {
+                projectID: null,
                 authorityType: -1,
                 projectGroups: [],
                 projectGroupsSelect: [],
@@ -116,6 +158,7 @@
                 currentPlanogram: null,
                 active: 0,
                 timelineItems: [],
+                projectsStatus: null,
                 status: [{
                         text: "Project Start",
                         value: 0,
@@ -228,7 +271,12 @@
                         value: 18,
                         color: "blue",
                         friendly: "Waiting Supplier"
-                    },
+                    }, {
+                        text: "Awaiting Distribution",
+                        value: 19,
+                        color: "blue",
+                        friendly: "Awaiting Distribution",
+                    }
                 ],
                 typeList: [{
                         text: "Event",
@@ -269,6 +317,155 @@
             self.initialise();
         },
         methods: {
+            openImplementationModal(status, type) {
+                let self = this
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+
+                console.log("self.projectsStatus");
+                console.log(self.projectsStatus);
+
+                if (status == 10 && type == 0) {
+                    self.$refs.PlanogramIplementationModal.show(
+                        "Approve planogram", type, data => {
+                            if (data.value == true) {
+
+                                console.log("data");
+                                console.log(data);
+
+                                let trans = {
+                                    "project_ID": self.projectID,
+                                    "dateTime": new Date,
+                                    "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
+                                    "username": self.projectsStatus.user,
+                                    "status": 12,
+                                    "type": 3,
+                                    "systemUserID": self.projectsStatus.userID,
+                                }
+                                Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                                    res => {
+
+                                        console.log(res);
+
+                                        delete Axios.defaults.headers.common["TenantID"];
+                                    })
+                            }
+                        })
+                }
+                if (status == 10 && type == 1) {
+                    self.$refs.PlanogramIplementationModal.show(
+                        "Decline Planogram Approval?", type, data => {
+                            if (data.value == true) {
+
+                                console.log("data");
+                                console.log(data);
+
+                                let trans = {
+                                    "project_ID": self.projectID,
+                                    "dateTime": new Date,
+                                    "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
+                                    "username": self.projectsStatus.user,
+                                    "status": 11,
+                                    "type": 3,
+                                    "systemUserID": self.projectsStatus.userID,
+                                }
+                                Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                                    res => {
+
+                                        console.log(res);
+
+                                        delete Axios.defaults.headers.common["TenantID"];
+                                    })
+                            }
+
+                        })
+                }
+                if ((status == 12 || status == 10) && type == 2) {
+                    self.$refs.PlanogramIplementationModal.show(
+                        "Request Planogram Variation?", type, data => {
+                            if (data.value == true) {
+
+                                console.log("data");
+                                console.log(data);
+
+                                let trans = {
+                                    "project_ID": self.projectID,
+                                    "dateTime": new Date,
+                                    "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
+                                    "username": self.projectsStatus.user,
+                                    "status": 14,
+                                    "type": 3,
+                                    "systemUserID": self.timelineItems[self.timelineItems.length-1].userID,
+                                }
+                                Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                                    res => {
+
+                                        console.log(res);
+
+                                        delete Axios.defaults.headers.common["TenantID"];
+                                    })
+                            }
+                        })
+                }
+                if (status == 13 && type == 3) {
+                    self.$refs.PlanogramIplementationModal.show(
+                        "Implement Planogram?", type, data => {
+                            if (data.value == true) {
+
+                                console.log("data");
+                                console.log(data);
+
+                                let trans = {
+                                    "project_ID": self.projectID,
+                                    "dateTime": new Date,
+                                    "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
+                                    "store_ID": self.projectsStatus.storeID,
+                                    "username": self.projectsStatus.user,
+                                    "status": 15,
+                                    "type": 3,
+                                    "systemUserID": self.projectsStatus.userID,
+                                }
+                                Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                                    res => {
+
+                                        console.log(res);
+
+                                        delete Axios.defaults.headers.common["TenantID"];
+                                    })
+                            }
+                        })
+                }
+                if (status == 19 && type == 4) {
+                    self.$refs.PlanogramIplementationModal.show(
+                        "Select the Stores to distribute to", type, data => {
+                            if (data.value == true) {
+
+                                console.log("data");
+                                console.log(data);
+                                
+                                    let trans = {
+                                        "project_ID": self.projectID,
+                                        "dateTime": new Date,
+                                        "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
+                                        "store_ID": data.stores,
+                                        "username": self.projectsStatus.user,
+                                        "status": 13,
+                                        "type": 3,
+                                        "systemUserID": data.users,
+                                    }
+                                    Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                                        res => {
+
+                                            console.log(res);
+
+                                            delete Axios.defaults.headers.common["TenantID"];
+                                })
+
+                            }
+                        })
+                }
+            },
             initialise() {
                 let self = this;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
@@ -604,7 +801,7 @@
             },
             getProjectTransactionsByProjectID(projectID) {
                 let self = this;
-
+                self.projectID = projectID
                 return new Promise((resolve, reject) => {
 
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -620,14 +817,25 @@
                                 if (idx == 0)
                                     self.currentStatus = element.status;
 
-                                self.timelineItems.push({
-                                    status: element.status,
-                                    notes: self.status[element.status].text,
-                                    date: element.dateTimeString,
-                                    user: element.username,
-                                    type: element.type
-                                })
+
+                                if (element.deleted != true) {
+                                    self.timelineItems.push({
+                                        status: element.status,
+                                        notes: self.status[element.status].text,
+                                        date: element.dateTimeString,
+                                        user: element.username,
+                                        userID: element.systemUserID,
+                                        type: element.type,
+                                        storeID: element.store_ID
+                                    })
+                                }
+
                             })
+
+                            self.projectsStatus = self.timelineItems[0]
+                            console.log("self.timelineItems");
+                            console.log(self.timelineItems);
+
 
                             resolve();
                         })

@@ -31,7 +31,7 @@
                                     <td>{{ props.item.emailAddress }}</td>
                                     <td>{{ props.item.username }}</td>
                                     <td>{{ props.item.password }}
-                                    </td>
+                                    <td>
                                         <v-menu>
                                             <v-btn slot="activator" icon>
                                                 <v-icon>more_vert</v-icon>

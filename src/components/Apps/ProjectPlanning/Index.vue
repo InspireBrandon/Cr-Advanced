@@ -431,7 +431,13 @@
                         value: 18,
                         color:"blue",
                         friendly: "Waiting Supplier"
-                    },
+                    },{
+                        text: "Awaiting Distribution",
+                        value: 19,
+                        color: "blue",
+                        friendly: "Awaiting Distribution",
+                        type: [3]
+                    }
                 ],
                 stores: [],
                 ProjectsGroups: [],
@@ -603,7 +609,7 @@
             },
 
             getUsers() {
-                let self = this;
+               let self = this;
 
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
 
@@ -612,37 +618,38 @@
 
                         self.userDetails = r.data;
 
+                        self.users.push({
+                            text: r.data[0].username.toString(),
+                            value: r.data[0].systemUserID
+                        })
+
                         r.data.forEach(element => {
 
                             if (element.emailAddress != null) {
                                 let isDatabaseUser = false;
 
                                 self.databaseUsers.forEach((dbu, idx) => {
+
                                     if (dbu.systemUserID == element.systemUserID) {
                                         isDatabaseUser = true;
-                                    }
-
-                                    if (dbu.systemUserID == encoded_details.USER_ID) {
-                                        self.databaseUsers.splice(idx, 1);
                                     }
                                 })
 
                                 if (isDatabaseUser) {
-                                    if (element.systemUserID != encoded_details.USER_ID) {
-                                        self.users.push({
-                                            text: element.username.toString(),
-                                            value: element.systemUserID
-                                        })
-                                    }
+                                    self.users.push({
+                                        text: element.username.toString(),
+                                        value: element.systemUserID
+                                    })
                                 }
                             }
                         });
 
                         self.showLoader = false;
+                        self.AssignedUser = self.users[0].value;
                     })
             },
             getDatabaseUsers() {
-                let self = this;
+                  let self = this;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let tmp = sessionStorage.currentDatabase
                 Axios.get(process.env.VUE_APP_API + `TenantAccess/User?tenantID=${tmp}`)
