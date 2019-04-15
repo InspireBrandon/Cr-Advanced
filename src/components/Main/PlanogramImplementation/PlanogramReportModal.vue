@@ -121,6 +121,23 @@
                                 </table>
                             </v-card-text>
                         </v-card>
+                        <div class="print-break-page"></div>
+                        <v-card class="mb-3">
+                            <v-toolbar flat dark dense>
+                                <v-toolbar-title>Product Fixture Report (by weekly sales)</v-toolbar-title>
+                            </v-toolbar>
+                            <v-card-text>
+                                <v-treeview :items="ProductFixtureReport" :open.sync="open" item-key="Data.ID"
+                                    item-text="Data.Data.name">
+
+                                    <template v-slot:prepend="{ item }">
+                                        <v-icon v-if="item.children"
+                                            v-text="`mdi-${item.id === 1 ? 'home-variant' : 'folder-network'}`">
+                                        </v-icon>
+                                    </template>
+                                </v-treeview>
+                            </v-card-text>
+                        </v-card>
                     </v-card-text>
                 </v-card>
             </v-dialog>
@@ -132,6 +149,22 @@
 <script>
     import Axios from 'axios';
     import Spinner from '@/components/Common/Spinner';
+
+    function makeTree(data, parent = null) {
+
+        return data.reduce(function (r, e) {
+            if (e.Type != "TEXTHEADER") {
+                if (e.Data.ParentID == parent) {
+                    if (e.Type == "PRODUCT") {
+                        e.Data.Data.name = e.Data.Data.description
+                    }
+                    e.children = makeTree(data, e.Data.ID)
+                    r.push(e)
+                }
+            }
+            return r;
+        }, [])
+    }
 
     function fixtureReportItem(item, allItems) {
         let self = this;
@@ -182,8 +215,10 @@
                 dialog: false,
                 planogramDetails: null,
                 planogramData: null,
+                open: [],
                 fixtureReport: [],
-                productReport: []
+                productReport: [],
+                ProductFixtureReport: []
             }
         },
         methods: {
@@ -230,6 +265,15 @@
 
                 self.generateFixtureReport();
                 self.generateProductReport();
+                self.generateProductFixtureReport();
+            },
+            generateProductFixtureReport() {
+                let self = this;
+
+                let tmp2 = makeTree(self.planogramData.planogramData)
+                console.log("tmp");
+                console.log(tmp2);
+                self.ProductFixtureReport = tmp2;
             },
             generateFixtureReport() {
                 let self = this;
@@ -255,7 +299,7 @@
             generateProductReport() {
                 let self = this;
 
-                console.log(self.planogramData);
+                // console.log(self.planogramData);
 
                 let tmp = [];
 
