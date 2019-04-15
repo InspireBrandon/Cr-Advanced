@@ -270,7 +270,14 @@
                         value: 18,
                         color: "blue",
                         friendly: "Waiting Supplier",
-                        type: 0
+                        type: [0]
+                    }
+                    , {
+                        text: "Awaiting Distribution",
+                        value: 19,
+                        color: "blue",
+                        friendly: "Awaiting Distribution",
+                        type: [3]
                     }
                 ]
             }
@@ -285,8 +292,11 @@
             },
 
             filterStatus: function () {
-                return this.statusList.filter(function () {
-                    status => status.type.includes(this.type)
+                var self = this
+                let value = self.type;
+
+                return this.statusList.filter(function (status) {
+                    return status.type.indexOf(value) > -1;
                 })
 
             }

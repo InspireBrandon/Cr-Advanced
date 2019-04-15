@@ -3,20 +3,39 @@
     <v-layout row justify-center>
       <v-dialog v-model="dialog" persistent max-width="1200">
         <v-card>
-          <v-card-title style="text-align: center; display: block;" class="headline">{{ title }}
+          <v-toolbar dark dense flat color="primary">
+            <v-toolbar-title>
+              {{ title }}
+
+            </v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon @click.native="returnValue(false)">
+              <v-icon>
+                close
+              </v-icon>
+            </v-btn>
+          </v-toolbar>
+          <v-card-title style="text-align: center; display: block;" class="headline">
             <v-textarea v-model="modalNotes" label="Notes"></v-textarea>
-            <v-flex md3>
-              <v-autocomplete style="max-width: 400px;" dense v-model="selectedUser" :items="users" label="Select A Store"></v-autocomplete>
+            <v-flex md6 v-if="type==4">
+              <v-autocomplete style="max-width: 400px;" dense v-model="selectedStore" :items="Stores"
+                label="Select A Store"></v-autocomplete>
             </v-flex>
+            <v-flex md6 v-if="type==4">
+              <v-autocomplete style="max-width: 400px;" dense v-model="selectedUser" :items="users"
+                label="Select A User"></v-autocomplete>
+            </v-flex>
+
           </v-card-title>
 
           <v-flex md9>
 
           </v-flex>
-          <v-card-actions style="text-align: center; display: block;">
+          <v-card-actions>
+            <!-- <v-btn color="error darken-1" @click.native="returnValue(false)">Cancel</v-btn> -->
             <v-spacer></v-spacer>
-            <v-btn color="primary darken-1" @click.native="returnValue(true)">Yes</v-btn>
-            <v-btn color="error darken-1" @click.native="returnValue(false)">No</v-btn>
+            <v-btn color="primary darken-1" @click.native="returnValue(true)">Submit</v-btn>
+
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -31,6 +50,9 @@
   export default {
     data() {
       return {
+        selectedStore: null,
+        Stores: [],
+        type: null,
         dialog: false,
         afterRuturn: null,
         title: '',
@@ -50,8 +72,12 @@
         Axios.get(process.env.VUE_APP_API + `SystemUser`)
           .then(r => {
 
-
             self.userDetails = r.data;
+
+            self.users.push({
+              text: r.data[0].username.toString(),
+              value: r.data[0].systemUserID
+            })
 
             r.data.forEach(element => {
 
@@ -59,27 +85,23 @@
                 let isDatabaseUser = false;
 
                 self.databaseUsers.forEach((dbu, idx) => {
+
                   if (dbu.systemUserID == element.systemUserID) {
                     isDatabaseUser = true;
                   }
-
-                  if (dbu.systemUserID == encoded_details.USER_ID) {
-                    self.databaseUsers.splice(idx, 1);
-                  }
                 })
 
-                if (!isDatabaseUser) {
-                  if (element.systemUserID != encoded_details.USER_ID) {
-
-                    self.users.push({
-                      text: element.emailAddress.toString(),
-                      value: element.systemUserID
-                    })
-                  }
+                if (isDatabaseUser) {
+                  self.users.push({
+                    text: element.username.toString(),
+                    value: element.systemUserID
+                  })
                 }
               }
             });
 
+            self.showLoader = false;
+            self.AssignedUser = self.users[0].value;
           })
       },
       getSpacePlans(callback) {
@@ -98,16 +120,32 @@
           })
       },
 
-      show(title, afterRuturn) {
+      show(title, type, afterRuturn) {
         let self = this;
+        self.type = type
+        console.log(self.type);
+        console.log("type: " + type);
+
+
         self.title = title;
         self.dialog = true;
         self.getStores()
 
         self.afterRuturn = afterRuturn;
         self.getSpacePlans()
+        self.getDatabaseUsers()
         // self.getUsers()
 
+      },
+      getDatabaseUsers() {
+        let self = this;
+        let encoded_details = jwt.decode(sessionStorage.accessToken);
+        let tmp = sessionStorage.currentDatabase
+        Axios.get(process.env.VUE_APP_API + `TenantAccess/User?tenantID=${tmp}`)
+          .then(r => {
+            self.databaseUsers = r.data;
+            self.getUsers();
+          })
       },
       getStores() {
         let self = this
@@ -116,14 +154,14 @@
 
           r.data.forEach(s => {
 
-            self.users.push({
+            self.Stores.push({
               text: s.storeName,
               value: s.storeID
             })
 
           })
           console.log("stores");
-          console.log(self.users);
+          console.log(self.Stores);
 
         })
 
@@ -131,8 +169,13 @@
 
       returnValue(value) {
         let self = this;
-
-        self.afterRuturn(value, self.modalNotes, self.selectedUser);
+        let tmp = {
+          value: value,
+          stores: self.selectedStore,
+          users: self.selectedUser,
+          notes: self.modalNotes
+        }
+        self.afterRuturn(tmp);
         self.dialog = false;
       }
     }
