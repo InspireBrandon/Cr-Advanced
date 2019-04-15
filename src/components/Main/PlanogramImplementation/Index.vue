@@ -39,9 +39,23 @@
                                                 <v-list-tile-title>{{ item.name }}</v-list-tile-title>
                                             </v-list-tile-content>
                                             <v-list-tile-action>
-                                                <v-btn icon @click="$refs.PlanogramReportModal.show(item)">
-                                                    <v-icon>visibility</v-icon>
-                                                </v-btn>
+                                                <v-menu left>
+                                                    <v-btn icon slot="activator">
+                                                        <v-icon>more_vert</v-icon>
+                                                    </v-btn>
+
+                                                    <v-list dense class="pa-0 ma-0">
+                                                        <v-list-tile @click="$refs.PlanogramReportModal.show(item)">
+                                                            <v-list-tile-title>Show</v-list-tile-title>
+                                                        </v-list-tile>
+                                                        <v-divider v-if="(authorityType == 0 || authorityType == 1)"></v-divider>
+                                                        {{ timelineItems[0].status }}
+                                                        <v-list-tile v-if="(authorityType == 0 || authorityType == 1)" @click="$refs.PlanogramReportModal.show(item)">
+                                                            <v-list-tile-title>Approve</v-list-tile-title>
+                                                        </v-list-tile>
+                                                    </v-list>
+
+                                                </v-menu>
                                             </v-list-tile-action>
                                         </v-list-tile>
                                         <v-divider v-if="index + 1 < planograms.length" :key="index"></v-divider>
@@ -597,8 +611,6 @@
 
                     Axios.get(process.env.VUE_APP_API + `ProjectTX?projectID=${projectID}`)
                         .then(r => {
-                            console.log(r.data);
-
                             delete Axios.defaults.headers.common["TenantID"];
 
                             self.timelineItems = [];
