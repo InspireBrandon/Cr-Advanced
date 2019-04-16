@@ -243,14 +243,14 @@
                 self.productFixtureReport = [];
 
                 self.planogramName = item.name;
+self.planogramData =item;
+                // self.getPlanogramByID(item.id)
+                //     .then(() => {
+                //         self.generateReports()
+                //     })
+                //     .catch(e => {
 
-                self.getPlanogramByID(item.id)
-                    .then(() => {
-                        self.generateReports()
-                    })
-                    .catch(e => {
-
-                    })
+                //     })
             },
             getPlanogramByID(id) {
                 let self = this;

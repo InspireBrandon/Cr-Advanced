@@ -1,129 +1,183 @@
 <template>
     <v-card>
+        <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear>
         <v-toolbar dense dark>
             <v-spacer></v-spacer>
             <v-toolbar-title>Planogram Implementation</v-toolbar-title>
         </v-toolbar>
-        <v-container grid-list-md>
+        <v-container fluid grid-list-md>
             <v-layout row wrap>
-                <v-flex v-if="authorityType == 0" xl3 lg6 md6 sm12 xs12>
-                    <v-autocomplete @change="getProjectsByProjectGroup" v-model="selectedProjectGroup"
-                        :items="projectGroupsSelect" hide-details label="Project Group">
-                    </v-autocomplete>
-                </v-flex>
+                <v-flex xl6 lg6 md12 sm12 xs12>
+                    <v-flex v-if="authorityType == 0" xl6 lg6 md6 sm12 xs12>
+                        <v-autocomplete @change="getProjectsByProjectGroup" v-model="selectedProjectGroup"
+                            :items="projectGroupsSelect" hide-details label="Project Group">
+                        </v-autocomplete>
+                    </v-flex>
 
-                <v-flex v-else xl3 lg6 md6 sm12 xs12>
-                    <v-autocomplete @change="getUserProjectsByProjectGroup" v-model="selectedProjectGroup"
-                        :items="projectGroupsSelect" hide-details label="Project Group">
-                    </v-autocomplete>
-                </v-flex>
-                <v-flex xl9 lg6 md6 sm0 xs0></v-flex>
-                <v-flex xl3 lg6 md6 sm12 xs12>
-                    <v-autocomplete @change="onProjectChange" v-if="selectedProjectGroup != null"
-                        v-model="selectedProject" :items="projectsSelect" hide-details label="Project"></v-autocomplete>
-                </v-flex>
-                <v-flex xl9 lg6 md6 sm0 xs0></v-flex>
-                <v-flex xl12 lg6 md12 sm12 xs12>
-                    <h1 v-if="currentPlanogram != null">{{ currentPlanogram.name }}</h1>
-                </v-flex>
-                <v-flex xl12 lg12 md12 sm12 xs12 v-if="planograms.length > 0">
-                    <v-tabs dark v-model="active" grow color="grey darken-4">
-                        <v-tab ripple>Planograms</v-tab>
-                        <v-tab ripple>Timeline</v-tab>
-                        <v-tab-item>
-                            <v-card style="height: calc(100vh - 340px); overflow: auto;">
-                                <v-list dense class="pa-0 ma-0">
-                                    <template v-if="item.name.toUpperCase().includes(currentPlanogram.displayname)"
-                                        v-for="(item, index) in planograms">
-                                        <v-list-tile :key="item.title" avatar ripple>
-                                            <v-list-tile-content>
-                                                <v-list-tile-title>{{ item.name }}</v-list-tile-title>
-                                            </v-list-tile-content>
-                                            <v-list-tile-action>
-                                                <v-menu left>
-                                                    <v-btn icon slot="activator">
-                                                        <v-icon>more_vert</v-icon>
-                                                    </v-btn>
+                    <v-flex v-else xl6 lg6 md6 sm12 xs12>
+                        <v-autocomplete @change="getUserProjectsByProjectGroup" v-model="selectedProjectGroup"
+                            :items="projectGroupsSelect" hide-details label="Project Group">
+                        </v-autocomplete>
+                    </v-flex>
 
-                                                    <v-list dense class="pa-0 ma-0">
-                                                        <v-list-tile @click="$refs.PlanogramReportModal.show(item)">
-                                                            <v-list-tile-title>Show</v-list-tile-title>
-                                                        </v-list-tile>
-                                                        <v-divider
-                                                            v-if="((authorityType == 0 || authorityType == 1)&&(projectsStatus.status==10))">
-                                                        </v-divider>
-                                                        <v-list-tile
-                                                            v-if="(( authorityType == 1)&&(projectsStatus.status==10))"
-                                                            @click="openImplementationModal(projectsStatus.status,0)">
-                                                            <v-list-tile-title>Approve</v-list-tile-title>
-                                                        </v-list-tile>
-                                                        <v-divider
-                                                            v-if="(( authorityType == 1)&&(projectsStatus.status==10))">
-                                                        </v-divider>
-                                                        <v-list-tile
-                                                            v-if="((authorityType == 1)&&(projectsStatus.status==10))"
-                                                            @click="openImplementationModal(projectsStatus.status,1)">
-                                                            <v-list-tile-title>Decline</v-list-tile-title>
-                                                        </v-list-tile>
-                                                        <v-divider
-                                                            v-if="((authorityType == 1)&&(projectsStatus.status==10))">
-                                                        </v-divider>
-                                                        <v-list-tile
-                                                            v-if="((authorityType == 1)&&(projectsStatus.status==10))"
-                                                            @click="openImplementationModal(projectsStatus.status,2)">
-                                                            <v-list-tile-title>Request Variation</v-list-tile-title>
-                                                        </v-list-tile>
-                                                        <v-divider
-                                                            v-if="(( authorityType == 1)&&(projectsStatus.status==13))">
-                                                        </v-divider>
-                                                        <v-list-tile
-                                                            v-if="(( authorityType == 3)&&(projectsStatus.status==13))"
-                                                            @click="openImplementationModal(projectsStatus.status,3)">
-                                                            <v-list-tile-title>Implement Planogram</v-list-tile-title>
-                                                        </v-list-tile>
-                                                        <v-divider
-                                                            v-if="(( authorityType == 1)&&(projectsStatus.status==19))">
-                                                        </v-divider>
-                                                        <v-list-tile
-                                                            v-if="(( authorityType == 1)&&(projectsStatus.status==19))"
-                                                            @click="openImplementationModal(projectsStatus.status,4)">
-                                                            <v-list-tile-title>Distribute Planograms</v-list-tile-title>
-                                                        </v-list-tile>
-                                                    </v-list>
+                    <v-flex xl6 lg6 md6 sm12 xs12>
+                        <v-autocomplete @change="onProjectChange" v-if="selectedProjectGroup != null"
+                            v-model="selectedProject" :items="projectsSelect" hide-details label="Project">
+                        </v-autocomplete>
+                    </v-flex>
 
-                                                </v-menu>
-                                            </v-list-tile-action>
-                                        </v-list-tile>
-                                        <v-divider v-if="index + 1 < planograms.length" :key="index"></v-divider>
+
+                    <v-flex xl12 lg12 md6 sm12 xs12 v-if="currentPlanogram != null">
+                        <h1>{{ currentPlanogram.name }} </h1>
+                        <v-autocomplete @change="selectPlanogram(selectedPlanogram)" dense v-model="selectedPlanogram"
+                            :items="filterPlanograms" label="find a planogram"></v-autocomplete>
+                    </v-flex>
+                    <v-flex xl12 lg12 md12 sm12 xs12 v-if="currentPlanogram != null">
+                        <v-toolbar color="primary" dark dense flat v-if="selectedPlanogram != null">
+                            <v-toolbar-title>
+                                Status: {{status[timelineItems[0].status].text}}
+
+                            </v-toolbar-title>
+                            <!-- <v-btn v-if="(( authorityType == 1)&&(projectsStatus.status==10))" >Approve</v-btn>
+                             <v-btn v-if="((authorityType == 1)&&(projectsStatus.status==10))">Decline</v-btn>
+                               <v-btn v-if="((authorityType == 1)&&(projectsStatus.status==10))">Request Variation</v-btn>
+                                 <v-btn v-if="(( authorityType == 3)&&(projectsStatus.status==13))">Implement Planogram</v-btn>
+                                   <v-btn v-if="(( authorityType == 1)&&(projectsStatus.status==19))">Distribute Planograms</v-btn> -->
+                        </v-toolbar>
+                        <v-divider></v-divider>
+                        <v-toolbar color="primary" dark dense flat v-if="selectedPlanogram != null">
+
+                            <v-btn flat outline v-if="(( authorityType == 1)&&(projectsStatus.status==10))"
+                                @click="openImplementationModal(projectsStatus.status,0)">Approve</v-btn>
+                            <v-btn flat outline v-if="((authorityType == 1)&&(projectsStatus.status==10))"
+                                @click="openImplementationModal(projectsStatus.status,1)">Decline</v-btn>
+                            <v-btn flat outline v-if="((authorityType == 1)&&(projectsStatus.status==10))"
+                                @click="openImplementationModal(projectsStatus.status,2)">Variation</v-btn>
+                            <v-btn flat outline v-if="(( authorityType == 3)&&(projectsStatus.status==13))"
+                                @click="openImplementationModal(projectsStatus.status,3)">Implement Planogram
+                            </v-btn>
+                            <v-btn flat outline v-if="(( authorityType == 1)&&(projectsStatus.status==19))"
+                                @click="openImplementationModal(projectsStatus.status,4)">Distribute Planograms
+                            </v-btn>
+                        </v-toolbar>
+                    </v-flex>
+                    <v-flex v-if="selectedPlanogram != null" lg12 md12 sm12 xs12>
+                        <v-card light>
+                            <v-toolbar color="primary" dark flat dense>
+                                Planogram Image
+                                <v-spacer></v-spacer>
+                                <v-tooltip bottom>
+                                    <v-btn flat outline  slot="activator" @click="openReport">
+                                        <!-- <v-icon>save_alt</v-icon> -->
+                                        Open Report
+                                    </v-btn>
+                                    <span>Open Report</span>
+                                </v-tooltip>
+                            </v-toolbar>
+                            <v-card-text>
+                                <v-img contain style="max-height: 350px;" :src="image"  @click="openImage"></v-img>
+                            </v-card-text>
+                        </v-card>
+                    </v-flex>
+                    <!-- <v-flex xl12 lg12 md12 sm12 xs12 v-if="planograms.length > 0">
+
+                        <v-list dense class="pa-0 ma-0">
+                            <template v-if="item.name.toUpperCase().includes(currentPlanogram.displayname)"
+                                v-for="(item, index) in planograms">
+                                <v-list-tile :key="item.title" avatar ripple>
+                                    <v-list-tile-content>
+                                        <v-list-tile-title>{{ item.name }}</v-list-tile-title>
+                                    </v-list-tile-content>
+                                    <v-list-tile-action>
+                                        <v-menu left>
+                                            <v-btn icon slot="activator">
+                                                <v-icon>more_vert</v-icon>
+                                            </v-btn>
+
+                                            <v-list dense class="pa-0 ma-0">
+                                                <v-list-tile @click="$refs.PlanogramReportModal.show(item)">
+                                                    <v-list-tile-title>Show</v-list-tile-title>
+                                                </v-list-tile>
+                                                <v-divider
+                                                    v-if="((authorityType == 0 || authorityType == 1)&&(projectsStatus.status==10))">
+                                                </v-divider>
+                                                <v-list-tile v-if="(( authorityType == 1)&&(projectsStatus.status==10))"
+                                                    @click="openImplementationModal(projectsStatus.status,0)">
+                                                    <v-list-tile-title>Approve</v-list-tile-title>
+                                                </v-list-tile>
+                                                <v-divider v-if="(( authorityType == 1)&&(projectsStatus.status==10))">
+                                                </v-divider>
+                                                <v-list-tile v-if="((authorityType == 1)&&(projectsStatus.status==10))"
+                                                    @click="openImplementationModal(projectsStatus.status,1)">
+                                                    <v-list-tile-title>Decline</v-list-tile-title>
+                                                </v-list-tile>
+                                                <v-divider v-if="((authorityType == 1)&&(projectsStatus.status==10))">
+                                                </v-divider>
+                                                <v-list-tile v-if="((authorityType == 1)&&(projectsStatus.status==10))"
+                                                    @click="openImplementationModal(projectsStatus.status,2)">
+                                                    <v-list-tile-title>Request Variation</v-list-tile-title>
+                                                </v-list-tile>
+                                                <v-divider v-if="(( authorityType == 1)&&(projectsStatus.status==13))">
+                                                </v-divider>
+                                                <v-list-tile v-if="(( authorityType == 3)&&(projectsStatus.status==13))"
+                                                    @click="openImplementationModal(projectsStatus.status,3)">
+                                                    <v-list-tile-title>Implement Planogram</v-list-tile-title>
+                                                </v-list-tile>
+                                                <v-divider v-if="(( authorityType == 1)&&(projectsStatus.status==19))">
+                                                </v-divider>
+                                                <v-list-tile v-if="(( authorityType == 1)&&(projectsStatus.status==19))"
+                                                    @click="openImplementationModal(projectsStatus.status,4)">
+                                                    <v-list-tile-title>Distribute Planograms</v-list-tile-title>
+                                                </v-list-tile>
+                                            </v-list>
+
+                                        </v-menu>
+                                    </v-list-tile-action>
+                                </v-list-tile>
+                                <v-divider v-if="index + 1 < planograms.length" :key="index"></v-divider>
+                            </template>
+                        </v-list>
+                    </v-flex> -->
+                </v-flex>
+                <v-flex xl6 lg6 md6 sm12 xs12 v-if="planograms.length > 0">
+                    <v-toolbar flat dense dark color="primary">
+                        <v-toolbar-title>Project Timeline</v-toolbar-title>
+                    </v-toolbar>
+                    <v-card flat style="height: calc(100vh - 200px); overflow: auto;">
+                        <v-card-text>
+                            <v-timeline dense>
+                                <v-timeline-item right :color="typeList[item.type == -1 ? 5 : item.type].color"
+                                    v-for="(item,index) in timelineItems" :key="index" small>
+                                    <v-card :color="typeList[item.type == -1 ? 5 : item.type].color" dark>
+                                        <v-card-title class="title pa-2 ma-0">
+                                            <span>{{ status[item.status  == -1 ? 18 : item.status].text }}</span>
+                                            <v-spacer></v-spacer>
+                                            <span>{{ item.date }}</span>
+                                        </v-card-title>
+                                    </v-card>
+                                    <template v-slot:opposite>
+                                        <span>{{ item.user }}</span>
                                     </template>
-                                </v-list>
-                            </v-card>
-                        </v-tab-item>
-                        <v-tab-item>
-                            <v-card style="height: calc(100vh - 340px); overflow: auto;">
-                                <v-card-text>
-                                    <v-timeline dense>
-                                        <v-timeline-item right :color="typeList[item.type == -1 ? 5 : item.type].color"
-                                            v-for="(item,index) in timelineItems" :key="index" small>
-                                            <v-card :color="typeList[item.type == -1 ? 5 : item.type].color" dark>
-                                                <v-card-title class="title pa-2 ma-0">
-                                                    <span>{{ status[item.status  == -1 ? 18 : item.status].text }}</span>
-                                                    <v-spacer></v-spacer>
-                                                    <span>{{ item.date }}</span>
-                                                </v-card-title>
-                                            </v-card>
-                                            <template v-slot:opposite>
-                                                <span>{{ item.user }}</span>
-                                            </template>
-                                        </v-timeline-item>
-                                    </v-timeline>
-                                </v-card-text>
-                            </v-card>
-                        </v-tab-item>
-                    </v-tabs>
+                                </v-timeline-item>
+                            </v-timeline>
+                        </v-card-text>
+                    </v-card>
                 </v-flex>
             </v-layout>
         </v-container>
+        <v-dialog fullscreen v-model="imageModal">
+            <v-card>
+                <v-toolbar dark color="primary" prominent>
+                    <v-spacer></v-spacer>
+                    <v-btn @click="imageModal = false" icon>
+                        <v-icon>close</v-icon>
+                    </v-btn>
+                </v-toolbar>
+                <v-card flat style="padding: 5px;">
+                    <v-img contain style="max-height: calc(100vh - 80px); width: 100%;" :src="image"></v-img>
+                </v-card>
+            </v-card>
+        </v-dialog>
         <PlanogramReportModal ref="PlanogramReportModal"></PlanogramReportModal>
         <PlanogramIplementationModal ref="PlanogramIplementationModal"></PlanogramIplementationModal>
     </v-card>
@@ -145,6 +199,12 @@
         },
         data: () => {
             return {
+                planogramObj :null,
+                showLoader: false,
+                imageModal: false,
+                image: '',
+                selectedPlanogram: null,
+                PlanogramItems: [],
                 projectID: null,
                 authorityType: -1,
                 projectGroups: [],
@@ -315,23 +375,57 @@
             let self = this;
             self.initialise();
         },
+        computed: {
+            filterPlanograms: function () {
+                var self = this
+                let value = self.type;
+
+                return this.PlanogramItems.filter(function (item) {
+
+                    return item.text.toUpperCase().includes(self.currentPlanogram.displayname);
+                })
+
+            }
+        },
         methods: {
+            openReport(){
+                let self = this
+                self.$refs.PlanogramReportModal.show(self.planogramObj)
+            },
+            selectPlanogram(planogram) {
+                let self = this;
+                self.showLoader = true
+                
+                self.$nextTick(() => {
+
+                    Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&id=' + planogram)
+                        .then(r => {
+                            self.planogramObj=r.data
+                            self.image = r.data.image;
+                            self.showLoader = false
+                        })
+                })
+            },
+            downloadImage() {
+                var self = this
+            },
+            openImage() {
+                this.imageModal = true;
+            },
             openImplementationModal(status, type) {
                 let self = this
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
 
-                console.log("self.projectsStatus");
-                console.log(self.projectsStatus);
+            
 
                 if (status == 10 && type == 0) {
                     self.$refs.PlanogramIplementationModal.show(
                         "Approve planogram", type, data => {
                             if (data.value == true) {
 
-                                console.log("data");
-                                console.log(data);
+                               
 
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -357,8 +451,7 @@
                         "Decline Planogram Approval?", type, data => {
                             if (data.value == true) {
 
-                                console.log("data");
-                                console.log(data);
+                               
 
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -385,10 +478,7 @@
                         "Request Planogram Variation?", type, data => {
                             if (data.value == true) {
 
-                                console.log("data");
-                                console.log(data);
-                                console.log("self.timelineItems[self.timelineItems.length-1].user");
-                                console.log(self.timelineItems[self.timelineItems.length - 1].user);
+                               
                                 let trans = {
                                     "project_ID": self.projectID,
                                     "dateTime": new Date,
@@ -401,7 +491,6 @@
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
 
-                                        console.log(res);
 
                                         delete Axios.defaults.headers.common["TenantID"];
                                     })
@@ -413,8 +502,7 @@
                         "Implement Planogram?", type, data => {
                             if (data.value == true) {
 
-                                console.log("data");
-                                console.log(data);
+                               
 
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -441,8 +529,7 @@
                         "Select the Stores to distribute to", type, data => {
                             if (data.value == true) {
 
-                                console.log("data");
-                                console.log(data);
+                                
 
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -665,7 +752,9 @@
             },
             getProjectsByProjectGroup() {
                 let self = this;
-
+                self.projectsSelect = null
+                self.selectedPlanogram = null
+                self.timelineItems = []
                 return new Promise((resolve, reject) => {
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
@@ -698,7 +787,9 @@
             },
             getUserProjectsByProjectGroup() {
                 let self = this;
-
+                self.projectsSelect = null
+                self.selectedPlanogram = null
+                self.timelineItems = []
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
 
@@ -737,6 +828,7 @@
                 let self = this;
 
                 self.$nextTick(() => {
+                    self.selectedPlanogram = null
                     let currentProjectID = self.selectedProject;
                     let currentProject;
 
@@ -792,6 +884,14 @@
                             'SystemFile/JSON?db=CR-DEVINSPIRE&folder=SPACE PLANNING')
                         .then(r => {
                             self.planograms = r.data;
+                            r.data.forEach(e => {
+                                self.PlanogramItems.push({
+                                    text: e.name,
+                                    value: e.id
+                                })
+                            })
+
+
                             resolve();
                         })
                         .catch(e => {
@@ -833,9 +933,7 @@
                             })
 
                             self.projectsStatus = self.timelineItems[0]
-                            console.log("self.timelineItems");
-                            console.log(self.timelineItems);
-
+                         
 
                             resolve();
                         })
