@@ -67,7 +67,7 @@
                                 Planogram Image
                                 <v-spacer></v-spacer>
                                 <v-tooltip bottom>
-                                    <v-btn flat outline  slot="activator" @click="openReport">
+                                    <v-btn flat outline slot="activator" @click="openReport">
                                         <!-- <v-icon>save_alt</v-icon> -->
                                         Open Report
                                     </v-btn>
@@ -75,7 +75,7 @@
                                 </v-tooltip>
                             </v-toolbar>
                             <v-card-text>
-                                <v-img contain style="max-height: 350px;" :src="image"  @click="openImage"></v-img>
+                                <v-img contain style="max-height: 350px;" :src="image" @click="openImage"></v-img>
                             </v-card-text>
                         </v-card>
                     </v-flex>
@@ -199,7 +199,7 @@
         },
         data: () => {
             return {
-                planogramObj :null,
+                planogramObj: null,
                 showLoader: false,
                 imageModal: false,
                 image: '',
@@ -335,6 +335,12 @@
                         value: 19,
                         color: "blue",
                         friendly: "Awaiting Distribution",
+                    },
+                    {
+                        text: "Approval In Progress",
+                        value: 20,
+                        color: "blue",
+                        friendly: "Approval In Progress",
                     }
                 ],
                 typeList: [{
@@ -388,19 +394,19 @@
             }
         },
         methods: {
-            openReport(){
+            openReport() {
                 let self = this
                 self.$refs.PlanogramReportModal.show(self.planogramObj)
             },
             selectPlanogram(planogram) {
                 let self = this;
                 self.showLoader = true
-                
+
                 self.$nextTick(() => {
 
                     Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&id=' + planogram)
                         .then(r => {
-                            self.planogramObj=r.data
+                            self.planogramObj = r.data
                             self.image = r.data.image;
                             self.showLoader = false
                         })
@@ -418,14 +424,14 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
 
-            
+
 
                 if (status == 10 && type == 0) {
                     self.$refs.PlanogramIplementationModal.show(
                         "Approve planogram", type, data => {
                             if (data.value == true) {
 
-                               
+
 
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -451,7 +457,7 @@
                         "Decline Planogram Approval?", type, data => {
                             if (data.value == true) {
 
-                               
+
 
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -478,7 +484,7 @@
                         "Request Planogram Variation?", type, data => {
                             if (data.value == true) {
 
-                               
+
                                 let trans = {
                                     "project_ID": self.projectID,
                                     "dateTime": new Date,
@@ -502,7 +508,7 @@
                         "Implement Planogram?", type, data => {
                             if (data.value == true) {
 
-                               
+
 
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -529,7 +535,7 @@
                         "Select the Stores to distribute to", type, data => {
                             if (data.value == true) {
 
-                                
+
 
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -933,7 +939,7 @@
                             })
 
                             self.projectsStatus = self.timelineItems[0]
-                         
+
 
                             resolve();
                         })

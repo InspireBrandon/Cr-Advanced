@@ -278,6 +278,13 @@
                         color: "blue",
                         friendly: "Awaiting Distribution",
                         type: [3]
+                    },
+                     {
+                        text: "Approval In Progress",
+                        value: 20,
+                        color: "blue",
+                        friendly: "Approval In Progress",
+                        type: [3]
                     }
                 ]
             }
