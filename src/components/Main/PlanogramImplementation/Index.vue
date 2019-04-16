@@ -34,8 +34,9 @@
                         <v-autocomplete :disabled="showLoader" @change="selectPlanogram(selectedPlanogram)" dense
                             v-model="selectedPlanogram" :items="filterPlanograms" label="Planogram"></v-autocomplete>
                     </v-flex>
-                    <v-flex xl12 lg12 md12 sm12 xs12 style="text-align: center;">
-                        <v-progress-circular v-if="showLoader" class="ma-0" color="primary" indeterminate height="5">
+
+                    <v-flex v-if="showLoader" xl12 lg12 md12 sm12 xs12 style="text-align: center;">
+                        <v-progress-circular class="ma-0" color="primary" indeterminate height="5">
                         </v-progress-circular>
                     </v-flex>
                     <v-flex xl12 lg12 md12 sm12 xs12 v-if="planogramObj != null && !showLoader">
@@ -54,13 +55,13 @@
                         <v-toolbar color="primary" dark dense flat v-if="selectedPlanogram != null">
 
                             <v-btn flat outline
-                                v-if="(( authorityType == 1)&&(projectsStatus.status==10)) || authorityType == 0"
+                                v-if="(( authorityType == 1)&&(projectsStatus.status==20)) || authorityType == 0"
                                 @click="openImplementationModal(projectsStatus.status,0)">Approve</v-btn>
                             <v-btn flat outline
-                                v-if="((authorityType == 1)&&(projectsStatus.status==10)) || authorityType == 0"
+                                v-if="((authorityType == 1)&&(projectsStatus.status==20)) || authorityType == 0"
                                 @click="openImplementationModal(projectsStatus.status,1)">Decline</v-btn>
                             <v-btn flat outline
-                                v-if="((authorityType == 1)&&(projectsStatus.status==10)) || authorityType == 0"
+                                v-if="((authorityType == 1)&&(projectsStatus.status==20)) || authorityType == 0"
                                 @click="openImplementationModal(projectsStatus.status,2)">Variation</v-btn>
                             <v-btn flat outline
                                 v-if="(( authorityType == 3)&&(projectsStatus.status==13)) || authorityType == 0"
@@ -441,14 +442,10 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
 
-
-
-                if (status == 10 && type == 0) {
+                if (status == 20 && type == 0) {
                     self.$refs.PlanogramIplementationModal.show(
                         "Approve planogram", type, data => {
                             if (data.value == true) {
-
-
 
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -462,14 +459,26 @@
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
 
-                                        console.log(res);
+                                        let element = res.data.projectTX;
+
+                                        self.timelineItems.unshift({
+                                            status: element.status,
+                                            notes: self.status[element.status].text,
+                                            date: element.dateTimeString,
+                                            user: element.username,
+                                            userID: element.systemUserID,
+                                            type: element.type,
+                                            storeID: element.store_ID
+                                        })
+
+                                        self.projectsStatus = self.timelineItems[0]
 
                                         delete Axios.defaults.headers.common["TenantID"];
                                     })
                             }
                         })
                 }
-                if (status == 10 && type == 1) {
+                if (status == 20 && type == 1) {
                     self.$refs.PlanogramIplementationModal.show(
                         "Decline Planogram Approval?", type, data => {
                             if (data.value == true) {
@@ -488,7 +497,19 @@
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
 
-                                        console.log(res);
+                                        let element = res.data.projectTX;
+
+                                        self.timelineItems.unshift({
+                                            status: element.status,
+                                            notes: self.status[element.status].text,
+                                            date: element.dateTimeString,
+                                            user: element.username,
+                                            userID: element.systemUserID,
+                                            type: element.type,
+                                            storeID: element.store_ID
+                                        })
+
+                                        self.projectsStatus = self.timelineItems[0]
 
                                         delete Axios.defaults.headers.common["TenantID"];
                                     })
@@ -513,7 +534,19 @@
                                 }
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
+                                        let element = res.data.projectTX;
 
+                                        self.timelineItems.unshift({
+                                            status: element.status,
+                                            notes: self.status[element.status].text,
+                                            date: element.dateTimeString,
+                                            user: element.username,
+                                            userID: element.systemUserID,
+                                            type: element.type,
+                                            storeID: element.store_ID
+                                        })
+
+                                        self.projectsStatus = self.timelineItems[0]
 
                                         delete Axios.defaults.headers.common["TenantID"];
                                     })
@@ -540,7 +573,19 @@
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
 
-                                        console.log(res);
+                                        let element = res.data.projectTX;
+
+                                        self.timelineItems.unshift({
+                                            status: element.status,
+                                            notes: self.status[element.status].text,
+                                            date: element.dateTimeString,
+                                            user: element.username,
+                                            userID: element.systemUserID,
+                                            type: element.type,
+                                            storeID: element.store_ID
+                                        })
+
+                                        self.projectsStatus = self.timelineItems[0]
 
                                         delete Axios.defaults.headers.common["TenantID"];
                                     })
@@ -567,7 +612,19 @@
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
 
-                                        console.log(res);
+                                        let element = res.data.projectTX;
+
+                                        self.timelineItems.unshift({
+                                            status: element.status,
+                                            notes: self.status[element.status].text,
+                                            date: element.dateTimeString,
+                                            user: element.username,
+                                            userID: element.systemUserID,
+                                            type: element.type,
+                                            storeID: element.store_ID
+                                        })
+
+                                        self.projectsStatus = self.timelineItems[0]
 
                                         delete Axios.defaults.headers.common["TenantID"];
                                     })
