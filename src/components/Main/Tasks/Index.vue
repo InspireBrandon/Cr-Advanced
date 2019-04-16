@@ -18,7 +18,11 @@
                             <td style="width: 5%;">
                                 <v-btn @click="setRangingInProgress(props.item)" small color="primary"
                                     v-if="props.item.type == 2 && props.item.status == 7">
-                                    <span>In Progress</span>
+                                    <span>Start</span>
+                                </v-btn>
+                                <v-btn @click="$router.push('/RangePlanning')" small color="primary"
+                                    v-if="props.item.type == 2 && props.item.status == 1">
+                                    <span>View</span>
                                 </v-btn>
                                 <v-btn @click="setRangingComplete(props.item, props.index)" small color="primary"
                                     v-if="props.item.type == 2 && props.item.status == 1">
@@ -26,10 +30,14 @@
                                 </v-btn>
                                 <v-btn @click="setPlanogramApprovalInProgress(props.item)" small color="primary"
                                     v-if="props.item.type == 3 && props.item.status == 10">
-                                    <span>In Progress</span>
+                                    <span>Start</span>
                                 </v-btn>
                                 <v-btn @click="$router.push('/PlanogramImplementation')" small color="primary"
                                     v-if="props.item.type == 3 && props.item.status == 20">
+                                    <span>View</span>
+                                </v-btn>
+                                <v-btn @click="sendForDistribution(props.item)" small color="primary"
+                                    v-if="props.item.type == 3 && props.item.status == 12">
                                     <span>View</span>
                                 </v-btn>
                             </td>
@@ -272,6 +280,9 @@
                         item.status = 20;
                         delete Axios.defaults.headers.common["TenantID"];
                     })
+            },
+            sendForDistribution(item) {
+                let self = this;
             }
         }
     }
