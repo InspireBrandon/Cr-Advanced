@@ -242,8 +242,9 @@
                 self.productReport = [];
                 self.productFixtureReport = [];
 
-                self.planogramName = item.name;
-self.planogramData =item;
+                // self.planogramName = item.name;
+                self.planogramData = item;
+                self.generateReports();
                 // self.getPlanogramByID(item.id)
                 //     .then(() => {
                 //         self.generateReports()
