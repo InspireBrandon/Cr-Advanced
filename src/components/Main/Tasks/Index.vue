@@ -16,9 +16,21 @@
                             <td>{{ props.item.store }}</td>
                             <td>{{ props.item.dateTimeString }}</td>
                             <td style="width: 5%;">
-                                <v-btn small color="primary">
-                                    <span>Go To Task</span>
-                                    <v-icon>arrow_right</v-icon>
+                                <v-btn @click="setRangingInProgress(props.item)" small color="primary"
+                                    v-if="props.item.type == 2 && props.item.status == 7">
+                                    <span>In Progress</span>
+                                </v-btn>
+                                <v-btn @click="setRangingComplete(props.item, props.index)" small color="primary"
+                                    v-if="props.item.type == 2 && props.item.status == 1">
+                                    <span>Complete</span>
+                                </v-btn>
+                                <v-btn @click="setPlanogramApprovalInProgress(props.item)" small color="primary"
+                                    v-if="props.item.type == 3 && props.item.status == 10">
+                                    <span>In Progress</span>
+                                </v-btn>
+                                <v-btn @click="$router.push('/PlanogramImplementation')" small color="primary"
+                                    v-if="props.item.type == 3 && props.item.status == 20">
+                                    <span>View</span>
                                 </v-btn>
                             </td>
                         </template>
@@ -155,6 +167,12 @@
                         value: 19,
                         color: "blue",
                         friendly: "Awaiting Distribution",
+                    },
+                    {
+                        text: "Approval In Progress",
+                        value: 20,
+                        color: "blue",
+                        friendly: "Approval In Progress",
                     }
                 ],
                 typeList: [{
@@ -209,6 +227,49 @@
                     })
                     .catch(e => {
                         console.error(e);
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+            },
+            setRangingInProgress(item) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                let trans = JSON.parse(JSON.stringify(item));
+                trans.status = 1;
+
+                Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                    res => {
+                        item.status = 1;
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+            },
+            setRangingComplete(item, index) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                let trans = JSON.parse(JSON.stringify(item));
+                trans.status = 2;
+                trans.systemUserID = item.projectOwnerID;
+
+                Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                    res => {
+                        self.projectTransactions.splice(index, 1);
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+            },
+            setPlanogramApprovalInProgress(item) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                let trans = JSON.parse(JSON.stringify(item));
+                trans.status = 20;
+
+                Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                    res => {
+                        item.status = 20;
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             }
