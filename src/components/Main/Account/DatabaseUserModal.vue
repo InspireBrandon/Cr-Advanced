@@ -5,10 +5,12 @@
             </v-progress-linear>
             <div v-if="!showLoader">
                 <v-toolbar dark color="primary" prominent>
+                    <v-toolbar-title>Users</v-toolbar-title>
+ <v-spacer></v-spacer>
                     <v-btn icon @click="modalShow = false">
                         <v-icon>arrow_back</v-icon>
                     </v-btn>
-                    <v-spacer></v-spacer>
+                   
                 </v-toolbar>
                 <v-container class="pt-5">
                     <v-layout row wrap>
