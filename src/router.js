@@ -67,8 +67,6 @@ import ProjectPlanning from '@/components/Apps/ProjectPlanning/Index.vue';
 import Drawer from '@/components/Apps/ProjectPlanning/Drawer.vue';
 
 
-
-
 //reports
 import AppsReportList from '@/components/Main/Reports/Apps/Index.vue'
 import SystemReportList from '@/components/Main/Reports/System/Index.vue'
@@ -79,6 +77,8 @@ import ProductFixtureReport from '@/views/Reports/SPACE-PLANNING-REPORTS/Product
 import ProductReport from '@/views/Reports/SPACE-PLANNING-REPORTS/ProductReport/Index.vue'
 
 import HelpFileView from '@/components/Main/HelpFile/Index.vue'
+import Tasks from '@/components/Main/Tasks/Index.vue';
+
 Vue.use(Router)
 
 export default new Router({
@@ -106,6 +106,10 @@ export default new Router({
           path: '/Apps',
           name: 'apps',
           component: Apps,
+        },{
+          path: '/Tasks',
+          name: 'tasks',
+          component: Tasks
         }, {
           path: '/Notifications',
           name: 'notifications',

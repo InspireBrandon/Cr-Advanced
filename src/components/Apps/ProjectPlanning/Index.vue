@@ -25,10 +25,10 @@
                         </v-menu> -->
             <v-list class="pt-0" dense>
 
-                <v-expansion-panel class="elevation-0 ;" v-for="groups in ProjectsGroups" :key="groups.id" >
-                    <v-expansion-panel-content >
-                        <template v-slot:header >
-                            <v-flex > {{groups.name}}
+                <v-expansion-panel class="elevation-0 ;" v-for="groups in ProjectsGroups" :key="groups.id">
+                    <v-expansion-panel-content>
+                        <template v-slot:header>
+                            <v-flex> {{groups.name}}
                             </v-flex>
                         </template>
                         <v-list>
@@ -102,8 +102,8 @@
                 </v-btn>
 
             </v-toolbar>
-            
-                           
+
+
             <v-data-table v-if="project!=null" :headers="headers" :items="ProjectTXs" hide-actions>
                 <template v-slot:items="props">
                     <td>
@@ -149,8 +149,10 @@
                         <v-edit-dialog :return-value.sync="props.item.status" large lazy persistent
                             @save="saveLine(props.item)" @cancel="''" @open="''" @close="''">
                             <div>
-                                <v-icon   :color="typeList[props.item.type== -1 ?  5 :  props.item.type].color">fiber_manual_record</v-icon>
-                                {{status[props.item.status].friendly }}</div>
+                                <v-icon :color="typeList[props.item.type== -1 ?  5 :  props.item.type].color">
+                                    fiber_manual_record</v-icon>
+                                {{status[props.item.status].friendly }}
+                            </div>
                             <template v-slot:input>
                                 <div class="mt-3 title">Update Iron</div>
                             </template>
@@ -212,7 +214,7 @@
                                 <v-list-tile @click="openProjectTXEdit(props.item)">Edit</v-list-tile>
                                 <v-divider></v-divider>
                             </v-list>
-                             <v-list dense>
+                            <v-list dense>
                                 <v-list-tile @click="deleteProjectTX(props.item)">Delete</v-list-tile>
                                 <v-divider></v-divider>
                             </v-list>
@@ -262,28 +264,28 @@
                 typeList: [{
                         text: "Event",
                         value: 0,
-                        color:"yellow"
+                        color: "yellow"
                     },
                     {
                         text: "Data Preparation",
                         value: 1,
-                        color:"green"
+                        color: "green"
 
                     }, {
                         text: "Ranging",
                         value: 2,
-                        color:"red"
+                        color: "red"
 
                     },
                     {
                         text: "Planogram",
                         value: 3,
-                        color:"blue"
+                        color: "blue"
 
                     }, {
                         text: "Promotion",
                         value: 4,
-                        color:"purple"
+                        color: "purple"
 
                     }, {
                         text: "",
@@ -323,115 +325,115 @@
                         text: "Project Start",
                         value: 0,
                         friendly: "Project Start",
-                        color:"blue",
+                        color: "blue",
                     },
                     {
                         text: "In Progress",
                         value: 1,
-                        color:"blue",
+                        color: "blue",
                         friendly: "In Progress"
-                        
+
                     },
                     {
                         text: "Complete",
                         value: 2,
-                        color:"blue",
+                        color: "blue",
                         friendly: "Complete"
                     },
                     {
                         text: "Workshop",
                         value: 3,
-                        color:"yellow",
+                        color: "yellow",
                         friendly: "Workshop"
                     }, {
                         text: "Workshop Complete",
                         value: 4,
-                        color:"yellow",
+                        color: "yellow",
                         friendly: "Workshop Complete"
                     },
                     {
                         text: "Meeting",
                         value: 5,
-                        color:"yellow",
+                        color: "yellow",
                         friendly: "Meeting"
                     },
                     {
                         text: "Data Preparation Start",
                         value: 6,
-                        color:"red",
+                        color: "red",
                         friendly: "Data Preparation Start"
                     },
                     {
                         text: "Ranging Start",
                         value: 7,
-                        color:"red",
+                        color: "red",
                         friendly: "Ranging Start"
                     },
                     {
                         text: "Planogram Start",
                         value: 8,
-                        color:"green",
+                        color: "green",
                         friendly: "Planogram Start"
                     },
                     {
                         text: "Meeting Supplier",
                         value: 9,
-                        color:"green",
+                        color: "green",
                         friendly: "Meeting Supplier"
                     },
                     {
                         text: "Requesting Approval",
                         value: 10,
-                        color:"green",
+                        color: "green",
                         friendly: "Requesting Approval"
                     },
                     {
                         text: "Declined",
                         value: 11,
-                        color:"green",
+                        color: "green",
                         friendly: "Declined"
                     },
                     {
                         text: "Approved",
                         value: 12,
-                        color:"green",
+                        color: "green",
                         friendly: "Approved"
                     },
                     {
                         text: "Implementation Pending",
                         value: 13,
-                        color:"blue",
+                        color: "blue",
                         friendly: "Implementation Pending"
                     },
                     {
                         text: "Variation Request",
                         value: 14,
-                        color:"blue",
+                        color: "blue",
                         friendly: 'Variation Request'
                     },
                     {
                         text: "Implemented",
                         value: 15,
-                        color:"blue",
+                        color: "blue",
                         friendly: "Implemented"
                     },
                     {
                         text: "On Hold",
                         value: 16,
-                        color:"blue",
+                        color: "blue",
                         friendly: "On Hold"
                     },
                     {
                         text: "Waiting Fixture Requirements",
                         value: 17,
-                        color:"blue",
+                        color: "blue",
                         friendly: "Waiting Fixture Requirements"
                     }, {
                         text: "Waiting Supplier",
                         value: 18,
-                        color:"blue",
+                        color: "blue",
                         friendly: "Waiting Supplier"
-                    },{
+                    }, {
                         text: "Awaiting Distribution",
                         value: 19,
                         color: "blue",
@@ -488,9 +490,6 @@
                     }
 
                 })
-
-
-
             },
             deleteProject(item, group) {
                 let self = this
@@ -513,9 +512,6 @@
                     }
 
                 })
-
-
-
             },
             deleteProjectGroup(item) {
                 let self = this
@@ -609,7 +605,7 @@
             },
 
             getUsers() {
-               let self = this;
+                let self = this;
 
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
 
@@ -649,7 +645,7 @@
                     })
             },
             getDatabaseUsers() {
-                  let self = this;
+                let self = this;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let tmp = sessionStorage.currentDatabase
                 Axios.get(process.env.VUE_APP_API + `TenantAccess/User?tenantID=${tmp}`)
@@ -756,7 +752,7 @@
             getTransactions(item) {
 
                 let self = this
-            self.ProjectTXs=[]
+                self.ProjectTXs = []
 
                 if (self.project == item) {
                     return
@@ -765,10 +761,10 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.get(process.env.VUE_APP_API + `ProjectTX?projectID=${item.id}`).then(r => {
                     console.log(r);
-                    
+
                     r.data.projectTXList.forEach(e => {
                         console.log(e);
-                        
+
                         if (e.deleted != true) {
                             self.ProjectTXs.push(e)
                         }
@@ -785,10 +781,12 @@
     .highlighted {
         background-color: #1976d2;
     }
-    .buttons{
-        background-color:#BDBDBD;
+
+    .buttons {
+        background-color: #BDBDBD;
     }
-    .listHeaders{
-        background-color:#EEEEEE;
+
+    .listHeaders {
+        background-color: #EEEEEE;
     }
 </style>
