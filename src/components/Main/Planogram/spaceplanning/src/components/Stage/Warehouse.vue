@@ -58,11 +58,13 @@
             <v-list-tile @click="planogramToRange">
               <v-list-tile-title>Planogram To Range</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile v-if="PlanogramObject.status == null||PlanogramObject.status==0||PlanogramObject.status==1||PlanogramObject.status==3||PlanogramObject.status==6"
+            <v-list-tile
+              v-if="PlanogramObject.status == null||PlanogramObject.status==0||PlanogramObject.status==1||PlanogramObject.status==3||PlanogramObject.status==6"
               @click="submitForApprovalPlano">
               <v-list-tile-title>Submit For Aproval</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile v-if="PlanogramObject.status==5||PlanogramObject.status==4||PlanogramObject.status==3||PlanogramObject.status==2||PlanogramObject.status==1"
+            <v-list-tile
+              v-if="PlanogramObject.status==5||PlanogramObject.status==4||PlanogramObject.status==3||PlanogramObject.status==2||PlanogramObject.status==1"
               @click="RetractPlanogram">
               <v-list-tile-title>Retract Planogram</v-list-tile-title>
             </v-list-tile>
@@ -128,22 +130,24 @@
           </v-expansion-panel>
         </v-flex>
         <v-flex v-if="rangingData.planogramID != null" md6 style="padding: 2px;">
-          <v-select :disabled="!gotData" light placeholder="Clusters" @change="onClusterTypeChange" dense :items="clusterTypes"
-            v-model="selectedClusterType" solo hide-details></v-select>
+          <v-select :disabled="!gotData" light placeholder="Clusters" @change="onClusterTypeChange" dense
+            :items="clusterTypes" v-model="selectedClusterType" solo hide-details></v-select>
           <!-- <v-select :disabled="!gotData" light placeholder="Category Cluster" @change="onCategoryClusterChange" dense
             :items="categoryCluster" v-model="selectedCategoryCluster" solo hide-details></v-select> -->
           <!-- v-if="showCategoryCluster==true" -->
         </v-flex>
         <v-flex v-if="rangingData.planogramID != null && gotData" md6 style="padding: 2px;">
-          <v-select light @change="onClusterOptionChange" v-if="selectedClusterType != null" :placeholder="'Select ' + selectedClusterType + ' cluster'"
-            dense :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" solo hide-details></v-select>
+          <v-select light @change="onClusterOptionChange" v-if="selectedClusterType != null"
+            :placeholder="'Select ' + selectedClusterType + ' cluster'" dense
+            :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" solo hide-details></v-select>
         </v-flex>
         <v-flex xs12 v-if="rangingData.planogramID != null">
           <div>
             <v-layout row wrap>
               <v-flex md8>
                 <v-toolbar color="primary" dense>
-                  <v-text-field dense solo flat hide-details label="Search" v-model="searchText" prepend-inner-icon="search"></v-text-field>
+                  <v-text-field dense solo flat hide-details label="Search" v-model="searchText"
+                    prepend-inner-icon="search"></v-text-field>
                 </v-toolbar>
               </v-flex>
               <v-flex md4 style="text-align: center;">
@@ -157,7 +161,8 @@
                 </v-btn-toggle>
               </v-flex>
               <v-flex md12 v-if="view_type == 0">
-                <v-list dark dense three-line :class="{ 'details_closed': details_panel != 0, 'details_open': details_panel == 0 }"
+                <v-list dark dense three-line
+                  :class="{ 'details_closed': details_panel != 0, 'details_open': details_panel == 0 }"
                   class="scroll-y">
                   <template v-for="(item, index) in filteredItems">
                     <div :key="index">
@@ -172,9 +177,9 @@
                           :src="warehouseCtrl.getProductImageURL(item.barcode)" draggable="true" @drag="dragProduct"
                           @dragstart="dragProductStart($event, item)" @dragend="clearDrag" contain></v-img>
 
-                        <v-img v-else style="width:50px !important; height:50px !important" src="/static/img/image-placeholder.png"
-                          draggable="true" @drag="dragProduct" @dragstart="dragProductStart($event, item)" @dragend="clearDrag"
-                          contain></v-img>
+                        <v-img v-else style="width:50px !important; height:50px !important"
+                          src="/static/img/image-placeholder.png" draggable="true" @drag="dragProduct"
+                          @dragstart="dragProductStart($event, item)" @dragend="clearDrag" contain></v-img>
 
                         <v-list-tile-content class="ml-2" style="width: 100%">
                           <v-list-tile-title>{{item.description}}</v-list-tile-title>
@@ -188,7 +193,8 @@
                             <v-btn slot="activator" small fab flat dark>
                               <v-icon v-if="item.store_Range_Indicator == 'YES'" color="green">done</v-icon>
                               <v-icon v-if="item.store_Range_Indicator == 'NO'" color="red">close</v-icon>
-                              <v-icon v-if="item.store_Range_Indicator == 'SELECTED' || item.store_Range_Indicator == 'SELECT'"
+                              <v-icon
+                                v-if="item.store_Range_Indicator == 'SELECTED' || item.store_Range_Indicator == 'SELECT'"
                                 color="blue">group_work</v-icon>
                             </v-btn>
                             <v-list>
@@ -219,12 +225,13 @@
                     <v-card>
                       <v-card-text style="text-align: center;">
                         <h4>{{ item.barcode }}</h4>
-                        <v-img v-if="warehouse_data.imagesOn" style="width:50px !important; height:50px !important; margin: 0 auto;"
+                        <v-img v-if="warehouse_data.imagesOn"
+                          style="width:50px !important; height:50px !important; margin: 0 auto;"
                           :src="warehouseCtrl.getProductImageURL(item.barcode)" draggable="true" @drag="dragProduct"
                           @dragstart="dragProductStart($event, item)" @dragend="clearDrag" contain></v-img>
-                        <v-img v-else style="width:50px !important; height:50px !important; margin: 0 auto;" src="/static/img/image-placeholder.png"
-                          draggable="true" @drag="dragProduct" @dragstart="dragProductStart($event, item)" @dragend="clearDrag"
-                          contain></v-img>
+                        <v-img v-else style="width:50px !important; height:50px !important; margin: 0 auto;"
+                          src="/static/img/image-placeholder.png" draggable="true" @drag="dragProduct"
+                          @dragstart="dragProductStart($event, item)" @dragend="clearDrag" contain></v-img>
                       </v-card-text>
                     </v-card>
                   </v-flex>
@@ -334,10 +341,10 @@
         clusterTypes: [{
             text: "All Stores Cluster",
             value: "allStores"
-          }, {
-            text: "Select Stores",
-            value: "stores"
-          },
+          }, //{
+            //text: "Select Stores",
+            //value: "stores"
+          //},
           {
             text: "Store Cluster",
             value: "store"
@@ -681,7 +688,7 @@
         self.$refs.spacePlanSelector.show((spacePlanID, item) => {
 
           self.PlanogramObject = item
-          
+
 
           self.planogramHelper.setCreate(false);
           let stage = self.$parent.$children[0].$children[2].getStage();
@@ -995,6 +1002,8 @@
               self.$store.commit("setClusterName", self.getClusterName());
               self.$store.commit("setClusterType", self.selectedClusterType);
               self.$store.commit("setClusterID", self.selectedClusterOption);
+              self.$store.commit("setStoreID", null)
+              self.$store.commit("setStoreName", null)
 
               let storeProducts = self.$store.state.activePlanogramProducts;
 

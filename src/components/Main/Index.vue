@@ -67,6 +67,15 @@
                                 <v-list-tile-title>Settings</v-list-tile-title>
                             </v-list-tile>
 
+                            <v-divider></v-divider>
+
+                            <v-list-tile @click="$router.push('tasks')">
+                                <v-list-tile-avatar>
+                                    <v-icon>inbox</v-icon>
+                                </v-list-tile-avatar>
+                                <v-list-tile-title>Tasks</v-list-tile-title>
+                            </v-list-tile>
+
                             <v-divider v-if="databases.length > 0"></v-divider>
 
                             <v-list-tile v-if="databases.length > 0" @click="sheet = true">
@@ -92,7 +101,8 @@
         </v-toolbar>
         <v-content>
             <v-img height="calc(100vh - 55px)" :src="backgroundImage" :alt="''">
-                <v-card class="elevation-0" style="background: url('./banner.png'); background-size: cover; background-position: center;">
+                <v-card class="elevation-0"
+                    style="background: url('./banner.png'); background-size: cover; background-position: center;">
                     <v-card-text style="height: 150px; position: relative; padding: 0px">
                         <router-view class="main-main"></router-view>
                     </v-card-text>
