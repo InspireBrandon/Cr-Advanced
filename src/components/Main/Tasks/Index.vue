@@ -1,5 +1,5 @@
 <template>
-    <v-container grid-list-md>
+    <v-container grid-list-md fluid>
         <v-layout row wrap>
             <v-flex md12>
                 <v-card>
@@ -9,50 +9,102 @@
                     <v-data-table :items="projectTransactions" class="elevation-1 scrollable" hide-actions hide-headers>
                         <template v-slot:items="props">
                             <td>{{ props.item.planogram }}</td>
-                            <td>{{ typeList[props.item.type == -1 ? 5 : props.item.type].text }}</td>
+                            <td>{{ typeList[props.item.type == -1 ? 9 : props.item.type].text }}</td>
                             <td>{{ status[props.item.status == -1 ? 18 : props.item.status].text }}</td>
                             <td>{{ props.item.storeCluster }}</td>
                             <td>{{ props.item.categoryCluster }}</td>
                             <td>{{ props.item.store }}</td>
                             <td>{{ props.item.dateTimeString }}</td>
                             <td style="width: 5%;">
-                                <v-btn @click="setRangingInProgress(props.item)" small color="primary"
-                                    v-if="props.item.type == 2 && props.item.status == 7">
-                                    <span>Start</span>
-                                </v-btn>
-                                <v-btn @click="$router.push('/RangePlanning')" small color="primary"
-                                    v-if="props.item.type == 2 && props.item.status == 1">
-                                    <span>View</span>
-                                </v-btn>
-                                <v-btn @click="setRangingComplete(props.item, props.index)" small color="primary"
-                                    v-if="props.item.type == 2 && props.item.status == 1">
-                                    <span>Complete</span>
-                                </v-btn>
-                                <v-btn @click="setPlanogramApprovalInProgress(props.item)" small color="primary"
-                                    v-if="props.item.type == 3 && props.item.status == 10">
-                                    <span>Start</span>
-                                </v-btn>
-                                <v-btn @click="$router.push('/PlanogramImplementation')" small color="primary"
-                                    v-if="props.item.type == 3 && props.item.status == 20">
-                                    <span>View</span>
-                                </v-btn>
-                                <v-btn @click="sendForDistribution(props.item, props.index)" small color="primary"
-                                    v-if="props.item.type == 3 && props.item.status == 12">
-                                    <span>Send</span>
-                                </v-btn>
-                                <v-btn @click="startDistributionProgress(props.item, props.index)" small color="primary"
-                                    v-if="props.item.type == 3 && props.item.status == 19">
-                                    <span>View</span>
-                                </v-btn>
-                                <v-btn @click="$router.push('/PlanogramImplementation')" small color="primary"
-                                    v-if="props.item.type == 3 && props.item.status == 21">
-                                    <span>View</span>
-                                </v-btn>
-                                <v-btn @click="completeDistribution(props.item, props.index)" small color="primary"
-                                    v-if="props.item.type == 3 && props.item.status == 21">
-                                    <span>Complete</span>
-                                </v-btn>
+                                <v-menu left>
+                                    <v-btn icon slot="activator">
+                                        <v-icon>more_vert</v-icon>
+                                    </v-btn>
+
+                                    <v-list dense class="pa-0 ma-0">
+                                        <v-list-tile @click="setRangingInProgress(props.item)"
+                                            v-if="props.item.type == 2 && props.item.status == 7">
+                                            <span>Start</span>
+                                        </v-list-tile>
+                                        <v-divider></v-divider>
+                                        <v-list-tile @click="$router.push('/RangePlanning')"
+                                            v-if="props.item.type == 2 && props.item.status == 1">
+                                            <span>View</span>
+                                        </v-list-tile>
+                                        <v-divider></v-divider>
+                                        <v-list-tile v-if="props.item.type == 2 && props.item.status == 1"
+                                            @click="setRangingComplete(props.item, props.index)">
+                                            <span>Complete</span>
+                                        </v-list-tile>
+                                        <v-divider></v-divider>
+                                        <v-list-tile v-if="props.item.type == 3 && props.item.status == 10"
+                                            @click="setPlanogramApprovalInProgress(props.item)">
+                                            <span>Start</span>
+                                        </v-list-tile>
+                                        <v-divider></v-divider>
+                                        <v-list-tile v-if="props.item.type == 3 && props.item.status == 20"
+                                            @click="$router.push('/PlanogramImplementation')">
+                                            <span>View</span>
+                                        </v-list-tile>
+                                        <v-divider></v-divider>
+                                        <v-list-tile v-if="props.item.type == 3 && props.item.status == 12"
+                                            @click="sendForDistribution(props.item, props.index)">
+                                            <span>Send</span>
+                                        </v-list-tile>
+                                        <v-divider></v-divider>
+                                        <v-list-tile v-if="props.item.type == 3 && props.item.status == 19"
+                                            @click="startDistributionProgress(props.item, props.index)">
+                                            <span>View</span>
+                                        </v-list-tile>
+                                        <v-divider></v-divider>
+                                        <v-list-tile v-if="props.item.type == 3 && props.item.status == 21"
+                                            @click="$router.push('/PlanogramImplementation')">
+                                            <span>View</span>
+                                        </v-list-tile>
+                                        <v-divider></v-divider>
+                                        <v-list-tile v-if="props.item.type == 3 && props.item.status == 21"
+                                            @click="completeDistribution(props.item, props.index)">
+                                            <span>Complete</span>
+                                        </v-list-tile>
+                                        <v-divider></v-divider>
+                                        <v-list-tile>
+                                            <span>Launch</span>
+                                        </v-list-tile>
+                                        <v-divider></v-divider>
+                                        <v-list-tile v-if="props.item.type == 3 ||props.item.type == 1"
+                                            @click="ChangeWaitingType(props.item, props.index,5)">
+                                            <span>Waiting Product Info</span>
+                                            <!-- dataprep/planogram -->
+                                        </v-list-tile>
+                                        <v-divider></v-divider>
+                                        <v-list-tile v-if="props.item.type == 3 "
+                                            @click="ChangeWaitingType(props.item, props.index,6)">
+                                            <span>Waiting Planogram Input</span>
+                                        </v-list-tile>
+                                        <v-divider></v-divider>
+                                        <v-list-tile v-if="props.item.type == 3"
+                                            @click="ChangeWaitingType(props.item, props.index,7)">
+                                            <span>Waiting Fixture Input</span>
+                                        </v-list-tile>
+                                        <v-divider></v-divider>
+                                        <v-list-tile v-if="props.item.type == 3 "
+                                            @click="ChangeWaitingType(props.item, props.index,8)">
+                                            <span>Waiting Check Planogram</span>
+                                        </v-list-tile>
+                                        <v-list-tile v-if="4<props.item.type<9 &&props.item.status == 26"
+                                            @click="ChangeWaitingStart(props.item, props.index)">
+                                            <span>Start</span>
+                                        </v-list-tile>
+                                        <v-divider></v-divider>
+                                          <v-list-tile v-if="4<props.item.type<9 &&props.item.status == 1"
+                                            @click="ChangeWaitingcomplete(props.item, props.index)">
+                                            <span>Complete</span>
+                                        </v-list-tile>
+
+                                    </v-list>
+                                </v-menu>
                             </td>
+
                         </template>
                     </v-data-table>
                 </v-card>
@@ -66,6 +118,8 @@
     import Axios from 'axios';
     import jwt from 'jsonwebtoken';
     import UserSelector from '@/components/Common/UserSelector'
+    import StatusHandler from '@/libs/system/projectStatusHandler'
+
 
     export default {
         name: 'tasks',
@@ -75,175 +129,68 @@
         data() {
             return {
                 projectTransactions: [],
-                status: [{
-                        text: "Project Start",
-                        value: 0,
-                        friendly: "Project Start",
-                        color: "blue",
-                    },
-                    {
-                        text: "In Progress",
-                        value: 1,
-                        color: "blue",
-                        friendly: "In Progress"
+                status: [],
+                typeList: []
 
-                    },
-                    {
-                        text: "Complete",
-                        value: 2,
-                        color: "blue",
-                        friendly: "Complete"
-                    },
-                    {
-                        text: "Workshop",
-                        value: 3,
-                        color: "warning",
-                        friendly: "Workshop"
-                    }, {
-                        text: "Workshop Complete",
-                        value: 4,
-                        color: "warning",
-                        friendly: "Workshop Complete"
-                    },
-                    {
-                        text: "Meeting",
-                        value: 5,
-                        color: "warning",
-                        friendly: "Meeting"
-                    },
-                    {
-                        text: "Data Preparation Start",
-                        value: 6,
-                        color: "red",
-                        friendly: "Data Preparation Start"
-                    },
-                    {
-                        text: "Ranging Start",
-                        value: 7,
-                        color: "red",
-                        friendly: "Ranging Start"
-                    },
-                    {
-                        text: "Planogram Start",
-                        value: 8,
-                        color: "green",
-                        friendly: "Planogram Start"
-                    },
-                    {
-                        text: "Meeting Supplier",
-                        value: 9,
-                        color: "green",
-                        friendly: "Meeting Supplier"
-                    },
-                    {
-                        text: "Requesting Approval",
-                        value: 10,
-                        color: "green",
-                        friendly: "Requesting Approval"
-                    },
-                    {
-                        text: "Declined",
-                        value: 11,
-                        color: "green",
-                        friendly: "Declined"
-                    },
-                    {
-                        text: "Approved",
-                        value: 12,
-                        color: "green",
-                        friendly: "Approved"
-                    },
-                    {
-                        text: "Implementation Pending",
-                        value: 13,
-                        color: "blue",
-                        friendly: "Implementation Pending"
-                    },
-                    {
-                        text: "Variation Request",
-                        value: 14,
-                        color: "blue",
-                        friendly: 'Variation Request'
-                    },
-                    {
-                        text: "Implemented",
-                        value: 15,
-                        color: "blue",
-                        friendly: "Implemented"
-                    },
-                    {
-                        text: "On Hold",
-                        value: 16,
-                        color: "blue",
-                        friendly: "On Hold"
-                    },
-                    {
-                        text: "Waiting Fixture Requirements",
-                        value: 17,
-                        color: "blue",
-                        friendly: "Waiting Fixture Requirements"
-                    }, {
-                        text: "Waiting Supplier",
-                        value: 18,
-                        color: "blue",
-                        friendly: "Waiting Supplier"
-                    }, {
-                        text: "Awaiting Distribution",
-                        value: 19,
-                        color: "blue",
-                        friendly: "Awaiting Distribution",
-                    },
-                    {
-                        text: "Approval In Progress",
-                        value: 20,
-                        color: "blue",
-                        friendly: "Approval In Progress",
-                    },
-                    {
-                        text: "Distribution In Progress",
-                        value: 21,
-                        color: "blue",
-                        friendly: "Distribution In Progress",
-                    }
-                ],
-                typeList: [{
-                        text: "Event",
-                        value: 0,
-                        color: "warning"
-                    },
-                    {
-                        text: "Data Preparation",
-                        value: 1,
-                        color: "green"
-
-                    }, {
-                        text: "Ranging",
-                        value: 2,
-                        color: "red"
-
-                    },
-                    {
-                        text: "Planogram",
-                        value: 3,
-                        color: "blue"
-
-                    }, {
-                        text: "Promotion",
-                        value: 4,
-                        color: "purple"
-
-                    }, {
-                        text: "",
-                        value: 5
-                    }
-                ]
             }
         },
         created() {
             let self = this;
             self.getTransactionsByUser()
+            self.getLists()
         },
         methods: {
+            ChangeWaitingcomplete(item, index) {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                let trans = JSON.parse(JSON.stringify(item));
+                trans.status = 2;
+                trans.systemUserID = item.projectOwnerID;
+                Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                    res => {
+                        item.status = 2
+                        self.projectTransactions.splice(index, 1);
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+            },
+            ChangeWaitingStart(item, index) {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                let trans = JSON.parse(JSON.stringify(item));
+                trans.status = 1;
+                Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                    res => {
+                        item.status = 1
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+            },
+            ChangeWaitingType(item, index, type) {
+                let self = this
+                self.$refs.userSelector.show(user => {
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    let trans = JSON.parse(JSON.stringify(item));
+                    trans.status = 26;
+                    trans.type = type
+                    trans.systemUserID = user.systemUserID;
+                    Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                        res => {
+
+                            self.projectTransactions.splice(index, 1);
+                            delete Axios.defaults.headers.common["TenantID"];
+                        })
+                })
+
+            },
+            getLists() {
+                let self = this
+                let statusHandler = new StatusHandler()
+                self.status = statusHandler.getStatus()
+                self.typeList = statusHandler.getTypeList()
+
+            },
             getTransactionsByUser() {
                 let self = this;
 
@@ -254,6 +201,8 @@
 
                 Axios.get(process.env.VUE_APP_API + `UserProjectTX?userID=${systemUserID}`).then(r => {
                         self.projectTransactions = r.data.projectTXList;
+                        console.log(self.projectTransactions);
+
                         delete Axios.defaults.headers.common["TenantID"];
                     })
                     .catch(e => {

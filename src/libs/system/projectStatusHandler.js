@@ -17,14 +17,14 @@ class projectStatusHandler {
                 value: 1,
                 color: "blue",
                 friendly: "In Progress",
-                type: [0, 1, 2, 3, 4]
+                type: [0, 1, 2, 3, 4 ,5,6,7,8]
             },
             {
                 text: "Complete",
                 value: 2,
                 color: "blue",
                 friendly: "Complete",
-                type: [0, 1, 2, 3, 4]
+                type: [0, 1, 2, 3, 4 ,5,6,7,8]
             },
             {
                 text: "Workshop",
@@ -93,7 +93,7 @@ class projectStatusHandler {
                 value: 12,
                 color: "green",
                 friendly: "Approved",
-                type: [0, 1, 2, 3, 4]
+                type: [0, 1, 2, 3, 4,5,6,7,8]
             },
             {
                 text: "Implementation Pending",
@@ -175,9 +175,27 @@ class projectStatusHandler {
                 type: [3]
             },{
                 text: "Like",
-                value: 24,
+                value: 25,
                 color: "blue",
                 friendly: "Like",
+                type: [3]
+            },{
+                text: "Start",
+                value: 26,
+                color: "blue",
+                friendly: "Start",
+                type: [5,6,7,8]
+            }, {
+                text: "Implementation Complete",
+                value: 27,
+                color: "blue",
+                friendly: "Implementation Complete",
+                type: [3]
+            }, {
+                text: "Distribution Complete",
+                value: 28,
+                color: "blue",
+                friendly: "Distribution Complete",
                 type: [3]
             }
         ]
@@ -226,20 +244,20 @@ class projectStatusHandler {
                 color: "purple"
 
             }, {
-                text: "WaitingProductInfo",
+                text: "Waiting Product Info",
                 value: 5,
                 color:"yellow"
             }, {
-                text: "WaitingPlanogramInput",
+                text: "Waiting Planogram Input",
                 color:"yellow",
                 value: 6
             }, {
                 color:"yellow",
-                text: "WaitingFixtureInput",
+                text: "Waiting Fixture Input",
                 value: 7
             }, {
                 color:"yellow",
-                text: "WaitingCheckPlanogram",
+                text: "Waiting Check Planogram",
                 value: 8
             }, {
                 color:"",
