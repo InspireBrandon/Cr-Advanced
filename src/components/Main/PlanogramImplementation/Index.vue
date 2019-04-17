@@ -42,7 +42,7 @@
                     <v-flex xl12 lg12 md12 sm12 xs12 v-if="selectedPlanogram != null && !showLoader">
                         <v-toolbar color="primary" dark dense flat v-if="selectedPlanogram != null">
                             <v-toolbar-title>
-                                Status: {{status[timelineItems[0].status].text}}
+                                Status: {{status[tmpItems[0].status].text}}
                             </v-toolbar-title>
                             <!-- <v-btn v-if="(( authorityType == 1)&&(projectsStatus.status==10))" >Approve</v-btn>
                              <v-btn v-if="((authorityType == 1)&&(projectsStatus.status==10))">Decline</v-btn>
@@ -98,13 +98,16 @@
                     <v-card flat style="height: calc(100vh - 200px); overflow: auto;">
                         <v-card-text>
                             <v-timeline dense>
-                                <v-timeline-item right :color="typeList[item.type == -1 ? 5 : item.type].color"
+                                <v-timeline-item style="padding-bottom: 5px;" right
+                                    :color="typeList[item.type == -1 ? 5 : item.type].color"
                                     v-for="(item,index) in timelineItems" :key="index" small>
                                     <v-card :color="typeList[item.type == -1 ? 5 : item.type].color" dark>
                                         <v-card-title class="title pa-2 ma-0">
                                             <span>{{ status[item.status  == -1 ? 18 : item.status].text }}</span>
-                                            <span v-if="item.storeCluster != null" style="margin-left: 5px;"> - {{ item.storeCluster }}</span>
-                                            <span v-if="item.store != null" style="margin-left: 5px;"> - {{ item.store }}</span>
+                                            <span v-if="item.storeCluster != null" style="margin-left: 5px;"> -
+                                                {{ item.storeCluster }}</span>
+                                            <span v-if="item.store != null" style="margin-left: 5px;"> -
+                                                {{ item.store }}</span>
                                             <v-spacer></v-spacer>
                                             <span>{{ item.date }}</span>
                                         </v-card-title>
@@ -163,6 +166,7 @@
                 image: '',
                 selectedPlanogram: null,
                 PlanogramItems: [],
+                tmpItems: [],
                 projectID: null,
                 authorityType: -1,
                 projectGroups: [],
@@ -176,11 +180,10 @@
                 active: 0,
                 timelineItems: [],
                 projectsStatus: null,
-                status: [
-                ],
-                typeList: [
-                ],
-                currentStatus: null
+                status: [],
+                typeList: [],
+                currentStatus: null,
+
             }
         },
         mounted() {
@@ -294,7 +297,7 @@
                 }
                 if (status == 20 && type == 1) {
                     self.$refs.PlanogramIplementationModal.show(
-                        "Decline Planogram Approval?",storeCluster, storeID, type, data => {
+                        "Decline Planogram Approval?", storeCluster, storeID, type, data => {
                             if (data.value == true) {
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -431,6 +434,22 @@
 
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
+                                        let element = res.data.projectTX;
+
+                                        self.timelineItems.unshift({
+                                            status: element.status,
+                                            notes: self.status[element.status].text,
+                                            date: element.dateTimeString,
+                                            user: element.username,
+                                            userID: element.systemUserID,
+                                            type: element.type,
+                                            storeID: element.store_ID,
+                                            store: element.store,
+                                            storeCluster_ID: element.storeCluster_ID,
+                                            storeCluster: element.storeCluster,
+                                            categoryCluster_ID: element.categoryCluster_ID
+                                        })
+
                                         delete Axios.defaults.headers.common["TenantID"];
                                     })
 
@@ -804,6 +823,7 @@
                             delete Axios.defaults.headers.common["TenantID"];
 
                             self.timelineItems = [];
+                            self.tmpItems = [];
 
                             r.data.projectTXList.forEach((element, idx) => {
 
@@ -824,12 +844,29 @@
                                         storeCluster: element.storeCluster,
                                         categoryCluster_ID: element.categoryCluster_ID
                                     })
+
+                                    if (element.type == 3 && element.status != 13) {
+                                        self.tmpItems.push({
+                                            status: element.status,
+                                            notes: self.status[element.status].text,
+                                            date: element.dateTimeString,
+                                            user: element.username,
+                                            userID: element.systemUserID,
+                                            type: element.type,
+                                            storeID: element.store_ID,
+                                            store: element.store,
+                                            storeCluster_ID: element.storeCluster_ID,
+                                            storeCluster: element.storeCluster,
+                                            categoryCluster_ID: element.categoryCluster_ID
+                                        })
+                                    }
                                 }
 
                             })
 
-                            self.projectsStatus = self.timelineItems[0]
+                            console.log("[STUFF]", self.tmpItems)
 
+                            self.projectsStatus = self.tmpItems[0]
 
                             resolve();
                         })
