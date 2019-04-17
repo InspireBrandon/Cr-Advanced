@@ -17,14 +17,14 @@ class projectStatusHandler {
                 value: 1,
                 color: "blue",
                 friendly: "In Progress",
-                type: [0, 1, 2, 3, 4 ,5,6,7,8]
+                type: [0, 1, 2, 3, 4, 5, 6, 7, 8]
             },
             {
                 text: "Complete",
                 value: 2,
                 color: "blue",
                 friendly: "Complete",
-                type: [0, 1, 2, 3, 4 ,5,6,7,8]
+                type: [0, 1, 2, 3, 4, 5, 6, 7, 8]
             },
             {
                 text: "Workshop",
@@ -93,7 +93,7 @@ class projectStatusHandler {
                 value: 12,
                 color: "green",
                 friendly: "Approved",
-                type: [0, 1, 2, 3, 4,5,6,7,8]
+                type: [0, 1, 2, 3, 4, 5, 6, 7, 8]
             },
             {
                 text: "Implementation Pending",
@@ -153,7 +153,7 @@ class projectStatusHandler {
                 value: 21,
                 color: "blue",
                 friendly: "Distribution In Progress",
-                type:[3]
+                type: [3]
             }, {
                 text: "Review Range",
                 value: 22,
@@ -174,18 +174,12 @@ class projectStatusHandler {
                 color: "blue",
                 friendly: "Implementation In Progress",
                 type: [3]
-            },{
+            }, {
                 text: "Like",
                 value: 25,
                 color: "blue",
                 friendly: "Like",
                 type: [3]
-            },{
-                text: "Start",
-                value: 26,
-                color: "blue",
-                friendly: "Start",
-                type: [5,6,7,8]
             }, {
                 text: "Implementation Complete",
                 value: 27,
@@ -198,6 +192,67 @@ class projectStatusHandler {
                 color: "blue",
                 friendly: "Distribution Complete",
                 type: [3]
+            }, {
+                text: "Waiting Product Info start",
+                value: 29,
+                type: [3, 1],
+                color: "yellow"
+            }, {
+                text: "Waiting Product Info in progress",
+                value: 30,
+                type: [3, 1],
+                color: "yellow"
+            }, {
+                text: "Waiting Product Info Complete",
+                value: 31,
+                type: [3, 1],
+                color: "yellow"
+            },
+            {
+                text: "Waiting Planogram Input start",
+                value: 32,
+                type: [3, 1],
+                color: "yellow"
+            }, {
+                text: "Waiting Planogram Input in progress",
+                value: 33,
+                type: [3, 1],
+                color: "yellow"
+            }, {
+                text: "Waiting Planogram Input Complete",
+                value: 34,
+                type: [3, 1],
+                color: "yellow"
+            }, {
+                text: "Waiting Fixture Input in start",
+                value: 35,
+                type: [3, 1],
+                color: "yellow"
+            }, {
+                text: "Waiting Fixture Input Complete",
+                value: 36,
+                type: [3, 1],
+                color: "yellow"
+            }, {
+                text: "Waiting Fixture Input in progress",
+                value: 37,
+                type: [3, 1],
+                color: "yellow"
+            }, {
+                text: "Waiting Check Planogram Start",
+                value: 38,
+                type: [3, 1],
+                color: "yellow"
+            }, {
+                color: "yellow",
+                type: [3, 1],
+                text: "Waiting Check Planogram in progress",
+                value: 39
+            }, {
+                text: "Waiting Check Planogram Complete",
+                value: 40,
+                type: [3, 1],
+                color: "yellow"
             }
         ]
 
@@ -245,29 +300,13 @@ class projectStatusHandler {
                 color: "purple"
 
             }, {
-                text: "Waiting Product Info",
-                value: 5,
-                color:"yellow"
-            }, {
-                text: "Waiting Planogram Input",
-                color:"yellow",
-                value: 6
-            }, {
-                color:"yellow",
-                text: "Waiting Fixture Input",
-                value: 7
-            }, {
-                color:"yellow",
-                text: "Waiting Check Planogram",
-                value: 8
-            }, {
-                color:"",
+                color: "",
                 text: "",
-                value: 9
+                value: 5
             }
         ]
-      
-        
+
+
         return types
     }
 }
