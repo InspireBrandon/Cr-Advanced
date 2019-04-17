@@ -708,7 +708,7 @@
 
                     console.log(data);
 
-                    self.ProjectTXs.push(data)
+                    self.ProjectTXs.unshift(data)
                 })
             },
             openProjectTXEdit(item) {
