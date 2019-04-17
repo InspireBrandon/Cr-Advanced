@@ -9,7 +9,7 @@
                     <v-data-table :items="projectTransactions" class="elevation-1 scrollable" hide-actions hide-headers>
                         <template v-slot:items="props">
                             <td>{{ props.item.planogram }}</td>
-                            <td>{{ typeList[props.item.type == -1 ? 9 : props.item.type].text }}</td>
+                            <td>{{ typeList[props.item.type == -1 ? 5 : props.item.type].text }}</td>
                             <td>{{ status[props.item.status == -1 ? 18 : props.item.status].text }}</td>
                             <td>{{ props.item.storeCluster }}</td>
                             <td>{{ props.item.categoryCluster }}</td>
@@ -71,36 +71,62 @@
                                             <span>Launch</span>
                                         </v-list-tile>
                                         <v-divider></v-divider>
+                                        <!--Waiting Product Info  -->
                                         <v-list-tile v-if="props.item.type == 3 ||props.item.type == 1"
-                                            @click="ChangeWaitingType(props.item, props.index,5)">
+                                            @click="ChangeWaitingType(props.item, props.index,29)">
                                             <span>Waiting Product Info</span>
-                                            <!-- dataprep/planogram -->
                                         </v-list-tile>
-                                        <v-divider></v-divider>
-                                        <v-list-tile v-if="props.item.type == 3 "
-                                            @click="ChangeWaitingType(props.item, props.index,6)">
-                                            <span>Waiting Planogram Input</span>
-                                        </v-list-tile>
-                                        <v-divider></v-divider>
-                                        <v-list-tile v-if="props.item.type == 3"
-                                            @click="ChangeWaitingType(props.item, props.index,7)">
-                                            <span>Waiting Fixture Input</span>
-                                        </v-list-tile>
-                                        <v-divider></v-divider>
-                                        <v-list-tile v-if="props.item.type == 3 "
-                                            @click="ChangeWaitingType(props.item, props.index,8)">
-                                            <span>Waiting Check Planogram</span>
-                                        </v-list-tile>
-                                        <v-list-tile v-if="4<props.item.type<9 &&props.item.status == 26"
-                                            @click="ChangeWaitingStart(props.item, props.index)">
+                                        <v-list-tile v-if="props.item.status == 29"
+                                            @click="ChangeWaitingStart(props.item, props.index,30)">
                                             <span>Start</span>
                                         </v-list-tile>
-                                        <v-divider></v-divider>
-                                          <v-list-tile v-if="4<props.item.type<9 &&props.item.status == 1"
-                                            @click="ChangeWaitingcomplete(props.item, props.index)">
+                                        <v-list-tile v-if="props.item.status == 30"
+                                            @click="ChangeWaitingcomplete(props.item, props.index,31)">
                                             <span>Complete</span>
                                         </v-list-tile>
-
+                                        <v-divider></v-divider>
+                                        <!-- Waiting Planogram Input -->
+                                        <v-list-tile v-if="props.item.type == 3"
+                                            @click="ChangeWaitingType(props.item, props.index,32)">
+                                            <span>Waiting Planogram Input</span>
+                                        </v-list-tile>
+                                        <v-list-tile v-if="props.item.status == 32"
+                                            @click="ChangeWaitingStart(props.item, props.index,33)">
+                                            <span>Start</span>
+                                        </v-list-tile>
+                                        <v-list-tile v-if="props.item.status == 33"
+                                            @click="ChangeWaitingcomplete(props.item, props.index,34)">
+                                            <span>Complete</span>
+                                        </v-list-tile>
+                                        <v-divider></v-divider>
+                                        <!-- Waiting Fixture Input -->
+                                        <v-list-tile v-if="props.item.type == 3"
+                                            @click="ChangeWaitingType(props.item, props.index,35)">
+                                            <span>Waiting Fixture Input</span>
+                                        </v-list-tile>
+                                        <v-list-tile v-if="props.item.status == 35"
+                                            @click="ChangeWaitingStart(props.item, props.index,36)">
+                                            <span>Start</span>
+                                        </v-list-tile>
+                                        <v-list-tile v-if="props.item.status == 36"
+                                            @click="ChangeWaitingcomplete(props.item, props.index,37)">
+                                            <span>Complete</span>
+                                        </v-list-tile>
+                                        <v-divider></v-divider>
+                                        <!-- Waiting Check Planogram -->
+                                        <v-list-tile v-if="props.item.type == 3"
+                                            @click="ChangeWaitingType(props.item, props.index,38)">
+                                            <span>Waiting Check Planogram</span>
+                                        </v-list-tile>
+                                        <v-list-tile v-if="props.item.status == 38"
+                                            @click="ChangeWaitingStart(props.item, props.index,39)">
+                                            <span>Start</span>
+                                        </v-list-tile>
+                                        <v-list-tile v-if="props.item.status == 39"
+                                            @click="ChangeWaitingcomplete(props.item, props.index,40)">
+                                            <span>Complete</span>
+                                        </v-list-tile>
+                                        <v-divider></v-divider>
                                     </v-list>
                                 </v-menu>
                             </td>
@@ -140,44 +166,50 @@
             self.getLists()
         },
         methods: {
-            ChangeWaitingcomplete(item, index) {
+            ChangeWaitingcomplete(item, index, type) {
                 let self = this
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 let trans = JSON.parse(JSON.stringify(item));
-                trans.status = 2;
+                trans.status = type;
                 trans.systemUserID = item.projectOwnerID;
                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                     res => {
-                        item.status = 2
+                        item.status = type
                         self.projectTransactions.splice(index, 1);
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
-            ChangeWaitingStart(item, index) {
+            ChangeWaitingStart(item, index, type) {
                 let self = this
+                console.log("ChangeWaitingStart");
+                console.log(type);
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 let trans = JSON.parse(JSON.stringify(item));
-                trans.status = 1;
+                trans.status = type;
                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                     res => {
-                        item.status = 1
+                        item.status = type
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
             ChangeWaitingType(item, index, type) {
                 let self = this
+                console.log("ChangeWaitingType");
+                console.log(type);
+
+
                 self.$refs.userSelector.show(user => {
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                     let trans = JSON.parse(JSON.stringify(item));
-                    trans.status = 26;
-                    trans.type = type
+                    trans.status = type;
+
                     trans.systemUserID = user.systemUserID;
                     Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                         res => {
-
+                            item.status = type
                             self.projectTransactions.splice(index, 1);
                             delete Axios.defaults.headers.common["TenantID"];
                         })

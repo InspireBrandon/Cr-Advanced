@@ -182,75 +182,75 @@ class projectStatusHandler {
                 type: [3]
             }, {
                 text: "Implementation Complete",
-                value: 27,
+                value: 26,
                 color: "blue",
                 friendly: "Implementation Complete",
                 type: [3]
             }, {
                 text: "Distribution Complete",
-                value: 28,
+                value: 27,
                 color: "blue",
                 friendly: "Distribution Complete",
                 type: [3]
             }, {
                 text: "Waiting Product Info start",
-                value: 29,
+                value: 28,
                 type: [3, 1],
                 color: "yellow"
             }, {
                 text: "Waiting Product Info in progress",
-                value: 30,
+                value: 29,
                 type: [3, 1],
                 color: "yellow"
             }, {
                 text: "Waiting Product Info Complete",
-                value: 31,
+                value: 30,
                 type: [3, 1],
                 color: "yellow"
             },
             {
                 text: "Waiting Planogram Input start",
-                value: 32,
+                value: 31,
                 type: [3, 1],
                 color: "yellow"
             }, {
                 text: "Waiting Planogram Input in progress",
-                value: 33,
+                value: 32,
                 type: [3, 1],
                 color: "yellow"
             }, {
                 text: "Waiting Planogram Input Complete",
-                value: 34,
+                value: 33,
                 type: [3, 1],
                 color: "yellow"
             }, {
                 text: "Waiting Fixture Input in start",
-                value: 35,
+                value: 34,
                 type: [3, 1],
                 color: "yellow"
             }, {
                 text: "Waiting Fixture Input Complete",
-                value: 36,
+                value: 35,
                 type: [3, 1],
                 color: "yellow"
             }, {
                 text: "Waiting Fixture Input in progress",
-                value: 37,
+                value: 36,
                 type: [3, 1],
                 color: "yellow"
             }, {
                 text: "Waiting Check Planogram Start",
-                value: 38,
+                value: 37,
                 type: [3, 1],
                 color: "yellow"
             }, {
                 color: "yellow",
                 type: [3, 1],
                 text: "Waiting Check Planogram in progress",
-                value: 39
+                value: 38
             }, {
                 text: "Waiting Check Planogram Complete",
-                value: 40,
+                value: 39,
                 type: [3, 1],
                 color: "yellow"
             }
