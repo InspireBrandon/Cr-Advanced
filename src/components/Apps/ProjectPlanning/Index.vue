@@ -294,7 +294,7 @@
                 ],
                 headers: [{
                     text: "Date",
-                    sortable: true,
+                    sortable: false,
                     value: "dateTimeString"
                 }, {
                     text: "Type",
