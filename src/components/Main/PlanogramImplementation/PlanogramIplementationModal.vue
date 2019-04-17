@@ -22,8 +22,8 @@
                 label="Select A Store"></v-autocomplete>
             </v-flex>
             <v-flex md6 v-if="type==4">
-              <v-autocomplete style="max-width: 400px;" dense v-model="selectedUser" :items="users"
-                label="Select A User"></v-autocomplete>
+              <v-autocomplete :disabled="disableStoreSelection" style="max-width: 400px;" dense v-model="selectedUser"
+                :items="users" label="Select A User"></v-autocomplete>
             </v-flex>
 
           </v-card-title>
@@ -132,6 +132,10 @@
         self.storeCluster = storeCluster;
         self.selectedStore = storeID;
 
+        if (self.selectedStore != undefined && self.selectedStore != null) {
+          self.disableStoreSelection = true;
+        }
+
         self.afterRuturn = afterRuturn;
         self.getSpacePlans()
         self.getDatabaseUsers()
@@ -154,8 +158,6 @@
           r.data.forEach(s => {
             let storeCluster = "";
 
-            console.log(self.storeCluster)
-
             if (self.storeCluster != undefined) {
               storeCluster = self.storeCluster.toUpperCase();
             }
@@ -165,7 +167,8 @@
               self.Stores.push({
                 text: s.storeName,
                 value: s.storeID
-              })
+              }
+              )
             }
           })
         })
