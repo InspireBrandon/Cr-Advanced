@@ -181,7 +181,7 @@
             <v-card>
                 <v-toolbar dark color="primary" prominent>
                     <v-toolbar-title>
-                       Planogram Image
+                        Planogram Image
                     </v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-btn @click="imageModal = false" icon>
@@ -357,13 +357,13 @@
                         color: "blue",
                         friendly: "Approval In Progress",
                     },
-                     {
+                    {
                         text: "Review Range",
                         value: 21,
                         color: "blue",
                         friendly: "Review Range",
                     },
-                     {
+                    {
                         text: "Review Planogram",
                         value: 22,
                         color: "blue",
@@ -465,6 +465,7 @@
                     self.$refs.PlanogramIplementationModal.show(
                         "Approve planogram", type, data => {
                             if (data.value == true) {
+                                console.log(self.timelineItems[0])
 
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -473,6 +474,9 @@
                                     "username": self.timelineItems[self.timelineItems.length - 1].user,
                                     "status": 12,
                                     "type": 3,
+                                    "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
+                                    "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
+                                    "store_ID": self.timelineItems[0].store_ID,
                                     "systemUserID": self.timelineItems[self.timelineItems.length - 1].userID,
                                 }
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
@@ -487,7 +491,9 @@
                                             user: element.username,
                                             userID: element.systemUserID,
                                             type: element.type,
-                                            storeID: element.store_ID
+                                            storeID: element.store_ID,
+                                            storeCluster_ID: element.storeCluster_ID,
+                                            categoryCluster_ID: element.categoryCluster_ID
                                         })
 
                                         self.projectsStatus = self.timelineItems[0]
@@ -501,9 +507,6 @@
                     self.$refs.PlanogramIplementationModal.show(
                         "Decline Planogram Approval?", type, data => {
                             if (data.value == true) {
-
-
-
                                 let trans = {
                                     "project_ID": self.projectID,
                                     "dateTime": new Date,
@@ -511,6 +514,9 @@
                                     "username": self.timelineItems[self.timelineItems.length - 1].user,
                                     "status": 11,
                                     "type": 3,
+                                    "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
+                                    "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
+                                    "store_ID": self.timelineItems[0].store_ID,
                                     "systemUserID": self.timelineItems[self.timelineItems.length - 1].userID,
                                 }
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
@@ -525,7 +531,9 @@
                                             user: element.username,
                                             userID: element.systemUserID,
                                             type: element.type,
-                                            storeID: element.store_ID
+                                            storeID: element.store_ID,
+                                            storeCluster_ID: element.storeCluster_ID,
+                                            categoryCluster_ID: element.categoryCluster_ID
                                         })
 
                                         self.projectsStatus = self.timelineItems[0]
@@ -540,8 +548,6 @@
                     self.$refs.PlanogramIplementationModal.show(
                         "Request Planogram Variation?", type, data => {
                             if (data.value == true) {
-
-
                                 let trans = {
                                     "project_ID": self.projectID,
                                     "dateTime": new Date,
@@ -549,6 +555,9 @@
                                     "username": self.timelineItems[self.timelineItems.length - 1].user,
                                     "status": 14,
                                     "type": 3,
+                                    "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
+                                    "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
+                                    "store_ID": self.timelineItems[0].store_ID,
                                     "systemUserID": self.timelineItems[self.timelineItems.length - 1].userID,
                                 }
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
@@ -562,7 +571,9 @@
                                             user: element.username,
                                             userID: element.systemUserID,
                                             type: element.type,
-                                            storeID: element.store_ID
+                                            storeID: element.store_ID,
+                                            storeCluster_ID: element.storeCluster_ID,
+                                            categoryCluster_ID: element.categoryCluster_ID
                                         })
 
                                         self.projectsStatus = self.timelineItems[0]
@@ -576,9 +587,6 @@
                     self.$refs.PlanogramIplementationModal.show(
                         "Implement Planogram?", type, data => {
                             if (data.value == true) {
-
-
-
                                 let trans = {
                                     "project_ID": self.projectID,
                                     "dateTime": new Date,
@@ -587,6 +595,9 @@
                                     "username": self.projectsStatus.user,
                                     "status": 15,
                                     "type": 3,
+                                    "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
+                                    "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
+                                    "store_ID": self.timelineItems[0].store_ID,
                                     "systemUserID": self.projectsStatus.userID,
                                 }
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
@@ -601,7 +612,9 @@
                                             user: element.username,
                                             userID: element.systemUserID,
                                             type: element.type,
-                                            storeID: element.store_ID
+                                            storeID: element.store_ID,
+                                            storeCluster_ID: element.storeCluster_ID,
+                                            categoryCluster_ID: element.categoryCluster_ID
                                         })
 
                                         self.projectsStatus = self.timelineItems[0]
@@ -615,9 +628,6 @@
                     self.$refs.PlanogramIplementationModal.show(
                         "Select the Stores to distribute to", type, data => {
                             if (data.value == true) {
-
-
-
                                 let trans = {
                                     "project_ID": self.projectID,
                                     "dateTime": new Date,
@@ -626,6 +636,9 @@
                                     "username": self.projectsStatus.user,
                                     "status": 13,
                                     "type": 3,
+                                    "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
+                                    "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
+                                    "store_ID": self.timelineItems[0].store_ID,
                                     "systemUserID": data.users,
                                 }
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
@@ -640,7 +653,9 @@
                                             user: element.username,
                                             userID: element.systemUserID,
                                             type: element.type,
-                                            storeID: element.store_ID
+                                            storeID: element.store_ID,
+                                            storeCluster_ID: element.storeCluster_ID,
+                                            categoryCluster_ID: element.categoryCluster_ID
                                         })
 
                                         self.projectsStatus = self.timelineItems[0]
@@ -1033,7 +1048,9 @@
                                         user: element.username,
                                         userID: element.systemUserID,
                                         type: element.type,
-                                        storeID: element.store_ID
+                                        storeID: element.store_ID,
+                                        storeCluster_ID: element.storeCluster_ID,
+                                        categoryCluster_ID: element.categoryCluster_ID
                                     })
                                 }
 
