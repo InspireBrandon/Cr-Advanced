@@ -1,8 +1,8 @@
 class projectStatusHandler {
     constructor() {
-      
+
     }
-    
+
     getStatus(componentType) {
         var self = this
         let statusList = [{
@@ -149,17 +149,29 @@ class projectStatusHandler {
                 friendly: "Approval In Progress",
                 type: [3]
             }, {
-                text: "Review Range",
+                text: "Distribution In Progress",
                 value: 21,
+                color: "blue",
+                friendly: "Distribution In Progress",
+            }, {
+                text: "Review Range",
+                value: 22,
                 color: "blue",
                 friendly: "Review Range",
                 type: [2]
             },
             {
                 text: "Review Planogram",
-                value: 22,
+                value: 23,
                 color: "blue",
                 friendly: "Review Planogram",
+                type: [3]
+            },
+            {
+                text: "Implementation In Progress",
+                value: 24,
+                color: "blue",
+                friendly: "Implementation In Progress",
                 type: [3]
             }
         ]
@@ -181,38 +193,37 @@ class projectStatusHandler {
         }
     }
     getTypeList() {
-        var  types = [
-           {
-            text: "Event",
-            value: 0,
-            color: "yellow"
-        },
-        {
-            text: "Data Preparation",
-            value: 1,
-            color: "green"
+        var types = [{
+                text: "Event",
+                value: 0,
+                color: "yellow"
+            },
+            {
+                text: "Data Preparation",
+                value: 1,
+                color: "green"
 
-        }, {
-            text: "Ranging",
-            value: 2,
-            color: "red"
+            }, {
+                text: "Ranging",
+                value: 2,
+                color: "red"
 
-        },
-        {
-            text: "Planogram",
-            value: 3,
-            color: "blue"
+            },
+            {
+                text: "Planogram",
+                value: 3,
+                color: "blue"
 
-        }, {
-            text: "Promotion",
-            value: 4,
-            color: "purple"
+            }, {
+                text: "Promotion",
+                value: 4,
+                color: "purple"
 
-        }, {
-            text: "",
-            value: 5
-        }
-    ]
+            }, {
+                text: "",
+                value: 5
+            }
+        ]
         return types
     }
 }
