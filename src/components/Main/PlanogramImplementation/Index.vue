@@ -157,9 +157,9 @@
                     <v-card flat style="height: calc(100vh - 200px); overflow: auto;">
                         <v-card-text>
                             <v-timeline dense>
-                                <v-timeline-item right :color="typeList[item.type == -1 ? 5 : item.type].color"
+                                <v-timeline-item right :color="typeList[item.type == -1 ? 9 : item.type].color"
                                     v-for="(item,index) in timelineItems" :key="index" small>
-                                    <v-card :color="typeList[item.type == -1 ? 5 : item.type].color" dark>
+                                    <v-card :color="typeList[item.type == -1 ? 9 : item.type].color" dark>
                                         <v-card-title class="title pa-2 ma-0">
                                             <span>{{ status[item.status  == -1 ? 18 : item.status].text }}</span>
                                             <v-spacer></v-spacer>

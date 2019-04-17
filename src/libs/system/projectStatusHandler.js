@@ -173,6 +173,12 @@ class projectStatusHandler {
                 color: "blue",
                 friendly: "Implementation In Progress",
                 type: [3]
+            },{
+                text: "Like",
+                value: 24,
+                color: "blue",
+                friendly: "Like",
+                type: [3]
             }
         ]
 
@@ -220,10 +226,29 @@ class projectStatusHandler {
                 color: "purple"
 
             }, {
+                text: "WaitingProductInfo",
+                value: 5,
+                color:"yellow"
+            }, {
+                text: "WaitingPlanogramInput",
+                color:"yellow",
+                value: 6
+            }, {
+                color:"yellow",
+                text: "WaitingFixtureInput",
+                value: 7
+            }, {
+                color:"yellow",
+                text: "WaitingCheckPlanogram",
+                value: 8
+            }, {
+                color:"",
                 text: "",
-                value: 5
+                value: 9
             }
         ]
+      
+        
         return types
     }
 }
