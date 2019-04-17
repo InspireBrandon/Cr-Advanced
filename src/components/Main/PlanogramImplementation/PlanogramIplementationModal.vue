@@ -9,7 +9,7 @@
 
             </v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn icon @click.native="returnValue(false)">
+            <v-btn icon @click="dialog = false">
               <v-icon>
                 close
               </v-icon>
@@ -61,6 +61,8 @@
         users: [],
         selectedUser: null,
         databaseUsers: [],
+        disableStoreSelection: false,
+        storeCluster: null
       }
     },
     methods: {
@@ -119,22 +121,20 @@
             // alert("Failed to get data...");
           })
       },
-
-      show(title, type, afterRuturn) {
+      show(title, type, storeCluster, storeID, afterRuturn) {
         let self = this;
         self.type = type
-        console.log(self.type);
-        console.log("type: " + type);
-
 
         self.title = title;
         self.dialog = true;
         self.getStores()
 
+        self.storeCluster = storeCluster;
+        self.selectedStore = storeID;
+
         self.afterRuturn = afterRuturn;
         self.getSpacePlans()
         self.getDatabaseUsers()
-        // self.getUsers()
 
       },
       getDatabaseUsers() {
@@ -151,22 +151,26 @@
         let self = this
         Axios.get(process.env.VUE_APP_API + "Store?db=CR-Devinspire").then(r => {
 
-
           r.data.forEach(s => {
+            let storeCluster = "";
 
-            self.Stores.push({
-              text: s.storeName,
-              value: s.storeID
-            })
+            console.log(self.storeCluster)
 
+            if (self.storeCluster != undefined) {
+              storeCluster = self.storeCluster.toUpperCase();
+            }
+
+            if (s.storeClusterName.toUpperCase() == (storeCluster == "" ? s.storeClusterName.toUpperCase() :
+                storeCluster)) {
+              self.Stores.push({
+                text: s.storeName,
+                value: s.storeID
+              })
+            }
           })
-          console.log("stores");
-          console.log(self.Stores);
-
         })
 
       },
-
       returnValue(value) {
         let self = this;
         let tmp = {
