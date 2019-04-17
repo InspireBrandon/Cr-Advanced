@@ -36,9 +36,9 @@
                                     v-if="props.item.type == 3 && props.item.status == 20">
                                     <span>View</span>
                                 </v-btn>
-                                <v-btn @click="sendForDistribution(props.item)" small color="primary"
+                                <v-btn @click="sendForDistribution(props.item, props.index)" small color="primary"
                                     v-if="props.item.type == 3 && props.item.status == 12">
-                                    <span>View</span>
+                                    <span>Send</span>
                                 </v-btn>
                             </td>
                         </template>
@@ -46,15 +46,20 @@
                 </v-card>
             </v-flex>
         </v-layout>
+        <UserSelector ref="userSelector" />
     </v-container>
 </template>
 
 <script>
     import Axios from 'axios';
     import jwt from 'jsonwebtoken';
+    import UserSelector from '@/components/Common/UserSelector'
 
     export default {
         name: 'tasks',
+        components: {
+            UserSelector
+        },
         data() {
             return {
                 projectTransactions: [],
@@ -281,8 +286,22 @@
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
-            sendForDistribution(item) {
+            sendForDistribution(item, index) {
                 let self = this;
+
+                self.$refs.userSelector.show(user => {
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    let trans = JSON.parse(JSON.stringify(item));
+                    trans.status = 19;
+                    trans.systemUserID = user.systemUserID;
+
+                    Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                        res => {
+                            self.projectTransactions.splice(index, 1);
+                            delete Axios.defaults.headers.common["TenantID"];
+                        })
+                })
             }
         }
     }
