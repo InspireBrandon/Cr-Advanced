@@ -43,7 +43,6 @@
                         <v-toolbar color="primary" dark dense flat v-if="selectedPlanogram != null">
                             <v-toolbar-title>
                                 Status: {{status[timelineItems[0].status].text}}
-
                             </v-toolbar-title>
                             <!-- <v-btn v-if="(( authorityType == 1)&&(projectsStatus.status==10))" >Approve</v-btn>
                              <v-btn v-if="((authorityType == 1)&&(projectsStatus.status==10))">Decline</v-btn>
@@ -68,7 +67,7 @@
                                 @click="openImplementationModal(projectsStatus.status,3)">Implement
                             </v-btn>
                             <v-btn flat outline
-                                v-if="(( authorityType == 1)&&(projectsStatus.status==19)) || authorityType == 0"
+                                v-if="(( authorityType == 1)&&(projectsStatus.status==21)) || authorityType == 0"
                                 @click="openImplementationModal(projectsStatus.status,4)">Distribute
                             </v-btn>
                         </v-toolbar>
@@ -181,7 +180,7 @@
             <v-card>
                 <v-toolbar dark color="primary" prominent>
                     <v-toolbar-title>
-                       Planogram Image
+                        Planogram Image
                     </v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-btn @click="imageModal = false" icon>
@@ -204,6 +203,7 @@
     import PlanogramReportModal from './PlanogramReportModal';
     import PlanogramIplementationModal from './PlanogramIplementationModal'
     import moment from 'moment'
+    import StatusHandler from '@/libs/system/projectStatusHandler'
 
     let _MODULE = "Planogram Implementation";
 
@@ -233,173 +233,9 @@
                 active: 0,
                 timelineItems: [],
                 projectsStatus: null,
-                status: [{
-                        text: "Project Start",
-                        value: 0,
-                        friendly: "Project Start",
-                        color: "blue",
-                    },
-                    {
-                        text: "In Progress",
-                        value: 1,
-                        color: "blue",
-                        friendly: "In Progress"
-
-                    },
-                    {
-                        text: "Complete",
-                        value: 2,
-                        color: "blue",
-                        friendly: "Complete"
-                    },
-                    {
-                        text: "Workshop",
-                        value: 3,
-                        color: "warning",
-                        friendly: "Workshop"
-                    }, {
-                        text: "Workshop Complete",
-                        value: 4,
-                        color: "warning",
-                        friendly: "Workshop Complete"
-                    },
-                    {
-                        text: "Meeting",
-                        value: 5,
-                        color: "warning",
-                        friendly: "Meeting"
-                    },
-                    {
-                        text: "Data Preparation Start",
-                        value: 6,
-                        color: "red",
-                        friendly: "Data Preparation Start"
-                    },
-                    {
-                        text: "Ranging Start",
-                        value: 7,
-                        color: "red",
-                        friendly: "Ranging Start"
-                    },
-                    {
-                        text: "Planogram Start",
-                        value: 8,
-                        color: "green",
-                        friendly: "Planogram Start"
-                    },
-                    {
-                        text: "Meeting Supplier",
-                        value: 9,
-                        color: "green",
-                        friendly: "Meeting Supplier"
-                    },
-                    {
-                        text: "Requesting Approval",
-                        value: 10,
-                        color: "green",
-                        friendly: "Requesting Approval"
-                    },
-                    {
-                        text: "Declined",
-                        value: 11,
-                        color: "green",
-                        friendly: "Declined"
-                    },
-                    {
-                        text: "Approved",
-                        value: 12,
-                        color: "green",
-                        friendly: "Approved"
-                    },
-                    {
-                        text: "Implementation Pending",
-                        value: 13,
-                        color: "blue",
-                        friendly: "Implementation Pending"
-                    },
-                    {
-                        text: "Variation Request",
-                        value: 14,
-                        color: "blue",
-                        friendly: 'Variation Request'
-                    },
-                    {
-                        text: "Implemented",
-                        value: 15,
-                        color: "blue",
-                        friendly: "Implemented"
-                    },
-                    {
-                        text: "On Hold",
-                        value: 16,
-                        color: "blue",
-                        friendly: "On Hold"
-                    },
-                    {
-                        text: "Waiting Fixture Requirements",
-                        value: 17,
-                        color: "blue",
-                        friendly: "Waiting Fixture Requirements"
-                    }, {
-                        text: "Waiting Supplier",
-                        value: 18,
-                        color: "blue",
-                        friendly: "Waiting Supplier"
-                    }, {
-                        text: "Awaiting Distribution",
-                        value: 19,
-                        color: "blue",
-                        friendly: "Awaiting Distribution",
-                    },
-                    {
-                        text: "Approval In Progress",
-                        value: 20,
-                        color: "blue",
-                        friendly: "Approval In Progress",
-                    },
-                     {
-                        text: "Review Range",
-                        value: 21,
-                        color: "blue",
-                        friendly: "Review Range",
-                    },
-                     {
-                        text: "Review Planogram",
-                        value: 22,
-                        color: "blue",
-                        friendly: "Review Planogram",
-                    }
+                status: [
                 ],
-                typeList: [{
-                        text: "Event",
-                        value: 0,
-                        color: "warning"
-                    },
-                    {
-                        text: "Data Preparation",
-                        value: 1,
-                        color: "green"
-
-                    }, {
-                        text: "Ranging",
-                        value: 2,
-                        color: "red"
-
-                    },
-                    {
-                        text: "Planogram",
-                        value: 3,
-                        color: "blue"
-
-                    }, {
-                        text: "Promotion",
-                        value: 4,
-                        color: "purple"
-
-                    }, {
-                        text: "",
-                        value: 5
-                    }
+                typeList: [
                 ],
                 currentStatus: null
             }
@@ -407,8 +243,11 @@
         mounted() {
             let self = this;
             self.initialise();
+            this.getTypeList()
+            this.getStatusList()
         },
         computed: {
+
             filterPlanograms: function () {
                 var self = this
                 let value = self.type;
@@ -428,6 +267,19 @@
             }
         },
         methods: {
+            getTypeList() {
+                let self = this
+                let statushandler = new StatusHandler()
+                self.typeList = statushandler.getTypeList()
+            },
+            getStatusList() {
+                let self = this
+                let statushandler = new StatusHandler()
+
+                self.status = statushandler.getStatus()
+
+
+            },
             openReport() {
                 let self = this
                 console.log(self.planogramObj);
@@ -611,7 +463,7 @@
                             }
                         })
                 }
-                if (status == 19 && type == 4) {
+                if (status == 21 && type == 4) {
                     self.$refs.PlanogramIplementationModal.show(
                         "Select the Stores to distribute to", type, data => {
                             if (data.value == true) {
