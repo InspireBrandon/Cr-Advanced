@@ -40,6 +40,18 @@
                                     v-if="props.item.type == 3 && props.item.status == 12">
                                     <span>Send</span>
                                 </v-btn>
+                                <v-btn @click="startDistributionProgress(props.item, props.index)" small color="primary"
+                                    v-if="props.item.type == 3 && props.item.status == 19">
+                                    <span>View</span>
+                                </v-btn>
+                                <v-btn @click="$router.push('/PlanogramImplementation')" small color="primary"
+                                    v-if="props.item.type == 3 && props.item.status == 21">
+                                    <span>View</span>
+                                </v-btn>
+                                <v-btn @click="completeDistribution(props.item, props.index)" small color="primary"
+                                    v-if="props.item.type == 3 && props.item.status == 21">
+                                    <span>Complete</span>
+                                </v-btn>
                             </td>
                         </template>
                     </v-data-table>
@@ -186,6 +198,12 @@
                         value: 20,
                         color: "blue",
                         friendly: "Approval In Progress",
+                    },
+                    {
+                        text: "Distribution In Progress",
+                        value: 21,
+                        color: "blue",
+                        friendly: "Distribution In Progress",
                     }
                 ],
                 typeList: [{
@@ -218,7 +236,7 @@
                         text: "",
                         value: 5
                     }
-                ],
+                ]
             }
         },
         created() {
@@ -302,6 +320,34 @@
                             delete Axios.defaults.headers.common["TenantID"];
                         })
                 })
+            },
+            startDistributionProgress(item) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                let trans = JSON.parse(JSON.stringify(item));
+                trans.status = 21;
+
+                Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                    res => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        self.$router.push("/PlanogramImplementation");
+                    })
+            },
+            completeDistribution(item, index) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                let trans = JSON.parse(JSON.stringify(item));
+                trans.status = 21;
+
+                Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                    res => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        self.$router.push("/PlanogramImplementation");
+                    })
             }
         }
     }
