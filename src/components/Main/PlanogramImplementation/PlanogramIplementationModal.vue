@@ -9,7 +9,7 @@
 
             </v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn icon @click.native="returnValue(false)">
+            <v-btn icon @click="dialog = false">
               <v-icon>
                 close
               </v-icon>
@@ -22,8 +22,8 @@
                 label="Select A Store"></v-autocomplete>
             </v-flex>
             <v-flex md6 v-if="type==4">
-              <v-autocomplete style="max-width: 400px;" dense v-model="selectedUser" :items="users"
-                label="Select A User"></v-autocomplete>
+              <v-autocomplete :disabled="disableStoreSelection" style="max-width: 400px;" dense v-model="selectedUser"
+                :items="users" label="Select A User"></v-autocomplete>
             </v-flex>
 
           </v-card-title>
@@ -61,6 +61,8 @@
         users: [],
         selectedUser: null,
         databaseUsers: [],
+        disableStoreSelection: false,
+        storeCluster: null
       }
     },
     methods: {
@@ -119,22 +121,24 @@
             // alert("Failed to get data...");
           })
       },
-
-      show(title, type, afterRuturn) {
+      show(title, type, storeCluster, storeID, afterRuturn) {
         let self = this;
         self.type = type
-        console.log(self.type);
-        console.log("type: " + type);
-
 
         self.title = title;
         self.dialog = true;
         self.getStores()
 
+        self.storeCluster = storeCluster;
+        self.selectedStore = storeID;
+
+        if (self.selectedStore != undefined && self.selectedStore != null) {
+          self.disableStoreSelection = true;
+        }
+
         self.afterRuturn = afterRuturn;
         self.getSpacePlans()
         self.getDatabaseUsers()
-        // self.getUsers()
 
       },
       getDatabaseUsers() {
@@ -151,22 +155,25 @@
         let self = this
         Axios.get(process.env.VUE_APP_API + "Store?db=CR-Devinspire").then(r => {
 
-
           r.data.forEach(s => {
+            let storeCluster = "";
 
-            self.Stores.push({
-              text: s.storeName,
-              value: s.storeID
-            })
+            if (self.storeCluster != undefined) {
+              storeCluster = self.storeCluster.toUpperCase();
+            }
 
+            if (s.storeClusterName.toUpperCase() == (storeCluster == "" ? s.storeClusterName.toUpperCase() :
+                storeCluster)) {
+              self.Stores.push({
+                text: s.storeName,
+                value: s.storeID
+              }
+              )
+            }
           })
-          console.log("stores");
-          console.log(self.Stores);
-
         })
 
       },
-
       returnValue(value) {
         let self = this;
         let tmp = {

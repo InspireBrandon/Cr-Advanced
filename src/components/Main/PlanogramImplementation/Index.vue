@@ -90,69 +90,10 @@
                             </v-card-text>
                         </v-card>
                     </v-flex>
-                    <!-- <v-flex xl12 lg12 md12 sm12 xs12 v-if="planograms.length > 0">
-
-                        <v-list dense class="pa-0 ma-0">
-                            <template v-if="item.name.toUpperCase().includes(currentPlanogram.displayname)"
-                                v-for="(item, index) in planograms">
-                                <v-list-tile :key="item.title" avatar ripple>
-                                    <v-list-tile-content>
-                                        <v-list-tile-title>{{ item.name }}</v-list-tile-title>
-                                    </v-list-tile-content>
-                                    <v-list-tile-action>
-                                        <v-menu left>
-                                            <v-btn icon slot="activator">
-                                                <v-icon>more_vert</v-icon>
-                                            </v-btn>
-
-                                            <v-list dense class="pa-0 ma-0">
-                                                <v-list-tile @click="$refs.PlanogramReportModal.show(item)">
-                                                    <v-list-tile-title>Show</v-list-tile-title>
-                                                </v-list-tile>
-                                                <v-divider
-                                                    v-if="((authorityType == 0 || authorityType == 1)&&(projectsStatus.status==10))">
-                                                </v-divider>
-                                                <v-list-tile v-if="(( authorityType == 1)&&(projectsStatus.status==10))"
-                                                    @click="openImplementationModal(projectsStatus.status,0)">
-                                                    <v-list-tile-title>Approve</v-list-tile-title>
-                                                </v-list-tile>
-                                                <v-divider v-if="(( authorityType == 1)&&(projectsStatus.status==10))">
-                                                </v-divider>
-                                                <v-list-tile v-if="((authorityType == 1)&&(projectsStatus.status==10))"
-                                                    @click="openImplementationModal(projectsStatus.status,1)">
-                                                    <v-list-tile-title>Decline</v-list-tile-title>
-                                                </v-list-tile>
-                                                <v-divider v-if="((authorityType == 1)&&(projectsStatus.status==10))">
-                                                </v-divider>
-                                                <v-list-tile v-if="((authorityType == 1)&&(projectsStatus.status==10))"
-                                                    @click="openImplementationModal(projectsStatus.status,2)">
-                                                    <v-list-tile-title>Request Variation</v-list-tile-title>
-                                                </v-list-tile>
-                                                <v-divider v-if="(( authorityType == 1)&&(projectsStatus.status==13))">
-                                                </v-divider>
-                                                <v-list-tile v-if="(( authorityType == 3)&&(projectsStatus.status==13))"
-                                                    @click="openImplementationModal(projectsStatus.status,3)">
-                                                    <v-list-tile-title>Implement Planogram</v-list-tile-title>
-                                                </v-list-tile>
-                                                <v-divider v-if="(( authorityType == 1)&&(projectsStatus.status==19))">
-                                                </v-divider>
-                                                <v-list-tile v-if="(( authorityType == 1)&&(projectsStatus.status==19))"
-                                                    @click="openImplementationModal(projectsStatus.status,4)">
-                                                    <v-list-tile-title>Distribute Planograms</v-list-tile-title>
-                                                </v-list-tile>
-                                            </v-list>
-
-                                        </v-menu>
-                                    </v-list-tile-action>
-                                </v-list-tile>
-                                <v-divider v-if="index + 1 < planograms.length" :key="index"></v-divider>
-                            </template>
-                        </v-list>
-                    </v-flex> -->
                 </v-flex>
                 <v-flex xl5 lg5 md12 sm12 xs12 v-if="timelineItems.length > 0">
                     <v-toolbar flat dense dark color="primary">
-                        <v-toolbar-title>Project Timeline</v-toolbar-title>
+                        <v-toolbar-title>Planogram Timeline</v-toolbar-title>
                     </v-toolbar>
                     <v-card flat style="height: calc(100vh - 200px); overflow: auto;">
                         <v-card-text>
@@ -162,6 +103,8 @@
                                     <v-card :color="typeList[item.type == -1 ? 9 : item.type].color" dark>
                                         <v-card-title class="title pa-2 ma-0">
                                             <span>{{ status[item.status  == -1 ? 18 : item.status].text }}</span>
+                                            <span v-if="item.storeCluster != null" style="margin-left: 5px;"> - {{ item.storeCluster }}</span>
+                                            <span v-if="item.store != null" style="margin-left: 5px;"> - {{ item.store }}</span>
                                             <v-spacer></v-spacer>
                                             <span>{{ item.date }}</span>
                                         </v-card-title>
@@ -247,7 +190,6 @@
             this.getStatusList()
         },
         computed: {
-
             filterPlanograms: function () {
                 var self = this
                 let value = self.type;
@@ -277,12 +219,9 @@
                 let statushandler = new StatusHandler()
 
                 self.status = statushandler.getStatus()
-
-
             },
             openReport() {
                 let self = this
-                console.log(self.planogramObj);
                 self.$refs.PlanogramReportModal.show(self.planogramObj)
             },
             selectPlanogram(planogram) {
@@ -290,8 +229,6 @@
                 self.showLoader = true
 
                 self.$nextTick(() => {
-
-                    console.log(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&id=' + planogram)
 
                     Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&id=' + planogram)
                         .then(r => {
@@ -313,12 +250,13 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
 
+                let storeCluster = self.timelineItems[0].storeCluster;
+                let storeID = self.timelineItems[0].store_ID;
+
                 if (status == 20 && type == 0) {
                     self.$refs.PlanogramIplementationModal.show(
-                        "Approve planogram", type, data => {
+                        "Approve planogram", type, storeCluster, storeID, data => {
                             if (data.value == true) {
-                                console.log(self.timelineItems[0])
-
                                 let trans = {
                                     "project_ID": self.projectID,
                                     "dateTime": new Date,
@@ -328,7 +266,6 @@
                                     "type": 3,
                                     "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
                                     "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
-                                    "store_ID": self.timelineItems[0].store_ID,
                                     "systemUserID": self.timelineItems[self.timelineItems.length - 1].userID,
                                 }
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
@@ -357,7 +294,7 @@
                 }
                 if (status == 20 && type == 1) {
                     self.$refs.PlanogramIplementationModal.show(
-                        "Decline Planogram Approval?", type, data => {
+                        "Decline Planogram Approval?",storeCluster, storeID, type, data => {
                             if (data.value == true) {
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -368,7 +305,6 @@
                                     "type": 3,
                                     "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
                                     "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
-                                    "store_ID": self.timelineItems[0].store_ID,
                                     "systemUserID": self.timelineItems[self.timelineItems.length - 1].userID,
                                 }
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
@@ -398,7 +334,7 @@
                 }
                 if ((status == 12 || status == 10) && type == 2) {
                     self.$refs.PlanogramIplementationModal.show(
-                        "Request Planogram Variation?", type, data => {
+                        "Request Planogram Variation?", type, storeCluster, storeID, data => {
                             if (data.value == true) {
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -409,7 +345,6 @@
                                     "type": 3,
                                     "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
                                     "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
-                                    "store_ID": self.timelineItems[0].store_ID,
                                     "systemUserID": self.timelineItems[self.timelineItems.length - 1].userID,
                                 }
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
@@ -437,7 +372,7 @@
                 }
                 if (status == 13 && type == 3) {
                     self.$refs.PlanogramIplementationModal.show(
-                        "Implement Planogram?", type, data => {
+                        "Implement Planogram?", type, storeCluster, storeID, data => {
                             if (data.value == true) {
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -449,7 +384,6 @@
                                     "type": 3,
                                     "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
                                     "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
-                                    "store_ID": self.timelineItems[0].store_ID,
                                     "systemUserID": self.projectsStatus.userID,
                                 }
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
@@ -478,7 +412,7 @@
                 }
                 if (status == 21 && type == 4) {
                     self.$refs.PlanogramIplementationModal.show(
-                        "Select the Stores to distribute to", type, data => {
+                        "Select the store to distribute to", type, storeCluster, storeID, data => {
                             if (data.value == true) {
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -490,28 +424,13 @@
                                     "type": 3,
                                     "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
                                     "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
-                                    "store_ID": self.timelineItems[0].store_ID,
                                     "systemUserID": data.users,
                                 }
+
+                                console.log(data);
+
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
-
-                                        let element = res.data.projectTX;
-
-                                        self.timelineItems.unshift({
-                                            status: element.status,
-                                            notes: self.status[element.status].text,
-                                            date: element.dateTimeString,
-                                            user: element.username,
-                                            userID: element.systemUserID,
-                                            type: element.type,
-                                            storeID: element.store_ID,
-                                            storeCluster_ID: element.storeCluster_ID,
-                                            categoryCluster_ID: element.categoryCluster_ID
-                                        })
-
-                                        self.projectsStatus = self.timelineItems[0]
-
                                         delete Axios.defaults.headers.common["TenantID"];
                                     })
 
@@ -858,13 +777,13 @@
                             'SystemFile/JSON?db=CR-DEVINSPIRE&folder=SPACE PLANNING')
                         .then(r => {
                             self.planograms = r.data;
+
                             r.data.forEach(e => {
                                 self.PlanogramItems.push({
                                     text: e.name,
                                     value: e.id
                                 })
                             })
-
 
                             resolve();
                         })
@@ -891,8 +810,7 @@
                                 if (idx == 0)
                                     self.currentStatus = element.status;
 
-
-                                if (element.deleted != true) {
+                                if (element.deleted != true && element.type == 3 && element.status != 13) {
                                     self.timelineItems.push({
                                         status: element.status,
                                         notes: self.status[element.status].text,
@@ -901,7 +819,9 @@
                                         userID: element.systemUserID,
                                         type: element.type,
                                         storeID: element.store_ID,
+                                        store: element.store,
                                         storeCluster_ID: element.storeCluster_ID,
+                                        storeCluster: element.storeCluster,
                                         categoryCluster_ID: element.categoryCluster_ID
                                     })
                                 }
@@ -933,9 +853,6 @@
                     Axios.get(process.env.VUE_APP_API + `ProjectPlanograms?userID=` + systemUserID)
                         .then(r => {
                             delete Axios.defaults.headers.common["TenantID"];
-
-                            console.log(r.data);
-
                             resolve();
                         })
                         .catch(e => {
