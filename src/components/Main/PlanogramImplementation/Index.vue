@@ -39,7 +39,7 @@
                         <v-progress-circular class="ma-0" color="primary" indeterminate height="5">
                         </v-progress-circular>
                     </v-flex>
-                    <v-flex xl12 lg12 md12 sm12 xs12 v-if="planogramObj != null && !showLoader">
+                    <v-flex xl12 lg12 md12 sm12 xs12 v-if="selectedPlanogram != null && !showLoader">
                         <v-toolbar color="primary" dark dense flat v-if="selectedPlanogram != null">
                             <v-toolbar-title>
                                 Status: {{status[timelineItems[0].status].text}}
@@ -91,7 +91,7 @@
                         </v-card>
                     </v-flex>
                 </v-flex>
-                <v-flex xl5 lg5 md12 sm12 xs12 v-if="timelineItems.length > 0">
+                <v-flex xl5 lg5 md12 sm12 xs12 v-if="planogramObj != null">
                     <v-toolbar flat dense dark color="primary">
                         <v-toolbar-title>Planogram Timeline</v-toolbar-title>
                     </v-toolbar>
@@ -810,7 +810,7 @@
                                 if (idx == 0)
                                     self.currentStatus = element.status;
 
-                                if (element.deleted != true && element.type == 3 && element.status != 13) {
+                                if (element.deleted != true) {
                                     self.timelineItems.push({
                                         status: element.status,
                                         notes: self.status[element.status].text,
