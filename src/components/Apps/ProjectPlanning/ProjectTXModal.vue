@@ -407,10 +407,10 @@
             },
             open(isAdd, item, callback) {
                 var self = this
-                this.$refs.form.reset()
+              
 
                 self.dialog = true
-
+  this.$refs.form.reset()
                 if (isAdd == false) {
                     self.isAdd = false
                     self.projectID = item.project_ID

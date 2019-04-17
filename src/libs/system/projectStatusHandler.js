@@ -153,6 +153,7 @@ class projectStatusHandler {
                 value: 21,
                 color: "blue",
                 friendly: "Distribution In Progress",
+                type:[3]
             }, {
                 text: "Review Range",
                 value: 22,
