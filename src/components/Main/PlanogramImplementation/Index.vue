@@ -180,6 +180,9 @@
         <v-dialog fullscreen v-model="imageModal">
             <v-card>
                 <v-toolbar dark color="primary" prominent>
+                    <v-toolbar-title>
+                       Planogram Image
+                    </v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-btn @click="imageModal = false" icon>
                         <v-icon>close</v-icon>
@@ -353,6 +356,18 @@
                         value: 20,
                         color: "blue",
                         friendly: "Approval In Progress",
+                    },
+                     {
+                        text: "Review Range",
+                        value: 21,
+                        color: "blue",
+                        friendly: "Review Range",
+                    },
+                     {
+                        text: "Review Planogram",
+                        value: 22,
+                        color: "blue",
+                        friendly: "Review Planogram",
                     }
                 ],
                 typeList: [{
@@ -397,14 +412,18 @@
             filterPlanograms: function () {
                 var self = this
                 let value = self.type;
-
-                if (self.PlanogramItems != null && self.currentPlanogram != null) {
-                    return this.PlanogramItems.filter(function (item) {
-                        return item.text.toUpperCase().includes(self.currentPlanogram.displayname);
-                    })
+                if (self.selectedProjectGroup != null) {
+                    if (self.PlanogramItems != null && self.currentPlanogram != null) {
+                        return this.PlanogramItems.filter(function (item) {
+                            return item.text.toUpperCase().includes(self.currentPlanogram.displayname);
+                        })
+                    } else {
+                        return [];
+                    }
                 } else {
                     return [];
                 }
+
 
             }
         },

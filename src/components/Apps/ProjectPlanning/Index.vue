@@ -241,6 +241,8 @@
     import ProjectTXModal from './ProjectTXModal.vue'
     import ProjectGroupModal from './ProjectGroupModal.vue'
 
+    import StatusHandler from '@/libs/system/projectStatusHandler'
+
     import Axios from 'axios'
     import jwt from 'jsonwebtoken';
 
@@ -261,36 +263,7 @@
                 project: null,
                 Projects: [],
 
-                typeList: [{
-                        text: "Event",
-                        value: 0,
-                        color: "yellow"
-                    },
-                    {
-                        text: "Data Preparation",
-                        value: 1,
-                        color: "green"
-
-                    }, {
-                        text: "Ranging",
-                        value: 2,
-                        color: "red"
-
-                    },
-                    {
-                        text: "Planogram",
-                        value: 3,
-                        color: "blue"
-
-                    }, {
-                        text: "Promotion",
-                        value: 4,
-                        color: "purple"
-
-                    }, {
-                        text: "",
-                        value: 5
-                    }
+                typeList: [
                 ],
                 headers: [{
                     text: "Date",
@@ -321,132 +294,133 @@
                     sortable: false
                 }],
                 ProjectTXs: [],
-                status: [{
-                        text: "Project Start",
-                        value: 0,
-                        friendly: "Project Start",
-                        color: "blue",
-                    },
-                    {
-                        text: "In Progress",
-                        value: 1,
-                        color: "blue",
-                        friendly: "In Progress"
+                status: [
+                    // {
+                    //     text: "Project Start",
+                    //     value: 0,
+                    //     friendly: "Project Start",
+                    //     color: "blue",
+                    // },
+                    // {
+                    //     text: "In Progress",
+                    //     value: 1,
+                    //     color: "blue",
+                    //     friendly: "In Progress"
 
-                    },
-                    {
-                        text: "Complete",
-                        value: 2,
-                        color: "blue",
-                        friendly: "Complete"
-                    },
-                    {
-                        text: "Workshop",
-                        value: 3,
-                        color: "yellow",
-                        friendly: "Workshop"
-                    }, {
-                        text: "Workshop Complete",
-                        value: 4,
-                        color: "yellow",
-                        friendly: "Workshop Complete"
-                    },
-                    {
-                        text: "Meeting",
-                        value: 5,
-                        color: "yellow",
-                        friendly: "Meeting"
-                    },
-                    {
-                        text: "Data Preparation Start",
-                        value: 6,
-                        color: "red",
-                        friendly: "Data Preparation Start"
-                    },
-                    {
-                        text: "Ranging Start",
-                        value: 7,
-                        color: "red",
-                        friendly: "Ranging Start"
-                    },
-                    {
-                        text: "Planogram Start",
-                        value: 8,
-                        color: "green",
-                        friendly: "Planogram Start"
-                    },
-                    {
-                        text: "Meeting Supplier",
-                        value: 9,
-                        color: "green",
-                        friendly: "Meeting Supplier"
-                    },
-                    {
-                        text: "Requesting Approval",
-                        value: 10,
-                        color: "green",
-                        friendly: "Requesting Approval"
-                    },
-                    {
-                        text: "Declined",
-                        value: 11,
-                        color: "green",
-                        friendly: "Declined"
-                    },
-                    {
-                        text: "Approved",
-                        value: 12,
-                        color: "green",
-                        friendly: "Approved"
-                    },
-                    {
-                        text: "Implementation Pending",
-                        value: 13,
-                        color: "blue",
-                        friendly: "Implementation Pending"
-                    },
-                    {
-                        text: "Variation Request",
-                        value: 14,
-                        color: "blue",
-                        friendly: 'Variation Request'
-                    },
-                    {
-                        text: "Implemented",
-                        value: 15,
-                        color: "blue",
-                        friendly: "Implemented"
-                    },
-                    {
-                        text: "On Hold",
-                        value: 16,
-                        color: "blue",
-                        friendly: "On Hold"
-                    },
-                    {
-                        text: "Waiting Fixture Requirements",
-                        value: 17,
-                        color: "blue",
-                        friendly: "Waiting Fixture Requirements"
-                    }, {
-                        text: "Waiting Supplier",
-                        value: 18,
-                        color: "blue",
-                        friendly: "Waiting Supplier"
-                    }, {
-                        text: "Awaiting Distribution",
-                        value: 19,
-                        color: "blue",
-                        friendly: "Awaiting Distribution",
-                        type: [3]
-                    },
-                         {
-                        text: "Approval In Progress",
-                        value: 20,
-                        color: "blue",
-                        friendly: "Approval In Progress",
-                        type: [3]
-                    }
+                    // },
+                    // {
+                    //     text: "Complete",
+                    //     value: 2,
+                    //     color: "blue",
+                    //     friendly: "Complete"
+                    // },
+                    // {
+                    //     text: "Workshop",
+                    //     value: 3,
+                    //     color: "yellow",
+                    //     friendly: "Workshop"
+                    // }, {
+                    //     text: "Workshop Complete",
+                    //     value: 4,
+                    //     color: "yellow",
+                    //     friendly: "Workshop Complete"
+                    // },
+                    // {
+                    //     text: "Meeting",
+                    //     value: 5,
+                    //     color: "yellow",
+                    //     friendly: "Meeting"
+                    // },
+                    // {
+                    //     text: "Data Preparation Start",
+                    //     value: 6,
+                    //     color: "red",
+                    //     friendly: "Data Preparation Start"
+                    // },
+                    // {
+                    //     text: "Ranging Start",
+                    //     value: 7,
+                    //     color: "red",
+                    //     friendly: "Ranging Start"
+                    // },
+                    // {
+                    //     text: "Planogram Start",
+                    //     value: 8,
+                    //     color: "green",
+                    //     friendly: "Planogram Start"
+                    // },
+                    // {
+                    //     text: "Meeting Supplier",
+                    //     value: 9,
+                    //     color: "green",
+                    //     friendly: "Meeting Supplier"
+                    // },
+                    // {
+                    //     text: "Requesting Approval",
+                    //     value: 10,
+                    //     color: "green",
+                    //     friendly: "Requesting Approval"
+                    // },
+                    // {
+                    //     text: "Declined",
+                    //     value: 11,
+                    //     color: "green",
+                    //     friendly: "Declined"
+                    // },
+                    // {
+                    //     text: "Approved",
+                    //     value: 12,
+                    //     color: "green",
+                    //     friendly: "Approved"
+                    // },
+                    // {
+                    //     text: "Implementation Pending",
+                    //     value: 13,
+                    //     color: "blue",
+                    //     friendly: "Implementation Pending"
+                    // },
+                    // {
+                    //     text: "Variation Request",
+                    //     value: 14,
+                    //     color: "blue",
+                    //     friendly: 'Variation Request'
+                    // },
+                    // {
+                    //     text: "Implemented",
+                    //     value: 15,
+                    //     color: "blue",
+                    //     friendly: "Implemented"
+                    // },
+                    // {
+                    //     text: "On Hold",
+                    //     value: 16,
+                    //     color: "blue",
+                    //     friendly: "On Hold"
+                    // },
+                    // {
+                    //     text: "Waiting Fixture Requirements",
+                    //     value: 17,
+                    //     color: "blue",
+                    //     friendly: "Waiting Fixture Requirements"
+                    // }, {
+                    //     text: "Waiting Supplier",
+                    //     value: 18,
+                    //     color: "blue",
+                    //     friendly: "Waiting Supplier"
+                    // }, {
+                    //     text: "Awaiting Distribution",
+                    //     value: 19,
+                    //     color: "blue",
+                    //     friendly: "Awaiting Distribution",
+                    //     type: [3]
+                    // },
+                    //      {
+                    //     text: "Approval In Progress",
+                    //     value: 20,
+                    //     color: "blue",
+                    //     friendly: "Approval In Progress",
+                    //     type: [3]
+                    // }
                 ],
                 stores: [],
                 ProjectsGroups: [],
@@ -460,7 +434,8 @@
             }
         },
         mounted() {
-
+            this.getTypeList()
+            this.getStatusList()
             this.getstores()
             this.getStoreClusters()
             this.getDatabaseUsers()
@@ -476,6 +451,19 @@
             }
         },
         methods: {
+            getTypeList(){
+                let self = this
+                let statushandler = new StatusHandler()
+                self.typeList=statushandler.getTypeList()
+            },
+            getStatusList(){
+                let self = this
+                let statushandler = new StatusHandler()
+
+                self.status=statushandler.getStatus()
+              
+                
+            },
             deleteProjectTX(item, group) {
                 let self = this
                 self.$refs.yesNoModal.show('Delete project transaction?', value => {
@@ -483,7 +471,6 @@
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                         Axios.delete(process.env.VUE_APP_API + `ProjectTX?projectTXID=${item.id}`).then(r => {
-                            console.log(r);
 
 
                             for (let index = 0; index < self.ProjectTXs.length; index++) {
