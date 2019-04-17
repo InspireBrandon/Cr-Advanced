@@ -16,116 +16,117 @@
                             <td>{{ props.item.store }}</td>
                             <td>{{ props.item.dateTimeString }}</td>
                             <td style="width: 5%;">
+                                <v-btn color="primary" @click="setRangingInProgress(props.item)"
+                                    v-if="props.item.type == 2 && props.item.status == 7">
+                                    <span>Start</span>
+                                </v-btn>
+                                <v-btn color="primary" @click="$router.push('/RangePlanning')"
+                                    v-if="props.item.type == 2 && props.item.status == 1">
+                                    <span>View</span>
+                                </v-btn>
+                                <v-btn color="primary" v-if="props.item.type == 2 && props.item.status == 1"
+                                    @click="setRangingComplete(props.item, props.index)">
+                                    <span>Complete</span>
+                                </v-btn>
+                                <v-btn color="primary" v-if="props.item.type == 3 && props.item.status == 10"
+                                    @click="setPlanogramApprovalInProgress(props.item)">
+                                    <span>Start</span>
+                                </v-btn>
+                                <v-btn color="primary" v-if="props.item.type == 3 && props.item.status == 20"
+                                    @click="$router.push('/PlanogramImplementation')">
+                                    <span>View</span>
+                                </v-btn>
+                                <v-btn color="primary" v-if="props.item.type == 3 && props.item.status == 12"
+                                    @click="sendForDistribution(props.item, props.index)">
+                                    <span>Send</span>
+                                </v-btn>
+                                <v-btn color="primary" v-if="props.item.type == 3 && props.item.status == 19"
+                                    @click="startDistributionProgress(props.item, props.index)">
+                                    <span>View</span>
+                                </v-btn>
+                                <v-btn color="primary" v-if="props.item.type == 3 && props.item.status == 21"
+                                    @click="$router.push('/PlanogramImplementation')">
+                                    <span>View</span>
+                                </v-btn>
+                                <v-btn color="primary" v-if="props.item.type == 3 && props.item.status == 21"
+                                    @click="completeDistribution(props.item, props.index)">
+                                    <span>Complete</span>
+                                </v-btn>
+                                <v-btn color="primary" v-if="props.item.status == 28"
+                                    @click="ChangeWaitingStart(props.item, props.index,29)">
+                                    <span>Start</span>
+                                </v-btn>
+                                <v-btn color="primary" v-if="props.item.status == 29"
+                                    @click="ChangeWaitingcomplete(props.item, props.index,30)">
+                                    <span>Complete</span>
+                                </v-btn>
+                                <v-btn color="primary" v-if="props.item.status == 31"
+                                    @click="ChangeWaitingStart(props.item, props.index,32)">
+                                    <span>Start</span>
+                                </v-btn>
+                                <v-btn color="primary" v-if="props.item.status == 32"
+                                    @click="ChangeWaitingcomplete(props.item, props.index,33)">
+                                    <span>Complete</span>
+                                </v-btn>
+                                <v-btn color="primary" v-if="props.item.status == 34"
+                                    @click="ChangeWaitingStart(props.item, props.index,35)">
+                                    <span>Start</span>
+                                </v-btn>
+                                <v-btn color="primary" v-if="props.item.status == 35"
+                                    @click="ChangeWaitingcomplete(props.item, props.index,36)">
+                                    <span>Complete</span>
+                                </v-btn>
+                                <v-btn color="primary" v-if="props.item.status == 37"
+                                    @click="ChangeWaitingStart(props.item, props.index,38)">
+                                    <span>Start</span>
+                                </v-btn>
+                                <v-btn color="primary" v-if="props.item.status == 38"
+                                    @click="ChangeWaitingcomplete(props.item, props.index,39)">
+                                    <span>Complete</span>
+                                </v-btn>
+                            </td>
+                            <td style="width: 5%;">
                                 <v-menu left>
                                     <v-btn icon slot="activator">
                                         <v-icon>more_vert</v-icon>
                                     </v-btn>
 
                                     <v-list dense class="pa-0 ma-0">
-                                        <v-list-tile @click="setRangingInProgress(props.item)"
-                                            v-if="props.item.type == 2 && props.item.status == 7">
-                                            <span>Start</span>
-                                        </v-list-tile>
-                                        <v-divider></v-divider>
-                                        <v-list-tile @click="$router.push('/RangePlanning')"
-                                            v-if="props.item.type == 2 && props.item.status == 1">
-                                            <span>View</span>
-                                        </v-list-tile>
-                                        <v-divider></v-divider>
-                                        <v-list-tile v-if="props.item.type == 2 && props.item.status == 1"
-                                            @click="setRangingComplete(props.item, props.index)">
-                                            <span>Complete</span>
-                                        </v-list-tile>
-                                        <v-divider></v-divider>
-                                        <v-list-tile v-if="props.item.type == 3 && props.item.status == 10"
-                                            @click="setPlanogramApprovalInProgress(props.item)">
-                                            <span>Start</span>
-                                        </v-list-tile>
-                                        <v-divider></v-divider>
-                                        <v-list-tile v-if="props.item.type == 3 && props.item.status == 20"
-                                            @click="$router.push('/PlanogramImplementation')">
-                                            <span>View</span>
-                                        </v-list-tile>
-                                        <v-divider></v-divider>
-                                        <v-list-tile v-if="props.item.type == 3 && props.item.status == 12"
-                                            @click="sendForDistribution(props.item, props.index)">
-                                            <span>Send</span>
-                                        </v-list-tile>
-                                        <v-divider></v-divider>
-                                        <v-list-tile v-if="props.item.type == 3 && props.item.status == 19"
-                                            @click="startDistributionProgress(props.item, props.index)">
-                                            <span>View</span>
-                                        </v-list-tile>
-                                        <v-divider></v-divider>
-                                        <v-list-tile v-if="props.item.type == 3 && props.item.status == 21"
-                                            @click="$router.push('/PlanogramImplementation')">
-                                            <span>View</span>
-                                        </v-list-tile>
-                                        <v-divider></v-divider>
-                                        <v-list-tile v-if="props.item.type == 3 && props.item.status == 21"
-                                            @click="completeDistribution(props.item, props.index)">
-                                            <span>Complete</span>
-                                        </v-list-tile>
-                                        <v-divider></v-divider>
-                                        <v-list-tile>
+                                        <!-- <v-list-tile>
                                             <span>Launch</span>
-                                        </v-list-tile>
+                                        </v-list-tile> -->
                                         <v-divider></v-divider>
                                         <!--Waiting Product Info  -->
-                                        <v-list-tile v-if="props.item.type == 3 ||props.item.type == 1"
-                                            @click="ChangeWaitingType(props.item, props.index,29)">
+                                        <v-list-tile
+                                            v-if="(props.item.type == 3 ||props.item.type == 1) &&(props.item.status!=28&&props.item.status!=29)"
+                                            @click="ChangeWaitingType(props.item, props.index,28)">
                                             <span>Waiting Product Info</span>
                                         </v-list-tile>
-                                        <v-list-tile v-if="props.item.status == 29"
-                                            @click="ChangeWaitingStart(props.item, props.index,30)">
-                                            <span>Start</span>
-                                        </v-list-tile>
-                                        <v-list-tile v-if="props.item.status == 30"
-                                            @click="ChangeWaitingcomplete(props.item, props.index,31)">
-                                            <span>Complete</span>
-                                        </v-list-tile>
+
                                         <v-divider></v-divider>
                                         <!-- Waiting Planogram Input -->
-                                        <v-list-tile v-if="props.item.type == 3"
-                                            @click="ChangeWaitingType(props.item, props.index,32)">
+                                        <v-list-tile
+                                            v-if="(props.item.type == 3 ) &&(props.item.status!=31&&props.item.status!=32)"
+                                            @click="ChangeWaitingType(props.item, props.index,31)">
                                             <span>Waiting Planogram Input</span>
                                         </v-list-tile>
-                                        <v-list-tile v-if="props.item.status == 32"
-                                            @click="ChangeWaitingStart(props.item, props.index,33)">
-                                            <span>Start</span>
-                                        </v-list-tile>
-                                        <v-list-tile v-if="props.item.status == 33"
-                                            @click="ChangeWaitingcomplete(props.item, props.index,34)">
-                                            <span>Complete</span>
-                                        </v-list-tile>
+
                                         <v-divider></v-divider>
                                         <!-- Waiting Fixture Input -->
-                                        <v-list-tile v-if="props.item.type == 3"
-                                            @click="ChangeWaitingType(props.item, props.index,35)">
+                                        <v-list-tile
+                                            v-if="props.item.type == 3&&(props.item.status!=34&&props.item.status!=35)"
+                                            @click="ChangeWaitingType(props.item, props.index,34)">
                                             <span>Waiting Fixture Input</span>
                                         </v-list-tile>
-                                        <v-list-tile v-if="props.item.status == 35"
-                                            @click="ChangeWaitingStart(props.item, props.index,36)">
-                                            <span>Start</span>
-                                        </v-list-tile>
-                                        <v-list-tile v-if="props.item.status == 36"
-                                            @click="ChangeWaitingcomplete(props.item, props.index,37)">
-                                            <span>Complete</span>
-                                        </v-list-tile>
+
                                         <v-divider></v-divider>
                                         <!-- Waiting Check Planogram -->
-                                        <v-list-tile v-if="props.item.type == 3"
-                                            @click="ChangeWaitingType(props.item, props.index,38)">
+                                        <v-list-tile
+                                            v-if="props.item.type == 3 &&(props.item.status!=37&&props.item.status!=38)"
+                                            @click="ChangeWaitingType(props.item, props.index,37)">
                                             <span>Waiting Check Planogram</span>
                                         </v-list-tile>
-                                        <v-list-tile v-if="props.item.status == 38"
-                                            @click="ChangeWaitingStart(props.item, props.index,39)">
-                                            <span>Start</span>
-                                        </v-list-tile>
-                                        <v-list-tile v-if="props.item.status == 39"
-                                            @click="ChangeWaitingcomplete(props.item, props.index,40)">
-                                            <span>Complete</span>
-                                        </v-list-tile>
+
                                         <v-divider></v-divider>
                                     </v-list>
                                 </v-menu>
