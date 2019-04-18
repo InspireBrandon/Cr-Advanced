@@ -16,71 +16,77 @@
                             <td>{{ props.item.store }}</td>
                             <td>{{ props.item.dateTimeString }}</td>
                             <td style="width: 5%;">
-                                <v-btn color="primary" @click="setRangingInProgress(props.item)"
+                                <v-btn small color="primary" @click="setRangingInProgress(props.item)"
                                     v-if="props.item.type == 2 && props.item.status == 7">
                                     <span>Start</span>
                                 </v-btn>
-                                <v-btn color="primary" @click="$router.push('/RangePlanning')"
+                                <v-btn small color="primary" @click="$router.push('/RangePlanning')"
                                     v-if="props.item.type == 2 && props.item.status == 1">
                                     <span>View</span>
                                 </v-btn>
-                                <v-btn color="primary" v-if="props.item.type == 2 && props.item.status == 1"
+                                <v-btn small color="primary" v-if="props.item.type == 2 && props.item.status == 1"
                                     @click="setRangingComplete(props.item, props.index)">
                                     <span>Complete</span>
                                 </v-btn>
-                                <v-btn color="primary" v-if="props.item.type == 3 && props.item.status == 10"
+                                <v-btn small color="primary" v-if="props.item.type == 3 && props.item.status == 10"
                                     @click="setPlanogramApprovalInProgress(props.item)">
                                     <span>Start</span>
                                 </v-btn>
-                                <v-btn color="primary" v-if="props.item.type == 3 && props.item.status == 20"
+                                <v-btn small color="primary" v-if="props.item.type == 3 && props.item.status == 20"
                                     @click="$router.push('/PlanogramImplementation')">
                                     <span>View</span>
                                 </v-btn>
-                                <v-btn color="primary" v-if="props.item.type == 3 && props.item.status == 12"
+                                <v-btn small color="primary"
+                                    v-if="props.item.type == 3 && props.item.status == 12 && systemUserID == props.item.projectOwnerID"
                                     @click="sendForDistribution(props.item, props.index)">
                                     <span>Send</span>
                                 </v-btn>
-                                <v-btn color="primary" v-if="props.item.type == 3 && props.item.status == 19"
-                                    @click="startDistributionProgress(props.item, props.index)">
-                                    <span>View</span>
-                                </v-btn>
-                                <v-btn color="primary" v-if="props.item.type == 3 && props.item.status == 21"
+                                <v-btn small color="primary"
+                                    v-if="props.item.type == 3 && props.item.status == 12 && systemUserID == props.item.actionedByUserID"
                                     @click="$router.push('/PlanogramImplementation')">
                                     <span>View</span>
                                 </v-btn>
-                                <v-btn color="primary" v-if="props.item.type == 3 && props.item.status == 21"
+                                <v-btn small color="primary" v-if="props.item.type == 3 && props.item.status == 19"
+                                    @click="startDistributionProgress(props.item, props.index)">
+                                    <span>View</span>
+                                </v-btn>
+                                <v-btn small color="primary" v-if="props.item.type == 3 && props.item.status == 21"
+                                    @click="$router.push('/PlanogramImplementation')">
+                                    <span>View</span>
+                                </v-btn>
+                                <v-btn small color="primary" v-if="props.item.type == 3 && props.item.status == 21"
                                     @click="completeDistribution(props.item, props.index)">
                                     <span>Complete</span>
                                 </v-btn>
-                                <v-btn color="primary" v-if="props.item.status == 28"
+                                <v-btn small color="primary" v-if="props.item.status == 28"
                                     @click="ChangeWaitingStart(props.item, props.index,29)">
                                     <span>Start</span>
                                 </v-btn>
-                                <v-btn color="primary" v-if="props.item.status == 29"
+                                <v-btn small color="primary" v-if="props.item.status == 29"
                                     @click="ChangeWaitingcomplete(props.item, props.index,30)">
                                     <span>Complete</span>
                                 </v-btn>
-                                <v-btn color="primary" v-if="props.item.status == 31"
+                                <v-btn small color="primary" v-if="props.item.status == 31"
                                     @click="ChangeWaitingStart(props.item, props.index,32)">
                                     <span>Start</span>
                                 </v-btn>
-                                <v-btn color="primary" v-if="props.item.status == 32"
+                                <v-btn small color="primary" v-if="props.item.status == 32"
                                     @click="ChangeWaitingcomplete(props.item, props.index,33)">
                                     <span>Complete</span>
                                 </v-btn>
-                                <v-btn color="primary" v-if="props.item.status == 34"
+                                <v-btn small color="primary" v-if="props.item.status == 34"
                                     @click="ChangeWaitingStart(props.item, props.index,35)">
                                     <span>Start</span>
                                 </v-btn>
-                                <v-btn color="primary" v-if="props.item.status == 35"
+                                <v-btn small color="primary" v-if="props.item.status == 35"
                                     @click="ChangeWaitingcomplete(props.item, props.index,36)">
                                     <span>Complete</span>
                                 </v-btn>
-                                <v-btn color="primary" v-if="props.item.status == 37"
+                                <v-btn small color="primary" v-if="props.item.status == 37"
                                     @click="ChangeWaitingStart(props.item, props.index,38)">
                                     <span>Start</span>
                                 </v-btn>
-                                <v-btn color="primary" v-if="props.item.status == 38"
+                                <v-btn small color="primary" v-if="props.item.status == 38"
                                     @click="ChangeWaitingcomplete(props.item, props.index,39)">
                                     <span>Complete</span>
                                 </v-btn>
@@ -100,7 +106,7 @@
                                         <v-list-tile
                                             v-if="(props.item.type == 3 ||props.item.type == 1) &&(props.item.status!=28&&props.item.status!=29)"
                                             @click="ChangeWaitingType(props.item, props.index,28)">
-                                            <span>Waiting Product Info</span>
+                                            <span>Request Product Info</span>
                                         </v-list-tile>
 
                                         <v-divider></v-divider>
@@ -108,7 +114,7 @@
                                         <v-list-tile
                                             v-if="(props.item.type == 3 ) &&(props.item.status!=31&&props.item.status!=32)"
                                             @click="ChangeWaitingType(props.item, props.index,31)">
-                                            <span>Waiting Planogram Input</span>
+                                            <span>Request Planogram Input</span>
                                         </v-list-tile>
 
                                         <v-divider></v-divider>
@@ -116,7 +122,7 @@
                                         <v-list-tile
                                             v-if="props.item.type == 3&&(props.item.status!=34&&props.item.status!=35)"
                                             @click="ChangeWaitingType(props.item, props.index,34)">
-                                            <span>Waiting Fixture Input</span>
+                                            <span>Request Fixture Input</span>
                                         </v-list-tile>
 
                                         <v-divider></v-divider>
@@ -124,14 +130,13 @@
                                         <v-list-tile
                                             v-if="props.item.type == 3 &&(props.item.status!=37&&props.item.status!=38)"
                                             @click="ChangeWaitingType(props.item, props.index,37)">
-                                            <span>Waiting Check Planogram</span>
+                                            <span>Request Planogram Check</span>
                                         </v-list-tile>
 
                                         <v-divider></v-divider>
                                     </v-list>
                                 </v-menu>
                             </td>
-
                         </template>
                     </v-data-table>
                 </v-card>
@@ -157,8 +162,8 @@
             return {
                 projectTransactions: [],
                 status: [],
-                typeList: []
-
+                typeList: [],
+                systemUserID: null
             }
         },
         created() {
@@ -183,8 +188,6 @@
             },
             ChangeWaitingStart(item, index, type) {
                 let self = this
-                console.log("ChangeWaitingStart");
-                console.log(type);
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 let trans = JSON.parse(JSON.stringify(item));
@@ -197,9 +200,6 @@
             },
             ChangeWaitingType(item, index, type) {
                 let self = this
-                console.log("ChangeWaitingType");
-                console.log(type);
-
 
                 self.$refs.userSelector.show(user => {
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -210,8 +210,6 @@
                     trans.systemUserID = user.systemUserID;
                     Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                         res => {
-                            item.status = type
-                            self.projectTransactions.splice(index, 1);
                             delete Axios.defaults.headers.common["TenantID"];
                         })
                 })
@@ -229,6 +227,8 @@
 
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
+
+                self.systemUserID = systemUserID;
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 

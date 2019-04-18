@@ -103,10 +103,10 @@ class projectStatusHandler {
                 type: [0]
             },
             {
-                text: "Variation Request",
+                text: "Variation Requested",
                 value: 14,
                 color: "blue",
-                friendly: 'Variation Request',
+                friendly: 'Variation Requested',
                 type: [2, 3]
             },
             {

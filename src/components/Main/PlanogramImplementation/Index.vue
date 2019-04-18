@@ -54,13 +54,13 @@
                         <v-toolbar color="primary" dark dense flat v-if="selectedPlanogram != null">
 
                             <v-btn flat outline
-                                v-if="(( authorityType == 1)&&(projectsStatus.status==20)) || authorityType == 0"
+                                v-if="(( authorityType == 1)&&(projectsStatus.status==20)) || authorityType == 0 || authorityType == 1"
                                 @click="openImplementationModal(projectsStatus.status,0)">Approve</v-btn>
                             <v-btn flat outline
-                                v-if="((authorityType == 1)&&(projectsStatus.status==20)) || authorityType == 0"
+                                v-if="((authorityType == 1)&&(projectsStatus.status==20)) || authorityType == 0 || authorityType == 1"
                                 @click="openImplementationModal(projectsStatus.status,1)">Decline</v-btn>
                             <v-btn flat outline
-                                v-if="((authorityType == 1)&&(projectsStatus.status==20)) || authorityType == 0"
+                                v-if="((authorityType == 1)&&(projectsStatus.status==20)) || authorityType == 0 || authorityType == 1"
                                 @click="openImplementationModal(projectsStatus.status,2)">Variation</v-btn>
                             <v-btn flat outline
                                 v-if="(( authorityType == 3)&&(projectsStatus.status==13)) || authorityType == 0"
@@ -252,11 +252,12 @@
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
 
                 let storeCluster = self.timelineItems[0].storeCluster;
                 let storeID = self.timelineItems[0].store_ID;
 
-                if (status == 20 && type == 0) {
+                if (type == 0) {
                     self.$refs.PlanogramIplementationModal.show(
                         "Approve planogram", type, storeCluster, storeID, data => {
                             if (data.value == true) {
@@ -270,6 +271,7 @@
                                     "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
                                     "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
                                     "systemUserID": self.timelineItems[self.timelineItems.length - 1].userID,
+                                    "actionedByUserID": systemUserID
                                 }
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
@@ -288,6 +290,18 @@
                                             categoryCluster_ID: element.categoryCluster_ID
                                         })
 
+                                        self.tmpItems.unshift({
+                                            status: element.status,
+                                            notes: self.status[element.status].text,
+                                            date: element.dateTimeString,
+                                            user: element.username,
+                                            userID: element.systemUserID,
+                                            type: element.type,
+                                            storeID: element.store_ID,
+                                            storeCluster_ID: element.storeCluster_ID,
+                                            categoryCluster_ID: element.categoryCluster_ID
+                                        })
+
                                         self.projectsStatus = self.timelineItems[0]
 
                                         delete Axios.defaults.headers.common["TenantID"];
@@ -295,7 +309,7 @@
                             }
                         })
                 }
-                if (status == 20 && type == 1) {
+                if (type == 1) {
                     self.$refs.PlanogramIplementationModal.show(
                         "Decline Planogram Approval?", storeCluster, storeID, type, data => {
                             if (data.value == true) {
@@ -327,6 +341,18 @@
                                             categoryCluster_ID: element.categoryCluster_ID
                                         })
 
+                                        self.tmpItems.unshift({
+                                            status: element.status,
+                                            notes: self.status[element.status].text,
+                                            date: element.dateTimeString,
+                                            user: element.username,
+                                            userID: element.systemUserID,
+                                            type: element.type,
+                                            storeID: element.store_ID,
+                                            storeCluster_ID: element.storeCluster_ID,
+                                            categoryCluster_ID: element.categoryCluster_ID
+                                        })
+
                                         self.projectsStatus = self.timelineItems[0]
 
                                         delete Axios.defaults.headers.common["TenantID"];
@@ -335,7 +361,7 @@
 
                         })
                 }
-                if ((status == 12 || status == 10) && type == 2) {
+                if (type == 2) {
                     self.$refs.PlanogramIplementationModal.show(
                         "Request Planogram Variation?", type, storeCluster, storeID, data => {
                             if (data.value == true) {
@@ -366,6 +392,18 @@
                                             categoryCluster_ID: element.categoryCluster_ID
                                         })
 
+                                        self.tmpItems.unshift({
+                                            status: element.status,
+                                            notes: self.status[element.status].text,
+                                            date: element.dateTimeString,
+                                            user: element.username,
+                                            userID: element.systemUserID,
+                                            type: element.type,
+                                            storeID: element.store_ID,
+                                            storeCluster_ID: element.storeCluster_ID,
+                                            categoryCluster_ID: element.categoryCluster_ID
+                                        })
+
                                         self.projectsStatus = self.timelineItems[0]
 
                                         delete Axios.defaults.headers.common["TenantID"];
@@ -373,7 +411,7 @@
                             }
                         })
                 }
-                if (status == 13 && type == 3) {
+                if (type == 3) {
                     self.$refs.PlanogramIplementationModal.show(
                         "Implement Planogram?", type, storeCluster, storeID, data => {
                             if (data.value == true) {
@@ -406,6 +444,18 @@
                                             categoryCluster_ID: element.categoryCluster_ID
                                         })
 
+                                        self.tmpItems.unshift({
+                                            status: element.status,
+                                            notes: self.status[element.status].text,
+                                            date: element.dateTimeString,
+                                            user: element.username,
+                                            userID: element.systemUserID,
+                                            type: element.type,
+                                            storeID: element.store_ID,
+                                            storeCluster_ID: element.storeCluster_ID,
+                                            categoryCluster_ID: element.categoryCluster_ID
+                                        })
+
                                         self.projectsStatus = self.timelineItems[0]
 
                                         delete Axios.defaults.headers.common["TenantID"];
@@ -413,7 +463,7 @@
                             }
                         })
                 }
-                if (status == 21 && type == 4) {
+                if (type == 4) {
                     self.$refs.PlanogramIplementationModal.show(
                         "Select the store to distribute to", type, storeCluster, storeID, data => {
                             if (data.value == true) {
@@ -447,6 +497,18 @@
                                             store: element.store,
                                             storeCluster_ID: element.storeCluster_ID,
                                             storeCluster: element.storeCluster,
+                                            categoryCluster_ID: element.categoryCluster_ID
+                                        })
+
+                                        self.tmpItems.unshift({
+                                            status: element.status,
+                                            notes: self.status[element.status].text,
+                                            date: element.dateTimeString,
+                                            user: element.username,
+                                            userID: element.systemUserID,
+                                            type: element.type,
+                                            storeID: element.store_ID,
+                                            storeCluster_ID: element.storeCluster_ID,
                                             categoryCluster_ID: element.categoryCluster_ID
                                         })
 
