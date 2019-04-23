@@ -58,7 +58,7 @@
                                 @click="openImplementationModal(projectsStatus.status,0)">Approve</v-btn>
                             <v-btn flat outline
                                 v-if="((authorityType == 1)&&(projectsStatus.status==20)) || authorityType == 0 || authorityType == 1"
-                                @click="openImplementationModal(projectsStatus.status,1)">Decline</v-btn>
+                                @click="assignTask(currentProjectTx)">Assign</v-btn>
                             <v-btn flat outline
                                 v-if="((authorityType == 1)&&(projectsStatus.status==20)) || authorityType == 0 || authorityType == 1"
                                 @click="openImplementationModal(projectsStatus.status,2)">Variation</v-btn>
@@ -140,6 +140,7 @@
         </v-dialog>
         <PlanogramReportModal ref="PlanogramReportModal"></PlanogramReportModal>
         <PlanogramIplementationModal ref="PlanogramIplementationModal"></PlanogramIplementationModal>
+        <AssignTask ref="assignTask"></AssignTask>
     </v-card>
 </template>
 
@@ -150,13 +151,15 @@
     import PlanogramIplementationModal from './PlanogramIplementationModal'
     import moment from 'moment'
     import StatusHandler from '@/libs/system/projectStatusHandler'
+    import AssignTask from '@/components/Common/AssignTask'
 
     let _MODULE = "Planogram Implementation";
 
     export default {
         components: {
             PlanogramReportModal,
-            PlanogramIplementationModal
+            PlanogramIplementationModal,
+            AssignTask
         },
         data: () => {
             return {
@@ -183,7 +186,7 @@
                 status: [],
                 typeList: [],
                 currentStatus: null,
-
+                currentProjectTx: null
             }
         },
         mounted() {
@@ -271,12 +274,15 @@
                                     "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
                                     "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
                                     "systemUserID": self.timelineItems[self.timelineItems.length - 1].userID,
-                                    "actionedByUserID": systemUserID
+                                    "actionedByUserID": systemUserID,
+                                    "notes": data.notes
                                 }
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
 
                                         let element = res.data.projectTX;
+
+                                        self.currentProjectTx = res.data.projectTX
 
                                         self.timelineItems.unshift({
                                             status: element.status,
@@ -286,7 +292,9 @@
                                             userID: element.systemUserID,
                                             type: element.type,
                                             storeID: element.store_ID,
+                                            store: element.store,
                                             storeCluster_ID: element.storeCluster_ID,
+                                            storeCluster: element.storeCluster,
                                             categoryCluster_ID: element.categoryCluster_ID
                                         })
 
@@ -298,7 +306,9 @@
                                             userID: element.systemUserID,
                                             type: element.type,
                                             storeID: element.store_ID,
+                                            store: element.store,
                                             storeCluster_ID: element.storeCluster_ID,
+                                            storeCluster: element.storeCluster,
                                             categoryCluster_ID: element.categoryCluster_ID
                                         })
 
@@ -323,11 +333,15 @@
                                     "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
                                     "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
                                     "systemUserID": self.timelineItems[self.timelineItems.length - 1].userID,
+                                    "actionedByUserID": systemUserID,
+                                    "notes": data.notes
                                 }
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
 
                                         let element = res.data.projectTX;
+
+                                        self.currentProjectTx = res.data.projectTX
 
                                         self.timelineItems.unshift({
                                             status: element.status,
@@ -337,7 +351,9 @@
                                             userID: element.systemUserID,
                                             type: element.type,
                                             storeID: element.store_ID,
+                                            store: element.store,
                                             storeCluster_ID: element.storeCluster_ID,
+                                            storeCluster: element.storeCluster,
                                             categoryCluster_ID: element.categoryCluster_ID
                                         })
 
@@ -349,7 +365,9 @@
                                             userID: element.systemUserID,
                                             type: element.type,
                                             storeID: element.store_ID,
+                                            store: element.store,
                                             storeCluster_ID: element.storeCluster_ID,
+                                            storeCluster: element.storeCluster,
                                             categoryCluster_ID: element.categoryCluster_ID
                                         })
 
@@ -375,10 +393,13 @@
                                     "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
                                     "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
                                     "systemUserID": self.timelineItems[self.timelineItems.length - 1].userID,
+                                    "notes": data.notes
                                 }
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
                                         let element = res.data.projectTX;
+
+                                        self.currentProjectTx = res.data.projectTX
 
                                         self.timelineItems.unshift({
                                             status: element.status,
@@ -388,7 +409,9 @@
                                             userID: element.systemUserID,
                                             type: element.type,
                                             storeID: element.store_ID,
+                                            store: element.store,
                                             storeCluster_ID: element.storeCluster_ID,
+                                            storeCluster: element.storeCluster,
                                             categoryCluster_ID: element.categoryCluster_ID
                                         })
 
@@ -400,7 +423,9 @@
                                             userID: element.systemUserID,
                                             type: element.type,
                                             storeID: element.store_ID,
+                                            store: element.store,
                                             storeCluster_ID: element.storeCluster_ID,
+                                            storeCluster: element.storeCluster,
                                             categoryCluster_ID: element.categoryCluster_ID
                                         })
 
@@ -426,11 +451,15 @@
                                     "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
                                     "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
                                     "systemUserID": self.projectsStatus.userID,
+                                    "actionedByUserID": systemUserID,
+                                    "notes": data.notes
                                 }
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
 
                                         let element = res.data.projectTX;
+
+                                        self.currentProjectTx = res.data.projectTX
 
                                         self.timelineItems.unshift({
                                             status: element.status,
@@ -440,7 +469,9 @@
                                             userID: element.systemUserID,
                                             type: element.type,
                                             storeID: element.store_ID,
+                                            store: element.store,
                                             storeCluster_ID: element.storeCluster_ID,
+                                            storeCluster: element.storeCluster,
                                             categoryCluster_ID: element.categoryCluster_ID
                                         })
 
@@ -452,7 +483,9 @@
                                             userID: element.systemUserID,
                                             type: element.type,
                                             storeID: element.store_ID,
+                                            store: element.store,
                                             storeCluster_ID: element.storeCluster_ID,
+                                            storeCluster: element.storeCluster,
                                             categoryCluster_ID: element.categoryCluster_ID
                                         })
 
@@ -478,13 +511,15 @@
                                     "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
                                     "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
                                     "systemUserID": data.users,
+                                    "actionedByUserID": systemUserID,
+                                    "notes": data.notes
                                 }
-
-                                console.log(data);
 
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
                                         let element = res.data.projectTX;
+
+                                        self.currentProjectTx = res.data.projectTX
 
                                         self.timelineItems.unshift({
                                             status: element.status,
@@ -889,8 +924,10 @@
 
                             r.data.projectTXList.forEach((element, idx) => {
 
-                                if (idx == 0)
+                                if (idx == 0) {
                                     self.currentStatus = element.status;
+                                    self.currentProjectTx = element
+                                }
 
                                 if (element.deleted != true) {
                                     self.timelineItems.push({
@@ -965,6 +1002,99 @@
             },
             handleError(message) {
                 alert(message);
+            },
+            assignTask(item) {
+                let self = this;
+
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+
+                self.$refs.assignTask.show(function (data) {
+                    let tmp = JSON.parse(JSON.stringify(item))
+                    let assignedToRequest = tmp;
+                    let task = tmp;
+
+                    assignedToRequest.systemUserID = data.systemUserID;
+                    assignedToRequest.actionedByUserID = systemUserID;
+                    assignedToRequest.notes = data.notes;
+                    assignedToRequest.status = 40;
+
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    Axios.post(process.env.VUE_APP_API + 'ProjectTX', assignedToRequest).then(res1 => {
+                        task.type = data.type;
+                        task.status = 5 + data.type;
+                        task.systemUserID = data.systemUserID;
+                        task.notes = data.notes;
+                        task.actionedByUserID = null;
+
+                        let element1 = res1.data.projectTX;
+
+                        self.timelineItems.unshift({
+                            status: element1.status,
+                            notes: self.status[element1.status].text,
+                            date: element1.dateTimeString,
+                            user: element1.username,
+                            userID: element1.systemUserID,
+                            type: element1.type,
+                            storeID: element1.store_ID,
+                            store: element1.store,
+                            storeCluster_ID: element1.storeCluster_ID,
+                            storeCluster: element1.storeCluster,
+                            categoryCluster_ID: element1.categoryCluster_ID
+                        })
+
+                        self.tmpItems.unshift({
+                            status: element1.status,
+                            notes: self.status[element1.status].text,
+                            date: element1.dateTimeString,
+                            user: element1.username,
+                            userID: element1.systemUserID,
+                            type: element1.type,
+                            storeID: element1.store_ID,
+                            store: element1.store,
+                            storeCluster_ID: element1.storeCluster_ID,
+                            storeCluster: element1.storeCluster,
+                            categoryCluster_ID: element1.categoryCluster_ID
+                        })
+
+                        Axios.post(process.env.VUE_APP_API + 'ProjectTX', task).then(res2 => {
+                            delete Axios.defaults.headers.common["TenantID"];
+
+                            let element2 = res2.data.projectTX;
+
+                            self.currentProjectTx = res2.data.projectTX
+
+                            self.timelineItems.unshift({
+                                status: element2.status,
+                                notes: self.status[element2.status].text,
+                                date: element2.dateTimeString,
+                                user: element2.username,
+                                userID: element2.systemUserID,
+                                type: element2.type,
+                                storeID: element2.store_ID,
+                                store: element2.store,
+                                storeCluster_ID: element2.storeCluster_ID,
+                                storeCluster: element2.storeCluster,
+                                categoryCluster_ID: element2.categoryCluster_ID
+                            })
+
+                            self.tmpItems.unshift({
+                                status: element2.status,
+                                notes: self.status[element2.status].text,
+                                date: element2.dateTimeString,
+                                user: element2.username,
+                                userID: element2.systemUserID,
+                                type: element2.type,
+                                storeID: element2.store_ID,
+                                store: element2.store,
+                                storeCluster_ID: element2.storeCluster_ID,
+                                storeCluster: element2.storeCluster,
+                                categoryCluster_ID: element2.categoryCluster_ID
+                            })
+                        })
+                    })
+                })
             }
         }
     }

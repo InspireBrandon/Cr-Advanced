@@ -8,14 +8,6 @@
                 </v-flex>
             </v-layout>
             <v-layout row wrap v-else>
-                <!-- <v-flex lg12 md12 sm12 xs12 v-if="appConfigDetail.length <= 0">
-                    <v-card>
-                        <v-card-text>
-                            <p>It appears that you dont have any apps installed. <a href="#"
-                                    @click.prevent="$router.push('/Store')">Click Here</a> to go and install some.</p>
-                        </v-card-text>
-                    </v-card>
-                </v-flex> -->
                 <v-flex lg12 md12 sm12 xs12 v-if="!hasDatabases">
                     <v-card>
                         <v-card-text>
@@ -54,44 +46,6 @@
         },
         created() {
             let self = this;
-            // self.getInstalledApps();
-            // self.checkAccessType(accessType => {
-            //     console.log(accessType);
-
-            //     switch (accessType) {
-            //         case "DATABASE-OWNER":
-            //             {
-            //                 self.getAppsTmpAll();
-            //             }
-            //             break;
-            //         case "SUPERUSER":
-            //             {
-            //                 self.getAppsTmpAll();
-            //             }
-            //             break;
-            //         case "GENERAL":
-            //             {
-            //                 self.getAppsTmpAll();
-            //             }
-            //             break;
-            //         case "RETAILER":
-            //             {
-            //                 self.getAppsTmpAll();
-            //             }
-            //             break;
-            //         case "STORE":
-            //             {
-            //                 self.getAppsTmpStore();
-            //             }
-            //             break;
-            //     }
-            // });
-
-            // super user - everything
-            // store - planogram implementation
-            // supplier - planogram implementation
-            // Buyer - Ranging, Space Planning, Data prep
-
             self.getAppsTmpAll();
 
         },

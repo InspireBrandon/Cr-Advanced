@@ -17,7 +17,7 @@
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="error darken-1" flat @click.native="dialog = false">Cancel</v-btn>
-            <v-btn color="primary darken-1" flat @click.native="returnSelectedUsers" :disabled="selectedUser == null">Continue</v-btn>
+            <v-btn color="primary darken-1" flat @click.native="returnSelectedUsers">Continue</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>

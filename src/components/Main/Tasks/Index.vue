@@ -5,6 +5,10 @@
                 <v-card>
                     <v-toolbar flat dark>
                         <v-toolbar-title>My Tasks</v-toolbar-title>
+                        <v-spacer></v-spacer>
+                        <v-spacer></v-spacer>
+                        <v-spacer></v-spacer>
+                        <v-autocomplete v-if="systemUserID == 1" label="Select User" @change="userChange" v-model="selectedUser" :items="users"></v-autocomplete>
                     </v-toolbar>
                     <v-data-table :items="projectTransactions" class="elevation-1 scrollable" hide-actions hide-headers>
                         <template v-slot:items="props">
@@ -16,19 +20,66 @@
                             <td>{{ props.item.store }}</td>
                             <td>{{ props.item.dateTimeString }}</td>
                             <td style="width: 5%;">
-                                <v-btn small color="primary" @click="setRangingInProgress(props.item)"
-                                    v-if="props.item.type == 2 && props.item.status == 7">
+                                <v-btn small color="primary" @click="$router.push('/PlanogramImplementation')"
+                                    v-if="props.item.status == 40">
+                                    <span>Progress</span>
+                                </v-btn>
+                                <!-- Product -->
+                                <v-btn small color="success" @click="setInProgress(props.item)"
+                                    v-if="props.item.type == 1 && props.item.status == 6 && systemUserID == props.item.systemUserID">
                                     <span>Start</span>
                                 </v-btn>
-                                <v-btn small color="primary" @click="$router.push('/RangePlanning')"
-                                    v-if="props.item.type == 2 && props.item.status == 1">
+                                <v-btn flat color="error" @click="$router.push('/PlanogramImplementation')"
+                                    v-if="props.item.type == 1 && props.item.status == 6 && systemUserID == props.item.actionedByUserID">
                                     <span>View</span>
                                 </v-btn>
-                                <v-btn small color="primary" v-if="props.item.type == 2 && props.item.status == 1"
-                                    @click="setRangingComplete(props.item, props.index)">
+                                <v-btn small :color="props.item.status == 1 ? 'error': 'primary'" @click="$router.push('/DataPreparation/ProductCatalogue')"
+                                    v-if="props.item.type == 1 && (props.item.status == 1 || props.item.status == 2)">
+                                    <span>View</span>
+                                </v-btn>
+                                <v-btn small color="warning"
+                                    v-if="props.item.type == 1 && props.item.status == 1 && systemUserID == props.item.systemUserID"
+                                    @click="setComplete(props.item, props.index)">
                                     <span>Complete</span>
                                 </v-btn>
-                                <v-btn small color="primary" v-if="props.item.type == 3 && props.item.status == 10"
+                                <!-- Ranging -->
+                                <v-btn small color="success" @click="setInProgress(props.item)"
+                                    v-if="props.item.type == 2 && props.item.status == 7 && systemUserID == props.item.systemUserID">
+                                    <span>Start</span>
+                                </v-btn>
+                                <v-btn flat color="error" @click="$router.push('/PlanogramImplementation')"
+                                    v-if="props.item.type == 2 && props.item.status == 7 && systemUserID == props.item.actionedByUserID">
+                                    <span>View</span>
+                                </v-btn>
+                                <v-btn small :color="props.item.status == 1 ? 'error': 'primary'" @click="$router.push('/RangePlanning')"
+                                    v-if="props.item.type == 2 && (props.item.status == 1 || props.item.status == 2)">
+                                    <span>View</span>
+                                </v-btn>
+                                <v-btn small color="warning"
+                                    v-if="props.item.type == 2 && props.item.status == 1 && systemUserID == props.item.systemUserID"
+                                    @click="setComplete(props.item, props.index)">
+                                    <span>Complete</span>
+                                </v-btn>
+                                <!-- Planogram -->
+                                <v-btn small color="success" @click="setInProgress(props.item)"
+                                    v-if="props.item.type == 3 && props.item.status == 8 && systemUserID == props.item.systemUserID">
+                                    <span>Start</span>
+                                </v-btn>
+                                <v-btn flat color="error" @click="$router.push('/SpacePlanning')"
+                                    v-if="props.item.type == 3 && props.item.status == 8 && systemUserID == props.item.actionedByUserID">
+                                    <span>View</span>
+                                </v-btn>
+                                <v-btn small :color="props.item.status == 1 ? 'error': 'primary'" @click="$router.push('/SpacePlanning')"
+                                    v-if="props.item.type == 3 && (props.item.status == 1 || props.item.status == 2)">
+                                    <span>View</span>
+                                </v-btn>
+                                <v-btn small color="warning"
+                                    v-if="props.item.type == 3 && props.item.status == 1 && systemUserID == props.item.systemUserID"
+                                    @click="setComplete(props.item, props.index)">
+                                    <span>Complete</span>
+                                </v-btn>
+                                <!-- Approval -->
+                                <v-btn small color="success" v-if="props.item.type == 3 && props.item.status == 10"
                                     @click="setPlanogramApprovalInProgress(props.item)">
                                     <span>Start</span>
                                 </v-btn>
@@ -36,7 +87,7 @@
                                     @click="$router.push('/PlanogramImplementation')">
                                     <span>View</span>
                                 </v-btn>
-                                <v-btn small color="primary"
+                                <v-btn small color="error"
                                     v-if="props.item.type == 3 && props.item.status == 12 && systemUserID == props.item.projectOwnerID"
                                     @click="sendForDistribution(props.item, props.index)">
                                     <span>Send</span>
@@ -54,39 +105,39 @@
                                     @click="$router.push('/PlanogramImplementation')">
                                     <span>View</span>
                                 </v-btn>
-                                <v-btn small color="primary" v-if="props.item.type == 3 && props.item.status == 21"
+                                <v-btn small color="warning" v-if="props.item.type == 3 && props.item.status == 21"
                                     @click="completeDistribution(props.item, props.index)">
                                     <span>Complete</span>
                                 </v-btn>
-                                <v-btn small color="primary" v-if="props.item.status == 28"
+                                <v-btn small color="success" v-if="props.item.status == 28"
                                     @click="ChangeWaitingStart(props.item, props.index,29)">
                                     <span>Start</span>
                                 </v-btn>
-                                <v-btn small color="primary" v-if="props.item.status == 29"
+                                <v-btn small color="warning" v-if="props.item.status == 29"
                                     @click="ChangeWaitingcomplete(props.item, props.index,30)">
                                     <span>Complete</span>
                                 </v-btn>
-                                <v-btn small color="primary" v-if="props.item.status == 31"
+                                <v-btn small color="success" v-if="props.item.status == 31"
                                     @click="ChangeWaitingStart(props.item, props.index,32)">
                                     <span>Start</span>
                                 </v-btn>
-                                <v-btn small color="primary" v-if="props.item.status == 32"
+                                <v-btn small color="warning" v-if="props.item.status == 32"
                                     @click="ChangeWaitingcomplete(props.item, props.index,33)">
                                     <span>Complete</span>
                                 </v-btn>
-                                <v-btn small color="primary" v-if="props.item.status == 34"
+                                <v-btn small color="success" v-if="props.item.status == 34"
                                     @click="ChangeWaitingStart(props.item, props.index,35)">
                                     <span>Start</span>
                                 </v-btn>
-                                <v-btn small color="primary" v-if="props.item.status == 35"
+                                <v-btn small color="warning" v-if="props.item.status == 35"
                                     @click="ChangeWaitingcomplete(props.item, props.index,36)">
                                     <span>Complete</span>
                                 </v-btn>
-                                <v-btn small color="primary" v-if="props.item.status == 37"
+                                <v-btn small color="success" v-if="props.item.status == 37"
                                     @click="ChangeWaitingStart(props.item, props.index,38)">
                                     <span>Start</span>
                                 </v-btn>
-                                <v-btn small color="primary" v-if="props.item.status == 38"
+                                <v-btn small color="warning" v-if="props.item.status == 38"
                                     @click="ChangeWaitingcomplete(props.item, props.index,39)">
                                     <span>Complete</span>
                                 </v-btn>
@@ -96,46 +147,62 @@
                                     <v-btn icon slot="activator">
                                         <v-icon>more_vert</v-icon>
                                     </v-btn>
-
                                     <v-list dense class="pa-0 ma-0">
-                                        <!-- <v-list-tile>
-                                            <span>Launch</span>
-                                        </v-list-tile> -->
+
+                                        <v-list-tile @click="assignTask(props.item)">
+                                            <span>Assign</span>
+                                        </v-list-tile>
+
                                         <v-divider></v-divider>
                                         <!--Waiting Product Info  -->
                                         <v-list-tile
-                                            v-if="(props.item.type == 3 ||props.item.type == 1) &&(props.item.status!=28&&props.item.status!=29)"
                                             @click="ChangeWaitingType(props.item, props.index,28)">
                                             <span>Request Product Info</span>
                                         </v-list-tile>
 
-                                        <v-divider></v-divider>
+                                        <v-divider>
+                                        </v-divider>
                                         <!-- Waiting Planogram Input -->
                                         <v-list-tile
-                                            v-if="(props.item.type == 3 ) &&(props.item.status!=31&&props.item.status!=32)"
                                             @click="ChangeWaitingType(props.item, props.index,31)">
                                             <span>Request Planogram Input</span>
                                         </v-list-tile>
 
-                                        <v-divider></v-divider>
+                                        <v-divider>
+                                        </v-divider>
                                         <!-- Waiting Fixture Input -->
                                         <v-list-tile
-                                            v-if="props.item.type == 3&&(props.item.status!=34&&props.item.status!=35)"
                                             @click="ChangeWaitingType(props.item, props.index,34)">
                                             <span>Request Fixture Input</span>
                                         </v-list-tile>
 
-                                        <v-divider></v-divider>
+                                        <v-divider>
+                                        </v-divider>
                                         <!-- Waiting Check Planogram -->
                                         <v-list-tile
-                                            v-if="props.item.type == 3 &&(props.item.status!=37&&props.item.status!=38)"
                                             @click="ChangeWaitingType(props.item, props.index,37)">
                                             <span>Request Planogram Check</span>
                                         </v-list-tile>
-
-                                        <v-divider></v-divider>
                                     </v-list>
                                 </v-menu>
+                            </td>
+                            <td style="width: 2%">
+                                <v-tooltip bottom v-if="props.item.subtask">
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn @click="acknowledgeOutstandingRequest" icon v-on="on">
+                                            <v-icon v-on="on">check</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <span>request outstanding</span>
+                                </v-tooltip>
+                            </td>
+                            <td style="width: 2%">
+                                <v-tooltip bottom v-if="props.item.notes != null">
+                                    <template v-slot:activator="{ on }">
+                                        <v-icon v-on="on">note</v-icon>
+                                    </template>
+                                    <span>{{ props.item.notes }}</span>
+                                </v-tooltip>
                             </td>
                         </template>
                     </v-data-table>
@@ -143,6 +210,7 @@
             </v-flex>
         </v-layout>
         <UserSelector ref="userSelector" />
+        <AssignTask ref="assignTask" />
     </v-container>
 </template>
 
@@ -150,25 +218,34 @@
     import Axios from 'axios';
     import jwt from 'jsonwebtoken';
     import UserSelector from '@/components/Common/UserSelector'
+    import AssignTask from '@/components/Common/AssignTask'
     import StatusHandler from '@/libs/system/projectStatusHandler'
-
 
     export default {
         name: 'tasks',
         components: {
-            UserSelector
+            UserSelector,
+            AssignTask
         },
         data() {
             return {
                 projectTransactions: [],
                 status: [],
                 typeList: [],
-                systemUserID: null
+                systemUserID: null,
+                selectedUser: null,
+                users: []
             }
         },
         created() {
             let self = this;
-            self.getTransactionsByUser()
+
+            let encoded_details = jwt.decode(sessionStorage.accessToken);
+            let systemUserID = encoded_details.USER_ID;
+            self.systemUserID = systemUserID;
+
+            self.getTransactionsByUser(systemUserID)
+            self.getUsers()
             self.getLists()
         },
         methods: {
@@ -205,12 +282,21 @@
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                     let trans = JSON.parse(JSON.stringify(item));
-                    trans.status = type;
 
-                    trans.systemUserID = user.systemUserID;
-                    Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
-                        res => {
-                            delete Axios.defaults.headers.common["TenantID"];
+                    trans.subtask = true;
+
+                    Axios.put(process.env.VUE_APP_API + 'ProjectTX', trans)
+                        .then(r => {
+                            trans.status = type;
+                            trans.systemUserID = user.systemUserID;
+                            trans.subtask = false;
+                            console.log(r);
+                            Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                                res => {
+                                    console.log(res);
+                                    delete Axios.defaults.headers.common["TenantID"];
+                                    self.getTransactionsByUser()
+                                })
                         })
                 })
 
@@ -222,13 +308,8 @@
                 self.typeList = statusHandler.getTypeList()
 
             },
-            getTransactionsByUser() {
+            getTransactionsByUser(systemUserID) {
                 let self = this;
-
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
-                let systemUserID = encoded_details.USER_ID;
-
-                self.systemUserID = systemUserID;
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
@@ -243,7 +324,7 @@
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
-            setRangingInProgress(item) {
+            setInProgress(item) {
                 let self = this;
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -257,7 +338,7 @@
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
-            setRangingComplete(item, index) {
+            setComplete(item, index) {
                 let self = this;
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -265,10 +346,11 @@
                 let trans = JSON.parse(JSON.stringify(item));
                 trans.status = 2;
                 trans.systemUserID = item.projectOwnerID;
+                trans.actionedByUserID = item.systemUserID;
 
                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                     res => {
-                        self.projectTransactions.splice(index, 1);
+                        item.status = 2;
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
@@ -330,6 +412,68 @@
                         delete Axios.defaults.headers.common["TenantID"];
                         self.$router.push("/PlanogramImplementation");
                     })
+            },
+            assignTask(item) {
+                let self = this;
+
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+
+                self.$refs.assignTask.show(function (data) {
+                    let tmp = JSON.parse(JSON.stringify(item))
+                    let assignedToRequest = tmp;
+                    let task = tmp;
+
+                    assignedToRequest.systemUserID = data.systemUserID;
+                    assignedToRequest.actionedByUserID = systemUserID;
+                    assignedToRequest.notes = data.notes;
+                    assignedToRequest.status = 40;
+
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    Axios.post(process.env.VUE_APP_API + 'ProjectTX', assignedToRequest).then(res1 => {
+                        task.type = data.type;
+                        task.status = 5 + data.type;
+                        task.systemUserID = data.systemUserID;
+                        task.notes = data.notes;
+                        task.actionedByUserID = null;
+                        Axios.post(process.env.VUE_APP_API + 'ProjectTX', task).then(res2 => {
+                            delete Axios.defaults.headers.common["TenantID"];
+                            self.getTransactionsByUser()
+                        })
+                    })
+                })
+            },
+            acknowledgeOutstandingRequest() {
+
+            },
+            getUsers() {
+                let self = this;
+
+                let accountID = jwt.decode(sessionStorage.accessToken).ACCOUNT_ID;
+
+                Axios.get(process.env.VUE_APP_API + `SystemUser`)
+                    .then(r => {
+                        for (var i = 0; i < r.data.length; i++) {
+                            let item = r.data[i];
+                            self.users.push({
+                                text: item.firstname + " " + item.lastname,
+                                value: item.systemUserID
+                            });
+                        }
+
+                        self.selectedUser = self.systemUserID;
+                    })
+                    .catch(e => {
+
+                    })
+            },
+            userChange() {
+                let self = this;
+
+                self.$nextTick(() => {
+                    self.getTransactionsByUser(self.selectedUser);
+                })
             }
         }
     }

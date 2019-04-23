@@ -14,17 +14,7 @@
                     </v-list-tile-action>
                 </v-list-tile>
             </v-list>
-            <!-- <v-menu left>
-                            <v-btn slot="activator" icon>
-                                <v-icon>more_vert</v-icon>
-                            </v-btn>
-                            <v-list dense>
-                                
-                                <v-divider></v-divider>
-                            </v-list>
-                        </v-menu> -->
             <v-list class="pt-0" dense>
-
                 <v-expansion-panel class="elevation-0 ;" v-for="groups in ProjectsGroups" :key="groups.id">
                     <v-expansion-panel-content>
                         <template v-slot:header>
@@ -32,10 +22,7 @@
                             </v-flex>
                         </template>
                         <v-list>
-
                             <v-list-tile class="buttons">
-
-
                                 <v-btn flat icon @click="deleteProjectGroup(groups)">
                                     <v-icon>delete</v-icon>
                                 </v-btn>
@@ -47,9 +34,7 @@
                                 <v-btn flat icon @click="openProjectAdd(groups)">
                                     <v-icon>add</v-icon>
                                 </v-btn>
-
                             </v-list-tile>
-
                             <hr>
                             <div v-for="(item,index) in groups.projectList" :key="index">
                                 <v-list-tile :class="{ 'highlighted': project == item  }"
@@ -70,16 +55,9 @@
                                 </v-list-tile>
                                 <v-divider></v-divider>
                             </div>
-                            <!-- <v-card>
-                            <v-card-text>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                                exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</v-card-text>
-                        </v-card> -->
                         </v-list>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
-
-
             </v-list>
         </v-navigation-drawer>
 
@@ -206,6 +184,18 @@
                         </v-edit-dialog>
                     </td>
                     <td>
+                        <v-edit-dialog large lazy persistent @save="saveLine(props.item,7)" @cancel="''" @open="''"
+                            @close="''">
+                            <div>{{ props.item.actionedByUserName }}</div>
+                            <template v-slot:input>
+                            </template>
+                            <template v-slot:input>
+                                <v-select v-model="props.item.actionedByUserName" :items="users" label="Edit" single-line
+                                    autofocus></v-select>
+                            </template>
+                        </v-edit-dialog>
+                    </td>
+                    <td>
                         <v-menu left>
                             <v-btn slot="activator" icon>
                                 <v-icon>more_vert</v-icon>
@@ -263,8 +253,7 @@
                 project: null,
                 Projects: [],
 
-                typeList: [
-                ],
+                typeList: [],
                 headers: [{
                     text: "Date",
                     sortable: false,
@@ -290,144 +279,23 @@
                     text: "Assigned User",
                     sortable: false
                 }, {
+                    text: "Actioned by user",
+                    sortable: false
+                }, {
                     text: "Actions",
                     sortable: false
                 }],
                 ProjectTXs: [],
-                status: [
-                    // {
-                    //     text: "Project Start",
-                    //     value: 0,
-                    //     friendly: "Project Start",
-                    //     color: "blue",
-                    // },
-                    // {
-                    //     text: "In Progress",
-                    //     value: 1,
-                    //     color: "blue",
-                    //     friendly: "In Progress"
-
-                    // },
-                    // {
-                    //     text: "Complete",
-                    //     value: 2,
-                    //     color: "blue",
-                    //     friendly: "Complete"
-                    // },
-                    // {
-                    //     text: "Workshop",
-                    //     value: 3,
-                    //     color: "yellow",
-                    //     friendly: "Workshop"
-                    // }, {
-                    //     text: "Workshop Complete",
-                    //     value: 4,
-                    //     color: "yellow",
-                    //     friendly: "Workshop Complete"
-                    // },
-                    // {
-                    //     text: "Meeting",
-                    //     value: 5,
-                    //     color: "yellow",
-                    //     friendly: "Meeting"
-                    // },
-                    // {
-                    //     text: "Data Preparation Start",
-                    //     value: 6,
-                    //     color: "red",
-                    //     friendly: "Data Preparation Start"
-                    // },
-                    // {
-                    //     text: "Ranging Start",
-                    //     value: 7,
-                    //     color: "red",
-                    //     friendly: "Ranging Start"
-                    // },
-                    // {
-                    //     text: "Planogram Start",
-                    //     value: 8,
-                    //     color: "green",
-                    //     friendly: "Planogram Start"
-                    // },
-                    // {
-                    //     text: "Meeting Supplier",
-                    //     value: 9,
-                    //     color: "green",
-                    //     friendly: "Meeting Supplier"
-                    // },
-                    // {
-                    //     text: "Requesting Approval",
-                    //     value: 10,
-                    //     color: "green",
-                    //     friendly: "Requesting Approval"
-                    // },
-                    // {
-                    //     text: "Declined",
-                    //     value: 11,
-                    //     color: "green",
-                    //     friendly: "Declined"
-                    // },
-                    // {
-                    //     text: "Approved",
-                    //     value: 12,
-                    //     color: "green",
-                    //     friendly: "Approved"
-                    // },
-                    // {
-                    //     text: "Implementation Pending",
-                    //     value: 13,
-                    //     color: "blue",
-                    //     friendly: "Implementation Pending"
-                    // },
-                    // {
-                    //     text: "Variation Request",
-                    //     value: 14,
-                    //     color: "blue",
-                    //     friendly: 'Variation Request'
-                    // },
-                    // {
-                    //     text: "Implemented",
-                    //     value: 15,
-                    //     color: "blue",
-                    //     friendly: "Implemented"
-                    // },
-                    // {
-                    //     text: "On Hold",
-                    //     value: 16,
-                    //     color: "blue",
-                    //     friendly: "On Hold"
-                    // },
-                    // {
-                    //     text: "Waiting Fixture Requirements",
-                    //     value: 17,
-                    //     color: "blue",
-                    //     friendly: "Waiting Fixture Requirements"
-                    // }, {
-                    //     text: "Waiting Supplier",
-                    //     value: 18,
-                    //     color: "blue",
-                    //     friendly: "Waiting Supplier"
-                    // }, {
-                    //     text: "Awaiting Distribution",
-                    //     value: 19,
-                    //     color: "blue",
-                    //     friendly: "Awaiting Distribution",
-                    //     type: [3]
-                    // },
-                    //      {
-                    //     text: "Approval In Progress",
-                    //     value: 20,
-                    //     color: "blue",
-                    //     friendly: "Approval In Progress",
-                    //     type: [3]
-                    // }
-                ],
+                status: [],
                 stores: [],
                 ProjectsGroups: [],
                 storeObjects: [],
                 StoreClusters: [],
                 databaseUsers: [],
-                users: [],
+                users: [{
+                    text: "None",
+                    value: null
+                }],
                 tmp: [],
 
 
@@ -451,18 +319,18 @@
             }
         },
         methods: {
-            getTypeList(){
+            getTypeList() {
                 let self = this
                 let statushandler = new StatusHandler()
-                self.typeList=statushandler.getTypeList()
+                self.typeList = statushandler.getTypeList()
             },
-            getStatusList(){
+            getStatusList() {
                 let self = this
                 let statushandler = new StatusHandler()
 
-                self.status=statushandler.getStatus()
-              
-                
+                self.status = statushandler.getStatus()
+
+
             },
             deleteProjectTX(item, group) {
                 let self = this
@@ -588,6 +456,15 @@
                     self.users.forEach(e => {
                         if (e.value == item.systemUserID) {
                             item.username = e.text
+                        }
+                    })
+                }
+                if (editType == 7) {
+                    //Assigned User edit
+                    item.actionedByUserID = item.actionedByUserName
+                    self.users.forEach(e => {
+                        if (e.value == item.actionedByUserID) {
+                            item.actionedByUserName = e.text
                         }
                     })
                 }
