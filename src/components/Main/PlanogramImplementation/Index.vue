@@ -28,7 +28,6 @@
                         </v-autocomplete>
                     </v-flex>
 
-
                     <v-flex xl12 lg12 md6 sm12 xs12 v-if="currentPlanogram != null && selectedProject != null">
                         <h1>{{ currentPlanogram.name }} </h1>
                         <v-autocomplete :disabled="showLoader" @change="selectPlanogram(selectedPlanogram)" dense
@@ -42,7 +41,7 @@
                     <v-flex xl12 lg12 md12 sm12 xs12 v-if="selectedPlanogram != null && !showLoader">
                         <v-toolbar color="primary" dark dense flat v-if="selectedPlanogram != null">
                             <v-toolbar-title>
-                                Status: {{status[tmpItems[0].status].text}}
+                                Status: {{status[timelineItems[0].status].text}}
                             </v-toolbar-title>
                             <!-- <v-btn v-if="(( authorityType == 1)&&(projectsStatus.status==10))" >Approve</v-btn>
                              <v-btn v-if="((authorityType == 1)&&(projectsStatus.status==10))">Decline</v-btn>
@@ -52,7 +51,6 @@
                         </v-toolbar>
                         <v-divider></v-divider>
                         <v-toolbar color="primary" dark dense flat v-if="selectedPlanogram != null">
-
                             <v-btn flat outline
                                 v-if="(( authorityType == 1)&&(projectsStatus.status==20)) || authorityType == 0 || authorityType == 1"
                                 @click="openImplementationModal(projectsStatus.status,0)">Approve</v-btn>
@@ -63,8 +61,8 @@
                                 v-if="((authorityType == 1)&&(projectsStatus.status==20)) || authorityType == 0 || authorityType == 1"
                                 @click="openImplementationModal(projectsStatus.status,2)">Variation</v-btn>
                             <v-btn flat outline
-                                v-if="(( authorityType == 3)&&(projectsStatus.status==13)) || authorityType == 0"
-                                @click="openImplementationModal(projectsStatus.status,3)">Implement
+                                v-if="(( authorityType == 3)&&(projectsStatus.status==24)) || authorityType == 0"
+                                @click="openImplementationModal(projectsStatus.status,3)">Implemented
                             </v-btn>
                             <v-btn flat outline
                                 v-if="(( authorityType == 1)&&(projectsStatus.status==21)) || authorityType == 0"
@@ -450,10 +448,13 @@
                                     "type": 3,
                                     "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
                                     "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
-                                    "systemUserID": self.projectsStatus.userID,
-                                    "actionedByUserID": systemUserID,
+                                    "systemUserID": self.timelineItems[0].actionedByUserID,
+                                    "actionedByUserID": self.timelineItems[0].userID,
                                     "notes": data.notes
                                 }
+
+                                console.log(trans)
+
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
 
@@ -472,7 +473,8 @@
                                             store: element.store,
                                             storeCluster_ID: element.storeCluster_ID,
                                             storeCluster: element.storeCluster,
-                                            categoryCluster_ID: element.categoryCluster_ID
+                                            categoryCluster_ID: element.categoryCluster_ID,
+                                            actionedByUserID: element.actionedByUserID
                                         })
 
                                         self.tmpItems.unshift({
@@ -486,7 +488,8 @@
                                             store: element.store,
                                             storeCluster_ID: element.storeCluster_ID,
                                             storeCluster: element.storeCluster,
-                                            categoryCluster_ID: element.categoryCluster_ID
+                                            categoryCluster_ID: element.categoryCluster_ID,
+                                            actionedByUserID: element.actionedByUserID
                                         })
 
                                         self.projectsStatus = self.timelineItems[0]
@@ -922,6 +925,8 @@
                             self.timelineItems = [];
                             self.tmpItems = [];
 
+                            console.log(r.data)
+
                             r.data.projectTXList.forEach((element, idx) => {
 
                                 if (idx == 0) {
@@ -941,7 +946,8 @@
                                         store: element.store,
                                         storeCluster_ID: element.storeCluster_ID,
                                         storeCluster: element.storeCluster,
-                                        categoryCluster_ID: element.categoryCluster_ID
+                                        categoryCluster_ID: element.categoryCluster_ID,
+                                        actionedByUserID: element.actionedByUserID
                                     })
 
                                     if (element.type == 3 && element.status != 13) {
@@ -956,16 +962,17 @@
                                             store: element.store,
                                             storeCluster_ID: element.storeCluster_ID,
                                             storeCluster: element.storeCluster,
-                                            categoryCluster_ID: element.categoryCluster_ID
+                                            categoryCluster_ID: element.categoryCluster_ID,
+                                            actionedByUserID: element.actionedByUserID
                                         })
                                     }
                                 }
 
                             })
 
-                            console.log("[STUFF]", self.tmpItems)
+                            console.log("[STUFF]", self.timelineItems)
 
-                            self.projectsStatus = self.tmpItems[0]
+                            self.projectsStatus = self.timelineItems[0]
 
                             resolve();
                         })

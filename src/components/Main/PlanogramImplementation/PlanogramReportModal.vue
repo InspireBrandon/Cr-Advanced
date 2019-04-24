@@ -127,15 +127,6 @@
                                 <v-toolbar-title>Product Fixture Report</v-toolbar-title>
                             </v-toolbar>
                             <v-card-text>
-                                <!-- <v-treeview :items="ProductFixtureReport" :open.sync="open" item-key="Data.ID"
-                                    item-text="Data.Data.name">
-
-                                    <template v-slot:prepend="{ item }">
-                                        <v-icon v-if="item.children"
-                                            v-text="`mdi-${item.id === 1 ? 'home-variant' : 'folder-network'}`">
-                                        </v-icon>
-                                    </template>
-                                </v-treeview> -->
                                 <TreeVue style="border: 1px solid black; margin-bottom: 10px;"
                                     v-for="(parent, idx) in productFixtureReport" :childdark="false" :key="idx"
                                     :data="parent" />
@@ -172,6 +163,8 @@
 
     function fixtureReportItem(item, allItems) {
         let self = this;
+
+        console.log(item)
 
         self.id = item.Data.Data.id;
         self.name = item.Data.Data.name;
@@ -241,17 +234,8 @@
                 self.fixtureReport = [];
                 self.productReport = [];
                 self.productFixtureReport = [];
-
-                // self.planogramName = item.name;
                 self.planogramData = item;
                 self.generateReports();
-                // self.getPlanogramByID(item.id)
-                //     .then(() => {
-                //         self.generateReports()
-                //     })
-                //     .catch(e => {
-
-                //     })
             },
             getPlanogramByID(id) {
                 let self = this;
@@ -297,16 +281,15 @@
             },
             generateProductReport() {
                 let self = this;
-
-                // console.log(self.planogramData);
-
                 let tmp = [];
 
                 self.planogramData.planogramData.forEach(element => {
+
                     if (element.Type == "PRODUCT") {
                         let canPush = true;
 
                         tmp.forEach(tmpItem => {
+                            // console.log(tmpItem, element.Data.Data)
                             if (tmpItem.id == element.Data.Data.id)
                                 canPush = false;
                         });
@@ -320,19 +303,22 @@
             },
             generateProductFixtureReport() {
                 let self = this;
+
+                self.planogramData.planogramData.sort(function(a, b) {
+                    if(a.Position > b.Position) {
+                        return 1;
+                    }
+                    else {
+                        return - 1;    
+                    }
+                });
+
                 self.productFixtureReport = makeTree(self.planogramData.planogramData);
             },
             print() {
                 var printContents = document.getElementById("planogram-report").innerHTML;
                 var printWindow = window.open('', 'PRINT');
-                printWindow.document.body.html = printContents;
-                // var styles = document.getElementsByTagName('style');
-                // var head = printWindow.document.getElementsByTagName('head')[0];
-
-                // for (var x = 0; x < styles.length; x++) {
-                //     head.appendChild(styles[x]);
-                // }
-
+                printWindow.document.body.innerHTML = printContents;
                 printWindow.document.close();
                 printWindow.focus();
                 printWindow.print();
