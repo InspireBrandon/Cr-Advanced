@@ -1864,7 +1864,8 @@ class PlanogramItemBase {
               ParentID: self.ParentID,
               Config: self.Config
             },
-            Position: self.Position
+            Position: self.Position,
+            Label: self.LabelText
           }
         }
         break;
@@ -1887,7 +1888,8 @@ class PlanogramItemBase {
               Config: self.Config,
               TotalChildren: newTotalChildren
             },
-            Position: self.Position
+            Position: self.Position,
+            Label: self.LabelText
           }
         }
         break;
@@ -1910,7 +1912,8 @@ class PlanogramItemBase {
               Config: self.Config,
               TotalChildren: newTotalChildren
             },
-            Position: self.Position
+            Position: self.Position,
+            Label: self.LabelText
           }
         }
         break;
@@ -1933,7 +1936,8 @@ class PlanogramItemBase {
               Config: self.Config,
               TotalChildren: newTotalChildren
             },
-            Position: self.Position
+            Position: self.Position,
+            Label: self.LabelText
           }
         }
         break;
@@ -1955,7 +1959,8 @@ class PlanogramItemBase {
               ParentID: self.ParentID,
               Config: self.Config
             },
-            Position: self.Position
+            Position: self.Position,
+            Label: self.LabelText
           }
         }
         break;
@@ -1978,7 +1983,8 @@ class PlanogramItemBase {
               Config: self.Config,
               TotalChildren: newTotalChildren
             },
-            Position: self.Position
+            Position: self.Position,
+            Label: self.LabelText
           }
         }
         break;
@@ -2000,7 +2006,8 @@ class PlanogramItemBase {
               ParentID: self.ParentID,
               Config: self.Config
             },
-            Position: self.Position
+            Position: self.Position,
+            Label: self.LabelText
           }
         }
         break;
@@ -2022,7 +2029,8 @@ class PlanogramItemBase {
               ParentID: self.ParentID,
               Config: self.Config
             },
-            Position: self.Position
+            Position: self.Position,
+            Label: self.LabelText
           }
         }
         break;
@@ -2049,7 +2057,8 @@ class PlanogramItemBase {
               ScaleX: self.Group.scaleX(),
               ScaleY: self.Group.scaleY()
             },
-            Position: self.Position
+            Position: self.Position,
+            Label: self.LabelText
           }
         }
         break;
@@ -2072,13 +2081,12 @@ class PlanogramItemBase {
               Config: self.Config,
               TotalChildren: newTotalChildren
             },
-            Position: self.Position
+            Position: self.Position,
+            Label: self.LabelText
           }
         }
         break;
     }
-
-    console.log(retVal);
 
     return retVal;
   }

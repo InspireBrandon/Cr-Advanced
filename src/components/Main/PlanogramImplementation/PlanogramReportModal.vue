@@ -164,8 +164,6 @@
     function fixtureReportItem(item, allItems) {
         let self = this;
 
-        console.log(item)
-
         self.id = item.Data.Data.id;
         self.name = item.Data.Data.name;
         self.height = item.Data.Data.height;
@@ -194,9 +192,16 @@
         self.qty = 0;
 
         allItems.forEach(el => {
-            if (el.Data.Data.id == self.id) {
-                self.capacity += el.Data.CalcData.Capacity;
-                self.qty++;
+            if (self.id == undefined) {
+                if (el.Data.Data.barcode == self.barcode) {
+                    self.capacity += el.Data.CalcData.Capacity;
+                    self.qty++;
+                }
+            } else {
+                if (el.Data.Data.id == self.id) {
+                    self.capacity += el.Data.CalcData.Capacity;
+                    self.qty++;
+                }
             }
         })
 
@@ -289,9 +294,13 @@
                         let canPush = true;
 
                         tmp.forEach(tmpItem => {
-                            // console.log(tmpItem, element.Data.Data)
-                            if (tmpItem.id == element.Data.Data.id)
-                                canPush = false;
+                            if (tmpItem.id == undefined) {
+                                if (tmpItem.barcode == element.Data.Data.barcode)
+                                    canPush = false;
+                            } else {
+                                if (tmpItem.id == element.Data.Data.id)
+                                    canPush = false;
+                            }
                         });
 
                         if (canPush)
@@ -304,12 +313,11 @@
             generateProductFixtureReport() {
                 let self = this;
 
-                self.planogramData.planogramData.sort(function(a, b) {
-                    if(a.Position > b.Position) {
+                self.planogramData.planogramData.sort(function (a, b) {
+                    if (a.Position > b.Position) {
                         return 1;
-                    }
-                    else {
-                        return - 1;    
+                    } else {
+                        return -1;
                     }
                 });
 
