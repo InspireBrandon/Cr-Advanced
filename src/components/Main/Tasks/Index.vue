@@ -5,7 +5,7 @@
         <v-layout row wrap>
             <v-flex md12 v-if="!showLoader">
                 <!-- start of tab if super user -->
-                <v-card v-if="accessType == 0 || accessType == 2">
+                <v-card v-if=" accessType == 2">
                     <!-- <v-toolbar flat dark>
                         <v-toolbar-title>My Tasks</v-toolbar-title>
                         <v-spacer></v-spacer>
@@ -263,12 +263,15 @@
                                     <v-autocomplete v-if="systemUserID == 1" label="Select User" @change="userChange"
                                         v-model="selectedUser" :items="users"></v-autocomplete>
                                 </v-toolbar>
+                                <!-- {{status[projectTransactionsProjectTab[0].status].text}} -->
                                 <v-data-table :items="projectTransactionsProjectTab" class="elevation-1 scrollable"
                                     hide-actions hide-headers>
                                     <template v-slot:items="props">
                                         <td>{{ props.item.planogram }}</td>
                                         <td>{{ typeList[props.item.type == -1 ? 5 : props.item.type].text }}</td>
-                                        <td>{{ status[props.item.status == -1 ? 18 : props.item.status].text }}</td>
+                                        <td>
+                                            {{ status[props.item.status == -1 ? 18 : props.item.status].text }}
+                                        </td>
                                         <td>{{ props.item.storeCluster }}</td>
                                         <td>{{ props.item.categoryCluster }}</td>
                                         <td>{{ props.item.store }}</td>
@@ -483,7 +486,7 @@
                 </v-card>
 
                 <!-- card start of view without super user -->
-                <v-card v-if="accessType != 0 && accessType != 2">
+                <v-card v-if="accessType != 2">
                     <v-toolbar flat dark>
                         <v-toolbar-title>My Tasks</v-toolbar-title>
                         <v-spacer></v-spacer>
@@ -746,19 +749,23 @@
         },
         created() {
             let self = this;
-            let tenantID = sessionStorage.currentDatabase;
+            self.getLists(callback => {
+                let tenantID = sessionStorage.currentDatabase;
 
-            let encoded_details = jwt.decode(sessionStorage.accessToken);
-            let systemUserID = encoded_details.USER_ID;
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
 
-            self.getUserAccess(systemUserID, tenantID)
+                self.getUserAccess(systemUserID, tenantID)
 
-            setTimeout(() => {
-                self.systemUserID = systemUserID;
-                self.getTransactionsByUser(systemUserID)
-                self.getUsers()
-                self.getLists()
-            }, 60);
+                setTimeout(() => {
+                    self.systemUserID = systemUserID;
+                    self.getTransactionsByUser(systemUserID)
+                    self.getUsers(callback => {
+                        self.showLoader = false
+                    })
+                }, 60);
+            })
+
         },
         methods: {
             getUserAccess(systemUserID, tenantID) {
@@ -829,11 +836,13 @@
                 })
 
             },
-            getLists() {
+            getLists(callback) {
                 let self = this
                 let statusHandler = new StatusHandler()
                 self.status = statusHandler.getStatus()
                 self.typeList = statusHandler.getTypeList()
+                console.log(self.status);
+                callback()
 
             },
             getProjectTabTransactionsByUser(systemUserID) {
@@ -844,6 +853,8 @@
                 Axios.get(process.env.VUE_APP_API + `SupplierUserProjectTX?userID=${systemUserID}`)
 
                     .then(r => {
+                        console.log(r.data);
+
                         self.projectTransactionsProjectTab = r.data.projectTXList;
                         delete Axios.defaults.headers.common["TenantID"];
                     })
@@ -859,12 +870,10 @@
                 Axios.get(process.env.VUE_APP_API + `UserProjectTX?userID=${systemUserID}`).then(r => {
                         self.projectTransactions = r.data.projectTXList;
                         delete Axios.defaults.headers.common["TenantID"];
-                        self.showLoader = false
                     })
                     .catch(e => {
                         console.error(e);
                         delete Axios.defaults.headers.common["TenantID"];
-                        self.showLoader = false
 
                     })
             },
@@ -989,7 +998,7 @@
                 })
             },
             acknowledgeOutstandingRequest() {},
-            getUsers() {
+            getUsers(callback) {
                 let self = this;
 
                 let accountID = jwt.decode(sessionStorage.accessToken).ACCOUNT_ID;
@@ -1005,9 +1014,10 @@
                         }
 
                         self.selectedUser = self.systemUserID;
+                        callback()
                     })
                     .catch(e => {
-
+                        callback()
                     })
             },
             userChange() {
