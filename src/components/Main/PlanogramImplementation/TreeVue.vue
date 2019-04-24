@@ -1,26 +1,89 @@
 <template>
     <div>
-        <div v-if="data.Type == 'GONDOLA' || data.Type == 'PALLETE'">
-            <v-toolbar dense flat dark><b>{{ data.Type + " " + data.Position + " - " }}</b> {{ data.Data.Data.name }}</v-toolbar>
+        <div v-if="data.Type == 'GONDOLA' || data.Type == 'PALLETE' && data.Type!='PRODUCT'">
+            <v-toolbar dense flat dark><b>{{ data.Type + " " + data.Position + " - " }}</b> {{ data.Data.Data.name }}
+            </v-toolbar>
         </div>
-        <div class="header-item"
+        <div v-if="data.Type!='PRODUCT'" class="header-item"
             :style="{ 'background': childdark == true ? 'lightgrey':'white', 'border': data.Type != 'GONDOLA' ? '1px solid black': 'none' }">
             <div v-if="data.Type != 'PRODUCT'">
                 <b>{{ data.Type + " " + data.Position + " - " }}</b> {{ data.Data.Data.name }}
             </div>
-            <div v-else>
-                {{  data.Data.Data.name + " Position:" + data.Position }}
+
+            <div v-if="data.Type !='PRODUCT'">
+                <item v-for="(item, index) in data.children" :childdark="!childdark" :key="index" :data="item">
+                </item>
             </div>
+            <div v-if="data.Type != 'GONDOLA' ">
+                <table>
+                    <tr>
+                        <th>name </th>
+                         <th>Barcode</th>
+                                        <th>Product Code</th>
+                                        <th>Capacity</th>
+                                        <th>DOS</th>
+                                        <th>Sales Cost</th>
+                                        <th>Sales Retail</th>
+                                        <th>Sales Units</th>
+                    </tr>
+                    <tr v-for="(product,index) in products" :key="index">
+                        <td>
+                            {{  product.Data.Data.name + " Position:" + data.Position }}
+                        </td>
+                         <!-- <td>{{ item.name }}</td> -->
+                                        <td>{{ product.Data.Data.barcode }}</td>
+                                        <td>{{product.Data.Data.product_Code}}</td>
+                                        <td style="text-align: right;">{{ product.Data.Data.qty }}</td>
+                                        <td style="text-align: right;">{{ product.Data.Data.daysOfSupply }}</td>
+                                        <td style="text-align: right;">{{ product.Data.Data.weeklySalesCost }}</td>
+                                        <td style="text-align: right;">{{ product.Data.Data.weeklySalesRetail }}</td>
+                                        <td style="text-align: right;">{{ product.Data.Data.weeklySalesUnits }}</td>
+                    </tr>
+                </table>
+
+            </div>
+            <!-- {{data.Type}} -->
+        </div>
+
+        <!-- <h1>Products</h1>
+        <div v-for="(product, idx) in products" :key="idx">
+            {{ product }}
             <item v-for="(item, index) in data.children" :childdark="!childdark" :key="index" :data="item">
             </item>
         </div>
+        <h1>Fixtures</h1>
+        <div v-for="(fixture, idx) in fixtures" :key="idx">
+            {{ fixture }}
+            <item v-for="(item, index) in data.children" :childdark="!childdark" :key="index" :data="item">
+            </item>
+        </div> -->
     </div>
 </template>
 
 <script>
     export default {
         name: 'item',
-        props: ['data', 'childdark']
+        props: ['data', 'childdark'],
+        created() {
+            let self = this;
+            self.products = []
+
+
+            self.data.children.forEach(element => {
+                if (element.Type == "PRODUCT") {
+                    self.products.push(element)
+                } else {
+                    self.fixtures.push(element)
+                }
+            });
+            console.log(self.products)
+        },
+        data() {
+            return {
+                products: [],
+                fixtures: [],
+            }
+        }
     }
 </script>
 

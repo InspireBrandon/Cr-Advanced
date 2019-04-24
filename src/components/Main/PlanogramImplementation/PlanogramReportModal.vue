@@ -101,9 +101,10 @@
                             <v-card-text>
                                 <table>
                                     <tr>
-                                        <th>Name</th>
+                                        <th>Description</th>
                                         <th>Barcode</th>
-                                        <th>Qty</th>
+                                        <th>Product Code</th>
+                                        <th>Capacity</th>
                                         <th>DOS</th>
                                         <th>Sales Cost</th>
                                         <th>Sales Retail</th>
@@ -112,6 +113,7 @@
                                     <tr v-for="(item, idx) in productReport" :key="idx">
                                         <td>{{ item.name }}</td>
                                         <td>{{ item.barcode }}</td>
+                                        <td>{{item.product_Code}}</td>
                                         <td style="text-align: right;">{{ item.qty }}</td>
                                         <td style="text-align: right;">{{ item.daysOfSupply }}</td>
                                         <td style="text-align: right;">{{ item.weeklySalesCost }}</td>
@@ -182,6 +184,7 @@
 
         self.id = item.Data.Data.id;
         self.name = item.Data.Data.description;
+        self.product_Code = item.Data.Data.product_Code;
         self.barcode = item.Data.Data.barcode;
         self.capacity = 0;
         self.daysOfSupply = item.Data.CalcData.DaysOfSupply;
@@ -322,6 +325,9 @@
                 });
 
                 self.productFixtureReport = makeTree(self.planogramData.planogramData);
+                 console.log("self.productFixtureReport");
+                console.log(self.productFixtureReport);
+                
             },
             print() {
                 var printContents = document.getElementById("planogram-report").innerHTML;
