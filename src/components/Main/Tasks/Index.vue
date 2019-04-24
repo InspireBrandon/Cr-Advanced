@@ -1,6 +1,6 @@
 <template>
     <v-container grid-list-md fluid>
-        <v-progress-linear v-if="showLoader" color="primary">
+        <v-progress-linear v-if="showLoader" :indeterminate="true">
         </v-progress-linear>
         <v-layout row wrap>
             <v-flex md12 v-if="!showLoader">
