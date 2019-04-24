@@ -47,12 +47,14 @@ class LoadSavePlanogramBase {
     }
 
     allItems.forEach(item => {
+      // remove the line below to test that the positions are being saved and repopulated in the load
+      item.PositionElement();
       output.planogramData.push(item.ToObject());
     });
 
     allProducts.forEach(ap => {
       output.planogramData.forEach(pdi => {
-        if(ap.ID == pdi.Data.ID) {
+        if (ap.ID == pdi.Data.ID) {
           let calcData = calculate(ap, vuex);
           pdi.Data["CalcData"] = calcData;
         }
@@ -60,8 +62,8 @@ class LoadSavePlanogramBase {
     })
 
     let planogramName = "";
-   
-    
+
+
     if (updateName) {
       if (clusterData.planogramName != null)
         planogramName += clusterData.planogramName
@@ -74,8 +76,6 @@ class LoadSavePlanogramBase {
       if (clusterData.tag != null && clusterData.tag != "")
         planogramName += clusterData.tag;
 
-        console.log(clusterData);
-        console.log("clusterData");
       if (clusterData.storeCluster != null && clusterData.storeCluster != "") {
         planogramName += " - " + clusterData.storeCluster;
       }
@@ -103,7 +103,6 @@ class LoadSavePlanogramBase {
     }
 
     output.name = planogramName;
-    console.log("PLANOGRAM OUTPUT", output)
     if (self.Create == true) {
       axios
         .post(
@@ -160,8 +159,6 @@ class LoadSavePlanogramBase {
     axios.get(self.ServerAddress + `SystemFile/JSON?db=CR-Devinspire&id=${spacePlanID}`)
       .then(r => {
 
-        console.log(r.data)
-
         afterGetSpacePlanFile(r.data.clusterData, r.data.dimensionData, r.data.name, rangeProducts => {
           if (rangeProducts == null) {
             self.startLoadingPlanogram(r.data, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
@@ -208,8 +205,8 @@ class LoadSavePlanogramBase {
 
     // Set Plangram settings
     if (fileData.planogramSettings != undefined && fileData.planogramSettings != null) {
-       VueStore.commit("setPlanogramProperties", fileData.planogramSettings);
-       console.log('[LOAD PLANGRAM SETTINGS]', fileData.planogramSettings);
+      VueStore.commit("setPlanogramProperties", fileData.planogramSettings);
+      console.log('[LOAD PLANGRAM SETTINGS]', fileData.planogramSettings);
     }
 
     // Init Gondolas
@@ -259,13 +256,18 @@ class LoadSavePlanogramBase {
             ParentID
           )
 
+          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
+          {
+            ctrl_item.Position = CurrentItem.Position;
+          }
+
           // set json data values to the object
           ctrl_item.ID = CurrentItem.Data.ID;
 
           ctrl_item.Initialise(CurrentItem.RelativePosition, false);
         }
         break;
-        case "AREA":
+      case "AREA":
         {
           let ctrl_item = new AreaNew(
             VueStore,
@@ -276,6 +278,11 @@ class LoadSavePlanogramBase {
             "AREA",
             ParentID
           )
+          
+          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
+          {
+            ctrl_item.Position = CurrentItem.Position;
+          }
 
           // set json data values to the object
           ctrl_item.ID = CurrentItem.Data.ID;
@@ -283,7 +290,7 @@ class LoadSavePlanogramBase {
           ctrl_item.Initialise(CurrentItem.RelativePosition, false);
         }
         break;
-        case "TEXTHEADER":
+      case "TEXTHEADER":
         {
           let ctrl_item = new TextHeaderNew(
             VueStore,
@@ -295,6 +302,11 @@ class LoadSavePlanogramBase {
             CurrentItem.Scale,
             CurrentItem.Data.Text
           )
+          
+          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
+          {
+            ctrl_item.Position = CurrentItem.Position;
+          }
 
           // set json data values to the object
           ctrl_item.ID = CurrentItem.Data.ID;
@@ -313,6 +325,11 @@ class LoadSavePlanogramBase {
             "PALETTE",
             ParentID
           )
+          
+          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
+          {
+            ctrl_item.Position = CurrentItem.Position;
+          }
 
           // set json data values to the object
           ctrl_item.ID = CurrentItem.Data.ID;
@@ -331,6 +348,12 @@ class LoadSavePlanogramBase {
             "SHELF",
             ParentID
           )
+
+          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
+          {
+            ctrl_item.Position = CurrentItem.Position;
+          }
+
 
           // set json data values to the object
           ctrl_item.ID = CurrentItem.Data.ID;
@@ -355,6 +378,11 @@ class LoadSavePlanogramBase {
             ParentID
           )
 
+          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
+          {
+            ctrl_item.Position = CurrentItem.Position;
+          }
+
           // set json data values to the object
           ctrl_item.ID = CurrentItem.Data.ID;
           ctrl_item.Config = CurrentItem.Data.Config;
@@ -377,6 +405,11 @@ class LoadSavePlanogramBase {
             "BASKET",
             ParentID
           )
+
+          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
+          {
+            ctrl_item.Position = CurrentItem.Position;
+          }
 
           // set json data values to the object
           ctrl_item.ID = CurrentItem.Data.ID;
@@ -401,6 +434,11 @@ class LoadSavePlanogramBase {
             ParentID
           )
 
+          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
+          {
+            ctrl_item.Position = CurrentItem.Position;
+          }
+
           // set json data values to the object
           ctrl_item.ID = CurrentItem.Data.ID;
           ctrl_item.Config = CurrentItem.Data.Config;
@@ -412,7 +450,7 @@ class LoadSavePlanogramBase {
           ctrl_item.ApplyZIndexing();
         }
         break;
-        case "LABELHOLDER":
+      case "LABELHOLDER":
         {
           let ctrl_item = new LabelHolderNew(
             VueStore,
@@ -423,6 +461,11 @@ class LoadSavePlanogramBase {
             "LABELHOLDER",
             ParentID
           )
+
+          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
+          {
+            ctrl_item.Position = CurrentItem.Position;
+          }
 
           // set json data values to the object
           ctrl_item.ID = CurrentItem.Data.ID;
@@ -447,6 +490,11 @@ class LoadSavePlanogramBase {
             ParentID
           )
 
+          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
+          {
+            ctrl_item.Position = CurrentItem.Position;
+          }
+
           // set json data values to the object
           ctrl_item.ID = CurrentItem.Data.ID;
           ctrl_item.Config = CurrentItem.Data.Config;
@@ -466,6 +514,11 @@ class LoadSavePlanogramBase {
             "PRODUCT",
             ParentID
           )
+
+          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
+          {
+            ctrl_item.Position = CurrentItem.Position;
+          }
 
           //#region Set the same configs
           ctrl_item.ID = CurrentItem.Data.ID;

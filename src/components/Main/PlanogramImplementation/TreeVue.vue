@@ -1,37 +1,19 @@
 <template>
     <div>
         <div v-if="data.Type == 'GONDOLA'">
-            <v-toolbar dense flat dark>{{ data.Data.Data.name }}</v-toolbar>
+            <v-toolbar dense flat dark>{{ data.Type + " " + data.Position + " - " + data.Data.Data.name }}</v-toolbar>
         </div>
         <div class="header-item"
             :style="{ 'background': childdark == true ? 'lightgrey':'white', 'border': data.Type != 'GONDOLA' ? '1px solid black': 'none' }">
-            <div v-if="data.Type != 'GONDOLA'">
-                {{ data.Data.Data.name }}
+            <div v-if="data.Type != 'PRODUCT'">
+                {{ data.Type + " " + data.Position + " - " + data.Data.Data.name }}
+            </div>
+            <div v-else>
+                {{  data.Data.Data.name + " Position:" + data.Position }}
             </div>
             <item v-for="(item, index) in data.children" :childdark="!childdark" :key="index" :data="item">
             </item>
         </div>
-        <!-- <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ data.Data.Data.name }}</td>
-                </tr>
-                <tr>
-                    <td>
-                        <div>
-                            <item v-for="(item, index) in data.children" :childdark="!childdark" :key="index"
-                                :data="item">
-                            </item>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table> -->
     </div>
 </template>
 

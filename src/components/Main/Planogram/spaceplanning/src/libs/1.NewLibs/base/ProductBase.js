@@ -362,12 +362,12 @@ class ProductBase extends ProductItemBase {
     // self.Group.add(self.Text);
   }
 
-  SetTextLabel(number) {
-    let self = this;
-    self.Position = number;
-    self.Text.text(self.Type + " " + number);
-    self.Group.draw();
-  }
+  // SetTextLabel(number) {
+  //   let self = this;
+  //   self.Position = number;
+  //   self.Text.text(self.Type + " " + number);
+  //   self.Group.draw();
+  // }
 
   AdjustBarPosition() {
 
