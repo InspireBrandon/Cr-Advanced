@@ -16,7 +16,7 @@
                     <v-card-text id="planogram-report">
                         <v-card class="mb-3">
                             <v-toolbar flat dark dense>
-                                <v-toolbar-title>Overview</v-toolbar-title>
+                                <v-toolbar-title>Title</v-toolbar-title>
                             </v-toolbar>
                             <v-card-text>
                                 <v-container grid-list-md>
@@ -54,7 +54,7 @@
                         </v-card>
                         <v-card class="mb-3">
                             <v-toolbar flat dark dense>
-                                <v-toolbar-title>Output</v-toolbar-title>
+                                <v-toolbar-title>Planogram</v-toolbar-title>
                             </v-toolbar>
                             <v-card-text class="pa-2">
                                 <v-container class="pa-0" grid-list-md>

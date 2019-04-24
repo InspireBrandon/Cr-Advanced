@@ -1,12 +1,12 @@
 <template>
     <div>
-        <div v-if="data.Type == 'GONDOLA'">
-            <v-toolbar dense flat dark>{{ data.Type + " " + data.Position + " - " + data.Data.Data.name }}</v-toolbar>
+        <div v-if="data.Type == 'GONDOLA' || data.Type == 'PALLETE'">
+            <v-toolbar dense flat dark><b>{{ data.Type + " " + data.Position + " - " }}</b> {{ data.Data.Data.name }}</v-toolbar>
         </div>
         <div class="header-item"
             :style="{ 'background': childdark == true ? 'lightgrey':'white', 'border': data.Type != 'GONDOLA' ? '1px solid black': 'none' }">
             <div v-if="data.Type != 'PRODUCT'">
-                {{ data.Type + " " + data.Position + " - " + data.Data.Data.name }}
+                <b>{{ data.Type + " " + data.Position + " - " }}</b> {{ data.Data.Data.name }}
             </div>
             <div v-else>
                 {{  data.Data.Data.name + " Position:" + data.Position }}
