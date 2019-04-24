@@ -1,11 +1,11 @@
 <template>
     <v-container grid-list-md fluid>
-        <v-progress-linear v-if="showLoader"  color="primary" >
+        <v-progress-linear v-if="showLoader" color="primary">
         </v-progress-linear>
         <v-layout row wrap>
             <v-flex md12 v-if="!showLoader">
                 <!-- start of tab if super user -->
-                <v-card v-if="accessType == 0">
+                <v-card v-if="accessType == 0 || accessType == 2">
                     <!-- <v-toolbar flat dark>
                         <v-toolbar-title>My Tasks</v-toolbar-title>
                         <v-spacer></v-spacer>
@@ -483,7 +483,7 @@
                 </v-card>
 
                 <!-- card start of view without super user -->
-                <v-card v-if="accessType != 0">
+                <v-card v-if="accessType != 0 && accessType != 2">
                     <v-toolbar flat dark>
                         <v-toolbar-title>My Tasks</v-toolbar-title>
                         <v-spacer></v-spacer>
@@ -748,15 +748,14 @@
             let self = this;
             let tenantID = sessionStorage.currentDatabase;
 
+            let encoded_details = jwt.decode(sessionStorage.accessToken);
+            let systemUserID = encoded_details.USER_ID;
 
+            self.getUserAccess(systemUserID, tenantID)
 
             setTimeout(() => {
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
-                let systemUserID = encoded_details.USER_ID;
                 self.systemUserID = systemUserID;
                 self.getTransactionsByUser(systemUserID)
-                self.getUserAccess(systemUserID, tenantID)
-                self.getProjectTabTransactionsByUser(systemUserID)
                 self.getUsers()
                 self.getLists()
             }, 60);
@@ -764,16 +763,20 @@
         methods: {
             getUserAccess(systemUserID, tenantID) {
                 let self = this;
+
                 Axios.get(process.env.VUE_APP_API +
                         `TenantLink_AccessType?systemUserID=${systemUserID}&tenantID=${tenantID}`)
                     .then(r => {
 
-                        self.accessType = r.data;
-                        if (r.data.tenantLink_AccessTypeList == null) {
+                        if (r.data.isDatabaseOwner) {
                             self.accessType = 0
+                        } else {
+                            self.accessType = r.data.tenantLink_AccessTypeList[0].accessType;
                         }
 
-                        console.log("[ACCESS TYPE]  " + self.accessType);
+                        if (self.accessType == 0 || self.accessType == 2) {
+                            self.getProjectTabTransactionsByUser(systemUserID)
+                        }
                     })
 
             },
@@ -817,10 +820,8 @@
                             trans.status = type;
                             trans.systemUserID = user.systemUserID;
                             trans.subtask = false;
-                            console.log(r);
                             Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                 res => {
-                                    console.log(res);
                                     delete Axios.defaults.headers.common["TenantID"];
                                     self.getTransactionsByUser()
                                 })
@@ -840,14 +841,13 @@
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.get(process.env.VUE_APP_API + `UserProjectTX?userID=${systemUserID}`).then(r => {
-                        self.projectTransactionsProjectTab = r.data.projectTXList;
-                        console.log(self.projectTransactionsprojectTransactionsProjectTab);
+                Axios.get(process.env.VUE_APP_API + `SupplierUserProjectTX?userID=${systemUserID}`)
 
+                    .then(r => {
+                        self.projectTransactionsProjectTab = r.data.projectTXList;
                         delete Axios.defaults.headers.common["TenantID"];
                     })
                     .catch(e => {
-                        console.error(e);
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
@@ -858,8 +858,6 @@
 
                 Axios.get(process.env.VUE_APP_API + `UserProjectTX?userID=${systemUserID}`).then(r => {
                         self.projectTransactions = r.data.projectTXList;
-                        console.log(self.projectTransactions);
-
                         delete Axios.defaults.headers.common["TenantID"];
                         self.showLoader = false
                     })
@@ -1040,7 +1038,7 @@
 
 <style scoped>
     .scrollable {
-        height: calc(100vh - 200px);
+        height: calc(100vh - 240px);
         overflow: auto;
     }
 </style>
