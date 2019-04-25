@@ -32,7 +32,7 @@
                     </tr>
                     <tr v-for="(product,index) in products" :key="index">
                         <td>{{product.Position}}</td>
-                        <td style="text-align: right;">{{product.Data.Data.product_Code}}</td>
+                        <td style="text-align: right;">{{product.Data.Data.product_sys_Code}}</td>
                         <td style="width:10% ;text-align: right">{{ product.Data.Data.barcode }}</td>
                         <td style="width:30%">
                             {{  product.Data.Data.name }}
