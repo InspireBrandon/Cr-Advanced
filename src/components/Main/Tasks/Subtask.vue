@@ -3,17 +3,21 @@
         <v-layout row justify-center>
             <v-dialog v-model="dialog" persistent max-width="600">
                 <v-card>
-                    <v-card-title>Assign task to User</v-card-title>
+                    <v-toolbar dark flat color="primary">
+                        <v-toolbar-title>
+                            {{title}}
+                        </v-toolbar-title>
+                    </v-toolbar>
                     <v-card flat>
                         <v-card-text>
-                        
+
                             <v-select :items="users" v-model="user" label="User"></v-select>
                             <v-textarea label="Notes" v-model="notes"></v-textarea>
                         </v-card-text>
                     </v-card>
                     <v-card-actions>
                         <v-spacer></v-spacer>
-                        <v-btn color="primary" @click.native="returnResult" :disabled="task == null || user == null">
+                        <v-btn color="primary" @click.native="returnResult" :disabled=" user == null">
                             Assign</v-btn>
                         <v-btn flat color="secondary" @click.native="dialog = false">Cancel</v-btn>
                     </v-card-actions>
@@ -30,6 +34,7 @@
     export default {
         data() {
             return {
+                title: null,
                 dialog: false,
                 afterRuturn: null,
                 tasks: [
@@ -64,9 +69,9 @@
         },
         created() {},
         methods: {
-            show(afterRuturn,task) {
+            show(title, afterRuturn) {
                 let self = this;
-                self.task = task;
+                self.title = title
                 self.user = null;
                 self.afterRuturn = afterRuturn;
                 self.getUsers(() => {
@@ -76,7 +81,6 @@
             returnResult() {
                 let self = this;
                 self.afterRuturn({
-                    type: self.task,
                     systemUserID: self.user,
                     notes: self.notes
                 });

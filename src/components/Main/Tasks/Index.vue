@@ -196,35 +196,36 @@
 
                                                     <v-divider></v-divider>
                                                     <!--Waiting Product Info  -->
-                                                    <v-list-tile @click="ChangeWaitingType(props.item, props.index,28)">
+                                                    <v-list-tile @click="ChangeWaitingType(props.item, props.index,28,'Request Product Info')">
                                                         <span>Request Product Info</span>
                                                     </v-list-tile>
 
                                                     <v-divider>
                                                     </v-divider>
                                                     <!-- Waiting Planogram Input -->
-                                                    <v-list-tile @click="ChangeWaitingType(props.item, props.index,31)">
+                                                    <v-list-tile @click="ChangeWaitingType(props.item, props.index,31,'Request Planogram Input')">
                                                         <span>Request Planogram Input</span>
                                                     </v-list-tile>
 
                                                     <v-divider>
                                                     </v-divider>
                                                     <!-- Waiting Fixture Input -->
-                                                    <v-list-tile @click="ChangeWaitingType(props.item, props.index,34)">
+                                                    <v-list-tile @click="ChangeWaitingType(props.item, props.index,34,'Request Fixture Input')">
                                                         <span>Request Fixture Input</span>
                                                     </v-list-tile>
 
                                                     <v-divider>
                                                     </v-divider>
                                                     <!-- Waiting Check Planogram -->
-                                                    <v-list-tile @click="ChangeWaitingType(props.item, props.index,37)">
+                                                    <v-list-tile @click="ChangeWaitingType(props.item, props.index,37,'Request Planogram Check')">
                                                         <span>Request Planogram Check</span>
                                                     </v-list-tile>
                                                 </v-list>
                                             </v-menu>
                                         </td>
                                         <td style="width: 2%">
-                                            <v-tooltip bottom v-if="props.item.subtask && props.item.systemUserID == systemUserID">
+                                            <v-tooltip bottom
+                                                v-if="props.item.subtask && props.item.systemUserID == systemUserID">
                                                 <template v-slot:activator="{ on }">
                                                     <v-btn @click="acknowledgeOutstandingRequest" icon v-on="on">
                                                         <v-icon v-on="on">check</v-icon>
@@ -454,37 +455,37 @@
                                         <v-icon>more_vert</v-icon>
                                     </v-btn>
                                     <v-list dense class="pa-0 ma-0">
-
+                                       
                                         <v-list-tile @click="assignTask(props.item)">
                                             <span>Assign</span>
                                         </v-list-tile>
 
                                         <v-divider></v-divider>
                                         <!--Waiting Product Info  -->
-                                        <v-list-tile @click="ChangeWaitingType(props.item, props.index,28)">
-                                            <span>Request Product Info</span>
-                                        </v-list-tile>
+                                        <v-list-tile @click="ChangeWaitingType(props.item, props.index,28,'Request Product Info')">
+                                                        <span>Request Product Info</span>
+                                                    </v-list-tile>
 
-                                        <v-divider>
-                                        </v-divider>
-                                        <!-- Waiting Planogram Input -->
-                                        <v-list-tile @click="ChangeWaitingType(props.item, props.index,31)">
-                                            <span>Request Planogram Input</span>
-                                        </v-list-tile>
+                                                    <v-divider>
+                                                    </v-divider>
+                                                    <!-- Waiting Planogram Input -->
+                                                    <v-list-tile @click="ChangeWaitingType(props.item, props.index,31,'Request Planogram Input')">
+                                                        <span>Request Planogram Input</span>
+                                                    </v-list-tile>
 
-                                        <v-divider>
-                                        </v-divider>
-                                        <!-- Waiting Fixture Input -->
-                                        <v-list-tile @click="ChangeWaitingType(props.item, props.index,34)">
-                                            <span>Request Fixture Input</span>
-                                        </v-list-tile>
+                                                    <v-divider>
+                                                    </v-divider>
+                                                    <!-- Waiting Fixture Input -->
+                                                    <v-list-tile @click="ChangeWaitingType(props.item, props.index,34,'Request Fixture Input')">
+                                                        <span>Request Fixture Input</span>
+                                                    </v-list-tile>
 
-                                        <v-divider>
-                                        </v-divider>
-                                        <!-- Waiting Check Planogram -->
-                                        <v-list-tile @click="ChangeWaitingType(props.item, props.index,37)">
-                                            <span>Request Planogram Check</span>
-                                        </v-list-tile>
+                                                    <v-divider>
+                                                    </v-divider>
+                                                    <!-- Waiting Check Planogram -->
+                                                    <v-list-tile @click="ChangeWaitingType(props.item, props.index,37,'Request Planogram Check')">
+                                                        <span>Request Planogram Check</span>
+                                                    </v-list-tile>
 
                                         <v-divider v-if="
                                             props.item.status == 2 || 
@@ -535,6 +536,8 @@
         </v-layout>
         <UserSelector ref="userSelector" />
         <AssignTask ref="assignTask" />
+        <SubtaskModal ref="SubtaskModal" />
+
     </v-container>
 </template>
 
@@ -544,12 +547,14 @@
     import UserSelector from '@/components/Common/UserSelector'
     import AssignTask from '@/components/Common/AssignTask'
     import StatusHandler from '@/libs/system/projectStatusHandler'
+    import SubtaskModal from './Subtask.vue'
 
     export default {
         name: 'tasks',
         components: {
             UserSelector,
-            AssignTask
+            AssignTask,
+            SubtaskModal
         },
         data() {
 
@@ -586,6 +591,7 @@
 
         },
         methods: {
+           
             getUserAccess(systemUserID, tenantID) {
                 let self = this;
 
@@ -630,10 +636,13 @@
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
-            ChangeWaitingType(item, index, type) {
+            ChangeWaitingType(item, index, type,title) {
                 let self = this
-
-                self.$refs.userSelector.show(user => {
+               
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+                
+                self.$refs.SubtaskModal.show(title,user => {
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                     let trans = JSON.parse(JSON.stringify(item));
@@ -643,6 +652,7 @@
                     Axios.put(process.env.VUE_APP_API + 'ProjectTX', trans)
                         .then(r => {
                             trans.status = type;
+                            trans.actionedByUserID =systemUserID
                             trans.systemUserID = user.systemUserID;
                             trans.subtask = false;
                             Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
