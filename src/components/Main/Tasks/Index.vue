@@ -196,28 +196,32 @@
 
                                                     <v-divider></v-divider>
                                                     <!--Waiting Product Info  -->
-                                                    <v-list-tile @click="ChangeWaitingType(props.item, props.index,28,'Request Product Info')">
+                                                    <v-list-tile
+                                                        @click="ChangeWaitingType(props.item, props.index,28,'Request Product Info')">
                                                         <span>Request Product Info</span>
                                                     </v-list-tile>
 
                                                     <v-divider>
                                                     </v-divider>
                                                     <!-- Waiting Planogram Input -->
-                                                    <v-list-tile @click="ChangeWaitingType(props.item, props.index,31,'Request Planogram Input')">
+                                                    <v-list-tile
+                                                        @click="ChangeWaitingType(props.item, props.index,31,'Request Planogram Input')">
                                                         <span>Request Planogram Input</span>
                                                     </v-list-tile>
 
                                                     <v-divider>
                                                     </v-divider>
                                                     <!-- Waiting Fixture Input -->
-                                                    <v-list-tile @click="ChangeWaitingType(props.item, props.index,34,'Request Fixture Input')">
+                                                    <v-list-tile
+                                                        @click="ChangeWaitingType(props.item, props.index,34,'Request Fixture Input')">
                                                         <span>Request Fixture Input</span>
                                                     </v-list-tile>
 
                                                     <v-divider>
                                                     </v-divider>
                                                     <!-- Waiting Check Planogram -->
-                                                    <v-list-tile @click="ChangeWaitingType(props.item, props.index,37,'Request Planogram Check')">
+                                                    <v-list-tile
+                                                        @click="ChangeWaitingType(props.item, props.index,37,'Request Planogram Check')">
                                                         <span>Request Planogram Check</span>
                                                     </v-list-tile>
                                                 </v-list>
@@ -225,13 +229,13 @@
                                         </td>
                                         <td style="width: 2%">
                                             <v-tooltip bottom
-                                                v-if="props.item.subtask && props.item.systemUserID == systemUserID">
+                                                v-if="props.item.subtask && props.item.actionedByUserID == systemUserID">
                                                 <template v-slot:activator="{ on }">
-                                                    <v-btn @click="acknowledgeOutstandingRequest" icon v-on="on">
+                                                    <v-btn @click="forceRollover(props.item)" icon v-on="on">
                                                         <v-icon v-on="on">check</v-icon>
                                                     </v-btn>
                                                 </template>
-                                                <span>request outstanding</span>
+                                                <span>Continue process</span>
                                             </v-tooltip>
                                         </td>
                                         <td style="width: 2%">
@@ -455,37 +459,41 @@
                                         <v-icon>more_vert</v-icon>
                                     </v-btn>
                                     <v-list dense class="pa-0 ma-0">
-                                       
+
                                         <v-list-tile @click="assignTask(props.item)">
                                             <span>Assign</span>
                                         </v-list-tile>
 
                                         <v-divider></v-divider>
                                         <!--Waiting Product Info  -->
-                                        <v-list-tile @click="ChangeWaitingType(props.item, props.index,28,'Request Product Info')">
-                                                        <span>Request Product Info</span>
-                                                    </v-list-tile>
+                                        <v-list-tile
+                                            @click="ChangeWaitingType(props.item, props.index,28,'Request Product Info')">
+                                            <span>Request Product Info</span>
+                                        </v-list-tile>
 
-                                                    <v-divider>
-                                                    </v-divider>
-                                                    <!-- Waiting Planogram Input -->
-                                                    <v-list-tile @click="ChangeWaitingType(props.item, props.index,31,'Request Planogram Input')">
-                                                        <span>Request Planogram Input</span>
-                                                    </v-list-tile>
+                                        <v-divider>
+                                        </v-divider>
+                                        <!-- Waiting Planogram Input -->
+                                        <v-list-tile
+                                            @click="ChangeWaitingType(props.item, props.index,31,'Request Planogram Input')">
+                                            <span>Request Planogram Input</span>
+                                        </v-list-tile>
 
-                                                    <v-divider>
-                                                    </v-divider>
-                                                    <!-- Waiting Fixture Input -->
-                                                    <v-list-tile @click="ChangeWaitingType(props.item, props.index,34,'Request Fixture Input')">
-                                                        <span>Request Fixture Input</span>
-                                                    </v-list-tile>
+                                        <v-divider>
+                                        </v-divider>
+                                        <!-- Waiting Fixture Input -->
+                                        <v-list-tile
+                                            @click="ChangeWaitingType(props.item, props.index,34,'Request Fixture Input')">
+                                            <span>Request Fixture Input</span>
+                                        </v-list-tile>
 
-                                                    <v-divider>
-                                                    </v-divider>
-                                                    <!-- Waiting Check Planogram -->
-                                                    <v-list-tile @click="ChangeWaitingType(props.item, props.index,37,'Request Planogram Check')">
-                                                        <span>Request Planogram Check</span>
-                                                    </v-list-tile>
+                                        <v-divider>
+                                        </v-divider>
+                                        <!-- Waiting Check Planogram -->
+                                        <v-list-tile
+                                            @click="ChangeWaitingType(props.item, props.index,37,'Request Planogram Check')">
+                                            <span>Request Planogram Check</span>
+                                        </v-list-tile>
 
                                         <v-divider v-if="
                                             props.item.status == 2 || 
@@ -512,13 +520,14 @@
                                 </v-menu>
                             </td>
                             <td style="width: 2%">
-                                <v-tooltip bottom v-if="props.item.subtask && props.item.systemUserID == systemUserID">
+                                <v-tooltip bottom
+                                    v-if="props.item.subtask && props.item.actionedByUserID == systemUserID">
                                     <template v-slot:activator="{ on }">
-                                        <v-btn @click="acknowledgeOutstandingRequest" icon v-on="on">
+                                        <v-btn @click="forceRollover(props.item)" icon v-on="on">
                                             <v-icon v-on="on">check</v-icon>
                                         </v-btn>
                                     </template>
-                                    <span>request outstanding</span>
+                                    <span>Continue process</span>
                                 </v-tooltip>
                             </td>
                             <td style="width: 2%">
@@ -591,7 +600,7 @@
 
         },
         methods: {
-           
+
             getUserAccess(systemUserID, tenantID) {
                 let self = this;
 
@@ -621,8 +630,44 @@
                     res => {
                         item.status = type
                         // self.projectTransactions.splice(index, 1);
-                        delete Axios.defaults.headers.common["TenantID"];
+
+                        Axios.get(process.env.VUE_APP_API +
+                                `ProjectTXSingle?projectTXID=${item.transactionRolloverID}`)
+                            .then(rolloverItemResponse => {
+                                let projectTX = rolloverItemResponse.data.projectTX;
+
+                                setTimeout(() => {
+                                    Axios.post(process.env.VUE_APP_API + 'ProjectTX', projectTX).then(
+                                        rolledOverResponse => {
+                                            console.log(rolledOverResponse.data)
+                                            delete Axios.defaults.headers.common["TenantID"];
+                                        })
+                                }, 200);
+                            })
                     })
+            },
+            forceRollover(item) {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                self.$nextTick(() => {
+                    console.log(item)
+                    Axios.get(process.env.VUE_APP_API +
+                            `ProjectTXSingle?projectTXID=${item.transactionRolloverID}`)
+                        .then(rolloverItemResponse => {
+                            let projectTX = rolloverItemResponse.data.projectTX;
+
+                            console.log(rolloverItemResponse.data)
+
+                            setTimeout(() => {
+                                Axios.post(process.env.VUE_APP_API + 'ProjectTX', projectTX).then(
+                                    rolledOverResponse => {
+                                        self.getTransactionsByUser(self.systemUserID)
+                                        delete Axios.defaults.headers.common["TenantID"];
+                                    })
+                            }, 200);
+                        })
+                })
             },
             ChangeWaitingStart(item, index, type) {
                 let self = this
@@ -636,30 +681,27 @@
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
-            ChangeWaitingType(item, index, type,title) {
+            ChangeWaitingType(item, index, type, title) {
                 let self = this
-               
+
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
-                
-                self.$refs.SubtaskModal.show(title,user => {
+
+                self.$refs.SubtaskModal.show(title, user => {
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                     let trans = JSON.parse(JSON.stringify(item));
 
                     trans.subtask = true;
+                    trans.status = type;
+                    trans.actionedByUserID = systemUserID
+                    trans.systemUserID = user.systemUserID;
+                    trans.transactionRolloverID = item.id;
 
-                    Axios.put(process.env.VUE_APP_API + 'ProjectTX', trans)
-                        .then(r => {
-                            trans.status = type;
-                            trans.actionedByUserID =systemUserID
-                            trans.systemUserID = user.systemUserID;
-                            trans.subtask = false;
-                            Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
-                                res => {
-                                    delete Axios.defaults.headers.common["TenantID"];
-                                    self.getTransactionsByUser()
-                                })
+                    Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                        res => {
+                            delete Axios.defaults.headers.common["TenantID"];
+                            self.getTransactionsByUser(self.systemUserID)
                         })
                 })
 
@@ -820,12 +862,11 @@
                         task.actionedByUserID = null;
                         Axios.post(process.env.VUE_APP_API + 'ProjectTX', task).then(res2 => {
                             delete Axios.defaults.headers.common["TenantID"];
-                            self.getTransactionsByUser()
+                            self.getTransactionsByUser(self.systemUserID)
                         })
                     })
                 })
             },
-            acknowledgeOutstandingRequest() {},
             getUsers(callback) {
                 let self = this;
 
