@@ -23,7 +23,8 @@
                                 <v-data-table :items="projectTransactions" class="elevation-1 scrollable" hide-actions
                                     hide-headers>
                                     <template v-slot:items="props">
-                                        <tr :style="{ 'background': props.item.subtask == true ? 'lightgrey': 'white' }">
+                                        <tr
+                                            :style="{ 'background': props.item.subtask == true ? 'lightgrey': 'white' }">
                                             <td>{{ props.item.planogram }}</td>
                                             <td>{{ typeList[props.item.type == -1 ? 5 : props.item.type].text }}</td>
                                             <td>{{ status[props.item.status == -1 ? 18 : props.item.status].text }}</td>
@@ -34,8 +35,8 @@
                                             <td style="width: 5%;">
                                                 <v-btn small color="error"
                                                     @click="RemoveTransaction(props.item, props.index)"
-                                                    v-if="props.item.status == 40">
-                                                    <span>Close</span>
+                                                    v-if="props.item.status == 40 || props.item.status == 30 || props.item.status == 33 || props.item.status == 36 || props.item.status == 39">
+                                                    <span>Hide</span>
                                                 </v-btn>
                                                 <!-- Product -->
                                                 <v-btn small color="success" @click="setInProgress(props.item)"
@@ -131,7 +132,8 @@
                                                     @click="ChangeWaitingStart(props.item, props.index,29)">
                                                     <span>Start</span>
                                                 </v-btn>
-                                                <v-btn small color="warning" v-if="props.item.status == 29"
+                                                <v-btn small color="warning"
+                                                    v-if="props.item.status == 29 && systemUserID == props.item.systemUserID"
                                                     @click="ChangeWaitingcomplete(props.item, props.index,30)">
                                                     <span>Complete</span>
                                                 </v-btn>
@@ -139,7 +141,8 @@
                                                     @click="ChangeWaitingStart(props.item, props.index,32)">
                                                     <span>Start</span>
                                                 </v-btn>
-                                                <v-btn small color="warning" v-if="props.item.status == 32"
+                                                <v-btn small color="warning"
+                                                    v-if="props.item.status == 32 && systemUserID == props.item.systemUserID"
                                                     @click="ChangeWaitingcomplete(props.item, props.index,33)">
                                                     <span>Complete</span>
                                                 </v-btn>
@@ -147,7 +150,8 @@
                                                     @click="ChangeWaitingStart(props.item, props.index,35)">
                                                     <span>Start</span>
                                                 </v-btn>
-                                                <v-btn small color="warning" v-if="props.item.status == 35"
+                                                <v-btn small color="warning"
+                                                    v-if="props.item.status == 35 && systemUserID == props.item.systemUserID"
                                                     @click="ChangeWaitingcomplete(props.item, props.index,36)">
                                                     <span>Complete</span>
                                                 </v-btn>
@@ -155,11 +159,13 @@
                                                     @click="ChangeWaitingStart(props.item, props.index,38)">
                                                     <span>Start</span>
                                                 </v-btn>
-                                                <v-btn small color="warning" v-if="props.item.status == 38"
+                                                <v-btn small color="warning"
+                                                    v-if="props.item.status == 38 && systemUserID == props.item.systemUserID"
                                                     @click="ChangeWaitingcomplete(props.item, props.index,39)">
                                                     <span>Complete</span>
                                                 </v-btn>
-                                                <v-btn small color="warning" v-if="props.item.status == 38"
+                                                <v-btn small color="warning"
+                                                    v-if="props.item.status == 38 && systemUserID == props.item.systemUserID"
                                                     @click="ChangeWaitingcomplete(props.item, props.index,39)">
                                                     <span>Complete</span>
                                                 </v-btn>
@@ -191,7 +197,7 @@
 
                                                         <v-list-tile v-if="accessType == 0 || accessType == 1"
                                                             @click="assignTask(props.item)">
-                                                            <span>Assign</span>
+                                                            <span>New process</span>
                                                         </v-list-tile>
 
                                                         <v-divider></v-divider>
@@ -235,7 +241,7 @@
                                                             <v-icon v-on="on">check</v-icon>
                                                         </v-btn>
                                                     </template>
-                                                    <span>Continue process</span>
+                                                    <span>End sub task</span>
                                                 </v-tooltip>
                                             </td>
                                             <td style="width: 2%">
@@ -308,8 +314,8 @@
                             <td>{{ props.item.dateTimeString }}</td>
                             <td style="width: 5%;">
                                 <v-btn small color="error" @click="RemoveTransaction(props.item, props.index)"
-                                    v-if="props.item.status == 40">
-                                    <span>Close</span>
+                                    v-if="props.item.status == 40 || props.item.status == 30 || props.item.status == 33 || props.item.status == 36 || props.item.status == 39">
+                                    <span>Hide</span>
                                 </v-btn>
                                 <!-- Product -->
                                 <v-btn small color="success" @click="setInProgress(props.item)"
@@ -462,7 +468,7 @@
                                     <v-list dense class="pa-0 ma-0">
 
                                         <v-list-tile @click="assignTask(props.item)">
-                                            <span>Assign</span>
+                                            <span>New process</span>
                                         </v-list-tile>
 
                                         <v-divider></v-divider>
@@ -514,7 +520,7 @@
                                             props.item.status == 36 ||
                                             props.item.status == 39"
                                             @click="RemoveTransaction(props.item, props.index)">
-                                            <span>Remove</span>
+                                            <span>Hide</span>
                                         </v-list-tile>
 
                                     </v-list>
@@ -528,7 +534,7 @@
                                             <v-icon v-on="on">check</v-icon>
                                         </v-btn>
                                     </template>
-                                    <span>Continue process</span>
+                                    <span>End sub task</span>
                                 </v-tooltip>
                             </td>
                             <td style="width: 2%">
@@ -627,6 +633,7 @@
 
                 let trans = JSON.parse(JSON.stringify(item));
                 trans.status = type;
+                trans.notes = null;
                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                     res => {
                         item.status = type
@@ -676,6 +683,7 @@
 
                 let trans = JSON.parse(JSON.stringify(item));
                 trans.status = type;
+                trans.notes = null;
                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                     res => {
                         item.status = type
@@ -695,6 +703,7 @@
 
                     trans.subtask = true;
                     trans.status = type;
+                    trans.notes = user.notes;
                     trans.actionedByUserID = systemUserID
                     trans.systemUserID = user.systemUserID;
                     trans.transactionRolloverID = item.id;
@@ -755,6 +764,7 @@
 
                 let trans = JSON.parse(JSON.stringify(item));
                 trans.status = 1;
+                trans.notes = null;
 
                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                     res => {
@@ -769,6 +779,7 @@
 
                 let trans = JSON.parse(JSON.stringify(item));
                 trans.status = 2;
+                trans.notes = null;
                 trans.systemUserID = item.projectOwnerID;
                 trans.actionedByUserID = item.systemUserID;
 
@@ -785,6 +796,7 @@
 
                 let trans = JSON.parse(JSON.stringify(item));
                 trans.status = 20;
+                trans.notes = null;
 
                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                     res => {
@@ -800,6 +812,7 @@
 
                     let trans = JSON.parse(JSON.stringify(item));
                     trans.status = 19;
+                    trans.notes = null;
                     trans.systemUserID = user.systemUserID;
 
                     Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
@@ -816,6 +829,7 @@
 
                 let trans = JSON.parse(JSON.stringify(item));
                 trans.status = 21;
+                trans.notes = null;
 
                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                     res => {
@@ -830,6 +844,7 @@
 
                 let trans = JSON.parse(JSON.stringify(item));
                 trans.status = 21;
+                trans.notes = null;
 
                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                     res => {
@@ -850,7 +865,7 @@
 
                     assignedToRequest.systemUserID = data.systemUserID;
                     assignedToRequest.actionedByUserID = systemUserID;
-                    assignedToRequest.notes = data.notes;
+                    // assignedToRequest.notes = data.notes;
                     assignedToRequest.status = 40;
 
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -904,6 +919,7 @@
 
                 let trans = JSON.parse(JSON.stringify(item));
                 trans.status = 24;
+                trans.notes = null;
                 trans.actionedByUserID = null;
 
                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
