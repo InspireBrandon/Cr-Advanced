@@ -14,30 +14,39 @@
                 <item v-for="(item, index) in data.children" :childdark="!childdark" :key="index" :data="item">
                 </item>
             </div>
-            <div v-if="data.Type != 'GONDOLA' ">
+            <div v-if="data.Type != 'GONDOLA' " style="background: white">
                 <table>
                     <tr>
-                        <th>name </th>
-                         <th>Barcode</th>
-                                        <th>Product Code</th>
-                                        <th>Capacity</th>
-                                        <th>DOS</th>
-                                        <th>Sales Cost</th>
-                                        <th>Sales Retail</th>
-                                        <th>Sales Units</th>
+                        <th>Position</th>
+                        <th>Product Code</th>
+                        <th>Barcode</th>
+                        <th>Description </th>
+
+
+                        <th>X Facings</th>
+                        <th>Y Facings</th>
+                        <th>Z Facings</th>
+                        <th>Caps</th>
+                        <th>Orientation</th>
+                        <th>Total Facings</th>
                     </tr>
                     <tr v-for="(product,index) in products" :key="index">
-                        <td>
-                            {{  product.Data.Data.name + " Position:" + data.Position }}
+                        <td>{{product.Position}}</td>
+                        <td style="text-align: right;">{{product.Data.Data.product_Code}}</td>
+                        <td style="width:10% ;text-align: right">{{ product.Data.Data.barcode }}</td>
+                        <td style="width:30%">
+                            {{  product.Data.Data.name }}
                         </td>
-                         <!-- <td>{{ item.name }}</td> -->
-                                        <td>{{ product.Data.Data.barcode }}</td>
-                                        <td>{{product.Data.Data.product_Code}}</td>
-                                        <td style="text-align: right;">{{ product.Data.Data.qty }}</td>
-                                        <td style="text-align: right;">{{ product.Data.Data.daysOfSupply }}</td>
-                                        <td style="text-align: right;">{{ product.Data.Data.weeklySalesCost }}</td>
-                                        <td style="text-align: right;">{{ product.Data.Data.weeklySalesRetail }}</td>
-                                        <td style="text-align: right;">{{ product.Data.Data.weeklySalesUnits }}</td>
+                        <!-- <td>{{ item.name }}</td> -->
+
+
+                        <td style="text-align: right;">{{ product.Data.Facings.x  }}</td>
+                        <td style="text-align: right;">{{ product.Data.Facings.y }}</td>
+                        <td style="text-align: right;">{{ product.Data.Facings.z }}</td>
+                        <td style="text-align: right;">{{ product.Data.Caps.Caps_Count }}</td>
+                        <td style="text-align: left;">{{ product.Data.Orientation.LastFace }}</td>
+                        <td style="text-align: right;">
+                            {{ (product.Data.Facings.x*product.Data.Facings.y*product.Data.Facings.z) }}</td>
                     </tr>
                 </table>
 
@@ -76,7 +85,6 @@
                     self.fixtures.push(element)
                 }
             });
-            console.log(self.products)
         },
         data() {
             return {

@@ -21,30 +21,37 @@
                             <v-card-text>
                                 <v-container grid-list-md>
                                     <v-layout row wrap v-if="planogramData != null">
-                                        <v-flex md12>
-                                            <span>Planogram Name: {{ planogramData.clusterData.planogramName }}</span>
+                                        <v-flex md8>
+                                            <v-flex md12>
+                                                <span>Planogram Name:
+                                                    {{ planogramData.clusterData.planogramName }}</span>
+                                            </v-flex>
+                                            <v-flex md12>
+                                                <span>Store Cluster: {{ planogramData.clusterData.storeCluster }}</span>
+                                            </v-flex>
+                                            <v-flex md12>
+                                                <span>Store: {{ planogramData.clusterData.planogramName }}</span>
+                                            </v-flex>
+                                            <v-flex md12>
+                                                <span>Displays: {{ planogramData.dimensionData.displays }}</span>
+                                            </v-flex>
+                                            <v-flex md12>
+                                                <span>Modules: {{ planogramData.dimensionData.modules }}</span>
+                                            </v-flex>
+                                            <v-flex md12>
+                                                <span>Pallettes: {{ planogramData.dimensionData.pallettes }}</span>
+                                            </v-flex>
+                                            <v-flex md12>
+                                                <span>Supplier Stands:
+                                                    {{ planogramData.dimensionData.supplierStands }}</span>
+                                            </v-flex>
+                                            <v-flex md12>
+                                                <span>Bins: {{ planogramData.dimensionData.bins }}</span>
+                                            </v-flex>
                                         </v-flex>
-                                        <v-flex md12>
-                                            <span>Store Cluster: {{ planogramData.clusterData.storeCluster }}</span>
-                                        </v-flex>
-                                        <v-flex md12>
-                                            <span>Store: {{ planogramData.clusterData.planogramName }}</span>
-                                        </v-flex>
-                                        <v-flex md12>
-                                            <span>Displays: {{ planogramData.dimensionData.displays }}</span>
-                                        </v-flex>
-                                        <v-flex md12>
-                                            <span>Modules: {{ planogramData.dimensionData.modules }}</span>
-                                        </v-flex>
-                                        <v-flex md12>
-                                            <span>Pallettes: {{ planogramData.dimensionData.pallettes }}</span>
-                                        </v-flex>
-                                        <v-flex md12>
-                                            <span>Supplier Stands:
-                                                {{ planogramData.dimensionData.supplierStands }}</span>
-                                        </v-flex>
-                                        <v-flex md12>
-                                            <span>Bins: {{ planogramData.dimensionData.bins }}</span>
+                                        <v-flex md4>
+                                            <img style="max-height: 400px; max-width: 400px;" src="http://project1.devinspire.co.za/static/img/Chain-Research-Logo1.a3c73b4.png"
+                                                alt="">
                                         </v-flex>
                                     </v-layout>
                                 </v-container>
@@ -82,6 +89,8 @@
                                         <th>Height(cm)</th>
                                         <th>Width(cm)</th>
                                         <th>Depth(cm)</th>
+                                        <th>Cost</th>
+
                                     </tr>
                                     <tr v-for="(item, idx) in fixtureReport" :key="idx">
                                         <td>{{ item.name }}</td>
@@ -89,6 +98,14 @@
                                         <td style="text-align: right;">{{ item.height }}</td>
                                         <td style="text-align: right;">{{ item.width }}</td>
                                         <td style="text-align: right;">{{ item.depth }}</td>
+                                        <td style="text-align: right;">{{ item.cost == undefined ? 0 : item.cost}}</td>
+
+                                    </tr>
+                                    <tr>
+
+                                        <td colspan="6" style="text-align: right;background:black;color:white">
+                                            Total Cost: {{totalCost}}
+                                        </td>
                                     </tr>
                                 </table>
                             </v-card-text>
@@ -96,14 +113,13 @@
                         <div class="print-break-page"></div>
                         <v-card class="mb-3">
                             <v-toolbar flat dark dense>
-                                <v-toolbar-title>Product Report (by weekly sales)</v-toolbar-title>
+                                <v-toolbar-title>Product Report - Weekly Average</v-toolbar-title>
                             </v-toolbar>
                             <v-card-text>
                                 <table>
-                                    <tr>
-                                        <th>Description</th>
+                                    <tr><th>Product Code</th>
                                         <th>Barcode</th>
-                                        <th>Product Code</th>
+                                        <th>Description</th>
                                         <th>Capacity</th>
                                         <th>DOS</th>
                                         <th>Sales Cost</th>
@@ -111,9 +127,9 @@
                                         <th>Sales Units</th>
                                     </tr>
                                     <tr v-for="(item, idx) in productReport" :key="idx">
-                                        <td>{{ item.name }}</td>
-                                        <td>{{ item.barcode }}</td>
                                         <td>{{item.product_Code}}</td>
+                                        <td>{{ item.barcode }}</td>
+                                        <td>{{ item.name }}</td>
                                         <td style="text-align: right;">{{ item.qty }}</td>
                                         <td style="text-align: right;">{{ item.daysOfSupply }}</td>
                                         <td style="text-align: right;">{{ item.weeklySalesCost }}</td>
@@ -224,7 +240,8 @@
                 open: [],
                 fixtureReport: [],
                 productReport: [],
-                productFixtureReport: []
+                productFixtureReport: [],
+                totalCost: 0,
             }
         },
         methods: {
@@ -279,13 +296,21 @@
                             if (tmpItem.id == element.Data.Data.id)
                                 canPush = false;
                         });
+                        if (canPush) {
 
-                        if (canPush)
+                            if (element.Data.Data.cost != undefined || element.Data.Data.cost != null) {
+                                self.totalCost = self.totalCost + element.Data.Data.cost
+
+                            }
                             tmp.push(new fixtureReportItem(element, self.planogramData.planogramData));
+                        }
+
                     }
                 });
 
                 self.fixtureReport = tmp;
+
+
             },
             generateProductReport() {
                 let self = this;
@@ -310,11 +335,21 @@
                             tmp.push(new productReportItem(element, self.planogramData.planogramData));
                     }
                 });
-
+                console.log(tmp);
+                
+                tmp.sort(function (a, b) {
+                   if(a.weeklySalesUnits!="N/A"){if (parseFloat(a.weeklySalesUnits) > parseFloat(b.weeklySalesUnits)) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }}
+                   
+                });
                 self.productReport = tmp;
             },
             generateProductFixtureReport() {
                 let self = this;
+                console.log(self.planogramData.planogramData);
 
                 self.planogramData.planogramData.sort(function (a, b) {
                     if (a.Position > b.Position) {
@@ -325,9 +360,9 @@
                 });
 
                 self.productFixtureReport = makeTree(self.planogramData.planogramData);
-                 console.log("self.productFixtureReport");
                 console.log(self.productFixtureReport);
-                
+
+
             },
             print() {
                 var printContents = document.getElementById("planogram-report").innerHTML;
