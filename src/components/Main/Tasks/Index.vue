@@ -197,7 +197,8 @@
                                                 </v-btn>
                                                 <v-list dense class="pa-0 ma-0">
 
-                                                    <v-list-tile @click="assignTask(props.item)">
+                                                    <v-list-tile v-if="accessType == 0 || accessType == 1"
+                                                        @click="assignTask(props.item)">
                                                         <span>Assign</span>
                                                     </v-list-tile>
 
@@ -460,7 +461,7 @@
                                                 </v-list>
                                             </v-menu>
                                         </td> -->
-                                        <td style="width: 2%">
+                                        <!-- <td style="width: 2%">
                                             <v-tooltip bottom v-if="props.item.subtask">
                                                 <template v-slot:activator="{ on }">
                                                     <v-btn @click="acknowledgeOutstandingRequest" icon v-on="on">
@@ -477,6 +478,11 @@
                                                 </template>
                                                 <span>{{ props.item.notes }}</span>
                                             </v-tooltip>
+                                        </td> -->
+                                        <td style="width: 2%">
+                                            <v-btn
+                                                @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.planogram_ID)"
+                                                small color="primary" v-if="props.item.type == 3">View</v-btn>
                                         </td>
                                     </template>
                                 </v-data-table>
@@ -689,6 +695,28 @@
                                         <v-list-tile @click="ChangeWaitingType(props.item, props.index,37)">
                                             <span>Request Planogram Check</span>
                                         </v-list-tile>
+
+                                        <v-divider v-if="
+                                            props.item.status == 2 || 
+                                            props.item.status == 26 || 
+                                            props.item.status == 27 || 
+                                            props.item.status == 30 || 
+                                            props.item.status == 33 ||
+                                            props.item.status == 36 ||
+                                            props.item.status == 39"></v-divider>
+
+                                        <v-list-tile v-if="
+                                            props.item.status == 2 || 
+                                            props.item.status == 26 || 
+                                            props.item.status == 27 || 
+                                            props.item.status == 30 || 
+                                            props.item.status == 33 ||
+                                            props.item.status == 36 ||
+                                            props.item.status == 39"
+                                            @click="RemoveTransaction(props.item, props.index)">
+                                            <span>Remove</span>
+                                        </v-list-tile>
+
                                     </v-list>
                                 </v-menu>
                             </td>
@@ -1040,6 +1068,20 @@
                     res => {
                         delete Axios.defaults.headers.common["TenantID"];
                         self.$router.push("/PlanogramImplementation");
+                    })
+            },
+            RemoveTransaction(item, index) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                let trans = JSON.parse(JSON.stringify(item));
+                trans.removed = true;
+
+                Axios.put(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                    res => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        self.projectTransactions.splice(index, 1);
                     })
             }
         }
