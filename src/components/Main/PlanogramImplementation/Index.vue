@@ -4,32 +4,33 @@
             <v-spacer></v-spacer>
             <v-toolbar-title>Planogram Implementation</v-toolbar-title>
         </v-toolbar>
+
         <v-container fluid grid-list-md>
             <v-layout row wrap>
                 <v-flex xl7 lg7 md12 sm12 xs12>
-                    <v-flex v-if="authorityType == 0" xl6 lg6 md6 sm12 xs12>
+                    <v-flex v-if="authorityType == 0 && routeProjectID == null" xl6 lg6 md6 sm12 xs12>
                         <v-autocomplete :disabled="showLoader" @change="getProjectsByProjectGroup"
                             v-model="selectedProjectGroup" :items="projectGroupsSelect" hide-details
                             label="Project Group">
                         </v-autocomplete>
                     </v-flex>
 
-                    <v-flex v-else xl6 lg6 md6 sm12 xs12>
+                    <v-flex v-if="authorityType =! 0 && routeProjectID == null" xl6 lg6 md6 sm12 xs12>
                         <v-autocomplete :disabled="showLoader" @change="getUserProjectsByProjectGroup"
                             v-model="selectedProjectGroup" :items="projectGroupsSelect" hide-details
                             label="Project Group">
                         </v-autocomplete>
                     </v-flex>
 
-                    <v-flex xl6 lg6 md6 sm12 xs12>
-                        <v-autocomplete :disabled="showLoader" @change="onProjectChange"
-                            v-if="selectedProjectGroup != null" v-model="selectedProject" :items="projectsSelect"
-                            hide-details label="Project">
+                    <v-flex xl6 lg6 md6 sm12 xs12 v-if="selectedProjectGroup != null">
+                        <v-autocomplete :disabled="showLoader" @change="onProjectChange" v-model="selectedProject"
+                            :items="projectsSelect" hide-details label="Project">
                         </v-autocomplete>
                     </v-flex>
 
-                    <v-flex xl12 lg12 md6 sm12 xs12 v-if="currentPlanogram != null && selectedProject != null">
-                        <h1>{{ currentPlanogram.name }} </h1>
+                    <v-flex xl12 lg12 md6 sm12 xs12
+                        v-if="(currentPlanogram != null && selectedProject != null) || routeProjectID != null">
+                        <h1 v-if="routeProjectID == null">{{ currentPlanogram.name }} </h1>
                         <v-autocomplete :disabled="showLoader" @change="selectPlanogram(selectedPlanogram)" dense
                             v-model="selectedPlanogram" :items="filterPlanograms" label="Planogram"></v-autocomplete>
                     </v-flex>
@@ -184,32 +185,45 @@
                 status: [],
                 typeList: [],
                 currentStatus: null,
-                currentProjectTx: null
+                currentProjectTx: null,
+                routeProjectID: null,
+                routePlanogramID: null
             }
         },
         mounted() {
             let self = this;
-            self.initialise();
-            this.getTypeList()
-            this.getStatusList()
+
+            self.getTypeList()
+            self.getStatusList()
+
+            if (self.$route.params.projectTransactionID != undefined) {
+                self.routeProjectID = self.$route.params.projectTransactionID;
+                self.selectedProject = self.routeProjectID;
+                self.routePlanogramID = self.$route.params.planogramID
+                self.onRouteEnter(function () {
+
+                    if (self.filterPlanograms.length == 1) {
+                        self.selectedPlanogram = self.filterPlanograms[0].value;
+                        self.selectPlanogram(self.selectedPlanogram);
+                    }
+                })
+            } else {
+                self.initialise();
+            }
+
+            console.log(self.selectedProjectGroup)
         },
         computed: {
             filterPlanograms: function () {
                 var self = this
                 let value = self.type;
-                if (self.selectedProjectGroup != null) {
-                    if (self.PlanogramItems != null && self.currentPlanogram != null) {
-                        return this.PlanogramItems.filter(function (item) {
-                            return item.text.toUpperCase().includes(self.currentPlanogram.displayname);
-                        })
-                    } else {
-                        return [];
-                    }
+                if (self.PlanogramItems != null && self.currentPlanogram != null) {
+                    return this.PlanogramItems.filter(function (item) {
+                        return item.text.toUpperCase().includes(self.currentPlanogram.displayname);
+                    })
                 } else {
                     return [];
                 }
-
-
             }
         },
         methods: {
@@ -452,8 +466,6 @@
                                     "actionedByUserID": self.timelineItems[0].userID,
                                     "notes": data.notes
                                 }
-
-                                console.log(trans)
 
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
@@ -870,6 +882,37 @@
                         })
                 })
             },
+            onRouteEnter(callback) {
+                let self = this;
+
+                self.$nextTick(() => {
+                    self.selectedPlanogram = null
+                    self.planogramObj = null;
+                    self.image = null;
+                    let currentProjectID = self.selectedProject;
+
+                    self.getPlanogramByID(self.routePlanogramID)
+                        .then(() => {
+
+                            self.getPlanograms()
+                                .then(() => {
+                                    self.getProjectTransactionsByProjectID(currentProjectID)
+                                        .then(() => {
+                                            callback();
+                                        })
+                                        .catch(() => {
+
+                                        })
+                                })
+                                .catch(() => {
+
+                                })
+                        })
+                        .catch(() => {
+
+                        })
+                })
+            },
             getPlanogramByID(planogramID) {
                 let self = this;
 
@@ -925,8 +968,6 @@
                             self.timelineItems = [];
                             self.tmpItems = [];
 
-                            console.log(r.data)
-
                             r.data.projectTXList.forEach((element, idx) => {
 
                                 if (idx == 0) {
@@ -967,10 +1008,7 @@
                                         })
                                     }
                                 }
-
                             })
-
-                            console.log("[STUFF]", self.timelineItems)
 
                             self.projectsStatus = self.timelineItems[0]
 

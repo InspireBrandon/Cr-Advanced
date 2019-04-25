@@ -6,14 +6,6 @@
             <v-flex md12 v-if="!showLoader">
                 <!-- start of tab if super user -->
                 <v-card v-if=" accessType == 2">
-                    <!-- <v-toolbar flat dark>
-                        <v-toolbar-title>My Tasks</v-toolbar-title>
-                        <v-spacer></v-spacer>
-                        <v-spacer></v-spacer>
-                        <v-spacer></v-spacer>
-                        <v-autocomplete v-if="systemUserID == 1" label="Select User" @change="userChange"
-                            v-model="selectedUser" :items="users"></v-autocomplete>
-                    </v-toolbar> -->
                     <v-tabs dark color="primary">
                         <v-tab>
                             My tasks
@@ -197,7 +189,8 @@
                                                 </v-btn>
                                                 <v-list dense class="pa-0 ma-0">
 
-                                                    <v-list-tile @click="assignTask(props.item)">
+                                                    <v-list-tile v-if="accessType == 0 || accessType == 1"
+                                                        @click="assignTask(props.item)">
                                                         <span>Assign</span>
                                                     </v-list-tile>
 
@@ -231,7 +224,7 @@
                                             </v-menu>
                                         </td>
                                         <td style="width: 2%">
-                                            <v-tooltip bottom v-if="props.item.subtask">
+                                            <v-tooltip bottom v-if="props.item.subtask && props.item.systemUserID == systemUserID">
                                                 <template v-slot:activator="{ on }">
                                                     <v-btn @click="acknowledgeOutstandingRequest" icon v-on="on">
                                                         <v-icon v-on="on">check</v-icon>
@@ -276,207 +269,10 @@
                                         <td>{{ props.item.categoryCluster }}</td>
                                         <td>{{ props.item.store }}</td>
                                         <td>{{ props.item.dateTimeString }}</td>
-                                        <!-- <td style="width: 5%;">
-                                            <v-btn small color="error" @click="$router.push('/PlanogramImplementation')"
-                                                v-if="props.item.status == 40">
-                                                <span>Progress</span>
-                                            </v-btn>
-                                            <v-btn small color="success" @click="setInProgress(props.item)"
-                                                v-if="props.item.type == 1 && props.item.status == 6 && systemUserID == props.item.systemUserID">
-                                                <span>Start</span>
-                                            </v-btn>
-                                            <v-btn flat color="error" @click="$router.push('/PlanogramImplementation')"
-                                                v-if="props.item.type == 1 && props.item.status == 6 && systemUserID == props.item.actionedByUserID">
-                                                <span>View</span>
-                                            </v-btn>
-                                            <v-btn small :color="props.item.status == 1 ? 'warning': 'primary'"
-                                                @click="$router.push('/DataPreparation/ProductCatalogue')"
-                                                v-if="props.item.type == 1 && (props.item.status == 1 || props.item.status == 2)">
-                                                <span>View</span>
-                                            </v-btn>
-                                            <v-btn small color="error"
-                                                v-if="props.item.type == 1 && props.item.status == 1 && systemUserID == props.item.systemUserID"
-                                                @click="setComplete(props.item, props.index)">
-                                                <span>Complete</span>
-                                            </v-btn>
-                                            <v-btn small color="success" @click="setInProgress(props.item)"
-                                                v-if="props.item.type == 2 && props.item.status == 7 && systemUserID == props.item.systemUserID">
-                                                <span>Start</span>
-                                            </v-btn>
-                                            <v-btn flat color="error" @click="$router.push('/PlanogramImplementation')"
-                                                v-if="props.item.type == 2 && props.item.status == 7 && systemUserID == props.item.actionedByUserID">
-                                                <span>View</span>
-                                            </v-btn>
-                                            <v-btn small :color="props.item.status == 1 ? 'warning': 'primary'"
-                                                @click="$router.push('/RangePlanning')"
-                                                v-if="props.item.type == 2 && (props.item.status == 1 || props.item.status == 2)">
-                                                <span>View</span>
-                                            </v-btn>
-                                            <v-btn small color="error"
-                                                v-if="props.item.type == 2 && props.item.status == 1 && systemUserID == props.item.systemUserID"
-                                                @click="setComplete(props.item, props.index)">
-                                                <span>Complete</span>
-                                            </v-btn>
-                                            <v-btn small color="success" @click="setInProgress(props.item)"
-                                                v-if="props.item.type == 3 && props.item.status == 8 && systemUserID == props.item.systemUserID">
-                                                <span>Start</span>
-                                            </v-btn>
-                                            <v-btn flat color="warning" @click="$router.push('/SpacePlanning')"
-                                                v-if="props.item.type == 3 && props.item.status == 8 && systemUserID == props.item.actionedByUserID">
-                                                <span>View</span>
-                                            </v-btn>
-                                            <v-btn small :color="props.item.status == 1 ? 'warning': 'primary'"
-                                                @click="$router.push('/SpacePlanning')"
-                                                v-if="props.item.type == 3 && (props.item.status == 1 || props.item.status == 2)">
-                                                <span>View</span>
-                                            </v-btn>
-                                            <v-btn small color="error"
-                                                v-if="props.item.type == 3 && props.item.status == 1 && systemUserID == props.item.systemUserID"
-                                                @click="setComplete(props.item, props.index)">
-                                                <span>Complete</span>
-                                            </v-btn>
-                                            <v-btn small color="success"
-                                                v-if="props.item.type == 3 && props.item.status == 10"
-                                                @click="setPlanogramApprovalInProgress(props.item)">
-                                                <span>Start</span>
-                                            </v-btn>
-                                            <v-btn small color="warning"
-                                                v-if="props.item.type == 3 && props.item.status == 20"
-                                                @click="$router.push('/PlanogramImplementation')">
-                                                <span>View</span>
-                                            </v-btn>
-                                            <v-btn small color="error"
-                                                v-if="props.item.type == 3 && props.item.status == 12 && systemUserID == props.item.projectOwnerID"
-                                                @click="sendForDistribution(props.item, props.index)">
-                                                <span>Send</span>
-                                            </v-btn>
-                                            <v-btn small color="primary"
-                                                v-if="props.item.type == 3 && props.item.status == 12 && systemUserID == props.item.actionedByUserID"
-                                                @click="$router.push('/PlanogramImplementation')">
-                                                <span>View</span>
-                                            </v-btn>
-                                            <v-btn small color="success"
-                                                v-if="props.item.type == 3 && props.item.status == 19"
-                                                @click="startDistributionProgress(props.item, props.index)">
-                                                <span>View</span>
-                                            </v-btn>
-                                            <v-btn small color="warning"
-                                                v-if="props.item.type == 3 && props.item.status == 21"
-                                                @click="$router.push('/PlanogramImplementation')">
-                                                <span>View</span>
-                                            </v-btn>
-                                            <v-btn small color="warning" v-if="props.item.type == 3 && props.item.status == 21"
-                                    @click="completeDistribution(props.item, props.index)">
-                                    <span>Complete</span>
-                                </v-btn>
-                                            <v-btn small color="success" v-if="props.item.status == 28"
-                                                @click="ChangeWaitingStart(props.item, props.index,29)">
-                                                <span>Start</span>
-                                            </v-btn>
-                                            <v-btn small color="warning" v-if="props.item.status == 29"
-                                                @click="ChangeWaitingcomplete(props.item, props.index,30)">
-                                                <span>Complete</span>
-                                            </v-btn>
-                                            <v-btn small color="success" v-if="props.item.status == 31"
-                                                @click="ChangeWaitingStart(props.item, props.index,32)">
-                                                <span>Start</span>
-                                            </v-btn>
-                                            <v-btn small color="warning" v-if="props.item.status == 32"
-                                                @click="ChangeWaitingcomplete(props.item, props.index,33)">
-                                                <span>Complete</span>
-                                            </v-btn>
-                                            <v-btn small color="success" v-if="props.item.status == 34"
-                                                @click="ChangeWaitingStart(props.item, props.index,35)">
-                                                <span>Start</span>
-                                            </v-btn>
-                                            <v-btn small color="warning" v-if="props.item.status == 35"
-                                                @click="ChangeWaitingcomplete(props.item, props.index,36)">
-                                                <span>Complete</span>
-                                            </v-btn>
-                                            <v-btn small color="success" v-if="props.item.status == 37"
-                                                @click="ChangeWaitingStart(props.item, props.index,38)">
-                                                <span>Start</span>
-                                            </v-btn>
-                                            <v-btn small color="warning" v-if="props.item.status == 38"
-                                                @click="ChangeWaitingcomplete(props.item, props.index,39)">
-                                                <span>Complete</span>
-                                            </v-btn>
-                                            <v-btn small color="warning" v-if="props.item.status == 38"
-                                                @click="ChangeWaitingcomplete(props.item, props.index,39)">
-                                                <span>Complete</span>
-                                            </v-btn>
-                                            <v-btn small color="success"
-                                                v-if="props.item.status == 13 && systemUserID == props.item.systemUserID"
-                                                @click="startImplementation(props.item)">
-                                                <span>View</span>
-                                            </v-btn>
-                                            <v-btn small color="success"
-                                                v-if="props.item.status == 13 && systemUserID == props.item.actionedByUserID"
-                                                @click="$router.push('/PlanogramImplementation')">
-                                                <span>View</span>
-                                            </v-btn>
-                                            <v-btn small color="warning" v-if="props.item.status == 24"
-                                                @click="$router.push('/PlanogramImplementation')">
-                                                <span>View</span>
-                                            </v-btn>
-                                            <v-btn small color="primary" v-if="props.item.status == 15"
-                                                @click="$router.push('/PlanogramImplementation')">
-                                                <span>View</span>
-                                            </v-btn>
-                                        </td> -->
-                                        <!-- <td style="width: 5%;">
-                                            <v-menu left>
-                                                <v-btn icon slot="activator">
-                                                    <v-icon>more_vert</v-icon>
-                                                </v-btn>
-                                                <v-list dense class="pa-0 ma-0">
-
-                                                    <v-list-tile @click="assignTask(props.item)">
-                                                        <span>Assign</span>
-                                                    </v-list-tile>
-
-                                                    <v-divider></v-divider>
-                                                    <v-list-tile @click="ChangeWaitingType(props.item, props.index,28)">
-                                                        <span>Request Product Info</span>
-                                                    </v-list-tile>
-
-                                                    <v-divider>
-                                                    </v-divider>
-                                                    <v-list-tile @click="ChangeWaitingType(props.item, props.index,31)">
-                                                        <span>Request Planogram Input</span>
-                                                    </v-list-tile>
-
-                                                    <v-divider>
-                                                    </v-divider>
-                                                    <v-list-tile @click="ChangeWaitingType(props.item, props.index,34)">
-                                                        <span>Request Fixture Input</span>
-                                                    </v-list-tile>
-
-                                                    <v-divider>
-                                                    </v-divider>
-                                                    <v-list-tile @click="ChangeWaitingType(props.item, props.index,37)">
-                                                        <span>Request Planogram Check</span>
-                                                    </v-list-tile>
-                                                </v-list>
-                                            </v-menu>
-                                        </td> -->
                                         <td style="width: 2%">
-                                            <v-tooltip bottom v-if="props.item.subtask">
-                                                <template v-slot:activator="{ on }">
-                                                    <v-btn @click="acknowledgeOutstandingRequest" icon v-on="on">
-                                                        <v-icon v-on="on">check</v-icon>
-                                                    </v-btn>
-                                                </template>
-                                                <span>request outstanding</span>
-                                            </v-tooltip>
-                                        </td>
-                                        <td style="width: 2%">
-                                            <v-tooltip bottom v-if="props.item.notes != null">
-                                                <template v-slot:activator="{ on }">
-                                                    <v-icon v-on="on">note</v-icon>
-                                                </template>
-                                                <span>{{ props.item.notes }}</span>
-                                            </v-tooltip>
+                                            <v-btn
+                                                @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.planogram_ID)"
+                                                small color="primary" v-if="props.item.type == 3">View</v-btn>
                                         </td>
                                     </template>
                                 </v-data-table>
@@ -689,11 +485,33 @@
                                         <v-list-tile @click="ChangeWaitingType(props.item, props.index,37)">
                                             <span>Request Planogram Check</span>
                                         </v-list-tile>
+
+                                        <v-divider v-if="
+                                            props.item.status == 2 || 
+                                            props.item.status == 26 || 
+                                            props.item.status == 27 || 
+                                            props.item.status == 30 || 
+                                            props.item.status == 33 ||
+                                            props.item.status == 36 ||
+                                            props.item.status == 39"></v-divider>
+
+                                        <v-list-tile v-if="
+                                            props.item.status == 2 || 
+                                            props.item.status == 26 || 
+                                            props.item.status == 27 || 
+                                            props.item.status == 30 || 
+                                            props.item.status == 33 ||
+                                            props.item.status == 36 ||
+                                            props.item.status == 39"
+                                            @click="RemoveTransaction(props.item, props.index)">
+                                            <span>Remove</span>
+                                        </v-list-tile>
+
                                     </v-list>
                                 </v-menu>
                             </td>
                             <td style="width: 2%">
-                                <v-tooltip bottom v-if="props.item.subtask">
+                                <v-tooltip bottom v-if="props.item.subtask && props.item.systemUserID == systemUserID">
                                     <template v-slot:activator="{ on }">
                                         <v-btn @click="acknowledgeOutstandingRequest" icon v-on="on">
                                             <v-icon v-on="on">check</v-icon>
@@ -1040,6 +858,20 @@
                     res => {
                         delete Axios.defaults.headers.common["TenantID"];
                         self.$router.push("/PlanogramImplementation");
+                    })
+            },
+            RemoveTransaction(item, index) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                let trans = JSON.parse(JSON.stringify(item));
+                trans.removed = true;
+
+                Axios.put(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                    res => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        self.projectTransactions.splice(index, 1);
                     })
             }
         }
