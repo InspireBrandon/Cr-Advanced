@@ -295,23 +295,23 @@ class projectStatusHandler {
         var types = [{
                 text: "Event",
                 value: 0,
-                color: "yellow"
+                color: "warning"
             },
             {
                 text: "Data Preparation",
                 value: 1,
-                color: "green"
+                color: "success"
 
             }, {
                 text: "Ranging",
                 value: 2,
-                color: "red"
+                color: "error"
 
             },
             {
                 text: "Planogram",
                 value: 3,
-                color: "blue"
+                color: "primary"
 
             }, {
                 text: "Promotion",

@@ -69,7 +69,7 @@
 
                             <v-divider></v-divider>
 
-                            <v-list-tile @click="$router.push('tasks')">
+                            <v-list-tile @click="$router.push('/Tasks')">
                                 <v-list-tile-avatar>
                                     <v-icon>inbox</v-icon>
                                 </v-list-tile-avatar>
