@@ -200,7 +200,7 @@
 
         self.id = item.Data.Data.id;
         self.name = item.Data.Data.description;
-        self.product_Code = item.Data.Data.product_Code;
+        self.product_Code = item.Data.Data.product_System_ID;
         self.barcode = item.Data.Data.barcode;
         self.capacity = 0;
         self.daysOfSupply = item.Data.CalcData.DaysOfSupply;
