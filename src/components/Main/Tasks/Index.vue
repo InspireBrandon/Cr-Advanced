@@ -331,6 +331,12 @@
                                         v-if="props.item.status == 40 || props.item.status == 30 || props.item.status == 33 || props.item.status == 36 || props.item.status == 39">
                                         <span>Close</span>
                                     </v-btn>
+
+                                    <v-btn small color="error" @click="RemoveTransaction(props.item, props.index)"
+                                        v-if="systemUserID == props.item.actionedByUserID && (props.item.status == 2 || props.item.status == 10 || props.item.status == 19 || props.item.status == 13)">
+                                        <span>Close</span>
+                                    </v-btn>
+
                                     <!-- Product -->
                                     <v-btn small color="success" @click="setInProgress(props.item)"
                                         v-if="props.item.type == 1 && props.item.status == 6 && systemUserID == props.item.systemUserID">
@@ -340,11 +346,11 @@
                                         v-if="props.item.type == 1 && props.item.status == 6 && systemUserID == props.item.actionedByUserID">
                                         <span>View</span>
                                     </v-btn>
-                                    <!-- <v-btn small :color="props.item.status == 1 ? 'warning': 'primary'"
+                                    <v-btn small :color="props.item.status == 1 ? 'warning': 'primary'"
                                         @click="$router.push('/DataPreparation/ProductCatalogue')"
-                                        v-if="props.item.type == 1 && (props.item.status == 1 || props.item.status == 2)">
+                                        v-if="props.item.type == 1 && (props.item.status == 1) && systemUserID == props.item.systemUserID">
                                         <span>View</span>
-                                    </v-btn> -->
+                                    </v-btn>
                                     <!-- PLEASE TJ -->
                                     <v-btn small color="success" @click="assignTask(props.item)"
                                         v-if="props.item.type == 1 && props.item.status == 2 && systemUserID == props.item.systemUserID">
@@ -368,11 +374,11 @@
                                         v-if="props.item.type == 2 && props.item.status == 7 && systemUserID == props.item.actionedByUserID">
                                         <span>View</span>
                                     </v-btn>
-                                    <!-- <v-btn small :color="props.item.status == 1 ? 'warning': 'primary'"
+                                    <v-btn small :color="props.item.status == 1 ? 'warning': 'primary'"
                                         @click="$router.push('/RangePlanning')"
-                                        v-if="props.item.type == 2 && (props.item.status == 1 || props.item.status == 2)">
+                                        v-if="props.item.type == 2 && (props.item.status == 1) && systemUserID == props.item.systemUserID">
                                         <span>View</span>
-                                    </v-btn> -->
+                                    </v-btn>
                                     <!-- PLEASE TJ -->
                                     <v-btn small color="error" @click="assignTask(props.item)"
                                         v-if="props.item.type == 2 && props.item.status == 2 && systemUserID == props.item.systemUserID">
@@ -397,11 +403,11 @@
                                         v-if="props.item.type == 3 && props.item.status == 8 && systemUserID == props.item.actionedByUserID">
                                         <span>View</span>
                                     </v-btn>
-                                    <!-- <v-btn small :color="props.item.status == 1 ? 'warning': 'primary'"
+                                    <v-btn small :color="props.item.status == 1 ? 'warning': 'primary'"
                                         @click="$router.push('/SpacePlanning')"
-                                        v-if="props.item.type == 3 && (props.item.status == 1 || props.item.status == 2)">
+                                        v-if="props.item.type == 3 && (props.item.status == 1) && systemUserID == props.item.systemUserID">
                                         <span>View</span>
-                                    </v-btn> -->
+                                    </v-btn>
                                     <!-- PLEASE TJ -->
                                     <v-btn small color="primary" @click="SubmitForApproval(props.item)"
                                         v-if="props.item.type == 3 && props.item.status == 2 && systemUserID == props.item.systemUserID">
@@ -413,7 +419,7 @@
                                         <span>Complete</span>
                                     </v-btn>
                                     <!-- Approval -->
-                                    <v-btn small color="success" v-if="props.item.type == 3 && props.item.status == 10"
+                                    <v-btn small color="success" v-if="props.item.type == 3 && props.item.status == 10 && systemUserID == props.item.systemUserID"
                                         @click="setPlanogramApprovalInProgress(props.item)">
                                         <span>Start</span>
                                     </v-btn>
@@ -431,7 +437,7 @@
                                         @click="$router.push('/PlanogramImplementation')">
                                         <span>View</span>
                                     </v-btn>
-                                    <v-btn small color="success" v-if="props.item.type == 3 && props.item.status == 19"
+                                    <v-btn small color="success" v-if="props.item.type == 3 && props.item.status == 19 && systemUserID == props.item.systemUserID"
                                         @click="startDistributionProgress(props.item, props.index)">
                                         <span>View</span>
                                     </v-btn>

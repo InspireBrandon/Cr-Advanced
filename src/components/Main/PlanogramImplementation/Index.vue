@@ -512,6 +512,8 @@
                         })
                 }
                 if (type == 4) {
+                    console.log(self.timelineItems[0]);
+
                     self.$refs.PlanogramIplementationModal.show(
                         "Select the store to distribute to", type, storeCluster, storeID, data => {
                             if (data.value == true) {
@@ -525,13 +527,17 @@
                                     "type": 3,
                                     "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
                                     "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
-                                    "systemUserID": data.users,
-                                    "actionedByUserID": systemUserID,
+                                    "systemUserID": null,
+                                    "actionedByUserID": self.timelineItems[0].userID,
                                     "notes": data.notes
                                 }
 
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
+                                        trans.actionedByUserID = null;
+                                        trans.systemUserID = data.users;
+                                        Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans)
+
                                         let element = res.data.projectTX;
 
                                         self.currentProjectTx = res.data.projectTX
