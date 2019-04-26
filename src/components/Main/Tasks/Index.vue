@@ -872,7 +872,7 @@
                         item.status = 2;
                         self.getTransactionsByUser(self.systemUserID)
                         trans.systemUserID = trans.actionedByUserID;
-                        trans.actionedByUserID = null
+                        trans.actionedByUserID = self.systemUserID
                         Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                             r => {
                                 item.status = 2;
