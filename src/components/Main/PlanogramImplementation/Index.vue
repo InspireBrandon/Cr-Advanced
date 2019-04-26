@@ -594,8 +594,6 @@
                         .then(r => {
                             let userType = 0;
 
-                            console.log(r.data)
-
                             if (!r.data.isDatabaseOwner) {
                                 userType = r.data.tenantLink_AccessTypeList[0].accessType
                             }
