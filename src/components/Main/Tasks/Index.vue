@@ -678,7 +678,7 @@
                         res => {
 
                             trans.systemUserID = trans.actionedByUserID;
-                            trans.actionedByUserID = null
+                            trans.actionedByUserID = self.systemUserID
                             Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                 r => {
                                     delete Axios.defaults.headers.common["TenantID"];
