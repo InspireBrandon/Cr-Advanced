@@ -342,7 +342,7 @@
                                         <span>View</span>
                                     </v-btn> -->
                                     <!-- PLEASE TJ -->
-                                    <v-btn small color="success" @click="$router.push('/SpacePlanning')"
+                                    <v-btn small color="success" @click="assignTask(props.item)"
                                         v-if="props.item.type == 1 && props.item.status == 2 && systemUserID == props.item.systemUserID">
                                         <span>Assign</span>
                                     </v-btn>
@@ -366,7 +366,7 @@
                                         <span>View</span>
                                     </v-btn> -->
                                     <!-- PLEASE TJ -->
-                                    <v-btn small color="error" @click="$router.push('/SpacePlanning')"
+                                    <v-btn small color="error" @click="assignTask(props.item)"
                                         v-if="props.item.type == 2 && props.item.status == 2 && systemUserID == props.item.systemUserID">
                                         <span>Assign</span>
                                     </v-btn>
@@ -395,7 +395,7 @@
                                         <span>View</span>
                                     </v-btn> -->
                                     <!-- PLEASE TJ -->
-                                    <v-btn small color="primary" @click="$router.push('/SpacePlanning')"
+                                    <v-btn small color="primary" @click="SubmitForApproval(props.item)"
                                         v-if="props.item.type == 3 && props.item.status == 2 && systemUserID == props.item.systemUserID">
                                         <span>Submit</span>
                                     </v-btn>
@@ -648,6 +648,30 @@
 
         },
         methods: {
+            SubmitForApproval(item){
+              let self = this
+
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+
+                self.$refs.SubtaskModal.show("Submit for Approval", user => {
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    let trans = JSON.parse(JSON.stringify(item));
+
+                    trans.status = 10;
+                    trans.notes = user.notes;
+                    trans.actionedByUserID = systemUserID
+                    trans.systemUserID = user.systemUserID;
+
+                    Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                        res => {
+                            delete Axios.defaults.headers.common["TenantID"];
+                            self.getTransactionsByUser(self.systemUserID)
+                        })
+                })
+
+            },
 
             getUserAccess(systemUserID, tenantID) {
                 let self = this;
@@ -689,6 +713,7 @@
                                     Axios.post(process.env.VUE_APP_API + 'ProjectTX', projectTX).then(
                                         rolledOverResponse => {
                                             console.log(rolledOverResponse.data)
+                                            self.getTransactionsByUser(self.systemUserID)
                                             delete Axios.defaults.headers.common["TenantID"];
                                         })
                                 }, 200);
@@ -728,6 +753,7 @@
                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                     res => {
                         item.status = type
+                        self.getTransactionsByUser(self.systemUserID)
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
@@ -810,6 +836,7 @@
                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                     res => {
                         item.status = 1;
+                        self.getTransactionsByUser(self.systemUserID)
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
@@ -827,6 +854,7 @@
                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                     res => {
                         item.status = 2;
+                        self.getTransactionsByUser(self.systemUserID)
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
@@ -842,6 +870,7 @@
                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                     res => {
                         item.status = 20;
+                        self.getTransactionsByUser(self.systemUserID)
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
@@ -859,6 +888,7 @@
                     Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                         res => {
                             self.projectTransactions.splice(index, 1);
+                            self.getTransactionsByUser(self.systemUserID)
                             delete Axios.defaults.headers.common["TenantID"];
                         })
                 })
