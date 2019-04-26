@@ -15,7 +15,7 @@
                         </v-autocomplete>
                     </v-flex>
 
-                    <v-flex v-if="authorityType =! 0 && routeProjectID == null" xl6 lg6 md6 sm12 xs12>
+                    <v-flex v-if="authorityType != 0 && routeProjectID == null" xl6 lg6 md6 sm12 xs12>
                         <v-autocomplete :disabled="showLoader" @change="getUserProjectsByProjectGroup"
                             v-model="selectedProjectGroup" :items="projectGroupsSelect" hide-details
                             label="Project Group">
@@ -593,6 +593,8 @@
                             `TenantLink_AccessType?systemUserID=${systemUserID}&tenantID=${tenantID}`)
                         .then(r => {
                             let userType = 0;
+
+                            console.log(r.data)
 
                             if (!r.data.isDatabaseOwner) {
                                 userType = r.data.tenantLink_AccessTypeList[0].accessType
