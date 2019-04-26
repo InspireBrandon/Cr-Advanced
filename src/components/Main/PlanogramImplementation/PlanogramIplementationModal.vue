@@ -17,6 +17,10 @@
           </v-toolbar>
           <v-card-title style="text-align: center; display: block;" class="headline">
             <v-textarea v-model="modalNotes" label="Notes"></v-textarea>
+            <v-flex md12 v-if="type==4">
+              <v-autocomplete :disabled="disableStoreSelection"  dense v-model="selectedPlanogram"
+                :items="planograms" label="Select A Planogram to distribute"></v-autocomplete>
+            </v-flex>
             <v-flex md6 v-if="type==4">
               <v-autocomplete style="max-width: 400px;" dense v-model="selectedStore" :items="Stores"
                 label="Select A Store"></v-autocomplete>
@@ -50,6 +54,8 @@
   export default {
     data() {
       return {
+        planograms:[],
+        selectedPlanogram:null,
         selectedStore: null,
         Stores: [],
         type: null,
@@ -121,10 +127,10 @@
             // alert("Failed to get data...");
           })
       },
-      show(title, type, storeCluster, storeID, afterRuturn) {
+      show(title, type, storeCluster, storeID,planograms, afterRuturn) {
         let self = this;
         self.type = type
-
+        self.planograms =planograms
         self.title = title;
         self.dialog = true;
         self.getStores()
@@ -167,8 +173,7 @@
               self.Stores.push({
                 text: s.storeName,
                 value: s.storeID
-              }
-              )
+              })
             }
           })
         })
@@ -177,6 +182,7 @@
       returnValue(value) {
         let self = this;
         let tmp = {
+          planogram:self.selectedPlanogram,
           value: value,
           stores: self.selectedStore,
           users: self.selectedUser,

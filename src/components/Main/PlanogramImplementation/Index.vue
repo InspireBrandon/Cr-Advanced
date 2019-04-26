@@ -274,7 +274,7 @@
 
                 if (type == 0) {
                     self.$refs.PlanogramIplementationModal.show(
-                        "Approve planogram", type, storeCluster, storeID, data => {
+                        "Approve planogram", type, storeCluster, storeID,null, data => {
                             if (data.value == true) {
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -333,7 +333,7 @@
                 }
                 if (type == 1) {
                     self.$refs.PlanogramIplementationModal.show(
-                        "Decline Planogram Approval?", storeCluster, storeID, type, data => {
+                        "Decline Planogram Approval?", type, storeCluster, storeID,null, data => {
                             if (data.value == true) {
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -393,7 +393,7 @@
                 }
                 if (type == 2) {
                     self.$refs.PlanogramIplementationModal.show(
-                        "Request Planogram Variation?", type, storeCluster, storeID, data => {
+                        "Request Planogram Variation?", type, storeCluster, storeID,null, data => {
                             if (data.value == true) {
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -450,7 +450,7 @@
                 }
                 if (type == 3) {
                     self.$refs.PlanogramIplementationModal.show(
-                        "Implement Planogram?", type, storeCluster, storeID, data => {
+                        "Implement Planogram?", type, storeCluster, storeID,null, data => {
                             if (data.value == true) {
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -515,13 +515,14 @@
                     console.log(self.timelineItems[0]);
 
                     self.$refs.PlanogramIplementationModal.show(
-                        "Select the store to distribute to", type, storeCluster, storeID, data => {
+                        "Select the store to distribute to", type, storeCluster, storeID,self.filterPlanograms, data => {
                             if (data.value == true) {
                                 let trans = {
                                     "project_ID": self.projectID,
                                     "dateTime": new Date,
                                     "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
                                     "store_ID": data.stores,
+                                    "systemFileID":data.planogram,
                                     "username": self.projectsStatus.user,
                                     "status": 13,
                                     "type": 3,
@@ -534,6 +535,8 @@
 
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
+                                        console.log(res);
+                                        
                                         trans.actionedByUserID = null;
                                         trans.systemUserID = data.users;
                                         Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans)
