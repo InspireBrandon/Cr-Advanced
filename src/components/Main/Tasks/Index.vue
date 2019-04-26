@@ -975,7 +975,7 @@
                         task.status = 5 + data.type;
                         task.systemUserID = data.systemUserID;
                         task.notes = data.notes;
-                        task.actionedByUserID = null;
+                        task.actionedByUserID = self.systemUserID;
                         Axios.post(process.env.VUE_APP_API + 'ProjectTX', task).then(res2 => {
                             delete Axios.defaults.headers.common["TenantID"];
                             self.getTransactionsByUser(self.systemUserID)
