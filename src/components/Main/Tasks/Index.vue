@@ -191,6 +191,10 @@
                                                     @click="$router.push('/PlanogramImplementation')">
                                                     <span>View</span>
                                                 </v-btn>
+                                                <v-btn small color="grey" @click="assignTask(props.item)"
+                                                    v-if="props.item.type == -1 && props.item.status == 0 && systemUserID == props.item.systemUserID">
+                                                    <span>Assign</span>
+                                                </v-btn>
                                             </td>
                                             <td style="width: 5%;">
                                                 <v-menu left>
@@ -344,6 +348,10 @@
                                     <!-- PLEASE TJ -->
                                     <v-btn small color="success" @click="assignTask(props.item)"
                                         v-if="props.item.type == 1 && props.item.status == 2 && systemUserID == props.item.systemUserID">
+                                        <span>Assign</span>
+                                    </v-btn>
+                                    <v-btn small color="grey" @click="assignTask(props.item)"
+                                        v-if="props.item.type == -1 && props.item.status == 0 && systemUserID == props.item.systemUserID">
                                         <span>Assign</span>
                                     </v-btn>
                                     <v-btn small color="error"
@@ -544,6 +552,7 @@
 
                                             <v-divider v-if="
                                             props.item.status == 2 || 
+                                            props.item.status == 10 ||  
                                             props.item.status == 26 || 
                                             props.item.status == 27 || 
                                             props.item.status == 30 || 
@@ -552,7 +561,8 @@
                                             props.item.status == 39"></v-divider>
 
                                             <v-list-tile v-if="
-                                            props.item.status == 2 || 
+                                            props.item.status == 2 ||
+                                           props.item.status == 10 ||  
                                             props.item.status == 26 || 
                                             props.item.status == 27 || 
                                             props.item.status == 30 || 
@@ -648,8 +658,8 @@
 
         },
         methods: {
-            SubmitForApproval(item){
-              let self = this
+            SubmitForApproval(item) {
+                let self = this
 
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
@@ -666,8 +676,14 @@
 
                     Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                         res => {
-                            delete Axios.defaults.headers.common["TenantID"];
-                            self.getTransactionsByUser(self.systemUserID)
+
+                            trans.systemUserID = trans.actionedByUserID;
+                            trans.actionedByUserID = null
+                            Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                                r => {
+                                    delete Axios.defaults.headers.common["TenantID"];
+                                    self.getTransactionsByUser(self.systemUserID)
+                                })
                         })
                 })
 
@@ -855,8 +871,17 @@
                     res => {
                         item.status = 2;
                         self.getTransactionsByUser(self.systemUserID)
+                        trans.systemUserID = trans.actionedByUserID;
+                        trans.actionedByUserID = null
+                        Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                            r => {
+                                item.status = 2;
+                                self.getTransactionsByUser(self.systemUserID)
+
+                            })
                         delete Axios.defaults.headers.common["TenantID"];
                     })
+
             },
             setPlanogramApprovalInProgress(item) {
                 let self = this;
@@ -876,7 +901,8 @@
             },
             sendForDistribution(item, index) {
                 let self = this;
-
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
                 self.$refs.userSelector.show(user => {
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
@@ -887,9 +913,12 @@
 
                     Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                         res => {
-                            self.projectTransactions.splice(index, 1);
-                            self.getTransactionsByUser(self.systemUserID)
-                            delete Axios.defaults.headers.common["TenantID"];
+                            Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                                res => {
+                                    trans.systemUserID = systemUserID;
+                                    self.getTransactionsByUser(self.systemUserID)
+                                    delete Axios.defaults.headers.common["TenantID"];
+                                })
                         })
                 })
             },
