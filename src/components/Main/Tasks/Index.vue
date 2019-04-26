@@ -672,13 +672,13 @@
                     trans.status = 10;
                     trans.notes = user.notes;
                     trans.actionedByUserID = systemUserID
-                    trans.systemUserID = user.systemUserID;
+                    trans.systemUserID = null;
 
                     Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                         res => {
 
-                            trans.systemUserID = trans.actionedByUserID;
-                            trans.actionedByUserID = self.systemUserID
+                            trans.systemUserID = user.systemUserID;
+                            trans.actionedByUserID = null
                             Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                 r => {
                                     delete Axios.defaults.headers.common["TenantID"];
@@ -864,15 +864,15 @@
                 let trans = JSON.parse(JSON.stringify(item));
                 trans.status = 2;
                 trans.notes = null;
-                trans.systemUserID = item.projectOwnerID;
-                trans.actionedByUserID = item.systemUserID;
+                trans.systemUserID = null;
+                trans.actionedByUserID = self.systemUserID;
 
                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                     res => {
                         item.status = 2;
                         self.getTransactionsByUser(self.systemUserID)
-                        trans.systemUserID = trans.actionedByUserID;
-                        trans.actionedByUserID = self.systemUserID
+                        trans.systemUserID = item.projectOwnerID;
+                        trans.actionedByUserID = null
                         Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                             r => {
                                 item.status = 2;
@@ -909,13 +909,15 @@
                     let trans = JSON.parse(JSON.stringify(item));
                     trans.status = 19;
                     trans.notes = null;
-                    trans.systemUserID = user.systemUserID;
+                    trans.systemUserID = null;
+                    trans.actionedByUserID = self.systemUserID;
 
                     Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                         res => {
+                            trans.actionedByUserID = null;
+                            trans.systemUserID = user.systemUserID;
                             Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                 res => {
-                                    trans.systemUserID = systemUserID;
                                     self.getTransactionsByUser(self.systemUserID)
                                     delete Axios.defaults.headers.common["TenantID"];
                                 })
@@ -975,7 +977,7 @@
                         task.status = 5 + data.type;
                         task.systemUserID = data.systemUserID;
                         task.notes = data.notes;
-                        task.actionedByUserID = self.systemUserID;
+                        task.actionedByUserID = null;
                         Axios.post(process.env.VUE_APP_API + 'ProjectTX', task).then(res2 => {
                             delete Axios.defaults.headers.common["TenantID"];
                             self.getTransactionsByUser(self.systemUserID)
