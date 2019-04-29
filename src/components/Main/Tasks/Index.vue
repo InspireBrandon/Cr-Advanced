@@ -983,6 +983,10 @@
                         task.status = 5 + data.type;
                         task.systemUserID = data.systemUserID;
                         task.notes = data.notes;
+                        task.storeCluster_ID = data.storeCluster;
+                        task.categoryCluster_ID = data.categoryCluster;
+                        task.store_ID = data.store;
+                        task.systemFileID = data.systemFile;
                         task.actionedByUserID = null;
                         Axios.post(process.env.VUE_APP_API + 'ProjectTX', task).then(res2 => {
                             delete Axios.defaults.headers.common["TenantID"];
