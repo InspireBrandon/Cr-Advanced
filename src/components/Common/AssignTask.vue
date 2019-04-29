@@ -10,7 +10,7 @@
                         <v-card-text>
                             <v-select :items="tasks" v-model="task" label="Task"></v-select>
                             <div v-if="task == 3">
-                                <v-checkbox v-model="useExisting" label="Use existing?"></v-checkbox>
+                                <v-checkbox v-model="useExisting" label="Modify existing?"></v-checkbox>
                                 <div v-if="useExisting">
                                     <v-select :items="systemFiles" v-model="systemFile" label="Planogram">
                                     </v-select>

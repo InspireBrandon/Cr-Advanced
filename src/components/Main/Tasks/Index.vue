@@ -17,8 +17,8 @@
                                     <v-spacer></v-spacer>
                                     <v-spacer></v-spacer>
                                     <v-spacer></v-spacer>
-                                    <v-autocomplete v-if="accessType == 0 || accessType == 2" label="Select User" @change="userChange"
-                                        v-model="selectedUser" :items="users"></v-autocomplete>
+                                    <v-autocomplete v-if="accessType == 0 || accessType == 2" label="Select User"
+                                        @change="userChange" v-model="selectedUser" :items="users"></v-autocomplete>
                                 </v-toolbar>
                                 <v-data-table :items="projectTransactions" class="elevation-1 scrollable" hide-actions
                                     hide-headers>
@@ -144,7 +144,7 @@
                                                 </v-btn>
                                                 <v-btn small color="primary"
                                                     v-if="props.item.type == 3 && props.item.status == 12 && (systemUserID == props.item.actionedByUserID || accessType == 0)"
-                                                    @click="$router.push('/PlanogramImplementation')">
+                                                    @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID)">
                                                     <span>View</span>
                                                 </v-btn>
                                                 <v-btn small color="success"
@@ -207,13 +207,13 @@
                                                     <span>Complete</span>
                                                 </v-btn>
                                                 <v-btn small color="success"
-                                                    v-if="props.item.status == 13 && (systemUserID == props.item.systemUserID || accessType == 0)"
+                                                    v-if="props.item.status == 13 && (systemUserID == props.item.systemUserID)"
                                                     @click="startImplementation(props.item)">
                                                     <span>View</span>
                                                 </v-btn>
                                                 <v-btn small color="success"
                                                     v-if="props.item.status == 13 && (systemUserID == props.item.actionedByUserID || accessType == 0)"
-                                                    @click="$router.push('/PlanogramImplementation')">
+                                                    @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID)">
                                                     <span>View</span>
                                                 </v-btn>
                                                 <v-btn small color="warning" v-if="props.item.status == 24"
@@ -221,7 +221,7 @@
                                                     <span>View</span>
                                                 </v-btn>
                                                 <v-btn small color="primary" v-if="props.item.status == 15"
-                                                    @click="$router.push('/PlanogramImplementation')">
+                                                    @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID)">
                                                     <span>View</span>
                                                 </v-btn>
                                             </td>
@@ -487,7 +487,7 @@
                                     </v-btn>
                                     <v-btn small color="primary"
                                         v-if="props.item.type == 3 && props.item.status == 12 && (systemUserID == props.item.actionedByUserID || accessType == 0)"
-                                        @click="$router.push('/PlanogramImplementation')">
+                                        @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID)">
                                         <span>View</span>
                                     </v-btn>
                                     <v-btn small color="success"
@@ -549,13 +549,13 @@
                                         <span>Complete</span>
                                     </v-btn>
                                     <v-btn small color="success"
-                                        v-if="props.item.status == 13 && (systemUserID == props.item.systemUserID || accessType == 0)"
+                                        v-if="props.item.status == 13 && (systemUserID == props.item.systemUserID)"
                                         @click="startImplementation(props.item)">
                                         <span>View</span>
                                     </v-btn>
                                     <v-btn small color="success"
                                         v-if="props.item.status == 13 && (systemUserID == props.item.actionedByUserID || accessType == 0)"
-                                        @click="$router.push('/PlanogramImplementation')">
+                                        @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID)">
                                         <span>View</span>
                                     </v-btn>
                                     <v-btn small color="warning" v-if="props.item.status == 24"
@@ -563,7 +563,7 @@
                                         <span>View</span>
                                     </v-btn>
                                     <v-btn small color="primary" v-if="props.item.status == 15"
-                                        @click="$router.push('/PlanogramImplementation')">
+                                        @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID)">
                                         <span>View</span>
                                     </v-btn>
                                 </td>
@@ -708,16 +708,14 @@
                 let systemUserID = encoded_details.USER_ID;
 
                 self.getUserAccess(systemUserID, tenantID, () => {
-                    
+                    setTimeout(() => {
+                        self.systemUserID = systemUserID;
+                        self.getTransactionsByUser(systemUserID)
+                        self.getUsers(callback => {
+                            self.showLoader = false
+                        })
+                    }, 1000);
                 })
-
-                setTimeout(() => {
-                    self.systemUserID = systemUserID;
-                    self.getTransactionsByUser(systemUserID)
-                    self.getUsers(callback => {
-                        self.showLoader = false
-                    })
-                }, 500);
             })
 
         },
@@ -1047,7 +1045,7 @@
                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                     res => {
                         delete Axios.defaults.headers.common["TenantID"];
-                        self.$router.push("/PlanogramImplementation");
+                        self.$router.push("/PlanogramImplementation/" + item.project_ID + "/" + item.systemFileID);
                     })
             },
             completeDistribution(item, index) {
@@ -1062,7 +1060,7 @@
                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                     res => {
                         delete Axios.defaults.headers.common["TenantID"];
-                        self.$router.push("/PlanogramImplementation");
+                        self.$router.push("/PlanogramImplementation/" + item.project_ID + "/" + item.systemFileID);
                     })
             },
             assignTask(item) {
@@ -1143,7 +1141,7 @@
                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                     res => {
                         delete Axios.defaults.headers.common["TenantID"];
-                        self.$router.push("/PlanogramImplementation");
+                        self.$router.push("/PlanogramImplementation/" + item.project_ID + "/" + item.systemFileID);
                     })
             },
             RemoveTransaction(item, index) {
