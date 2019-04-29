@@ -134,7 +134,7 @@
                                                 </v-btn>
                                                 <v-btn small color="warning"
                                                     v-if="props.item.type == 3 && props.item.status == 20"
-                                                    @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID)">
+                                                    @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID+'/' + props.item.status)">
                                                     <span>View</span>
                                                 </v-btn>
                                                 <v-btn small color="error"
@@ -144,7 +144,7 @@
                                                 </v-btn>
                                                 <v-btn small color="primary"
                                                     v-if="props.item.type == 3 && props.item.status == 12 && (systemUserID == props.item.actionedByUserID || accessType == 0)"
-                                                    @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID)">
+                                                    @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID+'/' + props.item.status)">
                                                     <span>View</span>
                                                 </v-btn>
                                                 <v-btn small color="success"
@@ -154,7 +154,7 @@
                                                 </v-btn>
                                                 <v-btn small color="warning"
                                                     v-if="props.item.type == 3 && props.item.status == 21"
-                                                    @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID)">
+                                                    @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID+'/' + props.item.status)">
                                                     <span>View</span>
                                                 </v-btn>
                                                 <!-- <v-btn small color="warning" v-if="props.item.type == 3 && props.item.status == 21"
@@ -213,15 +213,15 @@
                                                 </v-btn>
                                                 <v-btn small color="success"
                                                     v-if="props.item.status == 13 && (systemUserID == props.item.actionedByUserID || accessType == 0)"
-                                                    @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID)">
+                                                    @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID+'/' + props.item.status)">
                                                     <span>View</span>
                                                 </v-btn>
                                                 <v-btn small color="warning" v-if="props.item.status == 24"
-                                                    @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID)">
+                                                    @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID+'/' + props.item.status)">
                                                     <span>View</span>
                                                 </v-btn>
                                                 <v-btn small color="primary" v-if="props.item.status == 15"
-                                                    @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID)">
+                                                    @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID+'/' + props.item.status)">
                                                     <span>View</span>
                                                 </v-btn>
                                             </td>
@@ -346,7 +346,7 @@
                                             <td>{{ props.item.dateTimeString }}</td>
                                             <td style="width: 2%">
                                                 <v-btn
-                                                    @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID)"
+                                                    @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID+'/' + props.item.status)"
                                                     small color="primary" v-if="props.item.type == 3">View</v-btn>
                                             </td>
                                         </tr>
@@ -477,7 +477,7 @@
                                         <span>Start</span>
                                     </v-btn>
                                     <v-btn small color="warning" v-if="props.item.type == 3 && props.item.status == 20"
-                                        @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID)">
+                                        @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID+'/' + props.item.status)">
                                         <span>View</span>
                                     </v-btn>
                                     <v-btn small color="error"
@@ -487,7 +487,7 @@
                                     </v-btn>
                                     <v-btn small color="primary"
                                         v-if="props.item.type == 3 && props.item.status == 12 && (systemUserID == props.item.actionedByUserID || accessType == 0)"
-                                        @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID)">
+                                        @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID+'/' + props.item.status)">
                                         <span>View</span>
                                     </v-btn>
                                     <v-btn small color="success"
@@ -496,7 +496,7 @@
                                         <span>View</span>
                                     </v-btn>
                                     <v-btn small color="warning" v-if="props.item.type == 3 && props.item.status == 21"
-                                        @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID)">
+                                        @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID+'/' + props.item.status)">
                                         <span>View</span>
                                     </v-btn>
                                     <!-- <v-btn small color="warning" v-if="props.item.type == 3 && props.item.status == 21"
@@ -555,15 +555,15 @@
                                     </v-btn>
                                     <v-btn small color="success"
                                         v-if="props.item.status == 13 && (systemUserID == props.item.actionedByUserID || accessType == 0)"
-                                        @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID)">
+                                        @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID+'/' + props.item.status)">
                                         <span>View</span>
                                     </v-btn>
                                     <v-btn small color="warning" v-if="props.item.status == 24"
-                                        @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID)">
+                                        @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID+'/' + props.item.status)">
                                         <span>View</span>
                                     </v-btn>
                                     <v-btn small color="primary" v-if="props.item.status == 15"
-                                        @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID)">
+                                        @click="$router.push('/PlanogramImplementation/' + props.item.project_ID + '/' + props.item.systemFileID+'/' + props.item.status)">
                                         <span>View</span>
                                     </v-btn>
                                 </td>

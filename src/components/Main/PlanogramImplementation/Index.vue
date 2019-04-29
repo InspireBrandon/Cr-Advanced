@@ -76,18 +76,18 @@
                         </v-toolbar> -->
                         <v-toolbar color="primary" dark dense flat
                             v-if="selectedPlanogram != null || routeProjectID != null">
-                            <v-btn v-if="(authorityType == 1)&&(projectsStatus.status==20)" flat outline
+                            <v-btn v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==20)" flat outline
                                 @click="openImplementationModal(projectsStatus.status,0)">Approve
                             </v-btn>
                             <v-btn flat outline @click="assignTask(currentProjectTx)">Assign</v-btn>
                             <v-btn flat outline
                                 @click="openImplementationModal(projectsStatus.status,2,timelineItems[0])">Variation
                             </v-btn>
-                            <v-btn flat v-if="(authorityType == 1)&&(projectsStatus.status==24)" outline
+                            <v-btn flat v-if="authorityType == 0||(authorityType == 3)&&(projectsStatus.status==24)" outline
                                 @click="openImplementationModal(projectsStatus.status,3,timelineItems[0])">
                                 Implemented
                             </v-btn>
-                            <v-btn flat v-if="(authorityType == 1)&&(projectsStatus.status==21)" outline
+                            <v-btn flat v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==21)" outline
                                 @click="openImplementationModal(projectsStatus.status,4,timelineItems[0])">Distribute
                             </v-btn>
                         </v-toolbar>

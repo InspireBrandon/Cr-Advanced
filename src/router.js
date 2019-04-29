@@ -163,7 +163,7 @@ export default new Router({
           name: "planogram_implementation",
           component: PlanogramImplementation
         }, {
-          path: "/PlanogramImplementation/:projectTransactionID/:planogramID",
+          path: "/PlanogramImplementation/:projectTransactionID/:planogramID/:status",
           name: "planogram_implementation",
           component: PlanogramImplementation
         }, {
