@@ -76,15 +76,19 @@
                         </v-toolbar> -->
                         <v-toolbar color="primary" dark dense flat
                             v-if="selectedPlanogram != null || routeProjectID != null">
-                            <v-btn flat outline @click="openImplementationModal(projectsStatus.status,0)">Approve
+                            <v-btn v-if="(authorityType == 1)&&(projectsStatus.status==20)" flat outline
+                                @click="openImplementationModal(projectsStatus.status,0)">Approve
                             </v-btn>
                             <v-btn flat outline @click="assignTask(currentProjectTx)">Assign</v-btn>
                             <v-btn flat outline
-                                @click="openImplementationModal(projectsStatus.status,2, timelineItems[0])">Variation
+                                @click="openImplementationModal(projectsStatus.status,2,timelineItems[0])">Variation
                             </v-btn>
-                            <v-btn flat outline @click="openImplementationModal(projectsStatus.status,3)">Implemented
+                            <v-btn flat v-if="(authorityType == 1)&&(projectsStatus.status==24)" outline
+                                @click="openImplementationModal(projectsStatus.status,3,timelineItems[0])">
+                                Implemented
                             </v-btn>
-                            <v-btn flat outline @click="openImplementationModal(projectsStatus.status,4)">Distribute
+                            <v-btn flat v-if="(authorityType == 1)&&(projectsStatus.status==21)" outline
+                                @click="openImplementationModal(projectsStatus.status,4,timelineItems[0])">Distribute
                             </v-btn>
                         </v-toolbar>
                     </v-flex>
@@ -212,7 +216,7 @@
 
             self.getTypeList()
             self.getStatusList()
-
+            self.initialise();
             if (self.$route.params.projectTransactionID != undefined) {
                 self.routeProjectID = self.$route.params.projectTransactionID;
                 self.selectedProject = self.routeProjectID;
@@ -285,7 +289,7 @@
 
                 if (type == 0) {
                     self.$refs.PlanogramIplementationModal.show(
-                        "Approve planogram", type, storeCluster, storeID, data => {
+                        "Approve planogram", type, storeCluster, storeID, null, data => {
                             if (data.value == true) {
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -344,7 +348,7 @@
                 }
                 if (type == 1) {
                     self.$refs.PlanogramIplementationModal.show(
-                        "Decline Planogram Approval?", storeCluster, storeID, type, data => {
+                        "Decline Planogram Approval?", type, storeCluster, storeID, null, data => {
                             if (data.value == true) {
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -404,6 +408,7 @@
                 }
                 if (type == 2) {
                     self.$refs.assignTask.showWithData(item, data => {
+
                         let trans = {
                             "project_ID": self.projectID,
                             "dateTime": new Date,
@@ -520,8 +525,13 @@
                     //     })
                 }
                 if (type == 3) {
+
                     self.$refs.PlanogramIplementationModal.show(
-                        "Implement Planogram?", type, storeCluster, storeID, data => {
+
+
+                        "Implement Planogram?", type, storeCluster, storeID, null, data => {
+
+
                             if (data.value == true) {
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -583,16 +593,24 @@
                         })
                 }
                 if (type == 4) {
-                    console.log(self.timelineItems[0]);
+                    let tmp = []
+
+                    self.PlanogramItems.forEach(element => {
+                        if (element.value == item.systemFileID) {
+                            tmp.push(element)
+                        }
+                    });
 
                     self.$refs.PlanogramIplementationModal.show(
-                        "Select the store to distribute to", type, storeCluster, storeID, data => {
+                        "Select the store to distribute to", type, storeCluster, storeID, tmp,
+                        data => {
                             if (data.value == true) {
                                 let trans = {
                                     "project_ID": self.projectID,
                                     "dateTime": new Date,
                                     "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
                                     "store_ID": data.stores,
+                                    "systemFileID": data.planogram,
                                     "username": self.projectsStatus.user,
                                     "status": 13,
                                     "type": 3,
@@ -651,6 +669,7 @@
 
                 self.getUserDetails(systemUserID, tenantID)
                     .then(userType => {
+
                         self.handleUser(userType);
                     })
                     .catch(message => {
@@ -1050,6 +1069,7 @@
                                 }
 
                                 if (element.deleted != true) {
+
                                     self.timelineItems.push({
                                         status: element.status,
                                         notes: self.status[element.status].text,
@@ -1062,7 +1082,10 @@
                                         storeCluster_ID: element.storeCluster_ID,
                                         storeCluster: element.storeCluster,
                                         categoryCluster_ID: element.categoryCluster_ID,
-                                        actionedByUserID: element.actionedByUserID
+                                        actionedByUserID: element.actionedByUserID,
+                                        projectOwnerID: element.projectOwnerID,
+                                        systemFileID: element.systemFileID
+
                                     })
 
                                     if (element.type == 3 && element.status != 13) {

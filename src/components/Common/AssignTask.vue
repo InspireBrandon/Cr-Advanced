@@ -220,12 +220,16 @@
             },
             showWithData(data, afterRuturn) {
                 let self = this;
+                self.user = null
                 self.task = null;
-                self.user = null;
                 self.afterRuturn = afterRuturn;
                 self.getData(() => {
                     console.log(data);
-
+                    if (data.userID != null) {
+                        self.user = data.userID
+                    }else{
+                        self.user=data.projectOwnerID
+                    }
                     if (data.systemFileID == null) {
                         self.useExisting = false;
                         self.storeCluster = data.storeID;
