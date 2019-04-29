@@ -29,7 +29,7 @@
                     </v-flex>
 
                     <v-flex xl12 lg12 md6 sm12 xs12
-                        v-if="(currentPlanogram != null && selectedProject != null) || routeProjectID != null">
+                        v-if="(currentPlanogram != null && selectedProject != null) && routeProjectID == null">
                         <h1 v-if="routeProjectID == null">{{ currentPlanogram.name }} </h1>
                         <v-autocomplete :disabled="showLoader" @change="selectPlanogram(selectedPlanogram)" dense
                             v-model="selectedPlanogram" :items="filterPlanograms" label="Planogram"></v-autocomplete>
@@ -39,8 +39,10 @@
                         <v-progress-circular class="ma-0" color="primary" indeterminate height="5">
                         </v-progress-circular>
                     </v-flex>
-                    <v-flex xl12 lg12 md12 sm12 xs12 v-if="selectedPlanogram != null && !showLoader">
-                        <v-toolbar color="primary" dark dense flat v-if="selectedPlanogram != null">
+                    <v-flex xl12 lg12 md12 sm12 xs12
+                        v-if="(selectedPlanogram != null || routeProjectID != null) && !showLoader">
+                        <v-toolbar color="primary" dark dense flat
+                            v-if="selectedPlanogram != null || routeProjectID != null">
                             <v-toolbar-title>
                                 Status: {{status[timelineItems[0].status].text}}
                             </v-toolbar-title>
@@ -51,7 +53,8 @@
                                    <v-btn v-if="(( authorityType == 1)&&(projectsStatus.status==19))">Distribute Planograms</v-btn> -->
                         </v-toolbar>
                         <v-divider></v-divider>
-                        <v-toolbar color="primary" dark dense flat v-if="selectedPlanogram != null">
+                        <!-- <v-toolbar color="primary" dark dense flat
+                            v-if="selectedPlanogram != null || routeProjectID != null">
                             <v-btn flat outline
                                 v-if="(( authorityType == 1)&&(projectsStatus.status==20)) || authorityType == 0 || authorityType == 1"
                                 @click="openImplementationModal(projectsStatus.status,0)">Approve</v-btn>
@@ -60,7 +63,8 @@
                                 @click="assignTask(currentProjectTx)">Assign</v-btn>
                             <v-btn flat outline
                                 v-if="((authorityType == 1)&&(projectsStatus.status==20)) || authorityType == 0 || authorityType == 1"
-                                @click="openImplementationModal(projectsStatus.status,2)">Variation</v-btn>
+                                @click="openImplementationModal(projectsStatus.status,2, timelineItems[0])">Variation
+                            </v-btn>
                             <v-btn flat outline
                                 v-if="(( authorityType == 3)&&(projectsStatus.status==24)) || authorityType == 0"
                                 @click="openImplementationModal(projectsStatus.status,3)">Implemented
@@ -68,6 +72,19 @@
                             <v-btn flat outline
                                 v-if="(( authorityType == 1)&&(projectsStatus.status==21)) || authorityType == 0"
                                 @click="openImplementationModal(projectsStatus.status,4)">Distribute
+                            </v-btn>
+                        </v-toolbar> -->
+                        <v-toolbar color="primary" dark dense flat
+                            v-if="selectedPlanogram != null || routeProjectID != null">
+                            <v-btn flat outline @click="openImplementationModal(projectsStatus.status,0)">Approve
+                            </v-btn>
+                            <v-btn flat outline @click="assignTask(currentProjectTx)">Assign</v-btn>
+                            <v-btn flat outline
+                                @click="openImplementationModal(projectsStatus.status,2, timelineItems[0])">Variation
+                            </v-btn>
+                            <v-btn flat outline @click="openImplementationModal(projectsStatus.status,3)">Implemented
+                            </v-btn>
+                            <v-btn flat outline @click="openImplementationModal(projectsStatus.status,4)">Distribute
                             </v-btn>
                         </v-toolbar>
                     </v-flex>
@@ -201,17 +218,11 @@
                 self.selectedProject = self.routeProjectID;
                 self.routePlanogramID = self.$route.params.planogramID
                 self.onRouteEnter(function () {
-
-                    if (self.filterPlanograms.length == 1) {
-                        self.selectedPlanogram = self.filterPlanograms[0].value;
-                        self.selectPlanogram(self.selectedPlanogram);
-                    }
+                    self.selectPlanogram(self.routePlanogramID);
                 })
             } else {
                 self.initialise();
             }
-
-            console.log(self.selectedProjectGroup)
         },
         computed: {
             filterPlanograms: function () {
@@ -262,7 +273,7 @@
             openImage() {
                 this.imageModal = true;
             },
-            openImplementationModal(status, type) {
+            openImplementationModal(status, type, item) {
                 let self = this
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -392,61 +403,121 @@
                         })
                 }
                 if (type == 2) {
-                    self.$refs.PlanogramIplementationModal.show(
-                        "Request Planogram Variation?", type, storeCluster, storeID,null, data => {
-                            if (data.value == true) {
-                                let trans = {
-                                    "project_ID": self.projectID,
-                                    "dateTime": new Date,
-                                    "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
-                                    "username": self.timelineItems[self.timelineItems.length - 1].user,
-                                    "status": 14,
-                                    "type": 3,
-                                    "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
-                                    "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
-                                    "systemUserID": self.timelineItems[self.timelineItems.length - 1].userID,
-                                    "notes": data.notes
-                                }
-                                Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
-                                    res => {
-                                        let element = res.data.projectTX;
+                    self.$refs.assignTask.showWithData(item, data => {
+                        let trans = {
+                            "project_ID": self.projectID,
+                            "dateTime": new Date,
+                            "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
+                            "username": self.timelineItems[self.timelineItems.length - 1].user,
+                            "status": 14,
+                            "type": 3,
+                            "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
+                            "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
+                            "systemUserID": null,
+                            "actionedByUserID": systemUserID,
+                            "notes": data.notes,
+                            "systemFileID": data.systemFile
+                        }
+                        Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                            res => {
+                                let element = res.data.projectTX;
 
-                                        self.currentProjectTx = res.data.projectTX
+                                trans.systemUserID = data.systemUserID;
+                                trans.actionedByUserID = null;
 
-                                        self.timelineItems.unshift({
-                                            status: element.status,
-                                            notes: self.status[element.status].text,
-                                            date: element.dateTimeString,
-                                            user: element.username,
-                                            userID: element.systemUserID,
-                                            type: element.type,
-                                            storeID: element.store_ID,
-                                            store: element.store,
-                                            storeCluster_ID: element.storeCluster_ID,
-                                            storeCluster: element.storeCluster,
-                                            categoryCluster_ID: element.categoryCluster_ID
-                                        })
+                                Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans)
 
-                                        self.tmpItems.unshift({
-                                            status: element.status,
-                                            notes: self.status[element.status].text,
-                                            date: element.dateTimeString,
-                                            user: element.username,
-                                            userID: element.systemUserID,
-                                            type: element.type,
-                                            storeID: element.store_ID,
-                                            store: element.store,
-                                            storeCluster_ID: element.storeCluster_ID,
-                                            storeCluster: element.storeCluster,
-                                            categoryCluster_ID: element.categoryCluster_ID
-                                        })
+                                self.currentProjectTx = res.data.projectTX
 
-                                        self.projectsStatus = self.timelineItems[0]
+                                self.timelineItems.unshift({
+                                    status: element.status,
+                                    notes: self.status[element.status].text,
+                                    date: element.dateTimeString,
+                                    user: element.username,
+                                    userID: element.systemUserID,
+                                    type: element.type,
+                                    storeID: element.store_ID,
+                                    store: element.store,
+                                    storeCluster_ID: element.storeCluster_ID,
+                                    storeCluster: element.storeCluster,
+                                    categoryCluster_ID: element.categoryCluster_ID
+                                })
 
-                                        delete Axios.defaults.headers.common["TenantID"];
-                                    })
-                            }
-                        })
+                                self.tmpItems.unshift({
+                                    status: element.status,
+                                    notes: self.status[element.status].text,
+                                    date: element.dateTimeString,
+                                    user: element.username,
+                                    userID: element.systemUserID,
+                                    type: element.type,
+                                    storeID: element.store_ID,
+                                    store: element.store,
+                                    storeCluster_ID: element.storeCluster_ID,
+                                    storeCluster: element.storeCluster,
+                                    categoryCluster_ID: element.categoryCluster_ID
+                                })
+
+                                self.projectsStatus = self.timelineItems[0]
+
+                                delete Axios.defaults.headers.common["TenantID"];
+                            })
+                    })
+
+                    // self.$refs.PlanogramIplementationModal.show(
+                    //     "Request Planogram Variation?", type, storeCluster, storeID, data => {
+                    //         if (data.value == true) {
+                    //             let trans = {
+                    //                 "project_ID": self.projectID,
+                    //                 "dateTime": new Date,
+                    //                 "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
+                    //                 "username": self.timelineItems[self.timelineItems.length - 1].user,
+                    //                 "status": 14,
+                    //                 "type": 3,
+                    //                 "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
+                    //                 "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
+                    //                 "systemUserID": self.timelineItems[self.timelineItems.length - 1].userID,
+                    //                 "notes": data.notes
+                    //             }
+                    //             Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
+                    //                 res => {
+                    //                     let element = res.data.projectTX;
+
+                    //                     self.currentProjectTx = res.data.projectTX
+
+                    //                     self.timelineItems.unshift({
+                    //                         status: element.status,
+                    //                         notes: self.status[element.status].text,
+                    //                         date: element.dateTimeString,
+                    //                         user: element.username,
+                    //                         userID: element.systemUserID,
+                    //                         type: element.type,
+                    //                         storeID: element.store_ID,
+                    //                         store: element.store,
+                    //                         storeCluster_ID: element.storeCluster_ID,
+                    //                         storeCluster: element.storeCluster,
+                    //                         categoryCluster_ID: element.categoryCluster_ID
+                    //                     })
+
+                    //                     self.tmpItems.unshift({
+                    //                         status: element.status,
+                    //                         notes: self.status[element.status].text,
+                    //                         date: element.dateTimeString,
+                    //                         user: element.username,
+                    //                         userID: element.systemUserID,
+                    //                         type: element.type,
+                    //                         storeID: element.store_ID,
+                    //                         store: element.store,
+                    //                         storeCluster_ID: element.storeCluster_ID,
+                    //                         storeCluster: element.storeCluster,
+                    //                         categoryCluster_ID: element.categoryCluster_ID
+                    //                     })
+
+                    //                     self.projectsStatus = self.timelineItems[0]
+
+                    //                     delete Axios.defaults.headers.common["TenantID"];
+                    //                 })
+                    //         }
+                    //     })
                 }
                 if (type == 3) {
                     self.$refs.PlanogramIplementationModal.show(
@@ -528,19 +599,13 @@
                                     "type": 3,
                                     "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
                                     "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
-                                    "systemUserID": null,
-                                    "actionedByUserID": self.timelineItems[0].userID,
+                                    "systemUserID": data.users,
+                                    "actionedByUserID": null,
                                     "notes": data.notes
                                 }
 
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
-                                        console.log(res);
-                                        
-                                        trans.actionedByUserID = null;
-                                        trans.systemUserID = data.users;
-                                        Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans)
-
                                         let element = res.data.projectTX;
 
                                         self.currentProjectTx = res.data.projectTX

@@ -78,9 +78,7 @@
                 <v-btn flat icon v-if="project!=null" @click="openProjectTXAdd()">
                     <v-icon>add</v-icon>
                 </v-btn>
-
             </v-toolbar>
-
 
             <v-data-table v-if="project!=null" :headers="headers" :items="ProjectTXs" hide-actions>
                 <template v-slot:items="props">
@@ -190,11 +188,23 @@
                             <template v-slot:input>
                             </template>
                             <template v-slot:input>
-                                <v-select v-model="props.item.actionedByUserName" :items="users" label="Edit" single-line
-                                    autofocus></v-select>
+                                <v-select v-model="props.item.actionedByUserName" :items="users" label="Edit"
+                                    single-line autofocus></v-select>
                             </template>
                         </v-edit-dialog>
                     </td>
+                    <!-- <td>
+                        <v-edit-dialog large lazy persistent @save="saveLine(props.item,8)" @cancel="''" @open="''"
+                            @close="''">
+                            <div>{{ props.item.spacePlanName }}</div>
+                            <template v-slot:input>
+                            </template>
+                            <template v-slot:input>
+                                <v-select v-model="props.item.actionedByUserName" :items="users" label="Edit"
+                                    single-line autofocus></v-select>
+                            </template>
+                        </v-edit-dialog>
+                    </td> -->
                     <td>
                         <v-menu left>
                             <v-btn slot="activator" icon>

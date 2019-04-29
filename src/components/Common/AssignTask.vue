@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-layout row justify-center>
-            <v-dialog v-model="dialog" persistent max-width="800px;">
+            <v-dialog v-model="dialog" persistent max-width="500px;">
                 <v-card>
                     <v-toolbar color="primary" dark>
                         <v-toolbar-title>Assign a task</v-toolbar-title>
@@ -215,6 +215,26 @@
                 self.user = null;
                 self.afterRuturn = afterRuturn;
                 self.getData(() => {
+                    self.dialog = true;
+                })
+            },
+            showWithData(data, afterRuturn) {
+                let self = this;
+                self.task = null;
+                self.user = null;
+                self.afterRuturn = afterRuturn;
+                self.getData(() => {
+                    console.log(data);
+
+                    if (data.systemFileID == null) {
+                        self.useExisting = false;
+                        self.storeCluster = data.storeID;
+                        self.categoryCluster = data.categoryCluster_ID;
+                        self.store_ID = data.store_ID;
+                    } else {
+                        self.useExisting = false;
+                        self.systemFile = data.systemUserID;
+                    }
                     self.dialog = true;
                 })
             },

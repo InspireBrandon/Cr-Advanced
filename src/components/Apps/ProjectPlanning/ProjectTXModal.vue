@@ -74,6 +74,12 @@
                             <!-- <v-text-field label="AssignedUser" placeholder="AssignedUser" v-model="AssignedUser"></v-text-field> -->
                         </v-flex>
 
+                        <v-flex md8>
+                            <v-autocomplete style="max-width: 600px;" dense v-model="systemFileID" :items="systemFiles"
+                                label="Planogram"></v-autocomplete>
+                            <!-- <v-text-field label="AssignedUser" placeholder="AssignedUser" v-model="AssignedUser"></v-text-field> -->
+                        </v-flex>
+
                     </v-layout>
                 </v-form>
                 <v-card-actions>
@@ -95,6 +101,26 @@
     import Axios from 'axios'
     import StatusHandler from '@/libs/system/projectStatusHandler'
 
+    function TextValue(text, value) {
+        this.text = text;
+        this.value = value;
+    }
+
+    function TextValueArray(array, textProperty, valueProperty, insertNull) {
+        let tmp = [];
+
+        if (insertNull)
+            tmp.push({
+                text: "",
+                value: null
+            })
+
+        array.forEach(element => {
+            tmp.push(new TextValue(element[textProperty], element[valueProperty]))
+        });
+
+        return tmp;
+    }
 
     export default {
         data() {
@@ -116,163 +142,17 @@
                 planogramsList: [],
                 selectedPlanogram: null,
                 date: null,
+                dateTime: null,
                 status: 0,
                 Store: null,
                 StoreCluster: null,
                 CategoryCluster: null,
                 AssignedUser: null,
                 storeObjects: [],
-                typeList: [
-                ],
-
-
-                statusList: [
-                    // {
-                    //     text: "Project Start",
-                    //     value: 0,
-                    //     friendly: "Project Start",
-                    //     color: "blue",
-                    //     type: [0, 1, 2, 3, 4]
-                    // },
-                    // {
-                    //     text: "In Progress",
-                    //     value: 1,
-                    //     color: "blue",
-                    //     friendly: "In Progress",
-                    //     type: [0, 1, 2, 3, 4]
-                    // },
-                    // {
-                    //     text: "Complete",
-                    //     value: 2,
-                    //     color: "blue",
-                    //     friendly: "Complete",
-                    //     type: [0, 1, 2, 3, 4]
-                    // },
-                    // {
-                    //     text: "Workshop",
-                    //     value: 3,
-                    //     color: "yellow",
-                    //     friendly: "Workshop",
-                    //     type: [0]
-                    // }, {
-                    //     text: "Workshop Complete",
-                    //     value: 4,
-                    //     color: "yellow",
-                    //     friendly: "Workshop Complete",
-                    //     type: [0]
-                    // },
-                    // {
-                    //     text: "Meeting",
-                    //     value: 5,
-                    //     color: "yellow",
-                    //     friendly: "Meeting",
-                    //     type: [0]
-                    // },
-                    // {
-                    //     text: "Data Preparation Start",
-                    //     value: 6,
-                    //     color: "red",
-                    //     friendly: "Data Preparation Start",
-                    //     type: [1]
-                    // },
-                    // {
-                    //     text: "Ranging Start",
-                    //     value: 7,
-                    //     color: "red",
-                    //     friendly: "Ranging Start",
-                    //     type: [2]
-                    // },
-                    // {
-                    //     text: "Planogram Start",
-                    //     value: 8,
-                    //     color: "green",
-                    //     friendly: "Planogram Start",
-                    //     type: [3]
-                    // },
-                    // {
-                    //     text: "Meeting Supplier",
-                    //     value: 9,
-                    //     color: "green",
-                    //     friendly: "Meeting Supplier",
-                    //     type: [0]
-                    // },
-                    // {
-                    //     text: "Requesting Approval",
-                    //     value: 10,
-                    //     color: "green",
-                    //     friendly: "Requesting Approval",
-                    //     type: [2, 3]
-                    // },
-                    // {
-                    //     text: "Declined",
-                    //     value: 11,
-                    //     color: "green",
-                    //     friendly: "Declined",
-                    //     type: [2, 3]
-                    // },
-                    // {
-                    //     text: "Approved",
-                    //     value: 12,
-                    //     color: "green",
-                    //     friendly: "Approved",
-                    //     type: [0, 1, 2, 3, 4]
-                    // },
-                    // {
-                    //     text: "Implementation Pending",
-                    //     value: 13,
-                    //     color: "blue",
-                    //     friendly: "Implementation Pending",
-                    //     type: [0]
-                    // },
-                    // {
-                    //     text: "Variation Request",
-                    //     value: 14,
-                    //     color: "blue",
-                    //     friendly: 'Variation Request',
-                    //     type: [2, 3]
-                    // },
-                    // {
-                    //     text: "Implemented",
-                    //     value: 15,
-                    //     color: "blue",
-                    //     friendly: "Implemented",
-                    //     type: [3]
-                    // },
-                    // {
-                    //     text: "On Hold",
-                    //     value: 16,
-                    //     color: "blue",
-                    //     friendly: "On Hold",
-                    //     type: [0]
-                    // },
-                    // {
-                    //     text: "Waiting Fixture Requirements",
-                    //     value: 17,
-                    //     color: "blue",
-                    //     friendly: "Waiting Fixture Requirements",
-                    //     type: [3]
-                    // }, {
-                    //     text: "Waiting Supplier",
-                    //     value: 18,
-                    //     color: "blue",
-                    //     friendly: "Waiting Supplier",
-                    //     type: [0]
-                    // }
-                    // , {
-                    //     text: "Awaiting Distribution",
-                    //     value: 19,
-                    //     color: "blue",
-                    //     friendly: "Awaiting Distribution",
-                    //     type: [3]
-                    // },
-                    //  {
-                    //     text: "Approval In Progress",
-                    //     value: 20,
-                    //     color: "blue",
-                    //     friendly: "Approval In Progress",
-                    //     type: [3]
-                    // }
-                ]
+                typeList: [],
+                statusList: [],
+                systemFiles: [],
+                systemFileID: null
             }
 
         },
@@ -287,11 +167,11 @@
             filterStatus: function () {
                 var self = this
                 let value = self.type;
-                    let statushandler = new StatusHandler()
-                    
-               return statushandler.getStatus(value)
-               
-                
+                let statushandler = new StatusHandler()
+
+                return statushandler.getStatus(value)
+
+
                 // return this.statusList.filter(function (status) {
                 //     return status.type.indexOf(value) > -1;
                 // })
@@ -305,12 +185,13 @@
             this.getDatabaseUsers()
             this.getstores()
             this.getStoreClusters()
+            this.getSpacePlans()
         },
         methods: {
-            getTypeList(){
+            getTypeList() {
                 let self = this
                 let statushandler = new StatusHandler()
-                self.typeList=statushandler.getTypeList()
+                self.typeList = statushandler.getTypeList()
             },
             getstores() {
                 let self = this
@@ -324,7 +205,6 @@
                     })
                 })
             },
-
             getStoreClusters() {
                 let self = this
                 Axios.get(process.env.VUE_APP_API + `Cluster/Store`).then(r => {
@@ -400,17 +280,25 @@
                                 value: element.id
                             })
                         });
+                    })
+            },
+            getSpacePlans() {
+                let self = this;
 
-
-
+                Axios.get(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire&folder=Space Planning")
+                    .then(r => {
+                        console.log(r.data)
+                        self.systemFiles = new TextValueArray(r.data, 'name', 'id', true)
+                    })
+                    .catch(e => {
                     })
             },
             open(isAdd, item, callback) {
                 var self = this
-              
 
                 self.dialog = true
-  this.$refs.form.reset()
+                this.$refs.form.reset()
+
                 if (isAdd == false) {
                     self.isAdd = false
                     self.projectID = item.project_ID
@@ -418,36 +306,34 @@
                     self.uid = item.uid
                     self.type = item.type
                     self.selectedPlanogram = item.planogram_ID
-
-                    self.timePicker = item.dateTimeString.slice(11, 16);
-
-                    self.datePicker = item.dateTimeString.slice(0, 10);
+                    self.datePicker = item.dateTimeString;
+                    self.dateTime = item.dateTime;
                     self.status = item.status
                     self.Store = item.store_ID
                     self.StoreCluster = item.StoreCluster_ID
                     self.CategoryCluster = item.StoreCluster
                     self.AssignedUser = item.systemUserID
+                    self.systemFileID = item.systemFileID;
                 }
                 if (isAdd == true) {
-
                     self.projectID = item.id
-
                     self.isAdd = true
                     self.selectedPlanogram = item.planogram_ID,
-                        self.date = null
+                    self.date = null
                     self.status = 0
                     self.Store = null
                     self.StoreCluster = null
-                    self.CategoryCluster = null
+                    self.CategoryCluster = null;
+                    self.systemFileID = null;
                 }
                 self.afterClose = callback
             },
             submit() {
                 var self = this
-                if (self.datePicker == null && self.timePicker == null && self.isAdd == false) {
-                    alert("Please select a date and time")
-                    return
-                }
+                // if (self.datePicker == null && self.timePicker == null && self.isAdd == false) {
+                //     alert("Please select a date and time")
+                //     return
+                // }
                 if (this.$refs.form.validate()) {
 
                     let tmpStore = null
@@ -498,13 +384,13 @@
                             "storeCluster_ID": self.StoreCluster,
                             "store_ID": self.Store,
                             "store": tmpStore,
-
-                            "dateTime": self.setDate,
+                            "dateTime": self.dateTime,
                             "dateTimeString": self.setDate,
                             "status": self.status,
                             "type": self.type,
                             "username": tmpAssignedUser,
                             "systemUserID": self.AssignedUser,
+                            "systemFileID": self.systemFileID
                         }
                         Axios.put(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
 
@@ -519,13 +405,13 @@
                             "store_ID": self.Store,
                             "dateTime": new Date,
                             "dateTimeString": moment(new Date).format('YYYY-MM-DD hh:mm'),
-
                             "status": self.status,
                             "type": self.type,
                             "username": tmpAssignedUser,
                             "store": tmpStore,
                             "storeCluster": tmpStoreCluster,
                             "systemUserID": self.AssignedUser,
+                            "systemFileID": self.systemFileID
                         }
                         Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
                             self.afterClose(res.data.projectTX)
