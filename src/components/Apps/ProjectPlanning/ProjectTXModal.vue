@@ -70,7 +70,7 @@
 
                         <v-flex md6>
                             <v-autocomplete style="max-width: 400px;" dense v-model="AssignedUser" :items="users"
-                                label="find a user" :rules="[v => !!v || 'You must Select a User!']"></v-autocomplete>
+                                label="find a user"></v-autocomplete>
                             <!-- <v-text-field label="AssignedUser" placeholder="AssignedUser" v-model="AssignedUser"></v-text-field> -->
                         </v-flex>
 
@@ -152,7 +152,9 @@
                 typeList: [],
                 statusList: [],
                 systemFiles: [],
-                systemFileID: null
+                systemFileID: null,
+                actionedByUserID: null,
+                form: null
             }
 
         },
@@ -175,7 +177,6 @@
                 // return this.statusList.filter(function (status) {
                 //     return status.type.indexOf(value) > -1;
                 // })
-
             }
         },
 
@@ -297,9 +298,10 @@
                 var self = this
 
                 self.dialog = true
-                this.$refs.form.reset()
 
                 if (isAdd == false) {
+                    self.form = item; 
+
                     self.isAdd = false
                     self.projectID = item.project_ID
                     self.id = item.id
@@ -310,8 +312,8 @@
                     self.dateTime = item.dateTime;
                     self.status = item.status
                     self.Store = item.store_ID
-                    self.StoreCluster = item.StoreCluster_ID
-                    self.CategoryCluster = item.StoreCluster
+                    self.StoreCluster = item.storeCluster_ID
+                    self.CategoryCluster = item.storeCluster
                     self.AssignedUser = item.systemUserID
                     self.systemFileID = item.systemFileID;
                 }
@@ -326,6 +328,7 @@
                     self.CategoryCluster = null;
                     self.systemFileID = null;
                 }
+
                 self.afterClose = callback
             },
             submit() {
@@ -359,7 +362,6 @@
                                 tmpStoreCluster = e.text
                             }
                         })
-
                     }
                     // if(self.CategoryCluster!=null||self.CategoryCluster!=undefined)
                     // {} 
@@ -384,13 +386,17 @@
                             "storeCluster_ID": self.StoreCluster,
                             "store_ID": self.Store,
                             "store": tmpStore,
-                            "dateTime": self.dateTime,
-                            "dateTimeString": self.setDate,
+                            "dateTime": self.form.dateTime,
+                            "dateTimeString": self.form.dateTimeString,
                             "status": self.status,
                             "type": self.type,
                             "username": tmpAssignedUser,
                             "systemUserID": self.AssignedUser,
-                            "systemFileID": self.systemFileID
+                            "systemFileID": self.systemFileID,
+                            "actionedByUserID": self.form.actionedByUserID,
+                            "subtask": self.form.subtask,
+                            "transactionRolloverID": self.form.transactionRolloverID,
+                            "notes": self.form.notes
                         }
                         Axios.put(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
 
@@ -411,7 +417,8 @@
                             "store": tmpStore,
                             "storeCluster": tmpStoreCluster,
                             "systemUserID": self.AssignedUser,
-                            "systemFileID": self.systemFileID
+                            "systemFileID": self.systemFileID,
+                            "actionedByUserID": self.actionedByUserID
                         }
                         Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
                             self.afterClose(res.data.projectTX)

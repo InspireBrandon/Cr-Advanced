@@ -601,7 +601,8 @@
                                     "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
                                     "systemUserID": data.users,
                                     "actionedByUserID": null,
-                                    "notes": data.notes
+                                    "notes": data.notes,
+                                    "systemFileID": self.timelineItems[0].systemFileID
                                 }
 
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(

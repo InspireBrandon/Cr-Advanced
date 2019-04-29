@@ -406,7 +406,6 @@
 
                 })
             },
-
             getProjectGroups() {
                 let self = this
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -484,7 +483,6 @@
                     delete Axios.defaults.headers.common["TenantID"];
                 })
             },
-
             getUsers() {
                 let self = this;
 
