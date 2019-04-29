@@ -43,7 +43,10 @@
                         v-if="(selectedPlanogram != null || routeProjectID != null) && !showLoader">
                         <v-toolbar color="primary" dark dense flat
                             v-if="selectedPlanogram != null || routeProjectID != null">
-                            <v-toolbar-title>
+                            <v-toolbar-title v-if="routeStatus!=null">
+                                Status: {{status[routeStatus].text}}
+                            </v-toolbar-title>
+                            <v-toolbar-title v-else>
                                 Status: {{status[timelineItems[0].status].text}}
                             </v-toolbar-title>
                             <!-- <v-btn v-if="(( authorityType == 1)&&(projectsStatus.status==10))" >Approve</v-btn>
@@ -76,19 +79,23 @@
                         </v-toolbar> -->
                         <v-toolbar color="primary" dark dense flat
                             v-if="selectedPlanogram != null || routeProjectID != null">
-                            <v-btn v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==20)" flat outline
-                                @click="openImplementationModal(projectsStatus.status,0)">Approve
+                            <v-btn
+                                v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==20||routeStatus==20)"
+                                flat outline @click="openImplementationModal(projectsStatus.status,0)">Approve
                             </v-btn>
                             <v-btn flat outline @click="assignTask(currentProjectTx)">Assign</v-btn>
                             <v-btn flat outline
                                 @click="openImplementationModal(projectsStatus.status,2,timelineItems[0])">Variation
                             </v-btn>
-                            <v-btn flat v-if="authorityType == 0||(authorityType == 3)&&(projectsStatus.status==24)" outline
-                                @click="openImplementationModal(projectsStatus.status,3,timelineItems[0])">
+                            <v-btn flat
+                                v-if="authorityType == 0||(authorityType == 3)&&(projectsStatus.status==24||routeStatus==24)"
+                                outline @click="openImplementationModal(projectsStatus.status,3,timelineItems[0])">
                                 Implemented
                             </v-btn>
-                            <v-btn flat v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==21)" outline
-                                @click="openImplementationModal(projectsStatus.status,4,timelineItems[0])">Distribute
+                            <v-btn flat
+                                v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==21||routeStatus==21)"
+                                outline @click="openImplementationModal(projectsStatus.status,4,timelineItems[0])">
+                                Distribute
                             </v-btn>
                         </v-toolbar>
                     </v-flex>
@@ -208,7 +215,8 @@
                 currentStatus: null,
                 currentProjectTx: null,
                 routeProjectID: null,
-                routePlanogramID: null
+                routePlanogramID: null,
+                routeStatus: null
             }
         },
         mounted() {
@@ -221,6 +229,7 @@
                 self.routeProjectID = self.$route.params.projectTransactionID;
                 self.selectedProject = self.routeProjectID;
                 self.routePlanogramID = self.$route.params.planogramID
+                self.routeStatus = self.$route.params.status
                 self.onRouteEnter(function () {
                     self.selectPlanogram(self.routePlanogramID);
                 })
