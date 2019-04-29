@@ -805,13 +805,10 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 self.$nextTick(() => {
-                    console.log(item)
                     Axios.get(process.env.VUE_APP_API +
                             `ProjectTXSingle?projectTXID=${item.transactionRolloverID}`)
                         .then(rolloverItemResponse => {
                             let projectTX = rolloverItemResponse.data.projectTX;
-
-                            console.log(rolloverItemResponse.data)
 
                             setTimeout(() => {
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', projectTX).then(
@@ -854,6 +851,7 @@
                     trans.actionedByUserID = systemUserID
                     trans.systemUserID = user.systemUserID;
                     trans.transactionRolloverID = item.id;
+                    trans.systemFileID = item.systemFileID;
 
                     Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                         res => {
