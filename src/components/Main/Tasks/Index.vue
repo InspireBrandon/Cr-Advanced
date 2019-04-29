@@ -17,7 +17,7 @@
                                     <v-spacer></v-spacer>
                                     <v-spacer></v-spacer>
                                     <v-spacer></v-spacer>
-                                    <v-autocomplete v-if="accessType == 0 || accessType == 2" label="Select User"
+                                    <v-autocomplete v-if="accessType == 0" label="Select User"
                                         @change="userChange" v-model="selectedUser" :items="users"></v-autocomplete>
                                 </v-toolbar>
                                 <v-data-table :items="projectTransactions" class="elevation-1 scrollable" hide-actions
