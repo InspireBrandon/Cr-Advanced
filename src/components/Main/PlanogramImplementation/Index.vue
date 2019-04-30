@@ -311,7 +311,8 @@
                                     "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
                                     "systemUserID": self.timelineItems[self.timelineItems.length - 1].userID,
                                     "actionedByUserID": systemUserID,
-                                    "notes": data.notes
+                                    "notes": data.notes,
+                                    "systemFileID": self.routePlanogramID
                                 }
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
@@ -370,7 +371,8 @@
                                     "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
                                     "systemUserID": self.timelineItems[self.timelineItems.length - 1].userID,
                                     "actionedByUserID": systemUserID,
-                                    "notes": data.notes
+                                    "notes": data.notes,
+                                    "systemFileID": self.routePlanogramID
                                 }
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                                     res => {
@@ -554,7 +556,8 @@
                                     "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
                                     "systemUserID": self.timelineItems[0].actionedByUserID,
                                     "actionedByUserID": self.timelineItems[0].userID,
-                                    "notes": data.notes
+                                    "notes": data.notes,
+                                    "systemFileID": self.routePlanogramID
                                 }
 
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
@@ -628,7 +631,7 @@
                                     "systemUserID": data.users,
                                     "actionedByUserID": null,
                                     "notes": data.notes,
-                                    "systemFileID": self.timelineItems[0].systemFileID
+                                    "systemFileID": self.routePlanogramID
                                 }
 
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(

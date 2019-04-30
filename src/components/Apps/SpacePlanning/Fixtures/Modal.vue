@@ -12,7 +12,7 @@
           <v-icon>close</v-icon>
         </v-btn>
       </v-toolbar>
-      <v-container style="form: calc(100vh - 65px); overflow-x: auto;" grid-list-md>
+      <v-container style="height: calc(100vh - 65px); overflow-x: auto;" grid-list-md>
         <v-layout row wrap>
           <v-flex lg4 md12>
             <v-card class="elevation-5">
@@ -169,8 +169,8 @@
                   <v-flex lg12 md12 sm12 xs12>
                     <h3>Image</h3>
                     <v-card class="elevation-5" @click="openFileExplorer"
-                      style="width: 150px; form: 150px; background: white; cursor: pointer; margin: 0 auto;">
-                      <img ref="changeImage" style="max-form: 150px; max-width: 150px;" src="" alt="">
+                      style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
+                      <img ref="changeImage" style="max-height: 150px; max-width: 150px;" src="" alt="">
                     </v-card>
                     <input ref="fileInput" style="display: none" @change="imageChange" type="file">
                   </v-flex>
@@ -178,8 +178,8 @@
                     <div v-show="form.type == 2 && (form.fixtureType == 0 || form.fixtureType == 1) && !form.rendering">
                       <h3>Bar image</h3>
                       <v-card class="elevation-5" @click="openFileExplorerBar"
-                        style="width: 150px; form: 150px; background: white; cursor: pointer; margin: 0 auto;">
-                        <img ref="changeImageBar" style="max-form: 150px; max-width: 150px;" src="" alt="">
+                        style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
+                        <img ref="changeImageBar" style="max-height: 150px; max-width: 150px;" src="" alt="">
                       </v-card>
                       <input ref="fileInputBar" style="display: none" @change="imageChangeBar" type="file">
                     </div>
@@ -396,11 +396,11 @@
           image: "",
           barImage: "",
           labelPlacement: "sample string 7",
-          form: 8.0,
+          height: 8.0,
           width: 9.0,
           depth: 10.0,
           fixtureSpacing: 11.0,
-          merchform: 12.0,
+          merchheight: 12.0,
           xPegsCount: 13,
           yPegsCount: 14,
           xHoleSpacing: 15.0,
