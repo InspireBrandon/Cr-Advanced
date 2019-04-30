@@ -17,8 +17,8 @@
                                     <v-spacer></v-spacer>
                                     <v-spacer></v-spacer>
                                     <v-spacer></v-spacer>
-                                    <v-autocomplete v-if="accessType == 0" label="Select User"
-                                        @change="userChange" v-model="selectedUser" :items="users"></v-autocomplete>
+                                    <v-autocomplete v-if="accessType == 0" label="Select User" @change="userChange"
+                                        v-model="selectedUser" :items="users"></v-autocomplete>
                                 </v-toolbar>
                                 <v-data-table :items="projectTransactions" class="elevation-1 scrollable" hide-actions
                                     hide-headers>
@@ -162,9 +162,14 @@
                                     <span>Complete</span>
                                 </v-btn> -->
                                                 <v-btn small color="success"
-                                                    v-if="props.item.status == 28 && (systemUserID == props.item.systemUserID || accessType == 0)"
+                                                    v-if="props.item.status == 28 && (systemUserID == props.item.systemUserID)"
                                                     @click="ChangeWaitingStart(props.item, props.index,29)">
                                                     <span>Start</span>
+                                                </v-btn>
+                                                <v-btn small color="error"
+                                                    v-if="props.item.status == 28 && (systemUserID == props.item.actionedByUserID)"
+                                                    @click="RemoveTransaction(props.item, props.index)">
+                                                    <span>Close</span>
                                                 </v-btn>
                                                 <v-btn small color="warning"
                                                     v-if="props.item.status == 29 && (systemUserID == props.item.systemUserID || accessType == 0)"
@@ -504,10 +509,16 @@
                                     <span>Complete</span>
                                 </v-btn> -->
                                     <v-btn small color="success"
-                                        v-if="props.item.status == 28 && (systemUserID == props.item.systemUserID || accessType == 0)"
+                                        v-if="props.item.status == 28 && (systemUserID == props.item.systemUserID)"
                                         @click="ChangeWaitingStart(props.item, props.index,29)">
                                         <span>Start</span>
                                     </v-btn>
+                                    <v-btn small color="error"
+                                        v-if="props.item.status == 28 && (systemUserID == props.item.actionedByUserID)"
+                                        @click="forceRollover(props.item)">
+                                        <span>Close</span>
+                                    </v-btn>
+
                                     <v-btn small color="warning"
                                         v-if="props.item.status == 29 && (systemUserID == props.item.systemUserID || accessType == 0)"
                                         @click="ChangeWaitingcomplete(props.item, props.index,30)">
@@ -849,14 +860,21 @@
                     trans.status = type;
                     trans.notes = user.notes;
                     trans.actionedByUserID = systemUserID
-                    trans.systemUserID = user.systemUserID;
+                    trans.actionedByUserID = self.systemUserID;
+                    trans.systemUserID = null;
                     trans.transactionRolloverID = item.id;
                     trans.systemFileID = item.systemFileID;
 
                     Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                         res => {
-                            delete Axios.defaults.headers.common["TenantID"];
-                            self.getTransactionsByUser(self.systemUserID)
+                            trans.actionedByUserID = null;
+                            trans.systemUserID = user.systemUserID;
+
+                            Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans)
+                                .then(r => {
+                                    delete Axios.defaults.headers.common["TenantID"];
+                                    self.getTransactionsByUser(self.systemUserID)
+                                })
                         })
                 })
 
@@ -1043,7 +1061,8 @@
                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                     res => {
                         delete Axios.defaults.headers.common["TenantID"];
-                        self.$router.push("/PlanogramImplementation/" + item.project_ID + "/" + item.systemFileID);
+                        self.$router.push("/PlanogramImplementation/" + item.project_ID + "/" + item.systemFileID +
+                            "/" + 21);
                     })
             },
             completeDistribution(item, index) {
@@ -1058,7 +1077,8 @@
                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                     res => {
                         delete Axios.defaults.headers.common["TenantID"];
-                        self.$router.push("/PlanogramImplementation/" + item.project_ID + "/" + item.systemFileID);
+                        self.$router.push("/PlanogramImplementation/" + item.project_ID + "/" + item.systemFileID +
+                            "/" + 21);
                     })
             },
             assignTask(item) {
@@ -1139,7 +1159,8 @@
                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
                     res => {
                         delete Axios.defaults.headers.common["TenantID"];
-                        self.$router.push("/PlanogramImplementation/" + item.project_ID + "/" + item.systemFileID);
+                        self.$router.push("/PlanogramImplementation/" + item.project_ID + "/" + item.systemFileID +
+                            "/" + 24);
                     })
             },
             RemoveTransaction(item, index) {
