@@ -9,16 +9,17 @@
                     <v-layout row wrap>
                         <v-flex md8 sm12>
                             <v-autocomplete return-object v-model="selectedSpacePlans" multiple :items="spacePlans"
-                                label="Planograms">
+                                label="Planograms to merge: ">
                                 <template v-slot:selection="{ item, index }">
                                     <span v-if="index == 0">{{ item.text }} </span>
-                                    <span v-if="index == 1" class="grey--text caption">(+
+                                    <span style="margin-left: 5px;" v-if="index == 1" class="grey--text caption">(+
                                         {{ selectedSpacePlans.length - 1 }} others)</span>
                                 </template>
                             </v-autocomplete>
                         </v-flex>
                         <v-flex md4 sm12>
-                            <v-autocomplete return-object v-model="selectedRangeFile" :items="rangeFiles" label="Range">
+                            <v-autocomplete v-if="selectedSpacePlans.length >= 2" return-object
+                                v-model="selectedRangeFile" :items="rangeFiles" label="New range file:">
                             </v-autocomplete>
                         </v-flex>
                         <v-flex md12>
@@ -60,17 +61,20 @@
             <v-card-actions class="pa-0">
                 <v-toolbar dark dense>
                     <v-spacer></v-spacer>
-                    <v-btn @click="joinPlanograms" color="primary">Join</v-btn>
+                    <v-btn :disabled="selectedSpacePlans.length < 2 || selectedRangeFile == null"
+                        @click="joinPlanograms" color="primary">Join</v-btn>
                 </v-toolbar>
             </v-card-actions>
         </v-card>
-        <Spinner ref="spinner"></Spinner>
+        <SpinnerText ref="spinner"></SpinnerText>
+        <DetailsDialog ref="DetailsDialog"></DetailsDialog>
     </v-dialog>
 </template>
 
 <script>
     import Axios from 'axios';
-    import Spinner from '@/components/Common/Spinner'
+    import SpinnerText from '@/components/Common/SpinnerText'
+    import DetailsDialog from "@/components/Main/Planogram/spaceplanning/src/components/Modals/JoinPlanogram/DetailsDialog.vue";
 
     function TextValue(text, value) {
         this.text = text;
@@ -89,14 +93,19 @@
 
     export default {
         name: 'JoinPlanogram',
-        components: { Spinner },
+        components: {
+            SpinnerText,
+            DetailsDialog
+        },
         data() {
             return {
                 dialog: false,
                 spacePlans: [],
                 selectedSpacePlans: [],
                 rangeFiles: [],
-                selectedRangeFile: null
+                selectedRangeFile: null,
+                spacePlanFiles: [],
+                rootPlanogramFile: null
             }
         },
         methods: {
@@ -156,7 +165,155 @@
             joinPlanograms() {
                 let self = this;
 
+                // self.$refs.DetailsDialog.show(data => {
+                //     console.log(data);
+                // })
+
                 self.$refs.spinner.show();
+
+                self.spacePlanFiles = [];
+
+                self.fetchPlanogramRecursive(0, () => {
+                    self.setPlanogramData(() => {
+                        setTimeout(() => {
+                            self.$refs.spinner.setText("Join Success");
+                            setTimeout(() => {
+                                self.$refs.spinner.setText("Attempting to save...");
+                                setTimeout(() => {
+                                    self.saveFile(() => {
+                                        self.$refs.spinner.hide();
+                                    })
+                                }, 1000);
+                            }, 1000);
+                        }, 1000);
+                    });
+                })
+            },
+            fetchPlanogramRecursive(count, callback) {
+                let self = this;
+
+                let fileID = self.selectedSpacePlans[count].value;
+                let text = `Fetching file ${count + 1}/${self.selectedSpacePlans.length}...`
+                self.$refs.spinner.setText(text);
+
+                Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fileID}`)
+                    .then(r => {
+                        self.spacePlanFiles.push(r.data)
+
+                        if (count < self.selectedSpacePlans.length - 1) {
+                            count++;
+                            self.fetchPlanogramRecursive(count, callback)
+                        } else {
+                            callback();
+                        }
+                    })
+                    .catch(e => {
+                        alert("Failed to get space plan. Please try again");
+                    })
+            },
+            setPlanogramData(callback) {
+                let self = this;
+
+                self.$refs.spinner.setText("Joining files...");
+
+                self.rootPlanogramFile = self.spacePlanFiles[0];
+
+                let highestHeight = parseFloat(self.rootPlanogramFile.dimensionData.height);
+
+                for (var i = 1; i < self.spacePlanFiles.length; i++) {
+                    let planogramFile = self.spacePlanFiles[i];
+
+                    planogramFile.planogramData.forEach(element => {
+                        self.rootPlanogramFile.planogramData.push(element)
+                    });
+
+                    if (parseFloat(planogramFile.dimensionData.height) > highestHeight)
+                        highestHeight = parseFloat(planogramFile.dimensionData.height)
+
+                    self.rootPlanogramFile.dimensionData.height = highestHeight.toFixed(2).toString();
+                    self.rootPlanogramFile.dimensionData.width = (parseFloat(self.rootPlanogramFile.dimensionData
+                        .width) + parseFloat(planogramFile.dimensionData.width)).toFixed(2).toString();
+                    self.rootPlanogramFile.dimensionData.modules = parseFloat(self.rootPlanogramFile.dimensionData
+                        .modules) + parseFloat(planogramFile.dimensionData.modules);
+                    self.rootPlanogramFile.dimensionData.displays = parseFloat(self.rootPlanogramFile.dimensionData
+                        .displays) + parseFloat(planogramFile.dimensionData.displays);
+                    self.rootPlanogramFile.dimensionData.pallettes = parseFloat(self.rootPlanogramFile.dimensionData
+                        .pallettes) + parseFloat(planogramFile.dimensionData.pallettes);
+                    self.rootPlanogramFile.dimensionData.supplierStands = parseFloat(self.rootPlanogramFile
+                        .dimensionData.supplierStands) + parseFloat(planogramFile.dimensionData.supplierStands);
+                    self.rootPlanogramFile.dimensionData.bins = parseFloat(self.rootPlanogramFile.dimensionData.bins) +
+                        parseFloat(planogramFile.dimensionData.bins);
+                }
+
+                self.rootPlanogramFile.clusterData.planogramName = self.selectedRangeFile.text;
+                self.rootPlanogramFile.clusterData.rangeID = self.selectedRangeFile.value;
+                self.rootPlanogramFile.name = self.generatePlanogramName(self.rootPlanogramFile.clusterData, self
+                    .rootPlanogramFile.dimensionData);
+
+                callback();
+            },
+            generatePlanogramName(clusterData, dimensionData) {
+                let self = this;
+
+                let planogramName = "";
+
+                if (clusterData.planogramName != null)
+                    planogramName += clusterData.planogramName
+
+                if (clusterData.tag != null && clusterData.tag != "")
+                    planogramName += clusterData.tag;
+
+                if (clusterData.storeCluster != null && clusterData.storeCluster != "") {
+                    planogramName += " - " + clusterData.storeCluster;
+                }
+
+                if (clusterData.storeName != null && clusterData.storeName != "") {
+                    planogramName += " - " + clusterData.storeName;
+                }
+
+                if (planogramName != "")
+                    planogramName += " - XXX";
+
+                planogramName += " - " + dimensionData.modules + " Module " + "(" + dimensionData.height + "M" + " x " +
+                    dimensionData.width + "M)";
+
+                if (planogramName[1] == "-")
+                    planogramName = planogramName.replace(' -', "");
+
+                if (planogramName != "") {
+                    planogramName += " - D" + dimensionData.displays;
+                    planogramName += " - P" + dimensionData.pallettes;
+                    planogramName += " - S" + dimensionData.supplierStands;
+                    planogramName += " - B" + dimensionData.bins;
+                }
+
+                return planogramName;
+            },
+            saveFile(callback) {
+                let self = this;
+
+                Axios.post(process.env.VUE_APP_API + "SystemFile/Json?db=CR-Devinspire", {
+                            systemFile: {
+                                systemUserID: 10,
+                                folder: "Space Planning",
+                                name: self.rootPlanogramFile.name
+                            },
+                            data: self.rootPlanogramFile
+                        }
+                    )
+                    .then(result => {
+                        if (result.data.success == true) {
+                            self.dialog = false;
+                            alert(self.rootPlanogramFile.name + " Successfully saved new.");
+                        } else {
+                            self.dialog = false;
+                            alert("Server responded unsuccessfully!");
+                        }
+                    })
+                    .catch(error => {
+                        self.dialog = false;
+                        console.error("Failed to save planogram file");
+                    });
             }
         }
     }
@@ -164,16 +321,7 @@
 
 <style>
     .b-chip {
-        margin-bottom: 2px;
-    }
-
-    .b-chip-text {
-        width: 90%;
-    }
-
-    .b-chip-close {
-        width: 10%;
-        text-align: right;
+        margin-bottom: 1px;
     }
 
     .join-planogram-scroll {

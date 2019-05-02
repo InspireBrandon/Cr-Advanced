@@ -43,7 +43,7 @@ class ProductBase extends ProductItemBase {
       // } else if (parentSquish > 0) {
       //   self.TotalWidth = ((self.Orientation_Width - parentSpreadSpacer) * self.Facings_X);
       // } else {
-      
+
       // }
       self.Height = self.Data.height * self.Ratio;
       self.TotalHeight = self.Orientation_Height * self.Facings_Y + (self.Caps_Count * self.Cap_Orientation_Height);
@@ -74,7 +74,7 @@ class ProductBase extends ProductItemBase {
     // self.Update();
 
     self.IncreaseParentChildrenCounter(positionElementRequired);
-    
+
     if (positionElementRequired == true) {
       self.UpdateMilkCrate(self.ParentID);
       self.Update();
@@ -95,8 +95,8 @@ class ProductBase extends ProductItemBase {
 
     if (ctrl_store.getCloneItem(self.VueStore) == self.ID) {
       let ctrl_clone = new CloneBase("PRODUCT");
-      ctrl_clone.Clone(self.VueStore, self.Stage, self, null, null, function() {
-        
+      ctrl_clone.Clone(self.VueStore, self.Stage, self, null, null, function () {
+
       });
       ctrl_store.setCloneItem(self.VueStore, null);
       return;
@@ -158,8 +158,10 @@ class ProductBase extends ProductItemBase {
     let ctrl_store = new StoreHelper();
     let parentItem = ctrl_store.getPlanogramItemById(self.VueStore, self.ParentID);
 
-    parentItem.ApplyZIndexing();
-    
+    if (parentItem != undefined && parentItem != null) {
+      parentItem.ApplyZIndexing();
+    }
+
     let ctrl_position = new GeneralPositionHelper();
     ctrl_position.PositionToParent(self.VueStore, self, self.ParentID);
 
@@ -209,8 +211,8 @@ class ProductBase extends ProductItemBase {
         if (allocated == false) {
           // let holeNewPos_x = pegboardPeg.getX() - xSpace;
           // let holeNewPos_y = pegboardPeg.getY() - ySpace;
-          let holeNewPos_x = pegboardPeg.x// - xSpace;
-          let holeNewPos_y = pegboardPeg.y// - ySpace;
+          let holeNewPos_x = pegboardPeg.x // - xSpace;
+          let holeNewPos_y = pegboardPeg.y // - ySpace;
           let holeNewWidth = useDefaultsForPeg == true ? 1 : (parentItem.Data.defaultPegDetails.width * self.Ratio) - 0.1;
           let holeNewHeight = useDefaultsForPeg == true ? 1 : (parentItem.Data.defaultPegDetails.height * self.Ratio) - 0.1;
 
@@ -255,7 +257,7 @@ class ProductBase extends ProductItemBase {
 
     // adjust product dimensions
     self.Data = newObject.Data;
-    
+
     self.SetProductStateData();
     self.GetImages(true); // force image reload
 
@@ -384,9 +386,9 @@ class ProductBase extends ProductItemBase {
         self.ImageRects.forEach(element => {
           element.show();
         });
-  
+
         self.AddRemoveBordersAndBackground();
-        
+
       })
     } else {
       self.ImageRects.forEach(element => {

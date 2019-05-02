@@ -725,7 +725,7 @@
                         self.getUsers(callback => {
                             self.showLoader = false
                         })
-                    }, 1000);
+                    }, 2000);
                 })
             })
 
