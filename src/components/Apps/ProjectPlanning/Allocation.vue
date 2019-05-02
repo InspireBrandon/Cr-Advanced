@@ -17,26 +17,53 @@
                     </v-autocomplete>
                 </v-flex>
                 <v-flex md6>
-                    <v-btn color="success" @click="AddSelectedToNew()">
-                        Add selected to new Group
-                    </v-btn>
-                    <v-btn color="success" @click="AddSelectedToExisting()">
-                        Add selected existing group
-                    </v-btn>
+                    <v-menu right>
+                        <v-btn slot="activator" icon>
+                            <v-icon>add</v-icon>
+                        </v-btn>
+                        <v-list dense>
+                            <v-btn :disabled="selectedfield.length<1" color="success" @click="AddSelectedToNew()">
+                                Add selected to new Group
+                            </v-btn>
+                            <v-divider></v-divider>
+                        </v-list>
+                        <v-list dense>
+                            <v-btn :disabled="selectedfield.length<1" color="success" @click="AddSelectedToExisting()">
+                                Add selected existing group
+                            </v-btn>
+                            <v-divider></v-divider>
+                        </v-list>
+                    </v-menu>
+
+
                 </v-flex>
 
                 <v-flex>
                     <v-card flat style="height: calc(100vh - 300px); overflow: auto;">
                         <v-data-table :headers="headers" :items="ProjectTXs" hide-actions>
                             <template v-slot:items="props">
-                                <tr :color="typeList[props.item.type == -1 ? 5 : props.item.type].color">
+                                <tr @click="handleCheckBox(props.item)">
                                     <td>
-                                        <div>{{ props.item.dateTimeString }}</div>
+                                        <div>
+                                            {{ props.item.dateTimeString }}
+                                            <v-icon v-if="props.item.status==2">
+                                                check
+                                            </v-icon>
+                                            <v-icon v-if="props.item.status==1">
+                                                cached
+                                            </v-icon>
+                                            <v-icon
+                                                v-if="props.item.status==0||props.item.status==6||props.item.status==7||props.item.status==8">
+                                                clear_all
+                                            </v-icon>
+                                        </div>
                                     </td>
                                     <td>
                                         <div>{{typeList[props.item.type == -1 ?  5 :  props.item.type].text}}</div>
                                     </td>
                                     <td>
+                                        <v-icon :color="typeList[props.item.type== -1 ?  5 :  props.item.type].color">
+                                            fiber_manual_record</v-icon>
                                         {{status[props.item.status].friendly }}
                                     </td>
                                     <td>
@@ -69,6 +96,89 @@
                 </v-flex>
             </v-layout>
         </v-container>
+        <v-dialog v-model="GroupSelector">
+            <v-card>
+                <v-toolbar color="primary" flat dark>
+                    <v-toolbar-title>
+                        Select transaction to group with
+                    </v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-btn icon @click="GroupSelector=false">
+                        <v-icon>
+                            close
+                        </v-icon>
+                    </v-btn>
+                </v-toolbar>
+                <v-list style="height: calc(100vh - 300px); overflow: auto;">
+                    <v-list-tile>
+                        <v-flex md1>
+                            Date
+                        </v-flex>
+                        <v-flex md2>
+                            Type
+                        </v-flex>
+                        <v-flex md2>Status
+                        </v-flex>
+                        <v-flex md2>
+                            Store
+                        </v-flex>
+                        <v-flex md1> Store Cluster
+                        </v-flex>
+                        <v-flex md1> Category Cluster
+                        </v-flex>
+                        <v-flex md1>Assigned User
+                        </v-flex>
+                        <v-flex md1>
+                            Actioned By
+                        </v-flex>
+
+
+                        <v-flex md1>
+                            Grouped
+                        </v-flex>
+                    </v-list-tile>
+                    <hr>
+                    <div v-for="(item,index) in AssignedItems" :key="index">
+                        <v-list-tile @click="highlight(item)" :class="{ 'highlighted': selectedProjectGroup == item  }">
+                            <v-flex md1>
+                                {{ item.dateTimeString }}
+                            </v-flex>
+                            <v-flex md2>
+                                {{typeList[item.type == -1 ?  5 :  item.type].text}}
+                            </v-flex>
+
+                            <v-flex md2>{{status[item.status].friendly }}
+                            </v-flex>
+                            <v-flex md2>
+                                {{ item.store}}
+                            </v-flex>
+                            <v-flex md1> {{ item.storeCluster}}
+                            </v-flex>
+                            <v-flex md1> {{ item.categoryCluster }}
+                            </v-flex>
+                            <v-flex md1> {{ item.username}}
+                            </v-flex>
+                            <v-flex md1>
+                                {{ item.actionedByUserName }}
+                            </v-flex>
+
+                            <v-flex md1>
+                                {{item.projectTXGroup_ID }}
+                                {{item.projectTXGroup_ID ==null?"NO":"YES"}}
+                            </v-flex>
+                        </v-list-tile>
+                        <v-divider></v-divider>
+                    </div>
+
+
+                </v-list>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn :disabled="selectedProjectGroup==null" color="success"
+                        @click="saveToExistingGroup(selectedProjectGroup)">Assign</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-card>
 </template>
 <script>
@@ -85,6 +195,7 @@
     export default {
         data() {
             return {
+                GroupSelector: false,
                 toggle: false,
                 selected: null,
                 selectedfield: [],
@@ -142,10 +253,11 @@
                     value: null
                 }],
                 tmp: [],
-
-
+                selectedProjectGroup: null,
+                AssignedItems: [],
             }
         },
+
         mounted() {
             let self = this
             this.getProjects()
@@ -158,6 +270,33 @@
 
         },
         methods: {
+            handleCheckBox(item, index) {
+                let self = this
+                let count = 0
+                let remove = false
+                self.selectedfield.forEach(e => {
+
+                    if (e == item) {
+                        remove = true
+                    }
+                })
+                if (remove == true) {
+                    self.selectedfield.forEach(field => {
+                        if (field == item) {
+                            self.selectedfield.splice(count, 1)
+                        }
+                        count++
+                    })
+
+                } else {
+                    self.selectedfield.push(item)
+                }
+                remove = false
+            },
+            highlight(item) {
+                let self = this
+                self.selectedProjectGroup = item
+            },
             AddSelectedToNew() {
                 let self = this
                 console.log("self.selectedfield");
@@ -178,7 +317,7 @@
                         Axios.put(process.env.VUE_APP_API + `ProjectTX`, element).then(
                             resp => {
                                 console.log(resp.data);
-
+                                self.getTransactions(self.selected)
                             })
                     })
 
@@ -187,7 +326,7 @@
 
                 // ProjectTXGroup_ID
             },
-            AddSelectedToExisting() {
+            saveToExistingGroup(item) {
                 let self = this
                 console.log("self.selectedfield");
                 console.log(self.selectedfield);
@@ -197,27 +336,33 @@
                 let txGroupProjectID = {
                     ProjectID: self.selected
                 }
+                tmpProjectTXGroup_ID = item.projectTXGroup_ID
 
-                self.selectedfield.forEach(element => {
-                    if (element.ProjectTXGroup_ID != null) {
-                        tmpProjectTXGroup_ID = element.ProjectTXGroup_ID
-                        return
-                    }
-                })
                 self.selectedfield.forEach(element => {
 
                     element.ProjectTXGroup_ID = tmpProjectTXGroup_ID
                     Axios.put(process.env.VUE_APP_API + `ProjectTX`, element).then(
                         resp => {
                             console.log(resp);
-
+                            self.getTransactions(self.selected)
                         })
                 })
 
                 delete Axios.defaults.headers.common["TenantID"];
 
-
+                self.GroupSelector = false
                 // ProjectTXGroup_ID
+            },
+            AddSelectedToExisting() {
+                let self = this
+                self.AssignedItems = []
+                self.ProjectTXs.forEach(e => {
+                    if (e.projectTXGroup_ID != null) {
+                        self.AssignedItems.push(e)
+                    }
+                })
+                self.GroupSelector = true
+
             },
             getTypeList() {
                 let self = this
@@ -529,7 +674,7 @@
             },
             getTransactions(item) {
                 console.log("herer");
-
+                let idx = 0
                 let self = this
                 self.$nextTick(() => {
                     self.ProjectTXs = []
@@ -544,8 +689,10 @@
                         r.data.projectTXList.forEach(e => {
 
                             if (e.deleted != true) {
+                                e.idx = idx
                                 self.ProjectTXs.push(e)
                             }
+                            idx++
                         })
                         delete Axios.defaults.headers.common["TenantID"];
                     })
@@ -557,3 +704,8 @@
         }
     }
 </script>
+<style>
+    .highlighted {
+        background-color: #1976d2;
+    }
+</style>
