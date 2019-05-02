@@ -45,18 +45,20 @@
                                 <tr @click="handleCheckBox(props.item)">
                                     <td>
                                         <div>
-                                            {{ props.item.dateTimeString }}
                                             <v-icon v-if="props.item.status==2">
-                                                check
+                                                check_circle_outline
                                             </v-icon>
                                             <v-icon v-if="props.item.status==1">
-                                                cached
+                                                event_available
                                             </v-icon>
                                             <v-icon
                                                 v-if="props.item.status==0||props.item.status==6||props.item.status==7||props.item.status==8">
-                                                clear_all
+                                                play_circle_outline
                                             </v-icon>
                                         </div>
+                                    </td>
+                                    <td>
+                                        {{ props.item.dateTimeString }}
                                     </td>
                                     <td>
                                         <div>{{typeList[props.item.type == -1 ?  5 :  props.item.type].text}}</div>
@@ -84,7 +86,7 @@
                                         {{props.item.projectTXGroup_ID ==null?"NO":"YES"}}
                                     </td>
                                     <td>
-                                        <v-checkbox readonly v-model="selectedfield" :label="props.item.name"
+                                        <v-checkbox readonly hide-details v-model="selectedfield" :label="props.item.name"
                                             :value="props.item">
                                         </v-checkbox>
                                     </td>
@@ -208,6 +210,10 @@
 
                 typeList: [],
                 headers: [{
+                    text: "",
+                    sortable: false,
+                    value: "dateTimeString"
+                },{
                     text: "Date",
                     sortable: false,
                     value: "dateTimeString"

@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-layout row justify-center>
-      <v-dialog v-model="dialog" persistent max-width="400">
+      <v-dialog v-model="dialog" persistent max-width="600">
         <v-card>
           <v-toolbar dark flat color="primary">
             <v-toolbar-title>
@@ -10,9 +10,9 @@
           </v-toolbar>
           <!-- <v-card-title style="text-align: center; display: block;" class="headline"></v-card-title> -->
           <v-card-actions style="text-align: center; display: block;">
-            <v-spacer></v-spacer>
             <v-btn color="primary darken-1" @click.native="returnValue(true)">Yes</v-btn>
             <v-btn color="error darken-1" @click.native="returnValue(false)">No</v-btn>
+            <v-btn color="error darken-1" @click.native="self.dialog = false">cancel</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
