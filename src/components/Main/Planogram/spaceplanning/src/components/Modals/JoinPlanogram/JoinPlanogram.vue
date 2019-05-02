@@ -3,6 +3,10 @@
         <v-card class="pa-0">
             <v-toolbar color="primary" dark>
                 <v-toolbar-title>Join Planogram</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-btn icon @click="dialog = false">
+                    <v-icon>close</v-icon>
+                </v-btn>
             </v-toolbar>
             <v-card-text class="join-planogram-scroll">
                 <v-container grid-list-md>
