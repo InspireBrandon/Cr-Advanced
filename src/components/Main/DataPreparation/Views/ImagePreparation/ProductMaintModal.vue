@@ -43,13 +43,16 @@
                                     v-model="generateProductSysCode" label="Generate"></v-checkbox>
                                 </v-flex>
                                 <v-flex md8>
-                                  <v-text-field v-model="form.barcode" dense hide-details label="* Barcode"></v-text-field>
+                                  <v-text-field v-model="form.barcode" dense hide-details label="* Barcode">
+                                  </v-text-field>
                                 </v-flex>
                                 <v-flex md8>
-                                  <v-text-field v-model="form.product_Code" dense hide-details label="* Product Code"></v-text-field>
+                                  <v-text-field v-model="form.product_Code" dense hide-details label="* Product Code">
+                                  </v-text-field>
                                 </v-flex>
                                 <v-flex md12>
-                                  <v-text-field v-model="form.description" dense hide-details label="* Description"></v-text-field>
+                                  <v-text-field v-model="form.description" dense hide-details label="* Description">
+                                  </v-text-field>
                                 </v-flex>
                                 <v-flex md6>
                                   <v-autocomplete v-model="form.categoryLink_ID" :items="dropdownFilters.categoryLinks"
@@ -60,18 +63,22 @@
                                     label="Subcategory"></v-autocomplete>
                                 </v-flex>
                                 <v-flex md6>
-                                  <v-autocomplete v-model="form.segment_ID" :items="dropdownFilters.segments" label="Segment"></v-autocomplete>
+                                  <v-autocomplete v-model="form.segment_ID" :items="dropdownFilters.segments"
+                                    label="Segment"></v-autocomplete>
                                 </v-flex>
                                 <v-flex md6>
                                   <v-autocomplete v-model="form.subsegment_ID" :items="dropdownFilters.subsegments"
                                     label="Subsegment"></v-autocomplete>
                                 </v-flex>
                                 <v-flex md6>
-                                  <v-autocomplete v-model="form.planogram_ID" :items="dropdownFilters.planograms" label="* Planogram"></v-autocomplete>
+                                  <v-autocomplete v-model="form.planogram_ID" :items="dropdownFilters.planograms"
+                                    label="* Planogram"></v-autocomplete>
                                 </v-flex>
                                 <v-flex md6>
-                                  <v-autocomplete :disabled="generateProductSysCode && form.product_System_ID == 'Generate_SYS_Product_ID'"
-                                    v-model="form.active_Shop_Code_ID" :items="dropdownFilters.active_Shop_Codes" label="Active Shop Code"></v-autocomplete>
+                                  <v-autocomplete
+                                    :disabled="generateProductSysCode && form.product_System_ID == 'Generate_SYS_Product_ID'"
+                                    v-model="form.active_Shop_Code_ID" :items="dropdownFilters.active_Shop_Codes"
+                                    label="Active Shop Code"></v-autocomplete>
                                 </v-flex>
                               </v-layout>
                             </v-container>
@@ -87,14 +94,16 @@
                             <v-container fluid grid-list-lg>
                               <v-layout row wrap>
                                 <v-flex md8>
-                                  <v-autocomplete v-model="form.brand_ID" :items="dropdownFilters.brands" label="* Brand"></v-autocomplete>
+                                  <v-autocomplete v-model="form.brand_ID" :items="dropdownFilters.brands"
+                                    label="* Brand"></v-autocomplete>
                                 </v-flex>
                                 <v-flex md8>
                                   <v-autocomplete v-model="form.manufacturer_ID" :items="dropdownFilters.manufacturers"
                                     label="* Manufacturer"></v-autocomplete>
                                 </v-flex>
                                 <v-flex md8>
-                                  <v-autocomplete v-model="form.supplier_ID" :items="dropdownFilters.suppliers" label="Supplier"></v-autocomplete>
+                                  <v-autocomplete v-model="form.supplier_ID" :items="dropdownFilters.suppliers"
+                                    label="Supplier"></v-autocomplete>
                                 </v-flex>
                               </v-layout>
                             </v-container>
@@ -116,10 +125,12 @@
                                   <v-text-field v-model="form.uom" dense hide-details label="UOM"></v-text-field>
                                 </v-flex>
                                 <v-flex md6>
-                                  <v-text-field v-model="form.size_Description" dense hide-details label="Size Description"></v-text-field>
+                                  <v-text-field v-model="form.size_Description" dense hide-details
+                                    label="Size Description"></v-text-field>
                                 </v-flex>
                                 <v-flex md6>
-                                  <v-text-field v-model="form.case_Pack_QTY" dense hide-details label="Case Pack Quantity"></v-text-field>
+                                  <v-text-field v-model="form.case_Pack_QTY" dense hide-details
+                                    label="Case Pack Quantity"></v-text-field>
                                 </v-flex>
                               </v-layout>
                             </v-container>
@@ -153,7 +164,8 @@
                                 <v-flex md2 v-if="product_type == 0">
 
                                   <v-speed-dial style="z-index: 99999;" v-model="fab" :top="top" :bottom="bottom"
-                                    :right="right" :direction="direction" :open-on-hover="hover" :transition="transition">
+                                    :right="right" :direction="direction" :open-on-hover="hover"
+                                    :transition="transition">
                                     <v-btn small slot="activator" v-model="fab" color="primary" dark fab>
                                       <v-icon>more_vert</v-icon>
                                       <v-icon>close</v-icon>
@@ -164,24 +176,32 @@
                                     <v-btn v-if="bcDropdown != -1" fab dark small color="green">
                                       <v-icon @click="openAltBarcodeDialog('EDIT')">edit</v-icon>
                                     </v-btn>
-                                    <v-btn v-if="bcDropdown != -1" fab dark small color="red" @click="deleteAlternateBarcode">
+                                    <v-btn v-if="bcDropdown != -1" fab dark small color="red"
+                                      @click="deleteAlternateBarcode">
                                       <v-icon>delete</v-icon>
                                     </v-btn>
                                   </v-speed-dial>
 
                                 </v-flex>
                                 <v-flex md12 sm12 v-if="product_type == 1">
-                                  <v-text-field v-model="form.tray_Barcode" dense hide-details label="Tray Barcode"></v-text-field>
+                                  <v-text-field v-model="form.tray_Barcode" dense hide-details label="Tray Barcode">
+                                  </v-text-field>
                                 </v-flex>
                                 <v-flex md12 sm12 v-if="product_type == 2">
-                                  <v-text-field v-model="form.case_Barcode" dense hide-details label="Case Barcode"></v-text-field>
+                                  <v-text-field v-model="form.case_Barcode" dense hide-details label="Case Barcode">
+                                  </v-text-field>
                                 </v-flex>
                                 <v-flex md12 sm12 v-if="product_type == 3">
-                                  <v-text-field v-model="form.shrink_Barcode" dense hide-details label="Shrink Barcode"></v-text-field>
+                                  <v-text-field v-model="form.shrink_Barcode" dense hide-details label="Shrink Barcode">
+                                  </v-text-field>
                                 </v-flex>
                                 <v-flex md12 sm12 v-if="product_type == 4">
-                                  <v-text-field v-model="form.pallet_Barcode" dense hide-details label="Pallet Barcode"></v-text-field>
+                                  <v-text-field v-model="form.pallet_Barcode" dense hide-details label="Pallet Barcode">
+                                  </v-text-field>
                                 </v-flex>
+                                <v-flex style="display: none;" md12>{{ image1 }}</v-flex> 
+                                <v-flex style="display: none;" md12>{{ image2 }}</v-flex> 
+                                <v-flex style="display: none;" md12>{{ image3 }}</v-flex> 
                                 <v-flex md4 sm4>
                                   <v-menu v-model="showMenu" :position-x="x" :position-y="y" absolute offset-y>
                                     <v-list>
@@ -190,14 +210,14 @@
                                       </v-list-tile>
                                     </v-list>
                                   </v-menu>
-                                  <div class="subheading">Front</div>
-                                  <v-hover>
-                                    <v-card @contextmenu="showImageMenu($event, 1)" slot-scope="{ hover }" :class="`elevation-${hover ? 12 : 2}`"
-                                      class="mx-auto hover">
-                                      <v-img ref="image1" @click="openFile(1)" :src="image1" :lazy-src="`static\img\no-image.png`"
-                                        aspect-ratio="1" class="grey lighten-2">
+                                  <div class="subheading">Front</div><v-hover>
+                                    <v-card @contextmenu="showImageMenu($event, 1)" slot-scope="{ hover }"
+                                      :class="`elevation-${hover ? 12 : 2}`" class="mx-auto hover">
+                                      <v-img ref="image1" @click="openFile(1)" :src="image1"
+                                        :lazy-src="`static\img\no-image.png`" aspect-ratio="1" class="grey lighten-2">
                                         <v-layout slot="placeholder" fill-height align-center justify-center ma-0>
-                                          <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
+                                          <v-progress-circular indeterminate color="grey lighten-5">
+                                          </v-progress-circular>
                                         </v-layout>
                                       </v-img>
                                     </v-card>
@@ -206,12 +226,13 @@
                                 <v-flex md4 sm4>
                                   <div class="subheading">Side</div>
                                   <v-hover>
-                                    <v-card @contextmenu="showImageMenu($event, 2)" slot-scope="{ hover }" :class="`elevation-${hover ? 12 : 2}`"
-                                      class="mx-auto hover">
-                                      <v-img @click="openFile(2)" :src="image2" :lazy-src="`static\img\no-image.png`"
+                                    <v-card @contextmenu="showImageMenu($event, 2)" slot-scope="{ hover }"
+                                      :class="`elevation-${hover ? 12 : 2}`" class="mx-auto hover">
+                                      <v-img ref="image2" @click="openFile(2)" :src="image2" :lazy-src="`static\img\no-image.png`"
                                         aspect-ratio="1" class="grey lighten-2">
                                         <v-layout slot="placeholder" fill-height align-center justify-center ma-0>
-                                          <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
+                                          <v-progress-circular indeterminate color="grey lighten-5">
+                                          </v-progress-circular>
                                         </v-layout>
                                       </v-img>
                                     </v-card>
@@ -220,12 +241,13 @@
                                 <v-flex md4 sm4>
                                   <div class="subheading">Top</div>
                                   <v-hover>
-                                    <v-card @contextmenu="showImageMenu($event, 3)" slot-scope="{ hover }" :class="`elevation-${hover ? 12 : 2}`"
-                                      class="mx-auto hover">
-                                      <v-img @click="openFile(3)" :src="image3" :lazy-src="`static\img\no-image.png`"
+                                    <v-card @contextmenu="showImageMenu($event, 3)" slot-scope="{ hover }"
+                                      :class="`elevation-${hover ? 12 : 2}`" class="mx-auto hover">
+                                      <v-img ref="image3" @click="openFile(3)" :src="image3" :lazy-src="`static\img\no-image.png`"
                                         class="grey lighten-2">
                                         <v-layout slot="placeholder" fill-height align-center justify-center ma-0>
-                                          <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
+                                          <v-progress-circular indeterminate color="grey lighten-5">
+                                          </v-progress-circular>
                                         </v-layout>
                                       </v-img>
                                     </v-card>
@@ -244,67 +266,72 @@
                                     suffix="cm"></v-text-field>
                                 </v-flex>
                                 <v-flex md4 v-if="product_type == 1">
-                                  <v-text-field v-model="form.tray_Height" dense hide-details type="number" label="Tray Height"
-                                    suffix="cm"></v-text-field>
+                                  <v-text-field v-model="form.tray_Height" dense hide-details type="number"
+                                    label="Tray Height" suffix="cm"></v-text-field>
                                 </v-flex>
                                 <v-flex md4 v-if="product_type == 1">
-                                  <v-text-field v-model="form.tray_Width" dense hide-details type="number" label="Tray Width"
-                                    suffix="cm"></v-text-field>
+                                  <v-text-field v-model="form.tray_Width" dense hide-details type="number"
+                                    label="Tray Width" suffix="cm"></v-text-field>
                                 </v-flex>
                                 <v-flex md4 v-if="product_type == 1">
-                                  <v-text-field v-model="form.tray_Depth" dense hide-details type="number" label="Tray Depth"
-                                    suffix="cm"></v-text-field>
+                                  <v-text-field v-model="form.tray_Depth" dense hide-details type="number"
+                                    label="Tray Depth" suffix="cm"></v-text-field>
                                 </v-flex>
                                 <v-flex md4 v-if="product_type == 1">
-                                  <v-text-field v-model="form.tray_Qty" dense hide-details type="number" label="Tray Qty"></v-text-field>
+                                  <v-text-field v-model="form.tray_Qty" dense hide-details type="number"
+                                    label="Tray Qty"></v-text-field>
                                 </v-flex>
                                 <v-flex md4 v-if="product_type == 2">
-                                  <v-text-field v-model="form.case_Height" dense hide-details type="number" label="Case Height"
-                                    suffix="cm"></v-text-field>
+                                  <v-text-field v-model="form.case_Height" dense hide-details type="number"
+                                    label="Case Height" suffix="cm"></v-text-field>
                                 </v-flex>
                                 <v-flex md4 v-if="product_type == 2">
-                                  <v-text-field v-model="form.case_Width" dense hide-details type="number" label="Case Width"
-                                    suffix="cm"></v-text-field>
+                                  <v-text-field v-model="form.case_Width" dense hide-details type="number"
+                                    label="Case Width" suffix="cm"></v-text-field>
                                 </v-flex>
                                 <v-flex md4 v-if="product_type == 2">
-                                  <v-text-field v-model="form.case_Depth" dense hide-details type="number" label="Case Depth"
-                                    suffix="cm"></v-text-field>
+                                  <v-text-field v-model="form.case_Depth" dense hide-details type="number"
+                                    label="Case Depth" suffix="cm"></v-text-field>
                                 </v-flex>
                                 <v-flex md4 v-if="product_type == 2">
-                                  <v-text-field v-model="form.case_Qty" dense hide-details type="number" label="Case Qty"></v-text-field>
+                                  <v-text-field v-model="form.case_Qty" dense hide-details type="number"
+                                    label="Case Qty"></v-text-field>
                                 </v-flex>
                                 <v-flex md4 v-if="product_type == 3">
-                                  <v-text-field v-model="form.shrink_Height" dense hide-details type="number" label="Shrink Height"
-                                    suffix="cm"></v-text-field>
+                                  <v-text-field v-model="form.shrink_Height" dense hide-details type="number"
+                                    label="Shrink Height" suffix="cm"></v-text-field>
                                 </v-flex>
                                 <v-flex md4 v-if="product_type == 3">
-                                  <v-text-field v-model="form.shrink_Width" dense hide-details type="number" label="Shrink Width"
-                                    suffix="cm"></v-text-field>
+                                  <v-text-field v-model="form.shrink_Width" dense hide-details type="number"
+                                    label="Shrink Width" suffix="cm"></v-text-field>
                                 </v-flex>
                                 <v-flex md4 v-if="product_type == 3">
-                                  <v-text-field v-model="form.shrink_Depth" dense hide-details type="number" label="Shrink Depth"
-                                    suffix="cm"></v-text-field>
+                                  <v-text-field v-model="form.shrink_Depth" dense hide-details type="number"
+                                    label="Shrink Depth" suffix="cm"></v-text-field>
                                 </v-flex>
                                 <v-flex md4 v-if="product_type == 3">
-                                  <v-text-field v-model="form.shrink_Qty" dense hide-details type="number" label="Shrink Qty"></v-text-field>
+                                  <v-text-field v-model="form.shrink_Qty" dense hide-details type="number"
+                                    label="Shrink Qty"></v-text-field>
                                 </v-flex>
                                 <v-flex md4 v-if="product_type == 4">
-                                  <v-text-field v-model="form.pallet_Height" dense hide-details type="number" label="Pallet Height"
-                                    suffix="cm"></v-text-field>
+                                  <v-text-field v-model="form.pallet_Height" dense hide-details type="number"
+                                    label="Pallet Height" suffix="cm"></v-text-field>
                                 </v-flex>
                                 <v-flex md4 v-if="product_type == 4">
-                                  <v-text-field v-model="form.pallet_Width" dense hide-details type="number" label="Pallet Width"
-                                    suffix="cm"></v-text-field>
+                                  <v-text-field v-model="form.pallet_Width" dense hide-details type="number"
+                                    label="Pallet Width" suffix="cm"></v-text-field>
                                 </v-flex>
                                 <v-flex md4 v-if="product_type == 4">
-                                  <v-text-field v-model="form.pallet_Depth" dense hide-details type="number" label="Pallet Depth"
-                                    suffix="cm"></v-text-field>
+                                  <v-text-field v-model="form.pallet_Depth" dense hide-details type="number"
+                                    label="Pallet Depth" suffix="cm"></v-text-field>
                                 </v-flex>
                                 <v-flex md4 v-if="product_type == 4">
-                                  <v-text-field v-model="form.pallet_Qty" dense hide-details type="number" label="Pallet Qty"></v-text-field>
+                                  <v-text-field v-model="form.pallet_Qty" dense hide-details type="number"
+                                    label="Pallet Qty"></v-text-field>
                                 </v-flex>
                                 <v-flex md12>
-                                  <v-checkbox true-value v-model="form.imageAudit" label="Image Audit?" color="primary"></v-checkbox>
+                                  <v-checkbox true-value v-model="form.imageAudit" label="Image Audit?" color="primary">
+                                  </v-checkbox>
                                 </v-flex>
                               </v-layout>
                             </v-card-text>
@@ -352,13 +379,15 @@
                                     </v-btn>
                                   </v-btn-toggle>
                                   <v-divider></v-divider>
-                                  <v-slider :max="360" :min="0" v-model="rotation" prepend-icon="rotate_right"></v-slider>
+                                  <v-slider :max="360" :min="0" v-model="rotation" prepend-icon="rotate_right">
+                                  </v-slider>
                                   {{ iRotation }} deg
                                   <v-divider></v-divider>
                                   <v-divider></v-divider>
                                   <v-btn color="primary" @click="selectImage">Choose Image</v-btn>
                                   <v-btn color="primary" @click="updateImage">Upload Image</v-btn>
-                                  <v-progress-linear v-model="uploadValue" v-if="showLoader" :indeterminate="inditerminate"></v-progress-linear>
+                                  <v-progress-linear v-model="uploadValue" v-if="showLoader"
+                                    :indeterminate="inditerminate"></v-progress-linear>
                                   <div style="text-align: right;">
                                   </div>
                                 </v-card-text>
@@ -427,13 +456,16 @@
                             <v-card-text>
                               <v-layout row wrap>
                                 <v-flex md12>
-                                  <v-text-field v-model="facings.Facings_X" type="number" dense hide-details label="Facings X"></v-text-field>
+                                  <v-text-field v-model="facings.Facings_X" type="number" dense hide-details
+                                    label="Facings X"></v-text-field>
                                 </v-flex>
                                 <v-flex md12>
-                                  <v-text-field v-model="facings.Facings_Y" type="number" dense hide-details label="Facings Y"></v-text-field>
+                                  <v-text-field v-model="facings.Facings_Y" type="number" dense hide-details
+                                    label="Facings Y"></v-text-field>
                                 </v-flex>
                                 <v-flex md12>
-                                  <v-text-field v-model="facings.Facings_Z" type="number" dense hide-details label="Facings Z"></v-text-field>
+                                  <v-text-field v-model="facings.Facings_Z" type="number" dense hide-details
+                                    label="Facings Z"></v-text-field>
                                 </v-flex>
                               </v-layout>
                             </v-card-text>
@@ -1117,52 +1149,57 @@
       changePackingType() {
         let self = this;
 
-        let productType = "";
-        let bc = "";
+        self.$nextTick(() => {
+          let productType = "";
+          let bc = "";
 
-        switch (self.product_type) {
-          case 0:
-            {
-              if (self.bcDropdown == -1)
-                bc = self.form.barcode;
-              else {
-                self.form.aleternateBarcode.forEach(el => {
-                  if (el.value == self.bcDropdown) {
-                    bc = el.text;
-                  }
-                })
+          switch (self.product_type) {
+            case 0:
+              {
+                if (self.bcDropdown == -1)
+                  bc = self.form.barcode;
+                else {
+                  self.form.aleternateBarcode.forEach(el => {
+                    if (el.value == self.bcDropdown) {
+                      bc = el.text;
+                    }
+                  })
+                }
               }
-            }
-            break;
-          case 1:
-            {
-              productType = "T";
-              bc = self.form.barcode;
-            }
-            break;
-          case 2:
-            {
-              productType = "C";
-              bc = self.form.barcode;
-            }
-            break;
-          case 3:
-            {
-              productType = "S";
-              bc = self.form.barcode;
-            }
-            break;
-          case 4:
-            {
-              productType = "P";
-              bc = self.form.barcode;
-            }
-            break;
-        }
+              break;
+            case 1:
+              {
+                productType = "T";
+                bc = self.form.barcode;
+              }
+              break;
+            case 2:
+              {
+                productType = "C";
+                bc = self.form.barcode;
+              }
+              break;
+            case 3:
+              {
+                productType = "S";
+                bc = self.form.barcode;
+              }
+              break;
+            case 4:
+              {
+                productType = "P";
+                bc = self.form.barcode;
+              }
+              break;
+          }
 
-        self.image1 = process.env.VUE_APP_API + BarcodeHandler.imageFromBarcode(bc, 1, productType);
-        self.image2 = process.env.VUE_APP_API + BarcodeHandler.imageFromBarcode(bc, 2, productType);
-        self.image3 = process.env.VUE_APP_API + BarcodeHandler.imageFromBarcode(bc, 3, productType);
+          self.image1 = process.env.VUE_APP_API + BarcodeHandler.imageFromBarcode(bc, 1, productType);
+          self.image2 = process.env.VUE_APP_API + BarcodeHandler.imageFromBarcode(bc, 2, productType);
+          self.image3 = process.env.VUE_APP_API + BarcodeHandler.imageFromBarcode(bc, 3, productType);
+
+          console.log(self.image1, self.image2, self.image3)
+
+        })
       },
       calculate() {
         let self = this;
@@ -1205,9 +1242,12 @@
           productData.ProductData.sales_Units
         );
 
-        calcData.Weekly_Sales_Retail = self.CalculationHandler.Calculate_Weekly_Sales_Retail(productData.ProductData.sales_Retail);
-        calcData.Weekly_Sales_Cost = self.CalculationHandler.Calculate_Weekly_Sales_Cost(productData.ProductData.sales_Cost);
-        calcData.Weekly_Sales_Units = self.CalculationHandler.Calculate_Weekly_Sales_Units(productData.ProductData.sales_Units);
+        calcData.Weekly_Sales_Retail = self.CalculationHandler.Calculate_Weekly_Sales_Retail(productData.ProductData
+          .sales_Retail);
+        calcData.Weekly_Sales_Cost = self.CalculationHandler.Calculate_Weekly_Sales_Cost(productData.ProductData
+          .sales_Cost);
+        calcData.Weekly_Sales_Units = self.CalculationHandler.Calculate_Weekly_Sales_Units(productData.ProductData
+          .sales_Units);
         calcData.Weekly_Profit = self.CalculationHandler.Calculate_Weekly_Profit(productData.ProductData.sales_Profit);
         calcData.XFacings = productData.Facings_X;
         calcData.Capacity = productData.TotalFacings;
@@ -1387,7 +1427,8 @@
 
         self.$refs.yesNo.show('Delete alternate barcode?', goThrough => {
           if (goThrough) {
-            Axios.delete(process.env.VUE_APP_API + 'ProductAltCode?db=CR-Hinterland-Live&altCodeID=' + self.bcDropdown)
+            Axios.delete(process.env.VUE_APP_API + 'ProductAltCode?db=CR-Hinterland-Live&altCodeID=' + self
+                .bcDropdown)
               .then(r => {
                 if (r.data) {
                   self.form.aleternateBarcode.forEach((el, idx) => {
@@ -1414,7 +1455,6 @@
       Dialog
     }
   }
-
 </script>
 
 <style scoped>
@@ -1440,5 +1480,4 @@
     height: calc(100vh - 200px);
     overflow-x: auto;
   }
-
 </style>
