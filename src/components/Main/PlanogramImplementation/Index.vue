@@ -606,11 +606,15 @@
                 }
                 if (type == 4) {
                     let tmp = []
-
+                        console.log(item);
+                        
                     self.PlanogramItems.forEach(element => {
+                         console.log(element.value +"|"+item.systemFileID);
                         if (element.value == item.systemFileID) {
                             tmp.push(element)
                         }
+                       
+                        
                     });
 
                     self.$refs.PlanogramIplementationModal.show(

@@ -74,6 +74,9 @@
                         reorder
                     </v-icon>
                 </v-btn>
+                <v-btn  dark @click.stop="$router.push('/Allocation/'+project.id)">
+                  allocate
+                </v-btn>
                 <v-spacer></v-spacer>
                 <v-btn flat icon v-if="project!=null" @click="openProjectTXAdd()">
                     <v-icon>add</v-icon>
@@ -370,7 +373,7 @@
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                         Axios.delete(process.env.VUE_APP_API + `Project?projectID=${item.id}`).then(r => {
-                            console.log(r);
+                            // console.log(r);
 
 
                             for (let index = 0; index < group.projectList.length; index++) {
@@ -581,7 +584,7 @@
             },
             openProjectAdd(item) {
                 var self = this
-                console.log(item);
+                // console.log(item);
 
                 self.$refs.ProjectModal.open(true, item, data => {
                     item.projectList.push(data.data.project)
@@ -591,7 +594,7 @@
                 var self = this
                 self.$refs.ProjectTXModal.open(true, self.project, data => {
 
-                    console.log(data);
+                    // console.log(data);
 
                     self.ProjectTXs.unshift(data)
                 })
@@ -639,10 +642,10 @@
                 self.project = item
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.get(process.env.VUE_APP_API + `ProjectTX?projectID=${item.id}`).then(r => {
-                    console.log(r);
+                    // console.log(r);
 
                     r.data.projectTXList.forEach(e => {
-                        console.log(e);
+                        // console.log(e);
 
                         if (e.deleted != true) {
                             self.ProjectTXs.push(e)
