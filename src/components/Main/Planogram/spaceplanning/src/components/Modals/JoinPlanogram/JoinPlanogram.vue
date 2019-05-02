@@ -260,9 +260,6 @@
                 if (clusterData.planogramName != null)
                     planogramName += clusterData.planogramName
 
-                if (clusterData.tag != null && clusterData.tag != "")
-                    planogramName += clusterData.tag;
-
                 if (clusterData.storeCluster != null && clusterData.storeCluster != "") {
                     planogramName += " - " + clusterData.storeCluster;
                 }
@@ -303,15 +300,15 @@
                     )
                     .then(result => {
                         if (result.data.success == true) {
-                            self.dialog = false;
+                            self.$refs.spinner.hide();
                             alert(self.rootPlanogramFile.name + " Successfully saved new.");
                         } else {
-                            self.dialog = false;
+                            self.$refs.spinner.hide();
                             alert("Server responded unsuccessfully!");
                         }
                     })
                     .catch(error => {
-                        self.dialog = false;
+                        self.$refs.spinner.hide();
                         console.error("Failed to save planogram file");
                     });
             }
