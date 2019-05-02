@@ -65,6 +65,9 @@ import ProductCatalogue from '@/components/Apps/DataPreparation/Types/ProductCat
 //projectPlanning
 import ProjectPlanning from '@/components/Apps/ProjectPlanning/Index.vue';
 import Drawer from '@/components/Apps/ProjectPlanning/Drawer.vue';
+import Allocation from '@/components/Apps/ProjectPlanning/Allocation.vue';
+
+
 
 
 //reports
@@ -193,6 +196,10 @@ export default new Router({
           name: 'product_report',
           component: ProductReport
         },
+        {
+          path: "/Allocation/:projectID",
+          name: "Allocation",
+          component: Allocation},
         {
           path: "/ProjectPlanning",
           name: "project_planning",

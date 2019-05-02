@@ -74,6 +74,9 @@
                         reorder
                     </v-icon>
                 </v-btn>
+                <v-btn  dark @click.stop="$router.push('/Allocation/'+project.id)">
+                  allocate
+                </v-btn>
                 <v-spacer></v-spacer>
                 <v-btn flat icon v-if="project!=null" @click="openProjectTXAdd()">
                     <v-icon>add</v-icon>
