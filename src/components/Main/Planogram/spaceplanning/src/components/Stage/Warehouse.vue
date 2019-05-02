@@ -58,6 +58,9 @@
             <v-list-tile @click="planogramToRange">
               <v-list-tile-title>Planogram To Range</v-list-tile-title>
             </v-list-tile>
+            <v-list-tile @click="openJoinPlanogram">
+              <v-list-tile-title>Join</v-list-tile-title>
+            </v-list-tile>
             <v-list-tile
               v-if="PlanogramObject.status == null||PlanogramObject.status==0||PlanogramObject.status==1||PlanogramObject.status==3||PlanogramObject.status==6"
               @click="submitForApprovalPlano">
@@ -262,6 +265,7 @@
     <YesNoModal ref="yesNoModal"></YesNoModal>
     <PlanogramAprovalModal ref="PlanogramAprovalModal"></PlanogramAprovalModal>
     <PlanogramRetractionModal ref="PlanogramRetractionModal"></PlanogramRetractionModal>
+    <JoinPlanogram ref="JoinPlanogram"></JoinPlanogram>
 
   </div>
 </template>
@@ -281,6 +285,7 @@
   import StoreHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/StoreHelper/StoreHelper.js";
   import PlanogramAprovalModal from "@/components/Main/Planogram/spaceplanning/src/components/Modals/PlanogramAproval/PlanogramAprovalModal.vue";
   import PlanogramRetractionModal from "@/components/Main/Planogram/spaceplanning/src/components/Modals/PlanogramAproval/PlanogramRetractionModal.vue";
+  import JoinPlanogram from "@/components/Main/Planogram/spaceplanning/src/components/Modals/JoinPlanogram/JoinPlanogram.vue";
 
   function textValue(data) {
     let self = this;
@@ -300,8 +305,8 @@
       Spinner,
       YesNoModal,
       PlanogramAprovalModal,
-      PlanogramRetractionModal
-
+      PlanogramRetractionModal,
+      JoinPlanogram
     },
     data() {
       let width = 0;
@@ -342,8 +347,8 @@
             text: "All Stores Cluster",
             value: "allStores"
           }, //{
-            //text: "Select Stores",
-            //value: "stores"
+          //text: "Select Stores",
+          //value: "stores"
           //},
           {
             text: "Store Cluster",
@@ -400,20 +405,16 @@
     },
     created() {
       this.planogramHelper = new LoadSavePlanogramBase(process.env.VUE_APP_API, true, null);
-      // EventBus.$on("TOGGLE_WAREHOUSE_IMAGES", this.updateImageOnProperty);
-      // EventBus.$on("PLANOGRAM_LOADED", this.FilterFromEvent);
     },
     mounted() {
       var self = this;
       this.Images_On = this.$ImagesOn;
-      //#region Populate Temp
       self.warehouseCtrl = new WarehouseController(
         pixelToCmRatio,
         self.warehouseKonva
       );
     },
     computed: {
-
       filteredItems() {
         let self = this;
         let tmp = [];
@@ -493,7 +494,6 @@
           }
         })
       },
-
       submitForApprovalPlano(item) {
         let self = this
         self.$refs.PlanogramAprovalModal.show('Submit planogram for aproval?', (value, notesModal, selectedUser) => {
@@ -989,7 +989,6 @@
           }
         })
       },
-
       onClusterOptionChange() {
         let self = this;
 
@@ -1099,6 +1098,13 @@
         } else {
           alert("This feature is still coming");
         }
+      },
+      openJoinPlanogram() {
+        let self = this;
+
+        self.$refs.JoinPlanogram.show(() => {
+          
+        })
       }
     }
   }
