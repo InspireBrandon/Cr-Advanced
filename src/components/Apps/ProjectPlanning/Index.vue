@@ -74,7 +74,7 @@
                         reorder
                     </v-icon>
                 </v-btn>
-                <v-btn  dark @click.stop="$router.push('/Allocation/'+project.id)">
+                <v-btn v-if="project!=null" dark @click.stop="$router.push('/Allocation/'+project.id)">
                   allocate
                 </v-btn>
                 <v-spacer></v-spacer>

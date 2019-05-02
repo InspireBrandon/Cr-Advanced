@@ -84,7 +84,7 @@
                                         {{props.item.projectTXGroup_ID ==null?"NO":"YES"}}
                                     </td>
                                     <td>
-                                        <v-checkbox v-model="selectedfield" :label="props.item.name"
+                                        <v-checkbox readonly v-model="selectedfield" :label="props.item.name"
                                             :value="props.item">
                                         </v-checkbox>
                                     </td>
@@ -103,7 +103,7 @@
                         Select transaction to group with
                     </v-toolbar-title>
                     <v-spacer></v-spacer>
-                    <v-btn icon @click="GroupSelector=false">
+                    <v-btn icon @click="GroupSelector=false,AssignedItems=[]">
                         <v-icon>
                             close
                         </v-icon>
@@ -676,8 +676,9 @@
                 console.log("herer");
                 let idx = 0
                 let self = this
+                self.ProjectTXs = []
                 self.$nextTick(() => {
-                    self.ProjectTXs = []
+
                     console.log(item);
 
 

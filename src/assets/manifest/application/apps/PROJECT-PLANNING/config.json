@@ -8,6 +8,11 @@
             "routeName": "Drawer",
             "title": "Project Planning",
             "openInNewWindow": false
+        },{
+            "route": "/Allocation/:ProjectID",
+            "routeName": "Allocation",
+            "title": "Transaction Allocation",
+            "openInNewWindow": false
         }
     ]
 }
