@@ -126,8 +126,8 @@
                         <v-card-text>
                             <v-timeline dense>
                                 <v-timeline-item style="padding-bottom: 5px;" right
-                                    :color="getColor(item.type, item.status)"
-                                    v-for="(item,index) in timelineItems" :key="index" small>
+                                    :color="getColor(item.type, item.status)" v-for="(item,index) in timelineItems"
+                                    :key="index" small>
                                     <v-card :color="getColor(item.type, item.status)" dark>
                                         <v-card-title class="title pa-2 ma-0">
                                             <span>{{ status[item.status  == -1 ? 18 : item.status].text }}</span>
@@ -304,14 +304,15 @@
                                     "project_ID": self.projectID,
                                     "dateTime": new Date,
                                     "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
-                                    "username": self.timelineItems[self.timelineItems.length - 1].user,
+                                    // "username": self.timelineItems[self.timelineItems.length - 1].user,
                                     "status": 12,
                                     "type": 3,
                                     "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
                                     "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
-                                    "systemUserID": self.timelineItems[self.timelineItems.length - 1].userID,
+                                    // "systemUserID": self.timelineItems[self.timelineItems.length - 1].userID,
                                     "actionedByUserID": systemUserID,
                                     "notes": data.notes,
+                                    "ProjectTXGroup_ID": self.timelineItems[0].ProjectTXGroup_ID,
                                     "systemFileID": self.routePlanogramID
                                 }
                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
@@ -320,7 +321,48 @@
                                         let element = res.data.projectTX;
 
                                         self.currentProjectTx = res.data.projectTX
+                                        let ProjectTxGroup = {
+                                            projectID: self.selectedProject
+                                        }
+                                        console.log("hree");
+ Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                                        Axios.post(process.env.VUE_APP_API + 'ProjectTXGroup', ProjectTxGroup)
+                                            .then(resp => {
+                                                console.log("resp");
+                                                console.log(resp);
 
+
+                                                let trans2 = {
+                                                    "project_ID": self.projectID,
+                                                    "dateTime": new Date,
+                                                    "dateTimeString": moment(new Date).format(
+                                                        'YYYY-MM-DD'),
+                                                    "username": self.timelineItems[self.timelineItems
+                                                        .length - 1].user,
+                                                    "status": 12,
+                                                    "type": 3,
+                                                    "storeCluster_ID": self.timelineItems[0]
+                                                        .storeCluster_ID,
+                                                    "categoryCluster_ID": self.timelineItems[0]
+                                                        .categoryCluster_ID,
+                                                    "systemUserID": self.timelineItems[self
+                                                        .timelineItems.length - 1].userID,
+                                                    // "actionedByUserID": systemUserID,
+                                                    "notes": data.notes,
+                                                    "systemFileID": self.routePlanogramID,
+                                                    "ProjectTXGroup_ID": resp.data.projectTXGroup.id
+                                                }
+                                                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                                                Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans2)
+                                                    .then(res => {
+                                                        delete Axios.defaults.headers.common[
+                                                            "TenantID"];
+                                                        console.log("res");
+                                                        console.log(res);
+
+                                                    })
+
+                                            })
                                         self.timelineItems.unshift({
                                             status: element.status,
                                             notes: self.status[element.status].text,
@@ -365,6 +407,7 @@
                                     "dateTime": new Date,
                                     "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
                                     "username": self.timelineItems[self.timelineItems.length - 1].user,
+                                    "ProjectTXGroup_ID": self.timelineItems[0].ProjectTXGroup_ID,
                                     "status": 11,
                                     "type": 3,
                                     "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
@@ -408,10 +451,14 @@
                                             storeCluster: element.storeCluster,
                                             categoryCluster_ID: element.categoryCluster_ID
                                         })
+                                        console.log(here);
 
                                         self.projectsStatus = self.timelineItems[0]
 
+
+
                                         delete Axios.defaults.headers.common["TenantID"];
+
                                     })
                             }
 
@@ -606,15 +653,15 @@
                 }
                 if (type == 4) {
                     let tmp = []
-                        console.log(item);
-                        
+                    console.log(item);
+
                     self.PlanogramItems.forEach(element => {
-                         console.log(element.value +"|"+item.systemFileID);
+                        console.log(element.value + "|" + item.systemFileID);
                         if (element.value == item.systemFileID) {
                             tmp.push(element)
                         }
-                       
-                        
+
+
                     });
 
                     self.$refs.PlanogramIplementationModal.show(
@@ -722,36 +769,32 @@
                 self.inform("PROCESSING", "Selecting appropriate process.")
 
                 switch (self.authorityType) {
-                    case 0:
-                        {
-                            // Super User
-                            self.processSuperUser()
+                    case 0: {
+                        // Super User
+                        self.processSuperUser()
                             .then(r => {
 
                             })
                             .catch(e => {
 
                             })
-                        }
-                        break;
-                    case 1:
-                        {
-                            // Buyer
-                            self.processBuyer();
-                        }
-                        break;
-                    case 2:
-                        {
-                            // Supplier
-                            self.processSupplier();
-                        }
-                        break;
-                    case 3:
-                        {
-                            // Store
-                            self.processStore();
-                        }
-                        break;
+                    }
+                    break;
+                case 1: {
+                    // Buyer
+                    self.processBuyer();
+                }
+                break;
+                case 2: {
+                    // Supplier
+                    self.processSupplier();
+                }
+                break;
+                case 3: {
+                    // Store
+                    self.processStore();
+                }
+                break;
                 }
             },
             processSuperUser() {
