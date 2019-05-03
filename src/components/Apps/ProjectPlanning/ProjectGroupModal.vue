@@ -46,7 +46,7 @@
     export default {
         data() {
             return {
-                valid:null,
+                valid: null,
                 item: null,
                 dialog: null,
                 projectGroups: [],
@@ -62,10 +62,10 @@
 
             },
             open(isAdd, item, callback) {
-
+                
                 let self = this
                 this.$refs.form.reset()
- 
+
                 self.dialog = true
                 if (isAdd == true) {
                     self.isAdd = true
@@ -73,17 +73,18 @@
                     self.description = null
                     self.selectedGroup = null
                 }
-                if(isAdd=false) 
-                 {
+                if (isAdd == false) {
+
+
                     self.isAdd = false
                     self.item = item
                     self.name = item.name
                     self.description = item.description
                 }
-                self.valid=true
+                self.valid = true
                 self.afterClose = callback
-                
-                
+
+
             },
             submit() {
                 var self = this

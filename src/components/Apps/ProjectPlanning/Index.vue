@@ -74,7 +74,7 @@
                         reorder
                     </v-icon>
                 </v-btn>
-                <v-btn v-if="project!=null" dark @click.stop="$router.push('/Allocation/'+project.id)">
+                <v-btn v-if="project!=null" outline dark @click.stop="$router.push('/Allocation/'+project.id)">
                   allocate
                 </v-btn>
                 <v-spacer></v-spacer>
@@ -122,7 +122,7 @@
                                     autofocus></v-select>
                             </template>
                         </v-edit-dialog>
-                    </td>
+                    </td> 
                     <td>
 
                         <v-edit-dialog :return-value.sync="props.item.status" large lazy persistent

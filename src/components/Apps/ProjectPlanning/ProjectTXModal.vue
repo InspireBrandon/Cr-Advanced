@@ -318,6 +318,7 @@
                     self.systemFileID = item.systemFileID;
                 }
                 if (isAdd == true) {
+                    self.type=null
                     self.projectID = item.id
                     self.isAdd = true
                     self.selectedPlanogram = item.planogram_ID,
