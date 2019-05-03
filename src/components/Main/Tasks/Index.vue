@@ -34,7 +34,8 @@
                                             <td>{{ props.item.dateTimeString }}</td>
                                             <td style="width: 5%;">
                                                 <!-- PROJECT START -->
-                                                <v-btn small v-if="props.item.type == 1"></v-btn>
+                                                <v-btn @click="assignTask(props.item)" small
+                                                    v-if="props.item.status == 0">Assign</v-btn>
                                                 <!-- END PROJECT START -->
                                                 <!-- DATA PREPARATION -->
                                                 <v-btn small v-if="props.item.type == 1"></v-btn>
@@ -43,6 +44,7 @@
                                                 <v-btn small v-if="props.item.type == 1"></v-btn>
                                                 <!-- END DATA PREPARATION -->
                                             </td>
+                                            <v-divider></v-divider>
                                         </tr>
                                     </template>
                                 </v-data-table>
@@ -531,33 +533,37 @@
                 let systemUserID = encoded_details.USER_ID;
 
                 self.$refs.assignTask.show(function (data) {
-                    let tmp = JSON.parse(JSON.stringify(item))
-                    let assignedToRequest = tmp;
-                    let task = tmp;
-
-                    assignedToRequest.systemUserID = data.systemUserID;
-                    assignedToRequest.actionedByUserID = systemUserID;
-                    // assignedToRequest.notes = data.notes;
-                    assignedToRequest.status = 40;
-
-                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
-                    task.type = data.type;
-
-                    Axios.post(process.env.VUE_APP_API + 'ProjectTX', assignedToRequest).then(res1 => {
-                        task.status = 5 + data.type;
-                        task.systemUserID = data.systemUserID;
-                        task.notes = data.notes;
-                        task.storeCluster_ID = data.storeCluster;
-                        task.categoryCluster_ID = data.categoryCluster;
-                        task.store_ID = data.store;
-                        task.systemFileID = data.systemFile;
-                        task.actionedByUserID = null;
-                        Axios.post(process.env.VUE_APP_API + 'ProjectTX', task).then(res2 => {
-                            delete Axios.defaults.headers.common["TenantID"];
-                            self.getTransactionsByUser(self.systemUserID)
-                        })
+                    self.createNewProjectTransactionGroup(item.project_ID, projectTXGroupID => {
+                        
                     })
+
+                    // let tmp = JSON.parse(JSON.stringify(item))
+                    // let assignedToRequest = tmp;
+                    // let task = tmp;
+
+                    // assignedToRequest.systemUserID = data.systemUserID;
+                    // assignedToRequest.actionedByUserID = systemUserID;
+                    // // assignedToRequest.notes = data.notes;
+                    // assignedToRequest.status = 40;
+
+                    // Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    // task.type = data.type;
+
+                    // Axios.post(process.env.VUE_APP_API + 'ProjectTX', assignedToRequest).then(res1 => {
+                    //     task.status = 5 + data.type;
+                    //     task.systemUserID = data.systemUserID;
+                    //     task.notes = data.notes;
+                    //     task.storeCluster_ID = data.storeCluster;
+                    //     task.categoryCluster_ID = data.categoryCluster;
+                    //     task.store_ID = data.store;
+                    //     task.systemFileID = data.systemFile;
+                    //     task.actionedByUserID = null;
+                    //     Axios.post(process.env.VUE_APP_API + 'ProjectTX', task).then(res2 => {
+                    //         delete Axios.defaults.headers.common["TenantID"];
+                    //         self.getTransactionsByUser(self.systemUserID)
+                    //     })
+                    // })
                 })
             },
             getUsers(callback) {
@@ -619,6 +625,16 @@
                         delete Axios.defaults.headers.common["TenantID"];
                         self.projectTransactions.splice(index, 1);
                     })
+            },
+            createNewProjectTransactionGroup(projectID, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `ProjectTXGroup`, projectID).then(r => {
+                    delete Axios.defaults.headers.common["TenantID"];
+                    callback(r.data.projectTXGroup.id);
+                })
             }
         }
     }

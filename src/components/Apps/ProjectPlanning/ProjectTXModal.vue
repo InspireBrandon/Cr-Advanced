@@ -398,7 +398,7 @@
                             "transactionRolloverID": self.form.transactionRolloverID,
                             "notes": self.form.notes
                         }
-                        Axios.put(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
+                        Axios.put(process.env.VUE_APP_API + 'ProjectTX?update=true', trans).then(res => {
 
                             self.afterClose(trans)
                             delete Axios.defaults.headers.common["TenantID"];

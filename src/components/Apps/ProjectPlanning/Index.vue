@@ -482,7 +482,7 @@
                 }
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.put(process.env.VUE_APP_API + 'ProjectTX', item).then(res => {
+                Axios.put(process.env.VUE_APP_API + 'ProjectTX?update=true', item).then(res => {
                     delete Axios.defaults.headers.common["TenantID"];
                 })
             },

@@ -207,7 +207,6 @@
                 drawer: null,
                 project: null,
                 Projects: [],
-
                 typeList: [],
                 headers: [{
                     text: "",
@@ -287,11 +286,10 @@
                     }
                 })
                 if (remove == true) {
-                    self.selectedfield.forEach(field => {
+                    self.selectedfield.forEach((field, idx) => {
                         if (field == item) {
-                            self.selectedfield.splice(count, 1)
+                            self.selectedfield.splice(idx, 1);
                         }
-                        count++
                     })
 
                 } else {
@@ -317,10 +315,9 @@
                 Axios.post(process.env.VUE_APP_API + `ProjectTXGroup`, txGroupProjectID).then(r => {
                     console.log(r);
 
-
                     self.selectedfield.forEach(element => {
                         element.ProjectTXGroup_ID = r.data.projectTXGroup.id
-                        Axios.put(process.env.VUE_APP_API + `ProjectTX`, element).then(
+                        Axios.put(process.env.VUE_APP_API + `ProjectTX?update=false`, element).then(
                             resp => {
                                 console.log(resp.data);
                                 self.getTransactions(self.selected)
@@ -329,8 +326,6 @@
 
                     delete Axios.defaults.headers.common["TenantID"];
                 })
-
-                // ProjectTXGroup_ID
             },
             saveToExistingGroup(item) {
                 let self = this
@@ -347,7 +342,7 @@
                 self.selectedfield.forEach(element => {
 
                     element.ProjectTXGroup_ID = tmpProjectTXGroup_ID
-                    Axios.put(process.env.VUE_APP_API + `ProjectTX`, element).then(
+                    Axios.put(process.env.VUE_APP_API + `ProjectTX?update=false`, element).then(
                         resp => {
                             console.log(resp);
                             self.getTransactions(self.selected)
@@ -368,7 +363,6 @@
                     }
                 })
                 self.GroupSelector = true
-
             },
             getTypeList() {
                 let self = this
@@ -380,8 +374,6 @@
                 let statushandler = new StatusHandler()
 
                 self.status = statushandler.getStatus()
-
-
             },
             deleteProjectTX(item, group) {
                 let self = this
@@ -520,7 +512,7 @@
                 }
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.put(process.env.VUE_APP_API + 'ProjectTX', item).then(res => {
+                Axios.put(process.env.VUE_APP_API + 'ProjectTX?update=false', item).then(res => {
                     delete Axios.defaults.headers.common["TenantID"];
                 })
             },
@@ -679,22 +671,17 @@
 
             },
             getTransactions(item) {
-                console.log("herer");
                 let idx = 0
                 let self = this
-                self.ProjectTXs = []
                 self.$nextTick(() => {
-
-                    console.log(item);
-
 
                     self.project = item
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                     Axios.get(process.env.VUE_APP_API + `ProjectTX?projectID=${item}`).then(r => {
-                        console.log(r);
+                        self.ProjectTXs = []
+                        self.selectedfield = [];
 
                         r.data.projectTXList.forEach(e => {
-
                             if (e.deleted != true) {
                                 e.idx = idx
                                 self.ProjectTXs.push(e)
@@ -704,9 +691,6 @@
                         delete Axios.defaults.headers.common["TenantID"];
                     })
                 })
-
-
-
             },
             getColor(type, status) {
                 return StatusHandler.getColorByTypeAndStatus(type, status)
