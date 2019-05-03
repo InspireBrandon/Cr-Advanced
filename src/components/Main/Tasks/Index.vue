@@ -713,20 +713,20 @@
         created() {
             let self = this;
             self.getLists(callback => {
-                let tenantID = sessionStorage.currentDatabase;
+                setTimeout(() => {
+                    let tenantID = sessionStorage.currentDatabase;
 
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
-                let systemUserID = encoded_details.USER_ID;
+                    let encoded_details = jwt.decode(sessionStorage.accessToken);
+                    let systemUserID = encoded_details.USER_ID;
 
-                self.getUserAccess(systemUserID, tenantID, () => {
-                    setTimeout(() => {
+                    self.getUserAccess(systemUserID, tenantID, () => {
                         self.systemUserID = systemUserID;
                         self.getTransactionsByUser(systemUserID)
                         self.getUsers(callback => {
                             self.showLoader = false
                         })
-                    }, 2000);
-                })
+                    })
+                }, 1000)
             })
 
         },

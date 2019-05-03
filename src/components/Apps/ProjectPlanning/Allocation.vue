@@ -64,7 +64,7 @@
                                         <div>{{typeList[props.item.type == -1 ?  5 :  props.item.type].text}}</div>
                                     </td>
                                     <td>
-                                        <v-icon :color="typeList[props.item.type== -1 ?  5 :  props.item.type].color">
+                                        <v-icon :color="getColor(props.item.type, props.item.status)">
                                             fiber_manual_record</v-icon>
                                         {{status[props.item.status].friendly }}
                                     </td>
@@ -86,8 +86,8 @@
                                         {{props.item.projectTXGroup_ID ==null?"NO":"YES"}}
                                     </td>
                                     <td>
-                                        <v-checkbox readonly hide-details v-model="selectedfield" :label="props.item.name"
-                                            :value="props.item">
+                                        <v-checkbox readonly hide-details v-model="selectedfield"
+                                            :label="props.item.name" :value="props.item">
                                         </v-checkbox>
                                     </td>
                                 </tr>
@@ -213,7 +213,7 @@
                     text: "",
                     sortable: false,
                     value: "dateTimeString"
-                },{
+                }, {
                     text: "Date",
                     sortable: false,
                     value: "dateTimeString"
@@ -707,6 +707,9 @@
 
 
 
+            },
+            getColor(type, status) {
+                return StatusHandler.getColorByTypeAndStatus(type, status)
             }
         }
     }

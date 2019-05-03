@@ -145,6 +145,10 @@
         }, {
           headerName: 'Category',
           field: 'category',
+        },{
+          headerName: 'Subcategory',
+          field: 'subcategory',
+          hide: true
         }, {
           headerName: 'Active_Shop_Code',
           field: 'active_Shop_Code',

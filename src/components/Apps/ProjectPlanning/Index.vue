@@ -128,7 +128,7 @@
                         <v-edit-dialog :return-value.sync="props.item.status" large lazy persistent
                             @save="saveLine(props.item)" @cancel="''" @open="''" @close="''">
                             <div>
-                                <v-icon :color="typeList[props.item.type== -1 ?  5 :  props.item.type].color">
+                                <v-icon :color="getColor(props.item.type, props.item.status)">
                                     fiber_manual_record</v-icon>
                                 {{status[props.item.status].friendly }}
                             </div>
@@ -617,7 +617,6 @@
                     // }
                 })
             },
-
             getProjects(group, callback) {
                 var self = this
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -655,6 +654,9 @@
                 })
 
 
+            },
+            getColor(type, status) {
+                return StatusHandler.getColorByTypeAndStatus(type, status)
             }
         }
     }

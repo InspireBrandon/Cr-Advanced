@@ -126,9 +126,9 @@
                         <v-card-text>
                             <v-timeline dense>
                                 <v-timeline-item style="padding-bottom: 5px;" right
-                                    :color="typeList[item.type == -1 ? 5 : item.type].color"
+                                    :color="getColor(item.type, item.status)"
                                     v-for="(item,index) in timelineItems" :key="index" small>
-                                    <v-card :color="typeList[item.type == -1 ? 5 : item.type].color" dark>
+                                    <v-card :color="getColor(item.type, item.status)" dark>
                                         <v-card-title class="title pa-2 ma-0">
                                             <span>{{ status[item.status  == -1 ? 18 : item.status].text }}</span>
                                             <span v-if="item.storeCluster != null" style="margin-left: 5px;"> -
@@ -1253,6 +1253,9 @@
                         })
                     })
                 })
+            },
+            getColor(type, status) {
+                return StatusHandler.getColorByTypeAndStatus(type, status)
             }
         }
     }
