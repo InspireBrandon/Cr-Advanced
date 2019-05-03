@@ -344,7 +344,7 @@ class projectStatusHandler {
     }
 
     static returnNextStep(type, status) {
-        const tmp = {
+        const retval = {
             endProcess: false,
             type: -1,
             status: -1
@@ -358,7 +358,7 @@ class projectStatusHandler {
                 break;
             case 1:
                 {
-
+                    retval = handleDataPrep(status, retval);
                 }
                 break;
             case 2:
@@ -382,11 +382,25 @@ class projectStatusHandler {
                 }
                 break;
         }
+
+        return retval;
     }
 }
 
-function handle() {
-    
+function handleDataPrep(status, retval) {
+    switch(status) {
+        case 1: {
+            retval.status = 2;
+        }break;
+        case 2: {
+            retval.endProcess = true;
+        }break;
+        case 6: {
+            retval.status = 1;
+        }break;
+    }
+
+    return retval;
 }
 
 function returnAcumulator(status, type) {
