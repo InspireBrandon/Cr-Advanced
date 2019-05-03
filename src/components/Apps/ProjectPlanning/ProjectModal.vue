@@ -84,8 +84,8 @@
                     console.log(r);
                     r.data.projectGroupList.forEach(e => {
                         self.GroupList.push({
-                            text:  e.name,
-                            value:e.id,
+                            text: e.name,
+                            value: e.id,
                         })
                     })
 
@@ -112,26 +112,26 @@
             },
             open(isAdd, item, callback) {
                 this.$refs.form.reset()
-            
-            this.getProjectGroups()
+
+                this.getProjectGroups()
 
                 console.log(item);
                 var self = this
                 self.dialog = true
                 if (isAdd == false) {
                     self.isAdd = false
-                     self.selectedGroup=item.projectGroupID
+                    self.selectedGroup = item.projectGroupID
                     self.project = item
                     self.selectedPlanogram = item.planogram_ID,
                         self.name = item.name,
                         self.description = item.description
                 }
                 if (isAdd == true) {
-                    
-                    
+
+
                     self.selectedPlanogram = null,
                         self.isAdd = true
-                        self.selectedGroup=item.id
+                    self.selectedGroup = item.id
                     self.name = null,
                         self.description = null
                 }
@@ -147,7 +147,7 @@
                             "systemUserID": encoded_details.USER_ID,
                             "planogram_ID": self.selectedPlanogram,
                             "name": self.name,
-                            "ProjectGroupID":self.selectedGroup,
+                            "ProjectGroupID": self.selectedGroup,
                             "description": self.description,
                             "deleted": false
                         }
@@ -157,18 +157,30 @@
                         Axios.post(process.env.VUE_APP_API + 'Project', tmp).then(r => {
                             console.log("r");
                             console.log(r);
-
-                            
-                            let trans = {
-                                "project_ID": r.data.project.id,
-                                "type": -1,
-                                "status": 0,
-                                "systemUserID": encoded_details.USER_ID,
+                            let ProjectTxGroup = {
+                                projectID: r.data.project.id
                             }
-                            Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
-                                delete Axios.defaults.headers.common["TenantID"];
-                                self.dialog = false
-                                self.afterClose(r)
+                            Axios.post(process.env.VUE_APP_API + 'ProjectTXGroup', ProjectTxGroup).then(   resp => {
+                                    console.log("resp");
+                                    console.log(resp);
+
+                                    
+                                let trans = {
+                                    "project_ID": r.data.project.id,
+                                    "type": -1,
+                                    "status": 0,
+                                    "systemUserID": encoded_details.USER_ID,
+                                    "ProjectTXGroup_ID":resp.data.projectTXGroup.id
+                                }
+                                Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
+                                    delete Axios.defaults.headers.common["TenantID"];
+                                    self.dialog = false
+                                    console.log("res");
+                                    console.log(res);
+                                    
+                                    self.afterClose(r)
+                                })
+
                             })
 
 
@@ -181,7 +193,7 @@
                             "id": self.project.id,
                             "systemUserID": encoded_details.USER_ID,
                             "planogram_ID": self.selectedPlanogram,
-                            "ProjectGroupID":self.selectedGroup,
+                            "ProjectGroupID": self.selectedGroup,
                             "name": self.name,
                             "description": self.description,
                             "deleted": false
