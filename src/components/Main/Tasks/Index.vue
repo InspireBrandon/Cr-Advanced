@@ -32,14 +32,17 @@
                                             <td>{{ props.item.categoryCluster }}</td>
                                             <td>{{ props.item.store }}</td>
                                             <td>{{ props.item.dateTimeString }}</td>
-                                            <!-- DATA PREPARATION -->
                                             <td style="width: 5%;">
+                                                <!-- PROJECT START -->
+                                                <v-btn small v-if="props.item.type == 1"></v-btn>
+                                                <!-- END PROJECT START -->
+                                                <!-- DATA PREPARATION -->
                                                 <v-btn small v-if="props.item.type == 1"></v-btn>
                                                 <v-btn small v-if="props.item.type == 1"></v-btn>
                                                 <v-btn small v-if="props.item.type == 1"></v-btn>
                                                 <v-btn small v-if="props.item.type == 1"></v-btn>
+                                                <!-- END DATA PREPARATION -->
                                             </td>
-                                            <!-- END DATA PREPARATION -->
                                         </tr>
                                     </template>
                                 </v-data-table>
