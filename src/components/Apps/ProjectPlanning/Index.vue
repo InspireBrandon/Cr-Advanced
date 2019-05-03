@@ -427,7 +427,12 @@
             openGroupEdit(item) {
                 var self = this
                 self.$refs.ProjectGroupModal.open(false, item, data => {
-                    self.ProjectsGroups.push(data)
+                    self.ProjectsGroups.forEach(e=>{
+                        if (e.id==data.id){
+                            e.name=data.name
+                            e.description=data.description
+                        }
+                    })
                 })
             },
             openProjectGroupAdd(item) {
