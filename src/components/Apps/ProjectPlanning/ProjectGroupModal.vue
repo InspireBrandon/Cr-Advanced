@@ -62,12 +62,14 @@
 
             },
             open(isAdd, item, callback) {
+                console.log(item);
                 
                 let self = this
-                this.$refs.form.reset()
+               
 
                 self.dialog = true
                 if (isAdd == true) {
+                     this.$refs.form.reset()
                     self.isAdd = true
                     self.name = null
                     self.description = null
@@ -110,7 +112,9 @@
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                         Axios.put(process.env.VUE_APP_API + 'ProjectGroup', self.item).then(r => {
-                            self.afterClose(r.data.projectGroup)
+                            console.log(r);
+                            
+                            self.afterClose(self.item)
                             self.dialog = false
 
                         })
