@@ -52,20 +52,12 @@
                         <v-divider></v-divider>
                         <v-toolbar color="primary" dark dense flat
                             v-if="selectedPlanogram != null || routeProjectID != null">
-                            <v-btn
-                                v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==20||routeStatus==20)"
-                                flat outline @click="approve()">Approve</v-btn>
-                            <v-btn flat outline @click="assignTask(currentProjectTx)">Assign</v-btn>
-                            <v-btn flat outline
-                                @click="openImplementationModal(projectsStatus.status,2,timelineItems[0])">Variation
-                            </v-btn>
-                            <v-btn flat
-                                v-if="authorityType == 0||(authorityType == 3)&&(projectsStatus.status==24||routeStatus==24)"
-                                outline @click="implement(projectsStatus.status,3,timelineItems[0])">
-                                Implemented</v-btn>
-                            <!-- <v-btn flat v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==21||routeStatus==21)" outline @click="distribute(projectsStatus.status,4,timelineItems[0])">Distribute</v-btn> -->
-                            <v-btn flat outline @click="distribute(projectsStatus.status,4,timelineItems[0])">Distribute
-                            </v-btn>
+                            <v-btn v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==20||routeStatus==20)" flat outline @click="approve()">Approve</v-btn>
+                            <v-btn flat v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==20||routeStatus==20)" outline @click="openImplementationModal(projectsStatus.status,2,timelineItems[0])">Variation</v-btn>
+                            <v-btn flat v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==20||routeStatus==20)" outline @click="decline(projectsStatus.status,2,timelineItems[0])">Decline</v-btn>
+                            <v-btn v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==21||routeStatus==21)" flat outline @click="approve()">Assign</v-btn>
+                            <v-btn flat v-if="authorityType == 0||(authorityType == 3)&&(projectsStatus.status==24||routeStatus==24)" outline @click="implement(projectsStatus.status,3,timelineItems[0])">Implemented</v-btn>
+                            <v-btn flat v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==21||routeStatus==21)" outline @click="distribute(projectsStatus.status,4,timelineItems[0])">Distribute</v-btn>
                         </v-toolbar>
                     </v-flex>
                     <v-flex v-if="planogramObj != null && !showLoader" lg12 md12 sm12 xs12>
@@ -137,6 +129,7 @@
         <PlanogramReportModal ref="PlanogramReportModal"></PlanogramReportModal>
         <PlanogramIplementationModal ref="PlanogramIplementationModal"></PlanogramIplementationModal>
         <AssignTask ref="assignTask"></AssignTask>
+        <YesNoModal ref="yesNoModal"></YesNoModal>
     </v-card>
 </template>
 
@@ -148,6 +141,7 @@
     import moment from 'moment'
     import StatusHandler from '@/libs/system/projectStatusHandler'
     import AssignTask from '@/components/Common/AssignTask'
+    import YesNoModal from '@/components/Common/YesNoModal'
 
     let _MODULE = "Planogram Implementation";
 
@@ -155,7 +149,8 @@
         components: {
             PlanogramReportModal,
             PlanogramIplementationModal,
-            AssignTask
+            AssignTask,
+            YesNoModal
         },
         data: () => {
             return {
@@ -736,32 +731,36 @@
                 self.inform("PROCESSING", "Selecting appropriate process.")
 
                 switch (self.authorityType) {
-                    case 0: {
-                        // Super User
-                        self.processSuperUser()
+                    case 0:
+                        {
+                            // Super User
+                            self.processSuperUser()
                             .then(r => {
 
                             })
                             .catch(e => {
 
                             })
-                    }
-                    break;
-                case 1: {
-                    // Buyer
-                    self.processBuyer();
-                }
-                break;
-                case 2: {
-                    // Supplier
-                    self.processSupplier();
-                }
-                break;
-                case 3: {
-                    // Store
-                    self.processStore();
-                }
-                break;
+                        }
+                        break;
+                    case 1:
+                        {
+                            // Buyer
+                            self.processBuyer();
+                        }
+                        break;
+                    case 2:
+                        {
+                            // Supplier
+                            self.processSupplier();
+                        }
+                        break;
+                    case 3:
+                        {
+                            // Store
+                            self.processStore();
+                        }
+                        break;
                 }
             },
             processSuperUser() {
@@ -1098,12 +1097,14 @@
                                 }
 
                                 if (element.deleted != true) {
-                                            console.log(element.actionedByUserID);
-                                              console.log(element.systemUserID);
-                                              console.log("___________________________________________________");
-                                              
-                                            
-                                    if (element.actionedByUserID == null && element.systemUserID != null) {
+                                    console.log(element.actionedByUserID);
+                                    console.log(element.systemUserID);
+                                    console.log(
+                                        "___________________________________________________");
+
+
+                                    if (element.actionedByUserID == null && element.systemUserID !=
+                                        null) {
                                         self.timelineItems.push({
                                             status: element.status,
                                             notes: self.status[element.status].text,
@@ -1356,6 +1357,34 @@
                     })
                 })
             },
+            decline() {
+                let self = this;
+
+                self.$refs.yesNoModal.show("End current task?", response => {
+                    if(response) {
+
+                    }
+                })
+            },
+            putOnHold() {
+                let self = this;
+                let request = JSON.parse(JSON.stringify(self.tmpRequest))
+
+                let projectTXGroupRequest = {
+                    projectID: request.project_ID
+                }
+
+                // Create On Hold transaction
+                self.createProjectTransaction(request, actionedOnHold => {
+                    // Create new projectGroup
+                    self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
+                        // Create ON Hold transaction for new projectGroup
+                        self.createProjectTransaction(request, newOnHold => {
+                            self.getProjectTransactionsByProjectID(request.project_ID);
+                        })
+                    })
+                })
+            },
             createProjectTransactionGroup(request, callback) {
                 let self = this;
 
@@ -1375,7 +1404,7 @@
                     delete Axios.defaults.headers.common["TenantID"];
                     callback(r.data.projectTX)
                 })
-            },
+            }
         }
     }
 </script>

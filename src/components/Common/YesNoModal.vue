@@ -7,12 +7,15 @@
             <v-toolbar-title>
               {{ title }}
             </v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon @click.native="dialog = false">
+              <v-icon>close</v-icon>
+            </v-btn>
           </v-toolbar>
           <!-- <v-card-title style="text-align: center; display: block;" class="headline"></v-card-title> -->
           <v-card-actions style="text-align: center; display: block;">
             <v-btn color="primary darken-1" @click.native="returnValue(true)">Yes</v-btn>
             <v-btn color="error darken-1" @click.native="returnValue(false)">No</v-btn>
-            <v-btn color="error darken-1" @click.native="self.dialog = false">cancel</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
