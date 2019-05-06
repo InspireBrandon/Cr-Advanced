@@ -129,8 +129,6 @@
                                 value: e.id
                             })
                         })
-                        // self.rangeData = r.data;
-                        console.log(self.rangeData);
 
                         callback();
                     })
@@ -255,7 +253,6 @@
                 self.task = null;
                 self.afterRuturn = afterRuturn;
                 self.getData(() => {
-                    console.log(data);
                     if (data.userID != null) {
                         self.user = data.userID
                     } else {
@@ -290,7 +287,8 @@
                             systemUserID: self.user,
                             notes: self.notes,
                             rangeFileID: self.selectedRange,
-                            systemFile: self.systemFile
+                            systemFile: self.systemFile,
+                            useExisting: true
                         });
                     } else {
                         self.afterRuturn({
@@ -300,7 +298,8 @@
                             rangeFileID: self.selectedRange,
                             storeCluster: self.storeCluster,
                             categoryCluster: self.categoryCluster,
-                            store: self.store
+                            store: self.store,
+                            useExisting: false
                         });
                     }
                 }

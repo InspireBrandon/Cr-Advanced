@@ -269,6 +269,13 @@ class projectStatusHandler {
                 type: [1, 2, 3],
                 color: "yellow",
                 friendly: "New Process Assigned"
+            },
+            {
+                text: "New Process Assigned",
+                value: 41,
+                type: [3],
+                color: "yellow",
+                friendly: "New Process Assigned"
             }
         ]
 
@@ -388,16 +395,22 @@ class projectStatusHandler {
 }
 
 function handleDataPrep(status, retval) {
-    switch(status) {
-        case 1: {
-            retval.status = 2;
-        }break;
-        case 2: {
-            retval.endProcess = true;
-        }break;
-        case 6: {
-            retval.status = 1;
-        }break;
+    switch (status) {
+        case 1:
+            {
+                retval.status = 2;
+            }
+            break;
+        case 2:
+            {
+                retval.endProcess = true;
+            }
+            break;
+        case 6:
+            {
+                retval.status = 1;
+            }
+            break;
     }
 
     return retval;
@@ -610,6 +623,11 @@ function returnAcumulator(status, type) {
         case 40:
             {
                 acumulator = 0 - type;
+            }
+            break;
+        case 41:
+            {
+                acumulator = 0;
             }
             break;
     }
