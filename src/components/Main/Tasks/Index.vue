@@ -35,6 +35,8 @@
                             </v-tooltip>
                         </v-btn-toggle>
                         <v-spacer></v-spacer>
+                        <v-autocomplete @change="GetNewTransactions(selectedUser)" placeholder="users" :items="users"
+                            v-model="selectedUser"></v-autocomplete>
                     </v-toolbar>
                     <v-card-text class="pa-0">
                         <v-data-table :headers="headers" :items="filteredTasks" class="elevation-0 scrollable"
@@ -63,7 +65,8 @@
                                             v-if="props.item.type == 1 && props.item.status == 6">View</v-btn>
                                         <div style="display: flex;">
                                             <v-btn small color="warning" @click="routeToView(props.item)"
-                                                v-if="props.item.type == 1 && props.item.status == 1">View</v-btn>
+                                                v-if="props.item.type == 1 && (props.item.status == 1||props.item.status == 2)">
+                                                View</v-btn>
                                             <v-btn small color="error" @click="setComplete(props.item)"
                                                 v-if="props.item.type == 1 && props.item.status == 1">Complete</v-btn>
                                         </div>
@@ -79,7 +82,8 @@
                                             v-if="props.item.type == 2 && props.item.status == 7">View</v-btn>
                                         <div style="display: flex;">
                                             <v-btn small color="warning" @click="routeToView(props.item)"
-                                                v-if="props.item.type == 2 && props.item.status == 1">View</v-btn>
+                                                v-if="props.item.type == 2 && (props.item.status == 1||props.item.status == 2)">
+                                                View</v-btn>
                                             <v-btn small color="error" @click="setComplete(props.item)"
                                                 v-if="props.item.type == 2 && props.item.status == 1">Complete</v-btn>
                                         </div>
@@ -224,6 +228,7 @@
                 users: [],
                 filterList: [],
                 dropSearch: null,
+                selectedUser: null,
             }
         },
         created() {
@@ -231,6 +236,7 @@
 
             setTimeout(() => {
                 self.getLists(() => {
+                    this.getDatabaseUsers()
                     let encoded_details = jwt.decode(sessionStorage.accessToken);
                     let systemUserID = encoded_details.USER_ID;
                     self.systemUserID = systemUserID;
@@ -276,10 +282,31 @@
             }
         },
         methods: {
+            GetNewTransactions(userID) {
+                let self = this
+                self.getTransactionsByUser(userID, () => {})
+            },
+            getDatabaseUsers() {
+                let self = this;
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.get(process.env.VUE_APP_API + `Tenant?userID=${encoded_details.USER_ID}`)
+                    .then(r => {
+                        let tenantID = r.data[0].tenantID
+                        Axios.get(process.env.VUE_APP_API + `TenantAccess/User?tenantID=${tenantID}`)
+                            .then(res => {
+                                // self.users = res.data;
+                                res.data.forEach(e => {
+                                    self.users.push({
+                                        text: e.firstname + " " + e.lastname,
+                                        value: e.systemUserID
+                                    })
+                                })
+                            })
+                    })
+            },
             getfilterList() {
                 let self = this
-
-
                 self.filterList = []
                 self.projectTransactions.forEach(element => {
                     if (!self.filterList.includes(element.planogram_ID)) {
@@ -345,36 +372,42 @@
                     }
 
                     // Create first project transaction group
-                    request.type = taskDetails.type;
-                    request.status = 40;
-                    request.systemUserID = null;
-                    request.actionedByUserID = systemUserID;
-                    request.project_ID = currentItem.project_ID;
-                    request.storeCluster_ID = taskDetails.storeCluster;
-                    request.categoryCluster_ID = taskDetails.categoryCluster;
-                    request.store_ID = taskDetails.store;
-                    // Create first process assigned TX
-                    self.createProjectTransaction(request, firstProcessAssigned => {
-                        // Create second project transaction group
-                        self.createProjectTransactionGroup(projectTXGroupRequest,
-                            projectTXGroupNew => {
-                                // Create second process assigned TX
-                                request.systemUserID = taskDetails.systemUserID;
-                                request.actionedByUserID = null;
-                                request.projectTXGroup_ID = projectTXGroupNew.id;
-                                self.createProjectTransaction(request,
-                                    secondProcessAssigned => {
-                                        // Create actual transaction
-                                        request.status = returnStartStatusByType(
-                                            request.type);
-                                        request.notes = taskDetails.notes;
-                                        self.createProjectTransaction(request,
-                                            actualTransaction => {
-                                                self.getTransactionsByUser(
-                                                    systemUserID);
-                                            })
-                                    })
-                            })
+                    self.createProjectTransactionGroup(projectTXGroupRequest, projectTXGroupSwitch => {
+                        console.log(taskDetails.rangeFileID);
+
+                        request.type = taskDetails.type;
+                        request.status = 40;
+                        request.systemUserID = null;
+                        request.rangeFileID = taskDetails.rangeFileID;
+                        request.actionedByUserID = systemUserID;
+                        request.projectTXGroup_ID = projectTXGroupSwitch.id;
+                        request.project_ID = currentItem.project_ID;
+                        request.storeCluster_ID = taskDetails.storeCluster;
+                        request.categoryCluster_ID = taskDetails.categoryCluster;
+                        request.store_ID = taskDetails.store;
+                        // Create first process assigned TX
+                        self.createProjectTransaction(request, firstProcessAssigned => {
+                            // Create second project transaction group
+                            self.createProjectTransactionGroup(projectTXGroupRequest,
+                                projectTXGroupNew => {
+                                    // Create second process assigned TX
+                                    request.systemUserID = taskDetails.systemUserID;
+                                    request.actionedByUserID = null;
+                                    request.projectTXGroup_ID = projectTXGroupNew.id;
+                                    self.createProjectTransaction(request,
+                                        secondProcessAssigned => {
+                                            // Create actual transaction
+                                            request.status = returnStartStatusByType(
+                                                request.type);
+                                            request.notes = taskDetails.notes;
+                                            self.createProjectTransaction(request,
+                                                actualTransaction => {
+                                                    self.getTransactionsByUser(
+                                                        systemUserID);
+                                                })
+                                        })
+                                })
+                        })
                     })
                 })
             },
@@ -443,26 +476,23 @@
                 let route;
 
                 switch (item.type) {
-                    case 1:
-                        {
-                            route = `/DataPreparation`
-                        }
-                        break;
-                    case 2:
-                        {
-                            route = `/RangePlanning`
-                        }
-                        break;
-                    case 3:
-                        {
-                            if (item.status == 1 || item.status == 8) {
-                                route = `/SpacePlanning`
-                            } else {
-                                route =
-                                    `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
-                            }
-                        }
-                        break;
+                    case 1: {
+                        route = `/DataPreparation`
+                    }
+                    break;
+                case 2: {
+                    route = `/RangePlanning/${item.rangeFileID}`
+                }
+                break;
+                case 3: {
+                    if (item.status == 1 || item.status == 8) {
+                        route = `/SpacePlanning`
+                    } else {
+                        route =
+                            `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
+                    }
+                }
+                break;
                 }
 
                 self.$router.push(route);
@@ -577,21 +607,18 @@
         let retval;
 
         switch (type) {
-            case 1:
-                {
-                    retval = 6;
-                }
-                break;
-            case 2:
-                {
-                    retval = 7;
-                }
-                break;
-            case 3:
-                {
-                    retval = 8;
-                }
-                break;
+            case 1: {
+                retval = 6;
+            }
+            break;
+        case 2: {
+            retval = 7;
+        }
+        break;
+        case 3: {
+            retval = 8;
+        }
+        break;
         }
 
         return retval;

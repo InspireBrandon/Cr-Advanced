@@ -134,7 +134,7 @@ export default new Router({
           name: 'user',
           component: User,
         }, {
-          path: '/RangePlanning',
+          path: '/RangePlanning/:rangeFileID',
           name: 'range_planning',
           component: RangePlanning,
         }, {
