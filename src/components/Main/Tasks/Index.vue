@@ -131,6 +131,14 @@
                                             v-if="props.item.type == 3 && props.item.status == 24">View</v-btn>
                                         <!-- END IMPLEMENTATION -->
                                     </td>
+                                    <td style="width: 2%">
+                                        <v-tooltip bottom v-if="props.item.notes != null">
+                                            <template v-slot:activator="{ on }">
+                                                <v-icon v-on="on">note</v-icon>
+                                            </template>
+                                            <span>{{ props.item.notes }}</span>
+                                        </v-tooltip>
+                                    </td>
                                 </tr>
                             </template>
                         </v-data-table>
@@ -193,6 +201,10 @@
                     },
                     {
                         text: 'Date',
+                        sortable: false
+                    },
+                    {
+                        text: '',
                         sortable: false
                     },
                     {
@@ -266,8 +278,8 @@
         methods: {
             getfilterList() {
                 let self = this
-                
-                
+
+
                 self.filterList = []
                 self.projectTransactions.forEach(element => {
                     if (!self.filterList.includes(element.planogram_ID)) {
@@ -333,39 +345,36 @@
                     }
 
                     // Create first project transaction group
-                    self.createProjectTransactionGroup(projectTXGroupRequest, projectTXGroupSwitch => {
-                        request.type = taskDetails.type;
-                        request.status = 40;
-                        request.systemUserID = null;
-                        request.actionedByUserID = systemUserID;
-                        request.projectTXGroup_ID = projectTXGroupSwitch.id;
-                        request.project_ID = currentItem.project_ID;
-                        request.storeCluster_ID = taskDetails.storeCluster;
-                        request.categoryCluster_ID = taskDetails.categoryCluster;
-                        request.store_ID = taskDetails.store;
-                        // Create first process assigned TX
-                        self.createProjectTransaction(request, firstProcessAssigned => {
-                            // Create second project transaction group
-                            self.createProjectTransactionGroup(projectTXGroupRequest,
-                                projectTXGroupNew => {
-                                    // Create second process assigned TX
-                                    request.systemUserID = taskDetails.systemUserID;
-                                    request.actionedByUserID = null;
-                                    request.projectTXGroup_ID = projectTXGroupNew.id;
-                                    self.createProjectTransaction(request,
-                                        secondProcessAssigned => {
-                                            // Create actual transaction
-                                            request.status = returnStartStatusByType(
-                                                request.type);
-                                            request.notes = taskDetails.notes;
-                                            self.createProjectTransaction(request,
-                                                actualTransaction => {
-                                                    self.getTransactionsByUser(
-                                                        systemUserID);
-                                                })
-                                        })
-                                })
-                        })
+                    request.type = taskDetails.type;
+                    request.status = 40;
+                    request.systemUserID = null;
+                    request.actionedByUserID = systemUserID;
+                    request.project_ID = currentItem.project_ID;
+                    request.storeCluster_ID = taskDetails.storeCluster;
+                    request.categoryCluster_ID = taskDetails.categoryCluster;
+                    request.store_ID = taskDetails.store;
+                    // Create first process assigned TX
+                    self.createProjectTransaction(request, firstProcessAssigned => {
+                        // Create second project transaction group
+                        self.createProjectTransactionGroup(projectTXGroupRequest,
+                            projectTXGroupNew => {
+                                // Create second process assigned TX
+                                request.systemUserID = taskDetails.systemUserID;
+                                request.actionedByUserID = null;
+                                request.projectTXGroup_ID = projectTXGroupNew.id;
+                                self.createProjectTransaction(request,
+                                    secondProcessAssigned => {
+                                        // Create actual transaction
+                                        request.status = returnStartStatusByType(
+                                            request.type);
+                                        request.notes = taskDetails.notes;
+                                        self.createProjectTransaction(request,
+                                            actualTransaction => {
+                                                self.getTransactionsByUser(
+                                                    systemUserID);
+                                            })
+                                    })
+                            })
                     })
                 })
             },
