@@ -740,36 +740,32 @@
                 self.inform("PROCESSING", "Selecting appropriate process.")
 
                 switch (self.authorityType) {
-                    case 0:
-                        {
-                            // Super User
-                            self.processSuperUser()
+                    case 0: {
+                        // Super User
+                        self.processSuperUser()
                             .then(r => {
 
                             })
                             .catch(e => {
 
                             })
-                        }
-                        break;
-                    case 1:
-                        {
-                            // Buyer
-                            self.processBuyer();
-                        }
-                        break;
-                    case 2:
-                        {
-                            // Supplier
-                            self.processSupplier();
-                        }
-                        break;
-                    case 3:
-                        {
-                            // Store
-                            self.processStore();
-                        }
-                        break;
+                    }
+                    break;
+                case 1: {
+                    // Buyer
+                    self.processBuyer();
+                }
+                break;
+                case 2: {
+                    // Supplier
+                    self.processSupplier();
+                }
+                break;
+                case 3: {
+                    // Store
+                    self.processStore();
+                }
+                break;
                 }
             },
             processSuperUser() {
@@ -1108,25 +1104,30 @@
                                 }
 
                                 if (element.deleted != true) {
+                                            console.log(element.actionedByUserID);
+                                              console.log(element.systemUserID);
+                                              console.log("___________________________________________________");
+                                              
+                                            
+                                    if (element.actionedByUserID == null && element.systemUserID != null) {
+                                        self.timelineItems.push({
+                                            status: element.status,
+                                            notes: self.status[element.status].text,
+                                            date: element.dateTimeString,
+                                            user: element.username,
+                                            userID: element.systemUserID,
+                                            type: element.type,
+                                            storeID: element.store_ID,
+                                            store: element.store,
+                                            storeCluster_ID: element.storeCluster_ID,
+                                            storeCluster: element.storeCluster,
+                                            categoryCluster_ID: element.categoryCluster_ID,
+                                            actionedByUserID: element.actionedByUserID,
+                                            projectOwnerID: element.projectOwnerID,
+                                            systemFileID: element.systemFileID
 
-                                    self.timelineItems.push({
-                                        status: element.status,
-                                        notes: self.status[element.status].text,
-                                        date: element.dateTimeString,
-                                        user: element.username,
-                                        userID: element.systemUserID,
-                                        type: element.type,
-                                        storeID: element.store_ID,
-                                        store: element.store,
-                                        storeCluster_ID: element.storeCluster_ID,
-                                        storeCluster: element.storeCluster,
-                                        categoryCluster_ID: element.categoryCluster_ID,
-                                        actionedByUserID: element.actionedByUserID,
-                                        projectOwnerID: element.projectOwnerID,
-                                        systemFileID: element.systemFileID
-
-                                    })
-
+                                        })
+                                    }
                                     if (element.type == 3 && element.status != 13) {
                                         self.tmpItems.push({
                                             status: element.status,
