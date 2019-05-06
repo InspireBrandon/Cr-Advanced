@@ -5,7 +5,8 @@
                 <v-card flat>
                     <v-toolbar flat dark dense color="primary">
                         <!-- <v-text-field prepend-inner-icon="search" placeholder="Search" dark></v-text-field> -->
-                        <v-autocomplete prepend-inner-icon="search" placeholder="Search" :items="filterList" v-model="dropSearch"></v-autocomplete>
+                        <v-autocomplete prepend-inner-icon="search" placeholder="Search" :items="filterList"
+                            v-model="dropSearch"></v-autocomplete>
                         <v-btn-toggle v-model="searchType" class="transparent" multiple>
                             <!-- <v-btn :value="0" flat>
                                 <v-icon>today</v-icon>
@@ -25,7 +26,6 @@
                             </v-btn> -->
                         </v-btn-toggle>
                         <v-spacer></v-spacer>
-                        {{searchType}}
                     </v-toolbar>
                     <v-card-text class="pa-0">
                         <v-data-table :headers="headers" :items="filteredTasks" class="elevation-0 scrollable"
@@ -105,14 +105,22 @@
                                         <v-btn small color="error" @click="closeTask(props.item)"
                                             v-if="(props.item.type == 3 && props.item.status == 12) && systemUserID == props.item.actionedByUserID">
                                             Close</v-btn>
-                                        <v-btn small color="primary" @click="routeToView(props.item)"
+                                        <v-btn small color="primary" @click="submitForDistribution(props.item)"
                                             v-if="(props.item.type == 3 && props.item.status == 12) && systemUserID == props.item.systemUserID">
                                             Send</v-btn>
                                         <!-- END APPROVAL PROCESS -->
                                         <!-- DISTRIBUTION -->
                                         <v-btn small color="success" @click="setDistributionInProgress(props.item)"
-                                            v-if="props.item.type == 3 && props.item.status == 10">View</v-btn>
+                                            v-if="props.item.type == 3 && props.item.status == 19">View</v-btn>
+                                        <v-btn small color="warning" @click="routeToView(props.item)"
+                                            v-if="props.item.type == 3 && props.item.status == 21">View</v-btn>
                                         <!-- END DISTRIBUTION -->
+                                        <!-- IMPLEMENTATION -->
+                                        <v-btn small color="success" @click="setImplementationInProgress(props.item)"
+                                            v-if="props.item.type == 3 && props.item.status == 13">View</v-btn>
+                                        <v-btn small color="warning" @click="routeToView(props.item)"
+                                            v-if="props.item.type == 3 && props.item.status == 24">View</v-btn>
+                                        <!-- END IMPLEMENTATION -->
                                     </td>
                                 </tr>
                             </template>
@@ -193,19 +201,21 @@
                 systemUserID: null,
                 selectedUser: null,
                 users: [],
-                filterList:[],
-                dropSearch:null,
+                filterList: [],
+                dropSearch: null,
             }
         },
         created() {
             let self = this;
 
-            self.getLists(() => {
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
-                let systemUserID = encoded_details.USER_ID;
-                self.systemUserID = systemUserID;
-                self.getTransactionsByUser(systemUserID, () => {})
-            })
+            setTimeout(() => {
+                self.getLists(() => {
+                    let encoded_details = jwt.decode(sessionStorage.accessToken);
+                    let systemUserID = encoded_details.USER_ID;
+                    self.systemUserID = systemUserID;
+                    self.getTransactionsByUser(systemUserID, () => {})
+                })
+            }, 1000);
         },
         computed: {
             filteredTasks(type) {
@@ -220,32 +230,29 @@
                 } else {
                     return this.projectTransactions
                 }
-                if (this.dropSearch!=null) {
+                if (this.dropSearch != null) {
                     let tmp2 = this.filteredTasks.filter((tx) => {
                         if (this.dropSearch == tx.planogram_ID) {
                             return tx
                         }
                         return
                     })
-                    
+
                 }
             }
-            
-
-
         },
         methods: {
-            getfilterList(){
-               let self = this
-               self.filterList=[]
-               self.projectTransactions.forEach(element => {
-                   if (!self.filterList.includes(element.planogram_ID)) {
-                         self.filterList.push({
-                           value:element.planogram_ID,
-                           text:element.planogram,
-                       })
-                   }
-               });
+            getfilterList() {
+                let self = this
+                self.filterList = []
+                self.projectTransactions.forEach(element => {
+                    if (!self.filterList.includes(element.planogram_ID)) {
+                        self.filterList.push({
+                            value: element.planogram_ID,
+                            text: element.planogram,
+                        })
+                    }
+                });
             },
             getLists(callback) {
                 let self = this
@@ -262,7 +269,7 @@
                 Axios.get(process.env.VUE_APP_API + `UserProjectTX?userID=${systemUserID}`).then(r => {
                         self.projectTransactions = r.data.projectTXList;
                         delete Axios.defaults.headers.common["TenantID"];
-                    self.getfilterList()
+                        self.getfilterList()
                         callback();
                     })
                     .catch(e => {
@@ -340,6 +347,18 @@
             },
             closeTask(item, index) {
                 let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                let trans = JSON.parse(JSON.stringify(item));
+                trans.removed = true;
+
+                Axios.put(process.env.VUE_APP_API + 'ProjectTX?update=false', trans).then(
+                    res => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        self.projectTransactions.splice(index, 1);
+                    })
+
                 self.projectTransactions.splice(index, 1);
             },
             setInProgressAndView(item) {
@@ -364,11 +383,22 @@
                     self.routeToView(newItem)
                 })
             },
-            setDistributionInProgress() {
+            setDistributionInProgress(item) {
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(item))
                 request.status = 21;
+                request.notes = null;
+
+                self.createProjectTransaction(request, newItem => {
+                    self.routeToView(newItem)
+                })
+            },
+            setImplementationInProgress(item) {
+                let self = this;
+
+                let request = JSON.parse(JSON.stringify(item))
+                request.status = 24;
                 request.notes = null;
 
                 self.createProjectTransaction(request, newItem => {
@@ -380,23 +410,26 @@
                 let route;
 
                 switch (item.type) {
-                    case 1: {
-                        route = `/DataPreparation`
-                    }
-                    break;
-                case 2: {
-                    route = `/RangePlanning`
-                }
-                break;
-                case 3: {
-                    if (item.status == 1 || item.status == 8) {
-                        route = `/SpacePlanning`
-                    } else {
-                        route =
-                            `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
-                    }
-                }
-                break;
+                    case 1:
+                        {
+                            route = `/DataPreparation`
+                        }
+                        break;
+                    case 2:
+                        {
+                            route = `/RangePlanning`
+                        }
+                        break;
+                    case 3:
+                        {
+                            if (item.status == 1 || item.status == 8) {
+                                route = `/SpacePlanning`
+                            } else {
+                                route =
+                                    `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
+                            }
+                        }
+                        break;
                 }
 
                 self.$router.push(route);
@@ -468,6 +501,41 @@
                         })
                     })
                 })
+            },
+            submitForDistribution(item) {
+                let self = this;
+
+                self.$refs.UserNotesModal.show(modalData => {
+                    let request = JSON.parse(JSON.stringify(item));
+
+                    let projectTXGroupRequest = {
+                        projectID: item.project_ID
+                    }
+
+                    request.status = 40;
+                    request.systemUserID = null;
+                    request.actionedByUserID = self.systemUserID;
+                    // Create New Process Assigned for complete group
+                    self.createProjectTransaction(request, processEndProjectTX => {
+                        // Create "New Group"
+                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroupTX => {
+                            // Create New Process Assigned for "New Group"
+                            request.systemUserID = modalData.systemUserID;
+                            request.actionedByUserID = null;
+                            request.projectTXGroup_ID = newGroupTX.id;
+                            self.createProjectTransaction(request, processStartProjectTX => {
+                                // Create Requesting Approval process for "New Group"
+                                request.status = 19;
+                                request.notes = modalData.notes;
+                                self.createProjectTransaction(request,
+                                    approvalTransaction => {
+                                        self.getTransactionsByUser(self
+                                            .systemUserID);
+                                    })
+                            })
+                        })
+                    })
+                })
             }
         }
     }
@@ -476,18 +544,21 @@
         let retval;
 
         switch (type) {
-            case 1: {
-                retval = 6;
-            }
-            break;
-        case 2: {
-            retval = 7;
-        }
-        break;
-        case 3: {
-            retval = 8;
-        }
-        break;
+            case 1:
+                {
+                    retval = 6;
+                }
+                break;
+            case 2:
+                {
+                    retval = 7;
+                }
+                break;
+            case 3:
+                {
+                    retval = 8;
+                }
+                break;
         }
 
         return retval;
