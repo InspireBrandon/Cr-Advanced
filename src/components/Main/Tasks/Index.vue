@@ -65,7 +65,7 @@
                                             v-if="props.item.type == 1 && props.item.status == 6">View</v-btn>
                                         <div style="display: flex;">
                                             <v-btn small color="warning" @click="routeToView(props.item)"
-                                                v-if="props.item.type == 1 && (props.item.status == 1||props.item.status == 2)">
+                                                v-if="props.item.type == 1 && (props.item.status == 1) && systemUserID == props.item.systemUserID">
                                                 View</v-btn>
                                             <v-btn small color="error" @click="setComplete(props.item)"
                                                 v-if="props.item.type == 1 && props.item.status == 1">Complete</v-btn>
@@ -73,16 +73,21 @@
                                         <v-btn small color="error" @click="closeTask(props.item, props.index)"
                                             v-if="(props.item.type == 1 && props.item.status == 2) && systemUserID == props.item.actionedByUserID">
                                             Close</v-btn>
-                                        <v-btn small color="secondary" @click="assign(props.item)"
-                                            v-if="(props.item.type == 1 && props.item.status == 2) && systemUserID == props.item.systemUserID">
-                                            Assign</v-btn>
+                                        <div style="display: flex;">
+                                            <v-btn small color="warning" @click="routeToView(props.item)"
+                                                v-if="(props.item.type == 1 && props.item.status == 2) && systemUserID == props.item.systemUserID">
+                                                View</v-btn>
+                                            <v-btn small color="secondary" @click="assign(props.item)"
+                                                v-if="(props.item.type == 1 && props.item.status == 2) && systemUserID == props.item.systemUserID">
+                                                Assign</v-btn>
+                                        </div>
                                         <!-- END DATA PREPARATION -->
                                         <!-- RANGING -->
                                         <v-btn small color="success" @click="setInProgressAndView(props.item)"
                                             v-if="props.item.type == 2 && props.item.status == 7">View</v-btn>
                                         <div style="display: flex;">
                                             <v-btn small color="warning" @click="routeToView(props.item)"
-                                                v-if="props.item.type == 2 && (props.item.status == 1||props.item.status == 2)">
+                                                v-if="props.item.type == 2 && (props.item.status == 1) && systemUserID == props.item.systemUserID">
                                                 View</v-btn>
                                             <v-btn small color="error" @click="setComplete(props.item)"
                                                 v-if="props.item.type == 2 && props.item.status == 1">Complete</v-btn>
@@ -90,9 +95,14 @@
                                         <v-btn small color="error" @click="closeTask(props.item, props.index)"
                                             v-if="(props.item.type == 2 && props.item.status == 2) && systemUserID == props.item.actionedByUserID">
                                             Close</v-btn>
-                                        <v-btn small color="secondary" @click="assign(props.item)"
-                                            v-if="(props.item.type == 2 && props.item.status == 2) && systemUserID == props.item.systemUserID">
-                                            Assign</v-btn>
+                                        <div style="display: flex;">
+                                            <v-btn small color="secondary" @click="assign(props.item)"
+                                                v-if="(props.item.type == 2 && props.item.status == 2) && systemUserID == props.item.systemUserID">
+                                                Assign</v-btn>
+                                            <v-btn small color="warning" @click="routeToView(props.item)"
+                                                v-if="(props.item.type == 2 && props.item.status == 2) && systemUserID == props.item.systemUserID">
+                                                View</v-btn>
+                                        </div>
                                         <!-- END RANGING -->
                                         <!-- SPACE PLANNING -->
                                         <v-btn small color="success" @click="setInProgressAndView(props.item)"
@@ -103,12 +113,17 @@
                                             <v-btn small color="error" @click="setPlanogramComplete(props.item)"
                                                 v-if="props.item.type == 3 && props.item.status == 1">Complete</v-btn>
                                         </div>
-                                        <v-btn small color="error" @click="closeTask(props.item, props.index)"
-                                            v-if="(props.item.type == 3 && props.item.status == 2) && systemUserID == props.item.actionedByUserID">
-                                            Close</v-btn>
-                                        <v-btn small color="primary" @click="submitForApproval(props.item)"
-                                            v-if="(props.item.type == 3 && props.item.status == 2) && systemUserID == props.item.systemUserID">
-                                            Submit</v-btn>
+                                        <div style="display: flex;">
+                                            <v-btn small color="error" @click="closeTask(props.item, props.index)"
+                                                v-if="(props.item.type == 3 && props.item.status == 2) && systemUserID == props.item.actionedByUserID">
+                                                Close</v-btn>
+                                            <v-btn small color="primary" @click="routeToView(props.item)"
+                                                v-if="(props.item.type == 3 && props.item.status == 2) && systemUserID == props.item.systemUserID">
+                                                View</v-btn>
+                                            <v-btn small color="primary" @click="submitForApproval(props.item)"
+                                                v-if="(props.item.type == 3 && props.item.status == 2) && systemUserID == props.item.systemUserID">
+                                                Submit</v-btn>
+                                        </div>
                                         <!-- SPACE PLANNING -->
                                         <!-- APPROVAL PROCESS -->
                                         <v-btn small color="success" @click="setApprovalInProgress(props.item)"
@@ -134,6 +149,44 @@
                                         <v-btn small color="warning" @click="routeToView(props.item)"
                                             v-if="props.item.type == 3 && props.item.status == 24">View</v-btn>
                                         <!-- END IMPLEMENTATION -->
+                                        <!-- ON HOLD -->
+                                        <v-btn small color="secondary" @click="assign(props.item)"
+                                            v-if="props.item.status == 16 && systemUserID == props.item.systemUserID">
+                                            Assign</v-btn>
+                                        <v-btn small color="error" @click="closeTask(props.item)"
+                                            v-if="props.item.status == 16 && systemUserID == props.item.actionedByUserID">
+                                            Close</v-btn>
+                                        <!-- END ON HOLD -->
+                                        <!-- VARIATION REQUEST -->
+                                        <v-btn small color="secondary" @click="assign(props.item)" v-if="props.item.status == 14 && systemUserID == props.item.systemUserID">Assign</v-btn>
+                                        <!-- END VARIATION REQUEST -->
+                                    </td>
+                                    <td style="width: 2%">
+                                        <v-tooltip bottom v-if="props.item.notes != null">
+                                            <template v-slot:activator="{ on }">
+                                                <v-icon v-on="on">note</v-icon>
+                                            </template>
+                                            <span>{{ props.item.notes }}</span>
+                                        </v-tooltip>
+                                    </td>
+                                    <td style="width: 2%">
+                                        <v-menu left>
+                                            <v-btn icon slot="activator">
+                                                <v-icon>more_vert</v-icon>
+                                            </v-btn>
+                                            <v-list dense class="pa-0 ma-0">
+
+                                                <v-list-tile @click="assign(props.item)">
+                                                    <span>Assign</span>
+                                                </v-list-tile>
+
+                                                <v-divider></v-divider>
+
+                                                <v-list-tile @click="putTaskOnHold(props.item)">
+                                                    <span>Put On Hold</span>
+                                                </v-list-tile>
+                                            </v-list>
+                                        </v-menu>
                                     </td>
                                 </tr>
                             </template>
@@ -147,6 +200,7 @@
         <SubtaskModal ref="SubtaskModal" />
         <SpacePlanSelector ref="SpacePlanSelector"></SpacePlanSelector>
         <UserNotesModal ref="UserNotesModal"></UserNotesModal>
+        <NotesModal ref="NotesModal"></NotesModal>
     </v-container>
 </template>
 
@@ -159,6 +213,7 @@
     import SubtaskModal from './Subtask.vue'
     import SpacePlanSelector from '@/components/Common/SpacePlanSelector.vue'
     import UserNotesModal from '@/components/Common/UserNotesModal.vue'
+    import NotesModal from '@/components/Common/NotesModal.vue'
 
     export default {
         name: 'tasks',
@@ -167,7 +222,8 @@
             AssignTask,
             SubtaskModal,
             SpacePlanSelector,
-            UserNotesModal
+            UserNotesModal,
+            NotesModal
         },
         data() {
             return {
@@ -197,6 +253,14 @@
                     },
                     {
                         text: 'Date',
+                        sortable: false
+                    },
+                    {
+                        text: '',
+                        sortable: false
+                    },
+                    {
+                        text: '',
                         sortable: false
                     },
                     {
@@ -359,43 +423,37 @@
                         projectID: currentItem.project_ID
                     }
 
-                    // Create first project transaction group
-                    self.createProjectTransactionGroup(projectTXGroupRequest, projectTXGroupSwitch => {
-                        console.log(taskDetails.rangeFileID);
-
-                        request.type = taskDetails.type;
-                        request.status = 40;
-                        request.systemUserID = null;
-                        request.rangeFileID = taskDetails.rangeFileID;
-                        request.actionedByUserID = systemUserID;
-                        request.projectTXGroup_ID = projectTXGroupSwitch.id;
-                        request.project_ID = currentItem.project_ID;
-                        request.storeCluster_ID = taskDetails.storeCluster;
-                        request.categoryCluster_ID = taskDetails.categoryCluster;
-                        request.store_ID = taskDetails.store;
-                        // Create first process assigned TX
-                        self.createProjectTransaction(request, firstProcessAssigned => {
-                            // Create second project transaction group
-                            self.createProjectTransactionGroup(projectTXGroupRequest,
-                                projectTXGroupNew => {
-                                    // Create second process assigned TX
-                                    request.systemUserID = taskDetails.systemUserID;
-                                    request.actionedByUserID = null;
-                                    request.projectTXGroup_ID = projectTXGroupNew.id;
-                                    self.createProjectTransaction(request,
-                                        secondProcessAssigned => {
-                                            // Create actual transaction
-                                            request.status = returnStartStatusByType(
-                                                request.type);
-                                            request.notes = taskDetails.notes;
-                                            self.createProjectTransaction(request,
-                                                actualTransaction => {
-                                                    self.getTransactionsByUser(
-                                                        systemUserID);
-                                                })
-                                        })
-                                })
-                        })
+                    request.type = taskDetails.type;
+                    request.status = 40;
+                    request.systemUserID = null;
+                    request.rangeFileID = taskDetails.rangeFileID;
+                    request.actionedByUserID = systemUserID;
+                    request.project_ID = currentItem.project_ID;
+                    request.storeCluster_ID = taskDetails.storeCluster;
+                    request.categoryCluster_ID = taskDetails.categoryCluster;
+                    request.store_ID = taskDetails.store;
+                    // Create first process assigned TX
+                    self.createProjectTransaction(request, firstProcessAssigned => {
+                        // Create second project transaction group
+                        self.createProjectTransactionGroup(projectTXGroupRequest,
+                            projectTXGroupNew => {
+                                // Create second process assigned TX
+                                request.systemUserID = taskDetails.systemUserID;
+                                request.actionedByUserID = null;
+                                request.projectTXGroup_ID = projectTXGroupNew.id;
+                                request.notes = taskDetails.notes;
+                                self.createProjectTransaction(request,
+                                    secondProcessAssigned => {
+                                        // Create actual transaction
+                                        request.status = returnStartStatusByType(
+                                            request.type);
+                                        self.createProjectTransaction(request,
+                                            actualTransaction => {
+                                                self.getTransactionsByUser(
+                                                    systemUserID);
+                                            })
+                                    })
+                            })
                     })
                 })
             },
@@ -410,7 +468,7 @@
                 Axios.put(process.env.VUE_APP_API + 'ProjectTX?update=false', trans).then(
                     res => {
                         delete Axios.defaults.headers.common["TenantID"];
-                        self.projectTransactions.splice(index, 1);
+                        self.getTransactionsByUser(systemUserID);
                     })
 
                 self.projectTransactions.splice(index, 1);
@@ -464,23 +522,26 @@
                 let route;
 
                 switch (item.type) {
-                    case 1: {
-                        route = `/DataPreparation`
-                    }
-                    break;
-                case 2: {
-                    route = `/RangePlanning/${item.rangeFileID}`
-                }
-                break;
-                case 3: {
-                    if (item.status == 1 || item.status == 8) {
-                        route = `/SpacePlanning`
-                    } else {
-                        route =
-                            `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
-                    }
-                }
-                break;
+                    case 1:
+                        {
+                            route = `/DataPreparation`
+                        }
+                        break;
+                    case 2:
+                        {
+                            route = `/RangePlanning/${item.rangeFileID}`
+                        }
+                        break;
+                    case 3:
+                        {
+                            if (item.status == 1 || item.status == 8) {
+                                route = `/SpacePlanning`
+                            } else {
+                                route =
+                                    `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
+                            }
+                        }
+                        break;
                 }
 
                 self.$router.push(route);
@@ -587,6 +648,36 @@
                         })
                     })
                 })
+            },
+            putTaskOnHold(item) {
+                let self = this;
+
+                let request = JSON.parse(JSON.stringify(item));
+
+                let projectTXGroupRequest = {
+                    projectID: item.project_ID
+                }
+
+                self.$refs.NotesModal.show("Why are you putting this task on hold?", notes => {
+                    request.status = 16;
+                    request.systemUserID = null;
+                    request.actionedByUserID = self.systemUserID;
+                    // Create on hold transaction
+                    self.createProjectTransaction(request, processEndProjectTX => {
+                        // Create "New Group"
+                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroupTX => {
+                            // Create on hold transaction for "New Group"
+                            request.systemUserID = request.projectOwnerID;
+                            request.actionedByUserID = null;
+                            request.projectTXGroup_ID = newGroupTX.id;
+                            request.notes = notes;
+                            self.createProjectTransaction(request, processStartProjectTX => {
+                                // Create Requesting Approval process for "New Group
+                                self.getTransactionsByUser(self.systemUserID);
+                            })
+                        })
+                    })
+                })
             }
         }
     }
@@ -595,18 +686,21 @@
         let retval;
 
         switch (type) {
-            case 1: {
-                retval = 6;
-            }
-            break;
-        case 2: {
-            retval = 7;
-        }
-        break;
-        case 3: {
-            retval = 8;
-        }
-        break;
+            case 1:
+                {
+                    retval = 6;
+                }
+                break;
+            case 2:
+                {
+                    retval = 7;
+                }
+                break;
+            case 3:
+                {
+                    retval = 8;
+                }
+                break;
         }
 
         return retval;
