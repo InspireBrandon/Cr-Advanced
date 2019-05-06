@@ -5,27 +5,36 @@
                 <v-card flat>
                     <v-toolbar flat dark dense color="primary">
                         <!-- <v-text-field prepend-inner-icon="search" placeholder="Search" dark></v-text-field> -->
-                        <v-autocomplete prepend-inner-icon="search" placeholder="Search" :items="filterList" v-model="dropSearch"></v-autocomplete>
+                        <v-autocomplete prepend-inner-icon="search" placeholder="Search" :items="filterList"
+                            v-model="dropSearch"></v-autocomplete>
                         <v-btn-toggle v-model="searchType" class="transparent" multiple>
-                            <!-- <v-btn :value="0" flat>
-                                <v-icon>today</v-icon>
-                            </v-btn> -->
-                            <v-btn :value="1" flat>
-                                <v-icon>
-                                    perm_data_setting</v-icon>
-                            </v-btn>
-                            <v-btn :value="2" flat>
-                                <v-icon>assessment</v-icon>
-                            </v-btn>
-                            <v-btn :value="3" flat>
-                                <v-icon>web</v-icon>
-                            </v-btn>
-                            <!-- <v-btn :value="4" flat>
-                                <v-icon>business</v-icon>
-                            </v-btn> -->
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-btn v-on="on" :value="1" flat>
+                                        <v-icon>
+                                            perm_data_setting</v-icon>
+                                    </v-btn>
+                                </template>
+                                <span>Data-Prep</span>
+                            </v-tooltip>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-btn v-on="on" :value="2" flat>
+                                        <v-icon>assessment</v-icon>
+                                    </v-btn>
+                                </template>
+                                <span>Ranging</span>
+                            </v-tooltip>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-btn v-on="on" :value="3" flat>
+                                        <v-icon>web</v-icon>
+                                    </v-btn>
+                                </template>
+                                <span>Planogram</span>
+                            </v-tooltip>
                         </v-btn-toggle>
                         <v-spacer></v-spacer>
-                        {{searchType}}
                     </v-toolbar>
                     <v-card-text class="pa-0">
                         <v-data-table :headers="headers" :items="filteredTasks" class="elevation-0 scrollable"
@@ -193,8 +202,8 @@
                 systemUserID: null,
                 selectedUser: null,
                 users: [],
-                filterList:[],
-                dropSearch:null,
+                filterList: [],
+                dropSearch: null,
             }
         },
         created() {
@@ -208,7 +217,18 @@
             })
         },
         computed: {
-            filteredTasks(type) {
+            filteredTasks() {
+                // filter for both buttons and field
+                if (this.searchType.length > 0 && this.dropSearch != null) {
+                    let tmp = this.projectTransactions.filter((tx) => {
+                        if (this.searchType.includes(tx.type) && this.dropSearch == tx.planogram_ID) {
+                            return tx
+                        }
+                        return
+                    })
+                    return tmp;
+                }
+                // search for buttons only                   
                 if (this.searchType.length > 0) {
                     let tmp = this.projectTransactions.filter((tx) => {
                         if (this.searchType.includes(tx.type)) {
@@ -216,36 +236,35 @@
                         }
                         return
                     })
-                    return filteredTasks;
-                } else {
-                    return this.projectTransactions
+                    return tmp;
                 }
-                if (this.dropSearch!=null) {
-                    let tmp2 = this.filteredTasks.filter((tx) => {
+                //search for only field
+                if (this.dropSearch != null) {
+                    let tmp = this.projectTransactions.filter((tx) => {
                         if (this.dropSearch == tx.planogram_ID) {
                             return tx
                         }
                         return
                     })
-                    
+                    return tmp;
+                }
+                if (this.searchType.length == 0 && this.dropSearch == null) {
+                    return this.projectTransactions
                 }
             }
-            
-
-
         },
         methods: {
-            getfilterList(){
-               let self = this
-               self.filterList=[]
-               self.projectTransactions.forEach(element => {
-                   if (!self.filterList.includes(element.planogram_ID)) {
-                         self.filterList.push({
-                           value:element.planogram_ID,
-                           text:element.planogram,
-                       })
-                   }
-               });
+            getfilterList() {
+                let self = this
+                self.filterList = []
+                self.projectTransactions.forEach(element => {
+                    if (!self.filterList.includes(element.planogram_ID)) {
+                        self.filterList.push({
+                            value: element.planogram_ID,
+                            text: element.planogram,
+                        })
+                    }
+                });
             },
             getLists(callback) {
                 let self = this
@@ -262,7 +281,7 @@
                 Axios.get(process.env.VUE_APP_API + `UserProjectTX?userID=${systemUserID}`).then(r => {
                         self.projectTransactions = r.data.projectTXList;
                         delete Axios.defaults.headers.common["TenantID"];
-                    self.getfilterList()
+                        self.getfilterList()
                         callback();
                     })
                     .catch(e => {
