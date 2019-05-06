@@ -60,9 +60,9 @@
                                 outline @click="requestVariation">
                                 Variation</v-btn>
                             <!-- <v-btn flat v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==20||routeStatus==20)" outline @click="decline(projectsStatus.status,2,timelineItems[0])">Decline</v-btn> -->
-                            <v-btn
+                            <!-- <v-btn
                                 v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==21||routeStatus==21)"
-                                flat outline @click="approve()">Assign</v-btn>
+                                flat outline @click="approve()">Assign</v-btn> -->
                             <v-btn flat
                                 v-if="authorityType == 0||(authorityType == 3)&&(projectsStatus.status==24||routeStatus==24)"
                                 outline @click="implement(projectsStatus.status,3,timelineItems[0])">Implemented</v-btn>
@@ -1324,25 +1324,23 @@
                 // Select a store
                 self.$refs.PlanogramIplementationModal.show("Distribute Planogram?", 4, null, null, null, data => {
                     request.status = 40;
-                    request.actionedByUserID = systemUserID;
+                    request.actionedByUserID = data.users;
                     request.systemUserID = null;
                     // Create new process assigned
-                    self.createProjectTransaction(request, endProcessTx => {
-                        // Create new process group
-                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
-                            // Create new process assigned against new group
-                            request.actionedByUserID = null;
-                            request.systemUserID = data.users;
-                            request.projectTXGroup_ID = newGroup.id;
-                            self.createProjectTransaction(request, processAssigned => {
-                                request.status = 13;
-                                request.notes = data.notes;
-                                self.createProjectTransaction(request,
-                                    implementationPendingResponse => {
-                                        self.getProjectTransactionsByProjectID(
-                                            request.project_ID);
-                                    })
-                            })
+                    // Create new process group
+                    self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
+                        // Create new process assigned against new group
+                        request.actionedByUserID = null;
+                        request.systemUserID = data.users;
+                        request.projectTXGroup_ID = newGroup.id;
+                        self.createProjectTransaction(request, processAssigned => {
+                            request.status = 13;
+                            request.notes = data.notes;
+                            self.createProjectTransaction(request,
+                                implementationPendingResponse => {
+                                    self.getProjectTransactionsByProjectID(
+                                        request.project_ID);
+                                })
                         })
                     })
                 })
@@ -1431,7 +1429,7 @@
 
                 let request = JSON.parse(JSON.stringify(self.tmpRequest))
 
-                                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
 
                 let projectTXGroupRequest = {
@@ -1452,7 +1450,8 @@
                         self.createProjectTransaction(request, newOnHold => {
                             request.status = 14;
                             self.createProjectTransaction(request, variantRequest => {
-                                self.getProjectTransactionsByProjectID(request.project_ID);
+                                self.getProjectTransactionsByProjectID(request
+                                    .project_ID);
                             })
                         })
                     })
