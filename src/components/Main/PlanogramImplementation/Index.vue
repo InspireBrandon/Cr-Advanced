@@ -80,9 +80,7 @@
                         <v-toolbar color="primary" dark dense flat
                             v-if="selectedPlanogram != null || routeProjectID != null">
                             <v-btn
-                                v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==20||routeStatus==20)"
-                                flat outline @click="openImplementationModal(projectsStatus.status,0)">Approve
-                            </v-btn>
+                                v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==20||routeStatus==20)" flat outline @click="approve()">Approve</v-btn>
                             <v-btn flat outline @click="assignTask(currentProjectTx)">Assign</v-btn>
                             <v-btn flat outline
                                 @click="openImplementationModal(projectsStatus.status,2,timelineItems[0])">Variation
@@ -216,7 +214,8 @@
                 currentProjectTx: null,
                 routeProjectID: null,
                 routePlanogramID: null,
-                routeStatus: null
+                routeStatus: null,
+                tmpRequest: null
             }
         },
         mounted() {
@@ -292,7 +291,6 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
-
                 let storeCluster = self.timelineItems[0].storeCluster;
                 let storeID = self.timelineItems[0].store_ID;
 
@@ -325,7 +323,8 @@
                                             projectID: self.selectedProject
                                         }
                                         console.log("hree");
- Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                                        Axios.defaults.headers.common["TenantID"] = sessionStorage
+                                            .currentDatabase;
                                         Axios.post(process.env.VUE_APP_API + 'ProjectTXGroup', ProjectTxGroup)
                                             .then(resp => {
                                                 console.log("resp");
@@ -352,7 +351,8 @@
                                                     "systemFileID": self.routePlanogramID,
                                                     "ProjectTXGroup_ID": resp.data.projectTXGroup.id
                                                 }
-                                                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                                                Axios.defaults.headers.common["TenantID"] = sessionStorage
+                                                    .currentDatabase;
                                                 Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans2)
                                                     .then(res => {
                                                         delete Axios.defaults.headers.common[
@@ -769,32 +769,36 @@
                 self.inform("PROCESSING", "Selecting appropriate process.")
 
                 switch (self.authorityType) {
-                    case 0: {
-                        // Super User
-                        self.processSuperUser()
+                    case 0:
+                        {
+                            // Super User
+                            self.processSuperUser()
                             .then(r => {
 
                             })
                             .catch(e => {
 
                             })
-                    }
-                    break;
-                case 1: {
-                    // Buyer
-                    self.processBuyer();
-                }
-                break;
-                case 2: {
-                    // Supplier
-                    self.processSupplier();
-                }
-                break;
-                case 3: {
-                    // Store
-                    self.processStore();
-                }
-                break;
+                        }
+                        break;
+                    case 1:
+                        {
+                            // Buyer
+                            self.processBuyer();
+                        }
+                        break;
+                    case 2:
+                        {
+                            // Supplier
+                            self.processSupplier();
+                        }
+                        break;
+                    case 3:
+                        {
+                            // Store
+                            self.processStore();
+                        }
+                        break;
                 }
             },
             processSuperUser() {
@@ -1119,12 +1123,17 @@
 
                             self.timelineItems = [];
                             self.tmpItems = [];
+                            self.items = r.data.projectTXList;
 
                             r.data.projectTXList.forEach((element, idx) => {
 
                                 if (idx == 0) {
                                     self.currentStatus = element.status;
                                     self.currentProjectTx = element
+                                }
+
+                                if (element.type == 3 && element.status == 20) {
+                                    self.tmpRequest = element;
                                 }
 
                                 if (element.deleted != true) {
@@ -1299,7 +1308,57 @@
             },
             getColor(type, status) {
                 return StatusHandler.getColorByTypeAndStatus(type, status)
-            }
+            },
+            approve() {
+                let self = this;
+
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+
+                let request = JSON.parse(JSON.stringify(self.tmpRequest))
+
+                let projectTXGroupRequest = {
+                    projectID: request.project_ID
+                }
+
+                request.status = 12;
+                request.actionedByUserID = systemUserID;
+                request.systemUserID = null;
+
+                // Create Approved Project Transaction
+                self.createProjectTransaction(request, newTransaction => {
+                    // Create New Group Project Transaction
+                    self.createProjectTransactionGroup(projectTXGroupRequest, newProjectGroup => {
+                        // Create Approved Project Transaction For New Group
+                        request.actionedByUserID = null;
+                        request.systemUserID = request.projectOwnerID;
+                        request.projectTXGroup_ID = newProjectGroup.id;
+                        self.createProjectTransaction(request, latestTransaction => {
+                            self.getProjectTransactionsByProjectID(request.project_ID);
+                        })
+                    })
+                })
+            },
+            createProjectTransactionGroup(request, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `ProjectTXGroup`, request).then(r => {
+                    delete Axios.defaults.headers.common["TenantID"];
+                    callback(r.data.projectTXGroup);
+                })
+            },
+            createProjectTransaction(request, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `ProjectTX`, request).then(r => {
+                    delete Axios.defaults.headers.common["TenantID"];
+                    callback(r.data.projectTX)
+                })
+            },
         }
     }
 </script>
