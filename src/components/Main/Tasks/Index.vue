@@ -3,9 +3,32 @@
         <v-layout row wrap>
             <v-flex md12>
                 <v-card flat>
-                    <v-toolbar flat dark dense color="primary"></v-toolbar>
+                    <v-toolbar flat dark dense color="primary">
+                        <!-- <v-text-field prepend-inner-icon="search" placeholder="Search" dark></v-text-field> -->
+                        <v-autocomplete prepend-inner-icon="search" placeholder="Search" :items="filterList" v-model="dropSearch"></v-autocomplete>
+                        <v-btn-toggle v-model="searchType" class="transparent" multiple>
+                            <!-- <v-btn :value="0" flat>
+                                <v-icon>today</v-icon>
+                            </v-btn> -->
+                            <v-btn :value="1" flat>
+                                <v-icon>
+                                    perm_data_setting</v-icon>
+                            </v-btn>
+                            <v-btn :value="2" flat>
+                                <v-icon>assessment</v-icon>
+                            </v-btn>
+                            <v-btn :value="3" flat>
+                                <v-icon>web</v-icon>
+                            </v-btn>
+                            <!-- <v-btn :value="4" flat>
+                                <v-icon>business</v-icon>
+                            </v-btn> -->
+                        </v-btn-toggle>
+                        <v-spacer></v-spacer>
+                        {{searchType}}
+                    </v-toolbar>
                     <v-card-text class="pa-0">
-                        <v-data-table :headers="headers" :items="projectTransactions" class="elevation-0 scrollable"
+                        <v-data-table :headers="headers" :items="filteredTasks" class="elevation-0 scrollable"
                             hide-actions>
                             <template v-slot:items="props">
                                 <tr
@@ -67,19 +90,28 @@
                                             <v-btn small color="error" @click="setPlanogramComplete(props.item)"
                                                 v-if="props.item.type == 3 && props.item.status == 1">Complete</v-btn>
                                         </div>
-                                        <v-btn small color="error" @click="closeTask(props.item, props.index)" v-if="(props.item.type == 3 && props.item.status == 2) && systemUserID == props.item.actionedByUserID">
+                                        <v-btn small color="error" @click="closeTask(props.item, props.index)"
+                                            v-if="(props.item.type == 3 && props.item.status == 2) && systemUserID == props.item.actionedByUserID">
                                             Close</v-btn>
-                                        <v-btn small color="primary" @click="submitForApproval(props.item)" v-if="(props.item.type == 3 && props.item.status == 2) && systemUserID == props.item.systemUserID">
+                                        <v-btn small color="primary" @click="submitForApproval(props.item)"
+                                            v-if="(props.item.type == 3 && props.item.status == 2) && systemUserID == props.item.systemUserID">
                                             Submit</v-btn>
                                         <!-- SPACE PLANNING -->
                                         <!-- APPROVAL PROCESS -->
-                                        <v-btn small color="success" @click="setApprovalInProgress(props.item)" v-if="props.item.type == 3 && props.item.status == 10">View</v-btn>
-                                        <v-btn small color="warning" @click="routeToView(props.item)" v-if="props.item.type == 3 && props.item.status == 20">View</v-btn>
-                                        <v-btn small color="error" @click="closeTask(props.item)" v-if="(props.item.type == 3 && props.item.status == 12) && systemUserID == props.item.actionedByUserID">Close</v-btn>
-                                        <v-btn small color="primary" @click="routeToView(props.item)" v-if="(props.item.type == 3 && props.item.status == 12) && systemUserID == props.item.systemUserID">Send</v-btn>
+                                        <v-btn small color="success" @click="setApprovalInProgress(props.item)"
+                                            v-if="props.item.type == 3 && props.item.status == 10">View</v-btn>
+                                        <v-btn small color="warning" @click="routeToView(props.item)"
+                                            v-if="props.item.type == 3 && props.item.status == 20">View</v-btn>
+                                        <v-btn small color="error" @click="closeTask(props.item)"
+                                            v-if="(props.item.type == 3 && props.item.status == 12) && systemUserID == props.item.actionedByUserID">
+                                            Close</v-btn>
+                                        <v-btn small color="primary" @click="routeToView(props.item)"
+                                            v-if="(props.item.type == 3 && props.item.status == 12) && systemUserID == props.item.systemUserID">
+                                            Send</v-btn>
                                         <!-- END APPROVAL PROCESS -->
                                         <!-- DISTRIBUTION -->
-                                        <v-btn small color="success" @click="setDistributionInProgress(props.item)" v-if="props.item.type == 3 && props.item.status == 10">View</v-btn>
+                                        <v-btn small color="success" @click="setDistributionInProgress(props.item)"
+                                            v-if="props.item.type == 3 && props.item.status == 10">View</v-btn>
                                         <!-- END DISTRIBUTION -->
                                     </td>
                                 </tr>
@@ -151,6 +183,7 @@
                         sortable: false
                     }
                 ],
+                searchType: [],
                 showLoader: true,
                 accessType: null,
                 projectTransactionsProjectTab: [],
@@ -159,7 +192,9 @@
                 typeList: [],
                 systemUserID: null,
                 selectedUser: null,
-                users: []
+                users: [],
+                filterList:[],
+                dropSearch:null,
             }
         },
         created() {
@@ -172,7 +207,46 @@
                 self.getTransactionsByUser(systemUserID, () => {})
             })
         },
+        computed: {
+            filteredTasks(type) {
+                if (this.searchType.length > 0) {
+                    let tmp = this.projectTransactions.filter((tx) => {
+                        if (this.searchType.includes(tx.type)) {
+                            return tx
+                        }
+                        return
+                    })
+                    return filteredTasks;
+                } else {
+                    return this.projectTransactions
+                }
+                if (this.dropSearch!=null) {
+                    let tmp2 = this.filteredTasks.filter((tx) => {
+                        if (this.dropSearch == tx.planogram_ID) {
+                            return tx
+                        }
+                        return
+                    })
+                    
+                }
+            }
+            
+
+
+        },
         methods: {
+            getfilterList(){
+               let self = this
+               self.filterList=[]
+               self.projectTransactions.forEach(element => {
+                   if (!self.filterList.includes(element.planogram_ID)) {
+                         self.filterList.push({
+                           value:element.planogram_ID,
+                           text:element.planogram,
+                       })
+                   }
+               });
+            },
             getLists(callback) {
                 let self = this
                 let statusHandler = new StatusHandler()
@@ -188,6 +262,7 @@
                 Axios.get(process.env.VUE_APP_API + `UserProjectTX?userID=${systemUserID}`).then(r => {
                         self.projectTransactions = r.data.projectTXList;
                         delete Axios.defaults.headers.common["TenantID"];
+                    self.getfilterList()
                         callback();
                     })
                     .catch(e => {
@@ -305,26 +380,23 @@
                 let route;
 
                 switch (item.type) {
-                    case 1:
-                        {
-                            route = `/DataPreparation`
-                        }
-                        break;
-                    case 2:
-                        {
-                            route = `/RangePlanning`
-                        }
-                        break;
-                    case 3:
-                        {
-                            if (item.status == 1 || item.status == 8) {
-                                route = `/SpacePlanning`
-                            } else {
-                                route =
-                                    `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
-                            }
-                        }
-                        break;
+                    case 1: {
+                        route = `/DataPreparation`
+                    }
+                    break;
+                case 2: {
+                    route = `/RangePlanning`
+                }
+                break;
+                case 3: {
+                    if (item.status == 1 || item.status == 8) {
+                        route = `/SpacePlanning`
+                    } else {
+                        route =
+                            `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
+                    }
+                }
+                break;
                 }
 
                 self.$router.push(route);
@@ -404,21 +476,18 @@
         let retval;
 
         switch (type) {
-            case 1:
-                {
-                    retval = 6;
-                }
-                break;
-            case 2:
-                {
-                    retval = 7;
-                }
-                break;
-            case 3:
-                {
-                    retval = 8;
-                }
-                break;
+            case 1: {
+                retval = 6;
+            }
+            break;
+        case 2: {
+            retval = 7;
+        }
+        break;
+        case 3: {
+            retval = 8;
+        }
+        break;
         }
 
         return retval;
