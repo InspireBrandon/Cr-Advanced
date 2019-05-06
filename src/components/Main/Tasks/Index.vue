@@ -35,8 +35,8 @@
                             </v-tooltip>
                         </v-btn-toggle>
                         <v-spacer></v-spacer>
-                        <v-autocomplete @change="GetNewTransactions(selectedUser)" placeholder="users" :items="users"
-                            v-model="selectedUser"></v-autocomplete>
+                        <v-autocomplete v-if="userAccess==0" @change="GetNewTransactions(selectedUser)"
+                            placeholder="users" :items="users" v-model="selectedUser"></v-autocomplete>
                     </v-toolbar>
                     <v-card-text class="pa-0">
                         <v-data-table :headers="headers" :items="filteredTasks" class="elevation-0 scrollable"
@@ -158,7 +158,9 @@
                                             Close</v-btn>
                                         <!-- END ON HOLD -->
                                         <!-- VARIATION REQUEST -->
-                                        <v-btn small color="secondary" @click="assign(props.item)" v-if="props.item.status == 14 && systemUserID == props.item.systemUserID">Assign</v-btn>
+                                        <v-btn small color="secondary" @click="assign(props.item)"
+                                            v-if="props.item.status == 14 && systemUserID == props.item.systemUserID">
+                                            Assign</v-btn>
                                         <!-- END VARIATION REQUEST -->
                                     </td>
                                     <td style="width: 2%">
@@ -214,6 +216,9 @@
     import SpacePlanSelector from '@/components/Common/SpacePlanSelector.vue'
     import UserNotesModal from '@/components/Common/UserNotesModal.vue'
     import NotesModal from '@/components/Common/NotesModal.vue'
+    import {
+        access
+    } from 'fs';
 
     export default {
         name: 'tasks',
@@ -281,6 +286,7 @@
                 filterList: [],
                 dropSearch: null,
                 selectedUser: null,
+                userAccess: null,
             }
         },
         created() {
@@ -288,6 +294,7 @@
 
             setTimeout(() => {
                 self.getLists(() => {
+                    self.checkAccessType()
                     this.getDatabaseUsers()
                     let encoded_details = jwt.decode(sessionStorage.accessToken);
                     let systemUserID = encoded_details.USER_ID;
@@ -334,6 +341,23 @@
             }
         },
         methods: {
+            checkAccessType() {
+                let self = this;
+
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+
+                Axios.get(process.env.VUE_APP_API +
+                        `TenantLink_AccessType?systemUserID=${encoded_details.USER_ID}&tenantID=${sessionStorage.currentDatabase}`
+                    )
+                    .then(r => {
+
+                        if (r.data.isDatabaseOwner == true) {
+                            self.userAccess = 0
+                        } else {
+                            self.userAccess = r.datatenantLink_AccessTypeList[0].accessType
+                        }
+                    })
+            },
             GetNewTransactions(userID) {
                 let self = this
                 self.getTransactionsByUser(userID, () => {})
@@ -348,12 +372,22 @@
                         Axios.get(process.env.VUE_APP_API + `TenantAccess/User?tenantID=${tenantID}`)
                             .then(res => {
                                 // self.users = res.data;
-                                res.data.forEach(e => {
-                                    self.users.push({
-                                        text: e.firstname + " " + e.lastname,
-                                        value: e.systemUserID
+                                Axios.get(process.env.VUE_APP_API + `/SystemUser/${self.systemUserID}`).then(
+                                    resp => {
+
+                                        self.users.push({
+                                            text: resp.data.firstname + " " + resp.data.lastname,
+                                            value: self.systemUserID
+                                        })
+                                        res.data.forEach(e => {
+                                            self.users.push({
+                                                text: e.firstname + " " + e.lastname,
+                                                value: e.systemUserID
+                                            })
+                                        })
                                     })
-                                })
+
+
                             })
                     })
             },
@@ -522,26 +556,23 @@
                 let route;
 
                 switch (item.type) {
-                    case 1:
-                        {
-                            route = `/DataPreparation`
-                        }
-                        break;
-                    case 2:
-                        {
-                            route = `/RangePlanning/${item.rangeFileID}`
-                        }
-                        break;
-                    case 3:
-                        {
-                            if (item.status == 1 || item.status == 8) {
-                                route = `/SpacePlanning`
-                            } else {
-                                route =
-                                    `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
-                            }
-                        }
-                        break;
+                    case 1: {
+                        route = `/DataPreparation`
+                    }
+                    break;
+                case 2: {
+                    route = `/RangePlanning/${item.rangeFileID}`
+                }
+                break;
+                case 3: {
+                    if (item.status == 1 || item.status == 8) {
+                        route = `/SpacePlanning`
+                    } else {
+                        route =
+                            `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
+                    }
+                }
+                break;
                 }
 
                 self.$router.push(route);
@@ -686,21 +717,18 @@
         let retval;
 
         switch (type) {
-            case 1:
-                {
-                    retval = 6;
-                }
-                break;
-            case 2:
-                {
-                    retval = 7;
-                }
-                break;
-            case 3:
-                {
-                    retval = 8;
-                }
-                break;
+            case 1: {
+                retval = 6;
+            }
+            break;
+        case 2: {
+            retval = 7;
+        }
+        break;
+        case 3: {
+            retval = 8;
+        }
+        break;
         }
 
         return retval;
