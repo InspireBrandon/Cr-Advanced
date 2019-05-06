@@ -24,6 +24,10 @@
                                 </div>
                             </div>
                             <v-select :items="users" v-model="user" label="User"></v-select>
+                            <v-autocomplete v-if="task==2" :items="rangeData" v-model="selectedRange"
+                                label="Ranging file">
+
+                            </v-autocomplete>
                             <v-textarea label="Notes" v-model="notes"></v-textarea>
                         </v-card-text>
                     </v-card>
@@ -93,6 +97,7 @@
                     //     value: 4
                     // }
                 ],
+                selectedRange: null,
                 task: null,
                 users: [],
                 user: null,
@@ -105,26 +110,52 @@
                 categoryCluster: null,
                 stores: [],
                 store: null,
-                useExisting: false
+                useExisting: false,
+                rangeData: []
             }
         },
         created() {},
         methods: {
+            getRange(callback) {
+                let self = this;
+
+                self.rangeData = [];
+
+                Axios.get(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire&folder=Ranging")
+                    .then(r => {
+                        r.data.forEach(e => {
+                            self.rangeData.push({
+                                text: e.name,
+                                value: e.id
+                            })
+                        })
+                        // self.rangeData = r.data;
+                        console.log(self.rangeData);
+
+                        callback();
+                    })
+                    .catch(e => {
+                        alert("Failed to get data...");
+                    })
+            },
             getData(callback) {
                 let self = this;
-                self.getSpacePlans()
-                    .then(() => {
-                        self.getStoreClusters()
-                            .then(() => {
-                                self.getStores()
-                                    .then(() => {
-                                        self.getUsers()
-                                            .then(() => {
-                                                callback();
-                                            })
-                                    })
-                            })
-                    })
+                self.getRange(() => {
+                    self.getSpacePlans()
+                        .then(() => {
+                            self.getStoreClusters()
+                                .then(() => {
+                                    self.getStores()
+                                        .then(() => {
+                                            self.getUsers()
+                                                .then(() => {
+                                                    callback();
+                                                })
+                                        })
+                                })
+                        })
+                })
+
             },
             getSpacePlans() {
                 let self = this;
@@ -227,8 +258,8 @@
                     console.log(data);
                     if (data.userID != null) {
                         self.user = data.userID
-                    }else{
-                        self.user=data.projectOwnerID
+                    } else {
+                        self.user = data.projectOwnerID
                     }
                     if (data.systemFileID == null) {
                         self.useExisting = false;
@@ -249,7 +280,8 @@
                     self.afterRuturn({
                         type: self.task,
                         systemUserID: self.user,
-                        notes: self.notes
+                        notes: self.notes,
+                        rangeFileID: self.selectedRange
                     });
                 } else {
                     if (self.useExisting) {
@@ -257,6 +289,7 @@
                             type: self.task,
                             systemUserID: self.user,
                             notes: self.notes,
+                            rangeFileID: self.selectedRange,
                             systemFile: self.systemFile
                         });
                     } else {
@@ -264,6 +297,7 @@
                             type: self.task,
                             systemUserID: self.user,
                             notes: self.notes,
+                            rangeFileID: self.selectedRange,
                             storeCluster: self.storeCluster,
                             categoryCluster: self.categoryCluster,
                             store: self.store

@@ -655,6 +655,8 @@
                             self.ProjectTXs.push(e)
                         }
                     })
+                    console.log(self.ProjectTXs);
+                    
                     delete Axios.defaults.headers.common["TenantID"];
                 })
 
