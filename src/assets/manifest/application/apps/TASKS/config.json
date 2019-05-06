@@ -1,0 +1,13 @@
+
+{
+    "configName":"Tasks",
+    "report":false,
+    "routes": [
+        {
+            "route": "/Tasks",
+            "routeName": "tasks",
+            "title": "Tasks",
+            "openInNewWindow": false
+        }
+    ]
+}

@@ -256,6 +256,8 @@
         methods: {
             getfilterList() {
                 let self = this
+                
+                
                 self.filterList = []
                 self.projectTransactions.forEach(element => {
                     if (!self.filterList.includes(element.planogram_ID)) {
