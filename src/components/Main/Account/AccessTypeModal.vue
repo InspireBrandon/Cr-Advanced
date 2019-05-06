@@ -76,7 +76,6 @@
                     .then(r => {
                         if (r.data.tenantLink_AccessTypeList.length > 0) {
                             self.form = r.data.tenantLink_AccessTypeList[0];
-
                             self.selectedPlanograms = [];
 
                             if(self.form.accessType == 2) {

@@ -6,11 +6,11 @@
             <div v-if="!showLoader">
                 <v-toolbar dark color="primary" prominent>
                     <v-toolbar-title>Users</v-toolbar-title>
- <v-spacer></v-spacer>
+                    <v-spacer></v-spacer>
                     <v-btn icon @click="modalShow = false">
                         <v-icon>arrow_back</v-icon>
                     </v-btn>
-                   
+
                 </v-toolbar>
                 <v-container class="pt-5">
                     <v-layout row wrap>
@@ -32,7 +32,8 @@
                                     <td>{{ props.item.lastname }}</td>
                                     <td>{{ props.item.emailAddress }}</td>
                                     <td>{{ props.item.username }}</td>
-                                    <td>{{ props.item.password }}
+                                    <td>{{ props.item.password }}</td>
+                                    <td>{{accessTypes[props.item.access].text}}</td>
                                     <td>
                                         <v-menu>
                                             <v-btn slot="activator" icon>
@@ -41,7 +42,8 @@
                                             <v-list dense>
                                                 <v-list-tile @click="setAccessType(props)">Set access type</v-list-tile>
                                                 <v-divider></v-divider>
-                                                <v-list-tile @click="openFeatureAccessModal(props.item.systemUserID)">Feature access</v-list-tile>
+                                                <v-list-tile @click="openFeatureAccessModal(props.item.systemUserID)">
+                                                    Feature access</v-list-tile>
                                                 <!-- <v-divider></v-divider>
                                                 <v-list-tile>Revoke access</v-list-tile> -->
                                             </v-list>
@@ -69,9 +71,26 @@
         data() {
             return {
                 accessTypes: [
-                    "Super User",
-                    "General",
-                    "Store"
+                   {
+                        text: 'Super User',
+                        value: 0
+                    },
+                    {
+                        text: 'Buyer',
+                        value: 1
+                    },
+                    {
+                        text: 'Supplier',
+                        value: 2
+                    },
+                    {
+                        text: 'Store',
+                        value: 3
+                    },
+                     {
+                        text: '',
+                        value: 4
+                    }
                 ],
                 headers: [{
                         text: 'First name',
@@ -102,6 +121,11 @@
                         align: 'left',
                         sortable: false,
                         value: 'password'
+                    }, {
+                        text: 'Access Type',
+                        align: 'left',
+                        sortable: false,
+                        value: 'access'
                     },
                     {
                         text: '',
@@ -173,6 +197,21 @@
                         });
 
                         self.showLoader = false;
+                        console.log(self.databaseUsers);
+
+                    })
+            },
+            getAccessType(systemUserID, tenantID, accessType) {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API +
+                        `TenantLink_AccessType?systemUserID=${systemUserID}&tenantID=${tenantID}`)
+                    .then(r => {
+                        if (r.data.tenantLink_AccessTypeList.length > 0) {
+                            accessType(r.data.tenantLink_AccessTypeList[0].accessType)
+                        }else{
+                            accessType(4)
+                        }
                     })
             },
             getDatabaseUsers() {
@@ -182,6 +221,13 @@
                 Axios.get(process.env.VUE_APP_API + `TenantAccess/User?tenantID=${self.tenantID}`)
                     .then(r => {
                         self.databaseUsers = r.data;
+                        self.databaseUsers.forEach(e => {
+                            self.getAccessType(e.systemUserID, self.tenantID, accessType => {
+                                console.log(accessType);
+
+                                e.access = accessType
+                            })
+                        })
                         self.getUsers();
                     })
             },

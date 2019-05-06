@@ -4,6 +4,9 @@
             <v-btn icon @click="$router.push('/Apps')">
                 <v-icon>home</v-icon>
             </v-btn>
+            <v-btn v-if="$route.path!='/tasks'" icon @click="$router.push('/tasks')">
+                <v-icon>list</v-icon>
+            </v-btn>
             <!-- <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon> -->
             <span class="title ml-3 mr-5">Chain&nbsp;<span class="font-weight-light">Research</span></span>
             <v-spacer></v-spacer>
