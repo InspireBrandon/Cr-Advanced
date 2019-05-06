@@ -25,13 +25,13 @@
               <v-list-tile-title>Close</v-list-tile-title>
             </v-list-tile>
           </v-list>
-        </v-menu> 
+        </v-menu>
         <v-menu dark offset-y style="margin-bottom: 10px;">
           <v-btn slot="activator" flat>
             Options
           </v-btn>
           <v-list>
-            <v-list-tile @click="fitColumns" >
+            <v-list-tile @click="fitColumns">
               <v-list-tile-title>Fit Columns</v-list-tile-title>
             </v-list-tile>
             <!-- <v-list-tile @click="saveRange">
@@ -87,8 +87,10 @@
                 v-model="selectedClusterType" solo hide-details></v-select>
             </v-flex>
             <v-flex lg2 md3>
-              <v-select @change="onClusterOptionChange" v-if="selectedClusterType != null" :placeholder="'Select ' + selectedClusterType + ' cluster'"
-                dense :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" solo hide-details></v-select>
+              <v-select @change="onClusterOptionChange" v-if="selectedClusterType != null"
+                :placeholder="'Select ' + selectedClusterType + ' cluster'" dense
+                :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" solo hide-details>
+              </v-select>
             </v-flex>
             <v-flex lg4 md4 style="margin-top: 15px;">
               <span v-show="storesInCluster > -1">{{ storesInCluster }} Stores </span>
@@ -115,10 +117,10 @@
           </v-layout>
         </v-toolbar>
         <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%;  height: calc(100vh - 235px);"
-          :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs" :selectionChanged="onSelectionChanged"
-          :rowData="rowData" :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true"
-          :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true" :enableColResize="true"
-          :floatingFilter="true" :gridReady="onGridReady" :groupMultiAutoColumn="true">
+          :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
+          :selectionChanged="onSelectionChanged" :rowData="rowData" :enableSorting="true" :enableFilter="true"
+          :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true"
+          :enableColResize="true" :floatingFilter="true" :gridReady="onGridReady" :groupMultiAutoColumn="true">
         </ag-grid-vue>
         <div>
           <p>{{ rowData.length }} Rows</p>
@@ -160,6 +162,7 @@
   } from "ag-grid-vue";
   import Axios from "axios"
   import optionsComponent from "./button.vue"
+
   function textValue(data) {
     let self = this;
     self.text = data.clusterName;
@@ -262,79 +265,13 @@
     created() {
       let self = this;
       self.getColumnDefenitions();
+      self.checkparams()
     },
     methods: {
-      onGridReady(params) {
-        this.gridApi = params.api;
-        this.columnApi = params.columnApi;
-      },
-      openEdit(product) {
+      checkparams() {
         let self = this
-
-        this.$refs.productMaint.show({
-          isAdd: false,
-          formData: product.data,
-          afterClose: function (newData) {
-
-            self.$refs.spinner.show();
-
-            for (var prop in newData) {
-              product.data[prop] = newData[prop]; // todo: set grid data(dropdowns)
-            }
-
-          }
-        })
-      },
-      newRange() {
-        let self = this;
-
-        self.isAdd = true;
-
-        self.canRefresh = false;
-
-        self.$refs.planogramSelector.show(false, planogram => {
-
-          self.selectedPlanogram = planogram;
-
-          self.$refs.dateRangeSelector.show(dateRange => {
-
-            self.selectedDateRange = dateRange;
-            self.$refs.spinner.show();
-
-            self.fileData.planogramName = planogram.displayname;
-            self.fileData.planogramID = planogram.planogram_ID;
-            self.fileData.dateFrom = dateRange.dateFrom;
-            self.fileData.dateTo = dateRange.dateTo;
-            self.fileData.dateFromString = dateRange.dateFromString;
-            self.fileData.dateToString = dateRange.dateToString;
-            self.fileData.periodic = dateRange.periodic;
-            self.fileData.monthsBetween = dateRange.monthsBetween;
-            self.fileData.tag = "";
-
-            Axios.get(process.env.VUE_APP_API +
-                `RangingAdvanced?planogramID=${planogram.planogram_ID}&dateFromID=${dateRange.dateFrom}&dateToID=${dateRange.dateTo}`
-              )
-              .then(r => {
-                self.rangingController = new RangingController(r.data);
-                self.setRangingClusterData(r.data.clusterData);
-                if (self.selectedClusterType != null && self.selectedClusterOption != null) {
-                  self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self.selectedClusterOption);
-                  console.log(self.rowData);
-                  self.fitColumns();
-                }
-                self.$refs.spinner.hide();
-                self.gotData = true
-              })
-          })
-        })
-      },
-      openRange() {
-        let self = this;
-
-        self.isAdd = false;
-
-        self.$refs.rangeSelectorModal.show(fileID => {
-          Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fileID}`)
+        if (self.$route.params != null) {
+          Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${self.$route.params.rangeFileID}`)
             .then(r => {
               self.fileData.planogramName = r.data.planogramName;
               self.fileData.planogramID = r.data.planogramID;
@@ -352,372 +289,478 @@
               self.rangingController = new RangingController(r.data);
               self.setRangingClusterData(r.data.clusterData);
               if (self.selectedClusterType != null && self.selectedClusterOption != null) {
-                self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self.selectedClusterOption);
+                self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
+                  .selectedClusterOption);
                 self.fitColumns();
               }
               self.$refs.spinner.hide();
               self.gotData = true
             })
-        })
-      },
-      closeRange() {
-        let self = this;
-        self.rowData = [];
-        self.selectedPlanogram = null;
-        self.selectedDateRange = null;
-        self.selectedItems = [];
-        self.gotData = false;
-      },
-      refreshRange() {
-        let self = this;
+
+    }
+  },
+  onGridReady(params) {
+      this.gridApi = params.api;
+      this.columnApi = params.columnApi;
+    },
+    openEdit(product) {
+      let self = this
+
+      this.$refs.productMaint.show({
+        isAdd: false,
+        formData: product.data,
+        afterClose: function (newData) {
+
+          self.$refs.spinner.show();
+
+          for (var prop in newData) {
+            product.data[prop] = newData[prop]; // todo: set grid data(dropdowns)
+          }
+
+        }
+      })
+    },
+    newRange() {
+      let self = this;
+
+      self.isAdd = true;
+
+      self.canRefresh = false;
+
+      self.$refs.planogramSelector.show(false, planogram => {
+
+        self.selectedPlanogram = planogram;
 
         self.$refs.dateRangeSelector.show(dateRange => {
 
+          self.selectedDateRange = dateRange;
+          self.$refs.spinner.show();
+
+          self.fileData.planogramName = planogram.displayname;
+          self.fileData.planogramID = planogram.planogram_ID;
           self.fileData.dateFrom = dateRange.dateFrom;
           self.fileData.dateTo = dateRange.dateTo;
           self.fileData.dateFromString = dateRange.dateFromString;
           self.fileData.dateToString = dateRange.dateToString;
           self.fileData.periodic = dateRange.periodic;
           self.fileData.monthsBetween = dateRange.monthsBetween;
+          self.fileData.tag = "";
 
-          self.$refs.spinner.show();
           Axios.get(process.env.VUE_APP_API +
-              `RangingAdvanced?planogramID=${self.fileData.planogramID}&dateFromID=${self.fileData.dateFrom}&dateToID=${self.fileData.dateTo}`
+              `RangingAdvanced?planogramID=${planogram.planogram_ID}&dateFromID=${dateRange.dateFrom}&dateToID=${dateRange.dateTo}`
             )
             .then(r => {
               self.rangingController = new RangingController(r.data);
               self.setRangingClusterData(r.data.clusterData);
               if (self.selectedClusterType != null && self.selectedClusterOption != null) {
-                self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self.selectedClusterOption);
+                self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
+                  .selectedClusterOption);
+                console.log(self.rowData);
                 self.fitColumns();
               }
               self.$refs.spinner.hide();
               self.gotData = true
             })
         })
-      },
-      getColumnDefenitions() {
-        let self = this;
-        return new Promise((resolve, reject) => {
-          try {
-            self.columnDefs = require('./headers.json');
-            self.columnDefs.push({
-              headerName: 'Options',
-              field: 'barcode',
-              cellRendererFramework: 'optionsComponent',
-              pinned: 'right'
-            })
-            resolve(true);
-          } catch (exc) {
-            reject();
-          }
-        })
-      },
-      updateStoreIndicators() {
-        let self = this;
+      })
+    },
+    openRange() {
+      let self = this;
 
-        let updatedIndicators = self.rangingController.getImportCSV();
+      self.isAdd = false;
 
-        if (updatedIndicators.length <= 0) {
-          alert("No indicators to update");
-        } else {
-          self.$refs.spinner.show();
-          Axios.put(process.env.VUE_APP_API + `Ranging/UpdateIndicators?db=CR-Hinterland-Live`, updatedIndicators)
-            .then(r => {
-              if (r.data) {
+      self.$refs.rangeSelectorModal.show(fileID => {
+        Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fileID}`)
+          .then(r => {
+            self.fileData.planogramName = r.data.planogramName;
+            self.fileData.planogramID = r.data.planogramID;
+            self.fileData.dateFrom = r.data.dateFrom;
+            self.fileData.dateTo = r.data.dateTo;
+            self.fileData.dateFromString = r.data.dateFromString;
+            self.fileData.dateToString = r.data.dateToString;
+            self.fileData.periodic = r.data.periodic;
+            self.fileData.monthsBetween = r.data.monthsBetween;
+            self.fileData.tag = r.data.tag;
+            self.fileData.active_Shop_Code_ID = r.data.active_Shop_Code_ID;
 
-              } else {
-                alert("There was an error updating the indicators");
-              }
-              self.$refs.spinner.hide();
-            })
+            self.canRefresh = true;
+
+            self.rangingController = new RangingController(r.data);
+            self.setRangingClusterData(r.data.clusterData);
+            if (self.selectedClusterType != null && self.selectedClusterOption != null) {
+              self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
+                .selectedClusterOption);
+              self.fitColumns();
+            }
+            self.$refs.spinner.hide();
+            self.gotData = true
+          })
+      })
+    },
+    closeRange() {
+      let self = this;
+      self.rowData = [];
+      self.selectedPlanogram = null;
+      self.selectedDateRange = null;
+      self.selectedItems = [];
+      self.gotData = false;
+    },
+    refreshRange() {
+      let self = this;
+
+      self.$refs.dateRangeSelector.show(dateRange => {
+
+        self.fileData.dateFrom = dateRange.dateFrom;
+        self.fileData.dateTo = dateRange.dateTo;
+        self.fileData.dateFromString = dateRange.dateFromString;
+        self.fileData.dateToString = dateRange.dateToString;
+        self.fileData.periodic = dateRange.periodic;
+        self.fileData.monthsBetween = dateRange.monthsBetween;
+
+        self.$refs.spinner.show();
+        Axios.get(process.env.VUE_APP_API +
+            `RangingAdvanced?planogramID=${self.fileData.planogramID}&dateFromID=${self.fileData.dateFrom}&dateToID=${self.fileData.dateTo}`
+          )
+          .then(r => {
+            self.rangingController = new RangingController(r.data);
+            self.setRangingClusterData(r.data.clusterData);
+            if (self.selectedClusterType != null && self.selectedClusterOption != null) {
+              self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
+                .selectedClusterOption);
+              self.fitColumns();
+            }
+            self.$refs.spinner.hide();
+            self.gotData = true
+          })
+      })
+    },
+    getColumnDefenitions() {
+      let self = this;
+      return new Promise((resolve, reject) => {
+        try {
+          self.columnDefs = require('./headers.json');
+          self.columnDefs.push({
+            headerName: 'Options',
+            field: 'barcode',
+            cellRendererFramework: 'optionsComponent',
+            pinned: 'right'
+          })
+          resolve(true);
+        } catch (exc) {
+          reject();
         }
-      },
-      updateProductDetails() {
-        let self = this;
+      })
+    },
+    updateStoreIndicators() {
+      let self = this;
 
-        let updatedProducts = self.rangingController.getAllProducts();
+      let updatedIndicators = self.rangingController.getImportCSV();
 
-        updatedProducts.forEach(el => {
-          el["id"] = el.productID;
-        })
-
-        Axios.put(process.env.VUE_APP_API + "Product/UpdateProductList?db=CR-Hinterland-Live", updatedProducts)
+      if (updatedIndicators.length <= 0) {
+        alert("No indicators to update");
+      } else {
+        self.$refs.spinner.show();
+        Axios.put(process.env.VUE_APP_API + `Ranging/UpdateIndicators?db=CR-Hinterland-Live`, updatedIndicators)
           .then(r => {
             if (r.data) {
-              alert("Successfully updated product details");
+
             } else {
-              alert("Failed to update product details");
+              alert("There was an error updating the indicators");
             }
+            self.$refs.spinner.hide();
           })
-          .catch(e => {
-            alert(e);
-            console.log(e);
-          })
-      },
-      setRangingClusterData(data) {
-        let self = this;
+      }
+    },
+    updateProductDetails() {
+      let self = this;
 
-        data.allStoresClusters.forEach(element => {
-          self.clusterOptions.allStores.push(new textValue(element));
-        });
+      let updatedProducts = self.rangingController.getAllProducts();
 
-        data.categoryClusters.forEach(element => {
-          self.clusterOptions.category.push(new textValue(element));
-        });
+      updatedProducts.forEach(el => {
+        el["id"] = el.productID;
+      })
 
-        data.customClusters.forEach(element => {
-          self.clusterOptions.custom.push(new textValue(element));
-        });
-
-        data.departmentClusters.forEach(element => {
-          self.clusterOptions.department.push(new textValue(element));
-        });
-
-        data.regionalClusters.forEach(element => {
-          self.clusterOptions.regional.push(new textValue(element));
-        });
-
-        data.storeClusters.forEach(element => {
-          self.clusterOptions.store.push(new textValue(element));
-        });
-      },
-      onSelectionChanged(e) {
-        let self = this;
-        var rows = e.api.getSelectedNodes();
-        self.selectedItems = rows;
-      },
-      setIndicator(indicator) {
-        let self = this;
-
-        self.selectedItems.forEach(el => {
-          self.rangingController.setClusterIndicator(self.selectedClusterType, self.selectedClusterOption, el.data.productID,
-            indicator);
-        })
-        self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self.selectedClusterOption);
-      },
-      onCellValueChanged(e) {
-        let self = this;
-        let field = e.colDef.field;
-
-        if (field != "store_Range_Indicator") {
-          if (e.oldValue != e.newValue) {
-            self.rangingController.setProductData(e.data.productID, field, e.newValue);
+      Axios.put(process.env.VUE_APP_API + "Product/UpdateProductList?db=CR-Hinterland-Live", updatedProducts)
+        .then(r => {
+          if (r.data) {
+            alert("Successfully updated product details");
+          } else {
+            alert("Failed to update product details");
           }
-        } else {
-          if (e.oldValue != e.newValue) {
-            if (e.newValue == "SELECTED") {
-              let stores = self.rangingController.getStoresByCluster(self.selectedClusterType, self.selectedClusterOption);
+        })
+        .catch(e => {
+          alert(e);
+          console.log(e);
+        })
+    },
+    setRangingClusterData(data) {
+      let self = this;
 
-              let tmpStores = [];
+      data.allStoresClusters.forEach(element => {
+        self.clusterOptions.allStores.push(new textValue(element));
+      });
 
-              stores.forEach(el => {
-                tmpStores.push({
-                  storeID: el.storeID,
-                  storeName: el.storeName,
-                  selected: false
-                })
+      data.categoryClusters.forEach(element => {
+        self.clusterOptions.category.push(new textValue(element));
+      });
+
+      data.customClusters.forEach(element => {
+        self.clusterOptions.custom.push(new textValue(element));
+      });
+
+      data.departmentClusters.forEach(element => {
+        self.clusterOptions.department.push(new textValue(element));
+      });
+
+      data.regionalClusters.forEach(element => {
+        self.clusterOptions.regional.push(new textValue(element));
+      });
+
+      data.storeClusters.forEach(element => {
+        self.clusterOptions.store.push(new textValue(element));
+      });
+    },
+    onSelectionChanged(e) {
+      let self = this;
+      var rows = e.api.getSelectedNodes();
+      self.selectedItems = rows;
+    },
+    setIndicator(indicator) {
+      let self = this;
+
+      self.selectedItems.forEach(el => {
+        self.rangingController.setClusterIndicator(self.selectedClusterType, self.selectedClusterOption, el.data
+          .productID,
+          indicator);
+      })
+      self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self.selectedClusterOption);
+    },
+    onCellValueChanged(e) {
+      let self = this;
+      let field = e.colDef.field;
+
+      if (field != "store_Range_Indicator") {
+        if (e.oldValue != e.newValue) {
+          self.rangingController.setProductData(e.data.productID, field, e.newValue);
+        }
+      } else {
+        if (e.oldValue != e.newValue) {
+          if (e.newValue == "SELECTED") {
+            let stores = self.rangingController.getStoresByCluster(self.selectedClusterType, self
+            .selectedClusterOption);
+
+            let tmpStores = [];
+
+            stores.forEach(el => {
+              tmpStores.push({
+                storeID: el.storeID,
+                storeName: el.storeName,
+                selected: false
               })
+            })
 
-              self.$refs.storeIndicatorSelector.show(tmpStores, self.selectedClusterType, self.selectedClusterOption,
-                newStores => {
-                  self.rangingController.setStoreIndicatorByProductID(newStores, e.data.productID);
-                  self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self.selectedClusterOption);
-                })
-            } else {
-              self.rangingController.setClusterIndicator(self.selectedClusterType, self.selectedClusterOption, e.data.productID,
-                e.newValue);
-            }
+            self.$refs.storeIndicatorSelector.show(tmpStores, self.selectedClusterType, self.selectedClusterOption,
+              newStores => {
+                self.rangingController.setStoreIndicatorByProductID(newStores, e.data.productID);
+                self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
+                  .selectedClusterOption);
+              })
+          } else {
+            self.rangingController.setClusterIndicator(self.selectedClusterType, self.selectedClusterOption, e.data
+              .productID,
+              e.newValue);
           }
         }
-      },
-      onClusterTypeChange() {
-        let self = this;
+      }
+    },
+    onClusterTypeChange() {
+      let self = this;
 
-        self.selectedClusterOption = null;
-      },
-      onClusterOptionChange() {
-        let self = this;
+      self.selectedClusterOption = null;
+    },
+    onClusterOptionChange() {
+      let self = this;
 
-        self.$nextTick(() => {
-          if (self.selectedClusterOption != null) {
-            self.rowData = [];
+      self.$nextTick(() => {
+        if (self.selectedClusterOption != null) {
+          self.rowData = [];
 
-            self.setViewType(self.viewType);
+          self.setViewType(self.viewType);
 
-            self.storesInCluster = self.rangingController.getStoresByCluster(self.selectedClusterType, self.selectedClusterOption)
-              .length;
-            self.fitColumns();
-          }
-        })
-      },
-      fitColumns() {
-        let self = this;
+          self.storesInCluster = self.rangingController.getStoresByCluster(self.selectedClusterType, self
+              .selectedClusterOption)
+            .length;
+          self.fitColumns();
+        }
+      })
+    },
+    fitColumns() {
+      let self = this;
 
-        var allColumnIds = [];
+      var allColumnIds = [];
 
-        self.columnApi.getAllColumns().forEach(function (column) {
-          allColumnIds.push(column.colId);
-        });
+      self.columnApi.getAllColumns().forEach(function (column) {
+        allColumnIds.push(column.colId);
+      });
 
-        self.columnApi.autoSizeColumns(allColumnIds);
-      },
-      promptForTag() {
-        let self = this;
+      self.columnApi.autoSizeColumns(allColumnIds);
+    },
+    promptForTag() {
+      let self = this;
 
-        self.$refs.prompt.show(self.fileData.tag.replace(" - ", ""), "Optional File Name Tag", 'Tag', tag => {
+      self.$refs.prompt.show(self.fileData.tag.replace(" - ", ""), "Optional File Name Tag", 'Tag', tag => {
 
-          if (self.isAdd) {
-            Axios.post(process.env.VUE_APP_API + "SystemFile/Exists?db=CR-Devinspire", {
-              SystemFile: {
-                SystemUser_ID: -1,
-                Folder: "Ranging",
-                Name: self.generateFileName() + tag,
-                Extension: '.json'
-              }
-
-            }).then(r => {
-              if (r.data == true) {
-                self.$refs.yesNo.show('File already Exists, Would you like to overwrite it?', goThrough => {
-                  if (goThrough) {
-                    self.saveRange(tag);
-                  }
-                })
-              }
-              else {
-                self.saveRange(tag);
-              }
-            })
-          } else {
-            self.saveRange(tag);
-          }
-
-        })
-      },
-      saveRange(tag) {
-        let self = this;
-
-        if (tag != '')
-          tag = " - " + tag;
-
-        let fileData = self.rangingController.getRangingFile();
-
-        fileData["planogramName"] = self.fileData.planogramName;
-        fileData["planogramID"] = self.fileData.planogramID;
-        fileData["dateFrom"] = self.fileData.dateFrom;
-        fileData["dateTo"] = self.fileData.dateTo;
-        fileData["dateFromString"] = self.fileData.dateFromString;
-        fileData["dateToString"] = self.fileData.dateToString;
-        fileData["periodic"] = self.fileData.periodic;
-        fileData["monthsBetween"] = self.fileData.monthsBetween;
-        fileData["tag"] = tag;
-
-        Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
+        if (self.isAdd) {
+          Axios.post(process.env.VUE_APP_API + "SystemFile/Exists?db=CR-Devinspire", {
             SystemFile: {
               SystemUser_ID: -1,
               Folder: "Ranging",
               Name: self.generateFileName() + tag,
               Extension: '.json'
-            },
-            Data: fileData
-          })
-          .then(r => {
-            alert("Successfully saved: " + self.generateFileName() + tag)
-          })
-          .catch(e => {
-            console.log(e);
-          })
-      },
-      setSelectedStores() {
-        let self = this;
+            }
 
-        if (self.selectedItems.length > 1) {
-          let stores = self.rangingController.getStoresByCluster(self.selectedClusterType, self.selectedClusterOption);
-
-          let tmpStores = [];
-
-          stores.forEach(el => {
-            tmpStores.push({
-              storeID: el.storeID,
-              storeName: el.storeName,
-              selected: false
-            })
-          })
-
-          self.$refs.storeIndicatorSelector.show(tmpStores, self.selectedClusterType, self.selectedClusterOption,
-            newStores => {
-              self.selectedItems.forEach(el => {
-                self.rangingController.setStoreIndicatorByProductID(newStores, el.data.productID);
+          }).then(r => {
+            if (r.data == true) {
+              self.$refs.yesNo.show('File already Exists, Would you like to overwrite it?', goThrough => {
+                if (goThrough) {
+                  self.saveRange(tag);
+                }
               })
-              self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self.selectedClusterOption);
-            })
-        } else {
-          let productID = self.selectedItems[0].data.productID;
-
-          let stores = self.rangingController.getStoresByProductAndCluster(productID, self.selectedClusterType, self.selectedClusterOption);
-
-          self.$refs.storeIndicatorSelector.show(stores, self.selectedClusterType, self.selectedClusterOption,
-            newStores => {
-              self.rangingController.setStoreIndicatorByProductID(newStores, productID);
-              self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self.selectedClusterOption);
-            })
-        }
-      },
-      generateFileName() {
-        let self = this;
-        if (self.fileData.planogramName != "") {
-          if (self.fileData.periodic) {
-            return `${self.fileData.planogramName} - ${self.fileData.monthsBetween} MMA`;
-          } else {
-            return `${self.fileData.planogramName} Average Monthly ${self.fileData.dateFromString} To ${self.fileData.dateToString}`;
-          }
-        } else {
-          return "";
-        }
-      },
-      getItemsToAudit() {
-        let self = this;
-
-        let retval = 0;
-
-        if (self.rangingController != undefined && self.rowData.length > 0) {
-          self.rangingController.getAllRangeProducts().forEach(element => {
-            if (element.imageAudit)
-              retval++;
-          });
-        }
-
-        return retval;
-      },
-      setViewType(type) {
-        let self = this;
-
-        self.viewType = type;
-
-        switch (type) {
-          case 'CLUSTER':
-            {
-              self.columnDefs = require('./headers.json');
-              self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self.selectedClusterOption);
+            } else {
+              self.saveRange(tag);
             }
-            break;
-          case 'STORE':
-            {
-              let storelevel = self.rangingController.getStoreIndicators(self.selectedClusterType, self.selectedClusterOption);
-              self.columnDefs = storelevel.headers;
-              self.rowData = storelevel.data;
-            }
-            break;
+          })
+        } else {
+          self.saveRange(tag);
         }
+
+      })
+    },
+    saveRange(tag) {
+      let self = this;
+
+      if (tag != '')
+        tag = " - " + tag;
+
+      let fileData = self.rangingController.getRangingFile();
+
+      fileData["planogramName"] = self.fileData.planogramName;
+      fileData["planogramID"] = self.fileData.planogramID;
+      fileData["dateFrom"] = self.fileData.dateFrom;
+      fileData["dateTo"] = self.fileData.dateTo;
+      fileData["dateFromString"] = self.fileData.dateFromString;
+      fileData["dateToString"] = self.fileData.dateToString;
+      fileData["periodic"] = self.fileData.periodic;
+      fileData["monthsBetween"] = self.fileData.monthsBetween;
+      fileData["tag"] = tag;
+
+      Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
+          SystemFile: {
+            SystemUser_ID: -1,
+            Folder: "Ranging",
+            Name: self.generateFileName() + tag,
+            Extension: '.json'
+          },
+          Data: fileData
+        })
+        .then(r => {
+          alert("Successfully saved: " + self.generateFileName() + tag)
+        })
+        .catch(e => {
+          console.log(e);
+        })
+    },
+    setSelectedStores() {
+      let self = this;
+
+      if (self.selectedItems.length > 1) {
+        let stores = self.rangingController.getStoresByCluster(self.selectedClusterType, self.selectedClusterOption);
+
+        let tmpStores = [];
+
+        stores.forEach(el => {
+          tmpStores.push({
+            storeID: el.storeID,
+            storeName: el.storeName,
+            selected: false
+          })
+        })
+
+        self.$refs.storeIndicatorSelector.show(tmpStores, self.selectedClusterType, self.selectedClusterOption,
+          newStores => {
+            self.selectedItems.forEach(el => {
+              self.rangingController.setStoreIndicatorByProductID(newStores, el.data.productID);
+            })
+            self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
+              .selectedClusterOption);
+          })
+      } else {
+        let productID = self.selectedItems[0].data.productID;
+
+        let stores = self.rangingController.getStoresByProductAndCluster(productID, self.selectedClusterType, self
+          .selectedClusterOption);
+
+        self.$refs.storeIndicatorSelector.show(stores, self.selectedClusterType, self.selectedClusterOption,
+          newStores => {
+            self.rangingController.setStoreIndicatorByProductID(newStores, productID);
+            self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
+              .selectedClusterOption);
+          })
+      }
+    },
+    generateFileName() {
+      let self = this;
+      if (self.fileData.planogramName != "") {
+        if (self.fileData.periodic) {
+          return `${self.fileData.planogramName} - ${self.fileData.monthsBetween} MMA`;
+        } else {
+          return `${self.fileData.planogramName} Average Monthly ${self.fileData.dateFromString} To ${self.fileData.dateToString}`;
+        }
+      } else {
+        return "";
+      }
+    },
+    getItemsToAudit() {
+      let self = this;
+
+      let retval = 0;
+
+      if (self.rangingController != undefined && self.rowData.length > 0) {
+        self.rangingController.getAllRangeProducts().forEach(element => {
+          if (element.imageAudit)
+            retval++;
+        });
+      }
+
+      return retval;
+    },
+    setViewType(type) {
+      let self = this;
+
+      self.viewType = type;
+
+      switch (type) {
+        case 'CLUSTER': {
+          self.columnDefs = require('./headers.json');
+          self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
+            .selectedClusterOption);
+        }
+        break;
+      case 'STORE': {
+        let storelevel = self.rangingController.getStoreIndicators(self.selectedClusterType, self
+        .selectedClusterOption);
+        self.columnDefs = storelevel.headers;
+        self.rowData = storelevel.data;
+      }
+      break;
       }
     }
   }
-
+  }
 </script>
 
 <style>
   .ag-theme-balham .audit-image-breach {
     background-color: lightcoral !important;
   }
-
 </style>

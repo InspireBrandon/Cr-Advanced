@@ -72,7 +72,8 @@
                             .tenantLink_AccessTypeList[0].accessType == 2) {
                             // store  or supplier
                             storeapptmp.forEach(e => {
-                                if (e.config.configName == "SpacePlanning") {
+                                if (e.config.configName == "SpacePlanning" || e.config.configName ==
+                                    "Tasks") {
 
                                     let tmpRoutes = [{
                                         "route": "/PlanogramImplementation",
@@ -94,7 +95,8 @@
                             // buyer  
                             buyerapptmp.forEach(e => {
                                 if (e.config.configName == "SpacePlanning" || e.config.configName ==
-                                    "ProductMaintenance" || e.config.configName == "RangePlanning") {
+                                    "ProductMaintenance" || e.config.configName == "RangePlanning" || e
+                                    .config.configName == "Tasks") {
 
                                     buyerApps.push(e)
                                     console.log(e);
@@ -239,8 +241,6 @@
                             })
 
                             self.appAccess(self.appConfigDetail, callback => {
-                                console.log("self.appConfigDetail");
-                                console.log(self.appConfigDetail);
                                 self.showLoader = false;
 
                             })

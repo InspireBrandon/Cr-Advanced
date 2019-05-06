@@ -5,7 +5,7 @@
     "report":false,
     "routes": [
         {
-            "route": "/RangePlanning",
+            "route": "/RangePlanning/:rangeFileID",
             "routeName": "/range_planning",
             "title": "Range Planning",
             "openInNewWindow": false
