@@ -61,7 +61,7 @@
                             </v-btn>
                             <v-btn flat
                                 v-if="authorityType == 0||(authorityType == 3)&&(projectsStatus.status==24||routeStatus==24)"
-                                outline @click="openImplementationModal(projectsStatus.status,3,timelineItems[0])">
+                                outline @click="implement(projectsStatus.status,3,timelineItems[0])">
                                 Implemented</v-btn>
                             <!-- <v-btn flat v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==21||routeStatus==21)" outline @click="distribute(projectsStatus.status,4,timelineItems[0])">Distribute</v-btn> -->
                             <v-btn flat outline @click="distribute(projectsStatus.status,4,timelineItems[0])">Distribute
@@ -556,11 +556,7 @@
                 if (type == 3) {
 
                     self.$refs.PlanogramIplementationModal.show(
-
-
                         "Implement Planogram?", type, storeCluster, storeID, null, data => {
-
-
                             if (data.value == true) {
                                 let trans = {
                                     "project_ID": self.projectID,
@@ -1097,9 +1093,7 @@
                                 if (idx == 0) {
                                     self.currentStatus = element.status;
                                     self.currentProjectTx = element
-                                }
 
-                                if (element.type == 3 && element.status == 20) {
                                     self.tmpRequest = element;
                                 }
 
@@ -1313,10 +1307,53 @@
             },
             distribute() {
                 let self = this;
+                let request = JSON.parse(JSON.stringify(self.tmpRequest))
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
 
+                let projectTXGroupRequest = {
+                    projectID: request.project_ID
+                }
                 // Select a store
-                self.$refs.PlanogramIplementationModal.show("Distribute Planogram?", 3, null, null, null, data => {
-                    console.log(data);
+                self.$refs.PlanogramIplementationModal.show("Distribute Planogram?", 4, null, null, null, data => {
+                    request.status = 40;
+                    request.actionedByUserID = systemUserID;
+                    request.systemUserID = null;
+                    // Create new process assigned
+                    self.createProjectTransaction(request, endProcessTx => {
+                        // Create new process group
+                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
+                            // Create new process assigned against new group
+                            request.actionedByUserID = null;
+                            request.systemUserID = data.users;
+                            request.projectTXGroup_ID = newGroup.id;
+                            self.createProjectTransaction(request, processAssigned => {
+                                request.status = 13;
+                                request.notes = data.notes;
+                                self.createProjectTransaction(request,
+                                    implementationPendingResponse => {
+                                        self.getProjectTransactionsByProjectID(
+                                            request.project_ID);
+                                    })
+                            })
+                        })
+                    })
+                })
+            },
+            implement() {
+                let self = this;
+                let request = JSON.parse(JSON.stringify(self.tmpRequest))
+
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+
+                self.$refs.PlanogramIplementationModal.show("Implement Planogram?", 3, null, null, null, data => {
+                    request.status = 26;
+                    request.notes = data.notes;
+                    request.systemUserID = systemUserID;
+                    self.createProjectTransaction(request, () => {
+                        self.getProjectTransactionsByProjectID(request.project_ID);
+                    })
                 })
             },
             createProjectTransactionGroup(request, callback) {

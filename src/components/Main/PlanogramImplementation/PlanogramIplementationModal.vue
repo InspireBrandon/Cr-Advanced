@@ -17,10 +17,6 @@
           </v-toolbar>
           <v-card-title style="text-align: center; display: block;" class="headline">
             <v-textarea v-model="modalNotes" label="Notes"></v-textarea>
-            <v-flex md12 v-if="type==4">
-              <v-autocomplete :disabled="disableStoreSelection"  dense v-model="selectedPlanogram"
-                :items="planograms" label="Select A Planogram to distribute"></v-autocomplete>
-            </v-flex>
             <v-flex md6 v-if="type==4">
               <v-autocomplete style="max-width: 400px;" dense v-model="selectedStore" :items="Stores"
                 label="Select A Store"></v-autocomplete>
