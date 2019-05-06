@@ -35,7 +35,7 @@
                                 <v-list class="pa-0">
                                     <template>
                                         <template v-for="(item, index) in items">
-                                            <v-list-tile avatar :key="index" @click="">
+                                            <v-list-tile avatar :key="index" >
                                                 <v-list-tile-avatar tile>
                                                     <v-img :src="item.avatar">
                                                     </v-img>
