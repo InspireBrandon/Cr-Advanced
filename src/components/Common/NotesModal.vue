@@ -1,26 +1,21 @@
 <template>
-    <div>
-        <v-layout row justify-center>
-            <v-dialog v-model="dialog" persistent max-width="600">
-                <v-card>
-                    <v-toolbar dark flat color="primary">
-                        <v-toolbar-title>{{ title }}</v-toolbar-title>
-                        <v-spacer></v-spacer>
-                        <v-btn icon @click.native="dialog = false">
-                            <v-icon>close</v-icon>
-                        </v-btn>
-                    </v-toolbar>
-                    <v-card-text>
-                        <v-textarea v-model="notes"></v-textarea>
-                    </v-card-text>
-                    <!-- <v-card-title style="text-align: center; display: block;" class="headline"></v-card-title> -->
-                    <v-card-actions style="text-align: right; display: block;">
-                        <v-btn color="primary darken-1" @click.native="returnValue">Continue</v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-dialog>
-        </v-layout>
-    </div>
+    <v-dialog v-model="dialog" persistent max-width="600">
+        <v-card>
+            <v-toolbar dark flat color="primary">
+                <v-toolbar-title>{{ title }}</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-btn icon @click.native="dialog = false">
+                    <v-icon>close</v-icon>
+                </v-btn>
+            </v-toolbar>
+            <v-card-text>
+                <v-textarea v-model="notes"></v-textarea>
+            </v-card-text>
+            <v-card-actions style="text-align: right; display: block;">
+                <v-btn color="primary darken-1" @click.native="returnValue">Continue</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 </template>
 
 <script>

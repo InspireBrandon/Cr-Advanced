@@ -54,8 +54,11 @@
                             v-if="selectedPlanogram != null || routeProjectID != null">
                             <v-btn v-if="(projectsStatus.status==20||routeStatus==20)" flat outline @click="approve()">
                                 Approve</v-btn>
-                            <v-btn flat v-if="(projectsStatus.status==20||routeStatus==20||routeStatus==21||projectsStatus.status==21||routeStatus==24||routeStatus==26)" outline @click="requestVariation">
+                            <v-btn flat
+                                v-if="(projectsStatus.status==20||routeStatus==20||routeStatus==21||projectsStatus.status==21||routeStatus==26)"
+                                outline @click="requestVariation">
                                 Variation</v-btn>
+                            <v-btn outline flat v-if="routeStatus == 24" @click="requestStoreVariation">Variation</v-btn>
                             <!-- <v-btn flat v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==20||routeStatus==20)" outline @click="decline(projectsStatus.status,2,timelineItems[0])">Decline</v-btn> -->
                             <!-- <v-btn
                                 v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==21||routeStatus==21)"
@@ -136,6 +139,7 @@
         <PlanogramIplementationModal ref="PlanogramIplementationModal"></PlanogramIplementationModal>
         <AssignTask ref="assignTask"></AssignTask>
         <YesNoModal ref="yesNoModal"></YesNoModal>
+        <NotesModal ref="notesModal"></NotesModal>
     </v-card>
 </template>
 
@@ -148,6 +152,7 @@
     import StatusHandler from '@/libs/system/projectStatusHandler'
     import AssignTask from '@/components/Common/AssignTask'
     import YesNoModal from '@/components/Common/YesNoModal'
+    import NotesModal from '@/components/Common/NotesModal'
 
     let _MODULE = "Planogram Implementation";
 
@@ -156,7 +161,8 @@
             PlanogramReportModal,
             PlanogramIplementationModal,
             AssignTask,
-            YesNoModal
+            YesNoModal,
+            NotesModal
         },
         data: () => {
             return {
@@ -257,439 +263,6 @@
             openImage() {
                 this.imageModal = true;
             },
-            openImplementationModal(status, type, item) {
-                let self = this
-
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
-                let systemUserID = encoded_details.USER_ID;
-                let storeCluster = self.timelineItems[0].storeCluster;
-                let storeID = self.timelineItems[0].store_ID;
-
-                if (type == 0) {
-                    self.$refs.submitForApproval.show(
-                        "Approve planogram", type, storeCluster, storeID, null, data => {
-                            if (data.value == true) {
-                                let trans = {
-                                    "project_ID": self.projectID,
-                                    "dateTime": new Date,
-                                    "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
-                                    // "username": self.timelineItems[self.timelineItems.length - 1].user,
-                                    "status": 12,
-                                    "type": 3,
-                                    "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
-                                    "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
-                                    // "systemUserID": self.timelineItems[self.timelineItems.length - 1].userID,
-                                    "actionedByUserID": systemUserID,
-                                    "notes": data.notes,
-                                    "ProjectTXGroup_ID": self.timelineItems[0].ProjectTXGroup_ID,
-                                    "systemFileID": self.routePlanogramID
-                                }
-                                Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
-                                    res => {
-
-                                        let element = res.data.projectTX;
-
-                                        self.currentProjectTx = res.data.projectTX
-                                        let ProjectTxGroup = {
-                                            projectID: self.selectedProject
-                                        }
-                                        console.log("hree");
-                                        Axios.defaults.headers.common["TenantID"] = sessionStorage
-                                            .currentDatabase;
-                                        Axios.post(process.env.VUE_APP_API + 'ProjectTXGroup', ProjectTxGroup)
-                                            .then(resp => {
-                                                console.log("resp");
-                                                console.log(resp);
-
-
-                                                let trans2 = {
-                                                    "project_ID": self.projectID,
-                                                    "dateTime": new Date,
-                                                    "dateTimeString": moment(new Date).format(
-                                                        'YYYY-MM-DD'),
-                                                    "username": self.timelineItems[self.timelineItems
-                                                        .length - 1].user,
-                                                    "status": 12,
-                                                    "type": 3,
-                                                    "storeCluster_ID": self.timelineItems[0]
-                                                        .storeCluster_ID,
-                                                    "categoryCluster_ID": self.timelineItems[0]
-                                                        .categoryCluster_ID,
-                                                    "systemUserID": self.timelineItems[self
-                                                        .timelineItems.length - 1].userID,
-                                                    // "actionedByUserID": systemUserID,
-                                                    "notes": data.notes,
-                                                    "systemFileID": self.routePlanogramID,
-                                                    "ProjectTXGroup_ID": resp.data.projectTXGroup.id
-                                                }
-                                                Axios.defaults.headers.common["TenantID"] = sessionStorage
-                                                    .currentDatabase;
-                                                Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans2)
-                                                    .then(res => {
-                                                        delete Axios.defaults.headers.common[
-                                                            "TenantID"];
-                                                        console.log("res");
-                                                        console.log(res);
-
-                                                    })
-
-                                            })
-                                        self.timelineItems.unshift({
-                                            status: element.status,
-                                            notes: self.status[element.status].text,
-                                            date: element.dateTimeString,
-                                            user: element.username,
-                                            userID: element.systemUserID,
-                                            type: element.type,
-                                            storeID: element.store_ID,
-                                            store: element.store,
-                                            storeCluster_ID: element.storeCluster_ID,
-                                            storeCluster: element.storeCluster,
-                                            categoryCluster_ID: element.categoryCluster_ID
-                                        })
-
-                                        self.tmpItems.unshift({
-                                            status: element.status,
-                                            notes: self.status[element.status].text,
-                                            date: element.dateTimeString,
-                                            user: element.username,
-                                            userID: element.systemUserID,
-                                            type: element.type,
-                                            storeID: element.store_ID,
-                                            store: element.store,
-                                            storeCluster_ID: element.storeCluster_ID,
-                                            storeCluster: element.storeCluster,
-                                            categoryCluster_ID: element.categoryCluster_ID
-                                        })
-
-                                        self.projectsStatus = self.timelineItems[0]
-
-                                        delete Axios.defaults.headers.common["TenantID"];
-                                    })
-                            }
-                        })
-                }
-                if (type == 1) {
-                    self.$refs.PlanogramIplementationModal.show(
-                        "Decline Planogram Approval?", type, storeCluster, storeID, null, data => {
-                            if (data.value == true) {
-                                let trans = {
-                                    "project_ID": self.projectID,
-                                    "dateTime": new Date,
-                                    "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
-                                    "username": self.timelineItems[self.timelineItems.length - 1].user,
-                                    "ProjectTXGroup_ID": self.timelineItems[0].ProjectTXGroup_ID,
-                                    "status": 11,
-                                    "type": 3,
-                                    "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
-                                    "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
-                                    "systemUserID": self.timelineItems[self.timelineItems.length - 1].userID,
-                                    "actionedByUserID": systemUserID,
-                                    "notes": data.notes,
-                                    "systemFileID": self.routePlanogramID
-                                }
-                                Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
-                                    res => {
-
-                                        let element = res.data.projectTX;
-
-                                        self.currentProjectTx = res.data.projectTX
-
-                                        self.timelineItems.unshift({
-                                            status: element.status,
-                                            notes: self.status[element.status].text,
-                                            date: element.dateTimeString,
-                                            user: element.username,
-                                            userID: element.systemUserID,
-                                            type: element.type,
-                                            storeID: element.store_ID,
-                                            store: element.store,
-                                            storeCluster_ID: element.storeCluster_ID,
-                                            storeCluster: element.storeCluster,
-                                            categoryCluster_ID: element.categoryCluster_ID
-                                        })
-
-                                        self.tmpItems.unshift({
-                                            status: element.status,
-                                            notes: self.status[element.status].text,
-                                            date: element.dateTimeString,
-                                            user: element.username,
-                                            userID: element.systemUserID,
-                                            type: element.type,
-                                            storeID: element.store_ID,
-                                            store: element.store,
-                                            storeCluster_ID: element.storeCluster_ID,
-                                            storeCluster: element.storeCluster,
-                                            categoryCluster_ID: element.categoryCluster_ID
-                                        })
-                                        console.log(here);
-
-                                        self.projectsStatus = self.timelineItems[0]
-
-
-
-                                        delete Axios.defaults.headers.common["TenantID"];
-
-                                    })
-                            }
-
-                        })
-                }
-                if (type == 2) {
-                    self.$refs.assignTask.showWithData(item, data => {
-
-                        let trans = {
-                            "project_ID": self.projectID,
-                            "dateTime": new Date,
-                            "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
-                            "username": self.timelineItems[self.timelineItems.length - 1].user,
-                            "status": 14,
-                            "type": 3,
-                            "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
-                            "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
-                            "systemUserID": null,
-                            "actionedByUserID": systemUserID,
-                            "notes": data.notes,
-                            "systemFileID": data.systemFile
-                        }
-                        Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
-                            res => {
-                                let element = res.data.projectTX;
-
-                                trans.systemUserID = data.systemUserID;
-                                trans.actionedByUserID = null;
-
-                                Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans)
-
-                                self.currentProjectTx = res.data.projectTX
-
-                                self.timelineItems.unshift({
-                                    status: element.status,
-                                    notes: self.status[element.status].text,
-                                    date: element.dateTimeString,
-                                    user: element.username,
-                                    userID: element.systemUserID,
-                                    type: element.type,
-                                    storeID: element.store_ID,
-                                    store: element.store,
-                                    storeCluster_ID: element.storeCluster_ID,
-                                    storeCluster: element.storeCluster,
-                                    categoryCluster_ID: element.categoryCluster_ID
-                                })
-
-                                self.tmpItems.unshift({
-                                    status: element.status,
-                                    notes: self.status[element.status].text,
-                                    date: element.dateTimeString,
-                                    user: element.username,
-                                    userID: element.systemUserID,
-                                    type: element.type,
-                                    storeID: element.store_ID,
-                                    store: element.store,
-                                    storeCluster_ID: element.storeCluster_ID,
-                                    storeCluster: element.storeCluster,
-                                    categoryCluster_ID: element.categoryCluster_ID
-                                })
-
-                                self.projectsStatus = self.timelineItems[0]
-
-                                delete Axios.defaults.headers.common["TenantID"];
-                            })
-                    })
-
-                    // self.$refs.PlanogramIplementationModal.show(
-                    //     "Request Planogram Variation?", type, storeCluster, storeID, data => {
-                    //         if (data.value == true) {
-                    //             let trans = {
-                    //                 "project_ID": self.projectID,
-                    //                 "dateTime": new Date,
-                    //                 "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
-                    //                 "username": self.timelineItems[self.timelineItems.length - 1].user,
-                    //                 "status": 14,
-                    //                 "type": 3,
-                    //                 "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
-                    //                 "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
-                    //                 "systemUserID": self.timelineItems[self.timelineItems.length - 1].userID,
-                    //                 "notes": data.notes
-                    //             }
-                    //             Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
-                    //                 res => {
-                    //                     let element = res.data.projectTX;
-
-                    //                     self.currentProjectTx = res.data.projectTX
-
-                    //                     self.timelineItems.unshift({
-                    //                         status: element.status,
-                    //                         notes: self.status[element.status].text,
-                    //                         date: element.dateTimeString,
-                    //                         user: element.username,
-                    //                         userID: element.systemUserID,
-                    //                         type: element.type,
-                    //                         storeID: element.store_ID,
-                    //                         store: element.store,
-                    //                         storeCluster_ID: element.storeCluster_ID,
-                    //                         storeCluster: element.storeCluster,
-                    //                         categoryCluster_ID: element.categoryCluster_ID
-                    //                     })
-
-                    //                     self.tmpItems.unshift({
-                    //                         status: element.status,
-                    //                         notes: self.status[element.status].text,
-                    //                         date: element.dateTimeString,
-                    //                         user: element.username,
-                    //                         userID: element.systemUserID,
-                    //                         type: element.type,
-                    //                         storeID: element.store_ID,
-                    //                         store: element.store,
-                    //                         storeCluster_ID: element.storeCluster_ID,
-                    //                         storeCluster: element.storeCluster,
-                    //                         categoryCluster_ID: element.categoryCluster_ID
-                    //                     })
-
-                    //                     self.projectsStatus = self.timelineItems[0]
-
-                    //                     delete Axios.defaults.headers.common["TenantID"];
-                    //                 })
-                    //         }
-                    //     })
-                }
-                if (type == 3) {
-
-                    self.$refs.PlanogramIplementationModal.show(
-                        "Implement Planogram?", type, storeCluster, storeID, null, data => {
-                            if (data.value == true) {
-                                let trans = {
-                                    "project_ID": self.projectID,
-                                    "dateTime": new Date,
-                                    "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
-                                    "store_ID": self.projectsStatus.storeID,
-                                    "username": self.projectsStatus.user,
-                                    "status": 15,
-                                    "type": 3,
-                                    "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
-                                    "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
-                                    "systemUserID": self.timelineItems[0].actionedByUserID,
-                                    "actionedByUserID": self.timelineItems[0].userID,
-                                    "notes": data.notes,
-                                    "systemFileID": self.routePlanogramID
-                                }
-
-                                Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
-                                    res => {
-
-                                        let element = res.data.projectTX;
-
-                                        self.currentProjectTx = res.data.projectTX
-
-                                        self.timelineItems.unshift({
-                                            status: element.status,
-                                            notes: self.status[element.status].text,
-                                            date: element.dateTimeString,
-                                            user: element.username,
-                                            userID: element.systemUserID,
-                                            type: element.type,
-                                            storeID: element.store_ID,
-                                            store: element.store,
-                                            storeCluster_ID: element.storeCluster_ID,
-                                            storeCluster: element.storeCluster,
-                                            categoryCluster_ID: element.categoryCluster_ID,
-                                            actionedByUserID: element.actionedByUserID
-                                        })
-
-                                        self.tmpItems.unshift({
-                                            status: element.status,
-                                            notes: self.status[element.status].text,
-                                            date: element.dateTimeString,
-                                            user: element.username,
-                                            userID: element.systemUserID,
-                                            type: element.type,
-                                            storeID: element.store_ID,
-                                            store: element.store,
-                                            storeCluster_ID: element.storeCluster_ID,
-                                            storeCluster: element.storeCluster,
-                                            categoryCluster_ID: element.categoryCluster_ID,
-                                            actionedByUserID: element.actionedByUserID
-                                        })
-
-                                        self.projectsStatus = self.timelineItems[0]
-
-                                        delete Axios.defaults.headers.common["TenantID"];
-                                    })
-                            }
-                        })
-                }
-                if (type == 4) {
-                    let tmp = []
-                    console.log(item);
-
-                    self.PlanogramItems.forEach(element => {
-                        console.log(element.value + "|" + item.systemFileID);
-                        if (element.value == item.systemFileID) {
-                            tmp.push(element)
-                        }
-                    });
-
-                    self.$refs.PlanogramIplementationModal.show(
-                        "Select the store to distribute to", type, storeCluster, storeID, tmp,
-                        data => {
-                            if (data.value == true) {
-                                let trans = {
-                                    "project_ID": self.projectID,
-                                    "dateTime": new Date,
-                                    "dateTimeString": moment(new Date).format('YYYY-MM-DD'),
-                                    "store_ID": data.stores,
-                                    "systemFileID": data.planogram,
-                                    "username": self.projectsStatus.user,
-                                    "status": 13,
-                                    "type": 3,
-                                    "storeCluster_ID": self.timelineItems[0].storeCluster_ID,
-                                    "categoryCluster_ID": self.timelineItems[0].categoryCluster_ID,
-                                    "systemUserID": data.users,
-                                    "actionedByUserID": null,
-                                    "notes": data.notes,
-                                    "systemFileID": self.routePlanogramID
-                                }
-
-                                Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(
-                                    res => {
-                                        let element = res.data.projectTX;
-
-                                        self.currentProjectTx = res.data.projectTX
-
-                                        self.timelineItems.unshift({
-                                            status: element.status,
-                                            notes: self.status[element.status].text,
-                                            date: element.dateTimeString,
-                                            user: element.username,
-                                            userID: element.systemUserID,
-                                            type: element.type,
-                                            storeID: element.store_ID,
-                                            store: element.store,
-                                            storeCluster_ID: element.storeCluster_ID,
-                                            storeCluster: element.storeCluster,
-                                            categoryCluster_ID: element.categoryCluster_ID
-                                        })
-
-                                        self.tmpItems.unshift({
-                                            status: element.status,
-                                            notes: self.status[element.status].text,
-                                            date: element.dateTimeString,
-                                            user: element.username,
-                                            userID: element.systemUserID,
-                                            type: element.type,
-                                            storeID: element.store_ID,
-                                            storeCluster_ID: element.storeCluster_ID,
-                                            categoryCluster_ID: element.categoryCluster_ID
-                                        })
-
-                                        delete Axios.defaults.headers.common["TenantID"];
-                                    })
-
-                            }
-                        })
-                }
-            },
             initialise() {
                 let self = this;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
@@ -735,36 +308,32 @@
                 self.inform("PROCESSING", "Selecting appropriate process.")
 
                 switch (self.authorityType) {
-                    case 0:
-                        {
-                            // Super User
-                            self.processSuperUser()
+                    case 0: {
+                        // Super User
+                        self.processSuperUser()
                             .then(r => {
 
                             })
                             .catch(e => {
 
                             })
-                        }
-                        break;
-                    case 1:
-                        {
-                            // Buyer
-                            self.processBuyer();
-                        }
-                        break;
-                    case 2:
-                        {
-                            // Supplier
-                            self.processSupplier();
-                        }
-                        break;
-                    case 3:
-                        {
-                            // Store
-                            self.processStore();
-                        }
-                        break;
+                    }
+                    break;
+                case 1: {
+                    // Buyer
+                    self.processBuyer();
+                }
+                break;
+                case 2: {
+                    // Supplier
+                    self.processSupplier();
+                }
+                break;
+                case 3: {
+                    // Store
+                    self.processStore();
+                }
+                break;
                 }
             },
             processSuperUser() {
@@ -1393,15 +962,29 @@
             requestVariation() {
                 let self = this;
 
-                self.$refs.assignTask.show(data => {
+                let request = JSON.parse(JSON.stringify(self.tmpRequest))
 
-                    if (data.useExisting) {
-                        console.log("useExisting")
-                        self.requestExisting(data);
-                    } else {
-                        console.log("not useExisting")
-                        self.requestNew(data);
-                    }
+                self.$refs.assignTask.showWithData(request, data => {
+
+                })
+
+                // self.$refs.assignTask.show(data => {
+
+                //     if (data.useExisting) {
+                //         console.log("useExisting")
+                //         self.requestExisting(data);
+                //     } else {
+                //         console.log("not useExisting")
+                //         self.requestNew(data);
+                //     }
+                // })
+            },
+            requestStoreVariation() {
+                let self = this;
+                self.$refs.notesModal.show('Please describe the variation you request', notes => {
+                    self.requestExisting({
+                        notes: notes
+                    });
                 })
             },
             requestNew(data) {
