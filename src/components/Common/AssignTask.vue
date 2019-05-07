@@ -8,25 +8,24 @@
                     </v-toolbar>
                     <v-card flat>
                         <v-card-text>
-                            <v-select :items="tasks" v-model="task" label="Task"></v-select>
+                            <v-select :disabled="elementsDisabled" :items="tasks" v-model="task" label="Task"></v-select>
                             <div v-if="task == 3">
                                 <v-checkbox v-model="useExisting" label="Modify existing?"></v-checkbox>
                                 <div v-if="useExisting">
-                                    <v-select :items="systemFiles" v-model="systemFile" label="Planogram">
+                                    <v-select :disabled="elementsDisabled" :items="systemFiles" v-model="systemFile" label="Planogram">
                                     </v-select>
                                 </div>
                                 <div v-else>
                                     <v-select :items="storeClusters" v-model="storeCluster" label="Store Cluster">
                                     </v-select>
-                                    <v-select disabled :items="categoryClusters" v-model="categoryCluster"
+                                    <v-select  disabled :items="categoryClusters" v-model="categoryCluster"
                                         label="Category Cluster"></v-select>
                                     <v-select :items="stores" v-model="store" label="Store"></v-select>
                                 </div>
                             </div>
-                            <v-select :items="users" v-model="user" label="User"></v-select>
-                            <v-autocomplete v-if="task==2" :items="rangeData" v-model="selectedRange"
+                            <v-select :disabled="elementsDisabled" :items="users" v-model="user" label="User"></v-select>
+                            <v-autocomplete :disabled="elementsDisabled" v-if="task==2" :items="rangeData" v-model="selectedRange"
                                 label="Ranging file">
-
                             </v-autocomplete>
                             <v-textarea label="Notes" v-model="notes"></v-textarea>
                         </v-card-text>
@@ -110,8 +109,9 @@
                 categoryCluster: null,
                 stores: [],
                 store: null,
-                useExisting: false,
-                rangeData: []
+                useExisting: true,
+                rangeData: [],
+                elementsDisabled: false
             }
         },
         created() {},
@@ -242,6 +242,7 @@
                 let self = this;
                 self.task = null;
                 self.user = null;
+                self.elementsDisabled = false;
                 self.afterRuturn = afterRuturn;
                 self.getData(() => {
                     self.dialog = true;
@@ -250,8 +251,9 @@
             showWithData(data, afterRuturn) {
                 let self = this;
                 self.user = null
-                self.task = null;
+                self.task = 3;
                 self.afterRuturn = afterRuturn;
+                self.elementsDisabled = true;
                 self.getData(() => {
                     if (data.userID != null) {
                         self.user = data.userID
@@ -260,12 +262,12 @@
                     }
                     if (data.systemFileID == null) {
                         self.useExisting = false;
-                        self.storeCluster = data.storeID;
+                        self.storeCluster = data.storeCluster_ID;
                         self.categoryCluster = data.categoryCluster_ID;
                         self.store_ID = data.store_ID;
                     } else {
-                        self.useExisting = false;
-                        self.systemFile = data.systemUserID;
+                        self.useExisting = true;
+                        self.systemFile = data.systemFileID;
                     }
                     self.dialog = true;
                 })
