@@ -2,7 +2,7 @@
     <v-card>
         <v-toolbar flat dark dense color="primary">
             <!-- <v-text-field prepend-inner-icon="search" placeholder="Search" dark></v-text-field> -->
-            <v-autocomplete prepend-inner-icon="search" placeholder="Search" :items="filterList" v-model="dropSearch">
+            <v-autocomplete prepend-inner-icon="search" placeholder="Search" @change="changeStore()" :items="filterList" v-model="dropSearch">
             </v-autocomplete>
             <v-spacer></v-spacer>
             <v-spacer></v-spacer>
@@ -82,8 +82,8 @@
         </v-container> -->
 
         <Tasks :searchTypeComp="searchType" :dropSearchComp="dropSearch" v-if="selectedView==0" />
-        <MyProjects v-if="selectedView==1" />
-        <Planograms v-if="selectedView==2" />
+        <MyProjects :searchTypeComp="searchType" :dropSearchComp="dropSearch" v-if="selectedView==1" />
+        <Planograms ref="Planograms" :searchTypeComp="searchType" :dropSearchComp="dropSearch" v-if="selectedView==2" />
     </v-card>
 </template>
 
@@ -140,6 +140,12 @@
 
                 })
             },
+            changeStore(){
+                 let self = this
+                self.$nextTick(() => {
+                self.$refs.Planograms.getData(self.dropSearch)
+                })
+            }
              
         }
 

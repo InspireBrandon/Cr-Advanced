@@ -174,11 +174,12 @@
                 EventBus.$emit('filter-items-changed', filterList);
 
             },
-            getLists() {
+            getLists(callback) {
                 let self = this
                 let statusHandler = new StatusHandler()
                 self.status = statusHandler.getStatus()
                 self.typeList = statusHandler.getTypeList()
+                callback()
             },
 
         },

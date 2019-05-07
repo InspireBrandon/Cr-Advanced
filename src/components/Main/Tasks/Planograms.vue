@@ -56,7 +56,6 @@
                                             <span>{{ props.item.notes }}</span>
                                         </v-tooltip>
                                     </td>
-
                                 </tr>
                             </template>
                         </v-data-table>
@@ -84,10 +83,11 @@
     import UserNotesModal from '@/components/Common/UserNotesModal.vue'
     import NotesModal from '@/components/Common/NotesModal.vue'
     import {
-        access
-    } from 'fs';
+        EventBus
+    } from '@/libs/events/event-bus.js';
 
     export default {
+        props: ['searchTypeComp', 'dropSearchComp'],
         name: 'tasks',
         components: {
             UserSelector,
@@ -99,7 +99,7 @@
         },
         data() {
             return {
-                searchType:null,
+                searchType: null,
                 filterList: [],
                 dropSearch: null,
                 users: [],
@@ -146,11 +146,47 @@
                     }
                 ],
                 projects: [],
+                status: [],
+                typeList: [],
 
             }
         },
+        created() {
+            this.getStores()
+        },
         methods: {
+            getStores() {
+                let self = this
+                let list = []
+                //  Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.get(process.env.VUE_APP_API + `Store?db=Hinterland-Live`).then(r => {
+                    console.log(r);
+                    r.data.forEach(element => {
+                        list.push({
+                            text: element.storeName,
+                            value: element.storeID
+                        })
+                    });
+                    EventBus.$emit('filter-items-changed', list);
 
+                })
+            },
+            getData(storeID) {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.get(process.env.VUE_APP_API + `StoreProjectTX?storeID=${storeID}`).then(r => {
+                        console.log(r);
+                        
+                        self.projects=r.data.projectTXList
+                })
+            },
+            getLists(callback) {
+                let self = this
+                let statusHandler = new StatusHandler()
+                self.status = statusHandler.getStatus()
+                self.typeList = statusHandler.getTypeList()
+                callback()
+            },
         },
 
 
