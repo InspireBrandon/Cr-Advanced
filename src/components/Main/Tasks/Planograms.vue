@@ -171,12 +171,15 @@
                             value: element.storeID
                         })
                     });
-                    EventBus.$emit('filter-items-changed', list);
+                    EventBus.$emit('stores-items-changed', list);
 
                 })
             },
             getData(storeID) {
                 let self = this
+                console.log("storeID");
+                console.log(storeID);
+                
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.get(process.env.VUE_APP_API + `StoreProjectTX?storeID=${storeID}`).then(r => {
                         console.log(r);

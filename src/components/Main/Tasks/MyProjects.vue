@@ -149,6 +149,7 @@
         mounted() {
             this.getLists(() => {
                 this.getProjects()
+                this.getUsers()
             })
         },
         methods: {
@@ -182,6 +183,22 @@
                 self.typeList = statusHandler.getTypeList()
                 callback()
             },
+            getUsers() {
+                let self = this
+                let list = []
+                Axios.get(process.env.VUE_APP_API +
+                    `SystemUser`).then(r => {
+                    console.log("users");
+                    console.log(r);
+                    r.data.forEach(e => {
+                        list.push({
+                            text: e.firstname + " " + e.lastname,
+                            value: e.systemUserID
+                        })
+                    })
+                    EventBus.$emit('stores-items-changed', list);
+                })
+            }
 
         },
     }

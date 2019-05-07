@@ -2,7 +2,7 @@
     <v-card>
         <v-toolbar flat dark dense color="primary">
             <!-- <v-text-field prepend-inner-icon="search" placeholder="Search" dark></v-text-field> -->
-            <v-autocomplete prepend-inner-icon="search" placeholder="Search" @change="changeStore()" :items="filterList" v-model="dropSearch">
+            <v-autocomplete prepend-inner-icon="search" placeholder="Search"  :items="filterList" v-model="dropSearch">
             </v-autocomplete>
             <v-spacer></v-spacer>
             <v-spacer></v-spacer>
@@ -36,7 +36,8 @@
             </v-btn-toggle>
         </v-toolbar>
         <v-toolbar dense flat dark>
-            <v-autocomplete placeholder="users" :items="users" v-model="selectedUser"></v-autocomplete>
+            <v-autocomplete v-if="selectedView==2" placeholder=" store" :items="users" v-model="selectedUser" @change="changeStore()"></v-autocomplete>
+             <v-autocomplete v-if="selectedView==0" placeholder="users " :items="users" v-model="selectedUser" @change="changeView()"></v-autocomplete>
             <v-spacer></v-spacer>
             <v-spacer></v-spacer>
             <v-btn-toggle v-model="selectedView" class="transparent" >
@@ -44,26 +45,26 @@
                     <template v-slot:activator="{ on }">
                         <v-btn v-on="on" :value="0" flat>
                             <v-icon>
-                                perm_data_setting</v-icon>
+                                all_inbox</v-icon>
                         </v-btn>
                     </template>
-                    <span>Data-Prep</span>
+                    <span>Tasks</span>
                 </v-tooltip>
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
                         <v-btn v-on="on" :value="1" flat>
-                            <v-icon>assessment</v-icon>
+                            <v-icon>bookmarks</v-icon>
                         </v-btn>
                     </template>
-                    <span>Ranging</span>
+                    <span>Projects</span>
                 </v-tooltip>
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
                         <v-btn v-on="on" :value="2" flat>
-                            <v-icon>web</v-icon>
+                            <v-icon>account_balance</v-icon>
                         </v-btn>
                     </template>
-                    <span>Planogram</span>
+                    <span>Stores</span>
                 </v-tooltip>
             </v-btn-toggle>
         </v-toolbar>
@@ -125,7 +126,12 @@
         mounted(){
              let self = this
             EventBus.$on('filter-items-changed',list => {
-                self.filterList = list;
+               self.filterList=[]
+               self.filterList = list;
+            });
+             EventBus.$on('stores-items-changed',list => {
+               self.users=[]
+                self.users = list;
             });
         },
         created(){
@@ -142,7 +148,7 @@
             changeStore(){
                  let self = this
                 self.$nextTick(() => {
-                self.$refs.Planograms.getData(self.dropSearch)
+                self.$refs.Planograms.getData(self.selectedUser)
                 })
             }
              

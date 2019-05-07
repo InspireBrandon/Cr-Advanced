@@ -301,7 +301,8 @@
             setTimeout(() => {
                 self.getLists(() => {
                     self.checkAccessType()
-                    this.getDatabaseUsers()
+                    self.getUsers()
+                    // this.getDatabaseUsers()
                     let encoded_details = jwt.decode(sessionStorage.accessToken);
                     let systemUserID = encoded_details.USER_ID;
                     self.systemUserID = systemUserID;
@@ -318,7 +319,7 @@
             // },
             filteredTasks() {
                 // filter for both buttons and field
-                if (this.dropSearchComp == null&&this.searchTypeComp==null) {
+                if (this.dropSearchComp == null && this.searchTypeComp == null) {
                     return this.projectTransactions
                 }
                 if (this.searchTypeComp.length > 0 && this.dropSearchComp != null) {
@@ -356,6 +357,22 @@
             }
         },
         methods: {
+            getUsers() {
+                let self = this
+                let list = []
+                Axios.get(process.env.VUE_APP_API +
+                    `SystemUser`).then(r => {
+                    console.log("users");
+                    console.log(r);
+                    r.data.forEach(e => {
+                        list.push({
+                            text: e.firstname + " " + e.lastname,
+                            value: e.systemUserID
+                        })
+                    })
+                    EventBus.$emit('stores-items-changed', list);
+                 })
+            },
             checkAccessType() {
                 let self = this;
 
