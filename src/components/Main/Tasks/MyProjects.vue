@@ -136,8 +136,8 @@
                         text: '',
                         sortable: false
                     },
-                    
-                   
+
+
                 ],
                 status: null,
                 typeList: null,
@@ -147,8 +147,9 @@
             }
         },
         mounted() {
-            this.getProjects()
-            this.getLists()
+            this.getLists(() => {
+                this.getProjects()
+            })
         },
         methods: {
             getProjects() {

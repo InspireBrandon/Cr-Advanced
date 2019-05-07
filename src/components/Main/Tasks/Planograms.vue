@@ -152,7 +152,11 @@
             }
         },
         created() {
-            this.getStores()
+            let self = this;
+
+            self.getLists(function() {
+                self.getStores()
+            });
         },
         methods: {
             getStores() {
@@ -176,8 +180,7 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.get(process.env.VUE_APP_API + `StoreProjectTX?storeID=${storeID}`).then(r => {
                         console.log(r);
-                        
-                        self.projects=r.data.projectTXList
+                        self.projects = r.data.projectTXList
                 })
             },
             getLists(callback) {
@@ -185,7 +188,7 @@
                 let statusHandler = new StatusHandler()
                 self.status = statusHandler.getStatus()
                 self.typeList = statusHandler.getTypeList()
-                callback()
+                callback();
             },
         },
 

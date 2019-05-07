@@ -38,7 +38,6 @@
         <v-toolbar dense flat dark>
             <v-autocomplete placeholder="users" :items="users" v-model="selectedUser"></v-autocomplete>
             <v-spacer></v-spacer>
-            {{views[selectedView].text}}
             <v-spacer></v-spacer>
             <v-btn-toggle v-model="selectedView" class="transparent" >
                 <v-tooltip bottom>
