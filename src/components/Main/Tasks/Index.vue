@@ -3,8 +3,7 @@
         <v-layout row wrap>
             <v-flex md12>
                 <v-card flat>
-                    <v-toolbar flat dark dense color="primary">
-                        <!-- <v-text-field prepend-inner-icon="search" placeholder="Search" dark></v-text-field> -->
+                    <!-- <v-toolbar flat dark dense color="primary">
                         <v-autocomplete prepend-inner-icon="search" placeholder="Search" :items="filterList"
                             v-model="dropSearch"></v-autocomplete>
                         <v-btn-toggle v-model="searchType" class="transparent" multiple>
@@ -37,7 +36,7 @@
                         <v-spacer></v-spacer>
                         <v-autocomplete v-if="userAccess==0" @change="GetNewTransactions(selectedUser)"
                             placeholder="users" :items="users" v-model="selectedUser"></v-autocomplete>
-                    </v-toolbar>
+                    </v-toolbar> -->
                     <v-card-text class="pa-0">
                         <v-data-table :headers="headers" :items="filteredTasks" class="elevation-0 scrollable"
                             hide-actions>
@@ -222,11 +221,13 @@
     import UserNotesModal from '@/components/Common/UserNotesModal.vue'
     import NotesModal from '@/components/Common/NotesModal.vue'
     import {
-        access
-    } from 'fs';
+        EventBus
+    } from '@/libs/events/event-bus.js';
+
 
     export default {
         name: 'tasks',
+        props: ['searchTypeComp', 'dropSearchComp'],
         components: {
             UserSelector,
             AssignTask,
@@ -292,11 +293,11 @@
                 dropSearch: null,
                 selectedUser: null,
                 userAccess: null,
+                eventBus: null,
             }
         },
         created() {
             let self = this;
-
             setTimeout(() => {
                 self.getLists(() => {
                     self.checkAccessType()
@@ -309,11 +310,20 @@
             }, 1000);
         },
         computed: {
+            // handlefilters(){
+            //     let self = this
+            //     self.searchType=self.searchTypeComp
+            //     self.dropSearch=self.dropSearchComp
+
+            // },
             filteredTasks() {
                 // filter for both buttons and field
-                if (this.searchType.length > 0 && this.dropSearch != null) {
+                if (this.dropSearchComp == null&&this.searchTypeComp==null) {
+                    return this.projectTransactions
+                }
+                if (this.searchTypeComp.length > 0 && this.dropSearchComp != null) {
                     let tmp = this.projectTransactions.filter((tx) => {
-                        if (this.searchType.includes(tx.type) && this.dropSearch == tx.planogram_ID) {
+                        if (this.searchTypeComp.includes(tx.type) && this.dropSearchComp == tx.planogram_ID) {
                             return tx
                         }
                         return
@@ -321,9 +331,9 @@
                     return tmp;
                 }
                 // search for buttons only                   
-                if (this.searchType.length > 0) {
+                if (this.searchTypeComp.length > 0) {
                     let tmp = this.projectTransactions.filter((tx) => {
-                        if (this.searchType.includes(tx.type)) {
+                        if (this.searchTypeComp.includes(tx.type)) {
                             return tx
                         }
                         return
@@ -331,16 +341,16 @@
                     return tmp;
                 }
                 //search for only field
-                if (this.dropSearch != null) {
+                if (this.dropSearchComp != null) {
                     let tmp = this.projectTransactions.filter((tx) => {
-                        if (this.dropSearch == tx.planogram_ID) {
+                        if (this.dropSearchComp == tx.planogram_ID) {
                             return tx
                         }
                         return
                     })
                     return tmp;
                 }
-                if (this.searchType.length == 0 && this.dropSearch == null) {
+                if (this.searchTypeComp.length == 0 && this.dropSearch == null) {
                     return this.projectTransactions
                 }
             }
@@ -397,6 +407,8 @@
                         })
                     }
                 });
+                EventBus.$emit('filter-items-changed', self.filterList);
+
             },
             getLists(callback) {
                 let self = this
@@ -595,26 +607,23 @@
                 let route;
 
                 switch (item.type) {
-                    case 1:
-                        {
-                            route = `/DataPreparation`
-                        }
-                        break;
-                    case 2:
-                        {
-                            route = `/RangePlanning/${item.rangeFileID}`
-                        }
-                        break;
-                    case 3:
-                        {
-                            if (item.status == 1 || item.status == 8 || item.status == 41) {
-                                route = `/SpacePlanning`
-                            } else {
-                                route =
-                                    `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
-                            }
-                        }
-                        break;
+                    case 1: {
+                        route = `/DataPreparation`
+                    }
+                    break;
+                case 2: {
+                    route = `/RangePlanning/${item.rangeFileID}`
+                }
+                break;
+                case 3: {
+                    if (item.status == 1 || item.status == 8 || item.status == 41) {
+                        route = `/SpacePlanning`
+                    } else {
+                        route =
+                            `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
+                    }
+                }
+                break;
                 }
 
                 self.$router.push(route);
@@ -759,21 +768,18 @@
         let retval;
 
         switch (type) {
-            case 1:
-                {
-                    retval = 6;
-                }
-                break;
-            case 2:
-                {
-                    retval = 7;
-                }
-                break;
-            case 3:
-                {
-                    retval = 8;
-                }
-                break;
+            case 1: {
+                retval = 6;
+            }
+            break;
+        case 2: {
+            retval = 7;
+        }
+        break;
+        case 3: {
+            retval = 8;
+        }
+        break;
         }
 
         return retval;

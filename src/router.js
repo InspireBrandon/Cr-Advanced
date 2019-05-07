@@ -80,7 +80,7 @@ import ProductFixtureReport from '@/views/Reports/SPACE-PLANNING-REPORTS/Product
 import ProductReport from '@/views/Reports/SPACE-PLANNING-REPORTS/ProductReport/Index.vue'
 
 import HelpFileView from '@/components/Main/HelpFile/Index.vue'
-import Tasks from '@/components/Main/Tasks/Index.vue';
+import Tasks from '@/components/Main/Tasks/Switcher.vue';
 
 Vue.use(Router)
 
