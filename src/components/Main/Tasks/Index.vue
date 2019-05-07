@@ -148,6 +148,8 @@
                                             v-if="props.item.type == 3 && props.item.status == 13">View</v-btn>
                                         <v-btn small color="warning" @click="routeToView(props.item)"
                                             v-if="props.item.type == 3 && props.item.status == 24">View</v-btn>
+                                        <v-btn small color="warning" @click="routeToView(props.item)"
+                                            v-if="props.item.type == 3 && props.item.status == 26">View</v-btn>
                                         <!-- END IMPLEMENTATION -->
                                         <!-- ON HOLD -->
                                         <v-btn small color="secondary" @click="assign(props.item)"
@@ -162,6 +164,9 @@
                                             v-if="props.item.status == 14 && systemUserID == props.item.systemUserID">
                                             Assign</v-btn>
                                         <!-- END VARIATION REQUEST -->
+                                        <v-btn small color="secondary" @click="assign(props.item)"
+                                            v-if="props.item.status == 41 && systemUserID == props.item.systemUserID">
+                                            Assign</v-btn>
                                     </td>
                                     <td style="width: 2%">
                                         <v-tooltip bottom v-if="props.item.notes != null">
@@ -178,7 +183,7 @@
                                             </v-btn>
                                             <v-list dense class="pa-0 ma-0">
 
-                                                <v-list-tile @click="assign(props.item)">
+                                                <v-list-tile @click="assignNotNew(props.item)">
                                                     <span>Assign</span>
                                                 </v-list-tile>
 
@@ -354,7 +359,7 @@
                         if (r.data.isDatabaseOwner == true) {
                             self.userAccess = 0
                         } else {
-                            self.userAccess = r.datatenantLink_AccessTypeList[0].accessType
+                            self.userAccess = r.data.tenantLink_AccessTypeList[0].accessType
                         }
                     })
             },
@@ -368,26 +373,16 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.get(process.env.VUE_APP_API + `Tenant?userID=${encoded_details.USER_ID}`)
                     .then(r => {
-                        let tenantID = r.data[0].tenantID
-                        Axios.get(process.env.VUE_APP_API + `TenantAccess/User?tenantID=${tenantID}`)
-                            .then(res => {
-                                // self.users = res.data;
-                                Axios.get(process.env.VUE_APP_API + `/SystemUser/${self.systemUserID}`).then(
-                                    resp => {
-
-                                        self.users.push({
-                                            text: resp.data.firstname + " " + resp.data.lastname,
-                                            value: self.systemUserID
-                                        })
-                                        res.data.forEach(e => {
-                                            self.users.push({
-                                                text: e.firstname + " " + e.lastname,
-                                                value: e.systemUserID
-                                            })
-                                        })
+                        Axios.get(process.env.VUE_APP_API + `/SystemUser`).then(
+                            resp => {
+                                resp.data.forEach(e => {
+                                    self.users.push({
+                                        text: e.firstname + " " + e.lastname,
+                                        value: e.systemUserID
                                     })
+                                })
 
-
+                                console.log(self.users)
                             })
                     })
             },
@@ -491,6 +486,50 @@
                     })
                 })
             },
+            assignNotNew(currentItem) {
+                let self = this;
+
+                let request = JSON.parse(JSON.stringify(currentItem))
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+
+                self.$refs.assignTask.show(taskDetails => {
+                    let projectTXGroupRequest = {
+                        projectID: currentItem.project_ID
+                    }
+
+                    request.type = taskDetails.type;
+                    request.status = 40;
+                    request.systemUserID = null;
+                    request.rangeFileID = taskDetails.rangeFileID;
+                    request.actionedByUserID = systemUserID;
+                    request.project_ID = currentItem.project_ID;
+                    request.storeCluster_ID = taskDetails.storeCluster;
+                    request.categoryCluster_ID = taskDetails.categoryCluster;
+                    request.store_ID = taskDetails.store;
+                    // Create first process assigned TX
+                    // Create second project transaction group
+                    self.createProjectTransactionGroup(projectTXGroupRequest,
+                        projectTXGroupNew => {
+                            // Create second process assigned TX
+                            request.systemUserID = taskDetails.systemUserID;
+                            request.actionedByUserID = null;
+                            request.projectTXGroup_ID = projectTXGroupNew.id;
+                            request.notes = taskDetails.notes;
+                            self.createProjectTransaction(request,
+                                secondProcessAssigned => {
+                                    // Create actual transaction
+                                    request.status = returnStartStatusByType(
+                                        request.type);
+                                    self.createProjectTransaction(request,
+                                        actualTransaction => {
+                                            self.getTransactionsByUser(
+                                                systemUserID);
+                                        })
+                                })
+                        })
+                })
+            },
             closeTask(item, index) {
                 let self = this;
 
@@ -556,23 +595,26 @@
                 let route;
 
                 switch (item.type) {
-                    case 1: {
-                        route = `/DataPreparation`
-                    }
-                    break;
-                case 2: {
-                    route = `/RangePlanning/${item.rangeFileID}`
-                }
-                break;
-                case 3: {
-                    if (item.status == 1 || item.status == 8) {
-                        route = `/SpacePlanning`
-                    } else {
-                        route =
-                            `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
-                    }
-                }
-                break;
+                    case 1:
+                        {
+                            route = `/DataPreparation`
+                        }
+                        break;
+                    case 2:
+                        {
+                            route = `/RangePlanning/${item.rangeFileID}`
+                        }
+                        break;
+                    case 3:
+                        {
+                            if (item.status == 1 || item.status == 8 || item.status == 41) {
+                                route = `/SpacePlanning`
+                            } else {
+                                route =
+                                    `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
+                            }
+                        }
+                        break;
                 }
 
                 self.$router.push(route);
@@ -717,18 +759,21 @@
         let retval;
 
         switch (type) {
-            case 1: {
-                retval = 6;
-            }
-            break;
-        case 2: {
-            retval = 7;
-        }
-        break;
-        case 3: {
-            retval = 8;
-        }
-        break;
+            case 1:
+                {
+                    retval = 6;
+                }
+                break;
+            case 2:
+                {
+                    retval = 7;
+                }
+                break;
+            case 3:
+                {
+                    retval = 8;
+                }
+                break;
         }
 
         return retval;

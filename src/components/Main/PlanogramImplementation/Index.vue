@@ -52,23 +52,18 @@
                         <v-divider></v-divider>
                         <v-toolbar color="primary" dark dense flat
                             v-if="selectedPlanogram != null || routeProjectID != null">
-                            <v-btn
-                                v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==20||routeStatus==20)"
-                                flat outline @click="approve()">Approve</v-btn>
-                            <v-btn flat
-                                v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==20||routeStatus==20)"
-                                outline @click="requestVariation">
+                            <v-btn v-if="(projectsStatus.status==20||routeStatus==20)" flat outline @click="approve()">
+                                Approve</v-btn>
+                            <v-btn flat v-if="(projectsStatus.status==20||routeStatus==20||routeStatus==21||projectsStatus.status==21||routeStatus==24||routeStatus==26)" outline @click="requestVariation">
                                 Variation</v-btn>
                             <!-- <v-btn flat v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==20||routeStatus==20)" outline @click="decline(projectsStatus.status,2,timelineItems[0])">Decline</v-btn> -->
                             <!-- <v-btn
                                 v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==21||routeStatus==21)"
                                 flat outline @click="approve()">Assign</v-btn> -->
-                            <v-btn flat
-                                v-if="authorityType == 0||(authorityType == 3)&&(projectsStatus.status==24||routeStatus==24)"
-                                outline @click="implement(projectsStatus.status,3,timelineItems[0])">Implemented</v-btn>
-                            <v-btn flat
-                                v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==21||routeStatus==21)"
-                                outline @click="distribute(projectsStatus.status,4,timelineItems[0])">Distribute</v-btn>
+                            <v-btn flat v-if="(projectsStatus.status==24||routeStatus==24)" outline
+                                @click="implement(projectsStatus.status,3,timelineItems[0])">Implemented</v-btn>
+                            <v-btn flat v-if="(projectsStatus.status==21||routeStatus==21)" outline
+                                @click="distribute(projectsStatus.status,4,timelineItems[0])">Distribute</v-btn>
                         </v-toolbar>
                     </v-flex>
                     <v-flex v-if="planogramObj != null && !showLoader" lg12 md12 sm12 xs12>
@@ -633,8 +628,6 @@
                         if (element.value == item.systemFileID) {
                             tmp.push(element)
                         }
-
-
                     });
 
                     self.$refs.PlanogramIplementationModal.show(
@@ -1098,16 +1091,23 @@
                             self.tmpItems = [];
                             self.items = r.data.projectTXList;
 
+                            let hasIn = false;
+
                             r.data.projectTXList.forEach((element, idx) => {
 
                                 if (idx == 0) {
                                     self.currentStatus = element.status;
                                     self.currentProjectTx = element
-
-                                    self.tmpRequest = element;
                                 }
 
                                 if (element.deleted != true) {
+
+                                    if (!hasIn) {
+                                        if (element.status == self.routeStatus) {
+                                            self.tmpRequest = element;
+                                            hasIn = true;
+                                        }
+                                    }
 
                                     if (element.actionedByUserID == null && element.systemUserID !=
                                         null) {
@@ -1336,6 +1336,7 @@
                         self.createProjectTransaction(request, processAssigned => {
                             request.status = 13;
                             request.notes = data.notes;
+                            request.store_ID = data.stores;
                             self.createProjectTransaction(request,
                                 implementationPendingResponse => {
                                     self.getProjectTransactionsByProjectID(
@@ -1396,14 +1397,14 @@
 
                     if (data.useExisting) {
                         console.log("useExisting")
-                        self.requestExisting();
+                        self.requestExisting(data);
                     } else {
                         console.log("not useExisting")
-                        self.requestNew();
+                        self.requestNew(data);
                     }
                 })
             },
-            requestNew() {
+            requestNew(data) {
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(self.tmpRequest))
@@ -1419,12 +1420,14 @@
                     request.systemUserID = request.projectOwnerID;
                     request.actionedByUserID = null;
                     request.projectTXGroup_ID = newGroup.id;
+                    request.notes = data.notes;
+                    request.store_ID = data.store;
                     self.createProjectTransaction(request, newOnHold => {
                         self.getProjectTransactionsByProjectID(request.project_ID);
                     })
                 })
             },
-            requestExisting() {
+            requestExisting(data) {
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(self.tmpRequest))
@@ -1449,6 +1452,8 @@
                         request.projectTXGroup_ID = newGroup.id;
                         self.createProjectTransaction(request, newOnHold => {
                             request.status = 14;
+                            request.notes = data.notes;
+                            request.store_ID = data.store;
                             self.createProjectTransaction(request, variantRequest => {
                                 self.getProjectTransactionsByProjectID(request
                                     .project_ID);

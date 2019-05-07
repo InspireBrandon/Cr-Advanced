@@ -118,7 +118,7 @@ class projectStatusHandler {
                 value: 16,
                 color: "blue",
                 friendly: "On Hold",
-                type: [0]
+                type: [0, 3]
             },
             {
                 text: "Waiting Fixture Requirements",
@@ -271,11 +271,11 @@ class projectStatusHandler {
                 friendly: "New Process Assigned"
             },
             {
-                text: "New Process Assigned",
+                text: "Request New Variation",
                 value: 41,
                 type: [3],
                 color: "yellow",
-                friendly: "New Process Assigned"
+                friendly: "Request New Variation"
             }
         ]
 
