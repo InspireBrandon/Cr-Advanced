@@ -160,19 +160,18 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 let filterList = []
                 Axios.get(process.env.VUE_APP_API + `Project`).then(r => {
-
                     r.data.projectList.forEach(element => {
                         filterList.push({
                             text: element.name,
                             value: element.id
                         })
-                        Axios.get(process.env.VUE_APP_API +
-                            `ProjectTX?projectID=${element.id}`).then(
-                            res => {
-                                self.projects.push(res.data.projectTXList[0])
-                            })
                     });
+
+                    Axios.get(process.env.VUE_APP_API + `GetLastTransactions`).then(res => {
+                            self.projects = res.data.projectTXList
+                        })
                 })
+
                 EventBus.$emit('filter-items-changed', filterList);
 
             },
