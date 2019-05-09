@@ -208,6 +208,27 @@
                             </template>
                         </v-edit-dialog>
                     </td> -->
+                
+                     <td>
+                        <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                        <v-icon v-on="on" v-if="props.item.rangeFileName!=null">
+                                            assessment</v-icon>
+                                </template>
+                                <span > {{props.item.rangeFileName}}</span>
+                            </v-tooltip>
+                       
+                    </td>
+                        <td>
+                        <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                        <v-icon v-on="on" v-if="props.item.systemFileName!=null">
+                                            web</v-icon>
+                                </template>
+                                <span > {{props.item.systemFileName}}</span>
+                            </v-tooltip>
+                       
+                    </td>
                     <td>
                         <v-menu left>
                             <v-btn slot="activator" icon>
@@ -295,6 +316,12 @@
                     text: "Actioned by user",
                     sortable: false
                 }, {
+                    text: "Range",
+                    sortable: false,
+                }, {
+                    text: "Planogram",
+                    sortable: false,
+                },{
                     text: "Actions",
                     sortable: false
                 }],

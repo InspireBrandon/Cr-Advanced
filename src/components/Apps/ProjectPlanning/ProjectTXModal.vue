@@ -27,7 +27,7 @@
                             <!-- <v-text-field label="AssignedUser" placeholder="AssignedUser" v-model="AssignedUser"></v-text-field> -->
                         </v-flex>
                         <v-flex md4>
-
+                            <v-checkbox v-model="removed" label="Removed"></v-checkbox>
                         </v-flex>
                         <v-flex md4></v-flex>
                         <!-- <v-flex md4 v-if="isAdd==true"></v-flex> -->
@@ -79,6 +79,11 @@
                                 label="Planogram"></v-autocomplete>
                             <!-- <v-text-field label="AssignedUser" placeholder="AssignedUser" v-model="AssignedUser"></v-text-field> -->
                         </v-flex>
+                        <v-flex md8>
+                            <v-autocomplete style="max-width: 600px;" dense v-model="selectedRange" :items="rangeData"
+                                label="Range"></v-autocomplete>
+                            <!-- <v-text-field label="AssignedUser" placeholder="AssignedUser" v-model="AssignedUser"></v-text-field> -->
+                        </v-flex>
 
                     </v-layout>
                 </v-form>
@@ -125,6 +130,7 @@
     export default {
         data() {
             return {
+                removed: null,
                 datePicker: null,
                 timePicker: null,
                 isAdd: null,
@@ -154,7 +160,9 @@
                 systemFiles: [],
                 systemFileID: null,
                 actionedByUserID: null,
-                form: null
+                form: null,
+                rangeData: [],
+                selectedRange: [],
             }
 
         },
@@ -187,8 +195,23 @@
             this.getstores()
             this.getStoreClusters()
             this.getSpacePlans()
+            this.getRanges()
         },
         methods: {
+            getRanges() {
+                let self = this
+                Axios.get(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire&folder=Ranging")
+                    .then(r => {
+                        console.log(r);
+                        r.data.forEach(e => {
+                            self.rangeData.push({
+                                text: e.name,
+                                value: e.id
+                            })
+                        })
+                        // self.rangeData = r.data;
+                    })
+            },
             getTypeList() {
                 let self = this
                 let statushandler = new StatusHandler()
@@ -291,8 +314,7 @@
                         console.log(r.data)
                         self.systemFiles = new TextValueArray(r.data, 'name', 'id', true)
                     })
-                    .catch(e => {
-                    })
+                    .catch(e => {})
             },
             open(isAdd, item, callback) {
                 var self = this
@@ -300,9 +322,10 @@
                 self.dialog = true
 
                 if (isAdd == false) {
-                    self.form = item; 
+                    self.form = item;
 
                     self.isAdd = false
+                    self.removed = item.removed
                     self.projectID = item.project_ID
                     self.id = item.id
                     self.uid = item.uid
@@ -316,13 +339,14 @@
                     self.CategoryCluster = item.storeCluster
                     self.AssignedUser = item.systemUserID
                     self.systemFileID = item.systemFileID;
+                    self.selectedRange = item.rangeFileID
                 }
                 if (isAdd == true) {
-                    self.type=null
+                    self.type = null
                     self.projectID = item.id
                     self.isAdd = true
                     self.selectedPlanogram = item.planogram_ID,
-                    self.date = null
+                        self.date = null
                     self.status = 0
                     self.Store = null
                     self.StoreCluster = null
@@ -377,10 +401,11 @@
                     let encoded_details = jwt.decode(sessionStorage.accessToken);
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-
                     if (!self.isAdd) {
                         let trans = {
                             "id": self.id,
+                            "rangeFileID": self.selectedRange,
+                            "removed": self.removed,
                             "uid": self.uid,
                             "project_ID": self.projectID,
                             "storeCluster": tmpStoreCluster,
@@ -407,6 +432,7 @@
                     }
                     if (self.isAdd) {
                         let trans = {
+                            "rangeFileID": self.selectedRange,
                             "project_ID": self.projectID,
                             "storeCluster_ID": self.StoreCluster,
                             "store_ID": self.Store,
@@ -416,6 +442,7 @@
                             "type": self.type,
                             "username": tmpAssignedUser,
                             "store": tmpStore,
+                            "removed": self.removed,
                             "storeCluster": tmpStoreCluster,
                             "systemUserID": self.AssignedUser,
                             "systemFileID": self.systemFileID,

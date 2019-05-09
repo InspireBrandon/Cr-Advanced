@@ -37,7 +37,8 @@
                         <v-autocomplete placeholder="users" :items="users" v-model="selectedUser"></v-autocomplete>
                     </v-toolbar> -->
                     <v-card-text class="pa-0">
-                        <v-data-table :headers="headers" :items="projects" class="elevation-0 scrollable" hide-actions>
+                        <v-data-table :headers="headers" :items="filteredTasks" class="elevation-0 scrollable"
+                            hide-actions>
                             <template v-slot:items="props">
                                 <tr
                                     :style="{ backgroundColor: (props.item.subtask == true  ? 'lightgrey' : 'transparent' )}">
@@ -89,6 +90,7 @@
 
     export default {
         name: 'tasks',
+        props: ['searchTypeComp', 'dropSearchComp'],
         components: {
             UserSelector,
             AssignTask,
@@ -148,9 +150,57 @@
         },
         mounted() {
             this.getLists(() => {
+                EventBus.$emit('data-loading');
+
                 this.getProjects()
                 this.getUsers()
             })
+        },
+        computed: {
+            // handlefilters(){
+            //     let self = this
+            //     self.searchType=self.searchTypeComp
+            //     self.dropSearch=self.dropSearchComp
+
+            // },
+            filteredTasks() {
+                // filter for both buttons and field
+                if (this.dropSearchComp == null && this.searchTypeComp == null) {
+                    return this.projects
+                }
+                if (this.searchTypeComp.length > 0 && this.dropSearchComp != null) {
+                    let tmp = this.projects.filter((tx) => {
+                        if (this.searchTypeComp.includes(tx.type) && this.dropSearchComp == tx.planogram_ID) {
+                            return tx
+                        }
+                        return
+                    })
+                    return tmp;
+                }
+                // search for buttons only                   
+                if (this.searchTypeComp.length > 0) {
+                    let tmp = this.projects.filter((tx) => {
+                        if (this.searchTypeComp.includes(tx.type)) {
+                            return tx
+                        }
+                        return
+                    })
+                    return tmp;
+                }
+                //search for only field
+                if (this.dropSearchComp != null) {
+                    let tmp = this.projects.filter((tx) => {
+                        if (this.dropSearchComp == tx.planogram_ID) {
+                            return tx
+                        }
+                        return
+                    })
+                    return tmp;
+                }
+                if (this.searchTypeComp.length == 0 && this.dropSearch == null) {
+                    return this.projects
+                }
+            }
         },
         methods: {
             getProjects() {
@@ -168,8 +218,10 @@
                     });
 
                     Axios.get(process.env.VUE_APP_API + `GetLastTransactions`).then(res => {
-                            self.projects = res.data.projectTXList
-                        })
+                        EventBus.$emit('data-loaded', systemUserID);
+
+                        self.projects = res.data.projectTXList
+                    })
                 })
 
                 EventBus.$emit('filter-items-changed', filterList);

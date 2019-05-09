@@ -1241,11 +1241,15 @@ class PlanogramItemBase {
     self.Selected = selected;
     // self.SetBaseDraggable(selected);
 
+    let event = new CustomEmitter();
+
     if (self.Type.toUpperCase() == "PRODUCT") {
-      let event = new CustomEmitter();
       // TODO: Visuals must go here
       // event.notify_product_group_selected_deselected(EventBus, self.Selected, self);
       event.notify_product_group_selected_deselected(EventBus, true, self);
+    }
+    else {
+      event.notify_gondola_selected_deselected(EventBus, true, self);
     }
 
     // if (self.Selected) {

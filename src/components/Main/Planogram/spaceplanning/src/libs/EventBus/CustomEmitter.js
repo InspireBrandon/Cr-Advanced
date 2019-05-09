@@ -8,6 +8,7 @@ class CustomEmitter {
   }
 
   notify_gondola_selected_deselected(emitter, selected, data) {
+    console.log("Gondola selected")
     emitter.$emit('NOTIFY_GONDOLA_SELECTED_DESELECTED', {
       selected: selected,
       data: data,
@@ -15,6 +16,7 @@ class CustomEmitter {
   }
 
   notify_product_group_selected_deselected(emitter, selected, data) {
+    console.log("Product group selected")
     emitter.$emit('NOTIFY_PRODUCT_GROUP_SELECTED_DESELECTED', {
       selected: selected,
       data: data,
@@ -61,7 +63,7 @@ class CustomEmitter {
     })
   }
 
-  delete_fixture(emitter, data, fixture) {
+  delete_gondola(emitter, data, fixture) {
     console.log("DELETE FIXTURE");
 
     emitter.$emit('DELETE_FIXTURE', {

@@ -40,13 +40,13 @@
                         </v-btn-toggle>
                     </v-toolbar>
                     <v-toolbar dense flat dark>
-                        <v-autocomplete v-if="selectedView==2" placeholder=" store" :items="users"
+                        <v-autocomplete v-if="selectedView==2" placeholder="Please Select a Store" :items="users"
                             v-model="selectedUser" @change="changeStore()"></v-autocomplete>
                         <v-autocomplete v-if="selectedView==0" placeholder="users " :items="users"
-                            v-model="selectedUser" @change="changeView()"></v-autocomplete>
+                            v-model="selectedUser" @change="changeView(selectedUser)"></v-autocomplete>
                         <v-spacer></v-spacer>
                         <v-spacer></v-spacer>
-                        <v-btn-toggle v-model="selectedView" class="transparent">
+                        <v-btn-toggle v-model="selectedView" class="transparent" mandatory>
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
                                     <v-btn v-on="on" :value="0" flat>
@@ -78,6 +78,7 @@
                     <MyProjects :searchTypeComp="searchType" :dropSearchComp="dropSearch" v-if="selectedView==1" />
                     <Planograms ref="Planograms" :searchTypeComp="searchType" :dropSearchComp="dropSearch"
                         v-if="selectedView==2" />
+                    <SplashLoader ref="SplashLoader" />
                 </v-card>
             </v-flex>
         </v-layout>
@@ -88,6 +89,8 @@
     import Tasks from "./Index.vue"
     import MyProjects from "./MyProjects.vue"
     import Planograms from "./Planograms.vue"
+    import SplashLoader from "@/components/Common/SplashLoader.vue"
+
     import {
         EventBus
     } from '@/libs/events/event-bus.js';
@@ -97,6 +100,7 @@
             Tasks,
             MyProjects,
             Planograms,
+            SplashLoader
         },
         data() {
             return {
@@ -130,6 +134,12 @@
                 self.users = []
                 self.users = list;
             });
+            EventBus.$on('data-loaded', list => {
+                self.$refs.SplashLoader.close()
+            });
+            EventBus.$on('data-loading', list => {
+                self.$refs.SplashLoader.show()
+            });
         },
         created() {
             let self = this
@@ -138,7 +148,10 @@
         methods: {
             changeView(item) {
                 let self = this
+                console.log("here");
+
                 self.$nextTick(() => {
+                    EventBus.$emit('user-select-changed', item);
 
                 })
             },
