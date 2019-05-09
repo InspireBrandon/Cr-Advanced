@@ -1030,6 +1030,8 @@ class ProductItemBase extends PlanogramItemBase {
         break;
     }
 
+    console.log(self)
+
     self.IncreaseParentChildrenCounter(true, self.ParentID);
     self.UpdateMilkCrate(self.ParentID);
     self.Update();

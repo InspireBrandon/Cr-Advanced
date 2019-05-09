@@ -199,9 +199,15 @@
                                   <v-text-field v-model="form.pallet_Barcode" dense hide-details label="Pallet Barcode">
                                   </v-text-field>
                                 </v-flex>
-                                <v-flex style="display: none;" md12>{{ image1 }}</v-flex> 
-                                <v-flex style="display: none;" md12>{{ image2 }}</v-flex> 
-                                <v-flex style="display: none;" md12>{{ image3 }}</v-flex> 
+                                <!-- <v-flex md12>
+                                  <img style="width: 50px; height: 50px;" :src="image1" alt="">
+                                </v-flex>
+                                <v-flex md12>
+                                  <img style="width: 50px; height: 50px;" :src="image2" alt="">
+                                </v-flex>
+                                <v-flex md12>
+                                  <img style="width: 50px; height: 50px;" :src="image3" alt="">
+                                </v-flex> -->
                                 <v-flex md4 sm4>
                                   <v-menu v-model="showMenu" :position-x="x" :position-y="y" absolute offset-y>
                                     <v-list>
@@ -210,48 +216,22 @@
                                       </v-list-tile>
                                     </v-list>
                                   </v-menu>
-                                  <div class="subheading">Front</div><v-hover>
-                                    <v-card @contextmenu="showImageMenu($event, 1)" slot-scope="{ hover }"
-                                      :class="`elevation-${hover ? 12 : 2}`" class="mx-auto hover">
-                                      <v-img ref="image1" @click="openFile(1)" :src="image1"
-                                        :lazy-src="`static\img\no-image.png`" aspect-ratio="1" class="grey lighten-2">
-                                        <v-layout slot="placeholder" fill-height align-center justify-center ma-0>
-                                          <v-progress-circular indeterminate color="grey lighten-5">
-                                          </v-progress-circular>
-                                        </v-layout>
-                                      </v-img>
-                                    </v-card>
-                                  </v-hover>
+                                  <div class="subheading">Front</div>
+                                  <v-card style="text-align: center;" light @contextmenu="showImageMenu($event, 1)">
+                                    <img class="product-image" :src="image1" alt="" @click="openFile(1)">
+                                  </v-card>
                                 </v-flex>
                                 <v-flex md4 sm4>
                                   <div class="subheading">Side</div>
-                                  <v-hover>
-                                    <v-card @contextmenu="showImageMenu($event, 2)" slot-scope="{ hover }"
-                                      :class="`elevation-${hover ? 12 : 2}`" class="mx-auto hover">
-                                      <v-img ref="image2" @click="openFile(2)" :src="image2" :lazy-src="`static\img\no-image.png`"
-                                        aspect-ratio="1" class="grey lighten-2">
-                                        <v-layout slot="placeholder" fill-height align-center justify-center ma-0>
-                                          <v-progress-circular indeterminate color="grey lighten-5">
-                                          </v-progress-circular>
-                                        </v-layout>
-                                      </v-img>
-                                    </v-card>
-                                  </v-hover>
+                                  <v-card style="text-align: center;" light @contextmenu="showImageMenu($event, 2)">
+                                    <img class="product-image" :src="image2" alt="" @click="openFile(2)">
+                                  </v-card>
                                 </v-flex>
                                 <v-flex md4 sm4>
                                   <div class="subheading">Top</div>
-                                  <v-hover>
-                                    <v-card @contextmenu="showImageMenu($event, 3)" slot-scope="{ hover }"
-                                      :class="`elevation-${hover ? 12 : 2}`" class="mx-auto hover">
-                                      <v-img ref="image3" @click="openFile(3)" :src="image3" :lazy-src="`static\img\no-image.png`"
-                                        class="grey lighten-2">
-                                        <v-layout slot="placeholder" fill-height align-center justify-center ma-0>
-                                          <v-progress-circular indeterminate color="grey lighten-5">
-                                          </v-progress-circular>
-                                        </v-layout>
-                                      </v-img>
-                                    </v-card>
-                                  </v-hover>
+                                  <v-card style="text-align: center;" light @contextmenu="showImageMenu($event, 3)">
+                                    <img class="product-image" :src="image3" alt="" @click="openFile(3)">
+                                  </v-card>
                                 </v-flex>
                                 <v-flex md4 v-if="product_type == 0">
                                   <v-text-field v-model="form.height" dense hide-details type="number" label="Height"
@@ -1013,16 +993,14 @@
         let self = this;
 
         switch (self.toggle) {
-          case 0:
-            {
-              self.$refs.cropper.setDragMode("move");
-            }
-            break;
-          case 1:
-            {
-              self.$refs.cropper.setDragMode("crop");
-            }
-            break;
+          case 0: {
+            self.$refs.cropper.setDragMode("move");
+          }
+          break;
+        case 1: {
+          self.$refs.cropper.setDragMode("crop");
+        }
+        break;
         }
       },
       flipHorizontal() {
@@ -1048,43 +1026,38 @@
         let bc = "";
 
         switch (self.product_type) {
-          case 0:
-            {
-              if (self.bcDropdown == -1)
-                bc = self.form.barcode;
-              else {
-                self.form.aleternateBarcode.forEach(el => {
-                  if (el.value == self.bcDropdown) {
-                    bc = el.text;
-                  }
-                })
-              }
-            }
-            break;
-          case 1:
-            {
-              caseType = "T";
+          case 0: {
+            if (self.bcDropdown == -1)
               bc = self.form.barcode;
+            else {
+              self.form.aleternateBarcode.forEach(el => {
+                if (el.value == self.bcDropdown) {
+                  bc = el.text;
+                }
+              })
             }
-            break;
-          case 2:
-            {
-              caseType = "C";
-              bc = self.form.barcode;
-            }
-            break;
-          case 3:
-            {
-              caseType = "S";
-              bc = self.form.barcode;
-            }
-            break;
-          case 4:
-            {
-              caseType = "P";
-              bc = self.form.barcode;
-            }
-            break;
+          }
+          break;
+        case 1: {
+          caseType = "T";
+          bc = self.form.barcode;
+        }
+        break;
+        case 2: {
+          caseType = "C";
+          bc = self.form.barcode;
+        }
+        break;
+        case 3: {
+          caseType = "S";
+          bc = self.form.barcode;
+        }
+        break;
+        case 4: {
+          caseType = "P";
+          bc = self.form.barcode;
+        }
+        break;
         }
 
         let folderFile = BarcodeHandler.getFolderFile(bc);
@@ -1149,57 +1122,81 @@
       changePackingType() {
         let self = this;
 
+        self.checkChangeDimensions();
+
         self.$nextTick(() => {
           let productType = "";
           let bc = "";
 
           switch (self.product_type) {
-            case 0:
-              {
-                if (self.bcDropdown == -1)
-                  bc = self.form.barcode;
-                else {
-                  self.form.aleternateBarcode.forEach(el => {
-                    if (el.value == self.bcDropdown) {
-                      bc = el.text;
-                    }
-                  })
-                }
-              }
-              break;
-            case 1:
-              {
-                productType = "T";
+            case 0: {
+              if (self.bcDropdown == -1)
                 bc = self.form.barcode;
+              else {
+                self.form.aleternateBarcode.forEach(el => {
+                  if (el.value == self.bcDropdown) {
+                    bc = el.text;
+                  }
+                })
               }
-              break;
-            case 2:
-              {
-                productType = "C";
-                bc = self.form.barcode;
-              }
-              break;
-            case 3:
-              {
-                productType = "S";
-                bc = self.form.barcode;
-              }
-              break;
-            case 4:
-              {
-                productType = "P";
-                bc = self.form.barcode;
-              }
-              break;
+            }
+            break;
+          case 1: {
+            productType = "T";
+            bc = self.form.barcode;
+          }
+          break;
+          case 2: {
+            productType = "C";
+            bc = self.form.barcode;
+          }
+          break;
+          case 3: {
+            productType = "S";
+            bc = self.form.barcode;
+          }
+          break;
+          case 4: {
+            productType = "P";
+            bc = self.form.barcode;
+          }
+          break;
           }
 
           self.image1 = process.env.VUE_APP_API + BarcodeHandler.imageFromBarcode(bc, 1, productType);
           self.image2 = process.env.VUE_APP_API + BarcodeHandler.imageFromBarcode(bc, 2, productType);
           self.image3 = process.env.VUE_APP_API + BarcodeHandler.imageFromBarcode(bc, 3, productType);
-
-          console.log(self.image1, self.image2, self.image3)
-
         })
+      },
+      checkChangeDimensions() {
+        let self = this;
+
+        let dimensionTypes = ['Height', 'Width', 'Depth', 'Qty'];
+        let packagingTypes = ['', 'tray', 'case', 'shrink', 'pallet'];
+
+        packagingTypes.forEach(packagingType => { 
+          dimensionTypes.forEach(dimensionType => {
+            let propName;
+
+            if(packagingType == '') {
+              propName = dimensionType.toLowerCase();
+            }
+            else {
+              propName = packagingType + "_" + dimensionType;
+            }
+
+            if(propName != 'qty') {
+              if(self.form[propName] == undefined || self.form[propName] == undefined || self.form[propName] < 1) {
+                if(dimensionType == "Qty") {
+                  self.form[propName] = 1;
+                }
+                else {
+                  self.form[propName] = 10;
+                }
+              }
+            }
+          })
+        });
       },
       calculate() {
         let self = this;
@@ -1271,26 +1268,22 @@
         let productType = "";
 
         switch (self.product_type) {
-          case 1:
-            {
-              productType = "T";
-            }
-            break;
-          case 2:
-            {
-              productType = "C";
-            }
-            break;
-          case 3:
-            {
-              productType = "S";
-            }
-            break;
-          case 4:
-            {
-              productType = "P";
-            }
-            break;
+          case 1: {
+            productType = "T";
+          }
+          break;
+        case 2: {
+          productType = "C";
+        }
+        break;
+        case 3: {
+          productType = "S";
+        }
+        break;
+        case 4: {
+          productType = "P";
+        }
+        break;
         }
 
         let bc = "";
@@ -1479,5 +1472,9 @@
   .main-container {
     height: calc(100vh - 200px);
     overflow-x: auto;
+  }
+
+  .product-image {
+    max-height: 200px;
   }
 </style>

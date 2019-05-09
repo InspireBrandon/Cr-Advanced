@@ -476,7 +476,7 @@
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
 
-                self.$refs.assignTask.show(taskDetails => {
+                self.$refs.assignTask.showWithData(request, taskDetails => {
                     let projectTXGroupRequest = {
                         projectID: currentItem.project_ID
                     }
@@ -522,7 +522,7 @@
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
 
-                self.$refs.assignTask.show(taskDetails => {
+                self.$refs.assignTask.showWithData(request, taskDetails => {
                     let projectTXGroupRequest = {
                         projectID: currentItem.project_ID
                     }

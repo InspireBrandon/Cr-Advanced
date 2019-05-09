@@ -251,9 +251,9 @@
             showWithData(data, afterRuturn) {
                 let self = this;
                 self.user = null
-                self.task = 3;
+                self.task = data.type;
                 self.afterRuturn = afterRuturn;
-                self.elementsDisabled = true;
+                self.elementsDisabled = false;
                 self.getData(() => {
                     if (data.userID != null) {
                         self.user = data.userID
