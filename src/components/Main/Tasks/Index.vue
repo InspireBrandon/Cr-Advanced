@@ -129,7 +129,7 @@
                                             v-if="props.item.type == 3 && props.item.status == 10">View</v-btn>
                                         <v-btn small color="warning" @click="routeToView(props.item)"
                                             v-if="props.item.type == 3 && props.item.status == 20">View</v-btn>
-                                        <v-btn small color="error" @click="closeTask(props.item)"
+                                        <v-btn small color="error" @click="closeTask(props.item , props.index)"
                                             v-if="(props.item.type == 3 && props.item.status == 12) && systemUserID == props.item.actionedByUserID">
                                             Close</v-btn>
                                         <v-btn small color="primary" @click="submitForDistribution(props.item)"
@@ -154,7 +154,7 @@
                                         <v-btn small color="secondary" @click="assign(props.item)"
                                             v-if="props.item.status == 16 && systemUserID == props.item.systemUserID">
                                             Assign</v-btn>
-                                        <v-btn small color="error" @click="closeTask(props.item)"
+                                        <v-btn small color="error" @click="closeTask(props.item , props.index)"
                                             v-if="props.item.status == 16 && systemUserID == props.item.actionedByUserID">
                                             Close</v-btn>
                                         <!-- END ON HOLD -->
@@ -296,6 +296,12 @@
                 eventBus: null,
             }
         },
+        mounted() {
+            let self = this
+            EventBus.$on('user-select-changed', user => {
+                self.GetNewTransactions(user)
+            });
+        },
         created() {
             let self = this;
             setTimeout(() => {
@@ -371,7 +377,7 @@
                         })
                     })
                     EventBus.$emit('stores-items-changed', list);
-                 })
+                })
             },
             checkAccessType() {
                 let self = this;
@@ -392,6 +398,8 @@
             },
             GetNewTransactions(userID) {
                 let self = this
+                EventBus.$emit('data-loading', userID);
+
                 self.getTransactionsByUser(userID, () => {})
             },
             getDatabaseUsers() {
@@ -436,6 +444,7 @@
             },
             getTransactionsByUser(systemUserID, callback) {
                 let self = this;
+                EventBus.$emit('data-loading', systemUserID);
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
@@ -443,6 +452,8 @@
                         self.projectTransactions = r.data.projectTXList;
                         delete Axios.defaults.headers.common["TenantID"];
                         self.getfilterList()
+                EventBus.$emit('data-loaded', systemUserID);
+                        
                         callback();
                     })
                     .catch(e => {

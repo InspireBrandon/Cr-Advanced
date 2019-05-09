@@ -1,11 +1,14 @@
 <template>
   <div>
     <v-layout v-if="ProductSelected">
+      <v-btn @click="DeleteItem()">Delete</v-btn>
       <v-select :items="productControls" v-model="selectedControl" label="Control" style="height: 50px;"></v-select>
-      <v-btn icon flat small @click="IncreaseInputControlX" v-if="selectedControl == 'FACING' || selectedControl == 'POSITION'">
+      <v-btn icon flat small @click="IncreaseInputControlX"
+        v-if="selectedControl == 'FACING' || selectedControl == 'POSITION'">
         <v-icon>arrow_right</v-icon>
       </v-btn>
-      <v-btn icon flat small @click="DecreaseInputControlX" v-if="selectedControl == 'FACING' || selectedControl == 'POSITION'">
+      <v-btn icon flat small @click="DecreaseInputControlX"
+        v-if="selectedControl == 'FACING' || selectedControl == 'POSITION'">
         <v-icon>arrow_left</v-icon>
       </v-btn>
       <v-btn icon flat small @click="IncreaseInputControlY" v-if="selectedControl == 'FACING'">
@@ -18,8 +21,8 @@
         <v-icon dark>rotate_right</v-icon>Rotate
       </v-btn>
       <v-flex xs3>
-        <v-select :items="productOrientationItems" v-model="selectedOrientation" label="Orientation" style="height: 50px;"
-          @change="ChangeOrientation"></v-select>
+        <v-select :items="productOrientationItems" v-model="selectedOrientation" label="Orientation"
+          style="height: 50px;" @change="ChangeOrientation"></v-select>
         <!-- <v-overflow-btn
           :items="productOrientationItems"
           v-model="selectedOrientation"
@@ -47,10 +50,17 @@
       <v-btn icon flat small @click="DecreaseCapFacings">
         <v-icon>arrow_drop_down</v-icon>
       </v-btn>
+
     </v-layout>
+    <YesNoModal ref="yesNoModal"></YesNoModal>
   </div>
 </template>
 <script>
+  import CustomEmitter from '@/components/Main/Planogram/spaceplanning/src/libs/EventBus/CustomEmitter.js';
+  import EventBus from "@/components/Main/Planogram/spaceplanning/src/libs/EventBus/EventBus.js";
+  import YesNoModal from '@/components/Common/YesNoModal';
+
+
   export default {
     data() {
       return {
@@ -61,6 +71,9 @@
         productControls: [{
             text: "Facings",
             value: "FACING"
+          }, {
+            text: "Delete",
+            value: "DELETE"
           }
           // {
           //   text: "Position",
@@ -70,12 +83,48 @@
         selectedControl: "FACING"
       };
     },
+    mounted() {},
+    components: {
+      YesNoModal
+    },
     computed: {
       ProductSelected() {
         return this.$parent.$parent.$parent.ProductSelected;
       }
     },
     methods: {
+      DeleteItem() {
+        let self = this
+        let stage = self.$parent.$parent.$parent;
+        let event = new CustomEmitter();
+        if (stage.selectionData.selectedGondola != undefined && stage.selectionData.selectedGondola != null && stage
+          .selectionData.selectedProductGroup != undefined && stage.selectionData
+          .selectedProductGroup) {
+          // let event = new CustomEmitter();
+        self.$refs.yesNoModal.show('Are you sure you want to delete this fixture?', value => {
+          if (value) {
+
+
+            if (stage.selectionData.selectedGondola != undefined && stage.selectionData.selectedGondola != null) {
+              let selectedFixture = stage.selectionData.selectedGondola;
+
+              if (selectedFixture.Type == "GONDOLA") {
+                event.delete_gondola(EventBus, selectedFixture.Data, selectedFixture);
+              } else {
+                event.delete_gondola(EventBus, selectedFixture.Data, selectedFixture);
+              }
+            }
+            if (stage.selectionData.selectedProductGroup != undefined && stage.selectionData
+              .selectedProductGroup) {
+              let selectedProduct = stage.selectionData.selectedProductGroup;
+              event.delete_product(EventBus, selectedProduct.Data, selectedProduct);
+            }
+          }
+        })
+        }
+        
+
+      },
       IncreaseInputControlX() {
         if (this.selectedControl == "FACING") {
           this.$parent.$parent.$parent.IncreaseFacingsX();
