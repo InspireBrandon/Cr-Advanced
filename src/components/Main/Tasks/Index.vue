@@ -151,9 +151,9 @@
                                             v-if="props.item.type == 3 && props.item.status == 26">View</v-btn>
                                         <!-- END IMPLEMENTATION -->
                                         <!-- ON HOLD -->
-                                        <v-btn small color="secondary" @click="assign(props.item)"
+                                        <v-btn small color="error" @click="closeTask(props.item , props.index)"
                                             v-if="props.item.status == 16 && systemUserID == props.item.systemUserID">
-                                            Assign</v-btn>
+                                            close</v-btn>
                                         <v-btn small color="error" @click="closeTask(props.item , props.index)"
                                             v-if="props.item.status == 16 && systemUserID == props.item.actionedByUserID">
                                             Close</v-btn>
@@ -427,6 +427,10 @@
             getfilterList() {
                 let self = this
                 self.filterList = []
+                  self.filterList.push({
+                            text: "All",
+                            value: null
+                        })
                 self.projectTransactions.forEach(element => {
                     if (!self.filterList.includes(element.planogram_ID)) {
                         self.filterList.push({

@@ -210,6 +210,10 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 let filterList = []
                 Axios.get(process.env.VUE_APP_API + `Project`).then(r => {
+                    filterList.push({
+                            text: "All",
+                            value: null
+                        })
                     r.data.projectList.forEach(element => {
                         filterList.push({
                             text: element.name,

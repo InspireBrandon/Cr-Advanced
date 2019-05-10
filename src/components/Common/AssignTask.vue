@@ -24,7 +24,7 @@
                                 </div>
                             </div>
                             <v-select :disabled="elementsDisabled" :items="users" v-model="user" label="User"></v-select>
-                            <v-autocomplete :disabled="elementsDisabled" v-if="task==2" :items="rangeData" v-model="selectedRange"
+                            <v-autocomplete :disabled="elementsDisabled" v-if="task==2&&selectedRange==null" :items="rangeData" v-model="selectedRange"
                                 label="Ranging file">
                             </v-autocomplete>
                             <v-textarea label="Notes" v-model="notes"></v-textarea>
