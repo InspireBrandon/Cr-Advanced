@@ -2,30 +2,33 @@
     <div>
         <v-layout row justify-center>
             <v-dialog v-model="dialog" persistent max-width="800">
-                <v-card >
+                <v-card>
                     <v-toolbar color="primary" dark>
                         <v-toolbar-title>Assign a task</v-toolbar-title>
                     </v-toolbar>
                     <v-card flat>
                         <v-card-text>
-                            <v-select :disabled="elementsDisabled" :items="tasks" v-model="task" label="Task"></v-select>
+                            <v-select :disabled="elementsDisabled" :items="tasks" v-model="task" label="Task">
+                            </v-select>
                             <div v-if="task == 3">
                                 <v-checkbox v-model="useExisting" label="Modify existing?"></v-checkbox>
                                 <div v-if="useExisting">
-                                    <v-select :disabled="elementsDisabled" :items="systemFiles" v-model="systemFile" label="Planogram">
+                                    <v-select :disabled="elementsDisabled" :items="systemFiles" v-model="systemFile"
+                                        label="Planogram">
                                     </v-select>
                                 </div>
                                 <div v-else>
                                     <v-select :items="storeClusters" v-model="storeCluster" label="Store Cluster">
                                     </v-select>
-                                    <v-select  disabled :items="categoryClusters" v-model="categoryCluster"
+                                    <v-select disabled :items="categoryClusters" v-model="categoryCluster"
                                         label="Category Cluster"></v-select>
                                     <v-select :items="stores" v-model="store" label="Store"></v-select>
                                 </div>
                             </div>
-                            <v-select :disabled="elementsDisabled" :items="users" v-model="user" label="User"></v-select>
-                            <v-autocomplete :disabled="elementsDisabled" v-if="task==2&&selectedRange==null" :items="rangeData" v-model="selectedRange"
-                                label="Ranging file">
+                            <v-select :disabled="elementsDisabled" :items="users" v-model="user" label="User">
+                            </v-select>
+                            <v-autocomplete :disabled="elementsDisabled" v-if="task==2" :items="rangeData"
+                                v-model="selectedRange" label="Ranging file">
                             </v-autocomplete>
                             <v-textarea label="Notes" v-model="notes"></v-textarea>
                         </v-card-text>
@@ -249,29 +252,29 @@
                 })
             },
             showWithData(data, afterRuturn) {
-
-                console.log(data);
-
                 let self = this;
                 self.user = null
                 self.task = data.type;
                 self.afterRuturn = afterRuturn;
                 self.selectedRange = data.rangeFileID;
                 self.elementsDisabled = false;
+                self.storeCluster = data.storeCluster_ID;
+                self.categoryCluster = data.categoryCluster_ID;
+                self.store_ID = data.store_ID;
+                self.systemFile = data.systemFileID;
+                self.user = data.projectOwnerID
+                self.notes = data.notes;
+
                 self.getData(() => {
                     if (data.userID != null) {
                         self.user = data.userID
                     } else {
-                        self.user = data.projectOwnerID
+                        self.useExisting = false;
                     }
                     if (data.systemFileID == null) {
                         self.useExisting = false;
-                        self.storeCluster = data.storeCluster_ID;
-                        self.categoryCluster = data.categoryCluster_ID;
-                        self.store_ID = data.store_ID;
                     } else {
                         self.useExisting = true;
-                        self.systemFile = data.systemFileID;
                     }
                     self.dialog = true;
                 })
@@ -279,36 +282,17 @@
             returnResult() {
                 let self = this;
 
-                if (self.task != 3) {
-                    self.afterRuturn({
-                        type: self.task,
-                        systemUserID: self.user,
-                        notes: self.notes,
-                        rangeFileID: self.selectedRange
-                    });
-                } else {
-                    if (self.useExisting) {
-                        self.afterRuturn({
-                            type: self.task,
-                            systemUserID: self.user,
-                            notes: self.notes,
-                            rangeFileID: self.selectedRange,
-                            systemFile: self.systemFile,
-                            useExisting: true
-                        });
-                    } else {
-                        self.afterRuturn({
-                            type: self.task,
-                            systemUserID: self.user,
-                            notes: self.notes,
-                            rangeFileID: self.selectedRange,
-                            storeCluster: self.storeCluster,
-                            categoryCluster: self.categoryCluster,
-                            store: self.store,
-                            useExisting: false
-                        });
-                    }
-                }
+                self.afterRuturn({
+                    type: self.task,
+                    systemUserID: self.user,
+                    notes: self.notes,
+                    rangeFileID: self.selectedRange,
+                    systemFile: self.systemFile,
+                    useExisting: self.useExisting,
+                    storeCluster: self.storeCluster,
+                    categoryCluster: self.categoryCluster,
+                    store: self.store,
+                });
 
                 self.dialog = false;
             },
