@@ -1053,7 +1053,7 @@
         self.$refs.yesNo.show('Delete this Fixture?', goThrough => {
           if (goThrough) {
             let event = new CustomEmitter();
-            event.delete_fixture(EventBus, self.newData, self.fixtureObj);
+            event.delete_gondola(EventBus, self.newData, self.fixtureObj);
             self.destroy();
           }
         })

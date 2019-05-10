@@ -1745,7 +1745,7 @@ class PlanogramItemBase {
   Delete() {
     let self = this;
     let ctrl_store = new StoreHelper();
-    let parentItem = ctrl_store.getPlanogramItemById(self.VueStore, self.ParentID);
+
     ctrl_store.removePlanogramItem(self.VueStore, self);
     self.Group.destroy();
 
@@ -1768,8 +1768,11 @@ class PlanogramItemBase {
     }
 
     // TODO: reposition elements
-    if (parentItem != null) {
-      self.UpdateParent(parentItem.ID);
+    if(self.ParentID != undefined && self.parentID != null) {
+      let parentItem = ctrl_store.getPlanogramItemById(self.VueStore, self.ParentID);
+      if (parentItem != null) {
+        self.UpdateParent(parentItem.ID);
+      }
     }
 
     self.Stage.draw();
