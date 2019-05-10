@@ -328,6 +328,9 @@
                 if (this.dropSearchComp == null && this.searchTypeComp == null) {
                     return this.projectTransactions
                 }
+
+                console.log(this)
+
                 if (this.searchTypeComp.length > 0 && this.dropSearchComp != null) {
                     let tmp = this.projectTransactions.filter((tx) => {
                         if (this.searchTypeComp.includes(tx.type) && this.dropSearchComp == tx.planogram_ID) {

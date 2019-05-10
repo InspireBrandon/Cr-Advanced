@@ -1,8 +1,8 @@
 <template>
     <div>
         <v-layout row justify-center>
-            <v-dialog v-model="dialog" persistent max-width="500px;">
-                <v-card>
+            <v-dialog v-model="dialog" persistent max-width="800">
+                <v-card >
                     <v-toolbar color="primary" dark>
                         <v-toolbar-title>Assign a task</v-toolbar-title>
                     </v-toolbar>

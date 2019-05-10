@@ -5,8 +5,7 @@
                 <v-card>
                     <v-toolbar flat dark dense color="primary">
                         <!-- <v-text-field prepend-inner-icon="search" placeholder="Search" dark></v-text-field> -->
-                        <v-autocomplete prepend-inner-icon="search" placeholder="Search" :items="filterList"
-                            v-model="dropSearch">
+                        <v-autocomplete prepend-inner-icon="search" placeholder="Search" :items="filterList" v-model="dropSearch">
                         </v-autocomplete>
                         <v-spacer></v-spacer>
                         <v-spacer></v-spacer>
@@ -39,7 +38,7 @@
                             </v-tooltip>
                         </v-btn-toggle>
                     </v-toolbar>
-                    <v-toolbar dense flat dark>
+                    <v-toolbar v-if="userAccess==0" dense flat dark>
                         <v-autocomplete v-if="selectedView==2" placeholder="Please Select a Store" :items="users"
                             v-model="selectedUser" @change="changeStore()"></v-autocomplete>
                         <v-autocomplete v-if="selectedView==0" placeholder="users " :items="users"
@@ -90,6 +89,10 @@
     import MyProjects from "./MyProjects.vue"
     import Planograms from "./Planograms.vue"
     import SplashLoader from "@/components/Common/SplashLoader.vue"
+    import jwt from 'jsonwebtoken';
+    import Axios from 'axios';
+
+
 
     import {
         EventBus
@@ -104,11 +107,12 @@
         },
         data() {
             return {
-
+                placeHolder:null,
+                userAccess: null,
                 filterList: [],
                 Search: null,
                 dropSearch: null,
-                searchType: null,
+                searchType: [],
                 selectedUser: null,
                 users: [],
                 selectedView: 0,
@@ -126,6 +130,7 @@
         },
         mounted() {
             let self = this
+            self.checkAccessType(() => {})
             EventBus.$on('filter-items-changed', list => {
                 self.filterList = []
                 self.filterList = list;
@@ -143,9 +148,36 @@
         },
         created() {
             let self = this
-            EventBus.$off('filter-items-changed');
+
+
         },
         methods: {
+            sendProp(item) {
+                let self = this
+                self.$nextTick(() => {
+                    console.log(item);
+                self.placeHolder = item
+                })
+
+            },
+            checkAccessType(callback) {
+                let self = this;
+                console.log("here");
+
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+
+                Axios.get(process.env.VUE_APP_API +
+                        `TenantLink_AccessType?systemUserID=${encoded_details.USER_ID}&tenantID=${sessionStorage.currentDatabase}`
+                    )
+                    .then(r => {
+                        if (r.data.isDatabaseOwner == true) {
+                            self.userAccess = 0
+                        } else {
+                            self.userAccess = r.data.tenantLink_AccessTypeList[0].accessType
+                        }
+                        callback()
+                    })
+            },
             changeView(item) {
                 let self = this
                 console.log("here");

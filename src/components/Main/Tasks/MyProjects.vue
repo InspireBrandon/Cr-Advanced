@@ -89,7 +89,7 @@
     } from '@/libs/events/event-bus.js';
 
     export default {
-        name: 'tasks',
+        name: 'Projects',
         props: ['searchTypeComp', 'dropSearchComp'],
         components: {
             UserSelector,
@@ -138,14 +138,11 @@
                         text: '',
                         sortable: false
                     },
-
-
                 ],
                 status: null,
                 typeList: null,
                 projects: [],
                 projectsList: [],
-
             }
         },
         mounted() {
@@ -161,16 +158,18 @@
             //     let self = this
             //     self.searchType=self.searchTypeComp
             //     self.dropSearch=self.dropSearchComp
-
             // },
             filteredTasks() {
                 // filter for both buttons and field
-                if (this.dropSearchComp == null && this.searchTypeComp == null) {
+                let self = this
+                
+                if (self.dropSearchComp == null && self.searchTypeComp == null) {
                     return this.projects
                 }
-                if (this.searchTypeComp.length > 0 && this.dropSearchComp != null) {
-                    let tmp = this.projects.filter((tx) => {
-                        if (this.searchTypeComp.includes(tx.type) && this.dropSearchComp == tx.planogram_ID) {
+                
+                if (this.searchTypeComp.length > 0 && self.dropSearchComp!= null) {
+                    let tmp = self.projects.filter((tx) => {
+                        if (self.searchTypeComp.includes(tx.type) && self.dropSearchComp == tx.planogram_ID) {
                             return tx
                         }
                         return
@@ -178,9 +177,9 @@
                     return tmp;
                 }
                 // search for buttons only                   
-                if (this.searchTypeComp.length > 0) {
-                    let tmp = this.projects.filter((tx) => {
-                        if (this.searchTypeComp.includes(tx.type)) {
+                if (self.searchTypeComp.length > 0) {
+                    let tmp = self.projects.filter((tx) => {
+                        if (self.searchTypeComp.includes(tx.type)) {
                             return tx
                         }
                         return
@@ -188,17 +187,18 @@
                     return tmp;
                 }
                 //search for only field
-                if (this.dropSearchComp != null) {
-                    let tmp = this.projects.filter((tx) => {
-                        if (this.dropSearchComp == tx.planogram_ID) {
+                if (self.dropSearchComp != null) {
+                    let tmp = self.projects.filter((tx) => {
+
+                        if (self.dropSearchComp == tx.planogram_ID) {
                             return tx
                         }
                         return
                     })
                     return tmp;
                 }
-                if (this.searchTypeComp.length == 0 && this.dropSearch == null) {
-                    return this.projects
+                if (self.searchTypeComp.length == 0 && self.dropSearchComp == null) {
+                    return self.projects
                 }
             }
         },
@@ -213,18 +213,17 @@
                     r.data.projectList.forEach(element => {
                         filterList.push({
                             text: element.name,
-                            value: element.id
+                            value: element.planogram_ID
                         })
                     });
 
                     Axios.get(process.env.VUE_APP_API + `GetLastTransactions`).then(res => {
                         EventBus.$emit('data-loaded', systemUserID);
-
                         self.projects = res.data.projectTXList
                     })
+                    EventBus.$emit('filter-items-changed', filterList);
                 })
 
-                EventBus.$emit('filter-items-changed', filterList);
 
             },
             getLists(callback) {
@@ -239,8 +238,7 @@
                 let list = []
                 Axios.get(process.env.VUE_APP_API +
                     `SystemUser`).then(r => {
-                    console.log("users");
-                    console.log(r);
+                    
                     r.data.forEach(e => {
                         list.push({
                             text: e.firstname + " " + e.lastname,
