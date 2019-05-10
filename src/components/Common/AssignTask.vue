@@ -253,6 +253,7 @@
                 self.user = null
                 self.task = data.type;
                 self.afterRuturn = afterRuturn;
+                self.rangeFileID = data.rangeFileID;
                 self.elementsDisabled = false;
                 self.getData(() => {
                     if (data.userID != null) {

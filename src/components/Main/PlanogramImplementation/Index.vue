@@ -58,7 +58,8 @@
                                 v-if="(projectsStatus.status==20||routeStatus==20||routeStatus==21||projectsStatus.status==21||routeStatus==26)"
                                 outline @click="requestVariation">
                                 Variation</v-btn>
-                            <v-btn outline flat v-if="routeStatus == 24" @click="requestStoreVariation">Variation</v-btn>
+                            <v-btn outline flat v-if="routeStatus == 24" @click="requestStoreVariation">Variation
+                            </v-btn>
                             <!-- <v-btn flat v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==20||routeStatus==20)" outline @click="decline(projectsStatus.status,2,timelineItems[0])">Decline</v-btn> -->
                             <!-- <v-btn
                                 v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==21||routeStatus==21)"
@@ -131,7 +132,8 @@
                     </v-btn>
                 </v-toolbar>
                 <v-card flat style="padding: 5px; overflow-x: auto; text-align: center;">
-                    <img ref="modalImage" @click="expandImage" contain style="max-height: calc(100vh - 100px);" :src="image">
+                    <img ref="modalImage" @click="expandImage" contain style="max-height: calc(100vh - 100px);"
+                        :src="image">
                 </v-card>
             </v-card>
         </v-dialog>
@@ -965,19 +967,14 @@
                 let request = JSON.parse(JSON.stringify(self.tmpRequest))
 
                 self.$refs.assignTask.showWithData(request, data => {
-
+                    if (data.useExisting) {
+                        console.log("useExisting")
+                        self.requestExisting(data);
+                    } else {
+                        console.log("not useExisting")
+                        self.requestNew(data);
+                    }
                 })
-
-                // self.$refs.assignTask.show(data => {
-
-                //     if (data.useExisting) {
-                //         console.log("useExisting")
-                //         self.requestExisting(data);
-                //     } else {
-                //         console.log("not useExisting")
-                //         self.requestNew(data);
-                //     }
-                // })
             },
             requestStoreVariation() {
                 let self = this;
@@ -1070,10 +1067,9 @@
 
                 let elementStyle = self.$refs.modalImage.style;
 
-                if(elementStyle.maxHeight == 'calc(100vh - 100px)') {
+                if (elementStyle.maxHeight == 'calc(100vh - 100px)') {
                     elementStyle.maxHeight = 'calc(200vh - 100px)'
-                }
-                else {
+                } else {
                     elementStyle.maxHeight = 'calc(100vh - 100px)';
                 }
             }
