@@ -75,7 +75,10 @@
                     </v-icon>
                 </v-btn>
                 <v-btn v-if="project!=null" outline dark @click.stop="$router.push('/Allocation/'+project.id)">
-                  allocate
+                    allocate
+                </v-btn>
+                <v-btn v-if="project!=null" outline dark @click.stop="deleteSelectedTX">
+                    Delete
                 </v-btn>
                 <v-spacer></v-spacer>
                 <v-btn flat icon v-if="project!=null" @click="openProjectTXAdd()">
@@ -85,6 +88,9 @@
 
             <v-data-table v-if="project!=null" :headers="headers" :items="ProjectTXs" hide-actions>
                 <template v-slot:items="props">
+                    <td>
+                        <v-checkbox v-model="selectedDelete" :value="props.item.id"></v-checkbox>
+                    </td>
                     <td>
                         <!-- {{ props.item.dateTimeString }} -->
                         <v-edit-dialog :return-value.sync="props.item.type" large lazy persistent
@@ -122,7 +128,7 @@
                                     autofocus></v-select>
                             </template>
                         </v-edit-dialog>
-                    </td> 
+                    </td>
                     <td>
 
                         <v-edit-dialog :return-value.sync="props.item.status" large lazy persistent
@@ -208,26 +214,26 @@
                             </template>
                         </v-edit-dialog>
                     </td> -->
-                
-                     <td>
+
+                    <td>
                         <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                        <v-icon v-on="on" v-if="props.item.rangeFileName!=null">
-                                            assessment</v-icon>
-                                </template>
-                                <span > {{props.item.rangeFileName}}</span>
-                            </v-tooltip>
-                       
+                            <template v-slot:activator="{ on }">
+                                <v-icon v-on="on" v-if="props.item.rangeFileName!=null">
+                                    assessment</v-icon>
+                            </template>
+                            <span> {{props.item.rangeFileName}}</span>
+                        </v-tooltip>
+
                     </td>
-                        <td>
+                    <td>
                         <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                        <v-icon v-on="on" v-if="props.item.systemFileName!=null">
-                                            web</v-icon>
-                                </template>
-                                <span > {{props.item.systemFileName}}</span>
-                            </v-tooltip>
-                       
+                            <template v-slot:activator="{ on }">
+                                <v-icon v-on="on" v-if="props.item.systemFileName!=null">
+                                    web</v-icon>
+                            </template>
+                            <span> {{props.item.systemFileName}}</span>
+                        </v-tooltip>
+
                     </td>
                     <td>
                         <v-menu left>
@@ -280,6 +286,7 @@
         },
         data() {
             return {
+                selectedDelete: [],
                 menu: null,
                 timePicker: "00:00",
                 datePicker: null,
@@ -289,7 +296,11 @@
 
                 typeList: [],
                 headers: [{
-                    text: "Date",
+                    text: "delete",
+                    sortable: false,
+
+                }, {
+                    text: "",
                     sortable: false,
                     value: "dateTimeString"
                 }, {
@@ -321,7 +332,7 @@
                 }, {
                     text: "Planogram",
                     sortable: false,
-                },{
+                }, {
                     text: "Actions",
                     sortable: false
                 }],
@@ -359,6 +370,32 @@
             }
         },
         methods: {
+            deleteSelectedTX() {
+                let self = this
+                self.$refs.yesNoModal.show('Delete selected project transactions?', value => {
+                    if (value) {
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                        console.log(self.selectedDelete);
+
+                        Axios.post(process.env.VUE_APP_API + `/ProjectTXDeleteMany`, self.selectedDelete).then(
+                            r => {
+
+                                console.log(r);
+                                self.selectedDelete.forEach(item => {
+                                    for (let index = 0; index < self.ProjectTXs.length; index++) {
+                                        const element = self.ProjectTXs[index];
+                                        if (element.id == item) {
+                                            self.ProjectTXs.splice(index, 1)
+                                        }
+                                    }
+                                })
+
+                                delete Axios.defaults.headers.common["TenantID"];
+                            })
+                    }
+
+                })
+            },
             getTypeList() {
                 let self = this
                 let statushandler = new StatusHandler()
@@ -454,10 +491,10 @@
             openGroupEdit(item) {
                 var self = this
                 self.$refs.ProjectGroupModal.open(false, item, data => {
-                    self.ProjectsGroups.forEach(e=>{
-                        if (e.id==data.id){
-                            e.name=data.name
-                            e.description=data.description
+                    self.ProjectsGroups.forEach(e => {
+                        if (e.id == data.id) {
+                            e.name = data.name
+                            e.description = data.description
                         }
                     })
                 })
@@ -683,7 +720,7 @@
                         }
                     })
                     console.log(self.ProjectTXs);
-                    
+
                     delete Axios.defaults.headers.common["TenantID"];
                 })
 
