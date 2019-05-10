@@ -75,6 +75,17 @@
                                         <div>{{ props.item.storeCluster}}</div>
                                     </td>
                                     <td>{{ props.item.categoryCluster }}</td>
+
+                                     <td>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-icon v-on="on" v-if="props.item.systemFileName!=null">
+                                    web</v-icon>
+                            </template>
+                            <span> {{props.item.systemFileName}}</span>
+                        </v-tooltip>
+
+                    </td>
                                     <td>
                                         <div>{{ props.item.username}}</div>
                                     </td>
@@ -232,6 +243,9 @@
                     sortable: false
                 }, {
                     text: "Category Cluster",
+                    sortable: false
+                }, {
+                    text: "Planogram",
                     sortable: false
                 }, {
                     text: "Assigned User",
