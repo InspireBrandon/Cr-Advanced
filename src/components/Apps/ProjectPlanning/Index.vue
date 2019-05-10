@@ -89,7 +89,7 @@
             <v-data-table v-if="project!=null" :headers="headers" :items="ProjectTXs" hide-actions>
                 <template v-slot:items="props">
                     <td>
-                        <v-checkbox v-model="selectedDelete" :value="props.item.id"></v-checkbox>
+                        <v-checkbox hide-details v-model="selectedDelete" :value="props.item.id"></v-checkbox>
                     </td>
                     <td>
                         <!-- {{ props.item.dateTimeString }} -->
