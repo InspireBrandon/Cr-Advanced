@@ -131,7 +131,7 @@
                     </v-btn>
                 </v-toolbar>
                 <v-card flat style="padding: 5px; overflow-x: auto; text-align: center;">
-                    <img contain style="max-height: calc(100vh - 100px);" :src="image">
+                    <img ref="modalImage" @click="expandImage" contain style="max-height: calc(100vh - 100px);" :src="image">
                 </v-card>
             </v-card>
         </v-dialog>
@@ -1064,6 +1064,18 @@
                     delete Axios.defaults.headers.common["TenantID"];
                     callback(r.data.projectTX)
                 })
+            },
+            expandImage() {
+                let self = this;
+
+                let elementStyle = self.$refs.modalImage.style;
+
+                if(elementStyle.maxHeight == 'calc(100vh - 100px)') {
+                    elementStyle.maxHeight = 'calc(200vh - 100px)'
+                }
+                else {
+                    elementStyle.maxHeight = 'calc(100vh - 100px)';
+                }
             }
         }
     }
