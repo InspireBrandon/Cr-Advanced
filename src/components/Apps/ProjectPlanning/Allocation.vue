@@ -76,16 +76,28 @@
                                     </td>
                                     <td>{{ props.item.categoryCluster }}</td>
 
-                                     <td>
-                        <v-tooltip bottom>
-                            <template v-slot:activator="{ on }">
-                                <v-icon v-on="on" v-if="props.item.systemFileName!=null">
-                                    web</v-icon>
-                            </template>
-                            <span> {{props.item.systemFileName}}</span>
-                        </v-tooltip>
+                                    <td>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-icon v-on="on" v-if="props.item.systemFileName!=null">
+                                                    web</v-icon>
+                                            </template>
+                                            <span> {{props.item.systemFileName}}</span>
+                                        </v-tooltip>
 
-                    </td>
+                                    </td>
+                                    <td>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-icon v-on="on" v-if="props.item.rangeFileName!=null">
+                                                    web</v-icon>
+                                            </template>
+                                            <span> {{props.item.rangeFileName}}</span>
+                                        </v-tooltip>
+                                    </td>
+                                    <td>
+                                        <v-icon v-if="props.item.removed == true">check</v-icon>
+                                    </td>
                                     <td>
                                         <div>{{ props.item.username}}</div>
                                     </td>
@@ -144,8 +156,6 @@
                         <v-flex md1>
                             Actioned By
                         </v-flex>
-
-
                         <v-flex md1>
                             Grouped
                         </v-flex>
@@ -159,7 +169,6 @@
                             <v-flex md2>
                                 {{typeList[item.type == -1 ?  5 :  item.type].text}}
                             </v-flex>
-
                             <v-flex md2>{{status[item.status].friendly }}
                             </v-flex>
                             <v-flex md2>
@@ -174,7 +183,6 @@
                             <v-flex md1>
                                 {{ item.actionedByUserName }}
                             </v-flex>
-
                             <v-flex md1>
                                 {{item.projectTXGroup_ID }}
                                 {{item.projectTXGroup_ID ==null?"NO":"YES"}}
@@ -182,8 +190,6 @@
                         </v-list-tile>
                         <v-divider></v-divider>
                     </div>
-
-
                 </v-list>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -234,7 +240,6 @@
                 }, {
                     text: "Status",
                     sortable: false,
-
                 }, {
                     text: "Store",
                     sortable: false
@@ -246,6 +251,12 @@
                     sortable: false
                 }, {
                     text: "Planogram",
+                    sortable: false
+                }, {
+                    text: "Range",
+                    sortable: false
+                }, {
+                    text: "Closed",
                     sortable: false
                 }, {
                     text: "Assigned User",
