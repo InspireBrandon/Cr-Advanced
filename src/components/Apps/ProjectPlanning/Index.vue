@@ -89,7 +89,7 @@
             <v-data-table v-if="project!=null" :headers="headers" :items="ProjectTXs" hide-actions>
                 <template v-slot:items="props">
                     <td>
-                        <v-checkbox v-model="selectedDelete" :value="props.item.id"></v-checkbox>
+                        <v-checkbox hide-details v-model="selectedDelete" :value="props.item.id"></v-checkbox>
                     </td>
                     <td>
                         <!-- {{ props.item.dateTimeString }} -->
@@ -223,7 +223,6 @@
                             </template>
                             <span> {{props.item.rangeFileName}}</span>
                         </v-tooltip>
-
                     </td>
                     <td>
                         <v-tooltip bottom>
@@ -233,7 +232,10 @@
                             </template>
                             <span> {{props.item.systemFileName}}</span>
                         </v-tooltip>
-
+                    </td>
+                    <td>
+                        <v-checkbox @change="setRemoved(props.item)" v-model="props.item.removed" hide-details>
+                        </v-checkbox>
                     </td>
                     <td>
                         <v-menu left>
@@ -331,6 +333,9 @@
                     sortable: false,
                 }, {
                     text: "Planogram",
+                    sortable: false,
+                }, {
+                    text: "Closed",
                     sortable: false,
                 }, {
                     text: "Actions",
@@ -723,8 +728,16 @@
 
                     delete Axios.defaults.headers.common["TenantID"];
                 })
+            },
+            setRemoved(item) {
+                let self = this;
 
-
+                self.$nextTick(() => {
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                    Axios.put(process.env.VUE_APP_API + 'ProjectTX?update=false', item).then(res => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+                })
             },
             getColor(type, status) {
                 return StatusHandler.getColorByTypeAndStatus(type, status)

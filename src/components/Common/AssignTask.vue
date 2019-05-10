@@ -249,10 +249,14 @@
                 })
             },
             showWithData(data, afterRuturn) {
+
+                console.log(data);
+
                 let self = this;
                 self.user = null
                 self.task = data.type;
                 self.afterRuturn = afterRuturn;
+                self.selectedRange = data.rangeFileID;
                 self.elementsDisabled = false;
                 self.getData(() => {
                     if (data.userID != null) {

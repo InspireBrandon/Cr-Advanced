@@ -48,7 +48,7 @@ class LoadSavePlanogramBase {
 
     allItems.forEach(item => {
       // remove the line below to test that the positions are being saved and repopulated in the load
-      item.PositionElement();
+      // item.PositionElement();
       output.planogramData.push(item.ToObject());
     });
 
