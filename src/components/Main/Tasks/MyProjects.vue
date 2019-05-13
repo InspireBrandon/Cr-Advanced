@@ -10,7 +10,7 @@
                                 <tr
                                     :style="{ backgroundColor: (props.item.subtask == true  ? 'lightgrey' : 'transparent' )}">
                                     <td>{{ props.item.planogram }}</td>
-                                    <td>{{ typeList[props.item.type == -1 ? 5 : props.item.type].text }}</td>
+                                   <td>{{ typeList[props.item.type == -1 ? 5 : props.item.type].text }}</td>
                                     <td>{{ status[props.item.status == -1 ? 18 : props.item.status].text }}</td>
                                     <td>{{ props.item.storeCluster }}</td>
                                     <td>{{ props.item.categoryCluster }}</td>
@@ -60,7 +60,7 @@
 
     export default {
         name: 'Projects',
-        props: ['searchTypeComp', 'dropSearchComp','projectData'],
+        props: ['searchTypeComp', 'dropSearchComp', 'projectData','typeList','status'],
         components: {
             UserSelector,
             AssignTask,
@@ -109,30 +109,30 @@
                         sortable: false
                     },
                 ],
-                status: null,
-                typeList: null,
+                // status: [],
+                // typeList: [],
                 projects: [],
                 projectsList: [],
                 userAccess: null,
                 userAccessTypeID: -1
             }
         },
-        mounted() {
-            let self = this;
-            self.getLists(() => {
-                // self.checkAccessType(() => {
-                //     EventBus.$emit('data-loading');
-                //     // self.getProjects()
-                //     // self.getUsers()
-                // })
-            })
-        },
+
+        // created() {
+        //     let self = this;
+        //     self.getLists(() => {
+        //         console.log(self.status);
+        //         console.log(self.typeList);
+        //     })
+        // },
         computed: {
             filteredTasks() {
                 // filter for both buttons and field
                 let self = this
 
                 if (self.dropSearchComp == null && self.searchTypeComp == null) {
+                    console.log("here");
+
                     return this.projectData
                 }
 
@@ -172,25 +172,7 @@
             }
         },
         methods: {
-            checkAccessType(callback) {
-                let self = this;
 
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
-
-                Axios.get(process.env.VUE_APP_API +
-                        `TenantLink_AccessType?systemUserID=${encoded_details.USER_ID}&tenantID=${sessionStorage.currentDatabase}`
-                    )
-                    .then(r => {
-                        if (r.data.isDatabaseOwner == true) {
-                            self.userAccess = 0
-                        } else {
-                            self.userAccess = r.data.tenantLink_AccessTypeList[0].accessType
-                            self.userAccessTypeID = r.data.tenantLink_AccessTypeList[0].tenantLink_AccessTypeID
-                        }
-
-                        callback();
-                    })
-            },
             filterOutSupplierPlanograms(callback) {
                 let self = this;
 
@@ -220,54 +202,14 @@
                                 })
                             }
                         });
-                        EventBus.$emit('filter-items-changed', tmpFilterlist);
+                        // EventBus.$emit('filter-items-changed', tmpFilterlist);
                         self.projects = tmp;
 
                         callback();
                     })
             },
-            // getProjects() {
-            //     let self = this
-            //     let encoded_details = jwt.decode(sessionStorage.accessToken);
-            //     let systemUserID = encoded_details.USER_ID;
-            //     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-            //     let filterList = []
-            //     Axios.get(process.env.VUE_APP_API + `Project`).then(r => {
-            //         filterList.push({
-            //             text: "All",
-            //             value: null
-            //         })
-            //         r.data.projectList.forEach(element => {
-            //             filterList.push({
-            //                 text: element.name,
-            //                 value: element.planogram_ID
-            //             })
-            //         });
-
-            //         Axios.get(process.env.VUE_APP_API + `GetLastTransactions`).then(res => {
-            //             EventBus.$emit('data-loaded', systemUserID);
-            //             self.projects = res.data.projectTXList;
-            //             if (self.userAccess == 2) {
-            //                 self.filterOutSupplierPlanograms(() => {
-            //                     EventBus.$emit('data-loaded', systemUserID);
-
-            //                 });
-            //             } else {
-            //                 EventBus.$emit('data-loaded', systemUserID);
-            //                 EventBus.$emit('filter-items-changed', filterList);
-            //             }
-            //         })
-            //     })
-
-
-            // },
-            getLists(callback) {
-                let self = this
-                let statusHandler = new StatusHandler()
-                self.status = statusHandler.getStatus()
-                self.typeList = statusHandler.getTypeList()
-                callback()
-            },
+         
+           
             // getUsers() {
             //     let self = this
             //     let list = []

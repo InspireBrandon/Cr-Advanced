@@ -84,7 +84,7 @@
                     </v-toolbar>
                     <Tasks :searchTypeComp="searchType" :dropSearchComp="dropSearch" :taskData="taskViewData"
                         v-if="selectedView==0" />
-                    <MyProjects :searchTypeComp="searchType" :dropSearchComp="dropSearch" :projectData="projectViewData" v-if="selectedView==1" />
+                    <MyProjects :searchTypeComp="searchType" :dropSearchComp="dropSearch" :projectData="projectViewData" v-if="selectedView==1" :typeList="typeList" :status="status"/>
                     <Planograms ref="Planograms" :searchTypeComp="searchType" :storeData="storeViewData"
                         :dropSearchComp="dropSearch" v-if="selectedView==2" />
                     <SplashLoader ref="SplashLoader" />
@@ -118,6 +118,8 @@
         },
         data() {
             return {
+                status:[],
+                typeList:[],
                 tmpStores: [],
                 tmpUsers: [],
                 systemUserID: null,
@@ -185,6 +187,13 @@
             EventBus.$off('data-loading');
         },
         methods: {
+             getLists(callback) {
+                let self = this
+                let statusHandler = new StatusHandler()
+                self.status = statusHandler.getStatus()
+                self.typeList = statusHandler.getTypeList()
+                callback()
+            },
             sendProp(item) {
                 let self = this
                 self.$nextTick(() => {
