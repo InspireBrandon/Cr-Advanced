@@ -10,7 +10,7 @@
                                 <tr
                                     :style="{ backgroundColor: (props.item.subtask == true  ? 'lightgrey' : 'transparent' )}">
                                     <td>{{ props.item.planogram }}</td>
-                                   <td>{{ typeList[props.item.type == -1 ? 5 : props.item.type].text }}</td>
+                                    <td>{{ typeList[props.item.type == -1 ? 5 : props.item.type].text }}</td>
                                     <td>{{ status[props.item.status == -1 ? 18 : props.item.status].text }}</td>
                                     <td>{{ props.item.storeCluster }}</td>
                                     <td>{{ props.item.categoryCluster }}</td>
@@ -60,7 +60,7 @@
 
     export default {
         name: 'Projects',
-        props: ['searchTypeComp', 'dropSearchComp', 'projectData','typeList','status'],
+        props: ['searchTypeComp', 'dropSearchComp', 'projectData'],
         components: {
             UserSelector,
             AssignTask,
@@ -109,8 +109,8 @@
                         sortable: false
                     },
                 ],
-                // status: [],
-                // typeList: [],
+                status: [],
+                typeList: [],
                 projects: [],
                 projectsList: [],
                 userAccess: null,
@@ -118,13 +118,13 @@
             }
         },
 
-        // created() {
-        //     let self = this;
-        //     self.getLists(() => {
-        //         console.log(self.status);
-        //         console.log(self.typeList);
-        //     })
-        // },
+        created() {
+            let self = this;
+            self.getLists(() => {
+                console.log(self.status);
+                console.log(self.typeList);
+            })
+        },
         computed: {
             filteredTasks() {
                 // filter for both buttons and field
@@ -172,7 +172,13 @@
             }
         },
         methods: {
-
+            getLists(callback) {
+                let self = this
+                let statusHandler = new StatusHandler()
+                self.status = statusHandler.getStatus()
+                self.typeList = statusHandler.getTypeList()
+                callback()
+            },
             filterOutSupplierPlanograms(callback) {
                 let self = this;
 
@@ -208,8 +214,8 @@
                         callback();
                     })
             },
-         
-           
+
+
             // getUsers() {
             //     let self = this
             //     let list = []
