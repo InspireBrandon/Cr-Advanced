@@ -3,40 +3,6 @@
         <v-layout row wrap>
             <v-flex md12>
                 <v-card flat>
-                    <!-- <v-toolbar flat dark dense color="primary">
-                        <v-autocomplete prepend-inner-icon="search" placeholder="Search" :items="filterList"
-                            v-model="dropSearch"></v-autocomplete>
-                        <v-btn-toggle v-model="searchType" class="transparent" multiple>
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                    <v-btn v-on="on" :value="1" flat>
-                                        <v-icon>
-                                            perm_data_setting</v-icon>
-                                    </v-btn>
-                                </template>
-                                <span>Data-Prep</span>
-                            </v-tooltip>
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                    <v-btn v-on="on" :value="2" flat>
-                                        <v-icon>assessment</v-icon>
-                                    </v-btn>
-                                </template>
-                                <span>Ranging</span>
-                            </v-tooltip>
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                    <v-btn v-on="on" :value="3" flat>
-                                        <v-icon>web</v-icon>
-                                    </v-btn>
-                                </template>
-                                <span>Planogram</span>
-                            </v-tooltip>
-                        </v-btn-toggle>
-                        <v-spacer></v-spacer>
-                        <v-autocomplete v-if="userAccess==0" @change="GetNewTransactions(selectedUser)"
-                            placeholder="users" :items="users" v-model="selectedUser"></v-autocomplete>
-                    </v-toolbar> -->
                     <v-card-text class="pa-0">
                         <v-data-table :headers="headers" :items="filteredTasks" class="elevation-0 scrollable"
                             hide-actions>
@@ -177,7 +143,7 @@
                                     </td>
                                     <td style="width: 2%">
                                         <v-menu left>
-                                            <v-btn icon slot="activator">
+                                            <v-btn v-if="userAccess != 3" icon slot="activator">
                                                 <v-icon>more_vert</v-icon>
                                             </v-btn>
                                             <v-list dense class="pa-0 ma-0">
@@ -294,6 +260,7 @@
                 selectedUser: null,
                 userAccess: null,
                 eventBus: null,
+                userAccessTypeID: -1
             }
         },
         mounted() {
@@ -306,13 +273,13 @@
             let self = this;
             setTimeout(() => {
                 self.getLists(() => {
-                    self.checkAccessType()
-                    self.getUsers()
-                    // this.getDatabaseUsers()
-                    let encoded_details = jwt.decode(sessionStorage.accessToken);
-                    let systemUserID = encoded_details.USER_ID;
-                    self.systemUserID = systemUserID;
-                    self.getTransactionsByUser(systemUserID, () => {})
+                    self.checkAccessType(() => {
+                        self.getUsers()
+                        let encoded_details = jwt.decode(sessionStorage.accessToken);
+                        let systemUserID = encoded_details.USER_ID;
+                        self.systemUserID = systemUserID;
+                        self.getTransactionsByUser(systemUserID, () => {})
+                    })
                 })
             }, 1000);
         },
@@ -328,8 +295,6 @@
                 if (this.dropSearchComp == null && this.searchTypeComp == null) {
                     return this.projectTransactions
                 }
-
-                console.log(this)
 
                 if (this.searchTypeComp.length > 0 && this.dropSearchComp != null) {
                     let tmp = this.projectTransactions.filter((tx) => {
@@ -369,20 +334,39 @@
             getUsers() {
                 let self = this
                 let list = []
-                Axios.get(process.env.VUE_APP_API +
-                    `SystemUser`).then(r => {
-                    console.log("users");
-                    console.log(r);
-                    r.data.forEach(e => {
-                        list.push({
-                            text: e.firstname + " " + e.lastname,
-                            value: e.systemUserID
+
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+
+                if (self.userAccess == 0) {
+                    Axios.get(process.env.VUE_APP_API + `SystemUser`).then(r => {
+                        r.data.forEach(e => {
+                            list.push({
+                                text: e.firstname + " " + e.lastname,
+                                value: e.systemUserID
+                            })
                         })
+
+                        EventBus.$emit('stores-items-changed', list);
                     })
-                    EventBus.$emit('stores-items-changed', list);
-                })
+                } else {
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    Axios.get(process.env.VUE_APP_API + `ProjectSharedViewShared?userID=${encoded_details.USER_ID}`)
+                        .then(r => {
+                            r.data.projectSharedViewList.forEach(e => {
+
+                                list.push({
+                                    text: e.userName,
+                                    value: e.systemUserID
+                                })
+                            })
+
+                            EventBus.$emit('stores-items-changed', list);
+                            delete Axios.defaults.headers.common["TenantID"];
+                        })
+                }
             },
-            checkAccessType() {
+            checkAccessType(callback) {
                 let self = this;
 
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
@@ -391,12 +375,14 @@
                         `TenantLink_AccessType?systemUserID=${encoded_details.USER_ID}&tenantID=${sessionStorage.currentDatabase}`
                     )
                     .then(r => {
-
                         if (r.data.isDatabaseOwner == true) {
                             self.userAccess = 0
                         } else {
                             self.userAccess = r.data.tenantLink_AccessTypeList[0].accessType
+                            self.userAccessTypeID = r.data.tenantLink_AccessTypeList[0].tenantLink_AccessTypeID
                         }
+
+                        callback();
                     })
             },
             GetNewTransactions(userID) {
@@ -419,8 +405,6 @@
                                         value: e.systemUserID
                                     })
                                 })
-
-                                console.log(self.users)
                             })
                     })
             },
@@ -436,7 +420,6 @@
                     }
                 });
                 EventBus.$emit('filter-items-changed', self.filterList);
-
             },
             getLists(callback) {
                 let self = this
@@ -454,13 +437,45 @@
                 Axios.get(process.env.VUE_APP_API + `UserProjectTX?userID=${systemUserID}`).then(r => {
                         self.projectTransactions = r.data.projectTXList;
                         delete Axios.defaults.headers.common["TenantID"];
-                        self.getfilterList()
-                EventBus.$emit('data-loaded', systemUserID);
-                        
-                        callback();
+                        if (self.userAccess == 2) {
+                            self.filterOutSupplierPlanograms(() => {
+                                self.getfilterList()
+                                EventBus.$emit('data-loaded', systemUserID);
+                                callback();
+                            });
+                        } else {
+                            self.getfilterList()
+                            EventBus.$emit('data-loaded', systemUserID);
+                            callback();
+                        }
                     })
                     .catch(e => {
                         delete Axios.defaults.headers.common["TenantID"];
+                    })
+            },
+            filterOutSupplierPlanograms(callback) {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API + `SupplierPlanogram?tenantLink_AccessTypeID=${self.userAccessTypeID}`)
+                    .then(r => {
+                        let supplierPlanograms = r.data;
+                        let tmp = [];
+
+                        self.projectTransactions.forEach(pt => {
+                            let canAdd = false;
+
+                            supplierPlanograms.forEach(sp => {
+                                if(pt.planogram_ID == sp.planogram_ID)
+                                    canAdd = true;
+                            })
+
+                            if(canAdd)
+                                tmp.push(pt);
+                        })
+
+                        self.projectTransactions = tmp;
+                        
+                        callback();
                     })
             },
             createProjectTransactionGroup(request, callback) {
@@ -820,6 +835,5 @@
 <style scoped>
     .scrollable {
         height: calc(100vh - 240px);
-        overflow: auto;
     }
 </style>

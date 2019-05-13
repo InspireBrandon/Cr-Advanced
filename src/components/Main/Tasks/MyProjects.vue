@@ -3,39 +3,6 @@
         <v-layout row wrap>
             <v-flex md12>
                 <v-card flat>
-                    <!-- <v-toolbar flat dark dense color="primary">
-                        <v-autocomplete prepend-inner-icon="search" placeholder="Search" :items="filterList"
-                            v-model="dropSearch"></v-autocomplete>
-                        <v-btn-toggle v-model="searchType" class="transparent" multiple>
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                    <v-btn v-on="on" :value="1" flat>
-                                        <v-icon>
-                                            perm_data_setting</v-icon>
-                                    </v-btn>
-                                </template>
-                                <span>Data-Prep</span>
-                            </v-tooltip>
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                    <v-btn v-on="on" :value="2" flat>
-                                        <v-icon>assessment</v-icon>
-                                    </v-btn>
-                                </template>
-                                <span>Ranging</span>
-                            </v-tooltip>
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                    <v-btn v-on="on" :value="3" flat>
-                                        <v-icon>web</v-icon>
-                                    </v-btn>
-                                </template>
-                                <span>Planogram</span>
-                            </v-tooltip>
-                        </v-btn-toggle>
-                        <v-spacer></v-spacer>
-                        <v-autocomplete placeholder="users" :items="users" v-model="selectedUser"></v-autocomplete>
-                    </v-toolbar> -->
                     <v-card-text class="pa-0">
                         <v-data-table :headers="headers" :items="filteredTasks" class="elevation-0 scrollable"
                             hide-actions>
@@ -49,6 +16,9 @@
                                     <td>{{ props.item.categoryCluster }}</td>
                                     <td>{{ props.item.store }}</td>
                                     <td>{{ props.item.dateTimeString }}</td>
+                                    <td>
+                                        <v-btn v-if="props.item.type != -1" color="primary" small @click="routeToView(props.item)">View</v-btn>
+                                    </td>
                                     <td style="width: 2%">
                                         <v-tooltip bottom v-if="props.item.notes != null">
                                             <template v-slot:activator="{ on }">
@@ -154,20 +124,15 @@
             })
         },
         computed: {
-            // handlefilters(){
-            //     let self = this
-            //     self.searchType=self.searchTypeComp
-            //     self.dropSearch=self.dropSearchComp
-            // },
             filteredTasks() {
                 // filter for both buttons and field
                 let self = this
-                
+
                 if (self.dropSearchComp == null && self.searchTypeComp == null) {
                     return this.projects
                 }
-                
-                if (this.searchTypeComp.length > 0 && self.dropSearchComp!= null) {
+
+                if (this.searchTypeComp.length > 0 && self.dropSearchComp != null) {
                     let tmp = self.projects.filter((tx) => {
                         if (self.searchTypeComp.includes(tx.type) && self.dropSearchComp == tx.planogram_ID) {
                             return tx
@@ -238,7 +203,7 @@
                 let list = []
                 Axios.get(process.env.VUE_APP_API +
                     `SystemUser`).then(r => {
-                    
+
                     r.data.forEach(e => {
                         list.push({
                             text: e.firstname + " " + e.lastname,
@@ -247,8 +212,33 @@
                     })
                     EventBus.$emit('stores-items-changed', list);
                 })
-            }
+            },
+            routeToView(item) {
+                let self = this;
+                let route;
 
+                switch (item.type) {
+                    case 1: {
+                        route = `/DataPreparation`
+                    }
+                    break;
+                case 2: {
+                    route = `/RangePlanning/${item.rangeFileID}`
+                }
+                break;
+                case 3: {
+                    if (item.status == 1 || item.status == 8 || item.status == 41) {
+                        route = `/SpacePlanning`
+                    } else {
+                        route =
+                            `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
+                    }
+                }
+                break;
+                }
+
+                self.$router.push(route);
+            }
         },
     }
 </script>

@@ -10,7 +10,7 @@
             </v-card-text>
             <v-card-actions style="text-align: right;">
                 <v-spacer></v-spacer>
-                <v-btn color="secondary" @click.native="self.dialog = false">Cancel</v-btn>
+                <v-btn color="secondary" @click.native="dialog = false">Cancel</v-btn>
                 <v-btn color="primary darken-1" @click.native="returnValue(true)">Continue</v-btn>
             </v-card-actions>
         </v-card>

@@ -5,7 +5,8 @@
                 <v-card>
                     <v-toolbar flat dark dense color="primary">
                         <!-- <v-text-field prepend-inner-icon="search" placeholder="Search" dark></v-text-field> -->
-                        <v-autocomplete prepend-inner-icon="search" placeholder="Search" :items="filterList" v-model="dropSearch">
+                        <v-autocomplete prepend-inner-icon="search" placeholder="Search" :items="filterList"
+                            v-model="dropSearch">
                         </v-autocomplete>
                         <v-spacer></v-spacer>
                         <v-spacer></v-spacer>
@@ -37,12 +38,18 @@
                                 <span>Planogram</span>
                             </v-tooltip>
                         </v-btn-toggle>
+                        <v-btn v-if="userAccess != 0 && userAccess != 4" @click="shareProjects" class="ml-2" small dark icon>
+                            <v-icon>share</v-icon>
+                        </v-btn>
                     </v-toolbar>
-                    <v-toolbar v-if="userAccess==0" dense flat dark>
+                    <v-toolbar v-if="userAccess!=4" dense flat dark>
                         <v-autocomplete v-if="selectedView==2" placeholder="Please Select a Store" :items="users"
                             v-model="selectedUser" @change="changeStore()"></v-autocomplete>
                         <v-autocomplete v-if="selectedView==0" placeholder="users " :items="users"
                             v-model="selectedUser" @change="changeView(selectedUser)"></v-autocomplete>
+                        <v-btn icon @click="homeView">
+                            <v-icon>home</v-icon>
+                        </v-btn>
                         <v-spacer></v-spacer>
                         <v-spacer></v-spacer>
                         <v-btn-toggle v-model="selectedView" class="transparent" mandatory>
@@ -81,6 +88,7 @@
                 </v-card>
             </v-flex>
         </v-layout>
+        <ProjectShare ref="ProjectShare"></ProjectShare>
     </v-container>
 </template>
 
@@ -91,8 +99,7 @@
     import SplashLoader from "@/components/Common/SplashLoader.vue"
     import jwt from 'jsonwebtoken';
     import Axios from 'axios';
-
-
+    import ProjectShare from "./ProjectShare.vue"
 
     import {
         EventBus
@@ -103,11 +110,12 @@
             Tasks,
             MyProjects,
             Planograms,
-            SplashLoader
+            SplashLoader,
+            ProjectShare
         },
         data() {
             return {
-                placeHolder:null,
+                placeHolder: null,
                 userAccess: null,
                 filterList: [],
                 Search: null,
@@ -131,6 +139,7 @@
         mounted() {
             let self = this
             self.checkAccessType(() => {})
+
             EventBus.$on('filter-items-changed', list => {
                 self.filterList = []
                 self.filterList = list;
@@ -149,20 +158,20 @@
         created() {
             let self = this
 
-
+            EventBus.$off('filter-items-changed');
+            EventBus.$off('stores-items-changed');
+            EventBus.$off('data-loaded');
+            EventBus.$off('data-loading');
         },
         methods: {
             sendProp(item) {
                 let self = this
                 self.$nextTick(() => {
-                    console.log(item);
-                self.placeHolder = item
+                    self.placeHolder = item
                 })
-
             },
             checkAccessType(callback) {
                 let self = this;
-                console.log("here");
 
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
 
@@ -180,11 +189,9 @@
             },
             changeView(item) {
                 let self = this
-                console.log("here");
 
                 self.$nextTick(() => {
                     EventBus.$emit('user-select-changed', item);
-
                 })
             },
             changeStore() {
@@ -192,9 +199,23 @@
                 self.$nextTick(() => {
                     self.$refs.Planograms.getData(self.selectedUser)
                 })
+            },
+            shareProjects() {
+                let self = this;
+
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+
+                self.$refs.ProjectShare.show(selectedUsers => {
+                    Axios.post(process.env.VUE_APP_API + `ProjectSharedView?userID=${encoded_details.USER_ID}`,
+                            selectedUsers)
+                        .then(r => {})
+                });
+            },
+            homeView() {
+                let self = this;
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                EventBus.$emit('user-select-changed', encoded_details.USER_ID);
             }
-
         }
-
     }
 </script>

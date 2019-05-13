@@ -3,39 +3,6 @@
         <v-layout row wrap>
             <v-flex md12>
                 <v-card flat>
-                    <!-- <v-toolbar flat dark dense color="error">
-                        <v-autocomplete prepend-inner-icon="search" placeholder="Search" :items="filterList"
-                            v-model="dropSearch"></v-autocomplete>
-                        <v-btn-toggle v-model="searchType" class="transparent" multiple>
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                    <v-btn v-on="on" :value="1" flat>
-                                        <v-icon>
-                                            perm_data_setting</v-icon>
-                                    </v-btn>
-                                </template>
-                                <span>Data-Prep</span>
-                            </v-tooltip>
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                    <v-btn v-on="on" :value="2" flat>
-                                        <v-icon>assessment</v-icon>
-                                    </v-btn>
-                                </template>
-                                <span>Ranging</span>
-                            </v-tooltip>
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                    <v-btn v-on="on" :value="3" flat>
-                                        <v-icon>web</v-icon>
-                                    </v-btn>
-                                </template>
-                                <span>Planogram</span>
-                            </v-tooltip>
-                        </v-btn-toggle>
-                        <v-spacer></v-spacer>
-                        <v-autocomplete placeholder="users" :items="users" v-model="selectedUser"></v-autocomplete>
-                    </v-toolbar> -->
                     <v-card-text class="pa-0">
                         <v-data-table :headers="headers" :items="projects" class="elevation-0 scrollable" hide-actions>
                             <template v-slot:items="props">
@@ -48,6 +15,9 @@
                                     <td>{{ props.item.categoryCluster }}</td>
                                     <td>{{ props.item.store }}</td>
                                     <td>{{ props.item.dateTimeString }}</td>
+                                    <td>
+                                        <v-btn v-if="props.item.type != null" color="primary" small @click="routeToView(props.item)">View</v-btn>
+                                    </td>
                                     <td style="width: 2%">
                                         <v-tooltip bottom v-if="props.item.notes != null">
                                             <template v-slot:activator="{ on }">
@@ -164,7 +134,6 @@
                 let list = []
                 //  Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.get(process.env.VUE_APP_API + `Store?db=Hinterland-Live`).then(r => {
-                    console.log(r);
                     r.data.forEach(element => {
                         list.push({
                             text: element.storeName,
@@ -179,12 +148,8 @@
                 let self = this
                 EventBus.$emit('data-loading');
 
-                console.log("storeID");
-                console.log(storeID);
-
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.get(process.env.VUE_APP_API + `StoreProjectTX?storeID=${storeID}`).then(r => {
-                    console.log(r);
                     self.projects = r.data.projectTXList
                     EventBus.$emit('data-loaded');
                 })
@@ -196,9 +161,33 @@
                 self.typeList = statusHandler.getTypeList()
                 callback();
             },
-        },
+            routeToView(item) {
+                let self = this;
+                let route;
 
+                switch (item.type) {
+                    case 1: {
+                        route = `/DataPreparation`
+                    }
+                    break;
+                case 2: {
+                    route = `/RangePlanning/${item.rangeFileID}`
+                }
+                break;
+                case 3: {
+                    if (item.status == 1 || item.status == 8 || item.status == 41) {
+                        route = `/SpacePlanning`
+                    } else {
+                        route =
+                            `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
+                    }
+                }
+                break;
+                }
 
+                self.$router.push(route);
+            },
+        }
     }
 
     function returnStartStatusByType(type) {

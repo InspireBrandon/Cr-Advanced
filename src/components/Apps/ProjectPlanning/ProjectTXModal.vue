@@ -162,7 +162,7 @@
                 actionedByUserID: null,
                 form: null,
                 rangeData: [],
-                selectedRange: [],
+                selectedRange: null,
             }
 
         },
@@ -436,8 +436,6 @@
                             "project_ID": self.projectID,
                             "storeCluster_ID": self.StoreCluster,
                             "store_ID": self.Store,
-                            "dateTime": new Date,
-                            "dateTimeString": moment(new Date).format('YYYY-MM-DD hh:mm'),
                             "status": self.status,
                             "type": self.type,
                             "username": tmpAssignedUser,
@@ -448,6 +446,9 @@
                             "systemFileID": self.systemFileID,
                             "actionedByUserID": self.actionedByUserID
                         }
+
+                        console.log(trans)
+
                         Axios.post(process.env.VUE_APP_API + 'ProjectTX', trans).then(res => {
                             self.afterClose(res.data.projectTX)
 

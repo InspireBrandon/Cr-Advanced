@@ -33,7 +33,7 @@
                                     <td>{{ props.item.emailAddress }}</td>
                                     <td>{{ props.item.username }}</td>
                                     <td>{{ props.item.password }}</td>
-                                    <td>{{accessTypes[props.item.access].text}}</td>
+                                    <td>{{accessTypes[props.item.access == null ? 4 : props.item.access].text}}</td>
                                     <td>
                                         <v-menu>
                                             <v-btn slot="activator" icon>
@@ -87,7 +87,7 @@
                         text: 'Store',
                         value: 3
                     },
-                     {
+                    {
                         text: '',
                         value: 4
                     }

@@ -15,7 +15,7 @@
                 </v-list-tile>
             </v-list>
             <v-list class="pt-0" dense>
-                <v-expansion-panel class="elevation-0 ;" v-for="groups in ProjectsGroups" :key="groups.id">
+                <v-expansion-panel class="elevation-0 ;" v-for="(groups, idx) in ProjectsGroups" :key="idx">
                     <v-expansion-panel-content>
                         <template v-slot:header>
                             <v-flex> {{groups.name}}
@@ -668,7 +668,7 @@
                 var self = this
                 self.$refs.ProjectTXModal.open(true, self.project, data => {
 
-                    // console.log(data);
+                    console.log(data);
 
                     self.ProjectTXs.unshift(data)
                 })
