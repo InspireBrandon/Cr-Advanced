@@ -1122,7 +1122,7 @@
       changePackingType() {
         let self = this;
 
-        self.checkChangeDimensions();
+        // self.checkChangeDimensions();
 
         self.$nextTick(() => {
           let productType = "";
@@ -1186,7 +1186,7 @@
             }
 
             if(propName != 'qty') {
-              if(self.form[propName] == undefined || self.form[propName] == undefined || self.form[propName] < 1) {
+              if(self.form[propName] == undefined || self.form[propName] == undefined || self.form[propName] <= 0) {
                 if(dimensionType == "Qty") {
                   self.form[propName] = 1;
                 }
@@ -1387,7 +1387,6 @@
           })
           .catch(e => {
             alert("Failed to create alternate barcode. Please try again");
-            console.log(e);
           })
       },
       modifyAlternateBarcode(bc) {

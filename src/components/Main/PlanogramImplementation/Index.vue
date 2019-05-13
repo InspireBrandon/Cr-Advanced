@@ -853,6 +853,32 @@
             getColor(type, status) {
                 return StatusHandler.getColorByTypeAndStatus(type, status)
             },
+            testForNotAssignedUser(request, systemUserID, callback) {
+                let self = this;
+
+                let projectTXGroupRequest = {
+                    projectID: request.project_ID
+                }
+
+                if (request.userID != systemUserID) {
+                    // Create task handover
+                    request.status = 42;
+                    request.actionedByUserID = request.systemUserID;
+                    request.systemUserID = null;
+                    self.createProjectTransaction(request, () => {
+                        self.createProjectTransactionGroup(projectTXGroupRequest, newProjectTXGroup => {
+                            request.projectTXGroup_ID = newProjectTXGroup.id;
+                            request.actionedByUserID = null;
+                            request.systemUserID = systemUserID;
+                            self.createProjectTransaction(request, newTransaction => {
+                                callback(newTransaction);
+                            })
+                        })
+                    })
+                } else {
+                    callback(request);
+                }
+            },
             approve() {
                 let self = this;
 
@@ -865,20 +891,24 @@
                     projectID: request.project_ID
                 }
 
-                request.status = 12;
-                request.actionedByUserID = systemUserID;
-                request.systemUserID = null;
+                self.testForNotAssignedUser(request, systemUserID, newRequest => {
+                    request = newRequest;
+                    request.status = 12;
+                    request.actionedByUserID = systemUserID;
+                    request.systemUserID = null;
 
-                // Create Approved Project Transaction
-                self.createProjectTransaction(request, newTransaction => {
-                    // Create New Group Project Transaction
-                    self.createProjectTransactionGroup(projectTXGroupRequest, newProjectGroup => {
-                        // Create Approved Project Transaction For New Group
-                        request.actionedByUserID = null;
-                        request.systemUserID = request.projectOwnerID;
-                        request.projectTXGroup_ID = newProjectGroup.id;
-                        self.createProjectTransaction(request, latestTransaction => {
-                            self.getProjectTransactionsByProjectID(request.project_ID);
+                    // Create Approved Project Transaction
+                    self.createProjectTransaction(request, newTransaction => {
+                        // Create New Group Project Transaction
+                        self.createProjectTransactionGroup(projectTXGroupRequest, newProjectGroup => {
+                            // Create Approved Project Transaction For New Group
+                            request.actionedByUserID = null;
+                            request.systemUserID = request.projectOwnerID;
+                            request.projectTXGroup_ID = newProjectGroup.id;
+                            self.createProjectTransaction(request, latestTransaction => {
+                                self.getProjectTransactionsByProjectID(request
+                                    .project_ID);
+                            })
                         })
                     })
                 })
@@ -892,27 +922,31 @@
                 let projectTXGroupRequest = {
                     projectID: request.project_ID
                 }
+
                 // Select a store
                 self.$refs.PlanogramIplementationModal.show("Distribute Planogram?", 4, null, null, null, data => {
-                    request.status = 40;
-                    request.actionedByUserID = data.users;
-                    request.systemUserID = null;
-                    // Create new process assigned
-                    // Create new process group
-                    self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
-                        // Create new process assigned against new group
-                        request.actionedByUserID = null;
-                        request.systemUserID = data.users;
-                        request.projectTXGroup_ID = newGroup.id;
-                        self.createProjectTransaction(request, processAssigned => {
-                            request.status = 13;
-                            request.notes = data.notes;
-                            request.store_ID = data.stores;
-                            self.createProjectTransaction(request,
-                                implementationPendingResponse => {
-                                    self.getProjectTransactionsByProjectID(
-                                        request.project_ID);
-                                })
+                    self.testForNotAssignedUser(request, systemUserID, newRequest => {
+                        request = newRequest;
+                        request.status = 40;
+                        request.actionedByUserID = data.users;
+                        request.systemUserID = null;
+                        // Create new process assigned
+                        // Create new process group
+                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
+                            // Create new process assigned against new group
+                            request.actionedByUserID = null;
+                            request.systemUserID = data.users;
+                            request.projectTXGroup_ID = newGroup.id;
+                            self.createProjectTransaction(request, processAssigned => {
+                                request.status = 13;
+                                request.notes = data.notes;
+                                request.store_ID = data.stores;
+                                self.createProjectTransaction(request,
+                                    implementationPendingResponse => {
+                                        self.getProjectTransactionsByProjectID(
+                                            request.project_ID);
+                                    })
+                            })
                         })
                     })
                 })
@@ -925,11 +959,14 @@
                 let systemUserID = encoded_details.USER_ID;
 
                 self.$refs.PlanogramIplementationModal.show("Implement Planogram?", 3, null, null, null, data => {
-                    request.status = 26;
-                    request.notes = data.notes;
-                    request.systemUserID = systemUserID;
-                    self.createProjectTransaction(request, () => {
-                        self.getProjectTransactionsByProjectID(request.project_ID);
+                    self.testForNotAssignedUser(request, systemUserID, newRequest => {
+                        request = newRequest;
+                        request.status = 26;
+                        request.notes = data.notes;
+                        request.systemUserID = systemUserID;
+                        self.createProjectTransaction(request, () => {
+                            self.getProjectTransactionsByProjectID(request.project_ID);
+                        })
                     })
                 })
             },
@@ -968,10 +1005,8 @@
 
                 self.$refs.assignTask.showWithData(request, data => {
                     if (data.useExisting) {
-                        console.log("useExisting")
                         self.requestExisting(data);
                     } else {
-                        console.log("not useExisting")
                         self.requestNew(data);
                     }
                 })
@@ -1019,24 +1054,29 @@
                     projectID: request.project_ID
                 }
 
-                request.status = 16;
-                request.systemUserID = null;
-                request.actionedByUserID = systemUserID;
-                // Create On Hold transaction
-                self.createProjectTransaction(request, actionedOnHold => {
-                    // Create new projectGroup
-                    self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
-                        // Create ON Hold transaction for new projectGroup
-                        request.systemUserID = request.projectOwnerID;
-                        request.actionedByUserID = null;
-                        request.projectTXGroup_ID = newGroup.id;
-                        self.createProjectTransaction(request, newOnHold => {
-                            request.status = 14;
-                            request.notes = data.notes;
-                            request.store_ID = data.store;
-                            self.createProjectTransaction(request, variantRequest => {
-                                self.getProjectTransactionsByProjectID(request
-                                    .project_ID);
+                self.testForNotAssignedUser(request, systemUserID, newRequest => {
+                    request = newRequest;
+                    request.status = 16;
+                    request.systemUserID = null;
+                    request.actionedByUserID = systemUserID;
+                    // Create On Hold transaction
+                    self.createProjectTransaction(request, actionedOnHold => {
+                        // Create new projectGroup
+                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
+                            // Create ON Hold transaction for new projectGroup
+                            request.systemUserID = request.projectOwnerID;
+                            request.actionedByUserID = null;
+                            request.projectTXGroup_ID = newGroup.id;
+                            self.createProjectTransaction(request, newOnHold => {
+                                request.status = 14;
+                                request.notes = data.notes;
+                                request.store_ID = data.store;
+                                self.createProjectTransaction(request,
+                                variantRequest => {
+                                    self.getProjectTransactionsByProjectID(
+                                        request
+                                        .project_ID);
+                                })
                             })
                         })
                     })

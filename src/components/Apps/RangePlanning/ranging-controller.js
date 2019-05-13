@@ -21,7 +21,7 @@ class RangingController {
     this.tag = rangingData.tag;
 
     this.allRangeProducts.forEach(el => {
-      setDefaultValuesIfNull(el);
+      // setDefaultValuesIfNull(el);
       el.useAlternateBarcode = false;
     })
   }
@@ -251,7 +251,7 @@ class RangingController {
       }
     })
 
-    setDefaultValuesIfNull();
+    // setDefaultValuesIfNull();
   }
 }
 

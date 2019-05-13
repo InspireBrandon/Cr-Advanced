@@ -832,5 +832,6 @@
 <style scoped>
     .scrollable {
         height: calc(100vh - 240px);
+        overflow: auto;
     }
 </style>

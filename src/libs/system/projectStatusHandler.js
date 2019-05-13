@@ -276,6 +276,13 @@ class projectStatusHandler {
                 type: [3],
                 color: "yellow",
                 friendly: "Request New Variation"
+            },
+            {
+                text: "Task Takeover",
+                value: 42,
+                type: [1, 2, 3],
+                color: "yellow",
+                friendly: "Request New Variation"
             }
         ]
 
@@ -358,36 +365,30 @@ class projectStatusHandler {
         }
 
         switch (type) {
-            case 0:
-                {
+            case 0: {
 
-                }
-                break;
-            case 1:
-                {
-                    retval = handleDataPrep(status, retval);
-                }
-                break;
-            case 2:
-                {
+            }
+            break;
+        case 1: {
+            retval = handleDataPrep(status, retval);
+        }
+        break;
+        case 2: {
 
-                }
-                break;
-            case 3:
-                {
+        }
+        break;
+        case 3: {
 
-                }
-                break;
-            case 4:
-                {
+        }
+        break;
+        case 4: {
 
-                }
-                break;
-            case 5:
-                {
+        }
+        break;
+        case 5: {
 
-                }
-                break;
+        }
+        break;
         }
 
         return retval;
@@ -396,21 +397,18 @@ class projectStatusHandler {
 
 function handleDataPrep(status, retval) {
     switch (status) {
-        case 1:
-            {
-                retval.status = 2;
-            }
-            break;
-        case 2:
-            {
-                retval.endProcess = true;
-            }
-            break;
-        case 6:
-            {
-                retval.status = 1;
-            }
-            break;
+        case 1: {
+            retval.status = 2;
+        }
+        break;
+    case 2: {
+        retval.endProcess = true;
+    }
+    break;
+    case 6: {
+        retval.status = 1;
+    }
+    break;
     }
 
     return retval;
@@ -420,216 +418,178 @@ function returnAcumulator(status, type) {
     let acumulator;
 
     switch (status) {
-        case 0:
-            {
-                acumulator = 0;
-            }
-            break;
-        case 1:
-            {
-                acumulator = 0;
-            }
-            break;
-        case 2:
-            {
-                acumulator = 0;
-            }
-            break;
-        case 3:
-            {
-                acumulator = 6;
-            }
-            break;
-        case 4:
-            {
-                acumulator = 6;
-            }
-            break;
-        case 5:
-            {
-                acumulator = 7;
-            }
-            break;
-        case 6:
-            {
-                acumulator = 0;
-            }
-            break;
-        case 7:
-            {
-                acumulator = 0;
-            }
-            break;
-        case 8:
-            {
-                acumulator = 0;
-            }
-            break;
-        case 9:
-            {
-                acumulator = 7;
-            }
-            break;
-        case 10:
-            {
-                acumulator = 1;
-            }
-            break;
-        case 11:
-            {
-                acumulator = 0;
-            }
-            break;
-        case 12:
-            {
-                acumulator = 1;
-            }
-            break;
-        case 13:
-            {
-                acumulator = 3;
-            }
-            break;
-        case 14:
-            {
-                acumulator = 0;
-            }
-            break;
-        case 15:
-            {
-                acumulator = 3;
-            }
-            break;
-        case 16:
-            {
-                acumulator = 0;
-            }
-            break;
-        case 17:
-            {
-                acumulator = 0;
-            }
-            break;
-        case 18:
-            {
-                acumulator = 0;
-            }
-            break;
-        case 19:
-            {
-                acumulator = 2;
-            }
-            break;
-        case 20:
-            {
-                acumulator = 1;
-            }
-            break;
-        case 21:
-            {
-                acumulator = 2;
-            }
-            break;
-        case 22:
-            {
-                acumulator = 0;
-            }
-            break;
-        case 23:
-            {
-                acumulator = 0;
-            }
-            break;
-        case 24:
-            {
-                acumulator = 3;
-            }
-            break;
-        case 25:
-            {
-                acumulator = 0;
-            }
-            break;
-        case 26:
-            {
-                acumulator = 3;
-            }
-            break;
-        case 27:
-            {
-                acumulator = 27;
-            }
-            break;
-        case 28:
-            {
-                acumulator = (0 - type) + 9;
-            }
-            break;
-        case 29:
-            {
-                acumulator = (0 - type) + 9;
-            }
-            break;
-        case 30:
-            {
-                acumulator = (0 - type) + 9;
-            }
-            break;
-        case 31:
-            {
-                acumulator = (0 - type) + 9;
-            }
-            break;
-        case 32:
-            {
-                acumulator = (0 - type) + 9;
-            }
-            break;
-        case 33:
-            {
-                acumulator = (0 - type) + 9;
-            }
-            break;
-        case 34:
-            {
-                acumulator = (0 - type) + 9;
-            }
-            break;
-        case 35:
-            {
-                acumulator = (0 - type) + 9;
-            }
-            break;
-        case 36:
-            {
-                acumulator = (0 - type) + 9;
-            }
-            break;
-        case 37:
-            {
-                acumulator = (0 - type) + 9;
-            }
-            break;
-        case 38:
-            {
-                acumulator = (0 - type) + 9;
-            }
-            break;
-        case 39:
-            {
-                acumulator = (0 - type) + 9;
-            }
-            break;
-        case 40:
-            {
-                acumulator = 0 - type;
-            }
-            break;
-        case 41:
-            {
-                acumulator = 0;
-            }
-            break;
+        case 0: {
+            acumulator = 0;
+        }
+        break;
+    case 1: {
+        acumulator = 0;
+    }
+    break;
+    case 2: {
+        acumulator = 0;
+    }
+    break;
+    case 3: {
+        acumulator = 6;
+    }
+    break;
+    case 4: {
+        acumulator = 6;
+    }
+    break;
+    case 5: {
+        acumulator = 7;
+    }
+    break;
+    case 6: {
+        acumulator = 0;
+    }
+    break;
+    case 7: {
+        acumulator = 0;
+    }
+    break;
+    case 8: {
+        acumulator = 0;
+    }
+    break;
+    case 9: {
+        acumulator = 7;
+    }
+    break;
+    case 10: {
+        acumulator = 1;
+    }
+    break;
+    case 11: {
+        acumulator = 0;
+    }
+    break;
+    case 12: {
+        acumulator = 1;
+    }
+    break;
+    case 13: {
+        acumulator = 3;
+    }
+    break;
+    case 14: {
+        acumulator = 0;
+    }
+    break;
+    case 15: {
+        acumulator = 3;
+    }
+    break;
+    case 16: {
+        acumulator = 0;
+    }
+    break;
+    case 17: {
+        acumulator = 0;
+    }
+    break;
+    case 18: {
+        acumulator = 0;
+    }
+    break;
+    case 19: {
+        acumulator = 2;
+    }
+    break;
+    case 20: {
+        acumulator = 1;
+    }
+    break;
+    case 21: {
+        acumulator = 2;
+    }
+    break;
+    case 22: {
+        acumulator = 0;
+    }
+    break;
+    case 23: {
+        acumulator = 0;
+    }
+    break;
+    case 24: {
+        acumulator = 3;
+    }
+    break;
+    case 25: {
+        acumulator = 0;
+    }
+    break;
+    case 26: {
+        acumulator = 3;
+    }
+    break;
+    case 27: {
+        acumulator = 27;
+    }
+    break;
+    case 28: {
+        acumulator = (0 - type) + 9;
+    }
+    break;
+    case 29: {
+        acumulator = (0 - type) + 9;
+    }
+    break;
+    case 30: {
+        acumulator = (0 - type) + 9;
+    }
+    break;
+    case 31: {
+        acumulator = (0 - type) + 9;
+    }
+    break;
+    case 32: {
+        acumulator = (0 - type) + 9;
+    }
+    break;
+    case 33: {
+        acumulator = (0 - type) + 9;
+    }
+    break;
+    case 34: {
+        acumulator = (0 - type) + 9;
+    }
+    break;
+    case 35: {
+        acumulator = (0 - type) + 9;
+    }
+    break;
+    case 36: {
+        acumulator = (0 - type) + 9;
+    }
+    break;
+    case 37: {
+        acumulator = (0 - type) + 9;
+    }
+    break;
+    case 38: {
+        acumulator = (0 - type) + 9;
+    }
+    break;
+    case 39: {
+        acumulator = (0 - type) + 9;
+    }
+    break;
+    case 40: {
+        acumulator = 0 - type;
+    }
+    break;
+    case 41: {
+        acumulator = 0;
+    }
+    break;
+    case 42: {
+        acumulator = 0;
+    }
+    break;
     }
 
     return acumulator;
