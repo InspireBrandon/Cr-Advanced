@@ -213,6 +213,8 @@
             },
             homeView() {
                 let self = this;
+                self.selectedView = 0;
+                self.selectedUser = null;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 EventBus.$emit('user-select-changed', encoded_details.USER_ID);
             }

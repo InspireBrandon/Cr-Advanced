@@ -382,7 +382,6 @@
             GetNewTransactions(userID) {
                 let self = this
                 EventBus.$emit('data-loading', userID);
-
                 self.getTransactionsByUser(userID, () => {})
             },
             getDatabaseUsers() {
