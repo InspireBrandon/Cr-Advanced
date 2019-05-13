@@ -28,6 +28,11 @@
                         <v-card-text>
                             <v-data-table class="elevation-0" hide-actions :items="databaseUsers" :headers="headers">
                                 <template v-slot:items="props">
+                                    <td>
+                                        <v-avatar size="40">
+                                            <img :src="`data:image/jpeg;base64,${props.item.image}`" alt="avatar">
+                                        </v-avatar>
+                                    </td>
                                     <td>{{ props.item.firstname }}</td>
                                     <td>{{ props.item.lastname }}</td>
                                     <td>{{ props.item.emailAddress }}</td>
@@ -70,8 +75,7 @@
     export default {
         data() {
             return {
-                accessTypes: [
-                   {
+                accessTypes: [{
                         text: 'Super User',
                         value: 0
                     },
@@ -93,6 +97,10 @@
                     }
                 ],
                 headers: [{
+                        text: '',
+                        align: 'center',
+                        sortable: false
+                    },{
                         text: 'First name',
                         align: 'left',
                         sortable: false,
@@ -208,10 +216,10 @@
                         `TenantLink_AccessType?systemUserID=${systemUserID}&tenantID=${tenantID}`)
                     .then(r => {
                         console.log(r);
-                        
+
                         if (r.data.tenantLink_AccessTypeList.length > 0) {
                             accessType(r.data.tenantLink_AccessTypeList[0].accessType)
-                        }else{
+                        } else {
                             accessType(4)
                         }
                     })
@@ -223,7 +231,7 @@
                 Axios.get(process.env.VUE_APP_API + `TenantAccess/User?tenantID=${self.tenantID}`)
                     .then(r => {
                         self.databaseUsers = r.data;
-                        
+
                         self.databaseUsers.forEach(e => {
                             self.getAccessType(e.systemUserID, self.tenantID, accessType => {
 
