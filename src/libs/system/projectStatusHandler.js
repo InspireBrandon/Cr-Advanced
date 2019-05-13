@@ -282,7 +282,7 @@ class projectStatusHandler {
                 value: 42,
                 type: [1, 2, 3],
                 color: "yellow",
-                friendly: "Request New Variation"
+                friendly: "Task Takeover"
             }
         ]
 
@@ -587,7 +587,7 @@ function returnAcumulator(status, type) {
     }
     break;
     case 42: {
-        acumulator = 0;
+        acumulator = (0 - type) + 7;
     }
     break;
     }

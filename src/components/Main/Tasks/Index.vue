@@ -132,6 +132,9 @@
                                         <v-btn small color="secondary" @click="assign(props.item)"
                                             v-if="props.item.status == 41 && systemUserID == props.item.systemUserID">
                                             Assign</v-btn>
+                                        <!-- TASK Takeover -->
+                                        <v-btn small color="error" @click="closeTask(props.item)" v-if="props.item.status == 42 && systemUserID == props.item.actionedByUserID">
+                                            Close</v-btn>
                                     </td>
                                     <td style="width: 2%">
                                         <v-tooltip bottom v-if="props.item.notes != null">
@@ -404,10 +407,10 @@
             getfilterList() {
                 let self = this
                 self.filterList = []
-                  self.filterList.push({
-                            text: "All",
-                            value: null
-                        })
+                self.filterList.push({
+                    text: "All",
+                    value: null
+                })
                 self.projectTransactions.forEach(element => {
                     if (!self.filterList.includes(element.planogram_ID)) {
                         self.filterList.push({
@@ -453,7 +456,8 @@
             filterOutSupplierPlanograms(callback) {
                 let self = this;
 
-                Axios.get(process.env.VUE_APP_API + `SupplierPlanogram?tenantLink_AccessTypeID=${self.userAccessTypeID}`)
+                Axios.get(process.env.VUE_APP_API +
+                        `SupplierPlanogram?tenantLink_AccessTypeID=${self.userAccessTypeID}`)
                     .then(r => {
                         let supplierPlanograms = r.data;
                         let tmp = [];
@@ -462,16 +466,16 @@
                             let canAdd = false;
 
                             supplierPlanograms.forEach(sp => {
-                                if(pt.planogram_ID == sp.planogram_ID)
+                                if (pt.planogram_ID == sp.planogram_ID)
                                     canAdd = true;
                             })
 
-                            if(canAdd)
+                            if (canAdd)
                                 tmp.push(pt);
                         })
 
                         self.projectTransactions = tmp;
-                        
+
                         callback();
                     })
             },
