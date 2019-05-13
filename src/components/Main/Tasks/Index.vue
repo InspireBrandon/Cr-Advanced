@@ -132,6 +132,9 @@
                                         <v-btn small color="secondary" @click="assign(props.item)"
                                             v-if="props.item.status == 41 && systemUserID == props.item.systemUserID">
                                             Assign</v-btn>
+                                        <!-- TASK Takeover -->
+                                        <v-btn small color="error" @click="closeTask(props.item)" v-if="props.item.status == 42 && systemUserID == props.item.actionedByUserID">
+                                            Close</v-btn>
                                     </td>
                                     <td style="width: 2%">
                                         <v-tooltip bottom v-if="props.item.notes != null">
@@ -761,5 +764,6 @@
 <style scoped>
     .scrollable {
         height: calc(100vh - 240px);
+        overflow: auto;
     }
 </style>
