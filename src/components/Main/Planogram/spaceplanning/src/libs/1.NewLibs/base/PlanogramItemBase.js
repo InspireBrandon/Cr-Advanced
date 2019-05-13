@@ -86,41 +86,34 @@ class PlanogramItemBase {
   BuildBaseConfigSettings() {
     let self = this;
     switch (self.Type.toUpperCase()) {
-      case "GONDOLA":
-        {
-          self.Config.LabelOrder = "T2B";
-        }
-        break;
-      case "SHELF":
-        {
-          self.Config.SpreadType = "L2R";
-        }
-        break;
-      case "BASE":
-        {
-          self.Config.SpreadType = "L2R";
-        }
-        break;
-      case "PEGBAR":
-        {
-          self.Config.SpreadType = "L2R";
-        }
-        break;
-      case "PEGBOARD":
-        {
+      case "GONDOLA": {
+        self.Config.LabelOrder = "T2B";
+      }
+      break;
+    case "SHELF": {
+      self.Config.SpreadType = "L2R";
+    }
+    break;
+    case "BASE": {
+      self.Config.SpreadType = "L2R";
+    }
+    break;
+    case "PEGBAR": {
+      self.Config.SpreadType = "L2R";
+    }
+    break;
+    case "PEGBOARD": {
 
-        }
-        break;
-      case "BASKET":
-        {
-          self.Config.SpreadType = "L2R";
-        }
-        break;
-      case "DIVIDER":
-        {
-          self.Config.SpreadType = "L2R";
-        }
-        break;
+    }
+    break;
+    case "BASKET": {
+      self.Config.SpreadType = "L2R";
+    }
+    break;
+    case "DIVIDER": {
+      self.Config.SpreadType = "L2R";
+    }
+    break;
     }
   }
 
@@ -168,8 +161,7 @@ class PlanogramItemBase {
         y: dropPos.y,
         draggable: true
       })
-    } 
-    else {
+    } else {
       self.Group = new Konva.Group({
         id: self.Type + '_master_group_' + self.ID,
         name: self.Type + '_master_group',
@@ -302,61 +294,50 @@ class PlanogramItemBase {
       let ctrl_store = new StoreHelper();
       let typeArr = [];
       switch (self.Type.toUpperCase()) {
-        case "GONDOLA":
-          {
+        case "GONDOLA": {
 
-          }
-          break;
-        case "AREA":
-          {
-            typeArr = ["GONDOLA"];
-          }
-          break;
-        case "PALETTE":
-          {
-            typeArr = ["GONDOLA"];
-          }
-          break;
-        case "PRODUCT":
-          {
-            typeArr = ["SHELF", "BASE", "BASKET", "PEGBAR", "PEGBOARD", "PALETTE", "LABELHOLDER"];
-          }
-          break;
-        case "SHELF":
-          {
-            typeArr = ["GONDOLA", "AREA"];
-          }
-          break;
-        case "BASE":
-          {
-            typeArr = ["GONDOLA", "AREA"];
-          }
-          break;
-        case "BASKET":
-          {
-            typeArr = ["SHELF", "BASE", "PEGBAR", "PEGBOARD", "DIVIDER", "PALETTE", "LABELHOLDER"];
-          }
-          break;
-        case "PEGBAR":
-          {
-            typeArr = ["GONDOLA", "AREA"];
-          }
-          break;
-        case "LABELHOLDER":
-          {
-            typeArr = ["PEGBOARD"];
-          }
-          break;
-        case "PEGBOARD":
-          {
-            typeArr = ["GONDOLA", "AREA"];
-          }
-          break;
-        case "DIVIDER":
-          {
-            typeArr = ["SHELF", "BASE", "PEGBAR", "PEGBOARD", "BASKET"];
-          }
-          break;
+        }
+        break;
+      case "AREA": {
+        typeArr = ["GONDOLA"];
+      }
+      break;
+      case "PALETTE": {
+        typeArr = ["GONDOLA"];
+      }
+      break;
+      case "PRODUCT": {
+        typeArr = ["SHELF", "BASE", "BASKET", "PEGBAR", "PEGBOARD", "PALETTE", "LABELHOLDER"];
+      }
+      break;
+      case "SHELF": {
+        typeArr = ["GONDOLA", "AREA"];
+      }
+      break;
+      case "BASE": {
+        typeArr = ["GONDOLA", "AREA"];
+      }
+      break;
+      case "BASKET": {
+        typeArr = ["SHELF", "BASE", "PEGBAR", "PEGBOARD", "DIVIDER", "PALETTE", "LABELHOLDER"];
+      }
+      break;
+      case "PEGBAR": {
+        typeArr = ["GONDOLA", "AREA"];
+      }
+      break;
+      case "LABELHOLDER": {
+        typeArr = ["PEGBOARD"];
+      }
+      break;
+      case "PEGBOARD": {
+        typeArr = ["GONDOLA", "AREA"];
+      }
+      break;
+      case "DIVIDER": {
+        typeArr = ["SHELF", "BASE", "PEGBAR", "PEGBOARD", "BASKET"];
+      }
+      break;
 
       }
       if (self.Type == "GONDOLA" || self.Type == "TEXTHEADER") {
@@ -419,16 +400,14 @@ class PlanogramItemBase {
       if (area.Renderings && area.Renderings.length > 0) {
         area.Renderings.forEach(rendering => {
           switch (rendering.type.toUpperCase()) {
-            case "BACKRENDERING":
-              {
-                rendering.konva.moveToBottom();
-              }
-              break;
-            case "FRONTRENDERING":
-              {
-                rendering.konva.moveToTop();
-              }
-              break;
+            case "BACKRENDERING": {
+              rendering.konva.moveToBottom();
+            }
+            break;
+          case "FRONTRENDERING": {
+            rendering.konva.moveToTop();
+          }
+          break;
           }
         });
       }
@@ -443,26 +422,22 @@ class PlanogramItemBase {
       if (shelf.Renderings && shelf.Renderings.length > 0) {
         shelf.Renderings.forEach(rendering => {
           switch (rendering.type.toUpperCase()) {
-            case "SHELFEDGE":
-              {
-                rendering.konva.moveToTop();
-              }
-              break;
-            case "LABELHOLDER":
-              {
-                rendering.konva.moveToTop();
-              }
-              break;
-            case "BACKRENDERING":
-              {
-                rendering.konva.moveToBottom();
-              }
-              break;
-            case "FRONTRENDERING":
-              {
-                rendering.konva.moveToTop();
-              }
-              break;
+            case "SHELFEDGE": {
+              rendering.konva.moveToTop();
+            }
+            break;
+          case "LABELHOLDER": {
+            rendering.konva.moveToTop();
+          }
+          break;
+          case "BACKRENDERING": {
+            rendering.konva.moveToBottom();
+          }
+          break;
+          case "FRONTRENDERING": {
+            rendering.konva.moveToTop();
+          }
+          break;
           }
         });
       }
@@ -476,26 +451,22 @@ class PlanogramItemBase {
       if (base.Renderings && base.Renderings.length > 0) {
         base.Renderings.forEach(rendering => {
           switch (rendering.type.toUpperCase()) {
-            case "SHELFEDGE":
-              {
-                rendering.konva.moveToTop();
-              }
-              break;
-            case "LABELHOLDER":
-              {
-                rendering.konva.moveToTop();
-              }
-              break;
-            case "BACKRENDERING":
-              {
-                rendering.konva.moveToBottom();
-              }
-              break;
-            case "FRONTRENDERING":
-              {
-                rendering.konva.moveToTop();
-              }
-              break;
+            case "SHELFEDGE": {
+              rendering.konva.moveToTop();
+            }
+            break;
+          case "LABELHOLDER": {
+            rendering.konva.moveToTop();
+          }
+          break;
+          case "BACKRENDERING": {
+            rendering.konva.moveToBottom();
+          }
+          break;
+          case "FRONTRENDERING": {
+            rendering.konva.moveToTop();
+          }
+          break;
           }
         });
       }
@@ -510,11 +481,10 @@ class PlanogramItemBase {
       if (hangingBar.Renderings && hangingBar.Renderings.length > 0) {
         hangingBar.Renderings.forEach(rendering => {
           switch (rendering.type.toUpperCase()) {
-            case "LABELHOLDER":
-              {
-                rendering.konva.moveToTop();
-              }
-              break;
+            case "LABELHOLDER": {
+              rendering.konva.moveToTop();
+            }
+            break;
           }
         });
       }
@@ -529,11 +499,10 @@ class PlanogramItemBase {
       if (labelHolder.Renderings && labelHolder.Renderings.length > 0) {
         labelHolder.Renderings.forEach(rendering => {
           switch (rendering.type.toUpperCase()) {
-            case "LABELHOLDER":
-              {
-                rendering.konva.moveToTop();
-              }
-              break;
+            case "LABELHOLDER": {
+              rendering.konva.moveToTop();
+            }
+            break;
           }
         });
       }
@@ -548,16 +517,14 @@ class PlanogramItemBase {
       if (basket.Renderings && basket.Renderings.length > 0) {
         basket.Renderings.forEach(rendering => {
           switch (rendering.type.toUpperCase()) {
-            case "LABELHOLDER":
-              {
-                rendering.konva.moveToTop();
-              }
-              break;
-            case "FRONTRENDERING":
-              {
-                rendering.konva.moveToTop();
-              }
-              break;
+            case "LABELHOLDER": {
+              rendering.konva.moveToTop();
+            }
+            break;
+          case "FRONTRENDERING": {
+            rendering.konva.moveToTop();
+          }
+          break;
           }
         });
       }
@@ -572,11 +539,10 @@ class PlanogramItemBase {
       if (gondola.Renderings && gondola.Renderings.length > 0) {
         gondola.Renderings.forEach(rendering => {
           switch (rendering.type.toUpperCase()) {
-            case "FRONTRENDERING":
-              {
-                rendering.konva.moveToTop();
-              }
-              break;
+            case "FRONTRENDERING": {
+              rendering.konva.moveToTop();
+            }
+            break;
           }
         });
       }
@@ -714,57 +680,51 @@ class PlanogramItemBase {
     });
 
     switch (parentItem.Type.toUpperCase()) {
-      case "BASE":
-        {
-          if (totalItemWidths > parentWidth) {
-            squish = (totalItemWidths - parentWidth) / (totalItems);
-          }
+      case "BASE": {
+        if (totalItemWidths > parentWidth) {
+          squish = (totalItemWidths - parentWidth) / (totalItems);
+        }
 
-          retVal = squish;
-        }
-        break;
-      case "SHELF":
-        {
-          if (totalItemWidths > parentWidth) {
-            squish = (totalItemWidths - parentWidth) / (totalItems);
-          }
+        retVal = squish;
+      }
+      break;
+    case "SHELF": {
+      if (totalItemWidths > parentWidth) {
+        squish = (totalItemWidths - parentWidth) / (totalItems);
+      }
 
-          retVal = squish;
-        }
-        break;
-      case "BASKET":
-        {
-          if (totalItemWidths > parentWidth) {
-            squish = (totalItemWidths - parentWidth) / (totalItems);
-          }
+      retVal = squish;
+    }
+    break;
+    case "BASKET": {
+      if (totalItemWidths > parentWidth) {
+        squish = (totalItemWidths - parentWidth) / (totalItems);
+      }
 
-          retVal = squish;
-        }
-        break;
-      case "PEGBAR":
-        {
-          if (totalItemWidths > parentWidth) {
-            squish = (totalItemWidths - parentWidth) / (totalItems);
-          }
+      retVal = squish;
+    }
+    break;
+    case "PEGBAR": {
+      if (totalItemWidths > parentWidth) {
+        squish = (totalItemWidths - parentWidth) / (totalItems);
+      }
 
-          retVal = squish;
-        }
-        break;
-      case "LABELHOLDER":
-        {
-          if (totalItemWidths > parentWidth) {
-            squish = (totalItemWidths - parentWidth) / (totalItems);
-          }
+      retVal = squish;
+    }
+    break;
+    case "LABELHOLDER": {
+      if (totalItemWidths > parentWidth) {
+        squish = (totalItemWidths - parentWidth) / (totalItems);
+      }
 
-          retVal = squish;
-        }
-        break;
-      default:
-        {
-          // self.SpacingEvenAmount = 0;
-          retVal = 0;
-        }
-        break;
+      retVal = squish;
+    }
+    break;
+    default: {
+      // self.SpacingEvenAmount = 0;
+      retVal = 0;
+    }
+    break;
     }
 
     return retVal;
@@ -844,102 +804,96 @@ class PlanogramItemBase {
     });
 
     switch (parentItem.Type.toUpperCase()) {
-      case "BASE":
-        {
-          let spreadType = parentItem.Data.spreadProducts;
+      case "BASE": {
+        let spreadType = parentItem.Data.spreadProducts;
 
-          if (spreadType.toUpperCase() != "SFE") {
-            return retVal;
-          }
-
-          if (totalItems == 1) {
-            spacing = 0;
-          } else {
-            spacing = (parentWidth - totalItemWidths) / (totalItems - 1);
-          }
-
-          self.SpacingEvenAmount = spacing;
-          retVal = spacing;
+        if (spreadType.toUpperCase() != "SFE") {
+          return retVal;
         }
-        break;
-      case "SHELF":
-        {
-          let spreadType = parentItem.Data.spreadProducts;
 
-          if (spreadType.toUpperCase() != "SFE") {
-            return retVal;
-          }
-
-          if (totalItems == 1) {
-            spacing = 0;
-          } else {
-            spacing = (parentWidth - totalItemWidths) / (totalItems - 1);
-          }
-
-          self.SpacingEvenAmount = spacing;
-          retVal = spacing;
+        if (totalItems == 1) {
+          spacing = 0;
+        } else {
+          spacing = (parentWidth - totalItemWidths) / (totalItems - 1);
         }
-        break;
-      case "BASKET":
-        {
-          let spreadType = parentItem.Data.spreadProducts;
 
-          if (spreadType.toUpperCase() != "SFE") {
-            return retVal;
-          }
+        self.SpacingEvenAmount = spacing;
+        retVal = spacing;
+      }
+      break;
+    case "SHELF": {
+      let spreadType = parentItem.Data.spreadProducts;
 
-          if (totalItems == 1) {
-            spacing = 0;
-          } else {
-            spacing = (parentWidth - totalItemWidths) / (totalItems - 1);
-          }
+      if (spreadType.toUpperCase() != "SFE") {
+        return retVal;
+      }
 
-          self.SpacingEvenAmount = spacing;
-          retVal = spacing;
-        }
-        break;
-      case "PEGBAR":
-        {
-          let spreadType = parentItem.Data.spreadProducts;
+      if (totalItems == 1) {
+        spacing = 0;
+      } else {
+        spacing = (parentWidth - totalItemWidths) / (totalItems - 1);
+      }
 
-          if (spreadType.toUpperCase() != "SFE") {
-            return retVal;
-          }
+      self.SpacingEvenAmount = spacing;
+      retVal = spacing;
+    }
+    break;
+    case "BASKET": {
+      let spreadType = parentItem.Data.spreadProducts;
 
-          if (totalItems == 1) {
-            spacing = 0;
-          } else {
-            spacing = (parentWidth - totalItemWidths) / (totalItems - 1);
-          }
+      if (spreadType.toUpperCase() != "SFE") {
+        return retVal;
+      }
 
-          self.SpacingEvenAmount = spacing;
-          retVal = spacing;
-        }
-        break;
-      case "LABELHOLDER":
-        {
-          let spreadType = parentItem.Data.spreadProducts;
+      if (totalItems == 1) {
+        spacing = 0;
+      } else {
+        spacing = (parentWidth - totalItemWidths) / (totalItems - 1);
+      }
 
-          if (spreadType.toUpperCase() != "SFE") {
-            return retVal;
-          }
+      self.SpacingEvenAmount = spacing;
+      retVal = spacing;
+    }
+    break;
+    case "PEGBAR": {
+      let spreadType = parentItem.Data.spreadProducts;
 
-          if (totalItems == 1) {
-            spacing = 0;
-          } else {
-            spacing = (parentWidth - totalItemWidths) / (totalItems - 1);
-          }
+      if (spreadType.toUpperCase() != "SFE") {
+        return retVal;
+      }
 
-          self.SpacingEvenAmount = spacing;
-          retVal = spacing;
-        }
-        break;
-      default:
-        {
-          self.SpacingEvenAmount = 0;
-          retVal = 0;
-        }
-        break;
+      if (totalItems == 1) {
+        spacing = 0;
+      } else {
+        spacing = (parentWidth - totalItemWidths) / (totalItems - 1);
+      }
+
+      self.SpacingEvenAmount = spacing;
+      retVal = spacing;
+    }
+    break;
+    case "LABELHOLDER": {
+      let spreadType = parentItem.Data.spreadProducts;
+
+      if (spreadType.toUpperCase() != "SFE") {
+        return retVal;
+      }
+
+      if (totalItems == 1) {
+        spacing = 0;
+      } else {
+        spacing = (parentWidth - totalItemWidths) / (totalItems - 1);
+      }
+
+      self.SpacingEvenAmount = spacing;
+      retVal = spacing;
+    }
+    break;
+    default: {
+      self.SpacingEvenAmount = 0;
+      retVal = 0;
+    }
+    break;
     }
 
     return retVal;
@@ -954,62 +908,55 @@ class PlanogramItemBase {
     }
 
     switch (self.Type.toUpperCase()) {
-      case "PRODUCT":
-        {
-          retVal = {
-            width: self.Orientation_Width * self.Facings_X,
-            height: self.Orientation_Height * self.Facings_Y + (self.Caps_Count * self.Cap_Orientation_Height)
-          }
+      case "PRODUCT": {
+        retVal = {
+          width: self.Orientation_Width * self.Facings_X,
+          height: self.Orientation_Height * self.Facings_Y + (self.Caps_Count * self.Cap_Orientation_Height)
         }
-        break;
-      case "BASE":
-        {
-          retVal = {
-            width: self.Data.width * self.Ratio,
-            height: self.Data.height * self.Ratio
-          }
-        }
-        break;
-      case "SHELF":
-        {
-          retVal = {
-            width: self.Data.width * self.Ratio,
-            height: self.Data.height * self.Ratio
-          }
-        }
-        break;
-      case "BASKET":
-        {
-          retVal = {
-            width: self.Data.width * self.Ratio,
-            height: self.Data.height * self.Ratio
-          }
-        }
-        break;
-      case "PEGBAR":
-        {
-          retVal = {
-            width: self.Data.width * self.Ratio,
-            height: self.Data.height * self.Ratio
-          }
-        }
-        break;
-      case "PEGBOARD":
-        {
-          retVal = {
-            width: self.Data.width * self.Ratio,
-            height: self.Data.height * self.Ratio
-          }
-        }
-        break;
-      case "PALETTE":
-        {
-          retVal = {
-            width: self.Data.width * self.Ratio,
-            height: self.Data.height * self.Ratio
-          }
-        }
-        break;
+      }
+      break;
+    case "BASE": {
+      retVal = {
+        width: self.Data.width * self.Ratio,
+        height: self.Data.height * self.Ratio
+      }
+    }
+    break;
+    case "SHELF": {
+      retVal = {
+        width: self.Data.width * self.Ratio,
+        height: self.Data.height * self.Ratio
+      }
+    }
+    break;
+    case "BASKET": {
+      retVal = {
+        width: self.Data.width * self.Ratio,
+        height: self.Data.height * self.Ratio
+      }
+    }
+    break;
+    case "PEGBAR": {
+      retVal = {
+        width: self.Data.width * self.Ratio,
+        height: self.Data.height * self.Ratio
+      }
+    }
+    break;
+    case "PEGBOARD": {
+      retVal = {
+        width: self.Data.width * self.Ratio,
+        height: self.Data.height * self.Ratio
+      }
+    }
+    break;
+    case "PALETTE": {
+      retVal = {
+        width: self.Data.width * self.Ratio,
+        height: self.Data.height * self.Ratio
+      }
+    }
+    break;
     }
 
     return retVal;
@@ -1033,39 +980,36 @@ class PlanogramItemBase {
     self.DestroyMilkCrate();
 
     switch (self.Type.toUpperCase()) {
-      case "PRODUCT":
-        {
-          if (parent.MilkCrate.enabled == false) {
-            self.SetObjectDimensions();
-            self.DestroyMilkCrate();
-            self.AddProductDisplay();
-          } else {
-            self.SetObjectDimensions(parent.MilkCrate);
-            self.DestroyDisplayForRedraw();
-            self.AddMilkCrate(parent.MilkCrate);
-          }
+      case "PRODUCT": {
+        if (parent.MilkCrate.enabled == false) {
+          self.SetObjectDimensions();
+          self.DestroyMilkCrate();
+          self.AddProductDisplay();
+        } else {
+          self.SetObjectDimensions(parent.MilkCrate);
+          self.DestroyDisplayForRedraw();
+          self.AddMilkCrate(parent.MilkCrate);
+        }
 
-          self.Cache();
-        }
-        break;
-      case "BASKET":
-        {
-          if (parent.MilkCrate.enabled == false) {
-            self.DestroyMilkCrate();
-          } else {
-            self.AddMilkCrate(parent.MilkCrate);
-          }
-        }
-        break;
-      case "DIVIDER":
-        {
-          if (parent.MilkCrate.enabled == false) {
-            self.DestroyMilkCrate();
-          } else {
-            self.AddMilkCrate(parent.MilkCrate);
-          }
-        }
-        break;
+        self.Cache();
+      }
+      break;
+    case "BASKET": {
+      if (parent.MilkCrate.enabled == false) {
+        self.DestroyMilkCrate();
+      } else {
+        self.AddMilkCrate(parent.MilkCrate);
+      }
+    }
+    break;
+    case "DIVIDER": {
+      if (parent.MilkCrate.enabled == false) {
+        self.DestroyMilkCrate();
+      } else {
+        self.AddMilkCrate(parent.MilkCrate);
+      }
+    }
+    break;
     }
 
     // let posRedrawTree = new ParentTreeRedraw();
@@ -1152,51 +1096,48 @@ class PlanogramItemBase {
     })
 
     switch (self.Type.toUpperCase()) {
-      case "PRODUCT":
-        {
-          //TODO: Add text as facings amount
-          self.MilkCrateText = new Konva.Text({
-            x: 0,
-            y: milkCrateDetails.size.height / 2,
-            width: milkCrateDetails.size.width,
-            height: milkCrateDetails.size.height,
-            fontFamily: 'Arial Black',
-            text: self.Facings_X,
-            fontSize: 15,
-            align: 'center'
-          })
-        }
-        break;
-      case "BASKET":
-        {
-          //TODO: Add facings amounta s default of 1
-          self.MilkCrateText = new Konva.Text({
-            x: 0,
-            y: milkCrateDetails.size.height / 2,
-            width: milkCrateDetails.size.width,
-            height: milkCrateDetails.size.height,
-            fontFamily: 'Arial Black',
-            text: "1",
-            fontSize: 15,
-            align: 'center'
-          })
-        }
-        break;
-      case "DIVIDER":
-        {
-          //TODO: Add facings amounta s default of 1
-          self.MilkCrateText = new Konva.Text({
-            x: 0,
-            y: 0,
-            width: milkCrateDetails.size.width,
-            height: milkCrateDetails.size.height,
-            fontFamily: 'Arial Black',
-            text: "1",
-            fontSize: 15,
-            align: 'center'
-          })
-        }
-        break;
+      case "PRODUCT": {
+        //TODO: Add text as facings amount
+        self.MilkCrateText = new Konva.Text({
+          x: 0,
+          y: milkCrateDetails.size.height / 2,
+          width: milkCrateDetails.size.width,
+          height: milkCrateDetails.size.height,
+          fontFamily: 'Arial Black',
+          text: self.Facings_X,
+          fontSize: 15,
+          align: 'center'
+        })
+      }
+      break;
+    case "BASKET": {
+      //TODO: Add facings amounta s default of 1
+      self.MilkCrateText = new Konva.Text({
+        x: 0,
+        y: milkCrateDetails.size.height / 2,
+        width: milkCrateDetails.size.width,
+        height: milkCrateDetails.size.height,
+        fontFamily: 'Arial Black',
+        text: "1",
+        fontSize: 15,
+        align: 'center'
+      })
+    }
+    break;
+    case "DIVIDER": {
+      //TODO: Add facings amounta s default of 1
+      self.MilkCrateText = new Konva.Text({
+        x: 0,
+        y: 0,
+        width: milkCrateDetails.size.width,
+        height: milkCrateDetails.size.height,
+        fontFamily: 'Arial Black',
+        text: "1",
+        fontSize: 15,
+        align: 'center'
+      })
+    }
+    break;
     }
 
     self.Group.add(self.MilkCrateRect);
@@ -1247,8 +1188,7 @@ class PlanogramItemBase {
       // TODO: Visuals must go here
       // event.notify_product_group_selected_deselected(EventBus, self.Selected, self);
       event.notify_product_group_selected_deselected(EventBus, true, self);
-    }
-    else {
+    } else {
       event.notify_gondola_selected_deselected(EventBus, true, self);
     }
 
@@ -1310,75 +1250,72 @@ class PlanogramItemBase {
     if (parentItem != null && parentItem != undefined) {
       // console.log("[CALLING UPDATE] CALLED");
       switch (self.Type.toUpperCase()) {
-        case "PRODUCT":
-          {
-            if (existing == null) {
-              parentItem.TotalChildren.push({
-                ID: self.ID,
-                Type: self.Type,
-                Item: self,
-                Count: self.Facings_X,
-                Width: self.Orientation_Width
-              });
+        case "PRODUCT": {
+          if (existing == null) {
+            parentItem.TotalChildren.push({
+              ID: self.ID,
+              Type: self.Type,
+              Item: self,
+              Count: self.Facings_X,
+              Width: self.Orientation_Width
+            });
 
-            } else {
-              self.RemoveChildFromTotalChildrenArray(existing.ID, parentItem.ID);
-              parentItem.TotalChildren.push({
-                ID: self.ID,
-                Type: self.Type,
-                Item: self,
-                Count: self.Facings_X,
-                Width: self.Orientation_Width
-              });
-            }
+          } else {
+            self.RemoveChildFromTotalChildrenArray(existing.ID, parentItem.ID);
+            parentItem.TotalChildren.push({
+              ID: self.ID,
+              Type: self.Type,
+              Item: self,
+              Count: self.Facings_X,
+              Width: self.Orientation_Width
+            });
           }
-          break;
-        case "BASKET":
-          {
-            if (existing == null) {
-              parentItem.TotalChildren.push({
-                ID: self.ID,
-                Type: self.Type,
-                Item: self,
-                Count: 1,
-                Width: self.TotalWidth
-              });
+        }
+        break;
+      case "BASKET": {
+        if (existing == null) {
+          parentItem.TotalChildren.push({
+            ID: self.ID,
+            Type: self.Type,
+            Item: self,
+            Count: 1,
+            Width: self.TotalWidth
+          });
 
-            } else {
-              self.RemoveChildFromTotalChildrenArray(existing.ID, parentItem.ID);
-              parentItem.TotalChildren.push({
-                ID: self.ID,
-                Type: self.Type,
-                Item: self,
-                Count: 1,
-                Width: self.TotalWidth
-              });
-            }
-          }
-          break;
-        case "DIVIDER":
-          {
-            if (existing == null) {
-              parentItem.TotalChildren.push({
-                ID: self.ID,
-                Type: self.Type,
-                Item: self,
-                Count: 1,
-                Width: self.TotalWidth
-              });
+        } else {
+          self.RemoveChildFromTotalChildrenArray(existing.ID, parentItem.ID);
+          parentItem.TotalChildren.push({
+            ID: self.ID,
+            Type: self.Type,
+            Item: self,
+            Count: 1,
+            Width: self.TotalWidth
+          });
+        }
+      }
+      break;
+      case "DIVIDER": {
+        if (existing == null) {
+          parentItem.TotalChildren.push({
+            ID: self.ID,
+            Type: self.Type,
+            Item: self,
+            Count: 1,
+            Width: self.TotalWidth
+          });
 
-            } else {
-              self.RemoveChildFromTotalChildrenArray(existing.ID, parentItem.ID);
-              parentItem.TotalChildren.push({
-                ID: self.ID,
-                Type: self.Type,
-                Item: self,
-                Count: 1,
-                Width: self.TotalWidth
-              });
-            }
-          }
-          break;
+        } else {
+          self.RemoveChildFromTotalChildrenArray(existing.ID, parentItem.ID);
+          parentItem.TotalChildren.push({
+            ID: self.ID,
+            Type: self.Type,
+            Item: self,
+            Count: 1,
+            Width: self.TotalWidth
+          });
+        }
+      }
+      break;
       }
 
       // TODO: Figure out a way not to redraw a million times.....
@@ -1538,15 +1475,14 @@ class PlanogramItemBase {
     self.GroupsOn = false;
 
     switch (self.Type.toUpperCase()) {
-      case "PRODUCT":
-        {
-          self.Quality = quality;
-          self.ToggleImages();
-          self.Cache();
-          self.Layer.batchDraw();
-          // self.ShowGroupBox();
-        }
-        break;;
+      case "PRODUCT": {
+        self.Quality = quality;
+        self.ToggleImages();
+        self.Cache();
+        self.Layer.batchDraw();
+        // self.ShowGroupBox();
+      }
+      break;;
     }
   }
 
@@ -1555,13 +1491,12 @@ class PlanogramItemBase {
     self.ImagesOn = false;
 
     switch (self.Type.toUpperCase()) {
-      case "PRODUCT":
-        {
-          self.ToggleImages();
-          self.Cache();
-          self.Layer.batchDraw();
-        }
-        break;;
+      case "PRODUCT": {
+        self.ToggleImages();
+        self.Cache();
+        self.Layer.batchDraw();
+      }
+      break;;
     }
   }
 
@@ -1570,13 +1505,12 @@ class PlanogramItemBase {
     self.labelsOn = true;
 
     switch (self.Type.toUpperCase()) {
-      case "PRODUCT":
-        {
-          self.ToggleLabels();
-          self.Cache();
-          self.Layer.batchDraw();
-        }
-        break;;
+      case "PRODUCT": {
+        self.ToggleLabels();
+        self.Cache();
+        self.Layer.batchDraw();
+      }
+      break;;
     }
   }
 
@@ -1585,13 +1519,12 @@ class PlanogramItemBase {
     self.labelsOn = false;
 
     switch (self.Type.toUpperCase()) {
-      case "PRODUCT":
-        {
-          self.ToggleLabels();
-          self.Cache();
-          self.Layer.batchDraw();
-        }
-        break;;
+      case "PRODUCT": {
+        self.ToggleLabels();
+        self.Cache();
+        self.Layer.batchDraw();
+      }
+      break;;
     }
   }
 
@@ -1601,12 +1534,11 @@ class PlanogramItemBase {
     self.ImagesOn = false;
 
     switch (self.Type.toUpperCase()) {
-      case "PRODUCT":
-        {
-          // self.ToggleImages();
-          self.ToggleGroups();
-        }
-        break;;
+      case "PRODUCT": {
+        // self.ToggleImages();
+        self.ToggleGroups();
+      }
+      break;;
     }
   }
 
@@ -1615,11 +1547,10 @@ class PlanogramItemBase {
     self.GroupsOn = false;
 
     switch (self.Type.toUpperCase()) {
-      case "PRODUCT":
-        {
-          self.ToggleGroups();
-        }
-        break;;
+      case "PRODUCT": {
+        self.ToggleGroups();
+      }
+      break;;
     }
   }
 
@@ -1649,7 +1580,7 @@ class PlanogramItemBase {
     self.Group.draw();
   }
 
-  SetTextLabelPosition () {
+  SetTextLabelPosition() {
     let self = this;
     let ctrl_store = new StoreHelper();
     let planogramSettings = ctrl_store.getPlanogramSettings(self.VueStore);
@@ -1685,56 +1616,46 @@ class PlanogramItemBase {
     });
 
     switch (self.Type.toUpperCase()) {
-      case "GONDOLA":
-        {
-          event.modal_load(EventBus, "GONDOLA", null, self.Data, self.ID, self);
-        }
-        break;
-      case "PALETTE":
-        {
-          event.modal_load(EventBus, "FIXTURE", "PALETTE", self, self.ID, self);
-        }
-        break;
-      case "SHELF":
-        {
-          event.modal_load(EventBus, "FIXTURE", "SHELF", self, self.ID, self);
-        }
-        break;
-      case "BASE":
-        {
-          event.modal_load(EventBus, "FIXTURE", "BASE", self, self.ID, self);
-        }
-        break;
-      case "PEGBAR":
-        {
-          event.modal_load(EventBus, "FIXTURE", "PEGBAR", self, self.ID, self);
-        }
-        break;
-      case "PEGBOARD":
-        {
-          event.modal_load(EventBus, "FIXTURE", "PEGBOARD", self, self.ID, self);
-        }
-        break;
-      case "BASKET":
-        {
-          event.modal_load(EventBus, "FIXTURE", "BASKET", self, self.ID, self);
-        }
-        break;
-      case "AREA":
-        {
-          event.modal_load(EventBus, "FIXTURE", "AREA", self, self.ID, self);
-        }
-        break;
-      case "PRODUCT":
-        {
-          event.modal_load(EventBus, "PRODUCT", "", self, self.ID, self);
-        }
-        break;
-      case "LABELHOLDER":
-        {
-          event.modal_load(EventBus, "FIXTURE", "LABELHOLDER", self, self.ID, self);
-        }
-        break;
+      case "GONDOLA": {
+        event.modal_load(EventBus, "GONDOLA", null, self.Data, self.ID, self);
+      }
+      break;
+    case "PALETTE": {
+      event.modal_load(EventBus, "FIXTURE", "PALETTE", self, self.ID, self);
+    }
+    break;
+    case "SHELF": {
+      event.modal_load(EventBus, "FIXTURE", "SHELF", self, self.ID, self);
+    }
+    break;
+    case "BASE": {
+      event.modal_load(EventBus, "FIXTURE", "BASE", self, self.ID, self);
+    }
+    break;
+    case "PEGBAR": {
+      event.modal_load(EventBus, "FIXTURE", "PEGBAR", self, self.ID, self);
+    }
+    break;
+    case "PEGBOARD": {
+      event.modal_load(EventBus, "FIXTURE", "PEGBOARD", self, self.ID, self);
+    }
+    break;
+    case "BASKET": {
+      event.modal_load(EventBus, "FIXTURE", "BASKET", self, self.ID, self);
+    }
+    break;
+    case "AREA": {
+      event.modal_load(EventBus, "FIXTURE", "AREA", self, self.ID, self);
+    }
+    break;
+    case "PRODUCT": {
+      event.modal_load(EventBus, "PRODUCT", "", self, self.ID, self);
+    }
+    break;
+    case "LABELHOLDER": {
+      event.modal_load(EventBus, "FIXTURE", "LABELHOLDER", self, self.ID, self);
+    }
+    break;
     }
 
   }
@@ -1745,30 +1666,27 @@ class PlanogramItemBase {
   Delete() {
     let self = this;
     let ctrl_store = new StoreHelper();
-
     ctrl_store.removePlanogramItem(self.VueStore, self);
+    self.Layer.find('Transformer').destroy();
     self.Group.destroy();
 
     switch (self.Type.toUpperCase()) {
-      case "PRODUCT":
-        {
-          self.RemoveChildFromTotalChildrenArray(self.ID, self.ParentID);
-        }
-        break;
-      case "BASKET":
-        {
-          self.RemoveChildFromTotalChildrenArray(self.ID, self.ParentID);
-        }
-        break;
-      case "DIVIDER":
-        {
-          self.RemoveChildFromTotalChildrenArray(self.ID, self.ParentID);
-        }
-        break;
+      case "PRODUCT": {
+        self.RemoveChildFromTotalChildrenArray(self.ID, self.ParentID);
+      }
+      break;
+    case "BASKET": {
+      self.RemoveChildFromTotalChildrenArray(self.ID, self.ParentID);
+    }
+    break;
+    case "DIVIDER": {
+      self.RemoveChildFromTotalChildrenArray(self.ID, self.ParentID);
+    }
+    break;
     }
 
     // TODO: reposition elements
-    if(self.ParentID != undefined && self.parentID != null) {
+    if (self.ParentID != undefined && self.parentID != null) {
       let parentItem = ctrl_store.getPlanogramItemById(self.VueStore, self.ParentID);
       if (parentItem != null) {
         self.UpdateParent(parentItem.ID);
@@ -1797,302 +1715,291 @@ class PlanogramItemBase {
     });
 
     switch (self.Type.toUpperCase()) {
-      case "PRODUCT":
-        {
-          retVal = {
-            Type: self.Type.toUpperCase(),
-            RelativePosition: {
-              x: self.Group.getX(),
-              y: self.Group.getY(),
+      case "PRODUCT": {
+        retVal = {
+          Type: self.Type.toUpperCase(),
+          RelativePosition: {
+            x: self.Group.getX(),
+            y: self.Group.getY(),
+          },
+          AbsolutePosition: {
+            x: self.Group.getAbsolutePosition().x,
+            y: self.Group.getAbsolutePosition().y
+          },
+          Data: {
+            Data: self.Data,
+            ID: self.ID,
+            ParentID: self.ParentID,
+            Config: self.ProductConfig,
+            Facings: {
+              x: self.Facings_X,
+              y: self.Facings_Y,
+              z: self.Facings_Z
             },
-            AbsolutePosition: {
-              x: self.Group.getAbsolutePosition().x,
-              y: self.Group.getAbsolutePosition().y
+            Orientation: {
+              Rotation: self.Rotation,
+              LastFace: self.LastFace,
+              Width: self.Orientation_Width,
+              Height: self.Orientation_Height,
+              Depth: self.Orientation_Depth
             },
-            Data: {
-              Data: self.Data,
-              ID: self.ID,
-              ParentID: self.ParentID,
-              Config: self.ProductConfig,
-              Facings: {
-                x: self.Facings_X,
-                y: self.Facings_Y,
-                z: self.Facings_Z
-              },
+            ImageOrientation: {
+              Width: self.image_orientation_width,
+              Height: self.image_orientation_height
+            },
+            Caps: {
               Orientation: {
-                Rotation: self.Rotation,
-                LastFace: self.LastFace,
-                Width: self.Orientation_Width,
-                Height: self.Orientation_Height,
-                Depth: self.Orientation_Depth
+                Width: self.Cap_Orientation_Width,
+                Height: self.Cap_Orientation_Height,
+                Depth: self.Cap_Orientation_Depth
               },
               ImageOrientation: {
-                Width: self.image_orientation_width,
-                Height: self.image_orientation_height
+                Width: self.caps_image_orientation_width,
+                Height: self.caps_image_orientation_height
               },
-              Caps: {
-                Orientation: {
-                  Width: self.Cap_Orientation_Width,
-                  Height: self.Cap_Orientation_Height,
-                  Depth: self.Cap_Orientation_Depth
-                },
-                ImageOrientation: {
-                  Width: self.caps_image_orientation_width,
-                  Height: self.caps_image_orientation_height
-                },
-                Rotation: self.Cap_Rotation,
-                Caps_Face: self.Caps_Face,
-                Caps_Count: self.Caps_Count,
-                Caps_Enabled: self.Caps_Enabled
-              },
-              TotalWidth: self.TotalWidth,
-              TotalHeight: self.TotalHeight,
-              RandomColor: self.RandomColor
+              Rotation: self.Cap_Rotation,
+              Caps_Face: self.Caps_Face,
+              Caps_Count: self.Caps_Count,
+              Caps_Enabled: self.Caps_Enabled
             },
-            Position: self.Position
-          }
+            TotalWidth: self.TotalWidth,
+            TotalHeight: self.TotalHeight,
+            RandomColor: self.RandomColor
+          },
+          Position: self.Position
         }
-        break;
-      case "AREA":
-        {
-          retVal = {
-            Type: self.Type.toUpperCase(),
-            RelativePosition: {
-              x: self.Group.getX(),
-              y: self.Group.getY(),
-            },
-            AbsolutePosition: {
-              x: self.Group.getAbsolutePosition().x,
-              y: self.Group.getAbsolutePosition().y
-            },
-            Data: {
-              Data: self.Data,
-              ID: self.ID,
-              ParentID: self.ParentID,
-              Config: self.Config
-            },
-            Position: self.Position,
-            Label: self.LabelText
-          }
-        }
-        break;
-      case "BASKET":
-        {
-          retVal = {
-            Type: self.Type.toUpperCase(),
-            RelativePosition: {
-              x: self.Group.getX(),
-              y: self.Group.getY(),
-            },
-            AbsolutePosition: {
-              x: self.Group.getAbsolutePosition().x,
-              y: self.Group.getAbsolutePosition().y
-            },
-            Data: {
-              Data: self.Data,
-              ID: self.ID,
-              ParentID: self.ParentID,
-              Config: self.Config,
-              TotalChildren: newTotalChildren
-            },
-            Position: self.Position,
-            Label: self.LabelText
-          }
-        }
-        break;
-      case "BASE":
-        {
-          retVal = {
-            Type: self.Type.toUpperCase(),
-            RelativePosition: {
-              x: self.Group.getX(),
-              y: self.Group.getY(),
-            },
-            AbsolutePosition: {
-              x: self.Group.getAbsolutePosition().x,
-              y: self.Group.getAbsolutePosition().y
-            },
-            Data: {
-              Data: self.Data,
-              ID: self.ID,
-              ParentID: self.ParentID,
-              Config: self.Config,
-              TotalChildren: newTotalChildren
-            },
-            Position: self.Position,
-            Label: self.LabelText
-          }
-        }
-        break;
-      case "SHELF":
-        {
-          retVal = {
-            Type: self.Type.toUpperCase(),
-            RelativePosition: {
-              x: self.Group.getX(),
-              y: self.Group.getY(),
-            },
-            AbsolutePosition: {
-              x: self.Group.getAbsolutePosition().x,
-              y: self.Group.getAbsolutePosition().y
-            },
-            Data: {
-              Data: self.Data,
-              ID: self.ID,
-              ParentID: self.ParentID,
-              Config: self.Config,
-              TotalChildren: newTotalChildren
-            },
-            Position: self.Position,
-            Label: self.LabelText
-          }
-        }
-        break;
-      case "PEGBOARD":
-        {
-          retVal = {
-            Type: self.Type.toUpperCase(),
-            RelativePosition: {
-              x: self.Group.getX(),
-              y: self.Group.getY(),
-            },
-            AbsolutePosition: {
-              x: self.Group.getAbsolutePosition().x,
-              y: self.Group.getAbsolutePosition().y
-            },
-            Data: {
-              Data: self.Data,
-              ID: self.ID,
-              ParentID: self.ParentID,
-              Config: self.Config
-            },
-            Position: self.Position,
-            Label: self.LabelText
-          }
-        }
-        break;
-      case "PEGBAR":
-        {
-          retVal = {
-            Type: self.Type.toUpperCase(),
-            RelativePosition: {
-              x: self.Group.getX(),
-              y: self.Group.getY(),
-            },
-            AbsolutePosition: {
-              x: self.Group.getAbsolutePosition().x,
-              y: self.Group.getAbsolutePosition().y
-            },
-            Data: {
-              Data: self.Data,
-              ID: self.ID,
-              ParentID: self.ParentID,
-              Config: self.Config,
-              TotalChildren: newTotalChildren
-            },
-            Position: self.Position,
-            Label: self.LabelText
-          }
-        }
-        break;
-      case "GONDOLA":
-        {
-          retVal = {
-            Type: self.Type.toUpperCase(),
-            RelativePosition: {
-              x: self.Group.getX(),
-              y: self.Group.getY(),
-            },
-            AbsolutePosition: {
-              x: self.Group.getAbsolutePosition().x,
-              y: self.Group.getAbsolutePosition().y
-            },
-            Data: {
-              Data: self.Data,
-              ID: self.ID,
-              ParentID: self.ParentID,
-              Config: self.Config
-            },
-            Position: self.Position,
-            Label: self.LabelText
-          }
-        }
-        break;
-      case "PALETTE":
-        {
-          retVal = {
-            Type: self.Type.toUpperCase(),
-            RelativePosition: {
-              x: self.Group.getX(),
-              y: self.Group.getY(),
-            },
-            AbsolutePosition: {
-              x: self.Group.getAbsolutePosition().x,
-              y: self.Group.getAbsolutePosition().y
-            },
-            Data: {
-              Data: self.Data,
-              ID: self.ID,
-              ParentID: self.ParentID,
-              Config: self.Config
-            },
-            Position: self.Position,
-            Label: self.LabelText
-          }
-        }
-        break;
-      case "TEXTHEADER":
-        {
-          retVal = {
-            Type: self.Type.toUpperCase(),
-            RelativePosition: {
-              x: self.Group.getX(),
-              y: self.Group.getY(),
-            },
-            AbsolutePosition: {
-              x: self.Group.getAbsolutePosition().x,
-              y: self.Group.getAbsolutePosition().y
-            },
-            Data: {
-              Data: self.Data,
-              ID: self.ID,
-              ParentID: self.ParentID,
-              Config: self.Config,
-              Text: self.StringText
-            },
-            Scale: {
-              ScaleX: self.Group.scaleX(),
-              ScaleY: self.Group.scaleY()
-            },
-            Position: self.Position,
-            Label: self.LabelText
-          }
-        }
-        break;
-      case "LABELHOLDER":
-        {
-          retVal = {
-            Type: self.Type.toUpperCase(),
-            RelativePosition: {
-              x: self.Group.getX(),
-              y: self.Group.getY(),
-            },
-            AbsolutePosition: {
-              x: self.Group.getAbsolutePosition().x,
-              y: self.Group.getAbsolutePosition().y
-            },
-            Data: {
-              Data: self.Data,
-              ID: self.ID,
-              ParentID: self.ParentID,
-              Config: self.Config,
-              TotalChildren: newTotalChildren
-            },
-            Position: self.Position,
-            Label: self.LabelText
-          }
-        }
-        break;
+      }
+      break;
+    case "AREA": {
+      retVal = {
+        Type: self.Type.toUpperCase(),
+        RelativePosition: {
+          x: self.Group.getX(),
+          y: self.Group.getY(),
+        },
+        AbsolutePosition: {
+          x: self.Group.getAbsolutePosition().x,
+          y: self.Group.getAbsolutePosition().y
+        },
+        Data: {
+          Data: self.Data,
+          ID: self.ID,
+          ParentID: self.ParentID,
+          Config: self.Config
+        },
+        Position: self.Position,
+        Label: self.LabelText
+      }
+    }
+    break;
+    case "BASKET": {
+      retVal = {
+        Type: self.Type.toUpperCase(),
+        RelativePosition: {
+          x: self.Group.getX(),
+          y: self.Group.getY(),
+        },
+        AbsolutePosition: {
+          x: self.Group.getAbsolutePosition().x,
+          y: self.Group.getAbsolutePosition().y
+        },
+        Data: {
+          Data: self.Data,
+          ID: self.ID,
+          ParentID: self.ParentID,
+          Config: self.Config,
+          TotalChildren: newTotalChildren
+        },
+        Position: self.Position,
+        Label: self.LabelText
+      }
+    }
+    break;
+    case "BASE": {
+      retVal = {
+        Type: self.Type.toUpperCase(),
+        RelativePosition: {
+          x: self.Group.getX(),
+          y: self.Group.getY(),
+        },
+        AbsolutePosition: {
+          x: self.Group.getAbsolutePosition().x,
+          y: self.Group.getAbsolutePosition().y
+        },
+        Data: {
+          Data: self.Data,
+          ID: self.ID,
+          ParentID: self.ParentID,
+          Config: self.Config,
+          TotalChildren: newTotalChildren
+        },
+        Position: self.Position,
+        Label: self.LabelText
+      }
+    }
+    break;
+    case "SHELF": {
+      retVal = {
+        Type: self.Type.toUpperCase(),
+        RelativePosition: {
+          x: self.Group.getX(),
+          y: self.Group.getY(),
+        },
+        AbsolutePosition: {
+          x: self.Group.getAbsolutePosition().x,
+          y: self.Group.getAbsolutePosition().y
+        },
+        Data: {
+          Data: self.Data,
+          ID: self.ID,
+          ParentID: self.ParentID,
+          Config: self.Config,
+          TotalChildren: newTotalChildren
+        },
+        Position: self.Position,
+        Label: self.LabelText
+      }
+    }
+    break;
+    case "PEGBOARD": {
+      retVal = {
+        Type: self.Type.toUpperCase(),
+        RelativePosition: {
+          x: self.Group.getX(),
+          y: self.Group.getY(),
+        },
+        AbsolutePosition: {
+          x: self.Group.getAbsolutePosition().x,
+          y: self.Group.getAbsolutePosition().y
+        },
+        Data: {
+          Data: self.Data,
+          ID: self.ID,
+          ParentID: self.ParentID,
+          Config: self.Config
+        },
+        Position: self.Position,
+        Label: self.LabelText
+      }
+    }
+    break;
+    case "PEGBAR": {
+      retVal = {
+        Type: self.Type.toUpperCase(),
+        RelativePosition: {
+          x: self.Group.getX(),
+          y: self.Group.getY(),
+        },
+        AbsolutePosition: {
+          x: self.Group.getAbsolutePosition().x,
+          y: self.Group.getAbsolutePosition().y
+        },
+        Data: {
+          Data: self.Data,
+          ID: self.ID,
+          ParentID: self.ParentID,
+          Config: self.Config,
+          TotalChildren: newTotalChildren
+        },
+        Position: self.Position,
+        Label: self.LabelText
+      }
+    }
+    break;
+    case "GONDOLA": {
+      retVal = {
+        Type: self.Type.toUpperCase(),
+        RelativePosition: {
+          x: self.Group.getX(),
+          y: self.Group.getY(),
+        },
+        AbsolutePosition: {
+          x: self.Group.getAbsolutePosition().x,
+          y: self.Group.getAbsolutePosition().y
+        },
+        Data: {
+          Data: self.Data,
+          ID: self.ID,
+          ParentID: self.ParentID,
+          Config: self.Config
+        },
+        Position: self.Position,
+        Label: self.LabelText
+      }
+    }
+    break;
+    case "PALETTE": {
+      retVal = {
+        Type: self.Type.toUpperCase(),
+        RelativePosition: {
+          x: self.Group.getX(),
+          y: self.Group.getY(),
+        },
+        AbsolutePosition: {
+          x: self.Group.getAbsolutePosition().x,
+          y: self.Group.getAbsolutePosition().y
+        },
+        Data: {
+          Data: self.Data,
+          ID: self.ID,
+          ParentID: self.ParentID,
+          Config: self.Config
+        },
+        Position: self.Position,
+        Label: self.LabelText
+      }
+    }
+    break;
+    case "TEXTHEADER": {
+      retVal = {
+        Type: self.Type.toUpperCase(),
+        RelativePosition: {
+          x: self.Group.getX(),
+          y: self.Group.getY(),
+        },
+        AbsolutePosition: {
+          x: self.Group.getAbsolutePosition().x,
+          y: self.Group.getAbsolutePosition().y
+        },
+        Data: {
+          Data: self.Data,
+          ID: self.ID,
+          ParentID: self.ParentID,
+          Config: self.Config,
+          Text: self.StringText
+        },
+        Scale: {
+          ScaleX: self.Group.scaleX(),
+          ScaleY: self.Group.scaleY()
+        },
+        Position: self.Position,
+        Label: self.LabelText
+      }
+    }
+    break;
+    case "LABELHOLDER": {
+      retVal = {
+        Type: self.Type.toUpperCase(),
+        RelativePosition: {
+          x: self.Group.getX(),
+          y: self.Group.getY(),
+        },
+        AbsolutePosition: {
+          x: self.Group.getAbsolutePosition().x,
+          y: self.Group.getAbsolutePosition().y
+        },
+        Data: {
+          Data: self.Data,
+          ID: self.ID,
+          ParentID: self.ParentID,
+          Config: self.Config,
+          TotalChildren: newTotalChildren
+        },
+        Position: self.Position,
+        Label: self.LabelText
+      }
+    }
+    break;
     }
 
     return retVal;

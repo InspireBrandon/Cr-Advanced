@@ -22,7 +22,8 @@
                                     </v-select>
                                     <v-select disabled :items="categoryClusters" v-model="categoryCluster"
                                         label="Category Cluster"></v-select>
-                                    <v-select :items="stores" v-model="store" label="Store"></v-select>
+                                    <v-select :items="stores" v-model="store" @change="filterUsersByStore"
+                                        label="Store"></v-select>
                                 </div>
                             </div>
                             <v-select :disabled="elementsDisabled" :items="users" v-model="user" label="User">
@@ -102,6 +103,7 @@
                 selectedRange: null,
                 task: null,
                 users: [],
+                tmpUsers: [],
                 user: null,
                 notes: null,
                 systemFiles: [],
@@ -119,6 +121,19 @@
         },
         created() {},
         methods: {
+            filterUsersByStore() {
+                let self = this
+                let tmp = []
+                self.tmpUsers.forEach(e => {
+                    if (e.accessType.accessType==2) {
+                        if (e.accessType.storeID==self.store) {
+                            tmp.push(e)
+                        }
+                    }
+                })
+                self.users=tmp
+
+            },
             getRange(callback) {
                 let self = this;
 
@@ -217,12 +232,32 @@
                         })
                 })
             },
+            getAccessType(systemUserID, accessType) {
+                let self = this;
+                let tenantID = sessionStorage.currentDatabase
+
+                Axios.get(process.env.VUE_APP_API +
+                        `TenantLink_AccessType?systemUserID=${systemUserID}&tenantID=${tenantID}`)
+                    .then(r => {
+                        if (r.data.tenantLink_AccessTypeList != null) {
+                            if (r.data.tenantLink_AccessTypeList.length > 0) {
+                                accessType(r.data.tenantLink_AccessTypeList[0])
+                            } else {
+                                accessType(4)
+                            }
+                        } else {
+                            accessType(4)
+                        }
+
+                    })
+            },
             getUsers() {
                 let self = this;
 
                 return new Promise((resolve, reject) => {
                     Axios.get(process.env.VUE_APP_API + `SystemUser`, false)
                         .then(r => {
+
                             self.users = [];
 
                             for (var i = 0; i < r.data.length; i++) {
@@ -230,10 +265,17 @@
 
                                 self.users.push({
                                     text: item.firstname + " " + item.lastname,
-                                    value: item.systemUserID
+                                    value: item.systemUserID,
+
                                 });
                             }
+                            self.users.forEach(e => {
+                                self.getAccessType(e.value, accessType => {
+                                    e.accessType = accessType
+                                })
+                            })
 
+                            self.tmpUsers = self.users
                             resolve();
                         })
                         .catch(e => {

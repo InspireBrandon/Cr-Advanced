@@ -71,9 +71,6 @@
         productControls: [{
             text: "Facings",
             value: "FACING"
-          }, {
-            text: "Delete",
-            value: "DELETE"
           }
           // {
           //   text: "Position",
@@ -97,32 +94,34 @@
         let self = this
         let stage = self.$parent.$parent.$parent;
         let event = new CustomEmitter();
-        if (stage.selectionData.selectedGondola != undefined && stage.selectionData.selectedGondola != null && stage
+        console.log(stage.selectionData);
+
+        if ((stage.selectionData.selectedGondola != undefined && stage.selectionData.selectedGondola != null) || (stage
           .selectionData.selectedProductGroup != undefined && stage.selectionData
-          .selectedProductGroup) {
-          // let event = new CustomEmitter();
-        self.$refs.yesNoModal.show('Are you sure you want to delete this fixture?', value => {
-          if (value) {
+          .selectedProductGroup)) {
+          let event = new CustomEmitter();
+          self.$refs.yesNoModal.show('Are you sure you want to delete this fixture?', value => {
+            if (value) {
 
 
-            if (stage.selectionData.selectedGondola != undefined && stage.selectionData.selectedGondola != null) {
-              let selectedFixture = stage.selectionData.selectedGondola;
+              if (stage.selectionData.selectedGondola != undefined && stage.selectionData.selectedGondola != null) {
+                let selectedFixture = stage.selectionData.selectedGondola;
 
-              if (selectedFixture.Type == "GONDOLA") {
-                event.delete_gondola(EventBus, selectedFixture.Data, selectedFixture);
-              } else {
-                event.delete_gondola(EventBus, selectedFixture.Data, selectedFixture);
+                if (selectedFixture.Type == "GONDOLA") {
+                  event.delete_gondola(EventBus, selectedFixture.Data, selectedFixture);
+                } else {
+                  event.delete_gondola(EventBus, selectedFixture.Data, selectedFixture);
+                }
+              }
+              if (stage.selectionData.selectedProductGroup != undefined && stage.selectionData
+                .selectedProductGroup) {
+                let selectedProduct = stage.selectionData.selectedProductGroup;
+                event.delete_product(EventBus, selectedProduct.Data, selectedProduct);
               }
             }
-            if (stage.selectionData.selectedProductGroup != undefined && stage.selectionData
-              .selectedProductGroup) {
-              let selectedProduct = stage.selectionData.selectedProductGroup;
-              event.delete_product(EventBus, selectedProduct.Data, selectedProduct);
-            }
-          }
-        })
+          })
         }
-        
+
 
       },
       IncreaseInputControlX() {
