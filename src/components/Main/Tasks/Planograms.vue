@@ -152,6 +152,7 @@
                         callback();
                     })
             },
+            //
             filterOutSupplierPlanograms(callback) {
                 let self = this;
 
@@ -174,7 +175,6 @@
                         })
 
                         self.projects = tmp;
-
                         callback();
                     })
             },
@@ -200,9 +200,18 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.get(process.env.VUE_APP_API + `StoreProjectTX?storeID=${storeID}`).then(r => {
                     self.projects = r.data.projectTXList
-                    EventBus.$emit('data-loaded');
+                    if (self.userAccess == 2) {
+                        self.filterOutSupplierPlanograms(callback => {
+                            EventBus.$emit('data-loaded');
+
+                        })
+                    } else {
+                        EventBus.$emit('data-loaded');
+
+                    }
                 })
             },
+
             getLists(callback) {
                 let self = this
                 let statusHandler = new StatusHandler()

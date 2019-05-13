@@ -211,7 +211,16 @@
                             if (canAdd)
                                 tmp.push(pt);
                         })
-
+                        let tmpFilterlist = []
+                        tmp.forEach(element => {
+                            if (!tmpFilterlist.includes(element.planogram_ID)) {
+                                tmpFilterlist.push({
+                                    value: element.planogram_ID,
+                                    text: element.planogram,
+                                })
+                            }
+                        });
+                        EventBus.$emit('filter-items-changed', tmpFilterlist);
                         self.projects = tmp;
 
                         callback();
@@ -241,7 +250,7 @@
                         if (self.userAccess == 2) {
                             self.filterOutSupplierPlanograms(() => {
                                 EventBus.$emit('data-loaded', systemUserID);
-                                EventBus.$emit('filter-items-changed', filterList);
+
                             });
                         } else {
                             EventBus.$emit('data-loaded', systemUserID);
