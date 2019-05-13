@@ -17,7 +17,8 @@
                                     <td>{{ props.item.store }}</td>
                                     <td>{{ props.item.dateTimeString }}</td>
                                     <td>
-                                        <v-btn v-if="props.item.type != -1" color="primary" small @click="routeToView(props.item)">View</v-btn>
+                                        <v-btn v-if="props.item.type != -1 && props.item.type != 2" color="primary"
+                                            small @click="routeToView(props.item)">View</v-btn>
                                     </td>
                                     <td style="width: 2%">
                                         <v-tooltip bottom v-if="props.item.notes != null">
@@ -27,7 +28,6 @@
                                             <span>{{ props.item.notes }}</span>
                                         </v-tooltip>
                                     </td>
-
                                 </tr>
                             </template>
                         </v-data-table>
@@ -113,14 +113,18 @@
                 typeList: null,
                 projects: [],
                 projectsList: [],
+                userAccess: null,
+                userAccessTypeID: -1
             }
         },
         mounted() {
-            this.getLists(() => {
-                EventBus.$emit('data-loading');
-
-                this.getProjects()
-                this.getUsers()
+            let self = this;
+            self.getLists(() => {
+                self.checkAccessType(() => {
+                    EventBus.$emit('data-loading');
+                    self.getProjects()
+                    self.getUsers()
+                })
             })
         },
         computed: {
@@ -168,6 +172,51 @@
             }
         },
         methods: {
+            checkAccessType(callback) {
+                let self = this;
+
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+
+                Axios.get(process.env.VUE_APP_API +
+                        `TenantLink_AccessType?systemUserID=${encoded_details.USER_ID}&tenantID=${sessionStorage.currentDatabase}`
+                    )
+                    .then(r => {
+                        if (r.data.isDatabaseOwner == true) {
+                            self.userAccess = 0
+                        } else {
+                            self.userAccess = r.data.tenantLink_AccessTypeList[0].accessType
+                            self.userAccessTypeID = r.data.tenantLink_AccessTypeList[0].tenantLink_AccessTypeID
+                        }
+
+                        callback();
+                    })
+            },
+            filterOutSupplierPlanograms(callback) {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API +
+                        `SupplierPlanogram?tenantLink_AccessTypeID=${self.userAccessTypeID}`)
+                    .then(r => {
+                        let supplierPlanograms = r.data;
+                        let tmp = [];
+
+                        self.projects.forEach(pt => {
+                            let canAdd = false;
+
+                            supplierPlanograms.forEach(sp => {
+                                if (pt.planogram_ID == sp.planogram_ID)
+                                    canAdd = true;
+                            })
+
+                            if (canAdd)
+                                tmp.push(pt);
+                        })
+
+                        self.projects = tmp;
+
+                        callback();
+                    })
+            },
             getProjects() {
                 let self = this
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
@@ -176,9 +225,9 @@
                 let filterList = []
                 Axios.get(process.env.VUE_APP_API + `Project`).then(r => {
                     filterList.push({
-                            text: "All",
-                            value: null
-                        })
+                        text: "All",
+                        value: null
+                    })
                     r.data.projectList.forEach(element => {
                         filterList.push({
                             text: element.name,
@@ -188,9 +237,17 @@
 
                     Axios.get(process.env.VUE_APP_API + `GetLastTransactions`).then(res => {
                         EventBus.$emit('data-loaded', systemUserID);
-                        self.projects = res.data.projectTXList
+                        self.projects = res.data.projectTXList;
+                        if (self.userAccess == 2) {
+                            self.filterOutSupplierPlanograms(() => {
+                                EventBus.$emit('data-loaded', systemUserID);
+                                EventBus.$emit('filter-items-changed', filterList);
+                            });
+                        } else {
+                            EventBus.$emit('data-loaded', systemUserID);
+                            EventBus.$emit('filter-items-changed', filterList);
+                        }
                     })
-                    EventBus.$emit('filter-items-changed', filterList);
                 })
 
 

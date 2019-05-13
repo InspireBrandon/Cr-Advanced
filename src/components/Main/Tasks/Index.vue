@@ -113,7 +113,7 @@
                                             v-if="props.item.type == 3 && props.item.status == 13">View</v-btn>
                                         <v-btn small color="warning" @click="routeToView(props.item)"
                                             v-if="props.item.type == 3 && props.item.status == 24">View</v-btn>
-                                        <v-btn small color="warning" @click="routeToView(props.item)"
+                                        <v-btn small color="primary" @click="routeToView(props.item)"
                                             v-if="props.item.type == 3 && props.item.status == 26">View</v-btn>
                                         <!-- END IMPLEMENTATION -->
                                         <!-- ON HOLD -->
@@ -284,12 +284,6 @@
             }, 1000);
         },
         computed: {
-            // handlefilters(){
-            //     let self = this
-            //     self.searchType=self.searchTypeComp
-            //     self.dropSearch=self.dropSearchComp
-
-            // },
             filteredTasks() {
                 // filter for both buttons and field
                 if (this.dropSearchComp == null && this.searchTypeComp == null) {
