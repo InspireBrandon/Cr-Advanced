@@ -1330,6 +1330,7 @@
       event_gondola_selected_deselected(eventData) {
         let self = this;
         self.selectionData.selectedGondola = eventData.data;
+        self.selectionData.selectedProductGroup=null
       },
       event_product_group_selected_deselected(eventData) {
         let self = this;
@@ -1348,6 +1349,7 @@
         //#endregion Toolbar controls PRODUCT
         let lastSelected = self.selectionData.selectedProductGroup;
         self.selectionData.selectedProductGroup = eventData.data;
+        self.selectionData.selectedGondola=null
 
         if (lastSelected != null) {
           lastSelected.Selected = false;

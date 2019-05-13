@@ -207,6 +207,8 @@
                 Axios.get(process.env.VUE_APP_API +
                         `TenantLink_AccessType?systemUserID=${systemUserID}&tenantID=${tenantID}`)
                     .then(r => {
+                        console.log(r);
+                        
                         if (r.data.tenantLink_AccessTypeList.length > 0) {
                             accessType(r.data.tenantLink_AccessTypeList[0].accessType)
                         }else{
@@ -221,9 +223,9 @@
                 Axios.get(process.env.VUE_APP_API + `TenantAccess/User?tenantID=${self.tenantID}`)
                     .then(r => {
                         self.databaseUsers = r.data;
+                        
                         self.databaseUsers.forEach(e => {
                             self.getAccessType(e.systemUserID, self.tenantID, accessType => {
-                                console.log(accessType);
 
                                 e.access = accessType
                             })
