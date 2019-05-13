@@ -193,7 +193,7 @@
 
     export default {
         name: 'tasks',
-        props: ['searchTypeComp', 'dropSearchComp'],
+        props: ['searchTypeComp', 'dropSearchComp', 'taskData'],
         components: {
             UserSelector,
             AssignTask,
@@ -249,7 +249,7 @@
                 showLoader: true,
                 accessType: null,
                 projectTransactionsProjectTab: [],
-                projectTransactions: [],
+                // projectTransactions: this.taskData,
                 status: [],
                 typeList: [],
                 systemUserID: null,
@@ -265,33 +265,30 @@
         },
         mounted() {
             let self = this
-            EventBus.$on('user-select-changed', user => {
-                self.GetNewTransactions(user)
-            });
+            // EventBus.$on('user-select-changed', user => {
+            //     self.GetNewTransactions(user)
+            // });
         },
         created() {
             let self = this;
-            setTimeout(() => {
-                self.getLists(() => {
-                    self.checkAccessType(() => {
-                        self.getUsers()
-                        let encoded_details = jwt.decode(sessionStorage.accessToken);
-                        let systemUserID = encoded_details.USER_ID;
-                        self.systemUserID = systemUserID;
-                        self.getTransactionsByUser(systemUserID, () => {})
-                    })
-                })
-            }, 1000);
+            self.getLists(() => {
+                // self.getUsers()
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+                self.systemUserID = systemUserID;
+                // self.getTransactionsByUser(systemUserID, () => {})
+            })
         },
         computed: {
+
             filteredTasks() {
                 // filter for both buttons and field
                 if (this.dropSearchComp == null && this.searchTypeComp == null) {
-                    return this.projectTransactions
+                    return this.taskData
                 }
 
                 if (this.searchTypeComp.length > 0 && this.dropSearchComp != null) {
-                    let tmp = this.projectTransactions.filter((tx) => {
+                    let tmp = this.taskData.filter((tx) => {
                         if (this.searchTypeComp.includes(tx.type) && this.dropSearchComp == tx.planogram_ID) {
                             return tx
                         }
@@ -301,7 +298,7 @@
                 }
                 // search for buttons only                   
                 if (this.searchTypeComp.length > 0) {
-                    let tmp = this.projectTransactions.filter((tx) => {
+                    let tmp = this.taskData.filter((tx) => {
                         if (this.searchTypeComp.includes(tx.type)) {
                             return tx
                         }
@@ -311,7 +308,7 @@
                 }
                 //search for only field
                 if (this.dropSearchComp != null) {
-                    let tmp = this.projectTransactions.filter((tx) => {
+                    let tmp = this.taskData.filter((tx) => {
                         if (this.dropSearchComp == tx.planogram_ID) {
                             return tx
                         }
@@ -320,7 +317,7 @@
                     return tmp;
                 }
                 if (this.searchTypeComp.length == 0 && this.dropSearch == null) {
-                    return this.projectTransactions
+                    return this.taskData
                 }
             }
         },
@@ -340,7 +337,7 @@
                             })
                         })
 
-                        EventBus.$emit('stores-items-changed', list);
+                        // EventBus.$emit('stores-items-changed', list);
                     })
                 } else {
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -354,70 +351,17 @@
                                     value: e.systemUserID
                                 })
                             })
-
-                            EventBus.$emit('stores-items-changed', list);
+                            // EventBus.$emit('stores-items-changed', list);
                             delete Axios.defaults.headers.common["TenantID"];
                         })
                 }
             },
-            checkAccessType(callback) {
-                let self = this;
-
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
-
-                Axios.get(process.env.VUE_APP_API +
-                        `TenantLink_AccessType?systemUserID=${encoded_details.USER_ID}&tenantID=${sessionStorage.currentDatabase}`
-                    )
-                    .then(r => {
-                        if (r.data.isDatabaseOwner == true) {
-                            self.userAccess = 0
-                        } else {
-                            self.userAccess = r.data.tenantLink_AccessTypeList[0].accessType
-                            self.userAccessTypeID = r.data.tenantLink_AccessTypeList[0].tenantLink_AccessTypeID
-                        }
-
-                        callback();
-                    })
-            },
             GetNewTransactions(userID) {
                 let self = this
-                EventBus.$emit('data-loading', userID);
+                EventBus.$emit('get-tasks');
+                // self.getTransactionsByUser(userID, () => {})
 
-                self.getTransactionsByUser(userID, () => {})
-            },
-            getDatabaseUsers() {
-                let self = this;
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                Axios.get(process.env.VUE_APP_API + `Tenant?userID=${encoded_details.USER_ID}`)
-                    .then(r => {
-                        Axios.get(process.env.VUE_APP_API + `/SystemUser`).then(
-                            resp => {
-                                resp.data.forEach(e => {
-                                    self.users.push({
-                                        text: e.firstname + " " + e.lastname,
-                                        value: e.systemUserID
-                                    })
-                                })
-                            })
-                    })
-            },
-            getfilterList() {
-                let self = this
-                self.filterList = []
-                  self.filterList.push({
-                            text: "All",
-                            value: null
-                        })
-                self.projectTransactions.forEach(element => {
-                    if (!self.filterList.includes(element.planogram_ID)) {
-                        self.filterList.push({
-                            value: element.planogram_ID,
-                            text: element.planogram,
-                        })
-                    }
-                });
-                EventBus.$emit('filter-items-changed', self.filterList);
+                // EventBus.$emit('filter-items-changed', self.filterList);
             },
             getLists(callback) {
                 let self = this
@@ -426,56 +370,32 @@
                 self.typeList = statusHandler.getTypeList()
                 callback()
             },
-            getTransactionsByUser(systemUserID, callback) {
-                let self = this;
-                EventBus.$emit('data-loading', systemUserID);
+            // getTransactionsByUser(systemUserID, callback) {
+            //     let self = this;
+            //     // EventBus.$emit('data-loading', systemUserID);
 
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+            //     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.get(process.env.VUE_APP_API + `UserProjectTX?userID=${systemUserID}`).then(r => {
-                        self.projectTransactions = r.data.projectTXList;
-                        delete Axios.defaults.headers.common["TenantID"];
-                        if (self.userAccess == 2) {
-                            self.filterOutSupplierPlanograms(() => {
-                                self.getfilterList()
-                                EventBus.$emit('data-loaded', systemUserID);
-                                callback();
-                            });
-                        } else {
-                            self.getfilterList()
-                            EventBus.$emit('data-loaded', systemUserID);
-                            callback();
-                        }
-                    })
-                    .catch(e => {
-                        delete Axios.defaults.headers.common["TenantID"];
-                    })
-            },
-            filterOutSupplierPlanograms(callback) {
-                let self = this;
+            //     Axios.get(process.env.VUE_APP_API + `UserProjectTX?userID=${systemUserID}`).then(r => {
+            //             self.projectTransactions = r.data.projectTXList;
+            //             delete Axios.defaults.headers.common["TenantID"];
+            //             if (self.userAccess == 2) {
+            //                 self.filterOutSupplierPlanograms(() => {
+            //                     self.getfilterList()
+            //                     // EventBus.$emit('data-loaded', systemUserID);
+            //                     callback();
+            //                 });
+            //             } else {
+            //                 self.getfilterList()
+            //                 // EventBus.$emit('data-loaded', systemUserID);
+            //                 callback();
+            //             }
+            //         })
+            //         .catch(e => {
+            //             delete Axios.defaults.headers.common["TenantID"];
+            //         })
 
-                Axios.get(process.env.VUE_APP_API + `SupplierPlanogram?tenantLink_AccessTypeID=${self.userAccessTypeID}`)
-                    .then(r => {
-                        let supplierPlanograms = r.data;
-                        let tmp = [];
 
-                        self.projectTransactions.forEach(pt => {
-                            let canAdd = false;
-
-                            supplierPlanograms.forEach(sp => {
-                                if(pt.planogram_ID == sp.planogram_ID)
-                                    canAdd = true;
-                            })
-
-                            if(canAdd)
-                                tmp.push(pt);
-                        })
-
-                        self.projectTransactions = tmp;
-                        
-                        callback();
-                    })
-            },
             createProjectTransactionGroup(request, callback) {
                 let self = this;
 
@@ -534,8 +454,10 @@
                                             request.type);
                                         self.createProjectTransaction(request,
                                             actualTransaction => {
-                                                self.getTransactionsByUser(
-                                                    systemUserID);
+                                                EventBus.$emit('get-tasks');
+
+                                                //     self.getTransactionsByUser(
+                                                //         systemUserID);
                                             })
                                     })
                             })
@@ -579,8 +501,9 @@
                                         request.type);
                                     self.createProjectTransaction(request,
                                         actualTransaction => {
-                                            self.getTransactionsByUser(
-                                                systemUserID);
+                                            EventBus.$emit('get-tasks');
+                                            // self.getTransactionsByUser(
+                                            //     systemUserID);
                                         })
                                 })
                         })
@@ -597,7 +520,8 @@
                 Axios.put(process.env.VUE_APP_API + 'ProjectTX?update=false', trans).then(
                     res => {
                         delete Axios.defaults.headers.common["TenantID"];
-                        self.getTransactionsByUser(systemUserID);
+                        EventBus.$emit('get-tasks');
+                        // self.getTransactionsByUser(systemUserID);
                     })
 
                 self.projectTransactions.splice(index, 1);
@@ -690,7 +614,8 @@
                         request.actionedByUserID = null;
                         // Create complete transaction for new group
                         self.createProjectTransaction(request, newGroupTransaction => {
-                            self.getTransactionsByUser(self.systemUserID);
+                            EventBus.$emit('get-tasks');
+                            // self.getTransactionsByUser(self.systemUserID);
                         })
                     })
                 })
@@ -732,8 +657,9 @@
                                 request.notes = modalData.notes;
                                 self.createProjectTransaction(request,
                                     approvalTransaction => {
-                                        self.getTransactionsByUser(self
-                                            .systemUserID);
+                                        EventBus.$emit('get-tasks');
+                                        // self.getTransactionsByUser(self
+                                        //     .systemUserID);
                                     })
                             })
                         })
@@ -767,8 +693,9 @@
                                 request.notes = modalData.notes;
                                 self.createProjectTransaction(request,
                                     approvalTransaction => {
-                                        self.getTransactionsByUser(self
-                                            .systemUserID);
+                                        EventBus.$emit('get-tasks');
+                                        // self.getTransactionsByUser(self
+                                        //     .systemUserID);
                                     })
                             })
                         })
@@ -798,8 +725,9 @@
                             request.projectTXGroup_ID = newGroupTX.id;
                             request.notes = notes;
                             self.createProjectTransaction(request, processStartProjectTX => {
+                                EventBus.$emit('get-tasks');
                                 // Create Requesting Approval process for "New Group
-                                self.getTransactionsByUser(self.systemUserID);
+                                // self.getTransactionsByUser(self.systemUserID);
                             })
                         })
                     })

@@ -4,7 +4,7 @@
             <v-flex md12>
                 <v-card flat>
                     <v-card-text class="pa-0">
-                        <v-data-table :headers="headers" :items="projects" class="elevation-0 scrollable" hide-actions>
+                        <v-data-table :headers="headers" :items="storeData" class="elevation-0 scrollable" hide-actions>
                             <template v-slot:items="props">
                                 <tr
                                     :style="{ backgroundColor: (props.item.subtask == true  ? 'lightgrey' : 'transparent' )}">
@@ -58,7 +58,7 @@
     } from '@/libs/events/event-bus.js';
 
     export default {
-        props: ['searchTypeComp', 'dropSearchComp'],
+        props: ['searchTypeComp', 'dropSearchComp','storeData'],
         name: 'tasks',
         components: {
             UserSelector,
@@ -127,90 +127,90 @@
             let self = this;
 
             self.getLists(function () {
-                self.checkAccessType(() => {
-                    self.getStores()
-                })
+                // self.checkAccessType(() => {
+                    // self.getStores()
+                // })
             });
         },
         methods: {
-            checkAccessType(callback) {
-                let self = this;
+            // checkAccessType(callback) {
+            //     let self = this;
 
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
+            //     let encoded_details = jwt.decode(sessionStorage.accessToken);
 
-                Axios.get(process.env.VUE_APP_API +
-                        `TenantLink_AccessType?systemUserID=${encoded_details.USER_ID}&tenantID=${sessionStorage.currentDatabase}`
-                    )
-                    .then(r => {
-                        if (r.data.isDatabaseOwner == true) {
-                            self.userAccess = 0
-                        } else {
-                            self.userAccess = r.data.tenantLink_AccessTypeList[0].accessType
-                            self.userAccessTypeID = r.data.tenantLink_AccessTypeList[0].tenantLink_AccessTypeID
-                        }
+            //     Axios.get(process.env.VUE_APP_API +
+            //             `TenantLink_AccessType?systemUserID=${encoded_details.USER_ID}&tenantID=${sessionStorage.currentDatabase}`
+            //         )
+            //         .then(r => {
+            //             if (r.data.isDatabaseOwner == true) {
+            //                 self.userAccess = 0
+            //             } else {
+            //                 self.userAccess = r.data.tenantLink_AccessTypeList[0].accessType
+            //                 self.userAccessTypeID = r.data.tenantLink_AccessTypeList[0].tenantLink_AccessTypeID
+            //             }
 
-                        callback();
-                    })
-            },
+            //             callback();
+            //         })
+            // },
             //
-            filterOutSupplierPlanograms(callback) {
-                let self = this;
+            // filterOutSupplierPlanograms(callback) {
+            //     let self = this;
 
-                Axios.get(process.env.VUE_APP_API +
-                        `SupplierPlanogram?tenantLink_AccessTypeID=${self.userAccessTypeID}`)
-                    .then(r => {
-                        let supplierPlanograms = r.data;
-                        let tmp = [];
+            //     Axios.get(process.env.VUE_APP_API +
+            //             `SupplierPlanogram?tenantLink_AccessTypeID=${self.userAccessTypeID}`)
+            //         .then(r => {
+            //             let supplierPlanograms = r.data;
+            //             let tmp = [];
 
-                        self.projects.forEach(pt => {
-                            let canAdd = false;
+            //             self.projects.forEach(pt => {
+            //                 let canAdd = false;
 
-                            supplierPlanograms.forEach(sp => {
-                                if (pt.planogram_ID == sp.planogram_ID)
-                                    canAdd = true;
-                            })
+            //                 supplierPlanograms.forEach(sp => {
+            //                     if (pt.planogram_ID == sp.planogram_ID)
+            //                         canAdd = true;
+            //                 })
 
-                            if (canAdd)
-                                tmp.push(pt);
-                        })
+            //                 if (canAdd)
+            //                     tmp.push(pt);
+            //             })
 
-                        self.projects = tmp;
-                        callback();
-                    })
-            },
-            getStores() {
-                let self = this
-                let list = []
-                //  Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                Axios.get(process.env.VUE_APP_API + `Store?db=Hinterland-Live`).then(r => {
-                    r.data.forEach(element => {
-                        list.push({
-                            text: element.storeName,
-                            value: element.storeID
-                        })
-                    });
-                    EventBus.$emit('stores-items-changed', list);
+            //             self.projects = tmp;
+            //             callback();
+            //         })
+            // },
+            // getStores() {
+            //     let self = this
+            //     let list = []
+            //     //  Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+            //     Axios.get(process.env.VUE_APP_API + `Store?db=Hinterland-Live`).then(r => {
+            //         r.data.forEach(element => {
+            //             list.push({
+            //                 text: element.storeName,
+            //                 value: element.storeID
+            //             })
+            //         });
+            //         EventBus.$emit('stores-items-changed', list);
 
-                })
-            },
-            getData(storeID) {
-                let self = this
-                EventBus.$emit('data-loading');
+            //     })
+            // },
+            // getData(storeID) {
+            //     let self = this
+            //     EventBus.$emit('data-loading');
 
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                Axios.get(process.env.VUE_APP_API + `StoreProjectTX?storeID=${storeID}`).then(r => {
-                    self.projects = r.data.projectTXList
-                    if (self.userAccess == 2) {
-                        self.filterOutSupplierPlanograms(callback => {
-                            EventBus.$emit('data-loaded');
+            //     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+            //     Axios.get(process.env.VUE_APP_API + `StoreProjectTX?storeID=${storeID}`).then(r => {
+            //         self.projects = r.data.projectTXList
+            //         if (self.userAccess == 2) {
+            //             self.filterOutSupplierPlanograms(callback => {
+            //                 EventBus.$emit('data-loaded');
 
-                        })
-                    } else {
-                        EventBus.$emit('data-loaded');
+            //             })
+            //         } else {
+            //             EventBus.$emit('data-loaded');
 
-                    }
-                })
-            },
+            //         }
+            //     })
+            // },
 
             getLists(callback) {
                 let self = this

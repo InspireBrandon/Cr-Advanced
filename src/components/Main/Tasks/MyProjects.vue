@@ -60,7 +60,7 @@
 
     export default {
         name: 'Projects',
-        props: ['searchTypeComp', 'dropSearchComp'],
+        props: ['searchTypeComp', 'dropSearchComp','projectData'],
         components: {
             UserSelector,
             AssignTask,
@@ -120,11 +120,11 @@
         mounted() {
             let self = this;
             self.getLists(() => {
-                self.checkAccessType(() => {
-                    EventBus.$emit('data-loading');
-                    self.getProjects()
-                    self.getUsers()
-                })
+                // self.checkAccessType(() => {
+                //     EventBus.$emit('data-loading');
+                //     // self.getProjects()
+                //     // self.getUsers()
+                // })
             })
         },
         computed: {
@@ -133,11 +133,11 @@
                 let self = this
 
                 if (self.dropSearchComp == null && self.searchTypeComp == null) {
-                    return this.projects
+                    return this.projectData
                 }
 
                 if (this.searchTypeComp.length > 0 && self.dropSearchComp != null) {
-                    let tmp = self.projects.filter((tx) => {
+                    let tmp = self.projectData.filter((tx) => {
                         if (self.searchTypeComp.includes(tx.type) && self.dropSearchComp == tx.planogram_ID) {
                             return tx
                         }
@@ -147,7 +147,7 @@
                 }
                 // search for buttons only                   
                 if (self.searchTypeComp.length > 0) {
-                    let tmp = self.projects.filter((tx) => {
+                    let tmp = self.projectData.filter((tx) => {
                         if (self.searchTypeComp.includes(tx.type)) {
                             return tx
                         }
@@ -157,7 +157,7 @@
                 }
                 //search for only field
                 if (self.dropSearchComp != null) {
-                    let tmp = self.projects.filter((tx) => {
+                    let tmp = self.projectData.filter((tx) => {
 
                         if (self.dropSearchComp == tx.planogram_ID) {
                             return tx
@@ -167,7 +167,7 @@
                     return tmp;
                 }
                 if (self.searchTypeComp.length == 0 && self.dropSearchComp == null) {
-                    return self.projects
+                    return self.projectData
                 }
             }
         },
@@ -226,41 +226,41 @@
                         callback();
                     })
             },
-            getProjects() {
-                let self = this
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
-                let systemUserID = encoded_details.USER_ID;
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                let filterList = []
-                Axios.get(process.env.VUE_APP_API + `Project`).then(r => {
-                    filterList.push({
-                        text: "All",
-                        value: null
-                    })
-                    r.data.projectList.forEach(element => {
-                        filterList.push({
-                            text: element.name,
-                            value: element.planogram_ID
-                        })
-                    });
+            // getProjects() {
+            //     let self = this
+            //     let encoded_details = jwt.decode(sessionStorage.accessToken);
+            //     let systemUserID = encoded_details.USER_ID;
+            //     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+            //     let filterList = []
+            //     Axios.get(process.env.VUE_APP_API + `Project`).then(r => {
+            //         filterList.push({
+            //             text: "All",
+            //             value: null
+            //         })
+            //         r.data.projectList.forEach(element => {
+            //             filterList.push({
+            //                 text: element.name,
+            //                 value: element.planogram_ID
+            //             })
+            //         });
 
-                    Axios.get(process.env.VUE_APP_API + `GetLastTransactions`).then(res => {
-                        EventBus.$emit('data-loaded', systemUserID);
-                        self.projects = res.data.projectTXList;
-                        if (self.userAccess == 2) {
-                            self.filterOutSupplierPlanograms(() => {
-                                EventBus.$emit('data-loaded', systemUserID);
+            //         Axios.get(process.env.VUE_APP_API + `GetLastTransactions`).then(res => {
+            //             EventBus.$emit('data-loaded', systemUserID);
+            //             self.projects = res.data.projectTXList;
+            //             if (self.userAccess == 2) {
+            //                 self.filterOutSupplierPlanograms(() => {
+            //                     EventBus.$emit('data-loaded', systemUserID);
 
-                            });
-                        } else {
-                            EventBus.$emit('data-loaded', systemUserID);
-                            EventBus.$emit('filter-items-changed', filterList);
-                        }
-                    })
-                })
+            //                 });
+            //             } else {
+            //                 EventBus.$emit('data-loaded', systemUserID);
+            //                 EventBus.$emit('filter-items-changed', filterList);
+            //             }
+            //         })
+            //     })
 
 
-            },
+            // },
             getLists(callback) {
                 let self = this
                 let statusHandler = new StatusHandler()
@@ -268,21 +268,21 @@
                 self.typeList = statusHandler.getTypeList()
                 callback()
             },
-            getUsers() {
-                let self = this
-                let list = []
-                Axios.get(process.env.VUE_APP_API +
-                    `SystemUser`).then(r => {
+            // getUsers() {
+            //     let self = this
+            //     let list = []
+            //     Axios.get(process.env.VUE_APP_API +
+            //         `SystemUser`).then(r => {
 
-                    r.data.forEach(e => {
-                        list.push({
-                            text: e.firstname + " " + e.lastname,
-                            value: e.systemUserID
-                        })
-                    })
-                    EventBus.$emit('stores-items-changed', list);
-                })
-            },
+            //         r.data.forEach(e => {
+            //             list.push({
+            //                 text: e.firstname + " " + e.lastname,
+            //                 value: e.systemUserID
+            //             })
+            //         })
+            //         EventBus.$emit('stores-items-changed', list);
+            //     })
+            // },
             routeToView(item) {
                 let self = this;
                 let route;
