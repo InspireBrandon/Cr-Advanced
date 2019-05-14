@@ -288,6 +288,7 @@
                 let systemUserID = encoded_details.USER_ID;
                 self.selectedUser = systemUserID;
                 self.selectedView = 0;
+                self.dropSearch = null;
                 self.getTaskViewData();
             },
             onViewChanged() {

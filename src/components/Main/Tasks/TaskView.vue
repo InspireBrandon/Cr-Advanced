@@ -366,10 +366,6 @@
                                             request.type);
                                         self.createProjectTransaction(request,
                                             actualTransaction => {
-                                                EventBus.$emit('get-tasks');
-
-                                                //     self.getTransactionsByUser(
-                                                //         systemUserID);
                                             })
                                     })
                             })
@@ -413,9 +409,6 @@
                                         request.type);
                                     self.createProjectTransaction(request,
                                         actualTransaction => {
-                                            EventBus.$emit('get-tasks');
-                                            // self.getTransactionsByUser(
-                                            //     systemUserID);
                                         })
                                 })
                         })
@@ -432,11 +425,8 @@
                 Axios.put(process.env.VUE_APP_API + 'ProjectTX?update=false', trans).then(
                     res => {
                         delete Axios.defaults.headers.common["TenantID"];
-                        EventBus.$emit('get-tasks');
-                        // self.getTransactionsByUser(systemUserID);
+                        self.$parent.taskViewData.splice(indexOf(item), 1);
                     })
-
-                self.projectTransactions.splice(index, 1);
             },
             setInProgressAndView(item) {
                 let self = this;
@@ -569,9 +559,6 @@
                                 request.notes = modalData.notes;
                                 self.createProjectTransaction(request,
                                     approvalTransaction => {
-                                        EventBus.$emit('get-tasks');
-                                        // self.getTransactionsByUser(self
-                                        //     .systemUserID);
                                     })
                             })
                         })
@@ -605,9 +592,6 @@
                                 request.notes = modalData.notes;
                                 self.createProjectTransaction(request,
                                     approvalTransaction => {
-                                        EventBus.$emit('get-tasks');
-                                        // self.getTransactionsByUser(self
-                                        //     .systemUserID);
                                     })
                             })
                         })
@@ -637,9 +621,6 @@
                             request.projectTXGroup_ID = newGroupTX.id;
                             request.notes = notes;
                             self.createProjectTransaction(request, processStartProjectTX => {
-                                EventBus.$emit('get-tasks');
-                                // Create Requesting Approval process for "New Group
-                                // self.getTransactionsByUser(self.systemUserID);
                             })
                         })
                     })
