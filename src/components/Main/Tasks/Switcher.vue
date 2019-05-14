@@ -45,7 +45,7 @@
                     <v-toolbar v-if="userAccess!=4" dense flat dark>
                         <!-- STORE SELECTOR -->
                         <v-autocomplete v-if="selectedView==2" placeholder="Please Select a Store" :items="stores"
-                            v-model="selectedStore" @change="getStoreViewData"></v-autocomplete>
+                            v-model="selectedStore" ></v-autocomplete>
                         <!-- USER SELECTOR -->
                         <v-autocomplete v-if="selectedView==0" placeholder="users " :items="users"
                             v-model="selectedUser" @change="getTaskViewData"></v-autocomplete>
@@ -210,6 +210,16 @@
                         return
                     })
                     return tmp;
+                }
+                if (self.selectedStore != null) {
+                    let tmp = filterData.filter((tx) => {
+
+                        if (self.selectedStore == tx.store_ID) {
+                            return tx
+                        }
+                        return 
+                    })
+                    return tmp
                 }
                 if (self.searchType.length == 0 && self.dropSearch == null) {
                     return filterData
@@ -396,7 +406,7 @@
                             self.$refs.SplashLoader.close()
                         }
                         console.log(self.projectViewData);
-                        
+
                     })
                 })
 
@@ -407,16 +417,11 @@
                 self.$refs.SplashLoader.show()
                 let filterList = []
                 self.$nextTick(() => {
-                    let storeID = self.selectedStore;
 
-                    if (storeID == null)
-                        storeID = self.stores[0].value;
-
-                    self.selectedStore = storeID;
 
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                    Axios.get(process.env.VUE_APP_API + `StoreProjectTX?storeID=${storeID}`).then(r => {
+                    Axios.get(process.env.VUE_APP_API + `StoreProjectTX`).then(r => {
                         self.storeViewData = r.data.projectTXList;
                         if (self.userAccess == 2) {
                             self.filterOutSupplierPlanograms(() => {
@@ -438,6 +443,10 @@
                                 self.$refs.SplashLoader.close()
                             })
                         } else {
+                            filterList.push({
+                                text: "All",
+                                value: null
+                            })
                             self.storeViewData.forEach(e => {
                                 if (!filterList.includes(e.planogram_ID)) {
                                     filterList.push({
@@ -482,10 +491,14 @@
             },
             getStores(callback) {
                 let self = this
-                let list = []
+                let list = [{
+                    text: "All",
+                    value: null
+                }]
 
                 Axios.get(process.env.VUE_APP_API + `Store?db=Hinterland-Live`).then(r => {
                     r.data.forEach(element => {
+
                         list.push({
                             text: element.storeName,
                             value: element.storeID
