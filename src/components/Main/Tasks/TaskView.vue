@@ -4,14 +4,14 @@
             <v-flex md12>
                 <v-card flat>
                     <v-card-text class="pa-0">
-                        <v-data-table :headers="headers" :items="filteredTasks" class="elevation-0 scrollable"
+                        <v-data-table :headers="headers" :items="data" class="elevation-0 scrollable"
                             hide-actions>
                             <template v-slot:items="props">
                                 <tr
                                     :style="{ backgroundColor: (props.item.subtask == true  ? 'lightgrey' : 'transparent' )}">
                                     <td>{{ props.item.planogram }}</td>
                                     <td>{{ typeList[props.item.type == -1 ? 5 : props.item.type].text }}</td>
-                                    <td>{{ status[props.item.status == -1 ? 18 : props.item.status].text }}</td>
+                                    <td>{{ statusList[props.item.status == -1 ? 18 : props.item.status].text }}</td>
                                     <td>{{ props.item.storeCluster }}</td>
                                     <td>{{ props.item.categoryCluster }}</td>
                                     <td>{{ props.item.store }}</td>
@@ -180,23 +180,22 @@
 </template>
 
 <script>
+    // LIBS
     import Axios from 'axios';
     import jwt from 'jsonwebtoken';
+    import { EventBus } from '@/libs/events/event-bus.js';
+
+    // Components
     import UserSelector from '@/components/Common/UserSelector'
     import AssignTask from '@/components/Common/AssignTask'
-    import StatusHandler from '@/libs/system/projectStatusHandler'
     import SubtaskModal from './Subtask.vue'
     import SpacePlanSelector from '@/components/Common/SpacePlanSelector.vue'
     import UserNotesModal from '@/components/Common/UserNotesModal.vue'
     import NotesModal from '@/components/Common/NotesModal.vue'
-    import {
-        EventBus
-    } from '@/libs/events/event-bus.js';
-
 
     export default {
-        name: 'tasks',
-        props: ['searchTypeComp', 'dropSearchComp', 'taskData'],
+        name: 'TaskView',
+        props: ['data', 'typeList', 'statusList'],
         components: {
             UserSelector,
             AssignTask,
@@ -252,9 +251,6 @@
                 showLoader: true,
                 accessType: null,
                 projectTransactionsProjectTab: [],
-                // projectTransactions: this.taskData,
-                status: [],
-                typeList: [],
                 systemUserID: null,
                 selectedUser: null,
                 users: [],
@@ -268,22 +264,8 @@
         },
         mounted() {
             let self = this
-            // EventBus.$on('user-select-changed', user => {
-            //     self.GetNewTransactions(user)
-            // });
-        },
-        created() {
-            let self = this;
-            self.getLists(() => {
-                // self.getUsers()
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
-                let systemUserID = encoded_details.USER_ID;
-                self.systemUserID = systemUserID;
-                // self.getTransactionsByUser(systemUserID, () => {})
-            })
         },
         computed: {
-
             filteredTasks() {
                 // filter for both buttons and field
                 if (this.dropSearchComp == null && this.searchTypeComp == null) {
@@ -325,80 +307,6 @@
             }
         },
         methods: {
-            getUsers() {
-                let self = this
-                let list = []
-
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
-
-                if (self.userAccess == 0) {
-                    Axios.get(process.env.VUE_APP_API + `SystemUser`).then(r => {
-                        r.data.forEach(e => {
-                            list.push({
-                                text: e.firstname + " " + e.lastname,
-                                value: e.systemUserID
-                            })
-                        })
-
-                        // EventBus.$emit('stores-items-changed', list);
-                    })
-                } else {
-                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
-                    Axios.get(process.env.VUE_APP_API + `ProjectSharedViewShared?userID=${encoded_details.USER_ID}`)
-                        .then(r => {
-                            r.data.projectSharedViewList.forEach(e => {
-
-                                list.push({
-                                    text: e.userName,
-                                    value: e.systemUserID
-                                })
-                            })
-                            // EventBus.$emit('stores-items-changed', list);
-                            delete Axios.defaults.headers.common["TenantID"];
-                        })
-                }
-            },
-            GetNewTransactions(userID) {
-                let self = this
-                EventBus.$emit('get-tasks');
-                // self.getTransactionsByUser(userID, () => {})
-
-                // EventBus.$emit('filter-items-changed', self.filterList);
-            },
-            getLists(callback) {
-                let self = this
-                let statusHandler = new StatusHandler()
-                self.status = statusHandler.getStatus()
-                self.typeList = statusHandler.getTypeList()
-                callback()
-            },
-            // getTransactionsByUser(systemUserID, callback) {
-            //     let self = this;
-            //     // EventBus.$emit('data-loading', systemUserID);
-
-            //     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
-            //     Axios.get(process.env.VUE_APP_API + `UserProjectTX?userID=${systemUserID}`).then(r => {
-            //             self.projectTransactions = r.data.projectTXList;
-            //             delete Axios.defaults.headers.common["TenantID"];
-            //             if (self.userAccess == 2) {
-            //                 self.filterOutSupplierPlanograms(() => {
-            //                     self.getfilterList()
-            //                     // EventBus.$emit('data-loaded', systemUserID);
-            //                     callback();
-            //                 });
-            //             } else {
-            //                 self.getfilterList()
-            //                 // EventBus.$emit('data-loaded', systemUserID);
-            //                 callback();
-            //             }
-            //         })
-            //         .catch(e => {
-            //             delete Axios.defaults.headers.common["TenantID"];
-            //         })
-
-
             createProjectTransactionGroup(request, callback) {
                 let self = this;
 
@@ -763,7 +671,7 @@
 
 <style scoped>
     .scrollable {
-        height: calc(100vh - 240px);
+        height: calc(100vh - 300px);
         overflow: auto;
     }
 </style>

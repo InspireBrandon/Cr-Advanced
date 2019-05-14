@@ -3,14 +3,11 @@
         <v-layout row wrap>
             <v-flex md12>
                 <v-card>
+                    <!-- MAIN TOOLBAR -->
                     <v-toolbar flat dark dense color="primary">
-                        <!-- <v-text-field prepend-inner-icon="search" placeholder="Search" dark></v-text-field> -->
                         <v-autocomplete prepend-inner-icon="search" placeholder="Search" :items="filterList"
-                            v-model="dropSearch">
-                        </v-autocomplete>
+                            v-model="dropSearch"></v-autocomplete>
                         <v-spacer></v-spacer>
-                        <v-spacer></v-spacer>
-
                         <v-btn-toggle v-model="searchType" class="transparent" multiple>
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
@@ -43,18 +40,20 @@
                             <v-icon>share</v-icon>
                         </v-btn>
                     </v-toolbar>
+                    <!-- END MAIN TOOLBAR -->
+                    <!-- BLACK TOOLBAR -->
                     <v-toolbar v-if="userAccess!=4" dense flat dark>
-                        <v-autocomplete v-if="selectedView==2" placeholder="Please Select a Store" :items="users"
-                            v-model="selectedUser" @change="changeStore(selectedUser)"></v-autocomplete>
+                        <!-- STORE SELECTOR -->
+                        <v-autocomplete v-if="selectedView==2" placeholder="Please Select a Store" :items="stores"
+                            v-model="selectedStore" @change="getStoreViewData"></v-autocomplete>
+                        <!-- USER SELECTOR -->
                         <v-autocomplete v-if="selectedView==0" placeholder="users " :items="users"
-                            v-model="selectedUser" @change="changeView(selectedUser)"></v-autocomplete>
+                            v-model="selectedUser" @change="getTaskViewData"></v-autocomplete>
                         <v-btn icon @click="homeView">
                             <v-icon>home</v-icon>
                         </v-btn>
                         <v-spacer></v-spacer>
-                        <v-spacer></v-spacer>
-                        <v-btn-toggle v-model="selectedView" @change="getData(selectedView)" class="transparent"
-                            mandatory>
+                        <v-btn-toggle v-model="selectedView" @change="onViewChanged" class="transparent" mandatory>
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
                                     <v-btn v-on="on" :value="0" flat>
@@ -82,11 +81,14 @@
                             </v-tooltip>
                         </v-btn-toggle>
                     </v-toolbar>
-                    <Tasks :searchTypeComp="searchType" :dropSearchComp="dropSearch" :taskData="taskViewData"
-                        v-if="selectedView==0" />
-                    <MyProjects :searchTypeComp="searchType" :dropSearchComp="dropSearch" :projectData="projectViewData" v-if="selectedView==1"/>
-                    <Planograms ref="Planograms" :searchTypeComp="searchType" :storeData="storeViewData"
-                        :dropSearchComp="dropSearch" v-if="selectedView==2" />
+                    <!-- END BLACK TOOLBAR -->
+
+                    <TaskView :data="taskViewData" v-if="selectedView==0" :typeList="typeList"
+                        :statusList="statusList" />
+                    <ProjectView :data="projectViewData" v-if="selectedView==1" :typeList="typeList"
+                        :statusList="statusList" />
+                    <StoreView :data="storeViewData" v-if="selectedView==2" :typeList="typeList"
+                        :statusList="statusList" />
                     <SplashLoader ref="SplashLoader" />
                 </v-card>
             </v-flex>
@@ -96,44 +98,48 @@
 </template>
 
 <script>
-    import Tasks from "./Index.vue"
-    import MyProjects from "./MyProjects.vue"
-    import Planograms from "./Planograms.vue"
-    import SplashLoader from "@/components/Common/SplashLoader.vue"
-    import jwt from 'jsonwebtoken';
+    // Libs
     import Axios from 'axios';
-    import ProjectShare from "./ProjectShare.vue"
-
+    import jwt from 'jsonwebtoken';
+    import StatusHandler from '@/libs/system/projectStatusHandler'
     import {
         EventBus
     } from '@/libs/events/event-bus.js';
 
+    // Components
+    import TaskView from "./TaskView.vue"
+    import ProjectView from "./ProjectView.vue"
+    import StoreView from "./StoreView.vue"
+    import SplashLoader from "@/components/Common/SplashLoader.vue"
+    import ProjectShare from "./ProjectShare.vue"
+
     export default {
         components: {
-            Tasks,
-            MyProjects,
-            Planograms,
+            TaskView,
+            ProjectView,
+            StoreView,
             SplashLoader,
             ProjectShare
         },
         data() {
             return {
-                status:[],
-                typeList:[],
-                tmpStores: [],
-                tmpUsers: [],
-                systemUserID: null,
+                statusList: [],
+                typeList: [],
+                // Filters
+                users: [],
+                selectedUser: null,
+                stores: [],
+                selectedStore: null,
+                // Component Data
                 taskViewData: [],
+                projectViewData: [],
                 storeViewData: [],
-                projectViewData:[],
-                placeHolder: null,
                 userAccess: null,
+                userAccessTypeID: -1,
                 filterList: [],
                 Search: null,
                 dropSearch: null,
                 searchType: [],
-                selectedUser: null,
-                users: [],
                 selectedView: 0,
                 views: [{
                     text: "Tasks",
@@ -147,67 +153,42 @@
                 }, ]
             }
         },
-        mounted() {
-            let self = this
-            EventBus.$on('get-tasks', list => {
-                self.getTransactionsByUser(self.selectedUser)
-            });
-
-            EventBus.$on('filter-items-changed', list => {
-                self.filterList = []
-                self.filterList = list;
-            });
-            EventBus.$on('stores-items-changed', list => {
-                self.users = []
-                self.users = list;
-            });
-            EventBus.$on('data-loaded', list => {
-                self.$refs.SplashLoader.close()
-            });
-            EventBus.$on('data-loading', list => {
-                self.$refs.SplashLoader.show()
-            });
-        },
         created() {
             let self = this
-            let encoded_details = jwt.decode(sessionStorage.accessToken);
-
-            let systemUserID = encoded_details.USER_ID;
-            self.systemUserID = systemUserID;
-            self.selectedUser = systemUserID
-            self.checkAccessType(() => {
-                self.getUsers(() => {
-                    self.getData(self.selectedView)
-                    self.getStores()
-                })
-            })
-            EventBus.$off('filter-items-changed');
-            EventBus.$off('stores-items-changed');
-            EventBus.$off('data-loaded');
-            EventBus.$off('data-loading');
+            self.getData()
         },
         methods: {
-             getLists(callback) {
+            getData() {
+                let self = this;
+
+                setTimeout(() => {
+                    self.getLists(() => {
+                        self.checkAccessType(() => {
+                            self.getUsers(() => {
+                                self.getStores(() => {
+                                    self.getTaskViewData()
+                                })
+                            })
+                        })
+                    })
+                }, 1000);
+            },
+            getLists(callback) {
                 let self = this
                 let statusHandler = new StatusHandler()
-                self.status = statusHandler.getStatus()
+                self.statusList = statusHandler.getStatus()
                 self.typeList = statusHandler.getTypeList()
                 callback()
-            },
-            sendProp(item) {
-                let self = this
-                self.$nextTick(() => {
-                    self.placeHolder = item
-                })
             },
             checkAccessType(callback) {
                 let self = this;
 
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+                self.selectedUser = systemUserID;
 
                 Axios.get(process.env.VUE_APP_API +
-                        `TenantLink_AccessType?systemUserID=${encoded_details.USER_ID}&tenantID=${sessionStorage.currentDatabase}`
-                    )
+                        `TenantLink_AccessType?systemUserID=${systemUserID}&tenantID=${sessionStorage.currentDatabase}`)
                     .then(r => {
                         if (r.data.isDatabaseOwner == true) {
                             self.userAccess = 0
@@ -215,22 +196,11 @@
                             self.userAccess = r.data.tenantLink_AccessTypeList[0].accessType
                             self.userAccessTypeID = r.data.tenantLink_AccessTypeList[0].tenantLink_AccessTypeID
                         }
-
                         callback();
                     })
             },
             changeView(item) {
                 let self = this
-                self.getTransactionsByUser(item)
-                // self.$nextTick(() => {
-                //     EventBus.$emit('user-select-changed', item);
-                // })
-            },
-            changeStore(selectedUser) {
-                let self = this
-                self.$nextTick(() => {
-                    self.getStoreViewData(selectedUser)
-                })
             },
             shareProjects() {
                 let self = this;
@@ -245,47 +215,69 @@
             },
             homeView() {
                 let self = this;
-                self.selectedView = 0;
-                self.selectedUser = null;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
-                EventBus.$emit('user-select-changed', encoded_details.USER_ID);
+                let systemUserID = encoded_details.USER_ID;
+                self.selectedUser = systemUserID;
+                self.selectedView = 0;
+                self.getTaskViewData();
             },
-            getData(selectedView) {
-                let self = this
-                switch (selectedView) {
-                    case 0: {
-                        self.getTaskViewData()
-                        self.users = self.tmpUsers
+            onViewChanged() {
+                let self = this;
 
+                self.$nextTick(() => {
+                    switch (self.selectedView) {
+                        case 0: {
+                            self.getTaskViewData(() => {});
+                        }
+                        break;
+                    case 1: {
+                        self.getProjectViewData(() => {});
                     }
                     break;
-                case 1: {
-                    self.getProjectViewData()
-                }
-                break;
-                case 2: {
-                    // self.getStoreViewData()
-                    self.users = self.tmpStores
-                }
-                break;
-                }
-            },
-            getTaskViewData() {
-                let self = this
-                console.log("[SWITCHER] getting tasks");
-                self.getTransactionsByUser(self.selectedUser, callback => {
-                    self.$refs.SplashLoader.close()
+                    case 2: {
+                        self.getStoreViewData(() => {});
+                    }
+                    break;
+                    }
                 })
+            },
+            getTaskViewData(callback) {
+                let self = this;
 
+                self.$nextTick(() => {
+                    self.taskViewData = [];
+
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    Axios.get(process.env.VUE_APP_API + `UserProjectTX?userID=${self.selectedUser}`).then(r => {
+                            self.taskViewData = r.data.projectTXList;
+                            delete Axios.defaults.headers.common["TenantID"];
+
+                            if (self.userAccess == 2) {
+                                self.filterOutSupplierPlanograms(() => {
+                                    if(callback != undefined)
+                                        callback();
+                                });
+                            } else {
+                                if(callback != undefined)
+                                    callback();
+                            }
+                        })
+                        .catch(e => {
+                            delete Axios.defaults.headers.common["TenantID"];
+                        })
+                })
             },
             getProjectViewData() {
                 let self = this
-                console.log("[SWITCHER] getting Projects");
 
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 let filterList = []
+
+                self.projectViewData = [];
+
                 Axios.get(process.env.VUE_APP_API + `Project`).then(r => {
                     filterList.push({
                         text: "All",
@@ -304,7 +296,6 @@
                         if (self.userAccess == 2) {
                             self.filterOutSupplierPlanograms(() => {
                                 // EventBus.$emit('data-loaded', systemUserID);
-
                             });
                         } else {
                             // EventBus.$emit('data-loaded', systemUserID);
@@ -315,75 +306,42 @@
 
 
             },
-            getTransactionsByUser(systemUserID, callback) {
-                let self = this;
+            getStoreViewData() {
+                let self = this
 
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                self.$nextTick(() => {
+                    let storeID = self.selectedStore;
 
-                Axios.get(process.env.VUE_APP_API + `UserProjectTX?userID=${systemUserID}`).then(r => {
-                        self.taskViewData = r.data.projectTXList;
+                    if (storeID == null)
+                        storeID = self.stores[0].value;
 
-                        console.log(r);
+                    self.selectedStore = storeID;
 
-                        delete Axios.defaults.headers.common["TenantID"];
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    Axios.get(process.env.VUE_APP_API + `StoreProjectTX?storeID=${storeID}`).then(r => {
+                        let tmp = r.data.projectTXList
                         if (self.userAccess == 2) {
                             self.filterOutSupplierPlanograms(() => {
-                                self.getfilterList()
-                                callback();
-                            });
+                                self.storeViewData = tmp
+                            })
                         } else {
-                            self.getfilterList()
-                            callback();
+                            self.storeViewData = tmp
                         }
                     })
-                    .catch(e => {
-                        delete Axios.defaults.headers.common["TenantID"];
-                    })
-            },
-            getfilterList() {
-                let self = this
-                self.filterList = []
-                self.filterList.push({
-                    text: "All",
-                    value: null
-                })
-                self.taskViewData.forEach(element => {
-                    if (!self.filterList.includes(element.planogram_ID)) {
-                        self.filterList.push({
-                            value: element.planogram_ID,
-                            text: element.planogram,
-                        })
-                    }
-                });
-            },
-            getStoreViewData(storeID) {
-                let self = this
-                // EventBus.$emit('data-loading');
-                console.log("[SWITCHER] getting stores");
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                Axios.get(process.env.VUE_APP_API + `StoreProjectTX?storeID=${storeID}`).then(r => {
-                    let tmp = r.data.projectTXList
-                    if (self.userAccess == 2) {
-                        self.filterOutSupplierPlanograms(callback => {
-                            self.storeViewData = tmp
-                        })
-                    } else {
-                        self.storeViewData = tmp
-                    }
-
-
                 })
             },
             filterOutSupplierPlanograms(callback) {
                 let self = this;
 
-                Axios.get(process.env.VUE_APP_API +
-                        `SupplierPlanogram?tenantLink_AccessTypeID=${self.userAccessTypeID}`)
+                Axios.get(process.env.VUE_APP_API + `SupplierPlanogram?tenantLink_AccessTypeID=${self.userAccessTypeID}`)
                     .then(r => {
                         let supplierPlanograms = r.data;
                         let tmp = [];
 
-                        self.projectTransactions.forEach(pt => {
+                        console.log(self.getSelectedView())
+
+                        self[self.getSelectedView() + "ViewData"].forEach(pt => {
                             let canAdd = false;
 
                             supplierPlanograms.forEach(sp => {
@@ -395,15 +353,15 @@
                                 tmp.push(pt);
                         })
 
-                        self.projectTransactions = tmp;
+                        self[self.getSelectedView()] = tmp;
 
                         callback();
                     })
             },
-            getStores() {
+            getStores(callback) {
                 let self = this
                 let list = []
-                //  Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
                 Axios.get(process.env.VUE_APP_API + `Store?db=Hinterland-Live`).then(r => {
                     r.data.forEach(element => {
                         list.push({
@@ -411,17 +369,17 @@
                             value: element.storeID
                         })
                     });
-                    // EventBus.$emit('stores-items-changed', list);
-                    self.tmpStores = list
+
+                    self.stores = list
+                    callback();
                 })
             },
-
             getUsers(callback) {
                 let self = this
-                console.log("self.users");
                 let list = []
-                self.users = []
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
+
+                self.users = [];
 
                 if (self.userAccess == 0) {
                     Axios.get(process.env.VUE_APP_API + `SystemUser`).then(r => {
@@ -432,9 +390,7 @@
                             })
                         })
 
-                        self.tmpUsers = list
-                        self.users = self.tmpUsers
-                        console.log(self.users);
+                        self.users = list
                     })
                 } else {
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -448,18 +404,35 @@
                                     value: e.systemUserID
                                 })
                             })
-                            // EventBus.$emit('stores-items-changed', list);
+
                             delete Axios.defaults.headers.common["TenantID"];
-                            self.tmpUsers = list
-                            self.users = self.tmpUsers
-                            console.log(self.users);
+                            self.users = list
                         })
                 }
-
-
                 callback()
             },
+            getSelectedView() {
+                let self = this;
+                let retval;
 
+                switch(self.selectedView)
+                {
+                    case 0:
+                    {
+                        retval = "task"
+                    }break;
+                    case 1:
+                    {
+                        retval = "project"
+                    }break;
+                    case 2:
+                    {
+                        retval = "store"
+                    }break;
+                }
+
+                return retval;
+            }
         }
     }
 </script>
