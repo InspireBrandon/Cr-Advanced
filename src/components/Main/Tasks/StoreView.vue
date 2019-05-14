@@ -4,7 +4,12 @@
             <v-flex md12>
                 <v-card flat>
                     <v-card-text class="pa-0">
-                        <v-data-table :headers="headers" :items="data" class="elevation-0 scrollable">
+                        <v-data-table :headers="headers" :items="data" class="elevation-0 scrollable" hide-actions>
+                            <template v-slot:no-data>
+                                <div style="text-align:center;">
+                                    View Tasks and Projects
+                                </div>
+                            </template>
                             <template v-slot:items="props">
                                 <tr
                                     :style="{ backgroundColor: (props.item.subtask == true  ? 'lightgrey' : 'transparent' )}">
@@ -41,7 +46,9 @@
     // Libs
     import Axios from 'axios';
     import jwt from 'jsonwebtoken';
-    import { EventBus } from '@/libs/events/event-bus.js';
+    import {
+        EventBus
+    } from '@/libs/events/event-bus.js';
 
     // Components
 
