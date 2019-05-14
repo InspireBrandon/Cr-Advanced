@@ -515,9 +515,16 @@
                 } else {
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
+                    Axios.get(process.env.VUE_APP_API + `SystemUser/${encoded_details.USER_ID}`).then(res => {
+                        list.push({
+                            text: res.data.firstname + " " + res.data.lastname,
+                            value: encoded_details.USER_ID
+                        })
+                    })
+
                     Axios.get(process.env.VUE_APP_API + `ProjectSharedViewShared?userID=${encoded_details.USER_ID}`)
                         .then(r => {
-                            
+
                             r.data.projectSharedViewList.forEach(e => {
 
                                 list.push({
