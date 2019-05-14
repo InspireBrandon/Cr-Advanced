@@ -83,11 +83,11 @@
                     </v-toolbar>
                     <!-- END BLACK TOOLBAR -->
 
-                    <TaskView :data="taskViewData" v-if="selectedView==0" :typeList="typeList"
+                    <TaskView :data="filteredData" v-if="selectedView==0" :typeList="typeList"
                         :statusList="statusList" />
-                    <ProjectView :data="projectViewData" v-if="selectedView==1" :typeList="typeList"
+                    <ProjectView :data="filteredData" v-if="selectedView==1" :typeList="typeList"
                         :statusList="statusList" />
-                    <StoreView :data="storeViewData" v-if="selectedView==2" :typeList="typeList"
+                    <StoreView :data="filteredData" v-if="selectedView==2" :typeList="typeList"
                         :statusList="statusList" />
                     <SplashLoader ref="SplashLoader" />
                 </v-card>
@@ -157,6 +157,64 @@
             let self = this
             self.getData()
         },
+        computed: {
+            filteredData() {
+                let self = this
+                let filterData = []
+
+                switch (self.selectedView) {
+                    case 0: {
+                        filterData = self.taskViewData
+                    }
+                    break;
+                case 1: {
+                    filterData = self.projectViewData
+                }
+                break;
+                case 2: {
+                    filterData = self.storeViewData
+                }
+                break;
+                }
+
+                if (self.dropSearch == null && self.searchType == null) {
+                    return filterData
+                }
+
+                if (this.searchType.length > 0 && self.dropSearch != null) {
+                    let tmp = filterData.filter((tx) => {
+                        if (self.searchType.includes(tx.type) && self.dropSearch == tx.planogram_ID) {
+                            return tx
+                        }
+                        return
+                    })
+                    return tmp;
+                }
+                if (self.searchType.length > 0) {
+                    let tmp = filterData.filter((tx) => {
+                        if (self.searchType.includes(tx.type)) {
+                            return tx
+                        }
+                        return
+                    })
+                    return tmp;
+                }
+                //search for only field
+                if (self.dropSearch != null) {
+                    let tmp = filterData.filter((tx) => {
+
+                        if (self.dropSearch == tx.planogram_ID) {
+                            return tx
+                        }
+                        return
+                    })
+                    return tmp;
+                }
+                if (self.searchType.length == 0 && self.dropSearch == null) {
+                    return filterData
+                }
+            }
+        },
         methods: {
             getData() {
                 let self = this;
@@ -225,6 +283,7 @@
                 let self = this;
 
                 self.$nextTick(() => {
+                    self.dropSearch = null
                     switch (self.selectedView) {
                         case 0: {
                             self.getTaskViewData(() => {});
@@ -243,7 +302,8 @@
             },
             getTaskViewData(callback) {
                 let self = this;
-
+                self.$refs.SplashLoader.show()
+                let filterList = []
                 self.$nextTick(() => {
                     self.taskViewData = [];
 
@@ -255,13 +315,25 @@
 
                             if (self.userAccess == 2) {
                                 self.filterOutSupplierPlanograms(() => {
-                                    if(callback != undefined)
+                                    if (callback != undefined)
                                         callback();
                                 });
                             } else {
-                                if(callback != undefined)
+                                if (callback != undefined)
                                     callback();
                             }
+
+                            self.taskViewData.forEach(e => {
+                                if (!filterList.includes(e.planogram_ID)) {
+                                    filterList.push({
+                                        text: e.planogram,
+                                        value: e.planogram_ID
+                                    })
+                                }
+                            })
+                            self.filterList = filterList
+                            self.$refs.SplashLoader.close()
+
                         })
                         .catch(e => {
                             delete Axios.defaults.headers.common["TenantID"];
@@ -270,6 +342,7 @@
             },
             getProjectViewData() {
                 let self = this
+                self.$refs.SplashLoader.show()
 
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
@@ -291,7 +364,7 @@
                     });
 
                     Axios.get(process.env.VUE_APP_API + `GetLastTransactions`).then(res => {
-                        EventBus.$emit('data-loaded', systemUserID);
+
                         self.projectViewData = res.data.projectTXList;
                         if (self.userAccess == 2) {
                             self.filterOutSupplierPlanograms(() => {
@@ -301,14 +374,18 @@
                             // EventBus.$emit('data-loaded', systemUserID);
                             // EventBus.$emit('filter-items-changed', filterList);
                         }
+                        self.$refs.SplashLoader.close()
+
                     })
+                    self.filterList = filterList
                 })
 
 
             },
             getStoreViewData() {
                 let self = this
-
+                self.$refs.SplashLoader.show()
+                let filterList = []
                 self.$nextTick(() => {
                     let storeID = self.selectedStore;
 
@@ -328,13 +405,25 @@
                         } else {
                             self.storeViewData = tmp
                         }
+                        self.storeViewData.forEach(e => {
+                            if (!filterList.includes(e.planogram_ID)) {
+                                filterList.push({
+                                    text: e.planogram,
+                                    value: e.planogram_ID
+                                })
+                            }
+                        })
+                        self.filterList = filterList
+                        self.$refs.SplashLoader.close()
+
                     })
                 })
             },
             filterOutSupplierPlanograms(callback) {
                 let self = this;
 
-                Axios.get(process.env.VUE_APP_API + `SupplierPlanogram?tenantLink_AccessTypeID=${self.userAccessTypeID}`)
+                Axios.get(process.env.VUE_APP_API +
+                        `SupplierPlanogram?tenantLink_AccessTypeID=${self.userAccessTypeID}`)
                     .then(r => {
                         let supplierPlanograms = r.data;
                         let tmp = [];
@@ -415,20 +504,19 @@
                 let self = this;
                 let retval;
 
-                switch(self.selectedView)
-                {
-                    case 0:
-                    {
+                switch (self.selectedView) {
+                    case 0: {
                         retval = "task"
-                    }break;
-                    case 1:
-                    {
-                        retval = "project"
-                    }break;
-                    case 2:
-                    {
-                        retval = "store"
-                    }break;
+                    }
+                    break;
+                case 1: {
+                    retval = "project"
+                }
+                break;
+                case 2: {
+                    retval = "store"
+                }
+                break;
                 }
 
                 return retval;
