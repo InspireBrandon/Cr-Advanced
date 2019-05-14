@@ -346,7 +346,7 @@
                     self.projectID = item.id
                     self.isAdd = true
                     self.selectedPlanogram = item.planogram_ID,
-                        self.date = null
+                    self.date = null
                     self.status = 0
                     self.Store = null
                     self.StoreCluster = null
@@ -422,7 +422,8 @@
                             "actionedByUserID": self.form.actionedByUserID,
                             "subtask": self.form.subtask,
                             "transactionRolloverID": self.form.transactionRolloverID,
-                            "notes": self.form.notes
+                            "notes": self.form.notes,
+                            "projectTXGroup_ID": self.form.projectTXGroup_ID
                         }
                         Axios.put(process.env.VUE_APP_API + 'ProjectTX?update=true', trans).then(res => {
 

@@ -4,7 +4,7 @@
             <v-flex md12>
                 <v-card flat>
                     <v-card-text class="pa-0">
-                        <v-data-table :headers="headers" :items="data" class="elevation-0 scrollable" hide-actions>
+                        <v-data-table :headers="headers" :items="data" class="elevation-0 scrollable">
                             <template v-slot:items="props">
                                 <tr
                                     :style="{ backgroundColor: (props.item.subtask == true  ? 'lightgrey' : 'transparent' )}">
@@ -24,7 +24,7 @@
                                     <td>
                                         <v-tooltip bottom>
                                             <template v-slot:activator="{ on }">
-                                                <v-icon v-on="on" v-if="props.item.rangeFileName!=null">
+                                                <v-icon v-on="on" v-if="props.item.rangeFileID!=null">
                                                     web</v-icon>
                                             </template>
                                             <span> {{props.item.rangeFileName}}</span>
@@ -35,8 +35,12 @@
                                     <td>{{ props.item.store }}</td>
                                     <td>{{ props.item.dateTimeString }}</td>
                                     <td>
-                                        <v-btn v-if="(props.item.type != -1)&&((props.item.type==3 &&props.item.systemFileName!=null)||(props.item.type==2 &&props.item.rangeFileID!=null))" color="primary"
-                                            small @click="routeToView(props.item)">View</v-btn>
+                                        <v-btn
+                                            v-if="(props.item.type != -1)&&(props.item.type==2 &&props.item.rangeFileID!=null)"
+                                            color="success" small @click="routeToView(props.item)">View</v-btn>
+                                        <v-btn
+                                            v-if="(props.item.type != -1)&&((props.item.type==3 &&props.item.systemFileName!=null))"
+                                            color="primary" small @click="routeToView(props.item)">View</v-btn>
                                     </td>
                                     <td style="width: 2%">
                                         <v-tooltip bottom v-if="props.item.notes != null">
