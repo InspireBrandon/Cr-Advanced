@@ -83,8 +83,8 @@
                     </v-toolbar>
                     <!-- END BLACK TOOLBAR -->
 
-                    <TaskView :data="filteredData" v-if="selectedView==0" :typeList="typeList"
-                        :statusList="statusList" />
+                    <TaskView :data="filteredData" v-if="selectedView==0" :typeList="typeList" :statusList="statusList"
+                        :systemUserID="systemUserID" />
                     <ProjectView :data="filteredData" v-if="selectedView==1" :typeList="typeList"
                         :statusList="statusList" />
                     <StoreView :data="filteredData" v-if="selectedView==2" :typeList="typeList"
@@ -141,6 +141,7 @@
                 dropSearch: null,
                 searchType: [],
                 selectedView: 0,
+                systemUserID: -1,
                 views: [{
                     text: "Tasks",
                     value: 0
@@ -153,7 +154,7 @@
                 }, ]
             }
         },
-        created() {
+        mounted() {
             let self = this
             self.getData()
         },
@@ -218,7 +219,6 @@
         methods: {
             getData() {
                 let self = this;
-
                 setTimeout(() => {
                     self.getLists(() => {
                         self.checkAccessType(() => {
@@ -244,6 +244,7 @@
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
                 self.selectedUser = systemUserID;
+                self.systemUserID = systemUserID;
 
                 Axios.get(process.env.VUE_APP_API +
                         `TenantLink_AccessType?systemUserID=${systemUserID}&tenantID=${sessionStorage.currentDatabase}`)
@@ -310,6 +311,12 @@
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                     Axios.get(process.env.VUE_APP_API + `UserProjectTX?userID=${self.selectedUser}`).then(r => {
+
+                            filterList.push({
+                                text: "All",
+                                value: null
+                            })
+
                             self.taskViewData = r.data.projectTXList;
                             delete Axios.defaults.headers.common["TenantID"];
 
@@ -331,6 +338,7 @@
                                     })
                                 }
                             })
+
                             self.filterList = filterList
                             self.$refs.SplashLoader.close()
 
@@ -356,28 +364,38 @@
                         text: "All",
                         value: null
                     })
-                    r.data.projectList.forEach(element => {
-                        filterList.push({
-                            text: element.name,
-                            value: element.planogram_ID
-                        })
-                    });
 
                     Axios.get(process.env.VUE_APP_API + `GetLastTransactions`).then(res => {
 
                         self.projectViewData = res.data.projectTXList;
                         if (self.userAccess == 2) {
                             self.filterOutSupplierPlanograms(() => {
-                                // EventBus.$emit('data-loaded', systemUserID);
+                                self.projectViewData.forEach(e => {
+                                    if (!filterList.includes(e.planogram_ID)) {
+                                        filterList.push({
+                                            text: e.planogram,
+                                            value: e.planogram_ID
+                                        })
+                                    }
+                                })
+
+                                self.filterList = filterList
+                                self.$refs.SplashLoader.close()
                             });
                         } else {
-                            // EventBus.$emit('data-loaded', systemUserID);
-                            // EventBus.$emit('filter-items-changed', filterList);
-                        }
-                        self.$refs.SplashLoader.close()
+                            self.projectViewData.forEach(e => {
+                                if (!filterList.includes(e.planogram_ID)) {
+                                    filterList.push({
+                                        text: e.planogram,
+                                        value: e.planogram_ID
+                                    })
+                                }
+                            })
 
+                            self.filterList = filterList
+                            self.$refs.SplashLoader.close()
+                        }
                     })
-                    self.filterList = filterList
                 })
 
 
@@ -397,25 +415,38 @@
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                     Axios.get(process.env.VUE_APP_API + `StoreProjectTX?storeID=${storeID}`).then(r => {
-                        let tmp = r.data.projectTXList
+                        self.storeViewData = r.data.projectTXList;
                         if (self.userAccess == 2) {
                             self.filterOutSupplierPlanograms(() => {
-                                self.storeViewData = tmp
+
+                                filterList.push({
+                                    text: "All",
+                                    value: null
+                                })
+
+                                self.storeViewData.forEach(e => {
+                                    if (!filterList.includes(e.planogram_ID)) {
+                                        filterList.push({
+                                            text: e.planogram,
+                                            value: e.planogram_ID
+                                        })
+                                    }
+                                })
+                                self.filterList = filterList
+                                self.$refs.SplashLoader.close()
                             })
                         } else {
-                            self.storeViewData = tmp
+                            self.storeViewData.forEach(e => {
+                                if (!filterList.includes(e.planogram_ID)) {
+                                    filterList.push({
+                                        text: e.planogram,
+                                        value: e.planogram_ID
+                                    })
+                                }
+                            })
+                            self.filterList = filterList
+                            self.$refs.SplashLoader.close()
                         }
-                        self.storeViewData.forEach(e => {
-                            if (!filterList.includes(e.planogram_ID)) {
-                                filterList.push({
-                                    text: e.planogram,
-                                    value: e.planogram_ID
-                                })
-                            }
-                        })
-                        self.filterList = filterList
-                        self.$refs.SplashLoader.close()
-
                     })
                 })
             },
@@ -428,21 +459,21 @@
                         let supplierPlanograms = r.data;
                         let tmp = [];
 
-                        console.log(self.getSelectedView())
-
                         self[self.getSelectedView() + "ViewData"].forEach(pt => {
                             let canAdd = false;
 
                             supplierPlanograms.forEach(sp => {
-                                if (pt.planogram_ID == sp.planogram_ID)
+                                if (pt.planogram_ID == sp.planogram_ID) {
                                     canAdd = true;
+                                }
                             })
 
-                            if (canAdd)
+                            if (canAdd) {
                                 tmp.push(pt);
+                            }
                         })
 
-                        self[self.getSelectedView()] = tmp;
+                        self[self.getSelectedView() + "ViewData"] = tmp;
 
                         callback();
                     })
@@ -486,6 +517,7 @@
 
                     Axios.get(process.env.VUE_APP_API + `ProjectSharedViewShared?userID=${encoded_details.USER_ID}`)
                         .then(r => {
+                            
                             r.data.projectSharedViewList.forEach(e => {
 
                                 list.push({

@@ -4,8 +4,7 @@
             <v-flex md12>
                 <v-card flat>
                     <v-card-text class="pa-0">
-                        <v-data-table :headers="headers" :items="data" class="elevation-0 scrollable"
-                            hide-actions>
+                        <v-data-table :headers="headers" :items="data" class="elevation-0 scrollable" hide-actions>
                             <template v-slot:items="props">
                                 <tr
                                     :style="{ backgroundColor: (props.item.subtask == true  ? 'lightgrey' : 'transparent' )}">
@@ -61,12 +60,12 @@
                                             v-if="(props.item.type == 2 && props.item.status == 2) && systemUserID == props.item.actionedByUserID">
                                             Close</v-btn>
                                         <div style="display: flex;">
-                                            <v-btn small color="secondary" @click="assign(props.item)"
-                                                v-if="(props.item.type == 2 && props.item.status == 2) && systemUserID == props.item.systemUserID">
-                                                Assign</v-btn>
                                             <v-btn small color="warning" @click="routeToView(props.item)"
                                                 v-if="(props.item.type == 2 && props.item.status == 2) && systemUserID == props.item.systemUserID">
                                                 View</v-btn>
+                                            <v-btn small color="secondary" @click="assign(props.item)"
+                                                v-if="(props.item.type == 2 && props.item.status == 2) && systemUserID == props.item.systemUserID">
+                                                Assign</v-btn>
                                         </div>
                                         <!-- END RANGING -->
                                         <!-- SPACE PLANNING -->
@@ -133,7 +132,8 @@
                                             v-if="props.item.status == 41 && systemUserID == props.item.systemUserID">
                                             Assign</v-btn>
                                         <!-- TASK Takeover -->
-                                        <v-btn small color="error" @click="closeTask(props.item)" v-if="props.item.status == 42 && systemUserID == props.item.actionedByUserID">
+                                        <v-btn small color="error" @click="closeTask(props.item)"
+                                            v-if="props.item.status == 42 && systemUserID == props.item.actionedByUserID">
                                             Close</v-btn>
                                     </td>
                                     <td style="width: 2%">
@@ -183,7 +183,9 @@
     // LIBS
     import Axios from 'axios';
     import jwt from 'jsonwebtoken';
-    import { EventBus } from '@/libs/events/event-bus.js';
+    import {
+        EventBus
+    } from '@/libs/events/event-bus.js';
 
     // Components
     import UserSelector from '@/components/Common/UserSelector'
@@ -195,7 +197,7 @@
 
     export default {
         name: 'TaskView',
-        props: ['data', 'typeList', 'statusList'],
+        props: ['data', 'typeList', 'statusList', 'systemUserID'],
         components: {
             UserSelector,
             AssignTask,
@@ -251,7 +253,6 @@
                 showLoader: true,
                 accessType: null,
                 projectTransactionsProjectTab: [],
-                systemUserID: null,
                 selectedUser: null,
                 users: [],
                 filterList: [],
