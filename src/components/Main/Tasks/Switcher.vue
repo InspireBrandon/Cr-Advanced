@@ -288,6 +288,7 @@
                 let systemUserID = encoded_details.USER_ID;
                 self.selectedUser = systemUserID;
                 self.selectedView = 0;
+                self.selectedStore=null
                 self.dropSearch = null;
                 self.getTaskViewData();
             },
@@ -298,10 +299,12 @@
                     self.dropSearch = null
                     switch (self.selectedView) {
                         case 0: {
+                              self.selectedStore=null
                             self.getTaskViewData(() => {});
                         }
                         break;
                     case 1: {
+                          self.selectedStore=null
                         self.getProjectViewData(() => {});
                     }
                     break;

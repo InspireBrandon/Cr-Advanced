@@ -5,6 +5,11 @@
                 <v-card flat>
                     <v-card-text class="pa-0">
                         <v-data-table :headers="headers" :items="data" class="elevation-0 scrollable" hide-actions>
+                            <template v-slot:no-data>
+                                <div style="text-align:center;">
+                                     View Tasks and Stores
+                                </div>
+                            </template>
                             <template v-slot:items="props">
                                 <tr
                                     :style="{ backgroundColor: (props.item.subtask == true  ? 'lightgrey' : 'transparent' )}">
@@ -35,8 +40,9 @@
                                     <td>{{ props.item.store }}</td>
                                     <td>{{ props.item.dateTimeString }}</td>
                                     <td>
-                                        <v-btn v-if="(props.item.type != -1)&&((props.item.type==3 &&props.item.systemFileName!=null)||(props.item.type==2 &&props.item.rangeFileID!=null))" color="primary"
-                                            small @click="routeToView(props.item)">View</v-btn>
+                                        <v-btn
+                                            v-if="(props.item.type != -1)&&((props.item.type==3 &&props.item.systemFileName!=null)||(props.item.type==2 &&props.item.rangeFileID!=null))"
+                                            color="primary" small @click="routeToView(props.item)">View</v-btn>
                                     </td>
                                     <td style="width: 2%">
                                         <v-tooltip bottom v-if="props.item.notes != null">

@@ -5,7 +5,13 @@
                 <v-card flat>
                     <v-card-text class="pa-0">
                         <v-data-table :headers="headers" :items="data" class="elevation-0 scrollable" hide-actions>
+                            <template v-slot:no-data>
+                                <div style="text-align:center;">
+                                     View Projects and Stores
+                                </div>
+                            </template>
                             <template v-slot:items="props">
+
                                 <tr
                                     :style="{ backgroundColor: (props.item.subtask == true  ? 'lightgrey' : 'transparent' )}">
                                     <td>{{ props.item.planogram }}</td>
@@ -365,8 +371,7 @@
                                         request.status = returnStartStatusByType(
                                             request.type);
                                         self.createProjectTransaction(request,
-                                            actualTransaction => {
-                                            })
+                                            actualTransaction => {})
                                     })
                             })
                     })
@@ -408,8 +413,7 @@
                                     request.status = returnStartStatusByType(
                                         request.type);
                                     self.createProjectTransaction(request,
-                                        actualTransaction => {
-                                        })
+                                        actualTransaction => {})
                                 })
                         })
                 })
@@ -558,8 +562,7 @@
                                 request.status = 10;
                                 request.notes = modalData.notes;
                                 self.createProjectTransaction(request,
-                                    approvalTransaction => {
-                                    })
+                                    approvalTransaction => {})
                             })
                         })
                     })
@@ -591,8 +594,7 @@
                                 request.status = 19;
                                 request.notes = modalData.notes;
                                 self.createProjectTransaction(request,
-                                    approvalTransaction => {
-                                    })
+                                    approvalTransaction => {})
                             })
                         })
                     })
@@ -620,8 +622,7 @@
                             request.actionedByUserID = null;
                             request.projectTXGroup_ID = newGroupTX.id;
                             request.notes = notes;
-                            self.createProjectTransaction(request, processStartProjectTX => {
-                            })
+                            self.createProjectTransaction(request, processStartProjectTX => {})
                         })
                     })
                 })
