@@ -395,6 +395,8 @@
                             self.filterList = filterList
                             self.$refs.SplashLoader.close()
                         }
+                        console.log(self.projectViewData);
+                        
                     })
                 })
 
