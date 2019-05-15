@@ -337,10 +337,14 @@
                             if (self.userAccess == 2) {
                                 self.filterOutSupplierPlanograms(() => {
                                     if (callback != undefined)
+                            self.$refs.SplashLoader.close()
+
                                         callback();
                                 });
                             } else {
                                 if (callback != undefined)
+                            self.$refs.SplashLoader.close()
+
                                     callback();
                             }
 
@@ -350,6 +354,8 @@
                                         text: e.planogram,
                                         value: e.planogram_ID
                                     })
+                            self.$refs.SplashLoader.close()
+
                                 }
                             })
 
@@ -358,6 +364,8 @@
 
                         })
                         .catch(e => {
+                            self.$refs.SplashLoader.close()
+
                             delete Axios.defaults.headers.common["TenantID"];
                         })
                 })
