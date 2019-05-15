@@ -115,6 +115,7 @@
 
     export default {
         components: {
+            
             TaskView,
             ProjectView,
             StoreView,

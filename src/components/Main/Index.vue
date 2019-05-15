@@ -7,6 +7,8 @@
             <v-btn v-if="$route.path!='/tasks'" icon @click="$router.push('/tasks')">
                 <v-icon>inbox</v-icon>
             </v-btn>
+            <NoticeBoard ref="NoticeBoard" />
+
             <!-- <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon> -->
             <span class="title ml-3 mr-5">Chain&nbsp;<span class="font-weight-light">Research</span></span>
             <v-spacer></v-spacer>
@@ -145,9 +147,14 @@
     import {
         EventBus
     } from '@/libs/events/event-bus.js';
+    import NoticeBoard from '@/components/Main/NoticeBoard/Noticeboard.vue'
+
 
     export default {
         name: 'main-page',
+        components:{
+            NoticeBoard,
+        },
         data() {
             return {
                 snackbarText: "",

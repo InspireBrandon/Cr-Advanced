@@ -35,6 +35,9 @@
                 {
                     component: "Space Planning",
                     displayName: "Space Planning",
+                },{
+                    component: "Notice Board",
+                    displayName: "Notice Board",
                 }
             ]
         }
