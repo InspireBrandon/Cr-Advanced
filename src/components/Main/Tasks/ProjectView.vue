@@ -39,8 +39,8 @@
                                     <td>{{ props.item.categoryCluster }}</td>
                                     <td>{{ props.item.store }}</td>
                                     <td>{{ props.item.dateTimeString }}</td>
-                                    <td>{{props.item.actionedByUserName}}</td>
                                     <td>{{props.item.username}}</td>
+                                    <td>{{props.item.actionedByUserName}}</td>
                                     <td>
                                         <v-btn
                                             v-if="(accessType!=2&&(props.item.type != -1)&&(props.item.type==2 &&props.item.rangeFileID!=null))"
@@ -140,11 +140,11 @@
                     {
                         text: 'Date',
                         sortable: false
-                    }, {
-                        text: 'Actioned by',
+                    },  {
+                        text: 'User Assigned',
                         sortable: false
                     }, {
-                        text: 'Received by',
+                        text: 'Actioned by',
                         sortable: false
                     },
                     {
