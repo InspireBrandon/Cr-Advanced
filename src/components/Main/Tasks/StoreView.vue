@@ -11,7 +11,7 @@
                                 </div>
                             </template>
                             <template v-slot:items="props">
-                                <tr
+                                <tr :key='props.item.id'
                                     :style="{ backgroundColor: (props.item.subtask == true  ? 'lightgrey' : 'transparent' )}">
                                     <td>{{ props.item.planogram }}</td>
                                     <td>{{ typeList[props.item.type == -1 ? 5 : props.item.type].text }}</td>

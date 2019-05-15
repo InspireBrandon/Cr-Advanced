@@ -45,7 +45,7 @@
                     <v-toolbar v-if="userAccess!=4" dense flat dark>
                         <!-- STORE SELECTOR -->
                         <v-autocomplete v-if="selectedView==2" placeholder="Please Select a Store" :items="stores"
-                            v-model="selectedStore" ></v-autocomplete>
+                            v-model="selectedStore"></v-autocomplete>
                         <!-- USER SELECTOR -->
                         <v-autocomplete v-if="selectedView==0" placeholder="users " :items="users"
                             v-model="selectedUser" @change="getTaskViewData"></v-autocomplete>
@@ -86,7 +86,7 @@
                     <TaskView :data="filteredData" v-if="selectedView==0" :typeList="typeList" :statusList="statusList"
                         :systemUserID="systemUserID" />
                     <ProjectView :data="filteredData" v-if="selectedView==1" :typeList="typeList"
-                        :statusList="statusList" :accessType="userAccess"/>
+                        :statusList="statusList" :accessType="userAccess" />
                     <StoreView :data="filteredData" v-if="selectedView==2" :typeList="typeList"
                         :statusList="statusList" />
                     <SplashLoader ref="SplashLoader" />
@@ -217,7 +217,7 @@
                         if (self.selectedStore == tx.store_ID) {
                             return tx
                         }
-                        return 
+                        return
                     })
                     return tmp
                 }
@@ -288,7 +288,7 @@
                 let systemUserID = encoded_details.USER_ID;
                 self.selectedUser = systemUserID;
                 self.selectedView = 0;
-                self.selectedStore=null
+                self.selectedStore = null
                 self.dropSearch = null;
                 self.getTaskViewData();
             },
@@ -299,12 +299,12 @@
                     self.dropSearch = null
                     switch (self.selectedView) {
                         case 0: {
-                              self.selectedStore=null
+                            self.selectedStore = null
                             self.getTaskViewData(() => {});
                         }
                         break;
                     case 1: {
-                          self.selectedStore=null
+                        self.selectedStore = null
                         self.getProjectViewData(() => {});
                     }
                     break;
@@ -336,16 +336,16 @@
 
                             if (self.userAccess == 2) {
                                 self.filterOutSupplierPlanograms(() => {
-                                    if (callback != undefined)
-                            self.$refs.SplashLoader.close()
-
+                                    if (callback != undefined) {
+                                        self.$refs.SplashLoader.close()
                                         callback();
+                                    }
                                 });
                             } else {
-                                if (callback != undefined)
-                            self.$refs.SplashLoader.close()
-
+                                if (callback != undefined) {
+                                    self.$refs.SplashLoader.close()
                                     callback();
+                                }
                             }
 
                             self.taskViewData.forEach(e => {
@@ -354,7 +354,7 @@
                                         text: e.planogram,
                                         value: e.planogram_ID
                                     })
-                            self.$refs.SplashLoader.close() 
+                                    self.$refs.SplashLoader.close()
 
                                 }
                             })
@@ -497,7 +497,7 @@
                         })
 
                         self[self.getSelectedView() + "ViewData"] = tmp;
-
+                        console.log(self[self.getSelectedView() + "ViewData"])
                         callback();
                     })
             },
