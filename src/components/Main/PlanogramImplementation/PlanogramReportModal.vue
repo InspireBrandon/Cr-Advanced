@@ -122,7 +122,7 @@
                                         <th>Description</th>
                                         <th>Capacity</th>
                                         <th>DOS</th>
-                                        <th>Sales Cost</th>
+                                        <th v-if="accesstype!=2">Sales Cost</th>
                                         <th>Sales Retail</th>
                                         <th>Sales Units</th>
                                     </tr>
@@ -132,7 +132,7 @@
                                         <td>{{ item.name }}</td>
                                         <td style="text-align: right;">{{ item.qty }}</td>
                                         <td style="text-align: right;">{{ item.daysOfSupply }}</td>
-                                        <td style="text-align: right;">{{ item.weeklySalesCost }}</td>
+                                        <td style="text-align: right;" v-if="accesstype!=2">{{ item.weeklySalesCost }}</td>
                                         <td style="text-align: right;">{{ item.weeklySalesRetail }}</td>
                                         <td style="text-align: right;">{{ item.weeklySalesUnits }}</td>
                                     </tr>
@@ -228,6 +228,8 @@
     }
 
     export default {
+        props: ['accesstype'],
+
         components: {
             Spinner,
             TreeVue

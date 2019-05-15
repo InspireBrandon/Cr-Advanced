@@ -21,6 +21,8 @@
                                     <td>{{ props.item.categoryCluster }}</td>
                                     <td>{{ props.item.store }}</td>
                                     <td>{{ props.item.dateTimeString }}</td>
+                                      <td>{{props.item.actionedByUserName}}</td>
+                                    <td>{{props.item.username}}</td>
                                     <td style="width: 5%;">
                                         <!-- PROJECT START -->
                                         <v-btn color="secondary" @click="assign(props.item)" small
@@ -240,6 +242,12 @@
                     },
                     {
                         text: 'Date',
+                        sortable: false
+                    }, {
+                        text: 'Actioned by',
+                        sortable: false
+                    }, {
+                        text: 'Received by',
                         sortable: false
                     },
                     {

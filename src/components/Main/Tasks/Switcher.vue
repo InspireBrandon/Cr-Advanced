@@ -86,7 +86,7 @@
                     <TaskView :data="filteredData" v-if="selectedView==0" :typeList="typeList" :statusList="statusList"
                         :systemUserID="systemUserID" />
                     <ProjectView :data="filteredData" v-if="selectedView==1" :typeList="typeList"
-                        :statusList="statusList" />
+                        :statusList="statusList" :accessType="userAccess"/>
                     <StoreView :data="filteredData" v-if="selectedView==2" :typeList="typeList"
                         :statusList="statusList" />
                     <SplashLoader ref="SplashLoader" />

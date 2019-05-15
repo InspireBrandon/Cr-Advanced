@@ -7,7 +7,7 @@
                         <v-data-table :headers="headers" :items="data" class="elevation-0 scrollable">
                             <template v-slot:no-data>
                                 <div style="text-align:center;">
-                                     View Tasks and Stores
+                                    View Tasks and Stores
                                 </div>
                             </template>
                             <template v-slot:items="props">
@@ -39,9 +39,11 @@
                                     <td>{{ props.item.categoryCluster }}</td>
                                     <td>{{ props.item.store }}</td>
                                     <td>{{ props.item.dateTimeString }}</td>
+                                    <td>{{props.item.actionedByUserName}}</td>
+                                    <td>{{props.item.username}}</td>
                                     <td>
                                         <v-btn
-                                            v-if="(props.item.type != -1)&&(props.item.type==2 &&props.item.rangeFileID!=null)"
+                                            v-if="(accessType!=2&&(props.item.type != -1)&&(props.item.type==2 &&props.item.rangeFileID!=null))"
                                             color="success" small @click="routeToView(props.item)">View</v-btn>
                                         <v-btn
                                             v-if="(props.item.type != -1)&&((props.item.type==3 &&props.item.systemFileName!=null))"
@@ -92,7 +94,7 @@
 
     export default {
         name: 'ProjectView',
-        props: ['data', 'typeList', 'statusList'],
+        props: ['data', 'typeList', 'statusList','accessType'],
         components: {
             AssignTask,
         },
@@ -138,8 +140,20 @@
                     {
                         text: 'Date',
                         sortable: false
+                    }, {
+                        text: 'Actioned by',
+                        sortable: false
+                    }, {
+                        text: 'Received by',
+                        sortable: false
                     },
                     {
+                        text: '',
+                        sortable: false
+                    },  {
+                        text: '',
+                        sortable: false
+                    },  {
                         text: '',
                         sortable: false
                     },

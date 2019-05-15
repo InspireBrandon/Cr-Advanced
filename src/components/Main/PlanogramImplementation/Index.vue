@@ -137,7 +137,7 @@
                 </v-card>
             </v-card>
         </v-dialog>
-        <PlanogramReportModal ref="PlanogramReportModal"></PlanogramReportModal>
+        <PlanogramReportModal :accesstype="authorityType" ref="PlanogramReportModal"></PlanogramReportModal>
         <PlanogramIplementationModal ref="PlanogramIplementationModal"></PlanogramIplementationModal>
         <AssignTask ref="assignTask"></AssignTask>
         <YesNoModal ref="yesNoModal"></YesNoModal>
@@ -306,6 +306,8 @@
                 let self = this;
 
                 self.authorityType = userType;
+
+
 
                 self.inform("PROCESSING", "Selecting appropriate process.")
 
