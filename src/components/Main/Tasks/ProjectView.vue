@@ -165,6 +165,26 @@
             }
         },
         methods: {
+            createProjectTransactionGroup(request, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `ProjectTXGroup`, request).then(r => {
+                    delete Axios.defaults.headers.common["TenantID"];
+                    callback(r.data.projectTXGroup);
+                })
+            },
+            createProjectTransaction(request, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `ProjectTX`, request).then(r => {
+                    delete Axios.defaults.headers.common["TenantID"];
+                    callback(r.data.projectTX)
+                })
+            },
             routeToView(item) {
                 let self = this;
                 let route;
@@ -214,7 +234,7 @@
                     request.store_ID = taskDetails.store;
                     // Create first process assigned TX
                     // Create second project transaction group
-                    self.createProjectTransactionGroup(projectTXGroupRequest,
+              self.createProjectTransactionGroup(projectTXGroupRequest,
                         projectTXGroupNew => {
                             // Create second process assigned TX
                             request.systemUserID = taskDetails.systemUserID;
@@ -237,6 +257,26 @@
                 })
             },
         },
+    }
+     function returnStartStatusByType(type) {
+        let retval;
+
+        switch (type) {
+            case 1: {
+                retval = 6;
+            }
+            break;
+        case 2: {
+            retval = 7;
+        }
+        break;
+        case 3: {
+            retval = 8;
+        }
+        break;
+        }
+
+        return retval;
     }
 </script>
 

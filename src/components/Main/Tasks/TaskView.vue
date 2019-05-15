@@ -377,7 +377,9 @@
                                         request.status = returnStartStatusByType(
                                             request.type);
                                         self.createProjectTransaction(request,
-                                            actualTransaction => {})
+                                            actualTransaction => {
+                                               
+                                            })
                                     })
                             })
                     })
