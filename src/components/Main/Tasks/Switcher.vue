@@ -354,7 +354,7 @@
                                         text: e.planogram,
                                         value: e.planogram_ID
                                     })
-                            self.$refs.SplashLoader.close()
+                            self.$refs.SplashLoader.close() 
 
                                 }
                             })

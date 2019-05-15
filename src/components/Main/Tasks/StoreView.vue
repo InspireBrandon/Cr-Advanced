@@ -4,7 +4,7 @@
             <v-flex md12>
                 <v-card flat>
                     <v-card-text class="pa-0">
-                        <v-data-table :headers="headers" :items="data" class="elevation-0 scrollable">
+                        <v-data-table :headers="headers" :items="data" class="elevation-0 scrollable" :rows-per-page-items="[10,50,75,100,{'text':'$vuetify.dataIterator.rowsPerPageAll','value':-1}]"> 
                             <template v-slot:no-data>
                                 <div style="text-align:center;">
                                     View Tasks and Projects
