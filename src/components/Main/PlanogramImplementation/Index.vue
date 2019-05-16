@@ -131,7 +131,7 @@
                         <v-icon>close</v-icon>
                     </v-btn>
                 </v-toolbar>
-                <v-card flat style="padding: 5px; overflow-x: auto; text-align: center;">
+                <v-card flat style="padding: 5px; overflow: auto; text-align: center; height: calc(100vh - 65px);">
                     <img ref="modalImage" @click="expandImage" contain style="max-height: calc(100vh - 100px);"
                         :src="image">
                 </v-card>

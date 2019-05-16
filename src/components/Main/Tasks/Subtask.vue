@@ -10,8 +10,8 @@
                     </v-toolbar>
                     <v-card flat>
                         <v-card-text>
-
-                            <v-select :items="users" v-model="user" label="User"></v-select>
+                            <v-select placeholder="Please select a subtask" :items="subtasks" v-model="subtask" label="Subtask"></v-select>
+                            <v-select placeholder="Please select a user" :items="users" v-model="user" label="User"></v-select>
                             <v-textarea label="Notes" v-model="notes"></v-textarea>
                         </v-card-text>
                     </v-card>
@@ -61,19 +61,37 @@
                     //     value: 4
                     // }
                 ],
+                subtasks: [{
+                        text: "Request product info",
+                        value: 28
+                    },
+                    {
+                        text: "Request planogram input",
+                        value: 31
+                    },
+                    {
+                        text: "Request fixture input",
+                        value: 34
+                    },
+                    {
+                        text: "Check planogram",
+                        value: 37
+                    }
+                ],
+                subtask: null,
                 task: null,
                 users: [],
                 user: null,
                 notes: null,
             }
         },
-        created() {},
         methods: {
             show(title, afterRuturn) {
                 let self = this;
                 self.title = title
                 self.user = null;
                 self.afterRuturn = afterRuturn;
+                self.subtask = null;
                 self.getUsers(() => {
                     self.dialog = true;
                 })
@@ -81,8 +99,9 @@
             returnResult() {
                 let self = this;
                 self.afterRuturn({
+                    status: self.subtask,
                     systemUserID: self.user,
-                    notes: self.notes
+                    notes: self.notes,
                 });
                 self.dialog = false;
             },

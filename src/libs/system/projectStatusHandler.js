@@ -333,6 +333,11 @@ class projectStatusHandler {
                 color: "",
                 text: "",
                 value: 5
+            },
+            {
+                color: "grey",
+                text: "Subtask",
+                value: 6
             }
         ]
 

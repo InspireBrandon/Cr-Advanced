@@ -4,14 +4,16 @@
             <v-flex md12>
                 <v-card flat>
                     <v-card-text class="pa-0">
-                        <v-data-table :headers="headers" :items="data" class="elevation-0 scrollable" :rows-per-page-items="[10,50,75,100,{'text':'$vuetify.dataIterator.rowsPerPageAll','value':-1}]">
+                        <v-data-table :headers="headers" :items="data" class="elevation-0 scrollable"
+                            :rows-per-page-items="[10,50,75,100,{'text':'$vuetify.dataIterator.rowsPerPageAll','value':-1}]">
                             <template v-slot:no-data>
                                 <div style="text-align:center;">
-                                     View Projects and Stores
+                                    You have no tasks. Please view Projects and Stores
                                 </div>
                             </template>
                             <template v-slot:items="props">
-                                <tr :key='props.item.id' :style="{ backgroundColor: (props.item.subtask == true  ? 'lightgrey' : 'transparent' )}">
+                                <tr :key='props.item.id'
+                                    :style="{ backgroundColor: (props.item.subtask == true  ? 'lightgrey' : 'transparent' )}">
                                     <td>{{ props.item.planogram }}</td>
                                     <td>{{ typeList[props.item.type == -1 ? 5 : props.item.type].text }}</td>
                                     <td>{{ statusList[props.item.status == -1 ? 18 : props.item.status].text }}</td>
@@ -20,7 +22,7 @@
                                     <td>{{ props.item.store }}</td>
                                     <td>{{ props.item.dateTimeString }}</td>
                                     <td>{{props.item.username}}</td>
-                                      <td>{{props.item.actionedByUserName}}</td>
+                                    <td>{{props.item.actionedByUserName}}</td>
                                     <td style="width: 5%;">
                                         <!-- PROJECT START -->
                                         <v-btn color="secondary" @click="assign(props.item)" small
@@ -141,6 +143,47 @@
                                         <v-btn small color="error" @click="closeTask(props.item)"
                                             v-if="props.item.status == 42 && systemUserID == props.item.actionedByUserID">
                                             Close</v-btn>
+                                        <!-- END TASK Takeover -->
+                                        <!-- SUBTASKS SET IN PROGRESS AND VIEW -->
+                                        <v-btn small color="success" @click="setSubtaskInProgressAndView(props.item)"
+                                            v-if="props.item.status == 28">View</v-btn>
+                                        <v-btn small color="success" @click="setSubtaskInProgressAndView(props.item)"
+                                            v-if="props.item.status == 31">View</v-btn>
+                                        <v-btn small color="success" @click="setSubtaskInProgressAndView(props.item)"
+                                            v-if="props.item.status == 34">View</v-btn>
+                                        <v-btn small color="success" @click="setSubtaskInProgressAndView(props.item)"
+                                            v-if="props.item.status == 37">View</v-btn>
+                                        <!-- END SUBTASKS SET IN PROGRESS AND VIEW -->
+                                        <!-- SUBTASKS VIEW -->
+                                        <v-btn small color="warning" @click="goToSubtaskView(props.item)"
+                                            v-if="props.item.status == 29">View</v-btn>
+                                        <v-btn small color="warning" @click="goToSubtaskView(props.item)"
+                                            v-if="props.item.status == 32">View</v-btn>
+                                        <v-btn small color="warning" @click="goToSubtaskView(props.item)"
+                                            v-if="props.item.status == 35">View</v-btn>
+                                        <v-btn small color="warning" @click="goToSubtaskView(props.item)"
+                                            v-if="props.item.status == 38">View</v-btn>
+                                        <!-- END SUBTASKS VIEW -->
+                                        <!-- COMPLETE SUBTASKS -->
+                                        <v-btn small color="error" @click="completeSubtask(props.item)"
+                                            v-if="props.item.status == 29">Complete</v-btn>
+                                        <v-btn small color="error" @click="completeSubtask(props.item)"
+                                            v-if="props.item.status == 32">Complete</v-btn>
+                                        <v-btn small color="error" @click="completeSubtask(props.item)"
+                                            v-if="props.item.status == 35">Complete</v-btn>
+                                        <v-btn small color="error" @click="completeSubtask(props.item)"
+                                            v-if="props.item.status == 38">Complete</v-btn>
+                                        <!-- END COMPLETE SUBTASKS -->
+                                        <!-- CLOSE SUBTASKS -->
+                                        <v-btn small color="error" @click="closeTask(props.item)"
+                                            v-if="props.item.status == 30">Close</v-btn>
+                                        <v-btn small color="error" @click="closeTask(props.item)"
+                                            v-if="props.item.status == 33">Close</v-btn>
+                                        <v-btn small color="error" @click="closeTask(props.item)"
+                                            v-if="props.item.status == 36">Close</v-btn>
+                                        <v-btn small color="error" @click="closeTask(props.item)"
+                                            v-if="props.item.status == 39">Close</v-btn>
+                                        <!-- END CLOSE SUBTASKS -->
                                     </td>
                                     <td style="width: 2%">
                                         <v-tooltip bottom v-if="props.item.notes != null">
@@ -165,6 +208,12 @@
 
                                                 <v-list-tile @click="putTaskOnHold(props.item)">
                                                     <span>Put On Hold</span>
+                                                </v-list-tile>
+
+                                                <v-divider></v-divider>
+
+                                                <v-list-tile @click="startSubtask(props.item)">
+                                                    <span>New subtask</span>
                                                 </v-list-tile>
                                             </v-list>
                                         </v-menu>
@@ -378,7 +427,7 @@
                                             request.type);
                                         self.createProjectTransaction(request,
                                             actualTransaction => {
-                                               
+
                                             })
                                     })
                             })
@@ -437,7 +486,7 @@
                 Axios.put(process.env.VUE_APP_API + 'ProjectTX?update=false', trans).then(
                     res => {
                         delete Axios.defaults.headers.common["TenantID"];
-                        self.$parent.taskViewData.splice(indexOf(item), 1);
+                        self.$parent.$parent.getTaskViewData();
                     })
             },
             setInProgressAndView(item) {
@@ -528,8 +577,7 @@
                         request.actionedByUserID = null;
                         // Create complete transaction for new group
                         self.createProjectTransaction(request, newGroupTransaction => {
-                            EventBus.$emit('get-tasks');
-                            // self.getTransactionsByUser(self.systemUserID);
+                            self.$parent.$parent.getTaskViewData();
                         })
                     })
                 })
@@ -570,7 +618,9 @@
                                 request.status = 10;
                                 request.notes = modalData.notes;
                                 self.createProjectTransaction(request,
-                                    approvalTransaction => {})
+                                    approvalTransaction => {
+                                        self.$parent.$parent.getTaskViewData();
+                                    })
                             })
                         })
                     })
@@ -602,7 +652,9 @@
                                 request.status = 19;
                                 request.notes = modalData.notes;
                                 self.createProjectTransaction(request,
-                                    approvalTransaction => {})
+                                    approvalTransaction => {
+                                        self.$parent.$parent.getTaskViewData();
+                                    })
                             })
                         })
                     })
@@ -630,7 +682,95 @@
                             request.actionedByUserID = null;
                             request.projectTXGroup_ID = newGroupTX.id;
                             request.notes = notes;
-                            self.createProjectTransaction(request, processStartProjectTX => {})
+                            self.createProjectTransaction(request, processStartProjectTX => {
+                                self.$parent.$parent.getTaskViewData();
+                            })
+                        })
+                    })
+                })
+            },
+            startSubtask(item) {
+                let self = this;
+
+                let request = JSON.parse(JSON.stringify(item));
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+
+                let projectTXGroupRequest = {
+                    projectID: item.project_ID
+                }
+
+                self.$refs.SubtaskModal.show("Start new subtask", subtaskDetails => {
+                    // Create new transaction group
+                    request.type = 6;
+                    request.status = subtaskDetails.status;
+                    request.systemUserID = subtaskDetails.systemUserID;
+                    request.actionedByUserID = null;
+                    request.notes = subtaskDetails.notes;
+                    request.rollingUserID = systemUserID;
+
+                    self.createProjectTransactionGroup(projectTXGroupRequest, newGroupTX => {
+                        // Set request dependant on subtask
+                        // Create transaction
+                        self.createProjectTransaction(request, subtaskTransaction => {
+                            alert("Subtask successfully sent");
+                        })
+                    })
+                })
+            },
+            setSubtaskInProgressAndView(item) {
+                let self = this;
+
+                let request = JSON.parse(JSON.stringify(item));
+
+                request.status++;
+
+                self.createProjectTransaction(request, subtaskTransaction => {
+                    self.goToSubtaskView(request)
+                })
+            },
+            returnSubtaskView(status) {
+                if (status == 28 || status == 29) {
+                    return "/DataPreparation";
+                }
+
+                if (status == 31 || status == 32) {
+                    return "/SpacePlanning";
+                }
+
+                if (status == 34 || status == 35) {
+                    return "/Fixtures";
+                }
+
+                if (status == 37 || status == 38) {
+                    return "/PlanogramImplementation";
+                }
+            },
+            goToSubtaskView(item) {
+                let self = this;
+                self.$router.push(self.returnSubtaskView(item.status))
+            },
+            completeSubtask(item) {
+                let self = this;
+
+                let request = JSON.parse(JSON.stringify(item));
+
+                let projectTXGroupRequest = {
+                    projectID: item.project_ID
+                }
+
+                self.$refs.NotesModal.show("Subtask complete notes", notes => {
+                    request.status++;
+                    // Create complete transaction
+                    self.createProjectTransaction(request, endTransaction => {
+                        // Create new group to inform other user
+                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
+                            request.systemUserID = request.rollingUserID;
+                            request.notes = notes;
+                            // Create new transaction
+                            self.createProjectTransaction(request, newRequest => {
+                                self.$parent.$parent.getTaskViewData();
+                            })
                         })
                     })
                 })
