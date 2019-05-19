@@ -1,5 +1,5 @@
 <template>
-    <v-container grid-list-md>
+    <v-container fluid grid-list-md pa-2>
         <v-layout row wrap>
             <v-flex md12>
                 <v-card>
@@ -83,12 +83,37 @@
                     </v-toolbar>
                     <!-- END BLACK TOOLBAR -->
 
-                    <TaskView :data="filteredData" v-if="selectedView==0" :typeList="typeList" :statusList="statusList"
-                        :systemUserID="systemUserID" />
-                    <ProjectView :data="filteredData" v-if="selectedView==1" :typeList="typeList"
-                        :statusList="statusList" :accessType="userAccess" />
-                    <StoreView :data="filteredData" v-if="selectedView==2" :typeList="typeList"
-                        :statusList="statusList" />
+                    <v-container fluid grid-list-md class="pa-0">
+                        <v-layout row wrap class="pa-0">
+                            <v-flex :class="{ 'md10': showNotices, 'md11': !showNotices }" class="pa-0" v-if="selectedView==0">
+                                <TaskView :data="filteredData" :typeList="typeList" :statusList="statusList"
+                                    :systemUserID="systemUserID" />
+                            </v-flex>
+                            <v-flex v-if="selectedView==0" :class="{ 'md2': showNotices, 'md1': !showNotices }">
+                                <v-card tile flat style="border-left: 1px solid lightgrey;">
+                                    <v-toolbar flat dark dense color="grey darken-3">
+                                        <v-toolbar-title v-if="showNotices">Notices</v-toolbar-title>
+                                        <v-spacer></v-spacer>
+                                        <v-btn icon small color="secondary">
+                                            <v-icon @click="showNotices = !showNotices" v-if="showNotices">visibility_off</v-icon>
+                                            <v-icon @click="showNotices = !showNotices" v-else>visibility</v-icon>
+                                        </v-btn>
+                                    </v-toolbar>
+                                    <v-card-text v-if="showNotices" class="scrollable">
+                                        <NoticeBoard ref="NoticeBoard" />
+                                    </v-card-text>
+                                </v-card>
+                            </v-flex>
+                            <v-flex md12 class="pa-0" v-if="selectedView==1">
+                                <ProjectView :data="filteredData" :typeList="typeList" :statusList="statusList"
+                                    :accessType="userAccess" />
+                            </v-flex>
+                            <v-flex md12 class="pa-0" v-if="selectedView==2">
+                                <StoreView :data="filteredData" :typeList="typeList" :statusList="statusList" />
+                            </v-flex>
+                        </v-layout>
+                    </v-container>
+
                     <SplashLoader ref="SplashLoader" />
                 </v-card>
             </v-flex>
@@ -112,15 +137,17 @@
     import StoreView from "./StoreView.vue"
     import SplashLoader from "@/components/Common/SplashLoader.vue"
     import ProjectShare from "./ProjectShare.vue"
+    import NoticeBoard from '@/components/Main/NoticeBoard/Noticeboard.vue'
 
     export default {
         components: {
-            
+
             TaskView,
             ProjectView,
             StoreView,
             SplashLoader,
-            ProjectShare
+            ProjectShare,
+            NoticeBoard
         },
         data() {
             return {
@@ -152,7 +179,8 @@
                 }, {
                     text: "Space Planning",
                     value: 2
-                }, ]
+                }, ],
+                showNotices: true
             }
         },
         mounted() {

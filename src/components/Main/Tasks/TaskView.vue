@@ -146,34 +146,40 @@
                                         <!-- END TASK Takeover -->
                                         <!-- SUBTASKS SET IN PROGRESS AND VIEW -->
                                         <v-btn small color="success" @click="setSubtaskInProgressAndView(props.item)"
-                                            v-if="props.item.status == 28">View</v-btn>
+                                            v-if="props.item.status == 28 && props.item.rollingUserID != systemUserID">View</v-btn>
                                         <v-btn small color="success" @click="setSubtaskInProgressAndView(props.item)"
-                                            v-if="props.item.status == 31">View</v-btn>
+                                            v-if="props.item.status == 31 && props.item.rollingUserID != systemUserID">View</v-btn>
                                         <v-btn small color="success" @click="setSubtaskInProgressAndView(props.item)"
-                                            v-if="props.item.status == 34">View</v-btn>
+                                            v-if="props.item.status == 34 && props.item.rollingUserID != systemUserID">View</v-btn>
                                         <v-btn small color="success" @click="setSubtaskInProgressAndView(props.item)"
-                                            v-if="props.item.status == 37">View</v-btn>
+                                            v-if="props.item.status == 37 && props.item.rollingUserID != systemUserID">View</v-btn>
                                         <!-- END SUBTASKS SET IN PROGRESS AND VIEW -->
                                         <!-- SUBTASKS VIEW -->
-                                        <v-btn small color="warning" @click="goToSubtaskView(props.item)"
-                                            v-if="props.item.status == 29">View</v-btn>
-                                        <v-btn small color="warning" @click="goToSubtaskView(props.item)"
-                                            v-if="props.item.status == 32">View</v-btn>
-                                        <v-btn small color="warning" @click="goToSubtaskView(props.item)"
-                                            v-if="props.item.status == 35">View</v-btn>
-                                        <v-btn small color="warning" @click="goToSubtaskView(props.item)"
-                                            v-if="props.item.status == 38">View</v-btn>
+                                        <div style="display: flex;">
+                                            <v-btn small color="warning" @click="goToSubtaskView(props.item)"
+                                                v-if="props.item.status == 29 && props.item.rollingUserID != systemUserID">View</v-btn>
+                                            <v-btn small color="error" @click="completeSubtask(props.item)"
+                                                v-if="props.item.status == 29 && props.item.rollingUserID != systemUserID">Complete</v-btn>
+                                        </div>
+                                        <div style="display: flex;">
+                                            <v-btn small color="warning" @click="goToSubtaskView(props.item)"
+                                                v-if="props.item.status == 32 && props.item.rollingUserID != systemUserID">View</v-btn>
+                                            <v-btn small color="error" @click="completeSubtask(props.item)"
+                                                v-if="props.item.status == 32 && props.item.rollingUserID != systemUserID">Complete</v-btn>
+                                        </div>
+                                        <div style="display: flex;">
+                                            <v-btn small color="warning" @click="goToSubtaskView(props.item)"
+                                                v-if="props.item.status == 35 && props.item.rollingUserID != systemUserID">View</v-btn>
+                                            <v-btn small color="error" @click="completeSubtask(props.item)"
+                                                v-if="props.item.status == 35 && props.item.rollingUserID != systemUserID">Complete</v-btn>
+                                        </div>
+                                        <div style="display: flex;">
+                                            <v-btn small color="warning" @click="goToSubtaskView(props.item)"
+                                                v-if="props.item.status == 38 && props.item.rollingUserID != systemUserID">View</v-btn>
+                                            <v-btn small color="error" @click="completeSubtask(props.item)"
+                                                v-if="props.item.status == 38 && props.item.rollingUserID != systemUserID">Complete</v-btn>
+                                        </div>
                                         <!-- END SUBTASKS VIEW -->
-                                        <!-- COMPLETE SUBTASKS -->
-                                        <v-btn small color="error" @click="completeSubtask(props.item)"
-                                            v-if="props.item.status == 29">Complete</v-btn>
-                                        <v-btn small color="error" @click="completeSubtask(props.item)"
-                                            v-if="props.item.status == 32">Complete</v-btn>
-                                        <v-btn small color="error" @click="completeSubtask(props.item)"
-                                            v-if="props.item.status == 35">Complete</v-btn>
-                                        <v-btn small color="error" @click="completeSubtask(props.item)"
-                                            v-if="props.item.status == 38">Complete</v-btn>
-                                        <!-- END COMPLETE SUBTASKS -->
                                         <!-- CLOSE SUBTASKS -->
                                         <v-btn small color="error" @click="closeTask(props.item)"
                                             v-if="props.item.status == 30">Close</v-btn>
@@ -702,18 +708,18 @@
 
                 self.$refs.SubtaskModal.show("Start new subtask", subtaskDetails => {
                     // Create new transaction group
-                    request.type = 6;
-                    request.status = subtaskDetails.status;
-                    request.systemUserID = subtaskDetails.systemUserID;
-                    request.actionedByUserID = null;
-                    request.notes = subtaskDetails.notes;
-                    request.rollingUserID = systemUserID;
-
                     self.createProjectTransactionGroup(projectTXGroupRequest, newGroupTX => {
+                        request.type = 6;
+                        request.status = subtaskDetails.status;
+                        request.systemUserID = subtaskDetails.systemUserID;
+                        request.actionedByUserID = null;
+                        request.notes = subtaskDetails.notes;
+                        request.rollingUserID = systemUserID;
+                        request.projectTXGroup_ID = newGroupTX.id;
                         // Set request dependant on subtask
                         // Create transaction
                         self.createProjectTransaction(request, subtaskTransaction => {
-                            alert("Subtask successfully sent");
+                            self.$parent.$parent.getTaskViewData();
                         })
                     })
                 })
@@ -766,6 +772,7 @@
                         // Create new group to inform other user
                         self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
                             request.systemUserID = request.rollingUserID;
+                            request.rollingUserID = null;
                             request.notes = notes;
                             // Create new transaction
                             self.createProjectTransaction(request, newRequest => {

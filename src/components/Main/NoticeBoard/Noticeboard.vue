@@ -1,25 +1,5 @@
 <template>
-  <v-dialog persistent v-model="dialog" width="90vw">
-
-    <v-icon slot="activator" @click="Open">error_outline</v-icon>
-
-    <v-card dark>
-      <v-card-title dark class="headline" primary-title>
-        Notice Board
-      </v-card-title>
-      <v-card-text>
-        <v-card light class="elevation-5" style="height: calc(90vh - 170px); overflow-x: auto;">
-          <v-card-text>
-            <div v-html="html"></div>
-          </v-card-text>
-        </v-card>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="primary" @click="dialog = false">Got it!</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+  <div v-html="html"></div>
 </template>
 
 <script>
@@ -36,7 +16,6 @@
       self.component = "Notice Board"
       axios.get(process.env.VUE_APP_API + "HelpFile?systemComponent=" + self.component)
         .then(r => {
-          console.log(r.data.success);
 
           if (r.data.success) {
             self.html = r.data.helpFile.html;
@@ -45,14 +24,15 @@
           }
         })
       setTimeout(() => {
-        this.dialog = true
+        this.snackbar = true
       }, 5000)
     },
     data() {
       return {
         component: "NoticeBoard",
+        timeout: 0,
         html: "",
-        dialog: false
+        snackbar: false
       }
     },
     methods: {
@@ -74,5 +54,8 @@
   }
 </script>
 <style scoped>
-
+  .scrollable {
+    height: calc(100vh - 300px);
+    overflow-x: auto;
+  }
 </style>

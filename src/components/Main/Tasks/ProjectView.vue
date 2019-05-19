@@ -4,7 +4,8 @@
             <v-flex md12>
                 <v-card flat>
                     <v-card-text class="pa-0">
-                        <v-data-table :headers="headers" :items="data" class="elevation-0 scrollable" :rows-per-page-items="[10,50,75,100,{'text':'$vuetify.dataIterator.rowsPerPageAll','value':-1}]">
+                        <v-data-table :headers="headers" :items="data" class="elevation-0 scrollable"
+                            :rows-per-page-items="[10,50,75,100,{'text':'$vuetify.dataIterator.rowsPerPageAll','value':-1}]">
                             <template v-slot:no-data>
                                 <div style="text-align:center;">
                                     View Tasks and Stores
@@ -46,7 +47,7 @@
                                             v-if="(accessType!=2&&(props.item.type != -1)&&(props.item.type==2 &&props.item.rangeFileID!=null))"
                                             color="success" small @click="routeToView(props.item)">View</v-btn>
                                         <v-btn
-                                            v-if="(props.item.type != -1)&&((props.item.type==3 &&props.item.systemFileName!=null))"
+                                            v-if="(props.item.type != -1)&&((props.item.type==3 &&props.item.systemFileName!=null))&&(props.item.status!=1&&props.item.status!=8&&props.item.status!=41)"
                                             color="primary" small @click="routeToView(props.item)">View</v-btn>
                                     </td>
                                     <td style="width: 2%">
@@ -94,7 +95,7 @@
 
     export default {
         name: 'ProjectView',
-        props: ['data', 'typeList', 'statusList','accessType'],
+        props: ['data', 'typeList', 'statusList', 'accessType'],
         components: {
             AssignTask,
         },
@@ -140,7 +141,7 @@
                     {
                         text: 'Date',
                         sortable: false
-                    },  {
+                    }, {
                         text: 'User Assigned',
                         sortable: false
                     }, {
@@ -150,10 +151,10 @@
                     {
                         text: '',
                         sortable: false
-                    },  {
+                    }, {
                         text: '',
                         sortable: false
-                    },  {
+                    }, {
                         text: '',
                         sortable: false
                     },
@@ -234,7 +235,7 @@
                     request.store_ID = taskDetails.store;
                     // Create first process assigned TX
                     // Create second project transaction group
-              self.createProjectTransactionGroup(projectTXGroupRequest,
+                    self.createProjectTransactionGroup(projectTXGroupRequest,
                         projectTXGroupNew => {
                             // Create second process assigned TX
                             request.systemUserID = taskDetails.systemUserID;
@@ -258,7 +259,8 @@
             },
         },
     }
-     function returnStartStatusByType(type) {
+
+    function returnStartStatusByType(type) {
         let retval;
 
         switch (type) {
