@@ -14,6 +14,7 @@
                         <v-tab ripple>Details</v-tab>
                         <v-tab ripple>Personale</v-tab>
                         <v-tab ripple>Areas</v-tab>
+                         <v-tab ripple>Category</v-tab>
                         <v-tab-item> 
                             <v-card-text class="component-container ma-0">
                                 <v-layout row wrap>
@@ -62,6 +63,15 @@
                                 </v-layout>
                             </v-card-text>
                         </v-tab-item>
+                          <v-tab-item>
+                            <v-card-text class="component-container ma-0">
+                                <v-layout row wrap>
+                                    <v-flex xl12 lg12 md12 sm12 xs12 class="pa-1">
+                                        <Category ref="Category" />
+                                    </v-flex>
+                                </v-layout>
+                            </v-card-text>
+                        </v-tab-item>
                     </v-tabs>
                 </v-card>
             </v-card-text>
@@ -76,6 +86,7 @@
 </template>
 
 <script>
+    import Category from '@/components/Apps/DataPreparation/Types/Store/Modify/Sections/Category.vue'
     import Name from '@/components/Apps/DataPreparation/Types/Store/Modify/Sections/Name.vue'
     import Properties from '@/components/Apps/DataPreparation/Types/Store/Modify/Sections/Properties.vue'
     import Contact from '@/components/Apps/DataPreparation/Types/Store/Modify/Sections/Contact.vue'
@@ -91,6 +102,7 @@
 
     export default {
         components: {
+            Category,
             Name,
             Properties,
             Contact,
