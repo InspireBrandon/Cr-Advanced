@@ -119,12 +119,15 @@
                     <td>
                         <v-edit-dialog :return-value.sync="props.item.type" large lazy persistent
                             @save="saveLine(props.item)" @cancel="''" @open="''" @close="''">
-                            <div>{{typeList[props.item.type == -1 ?  5 :  props.item.type].text}}</div>
+                            <div>
+                                {{typeList[props.item.type == -1 ?  5 :  props.item.type].text}}
+
+                            </div>
                             <template v-slot:input>
                                 <div class="mt-3 title">Update Iron</div>
                             </template>
                             <template v-slot:input>
-                                <v-select v-model="props.item.type" :items="typeList" label="Edit" single-line counter
+                                <v-select v-model="props.item.type" :items="typeList2" label="Edit" single-line counter
                                     autofocus></v-select>
                             </template>
                         </v-edit-dialog>
@@ -347,6 +350,7 @@
                 ProjectsGroups: [],
                 storeObjects: [],
                 StoreClusters: [],
+                typeList2:[],
                 databaseUsers: [],
                 users: [{
                     text: "None",
@@ -405,6 +409,11 @@
                 let self = this
                 let statushandler = new StatusHandler()
                 self.typeList = statushandler.getTypeList()
+                self.typeList2=statushandler.getTypeList()
+                self.typeList2.splice(5,1)
+                //   console.log(self.typeList);
+                // console.log(self.typeList2);
+                
             },
             getStatusList() {
                 let self = this

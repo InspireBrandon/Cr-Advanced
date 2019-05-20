@@ -329,7 +329,8 @@ class projectStatusHandler {
                 value: 4,
                 color: "purple"
 
-            }, {
+            },
+            {
                 color: "",
                 text: "",
                 value: 5
@@ -338,7 +339,7 @@ class projectStatusHandler {
                 color: "grey",
                 text: "Subtask",
                 value: 6
-            }
+            },
         ]
 
 
