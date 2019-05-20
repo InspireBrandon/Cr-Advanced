@@ -89,7 +89,7 @@
                                 <TaskView :data="filteredData" :typeList="typeList" :statusList="statusList"
                                     :systemUserID="systemUserID" />
                             </v-flex>
-                            <v-flex v-if="selectedView==0" :class="{ 'md2': showNotices, 'md1': !showNotices }">
+                            <v-flex v-if="selectedView==0" :class="{ 'md2': showNotices, 'md11': !showNotices }">
                                 <v-card tile flat style="border-left: 1px solid lightgrey;">
                                     <v-toolbar flat dark dense color="grey darken-3">
                                         <v-toolbar-title v-if="showNotices">Notices</v-toolbar-title>
