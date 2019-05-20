@@ -1,0 +1,13 @@
+
+{
+    "configName":"FloorPlanning",
+    "report":false,
+    "routes": [
+        {
+            "route": "/FloorPlanning",
+            "routeName": "FloorPlanning",
+            "title": "Floor Planning",
+            "openInNewWindow": false
+        }
+    ]
+}
