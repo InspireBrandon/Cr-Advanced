@@ -146,30 +146,30 @@
                                         <!-- END TASK Takeover -->
                                         <!-- SUBTASKS SET IN PROGRESS AND VIEW -->
                                         <v-btn small color="success" @click="setSubtaskInProgressAndView(props.item)"
-                                            v-if="props.item.status == 28 && props.item.rollingUserID != systemUserID">View</v-btn>
+                                            v-if="props.item.status == 28 && props.item.rollingUserID != systemUserID">Recieved</v-btn>
                                         <v-btn small color="success" @click="setSubtaskInProgressAndView(props.item)"
-                                            v-if="props.item.status == 31 && props.item.rollingUserID != systemUserID">View</v-btn>
+                                            v-if="props.item.status == 31 && props.item.rollingUserID != systemUserID">Recieved</v-btn>
                                         <v-btn small color="success" @click="setSubtaskInProgressAndView(props.item)"
-                                            v-if="props.item.status == 34 && props.item.rollingUserID != systemUserID">View</v-btn>
+                                            v-if="props.item.status == 34 && props.item.rollingUserID != systemUserID">Recieved</v-btn>
                                         <v-btn small color="success" @click="setSubtaskInProgressAndView(props.item)"
-                                            v-if="props.item.status == 37 && props.item.rollingUserID != systemUserID">View</v-btn>
+                                            v-if="props.item.status == 37 && props.item.rollingUserID != systemUserID">Recieved</v-btn>
                                         <!-- END SUBTASKS SET IN PROGRESS AND VIEW -->
                                         <!-- SUBTASKS VIEW -->
                                         <div style="display: flex;">
-                                            <v-btn small color="warning" @click="goToSubtaskView(props.item)"
-                                                v-if="props.item.status == 29 && props.item.rollingUserID != systemUserID">View</v-btn>
+                                            <!-- <v-btn small color="warning" @click="goToSubtaskView(props.item)"
+                                                v-if="props.item.status == 29 && props.item.rollingUserID != systemUserID">View</v-btn> -->
                                             <v-btn small color="error" @click="completeSubtask(props.item)"
                                                 v-if="props.item.status == 29 && props.item.rollingUserID != systemUserID">Complete</v-btn>
                                         </div>
                                         <div style="display: flex;">
-                                            <v-btn small color="warning" @click="goToSubtaskView(props.item)"
-                                                v-if="props.item.status == 32 && props.item.rollingUserID != systemUserID">View</v-btn>
+                                            <!-- <v-btn small color="warning" @click="goToSubtaskView(props.item)"
+                                                v-if="props.item.status == 32 && props.item.rollingUserID != systemUserID">View</v-btn> -->
                                             <v-btn small color="error" @click="completeSubtask(props.item)"
                                                 v-if="props.item.status == 32 && props.item.rollingUserID != systemUserID">Complete</v-btn>
                                         </div>
                                         <div style="display: flex;">
-                                            <v-btn small color="warning" @click="goToSubtaskView(props.item)"
-                                                v-if="props.item.status == 35 && props.item.rollingUserID != systemUserID">View</v-btn>
+                                            <!-- <v-btn small color="warning" @click="goToSubtaskView(props.item)"
+                                                v-if="props.item.status == 35 && props.item.rollingUserID != systemUserID">View</v-btn> -->
                                             <v-btn small color="error" @click="completeSubtask(props.item)"
                                                 v-if="props.item.status == 35 && props.item.rollingUserID != systemUserID">Complete</v-btn>
                                         </div>
@@ -712,7 +712,7 @@
                         request.type = 6;
                         request.status = subtaskDetails.status;
                         request.systemUserID = subtaskDetails.systemUserID;
-                        request.actionedByUserID = null;
+                        request.actionedByUserID = systemUserID;
                         request.notes = subtaskDetails.notes;
                         request.rollingUserID = systemUserID;
                         request.projectTXGroup_ID = newGroupTX.id;
@@ -732,29 +732,30 @@
                 request.status++;
 
                 self.createProjectTransaction(request, subtaskTransaction => {
-                    self.goToSubtaskView(request)
+                    self.$parent.$parent.getTaskViewData();
+                    // self.goToSubtaskView(request)
                 })
             },
-            returnSubtaskView(status) {
-                if (status == 28 || status == 29) {
+            returnSubtaskView(item) {
+                if (item.status == 28 || item.status == 29) {
                     return "/DataPreparation";
                 }
 
-                if (status == 31 || status == 32) {
+                if (item.status == 31 || item.status == 32) {
                     return "/SpacePlanning";
                 }
 
-                if (status == 34 || status == 35) {
+                if (item.status == 34 || item.status == 35) {
                     return "/Fixtures";
                 }
 
-                if (status == 37 || status == 38) {
-                    return "/PlanogramImplementation";
+                if (item.status == 37 || item.status == 38) {
+                    return `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
                 }
             },
             goToSubtaskView(item) {
                 let self = this;
-                self.$router.push(self.returnSubtaskView(item.status))
+                self.$router.push(self.returnSubtaskView(item))
             },
             completeSubtask(item) {
                 let self = this;

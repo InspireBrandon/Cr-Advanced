@@ -68,8 +68,6 @@ import Drawer from '@/components/Apps/ProjectPlanning/Drawer.vue';
 import Allocation from '@/components/Apps/ProjectPlanning/Allocation.vue';
 
 
-
-
 //reports
 import AppsReportList from '@/components/Main/Reports/Apps/Index.vue'
 import SystemReportList from '@/components/Main/Reports/System/Index.vue'
@@ -81,6 +79,9 @@ import ProductReport from '@/views/Reports/SPACE-PLANNING-REPORTS/ProductReport/
 
 import HelpFileView from '@/components/Main/HelpFile/Index.vue'
 import Tasks from '@/components/Main/Tasks/Switcher.vue';
+
+// Floor Planning
+import FloorPlanning from '@/components/Main/FloorPlanning/index.vue'
 
 Vue.use(Router)
 
@@ -97,6 +98,10 @@ export default new Router({
       path: '/SpacePlanning',
       name: 'space_planning',
       component: SpacePlanning
+    },{
+      path: '/FloorPlanning',
+      name: 'floor_planning',
+      component: FloorPlanning
     }, {
       path: '/Menu',
       name: 'main',

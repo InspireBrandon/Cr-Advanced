@@ -10,7 +10,7 @@
             </v-toolbar>
             <v-card-text class="ma-0 pa-0">
                 <v-card>
-                    <v-tabs v-model="active" grow centered dark>
+                    <v-tabs v-model="active" grow centered color="grey darken-4" dark>
                         <v-tab ripple>Details</v-tab>
                         <v-tab ripple>Personale</v-tab>
                         <v-tab ripple>Areas</v-tab>

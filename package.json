@@ -17,6 +17,7 @@
     "ag-grid-enterprise": "^19.1.4",
     "ag-grid-vue": "^19.1.2",
     "axios": "^0.18.0",
+    "babylonjs": "^4.0.3",
     "cloudinary-core": "^2.6.2",
     "jsonwebtoken": "^8.5.0",
     "konva": "^3.2.0",
