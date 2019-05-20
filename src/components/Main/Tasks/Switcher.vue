@@ -1,7 +1,7 @@
 <template>
     <v-container fluid grid-list-md pa-2>
         <v-layout row wrap>
-            <v-flex md12>
+            <v-flex v-if="hasDatabases" md12>
                 <v-card>
                     <!-- MAIN TOOLBAR -->
                     <v-toolbar flat dark dense color="primary">
@@ -85,7 +85,8 @@
 
                     <v-container fluid grid-list-md class="pa-0">
                         <v-layout row wrap class="pa-0">
-                            <v-flex :class="{ 'md10': showNotices, 'md11': !showNotices }" class="pa-0" v-if="selectedView==0">
+                            <v-flex :class="{ 'md10': showNotices, 'md11': !showNotices }" class="pa-0"
+                                v-if="selectedView==0">
                                 <TaskView :data="filteredData" :typeList="typeList" :statusList="statusList"
                                     :systemUserID="systemUserID" />
                             </v-flex>
@@ -95,7 +96,8 @@
                                         <v-toolbar-title v-if="showNotices">Notices</v-toolbar-title>
                                         <v-spacer></v-spacer>
                                         <v-btn icon small color="secondary">
-                                            <v-icon @click="showNotices = !showNotices" v-if="showNotices">visibility_off</v-icon>
+                                            <v-icon @click="showNotices = !showNotices" v-if="showNotices">
+                                                visibility_off</v-icon>
                                             <v-icon @click="showNotices = !showNotices" v-else>visibility</v-icon>
                                         </v-btn>
                                     </v-toolbar>
@@ -115,6 +117,14 @@
                     </v-container>
 
                     <SplashLoader ref="SplashLoader" />
+                </v-card>
+            </v-flex>
+            <v-flex v-else md12>
+                <v-card>
+                    <v-card-text v-if="self.loading">
+                        It appears as though you do not have access to any databases. Please request access to
+                        continue...
+                    </v-card-text>
                 </v-card>
             </v-flex>
         </v-layout>
@@ -180,7 +190,9 @@
                     text: "Space Planning",
                     value: 2
                 }, ],
-                showNotices: true
+                showNotices: true,
+                hasDatabases: false,
+                loading: true
             }
         },
         mounted() {
@@ -259,16 +271,38 @@
             getData() {
                 let self = this;
                 setTimeout(() => {
-                    self.getLists(() => {
-                        self.checkAccessType(() => {
-                            self.getUsers(() => {
-                                self.getStores(() => {
-                                    self.getTaskViewData()
+                    self.getDatabases(() => {
+                        if (self.hasDatabases) {
+                            self.getLists(() => {
+                                self.checkAccessType(() => {
+                                    self.getUsers(() => {
+                                        self.getStores(() => {
+                                            self.getTaskViewData(() => {
+                                                self.loading = false;
+                                            })
+                                        })
+                                    })
                                 })
                             })
-                        })
+                        }
+                        else {
+                            self.loading = false;
+                        }
                     })
                 }, 1000);
+            },
+            getDatabases(callback) {
+                let self = this;
+
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+
+                Axios.get(process.env.VUE_APP_API + `TenantAccess?systemUserID=${systemUserID}`)
+                    .then(r => {
+                        if (r.data.length > 0)
+                            self.hasDatabases = true;
+                        callback();
+                    })
             },
             getLists(callback) {
                 let self = this
