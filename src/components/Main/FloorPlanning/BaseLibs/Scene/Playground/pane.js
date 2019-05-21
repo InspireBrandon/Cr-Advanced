@@ -11,6 +11,7 @@ class Pane {
         // let url = localStorage.ServerAddress + 'ProductImage?rng=' + Math.random() + '&folder=000000018&file=82223.1&compress=true'
         // let url = 'https://www.tileafrica.co.za/Images/Products/T0025604/01.jpg';
         // myMaterial.diffuseTexture = new BABYLON.Texture(url, this.world.scene);
+        // myMaterial.wireframe = true;
 
         var myGround = BABYLON.MeshBuilder.CreateGround("ground", {
             width: width,
@@ -21,6 +22,8 @@ class Pane {
         myGround.receiveShadows = true;
         myGround.checkCollisions = true;
         myGround.material = myMaterial;
+
+        console.log(myGround)
     }
 }
 
