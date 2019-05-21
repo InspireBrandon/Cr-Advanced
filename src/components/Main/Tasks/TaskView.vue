@@ -146,38 +146,47 @@
                                         <!-- END TASK Takeover -->
                                         <!-- SUBTASKS SET IN PROGRESS AND VIEW -->
                                         <v-btn small color="success" @click="setSubtaskInProgressAndView(props.item)"
-                                            v-if="props.item.status == 28 && props.item.rollingUserID != systemUserID">Recieved</v-btn>
+                                            v-if="props.item.status == 28 && props.item.rollingUserID != systemUserID">
+                                            Recieved</v-btn>
                                         <v-btn small color="success" @click="setSubtaskInProgressAndView(props.item)"
-                                            v-if="props.item.status == 31 && props.item.rollingUserID != systemUserID">Recieved</v-btn>
+                                            v-if="props.item.status == 31 && props.item.rollingUserID != systemUserID">
+                                            Recieved</v-btn>
                                         <v-btn small color="success" @click="setSubtaskInProgressAndView(props.item)"
-                                            v-if="props.item.status == 34 && props.item.rollingUserID != systemUserID">Recieved</v-btn>
+                                            v-if="props.item.status == 34 && props.item.rollingUserID != systemUserID">
+                                            Recieved</v-btn>
                                         <v-btn small color="success" @click="setSubtaskInProgressAndView(props.item)"
-                                            v-if="props.item.status == 37 && props.item.rollingUserID != systemUserID">Recieved</v-btn>
+                                            v-if="props.item.status == 37 && props.item.rollingUserID != systemUserID">
+                                            Recieved</v-btn>
                                         <!-- END SUBTASKS SET IN PROGRESS AND VIEW -->
                                         <!-- SUBTASKS VIEW -->
                                         <div style="display: flex;">
                                             <!-- <v-btn small color="warning" @click="goToSubtaskView(props.item)"
                                                 v-if="props.item.status == 29 && props.item.rollingUserID != systemUserID">View</v-btn> -->
                                             <v-btn small color="error" @click="completeSubtask(props.item)"
-                                                v-if="props.item.status == 29 && props.item.rollingUserID != systemUserID">Complete</v-btn>
+                                                v-if="props.item.status == 29 && props.item.rollingUserID != systemUserID">
+                                                Complete</v-btn>
                                         </div>
                                         <div style="display: flex;">
                                             <!-- <v-btn small color="warning" @click="goToSubtaskView(props.item)"
                                                 v-if="props.item.status == 32 && props.item.rollingUserID != systemUserID">View</v-btn> -->
                                             <v-btn small color="error" @click="completeSubtask(props.item)"
-                                                v-if="props.item.status == 32 && props.item.rollingUserID != systemUserID">Complete</v-btn>
+                                                v-if="props.item.status == 32 && props.item.rollingUserID != systemUserID">
+                                                Complete</v-btn>
                                         </div>
                                         <div style="display: flex;">
                                             <!-- <v-btn small color="warning" @click="goToSubtaskView(props.item)"
                                                 v-if="props.item.status == 35 && props.item.rollingUserID != systemUserID">View</v-btn> -->
                                             <v-btn small color="error" @click="completeSubtask(props.item)"
-                                                v-if="props.item.status == 35 && props.item.rollingUserID != systemUserID">Complete</v-btn>
+                                                v-if="props.item.status == 35 && props.item.rollingUserID != systemUserID">
+                                                Complete</v-btn>
                                         </div>
                                         <div style="display: flex;">
                                             <v-btn small color="warning" @click="goToSubtaskView(props.item)"
-                                                v-if="props.item.status == 38 && props.item.rollingUserID != systemUserID">View</v-btn>
+                                                v-if="props.item.status == 38 && props.item.rollingUserID != systemUserID">
+                                                View</v-btn>
                                             <v-btn small color="error" @click="completeSubtask(props.item)"
-                                                v-if="props.item.status == 38 && props.item.rollingUserID != systemUserID">Complete</v-btn>
+                                                v-if="props.item.status == 38 && props.item.rollingUserID != systemUserID">
+                                                Complete</v-btn>
                                         </div>
                                         <!-- END SUBTASKS VIEW -->
                                         <!-- CLOSE SUBTASKS -->
@@ -332,6 +341,9 @@
         },
         mounted() {
             let self = this
+            self.getUsers(() => {
+
+            });
         },
         computed: {
             filteredTasks() {
@@ -416,6 +428,7 @@
                     request.storeCluster_ID = taskDetails.storeCluster;
                     request.categoryCluster_ID = taskDetails.categoryCluster;
                     request.store_ID = taskDetails.store;
+                    request.notes = self.findAndReplaceNote(request.notes);
                     // Create first process assigned TX
                     self.createProjectTransaction(request, firstProcessAssigned => {
                         // Create second project transaction group
@@ -425,12 +438,12 @@
                                 request.systemUserID = taskDetails.systemUserID;
                                 request.actionedByUserID = null;
                                 request.projectTXGroup_ID = projectTXGroupNew.id;
-                                request.notes = taskDetails.notes;
+                                request.notes = self.findAndReplaceNote(taskDetails.notes);
                                 self.createProjectTransaction(request,
                                     secondProcessAssigned => {
                                         // Create actual transaction
-                                        request.status = returnStartStatusByType(
-                                            request.type);
+                                        request.status = returnStartStatusByType(request.type);
+                                            request.notes = self.findAndReplaceNote(request.notes);
                                         self.createProjectTransaction(request,
                                             actualTransaction => {
 
@@ -461,6 +474,7 @@
                     request.storeCluster_ID = taskDetails.storeCluster;
                     request.categoryCluster_ID = taskDetails.categoryCluster;
                     request.store_ID = taskDetails.store;
+                    request.notes = self.findAndReplaceNote(request.notes);
                     // Create first process assigned TX
                     // Create second project transaction group
                     self.createProjectTransactionGroup(projectTXGroupRequest,
@@ -469,12 +483,13 @@
                             request.systemUserID = taskDetails.systemUserID;
                             request.actionedByUserID = null;
                             request.projectTXGroup_ID = projectTXGroupNew.id;
-                            request.notes = taskDetails.notes;
+                            request.notes = self.findAndReplaceNote(taskDetails.notes);
                             self.createProjectTransaction(request,
                                 secondProcessAssigned => {
                                     // Create actual transaction
                                     request.status = returnStartStatusByType(
                                         request.type);
+                                        request.notes = self.findAndReplaceNote(request.notes);
                                     self.createProjectTransaction(request,
                                         actualTransaction => {})
                                 })
@@ -488,6 +503,7 @@
 
                 let trans = JSON.parse(JSON.stringify(item));
                 trans.removed = true;
+                trans.notes = self.findAndReplaceNote(trans.notes);
 
                 Axios.put(process.env.VUE_APP_API + 'ProjectTX?update=false', trans).then(
                     res => {
@@ -500,7 +516,7 @@
 
                 let request = JSON.parse(JSON.stringify(item))
                 request.status = 1;
-                request.notes = null;
+                request.notes = self.findAndReplaceNote(request.notes);
 
                 self.createProjectTransaction(request, newItem => {
                     self.routeToView(newItem)
@@ -511,7 +527,7 @@
 
                 let request = JSON.parse(JSON.stringify(item))
                 request.status = 20;
-                request.notes = null;
+                request.notes = self.findAndReplaceNote(request.notes);
 
                 self.createProjectTransaction(request, newItem => {
                     self.routeToView(newItem)
@@ -522,7 +538,7 @@
 
                 let request = JSON.parse(JSON.stringify(item))
                 request.status = 21;
-                request.notes = null;
+                request.notes = self.findAndReplaceNote(request.notes);
 
                 self.createProjectTransaction(request, newItem => {
                     self.routeToView(newItem)
@@ -533,7 +549,7 @@
 
                 let request = JSON.parse(JSON.stringify(item))
                 request.status = 24;
-                request.notes = null;
+                request.notes = self.findAndReplaceNote(request.notes);
 
                 self.createProjectTransaction(request, newItem => {
                     self.routeToView(newItem)
@@ -571,6 +587,7 @@
                 request.status = 2;
                 request.actionedByUserID = item.systemUserID;
                 request.systemUserID = null;
+                request.notes = self.findAndReplaceNote(request.notes);
                 // Create complete transaction
                 self.createProjectTransaction(request, completeTransactionCloseTask => {
                     let projectTXGroupRequest = {
@@ -581,6 +598,7 @@
                         request.projectTXGroup_ID = newGroup.id;
                         request.systemUserID = item.projectOwnerID;
                         request.actionedByUserID = null;
+                        request.notes = self.findAndReplaceNote(request.notes);
                         // Create complete transaction for new group
                         self.createProjectTransaction(request, newGroupTransaction => {
                             self.$parent.$parent.getTaskViewData();
@@ -611,6 +629,7 @@
                     request.status = 40;
                     request.systemUserID = null;
                     request.actionedByUserID = self.systemUserID;
+                    request.notes = self.findAndReplaceNote(request.notes);
                     // Create New Process Assigned for complete group
                     self.createProjectTransaction(request, processEndProjectTX => {
                         // Create "New Group"
@@ -619,10 +638,11 @@
                             request.systemUserID = modalData.systemUserID;
                             request.actionedByUserID = null;
                             request.projectTXGroup_ID = newGroupTX.id;
+                            request.notes = self.findAndReplaceNote(request.notes);
                             self.createProjectTransaction(request, processStartProjectTX => {
                                 // Create Requesting Approval process for "New Group"
                                 request.status = 10;
-                                request.notes = modalData.notes;
+                                request.notes = self.findAndReplaceNote(modalData.notes);
                                 self.createProjectTransaction(request,
                                     approvalTransaction => {
                                         self.$parent.$parent.getTaskViewData();
@@ -645,6 +665,7 @@
                     request.status = 40;
                     request.systemUserID = null;
                     request.actionedByUserID = self.systemUserID;
+                    request.notes = self.findAndReplaceNote(request.notes);
                     // Create New Process Assigned for complete group
                     self.createProjectTransaction(request, processEndProjectTX => {
                         // Create "New Group"
@@ -653,10 +674,11 @@
                             request.systemUserID = modalData.systemUserID;
                             request.actionedByUserID = null;
                             request.projectTXGroup_ID = newGroupTX.id;
+                            request.notes = self.findAndReplaceNote(request.notes);
                             self.createProjectTransaction(request, processStartProjectTX => {
                                 // Create Requesting Approval process for "New Group"
                                 request.status = 19;
-                                request.notes = modalData.notes;
+                                request.notes = self.findAndReplaceNote(modalData.notes);
                                 self.createProjectTransaction(request,
                                     approvalTransaction => {
                                         self.$parent.$parent.getTaskViewData();
@@ -679,6 +701,7 @@
                     request.status = 16;
                     request.systemUserID = null;
                     request.actionedByUserID = self.systemUserID;
+                    request.notes = self.findAndReplaceNote(request.notes);
                     // Create on hold transaction
                     self.createProjectTransaction(request, processEndProjectTX => {
                         // Create "New Group"
@@ -687,7 +710,7 @@
                             request.systemUserID = request.projectOwnerID;
                             request.actionedByUserID = null;
                             request.projectTXGroup_ID = newGroupTX.id;
-                            request.notes = notes;
+                            request.notes = self.findAndReplaceNote(notes);
                             self.createProjectTransaction(request, processStartProjectTX => {
                                 self.$parent.$parent.getTaskViewData();
                             })
@@ -712,8 +735,8 @@
                         request.type = 6;
                         request.status = subtaskDetails.status;
                         request.systemUserID = subtaskDetails.systemUserID;
-                        request.actionedByUserID = systemUserID;
-                        request.notes = subtaskDetails.notes;
+                        request.actionedByUserID = null;
+                        request.notes = self.findAndReplaceNote(subtaskDetails.notes);
                         request.rollingUserID = systemUserID;
                         request.projectTXGroup_ID = newGroupTX.id;
                         // Set request dependant on subtask
@@ -728,8 +751,10 @@
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(item));
+                request.notes = self.findAndReplaceNote(request.notes);
 
                 request.status++;
+                request.actionedByUserID = null;
 
                 self.createProjectTransaction(request, subtaskTransaction => {
                     self.$parent.$parent.getTaskViewData();
@@ -768,13 +793,21 @@
 
                 self.$refs.NotesModal.show("Subtask complete notes", notes => {
                     request.status++;
+                    request.notes = self.findAndReplaceNote(request.notes);
+                    request.actionedByUserID = request.systemUserID;
+                    request.systemUserID = null;
+                    let tmpRollover = request.rollingUserID;
+                    request.rollingUserID = null;
+
                     // Create complete transaction
                     self.createProjectTransaction(request, endTransaction => {
                         // Create new group to inform other user
                         self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
-                            request.systemUserID = request.rollingUserID;
+                            request.notes = self.findAndReplaceNote(notes);
+                            request.systemUserID = tmpRollover;
+                            request.actionedByUserID = null;
                             request.rollingUserID = null;
-                            request.notes = notes;
+                            request.projectTXGroup_ID = newGroup.id;
                             // Create new transaction
                             self.createProjectTransaction(request, newRequest => {
                                 self.$parent.$parent.getTaskViewData();
@@ -782,6 +815,50 @@
                         })
                     })
                 })
+            },
+            getUsernameByUserID(userID) {
+                let self = this;
+
+                let userName = "";
+
+                self.users.forEach(user => {
+                    if (user.systemUserID == userID) {
+                        userName = user.firstname + " " + user.lastname;
+                    }
+                })
+
+                return userName;
+            },
+            getUsers(callback) {
+                let self = this
+
+                Axios.get(process.env.VUE_APP_API + `SystemUser`).then(r => {
+                    r.data.forEach(e => {
+                        self.users = r.data
+                    })
+
+                    callback()
+                })
+            },
+            findAndReplaceNote(note) {
+                let self = this;
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+                let userName = self.getUsernameByUserID(systemUserID);
+                let newNote = "";
+
+                if (note != undefined && note != null) {
+                    let noteARR = note.split(/-(.+)/);
+                    if (noteARR.length > 1) {
+                        newNote = userName + " - " + noteARR[1]
+                    } else {
+                        newNote = userName + " - " + noteARR[0]
+                    }
+                } else {
+                    newNote = userName + " - ";
+                }
+
+                return newNote;
             }
         }
     }

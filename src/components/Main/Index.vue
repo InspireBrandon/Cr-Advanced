@@ -4,7 +4,7 @@
             <v-btn icon @click="$router.push('/Apps')">
                 <v-icon>home</v-icon>
             </v-btn>
-            <v-btn v-if="$route.path!='/tasks'" icon @click="$router.push('/tasks')">
+            <v-btn v-if="$route.path.toUpperCase() !='/TASKS'" icon @click="$router.push('/tasks')">
                 <v-icon>inbox</v-icon>
             </v-btn>
 

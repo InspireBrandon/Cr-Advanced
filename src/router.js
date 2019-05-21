@@ -66,7 +66,7 @@ import ProductCatalogue from '@/components/Apps/DataPreparation/Types/ProductCat
 import ProjectPlanning from '@/components/Apps/ProjectPlanning/Index.vue';
 import Drawer from '@/components/Apps/ProjectPlanning/Drawer.vue';
 import Allocation from '@/components/Apps/ProjectPlanning/Allocation.vue';
-
+import MeetingsAndWorkshops from '@/components/Apps/ProjectPlanning/MeetingsAndWorkshops/Index.vue';
 
 //reports
 import AppsReportList from '@/components/Main/Reports/Apps/Index.vue'
@@ -204,7 +204,13 @@ export default new Router({
         {
           path: "/Allocation/:projectID",
           name: "Allocation",
-          component: Allocation},
+          component: Allocation
+        },
+        {
+          path: "/MeetingsAndWorkshops",
+          name: "meetings_and_workshops",
+          component: MeetingsAndWorkshops
+        },
         {
           path: "/ProjectPlanning",
           name: "project_planning",

@@ -13,6 +13,12 @@
             "routeName": "Allocation",
             "title": "Transaction Allocation",
             "openInNewWindow": false
+        },
+        {
+            "route": "/MeetingsAndWorkshops",
+            "routeName": "MeetingsAndWorkshops",
+            "title": "Meetings And Workshops",
+            "openInNewWindow": false
         }
     ]
 }
