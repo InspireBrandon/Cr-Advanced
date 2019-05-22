@@ -1,5 +1,6 @@
 <template>
     <v-app id="inspire">
+        <SpaceplanSelector ref="SpaceplanSelector" />
         <v-navigation-drawer v-model="drawer" dense fixed right app>
             <v-list dense>
                 <v-list-tile @click="toggleCamera">
@@ -8,6 +9,14 @@
                     </v-list-tile-action>
                     <v-list-tile-content>
                         <v-list-tile-title>Change Camera</v-list-tile-title>
+                    </v-list-tile-content>
+                </v-list-tile>
+                <v-list-tile @click="addBox">
+                    <v-list-tile-action>
+                        <v-icon>box</v-icon>
+                    </v-list-tile-action>
+                    <v-list-tile-content>
+                        <v-list-tile-title>Add Box</v-list-tile-title>
                     </v-list-tile-content>
                 </v-list-tile>
                 <v-list-tile @click="addPane">
@@ -34,6 +43,14 @@
                         <v-list-tile-title>Add Planogram</v-list-tile-title>
                     </v-list-tile-content>
                 </v-list-tile>
+                <v-list-tile @click="addComplexPlanogram">
+                    <v-list-tile-action>
+                        <v-icon>tile</v-icon>
+                    </v-list-tile-action>
+                    <v-list-tile-content>
+                        <v-list-tile-title>Add Complex Planogram</v-list-tile-title>
+                    </v-list-tile-content>
+                </v-list-tile>
             </v-list>
         </v-navigation-drawer>
         <v-toolbar color="cyan" dense dark app>
@@ -52,7 +69,13 @@
     import PaneLib from "@/components/Main/FloorPlanning/BaseLibs/Scene/Playground/pane.js";
     import BoxLib from "@/components/Main/FloorPlanning/BaseLibs/Scene/Playground/product.js";
     import PlanogramLib from "@/components/Main/FloorPlanning/BaseLibs/Planogram/Planogram.js";
+    import SpaceplanSelector from "@/components/Common/SpacePlanSelector"
+    import * as BABYLON from '@babylonjs/core/Legacy/legacy';
+
     export default {
+        components: {
+            SpaceplanSelector
+        },
         data() {
             return {
                 drawer: true,
@@ -88,7 +111,21 @@
             addPane() {
                 let self = this;
                 self.paneObj = new PaneLib(self.sceneObj);
-                self.paneObj.addPane(100, 100, 1);
+                self.paneObj.addPane(33, 33, 1);
+            },
+            addBox() {
+                let self = this;
+
+                var myMaterial = new BABYLON.StandardMaterial("myMaterial", self.sceneObj.scene);
+                var myBox = BABYLON.MeshBuilder.CreateBox("myBox", {
+                    height: 5,
+                    width: 5,
+                    depth: 5
+                }, self.sceneObj.scene);
+                myBox.position.x = 0;
+                myBox.position.y = 5/2;
+                myBox.position.z = 0;
+                myBox.material = myMaterial;
             },
             addBoxes() {
                 let self = this;
@@ -98,7 +135,15 @@
             addPlanogram() {
                 let self = this;
                 let planoObj = new PlanogramLib(self.sceneObj);
-                planoObj.addPlanogram();
+
+                self.$refs.SpaceplanSelector.show((id, selectedPlanogram) => {
+                    planoObj.addPlanogram(id);
+                })
+            },
+            addComplexPlanogram() {
+                let self = this;
+                let planoObj = new PlanogramLib(self.sceneObj);
+                planoObj.addComplexPlanogram();
             },
             //#region Events
             onPointerDown(evt) {
@@ -108,9 +153,10 @@
                 }
 
                 // check if we are under a mesh
-                var pickInfo = self.sceneObj.scene.pick(self.sceneObj.scene.pointerX, self.sceneObj.scene.pointerY, function (mesh) {
-                    return mesh.id !== "ground";
-                });
+                var pickInfo = self.sceneObj.scene.pick(self.sceneObj.scene.pointerX, self.sceneObj.scene.pointerY,
+                    function (mesh) {
+                        return mesh.id !== "ground";
+                    });
                 if (pickInfo.hit) {
                     self.currentMesh = pickInfo.pickedMesh;
                     self.startingPoint = self.getGroundPosition(evt);
@@ -148,12 +194,13 @@
 
                 self.startingPoint = current;
             },
-            getGroundPosition () {
+            getGroundPosition() {
                 let self = this;
                 // Use a predicate to get position on the ground
-                var pickinfo = self.sceneObj.scene.pick(self.sceneObj.scene.pointerX, self.sceneObj.scene.pointerY, function (mesh) {
-                    return mesh.id == "ground";
-                });
+                var pickinfo = self.sceneObj.scene.pick(self.sceneObj.scene.pointerX, self.sceneObj.scene.pointerY,
+                    function (mesh) {
+                        return mesh.id == "ground";
+                    });
                 if (pickinfo.hit) {
                     return pickinfo.pickedPoint;
                 }

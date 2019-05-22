@@ -5,38 +5,113 @@ class Planogram {
         this.world = world;
         this.data = null;
         this.fullSegment = null;
+        this.TotalSegments = 0;
     }
 
     addPlanogram(id) {
         let self = this;
 
-        let url = localStorage.ServerAddress + "SystemFile/JSON?db=CR-Devinspire&id=313";
+        // let url = localStorage.ServerAddress + "SystemFile/JSON?db=CR-Devinspire&id=423";
+        let url = localStorage.ServerAddress + `SystemFile/JSON?db=CR-Devinspire&id=${id}`;
+        // let url = localStorage.ServerAddress + "SystemFile/JSON?db=CR-Devinspire&id=313";
         axios.get(url)
-        .then(result=> {
-            self.data = result.data;
-            self.appendToWorld();
-        })
+            .then(result => {
+                self.data = result.data;
+                self.appendToWorld();
+            })
     }
 
     appendToWorld() {
         let self = this;
-        let totalWidth = self.data.dimensionData.width;
-        let totalHeight = self.data.dimensionData.height;
-        
+        let dimension = self.getDimensions();
+
+        console.log("dimensions", dimension)
+
         var myMaterial = new BABYLON.StandardMaterial("myMaterial", this.world.scene);
 
         myMaterial.diffuseTexture = new BABYLON.Texture(self.data.image, this.world.scene);
-        myMaterial.diffuseColor = new BABYLON.Color3(0.4, 0.4, 0.4);
+        // myMaterial.diffuseColor = new BABYLON.Color3(0.4, 0.4, 0.4);
         myMaterial.diffuseTexture.hasAlpha = true;
-        myMaterial.backFaceCulling = true;
+        // myMaterial.backFaceCulling = true;
         myMaterial.diffuseTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
 
-        var myBox = BABYLON.MeshBuilder.CreateBox("myBox", {height: totalHeight, width: totalWidth, depth: 0.48}, self.world.scene);
-        myBox.position.y = 1;
+        var columns = 1; // 6 columns
+        var rows = 1; // 1 row
+
+        //alien sprite
+        var faceUV = new Array(1);
+        faceUV[1] = new BABYLON.Vector4(1 / columns, 0, (1 + 1) / columns, 1 / rows);
+        //set all faces to same
+        // for (var i = 0; i < 6; i++) {
+        // }
+        //wrap set
+        var options = {
+            faceUV: faceUV,
+            height: dimension.height,
+            width: dimension.width,
+            depth: dimension.depth,
+            wrap: true
+        };
+
+        var myBox = BABYLON.MeshBuilder.CreateBox("myBox", options, self.world.scene);
+        myBox.position.y = dimension.height / 2; // totalHeight == 0 ? 1 : totalHeight;
         myBox.material = myMaterial;
         myBox.checkCollisions = true;
 
-        console.log("[PLANOGRAM]", "LOADED")
+        // var gizmoManager = new BABYLON.GizmoManager(self.world.scene);
+        // gizmoManager.positionGizmoEnabled = true;
+        // gizmoManager.rotationGizmoEnabled = true;
+        // gizmoManager.scaleGizmoEnabled = true;
+        // gizmoManager.boundingBoxGizmoEnabled = true;
+        // gizmoManager.usePointerToAttachGizmos = true;
+        // gizmoManager.attachToMesh(myBox);
+
+    }
+
+    getDimensions() {
+        let self = this;
+        let retVal = {
+            width: 0,
+            height: 0,
+            depth: 0
+        }
+
+        let allGondolas = self.data.planogramData.filter((el) => el.Type == "GONDOLA");
+
+        // width
+
+        allGondolas.forEach(element => {
+            retVal.width += parseFloat(element.Data.Data.width) / 100;
+        });
+
+
+        // height
+        let lastHeight = 0.0;
+        allGondolas.forEach(element => {
+            if (element.Data.Data.height > lastHeight) {
+                lastHeight = parseFloat(element.Data.Data.height);
+            }
+
+            retVal.height = lastHeight / 100;
+        });
+
+
+        // depth
+        allGondolas.forEach(element => {
+            let lastDepth = 0.0;
+            if (element.Data.Data.depth > lastDepth) {
+                lastDepth = parseFloat(element.Data.Data.depth);
+            }
+
+            retVal.depth = lastDepth / 100;
+        });
+
+        console.log("BEFORE", retVal)
+        retVal.width = parseFloat(retVal.width);
+        retVal.height = parseFloat(retVal.height) * 1.5;
+        retVal.depth = parseFloat(retVal.depth);
+
+        return retVal;
     }
 }
 
