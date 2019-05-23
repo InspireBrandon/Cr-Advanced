@@ -244,6 +244,7 @@
         <AssignTask ref="assignTask" />
         <SubtaskModal ref="SubtaskModal" />
         <SpacePlanSelector ref="SpacePlanSelector"></SpacePlanSelector>
+        <RangeSelectorModal ref="RangeSelectorModal"></RangeSelectorModal>
         <UserNotesModal ref="UserNotesModal"></UserNotesModal>
         <NotesModal ref="NotesModal"></NotesModal>
     </v-container>
@@ -262,6 +263,7 @@
     import AssignTask from '@/components/Common/AssignTask'
     import SubtaskModal from './Subtask.vue'
     import SpacePlanSelector from '@/components/Common/SpacePlanSelector.vue'
+    import RangeSelectorModal from '@/components/Common/RangeSelectorModal.vue'
     import UserNotesModal from '@/components/Common/UserNotesModal.vue'
     import NotesModal from '@/components/Common/NotesModal.vue'
 
@@ -273,6 +275,7 @@
             AssignTask,
             SubtaskModal,
             SpacePlanSelector,
+            RangeSelectorModal,
             UserNotesModal,
             NotesModal
         },
@@ -443,7 +446,7 @@
                                     secondProcessAssigned => {
                                         // Create actual transaction
                                         request.status = returnStartStatusByType(request.type);
-                                            request.notes = self.findAndReplaceNote(request.notes);
+                                        request.notes = self.findAndReplaceNote(request.notes);
                                         self.createProjectTransaction(request,
                                             actualTransaction => {
 
@@ -489,7 +492,7 @@
                                     // Create actual transaction
                                     request.status = returnStartStatusByType(
                                         request.type);
-                                        request.notes = self.findAndReplaceNote(request.notes);
+                                    request.notes = self.findAndReplaceNote(request.notes);
                                     self.createProjectTransaction(request,
                                         actualTransaction => {})
                                 })
@@ -612,8 +615,11 @@
                 let newItem = JSON.parse(JSON.stringify(item))
 
                 self.$refs.SpacePlanSelector.show(spacePlanID => {
-                    newItem.systemFileID = spacePlanID;
-                    self.setComplete(newItem);
+                    self.$refs.RangeSelectorModal.show(rangePlanID => {
+                        newItem.systemFileID = spacePlanID;
+                        newItem.rangeFileID = rangePlanID;
+                        self.setComplete(newItem);
+                    })
                 })
             },
             submitForApproval(item) {
@@ -642,7 +648,8 @@
                             self.createProjectTransaction(request, processStartProjectTX => {
                                 // Create Requesting Approval process for "New Group"
                                 request.status = 10;
-                                request.notes = self.findAndReplaceNote(modalData.notes);
+                                request.notes = self.findAndReplaceNote(modalData
+                                .notes);
                                 self.createProjectTransaction(request,
                                     approvalTransaction => {
                                         self.$parent.$parent.getTaskViewData();
@@ -678,7 +685,8 @@
                             self.createProjectTransaction(request, processStartProjectTX => {
                                 // Create Requesting Approval process for "New Group"
                                 request.status = 19;
-                                request.notes = self.findAndReplaceNote(modalData.notes);
+                                request.notes = self.findAndReplaceNote(modalData
+                                .notes);
                                 self.createProjectTransaction(request,
                                     approvalTransaction => {
                                         self.$parent.$parent.getTaskViewData();
