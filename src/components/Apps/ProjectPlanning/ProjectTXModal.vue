@@ -202,14 +202,12 @@
                 let self = this
                 Axios.get(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire&folder=Ranging")
                     .then(r => {
-                        console.log(r);
                         r.data.forEach(e => {
                             self.rangeData.push({
                                 text: e.name,
                                 value: e.id
                             })
                         })
-                        // self.rangeData = r.data;
                     })
             },
             getTypeList() {
