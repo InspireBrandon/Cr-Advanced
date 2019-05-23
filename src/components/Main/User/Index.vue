@@ -22,15 +22,23 @@
                                         <v-form>
                                             <v-layout row wrap>
                                                 <v-flex md6>
-                                                    <v-text-field label="First Name" v-model="profile.firstname"></v-text-field>
+                                                    <v-text-field label="First Name" v-model="profile.firstname">
+                                                    </v-text-field>
                                                 </v-flex>
                                                 <v-flex md6>
-                                                    <v-text-field label="Last Name" v-model="profile.lastname"></v-text-field>
+                                                    <v-text-field label="Last Name" v-model="profile.lastname">
+                                                    </v-text-field>
                                                 </v-flex>
                                                 <v-flex md6>
-                                                    <v-text-field label="Email Address" v-model="profile.emailAddress"></v-text-field>
+                                                    <v-text-field label="Email Address" v-model="profile.emailAddress">
+                                                    </v-text-field>
                                                 </v-flex>
-                                                <input @change="onImageChange" type="file" style="display: none;" ref="fileInput">
+                                                <v-flex lg6 md6 sm12 xs12>
+                                                    <v-checkbox v-model="profile.allowEmails"
+                                                        label="Allow E-mail Notifications"></v-checkbox>
+                                                </v-flex>
+                                                <input @change="onImageChange" type="file" style="display: none;"
+                                                    ref="fileInput">
                                             </v-layout>
                                         </v-form>
                                     </v-card-text>
@@ -96,6 +104,7 @@
                     systemUserID: self.profile.systemUserID,
                     systemUserUID: self.profile.systemUserUID,
                     accountID: self.profile.accountID,
+                   allowEmails:self.profile.allowEmails,
                     firstname: self.profile.firstname,
                     lastname: self.profile.lastname,
                     emailAddress: self.profile.emailAddress,
@@ -119,7 +128,7 @@
                     .then(r => {
                         self.profile = r.data;
                         if (r.data.image != null && r.data.image != undefined && r.data.image != '') {
-                            self.displayImage = 'data:image/png;base64,' + r.data.image; 
+                            self.displayImage = 'data:image/png;base64,' + r.data.image;
                         }
                         self.showLoader = false;
                     })
