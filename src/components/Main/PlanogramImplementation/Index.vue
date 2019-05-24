@@ -122,6 +122,27 @@
                         </v-card-text>
                     </v-card>
                 </v-flex>
+                <v-flex xl7 lg7 md7 sm12 xs12>
+                    <v-toolbar flat color="primary" dark dense>
+                        <v-toolbar-title>
+                            Store Plannograms
+                        </v-toolbar-title>
+                    </v-toolbar>
+                    <v-data-table :headers="headers" :items="currentStorePlanograms" class="elevation-1">
+                        <template v-slot:items="props">
+                            <tr>
+                                <td>{{props.item.storeName}}</td>
+                                <td>{{props.item.planogramName}}</td>
+                                <td>{{props.item.implemented==0 ? false : true}}</td>
+                                <td>
+                                    <v-btn color="primary" @click="ChangeSpacePlan">Change</v-btn>
+                                    <v-btn color="primary" @click="orderVariation">Variation</v-btn>
+                                </td>
+                            </tr>
+                        </template>
+                    </v-data-table>
+                </v-flex>
+                <v-flex xl5 lg5 md5 sm12 xs12></v-flex>
             </v-layout>
         </v-container>
         <v-dialog fullscreen v-model="imageModal">
@@ -146,6 +167,7 @@
         <AssignTask ref="assignTask"></AssignTask>
         <YesNoModal ref="yesNoModal"></YesNoModal>
         <NotesModal ref="notesModal"></NotesModal>
+        <SpacePlanSelector ref="SpacePlanSelector" />
     </v-card>
 </template>
 
@@ -159,11 +181,14 @@
     import AssignTask from '@/components/Common/AssignTask'
     import YesNoModal from '@/components/Common/YesNoModal'
     import NotesModal from '@/components/Common/NotesModal'
+    import SpacePlanSelector from '@/components/Common/SpacePlanSelector'
+
 
     let _MODULE = "Planogram Implementation";
 
     export default {
         components: {
+            SpacePlanSelector,
             PlanogramReportModal,
             PlanogramIplementationModal,
             AssignTask,
@@ -172,6 +197,15 @@
         },
         data: () => {
             return {
+                currentStorePlanograms: [{
+                    storeName: "Store A",
+                    planogramName: "PlanoNAme",
+                    implemented: 0,
+                }, {
+                    storeName: "Store B",
+                    planogramName: "PlanoNAme 2 ",
+                    implemented: 1,
+                }],
                 planogramObj: null,
                 showLoader: false,
                 imageModal: false,
@@ -199,7 +233,20 @@
                 routeProjectID: null,
                 routePlanogramID: null,
                 routeStatus: null,
-                tmpRequest: null
+                tmpRequest: null,
+                headers: [{
+                    text: "Store",
+                    sortable: false
+                }, {
+                    text: "Planogram",
+                    sortable: false
+                }, {
+                    text: "Implemented",
+                    sortable: false
+                }, {
+                    text: "Options",
+                    sortable: false
+                }],
             }
         },
         mounted() {
@@ -234,6 +281,18 @@
             }
         },
         methods: {
+            ChangeSpacePlan() {
+                let self = this
+                self.$refs.SpacePlanSelector.show(data => {
+
+                })
+            },
+            orderVariation() {
+                let self = this
+                self.$refs.assignTask.show(data=>{
+
+                })
+            },
             getTypeList() {
                 let self = this
                 let statushandler = new StatusHandler()
