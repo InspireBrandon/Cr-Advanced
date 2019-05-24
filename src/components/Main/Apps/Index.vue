@@ -185,18 +185,11 @@
             handleBuyer(app) {
                 switch (app.system_code) {
                     case "RANGE-PLANNING": {
-                        app["demo"] = false;
+                        app["demo"] = true;
                     }
                     break;
                 case "SPACE-PLANNING": {
-                    app.config.routes = [{
-                        "route": "/PlanogramImplementation",
-                        "routeName": "plannogram_implementation",
-                        "title": "Planogram Implementation",
-                        "openInNewWindow": false
-                    }];
-
-                    app["demo"] = false;
+                    app["demo"] = true;
                 }
                 break;
                 case "PRODUCT-MAINTENANCE": {
@@ -230,14 +223,7 @@
                     }
                     break;
                 case "SPACE-PLANNING": {
-                    app.config.routes = [{
-                        "route": "/PlanogramImplementation",
-                        "routeName": "plannogram_implementation",
-                        "title": "Planogram Implementation",
-                        "openInNewWindow": false
-                    }];
-
-                    app["demo"] = false;
+                    app["demo"] = true;
                 }
                 break;
                 case "PRODUCT-MAINTENANCE": {
@@ -271,14 +257,7 @@
                     }
                     break;
                 case "SPACE-PLANNING": {
-                    app.config.routes = [{
-                        "route": "/PlanogramImplementation",
-                        "routeName": "plannogram_implementation",
-                        "title": "Planogram Implementation",
-                        "openInNewWindow": false
-                    }];
-
-                    app["demo"] = false;
+                    app["demo"] = true;
                 }
                 break;
                 case "PRODUCT-MAINTENANCE": {
