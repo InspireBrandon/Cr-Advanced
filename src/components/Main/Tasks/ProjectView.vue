@@ -68,6 +68,9 @@
                                                 <v-list-tile @click="assignNotNew(props.item)">
                                                     <span>Assign</span>
                                                 </v-list-tile>
+                                                <v-list-tile @click="startSubtask(props.item)">
+                                                    <span>New subtask</span>
+                                                </v-list-tile>
                                             </v-list>
                                         </v-menu>
                                     </td>
@@ -79,6 +82,7 @@
             </v-flex>
         </v-layout>
         <AssignTask ref="assignTask" />
+        <SubtaskModal ref="SubtaskModal" />
     </v-container>
 </template>
 
@@ -92,12 +96,15 @@
 
     // Components
     import AssignTask from '@/components/Common/AssignTask'
+    import SubtaskModal from './Subtask.vue'
 
     export default {
         name: 'ProjectView',
         props: ['data', 'typeList', 'statusList', 'accessType'],
         components: {
             AssignTask,
+            SubtaskModal,
+
         },
         data() {
             return {
@@ -166,6 +173,35 @@
             }
         },
         methods: {
+             startSubtask(item) {
+                let self = this;
+
+                let request = JSON.parse(JSON.stringify(item));
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+
+                let projectTXGroupRequest = {
+                    projectID: item.project_ID
+                }
+
+                self.$refs.SubtaskModal.show("Start new subtask", subtaskDetails => {
+                    // Create new transaction group
+                    self.createProjectTransactionGroup(projectTXGroupRequest, newGroupTX => {
+                        request.type = 6;
+                        request.status = subtaskDetails.status;
+                        request.systemUserID = subtaskDetails.systemUserID;
+                        request.actionedByUserID = null;
+                        request.notes = self.findAndReplaceNote(subtaskDetails.notes);
+                        request.rollingUserID = systemUserID;
+                        request.projectTXGroup_ID = newGroupTX.id;
+                        // Set request dependant on subtask
+                        // Create transaction
+                        self.createProjectTransaction(request, subtaskTransaction => {
+                            self.$parent.$parent.getTaskViewData();
+                        })
+                    })
+                })
+            },
             createProjectTransactionGroup(request, callback) {
                 let self = this;
 
@@ -185,6 +221,39 @@
                     delete Axios.defaults.headers.common["TenantID"];
                     callback(r.data.projectTX)
                 })
+            },
+            getUsernameByUserID(userID) {
+                let self = this;
+
+                let userName = "";
+
+                self.users.forEach(user => {
+                    if (user.systemUserID == userID) {
+                        userName = user.firstname + " " + user.lastname;
+                    }
+                })
+
+                return userName;
+            },
+            findAndReplaceNote(note) {
+                let self = this;
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+                let userName = self.getUsernameByUserID(systemUserID);
+                let newNote = "";
+
+                if (note != undefined && note != null) {
+                    let noteARR = note.split(/-(.+)/);
+                    if (noteARR.length > 1) {
+                        newNote = userName + " - " + noteARR[1]
+                    } else {
+                        newNote = userName + " - " + noteARR[0]
+                    }
+                } else {
+                    newNote = userName + " - ";
+                }
+
+                return newNote;
             },
             routeToView(item) {
                 let self = this;
