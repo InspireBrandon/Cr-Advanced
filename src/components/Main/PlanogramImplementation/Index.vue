@@ -106,6 +106,10 @@
                                                 {{ item.storeCluster }}</span>
                                             <span v-if="item.store != null" style="margin-left: 5px;"> -
                                                 {{ item.store }}</span>
+                                            <span v-if="item.user!=null" style="margin-left: 5px;"> -
+                                                {{ item.user }}</span>
+                                            <span v-if="item.actionedByUserName!=null" style="margin-left: 5px;"> -
+                                                {{ item.actionedByUserName }}</span>
                                             <v-spacer></v-spacer>
                                             <span>{{ item.date }}</span>
                                         </v-card-title>
@@ -695,6 +699,7 @@
                                             storeCluster: element.storeCluster,
                                             categoryCluster_ID: element.categoryCluster_ID,
                                             actionedByUserID: element.actionedByUserID,
+                                            actionedByUserName: element.actionedByUserName,
                                             projectOwnerID: element.projectOwnerID,
                                             systemFileID: element.systemFileID
 
@@ -713,7 +718,9 @@
                                             storeCluster_ID: element.storeCluster_ID,
                                             storeCluster: element.storeCluster,
                                             categoryCluster_ID: element.categoryCluster_ID,
-                                            actionedByUserID: element.actionedByUserID
+                                            actionedByUserID: element.actionedByUserID,
+                                            actionedByUserName: element.actionedByUserName,
+
                                         })
                                     }
                                 }
