@@ -18,6 +18,7 @@ import Notifications from '@/components/Main/Notifications/Index.vue'
 import RangePlanning from '@/components/Apps/RangePlanning/Index.vue'
 //import SpacePlanning from '@/components/Main/Planogram/spaceplanning/src/views/Main.vue'
 import Fixtures from '@/components/Apps/SpacePlanning/Fixtures/Index.vue'
+import Yeet from '@/components/Main/Yeet.vue'
 
 //Product maintainence
 import DataPreparation from '@/components/Main/DataPreparation';
@@ -106,7 +107,12 @@ export default new Router({
       path: '/Menu',
       name: 'main',
       component: Main,
-      children: [{
+      children: [
+        {
+          path: '/Yeet',
+          name: 'Yeet',
+          component: Yeet
+        },{
           path: '/Home',
           name: 'home',
           component: Home
