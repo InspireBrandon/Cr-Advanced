@@ -41,48 +41,53 @@
 
                             <v-tabs v-show="!overview" v-model="active" grow dark slider-color="primary">
                                 <v-tab ripple v-for="(tab, idx) in tabs" :key="idx">{{ tab }}</v-tab>
-                                <!-- Hierachy -->
+                                <!-- Standard -->
                                 <v-tab-item>
                                     <v-card flat>
-                                        <Hierachy :copy="copy" :remove="remove" :duplicate="duplicate" :items="items"
-                                            ref="Hierachy">
-                                        </Hierachy>
+                                        <Standard :canPaste="canPaste" :copy="copy" :paste="paste" :remove="remove"
+                                            :duplicate="duplicate" :items="items" ref="Standard">
+                                        </Standard>
                                     </v-card>
                                 </v-tab-item>
                                 <!-- Vendor -->
                                 <v-tab-item>
                                     <v-card flat>
-                                        <Vendor :copy="copy" :remove="remove" :duplicate="duplicate" :items="items"
-                                            ref="Vendor">
+                                        <Vendor :canPaste="canPaste" :copy="copy" :paste="paste" :remove="remove"
+                                            :duplicate="duplicate" :items="items" ref="Vendor">
                                         </Vendor>
+                                    </v-card>
+                                </v-tab-item>
+                                <!-- Hierachy -->
+                                <v-tab-item>
+                                    <v-card flat>
+                                        <Hierachy :canPaste="canPaste" :copy="copy" :paste="paste"
+                                            :remove="remove" :duplicate="duplicate" :items="items"
+                                            ref="Hierachy">
+                                        </Hierachy>
+                                    </v-card>
+                                </v-tab-item>
+                                <!-- Item Status -->
+                                <v-tab-item>
+                                    <v-card flat>
+                                        <ItemStatus :canPaste="canPaste" :copy="copy" :paste="paste" :remove="remove"
+                                            :duplicate="duplicate" :items="items" ref="ItemStatus">
+                                        </ItemStatus>
                                     </v-card>
                                 </v-tab-item>
                                 <!-- Images -->
                                 <v-tab-item>
                                     <v-card flat>
-                                        <ImagesAndDimensions :copy="copy" :remove="remove" :duplicate="duplicate"
-                                            :items="items" ref="ImagesAndDimensions">
+                                        <ImagesAndDimensions :canPaste="canPaste" :copy="copy" :paste="paste"
+                                            :remove="remove" :duplicate="duplicate" :items="items"
+                                            ref="ImagesAndDimensions">
                                         </ImagesAndDimensions>
                                     </v-card>
                                 </v-tab-item>
-                                <!-- Costing -->
+                                <!-- Supporting Documents -->
                                 <v-tab-item>
                                     <v-card flat>
-                                        <CostingSheet :copy="copy" :remove="remove" :duplicate="duplicate"
-                                            :items="items" ref="CostingSheet">
-                                        </CostingSheet>
-                                    </v-card>
-                                </v-tab-item>
-                                <!-- Listing -->
-                                <v-tab-item>
-                                    <v-card flat>
-                                    </v-card>
-                                </v-tab-item>
-                                <!-- Agreements -->
-                                <v-tab-item>
-                                    <v-card flat>
-                                        <Agreements :canPaste="canPaste" :copy="copy" :paste="paste" :remove="remove" :duplicate="duplicate" :items="items"
-                                            ref="Agreements">
+                                        <Agreements :canPaste="canPaste" :copy="copy" :paste="paste" :remove="remove"
+                                            :duplicate="duplicate" :items="items" ref="Agreements">
                                         </Agreements>
                                     </v-card>
                                 </v-tab-item>
@@ -91,6 +96,17 @@
                                     <v-card flat>
                                     </v-card>
                                 </v-tab-item>
+                                <!-- Stock Control -->
+                                <v-tab-item>
+                                    <v-card flat>
+                                    </v-card>
+                                </v-tab-item>
+                                <!-- Price And Margin -->
+                                <v-tab-item>
+                                    <v-card flat>
+                                    </v-card>
+                                </v-tab-item>
+                                <!-- Opening Orders -->
                             </v-tabs>
 
                             <v-card flat v-show="overview">
@@ -165,27 +181,33 @@
 </template>
 
 <script>
-    import Hierachy from '@/components/Apps/RangePlanning/ProductListing/Sections/Hierachy'
+    import Standard from '@/components/Apps/RangePlanning/ProductListing/Sections/Standard'
     import Vendor from '@/components/Apps/RangePlanning/ProductListing/Sections/Vendor'
+    import Hierachy from '@/components/Apps/RangePlanning/ProductListing/Sections/Hierachy'
+    import ItemStatus from '@/components/Apps/RangePlanning/ProductListing/Sections/ItemStatus'
     import ImagesAndDimensions from '@/components/Apps/RangePlanning/ProductListing/Sections/ImagesAndDimensions/Index'
     import CostingSheet from '@/components/Apps/RangePlanning/ProductListing/Sections/CostingSheet'
     // TODO ADD LISTING
     import Agreements from '@/components/Apps/RangePlanning/ProductListing/Sections/Agreements'
 
-    const tabs = ['Hierachy', 'Vendor', 'Images', 'Costing', 'Listing', 'Agreements', 'Resouces'];
+    const tabs = ['Standard', 'Vendor', 'Hierachy', 'Item Status', 'Images', 'Supporting Documents', 'Resources',
+        'Stock Control', 'Price and Margin', 'Opening Orders'
+    ];
 
     export default {
         name: 'product-listing',
         components: {
-            Hierachy,
+            Standard,
             Vendor,
+            Hierachy,
+            ItemStatus,
             ImagesAndDimensions,
             CostingSheet,
             Agreements
         },
         data() {
             return {
-                dialog: false,
+                dialog: true,
                 tabs: tabs,
                 active: null,
                 items: [],
@@ -217,7 +239,8 @@
                     threeDimensionalImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
                     frontImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
                     sideImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
-                    topImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png'
+                    topImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
+                    taxCode: "VE"
                 })
             },
             openFile() {
@@ -255,7 +278,8 @@
                         sideImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
                         topImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
                         consignmentOrFixed: "Consignment",
-                        replacementOrNewProduct: "New Product"
+                        replacementOrNewProduct: "New Product",
+                        taxCode: "VE"
                     })
                 }
             },
@@ -269,7 +293,7 @@
             },
             remove(item) {
                 let self = this;
-                self.items.splice(self.items.indexOf(item));
+                self.items.splice(self.items.indexOf(item), 1);
             },
             copy(item) {
                 let self = this;
@@ -279,8 +303,8 @@
             paste(item) {
                 let self = this;
 
-                for(var prop in self.clipBoardItem) {
-                    if(prop != "index") {
+                for (var prop in self.clipBoardItem) {
+                    if (prop != "index") {
                         item[prop] = self.clipBoardItem[prop];
                     }
                 }
@@ -295,6 +319,7 @@
             },
             save() {
                 let self = this;
+                console.log(self.items)
             }
         }
     }

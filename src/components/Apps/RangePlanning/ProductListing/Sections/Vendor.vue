@@ -23,17 +23,17 @@
                             <v-icon>more_vert</v-icon>
                         </v-btn>
                         <v-list light dense>
-                            <v-list-tile>
-                                <v-list-tile-title>New Line</v-list-tile-title>
+                            <v-list-tile @click="duplicateLine(props.item)">
+                                <v-list-tile-title>Duplicate Line</v-list-tile-title>
                             </v-list-tile>
-                            <v-list-tile>
-                                <v-list-tile-title>Open</v-list-tile-title>
+                            <v-list-tile @click="copy(props.item)">
+                                <v-list-tile-title>Copy</v-list-tile-title>
                             </v-list-tile>
-                            <v-list-tile>
-                                <v-list-tile-title>Save</v-list-tile-title>
+                            <v-list-tile :disabled="canPaste" @click="paste(props.item)">
+                                <v-list-tile-title>Paste</v-list-tile-title>
                             </v-list-tile>
-                            <v-list-tile>
-                                <v-list-tile-title>Close</v-list-tile-title>
+                            <v-list-tile @click="removeLine(props.item)">
+                                <v-list-tile-title>Remove Line</v-list-tile-title>
                             </v-list-tile>
                         </v-list>
                     </v-menu>
@@ -83,7 +83,7 @@
 
     export default {
         name: 'hierachy',
-        props: ['items'],
+        props: ['items', 'duplicate', 'remove', 'copy', 'canPaste', 'paste'],
         data() {
             return {
                 headers: headers

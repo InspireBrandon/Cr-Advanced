@@ -10,46 +10,46 @@
                     </v-text-field>
                 </td>
                 <td class="pa-0">
-                    <v-text-field v-model="props.item.markupPercent" dense full-width flat solo hide-details
-                        class="mt-0">
-                    </v-text-field>
-                </td>
-                <td class="pa-0">
-                    <v-text-field v-model="props.item.rSPExclusive" dense full-width flat solo hide-details
-                        class="mt-0">
-                    </v-text-field>
-                </td>
-                <td class="pa-0">
-                    <v-text-field v-model="props.item.rSPInclusive" dense full-width flat solo hide-details
-                        class="mt-0">
-                    </v-text-field>
-                </td>
-                <td class="pa-0">
-                    <v-text-field v-model="props.item.roundedSellingPrice" dense full-width flat solo hide-details
-                        class="mt-0">
-                    </v-text-field>
-                </td>
-                <td class="pa-0">
-                    <v-text-field v-model="props.item.grossProfitPercentage" dense full-width flat solo hide-details
-                        class="mt-0">
-                    </v-text-field>
-                </td>
-                <td class="pa-0">
-                    <v-text-field v-model="props.item.grossProfitPercentageForCategory" dense full-width flat solo
+                    <v-text-field v-model="props.item.markupPercent" dense full-width flat solo
                         hide-details class="mt-0">
                     </v-text-field>
                 </td>
                 <td class="pa-0">
-                    <v-text-field v-model="props.item.discountPercentageAllowed" dense full-width flat solo hide-details
+                    <v-text-field v-model="props.item.rSPExclusive" dense full-width flat solo
+                        hide-details class="mt-0">
+                    </v-text-field>
+                </td>
+                <td class="pa-0">
+                    <v-text-field v-model="props.item.rSPInclusive" dense full-width flat solo
+                        hide-details class="mt-0">
+                    </v-text-field>
+                </td>
+                <td class="pa-0">
+                    <v-text-field v-model="props.item.roundedSellingPrice" dense full-width flat solo
+                        hide-details class="mt-0">
+                    </v-text-field>
+                </td>
+                <td class="pa-0">
+                    <v-text-field v-model="props.item.grossProfitPercentage" dense full-width flat solo
+                        hide-details class="mt-0">
+                    </v-text-field>
+                </td>
+                <td class="pa-0">
+                    <v-text-field v-model="props.item.grossProfitPercentageForCategory" dense full-width
+                        flat solo hide-details class="mt-0">
+                    </v-text-field>
+                </td>
+                <td class="pa-0">
+                    <v-text-field v-model="props.item.discountPercentageAllowed" dense full-width flat
+                        solo hide-details class="mt-0">
+                    </v-text-field>
+                </td>
+                <td class="clickable" @dblclick="changeTaxCode(props.item)">
+                    <span>{{ props.item.taxCode }}</span>
+                </td>
+                <td class="pa-0">
+                    <v-text-field v-model="props.item.taxClass" dense full-width flat solo hide-details
                         class="mt-0">
-                    </v-text-field>
-                </td>
-                <td class="pa-0">
-                    <v-text-field v-model="props.item.taxCode" dense full-width flat solo hide-details class="mt-0">
-                    </v-text-field>
-                </td>
-                <td class="pa-0">
-                    <v-text-field v-model="props.item.taxClass" dense full-width flat solo hide-details class="mt-0">
                     </v-text-field>
                 </td>
                 <td style="width: 5px;">
@@ -60,6 +60,12 @@
                         <v-list light dense>
                             <v-list-tile @click="duplicateLine(props.item)">
                                 <v-list-tile-title>Duplicate Line</v-list-tile-title>
+                            </v-list-tile>
+                            <v-list-tile @click="copy(props.item)">
+                                <v-list-tile-title>Copy</v-list-tile-title>
+                            </v-list-tile>
+                            <v-list-tile :disabled="canPaste" @click="paste(props.item)">
+                                <v-list-tile-title>Paste</v-list-tile-title>
                             </v-list-tile>
                             <v-list-tile @click="removeLine(props.item)">
                                 <v-list-tile-title>Remove Line</v-list-tile-title>
@@ -136,7 +142,7 @@
 
     export default {
         name: 'hierachy',
-        props: ['items', 'duplicate', 'remove'],
+        props: ['items', 'duplicate', 'remove', 'copy', 'canPaste', 'paste'],
         data() {
             return {
                 headers: headers
@@ -150,7 +156,16 @@
             removeLine(item) {
                 let self = this;
                 self.remove(item);
-            }
+            },
+            changeTaxCode(item) {
+                let self = this;
+
+                if (item.taxCode == "VE") {
+                    item.taxCode = "V0"
+                } else {
+                    item.taxCode = "VE"
+                }
+            },
         }
     }
 </script>
@@ -158,5 +173,9 @@
 <style>
     .no-hover {
         background: white !important;
+    }
+
+    .clickable {
+        cursor: pointer;
     }
 </style>

@@ -2,35 +2,32 @@
     <v-data-table hide-actions disable-initial-sort :headers="headers" :items="items">
         <template v-slot:items="props">
             <tr class="no-hover">
-                <td>{{ props.item.productSystemID }}</td>
-                <td>{{ props.item.barcode }}</td>
-                <td>{{ props.item.description }}</td>
-                <td>
-                    <v-text-field v-model="props.item.pallet_Height" dense full-width flat solo hide-details
-                        class="mt-0">
+                <td class="px-2">
+                    <v-select hide-details :items="reasonsForRequest" v-model="props.item.reasonForRequest" placeholder="Please Select"></v-select>
+                </td>
+                <td class="px-2">
+                    <v-text-field v-if="props.item.reasonForRequest != null" v-model="props.item.productSystemID" placeholder="Product System ID" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px">
                     </v-text-field>
                 </td>
-                <td>
-                    <v-text-field v-model="props.item.pallet_Width" dense full-width flat solo hide-details
-                        class="mt-0">
+                <td class="px-2">
+                    <v-text-field v-if="props.item.reasonForRequest != null" v-model="props.item.barcode" placeholder="Barcode" dense full-width flat solo
+                        hide-details class="mt-0" style="margin-top: 0px">
                     </v-text-field>
                 </td>
-                <td>
-                    <v-text-field v-model="props.item.pallet_Depth" dense full-width flat solo hide-details
-                        class="mt-0">
+                <td class="px-2">
+                    <v-text-field v-if="props.item.reasonForRequest != null" v-model="props.item.size" placeholder="Size" dense full-width flat solo hide-details
+                        class="mt-0" style="margin-top: 0px">
                     </v-text-field>
                 </td>
-                <td>
-                    <img src="http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png"
-                        alt="" style="max-height: 50px; margin-top: 5px;">
+                <td class="px-2">
+                    <v-text-field v-if="props.item.reasonForRequest != null" v-model="props.item.uom" placeholder="UOM" dense full-width flat solo hide-details
+                        class="mt-0" style="margin-top: 0px">
+                    </v-text-field>
                 </td>
-                <td>
-                    <img src="http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png"
-                        alt="" style="max-height: 50px; margin-top: 5px;">
-                </td>
-                <td>
-                    <img src="http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png"
-                        alt="" style="max-height: 50px; margin-top: 5px;">
+                <td class="px-2">
+                    <v-text-field v-if="props.item.reasonForRequest != null" v-model="props.item.sizeDescription" placeholder="Size Description" dense full-width flat
+                        solo hide-details class="mt-0" style="margin-top: 0px">
+                    </v-text-field>
                 </td>
                 <td style="width: 5px;">
                     <v-menu dark offset-y>
@@ -60,49 +57,28 @@
 
 <script>
     const headers = [{
+            text: 'Reason For Request',
+            sortable: false
+        },
+        {
             text: 'Product System ID',
-            sortable: false,
-            width: '200'
+            sortable: false
         },
         {
             text: 'Barcode',
-            sortable: false,
-            width: '150'
+            sortable: false
         },
         {
-            text: 'Description',
-            sortable: false,
-            width: '300'
+            text: 'Size',
+            sortable: false
         },
         {
-            text: 'Pallet Height',
-            sortable: false,
-            width: '100'
+            text: 'UOM',
+            sortable: false
         },
         {
-            text: 'Pallet Width',
-            sortable: false,
-            width: '100'
-        },
-        {
-            text: 'Pallet Depth',
-            sortable: false,
-            width: '100'
-        },
-        {
-            text: 'Pallet Front',
-            sortable: false,
-            width: '100'
-        },
-        {
-            text: 'Pallet Side',
-            sortable: false,
-            width: '100'
-        },
-        {
-            text: 'Pallet Top',
-            sortable: false,
-            width: '100'
+            text: 'Size Description',
+            sortable: false
         },
         {
             text: '',
@@ -115,8 +91,12 @@
         props: ['items', 'duplicate', 'remove', 'copy', 'canPaste', 'paste'],
         data() {
             return {
-                currentView: 0,
-                headers: headers
+                headers: headers,
+                reasonsForRequest: [
+                    'De-Listing',
+                    'Status Change',
+                    'New Product',
+                ]
             }
         },
         methods: {

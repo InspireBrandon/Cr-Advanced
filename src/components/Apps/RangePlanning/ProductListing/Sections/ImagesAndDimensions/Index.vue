@@ -3,11 +3,11 @@
         <v-toolbar dark dense>
             <v-btn color="primary" @click="currentView == 4? currentView = 0 : currentView++">{{ currentViewName() }}</v-btn>
         </v-toolbar>
-        <General :items="items" v-show="currentView == 0" ref="General"></General>
-        <Tray :items="items" v-show="currentView == 1" ref="Tray"></Tray>
-        <Case :items="items" v-show="currentView == 2" ref="Case"></Case>
-        <Shrink :items="items" v-show="currentView == 3" ref="Shrink"></Shrink>
-        <Pallet :items="items" v-show="currentView == 4" ref="Pallet"></Pallet>
+        <General :canPaste="canPaste" :copy="copy" :paste="paste" :items="items" :duplicate="duplicate" :remove="remove" v-show="currentView == 0" ref="General"></General>
+        <Tray :canPaste="canPaste" :copy="copy" :paste="paste" :items="items" :duplicate="duplicate" :remove="remove" v-show="currentView == 1" ref="Tray"></Tray>
+        <Case :canPaste="canPaste" :copy="copy" :paste="paste" :items="items" :duplicate="duplicate" :remove="remove" v-show="currentView == 2" ref="Case"></Case>
+        <Shrink :canPaste="canPaste" :copy="copy" :paste="paste" :items="items" :duplicate="duplicate" :remove="remove" v-show="currentView == 3" ref="Shrink"></Shrink>
+        <Pallet :canPaste="canPaste" :copy="copy" :paste="paste" :items="items" :duplicate="duplicate" :remove="remove" v-show="currentView == 4" ref="Pallet"></Pallet>
     </div>
 </template>
 

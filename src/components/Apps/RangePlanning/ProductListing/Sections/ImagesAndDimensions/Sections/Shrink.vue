@@ -6,15 +6,18 @@
                 <td>{{ props.item.barcode }}</td>
                 <td>{{ props.item.description }}</td>
                 <td>
-                    <v-text-field v-model="props.item.shrink_Height" dense full-width flat solo hide-details class="mt-0">
+                    <v-text-field v-model="props.item.shrink_Height" dense full-width flat solo hide-details
+                        class="mt-0">
                     </v-text-field>
                 </td>
                 <td>
-                    <v-text-field v-model="props.item.shrink_Width" dense full-width flat solo hide-details class="mt-0">
+                    <v-text-field v-model="props.item.shrink_Width" dense full-width flat solo hide-details
+                        class="mt-0">
                     </v-text-field>
                 </td>
                 <td>
-                    <v-text-field v-model="props.item.shrink_Depth" dense full-width flat solo hide-details class="mt-0">
+                    <v-text-field v-model="props.item.shrink_Depth" dense full-width flat solo hide-details
+                        class="mt-0">
                     </v-text-field>
                 </td>
                 <td>
@@ -37,6 +40,12 @@
                         <v-list light dense>
                             <v-list-tile @click="duplicateLine(props.item)">
                                 <v-list-tile-title>Duplicate Line</v-list-tile-title>
+                            </v-list-tile>
+                            <v-list-tile @click="copy(props.item)">
+                                <v-list-tile-title>Copy</v-list-tile-title>
+                            </v-list-tile>
+                            <v-list-tile :disabled="canPaste" @click="paste(props.item)">
+                                <v-list-tile-title>Paste</v-list-tile-title>
                             </v-list-tile>
                             <v-list-tile @click="removeLine(props.item)">
                                 <v-list-tile-title>Remove Line</v-list-tile-title>
@@ -103,7 +112,7 @@
 
     export default {
         name: 'hierachy',
-        props: ['items', 'duplicate', 'remove'],
+        props: ['items', 'duplicate', 'remove', 'copy', 'canPaste', 'paste'],
         data() {
             return {
                 currentView: 0,
