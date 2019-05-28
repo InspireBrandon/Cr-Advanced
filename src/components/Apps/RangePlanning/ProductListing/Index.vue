@@ -1,0 +1,313 @@
+<template>
+    <div>
+        <v-layout row justify-center>
+            <v-dialog fullscreen persistent v-model="dialog">
+                <v-card>
+                    <v-toolbar dark color="primary">
+                        <v-toolbar-title>New Product Listing</v-toolbar-title>
+                        <v-spacer></v-spacer>
+                        <v-btn icon @click="close">
+                            <v-icon>close</v-icon>
+                        </v-btn>
+                    </v-toolbar>
+                    <v-card-text>
+                        <div class="elevation-3">
+
+                            <v-toolbar dark dense flat>
+                                <v-toolbar-items>
+                                    <v-menu dark offset-y style="margin-bottom: 10px;">
+                                        <v-btn slot="activator" flat>
+                                            File
+                                        </v-btn>
+                                        <v-list light dense>
+                                            <v-list-tile @click="newLine">
+                                                <v-list-tile-title>New Line</v-list-tile-title>
+                                            </v-list-tile>
+                                            <v-list-tile @click="openFile">
+                                                <v-list-tile-title>Open</v-list-tile-title>
+                                            </v-list-tile>
+                                            <v-list-tile @click="save">
+                                                <v-list-tile-title>Save</v-list-tile-title>
+                                            </v-list-tile>
+                                            <v-list-tile @click="closeFile">
+                                                <v-list-tile-title>Close</v-list-tile-title>
+                                            </v-list-tile>
+                                        </v-list>
+                                    </v-menu>
+                                </v-toolbar-items>
+                                <v-btn color="primary" @click="overview = !overview">
+                                    {{ overview == false? 'Report' : 'Sections' }}</v-btn>
+                            </v-toolbar>
+
+                            <v-tabs v-show="!overview" v-model="active" grow dark slider-color="primary">
+                                <v-tab ripple v-for="(tab, idx) in tabs" :key="idx">{{ tab }}</v-tab>
+                                <!-- Hierachy -->
+                                <v-tab-item>
+                                    <v-card flat>
+                                        <Hierachy :copy="copy" :remove="remove" :duplicate="duplicate" :items="items"
+                                            ref="Hierachy">
+                                        </Hierachy>
+                                    </v-card>
+                                </v-tab-item>
+                                <!-- Vendor -->
+                                <v-tab-item>
+                                    <v-card flat>
+                                        <Vendor :copy="copy" :remove="remove" :duplicate="duplicate" :items="items"
+                                            ref="Vendor">
+                                        </Vendor>
+                                    </v-card>
+                                </v-tab-item>
+                                <!-- Images -->
+                                <v-tab-item>
+                                    <v-card flat>
+                                        <ImagesAndDimensions :copy="copy" :remove="remove" :duplicate="duplicate"
+                                            :items="items" ref="ImagesAndDimensions">
+                                        </ImagesAndDimensions>
+                                    </v-card>
+                                </v-tab-item>
+                                <!-- Costing -->
+                                <v-tab-item>
+                                    <v-card flat>
+                                        <CostingSheet :copy="copy" :remove="remove" :duplicate="duplicate"
+                                            :items="items" ref="CostingSheet">
+                                        </CostingSheet>
+                                    </v-card>
+                                </v-tab-item>
+                                <!-- Listing -->
+                                <v-tab-item>
+                                    <v-card flat>
+                                    </v-card>
+                                </v-tab-item>
+                                <!-- Agreements -->
+                                <v-tab-item>
+                                    <v-card flat>
+                                        <Agreements :canPaste="canPaste" :copy="copy" :paste="paste" :remove="remove" :duplicate="duplicate" :items="items"
+                                            ref="Agreements">
+                                        </Agreements>
+                                    </v-card>
+                                </v-tab-item>
+                                <!-- Resources -->
+                                <v-tab-item>
+                                    <v-card flat>
+                                    </v-card>
+                                </v-tab-item>
+                            </v-tabs>
+
+                            <v-card flat v-show="overview">
+                                <table style="width: calc(100vw - 32px); overflow-x: scroll">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align: left;">Product System ID</th>
+                                            <th style="text-align: left;">Product Code</th>
+                                            <th style="text-align: left;">Barcode</th>
+                                            <th style="text-align: left;">Description</th>
+                                            <th style="text-align: left;">Vendor No.</th>
+                                            <th style="text-align: left;">Vendor Name</th>
+                                            <th style="text-align: left;">Vendor Description</th>
+                                            <th style="text-align: left;">Brand</th>
+                                            <th style="text-align: left;">Height</th>
+                                            <th style="text-align: left;">Width</th>
+                                            <th style="text-align: left;">Depth</th>
+                                            <th style="text-align: left;">Tray Height</th>
+                                            <th style="text-align: left;">Tray Width</th>
+                                            <th style="text-align: left;">Tray Depth</th>
+                                            <th style="text-align: left;">Case Height</th>
+                                            <th style="text-align: left;">Case Width</th>
+                                            <th style="text-align: left;">Case Depth</th>
+                                            <th style="text-align: left;">Shrink Height</th>
+                                            <th style="text-align: left;">Shrink Width</th>
+                                            <th style="text-align: left;">Shrink Depth</th>
+                                            <th style="text-align: left;">Pallet Height</th>
+                                            <th style="text-align: left;">Pallet Width</th>
+                                            <th style="text-align: left;">Pallet Depth</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(item, idx) in items" :key="idx">
+                                            <td>{{ item.productSystemID }}</td>
+                                            <td>{{ item.productCode }}</td>
+                                            <td>{{ item.barcode }}</td>
+                                            <td>{{ item.description }}</td>
+                                            <td>{{ item.vendorNumber }}</td>
+                                            <td>{{ item.vendorName }}</td>
+                                            <td>{{ item.vendorDescription }}</td>
+                                            <td>{{ item.brand }}</td>
+                                            <td>{{ item.height }}</td>
+                                            <td>{{ item.width }}</td>
+                                            <td>{{ item.depth }}</td>
+                                            <td>{{ item.tray_Height }}</td>
+                                            <td>{{ item.tray_Width }}</td>
+                                            <td>{{ item.tray_Depth }}</td>
+                                            <td>{{ item.case_Height }}</td>
+                                            <td>{{ item.case_Width }}</td>
+                                            <td>{{ item.case_Depth }}</td>
+                                            <td>{{ item.shrink_Height }}</td>
+                                            <td>{{ item.shrink_Width }}</td>
+                                            <td>{{ item.shrink_Depth }}</td>
+                                            <td>{{ item.pallet_Height }}</td>
+                                            <td>{{ item.pallet_Width }}</td>
+                                            <td>{{ item.pallet_Depth }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </v-card>
+                        </div>
+                    </v-card-text>
+                </v-card>
+                <v-snackbar v-model="snackbar" bottom :timeout="snackbarTimeout">
+                    <div style="text-align: center; width: 100%;">
+                        {{ snackbarText }}
+                    </div>
+                </v-snackbar>
+            </v-dialog>
+        </v-layout>
+    </div>
+</template>
+
+<script>
+    import Hierachy from '@/components/Apps/RangePlanning/ProductListing/Sections/Hierachy'
+    import Vendor from '@/components/Apps/RangePlanning/ProductListing/Sections/Vendor'
+    import ImagesAndDimensions from '@/components/Apps/RangePlanning/ProductListing/Sections/ImagesAndDimensions/Index'
+    import CostingSheet from '@/components/Apps/RangePlanning/ProductListing/Sections/CostingSheet'
+    // TODO ADD LISTING
+    import Agreements from '@/components/Apps/RangePlanning/ProductListing/Sections/Agreements'
+
+    const tabs = ['Hierachy', 'Vendor', 'Images', 'Costing', 'Listing', 'Agreements', 'Resouces'];
+
+    export default {
+        name: 'product-listing',
+        components: {
+            Hierachy,
+            Vendor,
+            ImagesAndDimensions,
+            CostingSheet,
+            Agreements
+        },
+        data() {
+            return {
+                dialog: false,
+                tabs: tabs,
+                active: null,
+                items: [],
+                overview: false,
+                clipBoardItem: null,
+                snackbar: false,
+                snackbarTimeout: 0,
+                snackbarText: null
+            }
+        },
+        computed: {
+            canPaste() {
+                return this.clipBoardItem == null;
+            }
+        },
+        methods: {
+            show() {
+                let self = this;
+                self.dialog = true;
+            },
+            close() {
+                let self = this;
+                self.dialog = false;
+            },
+            newLine() {
+                let self = this;
+                self.items.push({
+                    productSystemID: "Generate_SYS_Product_ID",
+                    threeDimensionalImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
+                    frontImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
+                    sideImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
+                    topImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png'
+                })
+            },
+            openFile() {
+                let self = this;
+                self.items = [];
+
+                for (var i = 1; i < 6; i++) {
+                    self.items.push({
+                        index: i,
+                        productSystemID: "Product System ID " + i,
+                        productCode: "Product Code " + i,
+                        barcode: "Barcode " + i,
+                        description: "Description " + i,
+                        vendorNumber: "Vendor Number " + i,
+                        vendorName: "Vendor Name " + i,
+                        vendorDescription: "Vendor Description " + i,
+                        brand: "Brand " + i,
+                        height: 10,
+                        width: 10,
+                        depth: 10,
+                        tray_Height: 10,
+                        tray_Width: 10,
+                        tray_Depth: 10,
+                        case_Height: 10,
+                        case_Width: 10,
+                        case_Depth: 10,
+                        shrink_Height: 10,
+                        shrink_Width: 10,
+                        shrink_Depth: 10,
+                        pallet_Height: 10,
+                        pallet_Width: 10,
+                        pallet_Depth: 10,
+                        threeDimensionalImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
+                        frontImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
+                        sideImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
+                        topImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
+                        consignmentOrFixed: "Consignment",
+                        replacementOrNewProduct: "New Product"
+                    })
+                }
+            },
+            closeFile() {
+                let self = this;
+                self.items = [];
+            },
+            duplicate(item) {
+                let self = this;
+                self.items.push(JSON.parse(JSON.stringify(item)));
+            },
+            remove(item) {
+                let self = this;
+                self.items.splice(self.items.indexOf(item));
+            },
+            copy(item) {
+                let self = this;
+                self.clipBoardItem = item;
+                self.showSnackbar("Line Copied", 2000)
+            },
+            paste(item) {
+                let self = this;
+
+                for(var prop in self.clipBoardItem) {
+                    if(prop != "index") {
+                        item[prop] = self.clipBoardItem[prop];
+                    }
+                }
+
+                self.showSnackbar("Line Replaced", 2000)
+            },
+            showSnackbar(snackbarText, timeout) {
+                let self = this;
+                self.snackbarTimeout = timeout;
+                self.snackbarText = snackbarText;
+                self.snackbar = true;
+            },
+            save() {
+                let self = this;
+            }
+        }
+    }
+</script>
+
+<style scoped>
+    table {
+        border-collapse: collapse;
+    }
+
+    table,
+    th,
+    td {
+        border: 1px solid black;
+    }
+</style>

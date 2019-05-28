@@ -533,42 +533,42 @@
         allProducts.forEach(product => {
           storeProducts.forEach(storeProduct => {
             if (storeProduct.Data.barcode == product.barcode) {
-              if (self.dimensionChange(storeProduct.Data, product)) {
 
-                storeProduct.Data.height = product.height;
-                storeProduct.Data.width = product.width;
-                storeProduct.Data.depth = product.depth;
+              storeProduct.Data.height = parseFloat(product.height);
+              storeProduct.Data.width = parseFloat(product.width);
+              storeProduct.Data.depth = parseFloat(product.depth);
 
-                storeProduct.Data.tray_Barcode = product.tray_Barcode;
-                storeProduct.Data.tray_Qty = product.tray_Qty;
-                storeProduct.Data.tray_Height = product.tray_Height;
-                storeProduct.Data.tray_Width = product.tray_Width;
-                storeProduct.Data.tray_Depth = product.tray_Depth;
+              storeProduct.Data.tray_Barcode = product.tray_Barcode;
+              storeProduct.Data.tray_Qty = parseInt(product.tray_Qty);
+              storeProduct.Data.tray_Height = parseFloat(product.tray_Height);
+              storeProduct.Data.tray_Width = parseFloat(product.tray_Width);
+              storeProduct.Data.tray_Depth = parseFloat(product.tray_Depth);
 
-                storeProduct.Data.case_Barcode = product.case_Barcode;
-                storeProduct.Data.case_Qty = product.case_Qty;
-                storeProduct.Data.case_Height = product.case_Height;
-                storeProduct.Data.case_Width = product.case_Width;
-                storeProduct.Data.case_Depth = product.case_Depth;
+              storeProduct.Data.case_Barcode = product.case_Barcode;
+              storeProduct.Data.case_Qty = parseInt(product.case_Qty);
+              storeProduct.Data.case_Height = parseFloat(product.case_Height);
+              storeProduct.Data.case_Width = parseFloat(product.case_Width);
+              storeProduct.Data.case_Depth = parseFloat(product.case_Depth);
 
-                storeProduct.Data.shrink_Barcode = product.shrink_Barcode;
-                storeProduct.Data.shrink_Qty = product.shrink_Qty;
-                storeProduct.Data.shrink_Height = product.shrink_Height;
-                storeProduct.Data.shrink_Width = product.shrink_Width;
-                storeProduct.Data.shrink_Depth = product.shrink_Depth;
+              storeProduct.Data.shrink_Barcode = product.shrink_Barcode;
+              storeProduct.Data.shrink_Qty = parseInt(product.shrink_Qty);
+              storeProduct.Data.shrink_Height = parseFloat(product.shrink_Height);
+              storeProduct.Data.shrink_Width = parseFloat(product.shrink_Width);
+              storeProduct.Data.shrink_Depth = parseFloat(product.shrink_Depth);
 
-                storeProduct.Data.pallet_Barcode = product.pallet_Barcode;
-                storeProduct.Data.pallet_Qty = product.pallet_Qty;
-                storeProduct.Data.pallet_Height = product.pallet_Height;
-                storeProduct.Data.pallet_Width = product.pallet_Width;
-                storeProduct.Data.pallet_Depth = product.pallet_Depth;
+              storeProduct.Data.pallet_Barcode = product.pallet_Barcode;
+              storeProduct.Data.pallet_Qty = parseInt(product.pallet_Qty);
+              storeProduct.Data.pallet_Height = parseFloat(product.pallet_Height);
+              storeProduct.Data.pallet_Width = parseFloat(product.pallet_Width);
+              storeProduct.Data.pallet_Depth = parseFloat(product.pallet_Depth);
 
-                ctrl_store.setProductData(self.$store, storeProduct.Data, product.barcode);
-                storeProduct.ChangeDimensions(storeProduct);
-              }
+              ctrl_store.setProductData(self.$store, storeProduct.Data, product.barcode);
+              storeProduct.ChangeDimensions(storeProduct);
             }
           })
         })
+
+        alert("Range to planogram complete");
       },
       dimensionChange(planoProduct, rangeProduct) {
         if (planoProduct.height == rangeProduct.height && planoProduct.width == rangeProduct.width && planoProduct
@@ -587,33 +587,60 @@
 
         storePlanogramItemProducts.forEach(spip => {
           allProducts.forEach(ap => {
+
+            ap.height = parseFloat(ap.height);
+            ap.width = parseFloat(ap.width);
+            ap.depth = parseFloat(ap.depth);
+
+            ap.tray_Barcode = ap.tray_Barcode;
+            ap.tray_Height = parseFloat(ap.tray_Height);
+            ap.tray_Width = parseFloat(ap.tray_Width);
+            ap.tray_Depth = parseFloat(ap.tray_Depth);
+
+            ap.case_Barcode = ap.case_Barcode;
+            ap.case_Height = parseFloat(ap.case_Height);
+            ap.case_Width = parseFloat(ap.case_Width);
+            ap.case_Depth = parseFloat(ap.case_Depth);
+
+            ap.shrink_Barcode = ap.shrink_Barcode;
+            ap.shrink_Height = parseFloat(ap.shrink_Height);
+            ap.shrink_Width = parseFloat(ap.shrink_Width);
+            ap.shrink_Depth = parseFloat(ap.shrink_Depth);
+
+            ap.pallet_Barcode = ap.pallet_Barcode;
+            ap.pallet_Height = parseFloat(ap.pallet_Height);
+            ap.pallet_Width = parseFloat(ap.pallet_Width);
+            ap.pallet_Depth = parseFloat(ap.pallet_Depth);
+
             if (ap.barcode == spip.Data.barcode) {
-              ap.height = spip.Data.height;
-              ap.width = spip.Data.width;
-              ap.depth = spip.Data.depth;
+              ap.height = parseFloat(spip.Data.height);
+              ap.width = parseFloat(spip.Data.width);
+              ap.depth = parseFloat(spip.Data.depth);
 
               ap.tray_Barcode = spip.Data.tray_Barcode;
-              ap.tray_Height = spip.Data.tray_Height;
-              ap.tray_Width = spip.Data.tray_Width;
-              ap.tray_Depth = spip.Data.tray_Depth;
+              ap.tray_Height = parseFloat(spip.Data.tray_Height);
+              ap.tray_Width = parseFloat(spip.Data.tray_Width);
+              ap.tray_Depth = parseFloat(spip.Data.tray_Depth);
 
               ap.case_Barcode = spip.Data.case_Barcode;
-              ap.case_Height = spip.Data.case_Height;
-              ap.case_Width = spip.Data.case_Width;
-              ap.case_Depth = spip.Data.case_Depth;
+              ap.case_Height = parseFloat(spip.Data.case_Height);
+              ap.case_Width = parseFloat(spip.Data.case_Width);
+              ap.case_Depth = parseFloat(spip.Data.case_Depth);
 
               ap.shrink_Barcode = spip.Data.shrink_Barcode;
-              ap.shrink_Height = spip.Data.shrink_Height;
-              ap.shrink_Width = spip.Data.shrink_Width;
-              ap.shrink_Depth = spip.Data.shrink_Depth;
+              ap.shrink_Height = parseFloat(spip.Data.shrink_Height);
+              ap.shrink_Width = parseFloat(spip.Data.shrink_Width);
+              ap.shrink_Depth = parseFloat(spip.Data.shrink_Depth);
 
               ap.pallet_Barcode = spip.Data.pallet_Barcode;
-              ap.pallet_Height = spip.Data.pallet_Height;
-              ap.pallet_Width = spip.Data.pallet_Width;
-              ap.pallet_Depth = spip.Data.pallet_Depth;
+              ap.pallet_Height = parseFloat(spip.Data.pallet_Height);
+              ap.pallet_Width = parseFloat(spip.Data.pallet_Width);
+              ap.pallet_Depth = parseFloat(spip.Data.pallet_Depth);
             }
           });
         })
+
+        alert("Planogram to range complete");
       },
       productInStore(productID) {
         let self = this;
@@ -1103,7 +1130,7 @@
         let self = this;
 
         self.$refs.JoinPlanogram.show(() => {
-          
+
         })
       }
     }
