@@ -41,7 +41,7 @@
                                             {{item.name}}
                                         </v-list-tile-content>
                                         <v-list-tile-action>
-                                            <v-btn>update</v-btn>
+                                            <v-btn @click="UpdateField(item)">update</v-btn>
                                         </v-list-tile-action>
                                     </v-list-tile>
                                     <v-divider></v-divider>
@@ -119,9 +119,22 @@
             this.loadData()
         },
         methods: {
+            UpdateField(item){
+                let self = this
+                self.totalFiles=1
+                    self.getSystemFile(item.id, callback=>{
+
+                    })
+            },
             selectSingle() {
                 let self = this
                 self.$refs.SpacePlanSelector.show(data => {
+                    console.log(data);
+                    self.totalFiles=1
+                    self.getSystemFile(data, callback=>{
+
+                    })
+                    
 
                 })
             },
@@ -191,9 +204,11 @@
                         // maybe dispatch an action that will update a progress bar or something
                     }
                 }
-                Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&id=' + item.id, config).then(
+                Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&id=' + item, config).then(
                     res => {
-                        self.currentPlanoName = item.name
+                        console.log(res);
+                        
+                        self.currentPlanoName = res.data.name
 
 
                         self.currentFileIndex = self.currentFileIndex + 1
@@ -201,7 +216,7 @@
 
 
                         if (res.data != false) {
-                            self.createDetailTX(res.data, item.id, callback => {
+                            self.createDetailTX(res.data, item, callback => {
 
                             })
                         }
@@ -210,10 +225,10 @@
                             self.currentPlanoName = "All Files Loaded"
 
                         } else {
-                            self.getSystemFile(self.spacePlans[self.index], data => {
-                                self.index=self.index+1
+                            self.getSystemFile(self.spacePlans[self.index].id, data => {
+                                self.index = self.index + 1
                                 console.log(self.index);
-                                
+
                             })
                         }
                         callback(res)
@@ -229,26 +244,18 @@
                 let self = this
                 Axios.get(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire&folder=Space Planning")
                     .then(r => {
+                        console.log(self.spacePlans);
+                        
                         self.spacePlans = r.data;
                         self.currentFileIndex = 0
                         self.totalFiles = 0
                         self.totalFiles = self.spacePlans.length
                         self.index = 0
-                        
-
-
-                        self.getSystemFile(self.spacePlans[self.index], data => {
-
-                        })
-
-
-
-
+                        self.getSystemFile(self.spacePlans[self.index].id, data => {})
                     })
                     .catch(e => {
                         console.error(e)
                     })
-
             },
             loadData() {
                 let self = this
