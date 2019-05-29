@@ -2,25 +2,20 @@
     <v-data-table hide-actions disable-initial-sort :headers="headers" :items="items">
         <template v-slot:items="props">
             <tr class="no-hover">
-                <td class="px-2">
-                    <v-text-field v-model="props.item.productSystemID" placeholder="Product System ID" dense full-width
-                        flat solo hide-details class="mt-0" style="margin-top: 0px">
-                    </v-text-field>
+                <td>{{ props.item.productSystemID }}</td>
+                <td>{{ props.item.barcode }}</td>
+                <td>{{ props.item.description }}</td>
+                <td style="text-align: center;">
+                    <v-checkbox v-model="props.item.replaceItemSAPCode" hide-details color="primary"></v-checkbox>
                 </td>
                 <td class="px-2">
-                    <v-text-field v-model="props.item.productCode" placeholder="Product Code" dense full-width flat solo
-                        hide-details class="mt-0" style="margin-top: 0px">
-                    </v-text-field>
+                    <v-autocomplete v-model="props.item.itemStatus" placeholder="Item Status" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
                 </td>
                 <td class="px-2">
-                    <v-text-field v-model="props.item.barcode" placeholder="Barcode" dense full-width flat solo
-                        hide-details class="mt-0" style="margin-top: 0px">
-                    </v-text-field>
+                    <v-autocomplete v-model="props.item.activeShopCode" placeholder="Active Shop Code" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
                 </td>
-                <td class="px-2">
-                    <v-text-field v-model="props.item.description" placeholder="Description" dense full-width flat solo
-                        hide-details class="mt-0" style="margin-top: 0px">
-                    </v-text-field>
+                <td>
+                    <v-checkbox v-model="props.item.openSupplier" hide-details color="primary"></v-checkbox>
                 </td>
                 <td style="width: 5px;">
                     <v-menu dark offset-y>
@@ -51,18 +46,33 @@
 <script>
     const headers = [{
             text: 'Product System ID',
-            sortable: false
-        },
-        {
-            text: 'Product Code',
-            sortable: false
+            sortable: false,
+            width: '200'
         },
         {
             text: 'Barcode',
-            sortable: false
+            sortable: false,
+            width: '150'
         },
         {
             text: 'Description',
+            sortable: false,
+            width: '300'
+        },
+        {
+            text: 'Replace Item SAP Code',
+            sortable: false
+        },
+        {
+            text: 'Item Status',
+            sortable: false
+        },
+        {
+            text: 'Active Shop Code',
+            sortable: false
+        },
+        {
+            text: 'Open Supplier',
             sortable: false
         },
         {

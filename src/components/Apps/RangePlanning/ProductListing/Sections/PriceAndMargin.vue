@@ -6,19 +6,44 @@
                 <td>{{ props.item.barcode }}</td>
                 <td>{{ props.item.description }}</td>
                 <td class="px-2">
-                    <v-autocomplete v-model="props.item.planogramName" placeholder="Planogram Name" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
+                    <v-text-field v-model="props.item.unit_Cost" placeholder="Cost" dense full-width flat solo
+                        hide-details class="mt-0" style="margin-top: 0px"></v-text-field>
                 </td>
                 <td class="px-2">
-                    <v-autocomplete v-model="props.item.category" placeholder="Category" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
-                </td>
-                <td>{{ props.item.category_Code }}</td>
-                <td>{{ props.item.department }}</td>
-                <td>{{ props.item.subdepartment }}</td>
-                <td class="px-2">
-                    <v-autocomplete v-model="props.item.subcategory" placeholder="Subcategory" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
+                    <v-text-field v-model="props.item.markup_Percent" placeholder="Markup" dense full-width flat solo
+                        hide-details class="mt-0" style="margin-top: 0px"></v-text-field>
                 </td>
                 <td class="px-2">
-                    <v-autocomplete v-model="props.item.segment" placeholder="Segment" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
+                    <v-text-field v-model="props.item.currentRSP" placeholder="RSP" dense full-width flat solo
+                        hide-details class="mt-0" style="margin-top: 0px"></v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field v-model="props.item.unit_Price" placeholder="Price" dense full-width flat solo
+                        hide-details class="mt-0" style="margin-top: 0px"></v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field v-model="props.item.gross_Profit_Percentage" placeholder="GP %" dense full-width flat
+                        solo hide-details class="mt-0" style="margin-top: 0px"></v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field v-model="props.item.category_Gross_Profit_Percentage" placeholder="GP %" dense
+                        full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field v-model="props.item.shortfall_Percentage" placeholder="Shortfall" dense full-width
+                        flat solo hide-details class="mt-0" style="margin-top: 0px"></v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field v-model="props.item.tax_Class" placeholder="Class" dense full-width flat solo
+                        hide-details class="mt-0" style="margin-top: 0px"></v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field v-model="props.item.purchase_Group" placeholder="Purchase Group" dense full-width flat solo
+                        hide-details class="mt-0" style="margin-top: 0px"></v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field v-model="props.item.tax_Code" placeholder="Code" dense full-width flat solo
+                        hide-details class="mt-0" style="margin-top: 0px"></v-text-field>
                 </td>
                 <td style="width: 5px;">
                     <v-menu dark offset-y>
@@ -63,31 +88,43 @@
             width: '300'
         },
         {
-            text: 'Planogram Name',
+            text: 'Unit Cost',
             sortable: false
         },
         {
-            text: 'Category',
+            text: 'Markup %',
             sortable: false
         },
         {
-            text: 'Category Code',
+            text: 'Current RSP',
             sortable: false
         },
         {
-            text: 'Department',
+            text: 'Unit Price',
             sortable: false
         },
         {
-            text: 'Subdepartment',
+            text: 'GP %',
             sortable: false
         },
         {
-            text: 'Subcategory',
+            text: 'Category GP %',
             sortable: false
         },
         {
-            text: 'Segment',
+            text: 'Shortfall %',
+            sortable: false
+        },
+        {
+            text: 'Tax Class',
+            sortable: false
+        },
+        {
+            text: 'Purchase Group',
+            sortable: false
+        },
+        {
+            text: 'Tax Code',
             sortable: false
         },
         {

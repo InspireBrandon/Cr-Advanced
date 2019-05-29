@@ -6,14 +6,28 @@
                 <td>{{ props.item.barcode }}</td>
                 <td>{{ props.item.description }}</td>
                 <td class="px-2">
-                    <v-autocomplete v-model="props.item.manufacturer" placeholder="Manufacturer" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
-                </td>
-                <td>{{ props.item.manufacturer_Code }}</td>
-                <td class="px-2">
-                    <v-autocomplete v-model="props.item.brand" placeholder="Brand" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
+                    <v-text-field v-model="props.item.order_Quantity" placeholder="Quantity" dense full-width flat
+                        solo hide-details class="mt-0" style="margin-top: 0px"></v-text-field>
                 </td>
                 <td class="px-2">
-                    <v-text-field placeholder="Product Code" v-model="props.item.product_Code" dense full-width flat solo hide-details class="mt-0"></v-text-field>
+                    <v-text-field v-model="props.item.order_Value_At_Cost" placeholder="Value At Cost" dense full-width
+                        flat solo hide-details class="mt-0" style="margin-top: 0px"></v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field v-model="props.item.order_Value_At_Retail" placeholder="Value At Retail" dense full-width flat
+                        solo hide-details class="mt-0" style="margin-top: 0px"></v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field v-model="props.item.order_Profit_Value" placeholder="Profit Value" dense full-width
+                        flat solo hide-details class="mt-0" style="margin-top: 0px"></v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field v-model="props.item.test_Period" placeholder="Test Period" dense full-width flat solo
+                        hide-details class="mt-0" style="margin-top: 0px"></v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field v-model="props.item.test_Period_Review_Date" placeholder="Test Period Review Date" dense full-width flat solo
+                        hide-details class="mt-0" style="margin-top: 0px"></v-text-field>
                 </td>
                 <td style="width: 5px;">
                     <v-menu dark offset-y>
@@ -58,27 +72,27 @@
             width: '300'
         },
         {
-            text: 'Manufacturer',
+            text: 'Order Quantity',
             sortable: false
         },
         {
-            text: 'Manufacturer Code',
-            sortable: false
-        },
-        // {
-        //     text: 'Supplier',
-        //     sortable: false
-        // },
-        // {
-        //     text: 'Supplier Code',
-        //     sortable: false
-        // },
-        {
-            text: 'Brand',
+            text: 'Order Value At Cost',
             sortable: false
         },
         {
-            text: 'Product Code',
+            text: 'Order Value At Retail',
+            sortable: false
+        },
+        {
+            text: 'Order Profit Value',
+            sortable: false
+        },
+        {
+            text: 'Test Period',
+            sortable: false
+        },
+        {
+            text: 'Test Period Review Date',
             sortable: false
         },
         {
@@ -93,6 +107,16 @@
         data() {
             return {
                 headers: headers
+            }
+        },
+        methods: {
+            duplicateLine(item) {
+                let self = this;
+                self.duplicate(item);
+            },
+            removeLine(item) {
+                let self = this;
+                self.remove(item);
             }
         }
     }

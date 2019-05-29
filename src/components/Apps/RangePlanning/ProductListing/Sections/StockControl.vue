@@ -6,19 +6,52 @@
                 <td>{{ props.item.barcode }}</td>
                 <td>{{ props.item.description }}</td>
                 <td class="px-2">
-                    <v-autocomplete v-model="props.item.planogramName" placeholder="Planogram Name" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
+                    <v-text-field v-model="props.item.stock_Units" placeholder="Units" dense full-width flat solo
+                        hide-details class="mt-0" style="margin-top: 0px">
+                    </v-text-field>
                 </td>
                 <td class="px-2">
-                    <v-autocomplete v-model="props.item.category" placeholder="Category" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
-                </td>
-                <td>{{ props.item.category_Code }}</td>
-                <td>{{ props.item.department }}</td>
-                <td>{{ props.item.subdepartment }}</td>
-                <td class="px-2">
-                    <v-autocomplete v-model="props.item.subcategory" placeholder="Subcategory" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
+                    <v-text-field v-model="props.item.stock_Cost" placeholder="Cost" dense full-width flat solo
+                        hide-details class="mt-0" style="margin-top: 0px">
+                    </v-text-field>
                 </td>
                 <td class="px-2">
-                    <v-autocomplete v-model="props.item.segment" placeholder="Segment" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
+                    <v-text-field v-model="props.item.stock_Retailer" placeholder="Retail" dense full-width flat
+                        solo hide-details class="mt-0" style="margin-top: 0px">
+                    </v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field v-model="props.item.outstanding_Order_Units" placeholder="Order Units"
+                        dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px">
+                    </v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field v-model="props.item.outstanding_Order_Value" placeholder="Order Value"
+                        dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px">
+                    </v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field v-model="props.item.action_Plan" placeholder="Plan" dense full-width flat solo
+                        hide-details class="mt-0" style="margin-top: 0px">
+                    </v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field v-model="props.item.return_By_Date" placeholder="Return By" dense full-width flat solo
+                        hide-details class="mt-0" style="margin-top: 0px">
+                    </v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field v-model="props.item.lead_Time" placeholder="Lead Time" dense full-width flat solo
+                        hide-details class="mt-0" style="margin-top: 0px">
+                    </v-text-field>
+                </td>
+                <td>
+                    <v-checkbox v-model="props.item.consignment" hide-details color="primary"></v-checkbox>
+                </td>
+                <td class="px-2">
+                    <v-text-field v-model="props.item.minimum_Order_Value" placeholder="Minimum Order Value" dense full-width
+                        flat solo hide-details class="mt-0" style="margin-top: 0px">
+                    </v-text-field>
                 </td>
                 <td style="width: 5px;">
                     <v-menu dark offset-y>
@@ -63,31 +96,45 @@
             width: '300'
         },
         {
-            text: 'Planogram Name',
+            text: 'Stock Units',
             sortable: false
         },
         {
-            text: 'Category',
+            text: 'Stock Cost',
             sortable: false
         },
         {
-            text: 'Category Code',
+            text: 'Stock Retil',
             sortable: false
         },
         {
-            text: 'Department',
+            text: 'Outstanding Order Units',
             sortable: false
         },
         {
-            text: 'Subdepartment',
+            text: 'Outstanding Order Value',
             sortable: false
         },
         {
-            text: 'Subcategory',
+            text: 'Action Plan',
+            sortable: false,
+            width: '25%'
+        },
+        {
+            text: 'Returns By Date',
             sortable: false
         },
         {
-            text: 'Segment',
+            text: 'Lead Time',
+            sortable: false,
+            width: '200px'
+        },
+        {
+            text: 'Consignment',
+            sortable: false
+        },
+        {
+            text: 'Minimum Order Value',
             sortable: false
         },
         {

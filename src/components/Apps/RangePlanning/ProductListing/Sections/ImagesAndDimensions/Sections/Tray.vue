@@ -5,16 +5,28 @@
                 <td>{{ props.item.productSystemID }}</td>
                 <td>{{ props.item.barcode }}</td>
                 <td>{{ props.item.description }}</td>
-                <td>
-                    <v-text-field v-model="props.item.tray_Height" dense full-width flat solo hide-details class="mt-0">
+                <td class="px-2">
+                    <v-text-field placeholder="Barcode" v-model="props.item.tray_Barcode" dense full-width flat solo hide-details class="mt-0">
                     </v-text-field>
                 </td>
-                <td>
-                    <v-text-field v-model="props.item.tray_Width" dense full-width flat solo hide-details class="mt-0">
+                <td class="px-2">
+                    <v-text-field placeholder="Qty" v-model="props.item.tray_Qty" dense full-width flat solo hide-details class="mt-0">
                     </v-text-field>
                 </td>
-                <td>
-                    <v-text-field v-model="props.item.tray_Depth" dense full-width flat solo hide-details class="mt-0">
+                <td class="px-2">
+                    <v-text-field placeholder="Weight" v-model="props.item.tray_Weight" dense full-width flat solo hide-details class="mt-0">
+                    </v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field placeholder="Height" v-model="props.item.tray_Height" dense full-width flat solo hide-details class="mt-0">
+                    </v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field placeholder="Width" v-model="props.item.tray_Width" dense full-width flat solo hide-details class="mt-0">
+                    </v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field placeholder="Depth" v-model="props.item.tray_Depth" dense full-width flat solo hide-details class="mt-0">
                     </v-text-field>
                 </td>
                 <td>
@@ -70,6 +82,21 @@
             text: 'Description',
             sortable: false,
             width: '300'
+        },
+        {
+            text: 'Tray Barcode',
+            sortable: false,
+            width: '100'
+        },
+        {
+            text: 'Tray Qty',
+            sortable: false,
+            width: '100'
+        },
+        {
+            text: 'Tray Weight',
+            sortable: false,
+            width: '100'
         },
         {
             text: 'Tray Height',

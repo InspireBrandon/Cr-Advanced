@@ -60,9 +60,8 @@
                                 <!-- Hierachy -->
                                 <v-tab-item>
                                     <v-card flat>
-                                        <Hierachy :canPaste="canPaste" :copy="copy" :paste="paste"
-                                            :remove="remove" :duplicate="duplicate" :items="items"
-                                            ref="Hierachy">
+                                        <Hierachy :canPaste="canPaste" :copy="copy" :paste="paste" :remove="remove"
+                                            :duplicate="duplicate" :items="items" ref="Hierachy">
                                         </Hierachy>
                                     </v-card>
                                 </v-tab-item>
@@ -86,27 +85,44 @@
                                 <!-- Supporting Documents -->
                                 <v-tab-item>
                                     <v-card flat>
-                                        <Agreements :canPaste="canPaste" :copy="copy" :paste="paste" :remove="remove"
-                                            :duplicate="duplicate" :items="items" ref="Agreements">
-                                        </Agreements>
+                                        <SupportingDocuments :canPaste="canPaste" :copy="copy" :paste="paste"
+                                            :remove="remove" :duplicate="duplicate" :items="items"
+                                            ref="SupportingDocuments">
+                                        </SupportingDocuments>
                                     </v-card>
                                 </v-tab-item>
                                 <!-- Resources -->
                                 <v-tab-item>
                                     <v-card flat>
+                                        <Resources :canPaste="canPaste" :copy="copy" :paste="paste" :remove="remove"
+                                            :duplicate="duplicate" :items="items" ref="Resources">
+                                        </Resources>
                                     </v-card>
                                 </v-tab-item>
                                 <!-- Stock Control -->
                                 <v-tab-item>
                                     <v-card flat>
+                                        <StockControl :canPaste="canPaste" :copy="copy" :paste="paste" :remove="remove"
+                                            :duplicate="duplicate" :items="items" ref="StockControl">
+                                        </StockControl>
                                     </v-card>
                                 </v-tab-item>
                                 <!-- Price And Margin -->
                                 <v-tab-item>
                                     <v-card flat>
+                                        <PriceAndMargin :canPaste="canPaste" :copy="copy" :paste="paste"
+                                            :remove="remove" :duplicate="duplicate" :items="items" ref="PriceAndMargin">
+                                        </PriceAndMargin>
                                     </v-card>
                                 </v-tab-item>
                                 <!-- Opening Orders -->
+                                <v-tab-item>
+                                    <v-card flat>
+                                        <OpeningOrders :canPaste="canPaste" :copy="copy" :paste="paste"
+                                            :remove="remove" :duplicate="duplicate" :items="items" ref="OpeningOrders">
+                                        </OpeningOrders>
+                                    </v-card>
+                                </v-tab-item>
                             </v-tabs>
 
                             <v-card flat v-show="overview">
@@ -186,7 +202,11 @@
     import Hierachy from '@/components/Apps/RangePlanning/ProductListing/Sections/Hierachy'
     import ItemStatus from '@/components/Apps/RangePlanning/ProductListing/Sections/ItemStatus'
     import ImagesAndDimensions from '@/components/Apps/RangePlanning/ProductListing/Sections/ImagesAndDimensions/Index'
-    import CostingSheet from '@/components/Apps/RangePlanning/ProductListing/Sections/CostingSheet'
+    import SupportingDocuments from '@/components/Apps/RangePlanning/ProductListing/Sections/SupportingDocuments'
+    import Resources from '@/components/Apps/RangePlanning/ProductListing/Sections/Resources'
+    import StockControl from '@/components/Apps/RangePlanning/ProductListing/Sections/StockControl'
+    import PriceAndMargin from '@/components/Apps/RangePlanning/ProductListing/Sections/PriceAndMargin'
+    import OpeningOrders from '@/components/Apps/RangePlanning/ProductListing/Sections/OpeningOrders'
     // TODO ADD LISTING
     import Agreements from '@/components/Apps/RangePlanning/ProductListing/Sections/Agreements'
 
@@ -202,8 +222,12 @@
             Hierachy,
             ItemStatus,
             ImagesAndDimensions,
-            CostingSheet,
-            Agreements
+            Agreements,
+            SupportingDocuments,
+            Resources,
+            StockControl,
+            PriceAndMargin,
+            OpeningOrders
         },
         data() {
             return {
@@ -235,11 +259,12 @@
             newLine() {
                 let self = this;
                 self.items.push({
-                    productSystemID: "Generate_SYS_Product_ID",
                     threeDimensionalImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
                     frontImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
                     sideImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
                     topImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
+                    consignmentOrFixed: "Consignment",
+                    replacementOrNewProduct: "New Product",
                     taxCode: "VE"
                 })
             },
@@ -249,30 +274,6 @@
 
                 for (var i = 1; i < 6; i++) {
                     self.items.push({
-                        index: i,
-                        productSystemID: "Product System ID " + i,
-                        productCode: "Product Code " + i,
-                        barcode: "Barcode " + i,
-                        description: "Description " + i,
-                        vendorNumber: "Vendor Number " + i,
-                        vendorName: "Vendor Name " + i,
-                        vendorDescription: "Vendor Description " + i,
-                        brand: "Brand " + i,
-                        height: 10,
-                        width: 10,
-                        depth: 10,
-                        tray_Height: 10,
-                        tray_Width: 10,
-                        tray_Depth: 10,
-                        case_Height: 10,
-                        case_Width: 10,
-                        case_Depth: 10,
-                        shrink_Height: 10,
-                        shrink_Width: 10,
-                        shrink_Depth: 10,
-                        pallet_Height: 10,
-                        pallet_Width: 10,
-                        pallet_Depth: 10,
                         threeDimensionalImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
                         frontImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
                         sideImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',

@@ -3,7 +3,7 @@
         <v-toolbar dark dense>
             <v-btn color="primary" @click="currentView == 4? currentView = 0 : currentView++">{{ currentViewName() }}</v-btn>
         </v-toolbar>
-        <General :canPaste="canPaste" :copy="copy" :paste="paste" :items="items" :duplicate="duplicate" :remove="remove" v-show="currentView == 0" ref="General"></General>
+        <Unit :canPaste="canPaste" :copy="copy" :paste="paste" :items="items" :duplicate="duplicate" :remove="remove" v-show="currentView == 0" ref="Unit"></Unit>
         <Tray :canPaste="canPaste" :copy="copy" :paste="paste" :items="items" :duplicate="duplicate" :remove="remove" v-show="currentView == 1" ref="Tray"></Tray>
         <Case :canPaste="canPaste" :copy="copy" :paste="paste" :items="items" :duplicate="duplicate" :remove="remove" v-show="currentView == 2" ref="Case"></Case>
         <Shrink :canPaste="canPaste" :copy="copy" :paste="paste" :items="items" :duplicate="duplicate" :remove="remove" v-show="currentView == 3" ref="Shrink"></Shrink>
@@ -12,7 +12,7 @@
 </template>
 
 <script>
-    import General from '@/components/Apps/RangePlanning/ProductListing/Sections/ImagesAndDimensions/Sections/General'
+    import Unit from '@/components/Apps/RangePlanning/ProductListing/Sections/ImagesAndDimensions/Sections/Unit'
     import Tray from '@/components/Apps/RangePlanning/ProductListing/Sections/ImagesAndDimensions/Sections/Tray'
     import Case from '@/components/Apps/RangePlanning/ProductListing/Sections/ImagesAndDimensions/Sections/Case'
     import Shrink from '@/components/Apps/RangePlanning/ProductListing/Sections/ImagesAndDimensions/Sections/Shrink'
@@ -22,7 +22,7 @@
         name: 'hierachy',
         props: ['items', 'duplicate', 'remove', 'copy', 'canPaste', 'paste'],
         components: { 
-            General,
+            Unit,
             Tray,
             Case,
             Shrink,
@@ -48,7 +48,7 @@
                 
                 switch(self.currentView) {
                     case 0: {
-                        currentName = "General";
+                        currentName = "Unit";
                     }break;
                     case 1: {
                         currentName = "Tray";

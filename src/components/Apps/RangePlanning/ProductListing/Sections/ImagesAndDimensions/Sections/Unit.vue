@@ -6,16 +6,16 @@
                     <td>{{ props.item.productSystemID }}</td>
                     <td>{{ props.item.barcode }}</td>
                     <td>{{ props.item.description }}</td>
-                    <td>
-                        <v-text-field v-model="props.item.height" dense full-width flat solo hide-details class="mt-0">
+                    <td class="px-2">
+                        <v-text-field placeholder="Height" v-model="props.item.height" dense full-width flat solo hide-details class="mt-0">
                         </v-text-field>
                     </td>
-                    <td>
-                        <v-text-field v-model="props.item.width" dense full-width flat solo hide-details class="mt-0">
+                    <td class="px-2">
+                        <v-text-field placeholder="Width" v-model="props.item.width" dense full-width flat solo hide-details class="mt-0">
                         </v-text-field>
                     </td>
-                    <td>
-                        <v-text-field v-model="props.item.depth" dense full-width flat solo hide-details class="mt-0">
+                    <td class="px-2">
+                        <v-text-field placeholder="Depth" v-model="props.item.depth" dense full-width flat solo hide-details class="mt-0">
                         </v-text-field>
                     </td>
                     <td class="clickable" @click="changeImage(props.item, 'threeDimensional')">
