@@ -5,19 +5,34 @@
                 <td>{{ props.item.productSystemID }}</td>
                 <td>{{ props.item.barcode }}</td>
                 <td>{{ props.item.description }}</td>
-                <td>
-                    <v-text-field v-model="props.item.pallet_Height" dense full-width flat solo hide-details
-                        class="mt-0">
+                <td class="px-2">
+                    <v-text-field placeholder="Barcode" v-model="props.item.pallet_Barcode" dense full-width flat solo
+                        hide-details class="mt-0">
                     </v-text-field>
                 </td>
-                <td>
-                    <v-text-field v-model="props.item.pallet_Width" dense full-width flat solo hide-details
-                        class="mt-0">
+                <td class="px-2">
+                    <v-text-field placeholder="Qty" v-model="props.item.pallet_Qty" dense full-width flat solo
+                        hide-details class="mt-0">
                     </v-text-field>
                 </td>
-                <td>
-                    <v-text-field v-model="props.item.pallet_Depth" dense full-width flat solo hide-details
-                        class="mt-0">
+                <td class="px-2">
+                    <v-text-field placeholder="Weight" v-model="props.item.pallet_Weight" dense full-width flat solo
+                        hide-details class="mt-0">
+                    </v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field placeholder="Height" v-model="props.item.pallet_Height" dense full-width flat solo
+                        hide-details class="mt-0">
+                    </v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field placeholder="Width" v-model="props.item.pallet_Width" dense full-width flat solo
+                        hide-details class="mt-0">
+                    </v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field placeholder="Depth" v-model="props.item.pallet_Depth" dense full-width flat solo
+                        hide-details class="mt-0">
                     </v-text-field>
                 </td>
                 <td>
@@ -73,6 +88,21 @@
             text: 'Description',
             sortable: false,
             width: '300'
+        },
+        {
+            text: 'Pallet Barcode',
+            sortable: false,
+            width: '100'
+        },
+        {
+            text: 'Pallet Qty',
+            sortable: false,
+            width: '100'
+        },
+        {
+            text: 'Pallet Weight',
+            sortable: false,
+            width: '100'
         },
         {
             text: 'Pallet Height',

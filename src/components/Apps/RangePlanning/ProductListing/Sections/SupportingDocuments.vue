@@ -5,15 +5,11 @@
                 <td>{{ props.item.productSystemID }}</td>
                 <td>{{ props.item.barcode }}</td>
                 <td>{{ props.item.description }}</td>
-                <td class="px-2">
-                    <v-autocomplete v-model="props.item.manufacturer" placeholder="Manufacturer" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
+                <td style="text-align: center;">
+                    <v-checkbox v-model="props.item.stockProtection" hide-details color="primary"></v-checkbox>
                 </td>
-                <td>{{ props.item.manufacturer_Code }}</td>
-                <td class="px-2">
-                    <v-autocomplete v-model="props.item.brand" placeholder="Brand" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
-                </td>
-                <td class="px-2">
-                    <v-text-field placeholder="Product Code" v-model="props.item.product_Code" dense full-width flat solo hide-details class="mt-0"></v-text-field>
+                <td style="text-align: center;">
+                    <v-checkbox v-model="props.item.letterOfAuthority" hide-details color="primary"></v-checkbox>
                 </td>
                 <td style="width: 5px;">
                     <v-menu dark offset-y>
@@ -58,27 +54,11 @@
             width: '300'
         },
         {
-            text: 'Manufacturer',
+            text: 'Stock Protection',
             sortable: false
         },
         {
-            text: 'Manufacturer Code',
-            sortable: false
-        },
-        // {
-        //     text: 'Supplier',
-        //     sortable: false
-        // },
-        // {
-        //     text: 'Supplier Code',
-        //     sortable: false
-        // },
-        {
-            text: 'Brand',
-            sortable: false
-        },
-        {
-            text: 'Product Code',
+            text: 'Letter of Authority',
             sortable: false
         },
         {
@@ -93,6 +73,16 @@
         data() {
             return {
                 headers: headers
+            }
+        },
+        methods: {
+            duplicateLine(item) {
+                let self = this;
+                self.duplicate(item);
+            },
+            removeLine(item) {
+                let self = this;
+                self.remove(item);
             }
         }
     }

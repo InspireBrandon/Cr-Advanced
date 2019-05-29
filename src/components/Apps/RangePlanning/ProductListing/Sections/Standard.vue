@@ -3,30 +3,36 @@
         <template v-slot:items="props">
             <tr class="no-hover">
                 <td class="px-2">
-                    <v-select hide-details :items="reasonsForRequest" v-model="props.item.reasonForRequest" placeholder="Please Select"></v-select>
+                    <v-select hide-details :items="reasonsForRequest" v-model="props.item.reasonForRequest"
+                        placeholder="Please Select"></v-select>
                 </td>
                 <td class="px-2">
-                    <v-text-field v-if="props.item.reasonForRequest != null" v-model="props.item.productSystemID" placeholder="Product System ID" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px">
+                    <v-text-field v-model="props.item.productSystemID" placeholder="Product System ID" dense full-width
+                        flat solo hide-details class="mt-0" style="margin-top: 0px">
                     </v-text-field>
                 </td>
                 <td class="px-2">
-                    <v-text-field v-if="props.item.reasonForRequest != null" v-model="props.item.barcode" placeholder="Barcode" dense full-width flat solo
+                    <v-text-field v-model="props.item.barcode" placeholder="Barcode" dense full-width flat solo
                         hide-details class="mt-0" style="margin-top: 0px">
                     </v-text-field>
                 </td>
                 <td class="px-2">
-                    <v-text-field v-if="props.item.reasonForRequest != null" v-model="props.item.size" placeholder="Size" dense full-width flat solo hide-details
+                    <v-text-field color="primary" counter max-length="10" v-model="props.item.description" placeholder="Description" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px">
+                    </v-text-field>
+                </td>
+                <td class="px-2">
+                    <v-text-field v-model="props.item.size" placeholder="Size" dense full-width flat solo hide-details
                         class="mt-0" style="margin-top: 0px">
                     </v-text-field>
                 </td>
                 <td class="px-2">
-                    <v-text-field v-if="props.item.reasonForRequest != null" v-model="props.item.uom" placeholder="UOM" dense full-width flat solo hide-details
+                    <v-text-field v-model="props.item.uom" placeholder="UOM" dense full-width flat solo hide-details
                         class="mt-0" style="margin-top: 0px">
                     </v-text-field>
                 </td>
                 <td class="px-2">
-                    <v-text-field v-if="props.item.reasonForRequest != null" v-model="props.item.sizeDescription" placeholder="Size Description" dense full-width flat
-                        solo hide-details class="mt-0" style="margin-top: 0px">
+                    <v-text-field v-model="props.item.sizeDescription" placeholder="Size Description" dense full-width
+                        flat solo hide-details class="mt-0" style="margin-top: 0px">
                     </v-text-field>
                 </td>
                 <td style="width: 5px;">
@@ -67,6 +73,11 @@
         {
             text: 'Barcode',
             sortable: false
+        },
+        {
+            text: 'Description',
+            sortable: false,
+            width: '25%'
         },
         {
             text: 'Size',
