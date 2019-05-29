@@ -230,6 +230,14 @@
                                                 <v-list-tile @click="startSubtask(props.item)">
                                                     <span>New subtask</span>
                                                 </v-list-tile>
+                                                <v-divider></v-divider>
+
+                                                <v-list-tile
+                                                    v-if="( props.item.status == 2||props.item.status == 2)&&props.item.actionedByUserID==null"
+                                                    @click="closeTask(props.item)">
+                                                    <span>close</span>
+                                                </v-list-tile>
+
                                             </v-list>
                                         </v-menu>
                                     </td>
@@ -449,7 +457,7 @@
                                         request.notes = self.findAndReplaceNote(request.notes);
                                         self.createProjectTransaction(request,
                                             actualTransaction => {
-
+                                                self.$parent.$parent.getTaskViewData();
                                             })
                                     })
                             })
@@ -649,7 +657,7 @@
                                 // Create Requesting Approval process for "New Group"
                                 request.status = 10;
                                 request.notes = self.findAndReplaceNote(modalData
-                                .notes);
+                                    .notes);
                                 self.createProjectTransaction(request,
                                     approvalTransaction => {
                                         self.$parent.$parent.getTaskViewData();
@@ -686,7 +694,7 @@
                                 // Create Requesting Approval process for "New Group"
                                 request.status = 19;
                                 request.notes = self.findAndReplaceNote(modalData
-                                .notes);
+                                    .notes);
                                 self.createProjectTransaction(request,
                                     approvalTransaction => {
                                         self.$parent.$parent.getTaskViewData();
@@ -816,6 +824,7 @@
                             request.actionedByUserID = null;
                             request.rollingUserID = null;
                             request.projectTXGroup_ID = newGroup.id;
+                            request.closed==true;
                             // Create new transaction
                             self.createProjectTransaction(request, newRequest => {
                                 self.$parent.$parent.getTaskViewData();

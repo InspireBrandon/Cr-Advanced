@@ -122,7 +122,7 @@
                         </v-card-text>
                     </v-card>
                 </v-flex>
-                <v-flex xl7 lg7 md7 sm12 xs12>
+                <!-- <v-flex xl7 lg7 md7 sm12 xs12>
                     <v-toolbar flat color="primary" dark dense>
                         <v-toolbar-title>
                             Store Plannograms
@@ -142,7 +142,7 @@
                         </template>
                     </v-data-table>
                 </v-flex>
-                <v-flex xl5 lg5 md5 sm12 xs12></v-flex>
+                <v-flex xl5 lg5 md5 sm12 xs12></v-flex> -->
             </v-layout>
         </v-container>
         <v-dialog fullscreen v-model="imageModal">
@@ -726,6 +726,7 @@
                             self.items = r.data.projectTXList;
 
                             let hasIn = false;
+                                    console.log(r.data.projectTXList);
 
                             r.data.projectTXList.forEach((element, idx) => {
 
@@ -742,7 +743,7 @@
                                             hasIn = true;
                                         }
                                     }
-
+                                    
                                     if (element.actionedByUserID == null && element.systemUserID !=
                                         null) {
                                         self.timelineItems.push({

@@ -24,7 +24,9 @@ import Yeet from '@/components/Main/Yeet.vue'
 import DataPreparation from '@/components/Main/DataPreparation';
 import DataPreparationViewSelection from '@/components/Main/DataPreparation/ViewSelection';
 
+import PlanogramDetailTool from '@/components/Main/PlanogramImplementation/PlanogramDetailTool.vue'
 import PlanogramImplementation from '@/components/Main/PlanogramImplementation/Index.vue'
+
 import RequestNewPlanogram from '@/components/Main/PlanogramImplementation/RequestNewPlanogram.vue'
 
 // Images
@@ -176,7 +178,13 @@ export default new Router({
           path: "/PlanogramImplementation",
           name: "planogram_implementation",
           component: PlanogramImplementation
-        }, {
+        }, 
+        {
+          path: "/PlanogramDetailTool",
+          name: "planogram_detail_tool",
+          component: PlanogramDetailTool
+        },
+        {
           path: "/PlanogramImplementation/:projectTransactionID/:planogramID/:status",
           name: "planogram_implementation",
           component: PlanogramImplementation
