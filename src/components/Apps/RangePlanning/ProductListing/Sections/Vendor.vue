@@ -6,14 +6,18 @@
                 <td>{{ props.item.barcode }}</td>
                 <td>{{ props.item.description }}</td>
                 <td class="px-2">
-                    <v-autocomplete v-model="props.item.manufacturer" placeholder="Manufacturer" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
+                    <v-autocomplete @change="onManufacturerChange(props.item)" :items="manufacturers"
+                        v-model="props.item.manufacturer" placeholder="Manufacturer" dense full-width flat solo
+                        hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
                 </td>
                 <td>{{ props.item.manufacturer_Code }}</td>
                 <td class="px-2">
-                    <v-autocomplete v-model="props.item.brand" placeholder="Brand" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
+                    <v-autocomplete :items="brands" v-model="props.item.brand" placeholder="Brand" dense full-width flat
+                        solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
                 </td>
                 <td class="px-2">
-                    <v-text-field placeholder="Product Code" v-model="props.item.product_Code" dense full-width flat solo hide-details class="mt-0"></v-text-field>
+                    <v-text-field placeholder="Product Code" v-model="props.item.product_Code" dense full-width flat
+                        solo hide-details class="mt-0"></v-text-field>
                 </td>
                 <td style="width: 5px;">
                     <v-menu dark offset-y>
@@ -89,10 +93,25 @@
 
     export default {
         name: 'hierachy',
-        props: ['items', 'duplicate', 'remove', 'copy', 'canPaste', 'paste'],
+        props: ['items', 'manufacturers', 'brands', 'duplicate', 'remove', 'copy', 'canPaste', 'paste',
+            'getManufacturerDetailsByID', 'setItemsData'
+        ],
         data() {
             return {
-                headers: headers
+                headers: headers,
+                manufacturer: null
+            }
+        },
+        methods: {
+            onManufacturerChange(item) {
+                let self = this;
+
+                self.$nextTick(() => {
+                    self.getManufacturerDetailsByID(item.manufacturer, manufacturerDetails => {
+                        self.setItemsData(item.index, "manufacturer_Code", manufacturerDetails
+                            .manufacturer_Code);
+                    });
+                })
             }
         }
     }

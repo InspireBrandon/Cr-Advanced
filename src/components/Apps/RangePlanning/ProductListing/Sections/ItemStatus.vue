@@ -9,10 +9,10 @@
                     <v-checkbox v-model="props.item.replaceItemSAPCode" hide-details color="primary"></v-checkbox>
                 </td>
                 <td class="px-2">
-                    <v-autocomplete v-model="props.item.itemStatus" placeholder="Item Status" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
+                    <v-autocomplete :items="itemStatuses" v-model="props.item.itemStatus" placeholder="Item Status" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
                 </td>
                 <td class="px-2">
-                    <v-autocomplete v-model="props.item.activeShopCode" placeholder="Active Shop Code" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
+                    <v-autocomplete :items="activeShopCodes" v-model="props.item.activeShopCode" placeholder="Active Shop Code" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
                 </td>
                 <td>
                     <v-checkbox v-model="props.item.openSupplier" hide-details color="primary"></v-checkbox>
@@ -83,7 +83,7 @@
 
     export default {
         name: 'hierachy',
-        props: ['items', 'duplicate', 'remove', 'copy', 'canPaste', 'paste'],
+        props: ['items', 'duplicate', 'remove', 'copy', 'canPaste', 'paste', 'activeShopCodes', 'itemStatuses'],
         data() {
             return {
                 headers: headers
