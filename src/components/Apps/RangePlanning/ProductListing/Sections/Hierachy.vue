@@ -6,19 +6,23 @@
                 <td>{{ props.item.barcode }}</td>
                 <td>{{ props.item.description }}</td>
                 <td class="px-2">
-                    <v-autocomplete v-model="props.item.planogramName" placeholder="Planogram Name" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
+                    <v-autocomplete :items="planograms" v-model="props.item.planogramName" placeholder="Planogram Name"
+                        dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
                 </td>
                 <td class="px-2">
-                    <v-autocomplete v-model="props.item.category" placeholder="Category" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
+                    <v-autocomplete @change="onCategoryLinkChange(props.item)" :items="categoryLinks" v-model="props.item.category" placeholder="Category" dense
+                        full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
                 </td>
                 <td>{{ props.item.category_Code }}</td>
                 <td>{{ props.item.department }}</td>
                 <td>{{ props.item.subdepartment }}</td>
                 <td class="px-2">
-                    <v-autocomplete v-model="props.item.subcategory" placeholder="Subcategory" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
+                    <v-autocomplete :items="subcategories" v-model="props.item.subcategory" placeholder="Subcategory" dense full-width flat
+                        solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
                 </td>
                 <td class="px-2">
-                    <v-autocomplete v-model="props.item.segment" placeholder="Segment" dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
+                    <v-autocomplete :items="segments" v-model="props.item.segment" placeholder="Segment" dense full-width flat solo
+                        hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
                 </td>
                 <td style="width: 5px;">
                     <v-menu dark offset-y>
@@ -98,7 +102,10 @@
 
     export default {
         name: 'hierachy',
-        props: ['items', 'duplicate', 'remove', 'copy', 'canPaste', 'paste'],
+        props: ['items', 'duplicate', 'remove', 'copy', 
+            'canPaste', 'paste', 'planograms', 'categoryLinks', 
+            'subcategories', 'segments', 'getCategoryDetailsByID', 'setItemsData'
+        ],
         data() {
             return {
                 headers: headers
@@ -112,6 +119,17 @@
             removeLine(item) {
                 let self = this;
                 self.remove(item);
+            },
+            onCategoryLinkChange(item) {
+                let self = this;
+
+                self.$nextTick(() => {
+                    self.getCategoryDetailsByID(item.category, categoryDetails => {
+                        self.setItemsData(item.index, "category_Code", categoryDetails.category_Code);
+                        self.setItemsData(item.index, "department", categoryDetails.subdepartmentName);
+                        self.setItemsData(item.index, "subdepartment", categoryDetails.departmentName);
+                    });
+                })
             }
         }
     }

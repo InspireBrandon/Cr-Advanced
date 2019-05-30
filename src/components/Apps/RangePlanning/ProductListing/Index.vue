@@ -52,24 +52,32 @@
                                 <!-- Vendor -->
                                 <v-tab-item>
                                     <v-card flat>
-                                        <Vendor :canPaste="canPaste" :copy="copy" :paste="paste" :remove="remove"
-                                            :duplicate="duplicate" :items="items" ref="Vendor">
+                                        <Vendor :manufacturers="manufacturers" :brands="brands"
+                                            :getManufacturerDetailsByID="getManufacturerDetailsByID"
+                                            :setItemsData="setItemsData" :canPaste="canPaste" :copy="copy"
+                                            :paste="paste" :remove="remove" :duplicate="duplicate" :items="items"
+                                            ref="Vendor">
                                         </Vendor>
                                     </v-card>
                                 </v-tab-item>
                                 <!-- Hierachy -->
                                 <v-tab-item>
                                     <v-card flat>
-                                        <Hierachy :canPaste="canPaste" :copy="copy" :paste="paste" :remove="remove"
-                                            :duplicate="duplicate" :items="items" ref="Hierachy">
+                                        <Hierachy :setItemsData="setItemsData"
+                                            :getCategoryDetailsByID="getCategoryDetailsByID"
+                                            :subcategories="subcategories" :planograms="planograms" :segments="segments"
+                                            :categoryLinks="categoryLinks" :canPaste="canPaste" :copy="copy"
+                                            :paste="paste" :remove="remove" :duplicate="duplicate" :items="items"
+                                            ref="Hierachy">
                                         </Hierachy>
                                     </v-card>
                                 </v-tab-item>
                                 <!-- Item Status -->
                                 <v-tab-item>
                                     <v-card flat>
-                                        <ItemStatus :canPaste="canPaste" :copy="copy" :paste="paste" :remove="remove"
-                                            :duplicate="duplicate" :items="items" ref="ItemStatus">
+                                        <ItemStatus :itemStatuses="itemStatuses" :activeShopCodes="activeShopCodes" :canPaste="canPaste" :copy="copy"
+                                            :paste="paste" :remove="remove" :duplicate="duplicate" :items="items"
+                                            ref="ItemStatus">
                                         </ItemStatus>
                                     </v-card>
                                 </v-tab-item>
@@ -118,8 +126,8 @@
                                 <!-- Opening Orders -->
                                 <v-tab-item>
                                     <v-card flat>
-                                        <OpeningOrders :canPaste="canPaste" :copy="copy" :paste="paste"
-                                            :remove="remove" :duplicate="duplicate" :items="items" ref="OpeningOrders">
+                                        <OpeningOrders :canPaste="canPaste" :copy="copy" :paste="paste" :remove="remove"
+                                            :duplicate="duplicate" :items="items" ref="OpeningOrders">
                                         </OpeningOrders>
                                     </v-card>
                                 </v-tab-item>
@@ -197,6 +205,8 @@
 </template>
 
 <script>
+    import Axios from 'axios';
+
     import Standard from '@/components/Apps/RangePlanning/ProductListing/Sections/Standard'
     import Vendor from '@/components/Apps/RangePlanning/ProductListing/Sections/Vendor'
     import Hierachy from '@/components/Apps/RangePlanning/ProductListing/Sections/Hierachy'
@@ -207,8 +217,6 @@
     import StockControl from '@/components/Apps/RangePlanning/ProductListing/Sections/StockControl'
     import PriceAndMargin from '@/components/Apps/RangePlanning/ProductListing/Sections/PriceAndMargin'
     import OpeningOrders from '@/components/Apps/RangePlanning/ProductListing/Sections/OpeningOrders'
-    // TODO ADD LISTING
-    import Agreements from '@/components/Apps/RangePlanning/ProductListing/Sections/Agreements'
 
     const tabs = ['Standard', 'Vendor', 'Hierachy', 'Item Status', 'Images', 'Supporting Documents', 'Resources',
         'Stock Control', 'Price and Margin', 'Opening Orders'
@@ -222,7 +230,6 @@
             Hierachy,
             ItemStatus,
             ImagesAndDimensions,
-            Agreements,
             SupportingDocuments,
             Resources,
             StockControl,
@@ -231,21 +238,42 @@
         },
         data() {
             return {
-                dialog: true,
+                dialog: false,
                 tabs: tabs,
                 active: null,
                 items: [],
+                indexIncrement: 0,
                 overview: false,
                 clipBoardItem: null,
                 snackbar: false,
                 snackbarTimeout: 0,
-                snackbarText: null
+                snackbarText: null,
+                manufacturerDetails: [],
+                manufacturers: [],
+                brandDetails: [],
+                brands: [],
+                planogramDetails: [],
+                planograms: [],
+                categoryLinkDetails: [],
+                categoryLinks: [],
+                subcategoryDetails: [],
+                subcategories: [],
+                segmentDetails: [],
+                segments: [],
+                activeShopCodeDetails: [],
+                activeShopCodes: [],
+                itemStatusDetails: [],
+                itemStatuses: []
             }
         },
         computed: {
             canPaste() {
                 return this.clipBoardItem == null;
             }
+        },
+        created() {
+            let self = this;
+            self.getData();
         },
         methods: {
             show() {
@@ -259,14 +287,21 @@
             newLine() {
                 let self = this;
                 self.items.push({
+                    index: self.indexIncrement,
+                    manufacturer_Code: '',
                     threeDimensionalImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
                     frontImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
                     sideImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
                     topImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
                     consignmentOrFixed: "Consignment",
                     replacementOrNewProduct: "New Product",
-                    taxCode: "VE"
+                    taxCode: "VE",
+                    category_Code: '',
+                    department: '',
+                    subdepartment: ''
                 })
+
+                self.indexIncrement++;
             },
             openFile() {
                 let self = this;
@@ -321,6 +356,221 @@
             save() {
                 let self = this;
                 console.log(self.items)
+            },
+            getData() {
+                let self = this;
+                self.getManufacturers();
+                self.getBrands();
+                self.getPlanograms();
+                self.getCategoryLinks();
+                self.getSubcategories();
+                self.getSegments();
+                self.getActiveShopCodes();
+                self.getItemStatuses();
+            },
+            setItemsData(idx, property, value) {
+                let self = this;
+                self.$nextTick(() => {
+                    self.items[idx][property] = value;
+                })
+            },
+            getManufacturers() {
+                let self = this;
+
+                self.manufacturers = [];
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + "Retailer/Manufacturer")
+                    .then(r => {
+
+                        self.manufacturerDetails = r.data;
+
+                        r.data.forEach(element => {
+                            self.manufacturers.push({
+                                text: element.displayname,
+                                value: element.id
+                            })
+                        });
+
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+            },
+            getManufacturerDetailsByID(id, callback) {
+                let self = this;
+                let retval = null;
+
+                self.manufacturerDetails.forEach(el => {
+                    if (el.id == id)
+                        retval = el;
+                })
+
+                callback(retval);
+            },
+            getCategoryDetailsByID(id, callback) {
+                let self = this;
+                let retval = null;
+
+                self.categoryLinkDetails.forEach(el => {
+                    if (el.id == id)
+                        retval = el;
+                })
+
+                callback(retval);
+            },
+            getBrands() {
+                let self = this;
+
+                self.brands = [];
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + "Retailer/Brand")
+                    .then(r => {
+
+                        self.brandDetails = r.data;
+
+                        r.data.forEach(element => {
+                            self.brands.push({
+                                text: element.displayname,
+                                value: element.id
+                            })
+                        });
+
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+            },
+            getPlanograms() {
+                let self = this;
+
+                self.planograms = [];
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + "Planogram")
+                    .then(r => {
+
+                        self.planogramDetails = r.data.planogramList;
+
+                        r.data.planogramList.forEach(element => {
+                            self.planograms.push({
+                                text: element.displayname,
+                                value: element.id
+                            })
+                        });
+
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+            },
+            getCategoryLinks() {
+                let self = this;
+
+                self.categoryLinks = [];
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + "Retailer/Category_Link")
+                    .then(r => {
+
+                        self.categoryLinkDetails = r.data;
+
+                        r.data.forEach(element => {
+                            self.categoryLinks.push({
+                                text: element.displayName,
+                                value: element.id
+                            })
+                        });
+
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+            },
+            getSubcategories() {
+                let self = this;
+
+                self.subcategories = [];
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + "Retailer/Subcategory")
+                    .then(r => {
+
+                        self.subcategoryDetails = r.data;
+
+                        r.data.forEach(element => {
+                            self.subcategories.push({
+                                text: element.displayname,
+                                value: element.id
+                            })
+                        });
+
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+            },
+            getSegments() {
+                let self = this;
+
+                self.segments = [];
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + "Retailer/Subcategory")
+                    .then(r => {
+
+                        self.segmentDetails = r.data;
+
+                        r.data.forEach(element => {
+                            self.segments.push({
+                                text: element.displayname,
+                                value: element.id
+                            })
+                        });
+
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+            },
+            getActiveShopCodes() {
+                let self = this;
+
+                self.activeShopCodes = [];
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + "Retailer/Active_Shop_Code")
+                    .then(r => {
+
+                        self.activeShopCodeDetails = r.data;
+
+                        r.data.forEach(element => {
+                            self.activeShopCodes.push({
+                                text: element.displayName,
+                                value: element.id
+                            })
+                        });
+
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+            },
+            getItemStatuses() {
+                let self = this;
+
+                self.itemStatuses = [];
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + "Retailer/Item_Status")
+                    .then(r => {
+
+                        self.itemStatusDetails = r.data;
+
+                        r.data.forEach(element => {
+                            self.itemStatuses.push({
+                                text: element.displayname,
+                                value: element.id
+                            })
+                        });
+
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
             }
         }
     }

@@ -1,7 +1,7 @@
 <template>
-    <v-container fluid grid-list-md pa-2>
+    <v-container fluid grid-list-xs pa-2>
         <v-layout row wrap>
-            <v-flex v-if="hasDatabases" md12>
+            <v-flex v-if="hasDatabases" xs12 sm12 md12>
                 <v-card>
                     <!-- MAIN TOOLBAR -->
                     <v-toolbar flat dark dense color="primary">
@@ -83,14 +83,13 @@
                     </v-toolbar>
                     <!-- END BLACK TOOLBAR -->
 
-                    <v-container fluid grid-list-md class="pa-0">
+                    <v-container style="max-width: 100vw; overflow-x: auto;" fluid grid-list-xs class="pa-0">
                         <v-layout row wrap class="pa-0">
-                            <v-flex :class="{ 'md10': showNotices, 'md11': !showNotices }" class="pa-0"
-                                v-if="selectedView==0">
+                            <v-flex :class="{ 'md10 sm10 xs10': showNotices, 'md11 sm11 xs11': !showNotices }" v-if="selectedView==0">
                                 <TaskView :data="filteredData" :typeList="typeList" :statusList="statusList"
                                     :systemUserID="systemUserID" />
                             </v-flex>
-                            <v-flex v-if="selectedView==0" :class="{ 'md2': showNotices, 'md1': !showNotices }">
+                            <v-flex v-if="selectedView==0" :class="{ 'md2 sm2 xs2': showNotices, 'md1 sm1 xs1': !showNotices }">
                                 <v-card tile flat style="border-left: 1px solid lightgrey;">
                                     <v-toolbar flat dark dense color="grey darken-3">
                                         <v-toolbar-title v-if="showNotices">Notices</v-toolbar-title>
