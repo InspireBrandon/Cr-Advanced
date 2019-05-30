@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div style=" overflow: auto;">
         <div v-if="data.Type == 'GONDOLA' || data.Type == 'PALLETE' && data.Type!='PRODUCT'">
             <v-toolbar dense flat dark><b>{{ data.Type + " " + data.Position + " - " }}</b> {{ data.Data.Data.name }}
             </v-toolbar>
@@ -14,21 +14,21 @@
                 <item v-for="(item, index) in data.children" :childdark="!childdark" :key="index" :data="item">
                 </item>
             </div>
-            <div v-if="data.Type != 'GONDOLA' " style="background: white">
+            <div v-if="data.Type != 'GONDOLA' " style="background: white ;overflow: auto;">
                 <table>
                     <tr>
                         <th>Position</th>
-                        <th>Product Code</th>
+                        <th style="min-width:150px">Product Code</th>
                         <th>Barcode</th>
-                        <th>Description </th>
+                        <th style="min-width:400px">Description </th>
 
 
-                        <th>X Facings</th>
-                        <th>Y Facings</th>
-                        <th>Z Facings</th>
+                        <th style="min-width:100px">X Facings</th>
+                        <th style="min-width:100px">Y Facings</th>
+                        <th style="min-width:100px">Z Facings</th>
                         <th>Caps</th>
                         <th>Orientation</th>
-                        <th>Total Facings</th>
+                        <th style="min-width:100px">Total Facings</th>
                     </tr>
                     <tr v-for="(product,index) in products" :key="index">
                         <td>{{product.Position}}</td>

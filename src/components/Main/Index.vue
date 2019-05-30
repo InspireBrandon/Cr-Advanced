@@ -108,7 +108,7 @@
                 <v-card class="elevation-0"
                     style="background: url('./banner.png'); background-size: cover; background-position: center;">
                     <v-card-text style="height: 150px; position: relative; padding: 0px">
-                        <router-view class="main-main"></router-view>
+                        <router-view class="main-main" v-if="Loaded"></router-view>
                     </v-card-text>
                 </v-card>
 
@@ -152,6 +152,7 @@
         name: 'main-page',
         data() {
             return {
+                Loaded:false,
                 snackbarText: "",
                 snackbar: false,
                 sheet: false,
@@ -286,6 +287,7 @@
                         if (r.data.length > 0) {
                             self.databases = r.data;
                             sessionStorage.currentDatabase = r.data[0].tenantID;
+                            self.Loaded=true
                         }
                     })
             },
