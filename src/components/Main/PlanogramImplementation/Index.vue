@@ -75,6 +75,9 @@
                             <v-toolbar color="primary" dark flat dense>
                                 Planogram Image
                                 <v-spacer></v-spacer>
+                    {{displayName}}
+                                <v-spacer>
+                                </v-spacer>
                                 <v-tooltip bottom>
                                     <v-btn flat outline slot="activator" @click="openReport">
                                         <!-- <v-icon>save_alt</v-icon> -->
@@ -151,6 +154,7 @@
                     <v-toolbar-title>
                         Planogram Image
                     </v-toolbar-title>
+                   
                     <v-spacer></v-spacer>
                     <v-btn @click="imageModal = false" icon>
                         <v-icon>close</v-icon>
@@ -206,6 +210,7 @@
                     planogramName: "PlanoNAme 2 ",
                     implemented: 1,
                 }],
+                displayName: null,
                 planogramObj: null,
                 showLoader: false,
                 imageModal: false,
@@ -289,7 +294,7 @@
             },
             orderVariation() {
                 let self = this
-                self.$refs.assignTask.show(data=>{
+                self.$refs.assignTask.show(data => {
 
                 })
             },
@@ -316,6 +321,9 @@
 
                     Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&id=' + planogram)
                         .then(r => {
+                            console.log(r.data.name);
+                            
+                            self.displayName = r.data.name
                             self.planogramObj = r.data
                             self.image = r.data.image;
                             self.showLoader = false
@@ -726,7 +734,7 @@
                             self.items = r.data.projectTXList;
 
                             let hasIn = false;
-                                    console.log(r.data.projectTXList);
+                            console.log(r.data.projectTXList);
 
                             r.data.projectTXList.forEach((element, idx) => {
 
@@ -743,7 +751,7 @@
                                             hasIn = true;
                                         }
                                     }
-                                    
+
                                     if (element.actionedByUserID == null && element.systemUserID !=
                                         null) {
                                         self.timelineItems.push({

@@ -806,32 +806,40 @@
                 let projectTXGroupRequest = {
                     projectID: item.project_ID
                 }
+              item.removed = true;
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                self.$refs.NotesModal.show("Subtask complete notes", notes => {
-                    request.status++;
-                    request.notes = self.findAndReplaceNote(request.notes);
-                    request.actionedByUserID = request.systemUserID;
-                    request.systemUserID = null;
-                    let tmpRollover = request.rollingUserID;
-                    request.rollingUserID = null;
+                Axios.put(process.env.VUE_APP_API + "ProjectTX?update=false", item).then(r => {
+                    console.log(r);
+                    
+                    self.$refs.NotesModal.show("Subtask complete notes", notes => {
+                        request.status++;
+                        request.notes = self.findAndReplaceNote(request.notes);
+                        request.actionedByUserID = request.systemUserID;
+                        request.systemUserID = null;
+                        let tmpRollover = request.rollingUserID;
+                        request.rollingUserID = null;
 
-                    // Create complete transaction
-                    self.createProjectTransaction(request, endTransaction => {
-                        // Create new group to inform other user
-                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
-                            request.notes = self.findAndReplaceNote(notes);
-                            request.systemUserID = tmpRollover;
-                            request.actionedByUserID = null;
-                            request.rollingUserID = null;
-                            request.projectTXGroup_ID = newGroup.id;
-                            request.closed==true;
-                            // Create new transaction
-                            self.createProjectTransaction(request, newRequest => {
-                                self.$parent.$parent.getTaskViewData();
-                            })
+                        // Create complete transaction
+                        self.createProjectTransaction(request, endTransaction => {
+                            // Create new group to inform other user
+                            self.createProjectTransactionGroup(projectTXGroupRequest,
+                                newGroup => {
+                                    request.notes = self.findAndReplaceNote(notes);
+                                    request.systemUserID = tmpRollover;
+                                    request.actionedByUserID = null;
+                                    request.rollingUserID = null;
+                                    request.projectTXGroup_ID = newGroup.id;
+
+                                    // Create new transaction
+                                    self.createProjectTransaction(request, newRequest => {
+                                        self.$parent.$parent.getTaskViewData();
+                                    })
+                                })
                         })
                     })
                 })
+
             },
             getUsernameByUserID(userID) {
                 let self = this;
