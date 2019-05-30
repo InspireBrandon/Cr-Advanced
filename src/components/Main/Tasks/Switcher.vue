@@ -83,7 +83,7 @@
                     </v-toolbar>
                     <!-- END BLACK TOOLBAR -->
 
-                    <v-container style="max-width: 100vw; overflow-x: auto;" fluid grid-list-xs class="pa-0">
+                    <v-container style="max-width: 100vw;" fluid grid-list-xs class="pa-0">
                         <v-layout row wrap class="pa-0">
                             <v-flex :class="{ 'md10 sm10 xs10': showNotices, 'md11 sm11 xs11': !showNotices }" v-if="selectedView==0">
                                 <TaskView :data="filteredData" :typeList="typeList" :statusList="statusList"
@@ -120,7 +120,7 @@
             </v-flex>
             <v-flex v-else md12>
                 <v-card>
-                    <v-card-text v-if="self.loading">
+                    <v-card-text v-if="loading">
                         It appears as though you do not have access to any databases. Please request access to
                         continue...
                     </v-card-text>

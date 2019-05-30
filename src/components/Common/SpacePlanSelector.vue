@@ -23,9 +23,6 @@
                 <v-list-tile-title v-text="sp.name"></v-list-tile-title>
               </v-list-tile-content>
               <v-spacer></v-spacer>
-              <v-list-tile-action>
-                {{status[sp.status == null ? 2 : sp.status].friendy}}
-              </v-list-tile-action>
             </v-list-tile>
           </v-list>
         </v-card-text>

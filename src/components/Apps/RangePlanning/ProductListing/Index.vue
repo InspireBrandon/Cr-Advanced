@@ -10,7 +10,7 @@
                             <v-icon>close</v-icon>
                         </v-btn>
                     </v-toolbar>
-                    <v-card-text>
+                    <v-card-text class="pa-0">
                         <div class="elevation-3">
 
                             <v-toolbar dark dense flat>
@@ -26,7 +26,7 @@
                                             <v-list-tile @click="openFile">
                                                 <v-list-tile-title>Open</v-list-tile-title>
                                             </v-list-tile>
-                                            <v-list-tile @click="save">
+                                            <v-list-tile @click="prompt">
                                                 <v-list-tile-title>Save</v-list-tile-title>
                                             </v-list-tile>
                                             <v-list-tile @click="closeFile">
@@ -39,20 +39,20 @@
                                     {{ overview == false? 'Report' : 'Sections' }}</v-btn>
                             </v-toolbar>
 
-                            <v-tabs v-show="!overview" v-model="active" grow dark slider-color="primary">
+                            <v-tabs v-if="items.length > 0" v-show="!overview" v-model="active" grow dark slider-color="primary">
                                 <v-tab ripple v-for="(tab, idx) in tabs" :key="idx">{{ tab }}</v-tab>
                                 <!-- Standard -->
                                 <v-tab-item>
                                     <v-card flat>
-                                        <Standard :canPaste="canPaste" :copy="copy" :paste="paste" :remove="remove"
-                                            :duplicate="duplicate" :items="items" ref="Standard">
+                                        <Standard v-if="active == 0" :canPaste="canPaste" :copy="copy" :paste="paste"
+                                            :remove="remove" :duplicate="duplicate" :items="items" ref="Standard">
                                         </Standard>
                                     </v-card>
                                 </v-tab-item>
                                 <!-- Vendor -->
                                 <v-tab-item>
                                     <v-card flat>
-                                        <Vendor :manufacturers="manufacturers" :brands="brands"
+                                        <Vendor v-if="active == 1" :manufacturers="manufacturers" :brands="brands"
                                             :getManufacturerDetailsByID="getManufacturerDetailsByID"
                                             :setItemsData="setItemsData" :canPaste="canPaste" :copy="copy"
                                             :paste="paste" :remove="remove" :duplicate="duplicate" :items="items"
@@ -63,7 +63,7 @@
                                 <!-- Hierachy -->
                                 <v-tab-item>
                                     <v-card flat>
-                                        <Hierachy :setItemsData="setItemsData"
+                                        <Hierachy v-if="active == 2" :setItemsData="setItemsData"
                                             :getCategoryDetailsByID="getCategoryDetailsByID"
                                             :subcategories="subcategories" :planograms="planograms" :segments="segments"
                                             :categoryLinks="categoryLinks" :canPaste="canPaste" :copy="copy"
@@ -75,7 +75,8 @@
                                 <!-- Item Status -->
                                 <v-tab-item>
                                     <v-card flat>
-                                        <ItemStatus :itemStatuses="itemStatuses" :activeShopCodes="activeShopCodes" :canPaste="canPaste" :copy="copy"
+                                        <ItemStatus v-if="active == 3" :itemStatuses="itemStatuses"
+                                            :activeShopCodes="activeShopCodes" :canPaste="canPaste" :copy="copy"
                                             :paste="paste" :remove="remove" :duplicate="duplicate" :items="items"
                                             ref="ItemStatus">
                                         </ItemStatus>
@@ -84,8 +85,8 @@
                                 <!-- Images -->
                                 <v-tab-item>
                                     <v-card flat>
-                                        <ImagesAndDimensions :canPaste="canPaste" :copy="copy" :paste="paste"
-                                            :remove="remove" :duplicate="duplicate" :items="items"
+                                        <ImagesAndDimensions v-if="active == 4" :canPaste="canPaste" :copy="copy"
+                                            :paste="paste" :remove="remove" :duplicate="duplicate" :items="items"
                                             ref="ImagesAndDimensions">
                                         </ImagesAndDimensions>
                                     </v-card>
@@ -93,8 +94,8 @@
                                 <!-- Supporting Documents -->
                                 <v-tab-item>
                                     <v-card flat>
-                                        <SupportingDocuments :canPaste="canPaste" :copy="copy" :paste="paste"
-                                            :remove="remove" :duplicate="duplicate" :items="items"
+                                        <SupportingDocuments v-if="active == 5" :canPaste="canPaste" :copy="copy"
+                                            :paste="paste" :remove="remove" :duplicate="duplicate" :items="items"
                                             ref="SupportingDocuments">
                                         </SupportingDocuments>
                                     </v-card>
@@ -102,38 +103,41 @@
                                 <!-- Resources -->
                                 <v-tab-item>
                                     <v-card flat>
-                                        <Resources :canPaste="canPaste" :copy="copy" :paste="paste" :remove="remove"
-                                            :duplicate="duplicate" :items="items" ref="Resources">
+                                        <Resources v-if="active == 6" :canPaste="canPaste" :copy="copy" :paste="paste"
+                                            :remove="remove" :duplicate="duplicate" :items="items" ref="Resources">
                                         </Resources>
                                     </v-card>
                                 </v-tab-item>
                                 <!-- Stock Control -->
                                 <v-tab-item>
                                     <v-card flat>
-                                        <StockControl :canPaste="canPaste" :copy="copy" :paste="paste" :remove="remove"
-                                            :duplicate="duplicate" :items="items" ref="StockControl">
+                                        <StockControl v-if="active == 7" :canPaste="canPaste" :copy="copy"
+                                            :paste="paste" :remove="remove" :duplicate="duplicate" :items="items"
+                                            ref="StockControl">
                                         </StockControl>
                                     </v-card>
                                 </v-tab-item>
                                 <!-- Price And Margin -->
                                 <v-tab-item>
                                     <v-card flat>
-                                        <PriceAndMargin :canPaste="canPaste" :copy="copy" :paste="paste"
-                                            :remove="remove" :duplicate="duplicate" :items="items" ref="PriceAndMargin">
+                                        <PriceAndMargin v-if="active == 8" :canPaste="canPaste" :copy="copy"
+                                            :paste="paste" :remove="remove" :duplicate="duplicate" :items="items"
+                                            ref="PriceAndMargin">
                                         </PriceAndMargin>
                                     </v-card>
                                 </v-tab-item>
                                 <!-- Opening Orders -->
                                 <v-tab-item>
                                     <v-card flat>
-                                        <OpeningOrders :canPaste="canPaste" :copy="copy" :paste="paste" :remove="remove"
-                                            :duplicate="duplicate" :items="items" ref="OpeningOrders">
+                                        <OpeningOrders v-if="active == 9" :canPaste="canPaste" :copy="copy"
+                                            :paste="paste" :remove="remove" :duplicate="duplicate" :items="items"
+                                            ref="OpeningOrders">
                                         </OpeningOrders>
                                     </v-card>
                                 </v-tab-item>
                             </v-tabs>
 
-                            <v-card flat v-show="overview">
+                            <v-card v-if="items.length > 0" flat v-show="overview">
                                 <table style="width: calc(100vw - 32px); overflow-x: scroll">
                                     <thead>
                                         <tr>
@@ -201,6 +205,9 @@
                 </v-snackbar>
             </v-dialog>
         </v-layout>
+        <Prompt ref="prompt"></Prompt>
+        <NewItemListingSelector ref="newItemListingSelector"></NewItemListingSelector>
+        <YesNoModal ref="yesNo"></YesNoModal>
     </div>
 </template>
 
@@ -218,6 +225,10 @@
     import PriceAndMargin from '@/components/Apps/RangePlanning/ProductListing/Sections/PriceAndMargin'
     import OpeningOrders from '@/components/Apps/RangePlanning/ProductListing/Sections/OpeningOrders'
 
+    import Prompt from '@/components/Common/Prompt';
+    import NewItemListingSelector from '@/components/Common/NewItemListingSelector'
+    import YesNoModal from '@/components/Common/YesNoModal'
+
     const tabs = ['Standard', 'Vendor', 'Hierachy', 'Item Status', 'Images', 'Supporting Documents', 'Resources',
         'Stock Control', 'Price and Margin', 'Opening Orders'
     ];
@@ -234,13 +245,18 @@
             Resources,
             StockControl,
             PriceAndMargin,
-            OpeningOrders
+            OpeningOrders,
+            Prompt,
+            NewItemListingSelector,
+            YesNoModal
         },
         data() {
             return {
+                isAdd: true,
                 dialog: false,
                 tabs: tabs,
                 active: null,
+                currentFileName: '',
                 items: [],
                 indexIncrement: 0,
                 overview: false,
@@ -289,10 +305,6 @@
                 self.items.push({
                     index: self.indexIncrement,
                     manufacturer_Code: '',
-                    threeDimensionalImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
-                    frontImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
-                    sideImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
-                    topImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
                     consignmentOrFixed: "Consignment",
                     replacementOrNewProduct: "New Product",
                     taxCode: "VE",
@@ -305,22 +317,19 @@
             },
             openFile() {
                 let self = this;
-                self.items = [];
 
-                for (var i = 1; i < 6; i++) {
-                    self.items.push({
-                        threeDimensionalImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
-                        frontImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
-                        sideImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
-                        topImage: 'http://www.stleos.uq.edu.au/wp-content/uploads/2016/08/image-placeholder-350x350.png',
-                        consignmentOrFixed: "Consignment",
-                        replacementOrNewProduct: "New Product",
-                        taxCode: "VE"
-                    })
-                }
+                self.$refs.newItemListingSelector.show((fileID, item) => {
+                    Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fileID}`)
+                        .then(r => {
+                            self.isAdd = false;
+                            self.currentFileName = item.name;
+                            self.items = r.data;
+                        })
+                })
             },
             closeFile() {
                 let self = this;
+                self.isAdd = true;
                 self.items = [];
             },
             duplicate(item) {
@@ -353,9 +362,55 @@
                 self.snackbarText = snackbarText;
                 self.snackbar = true;
             },
-            save() {
+            prompt() {
                 let self = this;
-                console.log(self.items)
+
+                if (self.isAdd) {
+                    self.$refs.prompt.show("", "Save file as", 'File name', fileName => {
+                        Axios.post(process.env.VUE_APP_API + "SystemFile/Exists?db=CR-Devinspire", {
+                            SystemFile: {
+                                SystemUser_ID: -1,
+                                Folder: "New Item Listing",
+                                Name: fileName,
+                                Extension: '.json'
+                            }
+                        }).then(r => {
+                            if (r.data == true) {
+                                self.$refs.yesNo.show(
+                                    'File already Exists, Would you like to overwrite it?',
+                                    goThrough => {
+                                        if (goThrough) {
+                                            self.save(fileName);
+                                        }
+                                    })
+                            } else {
+                                self.save(fileName);
+                            }
+                        })
+                    })
+                } else {
+                    self.save(self.currentFileName);
+                }
+            },
+            save(name) {
+                let self = this;
+
+                Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
+                        SystemFile: {
+                            SystemUser_ID: -1,
+                            Folder: "New Item Listing",
+                            Name: name,
+                            Extension: '.json'
+                        },
+                        Data: self.items
+                    })
+                    .then(r => {
+                        alert("Saved!");
+                        console.log(r.data);
+                    })
+                    .catch(e => {
+                        console.log(e);
+                    })
             },
             getData() {
                 let self = this;
