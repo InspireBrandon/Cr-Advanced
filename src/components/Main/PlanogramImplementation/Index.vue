@@ -1,7 +1,8 @@
 <template>
     <v-card>
-        <v-toolbar dense dark >
-            <v-btn color="primary" flat outline dark @click="openStoreView()" v-if="(currentPlanogram != null && selectedProject != null)">Store View </v-btn>
+        <v-toolbar dense dark>
+            <v-btn color="primary" flat outline dark @click="openStoreView()"
+                v-if="(currentPlanogram != null && selectedProject != null)">Store View </v-btn>
             <v-spacer></v-spacer>
             <v-toolbar-title>Planogram Implementation</v-toolbar-title>
         </v-toolbar>
@@ -130,33 +131,47 @@
 
                 <v-dialog fullscreen v-model="storeView">
                     <v-card>
-                        <v-toolbar flat color="primary" dark dense>
+                        <v-toolbar flat color="primary" dark>
                             <v-toolbar-title>
-                                Store Plannograms overView
+                                Store Planogram Overview: {{ ProjectName }}
                             </v-toolbar-title>
                             <v-spacer></v-spacer>
-                            <v-btn icon flat dark @click="storeView=false"> 
+                            <v-btn icon flat dark @click="storeView=false">
                                 <v-icon>close</v-icon>
                             </v-btn>
                         </v-toolbar>
-                        <v-toolbar  dark flat>
-                                <v-toolbar-title>
-                                    {ProjectName}
-                                </v-toolbar-title>
+                        <v-toolbar dark flat dense>
+                            <v-toolbar-items>
+                                <v-tabs v-model="active" color="cyan" dark slider-color="yellow">
+                                    <v-tab v-for="n in 3" :key="n" ripple>
+                                        Item {{ n }}
+                                    </v-tab>
+                                </v-tabs>
+                            </v-toolbar-items>
                         </v-toolbar>
-                        <v-data-table :headers="headers" :items="currentStorePlanograms" class="elevation-1" hide-actions>
-                            <template v-slot:items="props">
-                                <tr>
-                                    <td>{{props.item.store}}</td>
-                                    <td>{{props.item.systemFileName}}</td>
-                                    <td>{{status[props.item.status  == -1 ? 18 : props.item.status].text}}</td>
-                                    <td>
-                                        <v-btn color="primary" @click="ChangeSpacePlan">Change</v-btn>
-                                        <v-btn color="primary" @click="orderVariation">Variation</v-btn>
-                                    </td>
-                                </tr>
-                            </template>
-                        </v-data-table>
+                        <v-card-text>
+                            <v-data-table :headers="headers" :items="currentStorePlanograms" class="elevation-1"
+                                hide-actions>
+                                <template v-slot:items="props">
+                                    <tr>
+                                        <td>{{props.item.storeName}}</td>
+                                        <td></td>
+                                        <td>{{ props.item.planogramStoreStatus == 0 ? 'Unasigned' : props.item.planogramStoreStatus }}
+                                        </td>
+                                        <td>
+                                            <!-- UNASSIGNED -->
+                                            <v-btn icon flat v-if="props.item.planogramStoreStatus == 0" small
+                                                color="primary" @click="ChangeSpacePlan">
+                                                <v-icon>assignment</v-icon>
+                                            </v-btn>
+                                            <!-- DISTRIBUTED TO STORE -->
+                                            <v-btn v-if="props.item.planogramStoreStatus == 1" small color="primary"
+                                                @click="ChangeSpacePlan">Change</v-btn>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </v-data-table>
+                        </v-card-text>
                     </v-card>
                 </v-dialog>
             </v-layout>
@@ -214,8 +229,7 @@
         },
         data: () => {
             return {
-                currentStorePlanograms: [
-                    ],
+                currentStorePlanograms: [],
                 storeView: false,
                 displayName: null,
                 planogramObj: null,
@@ -253,11 +267,12 @@
                     text: "Planogram",
                     sortable: false
                 }, {
-                    text: "Implemented",
+                    text: "Current Status",
                     sortable: false
                 }, {
                     text: "Options",
-                    sortable: false
+                    sortable: false,
+                    width: '280px'
                 }],
             }
         },
@@ -293,23 +308,21 @@
             }
         },
         methods: {
-            openStoreView(){
-                let self=this
-                self.getStorePlanograms()
-                self.storeView=true
+            openStoreView() {
+                let self = this
+                self.storeView = true
 
             },
-            getStorePlanograms(){
+            getStorePlanograms() {
                 let self = this
-                self.currentStorePlanograms=[]
-                self.items.forEach(element=>{
-                    if((element.status==13||element.status==15)&&element.actionedByUserID==null&&element.systemFileName!=null){
-                        self.currentStorePlanograms.push(element)
-                    }
-                })
-                console.log(self.currentStorePlanograms);
-                
-                
+                self.currentStorePlanograms = [];
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + 'Store_Planogram?project_ID=' + self.selectedProject)
+                    .then(r => {
+                        self.currentStorePlanograms = r.data.store_PlanogramList;
+                    })
             },
             ChangeSpacePlan() {
                 let self = this
@@ -645,6 +658,8 @@
                     let currentProjectID = self.selectedProject;
                     let currentProject;
 
+                    self.getStorePlanograms();
+
                     self.projects.forEach(project => {
                         if (project.id == currentProjectID)
                             currentProject = project;
@@ -878,7 +893,7 @@
 
 
                             self.projectsStatus = self.timelineItems[0]
-                           
+
                             resolve();
                         })
                         .catch(e => {
@@ -1269,4 +1284,4 @@
         background: #1976d2;
         color: white;
     }
-</style>
+</style>d
