@@ -43,9 +43,9 @@
                                     <td>{{props.item.username}}</td>
                                     <td>{{props.item.actionedByUserName}}</td>
                                     <td>
-                                        <v-btn
+                                        <!-- <v-btn
                                             v-if="(accessType!=2&&(props.item.type != -1)&&(props.item.type==2 &&props.item.rangeFileID!=null))"
-                                            color="success" small @click="routeToView(props.item)">View</v-btn>
+                                            color="success" small @click="routeToView(props.item)">View</v-btn> -->
                                         <v-btn
                                             v-if="(props.item.type != -1)&&((props.item.type==3 &&props.item.systemFileName!=null))&&(props.item.status!=1&&props.item.status!=8&&props.item.status!=41)"
                                             color="primary" small @click="routeToView(props.item)">View</v-btn>
