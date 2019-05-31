@@ -209,6 +209,22 @@
                                         </v-tooltip>
                                     </td>
                                     <td style="width: 2%">
+                                        <v-tooltip bottom v-if="props.item.systemFileName != null">
+                                            <template v-slot:activator="{ on }">
+                                                <v-icon v-on="on">web</v-icon>
+                                            </template>
+                                            <span>{{ props.item.systemFileName }}</span>
+                                        </v-tooltip>
+                                    </td>
+                                    <td style="width: 2%">
+                                        <v-tooltip bottom v-if="props.item.rangeFileName != null">
+                                            <template v-slot:activator="{ on }">
+                                                <v-icon v-on="on">assessment</v-icon>
+                                            </template>
+                                            <span>{{ props.item.rangeFileName }}</span>
+                                        </v-tooltip>
+                                    </td>
+                                    <td style="width: 2%">
                                         <v-menu left>
                                             <v-btn v-if="userAccess != 3" icon slot="activator">
                                                 <v-icon>more_vert</v-icon>
@@ -321,6 +337,14 @@
                         sortable: false
                     }, {
                         text: 'Actioned by',
+                        sortable: false
+                    },
+                    {
+                        text: '',
+                        sortable: false
+                    },
+                    {
+                        text: '',
                         sortable: false
                     },
                     {
@@ -806,12 +830,12 @@
                 let projectTXGroupRequest = {
                     projectID: item.project_ID
                 }
-              item.removed = true;
+                item.removed = true;
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.put(process.env.VUE_APP_API + "ProjectTX?update=false", item).then(r => {
                     console.log(r);
-                    
+
                     self.$refs.NotesModal.show("Subtask complete notes", notes => {
                         request.status++;
                         request.notes = self.findAndReplaceNote(request.notes);
