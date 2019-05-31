@@ -1,6 +1,7 @@
 <template>
     <v-card>
-        <v-toolbar dense dark>
+        <v-toolbar dense dark >
+            <v-btn color="primary" flat outline dark @click="openStoreView()" v-if="(currentPlanogram != null && selectedProject != null)">Store View </v-btn>
             <v-spacer></v-spacer>
             <v-toolbar-title>Planogram Implementation</v-toolbar-title>
         </v-toolbar>
@@ -38,6 +39,7 @@
                         <v-progress-circular class="ma-0" color="primary" indeterminate height="5">
                         </v-progress-circular>
                     </v-flex>
+
                     <v-flex xl12 lg12 md12 sm12 xs12
                         v-if="(selectedPlanogram != null || routeProjectID != null) && !showLoader">
                         <v-toolbar color="primary" dark dense flat
@@ -75,7 +77,7 @@
                             <v-toolbar color="primary" dark flat dense>
                                 Planogram Image
                                 <v-spacer></v-spacer>
-                    {{displayName}}
+                                {{displayName}}
                                 <v-spacer>
                                 </v-spacer>
                                 <v-tooltip bottom>
@@ -125,27 +127,38 @@
                         </v-card-text>
                     </v-card>
                 </v-flex>
-                <!-- <v-flex xl7 lg7 md7 sm12 xs12>
-                    <v-toolbar flat color="primary" dark dense>
-                        <v-toolbar-title>
-                            Store Plannograms
-                        </v-toolbar-title>
-                    </v-toolbar>
-                    <v-data-table :headers="headers" :items="currentStorePlanograms" class="elevation-1">
-                        <template v-slot:items="props">
-                            <tr>
-                                <td>{{props.item.storeName}}</td>
-                                <td>{{props.item.planogramName}}</td>
-                                <td>{{props.item.implemented==0 ? false : true}}</td>
-                                <td>
-                                    <v-btn color="primary" @click="ChangeSpacePlan">Change</v-btn>
-                                    <v-btn color="primary" @click="orderVariation">Variation</v-btn>
-                                </td>
-                            </tr>
-                        </template>
-                    </v-data-table>
-                </v-flex>
-                <v-flex xl5 lg5 md5 sm12 xs12></v-flex> -->
+
+                <v-dialog fullscreen v-model="storeView">
+                    <v-card>
+                        <v-toolbar flat color="primary" dark dense>
+                            <v-toolbar-title>
+                                Store Plannograms overView
+                            </v-toolbar-title>
+                            <v-spacer></v-spacer>
+                            <v-btn icon flat dark @click="storeView=false"> 
+                                <v-icon>close</v-icon>
+                            </v-btn>
+                        </v-toolbar>
+                        <v-toolbar  dark flat>
+                                <v-toolbar-title>
+                                    {ProjectName}
+                                </v-toolbar-title>
+                        </v-toolbar>
+                        <v-data-table :headers="headers" :items="currentStorePlanograms" class="elevation-1" hide-actions>
+                            <template v-slot:items="props">
+                                <tr>
+                                    <td>{{props.item.store}}</td>
+                                    <td>{{props.item.systemFileName}}</td>
+                                    <td>{{status[props.item.status  == -1 ? 18 : props.item.status].text}}</td>
+                                    <td>
+                                        <v-btn color="primary" @click="ChangeSpacePlan">Change</v-btn>
+                                        <v-btn color="primary" @click="orderVariation">Variation</v-btn>
+                                    </td>
+                                </tr>
+                            </template>
+                        </v-data-table>
+                    </v-card>
+                </v-dialog>
             </v-layout>
         </v-container>
         <v-dialog fullscreen v-model="imageModal">
@@ -154,7 +167,7 @@
                     <v-toolbar-title>
                         Planogram Image
                     </v-toolbar-title>
-                   
+
                     <v-spacer></v-spacer>
                     <v-btn @click="imageModal = false" icon>
                         <v-icon>close</v-icon>
@@ -201,15 +214,9 @@
         },
         data: () => {
             return {
-                currentStorePlanograms: [{
-                    storeName: "Store A",
-                    planogramName: "PlanoNAme",
-                    implemented: 0,
-                }, {
-                    storeName: "Store B",
-                    planogramName: "PlanoNAme 2 ",
-                    implemented: 1,
-                }],
+                currentStorePlanograms: [
+                    ],
+                storeView: false,
                 displayName: null,
                 planogramObj: null,
                 showLoader: false,
@@ -286,6 +293,24 @@
             }
         },
         methods: {
+            openStoreView(){
+                let self=this
+                self.getStorePlanograms()
+                self.storeView=true
+
+            },
+            getStorePlanograms(){
+                let self = this
+                self.currentStorePlanograms=[]
+                self.items.forEach(element=>{
+                    if((element.status==13||element.status==15)&&element.actionedByUserID==null&&element.systemFileName!=null){
+                        self.currentStorePlanograms.push(element)
+                    }
+                })
+                console.log(self.currentStorePlanograms);
+                
+                
+            },
             ChangeSpacePlan() {
                 let self = this
                 self.$refs.SpacePlanSelector.show(data => {
@@ -322,7 +347,7 @@
                     Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&id=' + planogram)
                         .then(r => {
                             console.log(r.data.name);
-                            
+
                             self.displayName = r.data.name
                             self.planogramObj = r.data
                             self.image = r.data.image;
@@ -744,7 +769,6 @@
                                 }
 
                                 if (element.deleted != true) {
-
                                     if (!hasIn) {
                                         if (element.status == self.routeStatus) {
                                             self.tmpRequest = element;
@@ -752,26 +776,84 @@
                                         }
                                     }
 
+
+
+                                    // if (element.actionedByUserID != null && element.status == 12) {
+                                    //     self.timelineItems.push({
+                                    //         status: element.status,
+                                    //         notes: self.status[element.status].text,
+                                    //         date: element.dateTimeString,
+                                    //         user: element.username,
+                                    //         userID: element.actionedByUserID,
+                                    //         type: element.type,
+                                    //         storeID: element.store_ID,
+                                    //         store: element.store,
+                                    //         storeCluster_ID: element.storeCluster_ID,
+                                    //         storeCluster: element.storeCluster,
+                                    //         categoryCluster_ID: element.categoryCluster_ID,
+                                    //         actionedByUserID: elemen.systemUserID,
+                                    //         actionedByUserName: element.actionedByUserName,
+                                    //         projectOwnerID: element.projectOwnerID,
+                                    //         systemFileID: element.systemFileID
+                                    //     })
+                                    // }
                                     if (element.actionedByUserID == null && element.systemUserID !=
                                         null) {
-                                        self.timelineItems.push({
-                                            status: element.status,
-                                            notes: self.status[element.status].text,
-                                            date: element.dateTimeString,
-                                            user: element.username,
-                                            userID: element.systemUserID,
-                                            type: element.type,
-                                            storeID: element.store_ID,
-                                            store: element.store,
-                                            storeCluster_ID: element.storeCluster_ID,
-                                            storeCluster: element.storeCluster,
-                                            categoryCluster_ID: element.categoryCluster_ID,
-                                            actionedByUserID: element.actionedByUserID,
-                                            actionedByUserName: element.actionedByUserName,
-                                            projectOwnerID: element.projectOwnerID,
-                                            systemFileID: element.systemFileID
+                                        if (element.status == 12) {
+                                            self.timelineItems.push({
+                                                status: r.data.projectTXList[idx + 1]
+                                                    .status,
+                                                notes: self.status[r.data.projectTXList[
+                                                    idx + 1].status].text,
+                                                date: r.data.projectTXList[idx + 1]
+                                                    .dateTimeString,
+                                                user: r.data.projectTXList[idx + 1]
+                                                    .username,
+                                                userID: r.data.projectTXList[idx + 1]
+                                                    .systemUserID,
+                                                type: r.data.projectTXList[idx + 1].type,
+                                                storeID: r.data.projectTXList[idx + 1]
+                                                    .store_ID,
+                                                store: r.data.projectTXList[idx + 1].store,
+                                                storeCluster_ID: r.data.projectTXList[idx +
+                                                    1].storeCluster_ID,
+                                                storeCluster: r.data.projectTXList[idx + 1]
+                                                    .storeCluster,
+                                                categoryCluster_ID: r.data.projectTXList[
+                                                    idx + 1].categoryCluster_ID,
+                                                actionedByUserID: r.data.projectTXList[idx +
+                                                    1].actionedByUserID,
+                                                actionedByUserName: r.data.projectTXList[
+                                                    idx + 1].actionedByUserName,
+                                                projectOwnerID: r.data.projectTXList[idx +
+                                                    1].projectOwnerID,
+                                                systemFileID: r.data.projectTXList[idx + 1]
+                                                    .systemFileID
 
-                                        })
+                                            })
+                                        } else {
+                                            self.timelineItems.push({
+                                                status: element.status,
+                                                notes: self.status[element.status].text,
+                                                date: element.dateTimeString,
+                                                user: element.username,
+                                                userID: element.systemUserID,
+                                                type: element.type,
+                                                storeID: element.store_ID,
+                                                store: element.store,
+                                                storeCluster_ID: element.storeCluster_ID,
+                                                storeCluster: element.storeCluster,
+                                                categoryCluster_ID: element
+                                                    .categoryCluster_ID,
+                                                actionedByUserID: element.actionedByUserID,
+                                                actionedByUserName: element
+                                                    .actionedByUserName,
+                                                projectOwnerID: element.projectOwnerID,
+                                                systemFileID: element.systemFileID
+
+                                            })
+                                        }
+
                                     }
                                     if (element.type == 3 && element.status != 13) {
                                         self.tmpItems.push({
@@ -794,8 +876,9 @@
                                 }
                             })
 
-                            self.projectsStatus = self.timelineItems[0]
 
+                            self.projectsStatus = self.timelineItems[0]
+                           
                             resolve();
                         })
                         .catch(e => {
