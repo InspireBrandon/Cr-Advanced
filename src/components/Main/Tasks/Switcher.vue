@@ -90,12 +90,12 @@
 
                     <v-container style="max-width: 100vw;" fluid grid-list-xs class="pa-0">
                         <v-layout row wrap class="pa-0">
-                            <!-- <v-flex :class="{ 'md10 sm6 xs6': showNotices, 'md12 sm12 xs12': !showNotices }"
+                            <v-flex :class="{ 'md10 sm6 xs6': showNotices, 'md12 sm12 xs12': !showNotices }"
                                 v-if="selectedView==0">
                                 <TaskView :data="filteredData" :typeList="typeList" :statusList="statusList"
                                     :systemUserID="systemUserID" />
-                            </v-flex> -->
-                            <v-flex v-if="selectedView==0"
+                            </v-flex>
+                            <!-- <v-flex v-if="selectedView==0"
                                 :class="{ 'md10 sm6 xs6': showNotices, 'md12 sm12 xs12': !showNotices }">
                                 <table>
                                     <thead>
@@ -167,7 +167,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                            </v-flex>
+                            </v-flex> -->
                             <v-flex v-if="selectedView==0 && showNotices"
                                 :class="{ 'md2 sm6 xs6': showNotices, 'md1 sm1 xs1': !showNotices }">
                                 <v-card tile flat style="border-left: 1px solid lightgrey;">
