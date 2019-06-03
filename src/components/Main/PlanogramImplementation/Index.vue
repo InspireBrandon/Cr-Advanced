@@ -3,6 +3,7 @@
         <v-toolbar dense dark>
             <v-btn color="primary" flat outline dark @click="openStoreView()"
                 v-if="(currentPlanogram != null && selectedProject != null)">Store View </v-btn>
+             
             <v-spacer></v-spacer>
             <v-toolbar-title>Planogram Implementation</v-toolbar-title>
         </v-toolbar>
@@ -129,50 +130,7 @@
                     </v-card>
                 </v-flex>
 
-                <v-dialog fullscreen v-model="storeView">
-                    <v-card>
-                        <v-toolbar flat color="primary" dark>
-                            <v-toolbar-title>
-                                Store Planogram Overview: { ProjectName }
-                            </v-toolbar-title>
-                            <v-spacer></v-spacer>
-                            <v-btn icon flat dark @click="storeView=false">
-                                <v-icon>close</v-icon>
-                            </v-btn>
-                        </v-toolbar>
-                        <v-toolbar dark flat dense>
-                            <v-menu>
-                                <v-btn slot="activator">options</v-btn>
-                                <v-list>
-                                    <v-list-tile>asdf</v-list-tile>
-                                    <v-list-tile>asdf</v-list-tile>
-                                    <v-list-tile>asdf</v-list-tile>
-                                </v-list>
-                            </v-menu>
-                        </v-toolbar>
-                        <v-card-text style="height: calc(100vh - 120px); overflow-x: auto;">
-                            <v-data-table :headers="headers" :items="currentStorePlanograms" class="elevation-1"
-                                hide-actions>
-                                <template v-slot:items="props">
-                                    <tr>
-                                        <td>{{props.item.storeName}}</td>
-                                        <td></td>
-                                        <td>{{ props.item.planogramStoreStatus == 0 ? 'Unasigned' : props.item.planogramStoreStatus }}
-                                        </td>
-                                        <td>
-                                            <!-- UNASSIGNED -->
-                                            <v-btn @click="assignPlanogramToStore" icon flat
-                                                v-if="props.item.planogramStoreStatus == 0" small color="primary">
-                                                <v-icon>assignment</v-icon>
-                                            </v-btn>
-                                            <!-- DISTRIBUTED TO STORE -->
-                                        </td>
-                                    </tr>
-                                </template>
-                            </v-data-table>
-                        </v-card-text>
-                    </v-card>
-                </v-dialog>
+               
             </v-layout>
         </v-container>
         <v-dialog fullscreen v-model="imageModal">
@@ -199,6 +157,8 @@
         <YesNoModal ref="yesNoModal"></YesNoModal>
         <NotesModal ref="notesModal"></NotesModal>
         <SpacePlanSelector ref="SpacePlanSelector" />
+        <PlanogramDetailsSelector ref="PlanogramDetailsSelector" />
+        <StorePlanogramOverview :ProjectName="selectedProject" :selectedProject="selectedProject" ref="StorePlanogramOverview"/>
     </v-card>
 </template>
 
@@ -213,23 +173,28 @@
     import YesNoModal from '@/components/Common/YesNoModal'
     import NotesModal from '@/components/Common/NotesModal'
     import SpacePlanSelector from '@/components/Common/SpacePlanSelector'
+    import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector'
+    import StorePlanogramOverview from './StorePlanogramOverview'
+
 
 
     let _MODULE = "Planogram Implementation";
 
     export default {
         components: {
+            PlanogramDetailsSelector,
             SpacePlanSelector,
             PlanogramReportModal,
             PlanogramIplementationModal,
             AssignTask,
             YesNoModal,
-            NotesModal
+            NotesModal,
+            StorePlanogramOverview
         },
         data: () => {
             return {
+               
                 active: null,
-                currentStorePlanograms: [],
                 storeView: false,
                 displayName: null,
                 planogramObj: null,
@@ -260,20 +225,7 @@
                 routePlanogramID: null,
                 routeStatus: null,
                 tmpRequest: null,
-                headers: [{
-                    text: "Store",
-                    sortable: false
-                }, {
-                    text: "Planogram",
-                    sortable: false
-                }, {
-                    text: "Current Status",
-                    sortable: false
-                }, {
-                    text: "Options",
-                    sortable: false,
-                    width: '280px'
-                }],
+               
             }
         },
         mounted() {
@@ -308,27 +260,13 @@
             }
         },
         methods: {
+          
             openStoreView() {
                 let self = this
-                self.storeView = true
+                self.$refs.StorePlanogramOverview.open() 
             },
-            getStorePlanograms() {
-                let self = this
-                self.currentStorePlanograms = [];
-
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
-                Axios.get(process.env.VUE_APP_API + 'Store_Planogram?project_ID=' + self.selectedProject)
-                    .then(r => {
-                        self.currentStorePlanograms = r.data.store_PlanogramList;
-                    })
-            },
-            assignPlanogramToStore() {
-                let self = this;
-                self.$refs.SpacePlanSelector.show(data => {
-                    console.log(data);
-                })
-            },
+           
+           
             ChangeSpacePlan() {
                 let self = this
                 self.$refs.SpacePlanSelector.show(data => {
@@ -663,7 +601,6 @@
                     let currentProjectID = self.selectedProject;
                     let currentProject;
 
-                    self.getStorePlanograms();
 
                     self.projects.forEach(project => {
                         if (project.id == currentProjectID)
@@ -819,7 +756,7 @@
                                     // }
                                     if (element.actionedByUserID == null && element.systemUserID !=
                                         null) {
-                                        if (element.status == 12) {
+                                        if (element.status == 12||element.status == 2) {
                                             self.timelineItems.push({
                                                 status: r.data.projectTXList[idx + 1]
                                                     .status,

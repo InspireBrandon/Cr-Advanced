@@ -576,7 +576,7 @@
                                     <td style="width: 2%">
                                         <v-tooltip bottom v-if="item.notes != null">
                                             <template v-slot:activator="{ on }">
-                                                <v-icon v-on="on">note</v-icon>
+                                                <v-icon v-on="on" @click="openNotes(item.notes)">note</v-icon>
                                             </template>
                                             <span>{{ item.notes }}</span>
                                         </v-tooltip>
@@ -672,6 +672,22 @@
                         </table>
                     </v-card-text>
                 </v-card>
+                <v-dialog v-model="notesDialog" max-width="500px">
+                    <v-card>
+                        <v-card-title>
+                            <v-menu bottom left>
+                                <template v-slot:activator="{ on }">
+                                    <v-textarea readonly outline  label="Notes"
+                                        :value="currentNotes">
+                                    </v-textarea>
+                                </template>
+                            </v-menu>
+                        </v-card-title>
+                        <v-card-actions>
+                            <v-btn color="primary" flat @click="dialog3=false">Close</v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
             </v-flex>
         </v-layout>
         <UserSelector ref="userSelector" />
@@ -715,6 +731,7 @@
         },
         data() {
             return {
+                notesDialog:false,
                 headers: [{
                         text: 'Project',
                         sortable: false
@@ -781,7 +798,8 @@
                 selectedUser: null,
                 userAccess: null,
                 eventBus: null,
-                userAccessTypeID: -1
+                userAccessTypeID: -1,
+                currentNotes:null,
             }
         },
         mounted() {
@@ -832,6 +850,12 @@
             }
         },
         methods: {
+            openNotes(notes){
+                let self = this
+                self.notesDialog = true
+                self.currentNotes=notes
+            },
+
             createProjectTransactionGroup(request, callback) {
                 let self = this;
 
