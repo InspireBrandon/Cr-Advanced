@@ -39,7 +39,7 @@
                                     {{ overview == false? 'Report' : 'Sections' }}</v-btn>
                             </v-toolbar>
 
-                            <v-tabs v-if="items.length > 0" v-show="!overview" v-model="active" grow dark slider-color="primary">
+                            <v-tabs active-class="active-tab" v-if="items.length > 0" v-show="!overview" v-model="active" grow dark slider-color="primary">
                                 <v-tab ripple v-for="(tab, idx) in tabs" :key="idx">{{ tab }}</v-tab>
                                 <!-- Standard -->
                                 <v-tab-item>
@@ -630,6 +630,13 @@
         }
     }
 </script>
+
+<style>
+    .active-tab {
+        background: #131313!important;
+    }
+</style>
+
 
 <style scoped>
     table {
