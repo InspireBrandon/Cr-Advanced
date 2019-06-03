@@ -156,15 +156,17 @@ class LoadSavePlanogramBase {
 
     self.resetStage(VueStore, MasterLayer, Stage);
 
-    axios.get(self.ServerAddress + `SystemFile/JSON?db=CR-Devinspire&id=${spacePlanID}`)
+    axios.get(self.ServerAddress + `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${spacePlanID}`)
       .then(r => {
 
-        afterGetSpacePlanFile(r.data.clusterData, r.data.dimensionData, r.data.name, rangeProducts => {
+        let jsonData = r.data.jsonObject
+
+        afterGetSpacePlanFile(jsonData.clusterData, jsonData.dimensionData, jsonData.name, rangeProducts => {
           if (rangeProducts == null) {
-            self.startLoadingPlanogram(r.data, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
+            self.startLoadingPlanogram(jsonData, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
           } else {
-            r.data.planogramData = StageWarehouseMiddleware.verifyIntegrityOfWarehouseData(r.data.planogramData, rangeProducts);
-            self.startLoadingPlanogram(r.data, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
+            jsonData.planogramData = StageWarehouseMiddleware.verifyIntegrityOfWarehouseData(jsonData.planogramData, rangeProducts);
+            self.startLoadingPlanogram(jsonData, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
           }
         });
       })
