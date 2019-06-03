@@ -133,7 +133,7 @@
                     <v-card>
                         <v-toolbar flat color="primary" dark>
                             <v-toolbar-title>
-                                Store Planogram Overview: {{ ProjectName }}
+                                Store Planogram Overview: { ProjectName }
                             </v-toolbar-title>
                             <v-spacer></v-spacer>
                             <v-btn icon flat dark @click="storeView=false">
@@ -141,15 +141,16 @@
                             </v-btn>
                         </v-toolbar>
                         <v-toolbar dark flat dense>
-                            <v-toolbar-items>
-                                <v-tabs v-model="active" color="cyan" dark slider-color="yellow">
-                                    <v-tab v-for="n in 3" :key="n" ripple>
-                                        Item {{ n }}
-                                    </v-tab>
-                                </v-tabs>
-                            </v-toolbar-items>
+                            <v-menu>
+                                <v-btn slot="activator">options</v-btn>
+                                <v-list>
+                                    <v-list-tile>asdf</v-list-tile>
+                                    <v-list-tile>asdf</v-list-tile>
+                                    <v-list-tile>asdf</v-list-tile>
+                                </v-list>
+                            </v-menu>
                         </v-toolbar>
-                        <v-card-text>
+                        <v-card-text style="height: calc(100vh - 120px); overflow-x: auto;">
                             <v-data-table :headers="headers" :items="currentStorePlanograms" class="elevation-1"
                                 hide-actions>
                                 <template v-slot:items="props">
@@ -160,13 +161,11 @@
                                         </td>
                                         <td>
                                             <!-- UNASSIGNED -->
-                                            <v-btn icon flat v-if="props.item.planogramStoreStatus == 0" small
-                                                color="primary" @click="ChangeSpacePlan">
+                                            <v-btn @click="assignPlanogramToStore" icon flat
+                                                v-if="props.item.planogramStoreStatus == 0" small color="primary">
                                                 <v-icon>assignment</v-icon>
                                             </v-btn>
                                             <!-- DISTRIBUTED TO STORE -->
-                                            <v-btn v-if="props.item.planogramStoreStatus == 1" small color="primary"
-                                                @click="ChangeSpacePlan">Change</v-btn>
                                         </td>
                                     </tr>
                                 </template>
@@ -229,6 +228,7 @@
         },
         data: () => {
             return {
+                active: null,
                 currentStorePlanograms: [],
                 storeView: false,
                 displayName: null,
@@ -311,7 +311,6 @@
             openStoreView() {
                 let self = this
                 self.storeView = true
-
             },
             getStorePlanograms() {
                 let self = this
@@ -324,10 +323,16 @@
                         self.currentStorePlanograms = r.data.store_PlanogramList;
                     })
             },
+            assignPlanogramToStore() {
+                let self = this;
+                self.$refs.SpacePlanSelector.show(data => {
+                    console.log(data);
+                })
+            },
             ChangeSpacePlan() {
                 let self = this
                 self.$refs.SpacePlanSelector.show(data => {
-
+                    console.log(data);
                 })
             },
             orderVariation() {
