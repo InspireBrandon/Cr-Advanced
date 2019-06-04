@@ -1,5 +1,5 @@
 <template>
-    <v-dialog max-width="800px" persistent v-model="show">
+    <v-dialog max-width="800px" persistent v-model="dialog">
         <v-card>
             <v-toolbar color="primary" dark flat>
                 <v-toolbar-title>
@@ -13,13 +13,15 @@
                         {{text1}}: {{currentFileSize.toFixed(2)}} MB / {{FileTotalSize.toFixed(2)}} MB
                         <v-progress-linear color="primary" height="20" :value="(currentFileSize/FileTotalSize)*100">
                             <div style="color:white;  text-align: center;">
-                                {{ (currentFileSize/FileTotalSize)*100}}%
+                                {{ ((currentFileSize/FileTotalSize)*100).toFixed(0)}}%
                             </div>
                         </v-progress-linear>
                     </v-flex>
                     <v-flex md12>
+                        <div v-if="text2!=null">
                         {{text2}}: {{currentFile}}/{{totalFiles}} files
-                        <v-progress-linear color="primary" height="20" :value="(currentFile/totalFiles)*100">
+                        </div>
+                        <v-progress-linear v-if="currentFile!=null" color="primary" height="20" :value="((currentFile/totalFiles)*100)+progress">
                             <div style="color:white; text-align: center">
                                 {{currentFile}}/{{totalFiles}}
                             </div>
@@ -29,7 +31,7 @@
 
                     </v-flex>
                     <v-flex md4>
-                        Current Download Speed:{{DownloadSpeed}} MB/s
+                        Current Download Speed:{{DownloadSpeed.toFixed(2)}} MB/s
                     </v-flex>
                 </v-layout>
             </v-container>
@@ -42,33 +44,33 @@
         data() {
             return {
                 text1: "text1",
-                text2: "text2",
-                currentFileSize: 1.00,
-                FileTotalSize: 1.00,
-                currentFile: 1.00,
-                totalFiles: 1.00,
-                DownloadSpeed: 1.00,
-                show: false
+                text2: null,
+                currentFileSize: 0,
+                FileTotalSize: 0,
+                currentFile: null,
+                totalFiles: 0,
+                DownloadSpeed: 0,
+                dialog: false,
+                progress:0
             }
         },
         methods: {
-            open(text1, text2, currentFileSize, FileTotalSize, currentFile, totalFiles, DownloadSpeed) {
+            show(data) {
                 let self = this
-                self.show = true
-                updateValues(text1, text2, currentFileSize, FileTotalSize, currentFile, totalFiles, DownloadSpeed)
+                self.dialog = true
+               
             },
-            updateValues(text1, text2, currentFileSize, FileTotalSize, currentFile, totalFiles, DownloadSpeed) {
+            updateLoader(data) {
                 let self = this
-                self.text1 = text1
-                self.text2 = text2
-                self.currentFileSize = currentFileSize
-                self.FileTotalSize = FileTotalSize
-                self.currentFile = currentFile
-                self.totalFiles = totalFiles
-                self.DownloadSpeed = DownloadSpeed
+
+                for(var prop in data) {
+                    self[prop] = data[prop]
+                }
             },
             close() {
-                self.show = false
+                let self= this
+
+                self.dialog = false
             }
         }
     }

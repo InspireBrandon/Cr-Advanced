@@ -144,6 +144,7 @@
     <YesNoModal ref="yesNo"></YesNoModal>
     <ProductMaintModal ref="productMaint"></ProductMaintModal>
     <ProductListing ref="productListing"></ProductListing>
+    <SizeLoader ref="SizeLoader" />
   </div>
 </template>
 
@@ -161,6 +162,8 @@
   import YesNoModal from '@/components/Common/YesNoModal'
   import ProductMaintModal from '@/components/Main/DataPreparation/Views/ImagePreparation/ProductMaintModal'
   import ProductListing from '@/components/Apps/RangePlanning/ProductListing/Index'
+  import SizeLoader from '@/components/Common/SizeLoader';
+
 
   import {
     AgGridVue
@@ -177,6 +180,7 @@
   export default {
     name: 'Ranging',
     components: {
+      SizeLoader,
       YesNoModal,
       ProductMaintModal,
       SoftwareToolbar,
@@ -374,13 +378,32 @@
         let self = this;
         self.$refs.productListing.show();
       },
+       updateLoader(data) {
+        let self = this
+        self.$refs.SizeLoader.updateLoader(data)
+      },
       openRange() {
         let self = this;
-
+        var startTime = new Date()
         self.isAdd = false;
-
+        let config = {
+          onDownloadProgress: progressEvent => {
+            var currentFileSize = progressEvent.loaded * 0.000001
+            var FileTotalSize = progressEvent.total * 0.000001
+          
+            var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+            var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
+             self.updateLoader({
+                  text1: "Downloading Range",
+                  currentFileSize: currentFileSize,
+                  FileTotalSize: FileTotalSize,
+                  DownloadSpeed: DownloadSpeed,
+                })
+          }
+        }
         self.$refs.rangeSelectorModal.show(fileID => {
-          Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fileID}`)
+          self.$refs.SizeLoader.show()
+          Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fileID}`, config)
             .then(r => {
               self.fileData.planogramName = r.data.planogramName;
               self.fileData.planogramID = r.data.planogramID;
@@ -402,7 +425,7 @@
                   .selectedClusterOption);
                 self.fitColumns();
               }
-              self.$refs.spinner.hide();
+              self.$refs.SizeLoader.close()
               self.gotData = true
             })
         })
