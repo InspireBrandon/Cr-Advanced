@@ -30,7 +30,7 @@
                                                 <span>Store Cluster: {{ planogramData.clusterData.storeCluster }}</span>
                                             </v-flex>
                                             <v-flex md12>
-                                                <span>Store: {{ planogramData.clusterData.planogramName }}</span>
+                                                <span>Store: {{ planogramData.clusterData.storeName }}</span>
                                             </v-flex>
                                             <v-flex md12>
                                                 <span>Displays: {{ planogramData.dimensionData.displays }}</span>
