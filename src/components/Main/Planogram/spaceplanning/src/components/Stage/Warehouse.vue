@@ -266,6 +266,7 @@
     <PlanogramAprovalModal ref="PlanogramAprovalModal"></PlanogramAprovalModal>
     <PlanogramRetractionModal ref="PlanogramRetractionModal"></PlanogramRetractionModal>
     <JoinPlanogram ref="JoinPlanogram"></JoinPlanogram>
+    <SizeLoader ref="SizeLoader" />
 
   </div>
 </template>
@@ -277,6 +278,7 @@
   import CustomEmitter from "@/components/Main/Planogram/spaceplanning/src/libs/EventBus/CustomEmitter.js";
   import EventBus from "@/components/Main/Planogram/spaceplanning/src/libs/EventBus/EventBus.js";
   import RangeSelectorModal from '@/components/Common/RangeSelectorModal';
+  import SizeLoader from '@/components/Common/SizeLoader';
   import SpacePlanSelector from '@/components/Common/SpacePlanSelector';
   import Spinner from '@/components/Common/Spinner';
   import RangingController from '@/components/Apps/RangePlanning/ranging-controller'
@@ -306,7 +308,8 @@
       YesNoModal,
       PlanogramAprovalModal,
       PlanogramRetractionModal,
-      JoinPlanogram
+      JoinPlanogram,
+      SizeLoader
     },
     data() {
       let width = 0;
@@ -464,6 +467,10 @@
       }
     },
     methods: {
+      updateLoader(data) {
+        let self = this
+        self.$refs.SizeLoader.updateLoader(data)
+      },
       RetractPlanogram() {
         let self = this
         self.$refs.PlanogramRetractionModal.show('Retract Planogram?', (value, notesModal, selectedUser) => {
@@ -714,22 +721,24 @@
 
         self.$refs.spacePlanSelector.show((spacePlanID, item) => {
 
-          self.PlanogramObject = item
+          setTimeout(() => {
+            self.PlanogramObject = item
 
+            self.planogramHelper.setCreate(false);
+            let stage = self.$parent.$children[0].$children[2].getStage();
+            stage.destroyChildren(); // destroy first
+            self.$parent.$children[0].createNewLayer("LoadInit");
+            let masterLayer = self.$parent.$children[0].MasterLayer;
 
-          self.planogramHelper.setCreate(false);
-          let stage = self.$parent.$children[0].$children[2].getStage();
-          stage.destroyChildren(); // destroy first
-          self.$parent.$children[0].createNewLayer("LoadInit");
-          let masterLayer = self.$parent.$children[0].MasterLayer;
+            let pxlRatio = 3; // TODO: Figure out why this is 1 and not 3, perhaps a timing issue?
 
-          let pxlRatio = 3; // TODO: Figure out why this is 1 and not 3, perhaps a timing issue?
-
-          self.$refs.spinner.show();
-          self.spacePlanID = spacePlanID;
-          self.planogramHelper.loadPlanogram(spacePlanID, self.$store, masterLayer, stage, pxlRatio, self
-            .setClusterAndDimensionData,
-            self.$refs.spinner.hide);
+            // self.$refs.spinner.show();
+            self.$refs.SizeLoader.show()
+            self.spacePlanID = spacePlanID;
+            self.planogramHelper.loadPlanogram(spacePlanID, self.$store, masterLayer, stage, pxlRatio, self
+              .setClusterAndDimensionData,
+              self.$refs.spinner.hide, self.updateLoader);
+          }, 1000);
         })
       },
       setClusterAndDimensionData(clusterData, dimension, spacePlanName, updatePlanoDataCallback) {
@@ -747,55 +756,95 @@
         self.bins = dimension == undefined || dimension.bins == undefined ? 0 : dimension.bins;
 
         if (clusterData.rangeID != null) {
-          axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${clusterData.rangeID}`)
-            .then(r => {
-              self.$store.commit("setRangeID", clusterData.rangeID);
-              self.$store.commit("setPlanogramName", r.data.planogramName);
-              self.setRangingClusterData(r.data.clusterData);
-              self.getCategoryCluster(r.data.planogramID)
-              self.gotData = true;
-              self.rangingController = new RangingController(r.data);
-              self.selectedClusterType = clusterData.clusterType;
-              self.$store.commit("setClusterName", clusterData.storeCluster);
-              self.$store.commit("setClusterType", clusterData.clusterType);
-              self.$store.commit("setClusterID", clusterData.clusterID);
-              self.$store.commit("setDaysBetween", (r.data.monthsBetween * 30));
 
-              self.rangingData.dateFromString = clusterData.dateFromString;
-              self.rangingData.dateToString = clusterData.dateToString;
-              self.rangingData.monthsBetween = clusterData.monthsBetween;
-              self.rangingData.periodic = clusterData.periodic;
-              self.rangingData.planogramID = clusterData.planogramID;
-              self.rangingData.planogramName = clusterData.planogramName;
-              self.rangingData.tag = clusterData.tag;
+          setTimeout(() => {
+            self.updateLoader({
+              currentFileSize: 0,
+              FileTotalSize: 0,
+            })
+            var startTime = new Date()
+            let config = {
+              onDownloadProgress: progressEvent => {
+                var currentFileSize = progressEvent.loaded * 0.000001
+                var FileTotalSize = progressEvent.total * 0.000001
+                var progress = (currentFileSize /FileTotalSize)*100
+                var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+                var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
+                console.log(TIME_TAKEN);
 
-              if (clusterData.storeID != null || clusterData.storeID != undefined) {
-
-
-                self.getStores()
-                self.selectedClusterType = "stores"
-                // self.clusterOptions[stores]=clusterData.storeID
-
-                self.selectedClusterOption = clusterData.storeID
-
-                self.onClusterOptionChange()
-
-
+                // do whatever you like with the percentage complete
+                // maybe dispatch an action that will update a progress bar or something
+                self.updateLoader({
+                  text1: "Downloading Range",
+                  text2: "File Progress",
+                  currentFileSize: currentFileSize,
+                  FileTotalSize: FileTotalSize,
+                  progress:progress/2,
+                  currentFile: 1,
+                  totalFiles: 2,
+                  DownloadSpeed: DownloadSpeed,
+                })
               }
-              setTimeout(() => {
-                if (clusterData.clusterType != null && clusterData.storeID == null || clusterData.clusterType !=
-                  undefined && clusterData.storeID == undefined) {
-                  self.selectedClusterOption = clusterData.clusterID;
-                  self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
-                    .selectedClusterOption);
+            }
+            axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${clusterData.rangeID}`,
+                config)
+              .then(r => {
+                self.updateLoader({
+                  currentFile: 2,
+                })
+                self.$store.commit("setRangeID", clusterData.rangeID);
+                self.$store.commit("setPlanogramName", r.data.planogramName);
+                self.setRangingClusterData(r.data.clusterData);
+                self.getCategoryCluster(r.data.planogramID)
+                self.gotData = true;
+                self.rangingController = new RangingController(r.data);
+                self.selectedClusterType = clusterData.clusterType;
+                self.$store.commit("setClusterName", clusterData.storeCluster);
+                self.$store.commit("setClusterType", clusterData.clusterType);
+                self.$store.commit("setClusterID", clusterData.clusterID);
+                self.$store.commit("setDaysBetween", (r.data.monthsBetween * 30));
+
+                self.rangingData.dateFromString = clusterData.dateFromString;
+                self.rangingData.dateToString = clusterData.dateToString;
+                self.rangingData.monthsBetween = clusterData.monthsBetween;
+                self.rangingData.periodic = clusterData.periodic;
+                self.rangingData.planogramID = clusterData.planogramID;
+                self.rangingData.planogramName = clusterData.planogramName;
+                self.rangingData.tag = clusterData.tag;
+
+                if (clusterData.storeID != null || clusterData.storeID != undefined) {
+
+
+                  self.getStores()
+                  self.selectedClusterType = "stores"
+                  // self.clusterOptions[stores]=clusterData.storeID
+
+                  self.selectedClusterOption = clusterData.storeID
+
+                  self.onClusterOptionChange()
+
+
                 }
-                updatePlanoDataCallback(self.products);
-              }, 60)
-            })
-            .catch(e => {
-              alert("Failed to get range file from server");
-            })
+                setTimeout(() => {
+                  if (clusterData.clusterType != null && clusterData.storeID == null || clusterData
+                    .clusterType !=
+                    undefined && clusterData.storeID == undefined) {
+                    self.selectedClusterOption = clusterData.clusterID;
+                    self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType,
+                      self
+                      .selectedClusterOption);
+                  }
+                  self.$refs.SizeLoader.close()
+                  updatePlanoDataCallback(self.products);
+                }, 60)
+              })
+              .catch(e => {
+                alert("Failed to get range file from server");
+                self.$refs.SizeLoader.close()
+              })
+          }, 1000);
         } else {
+          self.$refs.SizeLoader.close()
           updatePlanoDataCallback(null);
         }
       },

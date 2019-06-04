@@ -151,12 +151,32 @@ class LoadSavePlanogramBase {
     return PlanogramNamer.generatePlanogramName(allPlanogramItems, clusterData);
   }
 
-  loadPlanogram(spacePlanID, VueStore, MasterLayer, Stage, pxlRatio, afterGetSpacePlanFile, hideLoader) {
+  loadPlanogram(spacePlanID, VueStore, MasterLayer, Stage, pxlRatio, afterGetSpacePlanFile, hideLoader, updateLoader) {
     let self = this;
-
+    let startTime = new Date()
     self.resetStage(VueStore, MasterLayer, Stage);
-
-    axios.get(self.ServerAddress + `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${spacePlanID}`)
+    let config = {
+      onDownloadProgress: progressEvent => {
+       var currentFileSize = progressEvent.loaded * 0.000001
+       var FileTotalSize = progressEvent.total * 0.000001
+       var TIME_TAKEN = new Date().getTime()  - startTime.getTime() 
+       var DownloadSpeed = currentFileSize/(TIME_TAKEN/1000)
+       console.log(TIME_TAKEN);
+       
+        // do whatever you like with the percentage complete
+        // maybe dispatch an action that will update a progress bar or something
+        updateLoader({
+          text1: "Downloading Planogram",
+          text2: null,
+          currentFileSize: currentFileSize,
+          FileTotalSize: FileTotalSize,
+          currentFile: null,
+          totalFiles: null,
+          DownloadSpeed:DownloadSpeed,
+        })
+      }
+    }
+    axios.get(self.ServerAddress + `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${spacePlanID}`, config)
       .then(r => {
 
         let jsonData = r.data.jsonObject
@@ -246,321 +266,299 @@ class LoadSavePlanogramBase {
     // create the current item
     let ctrl_item = null;
     switch (CurrentItem.Type.toUpperCase()) {
-      case "GONDOLA":
-        {
-          let ctrl_item = new GondolaNew(
-            VueStore,
-            Stage,
-            MasterLayer,
-            CurrentItem.Data.Data,
-            PxlRatio,
-            "GONDOLA",
-            ParentID
-          )
+      case "GONDOLA": {
+        let ctrl_item = new GondolaNew(
+          VueStore,
+          Stage,
+          MasterLayer,
+          CurrentItem.Data.Data,
+          PxlRatio,
+          "GONDOLA",
+          ParentID
+        )
 
-          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
-          {
-            ctrl_item.Position = CurrentItem.Position;
-          }
-
-          // set json data values to the object
-          ctrl_item.ID = CurrentItem.Data.ID;
-
-          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+        if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+          ctrl_item.Position = CurrentItem.Position;
         }
-        break;
-      case "AREA":
-        {
-          let ctrl_item = new AreaNew(
-            VueStore,
-            Stage,
-            MasterLayer,
-            CurrentItem.Data.Data,
-            PxlRatio,
-            "AREA",
-            ParentID
-          )
-          
-          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
-          {
-            ctrl_item.Position = CurrentItem.Position;
-          }
 
-          // set json data values to the object
-          ctrl_item.ID = CurrentItem.Data.ID;
+        // set json data values to the object
+        ctrl_item.ID = CurrentItem.Data.ID;
 
-          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
-        }
-        break;
-      case "TEXTHEADER":
-        {
-          let ctrl_item = new TextHeaderNew(
-            VueStore,
-            Stage,
-            MasterLayer,
-            CurrentItem.Data.Data,
-            PxlRatio,
-            "TEXTHEADER",
-            CurrentItem.Scale,
-            CurrentItem.Data.Text
-          )
-          
-          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
-          {
-            ctrl_item.Position = CurrentItem.Position;
-          }
+        ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+      }
+      break;
+    case "AREA": {
+      let ctrl_item = new AreaNew(
+        VueStore,
+        Stage,
+        MasterLayer,
+        CurrentItem.Data.Data,
+        PxlRatio,
+        "AREA",
+        ParentID
+      )
 
-          // set json data values to the object
-          ctrl_item.ID = CurrentItem.Data.ID;
+      if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+        ctrl_item.Position = CurrentItem.Position;
+      }
 
-          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
-        }
-        break;
-      case "PALETTE":
-        {
-          let ctrl_item = new PaletteNew(
-            VueStore,
-            Stage,
-            MasterLayer,
-            CurrentItem.Data.Data,
-            PxlRatio,
-            "PALETTE",
-            ParentID
-          )
-          
-          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
-          {
-            ctrl_item.Position = CurrentItem.Position;
-          }
+      // set json data values to the object
+      ctrl_item.ID = CurrentItem.Data.ID;
 
-          // set json data values to the object
-          ctrl_item.ID = CurrentItem.Data.ID;
+      ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+    }
+    break;
+    case "TEXTHEADER": {
+      let ctrl_item = new TextHeaderNew(
+        VueStore,
+        Stage,
+        MasterLayer,
+        CurrentItem.Data.Data,
+        PxlRatio,
+        "TEXTHEADER",
+        CurrentItem.Scale,
+        CurrentItem.Data.Text
+      )
 
-          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
-        }
-        break;
-      case "SHELF":
-        {
-          let ctrl_item = new ShelfNew(
-            VueStore,
-            Stage,
-            MasterLayer,
-            CurrentItem.Data.Data,
-            PxlRatio,
-            "SHELF",
-            ParentID
-          )
+      if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+        ctrl_item.Position = CurrentItem.Position;
+      }
 
-          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
-          {
-            ctrl_item.Position = CurrentItem.Position;
-          }
+      // set json data values to the object
+      ctrl_item.ID = CurrentItem.Data.ID;
+
+      ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+    }
+    break;
+    case "PALETTE": {
+      let ctrl_item = new PaletteNew(
+        VueStore,
+        Stage,
+        MasterLayer,
+        CurrentItem.Data.Data,
+        PxlRatio,
+        "PALETTE",
+        ParentID
+      )
+
+      if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+        ctrl_item.Position = CurrentItem.Position;
+      }
+
+      // set json data values to the object
+      ctrl_item.ID = CurrentItem.Data.ID;
+
+      ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+    }
+    break;
+    case "SHELF": {
+      let ctrl_item = new ShelfNew(
+        VueStore,
+        Stage,
+        MasterLayer,
+        CurrentItem.Data.Data,
+        PxlRatio,
+        "SHELF",
+        ParentID
+      )
+
+      if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+        ctrl_item.Position = CurrentItem.Position;
+      }
 
 
-          // set json data values to the object
-          ctrl_item.ID = CurrentItem.Data.ID;
-          ctrl_item.Config = CurrentItem.Data.Config;
-          if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
-            ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
-          }
+      // set json data values to the object
+      ctrl_item.ID = CurrentItem.Data.ID;
+      ctrl_item.Config = CurrentItem.Data.Config;
+      if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
+        ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
+      }
 
-          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
-          ctrl_item.ApplyZIndexing();
-        }
-        break;
-      case "BASE":
-        {
-          let ctrl_item = new BaseNew(
-            VueStore,
-            Stage,
-            MasterLayer,
-            CurrentItem.Data.Data,
-            PxlRatio,
-            "BASE",
-            ParentID
-          )
+      ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+      ctrl_item.ApplyZIndexing();
+    }
+    break;
+    case "BASE": {
+      let ctrl_item = new BaseNew(
+        VueStore,
+        Stage,
+        MasterLayer,
+        CurrentItem.Data.Data,
+        PxlRatio,
+        "BASE",
+        ParentID
+      )
 
-          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
-          {
-            ctrl_item.Position = CurrentItem.Position;
-          }
+      if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+        ctrl_item.Position = CurrentItem.Position;
+      }
 
-          // set json data values to the object
-          ctrl_item.ID = CurrentItem.Data.ID;
-          ctrl_item.Config = CurrentItem.Data.Config;
-          if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
-            ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
-          }
+      // set json data values to the object
+      ctrl_item.ID = CurrentItem.Data.ID;
+      ctrl_item.Config = CurrentItem.Data.Config;
+      if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
+        ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
+      }
 
-          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
-          ctrl_item.ApplyZIndexing();
-        }
-        break;
-      case "BASKET":
-        {
-          let ctrl_item = new BasketNew(
-            VueStore,
-            Stage,
-            MasterLayer,
-            CurrentItem.Data.Data,
-            PxlRatio,
-            "BASKET",
-            ParentID
-          )
+      ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+      ctrl_item.ApplyZIndexing();
+    }
+    break;
+    case "BASKET": {
+      let ctrl_item = new BasketNew(
+        VueStore,
+        Stage,
+        MasterLayer,
+        CurrentItem.Data.Data,
+        PxlRatio,
+        "BASKET",
+        ParentID
+      )
 
-          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
-          {
-            ctrl_item.Position = CurrentItem.Position;
-          }
+      if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+        ctrl_item.Position = CurrentItem.Position;
+      }
 
-          // set json data values to the object
-          ctrl_item.ID = CurrentItem.Data.ID;
-          ctrl_item.Config = CurrentItem.Data.Config;
-          if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
-            ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
-          }
+      // set json data values to the object
+      ctrl_item.ID = CurrentItem.Data.ID;
+      ctrl_item.Config = CurrentItem.Data.Config;
+      if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
+        ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
+      }
 
-          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
-          ctrl_item.ApplyZIndexing();
-        }
-        break;
-      case "PEGBAR":
-        {
-          let ctrl_item = new PegBarNew(
-            VueStore,
-            Stage,
-            MasterLayer,
-            CurrentItem.Data.Data,
-            PxlRatio,
-            "PEGBAR",
-            ParentID
-          )
+      ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+      ctrl_item.ApplyZIndexing();
+    }
+    break;
+    case "PEGBAR": {
+      let ctrl_item = new PegBarNew(
+        VueStore,
+        Stage,
+        MasterLayer,
+        CurrentItem.Data.Data,
+        PxlRatio,
+        "PEGBAR",
+        ParentID
+      )
 
-          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
-          {
-            ctrl_item.Position = CurrentItem.Position;
-          }
+      if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+        ctrl_item.Position = CurrentItem.Position;
+      }
 
-          // set json data values to the object
-          ctrl_item.ID = CurrentItem.Data.ID;
-          ctrl_item.Config = CurrentItem.Data.Config;
-          if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
-            ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
-          }
+      // set json data values to the object
+      ctrl_item.ID = CurrentItem.Data.ID;
+      ctrl_item.Config = CurrentItem.Data.Config;
+      if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
+        ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
+      }
 
-          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
-          ctrl_item.ApplyZIndexing();
-        }
-        break;
-      case "LABELHOLDER":
-        {
-          let ctrl_item = new LabelHolderNew(
-            VueStore,
-            Stage,
-            MasterLayer,
-            CurrentItem.Data.Data,
-            PxlRatio,
-            "LABELHOLDER",
-            ParentID
-          )
+      ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+      ctrl_item.ApplyZIndexing();
+    }
+    break;
+    case "LABELHOLDER": {
+      let ctrl_item = new LabelHolderNew(
+        VueStore,
+        Stage,
+        MasterLayer,
+        CurrentItem.Data.Data,
+        PxlRatio,
+        "LABELHOLDER",
+        ParentID
+      )
 
-          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
-          {
-            ctrl_item.Position = CurrentItem.Position;
-          }
+      if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+        ctrl_item.Position = CurrentItem.Position;
+      }
 
-          // set json data values to the object
-          ctrl_item.ID = CurrentItem.Data.ID;
-          ctrl_item.Config = CurrentItem.Data.Config;
-          if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
-            ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
-          }
+      // set json data values to the object
+      ctrl_item.ID = CurrentItem.Data.ID;
+      ctrl_item.Config = CurrentItem.Data.Config;
+      if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
+        ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
+      }
 
-          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
-          ctrl_item.ApplyZIndexing();
-        }
-        break;
-      case "PEGBOARD":
-        {
-          let ctrl_item = new PegboardNew(
-            VueStore,
-            Stage,
-            MasterLayer,
-            CurrentItem.Data.Data,
-            PxlRatio,
-            "PEGBOARD",
-            ParentID
-          )
+      ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+      ctrl_item.ApplyZIndexing();
+    }
+    break;
+    case "PEGBOARD": {
+      let ctrl_item = new PegboardNew(
+        VueStore,
+        Stage,
+        MasterLayer,
+        CurrentItem.Data.Data,
+        PxlRatio,
+        "PEGBOARD",
+        ParentID
+      )
 
-          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
-          {
-            ctrl_item.Position = CurrentItem.Position;
-          }
+      if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+        ctrl_item.Position = CurrentItem.Position;
+      }
 
-          // set json data values to the object
-          ctrl_item.ID = CurrentItem.Data.ID;
-          ctrl_item.Config = CurrentItem.Data.Config;
+      // set json data values to the object
+      ctrl_item.ID = CurrentItem.Data.ID;
+      ctrl_item.Config = CurrentItem.Data.Config;
 
-          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
-          ctrl_item.ApplyZIndexing();
-        }
-        break;
-      case "PRODUCT":
-        {
-          let ctrl_item = new ProductGroupNew(
-            VueStore,
-            Stage,
-            MasterLayer,
-            CurrentItem.Data.Data,
-            PxlRatio,
-            "PRODUCT",
-            ParentID
-          )
+      ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+      ctrl_item.ApplyZIndexing();
+    }
+    break;
+    case "PRODUCT": {
+      let ctrl_item = new ProductGroupNew(
+        VueStore,
+        Stage,
+        MasterLayer,
+        CurrentItem.Data.Data,
+        PxlRatio,
+        "PRODUCT",
+        ParentID
+      )
 
-          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
-          {
-            ctrl_item.Position = CurrentItem.Position;
-          }
+      if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+        ctrl_item.Position = CurrentItem.Position;
+      }
 
-          //#region Set the same configs
-          ctrl_item.ID = CurrentItem.Data.ID;
-          ctrl_item.Orientation_Width = CurrentItem.Data.Orientation.Width;
-          ctrl_item.Orientation_Height = CurrentItem.Data.Orientation.Height;
-          ctrl_item.Orientation_Depth = CurrentItem.Data.Orientation.Depth;
+      //#region Set the same configs
+      ctrl_item.ID = CurrentItem.Data.ID;
+      ctrl_item.Orientation_Width = CurrentItem.Data.Orientation.Width;
+      ctrl_item.Orientation_Height = CurrentItem.Data.Orientation.Height;
+      ctrl_item.Orientation_Depth = CurrentItem.Data.Orientation.Depth;
 
-          ctrl_item.image_orientation_width = CurrentItem.Data.ImageOrientation.Width;
-          ctrl_item.image_orientation_height = CurrentItem.Data.ImageOrientation.Height;
+      ctrl_item.image_orientation_width = CurrentItem.Data.ImageOrientation.Width;
+      ctrl_item.image_orientation_height = CurrentItem.Data.ImageOrientation.Height;
 
-          // caps
-          ctrl_item.Cap_Orientation_Width = CurrentItem.Data.Caps.Orientation.Width;
-          ctrl_item.Cap_Orientation_Height = CurrentItem.Data.Caps.Orientation.Height;
-          ctrl_item.Cap_Orientation_Depth = CurrentItem.Data.Caps.Orientation.Depth;
-          ctrl_item.Caps_Count = CurrentItem.Data.Caps.Caps_Count;
-          ctrl_item.Caps_Face = CurrentItem.Data.Caps.Caps_Face;
-          ctrl_item.caps_image_orientation_width = CurrentItem.Data.Caps.ImageOrientation.Width;
-          ctrl_item.caps_image_orientation_height = CurrentItem.Data.Caps.ImageOrientation.Height;
-          ctrl_item.Caps_Enabled = CurrentItem.Data.Caps.Caps_Enabled;
-          ctrl_item.Cap_Rotation = CurrentItem.Data.Caps.Rotation;
-          // orientation and facings
-          ctrl_item.Rotation = CurrentItem.Data.Orientation.Rotation;
-          ctrl_item.LastFace = CurrentItem.Data.Orientation.LastFace;
+      // caps
+      ctrl_item.Cap_Orientation_Width = CurrentItem.Data.Caps.Orientation.Width;
+      ctrl_item.Cap_Orientation_Height = CurrentItem.Data.Caps.Orientation.Height;
+      ctrl_item.Cap_Orientation_Depth = CurrentItem.Data.Caps.Orientation.Depth;
+      ctrl_item.Caps_Count = CurrentItem.Data.Caps.Caps_Count;
+      ctrl_item.Caps_Face = CurrentItem.Data.Caps.Caps_Face;
+      ctrl_item.caps_image_orientation_width = CurrentItem.Data.Caps.ImageOrientation.Width;
+      ctrl_item.caps_image_orientation_height = CurrentItem.Data.Caps.ImageOrientation.Height;
+      ctrl_item.Caps_Enabled = CurrentItem.Data.Caps.Caps_Enabled;
+      ctrl_item.Cap_Rotation = CurrentItem.Data.Caps.Rotation;
+      // orientation and facings
+      ctrl_item.Rotation = CurrentItem.Data.Orientation.Rotation;
+      ctrl_item.LastFace = CurrentItem.Data.Orientation.LastFace;
 
-          ctrl_item.TotalWidth = CurrentItem.Data.TotalWidth;
-          ctrl_item.TotalHeight = CurrentItem.Data.TotalHeight;
+      ctrl_item.TotalWidth = CurrentItem.Data.TotalWidth;
+      ctrl_item.TotalHeight = CurrentItem.Data.TotalHeight;
 
-          ctrl_item.Facings_X = CurrentItem.Data.Facings.x;
-          ctrl_item.Facings_Y = CurrentItem.Data.Facings.y;
-          ctrl_item.Facings_Z = CurrentItem.Data.Facings.z;
+      ctrl_item.Facings_X = CurrentItem.Data.Facings.x;
+      ctrl_item.Facings_Y = CurrentItem.Data.Facings.y;
+      ctrl_item.Facings_Z = CurrentItem.Data.Facings.z;
 
-          ctrl_item.RandomColor = CurrentItem.Data.RandomColor;
-          ctrl_item.PegboardHoleAssigned = CurrentItem.Data.PegboardHoleAssigned;
-          ctrl_item.PegboardHoleAssignedID = CurrentItem.Data.PegboardHoleAssignedID;
-          //#endregion
+      ctrl_item.RandomColor = CurrentItem.Data.RandomColor;
+      ctrl_item.PegboardHoleAssigned = CurrentItem.Data.PegboardHoleAssigned;
+      ctrl_item.PegboardHoleAssignedID = CurrentItem.Data.PegboardHoleAssignedID;
+      //#endregion
 
-          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+      ctrl_item.Initialise(CurrentItem.RelativePosition, false);
 
-        }
-        break;
+    }
+    break;
     }
 
     if (ctrl_item != null) {
