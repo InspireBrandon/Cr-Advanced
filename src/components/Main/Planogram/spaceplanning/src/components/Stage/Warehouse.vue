@@ -737,7 +737,7 @@
             self.spacePlanID = spacePlanID;
             self.planogramHelper.loadPlanogram(spacePlanID, self.$store, masterLayer, stage, pxlRatio, self
               .setClusterAndDimensionData,
-              self.$refs.spinner.hide, self.updateLoader);
+              self.$refs.SizeLoader.close, self.updateLoader);
           }, 1000);
         })
       },
@@ -767,7 +767,7 @@
               onDownloadProgress: progressEvent => {
                 var currentFileSize = progressEvent.loaded * 0.000001
                 var FileTotalSize = progressEvent.total * 0.000001
-                var progress = (currentFileSize /FileTotalSize)*100
+                var progress = (currentFileSize / FileTotalSize) * 100
                 var TIME_TAKEN = new Date().getTime() - startTime.getTime()
                 var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
                 console.log(TIME_TAKEN);
@@ -779,7 +779,7 @@
                   text2: "File Progress",
                   currentFileSize: currentFileSize,
                   FileTotalSize: FileTotalSize,
-                  progress:progress/2,
+                  progress: progress / 2,
                   currentFile: 1,
                   totalFiles: 2,
                   DownloadSpeed: DownloadSpeed,
@@ -865,11 +865,11 @@
       },
       saveFile(isNew) {
         let self = this;
-
         let parent = self.$parent.$children[0].$children[2];
         let stage = parent.getStage();
 
-        let image = parent.$parent.getImageBytes(5);
+        let b64 = parent.$parent.getImageBytes(5);
+        let image = parent.$parent.b64toBlob(b64, "image/png")
 
         let clusterData = self.rangingData;
         let vscd = self.$store.getters.getClusterData;
@@ -895,6 +895,7 @@
               self.planogramHelper.setCreate(self.spacePlanID == null || isNew);
 
               if (self.spacePlanID == null) {
+                self.$refs.SizeLoader.show()
                 self.planogramHelper.save(self.$store, stage, clusterData, {
                   modules: self.modules,
                   height: self.height,
@@ -903,9 +904,11 @@
                   pallettes: self.pallettes,
                   supplierStands: self.supplierStands,
                   bins: self.bins
-                }, self.spacePlanID, self.spacePlanName, true, image)
+                }, self.spacePlanID, self.spacePlanName, true, image, self.updateLoader , self.$refs.SizeLoader.close)
+                // self.$refs.SizeLoader.close()
               } else {
                 self.$refs.yesNoModal.show('Update file name with latest configuration?', value => {
+                   self.$refs.SizeLoader.show()
                   self.planogramHelper.save(self.$store, stage, clusterData, {
                     modules: self.modules,
                     height: self.height,
@@ -914,7 +917,7 @@
                     pallettes: self.pallettes,
                     supplierStands: self.supplierStands,
                     bins: self.bins
-                  }, self.spacePlanID, self.spacePlanName, value, image)
+                  }, self.spacePlanID, self.spacePlanName, value, image , self.updateLoader , self.$refs.SizeLoader.close)
                 })
               }
             })
@@ -929,11 +932,12 @@
             }, self.spacePlanID, self.spacePlanName, true, image)
           } else {
             self.$refs.yesNoModal.show('Update file name with latest configuration?', value => {
+               self.$refs.SizeLoader.show()
               self.planogramHelper.save(self.$store, stage, clusterData, {
                 modules: self.modules,
                 height: self.height,
                 width: self.width
-              }, self.spacePlanID, self.spacePlanName, value, image)
+              }, self.spacePlanID, self.spacePlanName, value, image,self.updateLoader , self.$refs.SizeLoader.close)
             })
           }
         }

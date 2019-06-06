@@ -55,7 +55,7 @@
             }
         },
         methods: {
-            show(data) {
+            show() {
                 let self = this
                 self.dialog = true
                

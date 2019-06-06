@@ -30,7 +30,7 @@ class LoadSavePlanogramBase {
     this.Create = create;
   }
 
-  save(vuex, stage, clusterData, dimensionData, spacePlanID, spacePlanName, updateName, image) {
+  save(vuex, stage, clusterData, dimensionData, spacePlanID, spacePlanName, updateName, image, updateLoader, close) {
     let self = this;
     let ctrl_store = new StoreHelper();
     let allItems = ctrl_store.getAllPlanogramItems(vuex);
@@ -54,7 +54,7 @@ class LoadSavePlanogramBase {
 
     allProducts.forEach(ap => {
       output.planogramData.forEach(pdi => {
-        if (ap.ID == pdi.Data.ID) {
+        if (ap.Barcode == pdi.Data.Barcode) {
           let calcData = calculate(ap, vuex);
           pdi.Data["CalcData"] = calcData;
         }
@@ -103,46 +103,237 @@ class LoadSavePlanogramBase {
     }
 
     output.name = planogramName;
-    if (self.Create == true) {
-      axios
-        .post(
-          self.ServerAddress + "SystemFile/Json?db=CR-Devinspire", {
-            systemFile: {
-              systemUserID: 10,
-              folder: "Space Planning",
-              name: planogramName
-            },
-            data: output
-          }
-        )
-        .then(result => {
-          if (result.data.success == true) {
-            alert(planogramName + " Successfully saved new.");
-          } else {
-            alert("Server responded unsuccessfully!");
-          }
+    console.log("[SAVING]");
+
+    // if (self.Create == true) {
+    let startTime = new Date()
+    let config = {
+      onUploadProgress: progressEvent => {
+        var currentFileSize = progressEvent.loaded * 0.000001
+        var FileTotalSize = progressEvent.total * 0.000001
+        var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+        var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
+
+        // do whatever you like with the percentage complete
+        // maybe dispatch an action that will update a progress bar or something
+        updateLoader({
+          text1: "Creating Folder",
+          text2: null,
+          currentFileSize: currentFileSize,
+          FileTotalSize: FileTotalSize,
+          currentFile: null,
+          totalFiles: null,
+          DownloadSpeed: DownloadSpeed,
         })
-        .catch(error => {
-          console.error("Failed to save planogram file");
-        });
-    } else {
-      axios
-        .put(
-          process.env.VUE_APP_API +
-          `SystemFile/Json?db=CR-Devinspire&id=${spacePlanID}&name=${planogramName}`,
-          output
-        )
-        .then(result => {
-          if (result.data.success == true) {
-            alert(planogramName + " Successfully saved.");
-          } else {
-            alert("Server responded unsuccessfully!");
-          }
-        })
-        .catch(error => {
-          console.error("Failed to save planogram file");
-        });
+      }
     }
+    axios.post(self.ServerAddress + "SystemFolder?db=CR-Devinspire", {
+      systemFile: {
+        systemUserID: 10,
+        folder: "Space Planning",
+        name: planogramName,
+        isFolder: 1,
+        extension: ""
+      },
+    }, config).then(resp => {
+      if (resp.success == true) {
+        alert("folder created")
+      }
+      console.log(planogramName)
+      let startTime = new Date()
+      let config = {
+        onUploadProgress: progressEvent => {
+          var currentFileSize = progressEvent.loaded * 0.000001
+          var FileTotalSize = progressEvent.total * 0.000001
+          var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+          var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
+          console.log(TIME_TAKEN);
+
+          // do whatever you like with the percentage complete
+          // maybe dispatch an action that will update a progress bar or something
+          updateLoader({
+            text1: "uploading Advanced Planogram",
+            text2: "File Progresss",
+            currentFileSize: currentFileSize,
+            FileTotalSize: FileTotalSize,
+            currentFile: 1,
+            totalFiles: 3,
+            DownloadSpeed: DownloadSpeed,
+          })
+        }
+      }
+      axios.post(self.ServerAddress + "SystemFile/JSON/Planogram?db=CR-Devinspire", {
+        file: "config_advanced",
+        systemFile: {
+          systemUserID: 10,
+          folder: "Space Planning",
+          name: planogramName,
+        },
+        data: output
+      }, config).then(result => {
+        // __sending simple version through
+        output.image = null
+        console.log(output);
+
+        output.planogramData.forEach(e => {
+          e.Data.Data.image = null
+          console.log(e.Data.Data);
+          if (e.Type != "PRODUCT")
+            e.Data.Data.renderings.forEach(render => {
+              render.image = null
+            })
+
+        })
+        console.log(output);
+        let startTime = new Date()
+        let config = {
+          onUploadProgress: progressEvent => {
+            var currentFileSize = progressEvent.loaded * 0.000001
+            var FileTotalSize = progressEvent.total * 0.000001
+            var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+            var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
+
+            // do whatever you like with the percentage complete
+            // maybe dispatch an action that will update a progress bar or something
+            updateLoader({
+              text1: "uploading Simple Planogram",
+              text2: "File Progresss",
+              currentFileSize: currentFileSize,
+              FileTotalSize: FileTotalSize,
+              currentFile: 2,
+              totalFiles: 3,
+              DownloadSpeed: DownloadSpeed,
+            })
+          }
+        }
+        axios.post(self.ServerAddress + "SystemFile/JSON/Planogram?db=CR-Devinspire", {
+          file: "config_simple",
+          systemFile: {
+            systemUserID: 10,
+            folder: "Space Planning",
+            name: planogramName
+          },
+          data: output
+        }, config).then(res => {
+          let config = {
+            onUploadProgress: progressEvent => {
+
+            }
+          }
+          let xhrObj = new XMLHttpRequest();
+          let url = self.ServerAddress +
+            `SystemFile/JSON/PlanogramImage?db=CR-Devinspire&fileName=${output.name}`;
+
+          xhrObj.open("Post", url);
+          let startTime = new Date()
+          xhrObj.upload.onprogress = function (pe) {
+            var currentFileSize = pe.loaded * 0.000001
+            var FileTotalSize = pe.total * 0.000001
+            var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+            var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
+
+            // do whatever you like with the percentage complete
+            // maybe dispatch an action that will update a progress bar or something
+            updateLoader({
+              text1: "uploading Planogram Image",
+              text2: "File Progresss",
+
+              currentFileSize: pe.loaded * 0.000001,
+              FileTotalSize: pe.total * 0.000001,
+              progress: ((currentFileSize / FileTotalSize) * 100) / 3,
+              currentFile: 2,
+              totalFiles: 3,
+              DownloadSpeed: DownloadSpeed
+            })
+          }
+
+          xhrObj.upload.onreadystatechange = function (oEvent) {
+
+            if (xhrObj.upload.readyState === 4) {
+              if (xhrObj.upload.status !== 200) {
+                alert("ERROR")
+              }
+            }
+          };
+
+          xhrObj.upload.onerror = function (e) {
+            alert("ERROR")
+            hasError = true;
+          }
+
+          xhrObj.upload.onloadend = function (e) {
+            updateLoader({
+              currentFile: 3,
+              totalFiles: 3,
+            })
+            setTimeout(() => {
+              close()
+            }, 500);
+          }
+
+          xhrObj.setRequestHeader("X-File-Name", "image.png");
+          xhrObj.setRequestHeader("Content-type", image.Type);
+          console.log("image");
+          console.log(image);
+
+          image.name = "image.png"
+          xhrObj.send(image);
+
+          // 
+
+        })
+      }).catch(e => {
+        console.log(e)
+        console.error("Failed to save planogram file");
+
+      })
+    })
+
+    // } else {
+    //   let startTime = new Date()
+    //   let config = {
+    //     onUploadProgress: progressEvent => {
+    //       var currentFileSize = progressEvent.loaded * 0.000001
+    //       var FileTotalSize = progressEvent.total * 0.000001
+    //       var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+    //       var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
+    //       console.log(TIME_TAKEN);
+
+    //       // do whatever you like with the percentage complete
+    //       // maybe dispatch an action that will update a progress bar or something
+    //       updateLoader({
+    //         text1: "Updating Planogram file",
+    //         text2: null,
+    //         currentFileSize: currentFileSize,
+    //         FileTotalSize: FileTotalSize,
+    //         currentFile: null,
+    //         totalFiles: null,
+    //         DownloadSpeed: DownloadSpeed,
+    //       })
+    //     }
+    //   }
+    //   axios
+    //     .put(
+    //       process.env.VUE_APP_API +
+    //       `SystemFile/Json?db=CR-Devinspire&id=${spacePlanID}&name=${planogramName}`,
+    //       output,config
+    //     )
+    //     .then(result => {
+    //       console.log(result);
+
+    //       close()
+    //       if (result.data.success == true) {
+    //         alert(planogramName + " Successfully saved.");
+    //       } else {
+    //         log
+    //         alert("Server responded unsuccessfully!");
+    //       }
+    //     })
+    //     .catch(error => {
+    //       close()
+    //       console.error("Failed to save planogram file");
+    //     });
+    // }
   }
 
   determinePlanogramName(allPlanogramItems, clusterData) {
@@ -157,12 +348,12 @@ class LoadSavePlanogramBase {
     self.resetStage(VueStore, MasterLayer, Stage);
     let config = {
       onDownloadProgress: progressEvent => {
-       var currentFileSize = progressEvent.loaded * 0.000001
-       var FileTotalSize = progressEvent.total * 0.000001
-       var TIME_TAKEN = new Date().getTime()  - startTime.getTime() 
-       var DownloadSpeed = currentFileSize/(TIME_TAKEN/1000)
-       console.log(TIME_TAKEN);
-       
+        var currentFileSize = progressEvent.loaded * 0.000001
+        var FileTotalSize = progressEvent.total * 0.000001
+        var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+        var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
+        console.log(TIME_TAKEN);
+
         // do whatever you like with the percentage complete
         // maybe dispatch an action that will update a progress bar or something
         updateLoader({
@@ -172,25 +363,30 @@ class LoadSavePlanogramBase {
           FileTotalSize: FileTotalSize,
           currentFile: null,
           totalFiles: null,
-          DownloadSpeed:DownloadSpeed,
+          DownloadSpeed: DownloadSpeed,
         })
       }
     }
-    axios.get(self.ServerAddress + `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${spacePlanID}`, config)
+    axios.get(self.ServerAddress + `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${spacePlanID}&file=config_advanced`, config)
       .then(r => {
+        console.log(r.data);
 
         let jsonData = r.data.jsonObject
+       
+          afterGetSpacePlanFile(jsonData.clusterData, jsonData.dimensionData, jsonData.name, rangeProducts => {
+            if (rangeProducts == null) {
+              self.startLoadingPlanogram(jsonData, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
+            } else {
+              jsonData.planogramData = StageWarehouseMiddleware.verifyIntegrityOfWarehouseData(jsonData.planogramData, rangeProducts);
+              self.startLoadingPlanogram(jsonData, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
+            }
+          });
+       
 
-        afterGetSpacePlanFile(jsonData.clusterData, jsonData.dimensionData, jsonData.name, rangeProducts => {
-          if (rangeProducts == null) {
-            self.startLoadingPlanogram(jsonData, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
-          } else {
-            jsonData.planogramData = StageWarehouseMiddleware.verifyIntegrityOfWarehouseData(jsonData.planogramData, rangeProducts);
-            self.startLoadingPlanogram(jsonData, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
-          }
-        });
       })
       .catch(e => {
+
+        hideLoader()
         alert("Failed to get data. " + e);
       })
   }
