@@ -3,7 +3,7 @@
         <v-toolbar dense dark>
             <v-btn color="primary" flat outline dark @click="openStoreView()"
                 v-if="(currentPlanogram != null && selectedProject != null)">Store View </v-btn>
-             
+
             <v-spacer></v-spacer>
             <v-toolbar-title>Planogram Implementation</v-toolbar-title>
         </v-toolbar>
@@ -91,7 +91,7 @@
                                 </v-tooltip>
                             </v-toolbar>
                             <v-card-text>
-                                <v-img contain style="max-height: 350px;" :src="image" @click="openImage"></v-img>
+                                <img style="max-height: 350px; max-width: 100%;" :src="image" @click="openImage">
                             </v-card-text>
                         </v-card>
                     </v-flex>
@@ -130,7 +130,7 @@
                     </v-card>
                 </v-flex>
 
-               
+
             </v-layout>
         </v-container>
         <v-dialog fullscreen v-model="imageModal">
@@ -158,7 +158,9 @@
         <NotesModal ref="notesModal"></NotesModal>
         <SpacePlanSelector ref="SpacePlanSelector" />
         <PlanogramDetailsSelector ref="PlanogramDetailsSelector" />
-        <StorePlanogramOverview :ProjectName="selectedProject" :selectedProject="selectedProject" ref="StorePlanogramOverview"/>
+        <StorePlanogramOverview :ProjectName="selectedProject" :selectedProject="selectedProject"
+            ref="StorePlanogramOverview" />
+        <SizeLoader ref="SizeLoader" />
     </v-card>
 </template>
 
@@ -175,6 +177,8 @@
     import SpacePlanSelector from '@/components/Common/SpacePlanSelector'
     import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector'
     import StorePlanogramOverview from './StorePlanogramOverview'
+    import SizeLoader from '@/components/Common/SizeLoader'
+
 
 
 
@@ -184,6 +188,7 @@
         components: {
             PlanogramDetailsSelector,
             SpacePlanSelector,
+            SizeLoader,
             PlanogramReportModal,
             PlanogramIplementationModal,
             AssignTask,
@@ -193,7 +198,7 @@
         },
         data: () => {
             return {
-               
+
                 active: null,
                 storeView: false,
                 displayName: null,
@@ -225,7 +230,7 @@
                 routePlanogramID: null,
                 routeStatus: null,
                 tmpRequest: null,
-               
+
             }
         },
         mounted() {
@@ -260,18 +265,16 @@
             }
         },
         methods: {
-          
+
             openStoreView() {
                 let self = this
-                self.$refs.StorePlanogramOverview.open() 
+                self.$refs.StorePlanogramOverview.open()
             },
-           
-           
+
+
             ChangeSpacePlan() {
                 let self = this
-                self.$refs.SpacePlanSelector.show(data => {
-                    console.log(data);
-                })
+                self.$refs.SpacePlanSelector.show(data => {})
             },
             orderVariation() {
                 let self = this
@@ -292,24 +295,70 @@
             },
             openReport() {
                 let self = this
+                self.planogramObj.image = self.image
                 self.$refs.PlanogramReportModal.show(self.planogramObj)
+            },
+            updateLoader(data) {
+                let self = this
+
+
+                self.$refs.SizeLoader.updateLoader(data)
             },
             selectPlanogram(planogram) {
                 let self = this;
                 self.showLoader = true
-
+                self.$refs.SizeLoader.show()
                 self.$nextTick(() => {
+                    let startTime = new Date()
+                    let config = {
+                        onDownloadProgress: progressEvent => {
+                            var currentFileSize = progressEvent.loaded * 0.000001
+                            var FileTotalSize = progressEvent.total * 0.000001
+                            var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+                            var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
 
-                    Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&id=' + planogram)
+                            // do whatever you like with the percentage complete
+                            // maybe dispatch an action that will update a progress bar or something
+                            self.updateLoader({
+                                text1: "Downloading Planogram Data",
+                                text2: null,
+                                currentFileSize: currentFileSize,
+                                FileTotalSize: FileTotalSize,
+                                currentFile: null,
+                                totalFiles: null,
+                                DownloadSpeed: DownloadSpeed,
+                            })
+                        }
+                    }
+                    Axios.get(process.env.VUE_APP_API +
+                            `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${planogram}&file=config_simple`,
+                            config)
                         .then(r => {
-                            console.log(r.data.name);
+                            console.log(r.data);
 
-                            self.displayName = r.data.name
-                            self.planogramObj = r.data
-                            self.image = r.data.image;
-                            self.showLoader = false
+                            self.displayName = r.data.jsonObject.name
+                            self.planogramObj = r.data.jsonObject
+                            self.$refs.SizeLoader.close()
+
+                            if (r.data.fromFolder == false) {
+                                self.image = r.data.jsonObject.image
+
+                            } else {
+                                self.getImage(r.data.jsonObject.name)
+
+                            }
+                            self.showLoader = false;
+                        }).catch(e => {
+                            self.showLoader = false;
+                            self.$refs.SizeLoader.close()
                         })
                 })
+            },
+            getImage(name) {
+                let self = this
+                let tmpname = "Space Planning\\" + name
+                self.image = process.env.VUE_APP_API +
+                    `SystemFile/PlanogramImage?folder=${tmpname}&file=image.png&compress=false&rng=${Math.random()}`;
             },
             downloadImage() {
                 var self = this
@@ -525,7 +574,8 @@
                     self.$nextTick(() => {
                         let projectGroupID = self.selectedProjectGroup;
 
-                        Axios.get(process.env.VUE_APP_API + `Project?projectGroupID=${projectGroupID}`)
+                        Axios.get(process.env.VUE_APP_API +
+                                `Project?projectGroupID=${projectGroupID}`)
                             .then(r => {
                                 delete Axios.defaults.headers.common["TenantID"];
                                 self.projects = r.data.projectList;
@@ -567,7 +617,8 @@
                         let projectGroupID = self.selectedProjectGroup;
 
                         Axios.get(process.env.VUE_APP_API +
-                                `Project?projectGroupID=${projectGroupID}&userID=${systemUserID}`)
+                                `Project?projectGroupID=${projectGroupID}&userID=${systemUserID}`
+                            )
                             .then(r => {
                                 delete Axios.defaults.headers.common["TenantID"];
                                 self.projects = r.data.projectList;
@@ -716,7 +767,6 @@
                             self.items = r.data.projectTXList;
 
                             let hasIn = false;
-                            console.log(r.data.projectTXList);
 
                             r.data.projectTXList.forEach((element, idx) => {
 
@@ -754,58 +804,76 @@
                                     //         systemFileID: element.systemFileID
                                     //     })
                                     // }
-                                    if (element.actionedByUserID == null && element.systemUserID !=
+                                    if (element.actionedByUserID == null && element
+                                        .systemUserID !=
                                         null) {
-                                        if (element.status == 12||element.status == 2) {
+                                        if (element.status == 12 || element.status == 2) {
                                             self.timelineItems.push({
-                                                status: r.data.projectTXList[idx + 1]
+                                                status: r.data.projectTXList[idx +
+                                                        1]
                                                     .status,
-                                                notes: self.status[r.data.projectTXList[
-                                                    idx + 1].status].text,
+                                                notes: self.status[r.data
+                                                    .projectTXList[
+                                                        idx + 1].status].text,
                                                 date: r.data.projectTXList[idx + 1]
                                                     .dateTimeString,
                                                 user: r.data.projectTXList[idx + 1]
                                                     .username,
-                                                userID: r.data.projectTXList[idx + 1]
+                                                userID: r.data.projectTXList[idx +
+                                                        1]
                                                     .systemUserID,
-                                                type: r.data.projectTXList[idx + 1].type,
-                                                storeID: r.data.projectTXList[idx + 1]
+                                                type: r.data.projectTXList[idx + 1]
+                                                    .type,
+                                                storeID: r.data.projectTXList[idx +
+                                                        1]
                                                     .store_ID,
-                                                store: r.data.projectTXList[idx + 1].store,
-                                                storeCluster_ID: r.data.projectTXList[idx +
-                                                    1].storeCluster_ID,
-                                                storeCluster: r.data.projectTXList[idx + 1]
+                                                store: r.data.projectTXList[idx + 1]
+                                                    .store,
+                                                storeCluster_ID: r.data
+                                                    .projectTXList[idx +
+                                                        1].storeCluster_ID,
+                                                storeCluster: r.data.projectTXList[
+                                                        idx + 1]
                                                     .storeCluster,
-                                                categoryCluster_ID: r.data.projectTXList[
-                                                    idx + 1].categoryCluster_ID,
-                                                actionedByUserID: r.data.projectTXList[idx +
-                                                    1].actionedByUserID,
-                                                actionedByUserName: r.data.projectTXList[
-                                                    idx + 1].actionedByUserName,
-                                                projectOwnerID: r.data.projectTXList[idx +
-                                                    1].projectOwnerID,
-                                                systemFileID: r.data.projectTXList[idx + 1]
+                                                categoryCluster_ID: r.data
+                                                    .projectTXList[
+                                                        idx + 1].categoryCluster_ID,
+                                                actionedByUserID: r.data
+                                                    .projectTXList[idx +
+                                                        1].actionedByUserID,
+                                                actionedByUserName: r.data
+                                                    .projectTXList[
+                                                        idx + 1].actionedByUserName,
+                                                projectOwnerID: r.data
+                                                    .projectTXList[idx +
+                                                        1].projectOwnerID,
+                                                systemFileID: r.data.projectTXList[
+                                                        idx + 1]
                                                     .systemFileID
 
                                             })
                                         } else {
                                             self.timelineItems.push({
                                                 status: element.status,
-                                                notes: self.status[element.status].text,
+                                                notes: self.status[element.status]
+                                                    .text,
                                                 date: element.dateTimeString,
                                                 user: element.username,
                                                 userID: element.systemUserID,
                                                 type: element.type,
                                                 storeID: element.store_ID,
                                                 store: element.store,
-                                                storeCluster_ID: element.storeCluster_ID,
+                                                storeCluster_ID: element
+                                                    .storeCluster_ID,
                                                 storeCluster: element.storeCluster,
                                                 categoryCluster_ID: element
                                                     .categoryCluster_ID,
-                                                actionedByUserID: element.actionedByUserID,
+                                                actionedByUserID: element
+                                                    .actionedByUserID,
                                                 actionedByUserName: element
                                                     .actionedByUserName,
-                                                projectOwnerID: element.projectOwnerID,
+                                                projectOwnerID: element
+                                                    .projectOwnerID,
                                                 systemFileID: element.systemFileID
 
                                             })
@@ -822,11 +890,15 @@
                                             type: element.type,
                                             storeID: element.store_ID,
                                             store: element.store,
-                                            storeCluster_ID: element.storeCluster_ID,
+                                            storeCluster_ID: element
+                                                .storeCluster_ID,
                                             storeCluster: element.storeCluster,
-                                            categoryCluster_ID: element.categoryCluster_ID,
-                                            actionedByUserID: element.actionedByUserID,
-                                            actionedByUserName: element.actionedByUserName,
+                                            categoryCluster_ID: element
+                                                .categoryCluster_ID,
+                                            actionedByUserID: element
+                                                .actionedByUserID,
+                                            actionedByUserName: element
+                                                .actionedByUserName,
 
                                         })
                                     }
@@ -1036,29 +1108,30 @@
                 }
 
                 // Select a store
-                self.$refs.PlanogramIplementationModal.show("Distribute Planogram?", 4, null, null, null, data => {
-                    request.status = 40;
-                    request.actionedByUserID = data.users;
-                    request.systemUserID = null;
-                    // Create new process assigned
-                    // Create new process group
-                    self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
-                        // Create new process assigned against new group
-                        request.actionedByUserID = null;
-                        request.systemUserID = data.users;
-                        request.projectTXGroup_ID = newGroup.id;
-                        self.createProjectTransaction(request, processAssigned => {
-                            request.status = 13;
-                            request.notes = data.notes;
-                            request.store_ID = data.stores;
-                            self.createProjectTransaction(request,
-                                implementationPendingResponse => {
-                                    self.getProjectTransactionsByProjectID(
-                                        request.project_ID);
-                                })
+                self.$refs.PlanogramIplementationModal.show("Distribute Planogram?", 4, null, null, null,
+                    data => {
+                        request.status = 40;
+                        request.actionedByUserID = data.users;
+                        request.systemUserID = null;
+                        // Create new process assigned
+                        // Create new process group
+                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
+                            // Create new process assigned against new group
+                            request.actionedByUserID = null;
+                            request.systemUserID = data.users;
+                            request.projectTXGroup_ID = newGroup.id;
+                            self.createProjectTransaction(request, processAssigned => {
+                                request.status = 13;
+                                request.notes = data.notes;
+                                request.store_ID = data.stores;
+                                self.createProjectTransaction(request,
+                                    implementationPendingResponse => {
+                                        self.getProjectTransactionsByProjectID(
+                                            request.project_ID);
+                                    })
+                            })
                         })
                     })
-                })
             },
             implement() {
                 let self = this;
@@ -1067,14 +1140,15 @@
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
 
-                self.$refs.PlanogramIplementationModal.show("Implement Planogram?", 3, null, null, null, data => {
-                    request.status = 26;
-                    request.notes = data.notes;
-                    request.systemUserID = systemUserID;
-                    self.createProjectTransaction(request, () => {
-                        self.getProjectTransactionsByProjectID(request.project_ID);
+                self.$refs.PlanogramIplementationModal.show("Implement Planogram?", 3, null, null, null,
+                    data => {
+                        request.status = 26;
+                        request.notes = data.notes;
+                        request.systemUserID = systemUserID;
+                        self.createProjectTransaction(request, () => {
+                            self.getProjectTransactionsByProjectID(request.project_ID);
+                        })
                     })
-                })
             },
             decline() {
                 let self = this;

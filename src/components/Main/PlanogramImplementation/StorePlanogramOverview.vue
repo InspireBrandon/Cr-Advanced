@@ -33,6 +33,11 @@
                                 <v-btn @click="assignPlanogramToStore(props.item)" icon flat small color="primary">
                                     <v-icon>assignment</v-icon>
                                 </v-btn>
+                                <v-btn icon @click="openStoreOver(props.item)">
+                                    <v-icon>
+                                        more_vert
+                                    </v-icon>
+                                </v-btn>
                                 <!-- DISTRIBUTED TO STORE -->
                             </td>
                         </tr>
@@ -40,23 +45,27 @@
                 </v-data-table>
             </v-card-text>
         </v-card>
+        <StorePlanograms ref="StorePlanograms" />
         <PlanogramDetailsSelector ref="PlanogramDetailsSelector" />
     </v-dialog>
 </template>
 <script>
-    import Axios  from 'axios'
+    import Axios from 'axios'
     import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector'
+    import StorePlanograms from './StorePlanograms.vue'
+
 
     export default {
 
         props: ['ProjectName', 'selectedProject'],
         components: {
             PlanogramDetailsSelector,
-          
+            StorePlanograms
         },
         data() {
 
             return {
+                allStoreDialog: false,
                 headers: [{
                     text: "Store",
                     sortable: false
@@ -93,6 +102,12 @@
             }
         },
         methods: {
+            openStoreOver(item) {
+                let self = this
+                self.$refs.StorePlanograms.open(item)
+                console.log(item);
+
+            },
             getStorePlanograms() {
                 let self = this
                 self.currentStorePlanograms = [];
@@ -109,7 +124,7 @@
             open() {
                 let self = this
                 self.storeView = true
-                self.getStorePlanograms() 
+                self.getStorePlanograms()
             },
             assignPlanogramToStore(listItem) {
                 let self = this;
