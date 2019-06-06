@@ -1,0 +1,13 @@
+
+{
+    "configName":"Testing",
+    "report":false,
+    "routes": [
+        {
+            "route": "/Testing",
+            "routeName": "Testing",
+            "title": "Testing",
+            "openInNewWindow": false
+        }
+    ]
+}

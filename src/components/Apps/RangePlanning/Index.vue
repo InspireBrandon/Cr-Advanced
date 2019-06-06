@@ -252,7 +252,6 @@
           regional: [],
           store: []
         },
-
         selectedPlanogram: null,
         selectedDateRange: null,
         selectedItems: [],
@@ -378,7 +377,7 @@
         let self = this;
         self.$refs.productListing.show();
       },
-       updateLoader(data) {
+      updateLoader(data) {
         let self = this
         self.$refs.SizeLoader.updateLoader(data)
       },
@@ -390,15 +389,15 @@
           onDownloadProgress: progressEvent => {
             var currentFileSize = progressEvent.loaded * 0.000001
             var FileTotalSize = progressEvent.total * 0.000001
-          
+
             var TIME_TAKEN = new Date().getTime() - startTime.getTime()
             var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
-             self.updateLoader({
-                  text1: "Downloading Range",
-                  currentFileSize: currentFileSize,
-                  FileTotalSize: FileTotalSize,
-                  DownloadSpeed: DownloadSpeed,
-                })
+            self.updateLoader({
+              text1: "Downloading Range",
+              currentFileSize: currentFileSize,
+              FileTotalSize: FileTotalSize,
+              DownloadSpeed: DownloadSpeed,
+            })
           }
         }
         self.$refs.rangeSelectorModal.show(fileID => {

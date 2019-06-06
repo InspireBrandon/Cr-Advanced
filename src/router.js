@@ -18,7 +18,7 @@ import Notifications from '@/components/Main/Notifications/Index.vue'
 import RangePlanning from '@/components/Apps/RangePlanning/Index.vue'
 //import SpacePlanning from '@/components/Main/Planogram/spaceplanning/src/views/Main.vue'
 import Fixtures from '@/components/Apps/SpacePlanning/Fixtures/Index.vue'
-import Yeet from '@/components/Main/Yeet.vue'
+import Testing from '@/components/Main/Testing.vue'
 
 //Product maintainence
 import DataPreparation from '@/components/Main/DataPreparation';
@@ -83,6 +83,8 @@ import ProductReport from '@/views/Reports/SPACE-PLANNING-REPORTS/ProductReport/
 import HelpFileView from '@/components/Main/HelpFile/Index.vue'
 import Tasks from '@/components/Main/Tasks/Switcher.vue';
 
+import ProductListing from '@/components/Apps/RangePlanning/ProductListing/Index.vue';
+
 // Floor Planning
 import FloorPlanning from '@/components/Main/FloorPlanning/index.vue'
 
@@ -111,9 +113,14 @@ export default new Router({
       component: Main,
       children: [
         {
-          path: '/Yeet',
-          name: 'Yeet',
-          component: Yeet
+          path: '/ProductListing',
+          name: 'ProductListing',
+          component: ProductListing
+        },
+        {
+          path: '/Testing',
+          name: 'Testing',
+          component: Testing
         },{
           path: '/Home',
           name: 'home',

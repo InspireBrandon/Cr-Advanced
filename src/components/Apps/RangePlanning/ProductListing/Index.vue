@@ -1,210 +1,102 @@
 <template>
     <div>
-        <v-layout row justify-center>
-            <v-dialog fullscreen persistent v-model="dialog">
-                <v-card>
-                    <v-toolbar dark color="primary">
-                        <v-toolbar-title>New Product Listing</v-toolbar-title>
-                        <v-spacer></v-spacer>
-                        <v-btn icon @click="close">
-                            <v-icon>close</v-icon>
-                        </v-btn>
-                    </v-toolbar>
-                    <v-card-text class="pa-0">
-                        <div class="elevation-3">
-
-                            <v-toolbar dark dense flat>
-                                <v-toolbar-items>
-                                    <v-menu dark offset-y style="margin-bottom: 10px;">
-                                        <v-btn slot="activator" flat>
-                                            File
-                                        </v-btn>
-                                        <v-list light dense>
-                                            <v-list-tile @click="newLine">
-                                                <v-list-tile-title>New Line</v-list-tile-title>
-                                            </v-list-tile>
-                                            <v-list-tile @click="openFile">
-                                                <v-list-tile-title>Open</v-list-tile-title>
-                                            </v-list-tile>
-                                            <v-list-tile @click="prompt">
-                                                <v-list-tile-title>Save</v-list-tile-title>
-                                            </v-list-tile>
-                                            <v-list-tile @click="closeFile">
-                                                <v-list-tile-title>Close</v-list-tile-title>
-                                            </v-list-tile>
-                                        </v-list>
-                                    </v-menu>
-                                </v-toolbar-items>
-                                <v-btn color="primary" @click="overview = !overview">
-                                    {{ overview == false? 'Report' : 'Sections' }}</v-btn>
-                            </v-toolbar>
-
-                            <v-tabs active-class="active-tab" v-if="items.length > 0" v-show="!overview" v-model="active" grow dark slider-color="primary">
-                                <v-tab ripple v-for="(tab, idx) in tabs" :key="idx">{{ tab }}</v-tab>
-                                <!-- Standard -->
-                                <v-tab-item>
-                                    <v-card flat>
-                                        <Standard v-if="active == 0" :canPaste="canPaste" :copy="copy" :paste="paste"
-                                            :remove="remove" :duplicate="duplicate" :items="items" ref="Standard">
-                                        </Standard>
-                                    </v-card>
-                                </v-tab-item>
-                                <!-- Vendor -->
-                                <v-tab-item>
-                                    <v-card flat>
-                                        <Vendor v-if="active == 1" :manufacturers="manufacturers" :brands="brands"
-                                            :getManufacturerDetailsByID="getManufacturerDetailsByID"
-                                            :setItemsData="setItemsData" :canPaste="canPaste" :copy="copy"
-                                            :paste="paste" :remove="remove" :duplicate="duplicate" :items="items"
-                                            ref="Vendor">
-                                        </Vendor>
-                                    </v-card>
-                                </v-tab-item>
-                                <!-- Hierachy -->
-                                <v-tab-item>
-                                    <v-card flat>
-                                        <Hierachy v-if="active == 2" :setItemsData="setItemsData"
-                                            :getCategoryDetailsByID="getCategoryDetailsByID"
-                                            :subcategories="subcategories" :planograms="planograms" :segments="segments"
-                                            :categoryLinks="categoryLinks" :canPaste="canPaste" :copy="copy"
-                                            :paste="paste" :remove="remove" :duplicate="duplicate" :items="items"
-                                            ref="Hierachy">
-                                        </Hierachy>
-                                    </v-card>
-                                </v-tab-item>
-                                <!-- Item Status -->
-                                <v-tab-item>
-                                    <v-card flat>
-                                        <ItemStatus v-if="active == 3" :itemStatuses="itemStatuses"
-                                            :activeShopCodes="activeShopCodes" :canPaste="canPaste" :copy="copy"
-                                            :paste="paste" :remove="remove" :duplicate="duplicate" :items="items"
-                                            ref="ItemStatus">
-                                        </ItemStatus>
-                                    </v-card>
-                                </v-tab-item>
-                                <!-- Images -->
-                                <v-tab-item>
-                                    <v-card flat>
-                                        <ImagesAndDimensions v-if="active == 4" :canPaste="canPaste" :copy="copy"
-                                            :paste="paste" :remove="remove" :duplicate="duplicate" :items="items"
-                                            ref="ImagesAndDimensions">
-                                        </ImagesAndDimensions>
-                                    </v-card>
-                                </v-tab-item>
-                                <!-- Supporting Documents -->
-                                <v-tab-item>
-                                    <v-card flat>
-                                        <SupportingDocuments v-if="active == 5" :canPaste="canPaste" :copy="copy"
-                                            :paste="paste" :remove="remove" :duplicate="duplicate" :items="items"
-                                            ref="SupportingDocuments">
-                                        </SupportingDocuments>
-                                    </v-card>
-                                </v-tab-item>
-                                <!-- Resources -->
-                                <v-tab-item>
-                                    <v-card flat>
-                                        <Resources v-if="active == 6" :canPaste="canPaste" :copy="copy" :paste="paste"
-                                            :remove="remove" :duplicate="duplicate" :items="items" ref="Resources">
-                                        </Resources>
-                                    </v-card>
-                                </v-tab-item>
-                                <!-- Stock Control -->
-                                <v-tab-item>
-                                    <v-card flat>
-                                        <StockControl v-if="active == 7" :canPaste="canPaste" :copy="copy"
-                                            :paste="paste" :remove="remove" :duplicate="duplicate" :items="items"
-                                            ref="StockControl">
-                                        </StockControl>
-                                    </v-card>
-                                </v-tab-item>
-                                <!-- Price And Margin -->
-                                <v-tab-item>
-                                    <v-card flat>
-                                        <PriceAndMargin v-if="active == 8" :canPaste="canPaste" :copy="copy"
-                                            :paste="paste" :remove="remove" :duplicate="duplicate" :items="items"
-                                            ref="PriceAndMargin">
-                                        </PriceAndMargin>
-                                    </v-card>
-                                </v-tab-item>
-                                <!-- Opening Orders -->
-                                <v-tab-item>
-                                    <v-card flat>
-                                        <OpeningOrders v-if="active == 9" :canPaste="canPaste" :copy="copy"
-                                            :paste="paste" :remove="remove" :duplicate="duplicate" :items="items"
-                                            ref="OpeningOrders">
-                                        </OpeningOrders>
-                                    </v-card>
-                                </v-tab-item>
-                            </v-tabs>
-
-                            <v-card v-if="items.length > 0" flat v-show="overview">
-                                <table style="width: calc(100vw - 32px); overflow-x: scroll">
-                                    <thead>
-                                        <tr>
-                                            <th style="text-align: left;">Product System ID</th>
-                                            <th style="text-align: left;">Product Code</th>
-                                            <th style="text-align: left;">Barcode</th>
-                                            <th style="text-align: left;">Description</th>
-                                            <th style="text-align: left;">Vendor No.</th>
-                                            <th style="text-align: left;">Vendor Name</th>
-                                            <th style="text-align: left;">Vendor Description</th>
-                                            <th style="text-align: left;">Brand</th>
-                                            <th style="text-align: left;">Height</th>
-                                            <th style="text-align: left;">Width</th>
-                                            <th style="text-align: left;">Depth</th>
-                                            <th style="text-align: left;">Tray Height</th>
-                                            <th style="text-align: left;">Tray Width</th>
-                                            <th style="text-align: left;">Tray Depth</th>
-                                            <th style="text-align: left;">Case Height</th>
-                                            <th style="text-align: left;">Case Width</th>
-                                            <th style="text-align: left;">Case Depth</th>
-                                            <th style="text-align: left;">Shrink Height</th>
-                                            <th style="text-align: left;">Shrink Width</th>
-                                            <th style="text-align: left;">Shrink Depth</th>
-                                            <th style="text-align: left;">Pallet Height</th>
-                                            <th style="text-align: left;">Pallet Width</th>
-                                            <th style="text-align: left;">Pallet Depth</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="(item, idx) in items" :key="idx">
-                                            <td>{{ item.productSystemID }}</td>
-                                            <td>{{ item.productCode }}</td>
-                                            <td>{{ item.barcode }}</td>
-                                            <td>{{ item.description }}</td>
-                                            <td>{{ item.vendorNumber }}</td>
-                                            <td>{{ item.vendorName }}</td>
-                                            <td>{{ item.vendorDescription }}</td>
-                                            <td>{{ item.brand }}</td>
-                                            <td>{{ item.height }}</td>
-                                            <td>{{ item.width }}</td>
-                                            <td>{{ item.depth }}</td>
-                                            <td>{{ item.tray_Height }}</td>
-                                            <td>{{ item.tray_Width }}</td>
-                                            <td>{{ item.tray_Depth }}</td>
-                                            <td>{{ item.case_Height }}</td>
-                                            <td>{{ item.case_Width }}</td>
-                                            <td>{{ item.case_Depth }}</td>
-                                            <td>{{ item.shrink_Height }}</td>
-                                            <td>{{ item.shrink_Width }}</td>
-                                            <td>{{ item.shrink_Depth }}</td>
-                                            <td>{{ item.pallet_Height }}</td>
-                                            <td>{{ item.pallet_Width }}</td>
-                                            <td>{{ item.pallet_Depth }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </v-card>
-                        </div>
-                    </v-card-text>
-                </v-card>
-                <v-snackbar v-model="snackbar" bottom :timeout="snackbarTimeout">
-                    <div style="text-align: center; width: 100%;">
-                        {{ snackbarText }}
-                    </div>
-                </v-snackbar>
-            </v-dialog>
-        </v-layout>
+        <v-toolbar dark dense flat>
+            <v-toolbar-items>
+                <v-menu dark offset-y style="margin-bottom: 10px;">
+                    <v-btn slot="activator" flat>
+                        File
+                    </v-btn>
+                    <v-list light dense>
+                        <v-list-tile @click="newLine">
+                            <v-list-tile-title>New Line</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="openFile">
+                            <v-list-tile-title>Open</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="prompt">
+                            <v-list-tile-title>Save</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="closeFile">
+                            <v-list-tile-title>Close</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
+                <v-menu dark offset-y style="margin-bottom: 10px;">
+                    <v-btn slot="activator" flat>
+                        View
+                    </v-btn>
+                    <v-list light dense>
+                        <v-list-tile @click="hideShow('Standard')">
+                            <v-list-tile-title>Standard</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="hideShow('Vendor')">
+                            <v-list-tile-title>Vendor</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="hideShow('Hierarchy')">
+                            <v-list-tile-title>Hierarchy</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="hideShow('Item Status')">
+                            <v-list-tile-title>Item Status</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list dense>
+                            <v-menu offset-x right open-on-hover>
+                                <v-list-tile style="width: 100%" slot="activator">
+                                    <v-list-tile-title>Change Image</v-list-tile-title>
+                                    <v-spacer></v-spacer>
+                                    <v-list-tile-action class="justify-end">
+                                        <v-icon>play_arrow</v-icon>
+                                    </v-list-tile-action>
+                                </v-list-tile>
+                                <v-list dense>
+                                    <v-list-tile @click="hideShow('Unit')">
+                                        <v-list-tile-title>Unit</v-list-tile-title>
+                                    </v-list-tile>
+                                    <v-list-tile @click="hideShow('Tray')">
+                                        <v-list-tile-title>Tray</v-list-tile-title>
+                                    </v-list-tile>
+                                    <v-list-tile @click="hideShow('Shrink')">
+                                        <v-list-tile-title>Shrink</v-list-tile-title>
+                                    </v-list-tile>
+                                    <v-list-tile @click="hideShow('Case')">
+                                        <v-list-tile-title>Case</v-list-tile-title>
+                                    </v-list-tile>
+                                    <v-list-tile @click="hideShow('Pallet')">
+                                        <v-list-tile-title>Pallet</v-list-tile-title>
+                                    </v-list-tile>
+                                </v-list>
+                            </v-menu>
+                        </v-list>
+                        <v-list-tile @click="hideShow('Supporting Documents')">
+                            <v-list-tile-title>Supporting Documents</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="hideShow('Resources')">
+                            <v-list-tile-title>Resources</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="hideShow('Stock Control')">
+                            <v-list-tile-title>Stock Control</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="hideShow('Price And Margin')">
+                            <v-list-tile-title>Price And Margin</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="hideShow('Opening Orders')">
+                            <v-list-tile-title>Opening Orders</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
+            </v-toolbar-items>
+        </v-toolbar>
+        <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 113px);"
+            :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
+            :selectionChanged="onSelectionChanged" :rowData="rowData" :enableSorting="true" :enableFilter="true"
+            :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
+            :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :gridReady="onGridReady"
+            :groupMultiAutoColumn="true">
+        </ag-grid-vue>
+        <v-snackbar v-model="snackbar" bottom :timeout="snackbarTimeout">
+            <div style="text-align: center; width: 100%;">
+                {{ snackbarText }}
+            </div>
+        </v-snackbar>
         <Prompt ref="prompt"></Prompt>
         <NewItemListingSelector ref="newItemListingSelector"></NewItemListingSelector>
         <YesNoModal ref="yesNo"></YesNoModal>
@@ -214,20 +106,15 @@
 <script>
     import Axios from 'axios';
 
-    import Standard from '@/components/Apps/RangePlanning/ProductListing/Sections/Standard'
-    import Vendor from '@/components/Apps/RangePlanning/ProductListing/Sections/Vendor'
-    import Hierachy from '@/components/Apps/RangePlanning/ProductListing/Sections/Hierachy'
-    import ItemStatus from '@/components/Apps/RangePlanning/ProductListing/Sections/ItemStatus'
-    import ImagesAndDimensions from '@/components/Apps/RangePlanning/ProductListing/Sections/ImagesAndDimensions/Index'
-    import SupportingDocuments from '@/components/Apps/RangePlanning/ProductListing/Sections/SupportingDocuments'
-    import Resources from '@/components/Apps/RangePlanning/ProductListing/Sections/Resources'
-    import StockControl from '@/components/Apps/RangePlanning/ProductListing/Sections/StockControl'
-    import PriceAndMargin from '@/components/Apps/RangePlanning/ProductListing/Sections/PriceAndMargin'
-    import OpeningOrders from '@/components/Apps/RangePlanning/ProductListing/Sections/OpeningOrders'
+    import {
+        AgGridVue
+    } from "ag-grid-vue";
 
     import Prompt from '@/components/Common/Prompt';
     import NewItemListingSelector from '@/components/Common/NewItemListingSelector'
     import YesNoModal from '@/components/Common/YesNoModal'
+    import ImageView from "./Image.vue"
+    import Button from "./button.vue"
 
     const tabs = ['Standard', 'Vendor', 'Hierachy', 'Item Status', 'Images', 'Supporting Documents', 'Resources',
         'Stock Control', 'Price and Margin', 'Opening Orders'
@@ -236,26 +123,17 @@
     export default {
         name: 'product-listing',
         components: {
-            Standard,
-            Vendor,
-            Hierachy,
-            ItemStatus,
-            ImagesAndDimensions,
-            SupportingDocuments,
-            Resources,
-            StockControl,
-            PriceAndMargin,
-            OpeningOrders,
             Prompt,
             NewItemListingSelector,
-            YesNoModal
+            YesNoModal,
+            ImageView,
+            AgGridVue,
+            Button
         },
         data() {
             return {
                 isAdd: true,
                 dialog: false,
-                tabs: tabs,
-                active: null,
                 currentFileName: '',
                 items: [],
                 indexIncrement: 0,
@@ -279,7 +157,21 @@
                 activeShopCodeDetails: [],
                 activeShopCodes: [],
                 itemStatusDetails: [],
-                itemStatuses: []
+                itemStatuses: [],
+                columnDefs: [],
+                rowData: [],
+                defaultColDef: {
+                    onCellValueChanged: this.onCellValueChanged
+                },
+                gridOptions: {
+                    rowHeight: 35,
+                    context: {
+                        componentParent: this
+                    },
+                    rowClassRules: {
+                        'audit-image-breach': 'data.imageAudit'
+                    }
+                }
             }
         },
         computed: {
@@ -287,14 +179,36 @@
                 return this.clipBoardItem == null;
             }
         },
+        beforeMount() {
+            let self = this;
+            self.columnDefs = require('./headers.json');
+        },
         created() {
             let self = this;
-            self.getData();
+            setTimeout(() => {
+                self.setColumnDefs();
+                self.getData();
+            }, 2000);
         },
         methods: {
+            setColumnDefs() {},
+            onGridReady(params) {
+                this.gridApi = params.api;
+                this.columnApi = params.columnApi;
+            },
+            onSelectionChanged() {
+
+            },
             show() {
                 let self = this;
                 self.dialog = true;
+
+                self.gridOptions = {
+                    rowHeight: 30,
+                    context: {
+                        componentParent: self
+                    }
+                };
             },
             close() {
                 let self = this;
@@ -302,18 +216,7 @@
             },
             newLine() {
                 let self = this;
-                self.items.push({
-                    index: self.indexIncrement,
-                    manufacturer_Code: '',
-                    consignmentOrFixed: "Consignment",
-                    replacementOrNewProduct: "New Product",
-                    taxCode: "VE",
-                    category_Code: '',
-                    department: '',
-                    subdepartment: ''
-                })
-
-                self.indexIncrement++;
+                self.rowData.push({})
             },
             openFile() {
                 let self = this;
@@ -323,14 +226,19 @@
                         .then(r => {
                             self.isAdd = false;
                             self.currentFileName = item.name;
-                            self.items = r.data;
+                            self.rowData = r.data;
+
+                            setTimeout(() => {
+                                self.gridApi.resetRowHeights();
+                                self.gridApi.sizeColumnsToFit()
+                            }, 60);
                         })
                 })
             },
             closeFile() {
                 let self = this;
                 self.isAdd = true;
-                self.items = [];
+                self.rowData = [];
             },
             duplicate(item) {
                 let self = this;
@@ -361,6 +269,34 @@
                 self.snackbarTimeout = timeout;
                 self.snackbarText = snackbarText;
                 self.snackbar = true;
+            },
+            hideShow(headerGroup) {
+                let self = this;
+
+                let tmp = JSON.parse(JSON.stringify(self.columnDefs));
+
+                tmp.forEach(cd => {
+                    if (cd.headerName == "Product System ID" || cd.headerName == "Barcode" || cd.headerName ==
+                        "Description" || cd.headerName == "") {} else {
+                        if (cd.headerName == headerGroup) {
+                            cd.children.forEach(ce => {
+                                ce.hide = false;
+                            })
+                        } else {
+                            cd.children.forEach(ce => {
+                                ce.hide = true;
+                            })
+                        }
+                    }
+                })
+
+                self.columnDefs = [];
+                self.columnDefs = tmp;
+
+                setTimeout(() => {
+                    self.gridApi.resetRowHeights();
+                    self.gridApi.sizeColumnsToFit()
+                }, 60);
             },
             prompt() {
                 let self = this;
@@ -395,6 +331,12 @@
             save(name) {
                 let self = this;
 
+                let finalArr = [];
+
+                self.gridApi.forEachNode(node => {
+                    finalArr.push(node.data);
+                })
+
                 Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
                         SystemFile: {
                             SystemUser_ID: -1,
@@ -402,7 +344,7 @@
                             Name: name,
                             Extension: '.json'
                         },
-                        Data: self.items
+                        Data: finalArr
                     })
                     .then(r => {
                         alert("Saved!");
@@ -633,7 +575,7 @@
 
 <style>
     .active-tab {
-        background: #131313!important;
+        background: #131313 !important;
     }
 </style>
 

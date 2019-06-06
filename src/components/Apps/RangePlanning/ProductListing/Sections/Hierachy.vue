@@ -5,24 +5,42 @@
                 <td>{{ props.item.productSystemID }}</td>
                 <td>{{ props.item.barcode }}</td>
                 <td>{{ props.item.description }}</td>
-                <td class="px-2">
-                    <v-autocomplete :items="planograms" v-model="props.item.planogramName" placeholder="Planogram Name"
-                        dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
+                <td class="px-2" @click="props.item.showPlanogramDropdown = !props.item.showPlanogramDropdown"
+                    v-if="!props.item.showPlanogramDropdown">
+                    <span v-if="!props.item.showPlanogramDropdown">{{ props.item.planogramName }}</span>
                 </td>
-                <td class="px-2">
-                    <v-autocomplete @change="onCategoryLinkChange(props.item)" :items="categoryLinks" v-model="props.item.category" placeholder="Category" dense
-                        full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
+                <td class="px-2" v-if="props.item.showPlanogramDropdown">
+                    <v-autocomplete @change="props.item.showPlanogramDropdown = !props.item.showPlanogramDropdown"
+                        v-if="props.item.showPlanogramDropdown" :items="planograms" v-model="props.item.planogramName"
+                        placeholder="Planogram Name" dense full-width flat solo hide-details class="mt-0"
+                        style="margin-top: 0px"></v-autocomplete>
+                </td>
+                <td class="px-2" @click="props.item.showCategoryDropdown = !props.item.showCategoryDropdown"
+                    v-if="!props.item.showCategoryDropdown">
+                    <span>{{ props.item.category }}</span>
+                </td>
+                <td class="px-2" v-if="props.item.showCategoryDropdown">
+                    <v-autocomplete @change="onCategoryLinkChange(props.item)" :items="categoryLinks"
+                        v-model="props.item.category" placeholder="Category" dense full-width flat solo hide-details
+                        class="mt-0" style="margin-top: 0px"></v-autocomplete>
                 </td>
                 <td>{{ props.item.category_Code }}</td>
                 <td>{{ props.item.department }}</td>
                 <td>{{ props.item.subdepartment }}</td>
-                <td class="px-2">
-                    <v-autocomplete :items="subcategories" v-model="props.item.subcategory" placeholder="Subcategory" dense full-width flat
-                        solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
+                <td class="px-2" @click="props.item.showSubcategory = !props.item.showSubcategory"
+                    v-if="!props.item.showSubcategory">
+                    <span>{{ props.item.subcategory }}</span>
                 </td>
-                <td class="px-2">
-                    <v-autocomplete :items="segments" v-model="props.item.segment" placeholder="Segment" dense full-width flat solo
-                        hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
+                <td class="px-2" v-if="props.item.showSubcategory">
+                    <v-autocomplete @change="props.item.showSubcategory = !props.item.showSubcategory" :items="subcategories" v-model="props.item.subcategory" placeholder="Subcategory"
+                        dense full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
+                </td>
+                <td class="px-2" @click="props.item.showSegment = !props.item.showSegment" v-if="!props.item.showSegment">
+                    <span>{{ props.item.segment }}</span>
+                </td>
+                <td class="px-2" v-if="props.item.showSegment">
+                    <v-autocomplete @change="props.item.showSegment = !props.item.showSegment" :items="segments" v-model="props.item.segment" placeholder="Segment" dense
+                        full-width flat solo hide-details class="mt-0" style="margin-top: 0px"></v-autocomplete>
                 </td>
                 <td style="width: 5px;">
                     <v-menu dark offset-y>
@@ -102,8 +120,8 @@
 
     export default {
         name: 'hierachy',
-        props: ['items', 'duplicate', 'remove', 'copy', 
-            'canPaste', 'paste', 'planograms', 'categoryLinks', 
+        props: ['items', 'duplicate', 'remove', 'copy',
+            'canPaste', 'paste', 'planograms', 'categoryLinks',
             'subcategories', 'segments', 'getCategoryDetailsByID', 'setItemsData'
         ],
         data() {
@@ -128,6 +146,7 @@
                         self.setItemsData(item.index, "category_Code", categoryDetails.category_Code);
                         self.setItemsData(item.index, "department", categoryDetails.subdepartmentName);
                         self.setItemsData(item.index, "subdepartment", categoryDetails.departmentName);
+                        item.showCategoryDropdown = false;
                     });
                 })
             }
