@@ -4,7 +4,8 @@
         "editable": true,
         "hide": false,
         "pinned": "left",
-        "maxWidth": 150
+        "maxWidth": 150,
+        "minWidth": 150
     },
     {
         "headerName": "Barcode",
@@ -12,7 +13,8 @@
         "editable": true,
         "hide": false,
         "pinned": "left",
-        "maxWidth": 100
+        "maxWidth": 120,
+        "minWidth": 120
     },
     {
         "headerName": "Description",
@@ -20,7 +22,8 @@
         "editable": true,
         "hide": false,
         "pinned": "left",
-        "maxWidth": 200
+        "maxWidth": 200,
+        "minWidth": 200
     },
     {
         "headerName": "Standard",
@@ -644,7 +647,8 @@
         "editable": false,
         "hide": false,
         "pinned": "right",
-        "maxWidth": 80,
+        "maxWidth": 100,
+        "minWidth": 100,
         "cellRendererFramework": "Button"
     }
 ]
