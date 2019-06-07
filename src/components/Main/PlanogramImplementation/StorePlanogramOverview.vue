@@ -98,7 +98,8 @@
                     }
                 ],
                 currentStorePlanograms: [],
-                storeView: false
+                storeView: false,
+                selectedProject:null
             }
         },
         methods: {
@@ -110,6 +111,8 @@
             },
             getStorePlanograms() {
                 let self = this
+                console.log(self.selectedProject);
+                
                 self.currentStorePlanograms = [];
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -123,6 +126,7 @@
             },
             open() {
                 let self = this
+                
                 self.storeView = true
                 self.getStorePlanograms()
             },
@@ -130,14 +134,16 @@
                 let self = this;
                 self.$refs.PlanogramDetailsSelector.show(data => {
                     console.log(data);
+                    console.log("listitme");
+                    
                     console.log(listItem);
 
                     let item = {
-                        "ID": listItem.id,
-                        "Store_ID": listItem.store_ID,
+                        "id": listItem.id,
+                        "store_ID": listItem.store_ID,
                         "project_ID": self.selectedProject,
-                        "PlanogramDetail_ID": data,
-                        "PlanogramStoreStatus": 1,
+                        "planogramDetail_ID": data,
+                        "planogramStoreStatus": 1,
                     }
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 

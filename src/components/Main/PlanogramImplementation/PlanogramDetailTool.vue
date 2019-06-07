@@ -186,6 +186,8 @@
             },
             getSystemFile(item, callback) {
                 let self = this
+                console.log(item);
+                
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 let config = {
                     onDownloadProgress: progressEvent => {
@@ -196,7 +198,7 @@
                         // maybe dispatch an action that will update a progress bar or something
                     }
                 }
-                Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON?db=CR-DEVINSPIRE&id=' + item, config).then(
+                Axios.get(process.env.VUE_APP_API + `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${item}&file=config_advanced` +  config).then(
                     res => {
                         console.log(res);
                         
@@ -211,7 +213,7 @@
                             //     self.getSystemFile(self.spacePlans[self.index].id, data => {})
                             //     console.log("Creating Transaction Complete");
                             // }, 2000)
-                            self.createDetailTX(res.data, item, data => {
+                            self.createDetailTX(res.data.jsonObject, item, data => {
                                 console.log("createDetailTX");
                                setTimeout(() => {
                                if (self.currentFileIndex == self.totalFiles) {
@@ -254,9 +256,7 @@
 
                         })
                     })
-                    .catch(e => {
-                        console.error(e)
-                    })
+                   
             },
             loadData() {
                 let self = this
