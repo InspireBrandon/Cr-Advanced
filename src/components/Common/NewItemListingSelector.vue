@@ -4,7 +4,7 @@
             <v-card height="500px" style="overflow: auto;">
 
                 <v-card-title style=" display: block;" class="headline pa-0">
-                    <v-toolbar dark color="primary">
+                    <v-toolbar flat dark color="primary">
                         <v-toolbar-title>Select A File</v-toolbar-title>
                         <v-spacer></v-spacer>
                         <v-text-field v-model="searchText" append-icon="search"></v-text-field>

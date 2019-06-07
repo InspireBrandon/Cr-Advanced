@@ -11,9 +11,9 @@
             <v-list-tile @click="newRange">
               <v-list-tile-title>New</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile @click="newProductListing">
+            <!-- <v-list-tile @click="newProductListing">
               <v-list-tile-title>New Product Listing</v-list-tile-title>
-            </v-list-tile>
+            </v-list-tile> -->
             <v-list-tile @click="openRange">
               <v-list-tile-title>Open</v-list-tile-title>
             </v-list-tile>
@@ -143,7 +143,7 @@
     <Dialog ref="dialog"></Dialog>
     <YesNoModal ref="yesNo"></YesNoModal>
     <ProductMaintModal ref="productMaint"></ProductMaintModal>
-    <ProductListing ref="productListing"></ProductListing>
+    <!-- <ProductListing ref="productListing"></ProductListing> -->
     <SizeLoader ref="SizeLoader" />
   </div>
 </template>
