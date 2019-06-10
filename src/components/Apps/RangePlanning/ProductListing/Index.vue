@@ -81,6 +81,9 @@
                         <v-list-tile @click="hideShow('Opening Orders')">
                             <v-list-tile-title>Opening Orders</v-list-tile-title>
                         </v-list-tile>
+                        <v-list-tile @click="hideShow('Evaluation')">
+                            <v-list-tile-title>Opening Orders</v-list-tile-title>
+                        </v-list-tile>
                     </v-list>
                 </v-menu>
             </v-toolbar-items>

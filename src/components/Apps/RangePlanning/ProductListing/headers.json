@@ -652,6 +652,22 @@
         ]
     },
     {
+        "headerName": "Evaluation",
+        "children": [{
+                "headerName": "Order Quantity",
+                "field": "order_Quantity",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Order Value At Cost",
+                "field": "order_Value_At_Cost",
+                "editable": true,
+                "hide": true
+            }
+        ]
+    },
+    {
         "headerName": "",
         "editable": false,
         "hide": false,
