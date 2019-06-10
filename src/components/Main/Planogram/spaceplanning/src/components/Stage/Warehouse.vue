@@ -770,7 +770,6 @@
                 var progress = (currentFileSize / FileTotalSize) * 100
                 var TIME_TAKEN = new Date().getTime() - startTime.getTime()
                 var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
-                console.log(TIME_TAKEN);
 
                 // do whatever you like with the percentage complete
                 // maybe dispatch an action that will update a progress bar or something
@@ -825,6 +824,7 @@
 
 
                 }
+                self.updateLoader({text1:"Rendering Planogram"})
                 setTimeout(() => {
                   if (clusterData.clusterType != null && clusterData.storeID == null || clusterData
                     .clusterType !=
@@ -836,7 +836,7 @@
                   }
                   self.$refs.SizeLoader.close()
                   updatePlanoDataCallback(self.products);
-                }, 60)
+                }, 2000)
               })
               .catch(e => {
                 alert("Failed to get range file from server");
@@ -868,7 +868,7 @@
         let parent = self.$parent.$children[0].$children[2];
         let stage = parent.getStage();
 
-        let b64 = parent.$parent.getImageBytes(5);
+        let b64 = parent.$parent.getImageBytes(2);
         let image = parent.$parent.b64toBlob(b64, "image/png")
 
         let clusterData = self.rangingData;
