@@ -104,7 +104,8 @@ class LoadSavePlanogramBase {
 
     output.name = planogramName;
     console.log("[SAVING]");
-
+    console.log(spacePlanID);
+    
     // if (self.Create == true) {
     let startTime = new Date()
     let config = {
@@ -132,14 +133,16 @@ class LoadSavePlanogramBase {
         systemUserID: 10,
         folder: "Space Planning",
         name: planogramName,
-        isFolder: 1,
-        extension: ""
+        isFolder: true,
+        extension: "",
+        id:spacePlanID,
       },
     }, config).then(resp => {
       if (resp.success == true) {
         alert("folder created")
       }
       console.log(planogramName)
+      output.image= null
       let startTime = new Date()
       let config = {
         onUploadProgress: progressEvent => {
@@ -147,7 +150,6 @@ class LoadSavePlanogramBase {
           var FileTotalSize = progressEvent.total * 0.000001
           var TIME_TAKEN = new Date().getTime() - startTime.getTime()
           var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
-          console.log(TIME_TAKEN);
 
           // do whatever you like with the percentage complete
           // maybe dispatch an action that will update a progress bar or something
@@ -173,18 +175,21 @@ class LoadSavePlanogramBase {
       }, config).then(result => {
         // __sending simple version through
         output.image = null
+        console.log("output");
         console.log(output);
+
 
         output.planogramData.forEach(e => {
           e.Data.Data.image = null
-          console.log(e.Data.Data);
-          if (e.Type != "PRODUCT")
+         
+          if (e.Type != "PRODUCT" && e.Data.Data.renderings != null) {
             e.Data.Data.renderings.forEach(render => {
               render.image = null
             })
+          }
+
 
         })
-        console.log(output);
         let startTime = new Date()
         let config = {
           onUploadProgress: progressEvent => {
@@ -372,16 +377,16 @@ class LoadSavePlanogramBase {
         console.log(r.data);
 
         let jsonData = r.data.jsonObject
-       
-          afterGetSpacePlanFile(jsonData.clusterData, jsonData.dimensionData, jsonData.name, rangeProducts => {
-            if (rangeProducts == null) {
-              self.startLoadingPlanogram(jsonData, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
-            } else {
-              jsonData.planogramData = StageWarehouseMiddleware.verifyIntegrityOfWarehouseData(jsonData.planogramData, rangeProducts);
-              self.startLoadingPlanogram(jsonData, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
-            }
-          });
-       
+
+        afterGetSpacePlanFile(jsonData.clusterData, jsonData.dimensionData, jsonData.name, rangeProducts => {
+          if (rangeProducts == null) {
+            self.startLoadingPlanogram(jsonData, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
+          } else {
+            jsonData.planogramData = StageWarehouseMiddleware.verifyIntegrityOfWarehouseData(jsonData.planogramData, rangeProducts);
+            self.startLoadingPlanogram(jsonData, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
+          }
+        });
+
 
       })
       .catch(e => {

@@ -8,7 +8,9 @@
             <v-toolbar-title>Select A Planogram</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-text-field v-model="searchText" append-icon="search"></v-text-field>
-              <v-btn icon @click.native="dialog = false"><v-icon>close</v-icon></v-btn>
+            <v-btn icon @click.native="dialog = false">
+              <v-icon>close</v-icon>
+            </v-btn>
 
           </v-toolbar>
         </v-card-title>
@@ -20,7 +22,7 @@
 
 
               <v-list-tile-content>
-                <v-list-tile-title v-text="sp.name"></v-list-tile-title>
+                <v-list-tile-title v-text="sp.fileName"></v-list-tile-title>
               </v-list-tile-content>
               <v-spacer></v-spacer>
             </v-list-tile>
@@ -34,7 +36,7 @@
           <v-spacer></v-spacer>
 
           <v-btn color="primary" @click="returnSpacePlanFile">Continue</v-btn>
-         
+
 
         </v-card-actions>
       </v-card>
@@ -94,7 +96,7 @@
       filteredSpacePlans() {
         return this.spaceData.filter(item => {
           if (!this.searchText) return this.spaceData;
-          return (item.name.toLowerCase().includes(this.searchText.toLowerCase()))
+          return (item.fileName.toLowerCase().includes(this.searchText.toLowerCase()))
         });
       }
     },
@@ -103,11 +105,14 @@
         let self = this;
 
         self.spaceData = [];
+        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-        Axios.get(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire&folder=Space Planning")
+        Axios.get(process.env.VUE_APP_API + "/Planogram_Details")
           .then(r => {
-            self.spaceData = r.data;
-            console.log(self.spaceData);
+            console.log(r);
+
+            self.spaceData = r.data.planogram_DetailsList;
+            delete Axios.defaults.headers.common["TenantID" ];
 
             callback();
           })
