@@ -302,7 +302,6 @@ class LoadSavePlanogramBase {
     //       var FileTotalSize = progressEvent.total * 0.000001
     //       var TIME_TAKEN = new Date().getTime() - startTime.getTime()
     //       var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
-    //       console.log(TIME_TAKEN);
 
     //       // do whatever you like with the percentage complete
     //       // maybe dispatch an action that will update a progress bar or something
@@ -357,7 +356,6 @@ class LoadSavePlanogramBase {
         var FileTotalSize = progressEvent.total * 0.000001
         var TIME_TAKEN = new Date().getTime() - startTime.getTime()
         var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
-        console.log(TIME_TAKEN);
 
         // do whatever you like with the percentage complete
         // maybe dispatch an action that will update a progress bar or something

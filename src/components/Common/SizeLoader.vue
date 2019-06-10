@@ -5,6 +5,9 @@
                 <v-toolbar-title>
                     Loading Data
                 </v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-progress-circular indeterminate color="white"></v-progress-circular>
+
             </v-toolbar>
             <v-container grid-list-md>
                 <v-layout row wrap>
@@ -19,9 +22,10 @@
                     </v-flex>
                     <v-flex md12>
                         <div v-if="text2!=null">
-                        {{text2}}: {{currentFile}}/{{totalFiles}} files
+                            {{text2}}: {{currentFile}}/{{totalFiles}} files
                         </div>
-                        <v-progress-linear v-if="currentFile!=null" color="primary" height="20" :value="((currentFile/totalFiles)*100)+progress">
+                        <v-progress-linear v-if="currentFile!=null" color="primary" height="20"
+                            :value="((currentFile/totalFiles)*100)+progress">
                             <div style="color:white; text-align: center">
                                 {{currentFile}}/{{totalFiles}}
                             </div>
@@ -51,24 +55,24 @@
                 totalFiles: 0,
                 DownloadSpeed: 0,
                 dialog: false,
-                progress:0
+                progress: 0
             }
         },
         methods: {
             show() {
                 let self = this
                 self.dialog = true
-               
+
             },
             updateLoader(data) {
                 let self = this
 
-                for(var prop in data) {
+                for (var prop in data) {
                     self[prop] = data[prop]
                 }
             },
             close() {
-                let self= this
+                let self = this
 
                 self.dialog = false
             }
