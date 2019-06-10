@@ -3,7 +3,7 @@
         <v-layout row wrap>
             <v-flex md12>
                 <v-card flat>
-                    <v-card-text class="pa-0">
+                    <v-card-text class="pa-0" style="height: calc(100vh - 220px); overflow-x: auto;">
                         <table>
                             <thead>
                                 <tr>
@@ -677,8 +677,7 @@
                         <v-card-title>
                             <v-menu bottom left>
                                 <template v-slot:activator="{ on }">
-                                    <v-textarea readonly outline  label="Notes"
-                                        :value="currentNotes">
+                                    <v-textarea readonly outline label="Notes" :value="currentNotes">
                                     </v-textarea>
                                 </template>
                             </v-menu>
@@ -731,7 +730,7 @@
         },
         data() {
             return {
-                notesDialog:false,
+                notesDialog: false,
                 headers: [{
                         text: 'Project',
                         sortable: false
@@ -799,7 +798,7 @@
                 userAccess: null,
                 eventBus: null,
                 userAccessTypeID: -1,
-                currentNotes:null,
+                currentNotes: null,
             }
         },
         mounted() {
@@ -850,12 +849,11 @@
             }
         },
         methods: {
-            openNotes(notes){
+            openNotes(notes) {
                 let self = this
                 self.notesDialog = true
-                self.currentNotes=notes
+                self.currentNotes = notes
             },
-
             createProjectTransactionGroup(request, callback) {
                 let self = this;
 
@@ -875,6 +873,24 @@
                     delete Axios.defaults.headers.common["TenantID"];
                     callback(r.data.projectTX)
                 })
+            },
+            checkTaskTakeover(request, callback) {
+                let self = this;
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+
+                if (request.systemUserID != systemUserID) {
+                    request.systemUserID = systemUserID;
+                    request.actionedByUserID = null;
+                    request.status = 42;
+                    request.Closed = true;
+
+                    self.createProjectTransaction(request, () => {
+                        callback();
+                    })
+                } else {
+                    callback();
+                }
             },
             assign(currentItem) {
                 let self = this;
@@ -984,44 +1000,64 @@
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(item))
-                request.status = 1;
-                request.notes = self.findAndReplaceNote(request.notes);
+                let tmpUser = request.systemUserID;
 
-                self.createProjectTransaction(request, newItem => {
-                    self.routeToView(newItem)
+                self.checkTaskTakeover(request, () => {
+                    request.systemUserID = tmpUser;
+                    request.status = 1;
+                    request.notes = self.findAndReplaceNote(request.notes);
+
+                    self.createProjectTransaction(request, newItem => {
+                        self.routeToView(newItem)
+                    })
                 })
             },
             setApprovalInProgress(item) {
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(item))
-                request.status = 20;
-                request.notes = self.findAndReplaceNote(request.notes);
+                let tmpUser = request.systemUserID;
 
-                self.createProjectTransaction(request, newItem => {
-                    self.routeToView(newItem)
+                self.checkTaskTakeover(request, () => {
+                    request.systemUserID = tmpUser;
+                    request.status = 20;
+                    request.notes = self.findAndReplaceNote(request.notes);
+
+                    self.createProjectTransaction(request, newItem => {
+                        self.routeToView(newItem)
+                    })
                 })
             },
             setDistributionInProgress(item) {
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(item))
-                request.status = 21;
-                request.notes = self.findAndReplaceNote(request.notes);
+                let tmpUser = request.systemUserID;
 
-                self.createProjectTransaction(request, newItem => {
-                    self.routeToView(newItem)
+                self.checkTaskTakeover(request, () => {
+                    request.systemUserID = tmpUser;
+                    request.status = 21;
+                    request.notes = self.findAndReplaceNote(request.notes);
+
+                    self.createProjectTransaction(request, newItem => {
+                        self.routeToView(newItem)
+                    })
                 })
             },
             setImplementationInProgress(item) {
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(item))
-                request.status = 24;
-                request.notes = self.findAndReplaceNote(request.notes);
+                let tmpUser = request.systemUserID;
 
-                self.createProjectTransaction(request, newItem => {
-                    self.routeToView(newItem)
+                self.checkTaskTakeover(request, () => {
+                    request.systemUserID = tmpUser;
+                    request.status = 24;
+                    request.notes = self.findAndReplaceNote(request.notes);
+
+                    self.createProjectTransaction(request, newItem => {
+                        self.routeToView(newItem)
+                    })
                 })
             },
             routeToView(item) {
@@ -1053,24 +1089,28 @@
             setComplete(item) {
                 let self = this;
                 let request = JSON.parse(JSON.stringify(item));
-                request.status = 2;
-                request.actionedByUserID = item.systemUserID;
-                request.systemUserID = null;
-                request.notes = self.findAndReplaceNote(request.notes);
-                // Create complete transaction
-                self.createProjectTransaction(request, completeTransactionCloseTask => {
-                    let projectTXGroupRequest = {
-                        projectID: item.project_ID
-                    }
-                    // Create new project transaction group
-                    self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
-                        request.projectTXGroup_ID = newGroup.id;
-                        request.systemUserID = item.projectOwnerID;
-                        request.actionedByUserID = null;
-                        request.notes = self.findAndReplaceNote(request.notes);
-                        // Create complete transaction for new group
-                        self.createProjectTransaction(request, newGroupTransaction => {
-                            self.$parent.$parent.getTaskViewData();
+                let tmpUser = request.systemUserID;
+
+                self.checkTaskTakeover(request, () => {
+                    request.status = 2;
+                    request.actionedByUserID = item.systemUserID;
+                    request.systemUserID = null;
+                    request.notes = self.findAndReplaceNote(request.notes);
+                    // Create complete transaction
+                    self.createProjectTransaction(request, completeTransactionCloseTask => {
+                        let projectTXGroupRequest = {
+                            projectID: item.project_ID
+                        }
+                        // Create new project transaction group
+                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
+                            request.projectTXGroup_ID = newGroup.id;
+                            request.systemUserID = item.projectOwnerID;
+                            request.actionedByUserID = null;
+                            request.notes = self.findAndReplaceNote(request.notes);
+                            // Create complete transaction for new group
+                            self.createProjectTransaction(request, newGroupTransaction => {
+                                self.$parent.$parent.getTaskViewData();
+                            })
                         })
                     })
                 })
@@ -1093,34 +1133,43 @@
 
                 self.$refs.UserNotesModal.show(modalData => {
                     let request = JSON.parse(JSON.stringify(item));
+                    let tmpUser = request.systemUserID;
 
-                    let projectTXGroupRequest = {
-                        projectID: item.project_ID
-                    }
+                    self.checkTaskTakeover(request, () => {
+                        request.systemUserID = tmpUser;
 
-                    request.status = 40;
-                    request.systemUserID = null;
-                    request.actionedByUserID = self.systemUserID;
-                    request.notes = self.findAndReplaceNote(request.notes);
-                    // Create New Process Assigned for complete group
-                    self.createProjectTransaction(request, processEndProjectTX => {
-                        // Create "New Group"
-                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroupTX => {
-                            // Create New Process Assigned for "New Group"
-                            request.systemUserID = modalData.systemUserID;
-                            request.actionedByUserID = null;
-                            request.projectTXGroup_ID = newGroupTX.id;
-                            request.notes = self.findAndReplaceNote(request.notes);
-                            self.createProjectTransaction(request, processStartProjectTX => {
-                                // Create Requesting Approval process for "New Group"
-                                request.status = 10;
-                                request.notes = self.findAndReplaceNote(modalData
-                                    .notes);
-                                self.createProjectTransaction(request,
-                                    approvalTransaction => {
-                                        self.$parent.$parent.getTaskViewData();
-                                    })
-                            })
+                        let projectTXGroupRequest = {
+                            projectID: item.project_ID
+                        }
+
+                        request.status = 40;
+                        request.systemUserID = null;
+                        request.actionedByUserID = self.systemUserID;
+                        request.notes = self.findAndReplaceNote(request.notes);
+                        // Create New Process Assigned for complete group
+                        self.createProjectTransaction(request, processEndProjectTX => {
+                            // Create "New Group"
+                            self.createProjectTransactionGroup(projectTXGroupRequest,
+                                newGroupTX => {
+                                    // Create New Process Assigned for "New Group"
+                                    request.systemUserID = modalData.systemUserID;
+                                    request.actionedByUserID = null;
+                                    request.projectTXGroup_ID = newGroupTX.id;
+                                    request.notes = self.findAndReplaceNote(request.notes);
+                                    self.createProjectTransaction(request,
+                                        processStartProjectTX => {
+                                            // Create Requesting Approval process for "New Group"
+                                            request.status = 10;
+                                            request.notes = self.findAndReplaceNote(
+                                                modalData
+                                                .notes);
+                                            self.createProjectTransaction(request,
+                                                approvalTransaction => {
+                                                    self.$parent.$parent
+                                                        .getTaskViewData();
+                                                })
+                                        })
+                                })
                         })
                     })
                 })
@@ -1130,34 +1179,43 @@
 
                 self.$refs.UserNotesModal.show(modalData => {
                     let request = JSON.parse(JSON.stringify(item));
+                    let tmpUser = request.systemUserID;
 
-                    let projectTXGroupRequest = {
-                        projectID: item.project_ID
-                    }
+                    self.checkTaskTakeover(request, () => {
+                        request.systemUserID = tmpUser;
 
-                    request.status = 40;
-                    request.systemUserID = null;
-                    request.actionedByUserID = self.systemUserID;
-                    request.notes = self.findAndReplaceNote(request.notes);
-                    // Create New Process Assigned for complete group
-                    self.createProjectTransaction(request, processEndProjectTX => {
-                        // Create "New Group"
-                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroupTX => {
-                            // Create New Process Assigned for "New Group"
-                            request.systemUserID = modalData.systemUserID;
-                            request.actionedByUserID = null;
-                            request.projectTXGroup_ID = newGroupTX.id;
-                            request.notes = self.findAndReplaceNote(request.notes);
-                            self.createProjectTransaction(request, processStartProjectTX => {
-                                // Create Requesting Approval process for "New Group"
-                                request.status = 19;
-                                request.notes = self.findAndReplaceNote(modalData
-                                    .notes);
-                                self.createProjectTransaction(request,
-                                    approvalTransaction => {
-                                        self.$parent.$parent.getTaskViewData();
-                                    })
-                            })
+                        let projectTXGroupRequest = {
+                            projectID: item.project_ID
+                        }
+
+                        request.status = 40;
+                        request.systemUserID = null;
+                        request.actionedByUserID = self.systemUserID;
+                        request.notes = self.findAndReplaceNote(request.notes);
+                        // Create New Process Assigned for complete group
+                        self.createProjectTransaction(request, processEndProjectTX => {
+                            // Create "New Group"
+                            self.createProjectTransactionGroup(projectTXGroupRequest,
+                                newGroupTX => {
+                                    // Create New Process Assigned for "New Group"
+                                    request.systemUserID = modalData.systemUserID;
+                                    request.actionedByUserID = null;
+                                    request.projectTXGroup_ID = newGroupTX.id;
+                                    request.notes = self.findAndReplaceNote(request.notes);
+                                    self.createProjectTransaction(request,
+                                        processStartProjectTX => {
+                                            // Create Requesting Approval process for "New Group"
+                                            request.status = 19;
+                                            request.notes = self.findAndReplaceNote(
+                                                modalData
+                                                .notes);
+                                            self.createProjectTransaction(request,
+                                                approvalTransaction => {
+                                                    self.$parent.$parent
+                                                        .getTaskViewData();
+                                                })
+                                        })
+                                })
                         })
                     })
                 })
@@ -1166,28 +1224,35 @@
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(item));
+                let tmpUser = request.systemUserID;
 
-                let projectTXGroupRequest = {
-                    projectID: item.project_ID
-                }
+                self.checkTaskTakeover(request, () => {
+                    request.systemUserID = tmpUser;
 
-                self.$refs.NotesModal.show("Why are you putting this task on hold?", notes => {
-                    request.status = 16;
-                    request.systemUserID = null;
-                    request.actionedByUserID = self.systemUserID;
-                    request.notes = self.findAndReplaceNote(request.notes);
-                    // Create on hold transaction
-                    self.createProjectTransaction(request, processEndProjectTX => {
-                        // Create "New Group"
-                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroupTX => {
-                            // Create on hold transaction for "New Group"
-                            request.systemUserID = request.projectOwnerID;
-                            request.actionedByUserID = null;
-                            request.projectTXGroup_ID = newGroupTX.id;
-                            request.notes = self.findAndReplaceNote(notes);
-                            self.createProjectTransaction(request, processStartProjectTX => {
-                                self.$parent.$parent.getTaskViewData();
-                            })
+                    let projectTXGroupRequest = {
+                        projectID: item.project_ID
+                    }
+
+                    self.$refs.NotesModal.show("Why are you putting this task on hold?", notes => {
+                        request.status = 16;
+                        request.systemUserID = null;
+                        request.actionedByUserID = self.systemUserID;
+                        request.notes = self.findAndReplaceNote(request.notes);
+                        // Create on hold transaction
+                        self.createProjectTransaction(request, processEndProjectTX => {
+                            // Create "New Group"
+                            self.createProjectTransactionGroup(projectTXGroupRequest,
+                                newGroupTX => {
+                                    // Create on hold transaction for "New Group"
+                                    request.systemUserID = request.projectOwnerID;
+                                    request.actionedByUserID = null;
+                                    request.projectTXGroup_ID = newGroupTX.id;
+                                    request.notes = self.findAndReplaceNote(notes);
+                                    self.createProjectTransaction(request,
+                                        processStartProjectTX => {
+                                            self.$parent.$parent.getTaskViewData();
+                                        })
+                                })
                         })
                     })
                 })
@@ -1196,27 +1261,32 @@
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(item));
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
-                let systemUserID = encoded_details.USER_ID;
+                let tmpUser = request.systemUserID;
 
-                let projectTXGroupRequest = {
-                    projectID: item.project_ID
-                }
+                self.checkTaskTakeover(request, () => {
+                    request.systemUserID = tmpUser;
+                    let encoded_details = jwt.decode(sessionStorage.accessToken);
+                    let systemUserID = encoded_details.USER_ID;
 
-                self.$refs.SubtaskModal.show("Start new subtask", subtaskDetails => {
-                    // Create new transaction group
-                    self.createProjectTransactionGroup(projectTXGroupRequest, newGroupTX => {
-                        request.type = 6;
-                        request.status = subtaskDetails.status;
-                        request.systemUserID = subtaskDetails.systemUserID;
-                        request.actionedByUserID = null;
-                        request.notes = self.findAndReplaceNote(subtaskDetails.notes);
-                        request.rollingUserID = systemUserID;
-                        request.projectTXGroup_ID = newGroupTX.id;
-                        // Set request dependant on subtask
-                        // Create transaction
-                        self.createProjectTransaction(request, subtaskTransaction => {
-                            self.$parent.$parent.getTaskViewData();
+                    let projectTXGroupRequest = {
+                        projectID: item.project_ID
+                    }
+
+                    self.$refs.SubtaskModal.show("Start new subtask", subtaskDetails => {
+                        // Create new transaction group
+                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroupTX => {
+                            request.type = 6;
+                            request.status = subtaskDetails.status;
+                            request.systemUserID = subtaskDetails.systemUserID;
+                            request.actionedByUserID = null;
+                            request.notes = self.findAndReplaceNote(subtaskDetails.notes);
+                            request.rollingUserID = systemUserID;
+                            request.projectTXGroup_ID = newGroupTX.id;
+                            // Set request dependant on subtask
+                            // Create transaction
+                            self.createProjectTransaction(request, subtaskTransaction => {
+                                self.$parent.$parent.getTaskViewData();
+                            })
                         })
                     })
                 })
@@ -1225,14 +1295,19 @@
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(item));
-                request.notes = self.findAndReplaceNote(request.notes);
+                let tmpUser = request.systemUserID;
 
-                request.status++;
-                request.actionedByUserID = null;
+                self.checkTaskTakeover(request, () => {
+                    request.systemUserID = tmpUser;
+                    request.notes = self.findAndReplaceNote(request.notes);
 
-                self.createProjectTransaction(request, subtaskTransaction => {
-                    self.$parent.$parent.getTaskViewData();
-                    // self.goToSubtaskView(request)
+                    request.status++;
+                    request.actionedByUserID = null;
+
+                    self.createProjectTransaction(request, subtaskTransaction => {
+                        self.$parent.$parent.getTaskViewData();
+                        // self.goToSubtaskView(request)
+                    })
                 })
             },
             returnSubtaskView(item) {
@@ -1260,44 +1335,53 @@
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(item));
+                let tmpUser = request.systemUserID;
 
-                let projectTXGroupRequest = {
-                    projectID: item.project_ID
-                }
-                item.removed = true;
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                self.checkTaskTakeover(request, () => {
+                    request.systemUserID = tmpUser;
 
-                Axios.put(process.env.VUE_APP_API + "ProjectTX?update=false", item).then(r => {
-                    console.log(r);
+                    let projectTXGroupRequest = {
+                        projectID: item.project_ID
+                    }
 
-                    self.$refs.NotesModal.show("Subtask complete notes", notes => {
-                        request.status++;
-                        request.notes = self.findAndReplaceNote(request.notes);
-                        request.actionedByUserID = request.systemUserID;
-                        request.systemUserID = null;
-                        let tmpRollover = request.rollingUserID;
-                        request.rollingUserID = null;
+                    item.removed = true;
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                        // Create complete transaction
-                        self.createProjectTransaction(request, endTransaction => {
-                            // Create new group to inform other user
-                            self.createProjectTransactionGroup(projectTXGroupRequest,
-                                newGroup => {
-                                    request.notes = self.findAndReplaceNote(notes);
-                                    request.systemUserID = tmpRollover;
-                                    request.actionedByUserID = null;
-                                    request.rollingUserID = null;
-                                    request.projectTXGroup_ID = newGroup.id;
+                    Axios.put(process.env.VUE_APP_API + "ProjectTX?update=false", item).then(r => {
+                        console.log(r);
 
-                                    // Create new transaction
-                                    self.createProjectTransaction(request, newRequest => {
-                                        self.$parent.$parent.getTaskViewData();
+                        self.$refs.NotesModal.show("Subtask complete notes", notes => {
+                            request.status++;
+                            request.notes = self.findAndReplaceNote(request.notes);
+                            request.actionedByUserID = request.systemUserID;
+                            request.systemUserID = null;
+                            let tmpRollover = request.rollingUserID;
+                            request.rollingUserID = null;
+
+                            // Create complete transaction
+                            self.createProjectTransaction(request, endTransaction => {
+                                // Create new group to inform other user
+                                self.createProjectTransactionGroup(
+                                    projectTXGroupRequest,
+                                    newGroup => {
+                                        request.notes = self.findAndReplaceNote(
+                                            notes);
+                                        request.systemUserID = tmpRollover;
+                                        request.actionedByUserID = null;
+                                        request.rollingUserID = null;
+                                        request.projectTXGroup_ID = newGroup.id;
+
+                                        // Create new transaction
+                                        self.createProjectTransaction(request,
+                                            newRequest => {
+                                                self.$parent.$parent
+                                                    .getTaskViewData();
+                                            })
                                     })
-                                })
+                            })
                         })
                     })
                 })
-
             },
             getUsernameByUserID(userID) {
                 let self = this;

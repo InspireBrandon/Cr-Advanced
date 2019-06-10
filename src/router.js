@@ -4,6 +4,7 @@ import Router from 'vue-router'
 import Login from '@/components/Login/Index.vue'
 import Register from '@/components/Register/Index.vue'
 import Main from '@/components/Main/Index.vue'
+import Maint from '@/components/Maint/Index.vue'
 
 // Main
 import Home from '@/components/Main/Home/Index.vue'
@@ -99,6 +100,10 @@ export default new Router({
       path: '/Register',
       name: 'register',
       component: Register
+    }, {
+      path: '/Maint',
+      name: 'maint',
+      component: Maint
     }, {
       path: '/SpacePlanning',
       name: 'space_planning',

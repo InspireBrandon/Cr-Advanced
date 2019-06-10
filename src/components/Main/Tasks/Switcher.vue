@@ -93,7 +93,7 @@
                             <v-flex :class="{ 'md10 sm6 xs6': showNotices, 'md12 sm12 xs12': !showNotices }"
                                 v-if="selectedView==0">
                                 <TaskView :data="filteredData" :typeList="typeList" :statusList="statusList"
-                                    :systemUserID="systemUserID" />
+                                    :systemUserID="selectedUser" />
                             </v-flex>
                             <!-- <v-flex v-if="selectedView==0"
                                 :class="{ 'md10 sm6 xs6': showNotices, 'md12 sm12 xs12': !showNotices }">

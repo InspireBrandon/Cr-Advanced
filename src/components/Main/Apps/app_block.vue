@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="canview">
         <v-card class="elevation-10">
             <v-toolbar flat dense color="primary" dark>
                 <span @click="$router.push(appConfigDetail.config.configName + '_Details')"
@@ -66,6 +66,8 @@
 </template>
 
 <script>
+    import jwt from 'jsonwebtoken';
+
     export default {
         name: 'app_block',
         props: ['appConfigDetail'],
@@ -73,7 +75,6 @@
             openApp(routeItem) {
                 let self = this;
                 if (routeItem.openInNewWindow) {
-
 
                     let routeData = this.$router.resolve({
                         name: routeItem.routeName
@@ -87,6 +88,19 @@
             demoApp() {
                 alert("Coming soon!!!");
             }
+        },
+        data() {
+            return {
+                canview: true
+            }
+        },
+        created() {
+            let self = this;
+            let encoded_details = jwt.decode(sessionStorage.accessToken);
+            let userJohn = encoded_details.USER_ID == 1;
+
+            if(self.appConfigDetail.detail.name == "Testing" && !userJohn)
+                self.canview = false;
         }
     }
 </script>

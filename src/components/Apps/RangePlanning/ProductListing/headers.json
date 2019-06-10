@@ -1,4 +1,13 @@
 [{
+    "headerName": "Type",
+    "field": "type",
+    "editable": false,
+    "hide": false,
+    "pinned": "left",
+    "cellRendererFramework": "OptionSelector",
+    "maxWidth": 80,
+    "minWidth": 80
+}, {
         "headerName": "Product System ID",
         "field": "product_System_ID",
         "editable": true,

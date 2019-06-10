@@ -11,8 +11,12 @@
     created() {
       localStorage.ServerAddress = process.env.VUE_APP_API;
 
-      if (sessionStorage.accessToken == undefined) {
-        this.$router.push('/Login');
+      if (process.env.VUE_APP_MAINT) {
+        this.$router.push('/Maint');
+      } else {
+        if (sessionStorage.accessToken == undefined) {
+          this.$router.push('/Login');
+        }
       }
     }
   }
