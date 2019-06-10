@@ -84,6 +84,10 @@
                     </v-list>
                 </v-menu>
             </v-toolbar-items>
+            <v-spacer />
+            <v-progress-circular v-if="showLoader" indeterminate color="primary"></v-progress-circular>
+            <span>{{ successText }}</span>
+            <span style="color: red;">{{ errorText }}</span>
         </v-toolbar>
         <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 113px);"
             :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
@@ -115,6 +119,7 @@
     import YesNoModal from '@/components/Common/YesNoModal'
     import ImageView from "./Image.vue"
     import Button from "./button.vue"
+    import OptionSelector from "./OptionSelector.vue"
 
     const tabs = ['Standard', 'Vendor', 'Hierachy', 'Item Status', 'Images', 'Supporting Documents', 'Resources',
         'Stock Control', 'Price and Margin', 'Opening Orders'
@@ -128,7 +133,8 @@
             YesNoModal,
             ImageView,
             AgGridVue,
-            Button
+            Button,
+            OptionSelector
         },
         data() {
             return {
@@ -171,7 +177,10 @@
                     rowClassRules: {
                         'audit-image-breach': 'data.imageAudit'
                     }
-                }
+                },
+                showLoader: false,
+                successText: "",
+                errorText: "",
             }
         },
         computed: {
@@ -277,7 +286,7 @@
 
                 tmp.forEach(cd => {
                     if (cd.headerName == "Product System ID" || cd.headerName == "Barcode" || cd.headerName ==
-                        "Description" || cd.headerName == "") {} else {
+                        "Description" || cd.headerName == "" || cd.headerName == "Type") {} else {
                         if (cd.headerName == headerGroup) {
                             cd.children.forEach(ce => {
                                 ce.hide = false;
@@ -337,6 +346,8 @@
                     finalArr.push(node.data);
                 })
 
+                self.showLoader = true;
+
                 Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
                         SystemFile: {
                             SystemUser_ID: -1,
@@ -347,11 +358,20 @@
                         Data: finalArr
                     })
                     .then(r => {
-                        alert("Saved!");
-                        console.log(r.data);
+                        setTimeout(() => {
+                            self.showLoader = false;
+                            self.successText = "Successfully saved";
+                            setTimeout(() => {
+                                self.successText = "";
+                            }, 2000);
+                        }, 1000);
                     })
                     .catch(e => {
-                        console.log(e);
+                        self.showLoader = false;
+                        self.errorText = "Failed to save";
+                        setTimeout(() => {
+                            self.errorText = "";
+                        }, 2000);
                     })
             },
             getData() {
@@ -568,6 +588,16 @@
 
                         delete Axios.defaults.headers.common["TenantID"];
                     })
+            },
+            showSavingLoader() {
+                let self = this;
+                self.showLoader = true;
+            },
+            showSavedSuccess() {
+                let self = this;
+            },
+            showSavedFailure() {
+                let self = this;
             }
         }
     }

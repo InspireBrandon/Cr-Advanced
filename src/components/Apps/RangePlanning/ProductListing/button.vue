@@ -24,7 +24,7 @@
             duplicateLine() {
                 let self = this;
                 self.params.api.updateRowData({
-                    add: [self.params.data]
+                    add: [JSON.parse(JSON.stringify(self.params.data))]
                 })
             },
             removeLine() {
