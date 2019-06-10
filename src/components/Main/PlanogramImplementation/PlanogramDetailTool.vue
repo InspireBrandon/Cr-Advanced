@@ -150,11 +150,12 @@
                 let detailsItem = null;
                 // console.log(item);
                 let sendRequst = {
-                    "systemFileID": fileID,
+                    "id":null,
+                    "systemFileID": parseInt(fileID),
                     "dateFromString": item.clusterData.dateFromString,
                     "dateToString": item.clusterData.dateToString,
-                    "monthsBetween": item.clusterData.monthsBetween,
-                    "periodic": item.clusterData.periodic,
+                    "monthsBetween": parseInt(item.clusterData.monthsBetween),
+                    "periodic": parseInt(item.clusterData.periodic),
                     "planogramID": parseInt(item.clusterData.planogramID),
                     "planogramName": item.clusterData.planogramName,
                     "tag": item.clusterData.tag,
@@ -174,7 +175,8 @@
                     "supplierStands": parseInt(item.dimensionData.supplierStands),
                     "bins": parseInt(item.dimensionData.bins)
                 }
-                // console.log(item);
+                console.log(sendRequst);
+
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + 'Planogram_Details/Save', sendRequst).then(
                     r => {
@@ -202,7 +204,7 @@
                     res => {
                         console.log(res);
                         
-                        self.currentPlanoName = res.data.name
+                        self.currentPlanoName = res.data.jsonObject.name
                         self.currentFileIndex = self.currentFileIndex + 1
 
                         if (res.data != false) {
