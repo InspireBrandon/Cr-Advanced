@@ -13,9 +13,6 @@
                 items: [{
                     name: "Product Listing",
                     route: "/ProductListing"
-                },{
-                    name: "Store Planogram",
-                    route: "/StorePlanogram"
                 }]
             }
         }

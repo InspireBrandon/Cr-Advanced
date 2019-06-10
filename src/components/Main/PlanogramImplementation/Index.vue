@@ -1,8 +1,8 @@
 <template>
     <v-card>
         <v-toolbar dense dark>
-            <v-btn color="primary" flat outline dark @click="openStoreView()"
-                v-if="(currentPlanogram != null && selectedProject != null)">Store View </v-btn>
+            <!-- <v-btn color="primary" flat outline dark @click="openStoreView()" v-if="(currentPlanogram != null && selectedProject != null)">Store View </v-btn> -->
+            <v-btn color="primary" flat outline dark @click="openStoreView()" v-if="userID == 1 && (currentPlanogram != null && selectedProject != null)">Store View </v-btn>
 
             <v-spacer></v-spacer>
             <v-toolbar-title>Planogram Implementation</v-toolbar-title>
@@ -230,7 +230,7 @@
                 routePlanogramID: null,
                 routeStatus: null,
                 tmpRequest: null,
-
+                userID: -1,
             }
         },
         mounted() {
@@ -370,6 +370,7 @@
                 let self = this;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
+                self.userID = systemUserID;
                 let tenantID = sessionStorage.currentDatabase;
 
                 self.getUserDetails(systemUserID, tenantID)
