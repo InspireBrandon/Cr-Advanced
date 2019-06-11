@@ -61,11 +61,11 @@
             <v-list-tile @click="openJoinPlanogram">
               <v-list-tile-title>Join</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile
+            <!-- <v-list-tile
               v-if="PlanogramObject.status == null||PlanogramObject.status==0||PlanogramObject.status==1||PlanogramObject.status==3||PlanogramObject.status==6"
               @click="submitForApprovalPlano">
               <v-list-tile-title>Submit For Aproval</v-list-tile-title>
-            </v-list-tile>
+            </v-list-tile> -->
             <v-list-tile
               v-if="PlanogramObject.status==5||PlanogramObject.status==4||PlanogramObject.status==3||PlanogramObject.status==2||PlanogramObject.status==1"
               @click="RetractPlanogram">

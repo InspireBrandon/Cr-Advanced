@@ -125,7 +125,6 @@
         methods: {
             UpdateField(item) {
                 let self = this
-                console.log(item.systemFileID);
                  self.currentFileIndex = 0
                     self.totalFiles = 1
                 self.getSystemFile(item.systemFileID, callback => {
@@ -148,14 +147,13 @@
             createDetailTX(item, fileID, callback) {
                 let self = this
                 let detailsItem = null;
-                // console.log(item);
+
                 let sendRequst = {
-                    "id":null,
                     "systemFileID": parseInt(fileID),
                     "dateFromString": item.clusterData.dateFromString,
                     "dateToString": item.clusterData.dateToString,
                     "monthsBetween": parseInt(item.clusterData.monthsBetween),
-                    "periodic": parseInt(item.clusterData.periodic),
+                    "periodic": item.clusterData.periodic,
                     "planogramID": parseInt(item.clusterData.planogramID),
                     "planogramName": item.clusterData.planogramName,
                     "tag": item.clusterData.tag,
@@ -164,7 +162,7 @@
                     "clusterType": item.clusterData.clusterType,
                     "clusterName": item.clusterData.clusterName,
                     "rangeID": parseInt(item.clusterData.rangeID),
-                    "storeID": parseInt(item.clusterData.storeID),
+                    "storeID": item.clusterData.storeID,
                     "storeName": item.clusterData.storeName,
                     "categoryCluster": item.clusterData.categoryCluster,
                     "modules": parseInt(item.dimensionData.modules),
@@ -175,20 +173,18 @@
                     "supplierStands": parseInt(item.dimensionData.supplierStands),
                     "bins": parseInt(item.dimensionData.bins)
                 }
-                console.log(sendRequst);
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + 'Planogram_Details/Save', sendRequst).then(
                     r => {
-                        console.log("attemtping to create new tx");
                         console.log(r);
+                        
                         callback(r)
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
             getSystemFile(item, callback) {
                 let self = this
-                console.log(item);
                 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 let config = {
@@ -200,23 +196,23 @@
                         // maybe dispatch an action that will update a progress bar or something
                     }
                 }
-                Axios.get(process.env.VUE_APP_API + `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${item}&file=config_advanced` +  config).then(
+                Axios.get(process.env.VUE_APP_API + `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${item}&file=config_advanced` , config).then(
                     res => {
-                        console.log(res);
-                        
-                        self.currentPlanoName = res.data.jsonObject.name
+                        if (res.data!=false) {
+                             self.currentPlanoName = res.data.jsonObject.name
+                        }else{
+                            self.currentPlanoName="File not found"
+                        }
+                       
                         self.currentFileIndex = self.currentFileIndex + 1
 
                         if (res.data != false) {
-                            console.log("Creating Transaction");
                             // 
                             //     // callback(res);
                             //     self.index = self.index + 1
                             //     self.getSystemFile(self.spacePlans[self.index].id, data => {})
-                            //     console.log("Creating Transaction Complete");
                             // }, 2000)
                             self.createDetailTX(res.data.jsonObject, item, data => {
-                                console.log("createDetailTX");
                                setTimeout(() => {
                                if (self.currentFileIndex == self.totalFiles) {
 
@@ -252,7 +248,6 @@
                         self.totalFiles = 0
                         self.totalFiles = self.spacePlans.length
                         self.index = 0
-                        console.log("started");
                         self.getSystemFile(self.spacePlans[self.index].id, data => {
 
 
