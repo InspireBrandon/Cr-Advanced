@@ -4,6 +4,7 @@ import Router from 'vue-router'
 import Login from '@/components/Login/Index.vue'
 import Register from '@/components/Register/Index.vue'
 import Main from '@/components/Main/Index.vue'
+import Maint from '@/components/Maint/Index.vue'
 
 // Main
 import Home from '@/components/Main/Home/Index.vue'
@@ -18,12 +19,15 @@ import Notifications from '@/components/Main/Notifications/Index.vue'
 import RangePlanning from '@/components/Apps/RangePlanning/Index.vue'
 //import SpacePlanning from '@/components/Main/Planogram/spaceplanning/src/views/Main.vue'
 import Fixtures from '@/components/Apps/SpacePlanning/Fixtures/Index.vue'
+import Testing from '@/components/Main/Testing.vue'
 
 //Product maintainence
 import DataPreparation from '@/components/Main/DataPreparation';
 import DataPreparationViewSelection from '@/components/Main/DataPreparation/ViewSelection';
 
+import PlanogramDetailTool from '@/components/Main/PlanogramImplementation/PlanogramDetailTool.vue'
 import PlanogramImplementation from '@/components/Main/PlanogramImplementation/Index.vue'
+
 import RequestNewPlanogram from '@/components/Main/PlanogramImplementation/RequestNewPlanogram.vue'
 
 // Images
@@ -80,6 +84,8 @@ import ProductReport from '@/views/Reports/SPACE-PLANNING-REPORTS/ProductReport/
 import HelpFileView from '@/components/Main/HelpFile/Index.vue'
 import Tasks from '@/components/Main/Tasks/Switcher.vue';
 
+import ProductListing from '@/components/Apps/RangePlanning/ProductListing/Index.vue';
+
 // Floor Planning
 import FloorPlanning from '@/components/Main/FloorPlanning/index.vue'
 
@@ -95,6 +101,10 @@ export default new Router({
       name: 'register',
       component: Register
     }, {
+      path: '/Maint',
+      name: 'maint',
+      component: Maint
+    }, {
       path: '/SpacePlanning',
       name: 'space_planning',
       component: SpacePlanning
@@ -106,7 +116,17 @@ export default new Router({
       path: '/Menu',
       name: 'main',
       component: Main,
-      children: [{
+      children: [
+        {
+          path: '/ProductListing',
+          name: 'ProductListing',
+          component: ProductListing
+        },
+        {
+          path: '/Testing',
+          name: 'Testing',
+          component: Testing
+        },{
           path: '/Home',
           name: 'home',
           component: Home
@@ -170,7 +190,13 @@ export default new Router({
           path: "/PlanogramImplementation",
           name: "planogram_implementation",
           component: PlanogramImplementation
-        }, {
+        }, 
+        {
+          path: "/PlanogramDetailTool",
+          name: "planogram_detail_tool",
+          component: PlanogramDetailTool
+        },
+        {
           path: "/PlanogramImplementation/:projectTransactionID/:planogramID/:status",
           name: "planogram_implementation",
           component: PlanogramImplementation

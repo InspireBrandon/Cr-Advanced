@@ -11,6 +11,14 @@
     created() {
       localStorage.ServerAddress = process.env.VUE_APP_API;
 
+      // if (process.env.VUE_APP_MAINT) {
+      //   this.$router.push('/Maint');
+      // } else {
+      //   if (sessionStorage.accessToken == undefined) {
+      //     this.$router.push('/Login');
+      //   }
+      // }
+
       if (sessionStorage.accessToken == undefined) {
         this.$router.push('/Login');
       }
@@ -25,6 +33,6 @@
 
   .main-main {
     overflow: auto;
-    height: calc(100vh - 50px);
+    height: calc(100vh - 60px);
   }
 </style>

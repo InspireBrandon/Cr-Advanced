@@ -1,8 +1,9 @@
 <template>
-    <div>
+    <div v-if="canview">
         <v-card class="elevation-10">
             <v-toolbar flat dense color="primary" dark>
-                <span @click="$router.push(appConfigDetail.config.configName + '_Details')" class="app_name">{{ appConfigDetail.detail.name }}</span>
+                <span @click="$router.push(appConfigDetail.config.configName + '_Details')"
+                    class="app_name">{{ appConfigDetail.detail.name }}</span>
             </v-toolbar>
             <v-img :src="appConfigDetail.detail.imgSrc" height="200px">
                 <v-container fill-height fluid pa-2>
@@ -15,16 +16,21 @@
             </v-img>
 
             <v-card-actions>
-                <v-btn color="primary" @click="openApp(appConfigDetail.config.routes[0])" v-if="appConfigDetail.config.routes.length == 1">
+                <v-btn color="primary" @click="openApp(appConfigDetail.config.routes[0])"
+                    v-if="appConfigDetail.config.routes.length == 1 && !appConfigDetail.demo">
                     Launch
                 </v-btn>
-                <v-menu offset-y v-if="appConfigDetail.config.routes.length > 1">
+                <!-- <v-btn color="secondary" @click="demoApp"
+                    v-if="appConfigDetail.demo">
+                    Demo
+                </v-btn> -->
+                <v-menu offset-y v-if="appConfigDetail.config.routes.length > 1 && !appConfigDetail.demo">
                     <v-btn color="primary" slot="activator">
                         Launch
                     </v-btn>
                     <v-list>
-                        <v-list-tile @click="openApp(routeItem)" v-for="(routeItem, index) in appConfigDetail.config.routes"
-                            :key="index">
+                        <v-list-tile @click="openApp(routeItem)"
+                            v-for="(routeItem, index) in appConfigDetail.config.routes" :key="index">
                             <v-list-tile-title>{{ routeItem.title }}</v-list-tile-title>
                             <v-divider></v-divider>
                         </v-list-tile>
@@ -60,6 +66,8 @@
 </template>
 
 <script>
+    import jwt from 'jsonwebtoken';
+
     export default {
         name: 'app_block',
         props: ['appConfigDetail'],
@@ -67,8 +75,7 @@
             openApp(routeItem) {
                 let self = this;
                 if (routeItem.openInNewWindow) {
-                   
-                    
+
                     let routeData = this.$router.resolve({
                         name: routeItem.routeName
                     });
@@ -77,7 +84,23 @@
                 } else {
                     self.$router.push(routeItem.route)
                 }
+            },
+            demoApp() {
+                alert("Coming soon!!!");
             }
+        },
+        data() {
+            return {
+                canview: true
+            }
+        },
+        created() {
+            let self = this;
+            let encoded_details = jwt.decode(sessionStorage.accessToken);
+            let userJohn = encoded_details.USER_ID == 1 || encoded_details.USER_ID == 12 || encoded_details.USER_ID == 13;
+
+            if(self.appConfigDetail.detail.name == "Testing" && !userJohn)
+                self.canview = false;
         }
     }
 </script>

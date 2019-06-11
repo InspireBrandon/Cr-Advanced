@@ -61,11 +61,11 @@
             <v-list-tile @click="openJoinPlanogram">
               <v-list-tile-title>Join</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile
+            <!-- <v-list-tile
               v-if="PlanogramObject.status == null||PlanogramObject.status==0||PlanogramObject.status==1||PlanogramObject.status==3||PlanogramObject.status==6"
               @click="submitForApprovalPlano">
               <v-list-tile-title>Submit For Aproval</v-list-tile-title>
-            </v-list-tile>
+            </v-list-tile> -->
             <v-list-tile
               v-if="PlanogramObject.status==5||PlanogramObject.status==4||PlanogramObject.status==3||PlanogramObject.status==2||PlanogramObject.status==1"
               @click="RetractPlanogram">
@@ -266,6 +266,7 @@
     <PlanogramAprovalModal ref="PlanogramAprovalModal"></PlanogramAprovalModal>
     <PlanogramRetractionModal ref="PlanogramRetractionModal"></PlanogramRetractionModal>
     <JoinPlanogram ref="JoinPlanogram"></JoinPlanogram>
+    <SizeLoader ref="SizeLoader" />
 
   </div>
 </template>
@@ -277,6 +278,7 @@
   import CustomEmitter from "@/components/Main/Planogram/spaceplanning/src/libs/EventBus/CustomEmitter.js";
   import EventBus from "@/components/Main/Planogram/spaceplanning/src/libs/EventBus/EventBus.js";
   import RangeSelectorModal from '@/components/Common/RangeSelectorModal';
+  import SizeLoader from '@/components/Common/SizeLoader';
   import SpacePlanSelector from '@/components/Common/SpacePlanSelector';
   import Spinner from '@/components/Common/Spinner';
   import RangingController from '@/components/Apps/RangePlanning/ranging-controller'
@@ -306,7 +308,8 @@
       YesNoModal,
       PlanogramAprovalModal,
       PlanogramRetractionModal,
-      JoinPlanogram
+      JoinPlanogram,
+      SizeLoader
     },
     data() {
       let width = 0;
@@ -464,6 +467,10 @@
       }
     },
     methods: {
+      updateLoader(data) {
+        let self = this
+        self.$refs.SizeLoader.updateLoader(data)
+      },
       RetractPlanogram() {
         let self = this
         self.$refs.PlanogramRetractionModal.show('Retract Planogram?', (value, notesModal, selectedUser) => {
@@ -533,42 +540,42 @@
         allProducts.forEach(product => {
           storeProducts.forEach(storeProduct => {
             if (storeProduct.Data.barcode == product.barcode) {
-              if (self.dimensionChange(storeProduct.Data, product)) {
 
-                storeProduct.Data.height = product.height;
-                storeProduct.Data.width = product.width;
-                storeProduct.Data.depth = product.depth;
+              storeProduct.Data.height = parseFloat(product.height);
+              storeProduct.Data.width = parseFloat(product.width);
+              storeProduct.Data.depth = parseFloat(product.depth);
 
-                storeProduct.Data.tray_Barcode = product.tray_Barcode;
-                storeProduct.Data.tray_Qty = product.tray_Qty;
-                storeProduct.Data.tray_Height = product.tray_Height;
-                storeProduct.Data.tray_Width = product.tray_Width;
-                storeProduct.Data.tray_Depth = product.tray_Depth;
+              storeProduct.Data.tray_Barcode = product.tray_Barcode;
+              storeProduct.Data.tray_Qty = parseInt(product.tray_Qty);
+              storeProduct.Data.tray_Height = parseFloat(product.tray_Height);
+              storeProduct.Data.tray_Width = parseFloat(product.tray_Width);
+              storeProduct.Data.tray_Depth = parseFloat(product.tray_Depth);
 
-                storeProduct.Data.case_Barcode = product.case_Barcode;
-                storeProduct.Data.case_Qty = product.case_Qty;
-                storeProduct.Data.case_Height = product.case_Height;
-                storeProduct.Data.case_Width = product.case_Width;
-                storeProduct.Data.case_Depth = product.case_Depth;
+              storeProduct.Data.case_Barcode = product.case_Barcode;
+              storeProduct.Data.case_Qty = parseInt(product.case_Qty);
+              storeProduct.Data.case_Height = parseFloat(product.case_Height);
+              storeProduct.Data.case_Width = parseFloat(product.case_Width);
+              storeProduct.Data.case_Depth = parseFloat(product.case_Depth);
 
-                storeProduct.Data.shrink_Barcode = product.shrink_Barcode;
-                storeProduct.Data.shrink_Qty = product.shrink_Qty;
-                storeProduct.Data.shrink_Height = product.shrink_Height;
-                storeProduct.Data.shrink_Width = product.shrink_Width;
-                storeProduct.Data.shrink_Depth = product.shrink_Depth;
+              storeProduct.Data.shrink_Barcode = product.shrink_Barcode;
+              storeProduct.Data.shrink_Qty = parseInt(product.shrink_Qty);
+              storeProduct.Data.shrink_Height = parseFloat(product.shrink_Height);
+              storeProduct.Data.shrink_Width = parseFloat(product.shrink_Width);
+              storeProduct.Data.shrink_Depth = parseFloat(product.shrink_Depth);
 
-                storeProduct.Data.pallet_Barcode = product.pallet_Barcode;
-                storeProduct.Data.pallet_Qty = product.pallet_Qty;
-                storeProduct.Data.pallet_Height = product.pallet_Height;
-                storeProduct.Data.pallet_Width = product.pallet_Width;
-                storeProduct.Data.pallet_Depth = product.pallet_Depth;
+              storeProduct.Data.pallet_Barcode = product.pallet_Barcode;
+              storeProduct.Data.pallet_Qty = parseInt(product.pallet_Qty);
+              storeProduct.Data.pallet_Height = parseFloat(product.pallet_Height);
+              storeProduct.Data.pallet_Width = parseFloat(product.pallet_Width);
+              storeProduct.Data.pallet_Depth = parseFloat(product.pallet_Depth);
 
-                ctrl_store.setProductData(self.$store, storeProduct.Data, product.barcode);
-                storeProduct.ChangeDimensions(storeProduct);
-              }
+              ctrl_store.setProductData(self.$store, storeProduct.Data, product.barcode);
+              storeProduct.ChangeDimensions(storeProduct);
             }
           })
         })
+
+        alert("Range to planogram complete");
       },
       dimensionChange(planoProduct, rangeProduct) {
         if (planoProduct.height == rangeProduct.height && planoProduct.width == rangeProduct.width && planoProduct
@@ -587,33 +594,60 @@
 
         storePlanogramItemProducts.forEach(spip => {
           allProducts.forEach(ap => {
+
+            ap.height = parseFloat(ap.height);
+            ap.width = parseFloat(ap.width);
+            ap.depth = parseFloat(ap.depth);
+
+            ap.tray_Barcode = ap.tray_Barcode;
+            ap.tray_Height = parseFloat(ap.tray_Height);
+            ap.tray_Width = parseFloat(ap.tray_Width);
+            ap.tray_Depth = parseFloat(ap.tray_Depth);
+
+            ap.case_Barcode = ap.case_Barcode;
+            ap.case_Height = parseFloat(ap.case_Height);
+            ap.case_Width = parseFloat(ap.case_Width);
+            ap.case_Depth = parseFloat(ap.case_Depth);
+
+            ap.shrink_Barcode = ap.shrink_Barcode;
+            ap.shrink_Height = parseFloat(ap.shrink_Height);
+            ap.shrink_Width = parseFloat(ap.shrink_Width);
+            ap.shrink_Depth = parseFloat(ap.shrink_Depth);
+
+            ap.pallet_Barcode = ap.pallet_Barcode;
+            ap.pallet_Height = parseFloat(ap.pallet_Height);
+            ap.pallet_Width = parseFloat(ap.pallet_Width);
+            ap.pallet_Depth = parseFloat(ap.pallet_Depth);
+
             if (ap.barcode == spip.Data.barcode) {
-              ap.height = spip.Data.height;
-              ap.width = spip.Data.width;
-              ap.depth = spip.Data.depth;
+              ap.height = parseFloat(spip.Data.height);
+              ap.width = parseFloat(spip.Data.width);
+              ap.depth = parseFloat(spip.Data.depth);
 
               ap.tray_Barcode = spip.Data.tray_Barcode;
-              ap.tray_Height = spip.Data.tray_Height;
-              ap.tray_Width = spip.Data.tray_Width;
-              ap.tray_Depth = spip.Data.tray_Depth;
+              ap.tray_Height = parseFloat(spip.Data.tray_Height);
+              ap.tray_Width = parseFloat(spip.Data.tray_Width);
+              ap.tray_Depth = parseFloat(spip.Data.tray_Depth);
 
               ap.case_Barcode = spip.Data.case_Barcode;
-              ap.case_Height = spip.Data.case_Height;
-              ap.case_Width = spip.Data.case_Width;
-              ap.case_Depth = spip.Data.case_Depth;
+              ap.case_Height = parseFloat(spip.Data.case_Height);
+              ap.case_Width = parseFloat(spip.Data.case_Width);
+              ap.case_Depth = parseFloat(spip.Data.case_Depth);
 
               ap.shrink_Barcode = spip.Data.shrink_Barcode;
-              ap.shrink_Height = spip.Data.shrink_Height;
-              ap.shrink_Width = spip.Data.shrink_Width;
-              ap.shrink_Depth = spip.Data.shrink_Depth;
+              ap.shrink_Height = parseFloat(spip.Data.shrink_Height);
+              ap.shrink_Width = parseFloat(spip.Data.shrink_Width);
+              ap.shrink_Depth = parseFloat(spip.Data.shrink_Depth);
 
               ap.pallet_Barcode = spip.Data.pallet_Barcode;
-              ap.pallet_Height = spip.Data.pallet_Height;
-              ap.pallet_Width = spip.Data.pallet_Width;
-              ap.pallet_Depth = spip.Data.pallet_Depth;
+              ap.pallet_Height = parseFloat(spip.Data.pallet_Height);
+              ap.pallet_Width = parseFloat(spip.Data.pallet_Width);
+              ap.pallet_Depth = parseFloat(spip.Data.pallet_Depth);
             }
           });
         })
+
+        alert("Planogram to range complete");
       },
       productInStore(productID) {
         let self = this;
@@ -687,22 +721,24 @@
 
         self.$refs.spacePlanSelector.show((spacePlanID, item) => {
 
-          self.PlanogramObject = item
+          setTimeout(() => {
+            self.PlanogramObject = item
 
+            self.planogramHelper.setCreate(false);
+            let stage = self.$parent.$children[0].$children[2].getStage();
+            stage.destroyChildren(); // destroy first
+            self.$parent.$children[0].createNewLayer("LoadInit");
+            let masterLayer = self.$parent.$children[0].MasterLayer;
 
-          self.planogramHelper.setCreate(false);
-          let stage = self.$parent.$children[0].$children[2].getStage();
-          stage.destroyChildren(); // destroy first
-          self.$parent.$children[0].createNewLayer("LoadInit");
-          let masterLayer = self.$parent.$children[0].MasterLayer;
+            let pxlRatio = 3; // TODO: Figure out why this is 1 and not 3, perhaps a timing issue?
 
-          let pxlRatio = 3; // TODO: Figure out why this is 1 and not 3, perhaps a timing issue?
-
-          self.$refs.spinner.show();
-          self.spacePlanID = spacePlanID;
-          self.planogramHelper.loadPlanogram(spacePlanID, self.$store, masterLayer, stage, pxlRatio, self
-            .setClusterAndDimensionData,
-            self.$refs.spinner.hide);
+            // self.$refs.spinner.show();
+            self.$refs.SizeLoader.show()
+            self.spacePlanID = spacePlanID;
+            self.planogramHelper.loadPlanogram(spacePlanID, self.$store, masterLayer, stage, pxlRatio, self
+              .setClusterAndDimensionData,
+              self.$refs.SizeLoader.close, self.updateLoader);
+          }, 1000);
         })
       },
       setClusterAndDimensionData(clusterData, dimension, spacePlanName, updatePlanoDataCallback) {
@@ -720,55 +756,95 @@
         self.bins = dimension == undefined || dimension.bins == undefined ? 0 : dimension.bins;
 
         if (clusterData.rangeID != null) {
-          axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${clusterData.rangeID}`)
-            .then(r => {
-              self.$store.commit("setRangeID", clusterData.rangeID);
-              self.$store.commit("setPlanogramName", r.data.planogramName);
-              self.setRangingClusterData(r.data.clusterData);
-              self.getCategoryCluster(r.data.planogramID)
-              self.gotData = true;
-              self.rangingController = new RangingController(r.data);
-              self.selectedClusterType = clusterData.clusterType;
-              self.$store.commit("setClusterName", clusterData.storeCluster);
-              self.$store.commit("setClusterType", clusterData.clusterType);
-              self.$store.commit("setClusterID", clusterData.clusterID);
-              self.$store.commit("setDaysBetween", (r.data.monthsBetween * 30));
 
-              self.rangingData.dateFromString = clusterData.dateFromString;
-              self.rangingData.dateToString = clusterData.dateToString;
-              self.rangingData.monthsBetween = clusterData.monthsBetween;
-              self.rangingData.periodic = clusterData.periodic;
-              self.rangingData.planogramID = clusterData.planogramID;
-              self.rangingData.planogramName = clusterData.planogramName;
-              self.rangingData.tag = clusterData.tag;
+          setTimeout(() => {
+            self.updateLoader({
+              currentFileSize: 0,
+              FileTotalSize: 0,
+            })
+            var startTime = new Date()
+            let config = {
+              onDownloadProgress: progressEvent => {
+                var currentFileSize = progressEvent.loaded * 0.000001
+                var FileTotalSize = progressEvent.total * 0.000001
+                var progress = (currentFileSize / FileTotalSize) * 100
+                var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+                var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
 
-              if (clusterData.storeID != null || clusterData.storeID != undefined) {
-
-
-                self.getStores()
-                self.selectedClusterType = "stores"
-                // self.clusterOptions[stores]=clusterData.storeID
-
-                self.selectedClusterOption = clusterData.storeID
-
-                self.onClusterOptionChange()
-
-
+                // do whatever you like with the percentage complete
+                // maybe dispatch an action that will update a progress bar or something
+                self.updateLoader({
+                  text1: "Downloading Range",
+                  text2: "File Progress",
+                  currentFileSize: currentFileSize,
+                  FileTotalSize: FileTotalSize,
+                  progress: progress / 2,
+                  currentFile: 1,
+                  totalFiles: 2,
+                  DownloadSpeed: DownloadSpeed,
+                })
               }
-              setTimeout(() => {
-                if (clusterData.clusterType != null && clusterData.storeID == null || clusterData.clusterType !=
-                  undefined && clusterData.storeID == undefined) {
-                  self.selectedClusterOption = clusterData.clusterID;
-                  self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
-                    .selectedClusterOption);
+            }
+            axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${clusterData.rangeID}`,
+                config)
+              .then(r => {
+                self.updateLoader({
+                  currentFile: 2,
+                })
+                self.$store.commit("setRangeID", clusterData.rangeID);
+                self.$store.commit("setPlanogramName", r.data.planogramName);
+                self.setRangingClusterData(r.data.clusterData);
+                self.getCategoryCluster(r.data.planogramID)
+                self.gotData = true;
+                self.rangingController = new RangingController(r.data);
+                self.selectedClusterType = clusterData.clusterType;
+                self.$store.commit("setClusterName", clusterData.storeCluster);
+                self.$store.commit("setClusterType", clusterData.clusterType);
+                self.$store.commit("setClusterID", clusterData.clusterID);
+                self.$store.commit("setDaysBetween", (r.data.monthsBetween * 30));
+
+                self.rangingData.dateFromString = clusterData.dateFromString;
+                self.rangingData.dateToString = clusterData.dateToString;
+                self.rangingData.monthsBetween = clusterData.monthsBetween;
+                self.rangingData.periodic = clusterData.periodic;
+                self.rangingData.planogramID = clusterData.planogramID;
+                self.rangingData.planogramName = clusterData.planogramName;
+                self.rangingData.tag = clusterData.tag;
+
+                if (clusterData.storeID != null || clusterData.storeID != undefined) {
+
+
+                  self.getStores()
+                  self.selectedClusterType = "stores"
+                  // self.clusterOptions[stores]=clusterData.storeID
+
+                  self.selectedClusterOption = clusterData.storeID
+
+                  self.onClusterOptionChange()
+
+
                 }
-                updatePlanoDataCallback(self.products);
-              }, 60)
-            })
-            .catch(e => {
-              alert("Failed to get range file from server");
-            })
+                self.updateLoader({text1:"Rendering Planogram"})
+                setTimeout(() => {
+                  if (clusterData.clusterType != null && clusterData.storeID == null || clusterData
+                    .clusterType !=
+                    undefined && clusterData.storeID == undefined) {
+                    self.selectedClusterOption = clusterData.clusterID;
+                    self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType,
+                      self
+                      .selectedClusterOption);
+                  }
+                  self.$refs.SizeLoader.close()
+                  updatePlanoDataCallback(self.products);
+                }, 2000)
+              })
+              .catch(e => {
+                alert("Failed to get range file from server");
+                self.$refs.SizeLoader.close()
+              })
+          }, 1000);
         } else {
+          self.$refs.SizeLoader.close()
           updatePlanoDataCallback(null);
         }
       },
@@ -789,11 +865,11 @@
       },
       saveFile(isNew) {
         let self = this;
-
         let parent = self.$parent.$children[0].$children[2];
         let stage = parent.getStage();
 
-        let image = parent.$parent.getImageBytes(5);
+        let b64 = parent.$parent.getImageBytes(2);
+        let image = parent.$parent.b64toBlob(b64, "image/png")
 
         let clusterData = self.rangingData;
         let vscd = self.$store.getters.getClusterData;
@@ -819,6 +895,7 @@
               self.planogramHelper.setCreate(self.spacePlanID == null || isNew);
 
               if (self.spacePlanID == null) {
+                self.$refs.SizeLoader.show()
                 self.planogramHelper.save(self.$store, stage, clusterData, {
                   modules: self.modules,
                   height: self.height,
@@ -827,9 +904,11 @@
                   pallettes: self.pallettes,
                   supplierStands: self.supplierStands,
                   bins: self.bins
-                }, self.spacePlanID, self.spacePlanName, true, image)
+                }, self.spacePlanID, self.spacePlanName, true, image, self.updateLoader , self.$refs.SizeLoader.close)
+                // self.$refs.SizeLoader.close()
               } else {
                 self.$refs.yesNoModal.show('Update file name with latest configuration?', value => {
+                   self.$refs.SizeLoader.show()
                   self.planogramHelper.save(self.$store, stage, clusterData, {
                     modules: self.modules,
                     height: self.height,
@@ -838,7 +917,7 @@
                     pallettes: self.pallettes,
                     supplierStands: self.supplierStands,
                     bins: self.bins
-                  }, self.spacePlanID, self.spacePlanName, value, image)
+                  }, self.spacePlanID, self.spacePlanName, value, image , self.updateLoader , self.$refs.SizeLoader.close)
                 })
               }
             })
@@ -853,11 +932,12 @@
             }, self.spacePlanID, self.spacePlanName, true, image)
           } else {
             self.$refs.yesNoModal.show('Update file name with latest configuration?', value => {
+               self.$refs.SizeLoader.show()
               self.planogramHelper.save(self.$store, stage, clusterData, {
                 modules: self.modules,
                 height: self.height,
                 width: self.width
-              }, self.spacePlanID, self.spacePlanName, value, image)
+              }, self.spacePlanID, self.spacePlanName, value, image,self.updateLoader , self.$refs.SizeLoader.close)
             })
           }
         }
@@ -1103,7 +1183,7 @@
         let self = this;
 
         self.$refs.JoinPlanogram.show(() => {
-          
+
         })
       }
     }

@@ -14,7 +14,7 @@
           <v-icon>close</v-icon>
         </v-btn>
       </v-toolbar>
-      <v-container style="height: calc(100vh - 65px); overflow-x: auto;" grid-list-md>
+      <v-container class="mx-0" style="height: calc(100vh - 65px); overflow-x: auto; max-width: 100%;" grid-list-md>
         <v-layout row wrap>
           <v-flex lg4 md12>
             <v-card class="elevation-5">
@@ -197,6 +197,9 @@
                   <v-expansion-panel v-model="renderingPanel" inset expand>
                     <v-expansion-panel-content class="elevation-0">
                       <div slot="header">Rendering Options</div>
+                      <v-flex v-if="newData.type == 2 && (newData.fixtureType == 0 || newData.fixtureType == 1 || newData.fixtureType == 3)">
+                        <v-checkbox label="Product Renderings" v-model="newData.productRendering"></v-checkbox>
+                      </v-flex>
                       <v-flex>
                         <hr>
                         <br>

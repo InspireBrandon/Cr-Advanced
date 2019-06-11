@@ -19,11 +19,6 @@ class RangingController {
     this.periodic = rangingData.periodic;
     this.monthsBetween = rangingData.monthsBetween;
     this.tag = rangingData.tag;
-
-    this.allRangeProducts.forEach(el => {
-      // setDefaultValuesIfNull(el);
-      el.useAlternateBarcode = false;
-    })
   }
 
   getRangingFile() {
@@ -72,9 +67,21 @@ class RangingController {
       }
     }
 
-    // return csvToDataObject.arrayToCSV({
-    //   data: finalArr
-    // })
+    finalArr.forEach(element1 => {
+      let itemCount = 0;
+      let itemFirstIndex = 0;
+
+      finalArr.forEach((element2, idx) => {
+        if(element1.ID == element2.ID) {
+          itemCount ++;
+          itemFirstIndex = idx;
+        }
+      });
+
+      if(itemCount == 2) {
+        finalArr.splice(itemFirstIndex, 1);
+      }
+    });
 
     return finalArr
   }
@@ -130,27 +137,24 @@ class RangingController {
             if (product.productID == productID) {
 
               switch (indicator) {
-                case "YES":
-                  {
-                    product.store_Range_Indicator = indicator;
-                    product.store_Range_Indicator_ID = 2;
-                    product["updated"] = true;
-                  }
-                  break;
-                case "NO":
-                  {
-                    product.store_Range_Indicator = indicator;
-                    product.store_Range_Indicator_ID = 1;
-                    product["updated"] = true;
-                  }
-                  break;
-                case "SELECT":
-                  {
-                    product.store_Range_Indicator = "SELECTED";
-                    product.store_Range_Indicator_ID = 3;
-                    product["updated"] = true;
-                  }
-                  break;
+                case "YES": {
+                  product.store_Range_Indicator = indicator;
+                  product.store_Range_Indicator_ID = 2;
+                  product["updated"] = true;
+                }
+                break;
+              case "NO": {
+                product.store_Range_Indicator = indicator;
+                product.store_Range_Indicator_ID = 1;
+                product["updated"] = true;
+              }
+              break;
+              case "SELECT": {
+                product.store_Range_Indicator = "SELECTED";
+                product.store_Range_Indicator_ID = 3;
+                product["updated"] = true;
+              }
+              break;
               }
             }
           })
@@ -241,7 +245,7 @@ class RangingController {
     this.allRangeProducts.forEach(product => {
       if (product.productID == el.productID) {
         for (var prop in el) {
-          if(prop != "useAlternateBarcode") {
+          if (prop != "useAlternateBarcode") {
             if (product[prop] != el[prop]) {
               product[prop + "Dirty"] = true;
               product[prop] = el[prop];
@@ -551,7 +555,7 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
     element.volume_potential_rank = productSales.length - index
   }
   console.log(productSales);
-  
+
   return productSales;
 }
 

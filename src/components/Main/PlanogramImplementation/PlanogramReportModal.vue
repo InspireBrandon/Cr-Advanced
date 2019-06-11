@@ -2,7 +2,7 @@
     <div>
         <v-layout row justify-center>
             <v-dialog v-model="dialog" persistent fullscreen>
-                <v-card>
+                <v-card style="height: calc(100vh - 200px); overflow: auto;">
                     <v-toolbar prominent dark color="primary">
                         <v-toolbar-title>Planogram Report</v-toolbar-title>
                         <v-spacer></v-spacer>
@@ -30,7 +30,7 @@
                                                 <span>Store Cluster: {{ planogramData.clusterData.storeCluster }}</span>
                                             </v-flex>
                                             <v-flex md12>
-                                                <span>Store: {{ planogramData.clusterData.planogramName }}</span>
+                                                <span>Store: {{ planogramData.clusterData.storeName }}</span>
                                             </v-flex>
                                             <v-flex md12>
                                                 <span>Displays: {{ planogramData.dimensionData.displays }}</span>
@@ -81,15 +81,15 @@
                             <v-toolbar flat dark dense>
                                 <v-toolbar-title>Fixture Report</v-toolbar-title>
                             </v-toolbar>
-                            <v-card-text>
+                            <v-card-text style=" overflow: auto;">
                                 <table>
                                     <tr>
-                                        <th>Name</th>
-                                        <th>Qty</th>
-                                        <th>Height(cm)</th>
-                                        <th>Width(cm)</th>
-                                        <th>Depth(cm)</th>
-                                        <th>Cost</th>
+                                        <th style="min-width:400px">Name</th>
+                                        <th style="min-width:50px">Qty</th>
+                                        <th style="min-width:100px">Height(cm)</th>
+                                        <th style="min-width:100px">Width(cm)</th>
+                                        <th style="min-width:100px">Depth(cm)</th>
+                                        <th style="min-width:50px">Cost</th>
 
                                     </tr>
                                     <tr v-for="(item, idx) in fixtureReport" :key="idx">
@@ -111,20 +111,20 @@
                             </v-card-text>
                         </v-card>
                         <div class="print-break-page"></div>
-                        <v-card class="mb-3">
+                        <v-card class="mb-3" >
                             <v-toolbar flat dark dense>
                                 <v-toolbar-title>Product Report - Weekly Average</v-toolbar-title>
                             </v-toolbar>
-                            <v-card-text>
+                            <v-card-text style="height: calc(100vh - 200px); overflow: auto;">
                                 <table>
-                                    <tr><th>Product Code</th>
-                                        <th>Barcode</th>
-                                        <th>Description</th>
-                                        <th>Capacity</th>
-                                        <th>DOS</th>
-                                        <th v-if="accesstype!=2">Sales Cost</th>
-                                        <th>Sales Retail</th>
-                                        <th>Sales Units</th>
+                                    <tr><th style="min-width:150px">Product Code</th>
+                                        <th style="min-width:150px">Barcode</th>
+                                        <th style="min-width:400px">Description</th>
+                                        <th style="min-width:100px">Capacity</th>
+                                        <th style="min-width:100px">DOS</th>
+                                        <th  style="min-width:100px" v-if="accesstype!=2">Sales Cost</th>
+                                        <th style="min-width:100px">Sales Retail</th>
+                                        <th style="min-width:100px">Sales Units</th>
                                     </tr>
                                     <tr v-for="(item, idx) in productReport" :key="idx">
                                         <td>{{item.product_Code}}</td>
@@ -140,11 +140,11 @@
                             </v-card-text>
                         </v-card>
                         <div class="print-break-page"></div>
-                        <v-card class="mb-3">
+                        <v-card class="mb-3" style=" overflow: auto;">
                             <v-toolbar flat dark dense>
                                 <v-toolbar-title>Product Fixture Report</v-toolbar-title>
                             </v-toolbar>
-                            <v-card-text>
+                            <v-card-text style="height: calc(100vh - 200px); overflow: auto;">
                                 <TreeVue style="border: 1px solid black; margin-bottom: 10px;"
                                     v-for="(parent, idx) in productFixtureReport" :childdark="false" :key="idx"
                                     :data="parent" />

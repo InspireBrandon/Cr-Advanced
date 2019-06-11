@@ -145,11 +145,11 @@ export const store = new Vuex.Store({
           el.Data.shrink_Width = data.data.shrink_Width;
           el.Data.shrink_Depth = data.data.shrink_Depth;
 
-          el.Data.pallet_Barcode = product.pallet_Barcode;
+          el.Data.pallet_Barcode = data.data.pallet_Barcode;
           el.Data.pallet_Qty = data.data.pallet_Qty;
-          el.Data.pallet_Height = product.pallet_Height;
-          el.Data.pallet_Width = product.pallet_Width;
-          el.Data.pallet_Depth = product.pallet_Depth;
+          el.Data.pallet_Height = data.data.pallet_Height;
+          el.Data.pallet_Width = data.data.pallet_Width;
+          el.Data.pallet_Depth = data.data.pallet_Depth;
         }
       })
 
@@ -161,28 +161,28 @@ export const store = new Vuex.Store({
             el.Data.depth = data.data.depth;
 
             el.Data.tray_Barcode = data.data.tray_Barcode;
-            el.Data.tray_Qty = product.tray_Qty;
+            el.Data.tray_Qty = data.data.tray_Qty;
             el.Data.tray_Height = data.data.tray_Height;
             el.Data.tray_Width = data.data.tray_Width;
             el.Data.tray_Depth = data.data.tray_Depth;
 
             el.Data.case_Barcode = data.data.case_Barcode;
-            el.Data.case_Qty = product.case_Qty;
+            el.Data.case_Qty = data.data.case_Qty;
             el.Data.case_Height = data.data.case_Height;
             el.Data.case_Width = data.data.case_Width;
             el.Data.case_Depth = data.data.case_Depth;
 
             el.Data.shrink_Barcode = data.data.shrink_Barcode;
-            el.Data.shrink_Qty = product.shrink_Qty;
+            el.Data.shrink_Qty = data.data.shrink_Qty;
             el.Data.shrink_Height = data.data.shrink_Height;
             el.Data.shrink_Width = data.data.shrink_Width;
             el.Data.shrink_Depth = data.data.shrink_Depth;
 
-            el.Data.pallet_Barcode = product.pallet_Barcode;
-            el.Data.pallet_Qty = product.pallet_Qty;
-            el.Data.pallet_Height = product.pallet_Height;
-            el.Data.pallet_Width = product.pallet_Width;
-            el.Data.pallet_Depth = product.pallet_Depth;
+            el.Data.pallet_Barcode = data.data.pallet_Barcode;
+            el.Data.pallet_Qty = data.data.pallet_Qty;
+            el.Data.pallet_Height = data.data.pallet_Height;
+            el.Data.pallet_Width = data.data.pallet_Width;
+            el.Data.pallet_Depth = data.data.pallet_Depth;
           }
         }
       })

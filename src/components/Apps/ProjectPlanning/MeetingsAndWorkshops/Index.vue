@@ -20,14 +20,15 @@
                         <v-layout wrap>
                             <v-flex sm12 lg12 class="calendar-container pl-0 pt-0">
                                 <v-sheet height="calc(100vh - 300px)">
-                                    <v-calendar ref="calendar">
+                                    <v-calendar v-if="eventsMap != null" ref="calendar">
                                         <template v-slot:day="{ date }">
                                             <template v-for="(event, idx) in eventsMap[date]">
                                                 <v-menu :key="idx" v-model="event.open" full-width offset-x>
                                                     <template v-slot:activator="{ on }">
                                                         <div @click="edit(event)" v-if="event.time" v-ripple
                                                             class="my-event" v-on="on"
-                                                            v-html="event.title + ' - ' + event.time"></div>
+                                                            v-html="event.title + ' - (' + event.time +  ' ' + amOrPM(event.time) + ' - ' + event.timeTo + ' ' + amOrPM(event.timeTo) + ')'">
+                                                        </div>
                                                     </template>
                                                 </v-menu>
                                             </template>
@@ -66,8 +67,13 @@
         },
         computed: {
             eventsMap() {
-                const map = {}
-                this.events.forEach(e => (map[e.date] = map[e.date] || []).push(e))
+                let map = null;
+
+                if (this.events.length > 0) {
+                    map = {};
+                    this.events.forEach(e => (map[e.date] = map[e.date] || []).push(e))
+                }
+
                 return map
             }
         },
@@ -81,36 +87,58 @@
             create() {
                 let self = this;
 
-                self.$refs.maint.show(true, () => {
+                self.$refs.maint.show(true, null, () => {
                     self.getMeetings();
                 })
             },
             edit(data) {
                 let self = this;
 
-                self.$refs.maint.show(false, () => {
+                let eventItem = self.getMeetingItemFromID(data.id);
+
+                self.$refs.maint.show(false, eventItem, () => {
                     self.getMeetings();
                 })
             },
             getMeetings(callback) {
                 let self = this;
 
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                self.meetings = [];
+                self.events = [];
 
-                Axios.get(process.env.VUE_APP_API + "Meeting")
-                    .then(r => {
-                        self.meetings = [];
-                        self.events = [];
-                        self.meetings = r.data.meetings;
-                        self.events = new EventItemList(r.data.meetings);
+                setTimeout(() => {
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                        console.log(self.meetings)
+                    Axios.get(process.env.VUE_APP_API + "Meeting?returnAttendees=true")
+                        .then(r => {
+                            self.meetings = r.data.meetings;
+                            self.events = new EventItemList(r.data.meetings);
 
-                        delete Axios.defaults.headers.common["TenantID"];
-                        if (callback != undefined) {
-                            callback();
-                        }
-                    })
+                            delete Axios.defaults.headers.common["TenantID"];
+                            if (callback != undefined) {
+                                callback();
+                            }
+                        })
+                }, 60)
+            },
+            amOrPM(time) {
+                let retval = "AM"
+
+                if (parseInt(time.split(":")[0]) > 11)
+                    retval = "PM"
+
+                return retval;
+            },
+            getMeetingItemFromID(id) {
+                let self = this;
+                let retval;
+
+                self.meetings.forEach(meeting => {
+                    if (meeting.id == id)
+                        retval = meeting;
+                })
+
+                return retval;
             }
         }
     }
@@ -121,9 +149,10 @@
         items.forEach(el => {
             tmp.push({
                 title: el.title,
-                date: '2019-05-30',
-                time: '12:30',
-                duration: 180
+                date: el.dateFrom,
+                time: el.timeFrom,
+                timeTo: el.timeTo,
+                id: el.id
             })
         })
         return tmp;

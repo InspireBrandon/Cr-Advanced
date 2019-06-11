@@ -30,7 +30,7 @@ class LoadSavePlanogramBase {
     this.Create = create;
   }
 
-  save(vuex, stage, clusterData, dimensionData, spacePlanID, spacePlanName, updateName, image) {
+  save(vuex, stage, clusterData, dimensionData, spacePlanID, spacePlanName, updateName, image, updateLoader, close) {
     let self = this;
     let ctrl_store = new StoreHelper();
     let allItems = ctrl_store.getAllPlanogramItems(vuex);
@@ -54,7 +54,7 @@ class LoadSavePlanogramBase {
 
     allProducts.forEach(ap => {
       output.planogramData.forEach(pdi => {
-        if (ap.ID == pdi.Data.ID) {
+        if (ap.Barcode == pdi.Data.Barcode) {
           let calcData = calculate(ap, vuex);
           pdi.Data["CalcData"] = calcData;
         }
@@ -103,46 +103,236 @@ class LoadSavePlanogramBase {
     }
 
     output.name = planogramName;
-    if (self.Create == true) {
-      axios
-        .post(
-          self.ServerAddress + "SystemFile/Json?db=CR-Devinspire", {
-            systemFile: {
-              systemUserID: 10,
-              folder: "Space Planning",
-              name: planogramName
-            },
-            data: output
-          }
-        )
-        .then(result => {
-          if (result.data.success == true) {
-            alert(planogramName + " Successfully saved new.");
-          } else {
-            alert("Server responded unsuccessfully!");
-          }
+    output = JSON.parse(JSON.stringify(output));
+    
+    // if (self.Create == true) {
+    let startTime = new Date()
+    let config = {
+      onUploadProgress: progressEvent => {
+        var currentFileSize = progressEvent.loaded * 0.000001
+        var FileTotalSize = progressEvent.total * 0.000001
+        var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+        var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
+
+        // do whatever you like with the percentage complete
+        // maybe dispatch an action that will update a progress bar or something
+        updateLoader({
+          text1: "Creating Folder",
+          text2: null,
+          currentFileSize: currentFileSize,
+          FileTotalSize: FileTotalSize,
+          currentFile: null,
+          totalFiles: null,
+          DownloadSpeed: DownloadSpeed,
         })
-        .catch(error => {
-          console.error("Failed to save planogram file");
-        });
-    } else {
-      axios
-        .put(
-          process.env.VUE_APP_API +
-          `SystemFile/Json?db=CR-Devinspire&id=${spacePlanID}&name=${planogramName}`,
-          output
-        )
-        .then(result => {
-          if (result.data.success == true) {
-            alert(planogramName + " Successfully saved.");
-          } else {
-            alert("Server responded unsuccessfully!");
-          }
-        })
-        .catch(error => {
-          console.error("Failed to save planogram file");
-        });
+      }
     }
+    axios.post(self.ServerAddress + "SystemFolder?db=CR-Devinspire", {
+      systemFile: {
+        systemUserID: 10,
+        folder: "Space Planning",
+        name: planogramName,
+        isFolder: true,
+        extension: "",
+        id:spacePlanID,
+      },
+    }, config).then(resp => {
+      if (resp.success == true) {
+        alert("folder created")
+      }
+      console.log(planogramName)
+      output.image= null
+      let startTime = new Date()
+      let config = {
+        onUploadProgress: progressEvent => {
+          var currentFileSize = progressEvent.loaded * 0.000001
+          var FileTotalSize = progressEvent.total * 0.000001
+          var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+          var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
+
+          // do whatever you like with the percentage complete
+          // maybe dispatch an action that will update a progress bar or something
+          updateLoader({
+            text1: "uploading Advanced Planogram",
+            text2: "File Progresss",
+            currentFileSize: currentFileSize,
+            FileTotalSize: FileTotalSize,
+            currentFile: 1,
+            totalFiles: 3,
+            DownloadSpeed: DownloadSpeed,
+          })
+        }
+      }
+      axios.post(self.ServerAddress + "SystemFile/JSON/Planogram?db=CR-Devinspire", {
+        file: "config_advanced",
+        systemFile: {
+          systemUserID: 10,
+          folder: "Space Planning",
+          name: planogramName,
+        },
+        data: output
+      }, config).then(result => {
+        // __sending simple version through
+
+        output.image = null
+
+        output.planogramData.forEach(e => {
+          e.Data.Data.image = null
+         
+          if (e.Type != "PRODUCT" && e.Data.Data.renderings != null) {
+            e.Data.Data.renderings.forEach(render => {
+              render.image = null
+            })
+          }
+        })
+        let startTime = new Date()
+        let config = {
+          onUploadProgress: progressEvent => {
+            var currentFileSize = progressEvent.loaded * 0.000001
+            var FileTotalSize = progressEvent.total * 0.000001
+            var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+            var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
+
+            // do whatever you like with the percentage complete
+            // maybe dispatch an action that will update a progress bar or something
+            updateLoader({
+              text1: "uploading Simple Planogram",
+              text2: "File Progresss",
+              currentFileSize: currentFileSize,
+              FileTotalSize: FileTotalSize,
+              currentFile: 2,
+              totalFiles: 3,
+              DownloadSpeed: DownloadSpeed,
+            })
+          }
+        }
+        axios.post(self.ServerAddress + "SystemFile/JSON/Planogram?db=CR-Devinspire", {
+          file: "config_simple",
+          systemFile: {
+            systemUserID: 10,
+            folder: "Space Planning",
+            name: planogramName
+          },
+          data: output
+        }, config).then(res => {
+          let config = {
+            onUploadProgress: progressEvent => {
+
+            }
+          }
+          let xhrObj = new XMLHttpRequest();
+          let url = self.ServerAddress +
+            `SystemFile/JSON/PlanogramImage?db=CR-Devinspire&fileName=${output.name}`;
+
+          xhrObj.open("Post", url);
+          let startTime = new Date()
+          xhrObj.upload.onprogress = function (pe) {
+            var currentFileSize = pe.loaded * 0.000001
+            var FileTotalSize = pe.total * 0.000001
+            var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+            var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
+
+            // do whatever you like with the percentage complete
+            // maybe dispatch an action that will update a progress bar or something
+            updateLoader({
+              text1: "uploading Planogram Image",
+              text2: "File Progresss",
+
+              currentFileSize: pe.loaded * 0.000001,
+              FileTotalSize: pe.total * 0.000001,
+              progress: ((currentFileSize / FileTotalSize) * 100) / 3,
+              currentFile: 2,
+              totalFiles: 3,
+              DownloadSpeed: DownloadSpeed
+            })
+          }
+
+          xhrObj.upload.onreadystatechange = function (oEvent) {
+
+            if (xhrObj.upload.readyState === 4) {
+              if (xhrObj.upload.status !== 200) {
+                alert("ERROR")
+              }
+            }
+          };
+
+          xhrObj.upload.onerror = function (e) {
+            alert("ERROR")
+            hasError = true;
+          }
+
+          xhrObj.upload.onloadend = function (e) {
+            updateLoader({
+              currentFile: 3,
+              totalFiles: 3,
+            })
+            setTimeout(() => {
+              close()
+            }, 500);
+          }
+
+          xhrObj.setRequestHeader("X-File-Name", "image.png");
+          xhrObj.setRequestHeader("Content-type", image.Type);
+          console.log("image");
+          console.log(image);
+
+          image.name = "image.png"
+          xhrObj.send(image);
+
+          // 
+
+        })
+      }).catch(e => {
+        console.log(e)
+        console.error("Failed to save planogram file");
+
+      })
+    })
+
+    // } else {
+    //   let startTime = new Date()
+    //   let config = {
+    //     onUploadProgress: progressEvent => {
+    //       var currentFileSize = progressEvent.loaded * 0.000001
+    //       var FileTotalSize = progressEvent.total * 0.000001
+    //       var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+    //       var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
+
+    //       // do whatever you like with the percentage complete
+    //       // maybe dispatch an action that will update a progress bar or something
+    //       updateLoader({
+    //         text1: "Updating Planogram file",
+    //         text2: null,
+    //         currentFileSize: currentFileSize,
+    //         FileTotalSize: FileTotalSize,
+    //         currentFile: null,
+    //         totalFiles: null,
+    //         DownloadSpeed: DownloadSpeed,
+    //       })
+    //     }
+    //   }
+    //   axios
+    //     .put(
+    //       process.env.VUE_APP_API +
+    //       `SystemFile/Json?db=CR-Devinspire&id=${spacePlanID}&name=${planogramName}`,
+    //       output,config
+    //     )
+    //     .then(result => {
+    //       console.log(result);
+
+    //       close()
+    //       if (result.data.success == true) {
+    //         alert(planogramName + " Successfully saved.");
+    //       } else {
+    //         log
+    //         alert("Server responded unsuccessfully!");
+    //       }
+    //     })
+    //     .catch(error => {
+    //       close()
+    //       console.error("Failed to save planogram file");
+    //     });
+    // }
   }
 
   determinePlanogramName(allPlanogramItems, clusterData) {
@@ -151,24 +341,50 @@ class LoadSavePlanogramBase {
     return PlanogramNamer.generatePlanogramName(allPlanogramItems, clusterData);
   }
 
-  loadPlanogram(spacePlanID, VueStore, MasterLayer, Stage, pxlRatio, afterGetSpacePlanFile, hideLoader) {
+  loadPlanogram(spacePlanID, VueStore, MasterLayer, Stage, pxlRatio, afterGetSpacePlanFile, hideLoader, updateLoader) {
     let self = this;
-
+    let startTime = new Date()
     self.resetStage(VueStore, MasterLayer, Stage);
+    let config = {
+      onDownloadProgress: progressEvent => {
+        var currentFileSize = progressEvent.loaded * 0.000001
+        var FileTotalSize = progressEvent.total * 0.000001
+        var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+        var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
 
-    axios.get(self.ServerAddress + `SystemFile/JSON?db=CR-Devinspire&id=${spacePlanID}`)
+        // do whatever you like with the percentage complete
+        // maybe dispatch an action that will update a progress bar or something
+        updateLoader({
+          text1: "Downloading Planogram",
+          text2: null,
+          currentFileSize: currentFileSize,
+          FileTotalSize: FileTotalSize,
+          currentFile: null,
+          totalFiles: null,
+          DownloadSpeed: DownloadSpeed,
+        })
+      }
+    }
+    axios.get(self.ServerAddress + `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${spacePlanID}&file=config_advanced`, config)
       .then(r => {
+        console.log(r.data);
 
-        afterGetSpacePlanFile(r.data.clusterData, r.data.dimensionData, r.data.name, rangeProducts => {
+        let jsonData = r.data.jsonObject
+
+        afterGetSpacePlanFile(jsonData.clusterData, jsonData.dimensionData, jsonData.name, rangeProducts => {
           if (rangeProducts == null) {
-            self.startLoadingPlanogram(r.data, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
+            self.startLoadingPlanogram(jsonData, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
           } else {
-            r.data.planogramData = StageWarehouseMiddleware.verifyIntegrityOfWarehouseData(r.data.planogramData, rangeProducts);
-            self.startLoadingPlanogram(r.data, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
+            jsonData.planogramData = StageWarehouseMiddleware.verifyIntegrityOfWarehouseData(jsonData.planogramData, rangeProducts);
+            self.startLoadingPlanogram(jsonData, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
           }
         });
+
+
       })
       .catch(e => {
+
+        hideLoader()
         alert("Failed to get data. " + e);
       })
   }
@@ -244,321 +460,299 @@ class LoadSavePlanogramBase {
     // create the current item
     let ctrl_item = null;
     switch (CurrentItem.Type.toUpperCase()) {
-      case "GONDOLA":
-        {
-          let ctrl_item = new GondolaNew(
-            VueStore,
-            Stage,
-            MasterLayer,
-            CurrentItem.Data.Data,
-            PxlRatio,
-            "GONDOLA",
-            ParentID
-          )
+      case "GONDOLA": {
+        let ctrl_item = new GondolaNew(
+          VueStore,
+          Stage,
+          MasterLayer,
+          CurrentItem.Data.Data,
+          PxlRatio,
+          "GONDOLA",
+          ParentID
+        )
 
-          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
-          {
-            ctrl_item.Position = CurrentItem.Position;
-          }
-
-          // set json data values to the object
-          ctrl_item.ID = CurrentItem.Data.ID;
-
-          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+        if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+          ctrl_item.Position = CurrentItem.Position;
         }
-        break;
-      case "AREA":
-        {
-          let ctrl_item = new AreaNew(
-            VueStore,
-            Stage,
-            MasterLayer,
-            CurrentItem.Data.Data,
-            PxlRatio,
-            "AREA",
-            ParentID
-          )
-          
-          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
-          {
-            ctrl_item.Position = CurrentItem.Position;
-          }
 
-          // set json data values to the object
-          ctrl_item.ID = CurrentItem.Data.ID;
+        // set json data values to the object
+        ctrl_item.ID = CurrentItem.Data.ID;
 
-          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
-        }
-        break;
-      case "TEXTHEADER":
-        {
-          let ctrl_item = new TextHeaderNew(
-            VueStore,
-            Stage,
-            MasterLayer,
-            CurrentItem.Data.Data,
-            PxlRatio,
-            "TEXTHEADER",
-            CurrentItem.Scale,
-            CurrentItem.Data.Text
-          )
-          
-          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
-          {
-            ctrl_item.Position = CurrentItem.Position;
-          }
+        ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+      }
+      break;
+    case "AREA": {
+      let ctrl_item = new AreaNew(
+        VueStore,
+        Stage,
+        MasterLayer,
+        CurrentItem.Data.Data,
+        PxlRatio,
+        "AREA",
+        ParentID
+      )
 
-          // set json data values to the object
-          ctrl_item.ID = CurrentItem.Data.ID;
+      if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+        ctrl_item.Position = CurrentItem.Position;
+      }
 
-          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
-        }
-        break;
-      case "PALETTE":
-        {
-          let ctrl_item = new PaletteNew(
-            VueStore,
-            Stage,
-            MasterLayer,
-            CurrentItem.Data.Data,
-            PxlRatio,
-            "PALETTE",
-            ParentID
-          )
-          
-          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
-          {
-            ctrl_item.Position = CurrentItem.Position;
-          }
+      // set json data values to the object
+      ctrl_item.ID = CurrentItem.Data.ID;
 
-          // set json data values to the object
-          ctrl_item.ID = CurrentItem.Data.ID;
+      ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+    }
+    break;
+    case "TEXTHEADER": {
+      let ctrl_item = new TextHeaderNew(
+        VueStore,
+        Stage,
+        MasterLayer,
+        CurrentItem.Data.Data,
+        PxlRatio,
+        "TEXTHEADER",
+        CurrentItem.Scale,
+        CurrentItem.Data.Text
+      )
 
-          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
-        }
-        break;
-      case "SHELF":
-        {
-          let ctrl_item = new ShelfNew(
-            VueStore,
-            Stage,
-            MasterLayer,
-            CurrentItem.Data.Data,
-            PxlRatio,
-            "SHELF",
-            ParentID
-          )
+      if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+        ctrl_item.Position = CurrentItem.Position;
+      }
 
-          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
-          {
-            ctrl_item.Position = CurrentItem.Position;
-          }
+      // set json data values to the object
+      ctrl_item.ID = CurrentItem.Data.ID;
+
+      ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+    }
+    break;
+    case "PALETTE": {
+      let ctrl_item = new PaletteNew(
+        VueStore,
+        Stage,
+        MasterLayer,
+        CurrentItem.Data.Data,
+        PxlRatio,
+        "PALETTE",
+        ParentID
+      )
+
+      if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+        ctrl_item.Position = CurrentItem.Position;
+      }
+
+      // set json data values to the object
+      ctrl_item.ID = CurrentItem.Data.ID;
+
+      ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+    }
+    break;
+    case "SHELF": {
+      let ctrl_item = new ShelfNew(
+        VueStore,
+        Stage,
+        MasterLayer,
+        CurrentItem.Data.Data,
+        PxlRatio,
+        "SHELF",
+        ParentID
+      )
+
+      if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+        ctrl_item.Position = CurrentItem.Position;
+      }
 
 
-          // set json data values to the object
-          ctrl_item.ID = CurrentItem.Data.ID;
-          ctrl_item.Config = CurrentItem.Data.Config;
-          if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
-            ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
-          }
+      // set json data values to the object
+      ctrl_item.ID = CurrentItem.Data.ID;
+      ctrl_item.Config = CurrentItem.Data.Config;
+      if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
+        ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
+      }
 
-          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
-          ctrl_item.ApplyZIndexing();
-        }
-        break;
-      case "BASE":
-        {
-          let ctrl_item = new BaseNew(
-            VueStore,
-            Stage,
-            MasterLayer,
-            CurrentItem.Data.Data,
-            PxlRatio,
-            "BASE",
-            ParentID
-          )
+      ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+      ctrl_item.ApplyZIndexing();
+    }
+    break;
+    case "BASE": {
+      let ctrl_item = new BaseNew(
+        VueStore,
+        Stage,
+        MasterLayer,
+        CurrentItem.Data.Data,
+        PxlRatio,
+        "BASE",
+        ParentID
+      )
 
-          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
-          {
-            ctrl_item.Position = CurrentItem.Position;
-          }
+      if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+        ctrl_item.Position = CurrentItem.Position;
+      }
 
-          // set json data values to the object
-          ctrl_item.ID = CurrentItem.Data.ID;
-          ctrl_item.Config = CurrentItem.Data.Config;
-          if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
-            ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
-          }
+      // set json data values to the object
+      ctrl_item.ID = CurrentItem.Data.ID;
+      ctrl_item.Config = CurrentItem.Data.Config;
+      if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
+        ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
+      }
 
-          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
-          ctrl_item.ApplyZIndexing();
-        }
-        break;
-      case "BASKET":
-        {
-          let ctrl_item = new BasketNew(
-            VueStore,
-            Stage,
-            MasterLayer,
-            CurrentItem.Data.Data,
-            PxlRatio,
-            "BASKET",
-            ParentID
-          )
+      ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+      ctrl_item.ApplyZIndexing();
+    }
+    break;
+    case "BASKET": {
+      let ctrl_item = new BasketNew(
+        VueStore,
+        Stage,
+        MasterLayer,
+        CurrentItem.Data.Data,
+        PxlRatio,
+        "BASKET",
+        ParentID
+      )
 
-          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
-          {
-            ctrl_item.Position = CurrentItem.Position;
-          }
+      if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+        ctrl_item.Position = CurrentItem.Position;
+      }
 
-          // set json data values to the object
-          ctrl_item.ID = CurrentItem.Data.ID;
-          ctrl_item.Config = CurrentItem.Data.Config;
-          if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
-            ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
-          }
+      // set json data values to the object
+      ctrl_item.ID = CurrentItem.Data.ID;
+      ctrl_item.Config = CurrentItem.Data.Config;
+      if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
+        ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
+      }
 
-          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
-          ctrl_item.ApplyZIndexing();
-        }
-        break;
-      case "PEGBAR":
-        {
-          let ctrl_item = new PegBarNew(
-            VueStore,
-            Stage,
-            MasterLayer,
-            CurrentItem.Data.Data,
-            PxlRatio,
-            "PEGBAR",
-            ParentID
-          )
+      ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+      ctrl_item.ApplyZIndexing();
+    }
+    break;
+    case "PEGBAR": {
+      let ctrl_item = new PegBarNew(
+        VueStore,
+        Stage,
+        MasterLayer,
+        CurrentItem.Data.Data,
+        PxlRatio,
+        "PEGBAR",
+        ParentID
+      )
 
-          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
-          {
-            ctrl_item.Position = CurrentItem.Position;
-          }
+      if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+        ctrl_item.Position = CurrentItem.Position;
+      }
 
-          // set json data values to the object
-          ctrl_item.ID = CurrentItem.Data.ID;
-          ctrl_item.Config = CurrentItem.Data.Config;
-          if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
-            ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
-          }
+      // set json data values to the object
+      ctrl_item.ID = CurrentItem.Data.ID;
+      ctrl_item.Config = CurrentItem.Data.Config;
+      if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
+        ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
+      }
 
-          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
-          ctrl_item.ApplyZIndexing();
-        }
-        break;
-      case "LABELHOLDER":
-        {
-          let ctrl_item = new LabelHolderNew(
-            VueStore,
-            Stage,
-            MasterLayer,
-            CurrentItem.Data.Data,
-            PxlRatio,
-            "LABELHOLDER",
-            ParentID
-          )
+      ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+      ctrl_item.ApplyZIndexing();
+    }
+    break;
+    case "LABELHOLDER": {
+      let ctrl_item = new LabelHolderNew(
+        VueStore,
+        Stage,
+        MasterLayer,
+        CurrentItem.Data.Data,
+        PxlRatio,
+        "LABELHOLDER",
+        ParentID
+      )
 
-          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
-          {
-            ctrl_item.Position = CurrentItem.Position;
-          }
+      if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+        ctrl_item.Position = CurrentItem.Position;
+      }
 
-          // set json data values to the object
-          ctrl_item.ID = CurrentItem.Data.ID;
-          ctrl_item.Config = CurrentItem.Data.Config;
-          if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
-            ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
-          }
+      // set json data values to the object
+      ctrl_item.ID = CurrentItem.Data.ID;
+      ctrl_item.Config = CurrentItem.Data.Config;
+      if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
+        ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
+      }
 
-          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
-          ctrl_item.ApplyZIndexing();
-        }
-        break;
-      case "PEGBOARD":
-        {
-          let ctrl_item = new PegboardNew(
-            VueStore,
-            Stage,
-            MasterLayer,
-            CurrentItem.Data.Data,
-            PxlRatio,
-            "PEGBOARD",
-            ParentID
-          )
+      ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+      ctrl_item.ApplyZIndexing();
+    }
+    break;
+    case "PEGBOARD": {
+      let ctrl_item = new PegboardNew(
+        VueStore,
+        Stage,
+        MasterLayer,
+        CurrentItem.Data.Data,
+        PxlRatio,
+        "PEGBOARD",
+        ParentID
+      )
 
-          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
-          {
-            ctrl_item.Position = CurrentItem.Position;
-          }
+      if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+        ctrl_item.Position = CurrentItem.Position;
+      }
 
-          // set json data values to the object
-          ctrl_item.ID = CurrentItem.Data.ID;
-          ctrl_item.Config = CurrentItem.Data.Config;
+      // set json data values to the object
+      ctrl_item.ID = CurrentItem.Data.ID;
+      ctrl_item.Config = CurrentItem.Data.Config;
 
-          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
-          ctrl_item.ApplyZIndexing();
-        }
-        break;
-      case "PRODUCT":
-        {
-          let ctrl_item = new ProductGroupNew(
-            VueStore,
-            Stage,
-            MasterLayer,
-            CurrentItem.Data.Data,
-            PxlRatio,
-            "PRODUCT",
-            ParentID
-          )
+      ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+      ctrl_item.ApplyZIndexing();
+    }
+    break;
+    case "PRODUCT": {
+      let ctrl_item = new ProductGroupNew(
+        VueStore,
+        Stage,
+        MasterLayer,
+        CurrentItem.Data.Data,
+        PxlRatio,
+        "PRODUCT",
+        ParentID
+      )
 
-          if (CurrentItem.Position != undefined && CurrentItem.Position != null)
-          {
-            ctrl_item.Position = CurrentItem.Position;
-          }
+      if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+        ctrl_item.Position = CurrentItem.Position;
+      }
 
-          //#region Set the same configs
-          ctrl_item.ID = CurrentItem.Data.ID;
-          ctrl_item.Orientation_Width = CurrentItem.Data.Orientation.Width;
-          ctrl_item.Orientation_Height = CurrentItem.Data.Orientation.Height;
-          ctrl_item.Orientation_Depth = CurrentItem.Data.Orientation.Depth;
+      //#region Set the same configs
+      ctrl_item.ID = CurrentItem.Data.ID;
+      ctrl_item.Orientation_Width = CurrentItem.Data.Orientation.Width;
+      ctrl_item.Orientation_Height = CurrentItem.Data.Orientation.Height;
+      ctrl_item.Orientation_Depth = CurrentItem.Data.Orientation.Depth;
 
-          ctrl_item.image_orientation_width = CurrentItem.Data.ImageOrientation.Width;
-          ctrl_item.image_orientation_height = CurrentItem.Data.ImageOrientation.Height;
+      ctrl_item.image_orientation_width = CurrentItem.Data.ImageOrientation.Width;
+      ctrl_item.image_orientation_height = CurrentItem.Data.ImageOrientation.Height;
 
-          // caps
-          ctrl_item.Cap_Orientation_Width = CurrentItem.Data.Caps.Orientation.Width;
-          ctrl_item.Cap_Orientation_Height = CurrentItem.Data.Caps.Orientation.Height;
-          ctrl_item.Cap_Orientation_Depth = CurrentItem.Data.Caps.Orientation.Depth;
-          ctrl_item.Caps_Count = CurrentItem.Data.Caps.Caps_Count;
-          ctrl_item.Caps_Face = CurrentItem.Data.Caps.Caps_Face;
-          ctrl_item.caps_image_orientation_width = CurrentItem.Data.Caps.ImageOrientation.Width;
-          ctrl_item.caps_image_orientation_height = CurrentItem.Data.Caps.ImageOrientation.Height;
-          ctrl_item.Caps_Enabled = CurrentItem.Data.Caps.Caps_Enabled;
-          ctrl_item.Cap_Rotation = CurrentItem.Data.Caps.Rotation;
-          // orientation and facings
-          ctrl_item.Rotation = CurrentItem.Data.Orientation.Rotation;
-          ctrl_item.LastFace = CurrentItem.Data.Orientation.LastFace;
+      // caps
+      ctrl_item.Cap_Orientation_Width = CurrentItem.Data.Caps.Orientation.Width;
+      ctrl_item.Cap_Orientation_Height = CurrentItem.Data.Caps.Orientation.Height;
+      ctrl_item.Cap_Orientation_Depth = CurrentItem.Data.Caps.Orientation.Depth;
+      ctrl_item.Caps_Count = CurrentItem.Data.Caps.Caps_Count;
+      ctrl_item.Caps_Face = CurrentItem.Data.Caps.Caps_Face;
+      ctrl_item.caps_image_orientation_width = CurrentItem.Data.Caps.ImageOrientation.Width;
+      ctrl_item.caps_image_orientation_height = CurrentItem.Data.Caps.ImageOrientation.Height;
+      ctrl_item.Caps_Enabled = CurrentItem.Data.Caps.Caps_Enabled;
+      ctrl_item.Cap_Rotation = CurrentItem.Data.Caps.Rotation;
+      // orientation and facings
+      ctrl_item.Rotation = CurrentItem.Data.Orientation.Rotation;
+      ctrl_item.LastFace = CurrentItem.Data.Orientation.LastFace;
 
-          ctrl_item.TotalWidth = CurrentItem.Data.TotalWidth;
-          ctrl_item.TotalHeight = CurrentItem.Data.TotalHeight;
+      ctrl_item.TotalWidth = CurrentItem.Data.TotalWidth;
+      ctrl_item.TotalHeight = CurrentItem.Data.TotalHeight;
 
-          ctrl_item.Facings_X = CurrentItem.Data.Facings.x;
-          ctrl_item.Facings_Y = CurrentItem.Data.Facings.y;
-          ctrl_item.Facings_Z = CurrentItem.Data.Facings.z;
+      ctrl_item.Facings_X = CurrentItem.Data.Facings.x;
+      ctrl_item.Facings_Y = CurrentItem.Data.Facings.y;
+      ctrl_item.Facings_Z = CurrentItem.Data.Facings.z;
 
-          ctrl_item.RandomColor = CurrentItem.Data.RandomColor;
-          ctrl_item.PegboardHoleAssigned = CurrentItem.Data.PegboardHoleAssigned;
-          ctrl_item.PegboardHoleAssignedID = CurrentItem.Data.PegboardHoleAssignedID;
-          //#endregion
+      ctrl_item.RandomColor = CurrentItem.Data.RandomColor;
+      ctrl_item.PegboardHoleAssigned = CurrentItem.Data.PegboardHoleAssigned;
+      ctrl_item.PegboardHoleAssignedID = CurrentItem.Data.PegboardHoleAssignedID;
+      //#endregion
 
-          ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+      ctrl_item.Initialise(CurrentItem.RelativePosition, false);
 
-        }
-        break;
+    }
+    break;
     }
 
     if (ctrl_item != null) {

@@ -3,209 +3,598 @@
         <v-layout row wrap>
             <v-flex md12>
                 <v-card flat>
-                    <v-card-text class="pa-0">
-                        <v-data-table :headers="headers" :items="data" class="elevation-0 scrollable"
-                            :rows-per-page-items="[10,50,75,100,{'text':'$vuetify.dataIterator.rowsPerPageAll','value':-1}]">
-                            <template v-slot:no-data>
-                                <div style="text-align:center;">
-                                    You have no tasks. Please view Projects and Stores
-                                </div>
-                            </template>
-                            <template v-slot:items="props">
-                                <tr :key='props.item.id'
-                                    :style="{ backgroundColor: (props.item.subtask == true  ? 'lightgrey' : 'transparent' )}">
-                                    <td>{{ props.item.planogram }}</td>
-                                    <td>{{ typeList[props.item.type == -1 ? 5 : props.item.type].text }}</td>
-                                    <td>{{ statusList[props.item.status == -1 ? 18 : props.item.status].text }}</td>
-                                    <td>{{ props.item.storeCluster }}</td>
-                                    <td>{{ props.item.categoryCluster }}</td>
-                                    <td>{{ props.item.store }}</td>
-                                    <td>{{ props.item.dateTimeString }}</td>
-                                    <td>{{props.item.username}}</td>
-                                    <td>{{props.item.actionedByUserName}}</td>
+                    <v-card-text class="pa-0" style="height: calc(100vh - 220px); overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Project</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Store Cluster</th>
+                                    <th>CC</th>
+                                    <th>Store</th>
+                                    <th>Date</th>
+                                    <th>User Assigned</th>
+                                    <th>Actioned By</th>
+                                    <th style="width: 120px;"></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th style="width: 80px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(item,idx) in data" :key="idx"
+                                    :style="{ backgroundColor: (item.subtask == true  ? 'lightgrey' : 'transparent' )}">
+
+
+                                    <td>{{ item.planogram }}</td>
+                                    <td>{{ typeList[item.type == -1 ? 5 : item.type].text }}</td>
+                                    <td>{{ statusList[item.status == -1 ? 18 : item.status].text }}</td>
+                                    <td>{{ item.storeCluster }}</td>
+                                    <td>{{ item.categoryCluster }}</td>
+                                    <td>{{ item.store }}</td>
+                                    <td>{{ item.dateTimeString }}</td>
+                                    <td>{{item.username}}</td>
+                                    <td>{{item.actionedByUserName}}</td>
                                     <td style="width: 5%;">
                                         <!-- PROJECT START -->
-                                        <v-btn color="secondary" @click="assign(props.item)" small
-                                            v-if="props.item.status == 0">Assign</v-btn>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn color="secondary" @click="assign(item)" flat icon small
+                                                    v-if="item.status == 0">
+                                                    <v-icon v-on="on">assignment</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>Assign</span>
+                                        </v-tooltip>
+
                                         <!-- END PROJECT START -->
                                         <!-- PROCESS ASSIGNED -->
-                                        <v-btn color="error" @click="closeTask(props.item, props.index)" small
-                                            v-if="props.item.status == 40">Close</v-btn>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn color="error" @click="closeTask(item, index)" flat icon small
+                                                    v-if="item.status == 40">
+                                                    <v-icon v-on="on">close</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>close</span>
+                                        </v-tooltip>
+
                                         <!-- END PROCESS ASSIGNED -->
                                         <!-- DATA PREPARATION -->
-                                        <v-btn small color="success" @click="setInProgressAndView(props.item)"
-                                            v-if="props.item.type == 1 && props.item.status == 6">View</v-btn>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="success"
+                                                    @click="setInProgressAndView(item)"
+                                                    v-if="item.type == 1 && item.status == 6">
+                                                    <v-icon v-on="on">visibility</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>View</span>
+                                        </v-tooltip>
+
                                         <div style="display: flex;">
-                                            <v-btn small color="warning" @click="routeToView(props.item)"
-                                                v-if="props.item.type == 1 && (props.item.status == 1) && systemUserID == props.item.systemUserID">
-                                                View</v-btn>
-                                            <v-btn small color="error" @click="setComplete(props.item)"
-                                                v-if="props.item.type == 1 && props.item.status == 1">Complete</v-btn>
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                    <v-btn flat icon small color="warning" @click="routeToView(item)"
+                                                        v-if="item.type == 1 && (item.status == 1) && systemUserID == item.systemUserID">
+                                                        <v-icon v-on="on">visibility</v-icon>
+                                                    </v-btn>
+                                                </template>
+                                                <span>View</span>
+                                            </v-tooltip>
+
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                    <v-btn flat icon small color="error" @click="setComplete(item)"
+                                                        v-if="item.type == 1 && item.status == 1">
+                                                        <v-icon v-on="on">check</v-icon>
+                                                    </v-btn>
+                                                </template>
+                                                <span>complete</span>
+                                            </v-tooltip>
+
                                         </div>
-                                        <v-btn small color="error" @click="closeTask(props.item, props.index)"
-                                            v-if="(props.item.type == 1 && props.item.status == 2) && systemUserID == props.item.actionedByUserID">
-                                            Close</v-btn>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="error" @click="closeTask(item, index)"
+                                                    v-if="(item.type == 1 && item.status == 2) && systemUserID == item.actionedByUserID">
+                                                    <v-icon v-on="on">close</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>close</span>
+                                        </v-tooltip>
+
                                         <div style="display: flex;">
-                                            <v-btn small color="warning" @click="routeToView(props.item)"
-                                                v-if="(props.item.type == 1 && props.item.status == 2) && systemUserID == props.item.systemUserID">
-                                                View</v-btn>
-                                            <v-btn small color="secondary" @click="assign(props.item)"
-                                                v-if="(props.item.type == 1 && props.item.status == 2) && systemUserID == props.item.systemUserID">
-                                                Assign</v-btn>
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                    <v-btn flat icon small color="warning" @click="routeToView(item)"
+                                                        v-if="(item.type == 1 && item.status == 2) && systemUserID == item.systemUserID">
+                                                        <v-icon v-on="on">visibility</v-icon>
+                                                    </v-btn>
+                                                </template>
+                                                <span>View</span>
+                                            </v-tooltip>
+
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                    <v-btn flat icon small color="secondary" @click="assign(item)"
+                                                        v-if="(item.type == 1 && item.status == 2) && systemUserID == item.systemUserID">
+                                                        <v-icon v-on="on">assignment</v-icon>
+                                                    </v-btn>
+                                                </template>
+                                                <span>Assign</span>
+                                            </v-tooltip>
                                         </div>
                                         <!-- END DATA PREPARATION -->
                                         <!-- RANGING -->
-                                        <v-btn small color="success" @click="setInProgressAndView(props.item)"
-                                            v-if="props.item.type == 2 && props.item.status == 7">View</v-btn>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="success"
+                                                    @click="setInProgressAndView(item)"
+                                                    v-if="item.type == 2 && item.status == 7">
+                                                    <v-icon v-on="on">visibility</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>View</span>
+                                        </v-tooltip>
+
                                         <div style="display: flex;">
-                                            <v-btn small color="warning" @click="routeToView(props.item)"
-                                                v-if="props.item.type == 2 && (props.item.status == 1) && systemUserID == props.item.systemUserID">
-                                                View</v-btn>
-                                            <v-btn small color="error" @click="setComplete(props.item)"
-                                                v-if="props.item.type == 2 && props.item.status == 1">Complete</v-btn>
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                    <v-btn flat icon small color="warning" @click="routeToView(item)"
+                                                        v-if="item.type == 2 && (item.status == 1) && systemUserID == item.systemUserID">
+                                                        <v-icon v-on="on">visibility</v-icon>
+                                                    </v-btn>
+                                                </template>
+                                                <span>View</span>
+                                            </v-tooltip>
+
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                    <v-btn flat icon small color="error" @click="setComplete(item)"
+                                                        v-if="item.type == 2 && item.status == 1">
+                                                        <v-icon v-on="on">check</v-icon>
+                                                    </v-btn>
+                                                </template>
+                                                <span>complete</span>
+                                            </v-tooltip>
+
                                         </div>
-                                        <v-btn small color="error" @click="closeTask(props.item, props.index)"
-                                            v-if="(props.item.type == 2 && props.item.status == 2) && systemUserID == props.item.actionedByUserID">
-                                            Close</v-btn>
+
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="error" @click="closeTask(item, index)"
+                                                    v-if="(item.type == 2 && item.status == 2) && systemUserID == item.actionedByUserID">
+                                                    <v-icon v-on="on">close</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>close</span>
+                                        </v-tooltip>
+
                                         <div style="display: flex;">
-                                            <v-btn small color="warning" @click="routeToView(props.item)"
-                                                v-if="(props.item.type == 2 && props.item.status == 2) && systemUserID == props.item.systemUserID">
-                                                View</v-btn>
-                                            <v-btn small color="secondary" @click="assign(props.item)"
-                                                v-if="(props.item.type == 2 && props.item.status == 2) && systemUserID == props.item.systemUserID">
-                                                Assign</v-btn>
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                    <v-btn flat icon small color="warning" @click="routeToView(item)"
+                                                        v-if="(item.type == 2 && item.status == 2) && systemUserID == item.systemUserID">
+                                                        <v-icon v-on="on">visibility</v-icon>
+                                                    </v-btn>
+                                                </template>
+                                                <span>View</span>
+                                            </v-tooltip>
+
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                    <v-btn flat icon small color="secondary" @click="assign(item)"
+                                                        v-if="(item.type == 2 && item.status == 2) && systemUserID == item.systemUserID">
+                                                        <v-icon v-on="on">assignment</v-icon>
+                                                    </v-btn>
+                                                </template>
+                                                <span>Assign</span>
+                                            </v-tooltip>
+
                                         </div>
                                         <!-- END RANGING -->
                                         <!-- SPACE PLANNING -->
-                                        <v-btn small color="success" @click="setInProgressAndView(props.item)"
-                                            v-if="props.item.type == 3 && props.item.status == 8">View</v-btn>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="success"
+                                                    @click="setInProgressAndView(item)"
+                                                    v-if="item.type == 3 && item.status == 8">
+                                                    <v-icon v-on="on">visibility</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>View</span>
+                                        </v-tooltip>
+
                                         <div style="display: flex;">
-                                            <v-btn small color="warning" @click="routeToView(props.item)"
-                                                v-if="props.item.type == 3 && props.item.status == 1">View</v-btn>
-                                            <v-btn small color="error" @click="setPlanogramComplete(props.item)"
-                                                v-if="props.item.type == 3 && props.item.status == 1">Complete</v-btn>
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                    <v-btn flat icon small color="warning" @click="routeToView(item)"
+                                                        v-if="item.type == 3 && item.status == 1">
+                                                        <v-icon v-on="on">visibility</v-icon>
+                                                    </v-btn>
+                                                </template>
+                                                <span>View</span>
+                                            </v-tooltip>
+
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                    <v-btn flat icon small color="error"
+                                                        @click="setPlanogramComplete(item)"
+                                                        v-if="item.type == 3 && item.status == 1">
+                                                        <v-icon v-on="on">check</v-icon>
+                                                    </v-btn>
+                                                </template>
+                                                <span>complete</span>
+                                            </v-tooltip>
+
                                         </div>
                                         <div style="display: flex;">
-                                            <v-btn small color="error" @click="closeTask(props.item, props.index)"
-                                                v-if="(props.item.type == 3 && props.item.status == 2) && systemUserID == props.item.actionedByUserID">
-                                                Close</v-btn>
-                                            <v-btn small color="primary" @click="routeToView(props.item)"
-                                                v-if="(props.item.type == 3 && props.item.status == 2) && systemUserID == props.item.systemUserID">
-                                                View</v-btn>
-                                            <v-btn small color="primary" @click="submitForApproval(props.item)"
-                                                v-if="(props.item.type == 3 && props.item.status == 2) && systemUserID == props.item.systemUserID">
-                                                Submit</v-btn>
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                    <v-btn flat icon small color="error" @click="closeTask(item, index)"
+                                                        v-if="(item.type == 3 && item.status == 2) && systemUserID == item.actionedByUserID">
+                                                        <v-icon v-on="on">close</v-icon>
+                                                    </v-btn>
+                                                </template>
+                                                <span>close</span>
+                                            </v-tooltip>
+
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                    <v-btn flat icon small color="primary" @click="routeToView(item)"
+                                                        v-if="(item.type == 3 && item.status == 2) && systemUserID == item.systemUserID">
+                                                        <v-icon v-on="on">visibility</v-icon>
+                                                    </v-btn>
+                                                </template>
+                                                <span>View</span>
+                                            </v-tooltip>
+
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                    <v-btn flat icon small color="primary"
+                                                        @click="submitForApproval(item)"
+                                                        v-if="(item.type == 3 && item.status == 2) && systemUserID == item.systemUserID">
+                                                        <v-icon v-on="on">send</v-icon>
+                                                    </v-btn>
+                                                </template>
+                                                <span>send</span>
+                                            </v-tooltip>
+
                                         </div>
                                         <!-- SPACE PLANNING -->
                                         <!-- APPROVAL PROCESS -->
-                                        <v-btn small color="success" @click="setApprovalInProgress(props.item)"
-                                            v-if="props.item.type == 3 && props.item.status == 10">View</v-btn>
-                                        <v-btn small color="warning" @click="routeToView(props.item)"
-                                            v-if="props.item.type == 3 && props.item.status == 20">View</v-btn>
-                                        <v-btn small color="error" @click="closeTask(props.item , props.index)"
-                                            v-if="(props.item.type == 3 && props.item.status == 12) && systemUserID == props.item.actionedByUserID">
-                                            Close</v-btn>
-                                        <v-btn small color="primary" @click="submitForDistribution(props.item)"
-                                            v-if="(props.item.type == 3 && props.item.status == 12) && systemUserID == props.item.systemUserID">
-                                            Send</v-btn>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+
+                                                <v-btn flat icon small color="success"
+                                                    @click="setApprovalInProgress(item)"
+                                                    v-if="item.type == 3 && item.status == 10">
+                                                    <v-icon v-on="on">visibility</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>View</span>
+                                        </v-tooltip>
+
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="warning" @click="routeToView(item)"
+                                                    v-if="item.type == 3 && item.status == 20">
+                                                    <v-icon v-on="on">visibility</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>View</span>
+                                        </v-tooltip>
+
+
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="error" @click="closeTask(item , index)"
+                                                    v-if="(item.type == 3 && item.status == 12) && systemUserID == item.actionedByUserID">
+                                                    <v-icon v-on="on">close</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>close</span>
+                                        </v-tooltip>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="primary"
+                                                    @click="submitForDistribution(item)"
+                                                    v-if="(item.type == 3 && item.status == 12) && systemUserID == item.systemUserID">
+                                                    <v-icon v-on="on">send</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>Send</span>
+                                        </v-tooltip>
+
                                         <!-- END APPROVAL PROCESS -->
                                         <!-- DISTRIBUTION -->
-                                        <v-btn small color="success" @click="setDistributionInProgress(props.item)"
-                                            v-if="props.item.type == 3 && props.item.status == 19">View</v-btn>
-                                        <v-btn small color="warning" @click="routeToView(props.item)"
-                                            v-if="props.item.type == 3 && props.item.status == 21">View</v-btn>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="success"
+                                                    @click="setDistributionInProgress(item)"
+                                                    v-if="item.type == 3 && item.status == 19">
+                                                    <v-icon v-on="on">visibility</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>View</span>
+                                        </v-tooltip>
+
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="warning" @click="routeToView(item)"
+                                                    v-if="item.type == 3 && item.status == 21">
+                                                    <v-icon v-on="on">visibility</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>View</span>
+                                        </v-tooltip>
+
                                         <!-- END DISTRIBUTION -->
                                         <!-- IMPLEMENTATION -->
-                                        <v-btn small color="success" @click="setImplementationInProgress(props.item)"
-                                            v-if="props.item.type == 3 && props.item.status == 13">View</v-btn>
-                                        <v-btn small color="warning" @click="routeToView(props.item)"
-                                            v-if="props.item.type == 3 && props.item.status == 24">View</v-btn>
-                                        <v-btn small color="primary" @click="routeToView(props.item)"
-                                            v-if="props.item.type == 3 && props.item.status == 26">View</v-btn>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="success"
+                                                    @click="setImplementationInProgress(item)"
+                                                    v-if="item.type == 3 && item.status == 13">
+                                                    <v-icon v-on="on">visibility</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>View</span>
+                                        </v-tooltip>
+
+
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="warning" @click="routeToView(item)"
+                                                    v-if="item.type == 3 && item.status == 24">
+                                                    <v-icon v-on="on">visibility</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>View</span>
+                                        </v-tooltip>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="primary" @click="routeToView(item)"
+                                                    v-if="item.type == 3 && item.status == 26">
+                                                    <v-icon v-on="on">visibility</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>View</span>
+                                        </v-tooltip>
+
                                         <!-- END IMPLEMENTATION -->
                                         <!-- ON HOLD -->
-                                        <v-btn small color="error" @click="closeTask(props.item , props.index)"
-                                            v-if="props.item.status == 16 && systemUserID == props.item.systemUserID">
-                                            close</v-btn>
-                                        <v-btn small color="error" @click="closeTask(props.item , props.index)"
-                                            v-if="props.item.status == 16 && systemUserID == props.item.actionedByUserID">
-                                            Close</v-btn>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="error" @click="closeTask(item , index)"
+                                                    v-if="item.status == 16 && systemUserID == item.systemUserID">
+                                                    <v-icon v-on="on">close</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>close</span>
+                                        </v-tooltip>
+
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="error" @click="closeTask(item , index)"
+                                                    v-if="item.status == 16 && systemUserID == item.actionedByUserID">
+                                                    <v-icon v-on="on">close</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>close</span>
+                                        </v-tooltip>
+
                                         <!-- END ON HOLD -->
                                         <!-- VARIATION REQUEST -->
-                                        <v-btn small color="secondary" @click="assign(props.item)"
-                                            v-if="props.item.status == 14 && systemUserID == props.item.systemUserID">
-                                            Assign</v-btn>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn small icon flat color="secondary" @click="assign(item)"
+                                                    v-if="item.status == 14 && systemUserID == item.systemUserID">
+                                                    <v-icon v-on="on">assignment</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>Assign</span>
+                                        </v-tooltip>
+
                                         <!-- END VARIATION REQUEST -->
-                                        <v-btn small color="secondary" @click="assign(props.item)"
-                                            v-if="props.item.status == 41 && systemUserID == props.item.systemUserID">
-                                            Assign</v-btn>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="secondary" @click="assign(item)"
+                                                    v-if="item.status == 41 && systemUserID == item.systemUserID">
+                                                    <v-icon v-on="on">assignment</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>Assign</span>
+                                        </v-tooltip>
+
                                         <!-- TASK Takeover -->
-                                        <v-btn small color="error" @click="closeTask(props.item)"
-                                            v-if="props.item.status == 42 && systemUserID == props.item.actionedByUserID">
-                                            Close</v-btn>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="error" @click="closeTask(item)"
+                                                    v-if="item.status == 42 && systemUserID == item.actionedByUserID">
+                                                    <v-icon v-on="on">close</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>Close</span>
+                                        </v-tooltip>
                                         <!-- END TASK Takeover -->
                                         <!-- SUBTASKS SET IN PROGRESS AND VIEW -->
-                                        <v-btn small color="success" @click="setSubtaskInProgressAndView(props.item)"
-                                            v-if="props.item.status == 28 && props.item.rollingUserID != systemUserID">
-                                            Recieved</v-btn>
-                                        <v-btn small color="success" @click="setSubtaskInProgressAndView(props.item)"
-                                            v-if="props.item.status == 31 && props.item.rollingUserID != systemUserID">
-                                            Recieved</v-btn>
-                                        <v-btn small color="success" @click="setSubtaskInProgressAndView(props.item)"
-                                            v-if="props.item.status == 34 && props.item.rollingUserID != systemUserID">
-                                            Recieved</v-btn>
-                                        <v-btn small color="success" @click="setSubtaskInProgressAndView(props.item)"
-                                            v-if="props.item.status == 37 && props.item.rollingUserID != systemUserID">
-                                            Recieved</v-btn>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="success"
+                                                    @click="setSubtaskInProgressAndView(item)"
+                                                    v-if="item.status == 28 && item.rollingUserID != systemUserID">
+                                                    <v-icon v-on="on">done</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>received</span>
+                                        </v-tooltip>
+
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="success"
+                                                    @click="setSubtaskInProgressAndView(item)"
+                                                    v-if="item.status == 31 && item.rollingUserID != systemUserID">
+                                                    <v-icon v-on="on">done</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>received</span>
+                                        </v-tooltip>
+
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="success"
+                                                    @click="setSubtaskInProgressAndView(item)"
+                                                    v-if="item.status == 34 && item.rollingUserID != systemUserID">
+                                                    <v-icon v-on="on">done</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>received</span>
+                                        </v-tooltip>
+
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="success"
+                                                    @click="setSubtaskInProgressAndView(item)"
+                                                    v-if="item.status == 37 && item.rollingUserID != systemUserID">
+                                                    <v-icon v-on="on">done</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>received</span>
+                                        </v-tooltip>
+
                                         <!-- END SUBTASKS SET IN PROGRESS AND VIEW -->
                                         <!-- SUBTASKS VIEW -->
                                         <div style="display: flex;">
-                                            <!-- <v-btn small color="warning" @click="goToSubtaskView(props.item)"
-                                                v-if="props.item.status == 29 && props.item.rollingUserID != systemUserID">View</v-btn> -->
-                                            <v-btn small color="error" @click="completeSubtask(props.item)"
-                                                v-if="props.item.status == 29 && props.item.rollingUserID != systemUserID">
-                                                Complete</v-btn>
+                                            <!-- <v-btn small color="warning" @click="goToSubtaskView(item)"
+                                                v-if="item.status == 29 && item.rollingUserID != systemUserID">View</v-btn> -->
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                    <v-btn flat icon small color="error" @click="completeSubtask(item)"
+                                                        v-if="item.status == 29 && item.rollingUserID != systemUserID">
+                                                        <v-icon v-on="on">check</v-icon>
+                                                    </v-btn>
+                                                </template>
+                                                <span>Complete</span>
+                                            </v-tooltip>
+
                                         </div>
                                         <div style="display: flex;">
-                                            <!-- <v-btn small color="warning" @click="goToSubtaskView(props.item)"
-                                                v-if="props.item.status == 32 && props.item.rollingUserID != systemUserID">View</v-btn> -->
-                                            <v-btn small color="error" @click="completeSubtask(props.item)"
-                                                v-if="props.item.status == 32 && props.item.rollingUserID != systemUserID">
-                                                Complete</v-btn>
+                                            <!-- <v-btn small color="warning" @click="goToSubtaskView(item)"
+                                                v-if="item.status == 32 && item.rollingUserID != systemUserID">View</v-btn> -->
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                    <v-btn flat icon small color="error" @click="completeSubtask(item)"
+                                                        v-if="item.status == 32 && item.rollingUserID != systemUserID">
+                                                        <v-icon v-on="on">check</v-icon>
+                                                    </v-btn>
+                                                </template>
+                                                <span>Complete</span>
+                                            </v-tooltip>
+
                                         </div>
                                         <div style="display: flex;">
-                                            <!-- <v-btn small color="warning" @click="goToSubtaskView(props.item)"
-                                                v-if="props.item.status == 35 && props.item.rollingUserID != systemUserID">View</v-btn> -->
-                                            <v-btn small color="error" @click="completeSubtask(props.item)"
-                                                v-if="props.item.status == 35 && props.item.rollingUserID != systemUserID">
-                                                Complete</v-btn>
+                                            <!-- <v-btn small color="warning" @click="goToSubtaskView(item)"
+                                                v-if="item.status == 35 && item.rollingUserID != systemUserID">View</v-btn> -->
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                    <v-btn small icon color="error" @click="completeSubtask(item)"
+                                                        v-if="item.status == 35 && item.rollingUserID != systemUserID">
+                                                        <v-icon v-on="on">check</v-icon>
+                                                    </v-btn>
+                                                </template>
+                                                <span>Complete</span>
+                                            </v-tooltip>
+
                                         </div>
                                         <div style="display: flex;">
-                                            <v-btn small color="warning" @click="goToSubtaskView(props.item)"
-                                                v-if="props.item.status == 38 && props.item.rollingUserID != systemUserID">
-                                                View</v-btn>
-                                            <v-btn small color="error" @click="completeSubtask(props.item)"
-                                                v-if="props.item.status == 38 && props.item.rollingUserID != systemUserID">
-                                                Complete</v-btn>
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                    <v-btn flat icon small color="warning"
+                                                        @click="goToSubtaskView(item)"
+                                                        v-if="item.status == 38 && item.rollingUserID != systemUserID">
+                                                        <v-icon v-on="on">visibility</v-icon>
+
+                                                    </v-btn>
+                                                </template>
+                                                <span>View</span>
+                                            </v-tooltip>
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                    <v-btn flat icon small color="error" @click="completeSubtask(item)"
+                                                        v-if="item.status == 38 && item.rollingUserID != systemUserID">
+                                                        <v-icon v-on="on">check</v-icon>
+                                                    </v-btn>
+                                                </template>
+                                                <span>Complete</span>
+                                            </v-tooltip>
+
                                         </div>
                                         <!-- END SUBTASKS VIEW -->
                                         <!-- CLOSE SUBTASKS -->
-                                        <v-btn small color="error" @click="closeTask(props.item)"
-                                            v-if="props.item.status == 30">Close</v-btn>
-                                        <v-btn small color="error" @click="closeTask(props.item)"
-                                            v-if="props.item.status == 33">Close</v-btn>
-                                        <v-btn small color="error" @click="closeTask(props.item)"
-                                            v-if="props.item.status == 36">Close</v-btn>
-                                        <v-btn small color="error" @click="closeTask(props.item)"
-                                            v-if="props.item.status == 39">Close</v-btn>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="error" @click="closeTask(item)"
+                                                    v-if="item.status == 30">
+                                                    <v-icon v-on="on">Close</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>Close</span>
+                                        </v-tooltip>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="error" @click="closeTask(item)"
+                                                    v-if="item.status == 33">
+                                                    <v-icon v-on="on">Close</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>Close</span>
+                                        </v-tooltip>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="error" @click="closeTask(item)"
+                                                    v-if="item.status == 36">
+                                                    <v-icon v-on="on">Close</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>Close</span>
+                                        </v-tooltip>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn flat icon small color="error" @click="closeTask(item)"
+                                                    v-if="item.status == 39">
+                                                    <v-icon v-on="on">Close</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>Close</span>
+                                        </v-tooltip>
                                         <!-- END CLOSE SUBTASKS -->
                                     </td>
                                     <td style="width: 2%">
-                                        <v-tooltip bottom v-if="props.item.notes != null">
+                                        <v-tooltip bottom v-if="item.notes != null">
                                             <template v-slot:activator="{ on }">
-                                                <v-icon v-on="on">note</v-icon>
+                                                <v-icon v-on="on" @click="openNotes(item.notes)">note</v-icon>
                                             </template>
-                                            <span>{{ props.item.notes }}</span>
+                                            <span>{{ item.notes }}</span>
+                                        </v-tooltip>
+                                    </td>
+                                    <td style="width: 2%">
+                                        <v-tooltip bottom v-if="item.systemFileName != null">
+                                            <template v-slot:activator="{ on }">
+                                                <v-icon v-on="on">web</v-icon>
+                                            </template>
+                                            <span>{{ item.systemFileName }}</span>
+                                        </v-tooltip>
+                                    </td>
+                                    <td style="width: 2%">
+                                        <v-tooltip bottom v-if="item.rangeFileName != null">
+                                            <template v-slot:activator="{ on }">
+                                                <v-icon v-on="on">assessment</v-icon>
+                                            </template>
+                                            <span>{{ item.rangeFileName }}</span>
                                         </v-tooltip>
                                     </td>
                                     <td style="width: 2%">
@@ -215,35 +604,96 @@
                                             </v-btn>
                                             <v-list dense class="pa-0 ma-0">
 
-                                                <v-list-tile @click="assignNotNew(props.item)">
+                                                <v-list-tile @click="assignNotNew(item)">
                                                     <span>Assign</span>
                                                 </v-list-tile>
 
                                                 <v-divider></v-divider>
 
-                                                <v-list-tile @click="putTaskOnHold(props.item)">
+                                                <v-list-tile @click="putTaskOnHold(item)">
                                                     <span>Put On Hold</span>
                                                 </v-list-tile>
 
                                                 <v-divider></v-divider>
 
-                                                <v-list-tile @click="startSubtask(props.item)">
+                                                <v-list-tile @click="startSubtask(item)">
                                                     <span>New subtask</span>
                                                 </v-list-tile>
+                                                <v-divider></v-divider>
+
+                                                <v-list-tile
+                                                    v-if="( item.status == 2||item.status == 2)&&item.actionedByUserID==null"
+                                                    @click="closeTask(item)">
+                                                    <span>close</span>
+                                                </v-list-tile>
+
                                             </v-list>
                                         </v-menu>
                                     </td>
                                 </tr>
-                            </template>
-                        </v-data-table>
+                                <!-- <td>
+                                                <v-btn color="success" flat icon small>
+                                                    <v-icon>visibility</v-icon>
+                                                </v-btn>
+                                                <v-btn color="warning" flat icon small>
+                                                    <v-icon>check</v-icon>
+                                                </v-btn>
+                                            </td>
+                                            <td>
+                                                <v-tooltip bottom v-if="item.notes != null">
+                                                    <template v-slot:activator="{ on }">
+                                                        <v-icon v-on="on">note</v-icon>
+                                                    </template>
+                                                    <span>{{ item.notes }}</span>
+                                                </v-tooltip>
+                                            </td>
+                                            <td>
+                                                <v-tooltip bottom v-if="item.systemFileName != null">
+                                                    <template v-slot:activator="{ on }">
+                                                        <v-icon v-on="on">web</v-icon>
+                                                    </template>
+                                                    <span>{{ item.systemFileName }}</span>
+                                                </v-tooltip>
+                                            </td>
+                                            <td>
+                                                <v-tooltip bottom v-if="item.rangeFileName != null">
+                                                    <template v-slot:activator="{ on }">
+                                                        <v-icon v-on="on">assessment</v-icon>
+                                                    </template>
+                                                    <span>{{ item.rangeFileName }}</span>
+                                                </v-tooltip>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <v-btn small icon>
+                                                    <v-icon>more_vert</v-icon>
+                                                </v-btn>
+                                            </td> -->
+                            </tbody>
+                        </table>
                     </v-card-text>
                 </v-card>
+                <v-dialog v-model="notesDialog" max-width="500px">
+                    <v-card>
+                        <v-card-title>
+                            <v-menu bottom left>
+                                <template v-slot:activator="{ on }">
+                                    <v-textarea readonly outline label="Notes" :value="currentNotes">
+                                    </v-textarea>
+                                </template>
+                            </v-menu>
+                        </v-card-title>
+                        <v-card-actions>
+                            <v-btn color="primary" flat @click="dialog3=false">Close</v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
             </v-flex>
         </v-layout>
         <UserSelector ref="userSelector" />
         <AssignTask ref="assignTask" />
         <SubtaskModal ref="SubtaskModal" />
         <SpacePlanSelector ref="SpacePlanSelector"></SpacePlanSelector>
+        <RangeSelectorModal ref="RangeSelectorModal"></RangeSelectorModal>
         <UserNotesModal ref="UserNotesModal"></UserNotesModal>
         <NotesModal ref="NotesModal"></NotesModal>
     </v-container>
@@ -262,6 +712,7 @@
     import AssignTask from '@/components/Common/AssignTask'
     import SubtaskModal from './Subtask.vue'
     import SpacePlanSelector from '@/components/Common/SpacePlanSelector.vue'
+    import RangeSelectorModal from '@/components/Common/RangeSelectorModal.vue'
     import UserNotesModal from '@/components/Common/UserNotesModal.vue'
     import NotesModal from '@/components/Common/NotesModal.vue'
 
@@ -273,11 +724,13 @@
             AssignTask,
             SubtaskModal,
             SpacePlanSelector,
+            RangeSelectorModal,
             UserNotesModal,
             NotesModal
         },
         data() {
             return {
+                notesDialog: false,
                 headers: [{
                         text: 'Project',
                         sortable: false
@@ -323,6 +776,14 @@
                     {
                         text: '',
                         sortable: false
+                    },
+                    {
+                        text: '',
+                        sortable: false
+                    },
+                    {
+                        text: '',
+                        sortable: false
                     }
                 ],
                 searchType: [],
@@ -336,7 +797,8 @@
                 selectedUser: null,
                 userAccess: null,
                 eventBus: null,
-                userAccessTypeID: -1
+                userAccessTypeID: -1,
+                currentNotes: null,
             }
         },
         mounted() {
@@ -387,6 +849,11 @@
             }
         },
         methods: {
+            openNotes(notes) {
+                let self = this
+                self.notesDialog = true
+                self.currentNotes = notes
+            },
             createProjectTransactionGroup(request, callback) {
                 let self = this;
 
@@ -406,6 +873,24 @@
                     delete Axios.defaults.headers.common["TenantID"];
                     callback(r.data.projectTX)
                 })
+            },
+            checkTaskTakeover(request, callback) {
+                let self = this;
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+
+                if (request.systemUserID != systemUserID) {
+                    request.systemUserID = systemUserID;
+                    request.actionedByUserID = null;
+                    request.status = 42;
+                    request.Closed = true;
+
+                    self.createProjectTransaction(request, () => {
+                        callback();
+                    })
+                } else {
+                    callback();
+                }
             },
             assign(currentItem) {
                 let self = this;
@@ -443,10 +928,10 @@
                                     secondProcessAssigned => {
                                         // Create actual transaction
                                         request.status = returnStartStatusByType(request.type);
-                                            request.notes = self.findAndReplaceNote(request.notes);
+                                        request.notes = self.findAndReplaceNote(request.notes);
                                         self.createProjectTransaction(request,
                                             actualTransaction => {
-
+                                                self.$parent.$parent.getTaskViewData();
                                             })
                                     })
                             })
@@ -489,7 +974,7 @@
                                     // Create actual transaction
                                     request.status = returnStartStatusByType(
                                         request.type);
-                                        request.notes = self.findAndReplaceNote(request.notes);
+                                    request.notes = self.findAndReplaceNote(request.notes);
                                     self.createProjectTransaction(request,
                                         actualTransaction => {})
                                 })
@@ -515,44 +1000,64 @@
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(item))
-                request.status = 1;
-                request.notes = self.findAndReplaceNote(request.notes);
+                let tmpUser = request.systemUserID;
 
-                self.createProjectTransaction(request, newItem => {
-                    self.routeToView(newItem)
+                self.checkTaskTakeover(request, () => {
+                    request.systemUserID = tmpUser;
+                    request.status = 1;
+                    request.notes = self.findAndReplaceNote(request.notes);
+
+                    self.createProjectTransaction(request, newItem => {
+                        self.routeToView(newItem)
+                    })
                 })
             },
             setApprovalInProgress(item) {
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(item))
-                request.status = 20;
-                request.notes = self.findAndReplaceNote(request.notes);
+                let tmpUser = request.systemUserID;
 
-                self.createProjectTransaction(request, newItem => {
-                    self.routeToView(newItem)
+                self.checkTaskTakeover(request, () => {
+                    request.systemUserID = tmpUser;
+                    request.status = 20;
+                    request.notes = self.findAndReplaceNote(request.notes);
+
+                    self.createProjectTransaction(request, newItem => {
+                        self.routeToView(newItem)
+                    })
                 })
             },
             setDistributionInProgress(item) {
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(item))
-                request.status = 21;
-                request.notes = self.findAndReplaceNote(request.notes);
+                let tmpUser = request.systemUserID;
 
-                self.createProjectTransaction(request, newItem => {
-                    self.routeToView(newItem)
+                self.checkTaskTakeover(request, () => {
+                    request.systemUserID = tmpUser;
+                    request.status = 21;
+                    request.notes = self.findAndReplaceNote(request.notes);
+
+                    self.createProjectTransaction(request, newItem => {
+                        self.routeToView(newItem)
+                    })
                 })
             },
             setImplementationInProgress(item) {
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(item))
-                request.status = 24;
-                request.notes = self.findAndReplaceNote(request.notes);
+                let tmpUser = request.systemUserID;
 
-                self.createProjectTransaction(request, newItem => {
-                    self.routeToView(newItem)
+                self.checkTaskTakeover(request, () => {
+                    request.systemUserID = tmpUser;
+                    request.status = 24;
+                    request.notes = self.findAndReplaceNote(request.notes);
+
+                    self.createProjectTransaction(request, newItem => {
+                        self.routeToView(newItem)
+                    })
                 })
             },
             routeToView(item) {
@@ -584,24 +1089,28 @@
             setComplete(item) {
                 let self = this;
                 let request = JSON.parse(JSON.stringify(item));
-                request.status = 2;
-                request.actionedByUserID = item.systemUserID;
-                request.systemUserID = null;
-                request.notes = self.findAndReplaceNote(request.notes);
-                // Create complete transaction
-                self.createProjectTransaction(request, completeTransactionCloseTask => {
-                    let projectTXGroupRequest = {
-                        projectID: item.project_ID
-                    }
-                    // Create new project transaction group
-                    self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
-                        request.projectTXGroup_ID = newGroup.id;
-                        request.systemUserID = item.projectOwnerID;
-                        request.actionedByUserID = null;
-                        request.notes = self.findAndReplaceNote(request.notes);
-                        // Create complete transaction for new group
-                        self.createProjectTransaction(request, newGroupTransaction => {
-                            self.$parent.$parent.getTaskViewData();
+                let tmpUser = request.systemUserID;
+
+                self.checkTaskTakeover(request, () => {
+                    request.status = 2;
+                    request.actionedByUserID = item.systemUserID;
+                    request.systemUserID = null;
+                    request.notes = self.findAndReplaceNote(request.notes);
+                    // Create complete transaction
+                    self.createProjectTransaction(request, completeTransactionCloseTask => {
+                        let projectTXGroupRequest = {
+                            projectID: item.project_ID
+                        }
+                        // Create new project transaction group
+                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
+                            request.projectTXGroup_ID = newGroup.id;
+                            request.systemUserID = item.projectOwnerID;
+                            request.actionedByUserID = null;
+                            request.notes = self.findAndReplaceNote(request.notes);
+                            // Create complete transaction for new group
+                            self.createProjectTransaction(request, newGroupTransaction => {
+                                self.$parent.$parent.getTaskViewData();
+                            })
                         })
                     })
                 })
@@ -612,8 +1121,11 @@
                 let newItem = JSON.parse(JSON.stringify(item))
 
                 self.$refs.SpacePlanSelector.show(spacePlanID => {
-                    newItem.systemFileID = spacePlanID;
-                    self.setComplete(newItem);
+                    self.$refs.RangeSelectorModal.show(rangePlanID => {
+                        newItem.systemFileID = spacePlanID;
+                        newItem.rangeFileID = rangePlanID;
+                        self.setComplete(newItem);
+                    })
                 })
             },
             submitForApproval(item) {
@@ -621,33 +1133,43 @@
 
                 self.$refs.UserNotesModal.show(modalData => {
                     let request = JSON.parse(JSON.stringify(item));
+                    let tmpUser = request.systemUserID;
 
-                    let projectTXGroupRequest = {
-                        projectID: item.project_ID
-                    }
+                    self.checkTaskTakeover(request, () => {
+                        request.systemUserID = tmpUser;
 
-                    request.status = 40;
-                    request.systemUserID = null;
-                    request.actionedByUserID = self.systemUserID;
-                    request.notes = self.findAndReplaceNote(request.notes);
-                    // Create New Process Assigned for complete group
-                    self.createProjectTransaction(request, processEndProjectTX => {
-                        // Create "New Group"
-                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroupTX => {
-                            // Create New Process Assigned for "New Group"
-                            request.systemUserID = modalData.systemUserID;
-                            request.actionedByUserID = null;
-                            request.projectTXGroup_ID = newGroupTX.id;
-                            request.notes = self.findAndReplaceNote(request.notes);
-                            self.createProjectTransaction(request, processStartProjectTX => {
-                                // Create Requesting Approval process for "New Group"
-                                request.status = 10;
-                                request.notes = self.findAndReplaceNote(modalData.notes);
-                                self.createProjectTransaction(request,
-                                    approvalTransaction => {
-                                        self.$parent.$parent.getTaskViewData();
-                                    })
-                            })
+                        let projectTXGroupRequest = {
+                            projectID: item.project_ID
+                        }
+
+                        request.status = 40;
+                        request.systemUserID = null;
+                        request.actionedByUserID = self.systemUserID;
+                        request.notes = self.findAndReplaceNote(request.notes);
+                        // Create New Process Assigned for complete group
+                        self.createProjectTransaction(request, processEndProjectTX => {
+                            // Create "New Group"
+                            self.createProjectTransactionGroup(projectTXGroupRequest,
+                                newGroupTX => {
+                                    // Create New Process Assigned for "New Group"
+                                    request.systemUserID = modalData.systemUserID;
+                                    request.actionedByUserID = null;
+                                    request.projectTXGroup_ID = newGroupTX.id;
+                                    request.notes = self.findAndReplaceNote(request.notes);
+                                    self.createProjectTransaction(request,
+                                        processStartProjectTX => {
+                                            // Create Requesting Approval process for "New Group"
+                                            request.status = 10;
+                                            request.notes = self.findAndReplaceNote(
+                                                modalData
+                                                .notes);
+                                            self.createProjectTransaction(request,
+                                                approvalTransaction => {
+                                                    self.$parent.$parent
+                                                        .getTaskViewData();
+                                                })
+                                        })
+                                })
                         })
                     })
                 })
@@ -657,33 +1179,43 @@
 
                 self.$refs.UserNotesModal.show(modalData => {
                     let request = JSON.parse(JSON.stringify(item));
+                    let tmpUser = request.systemUserID;
 
-                    let projectTXGroupRequest = {
-                        projectID: item.project_ID
-                    }
+                    self.checkTaskTakeover(request, () => {
+                        request.systemUserID = tmpUser;
 
-                    request.status = 40;
-                    request.systemUserID = null;
-                    request.actionedByUserID = self.systemUserID;
-                    request.notes = self.findAndReplaceNote(request.notes);
-                    // Create New Process Assigned for complete group
-                    self.createProjectTransaction(request, processEndProjectTX => {
-                        // Create "New Group"
-                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroupTX => {
-                            // Create New Process Assigned for "New Group"
-                            request.systemUserID = modalData.systemUserID;
-                            request.actionedByUserID = null;
-                            request.projectTXGroup_ID = newGroupTX.id;
-                            request.notes = self.findAndReplaceNote(request.notes);
-                            self.createProjectTransaction(request, processStartProjectTX => {
-                                // Create Requesting Approval process for "New Group"
-                                request.status = 19;
-                                request.notes = self.findAndReplaceNote(modalData.notes);
-                                self.createProjectTransaction(request,
-                                    approvalTransaction => {
-                                        self.$parent.$parent.getTaskViewData();
-                                    })
-                            })
+                        let projectTXGroupRequest = {
+                            projectID: item.project_ID
+                        }
+
+                        request.status = 40;
+                        request.systemUserID = null;
+                        request.actionedByUserID = self.systemUserID;
+                        request.notes = self.findAndReplaceNote(request.notes);
+                        // Create New Process Assigned for complete group
+                        self.createProjectTransaction(request, processEndProjectTX => {
+                            // Create "New Group"
+                            self.createProjectTransactionGroup(projectTXGroupRequest,
+                                newGroupTX => {
+                                    // Create New Process Assigned for "New Group"
+                                    request.systemUserID = modalData.systemUserID;
+                                    request.actionedByUserID = null;
+                                    request.projectTXGroup_ID = newGroupTX.id;
+                                    request.notes = self.findAndReplaceNote(request.notes);
+                                    self.createProjectTransaction(request,
+                                        processStartProjectTX => {
+                                            // Create Requesting Approval process for "New Group"
+                                            request.status = 19;
+                                            request.notes = self.findAndReplaceNote(
+                                                modalData
+                                                .notes);
+                                            self.createProjectTransaction(request,
+                                                approvalTransaction => {
+                                                    self.$parent.$parent
+                                                        .getTaskViewData();
+                                                })
+                                        })
+                                })
                         })
                     })
                 })
@@ -692,28 +1224,35 @@
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(item));
+                let tmpUser = request.systemUserID;
 
-                let projectTXGroupRequest = {
-                    projectID: item.project_ID
-                }
+                self.checkTaskTakeover(request, () => {
+                    request.systemUserID = tmpUser;
 
-                self.$refs.NotesModal.show("Why are you putting this task on hold?", notes => {
-                    request.status = 16;
-                    request.systemUserID = null;
-                    request.actionedByUserID = self.systemUserID;
-                    request.notes = self.findAndReplaceNote(request.notes);
-                    // Create on hold transaction
-                    self.createProjectTransaction(request, processEndProjectTX => {
-                        // Create "New Group"
-                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroupTX => {
-                            // Create on hold transaction for "New Group"
-                            request.systemUserID = request.projectOwnerID;
-                            request.actionedByUserID = null;
-                            request.projectTXGroup_ID = newGroupTX.id;
-                            request.notes = self.findAndReplaceNote(notes);
-                            self.createProjectTransaction(request, processStartProjectTX => {
-                                self.$parent.$parent.getTaskViewData();
-                            })
+                    let projectTXGroupRequest = {
+                        projectID: item.project_ID
+                    }
+
+                    self.$refs.NotesModal.show("Why are you putting this task on hold?", notes => {
+                        request.status = 16;
+                        request.systemUserID = null;
+                        request.actionedByUserID = self.systemUserID;
+                        request.notes = self.findAndReplaceNote(request.notes);
+                        // Create on hold transaction
+                        self.createProjectTransaction(request, processEndProjectTX => {
+                            // Create "New Group"
+                            self.createProjectTransactionGroup(projectTXGroupRequest,
+                                newGroupTX => {
+                                    // Create on hold transaction for "New Group"
+                                    request.systemUserID = request.projectOwnerID;
+                                    request.actionedByUserID = null;
+                                    request.projectTXGroup_ID = newGroupTX.id;
+                                    request.notes = self.findAndReplaceNote(notes);
+                                    self.createProjectTransaction(request,
+                                        processStartProjectTX => {
+                                            self.$parent.$parent.getTaskViewData();
+                                        })
+                                })
                         })
                     })
                 })
@@ -722,27 +1261,32 @@
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(item));
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
-                let systemUserID = encoded_details.USER_ID;
+                let tmpUser = request.systemUserID;
 
-                let projectTXGroupRequest = {
-                    projectID: item.project_ID
-                }
+                self.checkTaskTakeover(request, () => {
+                    request.systemUserID = tmpUser;
+                    let encoded_details = jwt.decode(sessionStorage.accessToken);
+                    let systemUserID = encoded_details.USER_ID;
 
-                self.$refs.SubtaskModal.show("Start new subtask", subtaskDetails => {
-                    // Create new transaction group
-                    self.createProjectTransactionGroup(projectTXGroupRequest, newGroupTX => {
-                        request.type = 6;
-                        request.status = subtaskDetails.status;
-                        request.systemUserID = subtaskDetails.systemUserID;
-                        request.actionedByUserID = null;
-                        request.notes = self.findAndReplaceNote(subtaskDetails.notes);
-                        request.rollingUserID = systemUserID;
-                        request.projectTXGroup_ID = newGroupTX.id;
-                        // Set request dependant on subtask
-                        // Create transaction
-                        self.createProjectTransaction(request, subtaskTransaction => {
-                            self.$parent.$parent.getTaskViewData();
+                    let projectTXGroupRequest = {
+                        projectID: item.project_ID
+                    }
+
+                    self.$refs.SubtaskModal.show("Start new subtask", subtaskDetails => {
+                        // Create new transaction group
+                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroupTX => {
+                            request.type = 6;
+                            request.status = subtaskDetails.status;
+                            request.systemUserID = subtaskDetails.systemUserID;
+                            request.actionedByUserID = null;
+                            request.notes = self.findAndReplaceNote(subtaskDetails.notes);
+                            request.rollingUserID = systemUserID;
+                            request.projectTXGroup_ID = newGroupTX.id;
+                            // Set request dependant on subtask
+                            // Create transaction
+                            self.createProjectTransaction(request, subtaskTransaction => {
+                                self.$parent.$parent.getTaskViewData();
+                            })
                         })
                     })
                 })
@@ -751,14 +1295,19 @@
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(item));
-                request.notes = self.findAndReplaceNote(request.notes);
+                let tmpUser = request.systemUserID;
 
-                request.status++;
-                request.actionedByUserID = null;
+                self.checkTaskTakeover(request, () => {
+                    request.systemUserID = tmpUser;
+                    request.notes = self.findAndReplaceNote(request.notes);
 
-                self.createProjectTransaction(request, subtaskTransaction => {
-                    self.$parent.$parent.getTaskViewData();
-                    // self.goToSubtaskView(request)
+                    request.status++;
+                    request.actionedByUserID = null;
+
+                    self.createProjectTransaction(request, subtaskTransaction => {
+                        self.$parent.$parent.getTaskViewData();
+                        // self.goToSubtaskView(request)
+                    })
                 })
             },
             returnSubtaskView(item) {
@@ -786,31 +1335,49 @@
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(item));
+                let tmpUser = request.systemUserID;
 
-                let projectTXGroupRequest = {
-                    projectID: item.project_ID
-                }
+                self.checkTaskTakeover(request, () => {
+                    request.systemUserID = tmpUser;
 
-                self.$refs.NotesModal.show("Subtask complete notes", notes => {
-                    request.status++;
-                    request.notes = self.findAndReplaceNote(request.notes);
-                    request.actionedByUserID = request.systemUserID;
-                    request.systemUserID = null;
-                    let tmpRollover = request.rollingUserID;
-                    request.rollingUserID = null;
+                    let projectTXGroupRequest = {
+                        projectID: item.project_ID
+                    }
 
-                    // Create complete transaction
-                    self.createProjectTransaction(request, endTransaction => {
-                        // Create new group to inform other user
-                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
-                            request.notes = self.findAndReplaceNote(notes);
-                            request.systemUserID = tmpRollover;
-                            request.actionedByUserID = null;
+                    item.removed = true;
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    Axios.put(process.env.VUE_APP_API + "ProjectTX?update=false", item).then(r => {
+                        console.log(r);
+
+                        self.$refs.NotesModal.show("Subtask complete notes", notes => {
+                            request.status++;
+                            request.notes = self.findAndReplaceNote(request.notes);
+                            request.actionedByUserID = request.systemUserID;
+                            request.systemUserID = null;
+                            let tmpRollover = request.rollingUserID;
                             request.rollingUserID = null;
-                            request.projectTXGroup_ID = newGroup.id;
-                            // Create new transaction
-                            self.createProjectTransaction(request, newRequest => {
-                                self.$parent.$parent.getTaskViewData();
+
+                            // Create complete transaction
+                            self.createProjectTransaction(request, endTransaction => {
+                                // Create new group to inform other user
+                                self.createProjectTransactionGroup(
+                                    projectTXGroupRequest,
+                                    newGroup => {
+                                        request.notes = self.findAndReplaceNote(
+                                            notes);
+                                        request.systemUserID = tmpRollover;
+                                        request.actionedByUserID = null;
+                                        request.rollingUserID = null;
+                                        request.projectTXGroup_ID = newGroup.id;
+
+                                        // Create new transaction
+                                        self.createProjectTransaction(request,
+                                            newRequest => {
+                                                self.$parent.$parent
+                                                    .getTaskViewData();
+                                            })
+                                    })
                             })
                         })
                     })
@@ -889,5 +1456,31 @@
     .scrollable {
         height: calc(100vh - 300px);
         overflow: auto;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        font-family: sans-serif;
+    }
+
+    table,
+    th,
+    td {
+        border: 1px solid rgb(199, 199, 199);
+        border-left: 0px !important;
+        border-right: 0px !important;
+        font-size: 13px;
+        text-align: left;
+    }
+
+    th {
+        padding: 5px 0px;
+    }
+
+    td {
+        border-bottom: 0px !important;
+        font-size: 12px;
+        padding: 0px 2px;
     }
 </style>
