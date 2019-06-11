@@ -108,7 +108,7 @@ class Planogram {
 
         console.log("BEFORE", retVal)
         retVal.width = parseFloat(retVal.width);
-        retVal.height = parseFloat(retVal.height) * 1.5;
+        retVal.height = parseFloat(retVal.height);
         retVal.depth = parseFloat(retVal.depth);
 
         return retVal;

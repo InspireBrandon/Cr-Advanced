@@ -54,6 +54,7 @@
             </v-list>
         </v-navigation-drawer>
         <v-toolbar color="cyan" dense dark app>
+            <v-btn icon @click="rotateSelected"><v-icon>rotate_90_degrees_ccw</v-icon></v-btn>
             <v-spacer></v-spacer>
             <v-toolbar-title>Floor Planning</v-toolbar-title>
             <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
@@ -71,6 +72,7 @@
     import PlanogramLib from "@/components/Main/FloorPlanning/BaseLibs/Planogram/Planogram.js";
     import SpaceplanSelector from "@/components/Common/SpacePlanSelector"
     import * as BABYLON from '@babylonjs/core/Legacy/legacy';
+import { Vector3 } from '@babylonjs/core/Legacy/legacy';
 
     export default {
         components: {
@@ -117,6 +119,7 @@
                 let self = this;
 
                 var myMaterial = new BABYLON.StandardMaterial("myMaterial", self.sceneObj.scene);
+                myMaterial.diffuseColor = new BABYLON.Color3(1, 0, 1);
                 var myBox = BABYLON.MeshBuilder.CreateBox("myBox", {
                     height: 5,
                     width: 5,
@@ -167,6 +170,9 @@
                         }, 0);
                     }
                 }
+            },
+            rotateSelected() {
+
             },
             onPointerUp(evt) {
                 let self = this;
