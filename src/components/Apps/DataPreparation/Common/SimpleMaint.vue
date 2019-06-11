@@ -21,11 +21,14 @@
                                     <v-text-field label="Display Name" v-model="form.displayname"></v-text-field>
                                 </v-flex>
                                 <v-flex md6>
-                                    <v-text-field v-if="code!=true" label="Code" v-model="form[lowercaseName(name) + '_Code']">
+                                    <v-text-field v-if="code!=true" label="Code"
+                                        v-model="form[lowercaseName(name) + '_Code']">
                                     </v-text-field>
                                 </v-flex>
                                 <v-flex md6>
-                                    <v-autocomplete v-if="headerName != undefined" v-model="form[lowercaseName(headerName) + '_ID']" :items="headerItems" :label="headerName"></v-autocomplete>
+                                    <v-autocomplete v-if="headerName != undefined"
+                                        v-model="form[lowercaseName(headerName) + '_ID']" :items="headerItems"
+                                        :label="headerName"></v-autocomplete>
                                 </v-flex>
                                 <v-flex md6>
                                     <v-checkbox label="Temporary"></v-checkbox>
@@ -56,10 +59,10 @@
     }
 
     export default {
-        props: ['name', 'headerName' , 'hasCode'],
+        props: ['name', 'headerName', 'hasCode', 'Manufacturer'],
         data() {
             return {
-                code:true,
+                code: true,
                 dialog: false,
                 isAdd: true,
                 form: {},
@@ -73,8 +76,8 @@
 
                 self.isAdd = isAdd;
                 self.callback = callback;
-                if(self.hasCode==false){
-                    self.code=false
+                if (self.hasCode == false) {
+                    self.code = false
                 }
                 if (isAdd) {
                     self.form.id = null;
@@ -94,13 +97,17 @@
                     self.form.temporary = item.temporary;
 
                     if (self.headerName != undefined && self.headerName != null && self.headerName != "") {
-                        self.form[lowercaseName(self.headerName) + "_ID"] = item[lowercaseName(self.headerName) + "_ID"];
+                        self.form[lowercaseName(self.headerName) + "_ID"] = item[lowercaseName(self.headerName) +
+                        "_ID"];
                     }
                 }
 
                 if (self.headerName != undefined && self.headerName != null && self.headerName != "") {
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
                     Axios.get(process.env.VUE_APP_API + `Retailer/${self.headerName}`)
                         .then(r => {
+                            delete Axios.defaults.headers.common["TenantID"];
                             let items = r.data;
                             self.headerItems = [];
 

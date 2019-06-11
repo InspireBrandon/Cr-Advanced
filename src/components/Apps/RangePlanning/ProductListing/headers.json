@@ -636,7 +636,12 @@
                 "field": "order_Profit_Value",
                 "editable": true,
                 "hide": true
-            },
+            }
+        ]
+    },
+    {
+        "headerName": "Evaluation",
+        "children": [
             {
                 "headerName": "Test Period",
                 "field": "test_Period",
@@ -648,21 +653,23 @@
                 "field": "test_Period_Review_Date",
                 "editable": true,
                 "hide": true
-            }
-        ]
-    },
-    {
-        "headerName": "Evaluation",
-        "children": [{
-                "headerName": "Order Quantity",
-                "field": "order_Quantity",
-                "editable": true,
+            },
+            {
+                "headerName": "Period 1",
+                "field": "period 1",
+                "editable": false,
                 "hide": true
             },
             {
-                "headerName": "Order Value At Cost",
-                "field": "order_Value_At_Cost",
-                "editable": true,
+                "headerName": "Period 2",
+                "field": "period_2",
+                "editable": false,
+                "hide": true
+            },
+            {
+                "headerName": "Period 3",
+                "field": "period_3",
+                "editable": false,
                 "hide": true
             }
         ]

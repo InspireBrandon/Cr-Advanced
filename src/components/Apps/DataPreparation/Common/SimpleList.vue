@@ -104,7 +104,9 @@
             },
             openAdd() {
                 let self = this;
-                self.$refs.maint.show(true);
+                self.$refs.maint.show(true, null, () => {
+                    
+                });
             }
         }
     }
