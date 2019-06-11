@@ -2,7 +2,8 @@
     <v-card>
         <v-toolbar dense dark>
             <!-- <v-btn color="primary" flat outline dark @click="openStoreView()" v-if="(currentPlanogram != null && selectedProject != null)">Store View </v-btn> -->
-            <v-btn color="primary" flat outline dark @click="openStoreView()" v-if="userID == 1 && (currentPlanogram != null && selectedProject != null)">Store View </v-btn>
+            <v-btn color="primary" flat outline dark @click="openStoreView()"
+                v-if="userID == 1 && (currentPlanogram != null && selectedProject != null)">Store View </v-btn>
 
             <v-spacer></v-spacer>
             <v-toolbar-title>Planogram Implementation</v-toolbar-title>
@@ -158,7 +159,7 @@
         <NotesModal ref="notesModal"></NotesModal>
         <SpacePlanSelector ref="SpacePlanSelector" />
         <PlanogramDetailsSelector ref="PlanogramDetailsSelector" />
-        <StorePlanogramOverview :ProjectName="selectedProject" :selectedProject="selectedProject"
+        <StorePlanogramOverview :ProjectName="selectedProjectName" :selectedProject="selectedProject"
             ref="StorePlanogramOverview" />
         <SizeLoader ref="SizeLoader" />
     </v-card>
@@ -231,6 +232,7 @@
                 routeStatus: null,
                 tmpRequest: null,
                 userID: -1,
+                selectedProjectName: null,
             }
         },
         mounted() {
@@ -652,6 +654,13 @@
                     self.image = null;
                     let currentProjectID = self.selectedProject;
                     let currentProject;
+                    self.projectsSelect.forEach(e => {
+                        if (e.value == self.selectedProject) {
+                            self.selectedProjectName = e
+                            console.log(self.selectedProjectName);
+
+                        }
+                    })
 
 
                     self.projects.forEach(project => {

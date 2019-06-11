@@ -3,7 +3,7 @@
         <v-card>
             <v-toolbar flat color="primary" dark>
                 <v-toolbar-title>
-                    Store Planogram Overview: {{ProjectName}}
+                    Store Planogram Overview: {{ProjectName.text}}
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-btn icon flat dark @click="storeView=false">
@@ -99,7 +99,6 @@
                 ],
                 currentStorePlanograms: [],
                 storeView: false,
-                selectedProject:null
             }
         },
         methods: {

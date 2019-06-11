@@ -3,7 +3,7 @@
         <v-card>
             <v-toolbar color="primary" dark flat>
                 <v-toolbar-title>
-                    Loading Data
+                    {{title}}
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-progress-circular indeterminate color="white"></v-progress-circular>
@@ -15,8 +15,11 @@
                     <v-flex md12>
                         {{text1}}: {{currentFileSize.toFixed(2)}} MB / {{FileTotalSize.toFixed(2)}} MB
                         <v-progress-linear color="primary" height="20" :value="(currentFileSize/FileTotalSize)*100">
-                            <div style="color:white;  text-align: center;">
+                            <div v-if="currentFileSize!=0&&FileTotalSize!=0" style="color:white;  text-align: center;">
                                 {{ ((currentFileSize/FileTotalSize)*100).toFixed(0)}}%
+                            </div>
+                            <div v-else style="color:white;  text-align: center;">
+                              0%
                             </div>
                         </v-progress-linear>
                     </v-flex>
@@ -47,6 +50,7 @@
         props: [],
         data() {
             return {
+                title:"Loading Data",
                 text1: "text1",
                 text2: null,
                 currentFileSize: 0,
