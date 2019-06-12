@@ -120,9 +120,12 @@
     import Prompt from '@/components/Common/Prompt';
     import NewItemListingSelector from '@/components/Common/NewItemListingSelector'
     import YesNoModal from '@/components/Common/YesNoModal'
-    import ImageView from "./Image.vue"
-    import Button from "./button.vue"
-    import OptionSelector from "./OptionSelector.vue"
+    import ImageView from "./GridComponents/Image.vue"
+    import Button from "./GridComponents/button.vue"
+    import OptionSelector from "./GridComponents/OptionSelector.vue"
+    import PeriodItem from "./GridComponents/PeriodItem.vue"
+    import DateSelector from "./GridComponents/DateSelector.vue"
+    import Validator from "./GridComponents/Validator.vue"
 
     const tabs = ['Standard', 'Vendor', 'Hierachy', 'Item Status', 'Images', 'Supporting Documents', 'Resources',
         'Stock Control', 'Price and Margin', 'Opening Orders'
@@ -137,7 +140,10 @@
             ImageView,
             AgGridVue,
             Button,
-            OptionSelector
+            OptionSelector,
+            PeriodItem,
+            DateSelector,
+            Validator
         },
         data() {
             return {
@@ -211,6 +217,9 @@
             onSelectionChanged() {
 
             },
+            onCellValueChanged(e) {
+                console.log(e);
+            },
             show() {
                 let self = this;
                 self.dialog = true;
@@ -229,6 +238,11 @@
             newLine() {
                 let self = this;
                 self.rowData.push({})
+
+                setTimeout(() => {
+                    self.gridApi.resetRowHeights();
+                    self.gridApi.sizeColumnsToFit()
+                }, 60);
             },
             openFile() {
                 let self = this;
@@ -251,36 +265,6 @@
                 let self = this;
                 self.isAdd = true;
                 self.rowData = [];
-            },
-            duplicate(item) {
-                let self = this;
-                self.items.push(JSON.parse(JSON.stringify(item)));
-            },
-            remove(item) {
-                let self = this;
-                self.items.splice(self.items.indexOf(item), 1);
-            },
-            copy(item) {
-                let self = this;
-                self.clipBoardItem = item;
-                self.showSnackbar("Line Copied", 2000)
-            },
-            paste(item) {
-                let self = this;
-
-                for (var prop in self.clipBoardItem) {
-                    if (prop != "index") {
-                        item[prop] = self.clipBoardItem[prop];
-                    }
-                }
-
-                self.showSnackbar("Line Replaced", 2000)
-            },
-            showSnackbar(snackbarText, timeout) {
-                let self = this;
-                self.snackbarTimeout = timeout;
-                self.snackbarText = snackbarText;
-                self.snackbar = true;
             },
             hideShow(headerGroup) {
                 let self = this;
@@ -387,12 +371,6 @@
                 self.getSegments();
                 self.getActiveShopCodes();
                 self.getItemStatuses();
-            },
-            setItemsData(idx, property, value) {
-                let self = this;
-                self.$nextTick(() => {
-                    self.items[idx][property] = value;
-                })
             },
             getManufacturers() {
                 let self = this;
@@ -591,16 +569,6 @@
 
                         delete Axios.defaults.headers.common["TenantID"];
                     })
-            },
-            showSavingLoader() {
-                let self = this;
-                self.showLoader = true;
-            },
-            showSavedSuccess() {
-                let self = this;
-            },
-            showSavedFailure() {
-                let self = this;
             }
         }
     }
