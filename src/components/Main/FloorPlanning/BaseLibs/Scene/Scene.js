@@ -43,7 +43,7 @@ class Scene {
             }
             break;
         case "UNIVERSAL": {
-            let camera = new BABYLON.UniversalCamera(id, new BABYLON.Vector3(0, 1, 0), self.scene);
+            let camera = new BABYLON.UniversalCamera(id, new BABYLON.Vector3(0, 0.1, 0), self.scene);
             // self.camera = new BABYLON.FlyCamera("FlyCamera", new BABYLON.Vector3(0, 5, -10), self.scene);
             camera.attachControl(self.canvas, true);
             camera.speed = 0.1;
