@@ -1,0 +1,90 @@
+[
+    {
+        "headerName": "Project",
+        "field": "planogram",
+        "editable": false,
+        "hide": false
+    },
+    {
+        "headerName": "Type",
+        "field": "type",
+        "editable": false,
+        "hide": false,
+        "cellRendererFramework": "Type"
+    },
+    {
+        "headerName": "Status",
+        "field": "status",
+        "editable": false,
+        "hide": false,
+        "cellRendererFramework": "Status"
+    },
+    {
+        "headerName": "Store Cluster",
+        "field": "storeCluster",
+        "editable": false,
+        "hide": false
+    },
+    {
+        "headerName": "Category Cluster",
+        "field": "categoryCluster",
+        "editable": false,
+        "hide": false
+    },
+    {
+        "headerName": "Store",
+        "field": "store",
+        "editable": false,
+        "hide": false
+    },
+    {
+        "headerName": "Date",
+        "field": "dateTimeString",
+        "editable": false,
+        "hide": false
+    },
+    {
+        "headerName": "User Assigned",
+        "field": "username",
+        "editable": false,
+        "hide": false
+    },
+    {
+        "headerName": "Actioned By",
+        "field": "actionedByUserName",
+        "editable": false,
+        "hide": false
+    },
+    {
+        "headerName": "Actions",
+        "field": "",
+        "editable": false,
+        "hide": false,
+        "cellRendererFramework": "Actions",
+        "width": 130
+    },
+    {
+        "headerName": "Notes",
+        "field": "",
+        "editable": false,
+        "hide": false,
+        "cellRendererFramework": "Notes",
+        "width": 90
+    },
+    {
+        "headerName": "Files",
+        "field": "",
+        "editable": false,
+        "hide": false,
+        "cellRendererFramework": "Files",
+        "width": 130
+    },
+    {
+        "headerName": "",
+        "field": "",
+        "editable": false,
+        "hide": false,
+        "cellRendererFramework": "Options",
+        "width": 100 
+    }
+]

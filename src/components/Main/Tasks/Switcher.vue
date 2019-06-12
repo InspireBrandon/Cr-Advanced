@@ -215,7 +215,7 @@
     } from '@/libs/events/event-bus.js';
 
     // Components
-    import TaskView from "./TaskView.vue"
+    import TaskView from "./TaskView/Index.vue"
     import ProjectView from "./ProjectView.vue"
     import StoreView from "./StoreView.vue"
     import SplashLoader from "@/components/Common/SplashLoader.vue"
@@ -224,7 +224,6 @@
 
     export default {
         components: {
-
             TaskView,
             ProjectView,
             StoreView,

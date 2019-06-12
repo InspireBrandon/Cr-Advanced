@@ -14,7 +14,8 @@
         "hide": false,
         "pinned": "left",
         "maxWidth": 150,
-        "minWidth": 150
+        "minWidth": 150,
+        "cellRendererFramework": "Validator"
     },
     {
         "headerName": "Barcode",
@@ -23,7 +24,8 @@
         "hide": false,
         "pinned": "left",
         "maxWidth": 120,
-        "minWidth": 120
+        "minWidth": 120,
+        "cellRendererFramework": "Validator"
     },
     {
         "headerName": "Description",
@@ -32,7 +34,8 @@
         "hide": false,
         "pinned": "left",
         "maxWidth": 200,
-        "minWidth": 200
+        "minWidth": 200,
+        "cellRendererFramework": "Validator"
     },
     {
         "headerName": "Standard",
@@ -636,34 +639,45 @@
                 "field": "order_Profit_Value",
                 "editable": true,
                 "hide": true
-            },
+            }
+        ]
+    },
+    {
+        "headerName": "Evaluation",
+        "children": [
             {
                 "headerName": "Test Period",
                 "field": "test_Period",
-                "editable": true,
+                "editable": false,
                 "hide": true
             },
             {
                 "headerName": "Test Period Review Date",
                 "field": "test_Period_Review_Date",
                 "editable": true,
-                "hide": true
-            }
-        ]
-    },
-    {
-        "headerName": "Evaluation",
-        "children": [{
-                "headerName": "Order Quantity",
-                "field": "order_Quantity",
-                "editable": true,
-                "hide": true
+                "hide": true,
+                "cellRendererFramework": "DateSelector"
             },
             {
-                "headerName": "Order Value At Cost",
-                "field": "order_Value_At_Cost",
-                "editable": true,
-                "hide": true
+                "headerName": "Period 1",
+                "field": "period 1",
+                "editable": false,
+                "hide": true,
+                "cellRendererFramework": "PeriodItem"
+            },
+            {
+                "headerName": "Period 2",
+                "field": "period_2",
+                "editable": false,
+                "hide": true,
+                "cellRendererFramework": "PeriodItem"
+            },
+            {
+                "headerName": "Period 3",
+                "field": "period_3",
+                "editable": false,
+                "hide": true,
+                "cellRendererFramework": "PeriodItem"
             }
         ]
     },

@@ -97,7 +97,7 @@
         created() {
             let self = this;
             let encoded_details = jwt.decode(sessionStorage.accessToken);
-            let userJohn = encoded_details.USER_ID == 1;
+            let userJohn = encoded_details.USER_ID == 1 || encoded_details.USER_ID == 12 || encoded_details.USER_ID == 13;
 
             if(self.appConfigDetail.detail.name == "Testing" && !userJohn)
                 self.canview = false;

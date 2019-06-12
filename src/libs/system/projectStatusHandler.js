@@ -283,6 +283,13 @@ class projectStatusHandler {
                 type: [1, 2, 3],
                 color: "yellow",
                 friendly: "Task Takeover"
+            },
+            {
+                text: "Mail",
+                value: 42,
+                type: [7],
+                color: "#ff7200",
+                friendly: "Mail"
             }
         ]
 
@@ -339,6 +346,11 @@ class projectStatusHandler {
                 color: "grey",
                 text: "Subtask",
                 value: 6
+            },
+            {
+                color: "#ff7200",
+                text: "Mail",
+                value: 7
             },
         ]
 

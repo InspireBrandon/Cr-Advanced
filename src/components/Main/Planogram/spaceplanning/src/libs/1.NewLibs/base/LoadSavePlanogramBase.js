@@ -103,8 +103,7 @@ class LoadSavePlanogramBase {
     }
 
     output.name = planogramName;
-    console.log("[SAVING]");
-    console.log(spacePlanID);
+    output = JSON.parse(JSON.stringify(output));
     
     // if (self.Create == true) {
     let startTime = new Date()
@@ -175,10 +174,8 @@ class LoadSavePlanogramBase {
         data: output                                  
       }, config).then(result => {
         // __sending simple version through
-        output.image = null
-        console.log("output");
-        console.log(output);
 
+        output.image = null
 
         output.planogramData.forEach(e => {
           e.Data.Data.image = null
@@ -188,8 +185,6 @@ class LoadSavePlanogramBase {
               render.image = null
             })
           }
-
-
         })
         let startTime = new Date()
         let config = {
