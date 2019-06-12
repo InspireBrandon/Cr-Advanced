@@ -625,7 +625,8 @@
                             .then(r => {
                                 delete Axios.defaults.headers.common["TenantID"];
                                 self.projects = r.data.projectList;
-
+                                console.log(self.projects);
+                                
                                 self.projectsSelect = [];
 
                                 self.projects.forEach(el => {

@@ -74,6 +74,9 @@
                 for (var prop in data) {
                     self[prop] = data[prop]
                 }
+                if (data.progress==null||data.progress==undefined){
+                    self.progress = 0
+                }
             },
             close() {
                 let self = this
