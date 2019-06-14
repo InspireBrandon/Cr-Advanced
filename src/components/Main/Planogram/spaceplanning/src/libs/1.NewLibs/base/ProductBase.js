@@ -321,7 +321,7 @@ class ProductBase extends ProductItemBase {
       self.Indicator2.moveToTop()
     }
 
-    if(storeResult.Data.store_Range_Indicator == "SELECTED") {
+    if(storeResult.Data.store_Range_Indicator == "SELECTED" || storeResult.Data.store_Range_Indicator == "SELECT") {
       self.Indicator1 = new Konva.Line({
         x: 0,
         y: 0,
@@ -336,7 +336,7 @@ class ProductBase extends ProductItemBase {
         x: 0,
         y: 0,
         points: [totalWidth, 0, totalWidth / 2, self.TotalHeight / 2, 0, self.TotalHeight],
-        stroke: 'red',
+        stroke: 'transparent',
         strokeWidth: 2,
         //lineCap: 'round',
         //lineJoin: 'round'
