@@ -250,8 +250,7 @@
                                     self.getUsers(() => {
                                         self.getStores(() => {
                                             self.getTaskViewData(() => {
-                                                self.loading =
-                                                    false;
+                                                self.loading = false;
                                             })
                                         })
                                     })

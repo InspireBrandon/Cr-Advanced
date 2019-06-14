@@ -1,5 +1,5 @@
 <template>
-    <div style="display: flex;">
+    <div v-if="systemUserID != undefined && systemUserID != null" style="display: flex;">
         <v-tooltip bottom v-if="button.button_1.show">
             <template v-slot:activator="{ on }">
                 <v-btn @click="button.button_1.click(params.data)" flat icon small>
@@ -22,12 +22,12 @@
     export default {
         data() {
             return {
-                systemUserID: -1,
+                systemUserID: null,
             }
         },
-        created() {
+        mounted() {
             let self = this;
-            self.systemUserID = self.params.context.componentParent.selectedUser;
+            self.systemUserID = self.params.context.componentParent.$parent.$parent.selectedUser;
         },
         computed: {
             button() {
@@ -35,14 +35,14 @@
                 let currentItem = self.params.data;
                 let componentParent = self.params.context.componentParent;
 
-                let retval = handle_button(currentItem, componentParent);
+                let retval = handle_button(currentItem, componentParent, self);
 
                 return retval;
             }
         }
     }
 
-    function handle_button(item, cp) {
+    function handle_button(item, cp, self) {
         let button_1 = new buttonItem();
         let button_2 = new buttonItem();
 
@@ -75,34 +75,34 @@
             switch (item.type) {
                 case 1: {
                     if (item.actionedByUserID == self.systemUserID) {
-                        button_1.set('secondary', 'assignment', cp.assign, "Assign")
-                        button_2.set('warning', 'visibility', cp.routeToView, "View")
+                        button_1.set('error', 'close', cp.closeTask, "Close")
                     }
 
                     if (item.systemUserID == self.systemUserID) {
-                        button_1.set('error', 'close', cp.closeTask, "Close")
+                        button_1.set('secondary', 'assignment', cp.assign, "Assign")
+                        button_2.set('warning', 'visibility', cp.routeToView, "View")
                     }
                 }
                 break;
             case 2: {
                 if (item.actionedByUserID == self.systemUserID) {
-                    button_1.set('secondary', 'assignment', cp.assign, "Assign")
-                    button_2.set('warning', 'visibility', cp.routeToView, "View")
+                    button_1.set('error', 'close', cp.closeTask, "Close")
                 }
 
                 if (item.systemUserID == self.systemUserID) {
-                    button_1.set('error', 'close', cp.closeTask, "Close")
+                    button_1.set('secondary', 'assignment', cp.assign, "Assign")
+                    button_2.set('warning', 'visibility', cp.routeToView, "View")
                 }
             }
             break;
             case 3: {
                 if (item.actionedByUserID == self.systemUserID) {
-                    button_1.set('primary', 'send', cp.submitForApproval, "Send")
                     button_2.set('error', 'close', cp.closeTask, "Close")
                 }
 
                 if (item.systemUserID == self.systemUserID) {
-                    button_1.set('warning', 'visibility', cp.routeToView, "View")
+                    button_1.set('primary', 'send', cp.submitForApproval, "Send")
+                    button_2.set('warning', 'visibility', cp.routeToView, "View")
                 }
             }
             break;
@@ -179,12 +179,12 @@
         }
         break;
         case 28: {
-            if(item.rollingUserID != systemUserID)
+            if (item.rollingUserID != item.systemUserID)
                 button_1.set('success', 'done', cp.setSubtaskInProgressAndView, "Received")
         }
         break;
         case 29: {
-            if(item.rollingUserID != systemUserID)
+            if (item.rollingUserID != item.systemUserID)
                 button_1.set('error', 'check', cp.completeSubtask, "Complete")
         }
         break;
@@ -193,12 +193,12 @@
         }
         break;
         case 31: {
-            if(item.rollingUserID != systemUserID)
+            if (item.rollingUserID != item.systemUserID)
                 button_1.set('success', 'done', cp.setSubtaskInProgressAndView, "Received")
         }
         break;
         case 32: {
-            if(item.rollingUserID != systemUserID)
+            if (item.rollingUserID != item.systemUserID)
                 button_1.set('error', 'check', cp.completeSubtask, "Complete")
         }
         break;
@@ -207,12 +207,12 @@
         }
         break;
         case 34: {
-            if(item.rollingUserID != systemUserID)
+            if (item.rollingUserID != item.systemUserID)
                 button_1.set('success', 'done', cp.setSubtaskInProgressAndView, "Received")
         }
         break;
         case 35: {
-            if(item.rollingUserID != systemUserID)
+            if (item.rollingUserID != item.systemUserID)
                 button_1.set('error', 'check', cp.completeSubtask, "Complete")
         }
         break;
@@ -221,12 +221,12 @@
         }
         break;
         case 37: {
-            if(item.rollingUserID != systemUserID)
+            if (item.rollingUserID != item.systemUserID)
                 button_1.set('success', 'done', cp.setSubtaskInProgressAndView, "Received")
         }
         break;
         case 38: {
-            if(item.rollingUserID != systemUserID) {
+            if (item.rollingUserID != item.systemUserID) {
                 button_1.set('warning', 'visibility', cp.goToSubtaskView, "View")
                 button_2.set('error', 'check', cp.completeSubtask, "Complete")
             }
