@@ -45,7 +45,7 @@
     } from '@/libs/events/event-bus.js';
 
     // Components
-    import Actions from './GridComponents/Actions.vue'
+    import Actions from './GridComponents/Actions-TMP.vue'
     import Files from './GridComponents/Files.vue'
     import Options from './GridComponents/Options.vue'
     import Notes from './GridComponents/Notes.vue'
@@ -371,7 +371,7 @@
                         })
                 })
             },
-            closeTask(item, index) {
+            closeTask(item) {
                 let self = this;
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;

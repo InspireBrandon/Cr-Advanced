@@ -1,42 +1,42 @@
 <template>
     <div>
         <v-menu left>
-            <v-btn v-if="params.context.componentParent.userAccess != 3" icon slot="activator">
+            <v-btn small v-if="params.context.componentParent.userAccess != 3" icon slot="activator">
                 <v-icon>more_vert</v-icon>
             </v-btn>
             <v-list dense class="pa-0 ma-0">
 
-                <v-list-tile @click="assign(params.data)">
+                <v-list-tile @click="params.context.componentParent.assign(params.data)">
                     <span>Assign</span>
                 </v-list-tile>
 
                 <v-divider></v-divider>
 
-                <v-list-tile @click="sendMail(params.data)">
+                <v-list-tile @click="params.context.componentParent.sendMail(params.data)">
                     <span>Mail</span>
                 </v-list-tile>
 
                 <v-divider></v-divider>
 
-                <v-list-tile v-if="params.data.systemFileName != null" @click="assign(params.data)">
+                <v-list-tile v-if="params.data.systemFileName != null" @click="params.context.componentParent.assign(params.data)">
                     <span>Variation</span>
                 </v-list-tile>
 
                 <v-divider></v-divider>
 
-                <v-list-tile @click="putTaskOnHold(params.data)">
+                <v-list-tile @click="params.context.componentParent.putTaskOnHold(params.data)">
                     <span>Put On Hold</span>
                 </v-list-tile>
 
                 <v-divider></v-divider>
 
-                <v-list-tile @click="startSubtask(params.data)">
+                <v-list-tile @click="params.context.componentParent.startSubtask(params.data)">
                     <span>New subtask</span>
                 </v-list-tile>
                 <v-divider></v-divider>
 
                 <v-list-tile v-if="( params.data.status == 2||params.data.status == 2)&&params.data.actionedByUserID==null"
-                    @click="closeTask(params.data)">
+                    @click="params.context.componentParent.closeTask(params.data)">
                     <span>close</span>
                 </v-list-tile>
 

@@ -3,10 +3,9 @@
         <v-layout row wrap>
             <v-flex v-if="hasDatabases" xs12 sm12 md12>
                 <v-card>
-                    <!-- MAIN TOOLBAR -->
                     <v-toolbar flat dark dense color="primary">
-                        <v-autocomplete prepend-inner-icon="search" placeholder="Search" :items="filterList"
-                            v-model="dropSearch"></v-autocomplete>
+                        <v-text-field prepend-inner-icon="search" placeholder="Search" v-model="filter_text">
+                        </v-text-field>
                         <v-spacer></v-spacer>
                         <v-btn-toggle v-model="searchType" class="transparent" multiple>
                             <v-tooltip bottom>
@@ -34,19 +33,17 @@
                                 </template>
                                 <span>Planogram</span>
                             </v-tooltip>
+                            <!-- <v-divider vertical></v-divider>
+                            <v-switch v-model="show_subtasks" dark color="secondary" class="ml-2" label="Show subtasks" hide-details></v-switch> -->
                         </v-btn-toggle>
                         <v-btn v-if="userAccess != 0 && userAccess != 4" @click="shareProjects" class="ml-2" small dark
                             icon>
                             <v-icon>share</v-icon>
                         </v-btn>
                     </v-toolbar>
-                    <!-- END MAIN TOOLBAR -->
-                    <!-- BLACK TOOLBAR -->
                     <v-toolbar v-if="userAccess!=4" dense flat dark>
-                        <!-- STORE SELECTOR -->
                         <v-autocomplete v-if="selectedView==2" placeholder="Please Select a Store" :items="stores"
                             v-model="selectedStore"></v-autocomplete>
-                        <!-- USER SELECTOR -->
                         <v-autocomplete v-if="selectedView==0" placeholder="users " :items="users"
                             v-model="selectedUser" @change="getTaskViewData"></v-autocomplete>
                         <v-btn icon @click="homeView">
@@ -86,8 +83,6 @@
                             <v-icon @click="showNotices = !showNotices" v-else>visibility</v-icon>
                         </v-btn>
                     </v-toolbar>
-                    <!-- END BLACK TOOLBAR -->
-
                     <v-container style="max-width: 100vw;" fluid grid-list-xs class="pa-0">
                         <v-layout row wrap class="pa-0">
                             <v-flex :class="{ 'md10 sm6 xs6': showNotices, 'md12 sm12 xs12': !showNotices }"
@@ -95,79 +90,6 @@
                                 <TaskView :data="filteredData" :typeList="typeList" :statusList="statusList"
                                     :systemUserID="selectedUser" />
                             </v-flex>
-                            <!-- <v-flex v-if="selectedView==0"
-                                :class="{ 'md10 sm6 xs6': showNotices, 'md12 sm12 xs12': !showNotices }">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Project</th>
-                                            <th>Type</th>
-                                            <th>Status</th>
-                                            <th>Store Cluster</th>
-                                            <th>CC</th>
-                                            <th>Store</th>
-                                            <th>Date</th>
-                                            <th>User Assigned</th>
-                                            <th>Actioned By</th>
-                                            <th style="width: 120px;"></th>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-                                            <th style="width: 80px;"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="(item,idx) in filteredData" :key="idx">
-                                            <td>{{ item.planogram }}</td>
-                                            <td>{{ typeList[item.type == -1 ? 5 : item.type].text }}</td>
-                                            <td>{{ statusList[item.status == -1 ? 18 : item.status].text }}</td>
-                                            <td>{{ item.storeCluster }}</td>
-                                            <td>{{ item.categoryCluster }}</td>
-                                            <td>{{ item.store }}</td>
-                                            <td>{{ item.dateTimeString }}</td>
-                                            <td>{{ item.username }}</td>
-                                            <td>{{ item.actionedByUserName }}</td>
-                                            <td>
-                                                <v-btn color="success" flat icon small>
-                                                    <v-icon>visibility</v-icon>
-                                                </v-btn>
-                                                <v-btn color="warning" flat icon small>
-                                                    <v-icon>check</v-icon>
-                                                </v-btn>
-                                            </td>
-                                            <td>
-                                                <v-tooltip bottom v-if="item.notes != null">
-                                                    <template v-slot:activator="{ on }">
-                                                        <v-icon v-on="on">note</v-icon>
-                                                    </template>
-                                                    <span>{{ item.notes }}</span>
-                                                </v-tooltip>
-                                            </td>
-                                            <td>
-                                                <v-tooltip bottom v-if="item.systemFileName != null">
-                                                    <template v-slot:activator="{ on }">
-                                                        <v-icon v-on="on">web</v-icon>
-                                                    </template>
-                                                    <span>{{ item.systemFileName }}</span>
-                                                </v-tooltip>
-                                            </td>
-                                            <td>
-                                                <v-tooltip bottom v-if="item.rangeFileName != null">
-                                                    <template v-slot:activator="{ on }">
-                                                        <v-icon v-on="on">assessment</v-icon>
-                                                    </template>
-                                                    <span>{{ item.rangeFileName }}</span>
-                                                </v-tooltip>
-                                            </td>
-                                            <td style="text-align: center;">
-                                                <v-btn small icon>
-                                                    <v-icon>more_vert</v-icon>
-                                                </v-btn>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </v-flex> -->
                             <v-flex v-if="selectedView==0 && showNotices"
                                 :class="{ 'md2 sm6 xs6': showNotices, 'md1 sm1 xs1': !showNotices }">
                                 <v-card tile flat style="border-left: 1px solid lightgrey;">
@@ -233,6 +155,8 @@
         },
         data() {
             return {
+                show_subtasks: false,
+                filter_text: "",
                 statusList: [],
                 typeList: [],
                 // Filters
@@ -291,51 +215,27 @@
                 break;
                 }
 
-                if (self.dropSearch == null && self.searchType == null) {
-                    return filterData
-                }
-
-                if (this.searchType.length > 0 && self.dropSearch != null) {
-                    let tmp = filterData.filter((tx) => {
-                        if (self.searchType.includes(tx.type) && self.dropSearch == tx.planogram_ID) {
-                            return tx
+                if (self.filter_text == "" && self.searchType.length == 0) {
+                    return filterData;
+                } else if (self.filter_text != "" && self.searchType.length == 0) {
+                    return filterData.filter(e => {
+                        if (e.planogram.toUpperCase().indexOf(self.filter_text.toUpperCase()) > -1) {
+                            return e.planogram;
                         }
-                        return
                     })
-                    return tmp;
-                }
-                if (self.searchType.length > 0) {
-                    let tmp = filterData.filter((tx) => {
-                        if (self.searchType.includes(tx.type)) {
-                            return tx
+                } else if (self.filter_text == "" && self.searchType.length > 0) {
+                    return filterData.filter(e => {
+                        if (self.searchType.indexOf(e.type) > -1) {
+                            return e.planogram;
                         }
-                        return
                     })
-                    return tmp;
-                }
-                //search for only field
-                if (self.dropSearch != null) {
-                    let tmp = filterData.filter((tx) => {
-
-                        if (self.dropSearch == tx.planogram_ID) {
-                            return tx
+                } else if (self.filter_text != "" && self.searchType.length > 0) {
+                    return filterData.filter(e => {
+                        if (e.planogram.toUpperCase().indexOf(self.filter_text.toUpperCase()) > -1 && self
+                            .searchType.indexOf(e.type) > -1) {
+                            return e.planogram;
                         }
-                        return
                     })
-                    return tmp;
-                }
-                if (self.selectedStore != null) {
-                    let tmp = filterData.filter((tx) => {
-
-                        if (self.selectedStore == tx.store_ID) {
-                            return tx
-                        }
-                        return
-                    })
-                    return tmp
-                }
-                if (self.searchType.length == 0 && self.dropSearch == null) {
-                    return filterData
                 }
             }
         },
