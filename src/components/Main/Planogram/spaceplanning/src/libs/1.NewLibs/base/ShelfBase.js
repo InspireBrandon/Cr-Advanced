@@ -5,6 +5,7 @@ import StoreHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.Ne
 import PlanogramItemBase from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PlanogramItemBase.js";
 import CloneBase from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/CloneBase.js";
 import ParentTreeRedraw from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/RedrawParentChildBase.js";
+import ProductRenderingBase from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/ProductRenderingBase.js";
 
 class ShelfBase extends PlanogramItemBase {
   constructor(vueStore, stage, layer, data, ratio, type, gondolaID) {
@@ -74,7 +75,7 @@ class ShelfBase extends PlanogramItemBase {
 
     if (ctrl_store.getCloneItem(self.VueStore) == self.ID) {
       let ctrl_clone = new CloneBase("SHELF");
-      ctrl_clone.Clone(self.VueStore, self.Stage, self, null, null, function() {
+      ctrl_clone.Clone(self.VueStore, self.Stage, self, null, null, function () {
         // self.UpdateParent(self.ID);
       });
       ctrl_store.setCloneItem(self.VueStore, null);
@@ -167,14 +168,14 @@ class ShelfBase extends PlanogramItemBase {
     let self = this;
 
     self.RemoveRenderings();
-    
+
     if (self.Data.RenderingsItems == undefined || self.Data.RenderingsItems == null) {
       return;
     }
 
     if (self.Data.RenderingsItems.ShelfEdge != undefined || self.Data.RenderingsItems.ShelfEdge != null) {
       console.log("[SHELF RENDERING] SHELF EDGE", self.Data.RenderingsItems.ShelfEdge);
-      
+
       // add shelf edge rendering
       let w = self.Data.RenderingsItems.ShelfEdge.width * self.Ratio;
       let h = self.Data.RenderingsItems.ShelfEdge.height * self.Ratio;
@@ -263,8 +264,35 @@ class ShelfBase extends PlanogramItemBase {
       self.Group.add(shelfBack);
     }
 
+    /** This will be applied if a productRendering is turned on */
+    self.ApplyProductRenderings();
+
     self.Layer.draw();
-    // self.Group.draw();
+  }
+
+  ApplyProductRenderings() {
+    let self = this;
+    let ctrl_store = new StoreHelper();
+    console.log("[PRODUCT RENDERINGS] WE ARE HERE!")
+    if (self.Data.productRendering != undefined && self.Data.productRendering != null && self.Data.productRendering == true) {
+
+      let allProducts = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "PRODUCT", self.ID);
+
+      if (allProducts.length == 0) {
+        return;
+      }
+
+      allProducts.forEach(product => {
+        // add rendering
+        let newRendering = new ProductRenderingBase(self.Layer, self, product, 0, self.Ratio);
+        newRendering.AddRendering();
+        self.Renderings.push({
+          type: 'PRODUCTRENDERING',
+          konva: newRendering.Group,
+          renderingObj: newRendering
+        });
+      });
+    }
   }
 
   RemoveRenderings() {
@@ -273,7 +301,7 @@ class ShelfBase extends PlanogramItemBase {
     self.Renderings.forEach(element => {
       element.konva.destroy();
     });
-
+    
     self.Renderings = [];
   }
 

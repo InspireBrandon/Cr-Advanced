@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="dialog" fullscreen persistent scrollable>
+    <v-dialog v-model="dialog" max-width="1000px"  persistent scrollable>
       <v-card height="400px" style="overflow: auto;">
 
         <v-card-title style=" display: block;" class="headline pa-0">
@@ -22,9 +22,11 @@
 
 
               <v-list-tile-content>
-                <v-list-tile-title v-text="sp.fileName"></v-list-tile-title>
+                <v-list-tile-title v-text="sp.fileName"> </v-list-tile-title>
+
               </v-list-tile-content>
               <v-spacer></v-spacer>
+              <v-list-tile-action>h:{{sp.height}} w:{{sp.width}} modules:{{sp.modules}}</v-list-tile-action>
             </v-list-tile>
           </v-list>
         </v-card-text>
@@ -50,12 +52,14 @@
   import Dialog from '@/components/Common/Dialog';
 
   export default {
+    props: ["PlanoName"],
     name: 'RangeSelectorModal',
     components: {
       Dialog
     },
     data() {
       return {
+        filterProject: null,
         searchText: null,
         dialog: false,
         spaceData: [],
@@ -101,28 +105,89 @@
       }
     },
     methods: {
-      getSpacePlans(callback) {
+      checkAdd(item, listitem, callback) {
+        let self = this
+        let canAdd = false
+        // console.log("-----------------------------");
+
+        // console.log(self.PlanoName == listitem.planogramName);
+        // console.log(listitem.planogramName);
+        //   console.log(self.PlanoName);
+
+        if (listitem.planogramName == null) {
+          listitem.planogramName = ""
+        }
+
+        if (self.PlanoName.toUpperCase() == listitem.planogramName.toUpperCase()) {
+          console.log("same");
+          canAdd = true
+        } else {
+          canAdd = false
+          return
+        }
+        if (item.modules >= listitem.modules) {
+          canAdd = true
+        } else {
+          canAdd = false
+          return
+        }
+        if (item.bins >= listitem.bins) {
+          canAdd = true
+        } else {
+          canAdd = false
+          return
+        }
+        if (item.height >= listitem.height) {
+          canAdd = true
+        } else {
+          canAdd = false
+          return
+        }
+        if (item.width >= listitem.width) {
+          canAdd = true
+        } else {
+          canAdd = false
+          return
+        }
+        callback(canAdd)
+      },
+      getSpacePlans(data, callback) {
         let self = this;
+        console.log("data");
+        console.log(data);
+        console.log(self.PlanoName);
+
 
         self.spaceData = [];
         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
         Axios.get(process.env.VUE_APP_API + "/Planogram_Details")
           .then(r => {
-            console.log(r);
+            console.log("r.data.planogram_DetailsList");
+            console.log(r.data.planogram_DetailsList);
+            self.spaceData = []
+            r.data.planogram_DetailsList.forEach(element => {
+              self.checkAdd(data, element, retval => {
+                if (retval == true) {
+                  self.spaceData.push(element)
+                }
+              })
 
-            self.spaceData = r.data.planogram_DetailsList;
-            delete Axios.defaults.headers.common["TenantID" ];
+            });
+
+
+            delete Axios.defaults.headers.common["TenantID"];
 
             callback();
           })
-          .catch(e => {
-            alert("Failed to get data...");
-          })
+        // .catch(e => {
+        //   alert("Failed to get data..."+e);
+        // })
       },
-      show(afterComplete) {
+      show(data, afterComplete) {
         let self = this;
-        self.getSpacePlans(() => {
+        // self.filterProject = ProjectID
+        self.getSpacePlans(data, callback => {
           self.dialog = true;
           self.afterComplete = afterComplete;
         })

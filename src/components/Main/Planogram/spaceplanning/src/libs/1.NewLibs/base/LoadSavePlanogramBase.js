@@ -153,6 +153,7 @@ class LoadSavePlanogramBase {
           // do whatever you like with the percentage complete
           // maybe dispatch an action that will update a progress bar or something
           updateLoader({
+            title:"Saving Data.... ",
             text1: "uploading Advanced Planogram",
             text2: "File Progresss",
             currentFileSize: currentFileSize,
@@ -170,7 +171,7 @@ class LoadSavePlanogramBase {
           folder: "Space Planning",
           name: planogramName,
         },
-        data: output
+        data: output                                  
       }, config).then(result => {
         // __sending simple version through
 

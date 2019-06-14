@@ -824,7 +824,9 @@
 
 
                 }
-                self.updateLoader({text1:"Rendering Planogram"})
+                self.updateLoader({
+                  text1: "Rendering Planogram"
+                })
                 setTimeout(() => {
                   if (clusterData.clusterType != null && clusterData.storeID == null || clusterData
                     .clusterType !=
@@ -862,6 +864,17 @@
         self.selectedClusterType = null;
         self.selectedClusterOption = null;
         self.rangingData.planogramID = null;
+        for (var prop in self.rangingData) {
+          self.rangingData[prop] = null
+        }
+        self.modules = 0
+        self.height = 0
+        self.width = 0
+        self.displays = 0
+        self.pallettes = 0
+        self.supplierStands = 0
+        self.bins = 0
+
       },
       saveFile(isNew) {
         let self = this;
@@ -897,19 +910,6 @@
               if (self.spacePlanID == null) {
                 self.$refs.SizeLoader.show()
                 self.planogramHelper.save(self.$store, stage, clusterData, {
-                  modules: self.modules,
-                  height: self.height,
-                  width: self.width,
-                  displays: self.displays,
-                  pallettes: self.pallettes,
-                  supplierStands: self.supplierStands,
-                  bins: self.bins
-                }, self.spacePlanID, self.spacePlanName, true, image, self.updateLoader , self.$refs.SizeLoader.close)
-                // self.$refs.SizeLoader.close()
-              } else {
-                self.$refs.yesNoModal.show('Update file name with latest configuration?', value => {
-                   self.$refs.SizeLoader.show()
-                  self.planogramHelper.save(self.$store, stage, clusterData, {
                     modules: self.modules,
                     height: self.height,
                     width: self.width,
@@ -917,7 +917,22 @@
                     pallettes: self.pallettes,
                     supplierStands: self.supplierStands,
                     bins: self.bins
-                  }, self.spacePlanID, self.spacePlanName, value, image , self.updateLoader , self.$refs.SizeLoader.close)
+                  }, self.spacePlanID, self.spacePlanName, true, image, self.updateLoader, self.$refs.SizeLoader
+                  .close)
+                // self.$refs.SizeLoader.close()
+              } else {
+                self.$refs.yesNoModal.show('Update file name with latest configuration?', value => {
+                  self.$refs.SizeLoader.show()
+                  self.planogramHelper.save(self.$store, stage, clusterData, {
+                      modules: self.modules,
+                      height: self.height,
+                      width: self.width,
+                      displays: self.displays,
+                      pallettes: self.pallettes,
+                      supplierStands: self.supplierStands,
+                      bins: self.bins
+                    }, self.spacePlanID, self.spacePlanName, value, image, self.updateLoader, self.$refs
+                    .SizeLoader.close)
                 })
               }
             })
@@ -932,12 +947,13 @@
             }, self.spacePlanID, self.spacePlanName, true, image)
           } else {
             self.$refs.yesNoModal.show('Update file name with latest configuration?', value => {
-               self.$refs.SizeLoader.show()
+              self.$refs.SizeLoader.show()
               self.planogramHelper.save(self.$store, stage, clusterData, {
-                modules: self.modules,
-                height: self.height,
-                width: self.width
-              }, self.spacePlanID, self.spacePlanName, value, image,self.updateLoader , self.$refs.SizeLoader.close)
+                  modules: self.modules,
+                  height: self.height,
+                  width: self.width
+                }, self.spacePlanID, self.spacePlanName, value, image, self.updateLoader, self.$refs.SizeLoader
+                .close)
             })
           }
         }
