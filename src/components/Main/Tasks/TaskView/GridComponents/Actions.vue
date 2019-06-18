@@ -53,8 +53,8 @@
                 </template>
                 <span>complete</span>
             </v-tooltip>
-
         </div>
+
         <v-tooltip bottom>
             <template v-slot:activator="{ on }">
                 <v-btn flat icon small @click="params.context.componentParent.closeTask(params.data, index)"
@@ -242,7 +242,6 @@
             <span>View</span>
         </v-tooltip>
 
-
         <v-tooltip bottom>
             <template v-slot:activator="{ on }">
                 <v-btn flat icon small @click="params.context.componentParent.closeTask(params.data , index)"
@@ -252,6 +251,7 @@
             </template>
             <span>close</span>
         </v-tooltip>
+        
         <v-tooltip bottom>
             <template v-slot:activator="{ on }">
                 <v-btn flat icon small color="primary" @click="params.context.componentParent.submitForDistribution(params.data)"
@@ -306,6 +306,7 @@
             </template>
             <span>View</span>
         </v-tooltip>
+        
         <v-tooltip bottom>
             <template v-slot:activator="{ on }">
                 <v-btn flat icon small color="primary" @click="params.context.componentParent.routeToView(params.data)"
@@ -536,7 +537,7 @@
         methods: {},
         created() {
             let self = this;
-            self.selectedUser = self.params.context.componentParent.selectedUser;
+            self.systemUserID = self.params.context.componentParent.selectedUser;
         }
     }
 </script>

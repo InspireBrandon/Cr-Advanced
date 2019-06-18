@@ -49,7 +49,7 @@
             <v-list-tile @click="saveFile(false)">
               <v-list-tile-title>Save</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile @click="saveFile(true)">
+            <v-list-tile disabled @click="saveFile(true)">
               <v-list-tile-title>Save New</v-list-tile-title>
             </v-list-tile>
             <v-list-tile @click="rangeToPlanogram">
@@ -874,7 +874,7 @@
         self.pallettes = 0
         self.supplierStands = 0
         self.bins = 0
-
+        self.spacePlanID = null;
       },
       saveFile(isNew) {
         let self = this;

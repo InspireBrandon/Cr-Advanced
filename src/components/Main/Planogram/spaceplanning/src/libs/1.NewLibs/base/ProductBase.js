@@ -6,6 +6,7 @@ import StoreHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.Ne
 import ProductItemBase from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/ProductItemBase.js";
 import CloneBase from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/CloneBase.js";
 import ParentTreeRedraw from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/RedrawParentChildBase.js";
+import ProductRenderingBase from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/ProductRenderingBase.js";
 
 class ProductBase extends ProductItemBase {
   constructor(vueStore, stage, layer, data, ratio, type, gondolaID) {
@@ -14,6 +15,7 @@ class ProductBase extends ProductItemBase {
     this.Indicator1 = null;
     this.Indicator2 = null;
     this.ParentTreeRedraw = new ParentTreeRedraw();
+    this.Rendering = null;
   }
 
   Initialise(dropPos, positionElementRequired = true) {
@@ -308,6 +310,35 @@ class ProductBase extends ProductItemBase {
         y: 0,
         points: [totalWidth, 0, totalWidth / 2, self.TotalHeight / 2, 0, self.TotalHeight],
         stroke: 'red',
+        strokeWidth: 2,
+        //lineCap: 'round',
+        //lineJoin: 'round'
+      })
+
+      // console.log("[PRODUCT] Show product indicators - ", storeResult, "YES/NO/SELECTED: ", storeResult.Data.store_Range_Indicator, self.Indicator1);
+      self.Group.add(self.Indicator1);
+      self.Group.add(self.Indicator2);
+
+      self.Indicator1.moveToTop()
+      self.Indicator2.moveToTop()
+    }
+
+    if(storeResult.Data.store_Range_Indicator == "SELECTED" || storeResult.Data.store_Range_Indicator == "SELECT") {
+      self.Indicator1 = new Konva.Line({
+        x: 0,
+        y: 0,
+        points: [0, 0, totalWidth / 2, self.TotalHeight / 2, totalWidth, self.TotalHeight],
+        stroke: 'blue',
+        strokeWidth: 2,
+        // lineCap: 'round',
+        // lineJoin: 'round'
+      })
+
+      self.Indicator2 = new Konva.Line({
+        x: 0,
+        y: 0,
+        points: [totalWidth, 0, totalWidth / 2, self.TotalHeight / 2, 0, self.TotalHeight],
+        stroke: 'transparent',
         strokeWidth: 2,
         //lineCap: 'round',
         //lineJoin: 'round'
@@ -637,6 +668,29 @@ class ProductBase extends ProductItemBase {
   }
 
   //#endregion
+
+  //#region Renderings
+
+  AddRendering (fixture, margin) {
+    let self = this;
+
+    if (self.Rendering != null) {
+      self.Rendering.DestroyRendering();
+    }
+
+    let newRendering = new ProductRenderingBase(self.Layer, fixture, self, margin, self.Ratio);
+    newRendering.AddRendering();
+    self.Rendering = newRendering;
+  }
+
+  RemoveRendering () {
+    let self = this;
+    if (self.Rendering != null) {
+      self.Rendering.DestroyRendering();
+    }
+  }
+
+  //#endregion Renderings
 }
 
 export default ProductBase;
