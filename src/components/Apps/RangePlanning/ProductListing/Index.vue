@@ -86,16 +86,32 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
+                <v-menu v-if="file_type != null" dark offset-y style="margin-bottom: 10px;">
+                    <v-btn slot="activator" flat>Options</v-btn>
+                    <v-list light dense>
+                        <v-list-tile @click="newLine()">
+                            <v-list-tile-title>Insert Line</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
             </v-toolbar-items>
+            <v-spacer />
+            <h3>{{ file_type }}</h3>
             <v-spacer />
             <v-progress-circular v-if="showLoader" indeterminate color="primary"></v-progress-circular>
             <span>{{ successText }}</span>
             <span style="color: red;">{{ errorText }}</span>
         </v-toolbar>
-        <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 113px);"
-            :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
-            :selectionChanged="onSelectionChanged" :rowData="rowData" :enableSorting="true" :enableFilter="true"
-            :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
+        <v-card v-if="file_type == null">
+            <v-card-text>
+                select a file template to get started <a @click.prevent="file_type_dialog = true" href="#">click
+                    here</a>
+            </v-card-text>
+        </v-card>
+        <ag-grid-vue v-if="file_type != null" :gridOptions="gridOptions"
+            style="width: 100%;  height: calc(100vh - 113px);" :defaultColDef="defaultColDef" class="ag-theme-balham"
+            :columnDefs="columnDefs" :selectionChanged="onSelectionChanged" :rowData="rowData" :enableSorting="true"
+            :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
             :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :gridReady="onGridReady"
             :groupMultiAutoColumn="true">
         </ag-grid-vue>
@@ -110,12 +126,13 @@
                 <v-toolbar color="primary" dark flat>
                     <v-toolbar-title>File templates</v-toolbar-title>
                 </v-toolbar>
-                <v-card-text>
-                    <span class="font-weight-light">Please select a file type:</span>
+                <v-card-text class="pt-0">
                     <v-container fluid grid-list-xl>
                         <v-layout row wrap>
+                            <v-flex md12><span class="font-weight-light">Please select a file type:</span></v-flex>
                             <v-flex md4 v-for="file_type in file_types" :key="file_type.title">
-                                <v-card @click="set_file_type(file_type.file_type)" style="cursor: pointer;" color="primary" dark class="elevation-3">
+                                <v-card @click="set_file_type(file_type.title)" style="cursor: pointer;"
+                                    color="primary" dark class="elevation-3">
                                     <v-card-title>
                                         <div style="text-align: center; width: 100%;">{{ file_type.title }}</div>
                                     </v-card-title>
@@ -132,7 +149,7 @@
 
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="primary" flat @click="file_type_dialog = false">Continue</v-btn>
+                    <v-btn color="error" flat @click="file_type_dialog = false">Cancel</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -226,8 +243,7 @@
                 successText: "",
                 errorText: "",
                 file_type: null,
-                file_types: [
-                    {
+                file_types: [{
                         title: 'Add Item',
                         icon: 'add',
                         file_type: 'ADD_ITEM'
@@ -297,6 +313,7 @@
             close() {
                 let self = this;
                 self.dialog = false;
+                self.file_type = null;
             },
             newLine() {
                 let self = this;
@@ -328,6 +345,7 @@
                 let self = this;
                 self.isAdd = true;
                 self.rowData = [];
+                self.file_type = null;
             },
             hideShow(headerGroup) {
                 let self = this;
