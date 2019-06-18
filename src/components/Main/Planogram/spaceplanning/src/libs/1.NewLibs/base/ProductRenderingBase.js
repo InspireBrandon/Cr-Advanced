@@ -32,7 +32,7 @@ class ProductRenderingBase {
         switch (self.fixture.Type.toUpperCase()) {
             case "SHELF": {
                 if (self.margin != null && self.margin != undefined && self.margin > 0) {
-                    self.y = (margin * self.ratio) * -1;
+                    self.y = (self.margin * self.ratio) * -1;
                 } else {
                     self.y = ((individualProductHeight + self.productItem.Orientation_Height) / 2) * -1;
                 }
@@ -89,8 +89,8 @@ class ProductRenderingBase {
         if (self.productItem.LastFace.toUpperCase() === "FRONT") {
             self.Image.rotation(0);
             self.Image.image(self.productItem.image_front);
-            self.Image.setX(0 + self.productItem.Orientation_Width / 2);
-            self.Image.setY(0 + self.productItem.Orientation_Height / 2);
+            self.Image.setX(self.x + self.productItem.Orientation_Width / 2);
+            self.Image.setY(self.y + self.productItem.Orientation_Height / 2);
 
             self.Image.offset({
                 x: self.productItem.image_orientation_width / 2,
@@ -105,8 +105,8 @@ class ProductRenderingBase {
         } else if (self.productItem.LastFace.toUpperCase() === "LEFT") {
             self.Image.rotation(0);
             self.Image.image(self.productItem.image_side);
-            self.Image.setX(0 + self.productItem.Orientation_Width / 2);
-            self.Image.setY(0 + self.productItem.Orientation_Height / 2);
+            self.Image.setX(self.x + self.productItem.Orientation_Width / 2);
+            self.Image.setY(self.y + self.productItem.Orientation_Height / 2);
 
             self.Image.offset({
                 x: self.productItem.image_orientation_width / 2,
@@ -121,8 +121,8 @@ class ProductRenderingBase {
         } else if (self.productItem.LastFace.toUpperCase() === "TOP") {
             self.Image.rotation(0);
             self.Image.image(self.productItem.image_top);
-            self.Image.setX(0 + self.productItem.Orientation_Width / 2);
-            self.Image.setY(0 + self.productItem.Orientation_Height / 2);
+            self.Image.setX(self.x + self.productItem.Orientation_Width / 2);
+            self.Image.setY(self.y + self.productItem.Orientation_Height / 2);
 
             self.Image.offset({
                 x: self.productItem.image_orientation_width / 2,
