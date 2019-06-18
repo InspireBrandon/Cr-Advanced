@@ -273,7 +273,6 @@ class ShelfBase extends PlanogramItemBase {
   ApplyProductRenderings() {
     let self = this;
     let ctrl_store = new StoreHelper();
-    console.log("[PRODUCT RENDERINGS] WE ARE HERE!")
     if (self.Data.productRendering != undefined && self.Data.productRendering != null && self.Data.productRendering == true) {
 
       let allProducts = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "PRODUCT", self.ID);
@@ -282,15 +281,21 @@ class ShelfBase extends PlanogramItemBase {
         return;
       }
 
+      let margin = self.Data.productRenderingMargin;
       allProducts.forEach(product => {
         // add rendering
-        let newRendering = new ProductRenderingBase(self.Layer, self, product, 0, self.Ratio);
-        newRendering.AddRendering();
-        self.Renderings.push({
-          type: 'PRODUCTRENDERING',
-          konva: newRendering.Group,
-          renderingObj: newRendering
-        });
+        product.AddRendering(self, margin);
+      });
+    } else {
+      let allProducts = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "PRODUCT", self.ID);
+
+      if (allProducts.length == 0) {
+        return;
+      }
+
+      allProducts.forEach(product => {
+        // add rendering
+        product.RemoveRendering();
       });
     }
   }
@@ -301,7 +306,7 @@ class ShelfBase extends PlanogramItemBase {
     self.Renderings.forEach(element => {
       element.konva.destroy();
     });
-    
+
     self.Renderings = [];
   }
 

@@ -276,8 +276,40 @@ class BasketBase extends PlanogramItemBase {
       self.Group.add(front);
     }
 
+    /** This will be applied if a productRendering is turned on */
+    self.ApplyProductRenderings();
+    
     self.Layer.draw();
     // self.Group.draw();
+  }
+
+  ApplyProductRenderings() {
+    let self = this;
+    let ctrl_store = new StoreHelper();
+    if (self.Data.productRendering != undefined && self.Data.productRendering != null && self.Data.productRendering == true) {
+
+      let allProducts = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "PRODUCT", self.ID);
+
+      if (allProducts.length == 0) {
+        return;
+      }
+
+      allProducts.forEach(product => {
+        // add rendering
+        product.AddRendering(self);
+      });
+    } else {
+      let allProducts = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "PRODUCT", self.ID);
+
+      if (allProducts.length == 0) {
+        return;
+      }
+
+      allProducts.forEach(product => {
+        // add rendering
+        product.RemoveRendering();
+      });
+    }
   }
 
   RemoveRenderings() {
