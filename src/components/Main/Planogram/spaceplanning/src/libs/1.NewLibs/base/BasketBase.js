@@ -294,6 +294,11 @@ class BasketBase extends PlanogramItemBase {
         return;
       }
 
+      let margin = 0;
+      if (self.Data.productRenderingMargin != undefined && self.Data.productRenderingMargin != null) {
+        margin = self.Data.productRenderingMargin;
+      }
+      
       allProducts.forEach(product => {
         // add rendering
         product.AddRendering(self);
