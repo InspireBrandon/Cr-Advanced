@@ -685,16 +685,18 @@
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(item));
+                let newRequest = JSON.parse(JSON.stringify(item));
                 let tmpUser = request.systemUserID;
 
                 self.checkTaskTakeover(request, () => {
-                    request.systemUserID = tmpUser;
-                    request.notes = self.findAndReplaceNote(request.notes);
+                    newRequest.systemUserID = tmpUser;
 
-                    request.status++;
-                    request.actionedByUserID = null;
+                    newRequest.notes = self.findAndReplaceNote(newRequest.notes);
 
-                    self.createProjectTransaction(request, subtaskTransaction => {
+                    newRequest.status++;
+                    newRequest.actionedByUserID = null;
+
+                    self.createProjectTransaction(newRequest, subtaskTransaction => {
                         self.$parent.$parent.getTaskViewData();
                         // self.goToSubtaskView(request)
                     })
@@ -725,10 +727,13 @@
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(item));
+                let newRequest = JSON.parse(JSON.stringify(item));
                 let tmpUser = request.systemUserID;
 
+                console.log(tmpUser);
+
                 self.checkTaskTakeover(request, () => {
-                    request.systemUserID = tmpUser;
+                    newRequest.systemUserID = tmpUser;
 
                     let projectTXGroupRequest = {
                         projectID: item.project_ID
@@ -741,28 +746,28 @@
                         console.log(r);
 
                         self.$refs.NotesModal.show("Subtask complete notes", notes => {
-                            request.status++;
-                            request.notes = self.findAndReplaceNote(request.notes);
-                            request.actionedByUserID = request.systemUserID;
-                            request.systemUserID = null;
-                            let tmpRollover = request.rollingUserID;
-                            request.rollingUserID = null;
+                            newRequest.status++;
+                            newRequest.notes = self.findAndReplaceNote(newRequest.notes);
+                            newRequest.actionedByUserID = newRequest.systemUserID;
+                            newRequest.systemUserID = null;
+                            let tmpRollover = newRequest.rollingUserID;
+                            newRequest.rollingUserID = null;
 
                             // Create complete transaction
-                            self.createProjectTransaction(request, endTransaction => {
+                            self.createProjectTransaction(newRequest, endTransaction => {
                                 // Create new group to inform other user
                                 self.createProjectTransactionGroup(
                                     projectTXGroupRequest,
                                     newGroup => {
-                                        request.notes = self.findAndReplaceNote(
+                                        newRequest.notes = self.findAndReplaceNote(
                                             notes);
-                                        request.systemUserID = tmpRollover;
-                                        request.actionedByUserID = null;
-                                        request.rollingUserID = null;
-                                        request.projectTXGroup_ID = newGroup.id;
+                                        newRequest.systemUserID = tmpRollover;
+                                        newRequest.actionedByUserID = null;
+                                        newRequest.rollingUserID = null;
+                                        newRequest.projectTXGroup_ID = newGroup.id;
 
                                         // Create new transaction
-                                        self.createProjectTransaction(request,
+                                        self.createProjectTransaction(newRequest,
                                             newRequest => {
                                                 self.$parent.$parent
                                                     .getTaskViewData();

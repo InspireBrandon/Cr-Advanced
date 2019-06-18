@@ -193,12 +193,12 @@
         }
         break;
         case 31: {
-            if (item.rollingUserID != item.systemUserID)
+            if (item.rollingUserID != self.systemUserID)
                 button_1.set('success', 'done', cp.setSubtaskInProgressAndView, "Received")
         }
         break;
         case 32: {
-            if (item.rollingUserID != item.systemUserID)
+            if (item.rollingUserID != self.systemUserID)
                 button_1.set('error', 'check', cp.completeSubtask, "Complete")
         }
         break;
@@ -207,12 +207,12 @@
         }
         break;
         case 34: {
-            if (item.rollingUserID != item.systemUserID)
+            if (item.rollingUserID != self.systemUserID)
                 button_1.set('success', 'done', cp.setSubtaskInProgressAndView, "Received")
         }
         break;
         case 35: {
-            if (item.rollingUserID != item.systemUserID)
+            if (item.rollingUserID != self.systemUserID)
                 button_1.set('error', 'check', cp.completeSubtask, "Complete")
         }
         break;
@@ -221,12 +221,12 @@
         }
         break;
         case 37: {
-            if (item.rollingUserID != item.systemUserID)
+            if (item.rollingUserID != self.systemUserID)
                 button_1.set('success', 'done', cp.setSubtaskInProgressAndView, "Received")
         }
         break;
         case 38: {
-            if (item.rollingUserID != item.systemUserID) {
+            if (item.rollingUserID != self.systemUserID) {
                 button_1.set('warning', 'visibility', cp.goToSubtaskView, "View")
                 button_2.set('error', 'check', cp.completeSubtask, "Complete")
             }
