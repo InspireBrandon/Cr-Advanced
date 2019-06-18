@@ -3,15 +3,17 @@ class ProductRenderingBase {
 
     constructor(layer, fixture, productItem, yMargin, ratio) {
         this.fixture = fixture;
-        this.Group = null;
         this.Layer = layer;
         this.productItem = productItem;
         this.ratio = ratio;
         this.margin = parseInt(yMargin);
+        this.Image = null;
         this.x = 0;
         this.y = 0;
         this.width = 0;
         this.height = 0;
+
+        console.log("[PRODUCT RENDERING] MARGIN", this.margin);
     }
 
     CalculatePosition() {
@@ -59,29 +61,9 @@ class ProductRenderingBase {
         }
     }
 
-    BuildRendering() {
-        let self = this;
-
-        self.Group = new Konva.Group({
-            x: self.x,
-            y: self.y,
-            width: self.productItem.Orientation_Width,
-            height: self.productItem.Orientation_Height,
-            draggable: false
-        });
-
-        self.fixture.Group.add(self.Group);
-
-        self.fixture.Renderings.push({
-            type: 'PRODUCTRENDERING',
-            konva: self.Group
-        });
-    }
-
     AddRendering() {
         let self = this;
         self.CalculatePosition();
-        self.BuildRendering();
         self.AddProductImage();
     }
 
@@ -97,71 +79,75 @@ class ProductRenderingBase {
 
         // self.Group.add(tmpRect); //ADD WHEN YOU WANT TO TEST
 
-        let image_rect = new Konva.Image({
+        self.Image = new Konva.Image({
+            x: self.x,
+            y: self.y,
             name: 'front-image-rendering-facing',
             listening: false
         })
 
         if (self.productItem.LastFace.toUpperCase() === "FRONT") {
-            image_rect.rotation(0);
-            image_rect.image(self.productItem.image_front);
-            image_rect.setX(0 + self.productItem.Orientation_Width / 2);
-            image_rect.setY(0 + self.productItem.Orientation_Height / 2);
+            self.Image.rotation(0);
+            self.Image.image(self.productItem.image_front);
+            self.Image.setX(0 + self.productItem.Orientation_Width / 2);
+            self.Image.setY(0 + self.productItem.Orientation_Height / 2);
 
-            image_rect.offset({
+            self.Image.offset({
                 x: self.productItem.image_orientation_width / 2,
                 y: self.productItem.image_orientation_height / 2
             })
 
-            image_rect.setWidth(self.productItem.image_orientation_width);
-            image_rect.setHeight(self.productItem.image_orientation_height);
+            self.Image.setWidth(self.productItem.image_orientation_width);
+            self.Image.setHeight(self.productItem.image_orientation_height);
 
-            image_rect.rotation(self.productItem.Rotation);
-            self.Group.add(image_rect);
+            self.Image.rotation(self.productItem.Rotation);
 
         } else if (self.productItem.LastFace.toUpperCase() === "LEFT") {
-            image_rect.rotation(0);
-            image_rect.image(self.productItem.image_side);
-            image_rect.setX(0 + self.productItem.Orientation_Width / 2);
-            image_rect.setY(0 + self.productItem.Orientation_Height / 2);
+            self.Image.rotation(0);
+            self.Image.image(self.productItem.image_side);
+            self.Image.setX(0 + self.productItem.Orientation_Width / 2);
+            self.Image.setY(0 + self.productItem.Orientation_Height / 2);
 
-            image_rect.offset({
+            self.Image.offset({
                 x: self.productItem.image_orientation_width / 2,
                 y: self.productItem.image_orientation_height / 2
             })
 
-            image_rect.setWidth(self.productItem.image_orientation_width);
-            image_rect.setHeight(self.productItem.image_orientation_height);
+            self.Image.setWidth(self.productItem.image_orientation_width);
+            self.Image.setHeight(self.productItem.image_orientation_height);
 
-            image_rect.rotation(self.productItem.Rotation);
-            self.Group.add(image_rect);
+            self.Image.rotation(self.productItem.Rotation);
 
         } else if (self.productItem.LastFace.toUpperCase() === "TOP") {
-            image_rect.rotation(0);
-            image_rect.image(self.productItem.image_top);
-            image_rect.setX(0 + self.productItem.Orientation_Width / 2);
-            image_rect.setY(0 + self.productItem.Orientation_Height / 2);
+            self.Image.rotation(0);
+            self.Image.image(self.productItem.image_top);
+            self.Image.setX(0 + self.productItem.Orientation_Width / 2);
+            self.Image.setY(0 + self.productItem.Orientation_Height / 2);
 
-            image_rect.offset({
+            self.Image.offset({
                 x: self.productItem.image_orientation_width / 2,
                 y: self.productItem.image_orientation_height / 2
             })
 
-            image_rect.setWidth(self.productItem.image_orientation_width);
-            image_rect.setHeight(self.productItem.image_orientation_height);
+            self.Image.setWidth(self.productItem.image_orientation_width);
+            self.Image.setHeight(self.productItem.image_orientation_height);
 
-            image_rect.rotation(self.productItem.Rotation);
-
-            self.ImageRects.push(image_rect);
-            self.Group.add(image_rect);
+            self.Image.rotation(self.productItem.Rotation);
         }
-        image_rect.show();
+        self.Image.show();
+
+        self.fixture.Renderings.push({
+            type: 'PRODUCTRENDERING',
+            konva: self.Image
+        });
+
+        self.fixture.Group.add(self.Image);
+        self.Layer.draw();
     }
 
     DestroyRendering() {
         let self = this;
-        self.Group.destroy();
-        self.Layer.draw();
+        self.Image.destroy();
     }
 }
 
