@@ -6,6 +6,7 @@ import StoreHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.Ne
 import ProductItemBase from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/ProductItemBase.js";
 import CloneBase from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/CloneBase.js";
 import ParentTreeRedraw from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/RedrawParentChildBase.js";
+import ProductRenderingBase from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/ProductRenderingBase.js";
 
 class ProductBase extends ProductItemBase {
   constructor(vueStore, stage, layer, data, ratio, type, gondolaID) {
@@ -14,6 +15,7 @@ class ProductBase extends ProductItemBase {
     this.Indicator1 = null;
     this.Indicator2 = null;
     this.ParentTreeRedraw = new ParentTreeRedraw();
+    this.Rendering = null;
   }
 
   Initialise(dropPos, positionElementRequired = true) {
@@ -666,6 +668,29 @@ class ProductBase extends ProductItemBase {
   }
 
   //#endregion
+
+  //#region Renderings
+
+  AddRendering (fixture, margin) {
+    let self = this;
+
+    if (self.Rendering != null) {
+      self.Rendering.DestroyRendering();
+    }
+
+    let newRendering = new ProductRenderingBase(self.Layer, fixture, self, margin, self.Ratio);
+    newRendering.AddRendering();
+    self.Rendering = newRendering;
+  }
+
+  RemoveRendering () {
+    let self = this;
+    if (self.Rendering != null) {
+      self.Rendering.DestroyRendering();
+    }
+  }
+
+  //#endregion Renderings
 }
 
 export default ProductBase;
