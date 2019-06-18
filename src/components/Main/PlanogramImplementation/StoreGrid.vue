@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="rowData.length>0">
         storeID:{{StoreID}}
         <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%;  height: calc(100vh - 235px);"
             :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
@@ -20,7 +20,7 @@
         AgGridVue
     } from "ag-grid-vue";
     export default {
-        props: ["rowData", "StoreID" , "method"],
+        props: ["rowData", "StoreID", "method"],
         components: {
             AgGridVue,
             Button,
@@ -28,10 +28,13 @@
         },
         data() {
             return {
-                currentStorePlanograms:[],
+                currentStorePlanograms: [],
                 headers: [{
                         "headerName": "Planogram",
                         "field": "name"
+                    }, {
+                        "headerName": "Name",
+                        "field": "GeneratedName"
                     }, {
                         "headerName": "Cluster Name",
                         "field": "clusterName"
@@ -133,7 +136,7 @@
                 setTimeout(() => {
                     this.gridApi.resetRowHeights();
                     this.gridApi.sizeColumnsToFit()
-                }, 60);
+                }, 300);
             },
 
             getDetails(StoreID) {
@@ -157,7 +160,7 @@
             assignPlanogramToStore(listItem) {
                 let self = this;
                 self.$refs.PlanogramDetailsSelector.show(listItem, false, data => {
-                   
+
 
                     let item = {
 
@@ -170,7 +173,9 @@
 
                     Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
                         .then(r => {
-                            let item = {store_ID:self.StoreID}
+                            let item = {
+                                store_ID: self.StoreID
+                            }
                             self.method(item)
                             // self.params.context.componentParent.GetData(self.StoreID)
                             // self.getDetails(self.StoreID)
