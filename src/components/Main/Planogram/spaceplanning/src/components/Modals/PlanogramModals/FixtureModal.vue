@@ -200,6 +200,9 @@
                       <v-flex v-if="newData.type == 2 && (newData.fixtureType == 0 || newData.fixtureType == 1 || newData.fixtureType == 3)">
                         <v-checkbox label="Product Renderings" v-model="newData.productRendering"></v-checkbox>
                       </v-flex>
+                      <v-flex v-if="newData.type == 2 && (newData.fixtureType == 0 || newData.fixtureType == 1 || newData.fixtureType == 3)">
+                        <v-text-field label="Product Rendering Margin" type="number" v-model="newData.producRenderingMargin"></v-text-field> 
+                      </v-flex>
                       <v-flex>
                         <hr>
                         <br>

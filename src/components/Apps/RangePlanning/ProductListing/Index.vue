@@ -7,8 +7,8 @@
                         File
                     </v-btn>
                     <v-list light dense>
-                        <v-list-tile @click="newLine">
-                            <v-list-tile-title>New Line</v-list-tile-title>
+                        <v-list-tile @click="file_type_dialog = true">
+                            <v-list-tile-title>New</v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile @click="openFile">
                             <v-list-tile-title>Open</v-list-tile-title>
@@ -104,6 +104,39 @@
                 {{ snackbarText }}
             </div>
         </v-snackbar>
+        <!-- FILE TYPE DIALOG -->
+        <v-dialog v-model="file_type_dialog" persistent width="500">
+            <v-card>
+                <v-toolbar color="primary" dark flat>
+                    <v-toolbar-title>File templates</v-toolbar-title>
+                </v-toolbar>
+                <v-card-text>
+                    <span class="font-weight-light">Please select a file type:</span>
+                    <v-container fluid grid-list-xl>
+                        <v-layout row wrap>
+                            <v-flex md4 v-for="file_type in file_types" :key="file_type.title">
+                                <v-card @click="set_file_type(file_type.file_type)" style="cursor: pointer;" color="primary" dark class="elevation-3">
+                                    <v-card-title>
+                                        <div style="text-align: center; width: 100%;">{{ file_type.title }}</div>
+                                    </v-card-title>
+                                    <v-card-text class="pt-0" style="text-align: center;">
+                                        <v-icon>{{ file_type.icon }}</v-icon>
+                                    </v-card-text>
+                                </v-card>
+                            </v-flex>
+                        </v-layout>
+                    </v-container>
+                </v-card-text>
+
+                <v-divider></v-divider>
+
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" flat @click="file_type_dialog = false">Continue</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <!-- END FILE TYPE DIALOG -->
         <Prompt ref="prompt"></Prompt>
         <NewItemListingSelector ref="newItemListingSelector"></NewItemListingSelector>
         <YesNoModal ref="yesNo"></YesNoModal>
@@ -147,6 +180,8 @@
         },
         data() {
             return {
+                file_type_dialog: false,
+                currentFileType: null,
                 isAdd: true,
                 dialog: false,
                 currentFileName: '',
@@ -190,6 +225,29 @@
                 showLoader: false,
                 successText: "",
                 errorText: "",
+                file_type: null,
+                file_types: [
+                    {
+                        title: 'Add Item',
+                        icon: 'add',
+                        file_type: 'ADD_ITEM'
+                    },
+                    {
+                        title: 'Change Item',
+                        icon: 'edit',
+                        file_type: 'CHANGE_ITEM'
+                    },
+                    {
+                        title: 'Delist Item',
+                        icon: 'delete',
+                        file_type: 'DELIST_ITEM'
+                    },
+                    {
+                        title: 'Promote Item',
+                        icon: 'grade',
+                        file_type: 'PROMOTE_ITEM'
+                    }
+                ]
             }
         },
         computed: {
@@ -219,6 +277,11 @@
             },
             onCellValueChanged(e) {
                 console.log(e);
+            },
+            set_file_type(file_type) {
+                let self = this;
+                self.file_type = file_type;
+                self.file_type_dialog = false;
             },
             show() {
                 let self = this;
