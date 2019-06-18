@@ -217,7 +217,7 @@
                       <v-flex
                         v-if="newData.type == 2 && (newData.fixtureType == 0 || newData.fixtureType == 1 || newData.fixtureType == 3)">
                         <v-text-field label="Product Rendering Margin" type="number"
-                          v-model="newData.producRenderingMargin"></v-text-field>
+                          v-model="newData.productRenderingMargin"></v-text-field>
                       </v-flex>
                       <v-flex>
                         <hr>
@@ -812,8 +812,8 @@
             self.newData.spreadProducts = 'L2R'
           }
 
-          if (self.newData.producRenderingMargin == undefined || self.newData.producRenderingMargin == null) {
-            self.newData.producRenderingMargin = 0;
+          if (self.newData.productRenderingMargin == undefined || self.newData.productRenderingMargin == null) {
+            self.newData.productRenderingMargin = 0;
           }
 
           if (self.newData.RenderingsItems == undefined) {
@@ -1078,8 +1078,8 @@
         self.newData.facingOffsetX = returnFloat(self.newData.facingOffsetX);
         self.newData.facingOffsetY = returnFloat(self.newData.facingOffsetY);
 
-        if (self.newData.producRenderingMargin == undefined || self.newData.producRenderingMargin == null) {
-          self.newData.producRenderingMargin = 0;
+        if (self.newData.productRenderingMargin == undefined || self.newData.productRenderingMargin == null) {
+          self.newData.productRenderingMargin = 0;
         }
 
         var fixtureObj = {
