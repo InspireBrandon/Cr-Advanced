@@ -6,13 +6,8 @@
         <v-btn @click="removeLine" class="ma-0" small icon>
             <v-icon color="red">delete</v-icon>
         </v-btn> -->
-        <v-btn @click="params.context.componentParent.$parent.$parent.$parent.$parent.assignPlanogramToStore(params.data)" icon flat small color="primary" class="ma-0">
+        <v-btn @click="params.context.componentParent.assignPlanogramToStore(params.data)" icon flat small color="primary" class="ma-0">
             <v-icon>assignment</v-icon>
-        </v-btn>
-        <v-btn icon @click="params.context.componentParent.$parent.$parent.$parent.$parent.$refs.StorePlanograms.show(params.data)" class="ma-0">
-            <v-icon>
-                more_vert
-            </v-icon>
         </v-btn>
     </div>
 </template>

@@ -11,12 +11,14 @@
 </template>
 <script>
     import Button from "./button.vue"
+    import Axios from 'axios'
 
     import {
         AgGridVue
     } from "ag-grid-vue";
     export default {
-        props: ["rowData"],
+
+        props: ["rowData", "selectedProject"],
         components: {
             AgGridVue,
             Button,
@@ -32,39 +34,46 @@
                     "field": "clusterName"
                 }, {
                     "headerName": "Modules",
-                    "maxWidth": 50,
+                    "maxWidth": 90,
                     "minWidth": 50,
+                    "editable": true,
                     "field": "modules"
                 }, {
                     "headerName": "Height",
-                    "maxWidth": 50,
+                    "maxWidth": 90,
                     "minWidth": 50,
+                    "editable": true,
                     "field": "height"
                 }, {
                     "headerName": "Width",
-                    "maxWidth": 50,
+                    "maxWidth": 90,
                     "minWidth": 50,
+                    "editable": true,
                     "field": "width"
                 }, {
                     "headerName": "Displays",
-                    "maxWidth": 50,
+                    "maxWidth": 90,
                     "minWidth": 50,
+                    "editable": true,
                     "field": "displays"
                 }, {
                     "headerName": "Pallettes",
-                    "maxWidth": 50,
+                    "maxWidth": 90,
                     "minWidth": 50,
+                    "editable": true,
                     "field": "pallettes"
                 }, {
                     "headerName": "Supplier Stands",
-                    "maxWidth": 50,
+                    "maxWidth": 90,
                     "minWidth": 50,
+                    "editable": true,
                     "field": "supplierStands"
                 }, {
                     "headerName": "Bins",
                     "field": "bins",
-                    "maxWidth": 50,
+                    "maxWidth": 90,
                     "minWidth": 50,
+                    "editable": true,
                 }, {
                     "headerName": "Current Status",
                     "field": "currentStatusText"
@@ -78,9 +87,10 @@
                     "cellRendererFramework": "Button"
                 }],
                 defaultColDef: {
-                    onCellValueChanged: this.onCellValueChanged
+                    onCellValueChanged: this.UpdateLine
                 },
                 gridOptions: {
+                    rowHeight: 35,
                     context: {
                         componentParent: this
                     },
@@ -91,9 +101,37 @@
             }
         },
         methods: {
+            assignPlanogramToStore(listItem) {
+                let self = this;
+                self.$refs.PlanogramDetailsSelector.show(listItem, data => {
+                 
+
+                    let item = {
+                        "id": listItem.id,
+                        "store_ID": listItem.store_ID,
+                        "project_ID": self.selectedProject,
+                        "planogramDetail_ID": data,
+                        "planogramStoreStatus": 1,
+                    }
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
+                        .then(r => {
+                            params.context.componentParent.getStorePlanograms()
+                            delete Axios.defaults.headers.common["TenantID"];
+                        }).catch(e => {
+                            delete Axios.defaults.headers.common["TenantID"];
+
+                        })
+
+
+                })
+            },
             UpdateLine(item) {
                 let self = this
-                self.createPlanoGramDetailTX(item)
+
+                let tmp = item.data
+                self.createPlanoGramDetailTX(tmp)
                 // create new detail tx
                 // update details then update store_planogram if necesssary
 
@@ -101,19 +139,21 @@
             createPlanoGramDetailTX(item) {
                 let self = this
                 let detailsItem = null;
-                console.log("item");
-                console.log(item);
+              
                 if (item.planogramName == null) {
                     item.planogramName = "No assigned Planogram"
                 }
                 if (item.tag == null) {
-                    item.tag = "NPA"
+                    item.tag = ""
                 }
                 if (item.storeCluster == null) {
-                    item.storeCluster = "L TM2"
+                    item.storeCluster = ""
+                }
+                if (item.categoryCluster == null) {
+                    item.categoryCluster = ""
                 }
                 if (item.clusterType == null) {
-                    item.clusterType = "store"
+                    item.clusterType = ""
                 }
                 if (item.clusterName == null) {
                     item.clusterName = ""
@@ -144,12 +184,11 @@
                     "supplierStands": parseInt(item.supplierStands),
                     "bins": parseInt(item.bins)
                 }
-                console.log(sendRequst);
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + 'Planogram_Details/Save', sendRequst).then(
                     r => {
-                        console.log(r);
+                        
                         let obj = {
                             "id": item.id,
                             "store_ID": item.store_ID,
@@ -158,13 +197,12 @@
                             "planogramStoreStatus": 0,
                         }
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                        console.log("obj");
-                        console.log(obj);
+                       
 
                         Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', obj)
                             .then(res => {
-                                console.log(res.data);
-                                self.getStorePlanograms()
+                             
+                                params.context.componentParent.getStorePlanograms()
                                 delete Axios.defaults.headers.common["TenantID"];
                             }).catch(e => {
                                 delete Axios.defaults.headers.common["TenantID"];
@@ -181,6 +219,10 @@
             onGridReady(params) {
                 this.gridApi = params.api;
                 this.columnApi = params.columnApi;
+                setTimeout(() => {
+                    this.gridApi.resetRowHeights();
+                    this.gridApi.sizeColumnsToFit()
+                }, 60);
             },
         }
     }

@@ -1,78 +1,92 @@
 <template>
-    <v-dialog persistent fullscreen v-model="allStoreDialog" flat>
+    <v-dialog persistent fullscreen v-model="dialog">
         <v-card>
             <v-toolbar dark color="primary">
                 <v-toolbar-title>
-                    {{storeName}} Overview
+                    Planograms assigned to {{title}}
                 </v-toolbar-title>
+               
                 <v-spacer></v-spacer>
-
-                <v-btn icon @click="allStoreDialog=false">
-                    <v-icon>
-                        close
-                    </v-icon>
+                <v-btn icon flat dark @click="dialog=false">
+                    <v-icon>close</v-icon>
                 </v-btn>
             </v-toolbar>
-            <v-card-text style="height: calc(100vh - 120px); overflow-x: auto;">
-                <v-data-table :headers="headers" :items="storePlanograms" class="elevation-1" hide-actions>
-                    <template v-slot:items="props">
-                        <tr>
-                            <!-- <td>{{props.item.storeName}}</td>
-                                <td></td>
-                                <td>{{ StoreStatusList[props.item.planogramStoreStatus].text}}
-                                </td>
-                                <td>
-                                    <v-btn @click="assignPlanogramToStore(props.item)" icon flat small color="primary">
-                                        <v-icon>assignment</v-icon>
-                                    </v-btn>
-                                </td> -->
-                        </tr>
-                    </template>
-                </v-data-table>
-            </v-card-text>
+            <StoreGrid ref="StoreGrid" :rowData="rowData" :method="GetData" :StoreID="store_ID" />
+            <PlanogramDetailsSelector :PlanoName="'Select'" ref="PlanogramDetailsSelector" />
+
+
         </v-card>
     </v-dialog>
 </template>
 <script>
+    import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector'
+
+    import StoreGrid from './StoreGrid'
     import Axios from 'axios'
     export default {
+        components: {
+            StoreGrid,
+            PlanogramDetailsSelector,
+        },
+        props: ["StoreID"],
         data() {
             return {
-                headers: [{
-                    text: "Store",
-                    sortable: false
-                }, {
-                    text: "Planogram",
-                    sortable: false
-                }, {
-                    text: "Current Status",
-                    sortable: false
-                }, {
-                    text: "Options",
-                    sortable: false,
-                    width: '280px'
-                }],
-                storePlanograms: [],
-                storeName: null,
-                allStoreDialog: false,
+                currentStorePlanograms:[],
+                store_ID:null,
+                dialog: false,
+                rowData: [],
+                title: null,
+                 StoreStatusList: [{
+                        text: "Unassigned"
+                    },
+
+                    {
+                        text: "DistrubutedToStore"
+                    },
+                    {
+                        text: "ImplementationInProgress"
+                    },
+                    {
+                        text: "Implemented"
+                    },
+                    {
+                        text: "VariationRequested"
+                    }
+                ],
             }
         },
         methods: {
-            open(item) {
+            GetData(StoreID) {
                 let self = this
-                self.allStoreDialog = true
-                self.storeName = item.storeName
-                self.getDetails(item.store_ID)
-            },
-            getDetails(StoreID) {
+
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.get(process.env.VUE_APP_API + `Store_Planogram?Store_ID=${StoreID}`)
+                Axios.get(process.env.VUE_APP_API + `Store_Planogram?Store_ID=${StoreID.store_ID}`)
                     .then(r => {
-                        console.log(r.data);
-
+                       self.rowData=[]   
+                        self.currentStorePlanograms=[]
+                        self.currentStorePlanograms = r.data.queryResult;
+                        self.currentStorePlanograms.forEach((e) => {
+                            
+                            e.currentStatusText = self.StoreStatusList[e.planogramStoreStatus].text
+                        })
+                        self.rowData = self.currentStorePlanograms
+                    }).catch(e=>{
+                        console.log(e);
+                        
                     })
-            }
+            },
+            show(data) {
+                let self = this
+                self.dialog = true
+                self.store_ID=data.store_ID
+                self.title = data.storeName
+                self.GetData(data)
+            },
+            close() {
+                let self = this
+                self.dialog = false
+            },
         }
 
     }

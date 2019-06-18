@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="dialog" max-width="1000px"  persistent scrollable>
+    <v-dialog v-model="dialog" max-width="1000px" persistent scrollable>
       <v-card height="400px" style="overflow: auto;">
 
         <v-card-title style=" display: block;" class="headline pa-0">
@@ -26,7 +26,7 @@
 
               </v-list-tile-content>
               <v-spacer></v-spacer>
-              <v-list-tile-action>h:{{sp.height}} w:{{sp.width}} modules:{{sp.modules}}</v-list-tile-action>
+              <!-- <v-list-tile-action>h:{{sp.height}} w:{{sp.width}} modules:{{sp.modules}}</v-list-tile-action> -->
             </v-list-tile>
           </v-list>
         </v-card-text>
@@ -59,6 +59,7 @@
     },
     data() {
       return {
+        doCheck: false,
         filterProject: null,
         searchText: null,
         dialog: false,
@@ -166,14 +167,17 @@
             console.log("r.data.planogram_DetailsList");
             console.log(r.data.planogram_DetailsList);
             self.spaceData = []
-            r.data.planogram_DetailsList.forEach(element => {
-              self.checkAdd(data, element, retval => {
-                if (retval == true) {
-                  self.spaceData.push(element)
-                }
-              })
-
-            });
+            if (self.doCheck == true) {
+              r.data.planogram_DetailsList.forEach(element => {
+                self.checkAdd(data, element, retval => {
+                  if (retval == true) {
+                    self.spaceData.push(element)
+                  }
+                })
+              });
+            } else {
+              self.spaceData = r.data.planogram_DetailsList
+            }
 
 
             delete Axios.defaults.headers.common["TenantID"];
@@ -184,8 +188,9 @@
         //   alert("Failed to get data..."+e);
         // })
       },
-      show(data, afterComplete) {
+      show(data, doCheck, afterComplete) {
         let self = this;
+        self.doCheck = doCheck
         // self.filterProject = ProjectID
         self.getSpacePlans(data, callback => {
           self.dialog = true;

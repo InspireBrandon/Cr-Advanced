@@ -1,149 +1,31 @@
 <template>
     <v-dialog fullscreen v-model="storeView">
         <v-card>
-        <v-toolbar flat color="primary" dark>
-            <v-toolbar-title>
-                Store Planogram Overview: {{ProjectName.text}}
-            </v-toolbar-title>
-            <v-spacer></v-spacer>
-            <v-btn icon flat dark @click="storeView=false">
-                <v-icon>close</v-icon>
-            </v-btn>
-        </v-toolbar>
-        <v-toolbar dark flat dense>
-            <v-menu>
-                <v-btn slot="activator">options</v-btn>
-                <v-list>
-                    <v-list-tile>asdf</v-list-tile>
-                    <v-list-tile>asdf</v-list-tile>
-                    <v-list-tile>asdf</v-list-tile>
-                </v-list>
-            </v-menu>
-        </v-toolbar>
-            <grid ref="grid" :rowData="rowData" />
+            <v-toolbar flat color="primary" dark>
+                <v-toolbar-title>
+                    Store Planogram Overview: {{title}}
+                </v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-btn icon flat dark @click="storeView=false">
+                    <v-icon>close</v-icon>
+                </v-btn>
+            </v-toolbar>
+            <v-toolbar dark flat dense>
+                <v-menu>
+                    <v-btn slot="activator">options</v-btn>
+                    <v-list>
+                        <v-list-tile>asdf</v-list-tile>
+                        <v-list-tile>asdf</v-list-tile>
+                        <v-list-tile>asdf</v-list-tile>
+                    </v-list>
+                </v-menu>
+            </v-toolbar>
+            <grid ref="grid" :selectedProject="selectedProject" :rowData="rowData" />
 
 
-        <v-data-table :headers="headers" :items="currentStorePlanograms" class="elevation-1">
-            <template v-slot:items="props">
-                <tr>
-                    <td>{{props.item.storeName}}
-                        <!-- <v-edit-dialog large lazy persistent @save="UpdateLine(props.item)" @cancel="''" @open="''" @close="''">
-                                    <div></div>
-                                    <template v-slot:input>
-                                    </template>
-                                    <template v-slot:input>
-                                        <v-text-field label="storeName" v-model="props.item.storeName"></v-text-field>
-                                    </template>
-                                </v-edit-dialog> -->
-                    </td>
-                    <td>{{props.item.clusterName}}
-                        <!-- <v-edit-dialog large lazy persistent @save="UpdateLine(props.item)" @cancel="''" @open="''" @close="''">
-                                    <div>{{props.item.clusterName}}</div>
-                                    <template v-slot:input>
-                                    </template>
-                                    <template v-slot:input>
-                                        <v-text-field label="clusterName" v-model="props.item.clusterName"></v-text-field>
-                                    </template>
-                                </v-edit-dialog> -->
-                    </td>
-                    <td>
-                        <v-edit-dialog large lazy persistent @save="UpdateLine(props.item)" @cancel="''" @open="''"
-                            @close="''">
-                            <div>{{props.item.modules}}</div>
-                            <template v-slot:input>
-                            </template>
-                            <template v-slot:input>
-                                <v-text-field label="Modules" v-model="props.item.modules"></v-text-field>
-                            </template>
-                        </v-edit-dialog>
-                    </td>
-                    <td>
-                        <v-edit-dialog large lazy persistent @save="UpdateLine(props.item)" @cancel="''" @open="''"
-                            @close="''">
-                            <div>{{props.item.height}}</div>
-                            <template v-slot:input>
-                            </template>
-                            <template v-slot:input>
-                                <v-text-field label="Height" v-model="props.item.height"></v-text-field>
-                            </template>
-                        </v-edit-dialog>
-                    </td>
-                    <td>
-                        <v-edit-dialog large lazy persistent @save="UpdateLine(props.item)" @cancel="''" @open="''"
-                            @close="''">
-                            <div>{{props.item.width}}</div>
-                            <template v-slot:input>
-                            </template>
-                            <template v-slot:input>
-                                <v-text-field label="Width" v-model="props.item.width"></v-text-field>
-                            </template>
-                        </v-edit-dialog>
-                    </td>
-                    <td>
-                        <v-edit-dialog large lazy persistent @save="UpdateLine(props.item)" @cancel="''" @open="''"
-                            @close="''">
-                            <div>{{props.item.displays}}</div>
-                            <template v-slot:input>
-                            </template>
-                            <template v-slot:input>
-                                <v-text-field label="Displays" v-model="props.item.displays"></v-text-field>
-                            </template>
-                        </v-edit-dialog>
-                    </td>
-                    <td>
-                        <v-edit-dialog large lazy persistent @save="UpdateLine(props.item)" @cancel="''" @open="''"
-                            @close="''">
-                            <div>{{props.item.pallettes}}</div>
-                            <template v-slot:input>
-                            </template>
-                            <template v-slot:input>
-                                <v-text-field label="Pallettes" v-model="props.item.pallettes"></v-text-field>
-                            </template>
-                        </v-edit-dialog>
-                    </td>
-                    <td>
-                        <v-edit-dialog large lazy persistent @save="UpdateLine(props.item)" @cancel="''" @open="''"
-                            @close="''">
-                            <div>{{props.item.supplierStands}}</div>
-                            <template v-slot:input>
-                            </template>
-                            <template v-slot:input>
-                                <v-text-field label="S1upplier Stands" v-model="props.item.supplierStands">
-                                </v-text-field>
-                            </template>
-                        </v-edit-dialog>
-                    </td>
-                    <td>
-                        <v-edit-dialog large lazy persistent @save="UpdateLine(props.item)" @cancel="''" @open="''"
-                            @close="''">
-                            <div>{{props.item.bins}}</div>
-                            <template v-slot:input>
-                            </template>
-                            <template v-slot:input>
-                                <v-text-field label="Bins" v-model="props.item.bins"></v-text-field>
-                            </template>
-                        </v-edit-dialog>
-                    </td>
-
-                    <td>{{ StoreStatusList[props.item.planogramStoreStatus].text}}
-                    </td>
-                    <td>
-                        <!-- UNASSIGNED -->
-                        <v-btn @click="assignPlanogramToStore(props.item)" icon flat small color="primary">
-                            <v-icon>assignment</v-icon>
-                        </v-btn>
-                        <v-btn icon @click="openStoreOver(props.item)">
-                            <v-icon>
-                                more_vert
-                            </v-icon>
-                        </v-btn>
-                        <!-- DISTRIBUTED TO STORE -->
-                    </td>
-                </tr>
-            </template>
-        </v-data-table>
-        <StorePlanograms ref="StorePlanograms" />
-        <PlanogramDetailsSelector :PlanoName="ProjectName.text" ref="PlanogramDetailsSelector" />
+            
+            <StorePlanograms  ref="StorePlanograms" />
+            <PlanogramDetailsSelector :PlanoName="ProjectName.text" ref="PlanogramDetailsSelector" />
         </v-card>
     </v-dialog>
 </template>
@@ -171,7 +53,7 @@
 
             return {
                 rowData: [],
-               
+                title: null,
                 StoreClusters: [],
                 allStoreDialog: false,
                 headers: [{
@@ -238,7 +120,31 @@
             }
         },
         methods: {
-          
+            assignPlanogramToStore(listItem) {
+                let self = this;
+                self.$refs.PlanogramDetailsSelector.show(listItem,true, data => {
+                  
+                    let item = {
+                        "id": listItem.id,
+                        "store_ID": listItem.store_ID,
+                        "project_ID": self.selectedProject,
+                        "planogramDetail_ID": data,
+                        "planogramStoreStatus": 1,
+                    }
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
+                        .then(r => {
+                            self.getStorePlanograms()
+                            delete Axios.defaults.headers.common["TenantID"];
+                        }).catch(e => {
+                            delete Axios.defaults.headers.common["TenantID"];
+
+                        })
+
+
+                })
+            },
             UpdateLine(item) {
                 let self = this
                 self.createPlanoGramDetailTX(item)
@@ -249,8 +155,7 @@
             createPlanoGramDetailTX(item) {
                 let self = this
                 let detailsItem = null;
-                console.log("item");
-                console.log(item);
+              
                 if (item.planogramName == null) {
                     item.planogramName = "No assigned Planogram"
                 }
@@ -292,12 +197,10 @@
                     "supplierStands": parseInt(item.supplierStands),
                     "bins": parseInt(item.bins)
                 }
-                console.log(sendRequst);
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + 'Planogram_Details/Save', sendRequst).then(
                     r => {
-                        console.log(r);
                         let obj = {
                             "id": item.id,
                             "store_ID": item.store_ID,
@@ -306,13 +209,11 @@
                             "planogramStoreStatus": 0,
                         }
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                        console.log("obj");
-                        console.log(obj);
+                      
 
                         Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', obj)
                             .then(res => {
-                                console.log(res.data);
-                                self.getStorePlanograms()
+                               
                                 delete Axios.defaults.headers.common["TenantID"];
                             }).catch(e => {
                                 delete Axios.defaults.headers.common["TenantID"];
@@ -342,12 +243,11 @@
             openStoreOver(item) {
                 let self = this
                 self.$refs.StorePlanograms.open(item)
-                console.log(item);
+
 
             },
             getStorePlanograms() {
                 let self = this
-                console.log(self.selectedProject);
 
                 self.currentStorePlanograms = [];
 
@@ -355,15 +255,14 @@
 
                 Axios.get(process.env.VUE_APP_API + 'Store_Planogram?project_ID=' + self.selectedProject)
                     .then(r => {
-                        console.log(r.data);
-
+                        self.rowData=[]   
+                        self.currentStorePlanograms=[]    
                         self.currentStorePlanograms = r.data.store_PlanogramList;
                         self.currentStorePlanograms.forEach(e => {
                             e.GeneratedName = self.GenerateName(e)
                             e.currentStatusText = self.StoreStatusList[e.planogramStoreStatus].text
                         })
                         self.rowData = self.currentStorePlanograms
-                        console.log(self.currentStorePlanograms);
 
                     })
             },
@@ -408,40 +307,11 @@
             },
             open() {
                 let self = this
-
+                self.title = self.ProjectName.text
                 self.storeView = true
                 self.getStorePlanograms()
             },
-            assignPlanogramToStore(listItem) {
-                let self = this;
-                self.$refs.PlanogramDetailsSelector.show(listItem, data => {
-                    console.log(data);
-                    console.log("listitme");
 
-                    console.log(listItem);
-
-                    let item = {
-                        "id": listItem.id,
-                        "store_ID": listItem.store_ID,
-                        "project_ID": self.selectedProject,
-                        "planogramDetail_ID": data,
-                        "planogramStoreStatus": 1,
-                    }
-                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
-                    Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
-                        .then(r => {
-                            console.log(r.data);
-                            self.getStorePlanograms()
-                            delete Axios.defaults.headers.common["TenantID"];
-                        }).catch(e => {
-                            delete Axios.defaults.headers.common["TenantID"];
-
-                        })
-
-
-                })
-            },
         }
     }
 </script>
