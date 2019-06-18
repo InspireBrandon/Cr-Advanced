@@ -631,32 +631,17 @@ class PlanogramItemBase {
 
     //#region IF A FIXTURE HAS A PRODUCT RENDERING DRAW TO FRONT OF ALL RENDERINGS
     self.ApplyProductRenderings();
+    self.Layer.draw();
     //#endregion
   }
 
   ApplyProductRenderings() {
     let self = this;
-    let ctrl_store = new StoreHelper();
-
-    let allFixtures = ctrl_store.getAllPlanogramItems(self.VueStore);
-    allFixtures = allFixtures.filter((el) =>
-      el.Type == "SHELF" ||
-      el.Type == "BASE" ||
-      el.Type == "BASKET");
-
-    allFixtures.forEach(fixtureItem => {
-      if (fixtureItem.Renderings && fixtureItem.Renderings.length > 0) {
-        fixtureItem.Renderings.forEach(rendering => {
-          switch (rendering.type.toUpperCase()) {
-            case "PRODUCTRENDERING": {
-              rendering.konva.moveToTop();
-            }
-            break;
-          }
-        });
-      }
-      fixtureItem.Group.draw();
+    let allProductRenderings = self.Stage.find('.front-image-rendering-facing');
+    allProductRenderings.forEach(productRendering => {
+      productRendering.moveToTop();
     });
+    console.log("PRODUCT RENDERINGS Z-INDEX", "COMPLETE!!!")
   }
 
   SetBasePosition(position) {
