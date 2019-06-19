@@ -59,7 +59,7 @@
                 headers: [{
                     "headerName": "Store",
                     "field": "storeName"
-                }, {
+                },{
                     "headerName": "Cluster Name",
                     "field": "clusterName"
                 }, {
@@ -263,6 +263,9 @@
                             e.currentStatusText = self.StoreStatusList[e.planogramStoreStatus].text
                         })
                         self.rowData = self.currentStorePlanograms
+                        console.log("overview");
+                        console.log(self.rowData);
+                        
 
                     })
             },

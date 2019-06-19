@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="rowData.length>0">
         <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%;  height: calc(100vh - 235px);"
             :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
             :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true"
@@ -29,6 +29,9 @@
                 headers: [{
                     "headerName": "Store",
                     "field": "storeName"
+                }, {
+                    "headerName": "Name",
+                    "field": "GeneratedName"
                 }, {
                     "headerName": "Cluster Name",
                     "field": "clusterName"
@@ -222,7 +225,7 @@
                 setTimeout(() => {
                     this.gridApi.resetRowHeights();
                     this.gridApi.sizeColumnsToFit()
-                }, 60);
+                }, 200);
             },
         }
     }

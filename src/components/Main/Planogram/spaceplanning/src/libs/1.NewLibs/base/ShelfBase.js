@@ -265,12 +265,12 @@ class ShelfBase extends PlanogramItemBase {
     }
 
     /** This will be applied if a productRendering is turned on */
-    self.ApplyProductRenderings();
+    self.AddProductRenderings();
 
     self.Layer.draw();
   }
 
-  ApplyProductRenderings() {
+  AddProductRenderings() {
     let self = this;
     let ctrl_store = new StoreHelper();
     if (self.Data.productRendering != undefined && self.Data.productRendering != null && self.Data.productRendering == true) {

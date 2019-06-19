@@ -12,8 +12,6 @@ class ProductRenderingBase {
         this.y = 0;
         this.width = 0;
         this.height = 0;
-
-        console.log("[PRODUCT RENDERING] MARGIN", this.margin);
     }
 
     CalculatePosition() {
@@ -40,7 +38,7 @@ class ProductRenderingBase {
             break;
         case "BASE": {
             if (self.margin != null && self.margin != undefined && self.margin > 0) {
-                self.y = (margin * self.ratio) * -1;
+                self.y = (self.margin * self.ratio) * -1;
             } else {
                 self.y = ((individualProductHeight + self.productItem.Orientation_Height) / 2) * -1;
             }
@@ -48,14 +46,10 @@ class ProductRenderingBase {
         break;
         case "BASKET": {
             if (self.margin != null && self.margin != undefined && self.margin > 0) {
-                self.y = (margin * self.ratio) * -1;
+                self.y = (self.margin * self.ratio) * -1;
             } else {
                 self.y = ((individualProductHeight + self.productItem.Orientation_Height) / 2) * -1;
             }
-        }
-        break;
-        case "PEGBAR": {
-
         }
         break;
         }
@@ -70,14 +64,14 @@ class ProductRenderingBase {
     AddProductImage() {
         let self = this;
         let tmpRect = new Konva.Rect({
-            x: 0,
-            y: 0,
+            x: self.x,
+            y: self.y,
             width: self.productItem.Orientation_Width,
             height: self.productItem.Orientation_Height,
             fill: 'red'
         })
 
-        // self.Group.add(tmpRect); //ADD WHEN YOU WANT TO TEST
+        self.fixture.Group.add(tmpRect); //ADD WHEN YOU WANT TO TEST
 
         self.Image = new Konva.Image({
             x: self.x,
@@ -136,12 +130,8 @@ class ProductRenderingBase {
         }
         self.Image.show();
 
-        self.fixture.Renderings.push({
-            type: 'PRODUCTRENDERING',
-            konva: self.Image
-        });
-
         self.fixture.Group.add(self.Image);
+
         self.Layer.draw();
     }
 
