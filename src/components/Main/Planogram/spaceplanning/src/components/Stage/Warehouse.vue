@@ -469,7 +469,11 @@
     methods: {
       updateLoader(data) {
         let self = this
+        if (data.spaceplanID != 0) {
+          self.spacePlanID = data.spaceplanID
+        }
         self.$refs.SizeLoader.updateLoader(data)
+
       },
       RetractPlanogram() {
         let self = this
@@ -891,8 +895,8 @@
           planogramName += self.rangingData.tag;
 
         let cluster = self.getStoreName()
-          planogramName += " - " + cluster;
-      
+        planogramName += " - " + cluster;
+
 
         if (self.rangingData.storeName != null && self.rangingData.storeName != "") {
           planogramName += " - " + self.rangingData.storeName;
@@ -914,9 +918,9 @@
           planogramName += " - B" + self.bins;
         }
         console.log('names______________________');
-        
+
         console.log(planogramName);
-          console.log(self.spacePlanName);
+        console.log(self.spacePlanName);
         let tmp = {
           systemFile: {
             systemUserID: 10,
@@ -934,11 +938,11 @@
             if (r.data == true) {
               self.$refs.yesNoModal.show('File already exists Would  you like to overwrite it?', value => {
                 if (value == true) {
-                  self.saveFile(true)
+                  self.saveFile(false)
                 }
               })
             } else {
-              self.saveFile(false)
+              self.saveFile(true)
             }
           })
 
@@ -1027,7 +1031,7 @@
             })
           }
         }
-        self.spacePlanID=tmpSpacePlanID
+       
       },
       setRangingClusterData(data) {
         let self = this;
