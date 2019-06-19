@@ -3,18 +3,17 @@
         <v-card>
             <v-toolbar dark color="primary">
                 <v-toolbar-title>
-                    Planograms assigned to {{title}}
+                    Planograms : <strong>{{title}}</strong>
                 </v-toolbar-title>
-               
                 <v-spacer></v-spacer>
                 <v-btn icon flat dark @click="dialog=false">
                     <v-icon>close</v-icon>
                 </v-btn>
             </v-toolbar>
+             <v-toolbar dark flat dense>
+            </v-toolbar>
             <StoreGrid ref="StoreGrid" :rowData="rowData" :method="GetData" :StoreID="store_ID" />
             <PlanogramDetailsSelector :PlanoName="'Select'" ref="PlanogramDetailsSelector" />
-
-
         </v-card>
     </v-dialog>
 </template>
@@ -58,7 +57,6 @@
         methods: {
             GetData(StoreID) {
                 let self = this
-
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.get(process.env.VUE_APP_API + `Store_Planogram?Store_ID=${StoreID.store_ID}`)

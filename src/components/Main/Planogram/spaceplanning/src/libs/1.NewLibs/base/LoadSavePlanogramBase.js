@@ -104,7 +104,7 @@ class LoadSavePlanogramBase {
 
     output.name = planogramName;
     output = JSON.parse(JSON.stringify(output));
-    
+
     // if (self.Create == true) {
     let startTime = new Date()
     let config = {
@@ -127,21 +127,38 @@ class LoadSavePlanogramBase {
         })
       }
     }
-    axios.post(self.ServerAddress + "SystemFolder?db=CR-Devinspire", {
-      systemFile: {
-        systemUserID: 10,
-        folder: "Space Planning",
-        name: planogramName,
-        isFolder: true,
-        extension: "",
-        id:spacePlanID,
-      },
-    }, config).then(resp => {
+    let tmp = {}
+    if (this.Create == true) {
+      planogramName=planogramName+" NEW"
+      tmp = {
+        systemFile: {
+          systemUserID: 10,
+          folder: "Space Planning",
+          name: planogramName ,
+          isFolder: true,
+          extension: "",
+          id: 0,
+        },
+      }
+    } else {
+      tmp = {
+        systemFile: {
+          systemUserID: 10,
+          folder: "Space Planning",
+          name: planogramName,
+          isFolder: true,
+          extension: "",
+          id: spacePlanID,
+        },
+      }
+    }
+
+    axios.post(self.ServerAddress + "SystemFolder?db=CR-Devinspire", tmp, config).then(resp => {
       if (resp.success == true) {
         alert("folder created")
       }
       console.log(planogramName)
-      output.image= null
+      output.image = null
       let startTime = new Date()
       let config = {
         onUploadProgress: progressEvent => {
@@ -153,7 +170,7 @@ class LoadSavePlanogramBase {
           // do whatever you like with the percentage complete
           // maybe dispatch an action that will update a progress bar or something
           updateLoader({
-            title:"Saving Data.... ",
+            title: "Saving Data.... ",
             text1: "uploading Advanced Planogram",
             text2: "File Progresss",
             currentFileSize: currentFileSize,
@@ -171,7 +188,7 @@ class LoadSavePlanogramBase {
           folder: "Space Planning",
           name: planogramName,
         },
-        data: output                                  
+        data: output
       }, config).then(result => {
         // __sending simple version through
 
@@ -179,7 +196,7 @@ class LoadSavePlanogramBase {
 
         output.planogramData.forEach(e => {
           e.Data.Data.image = null
-         
+
           if (e.Type != "PRODUCT" && e.Data.Data.renderings != null) {
             e.Data.Data.renderings.forEach(render => {
               render.image = null
