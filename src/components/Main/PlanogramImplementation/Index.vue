@@ -177,7 +177,7 @@
     import NotesModal from '@/components/Common/NotesModal'
     import SpacePlanSelector from '@/components/Common/SpacePlanSelector'
     import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector'
-    import StorePlanogramOverview from './StorePlanogramOverview'
+    import StorePlanogramOverview from '@/components/Main/PlanogramImplementation/PlanogramOverView/StorePlanogramOverview'
     import SizeLoader from '@/components/Common/SizeLoader'
 
 

@@ -1,6 +1,5 @@
 <template>
     <div v-if="rowData.length>0">
-        storeID:{{StoreID}}
         <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%;  height: calc(100vh - 235px);"
             :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
             :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true"
@@ -15,7 +14,6 @@
     import Button from "./StoreButton.vue"
     import Axios from 'axios'
     import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector'
-
     import {
         AgGridVue
     } from "ag-grid-vue";
@@ -36,7 +34,7 @@
                         "headerName": "Name",
                         "field": "GeneratedName"
                     }, {
-                        "headerName": "Cluster Name",
+                        "headerName": "Planogram Cluster",
                         "field": "clusterName"
                     }, {
                         "headerName": "Modules",
@@ -97,7 +95,6 @@
                 StoreStatusList: [{
                         text: "Unassigned"
                     },
-
                     {
                         text: "DistrubutedToStore"
                     },
@@ -123,7 +120,6 @@
                         'audit-image-breach': 'data.imageAudit'
                     }
                 },
-
                 storePlanograms: [],
                 storeName: null,
                 allStoreDialog: false,
@@ -138,32 +134,10 @@
                     this.gridApi.sizeColumnsToFit()
                 }, 300);
             },
-
-            getDetails(StoreID) {
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
-                Axios.get(process.env.VUE_APP_API + `Store_Planogram?Store_ID=${StoreID}`)
-                    .then(r => {
-                        console.log(r.data);
-                        self.rowData = r.data.queryResult
-
-                        self.currentStorePlanograms = r.data.queryResult;
-                        self.currentStorePlanograms.forEach(e => {
-                            e.currentStatusText = e.planogramStoreStatus
-
-                            // e.currentStatusText = self.StoreStatusList[e.planogramStoreStatus].text
-                        })
-                        self.rowData = self.currentStorePlanograms
-
-                    })
-            },
             assignPlanogramToStore(listItem) {
                 let self = this;
                 self.$refs.PlanogramDetailsSelector.show(listItem, false, data => {
-
-
                     let item = {
-
                         "store_ID": self.StoreID,
                         "project_ID": listItem.id,
                         "planogramDetail_ID": data,
@@ -177,18 +151,12 @@
                                 store_ID: self.StoreID
                             }
                             self.method(item)
-                            // self.params.context.componentParent.GetData(self.StoreID)
-                            // self.getDetails(self.StoreID)
                             delete Axios.defaults.headers.common["TenantID"];
                         }).catch(e => {
                             delete Axios.defaults.headers.common["TenantID"];
-
                         })
-
-
                 })
             },
         }
-
     }
 </script>

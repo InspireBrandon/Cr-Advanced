@@ -6,34 +6,34 @@
             rowSelection="multiple" :rowDeselection="true" :enableColResize="true" :floatingFilter="true"
             :gridReady="onGridReady" :groupMultiAutoColumn="true">
         </ag-grid-vue>
+    rows : {{rowData.length}}
     </div>
-
 </template>
 <script>
     import Button from "./button.vue"
     import Axios from 'axios'
-
     import {
         AgGridVue
     } from "ag-grid-vue";
     export default {
-
-        props: ["rowData", "selectedProject"],
+        props: ["rowData", "selectedProject","getRowData"],
         components: {
             AgGridVue,
             Button,
         },
-
         data() {
             return {
                 headers: [{
                     "headerName": "Store",
                     "field": "storeName"
+                },{
+                    "headerName": "Store Cluster",
+                    "field": "cluster"
                 }, {
                     "headerName": "Name",
                     "field": "GeneratedName"
                 }, {
-                    "headerName": "Cluster Name",
+                    "headerName": "Planogram Cluster",
                     "field": "clusterName"
                 }, {
                     "headerName": "Modules",
@@ -104,32 +104,6 @@
             }
         },
         methods: {
-            assignPlanogramToStore(listItem) {
-                let self = this;
-                self.$refs.PlanogramDetailsSelector.show(listItem, data => {
-                 
-
-                    let item = {
-                        "id": listItem.id,
-                        "store_ID": listItem.store_ID,
-                        "project_ID": self.selectedProject,
-                        "planogramDetail_ID": data,
-                        "planogramStoreStatus": 1,
-                    }
-                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
-                    Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
-                        .then(r => {
-                            params.context.componentParent.getStorePlanograms()
-                            delete Axios.defaults.headers.common["TenantID"];
-                        }).catch(e => {
-                            delete Axios.defaults.headers.common["TenantID"];
-
-                        })
-
-
-                })
-            },
             UpdateLine(item) {
                 let self = this
 
@@ -204,8 +178,9 @@
 
                         Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', obj)
                             .then(res => {
-                             
-                                params.context.componentParent.getStorePlanograms()
+                                 console.log("hitting this one");
+                                  self.getRowData()      
+                                // params.context.componentParent.getStorePlanograms()
                                 delete Axios.defaults.headers.common["TenantID"];
                             }).catch(e => {
                                 delete Axios.defaults.headers.common["TenantID"];
@@ -215,9 +190,6 @@
 
                         delete Axios.defaults.headers.common["TenantID"];
                     })
-                // .catch(err => {
-                // alert("THE BIG OOF")
-                // })
             },
             onGridReady(params) {
                 this.gridApi = params.api;
