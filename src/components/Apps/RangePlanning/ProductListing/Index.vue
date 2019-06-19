@@ -86,14 +86,12 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
-                <v-menu v-if="file_type != null" dark offset-y style="margin-bottom: 10px;">
-                    <v-btn slot="activator" flat>Options</v-btn>
-                    <v-list light dense>
-                        <v-list-tile @click="newLine()">
-                            <v-list-tile-title>Insert Line</v-list-tile-title>
-                        </v-list-tile>
-                    </v-list>
-                </v-menu>
+                <v-btn :class="{ 'pulse': rowData.length == 0 }" @click="newLineAdd()"
+                    v-if="file_type != null && file_type == 'Add Item'" color="success" slot="activator">Add new line
+                </v-btn>
+                <v-btn :class="{ 'pulse': rowData.length == 0 }" @click="newLineChange()"
+                    v-if="file_type != null && file_type == 'Change Item'" color="success" slot="activator">Add new line
+                </v-btn>
             </v-toolbar-items>
             <v-spacer />
             <h3>{{ file_type }}</h3>
@@ -131,8 +129,8 @@
                         <v-layout row wrap>
                             <v-flex md12><span class="font-weight-light">Please select a file type:</span></v-flex>
                             <v-flex md4 v-for="file_type in file_types" :key="file_type.title">
-                                <v-card @click="set_file_type(file_type.title)" style="cursor: pointer;"
-                                    color="primary" dark class="elevation-3">
+                                <v-card @click="set_file_type(file_type.title)" style="cursor: pointer;" color="primary"
+                                    dark class="elevation-3">
                                     <v-card-title>
                                         <div style="text-align: center; width: 100%;">{{ file_type.title }}</div>
                                     </v-card-title>
@@ -157,6 +155,7 @@
         <Prompt ref="prompt"></Prompt>
         <NewItemListingSelector ref="newItemListingSelector"></NewItemListingSelector>
         <YesNoModal ref="yesNo"></YesNoModal>
+        <ProductLookup ref="ProductLookup"></ProductLookup>
     </div>
 </template>
 
@@ -168,6 +167,7 @@
     } from "ag-grid-vue";
 
     import Prompt from '@/components/Common/Prompt';
+    import ProductLookup from '@/components/Common/ProductLookup';
     import NewItemListingSelector from '@/components/Common/NewItemListingSelector'
     import YesNoModal from '@/components/Common/YesNoModal'
     import ImageView from "./GridComponents/Image.vue"
@@ -193,7 +193,8 @@
             OptionSelector,
             PeriodItem,
             DateSelector,
-            Validator
+            Validator,
+            ProductLookup
         },
         data() {
             return {
@@ -315,7 +316,7 @@
                 self.dialog = false;
                 self.file_type = null;
             },
-            newLine() {
+            newLineAdd() {
                 let self = this;
                 self.rowData.push({})
 
@@ -323,6 +324,30 @@
                     self.gridApi.resetRowHeights();
                     self.gridApi.sizeColumnsToFit()
                 }, 60);
+            },
+            newLineChange() {
+                let self = this;
+
+                self.$refs.ProductLookup.show(product_data => {
+                    self.getProductByID(product_data.id)
+                        .then(product => {
+                            self.rowData.push(product);
+                            self.rowData.push(product);
+                        })
+                });
+            },
+            getProductByID(id) {
+                let self = this;
+
+                return new Promise((res, rej) => {
+                    Axios.get(process.env.VUE_APP_API + `Product/${id}?db=CR-HINTERLAND-LIVE`)
+                        .then(r => {
+                            res(r.data);
+                        })
+                        .catch(e => {
+                            rej();
+                        })
+                })
             },
             openFile() {
                 let self = this;
@@ -658,6 +683,45 @@
 <style>
     .active-tab {
         background: #131313 !important;
+    }
+
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+
+    .pulse:hover {
+        animation: none;
+    }
+
+    @-webkit-keyframes pulse {
+        0% {
+            -webkit-box-shadow: 0 0 0 0 rgba(76, 204, 44, 0.637);
+        }
+
+        70% {
+            -webkit-box-shadow: 0 0 0 0 rgba(76, 204, 44, 0.637);
+        }
+
+        100% {
+            -webkit-box-shadow: 0 0 0 0 rgba(76, 204, 44, 0.637);
+        }
+    }
+
+    @keyframes pulse {
+        0% {
+            -moz-box-shadow: 0 0 0 0 rgba(204, 169, 44, 0.4);
+            box-shadow: 0 0 0 0 rgba(204, 169, 44, 0.4);
+        }
+
+        70% {
+            -moz-box-shadow: 0 0 0 10px rgba(204, 169, 44, 0);
+            box-shadow: 0 0 0 10px rgba(204, 169, 44, 0);
+        }
+
+        100% {
+            -moz-box-shadow: 0 0 0 0 rgba(204, 169, 44, 0);
+            box-shadow: 0 0 0 0 rgba(204, 169, 44, 0);
+        }
     }
 </style>
 

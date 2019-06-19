@@ -147,20 +147,16 @@
                         self.currentStorePlanograms = r.data.queryResult;
                         self.currentStorePlanograms.forEach(e => {
                             e.currentStatusText = e.planogramStoreStatus
-
                             // e.currentStatusText = self.StoreStatusList[e.planogramStoreStatus].text
                         })
                         self.rowData = self.currentStorePlanograms
-
                     })
             },
             assignPlanogramToStore(listItem) {
                 let self = this;
                 self.$refs.PlanogramDetailsSelector.show(listItem, false, data => {
-                   
 
                     let item = {
-
                         "store_ID": self.StoreID,
                         "project_ID": listItem.id,
                         "planogramDetail_ID": data,
@@ -179,8 +175,6 @@
                             delete Axios.defaults.headers.common["TenantID"];
 
                         })
-
-
                 })
             },
         }
