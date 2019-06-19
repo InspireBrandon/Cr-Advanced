@@ -157,6 +157,10 @@ class LoadSavePlanogramBase {
       if (resp.success == true) {
         alert("folder created")
       }
+      console.log("resp");
+
+      console.log(resp);
+      
       console.log(planogramName)
       output.image = null
       let startTime = new Date()
@@ -178,6 +182,7 @@ class LoadSavePlanogramBase {
             currentFile: 1,
             totalFiles: 3,
             DownloadSpeed: DownloadSpeed,
+            spaceplanID:resp.data.systemFileID
           })
         }
       }
@@ -191,7 +196,10 @@ class LoadSavePlanogramBase {
         data: output
       }, config).then(result => {
         // __sending simple version through
-
+         
+          
+          
+          
         output.image = null
 
         output.planogramData.forEach(e => {
