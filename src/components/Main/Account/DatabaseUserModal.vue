@@ -49,8 +49,8 @@
                                                 <v-divider></v-divider>
                                                 <v-list-tile @click="openFeatureAccessModal(props.item.systemUserID)">
                                                     Feature access</v-list-tile>
-                                                <!-- <v-divider></v-divider>
-                                                <v-list-tile>Revoke access</v-list-tile> -->
+                                                <v-divider></v-divider>
+                                                <v-list-tile @click="revoke_access(props.item)">Revoke access</v-list-tile>
                                             </v-list>
                                         </v-menu>
                                     </td>
@@ -293,6 +293,18 @@
             setAccessType(props) {
                 let self = this;
                 self.$refs.AccessTypeModal.open(props.item.systemUserID, self.tenantID, accessType => {});
+            },
+            revoke_access(item) {
+                let self = this;
+
+                Axios.delete(process.env.VUE_APP_API + `TenantAccess/User?systemUserID=${item.systemUserID}&tenantID=${sessionStorage.currentDatabase}`)
+                    .then(r => {
+                        if(r.data)
+                            self.databaseUsers.splice(self.databaseUsers.indexOf(item), 1);
+                    })
+                    .catch(e => {
+
+                    })
             }
         }
     }
