@@ -205,7 +205,6 @@ export default new Router({
           name: "request_new_planogram",
           component: RequestNewPlanogram
         },
-       
         {
           path: '/SystemReportList',
           name: 'system_report_list',
