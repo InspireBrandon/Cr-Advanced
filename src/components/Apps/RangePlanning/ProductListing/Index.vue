@@ -111,7 +111,7 @@
             :columnDefs="columnDefs" :selectionChanged="onSelectionChanged" :rowData="rowData" :enableSorting="true"
             :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
             :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :gridReady="onGridReady"
-            :groupMultiAutoColumn="true">
+            :groupMultiAutoColumn="true" :cellEditingStarted="onRowEditingStarted">
         </ag-grid-vue>
         <v-snackbar v-model="snackbar" bottom :timeout="snackbarTimeout">
             <div style="text-align: center; width: 100%;">
@@ -292,8 +292,11 @@
             onSelectionChanged() {
 
             },
+            onRowEditingStarted(e) {
+                if(!e.data.can_edit)
+                    this.gridApi.stopEditing();
+            },
             onCellValueChanged(e) {
-                console.log(e);
             },
             set_file_type(file_type) {
                 let self = this;
@@ -331,8 +334,12 @@
                 self.$refs.ProductLookup.show(product_data => {
                     self.getProductByID(product_data.id)
                         .then(product => {
-                            self.rowData.push(product);
-                            self.rowData.push(product);
+                            let tmp1 = JSON.parse(JSON.stringify(product));
+                            tmp1.can_edit = false;
+                            self.rowData.push(tmp1);
+                            let tmp2 = JSON.parse(JSON.stringify(tmp1));
+                            tmp2.can_edit = true;
+                            self.rowData.push(tmp2);
                         })
                 });
             },

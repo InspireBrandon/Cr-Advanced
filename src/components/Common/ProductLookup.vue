@@ -8,20 +8,24 @@
                     </v-toolbar>
                     <v-card flat>
                         <v-card-text>
-                            <v-text-field  v-model="identifier" label="Barcode"></v-text-field>
-                            <div style="text-align: right">
-                                <v-btn :disabled="identifier.length < 3" class="ma-0" @click="getProducts" color="primary">Search</v-btn>
-                            </div>
+                            <v-form @submit.prevent="getProducts">
+                                <v-text-field v-model="identifier" label="Barcode"></v-text-field>
+                                <div style="text-align: right">
+                                    <v-btn :disabled="identifier.length < 3" class="ma-0" type="submit" color="primary">Search</v-btn>
+                                </div>
+                            </v-form>
                         </v-card-text>
                         <v-list dense class="pa-0" style="height: calc(100vh - 400px); overflow-x: auto;">
                             <template v-for="(item, idx) in products">
-                                <v-list-tile avatar @click="selected_product = item" :class="{ 'selected': selected_product == item }" :key="idx">
+                                <v-list-tile avatar @click="selected_product = item"
+                                    :class="{ 'selected': selected_product == item }" :key="idx">
                                     <!-- <v-list-tile-avatar>
                                         <v-avatar size="40" tile>
                                             <img style="height: 40px;" :src="getImage(item.barcode)" />
                                         </v-avatar>
                                     </v-list-tile-avatar> -->
-                                    <v-list-tile-content>{{ item.barcode + ' - ' + item.description }}</v-list-tile-content>
+                                    <v-list-tile-content>{{ item.barcode + ' - ' + item.description }}
+                                    </v-list-tile-content>
                                 </v-list-tile>
                                 <v-divider :key="'d' + idx"></v-divider>
                             </template>
@@ -31,7 +35,8 @@
                     <v-card-actions>
                         <v-spacer></v-spacer>
                         <v-btn flat color="secondary" @click.native="dialog = false">Cancel</v-btn>
-                        <v-btn :disabled="selected_product == null" flat color="primary" @click.native="returnData">Continue</v-btn> 
+                        <v-btn :disabled="selected_product == null" flat color="primary" @click.native="returnData">
+                            Continue</v-btn>
                     </v-card-actions>
                 </v-card>
             </v-dialog>
@@ -78,8 +83,8 @@
                 self.dialog = false;
             },
             getImage(barcode) {
-               let self = this;
-               return process.env.VUE_APP_API + BarcodeHandler.imageFromBarcode(barcode, "", "1"); 
+                let self = this;
+                return process.env.VUE_APP_API + BarcodeHandler.imageFromBarcode(barcode, "", "1");
             }
         }
     }
