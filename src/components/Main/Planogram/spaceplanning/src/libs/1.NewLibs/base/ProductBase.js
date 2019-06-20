@@ -432,7 +432,6 @@ class ProductBase extends ProductItemBase {
         element.strokeWidth(0.5);
       });
     }
-
     // self.Group.draw();
     self.Stage.draw();
   }

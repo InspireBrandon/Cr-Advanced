@@ -1,0 +1,992 @@
+[{
+        "headerName": "Product System ID",
+        "field": "product_System_ID",
+        "editable": true,
+        "hide": false,
+        "pinned": "left",
+        "maxWidth": 150,
+        "minWidth": 150,
+        "cellRendererFramework": "Validator"
+    },
+    {
+        "headerName": "Barcode",
+        "field": "barcode",
+        "editable": true,
+        "hide": false,
+        "pinned": "left",
+        "maxWidth": 120,
+        "minWidth": 120,
+        "cellRendererFramework": "Validator"
+    },
+    {
+        "headerName": "General Description",
+        "field": "description",
+        "editable": true,
+        "hide": false,
+        "pinned": "left",
+        "maxWidth": 200,
+        "minWidth": 200,
+        "cellRendererFramework": "Validator"
+    },
+    {
+        "headerName": "Vendor Item Description",
+        "children": [{
+                "headerName": "Product Code",
+                "field": "product_Code",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Vendor Description",
+                "field": "vendor_Description",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Vendor Size Description",
+                "field": "vendor_Size_Description",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Brand",
+                "field": "brand",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Product Information",
+                "field": "brand",
+                "editable": true,
+                "hide": false
+            }
+        ]
+    },
+    {
+        "headerName": "Final Item Description",
+        "children": [{
+                "headerName": "Size",
+                "field": "size",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "UOM",
+                "field": "uom",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Size Description",
+                "field": "size_Description",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Final Description",
+                "field": "final_Description",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Description Length",
+                "field": "description_Length",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Vendor Brand",
+                "field": "vendor_Brand",
+                "editable": true,
+                "hide": false
+            }
+        ]
+    },
+    {
+        "headerName": "Vendor",
+        "children": [{
+                "headerName": "Supplier",
+                "field": "supplier",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Supplier Code",
+                "field": "supplier_Code",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Manufacturer",
+                "field": "manufacturer",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Manufacturer Code",
+                "field": "manufacturer_Code",
+                "editable": true,
+                "hide": false
+            }
+        ]
+    },
+    {
+        "headerName": "Vendor Constraints",
+        "children": [{
+                "headerName": "Lead Time",
+                "field": "lead_Time",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Safety Days",
+                "field": "safety_Days",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Minimum Order Value",
+                "field": "minimum_Order_Value",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Consignment",
+                "field": "Consignment",
+                "editable": true,
+                "hide": false
+            }
+        ]
+    },
+    {
+        "headerName": "Product Hierachy",
+        "children": [{
+                "headerName": "Category",
+                "field": "category",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Category Code",
+                "field": "category_Code",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Planogram Name",
+                "field": "planogram_Name",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Department",
+                "field": "department",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Subdepartment",
+                "field": "subdepartment",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Subcategory",
+                "field": "subcategory",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Segment",
+                "field": "segment",
+                "editable": true,
+                "hide": false
+            }
+        ]
+    },
+    {
+        "headerName": "Motivation",
+        "children": [{
+                "headerName": "Replacement Type",
+                "field": "replacement_Type",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Reason For Request",
+                "field": "reason_For_Request",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Replacement Item SAP Code",
+                "field": "replacement_Item_SAP_Code",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Replacement Item Description",
+                "field": "replacement_Item_Description",
+                "editable": true,
+                "hide": false
+            }
+        ]
+    },
+    {
+        "headerName": "Item Status",
+        "children": [{
+                "headerName": "Item Status",
+                "field": "item_Status",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Active Shop Code",
+                "field": "active_Shop_Code",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Open Supplier",
+                "field": "open_Supplier",
+                "editable": true,
+                "hide": false
+            }
+        ]
+    },
+    {
+        "headerName": "Strategy",
+        "children": [{
+                "headerName": "Category Role",
+                "field": "category_Role",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Strategy",
+                "field": "strategy",
+                "editable": true,
+                "hide": false
+            },
+            {
+                "headerName": "Product Role",
+                "field": "product_Role",
+                "editable": true,
+                "hide": false
+            }
+        ]
+    },
+    {
+        "headerName": "Unit",
+        "children": [{
+                "headerName": "Height",
+                "field": "height",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Width",
+                "field": "width",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Depth",
+                "field": "depth",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "3D",
+                "editable": false,
+                "hide": true,
+                "cellRendererFramework": "ImageView"
+            },
+            {
+                "headerName": "Front",
+                "editable": false,
+                "hide": true,
+                "cellRendererFramework": "ImageView"
+            },
+            {
+                "headerName": "Side",
+                "editable": false,
+                "hide": true,
+                "cellRendererFramework": "ImageView"
+            },
+            {
+                "headerName": "Top",
+                "editable": false,
+                "hide": true,
+                "cellRendererFramework": "ImageView"
+            }
+        ]
+    }, {
+        "headerName": "Tray",
+        "children": [{
+                "headerName": "Tray Barcode",
+                "field": "tray_Barcode",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Tray Qty",
+                "field": "tray_Qty",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Tray Weight",
+                "field": "tray_Weight",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Tray Height",
+                "field": "tray_Height",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Tray Width",
+                "field": "tray_Width",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Tray Depth",
+                "field": "tray_Depth",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Tray Front",
+                "editable": true,
+                "hide": true,
+                "cellRendererFramework": "ImageView"
+            },
+            {
+                "headerName": "Tray Side",
+                "editable": true,
+                "hide": true,
+                "cellRendererFramework": "ImageView"
+            },
+            {
+                "headerName": "Tray Top",
+                "editable": true,
+                "hide": true,
+                "cellRendererFramework": "ImageView"
+            }
+        ]
+    }, {
+        "headerName": "Shrink",
+        "children": [{
+                "headerName": "Shrink Barcode",
+                "field": "shrink_Barcode",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Shrink Qty",
+                "field": "shrink_Qty",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Shrink Weight",
+                "field": "shrink_Weight",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Shrink Height",
+                "field": "shrink_Height",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Shrink Width",
+                "field": "shrink_Width",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Shrink Depth",
+                "field": "shrink_Depth",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Shrink Front",
+                "editable": true,
+                "hide": true,
+                "cellRendererFramework": "ImageView"
+            },
+            {
+                "headerName": "Shrink Side",
+                "editable": true,
+                "hide": true,
+                "cellRendererFramework": "ImageView"
+            },
+            {
+                "headerName": "Shrink Top",
+                "editable": true,
+                "hide": true,
+                "cellRendererFramework": "ImageView"
+            }
+        ]
+    }, {
+        "headerName": "Case",
+        "children": [{
+                "headerName": "Case Barcode",
+                "field": "case_Barcode",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Case Qty",
+                "field": "case_Qty",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Case Weight",
+                "field": "case_Weight",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Case Height",
+                "field": "case_Height",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Case Width",
+                "field": "case_Width",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Case Depth",
+                "field": "case_Depth",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Case Front",
+                "editable": true,
+                "hide": true,
+                "cellRendererFramework": "ImageView"
+            },
+            {
+                "headerName": "Case Side",
+                "editable": true,
+                "hide": true,
+                "cellRendererFramework": "ImageView"
+            },
+            {
+                "headerName": "Case Top",
+                "editable": true,
+                "hide": true,
+                "cellRendererFramework": "ImageView"
+            }
+        ]
+    }, {
+        "headerName": "Pallet",
+        "children": [{
+                "headerName": "Pallet Barcode",
+                "field": "pallet_Barcode",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Pallet Qty",
+                "field": "pallet_Qty",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Pallet Weight",
+                "field": "pallet_Weight",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Pallet Height",
+                "field": "pallet_Height",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Pallet Width",
+                "field": "pallet_Width",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Pallet Depth",
+                "field": "pallet_Depth",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Pallet Front",
+                "editable": true,
+                "hide": true,
+                "cellRendererFramework": "ImageView"
+            },
+            {
+                "headerName": "Pallet Side",
+                "editable": true,
+                "hide": true,
+                "cellRendererFramework": "ImageView"
+            },
+            {
+                "headerName": "Pallet Top",
+                "editable": true,
+                "hide": true,
+                "cellRendererFramework": "ImageView"
+            }
+        ]
+    },
+    {
+        "headerName": "Supporting Documents",
+        "children": [{
+                "headerName": "Stock Protection",
+                "field": "stock_Protection",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "LOA (Letter of Authority)",
+                "field": "loa",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Marketing Plan",
+                "field": "marketing_Plan",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Marketing Material",
+                "field": "marketing_Material",
+                "editable": true,
+                "hide": true
+            }
+        ]
+    },
+    {
+        "headerName": "Resources",
+        "children": [{
+                "headerName": "Retail Buyer",
+                "field": "retail_Buyer",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Retail Stock Planner",
+                "field": "retail_Stock_Planner",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Buyer Assistant",
+                "field": "buyer_Assistant",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Order Clerk",
+                "field": "order_Clerk",
+                "editable": true,
+                "hide": true
+            }
+        ]
+    },
+    {
+        "headerName": "Vendor Contact Details",
+        "children": [{
+                "headerName": "Contact",
+                "field": "contact",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Cell",
+                "field": "cell",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "email",
+                "field": "email",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Order Clerk",
+                "field": "order_Clerk",
+                "editable": true,
+                "hide": true
+            }
+        ]
+    },
+    {
+        "headerName": "Tax and System Fields",
+        "children": [{
+                "headerName": "Tax Rate",
+                "field": "tax_Rate",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Tax Class",
+                "field": "tax_Class",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Tax Code",
+                "field": "tax_Code",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Purchase Group",
+                "field": "purchase_Group",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "MRP Controller",
+                "field": "mrp_Controller",
+                "editable": true,
+                "hide": true
+            }
+        ]
+    },
+    {
+        "headerName": "Price and Margin",
+        "children": [{
+                "headerName": "Unit Cost",
+                "field": "unit_Cost",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "RSP Incl VAT",
+                "field": "rsp_Including_VAT",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "RSP Excl Vat",
+                "field": "rsp_Excluding_VAT",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Rounded Selling Price",
+                "field": "rounded_Selling_Price",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Markup %",
+                "field": "markup_Percentage",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Gross Profit %",
+                "field": "gross_Profit_Percentage",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Category GP %",
+                "field": "category_Gross_Profit_Percentage",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Shortfall %",
+                "field": "shortfall_Percentage",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Discount % Allowed",
+                "field": "discount_Percentage_Allowed",
+                "editable": true,
+                "hide": true
+            }
+        ]
+    },
+    {
+        "headerName": "Competitor Pricing",
+        "children": [{
+                "headerName": "Competitor 1 RSP",
+                "field": "competitor_1_RSP",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Competitor 2 RSP",
+                "field": "competitor_2_RSP",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Competitor 3 RSP",
+                "field": "competitor_3_RSP",
+                "editable": true,
+                "hide": true
+            }
+        ]
+    },
+    {
+        "headerName": "Ranging",
+        "children": [{
+                "headerName": "Indicator - LTM1",
+                "field": "Indicator_LTM1",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Indicator - MTM3",
+                "field": "Indicator_LTM1",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "ETC X9",
+                "field": "Indicator_LTM1",
+                "editable": true,
+                "hide": true
+            }
+        ]
+    },
+    {
+        "headerName": "Sales Projection - 6 Months",
+        "children": [{
+                "headerName": "Number Of Stores",
+                "field": "number_Of_Stores",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Selected Stores Turnover",
+                "field": "selected_Stores_Turnover",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Category Turnover",
+                "field": "category_Turnover",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "% Of Category Sales Projected",
+                "field": "category_Turnover",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "% Canibilisation",
+                "field": "percentage_Canibilisation",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Projected Sales (incl)",
+                "field": "projected_Sales",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Projected Units",
+                "field": "projected_Units",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Projected Profit",
+                "field": "projected_Profit",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Projected GP %",
+                "field": "projected_Gross_Profit_Percentage",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Projected Margin %",
+                "field": "projected_Margin_Percentage",
+                "editable": true,
+                "hide": true
+            }
+        ]
+    },
+    {
+        "headerName": "Opening Orders",
+        "children": [{
+                "headerName": "Suggested Order Qty",
+                "field": "suggested_Order_Qty",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Suggested Order Value at Cost",
+                "field": "Suggested_Order_Value_At_Cost",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Suggested Order Value at Retail",
+                "field": "Suggested_Order_Value_At_Retail",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Order Quantity",
+                "field": "order_Quantity",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Order Value at Cost",
+                "field": "order_Value_At_Cost",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Order Value at Retail",
+                "field": "order_Value_At_Retail",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Order Profit Value",
+                "field": "order_Profit_Value",
+                "editable": true,
+                "hide": true
+            }
+        ]
+    },
+    {
+        "headerName": "Product Sales Evaluation",
+        "children": [{
+                "headerName": "Test Period",
+                "field": "test_Period",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Test Period Review Date",
+                "field": "test_Period_Review_Date",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Period 1",
+                "field": "period_1",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Period 2",
+                "field": "period_2",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Period 3",
+                "field": "period_3",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Period 4",
+                "field": "period_4",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Period 5",
+                "field": "period_5",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Period 6",
+                "field": "period_6",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Projected Sales (Incl)",
+                "field": "projected_Sales_Evaluation",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Projected Units",
+                "field": "projected_Units_Evaluation",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Sales YTD",
+                "field": "sales_YTD",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Units YTD",
+                "field": "units_YTD",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "% of Category Sales Projected",
+                "field": "percentage_OF_Category_Sales_Projected",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Sales Index",
+                "field": "sales_Index",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Units Index",
+                "field": "units_Index",
+                "editable": true,
+                "hide": true
+            },
+            {
+                "headerName": "Profit Index",
+                "field": "profit_Index",
+                "editable": true,
+                "hide": true
+            }
+        ]
+    },
+    {
+        "headerName": "",
+        "editable": false,
+        "hide": false,
+        "pinned": "right",
+        "maxWidth": 100,
+        "minWidth": 100,
+        "cellRendererFramework": "Button"
+    }
+]
