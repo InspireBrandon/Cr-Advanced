@@ -811,7 +811,6 @@ class LoadSavePlanogramBase {
     
     let lastItem = null;
     allItemsFiltered.forEach(fixture => {
-      console.log(fixture, fixture.Data);
       lastItem = fixture;
       fixture.AddProductRenderings();
     });
