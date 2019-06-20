@@ -1,4 +1,7 @@
 [{
+    "headerName": "Can Edit",
+    "field": "can_edit"
+},{
         "headerName": "Product System ID",
         "field": "product_System_ID",
         "editable": true,

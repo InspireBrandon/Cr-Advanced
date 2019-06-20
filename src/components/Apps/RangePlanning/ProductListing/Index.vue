@@ -237,7 +237,7 @@
                         componentParent: this
                     },
                     rowClassRules: {
-                        'audit-image-breach': 'data.imageAudit'
+                        'disabled-line': 'data.can_edit'
                     }
                 },
                 showLoader: false,
@@ -293,11 +293,10 @@
 
             },
             onRowEditingStarted(e) {
-                if(!e.data.can_edit)
+                if (!e.data.can_edit)
                     this.gridApi.stopEditing();
             },
-            onCellValueChanged(e) {
-            },
+            onCellValueChanged(e) {},
             set_file_type(file_type) {
                 let self = this;
                 self.file_type = file_type;
@@ -690,6 +689,10 @@
 <style>
     .active-tab {
         background: #131313 !important;
+    }
+
+    .disabled-line {
+        background: green;
     }
 
     .pulse {
