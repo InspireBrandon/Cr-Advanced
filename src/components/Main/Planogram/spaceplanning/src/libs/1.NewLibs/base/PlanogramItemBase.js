@@ -641,7 +641,7 @@ class PlanogramItemBase {
     allProductRenderings.forEach(productRendering => {
       productRendering.moveToTop();
     });
-    console.log("PRODUCT RENDERINGS Z-INDEX", "COMPLETE!!!")
+    self.Layer.draw();
   }
 
   SetBasePosition(position) {

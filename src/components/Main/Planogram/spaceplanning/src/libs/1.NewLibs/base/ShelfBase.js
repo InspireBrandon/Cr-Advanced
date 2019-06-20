@@ -274,7 +274,6 @@ class ShelfBase extends PlanogramItemBase {
     let self = this;
     let ctrl_store = new StoreHelper();
     if (self.Data.productRendering != undefined && self.Data.productRendering != null && self.Data.productRendering == true) {
-
       let allProducts = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "PRODUCT", self.ID);
 
       if (allProducts.length == 0) {
@@ -288,9 +287,11 @@ class ShelfBase extends PlanogramItemBase {
       
       allProducts.forEach(product => {
         // add rendering
+        product.RemoveRendering();
         product.AddRendering(self, margin);
       });
     } else {
+      console.warn("[PRODUCT RENDERING]", self.Type, "Product rendering setting off")
       let allProducts = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "PRODUCT", self.ID);
 
       if (allProducts.length == 0) {

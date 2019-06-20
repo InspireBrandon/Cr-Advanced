@@ -473,6 +473,9 @@ class LoadSavePlanogramBase {
     let ctrl_label = new LabelHelper();
     ctrl_label.SetNewLabelAndPositionNumbers(VueStore);
 
+    // call product renderings
+    self.loadRenderingsPostLoad(VueStore);
+    // end
     Stage.draw();
 
     hideLoader();
@@ -798,6 +801,23 @@ class LoadSavePlanogramBase {
         });
       }
     }
+  }
+
+  loadRenderingsPostLoad(VueStore) {
+    let self = this;
+    let ctrl_store = new StoreHelper();
+    let allItems = ctrl_store.getAllPlanogramItems(VueStore);
+    let allItemsFiltered = allItems.filter((el) => el.Type == "SHELF" || el.Type == "BASE" || el.Type == "BASKET");
+    
+    let lastItem = null;
+    allItemsFiltered.forEach(fixture => {
+      console.log(fixture, fixture.Data);
+      lastItem = fixture;
+      fixture.AddProductRenderings();
+    });
+
+    lastItem.ApplyZIndexing();
+    lastItem.Layer.draw();
   }
 }
 
