@@ -174,7 +174,7 @@ class ShelfBase extends PlanogramItemBase {
     }
 
     if (self.Data.RenderingsItems.ShelfEdge != undefined || self.Data.RenderingsItems.ShelfEdge != null) {
-      console.log("[SHELF RENDERING] SHELF EDGE", self.Data.RenderingsItems.ShelfEdge);
+      // console.log("[SHELF RENDERING] SHELF EDGE", self.Data.RenderingsItems.ShelfEdge);
 
       // add shelf edge rendering
       let w = self.Data.RenderingsItems.ShelfEdge.width * self.Ratio;
@@ -205,7 +205,7 @@ class ShelfBase extends PlanogramItemBase {
     }
 
     if (self.Data.RenderingsItems.LabelHolder != undefined || self.Data.RenderingsItems.LabelHolder != null) {
-      console.log("[SHELF RENDERING] LABEL HOLDER", self.Data.RenderingsItems.LabelHolder);
+      // console.log("[SHELF RENDERING] LABEL HOLDER", self.Data.RenderingsItems.LabelHolder);
       // add shelf edge rendering
       let w = self.Data.RenderingsItems.LabelHolder.width * self.Ratio;
       let h = self.Data.RenderingsItems.LabelHolder.height * self.Ratio;
@@ -236,7 +236,7 @@ class ShelfBase extends PlanogramItemBase {
 
     if (self.Data.RenderingsItems.Back != undefined || self.Data.RenderingsItems.Back != null) {
       // add shelf edge rendering
-      console.log("[SHELF RENDERING] BACK RENDERING", self.Data.RenderingsItems.Back);
+      // console.log("[SHELF RENDERING] BACK RENDERING", self.Data.RenderingsItems.Back);
       let w = self.Data.RenderingsItems.Back.width * self.Ratio;
       let h = self.Data.RenderingsItems.Back.height * self.Ratio;
       let offset = 0;
@@ -274,7 +274,6 @@ class ShelfBase extends PlanogramItemBase {
     let self = this;
     let ctrl_store = new StoreHelper();
     if (self.Data.productRendering != undefined && self.Data.productRendering != null && self.Data.productRendering == true) {
-
       let allProducts = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "PRODUCT", self.ID);
 
       if (allProducts.length == 0) {
@@ -288,9 +287,11 @@ class ShelfBase extends PlanogramItemBase {
       
       allProducts.forEach(product => {
         // add rendering
+        product.RemoveRendering();
         product.AddRendering(self, margin);
       });
     } else {
+      console.warn("[PRODUCT RENDERING]", self.Type, "Product rendering setting off")
       let allProducts = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "PRODUCT", self.ID);
 
       if (allProducts.length == 0) {
