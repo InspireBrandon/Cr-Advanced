@@ -108,7 +108,7 @@
         </v-card>
         <ag-grid-vue v-if="file_type != null" :gridOptions="gridOptions"
             style="width: 100%;  height: calc(100vh - 113px);" :defaultColDef="defaultColDef" class="ag-theme-balham"
-            :columnDefs="columnDefs" :selectionChanged="onSelectionChanged" :rowData="rowData" :enableSorting="true"
+            :columnDefs="columnDefs" :rowData="rowData" :enableSorting="true"
             :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
             :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :gridReady="onGridReady"
             :groupMultiAutoColumn="true" :cellEditingStarted="onRowEditingStarted">
@@ -279,18 +279,13 @@
         created() {
             let self = this;
             setTimeout(() => {
-                self.setColumnDefs();
                 self.getData();
             }, 2000);
         },
         methods: {
-            setColumnDefs() {},
             onGridReady(params) {
                 this.gridApi = params.api;
                 this.columnApi = params.columnApi;
-            },
-            onSelectionChanged() {
-
             },
             onRowEditingStarted(e) {
                 if (!e.data.can_edit)
