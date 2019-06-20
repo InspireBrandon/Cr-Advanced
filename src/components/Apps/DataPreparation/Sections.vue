@@ -10,51 +10,99 @@
                         <v-card-text>
                             <v-layout row wrap>
                                 <v-flex md12>
-                                    <v-card dark dense color="primary">
-                                        <v-card-title>Product</v-card-title>
+                                    <v-card dark dense color="blue-grey darken-2">
+                                        <v-card-title class="title font-weight-bold font-italic">Product
+                                            <v-spacer></v-spacer>
+                                            <v-icon right>shopping_cart</v-icon>
+                                        </v-card-title>
                                     </v-card>
                                 </v-flex>
                                 <v-flex md4 v-for="(card, idx) in product" :key="idx">
                                     <v-card @click="openDataImport(card.route)">
-                                        <v-card-text>
-                                            {{card.name}}
-                                        </v-card-text>
+                                        <v-tooltip top>
+                                            <template v-slot:activator="{ on }">
+                                                <v-hover>
+                                                    <v-card-text dark v-on="on" id="fact"
+                                                        class="subheading font-weight-regular font-italic"
+                                                        slot-scope="{ hover }" :class="`elevation-${hover ? 12 : 2}`">
+                                                        {{card.name}}
+                                                    </v-card-text>
+                                                </v-hover>
+                                            </template>
+                                            <span>Route is: {{card.route}}</span>
+                                        </v-tooltip>
                                     </v-card>
                                 </v-flex>
                                 <v-flex md12>
-                                    <v-card dark dense color="primary">
-                                        <v-card-title>Market</v-card-title>
+                                    <v-card dark dense color="blue-grey darken-2">
+                                        <v-card-title class="title font-weight-bold font-italic">Market
+                                            <v-spacer></v-spacer>
+                                            <v-icon right>work</v-icon>
+                                        </v-card-title>
                                     </v-card>
                                 </v-flex>
                                 <v-flex md4 v-for="(card, idx) in market" :key="idx">
                                     <v-card @click="openDataImport(card.route)">
-                                        <v-card-text>
-                                            {{card.name}}
-                                        </v-card-text>
+                                        <v-tooltip top>
+                                            <template v-slot:activator="{ on }">
+                                                <v-hover>
+                                                    <v-card-text dark v-on="on" id="fact"
+                                                        class="subheading font-weight-regular font-italic"
+                                                        slot-scope="{ hover }" :class="`elevation-${hover ? 12 : 2}`">
+                                                        {{card.name}}
+                                                    </v-card-text>
+                                                </v-hover>
+                                            </template>
+                                            <span>Route is: {{card.route}}</span>
+                                        </v-tooltip>
                                     </v-card>
                                 </v-flex>
                                 <v-flex md12>
-                                    <v-card dark dense color="primary">
-                                        <v-card-title>Fact</v-card-title>
+                                    <v-card dark dense color="blue-grey darken-2">
+                                        <v-card-title class="title font-weight-bold font-italic">Fact
+                                            <v-spacer></v-spacer>
+                                            <v-icon right>subject</v-icon>
+                                        </v-card-title>
                                     </v-card>
                                 </v-flex>
                                 <v-flex md4 v-for="(card, idx) in fact" :key="idx">
                                     <v-card @click="openDataImport(card.route)">
-                                        <v-card-text>
-                                            {{card.name}}
-                                        </v-card-text>
+                                        <v-tooltip top>
+                                            <template v-slot:activator="{ on }">
+                                                <v-hover>
+                                                    <v-card-text dark v-on="on" id="fact"
+                                                        class="subheading font-weight-regular font-italic"
+                                                        slot-scope="{ hover }" :class="`elevation-${hover ? 12 : 2}`">
+                                                        {{card.name}}
+                                                    </v-card-text>
+                                                </v-hover>
+                                            </template>
+                                            <span>Route is: {{card.route}}</span>
+                                        </v-tooltip>
                                     </v-card>
                                 </v-flex>
                                 <v-flex md12>
-                                    <v-card dark dense color="primary">
-                                        <v-card-title>Period</v-card-title>
+                                    <v-card dark dense color="blue-grey darken-2">
+                                        <v-card-title class="title font-weight-bold font-italic">Period
+                                            <v-spacer></v-spacer>
+                                            <v-icon right>timeline</v-icon>
+                                        </v-card-title>
                                     </v-card>
                                 </v-flex>
                                 <v-flex md4 v-for="(card, idx) in period" :key="idx">
                                     <v-card @click="openDataImport(card.route)">
-                                        <v-card-text>
-                                            {{card.name}}
-                                        </v-card-text>
+                                        <v-tooltip top>
+                                            <template v-slot:activator="{ on }">
+                                                <v-hover>
+                                                    <v-card-text dark v-on="on" id="fact"
+                                                        class="subheading font-weight-regular font-italic"
+                                                        slot-scope="{ hover }" :class="`elevation-${hover ? 12 : 2}`">
+                                                        {{card.name}}
+                                                    </v-card-text>
+                                                </v-hover>
+                                            </template>
+                                            <span>Route is: {{card.route}}</span>
+                                        </v-tooltip>
                                     </v-card>
                                 </v-flex>
                             </v-layout>
@@ -146,3 +194,20 @@
         }
     }
 </script>
+<style>
+    #product {
+        cursor: pointer;
+    }
+
+    #market {
+        cursor: pointer;
+    }
+
+    #fact {
+        cursor: pointer;
+    }
+
+    #period {
+        cursor: pointer;
+    }
+</style>
