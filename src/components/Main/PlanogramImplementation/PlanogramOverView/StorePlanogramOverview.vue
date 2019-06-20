@@ -1,9 +1,9 @@
 <template>
     <v-dialog persistent fullscreen v-model="storeView">
         <v-card>
-            <v-toolbar  color="primary" dark>
+            <v-toolbar color="primary" dark>
                 <v-toolbar-title>
-                  Planogram Overview: <strong>{{title}}</strong>
+                    Planogram Overview: <strong>{{title}}</strong>
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-btn icon flat dark @click="storeView=false">
@@ -11,6 +11,9 @@
                 </v-btn>
             </v-toolbar>
             <v-toolbar dark flat dense>
+                <v-btn @click="assignGroups">
+                    group assign
+                </v-btn>
                 <!-- <v-menu>
                     <v-btn slot="activator">options</v-btn>
                     <v-list>
@@ -20,9 +23,10 @@
                     </v-list>
                 </v-menu> -->
             </v-toolbar>
-            <grid ref="grid" :getRowData="getStorePlanograms" :selectedProject="selectedProject" :rowData="rowData" />
+            <grid ref="grid" :getRowData="getStorePlanograms" :selectedProject="selectedProject" :rowData="rowData"
+                :assign="assignGroups" />
 
-            <StorePlanograms  ref="StorePlanograms" />
+            <StorePlanograms ref="StorePlanograms" />
             <PlanogramDetailsSelector :PlanoName="ProjectName.text" ref="PlanogramDetailsSelector" />
         </v-card>
     </v-dialog>
@@ -52,6 +56,8 @@
                 allStoreDialog: false,
                 StoreStatusList: [{
                         text: "Unassigned"
+                    }, {
+                        text: "Selected"
                     },
                     {
                         text: "DistrubutedToStore"
@@ -71,28 +77,100 @@
             }
         },
         methods: {
-            assignPlanogramToStore(listItem) {
+            checkFits(storePlan, planDetails, callback) {
+                let self = this
+                let retval = false
+                if (storePlan.modules < planDetails.modules) {
+                    retval = true
+                }
+                if (storePlan.height < planDetails.height) {
+                    retval = true
+                }
+                if (storePlan.cluster != planDetails.storeCluster) {
+                    retval = true
+                }
+                callback(retval)
+            },
+            Distribute(data) {
+                let self = this
+            },
+            assignGroups() {
+                let self = this
+                let data = self.$refs.grid.getSelectedRows()
+                let count = 0
+                self.$refs.PlanogramDetailsSelector.show(null, false, detailID => {
+                    data.forEach(e => {
+                        self.assignPlanogramToStoreNoRefresh(e.data, detailID, () => {
+                            count = count + 1
+                            if (data.length == count) {
+                                self.getStorePlanograms()
+                            }
+                        })
+                    })
+                })
+            },
+            assignPlanogramToStoreNoRefresh(listItem, detailID, callback) {
                 let self = this;
-                console.log("assigning");
-                self.$refs.PlanogramDetailsSelector.show(listItem,true, data => {
+                self.checkFits(listItem, data, fits => {
                     let item = {
                         "id": listItem.id,
                         "store_ID": listItem.store_ID,
                         "project_ID": self.selectedProject,
-                        "planogramDetail_ID": data,
+                        "planogramDetail_ID": detailID.id,
                         "planogramStoreStatus": 1,
+                        // "Modules": detailID.modules,
+                        // "Height": detailID.height,
+                        // "Width": detailID.width,
+                        // "Displays": detailID.displays,
+                        // "Pallettes": detailID.pallettes,
+                        // "SupplierStands": detailID.supplierStands,
+                        // "Bins": detailID.bins,
+                        "Fits": fits
+
                     }
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
                     Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
                         .then(r => {
                             console.log(r);
-                            self.getStorePlanograms()
                             delete Axios.defaults.headers.common["TenantID"];
                         }).catch(e => {
                             console.log(e);
                             delete Axios.defaults.headers.common["TenantID"];
                         })
+                })
+            },
+
+            assignPlanogramToStore(listItem) {
+                let self = this;
+                self.$refs.PlanogramDetailsSelector.show(listItem, true, data => {
+                    self.checkFits(listItem, data, fits => {
+                        let item = {
+                            "id": listItem.id,
+                            "store_ID": listItem.store_ID,
+                            "project_ID": self.selectedProject,
+                            "planogramDetail_ID": data.id,
+                            "planogramStoreStatus": 1,
+                            // "Modules": data.modules,
+                            // "Height": data.height,
+                            // "Width": data.width,
+                            // "Displays": data.displays,
+                            // "Pallettes": data.pallettes,
+                            // "SupplierStands": data.supplierStands,
+                            // "Bins": data.bins,
+                            "Fits": fits
+                        }
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                        Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
+                            .then(r => {
+                                console.log(r);
+                                self.getStorePlanograms()
+                                delete Axios.defaults.headers.common["TenantID"];
+                            }).catch(e => {
+                                console.log(e);
+                                delete Axios.defaults.headers.common["TenantID"];
+                            })
+                    })
+
                 })
             },
             openStoreOver(item) {
@@ -108,8 +186,8 @@
 
                 Axios.get(process.env.VUE_APP_API + 'Store_Planogram?project_ID=' + self.selectedProject)
                     .then(r => {
-                        self.rowData=[]   
-                        self.currentStorePlanograms=[]    
+                        self.rowData = []
+                        self.currentStorePlanograms = []
                         self.currentStorePlanograms = r.data.store_PlanogramList;
                         self.currentStorePlanograms.forEach(e => {
                             e.GeneratedName = self.GenerateName(e)

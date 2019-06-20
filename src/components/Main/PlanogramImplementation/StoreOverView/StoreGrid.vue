@@ -30,55 +30,51 @@
                 headers: [{
                         "headerName": "Planogram",
                         "field": "name"
+                    },  {
+                        "headerName": "Category Cluster",
+                        "field": "categoryCluster"
                     }, {
                         "headerName": "Name",
                         "field": "GeneratedName"
-                    }, {
-                        "headerName": "Planogram Cluster",
-                        "field": "clusterName"
-                    }, {
+                    },{
                         "headerName": "Modules",
                         "maxWidth": 90,
                         "minWidth": 50,
-                        "editable": true,
                         "field": "modules"
                     }, {
                         "headerName": "Height",
                         "maxWidth": 90,
                         "minWidth": 50,
-                        "editable": true,
                         "field": "height"
                     }, {
                         "headerName": "Width",
                         "maxWidth": 90,
                         "minWidth": 50,
-                        "editable": true,
                         "field": "width"
                     }, {
                         "headerName": "Displays",
                         "maxWidth": 90,
                         "minWidth": 50,
-                        "editable": true,
                         "field": "displays"
                     }, {
                         "headerName": "Pallettes",
                         "maxWidth": 90,
                         "minWidth": 50,
-                        "editable": true,
                         "field": "pallettes"
                     }, {
                         "headerName": "Supplier Stands",
                         "maxWidth": 90,
                         "minWidth": 50,
-                        "editable": true,
                         "field": "supplierStands"
                     }, {
                         "headerName": "Bins",
                         "field": "bins",
                         "maxWidth": 90,
                         "minWidth": 50,
-                        "editable": true,
                     }, {
+                        "headerName": "unRequired In Store",
+                        "field": "requiredInStore",
+                    },{
                         "headerName": "Current Status",
                         "field": "currentStatusText"
                     },
@@ -87,13 +83,15 @@
                         "editable": false,
                         "hide": false,
                         "pinned": "right",
-                        "maxWidth": 100,
-                        "minWidth": 100,
+                        "maxWidth": 120,
+                        "minWidth": 120,
                         "cellRendererFramework": "Button"
                     }
                 ],
                 StoreStatusList: [{
                         text: "Unassigned"
+                    }, {
+                        text: "Selected"
                     },
                     {
                         text: "DistrubutedToStore"
@@ -140,7 +138,7 @@
                     let item = {
                         "store_ID": self.StoreID,
                         "project_ID": listItem.id,
-                        "planogramDetail_ID": data,
+                        "planogramDetail_ID": data.id,
                         "planogramStoreStatus": 1,
                     }
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
