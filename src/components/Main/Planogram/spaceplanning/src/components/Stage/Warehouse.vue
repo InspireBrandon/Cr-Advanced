@@ -49,9 +49,9 @@
             <v-list-tile @click="saveFile(false)">
               <v-list-tile-title>Save</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile @click="CheckExists()">
+            <!-- <v-list-tile @click="CheckExists()">
               <v-list-tile-title>Save New</v-list-tile-title>
-            </v-list-tile>
+            </v-list-tile> -->
             <v-list-tile @click="rangeToPlanogram">
               <v-list-tile-title>Range To Planogram</v-list-tile-title>
             </v-list-tile>
