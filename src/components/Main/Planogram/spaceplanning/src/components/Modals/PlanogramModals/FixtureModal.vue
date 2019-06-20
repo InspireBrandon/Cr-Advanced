@@ -813,7 +813,7 @@
           }
 
           if (self.newData.productRenderingMargin == undefined || self.newData.productRenderingMargin == null) {
-            self.newData.productRenderingMargin = 0;
+            self.newData.productRenderingMargin = 15;
           }
 
           if (self.newData.RenderingsItems == undefined) {
@@ -1079,7 +1079,7 @@
         self.newData.facingOffsetY = returnFloat(self.newData.facingOffsetY);
 
         if (self.newData.productRenderingMargin == undefined || self.newData.productRenderingMargin == null) {
-          self.newData.productRenderingMargin = 0;
+          self.newData.productRenderingMargin = 15;
         }
 
         var fixtureObj = {

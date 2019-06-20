@@ -468,10 +468,13 @@
     },
     methods: {
       updateLoader(data) {
+
+        console.log(data);
+
         let self = this
-        if (data.spaceplanID != 0) {
-          self.spacePlanID = data.spaceplanID
-        }
+        // if (data.spaceplanID != 0) {
+        //   self.spacePlanID = data.spaceplanID
+        // }
         self.$refs.SizeLoader.updateLoader(data)
 
       },
@@ -945,7 +948,6 @@
               self.saveFile(true)
             }
           })
-
       },
       saveFile(isNew) {
         let self = this;
@@ -976,12 +978,16 @@
 
           let rangingFileUpdated = self.rangingController.getRangingFile();
 
+          console.log("Saving Range File");
+
           axios.put(process.env.VUE_APP_API + "SystemFile/JSON/NoRename?db=CR-Devinspire&id=" + vscd.rangeID,
               rangingFileUpdated)
             .then(r => {
               self.planogramHelper.setCreate(self.spacePlanID == null || isNew);
 
               if (self.spacePlanID == null) {
+                console.log("spacePlanID is null");
+
                 self.$refs.SizeLoader.show()
                 self.planogramHelper.save(self.$store, stage, clusterData, {
                     modules: self.modules,
@@ -995,6 +1001,8 @@
                   .close)
                 // self.$refs.SizeLoader.close()
               } else {
+                console.log("spacePlanID is not null");
+
                 self.$refs.yesNoModal.show('Update file name with latest configuration?', value => {
                   self.$refs.SizeLoader.show()
                   self.planogramHelper.save(self.$store, stage, clusterData, {
