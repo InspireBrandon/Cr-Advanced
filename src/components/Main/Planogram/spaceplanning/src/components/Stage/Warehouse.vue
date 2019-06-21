@@ -49,9 +49,9 @@
             <v-list-tile @click="saveFile(false)">
               <v-list-tile-title>Save</v-list-tile-title>
             </v-list-tile>
-            <!-- <v-list-tile @click="CheckExists()">
+            <v-list-tile @click="CheckExists()">
               <v-list-tile-title>Save New</v-list-tile-title>
-            </v-list-tile> -->
+            </v-list-tile>
             <v-list-tile @click="rangeToPlanogram">
               <v-list-tile-title>Range To Planogram</v-list-tile-title>
             </v-list-tile>
@@ -945,7 +945,7 @@
                 }
               })
             } else {
-              self.saveFile(true)
+              self.saveNew(false)
             }
           })
       },
@@ -1040,6 +1040,72 @@
                 .close,callback=>{})
             })
           }
+        }
+       
+      },
+      saveNew(isNew) {
+        let self = this;
+        let parent = self.$parent.$children[0].$children[2];
+        let stage = parent.getStage();
+
+        let b64 = parent.$parent.getImageBytes(2);
+        let image = parent.$parent.b64toBlob(b64, "image/png")
+
+        let clusterData = self.rangingData;
+        let vscd = self.$store.getters.getClusterData;
+        clusterData["storeCluster"] = self.getClusterName();
+        clusterData["clusterID"] = vscd.clusterID;
+        clusterData["clusterType"] = vscd.clusterType;
+        clusterData["clusterName"] = vscd.clusterName;
+        clusterData["rangeID"] = vscd.rangeID;
+        clusterData["storeID"] = vscd.storeID;
+        clusterData["storeName"] = vscd.storeName;
+        clusterData["categoryCluster"] = vscd.categoryCluster;
+        let tmpSpacePlanID = self.spacePlanID
+        self.spacePlanID=null
+        if (vscd.rangeID != null) {
+          self.$store.getters.getAllPlanogramActiveProducts.forEach(el => {
+            self.rangingController.setAllProductData(el.Data);
+          })
+
+          let rangingFileUpdated = self.rangingController.getRangingFile();
+
+          console.log("Saving Range File");
+
+          axios.put(process.env.VUE_APP_API + "SystemFile/JSON/NoRename?db=CR-Devinspire&id=" + vscd.rangeID,
+              rangingFileUpdated)
+            .then(r => {
+              self.planogramHelper.setCreate(self.spacePlanID == null || isNew);
+
+              if (self.spacePlanID == null) {
+                console.log("spacePlanID is null");
+
+                self.$refs.SizeLoader.show()
+                self.planogramHelper.save(self.$store, stage, clusterData, {
+                    modules: self.modules,
+                    height: self.height,
+                    width: self.width,
+                    displays: self.displays,
+                    pallettes: self.pallettes,
+                    supplierStands: self.supplierStands,
+                    bins: self.bins
+                  }, self.spacePlanID, self.spacePlanName, true, image, self.updateLoader, self.$refs.SizeLoader
+                  .close,data=>{
+                    
+                    console.log("[NEW SPACEPLANID]",data);
+                    self.spacePlanID=data
+                  })
+              } 
+            })
+        } else {
+          self.planogramHelper.setCreate(self.spacePlanID == null || isNew);
+          if (self.spacePlanID == null) {
+            self.planogramHelper.save(self.$store, stage, clusterData, {
+              modules: self.modules,
+              height: self.height,
+              width: self.width
+            }, self.spacePlanID, self.spacePlanName, true, image)
+          } 
         }
        
       },

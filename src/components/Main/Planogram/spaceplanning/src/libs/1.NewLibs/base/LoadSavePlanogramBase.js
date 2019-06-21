@@ -361,6 +361,292 @@ class LoadSavePlanogramBase {
     // }
   }
 
+  saveNew(vuex, stage, clusterData, dimensionData, spacePlanID, spacePlanName, updateName, image, updateLoader, close,callback) {
+    let self = this;
+    let ctrl_store = new StoreHelper();
+    let allItems = ctrl_store.getAllPlanogramItems(vuex);
+    let allProducts = ctrl_store.getAllPlanogramItemsByType(vuex, "PRODUCT");
+
+    let output = {
+      name: "",
+      stage: null,
+      planogramData: [],
+      planogramSettings: vuex.getters.getPlanogramProperties,
+      clusterData: clusterData,
+      dimensionData: dimensionData,
+      image: image
+    }
+
+    allItems.forEach(item => {
+      // remove the line below to test that the positions are being saved and repopulated in the load
+      // item.PositionElement();
+      output.planogramData.push(item.ToObject());
+    });
+
+    allProducts.forEach(ap => {
+      output.planogramData.forEach(pdi => {
+        if (ap.Barcode == pdi.Data.Barcode) {
+          let calcData = calculate(ap, vuex);
+          pdi.Data["CalcData"] = calcData;
+        }
+      })
+    })
+
+    let planogramName = "";
+
+    if (updateName) {
+      if (clusterData.planogramName != null)
+        planogramName += clusterData.planogramName
+      if (clusterData.periodic != null) {
+        if (clusterData.periodic)
+          planogramName += " - " + clusterData.monthsBetween + "MMA";
+        else
+          planogramName += " - " + clusterData.dateFromString + " to " + clusterData.dateToString;
+      }
+      if (clusterData.tag != null && clusterData.tag != "")
+        planogramName += clusterData.tag;
+
+      if (clusterData.storeCluster != null && clusterData.storeCluster != "") {
+        planogramName += " - " + clusterData.storeCluster;
+      }
+
+      if (clusterData.storeName != null && clusterData.storeName != "") {
+        planogramName += " - " + clusterData.storeName;
+      }
+
+      if (planogramName != "")
+        planogramName += " - XXX";
+
+      planogramName += " - " + dimensionData.modules + " Module " + "(" + dimensionData.height + "M" + " x " + dimensionData.width + "M)";
+
+      if (planogramName[1] == "-")
+        planogramName = planogramName.replace(' -', "");
+
+      if (planogramName != "") {
+        planogramName += " - D" + dimensionData.displays;
+        planogramName += " - P" + dimensionData.pallettes;
+        planogramName += " - S" + dimensionData.supplierStands;
+        planogramName += " - B" + dimensionData.bins;
+      }
+    } else {
+      planogramName = spacePlanName;
+    }
+
+    output.name = planogramName;
+    output = JSON.parse(JSON.stringify(output));
+
+    // if (self.Create == true) {
+    let startTime = new Date()
+    let config = {
+      onUploadProgress: progressEvent => {
+        var currentFileSize = progressEvent.loaded * 0.000001
+        var FileTotalSize = progressEvent.total * 0.000001
+        var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+        var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
+
+        // do whatever you like with the percentage complete
+        // maybe dispatch an action that will update a progress bar or something
+        updateLoader({
+          text1: "Creating Folder",
+          text2: null,
+          currentFileSize: currentFileSize,
+          FileTotalSize: FileTotalSize,
+          currentFile: null,
+          totalFiles: null,
+          DownloadSpeed: DownloadSpeed,
+        })
+      }
+    }
+    let tmp = {}
+    if (this.Create == true) {
+      planogramName = planogramName
+      tmp = {
+        systemFile: {
+          systemUserID: 10,
+          folder: "Space Planning",
+          name: planogramName,
+          isFolder: true,
+          extension: "",
+          id: 0,
+        },
+      }
+    } else {
+      tmp = {
+        systemFile: {
+          systemUserID: 10,
+          folder: "Space Planning",
+          name: planogramName,
+          isFolder: true,
+          extension: "",
+          id: spacePlanID,
+        },
+      }
+    }
+
+    axios.post(self.ServerAddress + "SystemFolder?db=CR-Devinspire", tmp, config).then(resp => {
+      console.log("[save transaction]_______________________________________");
+      console.log(resp);
+      console.log("[save transaction]_______________________________________");
+     let resultSpace = resp.data.systemFileID
+      if (resp.success == true) {
+        alert("folder created")
+      }
+
+      output.image = null
+      let startTime = new Date()
+      let config = {
+        onUploadProgress: progressEvent => {
+          var currentFileSize = progressEvent.loaded * 0.000001
+          var FileTotalSize = progressEvent.total * 0.000001
+          var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+          var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
+
+          // do whatever you like with the percentage complete
+          // maybe dispatch an action that will update a progress bar or something
+          updateLoader({
+            title: "Saving Data.... ",
+            text1: "uploading Advanced Planogram",
+            text2: "File Progresss",
+            currentFileSize: currentFileSize,
+            FileTotalSize: FileTotalSize,
+            currentFile: 1,
+            totalFiles: 3,
+            DownloadSpeed: DownloadSpeed,
+            spaceplanID: resp.data.systemFileID
+          })
+        }
+      }
+      axios.post(self.ServerAddress + "SystemFile/JSON/Planogram?db=CR-Devinspire", {
+        file: "config_advanced",
+        systemFile: {
+          systemUserID: 10,
+          folder: "Space Planning",
+          name: planogramName,
+        },
+        data: output
+      }, config).then(result => {
+        // __sending simple version through
+
+
+
+
+        output.image = null
+
+        output.planogramData.forEach(e => {
+          e.Data.Data.image = null
+
+          if (e.Type != "PRODUCT" && e.Data.Data.renderings != null) {
+            e.Data.Data.renderings.forEach(render => {
+              render.image = null
+            })
+          }
+        })
+        let startTime = new Date()
+        let config = {
+          onUploadProgress: progressEvent => {
+            var currentFileSize = progressEvent.loaded * 0.000001
+            var FileTotalSize = progressEvent.total * 0.000001
+            var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+            var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
+
+            // do whatever you like with the percentage complete
+            // maybe dispatch an action that will update a progress bar or something
+            updateLoader({
+              text1: "uploading Simple Planogram",
+              text2: "File Progresss",
+              currentFileSize: currentFileSize,
+              FileTotalSize: FileTotalSize,
+              currentFile: 2,
+              totalFiles: 3,
+              DownloadSpeed: DownloadSpeed,
+            })
+          }
+        }
+        axios.post(self.ServerAddress + "SystemFile/JSON/Planogram?db=CR-Devinspire", {
+          file: "config_simple",
+          systemFile: {
+            systemUserID: 10,
+            folder: "Space Planning",
+            name: planogramName
+          },
+          data: output
+        }, config).then(res => {
+          let config = {
+            onUploadProgress: progressEvent => {
+
+            }
+          }
+          let xhrObj = new XMLHttpRequest();
+          let url = self.ServerAddress +
+            `SystemFile/JSON/PlanogramImage?db=CR-Devinspire&fileName=${output.name}`;
+
+          xhrObj.open("Post", url);
+          let startTime = new Date()
+          xhrObj.upload.onprogress = function (pe) {
+            var currentFileSize = pe.loaded * 0.000001
+            var FileTotalSize = pe.total * 0.000001
+            var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+            var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
+
+            // do whatever you like with the percentage complete
+            // maybe dispatch an action that will update a progress bar or something
+            updateLoader({
+              text1: "uploading Planogram Image",
+              text2: "File Progresss",
+
+              currentFileSize: pe.loaded * 0.000001,
+              FileTotalSize: pe.total * 0.000001,
+              progress: ((currentFileSize / FileTotalSize) * 100) / 3,
+              currentFile: 2,
+              totalFiles: 3,
+              DownloadSpeed: DownloadSpeed
+            })
+          }
+
+          xhrObj.upload.onreadystatechange = function (oEvent) {
+
+            if (xhrObj.upload.readyState === 4) {
+              if (xhrObj.upload.status !== 200) {
+                alert("ERROR")
+              }
+            }
+          };
+
+          xhrObj.upload.onerror = function (e) {
+            alert("ERROR")
+            hasError = true;
+          }
+
+          xhrObj.upload.onloadend = function (e) {
+            updateLoader({
+              currentFile: 3,
+              totalFiles: 3,
+            })
+            setTimeout(() => {
+              close()
+            }, 500);
+          }
+
+          xhrObj.setRequestHeader("X-File-Name", "image.png");
+          xhrObj.setRequestHeader("Content-type", image.Type);
+          console.log("image");
+          console.log(image);
+
+          image.name = "image.png"
+          xhrObj.send(image);
+
+          // 
+
+        })
+        callback(resultSpace)
+      }).catch(e => {
+        console.log(e)
+        console.error("Failed to save planogram file");
+
+      })
+    })
+  }
+
   determinePlanogramName(allPlanogramItems, clusterData) {
     // TODO: Make sure that we change the name to the correct standard.
     // return clusterData.planogramName + " " + clusterData.clusterName;
