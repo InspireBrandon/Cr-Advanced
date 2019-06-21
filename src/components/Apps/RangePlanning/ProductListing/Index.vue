@@ -268,12 +268,15 @@
             },
             newLineAdd() {
                 let self = this;
-                self.rowData.push({})
 
-                setTimeout(() => {
-                    self.gridApi.resetRowHeights();
-                    self.gridApi.sizeColumnsToFit()
-                }, 60);
+                self.$refs.NewProductValidator.show();
+
+                // self.rowData.push({})
+
+                // setTimeout(() => {
+                //     self.gridApi.resetRowHeights();
+                //     self.gridApi.sizeColumnsToFit()
+                // }, 60);
             },
             newLineChange() {
                 let self = this;
