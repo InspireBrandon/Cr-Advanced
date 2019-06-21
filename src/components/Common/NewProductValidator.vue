@@ -25,15 +25,23 @@
                                                 label="Product system id"></v-text-field>
                                         </v-flex>
                                         <v-flex md1 xs1 class="pl-0">
-                                            <v-icon transition="slide-x-transition" style="margin-top: 25px;" color="success">check_circle_outline</v-icon>
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                    <v-icon transition="slide-x-transition" style="margin-top: 25px;" color="info" v-on="on">info</v-icon>
+                                                </template>
+                                                <span>Please fill in a product system id</span>
+                                            </v-tooltip>
+                                            <!-- <v-icon transition="slide-x-transition" style="margin-top: 25px;" color="success">check_circle_outline</v-icon> -->
                                         </v-flex>
                                         <v-flex md5 xs11>
                                             <v-text-field :loading="barcode_loading" @blur="on_barcode_blur"
                                                 v-model="form.barcode" @keydown="save_disabled = true"
-                                                :disabled="barcode_loading" label="Barcode"></v-text-field>
+                                                :disabled="barcode_loading || form.product_System_ID == ''"
+                                                label="Barcode"></v-text-field>
                                         </v-flex>
                                         <v-flex md1 xs1 class="pl-0">
-                                            <v-icon style="margin-top: 25px;" color="success">check_circle_outline</v-icon>
+                                            <v-icon style="margin-top: 25px;" color="success">check_circle_outline
+                                            </v-icon>
                                         </v-flex>
                                         <v-flex md12>
                                             <v-text-field v-model="form.description" label="Description"></v-text-field>
