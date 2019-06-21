@@ -26,6 +26,7 @@
 
               </v-list-tile-content>
               <v-spacer></v-spacer>
+              <v-list-tile-action v-if="bestFit==sp.count"> BEST FIT</v-list-tile-action>
               <!-- <v-list-tile-action>h:{{sp.height}} w:{{sp.width}} modules:{{sp.modules}}</v-list-tile-action> -->
             </v-list-tile>
           </v-list>
@@ -59,6 +60,7 @@
     },
     data() {
       return {
+        bestFit:0,
         doCheck: false,
         filterProject: null,
         searchText: null,
@@ -108,90 +110,55 @@
     methods: {
       checkAdd(item, listitem, callback) {
         let self = this
-        let canAdd = false
-        // console.log("-----------------------------");
-
-        // console.log(self.PlanoName == listitem.planogramName);
-        // console.log(listitem.planogramName);
-        //   console.log(self.PlanoName);
-
+        let canAdd = {
+          count: 0,
+          add: false
+        }
         if (listitem.planogramName == null) {
           listitem.planogramName = ""
         }
-
         if (self.PlanoName.toUpperCase() == listitem.planogramName.toUpperCase()) {
-          console.log("same");
-          canAdd = true
-        } else {
-          canAdd = false
-          return
+          canAdd.add = true
         }
         if (item.modules >= listitem.modules) {
-          canAdd = true
-        } else {
-          canAdd = false
-          return
-        }
-        if (item.bins >= listitem.bins) {
-          canAdd = true
-        } else {
-          canAdd = false
-          return
+          canAdd.count++
         }
         if (item.height >= listitem.height) {
-          canAdd = true
-        } else {
-          canAdd = false
-          return
+         canAdd.count++
         }
-        if (item.width >= listitem.width) {
-          canAdd = true
-        } else {
-          canAdd = false
-          return
-        }
+
         callback(canAdd)
       },
       getSpacePlans(data, callback) {
         let self = this;
-        console.log("data");
-        console.log(data);
-        console.log(self.PlanoName);
-
-
+        self.bestFit=0
         self.spaceData = [];
         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
         Axios.get(process.env.VUE_APP_API + "/Planogram_Details")
           .then(r => {
-            console.log("r.data.planogram_DetailsList");
-            console.log(r.data.planogram_DetailsList);
             self.spaceData = []
             if (self.doCheck == true) {
               r.data.planogram_DetailsList.forEach(element => {
                 self.checkAdd(data, element, retval => {
-                  if (retval == true) {
+                  if (retval.add == true) {
+                    element.count=retval.count
                     self.spaceData.push(element)
                   }
                 })
               });
+              self.spaceData.sort((a, b) => (a.count < b.count) ? 1 : -1)
+               self.bestFit=self.spaceData[0].count
             } else {
               self.spaceData = r.data.planogram_DetailsList
             }
-
-
             delete Axios.defaults.headers.common["TenantID"];
-
             callback();
           })
-        // .catch(e => {
-        //   alert("Failed to get data..."+e);
-        // })
       },
       show(data, doCheck, afterComplete) {
         let self = this;
         self.doCheck = doCheck
-        // self.filterProject = ProjectID
         self.getSpacePlans(data, callback => {
           self.dialog = true;
           self.afterComplete = afterComplete;
@@ -204,7 +171,7 @@
         } else {
           self.dialog = false;
 
-          self.afterComplete(self.selectedSpacePlan.id, self.selectedSpacePlan);
+          self.afterComplete(self.selectedSpacePlan);
         }
       },
       deleteSpacePlanFile() {

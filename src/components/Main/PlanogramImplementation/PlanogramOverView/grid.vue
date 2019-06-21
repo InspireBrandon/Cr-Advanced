@@ -1,12 +1,13 @@
 <template>
     <div v-if="rowData.length>0">
-        <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%;  height: calc(100vh - 235px);"
-            :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
-            :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true"
-            rowSelection="multiple" :rowDeselection="true" :enableColResize="true" :floatingFilter="true"
-            :gridReady="onGridReady" :groupMultiAutoColumn="true">
+        <ag-grid-vue :gridOptions="gridOptions" :selectionChanged="onSelectionChanged" :sideBar='false'
+            style="width: 100%;  height: calc(100vh - 235px);" :defaultColDef="defaultColDef" class="ag-theme-balham"
+            :columnDefs="headers" :rowData="rowData" :enableSorting="true" :enableFilter="true"
+            :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
+            :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :gridReady="onGridReady"
+            :groupMultiAutoColumn="true">
         </ag-grid-vue>
-    rows : {{rowData.length}}
+        rows : {{rowData.length}}
     </div>
 </template>
 <script>
@@ -16,79 +17,91 @@
         AgGridVue
     } from "ag-grid-vue";
     export default {
-        props: ["rowData", "selectedProject","getRowData"],
+        props: ["rowData", "selectedProject", "getRowData", "assign"],
         components: {
             AgGridVue,
             Button,
         },
         data() {
             return {
-                headers: [{
-                    "headerName": "Store",
-                    "field": "storeName"
-                },{
-                    "headerName": "Store Cluster",
-                    "field": "cluster"
-                }, {
-                    "headerName": "Name",
-                    "field": "GeneratedName"
-                }, {
-                    "headerName": "Planogram Cluster",
-                    "field": "clusterName"
-                }, {
-                    "headerName": "Modules",
-                    "maxWidth": 90,
-                    "minWidth": 50,
-                    "editable": true,
-                    "field": "modules"
-                }, {
-                    "headerName": "Height",
-                    "maxWidth": 90,
-                    "minWidth": 50,
-                    "editable": true,
-                    "field": "height"
-                }, {
-                    "headerName": "Width",
-                    "maxWidth": 90,
-                    "minWidth": 50,
-                    "editable": true,
-                    "field": "width"
-                }, {
-                    "headerName": "Displays",
-                    "maxWidth": 90,
-                    "minWidth": 50,
-                    "editable": true,
-                    "field": "displays"
-                }, {
-                    "headerName": "Pallettes",
-                    "maxWidth": 90,
-                    "minWidth": 50,
-                    "editable": true,
-                    "field": "pallettes"
-                }, {
-                    "headerName": "Supplier Stands",
-                    "maxWidth": 90,
-                    "minWidth": 50,
-                    "editable": true,
-                    "field": "supplierStands"
-                }, {
-                    "headerName": "Bins",
-                    "field": "bins",
-                    "maxWidth": 90,
-                    "minWidth": 50,
-                    "editable": true,
-                }, {
-                    "headerName": "Current Status",
-                    "field": "currentStatusText"
-                }, {
-                    "headerName": "",
-                    "editable": false,
-                    "hide": false,
-                    "pinned": "right",
-                    "maxWidth": 100,
-                    "minWidth": 100,
-                    "cellRendererFramework": "Button"
-                }],
+                selectedItems: [],
+                headers: [
+                    //     {
+                    //     "headerName": "",
+                    //     "maxWidth": 50,
+                    //     "minWidth": 50,
+                    //       "cellRendererFramework": "CheckBox"
+                    // },
+                    {
+                        "headerName": "Store",
+                        "checkboxSelection": true,
+                        "field": "storeName"
+                    }, {
+                        "headerName": "Store Cluster",
+                        "field": "cluster"
+                    }, {
+                        "headerName": "Category Cluster",
+                        "field": "categoryCluster",
+                        "maxWidth": 100,
+                        "minWidth": 100,
+                    }, {
+                        "headerName": "Name",
+                        "field": "GeneratedName"
+                    }, {
+                        "headerName": "Modules",
+                        "maxWidth": 90,
+                        "minWidth": 50,
+                        "editable": true,
+                        "field": "modules"
+                    }, {
+                        "headerName": "Height",
+                        "maxWidth": 90,
+                        "minWidth": 50,
+                        "editable": true,
+                        "field": "height"
+                    }, {
+                        "headerName": "Width",
+                        "maxWidth": 90,
+                        "minWidth": 50,
+                        "editable": true,
+                        "field": "width"
+                    }, {
+                        "headerName": "Displays",
+                        "maxWidth": 90,
+                        "minWidth": 50,
+                        "editable": true,
+                        "field": "displays"
+                    }, {
+                        "headerName": "Pallettes",
+                        "maxWidth": 90,
+                        "minWidth": 50,
+                        "editable": true,
+                        "field": "pallettes"
+                    }, {
+                        "headerName": "Supplier Stands",
+                        "maxWidth": 90,
+                        "minWidth": 50,
+                        "editable": true,
+                        "field": "supplierStands"
+                    }, {
+                        "headerName": "Bins",
+                        "field": "bins",
+                        "maxWidth": 90,
+                        "minWidth": 50,
+                        "editable": true,
+                    }, {
+                        "headerName": "Current Status",
+                        "field": "currentStatusText"
+                    }, {
+                        "headerName": "",
+                        "editable": false,
+                        "hide": false,
+                        "pinned": "right",
+                        "maxWidth": 100,
+                        "minWidth": 100,
+                        "cellRendererFramework": "Button"
+                    }
+                ],
                 defaultColDef: {
                     onCellValueChanged: this.UpdateLine
                 },
@@ -98,25 +111,61 @@
                         componentParent: this
                     },
                     rowClassRules: {
-                        'audit-image-breach': 'data.imageAudit'
+                        'audit-image-breach': 'data.fits'
                     }
                 },
             }
         },
         methods: {
+            getSelectedRows() {
+                let self = this
+                return this.selectedItems
+            },
+            onSelectionChanged(e) {
+                var rows = e.api.getSelectedNodes();
+                this.selectedItems = rows;
+            },
+            createStorePlano(listItem, callback) {
+                let self = this;
+                let item = {
+                    "id": listItem.id,
+                    "store_ID": listItem.store_ID,
+                    "project_ID": self.selectedProject,
+                    "planogramDetail_ID": listItem.planogramDetail_ID,
+                    "planogramStoreStatus": listItem.planogramStoreStatus,
+                    "Modules": listItem.modules,
+                    "Height": listItem.height,
+                    "Width": parseFloat(listItem.width),
+                    "Displays": listItem.displays,
+                    "Pallettes": listItem.pallettes,
+                    "SupplierStands": listItem.supplierStands,
+                    "Bins": listItem.bins,
+                    "Fits": false
+                }
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
+                    .then(r => {
+                        console.log(r);
+                        delete Axios.defaults.headers.common["TenantID"];
+                        callback(r)
+                    }).catch(e => {
+                        console.log(e);
+                        delete Axios.defaults.headers.common["TenantID"];
+                        callback(e)
+                    })
+            },
             UpdateLine(item) {
                 let self = this
-
                 let tmp = item.data
-                self.createPlanoGramDetailTX(tmp)
-                // create new detail tx
-                // update details then update store_planogram if necesssary
-
+                self.createStorePlano(tmp, data => {
+                    self.getRowData()
+                })
+                // self.createPlanoGramDetailTX(tmp)
             },
             createPlanoGramDetailTX(item) {
                 let self = this
                 let detailsItem = null;
-              
+
                 if (item.planogramName == null) {
                     item.planogramName = "No assigned Planogram"
                 }
@@ -165,7 +214,7 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + 'Planogram_Details/Save', sendRequst).then(
                     r => {
-                        
+
                         let obj = {
                             "id": item.id,
                             "store_ID": item.store_ID,
@@ -174,12 +223,11 @@
                             "planogramStoreStatus": 0,
                         }
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                       
+
 
                         Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', obj)
                             .then(res => {
-                                 console.log("hitting this one");
-                                  self.getRowData()      
+                                self.getRowData()
                                 // params.context.componentParent.getStorePlanograms()
                                 delete Axios.defaults.headers.common["TenantID"];
                             }).catch(e => {
@@ -202,3 +250,8 @@
         }
     }
 </script>
+<style>
+    .ag-theme-balham .audit-image-breach {
+        background-color: lightcoral !important;
+    }
+</style>

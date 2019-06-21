@@ -166,7 +166,7 @@
                 "cellRendererFramework": "ImageView"
             }
         ]
-    },  {
+    }, {
         "headerName": "Tray",
         "children": [{
                 "headerName": "Tray Barcode",
@@ -635,8 +635,7 @@
     },
     {
         "headerName": "Evaluation",
-        "children": [
-            {
+        "children": [{
                 "headerName": "Test Period",
                 "field": "test_Period",
                 "editable": false,

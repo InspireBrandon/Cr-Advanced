@@ -63,7 +63,6 @@ class LoadSavePlanogramBase {
 
     let planogramName = "";
 
-
     if (updateName) {
       if (clusterData.planogramName != null)
         planogramName += clusterData.planogramName
@@ -129,12 +128,12 @@ class LoadSavePlanogramBase {
     }
     let tmp = {}
     if (this.Create == true) {
-      planogramName=planogramName+" NEW"
+      planogramName = planogramName
       tmp = {
         systemFile: {
           systemUserID: 10,
           folder: "Space Planning",
-          name: planogramName ,
+          name: planogramName,
           isFolder: true,
           extension: "",
           id: 0,
@@ -157,11 +156,7 @@ class LoadSavePlanogramBase {
       if (resp.success == true) {
         alert("folder created")
       }
-      console.log("resp");
 
-      console.log(resp);
-      
-      console.log(planogramName)
       output.image = null
       let startTime = new Date()
       let config = {
@@ -182,7 +177,7 @@ class LoadSavePlanogramBase {
             currentFile: 1,
             totalFiles: 3,
             DownloadSpeed: DownloadSpeed,
-            spaceplanID:resp.data.systemFileID
+            spaceplanID: resp.data.systemFileID
           })
         }
       }
@@ -196,10 +191,10 @@ class LoadSavePlanogramBase {
         data: output
       }, config).then(result => {
         // __sending simple version through
-         
-          
-          
-          
+
+
+
+
         output.image = null
 
         output.planogramData.forEach(e => {
@@ -473,6 +468,9 @@ class LoadSavePlanogramBase {
     let ctrl_label = new LabelHelper();
     ctrl_label.SetNewLabelAndPositionNumbers(VueStore);
 
+    // call product renderings
+    self.loadRenderingsPostLoad(VueStore);
+    // end
     Stage.draw();
 
     hideLoader();
@@ -798,6 +796,22 @@ class LoadSavePlanogramBase {
         });
       }
     }
+  }
+
+  loadRenderingsPostLoad(VueStore) {
+    let self = this;
+    let ctrl_store = new StoreHelper();
+    let allItems = ctrl_store.getAllPlanogramItems(VueStore);
+    let allItemsFiltered = allItems.filter((el) => el.Type == "SHELF" || el.Type == "BASE" || el.Type == "BASKET");
+
+    let lastItem = null;
+    allItemsFiltered.forEach(fixture => {
+      lastItem = fixture;
+      fixture.AddProductRenderings();
+    });
+
+    lastItem.ApplyZIndexing();
+    lastItem.Layer.draw();
   }
 }
 

@@ -25,65 +25,13 @@
                     <v-btn slot="activator" flat>
                         View
                     </v-btn>
-                    <v-list light dense>
-                        <v-list-tile @click="hideShow('Standard')">
-                            <v-list-tile-title>Standard</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="hideShow('Vendor')">
-                            <v-list-tile-title>Vendor</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="hideShow('Hierarchy')">
-                            <v-list-tile-title>Hierarchy</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="hideShow('Item Status')">
-                            <v-list-tile-title>Item Status</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list dense>
-                            <v-menu offset-x right open-on-hover>
-                                <v-list-tile style="width: 100%" slot="activator">
-                                    <v-list-tile-title>Change Image</v-list-tile-title>
-                                    <v-spacer></v-spacer>
-                                    <v-list-tile-action class="justify-end">
-                                        <v-icon>play_arrow</v-icon>
-                                    </v-list-tile-action>
-                                </v-list-tile>
-                                <v-list dense>
-                                    <v-list-tile @click="hideShow('Unit')">
-                                        <v-list-tile-title>Unit</v-list-tile-title>
-                                    </v-list-tile>
-                                    <v-list-tile @click="hideShow('Tray')">
-                                        <v-list-tile-title>Tray</v-list-tile-title>
-                                    </v-list-tile>
-                                    <v-list-tile @click="hideShow('Shrink')">
-                                        <v-list-tile-title>Shrink</v-list-tile-title>
-                                    </v-list-tile>
-                                    <v-list-tile @click="hideShow('Case')">
-                                        <v-list-tile-title>Case</v-list-tile-title>
-                                    </v-list-tile>
-                                    <v-list-tile @click="hideShow('Pallet')">
-                                        <v-list-tile-title>Pallet</v-list-tile-title>
-                                    </v-list-tile>
-                                </v-list>
-                            </v-menu>
-                        </v-list>
-                        <v-list-tile @click="hideShow('Supporting Documents')">
-                            <v-list-tile-title>Supporting Documents</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="hideShow('Resources')">
-                            <v-list-tile-title>Resources</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="hideShow('Stock Control')">
-                            <v-list-tile-title>Stock Control</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="hideShow('Price And Margin')">
-                            <v-list-tile-title>Price And Margin</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="hideShow('Opening Orders')">
-                            <v-list-tile-title>Opening Orders</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="hideShow('Evaluation')">
-                            <v-list-tile-title>Evaluation</v-list-tile-title>
-                        </v-list-tile>
+                    <v-list light dense style="height: 500px; overflow-x: auto;">
+                        <template v-for="(item, idx) in columnDefs">
+                            <v-list-tile @click="hideShow(item.headerName)" v-if="item.children != undefined"
+                                :key="idx">
+                                <v-list-tile-title>{{ item.headerName }}</v-list-tile-title>
+                            </v-list-tile>
+                        </template>
                     </v-list>
                 </v-menu>
                 <v-btn :class="{ 'pulse': rowData.length == 0 }" @click="newLineAdd()"
@@ -108,8 +56,8 @@
         </v-card>
         <ag-grid-vue v-if="file_type != null" :gridOptions="gridOptions"
             style="width: 100%;  height: calc(100vh - 113px);" :defaultColDef="defaultColDef" class="ag-theme-balham"
-            :columnDefs="columnDefs" :rowData="rowData" :enableSorting="true"
-            :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
+            :columnDefs="columnDefs" :rowData="rowData" :enableSorting="true" :enableFilter="true"
+            :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
             :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :gridReady="onGridReady"
             :groupMultiAutoColumn="true" :cellEditingStarted="onRowEditingStarted">
         </ag-grid-vue>
@@ -260,7 +208,7 @@
                         file_type: 'DELIST_ITEM'
                     },
                     {
-                        title: 'Promote Item',
+                        title: 'Promotion',
                         icon: 'grade',
                         file_type: 'PROMOTE_ITEM'
                     }
@@ -274,7 +222,6 @@
         },
         beforeMount() {
             let self = this;
-            self.columnDefs = require('./headers.json');
         },
         created() {
             let self = this;
@@ -295,6 +242,9 @@
             set_file_type(file_type) {
                 let self = this;
                 self.file_type = file_type;
+
+                self.columnDefs = require('./Headers/' + self.file_type);
+
                 self.file_type_dialog = false;
             },
             show() {
@@ -379,8 +329,7 @@
                 let tmp = JSON.parse(JSON.stringify(self.columnDefs));
 
                 tmp.forEach(cd => {
-                    if (cd.headerName == "Product System ID" || cd.headerName == "Barcode" || cd.headerName ==
-                        "Description" || cd.headerName == "" || cd.headerName == "Type") {} else {
+                    if (cd.children != undefined) {
                         if (cd.headerName == headerGroup) {
                             cd.children.forEach(ce => {
                                 ce.hide = false;
