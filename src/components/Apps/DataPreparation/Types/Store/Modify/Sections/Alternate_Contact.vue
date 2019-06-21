@@ -1,6 +1,9 @@
 <template>
     <div>
-        <v-toolbar flat dark dense color="primary">Alternate Contact</v-toolbar>
+        <v-toolbar flat dark dense color="primary" class="subheading font-weight-regular font-italic">Alternate Contact
+            <v-spacer></v-spacer>
+            <v-icon>star_border</v-icon>
+        </v-toolbar>
         <v-form ref="form">
             <v-container grid-list-md>
                 <v-layout row wrap>
@@ -8,10 +11,10 @@
                         <v-text-field v-model="form.alternate_Contact" label="Alternate Contact"></v-text-field>
                     </v-flex>
                     <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
-                        <v-text-field v-model="form.alternate_Contact_Cell" label="Alternate Contact Cell"></v-text-field>
+                        <v-text-field v-model="form.alternate_Contact_Cell" label="Alternate Contact Cell" mask="phone"></v-text-field>
                     </v-flex>
                     <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
-                        <v-text-field v-model="form.alternate_Contact_Email" label="Alternate Contact Email"></v-text-field>
+                        <v-text-field v-model="form.alternate_Contact_Email" label="Alternate Contact Email" type="email"></v-text-field>
                     </v-flex>
                 </v-layout>
             </v-container>

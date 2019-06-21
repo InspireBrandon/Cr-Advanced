@@ -11,31 +11,21 @@
                         </v-btn>
                         <v-toolbar-title>Store</v-toolbar-title>
                         <v-spacer></v-spacer>
+                        <v-text-field append-icon="search" type="text" id="filter-text-box" placeholder="Filter..."
+                            @input="onFilterTextBoxChanged" v-model="filterText">
+                        </v-text-field>
+                        <v-spacer></v-spacer>
                         <v-btn icon @click="openAdd">
                             <v-icon>add_circle</v-icon>
                         </v-btn>
                     </v-toolbar>
-                    <v-list dense>
-                        <div v-for="(item,index) in stores" :key=index>
-                            <v-list-tile>
-                                <v-list-tile-title>{{item.displayname}}</v-list-tile-title>
-                                 <v-list-tile-action>
-                                        <v-menu left>
-                                            <v-btn slot="activator" icon>
-                                                <v-icon>more_vert</v-icon>
-                                            </v-btn>
-                                            <v-list dense>
-                                                <v-list-tile @click="openEdit(item)">Edit</v-list-tile>
-                                                <v-divider></v-divider>
-                                                <v-list-tile>Delete</v-list-tile>
-                                            </v-list>
-                                        </v-menu>
-                                    </v-list-tile-action>
-                                
-                            </v-list-tile>
-                            <v-divider></v-divider>
-                        </div>
-                    </v-list>
+                    <ag-grid-vue id="ag-Grid" :gridOptions="gridOptions"
+                        style="width: 100%;  height: calc(100vh - 160px);" :defaultColDef="defaultColDef"
+                        class="ag-theme-balham" :columnDefs="columnDefs" :rowData="rowData" :enableSorting="true"
+                        :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true"
+                        rowSelection="multiple" :rowDeselection="true" :enableColResize="true" :floatingFilter="true"
+                        :groupMultiAutoColumn="true" :gridReady="onGridReady">
+                    </ag-grid-vue>
                 </v-flex>
             </v-layout>
         </v-container>
@@ -44,24 +34,64 @@
 </template>
 
 <script>
-    // import SimpleList from '@/components/Apps/DataPreparation/Common/SimpleList.vue'
     import ModifyStore from '@/components/Apps/DataPreparation/Types/Store/Modify/Index.vue'
+    import Button from './Modify/GridComponents/button';
     import Axios from 'axios'
+    import {
+        AgGridVue
+    } from "ag-grid-vue";
+
 
     export default {
         data() {
             return {
-                stores: [],
+                filterText: '',
+                items: [],
+                pageNumber: 0,
+                allowedRecords: 25,
+                columnDefs: [],
+                rowData: [],
+                defaultColDef: {},
+                gridOptions: {
+                    rowHeight: 35,
+                    pinnedTopRowData: [],
+                    pinnedBottomRowData: [],
+                    context: {
+                        componentParent: self
+                    },
+                    rowClassRules: {
+                        'disabled-line': 'data.can_edit'
+                    }
+                },
+
             }
         },
         components: {
-            // SimpleList,
-            ModifyStore
+            ModifyStore,
+            AgGridVue,
+            Button
         },
-        mounted() {
-            this.getStores()
+        created() {
+            let self = this;
+            
+            self.gridOptions.context.componentParent = this;
+            self.getStores();
+        },
+        beforeMount() {
+            let self = this;
+            // console.log(require('./headers.json'))
+            self.columnDefs = require('./headers.json');
         },
         methods: {
+            onFilterTextBoxChanged() {
+                let self = this;
+                self.gridApi.setQuickFilter(self.filterText);
+            },
+            onGridReady(params) {
+                let self = this;
+                self.gridApi = params.api;
+                self.columnApi = params.columnApi;
+            },
             openEdit(item) {
                 let self = this;
                 self.$refs.modifyStore.open(item);
@@ -76,7 +106,7 @@
                     .then(r => {
                         console.log(r);
 
-                        self.stores = r.data;
+                        self.rowData = r.data;
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },

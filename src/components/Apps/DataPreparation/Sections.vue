@@ -41,7 +41,7 @@
                                         </v-card-title>
                                     </v-card>
                                 </v-flex>
-                                <v-flex md4 v-for="(card, idx) in market" :key="idx">
+                                <v-flex md4 v-for="(card, idx) in market" :key="'a' + idx">
                                     <v-card @click="openDataImport(card.route)">
                                         <v-tooltip top>
                                             <template v-slot:activator="{ on }">
@@ -65,7 +65,7 @@
                                         </v-card-title>
                                     </v-card>
                                 </v-flex>
-                                <v-flex md4 v-for="(card, idx) in fact" :key="idx">
+                                <v-flex md4 v-for="(card, idx) in fact" :key="'b' + idx">
                                     <v-card @click="openDataImport(card.route)">
                                         <v-tooltip top>
                                             <template v-slot:activator="{ on }">
@@ -89,7 +89,7 @@
                                         </v-card-title>
                                     </v-card>
                                 </v-flex>
-                                <v-flex md4 v-for="(card, idx) in period" :key="idx">
+                                <v-flex md4 v-for="(card, idx) in period" :key="'c' + idx">
                                     <v-card @click="openDataImport(card.route)">
                                         <v-tooltip top>
                                             <template v-slot:activator="{ on }">

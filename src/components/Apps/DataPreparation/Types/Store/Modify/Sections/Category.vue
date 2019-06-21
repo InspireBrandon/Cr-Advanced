@@ -1,6 +1,9 @@
 <template>
     <div>
-        <v-toolbar flat dense color="primary" dark>Category</v-toolbar>
+        <v-toolbar flat dense color="primary" dark class="subheading font-weight-regular font-italic">Category
+            <v-spacer></v-spacer>
+            <v-icon>category</v-icon>
+        </v-toolbar>
         <v-form ref="form">
             <v-container grid-list-md>
                 <v-layout row wrap>
@@ -25,7 +28,6 @@
             return {
                 valid: true,
                 form: {
-                    
                     store_Phone: '',
                     store_Fax: '',
                     store_Email: ''

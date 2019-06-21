@@ -1,0 +1,11 @@
+[{
+        "headerName": "Name",
+        "field": "displayname"
+    },
+    {
+        "headerName": "",
+        "field": "",
+        "cellRendererFramework": "Button",
+        "pinned": "right"
+    }
+]

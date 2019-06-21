@@ -1,6 +1,9 @@
 <template>
     <div>
-        <v-toolbar flat dense color="primary" dark>Properties</v-toolbar>
+        <v-toolbar flat dense color="primary" class="subheading font-weight-regular font-italic" dark>Properties
+            <v-spacer></v-spacer>
+            <v-icon>perm_device_information</v-icon>
+        </v-toolbar>
         <v-form ref="form">
             <v-container grid-list-md>
                 <v-layout row wrap>

@@ -1,17 +1,20 @@
 <template>
     <div>
-        <v-toolbar flat dense color="primary" dark>Contact</v-toolbar>
+        <v-toolbar flat dense color="primary" dark class="subheading font-weight-regular font-italic">Contact
+            <v-spacer></v-spacer>
+            <v-icon>contacts</v-icon>
+        </v-toolbar>
         <v-form ref="form">
             <v-container grid-list-md>
                 <v-layout row wrap>
                     <v-flex xl6 lg6 md6 sm12 xs12>
-                        <v-text-field v-model="form.store_Phone" label="Phone"></v-text-field>
+                        <v-text-field v-model="form.store_Phone" label="Phone" mask="phone"></v-text-field>
                     </v-flex>
                     <v-flex xl6 lg6 md6 sm12 xs12>
-                        <v-text-field v-model="form.store_Fax"  label="Fax"></v-text-field>
+                        <v-text-field v-model="form.store_Fax"  label="Fax" mask="phone"></v-text-field>
                     </v-flex>
                     <v-flex xl6 lg6 md6 sm12 xs12>
-                        <v-text-field v-model="form.store_Email"  label="Email"></v-text-field>
+                        <v-text-field v-model="form.store_Email"  label="Email" type="email"></v-text-field>
                     </v-flex>
                 </v-layout>
             </v-container>
