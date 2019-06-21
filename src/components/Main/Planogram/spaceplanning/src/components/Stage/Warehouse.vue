@@ -46,7 +46,7 @@
             <v-list-tile @click="importRange">
               <v-list-tile-title>Select Range</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile @click="saveFile(false)">
+            <v-list-tile @click="CheckExistsID()">
               <v-list-tile-title>Save</v-list-tile-title>
             </v-list-tile>
             <v-list-tile @click="CheckExists()">
@@ -883,6 +883,70 @@
         self.bins = 0
         self.spacePlanID = null;
       },
+      CheckExistsID() {
+        let self = this
+        let planogramName = ""
+        if (self.rangingData.planogramName != null)
+          planogramName += self.rangingData.planogramName
+        if (self.rangingData.periodic != null) {
+          if (self.rangingData.periodic)
+            planogramName += " - " + self.rangingData.monthsBetween + "MMA";
+          else
+            planogramName += " - " + self.rangingData.dateFromString + " to " + self.rangingData.dateToString;
+        }
+        if (self.rangingData.tag != null && self.rangingData.tag != "")
+          planogramName += self.rangingData.tag;
+
+        let cluster = self.getStoreName()
+        planogramName += " - " + cluster;
+
+
+        if (self.rangingData.storeName != null && self.rangingData.storeName != "") {
+          planogramName += " - " + self.rangingData.storeName;
+        }
+
+        if (planogramName != "")
+          planogramName += " - XXX";
+
+        planogramName += " - " + self.modules + " Module " + "(" + self.height + "M" + " x " +
+          self.width + "M)";
+
+        if (planogramName[1] == "-")
+          planogramName = planogramName.replace(' -', "");
+
+        if (planogramName != "") {
+          planogramName += " - D" + self.displays;
+          planogramName += " - P" + self.pallettes;
+          planogramName += " - S" + self.supplierStands;
+          planogramName += " - B" + self.bins;
+        }
+        console.log('names______________________');
+
+        console.log(planogramName);
+        console.log(self.spacePlanName);
+        let tmp = {
+          systemFile: {
+            systemUserID: 10,
+            folder: "Space Planning",
+            name: planogramName,
+            isFolder: true,
+            extension: "",
+            id: self.spacePlanID,
+          },
+        }
+        axios.post(process.env.VUE_APP_API + "SystemFile/ExistsID?db=cr-devinspire", tmp).then(
+          r => {
+            if (r.data == true) {
+              self.$refs.yesNoModal.show('File already exists Would you like to overwrite it?', value => {
+                if (value == true) {
+                  self.saveFile(false)
+                }
+              })
+            }else{
+              self.saveFile(false)
+            } 
+          })
+      },
       CheckExists() {
         let self = this
         let planogramName = ""
@@ -936,8 +1000,6 @@
         }
         axios.post(process.env.VUE_APP_API + "SystemFile/Exists?db=cr-devinspire", tmp).then(
           r => {
-            let mtpID = self.spacePlanID
-            self.spacePlanID = null
             if (r.data == true) {
               self.$refs.yesNoModal.show('File already exists Would  you like to overwrite it?', value => {
                 if (value == true) {
