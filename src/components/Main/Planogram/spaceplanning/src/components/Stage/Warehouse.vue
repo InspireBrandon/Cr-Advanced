@@ -46,12 +46,12 @@
             <v-list-tile @click="importRange">
               <v-list-tile-title>Select Range</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile @click="saveFile(false)">
+            <v-list-tile @click="CheckExistsID()">
               <v-list-tile-title>Save</v-list-tile-title>
             </v-list-tile>
-            <!-- <v-list-tile @click="CheckExists()">
+            <v-list-tile @click="CheckExists()">
               <v-list-tile-title>Save New</v-list-tile-title>
-            </v-list-tile> -->
+            </v-list-tile>
             <v-list-tile @click="rangeToPlanogram">
               <v-list-tile-title>Range To Planogram</v-list-tile-title>
             </v-list-tile>
@@ -883,6 +883,70 @@
         self.bins = 0
         self.spacePlanID = null;
       },
+      CheckExistsID() {
+        let self = this
+        let planogramName = ""
+        if (self.rangingData.planogramName != null)
+          planogramName += self.rangingData.planogramName
+        if (self.rangingData.periodic != null) {
+          if (self.rangingData.periodic)
+            planogramName += " - " + self.rangingData.monthsBetween + "MMA";
+          else
+            planogramName += " - " + self.rangingData.dateFromString + " to " + self.rangingData.dateToString;
+        }
+        if (self.rangingData.tag != null && self.rangingData.tag != "")
+          planogramName += self.rangingData.tag;
+
+        let cluster = self.getStoreName()
+        planogramName += " - " + cluster;
+
+
+        if (self.rangingData.storeName != null && self.rangingData.storeName != "") {
+          planogramName += " - " + self.rangingData.storeName;
+        }
+
+        if (planogramName != "")
+          planogramName += " - XXX";
+
+        planogramName += " - " + self.modules + " Module " + "(" + self.height + "M" + " x " +
+          self.width + "M)";
+
+        if (planogramName[1] == "-")
+          planogramName = planogramName.replace(' -', "");
+
+        if (planogramName != "") {
+          planogramName += " - D" + self.displays;
+          planogramName += " - P" + self.pallettes;
+          planogramName += " - S" + self.supplierStands;
+          planogramName += " - B" + self.bins;
+        }
+        console.log('names______________________');
+
+        console.log(planogramName);
+        console.log(self.spacePlanName);
+        let tmp = {
+          systemFile: {
+            systemUserID: 10,
+            folder: "Space Planning",
+            name: planogramName,
+            isFolder: true,
+            extension: "",
+            id: self.spacePlanID,
+          },
+        }
+        axios.post(process.env.VUE_APP_API + "SystemFile/ExistsID?db=cr-devinspire", tmp).then(
+          r => {
+            if (r.data == true) {
+              self.$refs.yesNoModal.show('File already exists Would you like to overwrite it?', value => {
+                if (value == true) {
+                  self.saveFile(false)
+                }
+              })
+            }else{
+              self.saveFile(false)
+            } 
+          })
+      },
       CheckExists() {
         let self = this
         let planogramName = ""
@@ -936,8 +1000,6 @@
         }
         axios.post(process.env.VUE_APP_API + "SystemFile/Exists?db=cr-devinspire", tmp).then(
           r => {
-            let mtpID = self.spacePlanID
-            self.spacePlanID = null
             if (r.data == true) {
               self.$refs.yesNoModal.show('File already exists Would  you like to overwrite it?', value => {
                 if (value == true) {
@@ -945,7 +1007,7 @@
                 }
               })
             } else {
-              self.saveFile(true)
+              self.saveNew(false)
             }
           })
       },
@@ -968,9 +1030,7 @@
         clusterData["storeName"] = vscd.storeName;
         clusterData["categoryCluster"] = vscd.categoryCluster;
         let tmpSpacePlanID = self.spacePlanID
-        if (isNew == true) {
-          self.spacePlanID = null
-        }
+       
         if (vscd.rangeID != null) {
           self.$store.getters.getAllPlanogramActiveProducts.forEach(el => {
             self.rangingController.setAllProductData(el.Data);
@@ -998,7 +1058,11 @@
                     supplierStands: self.supplierStands,
                     bins: self.bins
                   }, self.spacePlanID, self.spacePlanName, true, image, self.updateLoader, self.$refs.SizeLoader
-                  .close)
+                  .close,data=>{
+                    
+                    console.log("[NEW SPACEPLANID]",data);
+                    self.spacePlanID=data
+                  })
                 // self.$refs.SizeLoader.close()
               } else {
                 console.log("spacePlanID is not null");
@@ -1014,7 +1078,7 @@
                       supplierStands: self.supplierStands,
                       bins: self.bins
                     }, self.spacePlanID, self.spacePlanName, value, image, self.updateLoader, self.$refs
-                    .SizeLoader.close)
+                    .SizeLoader.close,callback=>{} )
                 })
               }
             })
@@ -1035,9 +1099,75 @@
                   height: self.height,
                   width: self.width
                 }, self.spacePlanID, self.spacePlanName, value, image, self.updateLoader, self.$refs.SizeLoader
-                .close)
+                .close,callback=>{})
             })
           }
+        }
+       
+      },
+      saveNew(isNew) {
+        let self = this;
+        let parent = self.$parent.$children[0].$children[2];
+        let stage = parent.getStage();
+
+        let b64 = parent.$parent.getImageBytes(2);
+        let image = parent.$parent.b64toBlob(b64, "image/png")
+
+        let clusterData = self.rangingData;
+        let vscd = self.$store.getters.getClusterData;
+        clusterData["storeCluster"] = self.getClusterName();
+        clusterData["clusterID"] = vscd.clusterID;
+        clusterData["clusterType"] = vscd.clusterType;
+        clusterData["clusterName"] = vscd.clusterName;
+        clusterData["rangeID"] = vscd.rangeID;
+        clusterData["storeID"] = vscd.storeID;
+        clusterData["storeName"] = vscd.storeName;
+        clusterData["categoryCluster"] = vscd.categoryCluster;
+        let tmpSpacePlanID = self.spacePlanID
+        self.spacePlanID=null
+        if (vscd.rangeID != null) {
+          self.$store.getters.getAllPlanogramActiveProducts.forEach(el => {
+            self.rangingController.setAllProductData(el.Data);
+          })
+
+          let rangingFileUpdated = self.rangingController.getRangingFile();
+
+          console.log("Saving Range File");
+
+          axios.put(process.env.VUE_APP_API + "SystemFile/JSON/NoRename?db=CR-Devinspire&id=" + vscd.rangeID,
+              rangingFileUpdated)
+            .then(r => {
+              self.planogramHelper.setCreate(self.spacePlanID == null || isNew);
+
+              if (self.spacePlanID == null) {
+                console.log("spacePlanID is null");
+
+                self.$refs.SizeLoader.show()
+                self.planogramHelper.save(self.$store, stage, clusterData, {
+                    modules: self.modules,
+                    height: self.height,
+                    width: self.width,
+                    displays: self.displays,
+                    pallettes: self.pallettes,
+                    supplierStands: self.supplierStands,
+                    bins: self.bins
+                  }, self.spacePlanID, self.spacePlanName, true, image, self.updateLoader, self.$refs.SizeLoader
+                  .close,data=>{
+                    
+                    console.log("[NEW SPACEPLANID]",data);
+                    self.spacePlanID=data
+                  })
+              } 
+            })
+        } else {
+          self.planogramHelper.setCreate(self.spacePlanID == null || isNew);
+          if (self.spacePlanID == null) {
+            self.planogramHelper.save(self.$store, stage, clusterData, {
+              modules: self.modules,
+              height: self.height,
+              width: self.width
+            }, self.spacePlanID, self.spacePlanName, true, image)
+          } 
         }
        
       },

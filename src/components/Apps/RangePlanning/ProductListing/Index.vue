@@ -104,6 +104,7 @@
         <NewItemListingSelector ref="newItemListingSelector"></NewItemListingSelector>
         <YesNoModal ref="yesNo"></YesNoModal>
         <ProductLookup ref="ProductLookup"></ProductLookup>
+        <NewProductValidator ref="NewProductValidator"></NewProductValidator>
     </div>
 </template>
 
@@ -116,6 +117,7 @@
 
     import Prompt from '@/components/Common/Prompt';
     import ProductLookup from '@/components/Common/ProductLookup';
+    import NewProductValidator from '@/components/Common/NewProductValidator';
     import NewItemListingSelector from '@/components/Common/NewItemListingSelector'
     import YesNoModal from '@/components/Common/YesNoModal'
     import ImageView from "./GridComponents/Image.vue"
@@ -142,7 +144,8 @@
             PeriodItem,
             DateSelector,
             Validator,
-            ProductLookup
+            ProductLookup,
+            NewProductValidator
         },
         data() {
             return {
@@ -265,12 +268,15 @@
             },
             newLineAdd() {
                 let self = this;
-                self.rowData.push({})
 
-                setTimeout(() => {
-                    self.gridApi.resetRowHeights();
-                    self.gridApi.sizeColumnsToFit()
-                }, 60);
+                self.$refs.NewProductValidator.show();
+
+                // self.rowData.push({})
+
+                // setTimeout(() => {
+                //     self.gridApi.resetRowHeights();
+                //     self.gridApi.sizeColumnsToFit()
+                // }, 60);
             },
             newLineChange() {
                 let self = this;

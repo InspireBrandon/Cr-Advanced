@@ -69,6 +69,8 @@
                             e.currentStatusText = self.StoreStatusList[e.planogramStoreStatus].text
                         })
                         self.rowData = self.currentStorePlanograms
+                        console.log(self.rowData);
+                        
                     }).catch(e=>{
                         console.log(e);
                         
