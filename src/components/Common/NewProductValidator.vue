@@ -20,18 +20,18 @@
                                         <v-flex md5 xs11>
                                             <v-text-field :loading="product_sys_id_loading"
                                                 @blur="on_product_system_id_blur" v-model="form.product_System_ID"
-                                                @keydown="save_disabled = true"
+                                                @keydown="handle_product_sys_keydown"
                                                 :disabled="generate_product_system_id || product_sys_id_loading"
                                                 label="Product system id"></v-text-field>
                                         </v-flex>
                                         <v-flex md1 xs1 class="pl-0">
                                             <v-tooltip bottom>
                                                 <template v-slot:activator="{ on }">
-                                                    <v-icon transition="slide-x-transition" style="margin-top: 25px;" color="info" v-on="on">info</v-icon>
+                                                    <v-icon transition="slide-x-transition" style="margin-top: 25px;"
+                                                        color="info" v-on="on">info</v-icon>
                                                 </template>
-                                                <span>Please fill in a product system id</span>
+                                                <span>YESSSS</span>
                                             </v-tooltip>
-                                            <!-- <v-icon transition="slide-x-transition" style="margin-top: 25px;" color="success">check_circle_outline</v-icon> -->
                                         </v-flex>
                                         <v-flex md5 xs11>
                                             <v-text-field :loading="barcode_loading" @blur="on_barcode_blur"
@@ -40,8 +40,13 @@
                                                 label="Barcode"></v-text-field>
                                         </v-flex>
                                         <v-flex md1 xs1 class="pl-0">
-                                            <v-icon style="margin-top: 25px;" color="success">check_circle_outline
-                                            </v-icon>
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                    <v-icon transition="slide-x-transition" style="margin-top: 25px;"
+                                                        color="info" v-on="on">info</v-icon>
+                                                </template>
+                                                <span>YESSSS</span>
+                                            </v-tooltip>
                                         </v-flex>
                                         <v-flex md12>
                                             <v-text-field v-model="form.description" label="Description"></v-text-field>
@@ -112,14 +117,26 @@
                     }
                 })
             },
+            handle_product_sys_keydown() {
+                let self = this;
+                self.save_disabled = true;
+
+                self.$nextTick(() => {
+                    if(self.form.product_System_ID == "Generate_SYS_Product_ID")
+                        self.product_sys_id_tooltip.show = false;
+                })
+            },
             on_product_system_id_blur() {
                 let self = this;
-                self.product_sys_id_loading = true;
 
-                setTimeout(() => {
-                    self.product_sys_id_loading = false;
-                    self.save_disabled = false;
-                }, 2000);
+                if (self.form.product_System_ID != "Generate_SYS_Product_ID") {
+                    self.product_sys_id_loading = true;
+
+                    setTimeout(() => {
+                        self.product_sys_id_loading = false;
+                        self.save_disabled = false;
+                    }, 2000);
+                }
             },
             on_barcode_blur() {
                 let self = this;
