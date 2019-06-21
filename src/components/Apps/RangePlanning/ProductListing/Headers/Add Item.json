@@ -34,31 +34,31 @@
                 "headerName": "Product Code",
                 "field": "product_Code",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Vendor Description",
                 "field": "vendor_Description",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Vendor Size Description",
                 "field": "vendor_Size_Description",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Brand",
                 "field": "brand",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Product Information",
                 "field": "brand",
                 "editable": true,
-                "hide": false
+                "hide": true
             }
         ]
     },
@@ -68,37 +68,37 @@
                 "headerName": "Size",
                 "field": "size",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "UOM",
                 "field": "uom",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Size Description",
                 "field": "size_Description",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Final Description",
                 "field": "final_Description",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Description Length",
                 "field": "description_Length",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Vendor Brand",
                 "field": "vendor_Brand",
                 "editable": true,
-                "hide": false
+                "hide": true
             }
         ]
     },
@@ -108,25 +108,25 @@
                 "headerName": "Supplier",
                 "field": "supplier",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Supplier Code",
                 "field": "supplier_Code",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Manufacturer",
                 "field": "manufacturer",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Manufacturer Code",
                 "field": "manufacturer_Code",
                 "editable": true,
-                "hide": false
+                "hide": true
             }
         ]
     },
@@ -136,25 +136,25 @@
                 "headerName": "Lead Time",
                 "field": "lead_Time",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Safety Days",
                 "field": "safety_Days",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Minimum Order Value",
                 "field": "minimum_Order_Value",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Consignment",
                 "field": "Consignment",
                 "editable": true,
-                "hide": false
+                "hide": true
             }
         ]
     },
@@ -164,43 +164,43 @@
                 "headerName": "Category",
                 "field": "category",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Category Code",
                 "field": "category_Code",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Planogram Name",
                 "field": "planogram_Name",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Department",
                 "field": "department",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Subdepartment",
                 "field": "subdepartment",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Subcategory",
                 "field": "subcategory",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Segment",
                 "field": "segment",
                 "editable": true,
-                "hide": false
+                "hide": true
             }
         ]
     },
@@ -210,25 +210,25 @@
                 "headerName": "Replacement Type",
                 "field": "replacement_Type",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Reason For Request",
                 "field": "reason_For_Request",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Replacement Item SAP Code",
                 "field": "replacement_Item_SAP_Code",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Replacement Item Description",
                 "field": "replacement_Item_Description",
                 "editable": true,
-                "hide": false
+                "hide": true
             }
         ]
     },
@@ -238,19 +238,19 @@
                 "headerName": "Item Status",
                 "field": "item_Status",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Active Shop Code",
                 "field": "active_Shop_Code",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Open Supplier",
                 "field": "open_Supplier",
                 "editable": true,
-                "hide": false
+                "hide": true
             }
         ]
     },
@@ -260,19 +260,19 @@
                 "headerName": "Category Role",
                 "field": "category_Role",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Strategy",
                 "field": "strategy",
                 "editable": true,
-                "hide": false
+                "hide": true
             },
             {
                 "headerName": "Product Role",
                 "field": "product_Role",
                 "editable": true,
-                "hide": false
+                "hide": true
             }
         ]
     },
