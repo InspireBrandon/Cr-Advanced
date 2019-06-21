@@ -21,7 +21,7 @@
                                     <v-text-field label="Display Name" v-model="form.displayname"></v-text-field>
                                 </v-flex>
                                 <v-flex md6>
-                                    <v-text-field v-if="code!=true" label="Code"
+                                    <v-text-field v-if="hasCode==true" label="Code"
                                         v-model="form[lowercaseName(name) + '_Code']">
                                     </v-text-field>
                                 </v-flex>

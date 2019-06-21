@@ -156,7 +156,8 @@
                     new cardItem({
                         name: 'Supergroup_A',
                         route: 'Supergroup_A'
-                    }), new cardItem({
+                    }), 
+                    new cardItem({
                         name: 'Supergroup_B',
                         route: 'Supergroup_B'
                     }),
@@ -167,13 +168,16 @@
                     new cardItem({
                         name: 'Item_Status',
                         route: 'Item_Status'
-                    }), new cardItem({
+                    }), 
+                    new cardItem({
                         name: 'Active_Shop_Code',
                         route: 'Active_Shop_Code'
-                    }), new cardItem({
+                    }), 
+                    new cardItem({
                         name: 'Retail_Chain',
                         route: 'Retail_Chain'
-                    }), new cardItem({
+                    }), 
+                    new cardItem({
                         name: 'Product Catalogue',
                         route: 'ProductCatalogue'
                     })

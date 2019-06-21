@@ -1,6 +1,6 @@
 <template>
     <div>
-        <SimpleList name="Manufacturer"></SimpleList>
+        <SimpleList :hasCode="true" name="Manufacturer"></SimpleList>
     </div>
 </template>
 
