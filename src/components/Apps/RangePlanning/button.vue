@@ -10,7 +10,6 @@
                 let product = this.params;
                 this.params.context.componentParent.openEdit(product);
             }
-
         }
     }
 </script>
