@@ -968,9 +968,7 @@
         clusterData["storeName"] = vscd.storeName;
         clusterData["categoryCluster"] = vscd.categoryCluster;
         let tmpSpacePlanID = self.spacePlanID
-        if (isNew == true) {
-          self.spacePlanID = null
-        }
+       
         if (vscd.rangeID != null) {
           self.$store.getters.getAllPlanogramActiveProducts.forEach(el => {
             self.rangingController.setAllProductData(el.Data);
@@ -998,7 +996,11 @@
                     supplierStands: self.supplierStands,
                     bins: self.bins
                   }, self.spacePlanID, self.spacePlanName, true, image, self.updateLoader, self.$refs.SizeLoader
-                  .close)
+                  .close,data=>{
+                    
+                    console.log("[NEW SPACEPLANID]",data);
+                    self.spacePlanID=data
+                  })
                 // self.$refs.SizeLoader.close()
               } else {
                 console.log("spacePlanID is not null");
@@ -1014,7 +1016,7 @@
                       supplierStands: self.supplierStands,
                       bins: self.bins
                     }, self.spacePlanID, self.spacePlanName, value, image, self.updateLoader, self.$refs
-                    .SizeLoader.close)
+                    .SizeLoader.close,callback=>{} )
                 })
               }
             })
@@ -1035,7 +1037,7 @@
                   height: self.height,
                   width: self.width
                 }, self.spacePlanID, self.spacePlanName, value, image, self.updateLoader, self.$refs.SizeLoader
-                .close)
+                .close,callback=>{})
             })
           }
         }
