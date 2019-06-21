@@ -30,7 +30,7 @@ class LoadSavePlanogramBase {
     this.Create = create;
   }
 
-  save(vuex, stage, clusterData, dimensionData, spacePlanID, spacePlanName, updateName, image, updateLoader, close) {
+  save(vuex, stage, clusterData, dimensionData, spacePlanID, spacePlanName, updateName, image, updateLoader, close,callback) {
     let self = this;
     let ctrl_store = new StoreHelper();
     let allItems = ctrl_store.getAllPlanogramItems(vuex);
@@ -153,6 +153,10 @@ class LoadSavePlanogramBase {
     }
 
     axios.post(self.ServerAddress + "SystemFolder?db=CR-Devinspire", tmp, config).then(resp => {
+      console.log("[save transaction]_______________________________________");
+      console.log(resp);
+      console.log("[save transaction]_______________________________________");
+     let resultSpace = resp.data.systemFileID
       if (resp.success == true) {
         alert("folder created")
       }
@@ -303,6 +307,7 @@ class LoadSavePlanogramBase {
           // 
 
         })
+        callback(resultSpace)
       }).catch(e => {
         console.log(e)
         console.error("Failed to save planogram file");
