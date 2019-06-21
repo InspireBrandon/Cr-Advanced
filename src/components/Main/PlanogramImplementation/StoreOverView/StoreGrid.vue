@@ -8,9 +8,12 @@
         </ag-grid-vue>
         <PlanogramDetailsSelector :PlanoName="'ProjectName.text'" ref="PlanogramDetailsSelector" />
         rows:{{rowData.length}}
+        <YesNoModal ref="YesNoModal" />
     </div>
 </template>
 <script>
+    import YesNoModal from '@/components/Common/YesNoModal'
+
     import Button from "./StoreButton.vue"
     import Axios from 'axios'
     import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector'
@@ -20,6 +23,7 @@
     export default {
         props: ["rowData", "StoreID", "method"],
         components: {
+            YesNoModal,
             AgGridVue,
             Button,
             PlanogramDetailsSelector
@@ -30,13 +34,13 @@
                 headers: [{
                         "headerName": "Planogram",
                         "field": "name"
-                    },  {
+                    }, {
                         "headerName": "Category Cluster",
                         "field": "categoryCluster"
                     }, {
                         "headerName": "Name",
                         "field": "GeneratedName"
-                    },{
+                    }, {
                         "headerName": "Modules",
                         "maxWidth": 90,
                         "minWidth": 50,
@@ -74,7 +78,7 @@
                     }, {
                         "headerName": "unRequired In Store",
                         "field": "requiredInStore",
-                    },{
+                    }, {
                         "headerName": "Current Status",
                         "field": "currentStatusText"
                     },
@@ -106,9 +110,7 @@
                         text: "VariationRequested"
                     }
                 ],
-                defaultColDef: {
-                    onCellValueChanged: this.UpdateLine
-                },
+                defaultColDef: {},
                 gridOptions: {
                     rowHeight: 35,
                     context: {
@@ -154,6 +156,40 @@
                             delete Axios.defaults.headers.common["TenantID"];
                         })
                 })
+            },
+            UpdateLine(item) {
+                let self = this
+                let text = ""
+                if (item.requiredInStore == true) {
+                    text = "Do you want to innclude this category in this store?"
+                } else {
+                    text = "Are you sure you want to remove this category ?"
+                }
+                self.$refs.YesNoModal.show(text, data => {
+                    if (data) {
+                        self.createStorePlano(item, data => {
+                            self.method(item)
+                        })
+                    }
+                })
+
+                // self.createPlanoGramDetailTX(tmp)
+            },
+            createStorePlano(listItem, callback) {
+                let self = this;
+
+                listItem.requiredInStore = !listItem.requiredInStore
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', listItem)
+                    .then(r => {
+                        console.log(r);
+                        delete Axios.defaults.headers.common["TenantID"];
+                        callback(r)
+                    }).catch(e => {
+                        console.log(e);
+                        delete Axios.defaults.headers.common["TenantID"];
+                        callback(e)
+                    })
             },
         }
     }
