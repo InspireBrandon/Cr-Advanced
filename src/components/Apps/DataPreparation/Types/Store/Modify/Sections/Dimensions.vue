@@ -1,6 +1,9 @@
 <template>
     <div>
-        <v-toolbar flat dark dense color="primary">Dimensions and Annual Direct Sales</v-toolbar>
+        <v-toolbar flat dark dense color="primary" class="subheading font-weight-regular font-italic">Dimensions and Annual Direct Sales
+            <v-spacer></v-spacer>
+            <v-icon>photo_size_select_small</v-icon>
+        </v-toolbar>
         <v-form ref="form">
             <v-container grid-list-md>
                 <v-layout row wrap>

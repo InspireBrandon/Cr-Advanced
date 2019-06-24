@@ -1,6 +1,9 @@
 <template>
     <div>
-        <v-toolbar flat dense color="primary" dark>Configuration</v-toolbar>
+        <v-toolbar flat dense color="primary" class="subheading font-weight-regular font-italic" dark>Configuration
+            <v-spacer></v-spacer>
+            <v-icon>settings</v-icon>
+        </v-toolbar>
         <v-form ref="form">
             <v-container grid-list-md>
                 <v-layout row wrap>
@@ -36,7 +39,6 @@
                    till_Points:'',
                    loyalty_Card:'',
                    poS_System:'',
-                   
                 }
             }
         },
