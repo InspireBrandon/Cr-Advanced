@@ -10,12 +10,20 @@
             </v-toolbar>
             <v-card-text class="ma-0 pa-0">
                 <v-card>
-                    <v-tabs v-model="active" grow centered color="grey darken-4" dark>
-                        <v-tab ripple>Details</v-tab>
-                        <v-tab ripple>Personale</v-tab>
-                        <v-tab ripple>Areas</v-tab>
-                         <v-tab ripple>Category</v-tab>
-                        <v-tab-item> 
+                    <v-tabs v-model="active" grow centered color="blue-grey darken-3" dark icons-and-text>
+                        <v-tab ripple class="subheading font-weight-regular font-italic"> Details
+                            <v-icon>details</v-icon>
+                        </v-tab>
+                        <v-tab ripple class="subheading font-weight-regular font-italic"> Personale
+                            <v-icon>person</v-icon>
+                        </v-tab>
+                        <v-tab ripple class="subheading font-weight-regular font-italic"> Areas
+                            <v-icon>location_on</v-icon>
+                        </v-tab>
+                        <v-tab ripple class="subheading font-weight-regular font-italic"> Category 
+                            <v-icon>category</v-icon>
+                        </v-tab>
+                        <v-tab-item>
                             <v-card-text class="component-container ma-0">
                                 <v-layout row wrap>
                                     <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
@@ -63,7 +71,7 @@
                                 </v-layout>
                             </v-card-text>
                         </v-tab-item>
-                          <v-tab-item>
+                        <v-tab-item>
                             <v-card-text class="component-container ma-0">
                                 <v-layout row wrap>
                                     <v-flex xl12 lg12 md12 sm12 xs12 class="pa-1">
@@ -97,7 +105,6 @@
     import AlternateContact from '@/components/Apps/DataPreparation/Types/Store/Modify/Sections/Alternate_Contact.vue'
     import Configuration from '@/components/Apps/DataPreparation/Types/Store/Modify/Sections/Configuration.vue'
     import Observations from '@/components/Apps/DataPreparation/Types/Store/Modify/Sections/Observations.vue'
-    import AnnualDirectSalesArea from '@/components/Apps/DataPreparation/Types/Store/Modify/Sections/Annual_Direct_Sales_Area.vue'
     import Axios from 'axios';
 
     export default {

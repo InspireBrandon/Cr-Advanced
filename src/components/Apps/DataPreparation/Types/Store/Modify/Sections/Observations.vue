@@ -1,6 +1,9 @@
 <template>
     <div>
-        <v-toolbar flat dense color="primary" dark>Observations</v-toolbar>
+        <v-toolbar flat dense color="primary" class="subheading font-weight-regular font-italic" dark>Observations
+            <v-spacer></v-spacer>
+            <v-icon>work</v-icon>
+        </v-toolbar>
         <v-form ref="form">
             <v-container grid-list-md>
                 <v-layout row wrap>

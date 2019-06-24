@@ -1,6 +1,9 @@
 <template>
     <div>
-        <v-toolbar flat dark dense color="primary">Store Manager</v-toolbar>
+        <v-toolbar flat dark dense color="primary" class="subheading font-weight-regular font-italic">Store Manager
+            <v-spacer></v-spacer>
+            <v-icon>star</v-icon>
+        </v-toolbar>
         <v-form ref="form">
             <v-container grid-list-md>
                 <v-layout row wrap>
@@ -8,10 +11,10 @@
                         <v-text-field v-model="form.store_Manager" label="Store Manager"></v-text-field>
                     </v-flex>
                     <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
-                        <v-text-field v-model="form.store_Manager_Cell" label="Store Manager Cell"></v-text-field>
+                        <v-text-field v-model="form.store_Manager_Cell" label="Store Manager Cell" mask="phone"></v-text-field>
                     </v-flex>
                     <v-flex xl6 lg6 md6 sm12 xs12 class="pa-1">
-                        <v-text-field  v-model="form.store_Manager_Email" label="Store Manager Email"></v-text-field>
+                        <v-text-field v-model="form.store_Manager_Email" label="Store Manager Email" type="email"></v-text-field>
                     </v-flex>
                 </v-layout>
             </v-container>

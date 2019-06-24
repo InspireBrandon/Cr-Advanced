@@ -9,10 +9,13 @@
         <PlanogramDetailsSelector :PlanoName="'ProjectName.text'" ref="PlanogramDetailsSelector" />
         rows:{{rowData.length}}
         <YesNoModal ref="YesNoModal" />
+            <VariationOrderModal ref="VariationOrderModal" />
+
     </div>
 </template>
 <script>
     import YesNoModal from '@/components/Common/YesNoModal'
+    import VariationOrderModal from '@/components/Main/PlanogramImplementation/VariationOrderModal'
 
     import Button from "./StoreButton.vue"
     import Axios from 'axios'
@@ -23,6 +26,7 @@
     export default {
         props: ["rowData", "StoreID", "method"],
         components: {
+            VariationOrderModal,
             YesNoModal,
             AgGridVue,
             Button,
@@ -126,6 +130,10 @@
             }
         },
         methods: {
+             openOrder(item){
+                let self= this
+                self.$refs.VariationOrderModal.show(item)
+            },
             onGridReady(params) {
                 this.gridApi = params.api;
                 this.columnApi = params.columnApi;

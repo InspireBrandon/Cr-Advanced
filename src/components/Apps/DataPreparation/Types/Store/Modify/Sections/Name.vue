@@ -1,6 +1,9 @@
 <template>
     <div>
-        <v-toolbar flat dense color="primary" dark>Name</v-toolbar>
+        <v-toolbar flat dense color="primary" class="subheading font-weight-regular font-italic" dark>Name
+            <v-spacer></v-spacer>
+            <v-icon>alternate_email</v-icon>
+        </v-toolbar>
         <v-form lazy-validation v-model="valid" ref="form">
             <v-container grid-list-md>
                 <v-layout row wrap>

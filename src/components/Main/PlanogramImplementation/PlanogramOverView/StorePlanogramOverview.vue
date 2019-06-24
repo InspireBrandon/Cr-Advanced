@@ -14,6 +14,7 @@
                 <v-btn @click="assignGroups">
                     group assign
                 </v-btn>
+              
                 <!-- <v-menu>
                     <v-btn slot="activator">options</v-btn>
                     <v-list>
@@ -28,6 +29,7 @@
 
             <StorePlanograms ref="StorePlanograms" />
             <PlanogramDetailsSelector :PlanoName="ProjectName.text" ref="PlanogramDetailsSelector" />
+
         </v-card>
     </v-dialog>
 </template>
@@ -77,6 +79,7 @@
             }
         },
         methods: {
+           
             checkFits(storePlan, planDetails, callback) {
                 let self = this
                 let retval = false

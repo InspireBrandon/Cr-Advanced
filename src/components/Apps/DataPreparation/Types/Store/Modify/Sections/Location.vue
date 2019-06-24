@@ -1,6 +1,9 @@
 <template>
     <div>
-        <v-toolbar flat dense color="primary" dark>Location</v-toolbar>
+        <v-toolbar flat dense color="primary" class="subheading font-weight-regular font-italic" dark>Location
+            <v-spacer></v-spacer>
+            <v-icon>my_location</v-icon>
+        </v-toolbar>
         <v-form ref="form">
             <v-container grid-list-md>
                 <v-layout row wrap>

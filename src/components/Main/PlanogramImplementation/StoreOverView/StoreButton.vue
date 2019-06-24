@@ -9,14 +9,23 @@
             </template>
             <span>Assign planogram</span>
         </v-tooltip>
-         <v-tooltip bottom>
+        <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-                <v-btn v-on="on"  @click="params.context.componentParent.UpdateLine(params.data)" icon flat
-                    small color="error" class="ma-0">
+                <v-btn v-on="on" @click="params.context.componentParent.UpdateLine(params.data)" icon flat small
+                    color="error" class="ma-0">
                     <v-icon>remove_circle_outline</v-icon>
                 </v-btn>
             </template>
             <span>Remove category from store</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+                <v-btn v-on="on" @click="params.context.componentParent.openOrder(params.data)" icon flat small
+                    color="warning" class="ma-0">
+                    <v-icon>edit_attributes</v-icon>
+                </v-btn>
+            </template>
+            <span>request variation</span>
         </v-tooltip>
     </div>
 </template>
@@ -26,10 +35,13 @@
         components: {
             YesNoModal
         },
-        methods: {},
+        methods: {
+
+        },
         created() {
             let self = this;
             self.selectedUser = self.params.context.componentParent.selectedUser;
         }
+
     }
 </script>
