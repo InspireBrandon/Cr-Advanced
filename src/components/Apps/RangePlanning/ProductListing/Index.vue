@@ -39,7 +39,7 @@
                         Settings
                     </v-btn>
                     <v-list light dense>
-                            <v-list-tile>Configuration</v-list-tile>
+                        <v-list-tile>Configuration</v-list-tile>
                     </v-list>
                 </v-menu>
                 <v-btn :class="{ 'pulse': rowData.length == 0 }" @click="newLineAdd()"
@@ -50,7 +50,7 @@
                 </v-btn>
             </v-toolbar-items>
             <v-spacer />
-            <h3>{{ file_type }}</h3>
+            <h3>{{ currentFileName == "" ? "" : currentFileName + ' - ' }} {{ file_type }}</h3>
             <v-spacer />
             <v-progress-circular v-if="showLoader" indeterminate color="primary"></v-progress-circular>
             <span>{{ successText }}</span>
@@ -134,6 +134,9 @@
     import PeriodItem from "./GridComponents/PeriodItem.vue"
     import DateSelector from "./GridComponents/DateSelector.vue"
     import Validator from "./GridComponents/Validator.vue"
+    import YesNoSelector from "./GridComponents/YesNoSelector.vue"
+    import DescriptionLength from "./GridComponents/DescriptionLength.vue"
+    import Selector from "./GridComponents/Selector.vue"
 
     const tabs = ['Standard', 'Vendor', 'Hierachy', 'Item Status', 'Images', 'Supporting Documents', 'Resources',
         'Stock Control', 'Price and Margin', 'Opening Orders'
@@ -153,7 +156,10 @@
             DateSelector,
             Validator,
             ProductLookup,
-            NewProductValidator
+            NewProductValidator,
+            YesNoSelector,
+            DescriptionLength,
+            Selector
         },
         data() {
             return {
@@ -222,7 +228,9 @@
                         icon: 'grade',
                         file_type: 'PROMOTE_ITEM'
                     }
-                ]
+                ],
+                brands: [],
+                suppliers: []
             }
         },
         computed: {
@@ -284,7 +292,8 @@
                         can_edit: true,
                         vendor_Description: data.description,
                         final_Description: data.description,
-                        description_Length: data.description.length
+                        description_Length: data.description.length,
+                        brand: null
                     })
                 });
 
@@ -324,17 +333,20 @@
             openFile() {
                 let self = this;
 
-                self.$refs.newItemListingSelector.show((fileID, item) => {
+                self.$refs.newItemListingSelector.show((fileID, item, type) => {
+                    self.isAdd = false;
+                    self.currentFileName = item.name;
+
+                    self.set_file_type(type)
+
                     Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fileID}`)
                         .then(r => {
-                            self.isAdd = false;
-                            self.currentFileName = item.name;
-                            self.rowData = r.data;
-
                             setTimeout(() => {
                                 self.gridApi.resetRowHeights();
                                 self.gridApi.sizeColumnsToFit()
                             }, 60);
+
+                            self.rowData = r.data;
                         })
                 })
             },
@@ -417,7 +429,8 @@
                             SystemUser_ID: -1,
                             Folder: "New Item Listing",
                             Name: name,
-                            Extension: '.json'
+                            Extension: '.json',
+                            Type: self.file_type
                         },
                         Data: finalArr
                     })
@@ -442,6 +455,7 @@
                 let self = this;
                 self.getManufacturers();
                 self.getBrands();
+                self.getSuppliers();
                 self.getPlanograms();
                 self.getCategoryLinks();
                 self.getSubcategories();
@@ -503,15 +517,28 @@
                 Axios.get(process.env.VUE_APP_API + "Retailer/Brand")
                     .then(r => {
 
-                        self.brandDetails = r.data;
+                        self.brands = r.data;
 
-                        r.data.forEach(element => {
-                            self.brands.push({
-                                text: element.displayname,
-                                value: element.id
-                            })
-                        });
+                        // r.data.forEach(element => {
+                        //     self.brands.push({
+                        //         text: element.displayname,
+                        //         value: element.id
+                        //     })
+                        // });
 
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+            },
+            getSuppliers() {
+                let self = this;
+
+                self.brands = [];
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + "Retailer/Supplier")
+                    .then(r => {
+                        self.suppliers = r.data;
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },

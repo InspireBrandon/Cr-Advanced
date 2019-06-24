@@ -34,31 +34,30 @@
                 "headerName": "Product Code",
                 "field": "product_Code",
                 "editable": true,
-                "hide": true
+                "hide": false
             },
             {
                 "headerName": "Vendor Description",
                 "field": "vendor_Description",
                 "editable": true,
-                "hide": true
+                "hide": false
             },
             {
                 "headerName": "Vendor Size Description",
                 "field": "vendor_Size_Description",
                 "editable": true,
-                "hide": true
+                "hide": false
             },
             {
                 "headerName": "Brand",
                 "field": "brand",
-                "editable": true,
-                "hide": true
+                "hide": false
             },
             {
                 "headerName": "Product Information",
                 "field": "brand",
                 "editable": true,
-                "hide": true
+                "hide": false
             }
         ]
     },
@@ -91,8 +90,8 @@
             {
                 "headerName": "Description Length",
                 "field": "description_Length",
-                "editable": false,
-                "hide": true
+                "hide": true,
+                "cellRendererFramework": "DescriptionLength"
             },
             {
                 "headerName": "Vendor Brand",
@@ -108,12 +107,14 @@
                 "headerName": "Supplier",
                 "field": "supplier",
                 "editable": true,
-                "hide": true
+                "hide": true,
+                "cellRendererFramework": "Selector",
+                "dropdownName": "suppliers"
             },
             {
                 "headerName": "Supplier Code",
                 "field": "supplier_Code",
-                "editable": true,
+                "editable": false,
                 "hide": true
             }
         ]
@@ -140,9 +141,10 @@
             },
             {
                 "headerName": "Consignment",
-                "field": "Consignment",
+                "field": "consignment",
                 "editable": true,
-                "hide": true
+                "hide": true,
+                "cellRendererFramework": "YesNoSelector"
             }
         ]
     },
