@@ -13,16 +13,16 @@
                         <v-list-tile @click="openFile">
                             <v-list-tile-title>Open</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile @click="prompt">
+                        <v-list-tile :disabled="file_type == null" @click="prompt">
                             <v-list-tile-title>Save</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile @click="closeFile">
+                        <v-list-tile :disabled="file_type == null" @click="closeFile">
                             <v-list-tile-title>Close</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
                 </v-menu>
-                <v-menu dark offset-y style="margin-bottom: 10px;">
-                    <v-btn slot="activator" flat>
+                <v-menu :disabled="file_type == null" dark offset-y style="margin-bottom: 10px;">
+                    <v-btn :disabled="file_type == null" slot="activator" flat>
                         View
                     </v-btn>
                     <v-list light dense style="height: 500px; overflow-x: auto;">
@@ -32,6 +32,14 @@
                                 <v-list-tile-title>{{ item.headerName }}</v-list-tile-title>
                             </v-list-tile>
                         </template>
+                    </v-list>
+                </v-menu>
+                <v-menu dark offset-y style="margin-bottom: 10px;">
+                    <v-btn slot="activator" flat>
+                        Settings
+                    </v-btn>
+                    <v-list light dense>
+                            <v-list-tile>Configuration</v-list-tile>
                     </v-list>
                 </v-menu>
                 <v-btn :class="{ 'pulse': rowData.length == 0 }" @click="newLineAdd()"
@@ -183,7 +191,6 @@
                     onCellValueChanged: this.onCellValueChanged
                 },
                 gridOptions: {
-                    rowHeight: 35,
                     context: {
                         componentParent: this
                     },
@@ -246,7 +253,8 @@
                 let self = this;
                 self.file_type = file_type;
 
-                self.columnDefs = require('./Headers/' + self.file_type);
+                let tmpHeaders = require('./Headers/' + self.file_type);
+                self.columnDefs = tmpHeaders;
 
                 self.file_type_dialog = false;
             },
@@ -255,7 +263,6 @@
                 self.dialog = true;
 
                 self.gridOptions = {
-                    rowHeight: 30,
                     context: {
                         componentParent: self
                     }
@@ -269,9 +276,17 @@
             newLineAdd() {
                 let self = this;
 
-                self.$refs.NewProductValidator.show();
-
-                // self.rowData.push({})
+                self.$refs.NewProductValidator.show(data => {
+                    self.rowData.push({
+                        product_System_ID: data.product_System_ID,
+                        barcode: data.barcode,
+                        description: data.description,
+                        can_edit: true,
+                        vendor_Description: data.description,
+                        final_Description: data.description,
+                        description_Length: data.description.length
+                    })
+                });
 
                 // setTimeout(() => {
                 //     self.gridApi.resetRowHeights();

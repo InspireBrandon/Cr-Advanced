@@ -17,14 +17,11 @@
                                                 label="Generate product system id" color="primary">
                                             </v-checkbox>
                                         </v-flex>
-                                        <v-flex md5 xs11>
-                                            <v-text-field :loading="product_sys_id_loading"
-                                                @blur="on_product_system_id_blur" v-model="form.product_System_ID"
-                                                @keydown="handle_product_sys_keydown"
-                                                :disabled="generate_product_system_id || product_sys_id_loading"
-                                                label="Product system id"></v-text-field>
+                                        <v-flex md6 xs12>
+                                            <v-text-field :disabled="generate_product_system_id"
+                                                v-model="form.product_System_ID" label="Product system id"></v-text-field>
                                         </v-flex>
-                                        <v-flex md1 xs1 class="pl-0">
+                                        <!-- <v-flex md1 xs1 class="pl-0">
                                             <v-tooltip bottom>
                                                 <template v-slot:activator="{ on }">
                                                     <v-icon transition="slide-x-transition" style="margin-top: 25px;"
@@ -32,14 +29,11 @@
                                                 </template>
                                                 <span>YESSSS</span>
                                             </v-tooltip>
+                                        </v-flex> -->
+                                        <v-flex md6 xs12>
+                                            <v-text-field v-model="form.barcode" label="Barcode"></v-text-field>
                                         </v-flex>
-                                        <v-flex md5 xs11>
-                                            <v-text-field :loading="barcode_loading" @blur="on_barcode_blur"
-                                                v-model="form.barcode" @keydown="save_disabled = true"
-                                                :disabled="barcode_loading || form.product_System_ID == ''"
-                                                label="Barcode"></v-text-field>
-                                        </v-flex>
-                                        <v-flex md1 xs1 class="pl-0">
+                                        <!-- <v-flex md1 xs1 class="pl-0">
                                             <v-tooltip bottom>
                                                 <template v-slot:activator="{ on }">
                                                     <v-icon transition="slide-x-transition" style="margin-top: 25px;"
@@ -47,7 +41,7 @@
                                                 </template>
                                                 <span>YESSSS</span>
                                             </v-tooltip>
-                                        </v-flex>
+                                        </v-flex> -->
                                         <v-flex md12>
                                             <v-text-field v-model="form.description" label="Description"></v-text-field>
                                         </v-flex>
@@ -59,9 +53,7 @@
                         <v-card-actions>
                             <v-spacer></v-spacer>
                             <v-btn flat color="secondary" @click.native="dialog = false">Cancel</v-btn>
-                            <v-btn :disabled="product_sys_id_loading || save_disabled" flat color="primary"
-                                @click.native="returnData">
-                                Continue</v-btn>
+                            <v-btn flat color="primary" @click.native="returnData">Continue</v-btn>
                         </v-card-actions>
                     </v-form>
                 </v-card>
@@ -99,11 +91,12 @@
         methods: {
             show(afterReturn) {
                 let self = this;
+                self.afterReturn = afterReturn;
                 self.dialog = true;
             },
             returnData() {
                 let self = this;
-                // self.afterReturn();
+                self.afterReturn(self.form);
                 self.dialog = false;
             },
             on_generate_change() {
