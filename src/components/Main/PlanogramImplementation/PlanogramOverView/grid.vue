@@ -8,10 +8,16 @@
             :groupMultiAutoColumn="true">
         </ag-grid-vue>
         rows : {{rowData.length}}
+        <VariationOrderModal ref="VariationOrderModal" />
     </div>
 </template>
 <script>
+    import PlanogramName from "./PlanogramName.vue"
     import Button from "./button.vue"
+    import Fits from "./Fits.vue"
+
+    import VariationOrderModal from '@/components/Main/PlanogramImplementation/VariationOrderModal'
+
     import Axios from 'axios'
     import {
         AgGridVue
@@ -20,7 +26,10 @@
         props: ["rowData", "selectedProject", "getRowData", "assign"],
         components: {
             AgGridVue,
+            VariationOrderModal,
             Button,
+            Fits,
+            PlanogramName,
         },
         data() {
             return {
@@ -35,71 +44,122 @@
                     {
                         "headerName": "Store",
                         "checkboxSelection": true,
-                        "field": "storeName"
+                        "field": "storeName",
+                        "minWidth": 200,
+                    }, {
+                        "headerName": "Planogram Name",
+                        "cellRendererFramework": "PlanogramName",
+                        
+                        "minWidth": 650,
+                        cellStyle: function (params) {
+                            if (params.data.planogramFit == true) {
+                                //mark police cells as red
+                                return {
+                                    // color: 'red',
+                                    backgroundColor: " rgb(240, 125, 125)"
+                                };
+                            } else {
+                                return {
+                                    // backgroundColor: " #C8E6C9"
+                                };
+                            }
+                        }
+                    }, {
+                        "headerName": "Current Status",
+                        "field": "currentStatusText",
+                        "minWidth": 100,
+                    }, {
+                        "headerName": "",
+                        "editable": false,
+                        "hide": false,
+                        "minWidth": 140,
+                        "cellRendererFramework": "Button"
+                    },
+                    {
+                        "headerName": "Fits",
+                        "cellRendererFramework": "Fits"
                     }, {
                         "headerName": "Store Cluster",
-                        "field": "cluster"
+                        "field": "cluster",
+                        "minWidth": 75,
+                        cellStyle: function (params) {
+                            if (params.data.storeClusterFit == true) {
+                                //mark police cells as red
+                                return {
+                                    // color: 'red',
+                                    backgroundColor: " rgb(240, 125, 125)"
+                                };
+                            } else {
+                                return {
+                                    backgroundColor: "#C8E6C9"
+                                };
+                            }
+                        }
                     }, {
                         "headerName": "Category Cluster",
                         "field": "categoryCluster",
-                        "maxWidth": 100,
-                        "minWidth": 100,
-                    }, {
-                        "headerName": "Name",
-                        "field": "GeneratedName"
+                        "minWidth": 75,
                     }, {
                         "headerName": "Modules",
-                        "maxWidth": 90,
                         "minWidth": 50,
                         "editable": true,
-                        "field": "modules"
+                        "field": "modules",
+                        cellStyle: function (params) {
+                            if (params.data.modulesFit == true) {
+                                //mark police cells as red
+                                return {
+                                    // color: 'red',
+                                    backgroundColor: " rgb(240, 125, 125)"
+                                };
+                            } else {
+                                return {
+                                    backgroundColor: " #C8E6C9"
+                                };
+                            }
+                        }
                     }, {
                         "headerName": "Height",
-                        "maxWidth": 90,
                         "minWidth": 50,
                         "editable": true,
-                        "field": "height"
+                        "field": "height",
+                        cellStyle: function (params) {
+                            if (params.data.heightFit == true) {
+                                //mark police cells as red
+                                return {
+                                    // color: 'red',
+                                    backgroundColor: " rgb(240, 125, 125)"
+                                };
+                            } else {
+                                return {
+                                    backgroundColor: " #C8E6C9"
+                                };
+                            }
+                        }
                     }, {
                         "headerName": "Width",
-                        "maxWidth": 90,
                         "minWidth": 50,
                         "editable": true,
                         "field": "width"
                     }, {
                         "headerName": "Displays",
-                        "maxWidth": 90,
                         "minWidth": 50,
                         "editable": true,
                         "field": "displays"
                     }, {
                         "headerName": "Pallettes",
-                        "maxWidth": 90,
                         "minWidth": 50,
                         "editable": true,
                         "field": "pallettes"
                     }, {
                         "headerName": "Supplier Stands",
-                        "maxWidth": 90,
                         "minWidth": 50,
                         "editable": true,
                         "field": "supplierStands"
                     }, {
                         "headerName": "Bins",
                         "field": "bins",
-                        "maxWidth": 90,
                         "minWidth": 50,
                         "editable": true,
-                    }, {
-                        "headerName": "Current Status",
-                        "field": "currentStatusText"
-                    }, {
-                        "headerName": "",
-                        "editable": false,
-                        "hide": false,
-                        "pinned": "right",
-                        "maxWidth": 100,
-                        "minWidth": 100,
-                        "cellRendererFramework": "Button"
                     }
                 ],
                 defaultColDef: {
@@ -110,13 +170,15 @@
                     context: {
                         componentParent: this
                     },
-                    rowClassRules: {
-                        'audit-image-breach': 'data.fits'
-                    }
+
                 },
             }
         },
         methods: {
+            openOrder(item) {
+                let self = this
+                self.$refs.VariationOrderModal.show(item)
+            },
             getSelectedRows() {
                 let self = this
                 return this.selectedItems
@@ -127,6 +189,17 @@
             },
             createStorePlano(listItem, callback) {
                 let self = this;
+                let moduleFit = false
+                let heightFit = false
+
+                if (listItem.modules < listItem.detailModules) {
+                    moduleFit = true
+                }
+                if (listItem.height < listItem.detailHeight) {
+                    heightFit = true
+                }
+                console.log(listItem);
+
                 let item = {
                     "id": listItem.id,
                     "store_ID": listItem.store_ID,
@@ -134,10 +207,12 @@
                     "planogramDetail_ID": listItem.planogramDetail_ID,
                     "planogramStoreStatus": listItem.planogramStoreStatus,
                     "Modules": listItem.modules,
-                    "Height": listItem.height,
+                    "Height": parseFloat(listItem.height),
                     "Width": parseFloat(listItem.width),
+                    "modulesFit": moduleFit,
                     "Displays": listItem.displays,
                     "Pallettes": listItem.pallettes,
+                    "heightFit": heightFit,
                     "SupplierStands": listItem.supplierStands,
                     "Bins": listItem.bins,
                     "Fits": false
@@ -252,6 +327,6 @@
 </script>
 <style>
     .ag-theme-balham .audit-image-breach {
-        background-color: lightcoral !important;
+        background-color: rgb(247, 199, 65) !important;
     }
 </style>
