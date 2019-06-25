@@ -59,7 +59,7 @@
                 StoreStatusList: [{
                         text: "Unassigned"
                     }, {
-                        text: "Selected"
+                        text: "Assigned"
                     },
                     {
                         text: "DistrubutedToStore"
@@ -79,7 +79,7 @@
             }
         },
         methods: {
-           
+            
             checkFits(storePlan, planDetails, callback) {
                 let self = this
                 let retval = false
@@ -100,6 +100,10 @@
             assignGroups() {
                 let self = this
                 let data = self.$refs.grid.getSelectedRows()
+                if(data.length<1){
+                    alert("Please select at least one store")
+                    return
+                }
                 let count = 0
                 self.$refs.PlanogramDetailsSelector.show(null, false, detailID => {
                     data.forEach(e => {
@@ -115,6 +119,7 @@
             assignPlanogramToStoreNoRefresh(listItem, detailID, callback) {
                 let self = this;
                 self.checkFits(listItem, data, fits => {
+                   
                     let item = {
                         "id": listItem.id,
                         "store_ID": listItem.store_ID,
@@ -145,14 +150,31 @@
 
             assignPlanogramToStore(listItem) {
                 let self = this;
+                let moduleFit=false
+                let heightFit=false
+                let storeClusterFit = false
+                let planogramFit = false
                 self.$refs.PlanogramDetailsSelector.show(listItem, true, data => {
                     self.checkFits(listItem, data, fits => {
+                        if(listItem.modules< data.modules){
+                            moduleFit=true
+                        }
+                        if(listItem.height< data.height){
+                            heightFit=true
+                        }
+                        if(listItem.cluster!= data.clusterName){
+                            storeClusterFit=true
+                        }
                         let item = {
                             "id": listItem.id,
                             "store_ID": listItem.store_ID,
                             "project_ID": self.selectedProject,
                             "planogramDetail_ID": data.id,
                             "planogramStoreStatus": 1,
+                            "HeightFit":heightFit,
+                            "StoreClusterFit":storeClusterFit,
+                            "PlanogramFit":planogramFit,
+                            "ModulesFit":moduleFit,
                             // "Modules": data.modules,
                             // "Height": data.height,
                             // "Width": data.width,
@@ -175,6 +197,45 @@
                     })
 
                 })
+            },
+            unassignPlanogram(listItem){
+                let self = this
+                let moduleFit=false
+                let heightFit=false
+                let storeClusterFit = false
+                let planogramFit = false
+                  
+                       
+                        let item = {
+                            "id": listItem.id,
+                            "store_ID": listItem.store_ID,
+                            "project_ID": self.selectedProject,
+                            "planogramDetail_ID": null,
+                            "planogramStoreStatus": 0,
+                            "HeightFit":heightFit,
+                            "StoreClusterFit":storeClusterFit,
+                            "PlanogramFit":planogramFit,
+                            "ModulesFit":moduleFit,
+                            "Modules": listItem.modules,
+                            "Height": listItem.height,
+                            "Width": listItem.width,
+                            "Displays": listItem.displays,
+                            "Pallettes": listItem.pallettes,
+                            "SupplierStands": listItem.supplierStands,
+                            "Bins": listItem.bins,
+                            "Fits": false
+                        }
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                        Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
+                            .then(r => {
+                                console.log(r);
+                                self.getStorePlanograms()
+                                delete Axios.defaults.headers.common["TenantID"];
+                            }).catch(e => {
+                                console.log(e);
+                                delete Axios.defaults.headers.common["TenantID"];
+                            })
+
             },
             openStoreOver(item) {
                 let self = this

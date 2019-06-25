@@ -186,7 +186,7 @@
                     text: "Space Planning",
                     value: 2
                 }, ],
-                showNotices: false,
+                showNotices: true,
                 hasDatabases: false,
                 loading: true
             }

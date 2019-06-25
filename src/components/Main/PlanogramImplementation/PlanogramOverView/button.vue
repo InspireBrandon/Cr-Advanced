@@ -6,9 +6,18 @@
         <v-btn @click="removeLine" class="ma-0" small icon>
             <v-icon color="red">delete</v-icon>
         </v-btn> -->
-       
-        <v-tooltip bottom>
+        <v-tooltip bottom v-if="params.data.planogramStoreStatus==1">
             <template v-slot:activator="{ on }">
+                <v-btn v-on="on"
+                   @click="params.context.componentParent.$parent.$parent.$parent.$parent.unassignPlanogram(params.data)"
+                    icon flat small color="error" class="ma-0">
+                    <v-icon>close</v-icon>
+                </v-btn>
+            </template>
+            <span>Remove Planogram</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+            <template v-slot:activator="{ on }" v-if="params.data.planogramStoreStatus!=1">
                 <v-btn v-on="on"
                     @click="params.context.componentParent.$parent.$parent.$parent.$parent.assignPlanogramToStore(params.data)"
                     icon flat small color="primary" class="ma-0">
@@ -38,6 +47,15 @@
                 </v-btn>
             </template>
             <span>Distribute</span>
+        </v-tooltip>
+        <v-tooltip bottom v-if="params.data.planogramStoreStatus!=0">
+            <template v-slot:activator="{ on }">
+                <v-btn v-on="on" @click="params.context.componentParent.openOrder(params.data)" icon flat small
+                    color="warning" class="ma-0">
+                    <v-icon>edit_attributes</v-icon>
+                </v-btn>
+            </template>
+            <span>request variation</span>
         </v-tooltip>
     </div>
 </template>

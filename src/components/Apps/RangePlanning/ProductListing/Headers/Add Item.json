@@ -1,7 +1,7 @@
 [{
         "headerName": "Product System ID",
         "field": "product_System_ID",
-        "editable": true,
+        "editable": false,
         "hide": false,
         "pinned": "left",
         "maxWidth": 150,
@@ -11,7 +11,7 @@
     {
         "headerName": "Barcode",
         "field": "barcode",
-        "editable": true,
+        "editable": false,
         "hide": false,
         "pinned": "left",
         "maxWidth": 120,
@@ -21,7 +21,7 @@
     {
         "headerName": "General Description",
         "field": "description",
-        "editable": true,
+        "editable": false,
         "hide": false,
         "pinned": "left",
         "maxWidth": 200,
@@ -34,31 +34,30 @@
                 "headerName": "Product Code",
                 "field": "product_Code",
                 "editable": true,
-                "hide": true
+                "hide": false
             },
             {
                 "headerName": "Vendor Description",
                 "field": "vendor_Description",
                 "editable": true,
-                "hide": true
+                "hide": false
             },
             {
                 "headerName": "Vendor Size Description",
                 "field": "vendor_Size_Description",
                 "editable": true,
-                "hide": true
+                "hide": false
             },
             {
                 "headerName": "Brand",
                 "field": "brand",
-                "editable": true,
-                "hide": true
+                "hide": false
             },
             {
                 "headerName": "Product Information",
                 "field": "brand",
                 "editable": true,
-                "hide": true
+                "hide": false
             }
         ]
     },
@@ -91,8 +90,8 @@
             {
                 "headerName": "Description Length",
                 "field": "description_Length",
-                "editable": true,
-                "hide": true
+                "hide": true,
+                "cellRendererFramework": "DescriptionLength"
             },
             {
                 "headerName": "Vendor Brand",
@@ -108,24 +107,14 @@
                 "headerName": "Supplier",
                 "field": "supplier",
                 "editable": true,
-                "hide": true
+                "hide": true,
+                "cellRendererFramework": "Selector",
+                "dropdownName": "suppliers"
             },
             {
                 "headerName": "Supplier Code",
                 "field": "supplier_Code",
-                "editable": true,
-                "hide": true
-            },
-            {
-                "headerName": "Manufacturer",
-                "field": "manufacturer",
-                "editable": true,
-                "hide": true
-            },
-            {
-                "headerName": "Manufacturer Code",
-                "field": "manufacturer_Code",
-                "editable": true,
+                "editable": false,
                 "hide": true
             }
         ]
@@ -152,9 +141,10 @@
             },
             {
                 "headerName": "Consignment",
-                "field": "Consignment",
+                "field": "consignment",
                 "editable": true,
-                "hide": true
+                "hide": true,
+                "cellRendererFramework": "YesNoSelector"
             }
         ]
     },
@@ -685,26 +675,30 @@
             {
                 "headerName": "RSP Excl Vat",
                 "field": "rsp_Excluding_VAT",
-                "editable": true,
-                "hide": true
+                "editable": false,
+                "hide": true,
+                "valueGetter": "((parseInt(data.rsp_Including_VAT) + ((parseFloat(data.rsp_Including_VAT) - parseInt(data.rsp_Including_VAT)) <= 50 ? 0.5 : 0.9)).toFixed(2) / 1.15).toFixed(2)"   
             },
             {
                 "headerName": "Rounded Selling Price",
                 "field": "rounded_Selling_Price",
-                "editable": true,
-                "hide": true
+                "editable": false,
+                "hide": true,
+                "valueGetter": "(parseInt(data.rsp_Including_VAT) + ((parseFloat(data.rsp_Including_VAT) - parseInt(data.rsp_Including_VAT)) <= 50 ? 0.5 : 0.9)).toFixed(2)"   
             },
             {
                 "headerName": "Markup %",
                 "field": "markup_Percentage",
-                "editable": true,
-                "hide": true
+                "editable": false,
+                "hide": true,
+                "valueGetter": "parseFloat((((parseInt(data.rsp_Including_VAT) + ((parseFloat(data.rsp_Including_VAT) - parseInt(data.rsp_Including_VAT)) <= 50 ? 0.5 : 0.9)).toFixed(2) / 1.15).toFixed(2) - parseFloat(data.unit_Cost).toFixed(2)) / parseFloat(data.unit_Cost).toFixed(2)).toFixed(2) * 100"   
             },
             {
                 "headerName": "Gross Profit %",
                 "field": "gross_Profit_Percentage",
-                "editable": true,
-                "hide": true
+                "editable": false,
+                "hide": true,
+                "valueGetter": "(parseFloat((((parseInt(data.rsp_Including_VAT) + ((parseFloat(data.rsp_Including_VAT) - parseInt(data.rsp_Including_VAT)) <= 50 ? 0.5 : 0.9)).toFixed(2) / 1.15).toFixed(2) - parseFloat(data.unit_Cost).toFixed(2)) / ((parseInt(data.rsp_Including_VAT) + ((parseFloat(data.rsp_Including_VAT) - parseInt(data.rsp_Including_VAT)) <= 50 ? 0.5 : 0.9)).toFixed(2) / 1.15).toFixed(2)) * 100).toFixed(0)"
             },
             {
                 "headerName": "Category GP %",
@@ -716,7 +710,8 @@
                 "headerName": "Shortfall %",
                 "field": "shortfall_Percentage",
                 "editable": true,
-                "hide": true
+                "hide": true,
+                "valueGetter": "data.category_Gross_Profit_Percentage - (parseFloat((((parseInt(data.rsp_Including_VAT) + ((parseFloat(data.rsp_Including_VAT) - parseInt(data.rsp_Including_VAT)) <= 50 ? 0.5 : 0.9)).toFixed(2) / 1.15).toFixed(2) - parseFloat(data.unit_Cost).toFixed(2)) / ((parseInt(data.rsp_Including_VAT) + ((parseFloat(data.rsp_Including_VAT) - parseInt(data.rsp_Including_VAT)) <= 50 ? 0.5 : 0.9)).toFixed(2) / 1.15).toFixed(2)) * 100).toFixed(0)"
             },
             {
                 "headerName": "Discount % Allowed",
@@ -985,8 +980,8 @@
         "editable": false,
         "hide": false,
         "pinned": "right",
-        "maxWidth": 100,
-        "minWidth": 100,
+        "maxWidth": 200,
+        "minWidth": 200,
         "cellRendererFramework": "Button"
     }
 ]

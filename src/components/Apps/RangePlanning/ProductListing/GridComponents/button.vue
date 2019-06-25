@@ -1,11 +1,8 @@
 <template>
     <div style="text-align: center; cursor: pointer;">
-        <v-btn @click="duplicateLine" class="ma-0" small icon>
-            <v-icon color="secondary">file_copy</v-icon>
-        </v-btn>
-        <v-btn @click="removeLine" class="ma-0" small icon>
-            <v-icon color="red">delete</v-icon>
-        </v-btn>
+        <a href="#">change</a>
+        <a href="#" @click.prevent="duplicateLine" style="margin-left: 15px;">duplicate</a>
+        <a href="#" @click.prevent="removeLine" style="color: red; margin-left: 15px;">delete</a>
         <YesNoModal ref="yesNo"></YesNoModal>
     </div>
 </template>

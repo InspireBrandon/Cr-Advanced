@@ -22,6 +22,7 @@
                                     <v-list-tile-title v-text="sp.name"></v-list-tile-title>
                                 </v-list-tile-content>
                                 <v-spacer></v-spacer>
+                                <v-list-tile-action-text>{{ sp.type }}</v-list-tile-action-text>
                             </v-list-tile>
                             <v-divider :key="'divider' + idx"></v-divider>
                         </template>
@@ -126,7 +127,7 @@
                 } else {
                     self.dialog = false;
 
-                    self.afterComplete(self.selectedSpacePlan.id, self.selectedSpacePlan);
+                    self.afterComplete(self.selectedSpacePlan.id, self.selectedSpacePlan, self.selectedSpacePlan.type);
                 }
             },
             deleteSpacePlanFile() {
