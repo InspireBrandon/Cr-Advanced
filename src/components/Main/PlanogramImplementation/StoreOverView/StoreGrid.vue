@@ -1,6 +1,6 @@
 <template>
     <div v-if="rowData.length>0">
-        <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%;  height: calc(100vh - 235px);"
+        <ag-grid-vue :gridOptions="gridOptions" :sideBar='false' style="width: 100%;  height: calc(100vh - 235px);"
             :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
             :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true"
             rowSelection="multiple" :rowDeselection="true" :enableColResize="true" :floatingFilter="true"
@@ -35,65 +35,62 @@
         data() {
             return {
                 currentStorePlanograms: [],
-                headers: [{
+                headers: [
+                    {
+                        "headerName": "Project Group",
+                        "field": "groupName",
+                        "minWidth": 200,
+                    },
+                    {
                         "headerName": "Planogram",
-                        "field": "name"
-                    }, {
-                        "headerName": "Category Cluster",
-                        "field": "categoryCluster"
+                        "field": "projectName",
+                        "minWidth": 200,
                     }, {
                         "headerName": "Name",
-                        "field": "GeneratedName"
-                    }, {
+                        "field": "GeneratedName",
+                        "minWidth": 650,
+                    },{
+                        "headerName": "Current Status",
+                        "field": "currentStatusText",
+                        "minWidth": 100,
+                    },{
+                        "headerName": "",
+                        "editable": false,
+                        "hide": false,
+                        "minWidth": 140,
+                        "cellRendererFramework": "Button"
+                    },  {
+                        "headerName": "Category Cluster",
+                        "field": "categoryCluster",
+                        "minWidth": 70,
+                    },{
                         "headerName": "Modules",
-                        "maxWidth": 90,
-                        "minWidth": 50,
+                        "minWidth": 70,
                         "field": "modules"
                     }, {
                         "headerName": "Height",
-                        "maxWidth": 90,
-                        "minWidth": 50,
+                        "minWidth": 70,
                         "field": "height"
                     }, {
                         "headerName": "Width",
-                        "maxWidth": 90,
-                        "minWidth": 50,
+                        "minWidth": 70,
                         "field": "width"
                     }, {
                         "headerName": "Displays",
-                        "maxWidth": 90,
-                        "minWidth": 50,
+                        "minWidth": 70,
                         "field": "displays"
                     }, {
                         "headerName": "Pallettes",
-                        "maxWidth": 90,
-                        "minWidth": 50,
+                        "minWidth": 70,
                         "field": "pallettes"
                     }, {
                         "headerName": "Supplier Stands",
-                        "maxWidth": 90,
-                        "minWidth": 50,
+                        "minWidth": 70,
                         "field": "supplierStands"
                     }, {
                         "headerName": "Bins",
                         "field": "bins",
-                        "maxWidth": 90,
-                        "minWidth": 50,
-                    }, {
-                        "headerName": "unRequired In Store",
-                        "field": "requiredInStore",
-                    }, {
-                        "headerName": "Current Status",
-                        "field": "currentStatusText"
-                    },
-                    {
-                        "headerName": "",
-                        "editable": false,
-                        "hide": false,
-                        "pinned": "right",
-                        "maxWidth": 120,
-                        "minWidth": 120,
-                        "cellRendererFramework": "Button"
+                        "minWidth": 70,
                     }
                 ],
                 StoreStatusList: [{
@@ -144,10 +141,12 @@
             },
             assignPlanogramToStore(listItem) {
                 let self = this;
+                console.log(listItem);
+                
                 self.$refs.PlanogramDetailsSelector.show(listItem, false, data => {
                     let item = {
                         "store_ID": self.StoreID,
-                        "project_ID": listItem.id,
+                        "project_ID": listItem.projectID,
                         "planogramDetail_ID": data.id,
                         "planogramStoreStatus": 1,
                     }
@@ -182,6 +181,40 @@
                 })
 
                 // self.createPlanoGramDetailTX(tmp)
+            },
+             removeFromStore(item,state) {
+                let self = this
+                let text = ""
+                if (item.requiredInStore == true) {
+                    text = "Do you want to innclude this category in this store?"
+                } else {
+                    text = "Are you sure you want to remove this category ?"
+                }
+                self.$refs.YesNoModal.show(text, data => {
+                    if (data) {
+                        self.remove(item,state, data => {
+                            self.method()
+                        })
+                    }
+                })
+
+                // self.createPlanoGramDetailTX(tmp)
+            },
+            remove(listItem,state ,callback) {
+                let self = this;
+
+                listItem.requiredInStore = state
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', listItem)
+                    .then(r => {
+                        console.log(r);
+                        delete Axios.defaults.headers.common["TenantID"];
+                        callback(r)
+                    }).catch(e => {
+                        console.log(e);
+                        delete Axios.defaults.headers.common["TenantID"];
+                        callback(e)
+                    })
             },
             createStorePlano(listItem, callback) {
                 let self = this;
