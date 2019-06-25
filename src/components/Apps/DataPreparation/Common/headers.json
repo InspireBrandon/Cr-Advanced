@@ -3,7 +3,7 @@
     "field": "displayname"
 }, 
 {
-    "headerName": "",
+    "headerName": "Actions",
     "field": "",
     "cellRendererFramework": "Button",
     "pinned": "right"

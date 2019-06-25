@@ -109,6 +109,7 @@
                         .then(r => {
                             delete Axios.defaults.headers.common["TenantID"];
                             let items = r.data;
+                            
                             self.headerItems = [];
 
                             items.forEach(element => {
