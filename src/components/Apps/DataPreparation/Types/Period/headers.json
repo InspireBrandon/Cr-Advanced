@@ -1,0 +1,17 @@
+[{
+        "headerName": "Period Name",
+        "field": "period_Name"
+    }, {
+        "headerName": "Period From Date",
+        "field": "period_From_Date"
+    }, {
+        "headerName": "Period to date",
+        "field": "period_To_Date"
+    },
+    {
+        "headerName": "",
+        "field": "",
+        "cellRendererFramework": "Button",
+        "pinned": "right"
+    }
+]

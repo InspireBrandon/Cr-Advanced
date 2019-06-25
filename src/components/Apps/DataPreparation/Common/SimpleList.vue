@@ -3,8 +3,8 @@
         <v-toolbar dark flat>
             <v-toolbar-title>{{name}}</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-text-field append-icon="search" type="text" id="filter-text-box" placeholder="Filter..." @input="onFilterTextBoxChanged"
-                v-model="filterText">
+            <v-text-field append-icon="search" type="text" id="filter-text-box" placeholder="Filter..."
+                @input="onFilterTextBoxChanged" v-model="filterText">
             </v-text-field>
             <v-spacer></v-spacer>
             Add a {{name}}
@@ -25,7 +25,6 @@
 <script>
     import SimpleMaint from '@/components/Apps/DataPreparation/Common/SimpleMaint.vue'
     import Button from './GridComponents/button';
-
     import Axios from 'axios';
     import {
         AgGridVue
@@ -44,8 +43,6 @@
 
             return {
                 filterText: '',
-                items: [],
-                pageNumber: 0,
                 allowedRecords: 25,
                 columnDefs: [],
                 rowData: [],
@@ -68,18 +65,9 @@
             this.gridOptions.context.componentParent = this;
             this.getItems();
         },
-        computed: {
-            paginatedItems() {
-                let self = this;
-
-                let items = JSON.parse(JSON.stringify(self.items));
-                let tmp = items.splice(((self.pageNumber * self.allowedRecords)), self.allowedRecords)
-                return tmp;
-            },
-        },
+        computed: {},
         beforeMount() {
             let self = this;
-            // console.log(require('./headers.json'))
             self.columnDefs = require('./headers.json');
         },
         mounted() {

@@ -1,7 +1,5 @@
 <template>
     <div>
-
-        <!-- <SimpleList name="Store"></SimpleList> -->
         <v-container fluid class="pa-0 ma-0" grid-list-md>
             <v-layout row wrap class="pa-0 ma-0">
                 <v-flex md12 class="pa-0 ma-0">
@@ -26,18 +24,14 @@
                 </v-flex>
             </v-layout>
         </v-container>
-        <ModifyStore ref="modifyStore" />
     </div>
 </template>
 
 <script>
-    import ModifyStore from '@/components/Apps/DataPreparation/Types/Store/Modify/Index.vue'
-    import Button from './Modify/GridComponents/button';
     import Axios from 'axios'
     import {
         AgGridVue
     } from "ag-grid-vue";
-
 
     export default {
         data() {
@@ -47,6 +41,7 @@
                 pageNumber: 0,
                 allowedRecords: 25,
                 columnDefs: [],
+                enableCharts: true,
                 rowData: [],
                 defaultColDef: {},
                 gridOptions: {
@@ -64,9 +59,7 @@
             }
         },
         components: {
-            ModifyStore,
             AgGridVue,
-            Button
         },
         created() {
             let self = this;
@@ -76,7 +69,6 @@
         },
         beforeMount() {
             let self = this;
-            // console.log(require('./headers.json'))
             self.columnDefs = require('./headers.json');
         },
         methods: {
@@ -88,10 +80,6 @@
                 let self = this;
                 self.gridApi = params.api;
                 self.columnApi = params.columnApi;
-            },
-            openEdit(item) {
-                let self = this;
-                self.$refs.modifyStore.open(item);
             },
             getStores() {
                 let self = this
@@ -107,7 +95,6 @@
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
-            openAdd() {},
         }
 
     }
