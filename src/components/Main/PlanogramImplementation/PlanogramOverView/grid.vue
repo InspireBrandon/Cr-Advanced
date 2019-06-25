@@ -9,13 +9,15 @@
         </ag-grid-vue>
         rows : {{rowData.length}}
         <VariationOrderModal ref="VariationOrderModal" />
+        <YesNoModal ref="YesNoModal" />
+
     </div>
 </template>
 <script>
     import PlanogramName from "./PlanogramName.vue"
     import Button from "./button.vue"
     import Fits from "./Fits.vue"
-
+    import YesNoModal from '@/components/Common/YesNoModal'
     import VariationOrderModal from '@/components/Main/PlanogramImplementation/VariationOrderModal'
 
     import Axios from 'axios'
@@ -30,6 +32,7 @@
             Button,
             Fits,
             PlanogramName,
+            YesNoModal,
         },
         data() {
             return {
@@ -76,7 +79,7 @@
                         "cellRendererFramework": "Button"
                     },
                     {
-                        "headerName": "Fits",
+                        "headerName": "Best Fit",
                         "cellRendererFramework": "Fits"
                     }, {
                         "headerName": "Store Cluster",
@@ -191,13 +194,21 @@
                 let self = this;
                 let moduleFit = false
                 let heightFit = false
-
+                let overallFits =true
+                let storeClusterFit = false
                 if (listItem.modules < listItem.detailModules) {
                     moduleFit = true
                 }
                 if (listItem.height < listItem.detailHeight) {
                     heightFit = true
                 }
+                 if (listItem.storeCluster != listItem.cluster) {
+                    storeClusterFit = true
+                }
+                if (storeClusterFit==true||heightFit==true||moduleFit==true) {
+                    overallFits=true
+                }
+                
                 console.log(listItem);
 
                 let item = {
@@ -210,12 +221,13 @@
                     "Height": parseFloat(listItem.height),
                     "Width": parseFloat(listItem.width),
                     "modulesFit": moduleFit,
+                    "storeClusterFit":storeClusterFit,
                     "Displays": listItem.displays,
                     "Pallettes": listItem.pallettes,
                     "heightFit": heightFit,
                     "SupplierStands": listItem.supplierStands,
                     "Bins": listItem.bins,
-                    "Fits": false
+                    "Fits": overallFits
                 }
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
@@ -312,6 +324,40 @@
 
 
                         delete Axios.defaults.headers.common["TenantID"];
+                    })
+            },
+             removeFromStore(item,state) {
+                let self = this
+                let text = ""
+                if (item.requiredInStore == true) {
+                    text = "Do you want to innclude this category in this store?"
+                } else {
+                    text = "Are you sure you want to remove this category ?"
+                }
+                self.$refs.YesNoModal.show(text, data => {
+                    if (data) {
+                        self.remove(item,state, data => {
+                            self.getRowData()
+                        })
+                    }
+                })
+
+                // self.createPlanoGramDetailTX(tmp)
+            },
+            remove(listItem,state ,callback) {
+                let self = this;
+
+                listItem.requiredInStore = state
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', listItem)
+                    .then(r => {
+                        console.log(r);
+                        delete Axios.defaults.headers.common["TenantID"];
+                        callback(r)
+                    }).catch(e => {
+                        console.log(e);
+                        delete Axios.defaults.headers.common["TenantID"];
+                        callback(e)
                     })
             },
             onGridReady(params) {

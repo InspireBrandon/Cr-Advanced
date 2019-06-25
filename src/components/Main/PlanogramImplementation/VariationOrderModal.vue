@@ -16,7 +16,7 @@
                         <v-select v-model="selectedPlanoDetail" :items="planoDetails" label="Planogram"></v-select>
                     </v-flex>
                     <v-flex md12>
-                        <v-checkbox label="Store Specific"></v-checkbox>
+                        <v-text-field label="Store Name" disabled v-model="storeName"></v-text-field>
                     </v-flex>
                     <v-flex md4>
                         <v-text-field v-model="height" label="Height"></v-text-field>
@@ -70,6 +70,7 @@
                 additionalNotes: null,
                 planoDetails: [],
                 selectedPlanoDetail: null,
+                storeName:null,
             }
         },
         methods: {
@@ -81,6 +82,7 @@
                 self.width = item.width
                 self.modules = item.width
                 self.bins = item.bins
+                self.storeName = item.storeName
                 self.displays = item.displays
                 self.supplierStands = item.supplierStands
                 self.pallettes = item.pallettes

@@ -156,7 +156,10 @@
                 let planogramFit = false
                 self.$refs.PlanogramDetailsSelector.show(listItem, true, data => {
                     self.checkFits(listItem, data, fits => {
-                        if(listItem.modules< data.modules){
+                        console.log(listItem.modules+ " : "+ data.modules)
+                      console.log(listItem.modules < data.modules);
+                      
+                      if(listItem.modules< data.modules){
                             moduleFit=true
                         }
                         if(listItem.height< data.height){

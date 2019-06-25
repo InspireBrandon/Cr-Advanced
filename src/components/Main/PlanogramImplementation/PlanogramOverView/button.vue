@@ -1,20 +1,20 @@
 <template>
     <div style=" cursor: pointer;">
-        <!-- <v-btn @click="duplicateLine" class="ma-0" small icon>
-            <v-icon color="secondary">file_copy</v-icon>
-        </v-btn>
-        <v-btn @click="removeLine" class="ma-0" small icon>
-            <v-icon color="red">delete</v-icon>
-        </v-btn> -->
-        <v-tooltip bottom v-if="params.data.planogramStoreStatus==1">
+        <v-tooltip bottom v-if="params.data.requiredInStore!=true &&params.data.fileName!=null">
             <template v-slot:activator="{ on }">
-                <v-btn v-on="on"
-                   @click="params.context.componentParent.$parent.$parent.$parent.$parent.unassignPlanogram(params.data)"
-                    icon flat small color="error" class="ma-0">
-                    <v-icon>close</v-icon>
+                <v-btn v-on="on" icon flat small color="error" class="ma-0" @click="params.context.componentParent.removeFromStore(params.data,true)">
+                    <v-icon>remove_circle_outline</v-icon>
+                </v-btn>
+            </template> 
+            <span>Remove category from store</span>
+        </v-tooltip>
+        <v-tooltip bottom v-if="params.data.requiredInStore==true &&params.data.fileName!=null">
+            <template v-slot:activator="{ on }">
+                <v-btn v-on="on" icon flat small color="success" class="ma-0" @click="params.context.componentParent.removeFromStore(params.data,false)">
+                    <v-icon>add</v-icon>
                 </v-btn>
             </template>
-            <span>Remove Planogram</span>
+            <span>Add Category to store</span>
         </v-tooltip>
         <v-tooltip bottom>
             <template v-slot:activator="{ on }" v-if="params.data.planogramStoreStatus!=1">
@@ -38,11 +38,11 @@
             </template>
             <span>Store overview</span>
         </v-tooltip>
-          <v-tooltip bottom v-if="params.data.planogramStoreStatus==1">
+        <v-tooltip bottom v-if="params.data.planogramStoreStatus==1">
             <template v-slot:activator="{ on }">
                 <v-btn v-on="on"
-                    @click="params.context.componentParent.$parent.$parent.$parent.$parent.Distribute(params.data)"
-                    icon flat small color="success" class="ma-0">
+                    @click="params.context.componentParent.$parent.$parent.$parent.$parent.Distribute(params.data)" icon
+                    flat small color="success" class="ma-0">
                     <v-icon>send</v-icon>
                 </v-btn>
             </template>
@@ -65,8 +65,7 @@
         components: {
             YesNoModal
         },
-        methods: {
-        },
+        methods: {},
         created() {
             let self = this;
             self.selectedUser = self.params.context.componentParent.selectedUser;
