@@ -197,6 +197,7 @@
                     onCellValueChanged: this.onCellValueChanged
                 },
                 gridOptions: {
+                    rowHeight: 35,
                     context: {
                         componentParent: this
                     },
@@ -319,10 +320,10 @@
                     })
                 });
 
-                // setTimeout(() => {
-                //     self.gridApi.resetRowHeights();
-                //     self.gridApi.sizeColumnsToFit()
-                // }, 60);
+                setTimeout(() => {
+                    self.gridApi.resetRowHeights();
+                    self.gridApi.sizeColumnsToFit()
+                }, 60);
             },
             newLineChange() {
                 let self = this;
@@ -557,7 +558,9 @@
 
                 Axios.get(process.env.VUE_APP_API + "Retailer/Supplier")
                     .then(r => {
-                        self.suppliers = r.data;
+                        r.data.forEach(el => {
+                            self.suppliers.push(el.displayname)    
+                        })
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },

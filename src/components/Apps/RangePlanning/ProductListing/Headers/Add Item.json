@@ -93,6 +93,7 @@
                 "headerName": "Description Length",
                 "field": "description_Length",
                 "hide": true,
+                "editable": false,
                 "cellRendererFramework": "DescriptionLength"
             },
             {

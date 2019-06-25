@@ -1,8 +1,9 @@
 <template>
     <div style="text-align: center; cursor: pointer;">
-        <select @change="set_code" style="width: 100%;" placeholder="click to select..." v-model="params.data[params.colDef.field]" name="" id="">
+        <v-combobox class="pa-0 ma-0" :items="params.context.componentParent[params.colDef.dropdownName]" placeholder="type in or select a value" v-model="params.data[params.colDef.field]"></v-combobox>
+        <!-- <select @change="set_code" style="width: 100%;" placeholder="click to select..." v-model="params.data[params.colDef.field]" name="" id="">
             <option v-for="(item, idx) in params.context.componentParent[params.colDef.dropdownName]" :value="item.id" :key="idx">{{ item.displayname }}</option>
-        </select>
+        </select> -->
     </div>
 </template>
 <script>
