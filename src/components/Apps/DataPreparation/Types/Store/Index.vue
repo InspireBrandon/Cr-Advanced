@@ -2,9 +2,9 @@
     <div>
 
         <!-- <SimpleList name="Store"></SimpleList> -->
-        <v-container grid-list-md>
-            <v-layout row wrap>
-                <v-flex md12>
+        <v-container fluid class="pa-0 ma-0" grid-list-md>
+            <v-layout row wrap class="pa-0 ma-0">
+                <v-flex md12 class="pa-0 ma-0">
                     <v-toolbar flat dense dark>
                         <v-btn icon @click="$router.go(-1)">
                             <v-icon>arrow_back</v-icon>

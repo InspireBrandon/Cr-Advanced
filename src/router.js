@@ -108,7 +108,7 @@ export default new Router({
       path: '/SpacePlanning',
       name: 'space_planning',
       component: SpacePlanning
-    },{
+    }, {
       path: '/FloorPlanning',
       name: 'floor_planning',
       component: FloorPlanning
@@ -116,8 +116,7 @@ export default new Router({
       path: '/Menu',
       name: 'main',
       component: Main,
-      children: [
-        {
+      children: [{
           path: '/ProductListing',
           name: 'ProductListing',
           component: ProductListing
@@ -126,7 +125,7 @@ export default new Router({
           path: '/Testing',
           name: 'Testing',
           component: Testing
-        },{
+        }, {
           path: '/Home',
           name: 'home',
           component: Home
@@ -134,7 +133,7 @@ export default new Router({
           path: '/Apps',
           name: 'apps',
           component: Apps,
-        },{
+        }, {
           path: '/Tasks',
           name: 'tasks',
           component: Tasks
@@ -190,7 +189,7 @@ export default new Router({
           path: "/PlanogramImplementation",
           name: "planogram_implementation",
           component: PlanogramImplementation
-        }, 
+        },
         {
           path: "/PlanogramDetailTool",
           name: "planogram_detail_tool",
@@ -240,7 +239,7 @@ export default new Router({
           path: "/ProjectPlanning",
           name: "project_planning",
           component: ProjectPlanning,
-          children:[{ 
+          children: [{
             path: "/Drawer",
             name: "Drawer",
             component: Drawer
@@ -267,16 +266,16 @@ export default new Router({
             name: 'new products',
             component: NewProducts
           }]
-        }, 
+        },
         {
           path: '/DataPreparation',
           name: 'DataPrep',
           component: DataPrep,
           children: [{
-              path: '',
-              name: 'DataPrep',
-              component: DataPrepSections,
-            }, {
+            path: '',
+            name: 'DataPrep',
+            component: DataPrepSections,
+            children: [{
               path: 'Manufacturer',
               name: 'Manufacturer',
               component: ManufacturerMaint
@@ -332,9 +331,8 @@ export default new Router({
               path: 'ProductCatalogue',
               name: 'ProductCatalogue',
               component: ProductCatalogue
-            }
-
-          ]
+            }]
+          }]
         }
       ]
     },
