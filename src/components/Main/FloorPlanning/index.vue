@@ -1,6 +1,6 @@
 <template>
-    <v-app id="inspire">
-        <SpaceplanSelector ref="SpaceplanSelector" />
+    <v-app>
+        <!-- <SpaceplanSelector ref="SpaceplanSelector" />
         <v-navigation-drawer v-model="drawer" dense fixed right app>
             <v-list dense>
                 <v-list-tile @click="toggleCamera">
@@ -61,7 +61,7 @@
         </v-toolbar>
         <v-content>
             <canvas id="renderCanvas" touch-action="none"></canvas>
-        </v-content>
+        </v-content> -->
     </v-app>
 </template>
 
@@ -72,7 +72,7 @@
     import PlanogramLib from "@/components/Main/FloorPlanning/BaseLibs/Planogram/Planogram.js";
     import SpaceplanSelector from "@/components/Common/SpacePlanSelector"
     import * as BABYLON from '@babylonjs/core/Legacy/legacy';
-import { Vector3 } from '@babylonjs/core/Legacy/legacy';
+    import { Vector3 } from '@babylonjs/core/Legacy/legacy';
 
     export default {
         components: {
