@@ -51,7 +51,9 @@
             {
                 "headerName": "Brand",
                 "field": "brand",
-                "hide": false
+                "editable": true,
+                "hide": false,
+                "needsSelect": true
             },
             {
                 "headerName": "Product Information",

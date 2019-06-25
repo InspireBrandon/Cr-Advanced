@@ -262,9 +262,29 @@
                 self.file_type = file_type;
 
                 let tmpHeaders = require('./Headers/' + self.file_type);
-                self.columnDefs = tmpHeaders;
+                let formattedHeaders = self.set_selects(tmpHeaders);
+                self.columnDefs = formattedHeaders;
 
                 self.file_type_dialog = false;
+            },
+            set_selects(headers) {
+                let self = this;
+
+                headers.forEach(header => {
+                    if(header.children != undefined) {
+                        header.children.forEach(child => {
+                            if(child.needsSelect) {
+                                child.cellEditor = "agRichSelectCellEditor",
+                                child.cellEditorParams = {};
+                                child.cellEditorParams.values = self.brands;
+                            }
+                        })
+                    }
+                })
+
+                console.log(headers);
+
+                return headers;
             },
             show() {
                 let self = this;
@@ -293,7 +313,9 @@
                         vendor_Description: data.description,
                         final_Description: data.description,
                         description_Length: data.description.length,
-                        brand: null
+                        brand: null,
+                        supplier: null,
+                        supplier_Code: null,
                     })
                 });
 
@@ -517,14 +539,11 @@
                 Axios.get(process.env.VUE_APP_API + "Retailer/Brand")
                     .then(r => {
 
-                        self.brands = r.data;
+                        self.brands = [];
 
-                        // r.data.forEach(element => {
-                        //     self.brands.push({
-                        //         text: element.displayname,
-                        //         value: element.id
-                        //     })
-                        // });
+                        r.data.forEach(brand => {
+                            self.brands.push(brand.displayname)
+                        })
 
                         delete Axios.defaults.headers.common["TenantID"];
                     })

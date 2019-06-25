@@ -14,17 +14,16 @@
                 items: []
             }
         },
-        created() {
-            console.log(this.params.colDef.field)
-        },
         methods: {
             set_code() {
                 let self = this;
 
+                let node = self.params.node;
+
                 self.$nextTick(() => {
                     self.params.context.componentParent[self.params.colDef.dropdownName].forEach(element => {
-                        if(element.id == self.params.colDef.field) {
-                            self.params.data[self.params.colDef.field + "_Code"] = element[self.params.colDef.field + "_Code"];
+                        if(element.id == self.params.data[self.params.colDef.field]) {
+                            node.setData({ [self.params.colDef.field + "_Code"]: element[self.params.colDef.field + "_Code"] })
                         }
                     });
                 })
