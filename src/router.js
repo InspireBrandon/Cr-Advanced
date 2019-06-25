@@ -20,6 +20,7 @@ import RangePlanning from '@/components/Apps/RangePlanning/Index.vue'
 //import SpacePlanning from '@/components/Main/Planogram/spaceplanning/src/views/Main.vue'
 import Fixtures from '@/components/Apps/SpacePlanning/Fixtures/Index.vue'
 import Testing from '@/components/Main/Testing.vue'
+import Graphs from '@/components/Main/Graphs/Graphs.vue'
 
 //Product maintainence
 import DataPreparation from '@/components/Main/DataPreparation';
@@ -125,6 +126,10 @@ export default new Router({
           path: '/Testing',
           name: 'Testing',
           component: Testing
+        }, {
+          path: '/Graphs',
+          name: 'Graphs',
+          component: Graphs
         }, {
           path: '/Home',
           name: 'home',

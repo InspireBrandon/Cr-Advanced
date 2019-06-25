@@ -11,7 +11,7 @@
                     <v-list dense class="pa-0" style="height: calc(100vh - 200px); overflow-x: auto;">
                         <template v-for="(item, idx) in filteredItems">
                             <v-list-tile @click="selectedItem = item; getTransactionsFromFolder(item.name)"
-                                :class="{ 'selected': selectedItem == item }" :key="idx">
+                                :class="{ 'selected': selectedItem == item.name }" :key="idx">
                                 {{ item.name }}
                             </v-list-tile>
                             <v-divider :key="'d-' + idx"></v-divider>
@@ -21,10 +21,10 @@
             </v-flex>
             <v-flex md8>
                 <v-layout row wrap>
-                    <v-flex>
+                    <v-flex v-if="selectedItem != null">
                         <v-card>
                             <v-toolbar flat dark dense>
-                                <v-toolbar-title>Data Import - {{ selectedItem.name }}</v-toolbar-title>
+                                <v-toolbar-title>Data Import - {{ selectedItem == null ? "" : selectedItem.name }}</v-toolbar-title>
                                 <v-spacer></v-spacer>
                                 <v-btn icon small @click="openFileDialog">
                                     <v-icon>cloud_upload</v-icon>
@@ -42,7 +42,7 @@
                                     </template>
                                     <template v-slot:footer>
                                         <td :colspan="headers.length">
-                                            <strong>Files in Folder {{selectedItem.name}}</strong>
+                                            <strong>{{ selectedItem == null ? "" : 'Files in Folder ' + selectedItem.name }}</strong>
                                         </td>
                                     </template>
                                 </v-data-table>
