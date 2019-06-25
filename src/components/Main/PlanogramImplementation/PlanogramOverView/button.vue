@@ -17,7 +17,7 @@
             <span>Add Category to store</span>
         </v-tooltip>
         <v-tooltip bottom>
-            <template v-slot:activator="{ on }" v-if="params.data.planogramStoreStatus!=1">
+            <template v-slot:activator="{ on }" v-if="params.data.planogramStoreStatus==0">
                 <v-btn v-on="on"
                     @click="params.context.componentParent.$parent.$parent.$parent.$parent.assignPlanogramToStore(params.data)"
                     icon flat small color="primary" class="ma-0">

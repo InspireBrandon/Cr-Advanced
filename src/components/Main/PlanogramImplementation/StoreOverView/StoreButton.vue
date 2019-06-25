@@ -25,7 +25,7 @@
             </template>
             <span>Add Category to store</span>
         </v-tooltip>
-        <v-tooltip bottom>
+        <v-tooltip bottom v-if="params.data.planogramStoreStatus!=0">
             <template v-slot:activator="{ on }">
                 <v-btn v-on="on" @click="params.context.componentParent.openOrder(params.data)" icon flat small
                     color="warning" class="ma-0">
