@@ -12,7 +12,7 @@ class Planogram {
         let self = this;
 
         // let url = localStorage.ServerAddress + "SystemFile/JSON?db=CR-Devinspire&id=423";
-        let url = localStorage.ServerAddress + `SystemFile/JSON?db=CR-Devinspire&id=${id}`;
+        let url = localStorage.ServerAddress + `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${id}&file=config_advanced`;
         // let url = localStorage.ServerAddress + "SystemFile/JSON?db=CR-Devinspire&id=313";
         axios.get(url)
             .then(result => {

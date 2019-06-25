@@ -58,10 +58,110 @@
             <v-spacer></v-spacer>
             <v-toolbar-title>Floor Planning</v-toolbar-title>
             <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+        </v-toolbar> -->
+        <v-toolbar color="grey darken-3" dark flat dense>
+            <v-toolbar-side-icon>
+                <v-icon>home</v-icon>
+            </v-toolbar-side-icon>
+            <v-toolbar-title>Floor Planning</v-toolbar-title>
+            <v-toolbar-items style="margin-left: 20px;" class="pt-2 pb-2">
+                <v-icon>insert_drive_file</v-icon>
+                <v-divider class="mx-1" vertical></v-divider>
+                <v-icon>folder</v-icon>
+                <v-divider class="mx-1" vertical></v-divider>
+                <v-icon>save</v-icon>
+            </v-toolbar-items>
+        </v-toolbar>
+        <v-toolbar color="grey darken-4" dark flat dense>
+            <v-toolbar-items class="pa-0">
+                <v-menu offset-y>
+                    <template v-slot:activator="{ on }">
+                        <v-btn flat small dark v-on="on">File</v-btn>
+                    </template>
+                    <v-list dense>
+                        <v-list-tile tile>
+                            <v-list-tile-title>New File</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
+                <v-menu offset-y>
+                    <template v-slot:activator="{ on }">
+                        <v-btn flat small dark v-on="on">Options</v-btn>
+                    </template>
+                    <v-list dense>
+                        <v-list-tile>
+                            <v-list-tile-title>Options</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
+                <v-menu offset-y>
+                    <template v-slot:activator="{ on }">
+                        <v-btn flat small dark v-on="on">Add</v-btn>
+                    </template>
+                    <v-list dense>
+                        <v-list-tile @click="addPane">
+                            <v-list-tile-title>Pane</v-list-tile-title>
+                        </v-list-tile>
+                        <v-divider></v-divider>
+                        <v-list-tile @click="addBoxes">
+                            <v-list-tile-title>Box</v-list-tile-title>
+                        </v-list-tile>
+                        <v-divider></v-divider>
+                        <v-list-tile @click="addPlanogram">
+                            <v-list-tile-title>Planogram</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
+            </v-toolbar-items>
+        </v-toolbar>
+        <v-toolbar color="grey darken-3" dark flat dense>
+            Details toolbar
         </v-toolbar>
         <v-content>
-            <canvas id="renderCanvas" touch-action="none"></canvas>
-        </v-content> -->
+            <v-card flat tile color="grey darken-2" style="height: calc(100vh - 136px)">
+                <v-container class="pa-0 ma-0" grid-list-lg style="max-width: 100%">
+                    <v-layout row wrap>
+                        <v-flex class="pa-0" md10>
+                            <v-card flat color="grey darken-2" tile style="height: calc(100vh - 136px)">
+                                <v-card-text class="pa-0">
+                                    <canvas id="renderCanvas" touch-action="none"></canvas>
+                                </v-card-text>
+                            </v-card>
+                        </v-flex>
+                        <v-flex md2 class="pa-0">
+                            <v-tabs dark v-model="active" color="grey darken-4" slider-color="yellow"
+                                style="width: 100%; overflow-y: hidden;">
+                                <v-tab ripple>
+                                    <v-icon>store</v-icon>
+                                </v-tab>
+                                <v-tab ripple>
+                                    <v-icon>tab_unselected</v-icon>
+                                </v-tab>
+                                <v-tab ripple>
+                                    <v-icon>toc</v-icon>
+                                </v-tab>
+                                <v-tab-item>
+                                    <v-card flat tile>
+                                        <v-card-text>Store</v-card-text>
+                                    </v-card>
+                                </v-tab-item>
+                                <v-tab-item>
+                                    <v-card flat tile>
+                                        <v-card-text>Perimiters</v-card-text>
+                                    </v-card>
+                                </v-tab-item>
+                                <v-tab-item>
+                                    <v-card flat tile>
+                                        <v-card-text>Assets</v-card-text>
+                                    </v-card>
+                                </v-tab-item>
+                            </v-tabs>
+                        </v-flex>
+                    </v-layout>
+                </v-container>
+            </v-card>
+        </v-content>
+        <SpaceplanSelector ref="SpaceplanSelector" />
     </v-app>
 </template>
 
@@ -72,7 +172,9 @@
     import PlanogramLib from "@/components/Main/FloorPlanning/BaseLibs/Planogram/Planogram.js";
     import SpaceplanSelector from "@/components/Common/SpacePlanSelector"
     import * as BABYLON from '@babylonjs/core/Legacy/legacy';
-    import { Vector3 } from '@babylonjs/core/Legacy/legacy';
+    import {
+        Vector3
+    } from '@babylonjs/core/Legacy/legacy';
 
     export default {
         components: {
@@ -80,6 +182,7 @@
         },
         data() {
             return {
+                active: null,
                 drawer: true,
                 sceneObj: null,
                 paneObj: null,
@@ -126,7 +229,7 @@
                     depth: 5
                 }, self.sceneObj.scene);
                 myBox.position.x = 0;
-                myBox.position.y = 5/2;
+                myBox.position.y = 5 / 2;
                 myBox.position.z = 0;
                 myBox.material = myMaterial;
             },
@@ -230,7 +333,7 @@
 
     #renderCanvas {
         width: 100%;
-        height: 100%;
+        height: calc(100vh - 136px);
         touch-action: none;
     }
 
