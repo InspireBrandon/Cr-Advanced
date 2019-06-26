@@ -1,6 +1,6 @@
 <template>
     <div style="text-align: center; cursor: pointer;">
-        <v-tooltip bottom>
+        <v-tooltip bottom v-if="params.data.planogramStoreStatus==0||params.data.planogramStoreStatus==5">
             <template v-slot:activator="{ on }">
                 <v-btn v-on="on" @click="params.context.componentParent.assignPlanogramToStore(params.data)" icon flat
                     small color="primary" class="ma-0">
@@ -17,7 +17,7 @@
             </template> 
             <span>Remove category from store</span>
         </v-tooltip>
-        <v-tooltip bottom v-if="params.data.requiredInStore==true&&params.data.fileName!=null ">
+        <v-tooltip bottom v-if="params.data.requiredInStore==true">
             <template v-slot:activator="{ on }">
                 <v-btn v-on="on" icon flat small color="success" class="ma-0" @click="params.context.componentParent.removeFromStore(params.data,false,0)">
                     <v-icon>add</v-icon>
