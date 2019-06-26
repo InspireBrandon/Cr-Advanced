@@ -1,9 +1,8 @@
 <template>
     <div style="text-align: center; cursor: pointer;">
-        <v-combobox class="pa-0 ma-0" :items="params.context.componentParent[params.colDef.dropdownName]" placeholder="type in or select a value" v-model="params.data[params.colDef.field]"></v-combobox>
-        <!-- <select @change="set_code" style="width: 100%;" placeholder="click to select..." v-model="params.data[params.colDef.field]" name="" id="">
-            <option v-for="(item, idx) in params.context.componentParent[params.colDef.dropdownName]" :value="item.id" :key="idx">{{ item.displayname }}</option>
-        </select> -->
+        <v-combobox @change="set_code" class="pa-0 ma-0"
+            :items="params.context.componentParent[params.colDef.dropdownName]" placeholder="type in or select a value"
+            v-model="params.data[params.colDef.field]"></v-combobox>
     </div>
 </template>
 <script>
@@ -19,15 +18,62 @@
             set_code() {
                 let self = this;
 
+                self.$nextTick(() => {
+                    self.setAdditionals(self.params.colDef.field)
+                })
+            },
+            setAdditionals(type) {
+                let self = this;
+
                 let node = self.params.node;
 
-                self.$nextTick(() => {
-                    self.params.context.componentParent[self.params.colDef.dropdownName].forEach(element => {
-                        if(element.id == self.params.data[self.params.colDef.field]) {
-                            node.setData({ [self.params.colDef.field + "_Code"]: element[self.params.colDef.field + "_Code"] })
+                switch (type.toUpperCase()) {
+                    case "BRAND": {
+                        if (self.params.data.vendor_Brand == "") {
+
+                            let tmp = node.data;
+
+                            tmp.vendor_Brand = self.params.data.brand
+
+                            node.setData(tmp)
                         }
-                    });
-                })
+                    }
+                    case "CATEGORY": {
+                        let tmp = node.data;
+
+                        let currentCategory = self.params.data.category;
+
+                        if (currentCategory != null) {
+                            let fullCategoryDetails = self.params.context.componentParent.getCategoryDetailsByID(
+                                currentCategory);
+    
+                            tmp.category_Code = fullCategoryDetails.category_Code;
+    
+                            tmp.subdepartment = fullCategoryDetails.subdepartmentName;
+                            tmp.department = fullCategoryDetails.departmentName;
+    
+                            node.setData(tmp)
+                            self.params.context.componentParent.redrawAllRows();
+                        }
+                    }
+                    case "SUPPLIER": {
+                        let tmp = node.data;
+
+                        let currentSupplier = self.params.data.supplier;
+
+                        if (currentSupplier != null) {
+                            let fullSupplierDetails = self.params.context.componentParent.getSupplierByID(
+                                currentSupplier);
+
+                            console.log(fullSupplierDetails)
+
+                            tmp.supplier_Code = fullSupplierDetails.supplier_Code;
+
+                            node.setData(tmp)
+                            self.params.context.componentParent.redrawAllRows();
+                        }
+                    }
+                }
             }
         }
     }

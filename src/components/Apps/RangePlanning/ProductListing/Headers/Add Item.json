@@ -53,13 +53,15 @@
                 "field": "brand",
                 "editable": true,
                 "hide": false,
-                "needsSelect": true
+                "cellRendererFramework": "Selector",
+                "dropdownName": "brands"
             },
             {
                 "headerName": "Product Information",
                 "field": "brand",
-                "editable": true,
-                "hide": false
+                "editable": false,
+                "hide": false,
+                "needsSelect": true
             }
         ]
     },
@@ -100,7 +102,9 @@
                 "headerName": "Vendor Brand",
                 "field": "vendor_Brand",
                 "editable": true,
-                "hide": true
+                "hide": true,
+                "cellRendererFramework": "Selector",
+                "dropdownName": "brands"
             }
         ]
     },
@@ -145,9 +149,9 @@
             {
                 "headerName": "Consignment",
                 "field": "consignment",
-                "editable": true,
+                "editable": false,
                 "hide": true,
-                "cellRendererFramework": "YesNoSelector"
+                "cellRendererFramework": "ConsignmentSelector"
             }
         ]
     },
@@ -157,19 +161,23 @@
                 "headerName": "Category",
                 "field": "category",
                 "editable": true,
-                "hide": true
+                "hide": true,
+                "cellRendererFramework": "Selector",
+                "dropdownName": "categoryLinks"
             },
             {
                 "headerName": "Category Code",
                 "field": "category_Code",
-                "editable": true,
+                "editable": false,
                 "hide": true
             },
             {
                 "headerName": "Planogram Name",
                 "field": "planogram_Name",
                 "editable": true,
-                "hide": true
+                "hide": true,
+                "cellRendererFramework": "Selector",
+                "dropdownName": "planograms"
             },
             {
                 "headerName": "Department",
@@ -680,21 +688,21 @@
                 "field": "rsp_Excluding_VAT",
                 "editable": false,
                 "hide": true,
-                "valueGetter": "((parseInt(data.rsp_Including_VAT) + ((parseFloat(data.rsp_Including_VAT) - parseInt(data.rsp_Including_VAT)) <= 50 ? 0.5 : 0.9)).toFixed(2) / 1.15).toFixed(2)"   
+                "valueGetter": "((parseInt(data.rsp_Including_VAT) + ((parseFloat(data.rsp_Including_VAT) - parseInt(data.rsp_Including_VAT)) <= 50 ? 0.5 : 0.9)).toFixed(2) / 1.15).toFixed(2)"
             },
             {
                 "headerName": "Rounded Selling Price",
                 "field": "rounded_Selling_Price",
                 "editable": false,
                 "hide": true,
-                "valueGetter": "(parseInt(data.rsp_Including_VAT) + ((parseFloat(data.rsp_Including_VAT) - parseInt(data.rsp_Including_VAT)) <= 50 ? 0.5 : 0.9)).toFixed(2)"   
+                "valueGetter": "(parseInt(data.rsp_Including_VAT) + ((parseFloat(data.rsp_Including_VAT) - parseInt(data.rsp_Including_VAT)) <= 50 ? 0.5 : 0.9)).toFixed(2)"
             },
             {
                 "headerName": "Markup %",
                 "field": "markup_Percentage",
                 "editable": false,
                 "hide": true,
-                "valueGetter": "parseFloat((((parseInt(data.rsp_Including_VAT) + ((parseFloat(data.rsp_Including_VAT) - parseInt(data.rsp_Including_VAT)) <= 50 ? 0.5 : 0.9)).toFixed(2) / 1.15).toFixed(2) - parseFloat(data.unit_Cost).toFixed(2)) / parseFloat(data.unit_Cost).toFixed(2)).toFixed(2) * 100"   
+                "valueGetter": "parseFloat((((parseInt(data.rsp_Including_VAT) + ((parseFloat(data.rsp_Including_VAT) - parseInt(data.rsp_Including_VAT)) <= 50 ? 0.5 : 0.9)).toFixed(2) / 1.15).toFixed(2) - parseFloat(data.unit_Cost).toFixed(2)) / parseFloat(data.unit_Cost).toFixed(2)).toFixed(2) * 100"
             },
             {
                 "headerName": "Gross Profit %",

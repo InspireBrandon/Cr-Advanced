@@ -1,9 +1,9 @@
 <template>
      <div>
-     <v-icon color="error" v-if="params.data.fits==1&&params.data.planogramStoreStatus!=0">
+     <v-icon color="error" v-if="params.data.fits==true&&params.data.planogramStoreStatus!=0&&params.data.planogramStoreStatus!=6">
          close
      </v-icon>
-      <v-icon color="success" v-if="params.data.fits==0&&params.data.planogramStoreStatus!=0">
+      <v-icon color="success" v-if="params.data.fits==false&&params.data.planogramStoreStatus!=0&&params.data.planogramStoreStatus!=6">
          done
      </v-icon>
      </div>
