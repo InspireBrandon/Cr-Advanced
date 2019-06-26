@@ -6,17 +6,17 @@
             rowSelection="multiple" :rowDeselection="true" :enableColResize="true" :floatingFilter="true"
             :gridReady="onGridReady" :groupMultiAutoColumn="true">
         </ag-grid-vue>
-        <PlanogramDetailsSelector :PlanoName="'ProjectName.text'" ref="PlanogramDetailsSelector" />
+        <PlanogramDetailsSelector :PlanoName="selectedCat" ref="PlanogramDetailsSelector" />
         rows:{{rowData.length}}
         <YesNoModal ref="YesNoModal" />
-            <VariationOrderModal ref="VariationOrderModal" />
+        <VariationOrderModal ref="VariationOrderModal" />
 
     </div>
 </template>
 <script>
     import YesNoModal from '@/components/Common/YesNoModal'
     import VariationOrderModal from '@/components/Main/PlanogramImplementation/VariationOrderModal'
-
+    import PlanogramName from "./PlanogramName.vue"
     import Button from "./StoreButton.vue"
     import Axios from 'axios'
     import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector'
@@ -30,13 +30,14 @@
             YesNoModal,
             AgGridVue,
             Button,
-            PlanogramDetailsSelector
+            PlanogramDetailsSelector,
+            PlanogramName,
+
         },
         data() {
             return {
                 currentStorePlanograms: [],
-                headers: [
-                    {
+                headers: [{
                         "headerName": "Project Group",
                         "field": "groupName",
                         "minWidth": 200,
@@ -46,31 +47,57 @@
                         "field": "projectName",
                         "minWidth": 200,
                     }, {
-                        "headerName": "Name",
-                        "field": "GeneratedName",
+                        "headerName": "Planogram Name",
+                        "cellRendererFramework": "PlanogramName",
                         "minWidth": 650,
-                    },{
+                    }, {
                         "headerName": "Current Status",
                         "field": "currentStatusText",
                         "minWidth": 100,
-                    },{
+                    }, {
                         "headerName": "",
                         "editable": false,
                         "hide": false,
                         "minWidth": 140,
                         "cellRendererFramework": "Button"
-                    },  {
+                    }, {
                         "headerName": "Category Cluster",
                         "field": "categoryCluster",
                         "minWidth": 70,
-                    },{
+                    }, {
                         "headerName": "Modules",
                         "minWidth": 70,
-                        "field": "modules"
+                        "field": "modules",
+                        cellStyle: function (params) {
+                            if (params.data.modulesFit == true) {
+                                //mark police cells as red
+                                return {
+                                    // color: 'red',
+                                    backgroundColor: " rgb(240, 125, 125)"
+                                };
+                            } else {
+                                return {
+                                    backgroundColor: " #C8E6C9"
+                                };
+                            }
+                        }
                     }, {
                         "headerName": "Height",
                         "minWidth": 70,
-                        "field": "height"
+                        "field": "height",
+                        cellStyle: function (params) {
+                            if (params.data.heightFit == true) {
+                                //mark police cells as red
+                                return {
+                                    // color: 'red',
+                                    backgroundColor: " rgb(240, 125, 125)"
+                                };
+                            } else {
+                                return {
+                                    backgroundColor: " #C8E6C9"
+                                };
+                            }
+                        }
                     }, {
                         "headerName": "Width",
                         "minWidth": 70,
@@ -121,15 +148,76 @@
                         'audit-image-breach': 'data.imageAudit'
                     }
                 },
+                selectedCat: null,
                 storePlanograms: [],
                 storeName: null,
                 allStoreDialog: false,
             }
         },
         methods: {
-             openOrder(item){
-                let self= this
-                self.$refs.VariationOrderModal.show(item)
+            unassignPlanogram(listItem) {
+                let self = this
+                console.log("unassign");
+                console.log(listItem);
+                self.$refs.YesNoModal.show("Do you want to remove this Planogram?", data => {
+                    if (data) {
+
+                        let moduleFit = false
+                        let heightFit = false
+                        let storeClusterFit = false
+                        let planogramFit = false
+
+
+                        let item = {
+                            "id": listItem.id,
+                            "store_ID": listItem.store_ID,
+                            "project_ID": listItem.project_ID,
+                            "planogramDetail_ID": null,
+                            "planogramStoreStatus": 0,
+                            "HeightFit": heightFit,
+                            "StoreClusterFit": storeClusterFit,
+                            "PlanogramFit": planogramFit,
+                            "ModulesFit": moduleFit,
+                            "Modules": listItem.modules,
+                            "Height": listItem.height,
+                            "Width": listItem.width,
+                            "Displays": listItem.displays,
+                            "Pallettes": listItem.pallettes,
+                            "SupplierStands": listItem.supplierStands,
+                            "Bins": listItem.bins,
+                            "Fits": false
+                        }
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                        Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
+                            .then(r => {
+                                console.log(r);
+                                self.method(listItem)
+                                delete Axios.defaults.headers.common["TenantID"];
+                            }).catch(e => {
+                                console.log(e);
+                                delete Axios.defaults.headers.common["TenantID"];
+                            })
+                    }
+                })
+
+
+            },
+            openOrder(item) {
+                let self = this
+                self.$refs.VariationOrderModal.show(item, callback => {
+                    item.planogramStoreStatus = 5
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                    Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
+                        .then(r => {
+                            console.log(r);
+                            delete Axios.defaults.headers.common["TenantID"];
+                            self.method(item)
+                        }).catch(e => {
+                            console.log(e);
+                            delete Axios.defaults.headers.common["TenantID"];
+
+                        })
+                })
             },
             onGridReady(params) {
                 this.gridApi = params.api;
@@ -139,29 +227,75 @@
                     this.gridApi.sizeColumnsToFit()
                 }, 300);
             },
+            checkFits(storePlan, planDetails, callback) {
+                let self = this
+                let retval = false
+                if (storePlan.modules < planDetails.modules) {
+                    retval = true
+                }
+                if (storePlan.height < planDetails.height) {
+                    retval = true
+                }
+                if (storePlan.cluster != planDetails.storeCluster) {
+                    retval = true
+                }
+                callback(retval)
+            },
             assignPlanogramToStore(listItem) {
                 let self = this;
                 console.log(listItem);
-                
-                self.$refs.PlanogramDetailsSelector.show(listItem, false, data => {
-                    let item = {
-                        "store_ID": self.StoreID,
-                        "project_ID": listItem.projectID,
-                        "planogramDetail_ID": data.id,
-                        "planogramStoreStatus": 1,
-                    }
-                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                self.selectedCat = listItem.projectName
+                self.$refs.PlanogramDetailsSelector.show(listItem, true, data => {
+                    //   busy here with fits addition for store view
+                    let moduleFit = false
+                    let heightFit = false
+                    let storeClusterFit = false
+                    let planogramFit = false
+                    self.checkFits(listItem, data, fits => {
+                        console.log(listItem.modules + " : " + data.modules)
+                        console.log(listItem.modules < data.modules);
 
-                    Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
-                        .then(r => {
-                            let item = {
-                                store_ID: self.StoreID
-                            }
-                            self.method(item)
-                            delete Axios.defaults.headers.common["TenantID"];
-                        }).catch(e => {
-                            delete Axios.defaults.headers.common["TenantID"];
-                        })
+                        if (listItem.modules < data.modules) {
+                            moduleFit = true
+                        }
+                        if (listItem.height < data.height) {
+                            heightFit = true
+                        }
+                        if (listItem.cluster != data.clusterName) {
+                            storeClusterFit = true
+                        }
+                        let item = {
+                            "id": listItem.id,
+                            "store_ID": self.StoreID,
+                            "project_ID": listItem.projectID,
+                            "planogramDetail_ID": data.id,
+                            "planogramStoreStatus": 1,
+                            "HeightFit": heightFit,
+                            "StoreClusterFit": storeClusterFit,
+                            "PlanogramFit": planogramFit,
+                            "ModulesFit": moduleFit,
+                            // "Modules": data.modules,
+                            // "Height": data.height,
+                            // "Width": data.width,
+                            // "Displays": data.displays,
+                            // "Pallettes": data.pallettes,
+                            // "SupplierStands": data.supplierStands,
+                            // "Bins": data.bins,
+                            "Fits": fits
+                        }
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                        Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
+                            .then(r => {
+                                let item = {
+                                    store_ID: self.StoreID
+                                }
+                                self.method(item)
+                                delete Axios.defaults.headers.common["TenantID"];
+                            }).catch(e => {
+                                delete Axios.defaults.headers.common["TenantID"];
+                            })
+                    })
                 })
             },
             UpdateLine(item) {
@@ -182,7 +316,7 @@
 
                 // self.createPlanoGramDetailTX(tmp)
             },
-             removeFromStore(item,state) {
+            removeFromStore(item, state, Status) {
                 let self = this
                 let text = ""
                 if (item.requiredInStore == true) {
@@ -192,18 +326,34 @@
                 }
                 self.$refs.YesNoModal.show(text, data => {
                     if (data) {
-                        self.remove(item,state, data => {
-                            self.method()
+                        self.remove(item, state, Status, data => {
+                            self.method(item)
                         })
                     }
                 })
 
                 // self.createPlanoGramDetailTX(tmp)
             },
-            remove(listItem,state ,callback) {
+            remove(listItem, state, Status, callback) {
                 let self = this;
+                if (state == true) {
+                    console.log("removing state");
+
+                    listItem.planogramDetail_ID = null
+                    listItem.HeightFit = false
+                    listItem.modulesFit = false
+                    listItem.storeClusterFit = false
+                    listItem.PlanogramFit = false
+                    listItem.Fits = false
+                    listItem.systemFileID = 0
+                }
+                console.log("status");
+                console.log(Status);
 
                 listItem.requiredInStore = state
+                listItem.planogramStoreStatus = Status
+                console.log(listItem);
+
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', listItem)
                     .then(r => {

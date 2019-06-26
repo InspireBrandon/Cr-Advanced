@@ -75,7 +75,9 @@
                         text: "Implemented"
                     },
                     {
-                        text: "Variation Requested"
+                        text: "Variation"
+                    },{
+                        text:"On Hold"
                     }
                 ],
                 currentStorePlanograms: [],
