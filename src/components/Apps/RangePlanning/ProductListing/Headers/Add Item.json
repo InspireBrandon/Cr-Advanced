@@ -53,15 +53,15 @@
                 "field": "brand",
                 "editable": true,
                 "hide": false,
-                "needsSelect": true
+                "cellRendererFramework": "Selector",
+                "dropdownName": "brands"
             },
             {
                 "headerName": "Product Information",
                 "field": "brand",
                 "editable": false,
                 "hide": false,
-                "cellRendererFramework": "Selector",
-                "dropdownName": "brands"
+                "needsSelect": true
             }
         ]
     },
