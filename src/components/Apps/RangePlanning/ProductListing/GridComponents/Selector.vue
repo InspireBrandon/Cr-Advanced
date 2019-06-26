@@ -1,10 +1,8 @@
 <template>
     <div style="text-align: center; cursor: pointer;">
-        <v-combobox @change="set_code" class="pa-0 ma-0" :items="params.context.componentParent[params.colDef.dropdownName]"
-            placeholder="type in or select a value" v-model="params.data[params.colDef.field]"></v-combobox>
-        <!-- <select @change="set_code" style="width: 100%;" placeholder="click to select..." v-model="params.data[params.colDef.field]" name="" id="">
-            <option v-for="(item, idx) in params.context.componentParent[params.colDef.dropdownName]" :value="item.id" :key="idx">{{ item.displayname }}</option>
-        </select> -->
+        <v-combobox @change="set_code" class="pa-0 ma-0"
+            :items="params.context.componentParent[params.colDef.dropdownName]" placeholder="type in or select a value"
+            v-model="params.data[params.colDef.field]"></v-combobox>
     </div>
 </template>
 <script>
@@ -21,9 +19,7 @@
                 let self = this;
 
                 self.$nextTick(() => {
-                    setTimeout(() => {
-                        self.setAdditionals(self.params.colDef.field)
-                    }, 100);
+                    self.setAdditionals(self.params.colDef.field)
                 })
             },
             setAdditionals(type) {
@@ -37,7 +33,7 @@
 
                             let tmp = node.data;
 
-                            tmp.vendor_Brand = self.params.data.brand 
+                            tmp.vendor_Brand = self.params.data.brand
 
                             node.setData(tmp)
                         }
@@ -47,12 +43,35 @@
 
                         let currentCategory = self.params.data.category;
 
-                        let fullCategoryDetails = self.params.context.componentParent.getCategoryDetailsByID(currentCategory);
+                        if (currentCategory != null) {
+                            let fullCategoryDetails = self.params.context.componentParent.getCategoryDetailsByID(
+                                currentCategory);
+    
+                            tmp.category_Code = fullCategoryDetails.category_Code;
+    
+                            tmp.subdepartment = fullCategoryDetails.subdepartmentName;
+                            tmp.department = fullCategoryDetails.departmentName;
+    
+                            node.setData(tmp)
+                            self.params.context.componentParent.redrawAllRows();
+                        }
+                    }
+                    case "SUPPLIER": {
+                        let tmp = node.data;
 
-                        tmp.category_Code = fullCategoryDetails.category_Code; 
+                        let currentSupplier = self.params.data.supplier;
 
-                        node.setData(tmp)
-                        self.params.context.componentParent.redrawAllRows();
+                        if (currentSupplier != null) {
+                            let fullSupplierDetails = self.params.context.componentParent.getSupplierByID(
+                                currentSupplier);
+
+                            console.log(fullSupplierDetails)
+
+                            tmp.supplier_Code = fullSupplierDetails.supplier_Code;
+
+                            node.setData(tmp)
+                            self.params.context.componentParent.redrawAllRows();
+                        }
                     }
                 }
             }

@@ -184,6 +184,7 @@
                 planogramDetails: [],
                 planograms: [],
                 categoryLinkDetails: [],
+                supplierLinkDetails: [],
                 categoryLinks: [],
                 subcategoryDetails: [],
                 subcategories: [],
@@ -241,7 +242,6 @@
                         value: false
                     }
                 ],
-                brands: [],
                 suppliers: [],
                 category_CodeDetails: [],
                 categoryCode: []
@@ -335,7 +335,7 @@
                         description_Length: data.description.length,
                         brand: null,
                         supplier: null,
-                        supplier_Code: null,
+                        supplier_Code: "",
                         consignment: "FIXED",
                         vendor_Brand: "",
                         category_Code: ""
@@ -549,6 +549,17 @@
                     if (el.displayName == name)
                         retval = el;
                 })
+                return retval;
+            },
+            getSupplierByID(name) {
+                let self = this;
+                let retval = null;
+
+                self.supplierLinkDetails.forEach(el => {
+
+                    if (el.displayname == name)
+                        retval = el;
+                })
 
                 return retval;
             },
@@ -580,6 +591,8 @@
 
                 Axios.get(process.env.VUE_APP_API + "Retailer/Supplier")
                     .then(r => {
+                        self.supplierLinkDetails = r.data;
+
                         r.data.forEach(el => {
                             self.suppliers.push(el.displayname)
                         })
