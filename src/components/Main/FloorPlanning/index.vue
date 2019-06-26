@@ -112,6 +112,16 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
+                <v-menu offset-y>
+                    <template v-slot:activator="{ on }">
+                        <v-btn flat small dark v-on="on">Camera</v-btn>
+                    </template>
+                    <v-list dense>
+                        <v-list-tile @click="toggleCamera">
+                            <v-list-tile-title>Toggle Camera</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
             </v-toolbar-items>
         </v-toolbar>
         <v-toolbar color="grey darken-3" dark flat dense>
@@ -132,7 +142,7 @@
                             <v-tabs dark v-model="active" color="grey darken-4" slider-color="yellow"
                                 style="width: 100%; overflow-y: hidden;">
                                 <v-tab ripple>
-                                    <v-icon>store</v-icon>
+                                    <v-icon>edit</v-icon>
                                 </v-tab>
                                 <v-tab ripple>
                                     <v-icon>tab_unselected</v-icon>
@@ -142,7 +152,61 @@
                                 </v-tab>
                                 <v-tab-item>
                                     <v-card flat tile>
-                                        <v-card-text>Store</v-card-text>
+                                        <v-list dark class="pa-0">
+                                            <v-list-group prepend-icon="store">
+                                                <template v-slot:activator>
+                                                    <v-list-tile>
+                                                        <v-list-tile-content>
+                                                            <v-list-tile-title>Walls & Pillars</v-list-tile-title>
+                                                        </v-list-tile-content>
+                                                    </v-list-tile>
+                                                </template>
+
+                                                <v-divider></v-divider>
+
+                                                <v-list-tile>
+                                                    <v-list-tile-content>
+                                                        <v-list-tile-title>Wall 1</v-list-tile-title>
+                                                    </v-list-tile-content>
+                                                </v-list-tile>
+
+                                                <v-divider></v-divider>
+
+                                                <v-list-tile>
+                                                    <v-list-tile-content>
+                                                        <v-list-tile-title>Pillar</v-list-tile-title>
+                                                    </v-list-tile-content>
+                                                </v-list-tile>
+                                            </v-list-group>
+
+                                            <v-divider></v-divider>
+
+                                            <v-list-group prepend-icon="store">
+                                                <template v-slot:activator>
+                                                    <v-list-tile>
+                                                        <v-list-tile-content>
+                                                            <v-list-tile-title>Doors</v-list-tile-title>
+                                                        </v-list-tile-content>
+                                                    </v-list-tile>
+                                                </template>
+
+                                                <v-divider></v-divider>
+
+                                                <v-list-tile>
+                                                    <v-list-tile-content>
+                                                        <v-list-tile-title>Door 1</v-list-tile-title>
+                                                    </v-list-tile-content>
+                                                </v-list-tile>
+
+                                                <v-divider></v-divider>
+
+                                                <v-list-tile>
+                                                    <v-list-tile-content>
+                                                        <v-list-tile-title>Door 2</v-list-tile-title>
+                                                    </v-list-tile-content>
+                                                </v-list-tile>
+                                            </v-list-group>
+                                        </v-list>
                                     </v-card>
                                 </v-tab-item>
                                 <v-tab-item>
@@ -189,7 +253,65 @@
                 boxObj: null,
                 selectedCamera: null,
                 startingPoint: null,
-                currentMesh: null
+                currentMesh: null,
+                items: [{
+                        action: 'local_activity',
+                        title: 'Attractions',
+                        items: [{
+                            title: 'List Item'
+                        }]
+                    },
+                    {
+                        action: 'restaurant',
+                        title: 'Dining',
+                        active: true,
+                        items: [{
+                                title: 'Breakfast & brunch'
+                            },
+                            {
+                                title: 'New American'
+                            },
+                            {
+                                title: 'Sushi'
+                            }
+                        ]
+                    },
+                    {
+                        action: 'school',
+                        title: 'Education',
+                        items: [{
+                            title: 'List Item'
+                        }]
+                    },
+                    {
+                        action: 'directions_run',
+                        title: 'Family',
+                        items: [{
+                            title: 'List Item'
+                        }]
+                    },
+                    {
+                        action: 'healing',
+                        title: 'Health',
+                        items: [{
+                            title: 'List Item'
+                        }]
+                    },
+                    {
+                        action: 'content_cut',
+                        title: 'Office',
+                        items: [{
+                            title: 'List Item'
+                        }]
+                    },
+                    {
+                        action: 'local_offer',
+                        title: 'Promotions',
+                        items: [{
+                            title: 'List Item'
+                        }]
+                    }
+                ]
             }
         },
         mounted() {
