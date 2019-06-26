@@ -1,4 +1,4 @@
-<template>
+<template dark>
     <div>
         <v-toolbar dark dense flat>
             <v-toolbar-items>
@@ -137,6 +137,7 @@
     import YesNoSelector from "./GridComponents/YesNoSelector.vue"
     import DescriptionLength from "./GridComponents/DescriptionLength.vue"
     import Selector from "./GridComponents/Selector.vue"
+    import ConsignmentSelector from "./GridComponents/ConsignmentSelector.vue"
 
     const tabs = ['Standard', 'Vendor', 'Hierachy', 'Item Status', 'Images', 'Supporting Documents', 'Resources',
         'Stock Control', 'Price and Margin', 'Opening Orders'
@@ -159,7 +160,8 @@
             NewProductValidator,
             YesNoSelector,
             DescriptionLength,
-            Selector
+            Selector,
+            ConsignmentSelector
         },
         data() {
             return {
@@ -230,8 +232,20 @@
                         file_type: 'PROMOTE_ITEM'
                     }
                 ],
+                consignment: [{
+                        text: "Consignment",
+                        value: true
+                    },
+                    {
+                        text: "Fixed",
+                        value: false
+                    }
+                ],
                 brands: [],
-                suppliers: []
+                suppliers: [],
+                category_CodeDetails: [],
+                categoryCode: []
+
             }
         },
         computed: {
@@ -249,9 +263,14 @@
             }, 2000);
         },
         methods: {
+            redrawAllRows() {
+                let self = this;
+                this.gridApi.redrawRows();
+            },
             onGridReady(params) {
-                this.gridApi = params.api;
-                this.columnApi = params.columnApi;
+                let self = this;
+                self.gridApi = params.api;
+                self.columnApi = params.columnApi;
             },
             onRowEditingStarted(e) {
                 if (!e.data.can_edit)
@@ -272,11 +291,11 @@
                 let self = this;
 
                 headers.forEach(header => {
-                    if(header.children != undefined) {
+                    if (header.children != undefined) {
                         header.children.forEach(child => {
-                            if(child.needsSelect) {
+                            if (child.needsSelect) {
                                 child.cellEditor = "agRichSelectCellEditor",
-                                child.cellEditorParams = {};
+                                    child.cellEditorParams = {};
                                 child.cellEditorParams.values = self.brands;
                             }
                         })
@@ -317,6 +336,9 @@
                         brand: null,
                         supplier: null,
                         supplier_Code: null,
+                        consignment: "FIXED",
+                        vendor_Brand: "",
+                        category_Code: ""
                     })
                 });
 
@@ -519,16 +541,16 @@
 
                 callback(retval);
             },
-            getCategoryDetailsByID(id, callback) {
+            getCategoryDetailsByID(name) {
                 let self = this;
                 let retval = null;
 
                 self.categoryLinkDetails.forEach(el => {
-                    if (el.id == id)
+                    if (el.displayName == name)
                         retval = el;
                 })
 
-                callback(retval);
+                return retval;
             },
             getBrands() {
                 let self = this;
@@ -552,14 +574,14 @@
             getSuppliers() {
                 let self = this;
 
-                self.brands = [];
+                self.suppliers = [];
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.get(process.env.VUE_APP_API + "Retailer/Supplier")
                     .then(r => {
                         r.data.forEach(el => {
-                            self.suppliers.push(el.displayname)    
+                            self.suppliers.push(el.displayname)
                         })
                         delete Axios.defaults.headers.common["TenantID"];
                     })
@@ -598,11 +620,8 @@
 
                         self.categoryLinkDetails = r.data;
 
-                        r.data.forEach(element => {
-                            self.categoryLinks.push({
-                                text: element.displayName,
-                                value: element.id
-                            })
+                        r.data.forEach(el => {
+                            self.categoryLinks.push(el.displayName)
                         });
 
                         delete Axios.defaults.headers.common["TenantID"];
