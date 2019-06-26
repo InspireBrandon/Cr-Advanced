@@ -9,16 +9,23 @@
             </template>
             <span>Assign planogram</span>
         </v-tooltip>
-        <v-tooltip bottom>
+         <v-tooltip bottom v-if="params.data.requiredInStore!=true ">
             <template v-slot:activator="{ on }">
-                <v-btn v-on="on" @click="params.context.componentParent.UpdateLine(params.data)" icon flat small
-                    color="error" class="ma-0">
+                <v-btn v-on="on" icon flat small color="error" class="ma-0" @click="params.context.componentParent.removeFromStore(params.data,true)">
                     <v-icon>remove_circle_outline</v-icon>
                 </v-btn>
-            </template>
+            </template> 
             <span>Remove category from store</span>
         </v-tooltip>
-        <v-tooltip bottom>
+        <v-tooltip bottom v-if="params.data.requiredInStore==true ">
+            <template v-slot:activator="{ on }">
+                <v-btn v-on="on" icon flat small color="success" class="ma-0" @click="params.context.componentParent.removeFromStore(params.data,false)">
+                    <v-icon>add</v-icon>
+                </v-btn>
+            </template>
+            <span>Add Category to store</span>
+        </v-tooltip>
+        <v-tooltip bottom v-if="params.data.planogramStoreStatus!=0">
             <template v-slot:activator="{ on }">
                 <v-btn v-on="on" @click="params.context.componentParent.openOrder(params.data)" icon flat small
                     color="warning" class="ma-0">

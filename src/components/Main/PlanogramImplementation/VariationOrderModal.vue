@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="dialog" max-width="700px">
+    <v-dialog v-model="dialog" persistent max-width="700px">
         <v-card>
             <v-toolbar dark flat color="primary">
                 <v-toolbar-title>
@@ -16,7 +16,7 @@
                         <v-select v-model="selectedPlanoDetail" :items="planoDetails" label="Planogram"></v-select>
                     </v-flex>
                     <v-flex md12>
-                        <v-checkbox label="Store Specific"></v-checkbox>
+                        <v-text-field label="Store Name" disabled v-model="storeName"></v-text-field>
                     </v-flex>
                     <v-flex md4>
                         <v-text-field v-model="height" label="Height"></v-text-field>
@@ -56,6 +56,7 @@
 
 <script>
     import Axios from 'axios'
+import { request } from 'http';
     export default {
         data() {
             return {
@@ -70,23 +71,33 @@
                 additionalNotes: null,
                 planoDetails: [],
                 selectedPlanoDetail: null,
+                storeName: null,
+                listitem:null,
+                project:null
             }
         },
         methods: {
             show(item) {
                 let self = this
-                console.log(item);
+                self.listitem=item
                 self.dialog = true
                 self.height = item.height
                 self.width = item.width
                 self.modules = item.width
                 self.bins = item.bins
+                self.storeName = item.storeName
                 self.displays = item.displays
                 self.supplierStands = item.supplierStands
                 self.pallettes = item.pallettes
-                if(item.planogramDetail_ID!=0){
-                self.selectedPlanoDetail = item.planogramDetail_ID
+                if (item.planogramDetail_ID != 0) {
+                    self.selectedPlanoDetail = item.planogramDetail_ID
                 }
+                 Axios.get(process.env.VUE_APP_API + `Project?ProjectID=${item.project_ID}`).then(r => {
+                    console.log(r);
+                   self.project=r.data.projectList[0]
+                }).catch(e => {
+                    console.log(e);
+                })
             },
             close() {
                 let self = this
@@ -94,35 +105,77 @@
             },
             getPlanoDetails() {
                 let self = this
-                Axios.get(process.env.VUE_APP_API +"Planogram_Details").then(r=>{
+                Axios.get(process.env.VUE_APP_API + "Planogram_Details").then(r => {
                     console.log(r.data);
                     r.data.planogram_DetailsList.forEach(element => {
-                       self.planoDetails.push({
-                           text:element.fileName,
-                           value:element.id
-                       })                             
+                        self.planoDetails.push({
+                            text: element.fileName,
+                            value: element.id
+                        })
                     });
-                }).catch(e=>{
+                }).catch(e => {
                     console.log(e);
                 })
             },
             buildString() {
                 let self = this
-                let string = "Variation requested for" + selectedPlanoDetail.text + "with the following details"
-                string += "height : " + self.height
-                string += "width : " + self.width
-                string += "modules : " + self.modules
-                string += "bins : " + self.bins
-                string += "displays : " + self.displays
-                string += "supplierStands : " + self.supplierStands
-                string += "pallettes : " + self.pallettes
-                string += "additionalNotes : " + self.additionalNotes
+                let name = ""
+                self.planoDetails.forEach(e => {
+                    if (e.value == self.selectedPlanoDetail) {
+                        name = e.text
+                    }
+                })
+
+                let string = "Variation requested for " + name + " with the following details  " + "\r\n" + "\r\n"
+                string += "Height: " + self.height + "\r\n"
+                string += "Width: " + self.width + "\r\n"
+                string += "Modules: " + self.modules + "\r\n"
+                string += "Bins: " + self.bins + "\r\n"
+                string += "Displays: " + self.displays + "\r\n"
+                string += "Supplier Stands: " + self.supplierStands + "\r\n"
+                string += "Palettes: " + self.pallettes + "\r\n"
+                string += "Additional Notes: " + self.additionalNotes
                 return string
+            },
+            createProjectTransactionGroup(request, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `ProjectTXGroup`, request).then(r => {
+                    delete Axios.defaults.headers.common["TenantID"];
+                    callback(r.data.projectTXGroup);
+                })
+            },
+            createProjectTransaction(request, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `ProjectTX`, request).then(r => {
+                    delete Axios.defaults.headers.common["TenantID"];
+                    callback(r.data.projectTX)
+                })
             },
             submit() {
                 let self = this
-                let text = self.buildString()
 
+
+                let projectTXGroupRequest = {
+                    projectID: listitem.project_ID
+                }
+
+                request.type = 3;
+                request.status = 41;
+                request.systemUserID = null;
+                request.actionedByUserID = systemUserID;
+
+                request.systemFileID = self.listitem.systemFileID
+                request.rangeFileID = self.listitem.rangeID;
+                request.project_ID = self.listitem.project_ID;
+                request.storeCluster_ID = self.listitem.storeCluster;
+                request.store_ID = self.listitem.store_ID;
+                request.notes = self.buildString()
                 // create tx group
                 // then create tx with notes = text 
 

@@ -194,11 +194,6 @@ class LoadSavePlanogramBase {
         },
         data: output
       }, config).then(result => {
-        // __sending simple version through
-
-
-
-
         output.image = null
 
         output.planogramData.forEach(e => {

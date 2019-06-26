@@ -29,12 +29,15 @@
 
             <StorePlanograms ref="StorePlanograms" />
             <PlanogramDetailsSelector :PlanoName="ProjectName.text" ref="PlanogramDetailsSelector" />
+        <YesNoModal ref="YesNoModal" />
 
         </v-card>
     </v-dialog>
 </template>
 <script>
     import Axios from 'axios'
+    import YesNoModal from '@/components/Common/YesNoModal'
+    
     import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector'
     import StorePlanograms from '@/components/Main/PlanogramImplementation/StoreOverView/StorePlanograms'
     import {
@@ -46,6 +49,7 @@
         props: ['ProjectName', 'selectedProject'],
         components: {
             grid,
+            YesNoModal,
             AgGridVue,
             PlanogramDetailsSelector,
             StorePlanograms
@@ -62,16 +66,16 @@
                         text: "Assigned"
                     },
                     {
-                        text: "DistrubutedToStore"
+                        text: "Distrubuted"
                     },
                     {
-                        text: "ImplementationInProgress"
+                        text: "Implementation In Progress"
                     },
                     {
                         text: "Implemented"
                     },
                     {
-                        text: "VariationRequested"
+                        text: "Variation Requested"
                     }
                 ],
                 currentStorePlanograms: [],
@@ -95,7 +99,20 @@
                 callback(retval)
             },
             Distribute(data) {
-                let self = this
+                let self = this;
+
+                data.planogramStoreStatus = 2
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', data)
+                    .then(r => {
+                        console.log(r);
+                        delete Axios.defaults.headers.common["TenantID"];
+                        self.getStorePlanograms()
+                    }).catch(e => {
+                        console.log(e);
+                        delete Axios.defaults.headers.common["TenantID"];
+                        callback(e)
+                    })
             },
             assignGroups() {
                 let self = this
@@ -156,7 +173,10 @@
                 let planogramFit = false
                 self.$refs.PlanogramDetailsSelector.show(listItem, true, data => {
                     self.checkFits(listItem, data, fits => {
-                        if(listItem.modules< data.modules){
+                        console.log(listItem.modules+ " : "+ data.modules)
+                      console.log(listItem.modules < data.modules);
+                      
+                      if(listItem.modules< data.modules){
                             moduleFit=true
                         }
                         if(listItem.height< data.height){
@@ -200,6 +220,9 @@
             },
             unassignPlanogram(listItem){
                 let self = this
+                  self.$refs.YesNoModal.show("Do you want to remove this Planogram?", data => {
+                    if (data) {
+                        
                 let moduleFit=false
                 let heightFit=false
                 let storeClusterFit = false
@@ -234,7 +257,10 @@
                             }).catch(e => {
                                 console.log(e);
                                 delete Axios.defaults.headers.common["TenantID"];
-                            })
+                            }) 
+                    }
+                })
+               
 
             },
             openStoreOver(item) {

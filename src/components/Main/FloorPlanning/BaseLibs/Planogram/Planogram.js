@@ -11,14 +11,20 @@ class Planogram {
     addPlanogram(id) {
         let self = this;
 
-        // let url = localStorage.ServerAddress + "SystemFile/JSON?db=CR-Devinspire&id=423";
-        let url = localStorage.ServerAddress + `SystemFile/JSON?db=CR-Devinspire&id=${id}`;
-        // let url = localStorage.ServerAddress + "SystemFile/JSON?db=CR-Devinspire&id=313";
+        let url = localStorage.ServerAddress + `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${id}&file=config_advanced`;
         axios.get(url)
             .then(result => {
-                self.data = result.data;
+                self.data = result.data.jsonObject;
+                self.image = self.getImage(self.data.name);
                 self.appendToWorld();
             })
+    }
+
+    getImage(name) {
+        let self = this;
+        let tmpname = "Space Planning\\" + name
+        let image = localStorage.ServerAddress + `SystemFile/PlanogramImage?folder=${tmpname}&file=image.png&compress=false&rng=${Math.random()}`;
+        return image;
     }
 
     appendToWorld() {
@@ -29,7 +35,9 @@ class Planogram {
 
         var myMaterial = new BABYLON.StandardMaterial("myMaterial", this.world.scene);
 
-        myMaterial.diffuseTexture = new BABYLON.Texture(self.data.image, this.world.scene);
+        console.log(self.image);
+
+        myMaterial.diffuseTexture = new BABYLON.Texture(self.image, this.world.scene);
         // myMaterial.diffuseColor = new BABYLON.Color3(0.4, 0.4, 0.4);
         myMaterial.diffuseTexture.hasAlpha = true;
         // myMaterial.backFaceCulling = true;
@@ -75,6 +83,8 @@ class Planogram {
             height: 0,
             depth: 0
         }
+
+        console.log(self.data);
 
         let allGondolas = self.data.planogramData.filter((el) => el.Type == "GONDOLA");
 

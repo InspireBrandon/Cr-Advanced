@@ -35,21 +35,22 @@
                 dialog: false,
                 rowData: [],
                 title: null,
-                 StoreStatusList: [{
+                  StoreStatusList: [{
                         text: "Unassigned"
-                    },
-
-                    {
-                        text: "DistrubutedToStore"
+                    }, {
+                        text: "Assigned"
                     },
                     {
-                        text: "ImplementationInProgress"
+                        text: "Distrubuted"
+                    },
+                    {
+                        text: "Implementation In Progress"
                     },
                     {
                         text: "Implemented"
                     },
                     {
-                        text: "VariationRequested"
+                        text: "Variation Requested"
                     }
                 ],
             }
