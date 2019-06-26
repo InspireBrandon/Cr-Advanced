@@ -238,10 +238,10 @@
                 if (listItem.height < listItem.detailHeight) {
                     heightFit = true
                 }
-                if (listItem.storeCluster != listItem.cluster) {
-                    storeClusterFit = true
-                }
-                if (storeClusterFit == true || heightFit == true || moduleFit == true) {
+                // if (listItem.storeCluster != listItem.cluster) {
+                //     storeClusterFit = true
+                // }
+                if (listItem.storeClusterFit == true || heightFit == true || moduleFit == true) {
                     overallFits = true
                 }
 
@@ -257,7 +257,7 @@
                     "Height": parseFloat(listItem.height),
                     "Width": parseFloat(listItem.width),
                     "modulesFit": moduleFit,
-                    "storeClusterFit": storeClusterFit,
+                    "storeClusterFit": listItem.storeClusterFit,
                     "Displays": listItem.displays,
                     "Pallettes": listItem.pallettes,
                     "heightFit": heightFit,

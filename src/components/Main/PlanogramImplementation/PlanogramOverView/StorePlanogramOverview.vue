@@ -14,7 +14,7 @@
                 <v-btn @click="assignGroups">
                     group assign
                 </v-btn>
-              
+
                 <!-- <v-menu>
                     <v-btn slot="activator">options</v-btn>
                     <v-list>
@@ -29,7 +29,7 @@
 
             <StorePlanograms ref="StorePlanograms" />
             <PlanogramDetailsSelector :PlanoName="ProjectName.text" ref="PlanogramDetailsSelector" />
-        <YesNoModal ref="YesNoModal" />
+            <YesNoModal ref="YesNoModal" />
 
         </v-card>
     </v-dialog>
@@ -37,7 +37,7 @@
 <script>
     import Axios from 'axios'
     import YesNoModal from '@/components/Common/YesNoModal'
-    
+
     import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector'
     import StorePlanograms from '@/components/Main/PlanogramImplementation/StoreOverView/StorePlanograms'
     import {
@@ -76,8 +76,8 @@
                     },
                     {
                         text: "Variation"
-                    },{
-                        text:"On Hold"
+                    }, {
+                        text: "On Hold"
                     }
                 ],
                 currentStorePlanograms: [],
@@ -85,7 +85,7 @@
             }
         },
         methods: {
-            
+
             checkFits(storePlan, planDetails, callback) {
                 let self = this
                 let retval = false
@@ -119,12 +119,12 @@
             assignGroups() {
                 let self = this
                 let data = self.$refs.grid.getSelectedRows()
-                if(data.length<1){
+                if (data.length < 1) {
                     alert("Please select at least one store")
                     return
                 }
                 let count = 0
-                self.$refs.PlanogramDetailsSelector.show(null, false, detailID => {
+                self.$refs.PlanogramDetailsSelector.show(data[0], true, detailID => {
                     data.forEach(e => {
                         self.assignPlanogramToStoreNoRefresh(e.data, detailID, () => {
                             count = count + 1
@@ -135,57 +135,74 @@
                     })
                 })
             },
-            assignPlanogramToStoreNoRefresh(listItem, detailID, callback) {
+            assignPlanogramToStoreNoRefresh(listItem, data, callback) {
                 let self = this;
+                let moduleFit = false
+                let heightFit = false
+                let storeClusterFit = false
+                let planogramFit = false
                 self.checkFits(listItem, data, fits => {
-                   
+                    if (listItem.modules < data.modules) {
+                        moduleFit = true
+                    }
+                    if (listItem.height < data.height) {
+                        heightFit = true
+                    }
+                    if (listItem.cluster != data.clusterName) {
+                        storeClusterFit = true
+                    }
                     let item = {
                         "id": listItem.id,
                         "store_ID": listItem.store_ID,
                         "project_ID": self.selectedProject,
-                        "planogramDetail_ID": detailID.id,
+                        "planogramDetail_ID": data.id,
                         "planogramStoreStatus": 1,
-                        // "Modules": detailID.modules,
-                        // "Height": detailID.height,
-                        // "Width": detailID.width,
-                        // "Displays": detailID.displays,
-                        // "Pallettes": detailID.pallettes,
-                        // "SupplierStands": detailID.supplierStands,
-                        // "Bins": detailID.bins,
+                        "HeightFit": heightFit,
+                        "StoreClusterFit": storeClusterFit,
+                        "PlanogramFit": planogramFit,
+                        "ModulesFit": moduleFit,
+                        // "Modules": data.modules,
+                        // "Height": data.height,
+                        // "Width": data.width,
+                        // "Displays": data.displays,
+                        // "Pallettes": data.pallettes,
+                        // "SupplierStands": data.supplierStands,
+                        // "Bins": data.bins,
                         "Fits": fits
-
                     }
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                     Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
                         .then(r => {
                             console.log(r);
                             delete Axios.defaults.headers.common["TenantID"];
+                            callback()
                         }).catch(e => {
                             console.log(e);
                             delete Axios.defaults.headers.common["TenantID"];
+                            callback()
                         })
                 })
             },
 
             assignPlanogramToStore(listItem) {
                 let self = this;
-                let moduleFit=false
-                let heightFit=false
+                let moduleFit = false
+                let heightFit = false
                 let storeClusterFit = false
                 let planogramFit = false
                 self.$refs.PlanogramDetailsSelector.show(listItem, true, data => {
                     self.checkFits(listItem, data, fits => {
-                        console.log(listItem.modules+ " : "+ data.modules)
-                      console.log(listItem.modules < data.modules);
-                      
-                      if(listItem.modules< data.modules){
-                            moduleFit=true
+                        console.log(listItem.modules + " : " + data.modules)
+                        console.log(listItem.modules < data.modules);
+
+                        if (listItem.modules < data.modules) {
+                            moduleFit = true
                         }
-                        if(listItem.height< data.height){
-                            heightFit=true
+                        if (listItem.height < data.height) {
+                            heightFit = true
                         }
-                        if(listItem.cluster!= data.clusterName){
-                            storeClusterFit=true
+                        if (listItem.cluster != data.clusterName) {
+                            storeClusterFit = true
                         }
                         let item = {
                             "id": listItem.id,
@@ -193,10 +210,10 @@
                             "project_ID": self.selectedProject,
                             "planogramDetail_ID": data.id,
                             "planogramStoreStatus": 1,
-                            "HeightFit":heightFit,
-                            "StoreClusterFit":storeClusterFit,
-                            "PlanogramFit":planogramFit,
-                            "ModulesFit":moduleFit,
+                            "HeightFit": heightFit,
+                            "StoreClusterFit": storeClusterFit,
+                            "PlanogramFit": planogramFit,
+                            "ModulesFit": moduleFit,
                             // "Modules": data.modules,
                             // "Height": data.height,
                             // "Width": data.width,
@@ -220,27 +237,27 @@
 
                 })
             },
-            unassignPlanogram(listItem){
+            unassignPlanogram(listItem) {
                 let self = this
-                  self.$refs.YesNoModal.show("Do you want to remove this Planogram?", data => {
+                self.$refs.YesNoModal.show("Do you want to remove this Planogram?", data => {
                     if (data) {
-                        
-                let moduleFit=false
-                let heightFit=false
-                let storeClusterFit = false
-                let planogramFit = false
-                  
-                       
+
+                        let moduleFit = false
+                        let heightFit = false
+                        let storeClusterFit = false
+                        let planogramFit = false
+
+
                         let item = {
                             "id": listItem.id,
                             "store_ID": listItem.store_ID,
                             "project_ID": self.selectedProject,
                             "planogramDetail_ID": null,
                             "planogramStoreStatus": 0,
-                            "HeightFit":heightFit,
-                            "StoreClusterFit":storeClusterFit,
-                            "PlanogramFit":planogramFit,
-                            "ModulesFit":moduleFit,
+                            "HeightFit": heightFit,
+                            "StoreClusterFit": storeClusterFit,
+                            "PlanogramFit": planogramFit,
+                            "ModulesFit": moduleFit,
                             "Modules": listItem.modules,
                             "Height": listItem.height,
                             "Width": listItem.width,
@@ -259,10 +276,10 @@
                             }).catch(e => {
                                 console.log(e);
                                 delete Axios.defaults.headers.common["TenantID"];
-                            }) 
+                            })
                     }
                 })
-               
+
 
             },
             openStoreOver(item) {
