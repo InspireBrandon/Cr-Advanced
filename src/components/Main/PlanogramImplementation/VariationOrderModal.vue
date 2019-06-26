@@ -46,7 +46,7 @@
             </v-container>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="success">
+                <v-btn color="success" @click="submit(123)">
                     send
                 </v-btn>
             </v-card-actions>
@@ -73,11 +73,12 @@ import { request } from 'http';
                 selectedPlanoDetail: null,
                 storeName: null,
                 listitem:null,
-                project:null
+                project:null,
+                afterReturn:null
             }
         },
         methods: {
-            show(item) {
+            show(item ,afterReturn) {
                 let self = this
                 self.listitem=item
                 self.dialog = true
@@ -92,6 +93,7 @@ import { request } from 'http';
                 if (item.planogramDetail_ID != 0) {
                     self.selectedPlanoDetail = item.planogramDetail_ID
                 }
+                self.afterReturn = afterReturn
                  Axios.get(process.env.VUE_APP_API + `Project?ProjectID=${item.project_ID}`).then(r => {
                     console.log(r);
                    self.project=r.data.projectList[0]
@@ -157,28 +159,29 @@ import { request } from 'http';
                     callback(r.data.projectTX)
                 })
             },
-            submit() {
+            submit(status) {
                 let self = this
 
 
-                let projectTXGroupRequest = {
-                    projectID: listitem.project_ID
-                }
+                // let projectTXGroupRequest = {
+                //     projectID: listitem.project_ID
+                // }
 
-                request.type = 3;
-                request.status = 41;
-                request.systemUserID = null;
-                request.actionedByUserID = systemUserID;
+                // request.type = 3;
+                // request.status = 41;
+                // request.systemUserID = null;
+                // request.actionedByUserID = systemUserID;
 
-                request.systemFileID = self.listitem.systemFileID
-                request.rangeFileID = self.listitem.rangeID;
-                request.project_ID = self.listitem.project_ID;
-                request.storeCluster_ID = self.listitem.storeCluster;
-                request.store_ID = self.listitem.store_ID;
-                request.notes = self.buildString()
+                // request.systemFileID = self.listitem.systemFileID
+                // request.rangeFileID = self.listitem.rangeID;
+                // request.project_ID = self.listitem.project_ID;
+                // request.storeCluster_ID = self.listitem.storeCluster;
+                // request.store_ID = self.listitem.store_ID;
+                // request.notes = self.buildString()
                 // create tx group
                 // then create tx with notes = text 
-
+            self.dialog=false  
+            self.afterReturn(status);
             },
         },
         created() {

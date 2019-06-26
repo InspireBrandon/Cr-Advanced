@@ -46,7 +46,7 @@ class Scene {
             let camera = new BABYLON.UniversalCamera(id, new BABYLON.Vector3(0, 0.1, 0), self.scene);
             // self.camera = new BABYLON.FlyCamera("FlyCamera", new BABYLON.Vector3(0, 5, -10), self.scene);
             camera.attachControl(self.canvas, true);
-            camera.speed = 0.1;
+            camera.speed = 0.3;
             // camera.wheelPrecision = 50;
             // camera.applyGravity = true;
             camera.checkCollisions = true;

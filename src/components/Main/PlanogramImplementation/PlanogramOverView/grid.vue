@@ -24,6 +24,9 @@
     import {
         AgGridVue
     } from "ag-grid-vue";
+    import {
+        stat
+    } from 'fs';
     export default {
         props: ["rowData", "selectedProject", "getRowData", "assign"],
         components: {
@@ -52,7 +55,7 @@
                     }, {
                         "headerName": "Planogram Name",
                         "cellRendererFramework": "PlanogramName",
-                        
+
                         "minWidth": 650,
                         cellStyle: function (params) {
                             if (params.data.planogramFit == true) {
@@ -178,7 +181,7 @@
             }
         },
         methods: {
-             createProjectTransactionGroup(request, callback) {
+            createProjectTransactionGroup(request, callback) {
                 let self = this;
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -200,7 +203,20 @@
             },
             openOrder(item) {
                 let self = this
-                self.$refs.VariationOrderModal.show(item)
+                self.$refs.VariationOrderModal.show(item, callback => {
+                    item.planogramStoreStatus = 5
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                    Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
+                        .then(r => {
+                            console.log(r);
+                            delete Axios.defaults.headers.common["TenantID"];
+                          self.getRowData()
+                        }).catch(e => {
+                            console.log(e);
+                            delete Axios.defaults.headers.common["TenantID"];
+                          
+                        })
+                })
             },
             getSelectedRows() {
                 let self = this
@@ -214,7 +230,7 @@
                 let self = this;
                 let moduleFit = false
                 let heightFit = false
-                let overallFits =true
+                let overallFits = true
                 let storeClusterFit = false
                 if (listItem.modules < listItem.detailModules) {
                     moduleFit = true
@@ -222,13 +238,13 @@
                 if (listItem.height < listItem.detailHeight) {
                     heightFit = true
                 }
-                 if (listItem.storeCluster != listItem.cluster) {
+                if (listItem.storeCluster != listItem.cluster) {
                     storeClusterFit = true
                 }
-                if (storeClusterFit==true||heightFit==true||moduleFit==true) {
-                    overallFits=true
+                if (storeClusterFit == true || heightFit == true || moduleFit == true) {
+                    overallFits = true
                 }
-                
+
                 console.log(listItem);
 
                 let item = {
@@ -241,7 +257,7 @@
                     "Height": parseFloat(listItem.height),
                     "Width": parseFloat(listItem.width),
                     "modulesFit": moduleFit,
-                    "storeClusterFit":storeClusterFit,
+                    "storeClusterFit": storeClusterFit,
                     "Displays": listItem.displays,
                     "Pallettes": listItem.pallettes,
                     "heightFit": heightFit,
@@ -346,9 +362,13 @@
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
-             removeFromStore(item,state) {
+            removeFromStore(item, state, Status) {
                 let self = this
                 let text = ""
+                console.log("status");
+
+                console.log(Status);
+
                 if (item.requiredInStore == true) {
                     text = "Do you want to innclude this category in this store?"
                 } else {
@@ -356,7 +376,7 @@
                 }
                 self.$refs.YesNoModal.show(text, data => {
                     if (data) {
-                        self.remove(item,state, data => {
+                        self.remove(item, state, Status, data => {
                             self.getRowData()
                         })
                     }
@@ -364,10 +384,24 @@
 
                 // self.createPlanoGramDetailTX(tmp)
             },
-            remove(listItem,state ,callback) {
+            remove(listItem, state, status, callback) {
                 let self = this;
+                if (state == true) {
+                    console.log("removing state");
+
+                    listItem.planogramDetail_ID = null
+                    listItem.HeightFit = false
+                    listItem.modulesFit = false
+                    listItem.storeClusterFit = false
+                    listItem.PlanogramFit = false
+                    listItem.Fits = false
+                    listItem.systemFileID = 0
+                }
+                console.log("status");
+                console.log(status);
 
                 listItem.requiredInStore = state
+                listItem.planogramStoreStatus = status
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', listItem)
                     .then(r => {
