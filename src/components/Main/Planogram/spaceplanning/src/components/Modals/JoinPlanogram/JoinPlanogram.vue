@@ -196,13 +196,13 @@
             fetchPlanogramRecursive(count, callback) {
                 let self = this;
 
-                let fileID = self.selectedSpacePlans[count].value;
+                let spacePlanID = self.selectedSpacePlans[count].value;
                 let text = `Fetching file ${count + 1}/${self.selectedSpacePlans.length}...`
                 self.$refs.spinner.setText(text);
 
-                Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fileID}`)
+                Axios.get(process.env.VUE_APP_API + `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${spacePlanID}&file=config_advanced`)
                     .then(r => {
-                        self.spacePlanFiles.push(r.data)
+                        self.spacePlanFiles.push(r.data.jsonObject)
 
                         if (count < self.selectedSpacePlans.length - 1) {
                             count++;
