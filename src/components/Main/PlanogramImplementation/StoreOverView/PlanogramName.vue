@@ -1,9 +1,9 @@
 <template>
-    <div>
-        <v-tooltip bottom v-if="params.data.planogramStoreStatus!=0&&params.data.planogramStoreStatus!=6">
+    <div v-if="params.data.planogramStoreStatus!=0&&params.data.planogramStoreStatus!=6">
+        <v-tooltip bottom>
             <template v-slot:activator="{ on }">
                 <v-btn v-on="on"
-                   @click="params.context.componentParent.unassignPlanogram(params.data)"
+                   @click="params.context.componentParent.unassignPlanogram(params)"
                     icon flat small color="error" class="ma-0">
                     <v-icon>close</v-icon>
                 </v-btn>

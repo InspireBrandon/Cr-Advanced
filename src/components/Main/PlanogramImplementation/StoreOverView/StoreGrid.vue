@@ -160,8 +160,10 @@
         methods: {
             unassignPlanogram(listItem) {
                 let self = this
-                console.log("unassign");
-                console.log(listItem);
+
+                let tmp = listItem.data
+                let node = listItem.node
+
                 self.$refs.YesNoModal.show("Do you want to remove this Planogram?", data => {
                     if (data) {
 
@@ -170,34 +172,39 @@
                         let storeClusterFit = false
                         let planogramFit = false
 
-
                         let item = {
-                            "id": listItem.id,
-                            "store_ID": listItem.store_ID,
-                            "project_ID": listItem.project_ID,
+                            "id": tmp.id,
+                            "store_ID": tmp.store_ID,
+                            "project_ID": tmp.project_ID,
                             "planogramDetail_ID": null,
                             "planogramStoreStatus": 0,
                             "HeightFit": heightFit,
                             "StoreClusterFit": storeClusterFit,
                             "PlanogramFit": planogramFit,
                             "ModulesFit": moduleFit,
-                            "Modules": listItem.modules,
-                            "Height": listItem.height,
-                            "Width": listItem.width,
-                            "Displays": listItem.displays,
-                            "Pallettes": listItem.pallettes,
+                            "Modules": tmp.modules,
+                            "Height": tmp.height,
+                            "Width": tmp.width,
+                            "Displays": tmp.displays,
+                            "Pallettes": tmp.pallettes,
                             "SupplierStands": listItem.supplierStands,
                             "Bins": listItem.bins,
                             "Fits": false
                         }
+
+                        tmp.planogramStoreStatus = 0;
+                        tmp.currentStatusText = "Unassigned"
+
+                        console.log(tmp)
+
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
                         Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
                             .then(r => {
-                                console.log(r);
-                                self.method(listItem)
+                                node.setData(tmp)
+                                self.gridApi.redrawRows();
                                 delete Axios.defaults.headers.common["TenantID"];
                             }).catch(e => {
-                                console.log(e);
                                 delete Axios.defaults.headers.common["TenantID"];
                             })
                     }
@@ -212,16 +219,22 @@
             },
             openOrder(item) {
                 let self = this
+
+                let tmp = item.data
+                let node = item.node
+
                 self.$refs.VariationOrderModal.show(item, callback => {
                     item.planogramStoreStatus = 5
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                     Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
                         .then(r => {
-                            console.log(r);
                             delete Axios.defaults.headers.common["TenantID"];
-                            self.method(item)
+                            item.currentStatusText = "Variation"
+
+
+
+                            node.setData(item)
                         }).catch(e => {
-                            console.log(e);
                             delete Axios.defaults.headers.common["TenantID"];
 
                         })
@@ -251,7 +264,6 @@
             },
             assignPlanogramToStore(data) {
                 let self = this;
-                console.log(data);
                 let listItem = data.data
                 let node = data.node
                 self.selectedCat = listItem.projectName
@@ -262,15 +274,19 @@
                     let storeClusterFit = false
                     let planogramFit = false
                     self.checkFits(listItem, data, fits => {
+
                         if (listItem.modules < data.modules) {
                             moduleFit = true
                         }
+
                         if (listItem.height < data.height) {
                             heightFit = true
                         }
+
                         if (listItem.cluster != data.clusterName) {
                             storeClusterFit = true
                         }
+
                         let item = {
                             "id": listItem.id,
                             "store_ID": self.StoreID,
@@ -281,13 +297,6 @@
                             "StoreClusterFit": storeClusterFit,
                             "PlanogramFit": planogramFit,
                             "ModulesFit": moduleFit,
-                            // "Modules": data.modules,
-                            // "Height": data.height,
-                            // "Width": data.width,
-                            // "Displays": data.displays,
-                            // "Pallettes": data.pallettes,
-                            // "SupplierStands": data.supplierStands,
-                            // "Bins": data.bins,
                             "Fits": fits
                         }
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -297,9 +306,6 @@
                                 let item = {
                                     store_ID: self.StoreID
                                 }
-                                console.log(r);
-                                console.log("settindata");
-                                console.log(data);
                                 listItem.fileName = data.fileName
                                 listItem.currentStatusText = "Assigned"
                                 listItem.heightFit = heightFit
@@ -320,8 +326,9 @@
             },
             updateCheck(item) {
                 let self = this
-                 let tmp = item.data
+                let tmp = item.data
                 let node = item.node
+
                 self.createUpdate(tmp, data => {
                     tmp.id = data.store_Planogram.id
                     tmp.heightFit = data.store_Planogram.heightFit;
@@ -330,24 +337,23 @@
                 })
             },
             createUpdate(listItem, callback) {
+
                 let self = this;
                 let moduleFit = false
                 let heightFit = false
                 let overallFits = false
                 let storeClusterFit = false
+                
                 if (listItem.modules < listItem.detailModules) {
                     moduleFit = true
                 }
                 if (listItem.height < listItem.detailHeight) {
                     heightFit = true
                 }
-                // if (listItem.storeCluster != listItem.cluster) {
-                //     storeClusterFit = true
-                // }
+
                 if (listItem.storeClusterFit == true || heightFit == true || moduleFit == true) {
                     overallFits = true
                 }
-
 
                 let item = {
                     "id": listItem.id,
@@ -371,11 +377,9 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
                     .then(r => {
-                        console.log(r);
                         delete Axios.defaults.headers.common["TenantID"];
                         callback(r.data)
                     }).catch(e => {
-                        console.log(e);
                         delete Axios.defaults.headers.common["TenantID"];
                         callback(e)
                     })
@@ -391,36 +395,42 @@
                 self.$refs.YesNoModal.show(text, data => {
                     if (data) {
                         self.createStorePlano(item, data => {
-                            self.method(item)
+
                         })
                     }
                 })
-
-                // self.createPlanoGramDetailTX(tmp)
             },
             removeFromStore(item, state, Status) {
                 let self = this
+                let tmp = item.data
+                let node = item.node
+
+                self.createUpdate(tmp, data => {
+                    tmp.id = data.store_Planogram.id
+                    tmp.heightFit = data.store_Planogram.heightFit;
+                    tmp.modulesFit = data.store_Planogram.modulesFit;
+                    node.setData(tmp)
+                })
+
                 let text = ""
+
                 if (item.requiredInStore == true) {
                     text = "Do you want to innclude this category in this store?"
                 } else {
                     text = "Are you sure you want to remove this category ?"
                 }
+
                 self.$refs.YesNoModal.show(text, data => {
                     if (data) {
                         self.remove(item, state, Status, data => {
-                            self.method(item)
+                            node.setData(item)
                         })
                     }
                 })
-
-                // self.createPlanoGramDetailTX(tmp)
             },
             remove(listItem, state, Status, callback) {
                 let self = this;
                 if (state == true) {
-                    console.log("removing state");
-
                     listItem.planogramDetail_ID = null
                     listItem.HeightFit = false
                     listItem.modulesFit = false
@@ -429,21 +439,16 @@
                     listItem.Fits = false
                     listItem.systemFileID = 0
                 }
-                console.log("status");
-                console.log(Status);
 
                 listItem.requiredInStore = state
                 listItem.planogramStoreStatus = Status
-                console.log(listItem);
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', listItem)
                     .then(r => {
-                        console.log(r);
                         delete Axios.defaults.headers.common["TenantID"];
                         callback(r)
                     }).catch(e => {
-                        console.log(e);
                         delete Axios.defaults.headers.common["TenantID"];
                         callback(e)
                     })
@@ -455,11 +460,9 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', listItem)
                     .then(r => {
-                        console.log(r);
                         delete Axios.defaults.headers.common["TenantID"];
                         callback(r)
                     }).catch(e => {
-                        console.log(e);
                         delete Axios.defaults.headers.common["TenantID"];
                         callback(e)
                     })

@@ -295,6 +295,7 @@
                     tmp.id = data.store_Planogram.id
                     tmp.heightFit = data.store_Planogram.heightFit;
                     tmp.modulesFit = data.store_Planogram.modulesFit;
+                    tmp.fits = data.store_Planogram.fits;
                     node.setData(tmp)
                 })
                 // self.createPlanoGramDetailTX(tmp)

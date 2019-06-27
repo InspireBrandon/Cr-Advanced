@@ -65,13 +65,17 @@
                 Axios.get(process.env.VUE_APP_API + `Store_Planogram?Store_ID=${StoreID.store_ID}`)
                     .then(r => {
                        self.rowData=[]   
-                        self.currentStorePlanograms=[]
+                        self.currentStorePlanograms = []
                         self.currentStorePlanograms = r.data.queryResult;
-                        self.currentStorePlanograms.forEach((e) => {
-                             e.GeneratedName = self.GenerateName(e)
+                        
+                        r.data.queryResult.forEach((e) => {
+                            e.GeneratedName = self.GenerateName(e)
                             e.currentStatusText = self.StoreStatusList[e.planogramStoreStatus].text
+                            self.currentStorePlanograms.push(e);
                         })
+
                         self.rowData = self.currentStorePlanograms
+
                         console.log(self.rowData);
                         
                     }).catch(e=>{
