@@ -36,6 +36,7 @@
                             tmp.vendor_Brand = self.params.data.brand
 
                             node.setData(tmp)
+                            self.params.context.componentParent.redrawAllRows();
                         }
                     }
                     case "CATEGORY": {
