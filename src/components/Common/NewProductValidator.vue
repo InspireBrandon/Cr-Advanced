@@ -18,7 +18,7 @@
                                             </v-checkbox>
                                         </v-flex>
                                         <v-flex md5 xs12>
-                                            <v-text-field :rules="sysIDRules" counter="15" maxlength="15"
+                                            <v-text-field :rules="sysIDRules" counter="30" maxlength="30"
                                                 @blur="on_product_system_id_blur" :loading="product_sys_id_loading"
                                                 :disabled="form.generate_product_system_id || product_sys_id_loading"
                                                 v-model="form.product_System_ID" label="Product system id">
@@ -106,6 +106,9 @@
                         this.description = '';
                         this.save_disabled = true;
                     },
+                    valid() {
+                        return this.product_System_ID == "" || this.barcode == "" || this.description == ""
+                    }
                 },
                 afterReturn: null,
                 product_sys_id_loading: false,
@@ -113,7 +116,7 @@
                 save_disabled: true,
                 sysIDRules: [
                     v => !!v || 'ID is required',
-                    v => v.length <= 15 || 'ID must be 15 characters or less'
+                    v => v.length <= 30 || 'ID must be 15 characters or less'
                 ],
                 barcodeRules: [
                     v => !!v || 'Barcode is required',
@@ -136,6 +139,9 @@
             atClose() {
                 let self = this;
                 self.dialog = false;
+                self.dialog = false;
+                self.noIDMatches = true;
+                self.noBarcodeMatches = true;
                 self.form.clear();
             },
             returnData() {
