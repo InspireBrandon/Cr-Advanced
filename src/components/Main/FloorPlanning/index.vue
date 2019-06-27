@@ -103,7 +103,7 @@
                             <v-list-tile-title>Pane</v-list-tile-title>
                         </v-list-tile>
                         <v-divider></v-divider>
-                        <v-list-tile @click="addBoxes">
+                        <v-list-tile @click="addBox">
                             <v-list-tile-title>Box</v-list-tile-title>
                         </v-list-tile>
                         <v-divider></v-divider>
@@ -343,17 +343,20 @@
             addBox() {
                 let self = this;
 
-                var myMaterial = new BABYLON.StandardMaterial("myMaterial", self.sceneObj.scene);
-                myMaterial.diffuseColor = new BABYLON.Color3(1, 0, 1);
-                var myBox = BABYLON.MeshBuilder.CreateBox("myBox", {
-                    height: 5,
-                    width: 5,
-                    depth: 5
-                }, self.sceneObj.scene);
-                myBox.position.x = 0;
-                myBox.position.y = 5 / 2;
-                myBox.position.z = 0;
-                myBox.material = myMaterial;
+                self.boxObj = new BoxLib(self.sceneObj);
+                self.boxObj.addBox();
+
+                // var myMaterial = new BABYLON.StandardMaterial("myMaterial", self.sceneObj.scene);
+                // myMaterial.diffuseColor = new BABYLON.Color3(1, 0, 1);
+                // var myBox = BABYLON.MeshBuilder.CreateBox("myBox", {
+                //     height: 5,
+                //     width: 5,
+                //     depth: 5
+                // }, self.sceneObj.scene);
+                // myBox.position.x = 0;
+                // myBox.position.y = 5 / 2;
+                // myBox.position.z = 0;
+                // myBox.material = myMaterial;
             },
             addBoxes() {
                 let self = this;
@@ -385,6 +388,7 @@
                     function (mesh) {
                         return mesh.id !== "ground";
                     });
+
                 if (pickInfo.hit) {
                     self.currentMesh = pickInfo.pickedMesh;
                     self.startingPoint = self.getGroundPosition(evt);
@@ -421,6 +425,7 @@
                 }
 
                 var diff = current.subtract(self.startingPoint);
+
                 self.currentMesh.position.addInPlace(diff);
 
                 self.startingPoint = current;

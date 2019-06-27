@@ -1,4 +1,5 @@
 import * as BABYLON from '@babylonjs/core/Legacy/legacy';
+import { ComponentResolver } from 'ag-grid-community';
 
 class Scene {
     constructor() {
@@ -137,6 +138,8 @@ class Scene {
     }
 
     MyPath(CameraPosition, GoalPosition) {
+
+        ComponentResolver.log("HERE");
 
         var path = [];
         for (var i = 0; i < 11; i++) {

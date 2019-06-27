@@ -275,6 +275,9 @@
             onRowEditingStarted(e) {
                 if (!e.data.can_edit)
                     this.gridApi.stopEditing();
+
+                if(!e.data.can_edit_supplier_code && e.colDef.field == 'supplier_Code')
+                    this.gridApi.stopEditing();
             },
             onCellValueChanged(e) {},
             set_file_type(file_type) {
@@ -301,8 +304,6 @@
                         })
                     }
                 })
-
-                console.log(headers);
 
                 return headers;
             },
@@ -338,7 +339,8 @@
                         supplier_Code: "",
                         consignment: "FIXED",
                         vendor_Brand: "",
-                        category_Code: ""
+                        category_Code: "",
+                        can_edit_supplier_code: true
                     })
                 });
 
