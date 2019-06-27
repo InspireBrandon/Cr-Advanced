@@ -39,7 +39,8 @@
                         Settings
                     </v-btn>
                     <v-list light dense>
-                        <v-list-tile>Configuration</v-list-tile>
+                        <v-list-tile @click="configOpen()" :class="{ 'pulse': rowData.length == 0 }" color="blue-grey darken-4">Configuration
+                        </v-list-tile>
                     </v-list>
                 </v-menu>
                 <v-btn :class="{ 'pulse': rowData.length == 0 }" @click="newLineAdd()"
@@ -113,6 +114,7 @@
         <YesNoModal ref="yesNo"></YesNoModal>
         <ProductLookup ref="ProductLookup"></ProductLookup>
         <NewProductValidator ref="NewProductValidator"></NewProductValidator>
+        <Configuration ref="config"></Configuration>
     </div>
 </template>
 
@@ -126,18 +128,19 @@
     import Prompt from '@/components/Common/Prompt';
     import ProductLookup from '@/components/Common/ProductLookup';
     import NewProductValidator from '@/components/Common/NewProductValidator';
-    import NewItemListingSelector from '@/components/Common/NewItemListingSelector'
-    import YesNoModal from '@/components/Common/YesNoModal'
-    import ImageView from "./GridComponents/Image.vue"
-    import Button from "./GridComponents/button.vue"
-    import OptionSelector from "./GridComponents/OptionSelector.vue"
-    import PeriodItem from "./GridComponents/PeriodItem.vue"
-    import DateSelector from "./GridComponents/DateSelector.vue"
-    import Validator from "./GridComponents/Validator.vue"
-    import YesNoSelector from "./GridComponents/YesNoSelector.vue"
-    import DescriptionLength from "./GridComponents/DescriptionLength.vue"
-    import Selector from "./GridComponents/Selector.vue"
-    import ConsignmentSelector from "./GridComponents/ConsignmentSelector.vue"
+    import NewItemListingSelector from '@/components/Common/NewItemListingSelector';
+    import YesNoModal from '@/components/Common/YesNoModal';
+    import ImageView from "./GridComponents/Image.vue";
+    import Button from "./GridComponents/button.vue";
+    import OptionSelector from "./GridComponents/OptionSelector.vue";
+    import PeriodItem from "./GridComponents/PeriodItem.vue";
+    import DateSelector from "./GridComponents/DateSelector.vue";
+    import Validator from "./GridComponents/Validator.vue";
+    import YesNoSelector from "./GridComponents/YesNoSelector.vue";
+    import DescriptionLength from "./GridComponents/DescriptionLength.vue";
+    import Selector from "./GridComponents/Selector.vue";
+    import ConsignmentSelector from "./GridComponents/ConsignmentSelector.vue";
+    import Configuration from "./GridComponents/Configuration.vue";
 
     const tabs = ['Standard', 'Vendor', 'Hierachy', 'Item Status', 'Images', 'Supporting Documents', 'Resources',
         'Stock Control', 'Price and Margin', 'Opening Orders'
@@ -161,7 +164,8 @@
             YesNoSelector,
             DescriptionLength,
             Selector,
-            ConsignmentSelector
+            ConsignmentSelector,
+            Configuration
         },
         data() {
             return {
@@ -276,7 +280,7 @@
                 if (!e.data.can_edit)
                     this.gridApi.stopEditing();
 
-                if(!e.data.can_edit_supplier_code && e.colDef.field == 'supplier_Code')
+                if (!e.data.can_edit_supplier_code && e.colDef.field == 'supplier_Code')
                     this.gridApi.stopEditing();
             },
             onCellValueChanged(e) {},
@@ -321,6 +325,10 @@
                 let self = this;
                 self.dialog = false;
                 self.file_type = null;
+            },
+            configOpen() {
+                let self = this;
+                self.$refs.config.show()
             },
             newLineAdd() {
                 let self = this;

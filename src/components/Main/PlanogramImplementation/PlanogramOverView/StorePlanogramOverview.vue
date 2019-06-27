@@ -44,10 +44,12 @@
         AgGridVue
     } from "ag-grid-vue";
     import grid from "./grid.vue"
-import { setTimeout } from 'timers';
+    import {
+        setTimeout
+    } from 'timers';
 
     export default {
-        props: ['ProjectName', 'selectedProject',],
+        props: ['ProjectName', 'selectedProject', ],
         components: {
             grid,
             YesNoModal,
@@ -57,7 +59,7 @@ import { setTimeout } from 'timers';
         },
         data() {
             return {
-                index:null,
+                index: null,
                 rowData: [],
                 title: null,
                 StoreClusters: [],
@@ -102,16 +104,18 @@ import { setTimeout } from 'timers';
                 }
                 callback(retval)
             },
-            Distribute(data) {
+            Distribute(rowData) {
                 let self = this;
-
+                let data = rowData.data
+                let node = rowData.node
                 data.planogramStoreStatus = 2
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', data)
                     .then(r => {
                         console.log(r);
+                        data.currentStatusText="Distributed"
+                        node.setData(data)
                         delete Axios.defaults.headers.common["TenantID"];
-                        self.getStorePlanograms()
                     }).catch(e => {
                         console.log(e);
                         delete Axios.defaults.headers.common["TenantID"];
@@ -189,12 +193,12 @@ import { setTimeout } from 'timers';
             assignPlanogramToStore(data) {
                 let self = this;
                 console.log(data);
-                let idx= data.rowIndex
+                let idx = data.rowIndex
                 let moduleFit = false
                 let heightFit = false
                 let storeClusterFit = false
                 let planogramFit = false
-                let listItem=data.data
+                let listItem = data.data
                 let node = data.node
                 self.$refs.PlanogramDetailsSelector.show(listItem, true, data => {
 
@@ -233,7 +237,7 @@ import { setTimeout } from 'timers';
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                         Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
                             .then(r => {
-                                listItem.id=r.data.store_Planogram.id
+                                listItem.id = r.data.store_Planogram.id
                                 listItem.fileName = data.fileName
                                 listItem.currentStatusText = "Assigned"
                                 listItem.heightFit = heightFit
@@ -241,13 +245,12 @@ import { setTimeout } from 'timers';
                                 listItem.planogramFit = planogramFit
                                 listItem.modulesFit = moduleFit
                                 listItem.fits = fits
-                                listItem.planogramStoreStatus= 1
-                                listItem.planogramDetail_ID=data.id
+                                listItem.planogramStoreStatus = 1
+                                listItem.planogramDetail_ID = data.id
                                 listItem.detailHeight = data.height
                                 listItem.detailModules = data.modules
                                 node.setData(listItem)
 
-                                self.$refs.grid.redrawAllRows()
                                 self.index = idx
                                 // self.getStorePlanograms()
                                 delete Axios.defaults.headers.common["TenantID"];
@@ -259,8 +262,10 @@ import { setTimeout } from 'timers';
 
                 })
             },
-            unassignPlanogram(listItem) {
+            unassignPlanogram(rowstuff) {
                 let self = this
+                let listItem = rowstuff.data
+                let node = rowstuff.node
                 self.$refs.YesNoModal.show("Do you want to remove this Planogram?", data => {
                     if (data) {
 
@@ -294,7 +299,17 @@ import { setTimeout } from 'timers';
                         Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
                             .then(r => {
                                 console.log(r);
-                                self.getStorePlanograms()
+                                listItem.planogramDetail_ID = null
+                                listItem.heightFit = false
+                                listItem.fileName = null
+                                listItem.modulesFit = false
+                                listItem.storeClusterFit = false
+                                listItem.planogramFit = false
+                                listItem.fits = false
+                                listItem.systemFileID = 0
+                                listItem.planogramStoreStatus = 0
+                                listItem.currentStatusText = "Unassigned"
+                                node.setData(listItem)
                                 delete Axios.defaults.headers.common["TenantID"];
                             }).catch(e => {
                                 console.log(e);
@@ -326,8 +341,7 @@ import { setTimeout } from 'timers';
                             e.currentStatusText = self.StoreStatusList[e.planogramStoreStatus].text
                         })
                         self.rowData = self.currentStorePlanograms
-                        setTimeout(() => {
-                        }, 300);
+                        setTimeout(() => {}, 300);
                         console.log(self.rowData);
                     })
             },

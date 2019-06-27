@@ -116,10 +116,10 @@
                         "editable": true,
                         "field": "modules",
                         cellClassRules: {
-                            'success-green': 'data.modulesFit == false && data.planogramStoreStatus!=0',
-                            'error-red': 'data.modulesFit == true && data.planogramStoreStatus!=0',
+                            'success-green': 'data.modulesFit == false && data.planogramStoreStatus!=0 && data.planogramStoreStatus!=6',
+                            'error-red': 'data.modulesFit == true && data.planogramStoreStatus!=0 && data.planogramStoreStatus!=6',
                         }
-                        
+
                     }, {
                         "headerName": "Height",
                         "minWidth": 50,
@@ -127,8 +127,8 @@
                         "editable": true,
                         "field": "height",
                         cellClassRules: {
-                            'success-green': 'data.heightFit == false && data.planogramStoreStatus!=0',
-                            'error-red': 'data.heightFit == true && data.planogramStoreStatus!=0',
+                            'success-green': 'data.heightFit == false && data.planogramStoreStatus!=0 && data.planogramStoreStatus!=6',
+                            'error-red': 'data.heightFit == true && data.planogramStoreStatus!=0 && data.planogramStoreStatus!=6',
                         }
                     },
                     //  {
@@ -208,16 +208,19 @@
                     callback(r.data.projectTX)
                 })
             },
-            openOrder(item) {
+            openOrder(data) {
                 let self = this
+                let item = data.data
+                let node = data.node
                 self.$refs.VariationOrderModal.show(item, callback => {
                     item.planogramStoreStatus = 5
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                     Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
                         .then(r => {
                             console.log(r);
-                            delete Axios.defaults.headers.common["TenantID"];
-                            self.getRowData()
+                            item.currentStatusText="Variation"
+                            node.setData(item)
+                             delete Axios.defaults.headers.common["TenantID"];
                         }).catch(e => {
                             console.log(e);
                             delete Axios.defaults.headers.common["TenantID"];
@@ -378,8 +381,12 @@
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
-            removeFromStore(item, state, Status) {
+            removeFromStore(rowdata, state, Status) {
                 let self = this
+                let item = rowdata.data
+                let node = rowdata.node
+
+
                 let text = ""
                 console.log("status");
 
@@ -390,10 +397,13 @@
                 } else {
                     text = "Are you sure you want to remove this category ?"
                 }
-                self.$refs.YesNoModal.show(text, data => {
-                    if (data) {
+                self.$refs.YesNoModal.show(text, val => {
+                    if (val) {
                         self.remove(item, state, Status, data => {
-                            self.getRowData()
+                             console.log("node data");
+                           console.log(data);
+                            
+                            node.setData(data)
                         })
                     }
                 })
@@ -407,23 +417,28 @@
 
                     listItem.planogramDetail_ID = null
                     listItem.HeightFit = false
+                    listItem.fileName=null
                     listItem.modulesFit = false
                     listItem.storeClusterFit = false
                     listItem.PlanogramFit = false
                     listItem.Fits = false
                     listItem.systemFileID = 0
+                    listItem.currentStatusText = "On Hold"
+                }else{
+                     listItem.currentStatusText = "Unassigned"
                 }
                 console.log("status");
                 console.log(status);
 
                 listItem.requiredInStore = state
+
                 listItem.planogramStoreStatus = status
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', listItem)
                     .then(r => {
                         console.log(r);
                         delete Axios.defaults.headers.common["TenantID"];
-                        callback(r)
+                        callback(listItem)
                     }).catch(e => {
                         console.log(e);
                         delete Axios.defaults.headers.common["TenantID"];

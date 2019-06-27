@@ -73,6 +73,7 @@
                     "pallettes",
                     "Custom"
                 ],
+                FixtureType:null,
                 dialog: false,
                 height: null,
                 width: null,
