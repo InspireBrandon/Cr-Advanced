@@ -197,6 +197,7 @@ import { setTimeout } from 'timers';
                 let listItem=data.data
                 let node = data.node
                 self.$refs.PlanogramDetailsSelector.show(listItem, true, data => {
+
                     self.checkFits(listItem, data, fits => {
                         console.log(listItem.modules + " : " + data.modules)
                         console.log(listItem.modules < data.modules);
@@ -232,22 +233,23 @@ import { setTimeout } from 'timers';
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                         Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
                             .then(r => {
-                                console.log(r);
-                                // listItem.id=r.data.store_Planogram.id
-                                // listItem.fileName = data.fileName
-                                // listItem.currentStatusText = "Assigned"
-                                // listItem.heightFit = heightFit
-                                // listItem.storeClusterFit = storeClusterFit
-                                // listItem.planogramFit = planogramFit
-                                // listItem.modulesFit = moduleFit
-                                // listItem.fits = fits
-                                // listItem.planogramStoreStatus= 1
-                                // listItem.planogramDetail_ID=data.id
-                                // node.setData(listItem)
+                                listItem.id=r.data.store_Planogram.id
+                                listItem.fileName = data.fileName
+                                listItem.currentStatusText = "Assigned"
+                                listItem.heightFit = heightFit
+                                listItem.storeClusterFit = storeClusterFit
+                                listItem.planogramFit = planogramFit
+                                listItem.modulesFit = moduleFit
+                                listItem.fits = fits
+                                listItem.planogramStoreStatus= 1
+                                listItem.planogramDetail_ID=data.id
+                                listItem.detailHeight = data.height
+                                listItem.detailModules = data.modules
+                                node.setData(listItem)
 
-                                // self.$refs.grid.redrawAllRows()
+                                self.$refs.grid.redrawAllRows()
                                 self.index = idx
-                                self.getStorePlanograms()
+                                // self.getStorePlanograms()
                                 delete Axios.defaults.headers.common["TenantID"];
                             }).catch(e => {
                                 console.log(e);
@@ -287,6 +289,7 @@ import { setTimeout } from 'timers';
                             "Bins": listItem.bins,
                             "Fits": false
                         }
+
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                         Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
                             .then(r => {

@@ -115,25 +115,33 @@
                         "minWidth": 50,
                         "editable": true,
                         "field": "modules",
-                        cellStyle: function (params) {
-                            if (params.data.modulesFit == true) {
-                                //mark police cells as red
-                                return {
-                                    // color: 'red',
-                                    backgroundColor: "rgb(240, 125, 125)"
-                                };
-                            } else {
-                                return {
-                                    backgroundColor: "#C8E6C9"
-                                };
-                            }
+                        cellClassRules: {
+                            'success-green': 'data.modulesFit == false',
+                            'error-red': 'data.modulesFit == true',
                         }
+                        // cellStyle: function (params) {
+                        //     if (params.data.modulesFit == true) {
+                        //         //mark police cells as red
+                        //         return {
+                        //             // color: 'red',
+                        //             backgroundColor: "rgb(240, 125, 125)"
+                        //         };
+                        //     } else {
+                        //         return {
+                        //             backgroundColor: "#C8E6C9"
+                        //         };
+                        //     }
+                        // }
                     }, {
                         "headerName": "Height",
                         "minWidth": 50,
-                        "cellRendererFramework": "height",
+                        // "cellRendererFramework": "height",
                         "editable": true,
                         "field": "height",
+                        cellClassRules: {
+                            'success-green': 'data.heightFit == false',
+                            'error-red': 'data.heightFit == true',
+                        }
                         // cellStyle: function (params) {
                         //     if (params.data.heightFit == true) {
                         //         //mark police cells as red
@@ -241,10 +249,10 @@
                         })
                 })
             },
-            recentre(index){
+            recentre(index) {
                 console.log("recentering");
-                
-                this.gridApi.ensureIndexVisible(index, 'top')	
+
+                this.gridApi.ensureIndexVisible(index, 'top')
             },
             getSelectedRows() {
                 let self = this
@@ -260,20 +268,20 @@
                 let heightFit = false
                 let overallFits = false
                 let storeClusterFit = false
+
+                console.log(listItem.height, listItem.detailHeight)
+
                 if (listItem.modules < listItem.detailModules) {
                     moduleFit = true
                 }
-                if (listItem.height < listItem.detailHeight) {
+
+                if (parseFloat(listItem.height) < listItem.detailHeight) {
                     heightFit = true
                 }
-                // if (listItem.storeCluster != listItem.cluster) {
-                //     storeClusterFit = true
-                // }
+
                 if (listItem.storeClusterFit == true || heightFit == true || moduleFit == true) {
                     overallFits = true
                 }
-
-                console.log(listItem);
 
                 let item = {
                     "id": listItem.id,
@@ -294,7 +302,9 @@
                     "FixtureType": listItem.fixtureType,
                     "Fits": overallFits
                 }
+
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
                 Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
                     .then(r => {
                         console.log(r);
@@ -312,10 +322,10 @@
                 let node = item.node
                 self.createStorePlano(tmp, data => {
                     tmp.id = data.store_Planogram.id
-                    
+                    tmp.heightFit = data.store_Planogram.heightFit;
+                    tmp.modulesFit = data.store_Planogram.modulesFit;
                     node.setData(tmp)
                 })
-
                 // self.createPlanoGramDetailTX(tmp)
             },
             createPlanoGramDetailTX(item) {
@@ -464,6 +474,7 @@
             },
             redrawAllRows() {
                 let self = this;
+                console.log("redrawing rows")
                 this.gridApi.redrawRows();
             },
         }
@@ -472,5 +483,13 @@
 <style>
     .ag-theme-balham .audit-image-breach {
         background-color: rgb(247, 199, 65) !important;
+    }
+
+    .success-green {
+        background: #C8E6C9;
+    }
+
+    .error-red {
+        background: rgb(240, 125, 125);
     }
 </style>
