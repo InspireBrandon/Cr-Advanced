@@ -2,7 +2,7 @@
     <div style="text-align: center; cursor: pointer;">
         <v-tooltip bottom v-if="params.data.planogramStoreStatus==0||params.data.planogramStoreStatus==5">
             <template v-slot:activator="{ on }">
-                <v-btn v-on="on" @click="params.context.componentParent.assignPlanogramToStore(params.data)" icon flat
+                <v-btn v-on="on" @click="params.context.componentParent.assignPlanogramToStore(params)" icon flat
                     small color="primary" class="ma-0">
                     <v-icon>assignment</v-icon>
                 </v-btn>

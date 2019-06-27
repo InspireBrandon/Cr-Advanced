@@ -10,13 +10,15 @@
         rows : {{rowData.length}}
         <VariationOrderModal ref="VariationOrderModal" />
         <YesNoModal ref="YesNoModal" />
-
     </div>
 </template>
 <script>
     import PlanogramName from "./PlanogramName.vue"
     import Button from "./button.vue"
     import Fits from "./Fits.vue"
+    import height from "./height.vue"
+
+    import FixtureType from "./FixtureType.vue"
     import YesNoModal from '@/components/Common/YesNoModal'
     import VariationOrderModal from '@/components/Main/PlanogramImplementation/VariationOrderModal'
 
@@ -33,8 +35,10 @@
             AgGridVue,
             VariationOrderModal,
             Button,
+            FixtureType,
             Fits,
             PlanogramName,
+            height,
             YesNoModal,
         },
         data() {
@@ -56,7 +60,7 @@
                         "headerName": "Planogram Name",
                         "cellRendererFramework": "PlanogramName",
 
-                        "minWidth": 650,
+                        "minWidth": 550,
                         cellStyle: function (params) {
                             if (params.data.planogramFit == true) {
                                 //mark police cells as red
@@ -84,7 +88,8 @@
                     {
                         "headerName": "Best Fit",
                         "cellRendererFramework": "Fits"
-                    }, {
+                    },
+                    {
                         "headerName": "Store Cluster",
                         "field": "cluster",
                         "minWidth": 75,
@@ -110,43 +115,45 @@
                         "minWidth": 50,
                         "editable": true,
                         "field": "modules",
-                        cellStyle: function (params) {
-                            if (params.data.modulesFit == true) {
-                                //mark police cells as red
-                                return {
-                                    // color: 'red',
-                                    backgroundColor: " rgb(240, 125, 125)"
-                                };
-                            } else {
-                                return {
-                                    backgroundColor: " #C8E6C9"
-                                };
-                            }
+                        cellClassRules: {
+                            'success-green': 'data.modulesFit == false && data.planogramStoreStatus!=0',
+                            'error-red': 'data.modulesFit == true && data.planogramStoreStatus!=0',
                         }
+                        
                     }, {
                         "headerName": "Height",
                         "minWidth": 50,
+                        // "cellRendererFramework": "height",
                         "editable": true,
                         "field": "height",
-                        cellStyle: function (params) {
-                            if (params.data.heightFit == true) {
-                                //mark police cells as red
-                                return {
-                                    // color: 'red',
-                                    backgroundColor: " rgb(240, 125, 125)"
-                                };
-                            } else {
-                                return {
-                                    backgroundColor: " #C8E6C9"
-                                };
-                            }
+                        cellClassRules: {
+                            'success-green': 'data.heightFit == false && data.planogramStoreStatus!=0',
+                            'error-red': 'data.heightFit == true && data.planogramStoreStatus!=0',
                         }
-                    }, {
-                        "headerName": "Width",
-                        "minWidth": 50,
+                    },
+                    //  {
+                    //     "headerName": "Width",
+                    //     "minWidth": 50,
+                    //     "editable": true,
+                    //     "field": "width"
+                    // }, 
+                    {
+                        "headerName": "Fixture Type",
+                        "field": "fixtureType",
+                        "cellEditor": "agRichSelectCellEditor",
+                        "cellEditorParams": {
+                            values: ["Standard",
+                                "Industrial",
+                                "Supplier Stand",
+                                "Till point",
+                                "pallettes",
+                                "Custom"
+                            ],
+                        },
                         "editable": true,
-                        "field": "width"
-                    }, {
+                        "minWidth": 150,
+                    },
+                    {
                         "headerName": "Displays",
                         "minWidth": 50,
                         "editable": true,
@@ -210,11 +217,11 @@
                         .then(r => {
                             console.log(r);
                             delete Axios.defaults.headers.common["TenantID"];
-                          self.getRowData()
+                            self.getRowData()
                         }).catch(e => {
                             console.log(e);
                             delete Axios.defaults.headers.common["TenantID"];
-                          
+
                         })
                 })
             },
@@ -230,22 +237,22 @@
                 let self = this;
                 let moduleFit = false
                 let heightFit = false
-                let overallFits = true
+                let overallFits = false
                 let storeClusterFit = false
+
+                console.log(listItem.height, listItem.detailHeight)
+
                 if (listItem.modules < listItem.detailModules) {
                     moduleFit = true
                 }
-                if (listItem.height < listItem.detailHeight) {
+
+                if (parseFloat(listItem.height) < listItem.detailHeight) {
                     heightFit = true
                 }
-                if (listItem.storeCluster != listItem.cluster) {
-                    storeClusterFit = true
-                }
-                if (storeClusterFit == true || heightFit == true || moduleFit == true) {
+
+                if (listItem.storeClusterFit == true || heightFit == true || moduleFit == true) {
                     overallFits = true
                 }
-
-                console.log(listItem);
 
                 let item = {
                     "id": listItem.id,
@@ -257,20 +264,23 @@
                     "Height": parseFloat(listItem.height),
                     "Width": parseFloat(listItem.width),
                     "modulesFit": moduleFit,
-                    "storeClusterFit": storeClusterFit,
+                    "storeClusterFit": listItem.storeClusterFit,
                     "Displays": listItem.displays,
                     "Pallettes": listItem.pallettes,
                     "heightFit": heightFit,
                     "SupplierStands": listItem.supplierStands,
                     "Bins": listItem.bins,
+                    "FixtureType": listItem.fixtureType,
                     "Fits": overallFits
                 }
+
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
                 Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
                     .then(r => {
                         console.log(r);
                         delete Axios.defaults.headers.common["TenantID"];
-                        callback(r)
+                        callback(r.data)
                     }).catch(e => {
                         console.log(e);
                         delete Axios.defaults.headers.common["TenantID"];
@@ -280,8 +290,12 @@
             UpdateLine(item) {
                 let self = this
                 let tmp = item.data
+                let node = item.node
                 self.createStorePlano(tmp, data => {
-                    self.getRowData()
+                    tmp.id = data.store_Planogram.id
+                    tmp.heightFit = data.store_Planogram.heightFit;
+                    tmp.modulesFit = data.store_Planogram.modulesFit;
+                    node.setData(tmp)
                 })
                 // self.createPlanoGramDetailTX(tmp)
             },
@@ -331,6 +345,7 @@
                     "displays": parseInt(item.displays),
                     "pallettes": parseInt(item.pallettes),
                     "supplierStands": parseInt(item.supplierStands),
+                    "fixtureType": item.fixtureType,
                     "bins": parseInt(item.bins)
                 }
 
@@ -414,6 +429,12 @@
                         callback(e)
                     })
             },
+            resize() {
+                setTimeout(() => {
+                    this.gridApi.resetRowHeights();
+                    this.gridApi.sizeColumnsToFit()
+                }, 200);
+            },
             onGridReady(params) {
                 this.gridApi = params.api;
                 this.columnApi = params.columnApi;
@@ -422,11 +443,24 @@
                     this.gridApi.sizeColumnsToFit()
                 }, 200);
             },
+            redrawAllRows() {
+                let self = this;
+                console.log("redrawing rows")
+                this.gridApi.redrawRows();
+            },
         }
     }
 </script>
 <style>
     .ag-theme-balham .audit-image-breach {
         background-color: rgb(247, 199, 65) !important;
+    }
+
+    .success-green {
+        background: #C8E6C9;
+    }
+
+    .error-red {
+        background: rgb(240, 125, 125);
     }
 </style>

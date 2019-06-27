@@ -6,7 +6,7 @@
                     Planograms : <strong>{{title}}</strong>
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
-                <v-btn icon flat dark @click="dialog=false">
+                <v-btn icon flat dark @click="close">
                     <v-icon>close</v-icon>
                 </v-btn>
             </v-toolbar>
@@ -27,7 +27,7 @@
             StoreGrid,
             PlanogramDetailsSelector,
         },
-        props: ["StoreID"],
+        props: ["StoreID","getStoreData"],
         data() {
             return {
                 currentStorePlanograms:[],
@@ -84,10 +84,12 @@
                 self.dialog = true
                 self.store_ID=data.store_ID
                 self.title = data.storeName
+                self.$refs.StoreGrid.resize()
                 self.GetData(data)
             },
             close() {
                 let self = this
+                self.getStoreData()
                 self.dialog = false
             },
             GenerateName(data) {

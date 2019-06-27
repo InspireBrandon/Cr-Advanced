@@ -52,7 +52,7 @@
                 </v-layout>
             </v-flex>
         </v-layout>
-        <a display="none" ref="downloadLink" :href="serverAddress + 'DataImport/Template?templateName=' + selectedItem"
+        <a v-if="selectedItem != null" display="none" ref="downloadLink" :href="serverAddress + 'DataImport/Template?templateName=' + selectedItem.name"
             download></a>
     </v-container>
 </template>
@@ -149,9 +149,7 @@
 
                 Axios.get(process.env.VUE_APP_API + `DataImport/ImportDatabase?importFolder=${importFolder}`)
                     .then(r => {
-                        console.log(r.data);
                         self.importTransactionItemList = r.data.importTransactionItemList;
-                        console.log("Items", self.importTransactionItemList);
                         if (r.data.importTransactionItemList === 0) {
                             self.display = false;
                         } else {
@@ -169,8 +167,10 @@
                 const files = e.target.files;
                 let file = files[0];
 
-                self.createUploadTransaction(file.name, self.selectedItem, transactionID => {
-                    self.uploadImportFile(transactionID, file, () => {})
+                self.createUploadTransaction(file.name, self.selectedItem.name, transactionID => {
+                    self.uploadImportFile(transactionID, file, () => {
+                        self.getTransactionsFromFolder(self.selectedItem.name)
+                    })
                 })
             },
             uploadImportFile(transactionID, file, callback) {
@@ -182,7 +182,6 @@
                         transactionID, file)
                     .then(r => {
                         delete Axios.defaults.headers.common["TenantID"];
-                        console.log(r);
                     })
                     .catch(e => {
                         delete Axios.defaults.headers.common["TenantID"];
@@ -203,7 +202,6 @@
                     })
                     .then(r => {
                         delete Axios.defaults.headers.common["TenantID"];
-                        self.items.push(r.data.importTransactionItem);
                         callback(r.data.importTransactionItem.id);
                     })
                     .catch(e => {

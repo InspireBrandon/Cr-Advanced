@@ -58,10 +58,9 @@
             },
             {
                 "headerName": "Product Information",
-                "field": "brand",
-                "editable": false,
-                "hide": false,
-                "needsSelect": true
+                "field": "product_Information",
+                "editable": true,
+                "hide": false
             }
         ]
     },

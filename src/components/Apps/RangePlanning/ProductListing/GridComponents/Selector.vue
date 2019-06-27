@@ -70,8 +70,9 @@
                                 currentSupplier);
 
                             if (fullSupplierDetails == null) {
-                                tmp.can_edit_supplier_code = false;
+                                tmp.can_edit_supplier_code = true;
                             } else {
+                                tmp.can_edit_supplier_code = false;
                                 tmp.supplier_Code = fullSupplierDetails.supplier_Code;
                             }
 

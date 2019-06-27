@@ -15,8 +15,12 @@
                     <v-flex md12>
                         <v-select v-model="selectedPlanoDetail" :items="planoDetails" label="Planogram"></v-select>
                     </v-flex>
-                    <v-flex md12>
+                    <v-flex md6>
                         <v-text-field label="Store Name" disabled v-model="storeName"></v-text-field>
+                    </v-flex>
+                    <v-flex md6>
+                        <v-select :items="FixtureTypes" label="Fixture Type" v-model="FixtureType">
+                        </v-select>
                     </v-flex>
                     <v-flex md4>
                         <v-text-field v-model="height" label="Height"></v-text-field>
@@ -56,10 +60,19 @@
 
 <script>
     import Axios from 'axios'
-import { request } from 'http';
+    import {
+        request
+    } from 'http';
     export default {
         data() {
             return {
+                FixtureTypes: ["Standard",
+                    "Industrial",
+                    "Supplier Stand",
+                    "Till point",
+                    "pallettes",
+                    "Custom"
+                ],
                 dialog: false,
                 height: null,
                 width: null,
@@ -72,15 +85,15 @@ import { request } from 'http';
                 planoDetails: [],
                 selectedPlanoDetail: null,
                 storeName: null,
-                listitem:null,
-                project:null,
-                afterReturn:null
+                listitem: null,
+                project: null,
+                afterReturn: null
             }
         },
         methods: {
-            show(item ,afterReturn) {
+            show(item, afterReturn) {
                 let self = this
-                self.listitem=item
+                self.listitem = item
                 self.dialog = true
                 self.height = item.height
                 self.width = item.width
@@ -90,13 +103,14 @@ import { request } from 'http';
                 self.displays = item.displays
                 self.supplierStands = item.supplierStands
                 self.pallettes = item.pallettes
+                self.FixtureType = item.fixtureType
                 if (item.planogramDetail_ID != 0) {
                     self.selectedPlanoDetail = item.planogramDetail_ID
                 }
                 self.afterReturn = afterReturn
-                 Axios.get(process.env.VUE_APP_API + `Project?ProjectID=${item.project_ID}`).then(r => {
+                Axios.get(process.env.VUE_APP_API + `Project?ProjectID=${item.project_ID}`).then(r => {
                     console.log(r);
-                   self.project=r.data.projectList[0]
+                    self.project = r.data.projectList[0]
                 }).catch(e => {
                     console.log(e);
                 })
@@ -180,8 +194,8 @@ import { request } from 'http';
                 // request.notes = self.buildString()
                 // create tx group
                 // then create tx with notes = text 
-            self.dialog=false  
-            self.afterReturn(status);
+                self.dialog = false
+                self.afterReturn(status);
             },
         },
         created() {

@@ -1,13 +1,6 @@
 <template>
     <div style=" cursor: pointer;">
-        <v-tooltip bottom v-if="params.data.requiredInStore!=true &&params.data.fileName!=null">
-            <template v-slot:activator="{ on }">
-                <v-btn v-on="on" icon flat small color="error" class="ma-0" @click="params.context.componentParent.removeFromStore(params.data,true,6)">
-                    <v-icon>remove_circle_outline</v-icon>
-                </v-btn>
-            </template> 
-            <span>Remove category from store</span>
-        </v-tooltip>
+       
         <v-tooltip bottom v-if="params.data.requiredInStore==true">
             <template v-slot:activator="{ on }">
                 <v-btn v-on="on" icon flat small color="success" class="ma-0" @click="params.context.componentParent.removeFromStore(params.data,false,0)">
@@ -19,7 +12,7 @@
         <v-tooltip bottom>
             <template v-slot:activator="{ on }" v-if="params.data.planogramStoreStatus==0||params.data.planogramStoreStatus==5">
                 <v-btn v-on="on"
-                    @click="params.context.componentParent.$parent.$parent.$parent.$parent.assignPlanogramToStore(params.data)"
+                    @click="params.context.componentParent.$parent.$parent.$parent.$parent.assignPlanogramToStore(params)"
                     icon flat small color="primary" class="ma-0">
                     <v-icon>assignment</v-icon>
                 </v-btn>
@@ -56,6 +49,14 @@
                 </v-btn>
             </template>
             <span>request variation</span>
+        </v-tooltip>
+         <v-tooltip bottom v-if="params.data.requiredInStore!=true &&params.data.fileName!=null">
+            <template v-slot:activator="{ on }">
+                <v-btn v-on="on" icon flat small color="error" class="ma-0" @click="params.context.componentParent.removeFromStore(params.data,true,6)">
+                    <v-icon>remove_circle_outline</v-icon>
+                </v-btn>
+            </template> 
+            <span>Remove category from store</span>
         </v-tooltip>
     </div>
 </template>
