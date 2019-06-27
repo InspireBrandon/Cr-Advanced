@@ -84,6 +84,7 @@
                 self.dialog = true
                 self.store_ID=data.store_ID
                 self.title = data.storeName
+                self.$refs.StoreGrid.resize()
                 self.GetData(data)
             },
             close() {

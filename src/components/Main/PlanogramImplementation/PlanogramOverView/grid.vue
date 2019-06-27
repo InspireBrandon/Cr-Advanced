@@ -10,13 +10,15 @@
         rows : {{rowData.length}}
         <VariationOrderModal ref="VariationOrderModal" />
         <YesNoModal ref="YesNoModal" />
-
     </div>
 </template>
 <script>
     import PlanogramName from "./PlanogramName.vue"
     import Button from "./button.vue"
     import Fits from "./Fits.vue"
+    import height from "./height.vue"
+
+    import FixtureType from "./FixtureType.vue"
     import YesNoModal from '@/components/Common/YesNoModal'
     import VariationOrderModal from '@/components/Main/PlanogramImplementation/VariationOrderModal'
 
@@ -33,8 +35,10 @@
             AgGridVue,
             VariationOrderModal,
             Button,
+            FixtureType,
             Fits,
             PlanogramName,
+            height,
             YesNoModal,
         },
         data() {
@@ -56,7 +60,7 @@
                         "headerName": "Planogram Name",
                         "cellRendererFramework": "PlanogramName",
 
-                        "minWidth": 650,
+                        "minWidth": 550,
                         cellStyle: function (params) {
                             if (params.data.planogramFit == true) {
                                 //mark police cells as red
@@ -84,7 +88,8 @@
                     {
                         "headerName": "Best Fit",
                         "cellRendererFramework": "Fits"
-                    }, {
+                    },
+                    {
                         "headerName": "Store Cluster",
                         "field": "cluster",
                         "minWidth": 75,
@@ -115,38 +120,56 @@
                                 //mark police cells as red
                                 return {
                                     // color: 'red',
-                                    backgroundColor: " rgb(240, 125, 125)"
+                                    backgroundColor: "rgb(240, 125, 125)"
                                 };
                             } else {
                                 return {
-                                    backgroundColor: " #C8E6C9"
+                                    backgroundColor: "#C8E6C9"
                                 };
                             }
                         }
                     }, {
                         "headerName": "Height",
                         "minWidth": 50,
+                        "cellRendererFramework": "height",
                         "editable": true,
                         "field": "height",
-                        cellStyle: function (params) {
-                            if (params.data.heightFit == true) {
-                                //mark police cells as red
-                                return {
-                                    // color: 'red',
-                                    backgroundColor: " rgb(240, 125, 125)"
-                                };
-                            } else {
-                                return {
-                                    backgroundColor: " #C8E6C9"
-                                };
-                            }
-                        }
-                    }, {
-                        "headerName": "Width",
-                        "minWidth": 50,
+                        // cellStyle: function (params) {
+                        //     if (params.data.heightFit == true) {
+                        //         //mark police cells as red
+                        //         return {
+                        //             // color: 'red',
+                        //             backgroundColor: " rgb(240, 125, 125)"
+                        //         };
+                        //     } else {
+                        //         return {
+                        //             backgroundColor: " #C8E6C9"
+                        //         };
+                        //     }
+                        // }
+                    },
+                    //  {
+                    //     "headerName": "Width",
+                    //     "minWidth": 50,
+                    //     "editable": true,
+                    //     "field": "width"
+                    // }, 
+                    {
+                        "headerName": "Fixture Type",
+                        "field": "fixtureType",
+                        "cellEditor": "agRichSelectCellEditor",
+                        "cellEditorParams": {
+                            values: ["Standard",
+                                "Industrial",
+                                "Supplier Stand",
+                                "Till point",
+                                "Custom"
+                            ],
+                        },
                         "editable": true,
-                        "field": "width"
-                    }, {
+                        "minWidth": 150,
+                    },
+                    {
                         "headerName": "Displays",
                         "minWidth": 50,
                         "editable": true,
@@ -210,13 +233,18 @@
                         .then(r => {
                             console.log(r);
                             delete Axios.defaults.headers.common["TenantID"];
-                          self.getRowData()
+                            self.getRowData()
                         }).catch(e => {
                             console.log(e);
                             delete Axios.defaults.headers.common["TenantID"];
-                          
+
                         })
                 })
+            },
+            recentre(index){
+                console.log("recentering");
+                
+                this.gridApi.ensureIndexVisible(index, 'top')	
             },
             getSelectedRows() {
                 let self = this
@@ -230,7 +258,7 @@
                 let self = this;
                 let moduleFit = false
                 let heightFit = false
-                let overallFits = true
+                let overallFits = false
                 let storeClusterFit = false
                 if (listItem.modules < listItem.detailModules) {
                     moduleFit = true
@@ -263,6 +291,7 @@
                     "heightFit": heightFit,
                     "SupplierStands": listItem.supplierStands,
                     "Bins": listItem.bins,
+                    "FixtureType": listItem.fixtureType,
                     "Fits": overallFits
                 }
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -270,7 +299,7 @@
                     .then(r => {
                         console.log(r);
                         delete Axios.defaults.headers.common["TenantID"];
-                        callback(r)
+                        callback(r.data)
                     }).catch(e => {
                         console.log(e);
                         delete Axios.defaults.headers.common["TenantID"];
@@ -280,9 +309,13 @@
             UpdateLine(item) {
                 let self = this
                 let tmp = item.data
+                let node = item.node
                 self.createStorePlano(tmp, data => {
-                    self.getRowData()
+                    tmp.id = data.store_Planogram.id
+                    
+                    node.setData(tmp)
                 })
+
                 // self.createPlanoGramDetailTX(tmp)
             },
             createPlanoGramDetailTX(item) {
@@ -331,6 +364,7 @@
                     "displays": parseInt(item.displays),
                     "pallettes": parseInt(item.pallettes),
                     "supplierStands": parseInt(item.supplierStands),
+                    "fixtureType": item.fixtureType,
                     "bins": parseInt(item.bins)
                 }
 
@@ -414,6 +448,12 @@
                         callback(e)
                     })
             },
+            resize() {
+                setTimeout(() => {
+                    this.gridApi.resetRowHeights();
+                    this.gridApi.sizeColumnsToFit()
+                }, 200);
+            },
             onGridReady(params) {
                 this.gridApi = params.api;
                 this.columnApi = params.columnApi;
@@ -421,6 +461,10 @@
                     this.gridApi.resetRowHeights();
                     this.gridApi.sizeColumnsToFit()
                 }, 200);
+            },
+            redrawAllRows() {
+                let self = this;
+                this.gridApi.redrawRows();
             },
         }
     }

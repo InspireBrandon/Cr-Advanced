@@ -11,7 +11,7 @@
                 </v-btn>
             </v-toolbar>
             <v-toolbar dark flat dense>
-                <v-btn @click="assignGroups">
+                <v-btn @click="assignGroups" color="blue-grey darken-2">
                     group assign
                 </v-btn>
 
@@ -44,6 +44,7 @@
         AgGridVue
     } from "ag-grid-vue";
     import grid from "./grid.vue"
+import { setTimeout } from 'timers';
 
     export default {
         props: ['ProjectName', 'selectedProject'],
@@ -56,6 +57,7 @@
         },
         data() {
             return {
+                index:null,
                 rowData: [],
                 title: null,
                 StoreClusters: [],
@@ -184,12 +186,16 @@
                 })
             },
 
-            assignPlanogramToStore(listItem) {
+            assignPlanogramToStore(data) {
                 let self = this;
+                console.log(data);
+                let idx= data.rowIndex
                 let moduleFit = false
                 let heightFit = false
                 let storeClusterFit = false
                 let planogramFit = false
+                let listItem=data.data
+                let node = data.node
                 self.$refs.PlanogramDetailsSelector.show(listItem, true, data => {
                     self.checkFits(listItem, data, fits => {
                         console.log(listItem.modules + " : " + data.modules)
@@ -227,6 +233,20 @@
                         Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
                             .then(r => {
                                 console.log(r);
+                                // listItem.id=r.data.store_Planogram.id
+                                // listItem.fileName = data.fileName
+                                // listItem.currentStatusText = "Assigned"
+                                // listItem.heightFit = heightFit
+                                // listItem.storeClusterFit = storeClusterFit
+                                // listItem.planogramFit = planogramFit
+                                // listItem.modulesFit = moduleFit
+                                // listItem.fits = fits
+                                // listItem.planogramStoreStatus= 1
+                                // listItem.planogramDetail_ID=data.id
+                                // node.setData(listItem)
+
+                                // self.$refs.grid.redrawAllRows()
+                                self.index = idx
                                 self.getStorePlanograms()
                                 delete Axios.defaults.headers.common["TenantID"];
                             }).catch(e => {
@@ -303,6 +323,9 @@
                             e.currentStatusText = self.StoreStatusList[e.planogramStoreStatus].text
                         })
                         self.rowData = self.currentStorePlanograms
+                        setTimeout(() => {
+                        self.$refs.grid.recentre(self.index)
+                        }, 300);
                         console.log(self.rowData);
                     })
             },
@@ -349,6 +372,7 @@
                 let self = this
                 self.title = self.ProjectName.text
                 self.storeView = true
+                self.$refs.grid.resize()
                 self.getStorePlanograms()
             },
 
