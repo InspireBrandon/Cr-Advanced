@@ -27,6 +27,8 @@
 
                 let node = self.params.node;
 
+                console.log(node)
+
                 switch (type.toUpperCase()) {
                     case "BRAND": {
                         if (self.params.data.vendor_Brand == "") {
@@ -47,12 +49,12 @@
                         if (currentCategory != null) {
                             let fullCategoryDetails = self.params.context.componentParent.getCategoryDetailsByID(
                                 currentCategory);
-    
+
                             tmp.category_Code = fullCategoryDetails.category_Code;
-    
+
                             tmp.subdepartment = fullCategoryDetails.subdepartmentName;
                             tmp.department = fullCategoryDetails.departmentName;
-    
+
                             node.setData(tmp)
                             self.params.context.componentParent.redrawAllRows();
                         }
@@ -62,13 +64,16 @@
 
                         let currentSupplier = self.params.data.supplier;
 
-                        if (currentSupplier != null) {
+                        if (currentSupplier != null && currentSupplier != '') {
+
                             let fullSupplierDetails = self.params.context.componentParent.getSupplierByID(
                                 currentSupplier);
 
-                            console.log(fullSupplierDetails)
-
-                            tmp.supplier_Code = fullSupplierDetails.supplier_Code;
+                            if (fullSupplierDetails == null) {
+                                tmp.can_edit_supplier_code = false;
+                            } else {
+                                tmp.supplier_Code = fullSupplierDetails.supplier_Code;
+                            }
 
                             node.setData(tmp)
                             self.params.context.componentParent.redrawAllRows();

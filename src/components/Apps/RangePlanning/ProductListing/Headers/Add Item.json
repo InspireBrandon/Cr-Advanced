@@ -121,7 +121,7 @@
             {
                 "headerName": "Supplier Code",
                 "field": "supplier_Code",
-                "editable": false,
+                "editable": true,
                 "hide": true
             }
         ]
