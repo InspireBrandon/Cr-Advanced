@@ -74,36 +74,19 @@
                         "minWidth": 50,
                         "editable": true,
                         "field": "modules",
-                        cellStyle: function (params) {
-                            if (params.data.modulesFit == true) {
-                                //mark police cells as red
-                                return {
-                                    // color: 'red',
-                                    backgroundColor: " rgb(240, 125, 125)"
-                                };
-                            } else {
-                                return {
-                                    backgroundColor: " #C8E6C9"
-                                };
-                            }
+                        cellClassRules: {
+                            'success-green': 'data.modulesFit == false && data.planogramStoreStatus!=0',
+                            'error-red': 'data.modulesFit == true && data.planogramStoreStatus!=0',
                         }
                     }, {
                         "headerName": "Height",
                         "minWidth": 50,
-                        "field": "height",
+                        // "cellRendererFramework": "height",
                         "editable": true,
-                        cellStyle: function (params) {
-                            if (params.data.heightFit == true) {
-                                //mark police cells as red
-                                return {
-                                    // color: 'red',
-                                    backgroundColor: " rgb(240, 125, 125)"
-                                };
-                            } else {
-                                return {
-                                    backgroundColor: " #C8E6C9"
-                                };
-                            }
+                        "field": "height",
+                        cellClassRules: {
+                            'success-green': 'data.heightFit == false && data.planogramStoreStatus!=0',
+                            'error-red': 'data.heightFit == true && data.planogramStoreStatus!=0',
                         }
                     }, {
                         "headerName": "Fixture Type",
@@ -114,6 +97,7 @@
                                 "Industrial",
                                 "Supplier Stand",
                                 "Till point",
+                                "pallettes",
                                 "Custom"
                             ],
                         },
@@ -323,7 +307,7 @@
                                 listItem.planogramFit = planogramFit
                                 listItem.modulesFit = moduleFit
                                 listItem.fits = fits
-                                listItem.planogramStoreStatus= 1
+                                listItem.planogramStoreStatus = 1
 
                                 node.setData(listItem)
 
@@ -336,15 +320,13 @@
             },
             updateCheck(item) {
                 let self = this
-                let store = {
-                    store_ID: self.StoreID
-                }
-                let tmp = item.data
+                 let tmp = item.data
                 let node = item.node
                 self.createUpdate(tmp, data => {
                     tmp.id = data.store_Planogram.id
+                    tmp.heightFit = data.store_Planogram.heightFit;
+                    tmp.modulesFit = data.store_Planogram.modulesFit;
                     node.setData(tmp)
-                     this.gridApi.redrawRows();
                 })
             },
             createUpdate(listItem, callback) {

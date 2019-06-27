@@ -116,22 +116,10 @@
                         "editable": true,
                         "field": "modules",
                         cellClassRules: {
-                            'success-green': 'data.modulesFit == false',
-                            'error-red': 'data.modulesFit == true',
+                            'success-green': 'data.modulesFit == false && data.planogramStoreStatus!=0',
+                            'error-red': 'data.modulesFit == true && data.planogramStoreStatus!=0',
                         }
-                        // cellStyle: function (params) {
-                        //     if (params.data.modulesFit == true) {
-                        //         //mark police cells as red
-                        //         return {
-                        //             // color: 'red',
-                        //             backgroundColor: "rgb(240, 125, 125)"
-                        //         };
-                        //     } else {
-                        //         return {
-                        //             backgroundColor: "#C8E6C9"
-                        //         };
-                        //     }
-                        // }
+                        
                     }, {
                         "headerName": "Height",
                         "minWidth": 50,
@@ -139,22 +127,9 @@
                         "editable": true,
                         "field": "height",
                         cellClassRules: {
-                            'success-green': 'data.heightFit == false',
-                            'error-red': 'data.heightFit == true',
+                            'success-green': 'data.heightFit == false && data.planogramStoreStatus!=0',
+                            'error-red': 'data.heightFit == true && data.planogramStoreStatus!=0',
                         }
-                        // cellStyle: function (params) {
-                        //     if (params.data.heightFit == true) {
-                        //         //mark police cells as red
-                        //         return {
-                        //             // color: 'red',
-                        //             backgroundColor: " rgb(240, 125, 125)"
-                        //         };
-                        //     } else {
-                        //         return {
-                        //             backgroundColor: " #C8E6C9"
-                        //         };
-                        //     }
-                        // }
                     },
                     //  {
                     //     "headerName": "Width",
@@ -171,6 +146,7 @@
                                 "Industrial",
                                 "Supplier Stand",
                                 "Till point",
+                                "pallettes",
                                 "Custom"
                             ],
                         },
@@ -248,11 +224,6 @@
 
                         })
                 })
-            },
-            recentre(index) {
-                console.log("recentering");
-
-                this.gridApi.ensureIndexVisible(index, 'top')
             },
             getSelectedRows() {
                 let self = this

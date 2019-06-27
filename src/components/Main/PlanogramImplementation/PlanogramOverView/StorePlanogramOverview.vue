@@ -27,7 +27,7 @@
             <grid ref="grid" :getRowData="getStorePlanograms" :selectedProject="selectedProject" :rowData="rowData"
                 :assign="assignGroups" />
 
-            <StorePlanograms ref="StorePlanograms" />
+            <StorePlanograms ref="StorePlanograms" :getStoreData="getStorePlanograms" />
             <PlanogramDetailsSelector :PlanoName="ProjectName.text" ref="PlanogramDetailsSelector" />
             <YesNoModal ref="YesNoModal" />
 
@@ -47,7 +47,7 @@
 import { setTimeout } from 'timers';
 
     export default {
-        props: ['ProjectName', 'selectedProject'],
+        props: ['ProjectName', 'selectedProject',],
         components: {
             grid,
             YesNoModal,
@@ -327,7 +327,6 @@ import { setTimeout } from 'timers';
                         })
                         self.rowData = self.currentStorePlanograms
                         setTimeout(() => {
-                        self.$refs.grid.recentre(self.index)
                         }, 300);
                         console.log(self.rowData);
                     })
