@@ -3,7 +3,7 @@
         <v-layout row justify-center>
             <v-dialog v-model="dialog" persistent max-width="800">
                 <v-card>
-                    <v-form @submit.prevent="getProducts">
+                    <v-form ref="form" @submit.prevent="getProducts">
                         <v-toolbar color="primary" dark>
                             <v-toolbar-title>Add New Item</v-toolbar-title>
                         </v-toolbar>
@@ -18,7 +18,7 @@
                                             </v-checkbox>
                                         </v-flex>
                                         <v-flex md5 xs12>
-                                            <v-text-field :rules="sysIDRules" counter="15" maxlength="15"
+                                            <v-text-field required :rules="sysIDRules" counter="30" maxlength="30"
                                                 @blur="on_product_system_id_blur" :loading="product_sys_id_loading"
                                                 :disabled="form.generate_product_system_id || product_sys_id_loading"
                                                 v-model="form.product_System_ID" label="Product system id">
@@ -41,7 +41,7 @@
                                             </v-tooltip>
                                         </v-flex>
                                         <v-flex md5 xs12>
-                                            <v-text-field :rules="barcodeRules" counter="15" maxlength="15"
+                                            <v-text-field required :rules="barcodeRules" counter="15" maxlength="15"
                                                 @blur="on_barcode_blur" :loading="barcode_loading"
                                                 :disabled="form.product_System_ID == '' || barcode_loading"
                                                 v-model="form.barcode" label="Barcode"></v-text-field>
@@ -63,7 +63,7 @@
                                             </v-tooltip>
                                         </v-flex>
                                         <v-flex md12>
-                                            <v-text-field :rules="descRules" counter="40" maxlength="40"
+                                            <v-text-field @keypress="first_type = false" :rules="descRules" counter="40" maxlength="40"
                                                 v-model="form.description" label="Description"></v-text-field>
                                         </v-flex>
                                     </v-layout>
@@ -92,6 +92,7 @@
         data() {
             return {
                 dialog: false,
+                first_type: true,
                 noIDMatches: true,
                 noBarcodeMatches: true,
                 form: {
@@ -106,21 +107,24 @@
                         this.description = '';
                         this.save_disabled = true;
                     },
+                    valid() {
+                        return this.product_System_ID == "" || this.barcode == "" || this.description == ""
+                    }
                 },
                 afterReturn: null,
                 product_sys_id_loading: false,
                 barcode_loading: false,
                 save_disabled: true,
                 sysIDRules: [
-                    v => !!v || 'ID is required',
-                    v => v.length <= 15 || 'ID must be 15 characters or less'
+                    v => !!v || 'ID is required' && this.save_disabled == true,
+                    v => v.length <= 30 || 'ID must be 30 characters or less'
                 ],
                 barcodeRules: [
-                    v => !!v || 'Barcode is required',
+                    v => !!v || 'Barcode is required' && this.save_disabled == true,
                     v => v.length <= 15 || 'Barcode must be 15 characters or less'
                 ],
                 descRules: [
-                    v => !!v || 'Description must be 40 characters',
+                    v => !!v || 'Description must be 40 characters' && this.save_disabled == true,
                     v => v.length <= 40 || 'Description must be less than 40 characters'
                 ],
             }
@@ -129,6 +133,7 @@
         methods: {
             show(afterReturn) {
                 let self = this;
+                self.first_type = false;
                 self.form.clear();
                 self.afterReturn = afterReturn;
                 self.dialog = true;
@@ -136,11 +141,16 @@
             atClose() {
                 let self = this;
                 self.dialog = false;
+                self.noIDMatches = true;
+                self.noBarcodeMatches = true;
                 self.form.clear();
             },
             returnData() {
                 let self = this;
                 self.afterReturn(self.form);
+                self.noIDMatches = true;
+                self.noBarcodeMatches = true;
+                self.save_disabled = true;
                 self.dialog = false;
             },
             on_generate_change() {
