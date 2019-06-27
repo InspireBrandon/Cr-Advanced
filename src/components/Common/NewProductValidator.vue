@@ -3,7 +3,7 @@
         <v-layout row justify-center>
             <v-dialog v-model="dialog" persistent max-width="800">
                 <v-card>
-                    <v-form ref="form" @submit.prevent="getProducts">
+                    <v-form ref="form" @submit.prevent="returnData">
                         <v-toolbar color="primary" dark>
                             <v-toolbar-title>Add New Item</v-toolbar-title>
                         </v-toolbar>
@@ -63,7 +63,7 @@
                                             </v-tooltip>
                                         </v-flex>
                                         <v-flex md12>
-                                            <v-text-field @keypress="first_type = false" :rules="descRules" counter="40" maxlength="40"
+                                            <v-text-field required @keypress="first_type = false" :rules="descRules" counter="40" maxlength="40"
                                                 v-model="form.description" label="Description"></v-text-field>
                                         </v-flex>
                                     </v-layout>
@@ -74,7 +74,7 @@
                         <v-card-actions>
                             <v-spacer></v-spacer>
                             <v-btn flat color="secondary" @click.native="atClose">Cancel</v-btn>
-                            <v-btn :disabled="save_disabled" flat color="primary" @click.native="returnData">Continue
+                            <v-btn :disabled="save_disabled" flat color="primary" type="submit">Continue
                             </v-btn>
                         </v-card-actions>
                     </v-form>
