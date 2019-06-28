@@ -19,9 +19,9 @@
   "dependencies": {
     "@capacitor/cli": "^1.0.0-alpha.38",
     "@capacitor/core": "^1.0.0-alpha.38",
-    "ag-grid-community": "^19.1.4",
-    "ag-grid-enterprise": "^19.1.4",
-    "ag-grid-vue": "^19.1.2",
+    "ag-grid-community": "^21.0.1",
+    "ag-grid-enterprise": "^21.0.1",
+    "ag-grid-vue": "^21.0.1",
     "axios": "^0.18.0",
     "cloudinary-core": "^2.6.2",
     "jsonwebtoken": "^8.5.0",

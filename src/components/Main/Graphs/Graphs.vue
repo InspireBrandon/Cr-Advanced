@@ -15,12 +15,13 @@
                         </v-btn>
                     </v-toolbar>
                     <ag-grid-vue id="ag-Grid" :gridOptions="gridOptions"
-                        style="width: 100%;  height: calc(100vh - 160px);" :defaultColDef="defaultColDef"
+                        style="width: 100%; height: 35vh;" :defaultColDef="defaultColDef"
                         class="ag-theme-balham" :columnDefs="columnDefs" :rowData="rowData" :enableSorting="true"
                         :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true"
                         rowSelection="multiple" :rowDeselection="true" :enableColResize="true" :floatingFilter="true"
                         :groupMultiAutoColumn="true" :gridReady="onGridReady">
                     </ag-grid-vue>
+                    <div id="myChart" class="ag-theme-balham-dark my-chart"></div>
                 </v-flex>
             </v-layout>
         </v-container>
@@ -32,6 +33,8 @@
     import {
         AgGridVue
     } from "ag-grid-vue";
+
+    var chartRef;
 
     export default {
         data() {
@@ -45,6 +48,8 @@
                 rowData: [],
                 defaultColDef: {},
                 gridOptions: {
+                    enableCharts: true,
+                    enableRangeSelection: true,
                     rowHeight: 35,
                     pinnedTopRowData: [],
                     pinnedBottomRowData: [],
@@ -53,6 +58,19 @@
                     },
                     rowClassRules: {
                         'disabled-line': 'data.can_edit'
+                    },
+                    onFirstDataRendered(params) {
+                        var chartRangeParams = {
+                            cellRange: {
+                                columns: ['name', 'value', 'other']
+                            },
+                            chartType: 'groupedBar',
+                            chartContainer: document.querySelector('#myChart'),
+                            suppressChartRanges: true,
+                            aggregate: true
+                        };
+
+                        chartRef = params.api.chartRange(chartRangeParams);
                     }
                 },
 
@@ -63,13 +81,47 @@
         },
         created() {
             let self = this;
-
             self.gridOptions.context.componentParent = this;
-            self.getStores();
         },
         beforeMount() {
             let self = this;
             self.columnDefs = require('./headers.json');
+            self.rowData = [{
+                    name: "Brandon",
+                    value: 5,
+                    other: 6
+                },
+                {
+                    name: "Piet",
+                    value: 6,
+                    other: 2
+                },
+                {
+                    name: "Douglas",
+                    value: 9,
+                    other: 1
+                },
+                {
+                    name: "TJ",
+                    value: 12,
+                    other: 8
+                },
+                {
+                    name: "Jason",
+                    value: 2,
+                    other: 4
+                },
+                {
+                    name: "Connor",
+                    value: 2,
+                    other: 99
+                },
+                {
+                    name: "Brendan",
+                    value: 3,
+                    other: 12
+                }
+            ]
         },
         methods: {
             onFilterTextBoxChanged() {
@@ -81,20 +133,25 @@
                 self.gridApi = params.api;
                 self.columnApi = params.columnApi;
             },
-            getStores() {
-                let self = this
+            createChart(type) {
 
+                // destroy existing chart
+                if (chartRef) {
+                    chartRef.destroyChart();
+                }
 
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                var params = {
+                    cellRange: {
+                        columns: ['name', 'value', 'other']
+                    },
+                    chartContainer: document.querySelector('#myChart'),
+                    chartType: type,
+                    suppressChartRanges: true,
+                    aggregate: true
+                };
 
-                Axios.get(process.env.VUE_APP_API + `Retailer/Store`)
-                    .then(r => {
-                        console.log(r);
-
-                        self.rowData = r.data;
-                        delete Axios.defaults.headers.common["TenantID"];
-                    })
-            },
+                chartRef = gridOptions.api.chartRange(params);
+            }
         }
 
     }

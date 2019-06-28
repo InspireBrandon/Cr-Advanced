@@ -50,6 +50,30 @@
                             <v-icon>home</v-icon>
                         </v-btn>
                         <v-spacer></v-spacer>
+
+                        <v-menu offset-y>
+                            <template v-slot:activator="{ on }">
+                                <v-btn flat dark v-on="on">View</v-btn>
+                            </template>
+                            <v-list dense>
+                                <v-list-tile tile @click="change_view_state(0)">
+                                    <v-list-tile-title>All</v-list-tile-title>
+                                </v-list-tile>
+                                <v-divider></v-divider>
+                                <v-list-tile tile @click="change_view_state(1)">
+                                    <v-list-tile-title>Approvals</v-list-tile-title>
+                                </v-list-tile>
+                                <v-divider></v-divider>
+                                <v-list-tile tile @click="change_view_state(2)">
+                                    <v-list-tile-title>Distribution</v-list-tile-title>
+                                </v-list-tile>
+                                <v-divider></v-divider>
+                                <v-list-tile tile @click="change_view_state(3)">
+                                    <v-list-tile-title>No Subtasks</v-list-tile-title>
+                                </v-list-tile>
+                            </v-list>
+                        </v-menu>
+
                         <v-btn-toggle v-model="selectedView" @change="onViewChanged" class="transparent" mandatory>
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
@@ -155,6 +179,7 @@
         },
         data() {
             return {
+                viewState: 0,
                 show_subtasks: false,
                 filter_text: "",
                 statusList: [],
@@ -202,15 +227,15 @@
 
                 switch (self.selectedView) {
                     case 0: {
-                        filterData = self.taskViewData
+                        filterData = self.filter_off_of_view(self.taskViewData);
                     }
                     break;
                 case 1: {
-                    filterData = self.projectViewData
+                    filterData = self.filter_off_of_view(self.projectViewData);
                 }
                 break;
                 case 2: {
-                    filterData = self.storeViewData
+                    filterData = self.filter_off_of_view(self.storeViewData);
                 }
                 break;
                 }
@@ -240,6 +265,50 @@
             }
         },
         methods: {
+            change_view_state(viewState) {
+                let self = this;
+                self.viewState = viewState
+                // self.getData();
+            },
+            filter_off_of_view(items) {
+                let self = this;
+                let tmp = [];
+
+                items.forEach(el => {
+                    if (self.can_view(el))
+                        tmp.push(el);
+                })
+
+                return tmp;
+            },
+            can_view(item) {
+                let self = this;
+
+                let canView = false;
+
+                switch (self.viewState) {
+                    case 0: {
+                        canView = true;
+                    }
+                    break;
+                case 1: {
+                    if (item.status == 10 || item.status == 12 || item.status == 20)
+                        canView = true;
+                }
+                break;
+                case 2: {
+                    if (item.status == 19)
+                        canView = true;
+                }
+                break;
+                case 3: {
+                    if (item.type != 6)
+                        canView = true;
+                }
+                }
+
+                return canView;
+            },
             getData() {
                 let self = this;
                 setTimeout(() => {
@@ -250,7 +319,8 @@
                                     self.getUsers(() => {
                                         self.getStores(() => {
                                             self.getTaskViewData(() => {
-                                                self.loading = false;
+                                                self.loading =
+                                                    false;
                                             })
                                         })
                                     })
