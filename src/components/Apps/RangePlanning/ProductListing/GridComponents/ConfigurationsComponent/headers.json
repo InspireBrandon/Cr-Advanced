@@ -1,6 +1,6 @@
 [{
         "headerName": "Fisrt Name",
-        "field": "displayname"
+        "field": "firstname"
     },
     {
         "headerName": "Last Name",
@@ -8,7 +8,7 @@
     },
     {
         "headerName": "Type",
-        "field": "type"
+        "field": "resourceType"
     },
     {
         "headerName": "Actions",
