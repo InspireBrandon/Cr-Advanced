@@ -123,7 +123,7 @@
           :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
           :selectionChanged="onSelectionChanged" :rowData="rowData" :enableSorting="true" :enableFilter="true"
           :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true"
-          :enableColResize="true" :floatingFilter="true" :gridReady="onGridReady" :groupMultiAutoColumn="true">
+          :enableColResize="true" :floatingFilter="true" :onGridReady="onGridReady" :groupMultiAutoColumn="true">
         </ag-grid-vue>
         <div>
           <p>{{ rowData.length }} Rows</p>

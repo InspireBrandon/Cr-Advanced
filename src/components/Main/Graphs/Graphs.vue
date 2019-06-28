@@ -14,12 +14,15 @@
                             <v-icon>add</v-icon>
                         </v-btn>
                     </v-toolbar>
-                    <ag-grid-vue id="ag-Grid" :gridOptions="gridOptions"
-                        style="width: 100%; height: 35vh;" :defaultColDef="defaultColDef"
-                        class="ag-theme-balham" :columnDefs="columnDefs" :rowData="rowData" :enableSorting="true"
-                        :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true"
-                        rowSelection="multiple" :rowDeselection="true" :enableColResize="true" :floatingFilter="true"
-                        :groupMultiAutoColumn="true" :gridReady="onGridReady">
+                    <button @click="createChart('stackedBar')">Stacked Bar Chart</button>
+                    <button @click="createChart('groupedBar')">Grouped Bar Chart</button>
+                    <button @click="createChart('line')">Line Chart</button>
+                    <ag-grid-vue id="ag-Grid" :gridOptions="gridOptions" style="width: 100%; height: 35vh;"
+                        :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
+                        :rowData="rowData" :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true"
+                        :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true"
+                        :enableColResize="true" :floatingFilter="true" :groupMultiAutoColumn="true"
+                        :onGridReady="onGridReady">
                     </ag-grid-vue>
                     <div id="myChart" class="ag-theme-balham-dark my-chart"></div>
                 </v-flex>
@@ -130,10 +133,14 @@
             },
             onGridReady(params) {
                 let self = this;
+
+                console.log(params)
+
                 self.gridApi = params.api;
                 self.columnApi = params.columnApi;
             },
             createChart(type) {
+                let self = this;
 
                 // destroy existing chart
                 if (chartRef) {
@@ -150,7 +157,9 @@
                     aggregate: true
                 };
 
-                chartRef = gridOptions.api.chartRange(params);
+                console.log(self.gridApi)
+
+                chartRef = self.gridApi.chartRange(params);
             }
         }
 

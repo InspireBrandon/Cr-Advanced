@@ -1,11 +1,11 @@
 <template>
-    <div v-if="rowData.length>0">
+    <div>
         storeID:{{StoreID}}
         <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%;  height: calc(100vh - 235px);"
             :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
             :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true"
             rowSelection="multiple" :rowDeselection="true" :enableColResize="true" :floatingFilter="true"
-            :gridReady="onGridReady" :groupMultiAutoColumn="true">
+            :onGridReady="onGridReady" :gridReady="onGridReady" :groupMultiAutoColumn="true">
         </ag-grid-vue>
         <PlanogramDetailsSelector :PlanoName="'ProjectName.text'" ref="PlanogramDetailsSelector" />
         rows:{{rowData.length}}
