@@ -15,7 +15,7 @@
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                     <v-btn v-on="on" icon flat small color="error" class="ma-0"
-                        @click="params.context.componentParent.removeFromStore(params.data,true,6)">
+                        @click="params.context.componentParent.removeFromStore(params,true,6)">
                         <v-icon>remove_circle_outline</v-icon>
                     </v-btn>
                 </template>
@@ -26,7 +26,7 @@
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                     <v-btn v-on="on" icon flat small color="success" class="ma-0"
-                        @click="params.context.componentParent.removeFromStore(params.data,false,0)">
+                        @click="params.context.componentParent.removeFromStore(params,false,0)">
                         <v-icon>add</v-icon>
                     </v-btn>
                 </template>
@@ -36,7 +36,7 @@
         <div v-if="params.data.planogramStoreStatus!=0&&params.data.planogramStoreStatus!=6">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
-                    <v-btn v-on="on" @click="params.context.componentParent.openOrder(params.data)" icon flat small
+                    <v-btn v-on="on" @click="params.context.componentParent.openOrder(params)" icon flat small
                         color="warning" class="ma-0">
                         <v-icon>edit_attributes</v-icon>
                     </v-btn>

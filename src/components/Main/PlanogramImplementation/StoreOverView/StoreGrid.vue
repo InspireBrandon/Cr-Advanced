@@ -223,17 +223,14 @@
                 let tmp = item.data
                 let node = item.node
 
-                self.$refs.VariationOrderModal.show(item, callback => {
-                    item.planogramStoreStatus = 5
+                self.$refs.VariationOrderModal.show(tmp, callback => {
+                    tmp.planogramStoreStatus = 5
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                    Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
+                    Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', tmp)
                         .then(r => {
                             delete Axios.defaults.headers.common["TenantID"];
-                            item.currentStatusText = "Variation"
-
-
-
-                            node.setData(item)
+                            tmp.currentStatusText = "Variation"
+                            node.setData(tmp)
                         }).catch(e => {
                             delete Axios.defaults.headers.common["TenantID"];
 
@@ -343,7 +340,7 @@
                 let heightFit = false
                 let overallFits = false
                 let storeClusterFit = false
-                
+
                 if (listItem.modules < listItem.detailModules) {
                     moduleFit = true
                 }
@@ -420,35 +417,69 @@
                     text = "Are you sure you want to remove this category ?"
                 }
 
-                self.$refs.YesNoModal.show(text, data => {
-                    if (data) {
-                        self.remove(item, state, Status, data => {
-                            node.setData(item)
+                self.$refs.YesNoModal.show(text, val => {
+                    if (val) {
+                        self.remove(tmp, state, Status, data => {
+                            node.setData(data)
                         })
                     }
                 })
             },
-            remove(listItem, state, Status, callback) {
+            // remove(listItem, state, Status, callback) {
+            //     let self = this;
+            //     if (state == true) {
+            //         listItem.planogramDetail_ID = null
+            //         listItem.HeightFit = false
+            //         listItem.modulesFit = false
+            //         listItem.storeClusterFit = false
+            //         listItem.PlanogramFit = false
+            //         listItem.Fits = false
+            //         listItem.systemFileID = 0
+            //     }
+
+            //     listItem.requiredInStore = state
+            //     listItem.planogramStoreStatus = Status
+
+            //     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+            //     Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', listItem)
+            //         .then(r => {
+            //             delete Axios.defaults.headers.common["TenantID"];
+            //             callback(r)
+            //         }).catch(e => {
+            //             delete Axios.defaults.headers.common["TenantID"];
+            //             callback(e)
+            //         })
+            // },
+            remove(listItem, state, status, callback) {
                 let self = this;
                 if (state == true) {
+                    console.log("removing state");
                     listItem.planogramDetail_ID = null
                     listItem.HeightFit = false
+                    listItem.fileName = null
                     listItem.modulesFit = false
                     listItem.storeClusterFit = false
                     listItem.PlanogramFit = false
                     listItem.Fits = false
                     listItem.systemFileID = 0
+                    listItem.currentStatusText = "On Hold"
+                } else {
+                    listItem.currentStatusText = "Unassigned"
                 }
+                console.log("status");
+                console.log(status);
 
                 listItem.requiredInStore = state
-                listItem.planogramStoreStatus = Status
 
+                listItem.planogramStoreStatus = status
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', listItem)
                     .then(r => {
+                        console.log(r);
                         delete Axios.defaults.headers.common["TenantID"];
-                        callback(r)
+                        callback(listItem)
                     }).catch(e => {
+                        console.log(e);
                         delete Axios.defaults.headers.common["TenantID"];
                         callback(e)
                     })

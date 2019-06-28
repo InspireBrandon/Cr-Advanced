@@ -4,7 +4,7 @@
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                     <v-btn icon v-on="on"
-                        @click="params.context.componentParent.$parent.$parent.$parent.$parent.$refs.StorePlanograms.show(params)"
+                        @click="params.context.componentParent.$parent.$parent.$parent.$parent.$refs.StorePlanograms.show(params.data)"
                         class="ma-0">
                         <v-icon>
                             store
