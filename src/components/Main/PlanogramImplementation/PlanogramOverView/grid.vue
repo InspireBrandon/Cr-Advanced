@@ -1,10 +1,10 @@
 <template>
-    <div v-if="rowData.length>0">
+    <div>
         <ag-grid-vue :gridOptions="gridOptions" :selectionChanged="onSelectionChanged" :sideBar='false'
             style="width: 100%;  height: calc(100vh - 235px);" :defaultColDef="defaultColDef" class="ag-theme-balham"
             :columnDefs="headers" :rowData="rowData" :enableSorting="true" :enableFilter="true"
             :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
-            :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :gridReady="onGridReady"
+            :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :gridReady="gridReady" :onGridReady="onGridReady"
             :groupMultiAutoColumn="true">
         </ag-grid-vue>
         rows : {{rowData.length}}
@@ -454,6 +454,22 @@
             onGridReady(params) {
                 this.gridApi = params.api;
                 this.columnApi = params.columnApi;
+
+                console.log("From on grid ready")
+                console.log(params, this.gridApi);
+
+                setTimeout(() => {
+                    this.gridApi.resetRowHeights();
+                    this.gridApi.sizeColumnsToFit()
+                }, 200);
+            },
+            gridReady(params) {
+                this.gridApi = params.api;
+                this.columnApi = params.columnApi;
+
+                console.log("From grid ready")
+                console.log(params, this.gridApi);
+
                 setTimeout(() => {
                     this.gridApi.resetRowHeights();
                     this.gridApi.sizeColumnsToFit()

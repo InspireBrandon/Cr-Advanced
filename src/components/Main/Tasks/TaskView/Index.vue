@@ -6,7 +6,7 @@
                     :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
                     :selectionChanged="onSelectionChanged" :rowData="data" :enableSorting="true" :enableFilter="true"
                     :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
-                    :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :gridReady="onGridReady"
+                    :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :onGridReady="onGridReady"
                     :groupMultiAutoColumn="true">
                 </ag-grid-vue>
                 <v-dialog v-model="notesDialog" max-width="500px">
