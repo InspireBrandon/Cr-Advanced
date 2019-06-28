@@ -4,14 +4,14 @@
             <v-layout justify-center>
                 <v-dialog v-model="dialog" width="1500">
                     <v-card>
-                        <v-toolbar dark color="blue darken-2" scroll-off-screen>
+                        <v-toolbar flat dark color="blue darken-2" scroll-off-screen>
                             <v-toolbar-title>Configuration</v-toolbar-title>
                             <v-spacer></v-spacer>
                             <v-btn icon @click="dialog = false">
                                 <v-icon>close</v-icon>
                             </v-btn>
                         </v-toolbar>
-                        <v-layout row wrap style="height: calc(100vh - 300px); overflow-x: auto;">
+                        <v-layout row wrap>
                             <v-flex md2 justify-start>
                                 <v-list dense class="pt-0">
                                     <template v-for="(item, idx) in items">
@@ -42,11 +42,9 @@
                                         <v-icon>add</v-icon>
                                     </v-btn>
                                 </v-toolbar>
-                            </v-flex>
-                            <v-flex md12>
-                                <v-card-text class="pt-0">
+                                <div>
                                     <Grid ref="grid" :rowData="rowData" />
-                                </v-card-text>
+                                </div>
                             </v-flex>
                         </v-layout>
 
@@ -109,9 +107,6 @@
             onFilterTextBoxChanged() {
                 let self = this;
                 self.$refs.grid.gridApi.setQuickFilter(self.filterText);
-            },
-            openEdit() {
-                let self = this;
             },
             openAdd() {
                 let self = this;
