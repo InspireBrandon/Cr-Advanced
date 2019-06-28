@@ -30,29 +30,14 @@
                             </v-flex>
                             <v-flex md10>
                                 <v-card-text class="pt-0">
-                                    <v-data-table :headers="headers" :items="desserts" class="elevation-0">
-                                        <template slot="headerCell" slot-scope="props">
-                                            <v-tooltip bottom>
-                                                <template v-slot:activator="{ on }">
-                                                    <span v-on="on">
-                                                        {{ props.header.text }}
-                                                    </span>
-                                                </template>
-                                                <span>
-                                                    {{ props.header.text }}
-                                                </span>
-                                            </v-tooltip>
-                                        </template>
-                                        <template v-slot:items="props">
-                                            <td>{{ props.item.name }}</td>
-                                            <td class="text-xs-right">{{ props.item.calories }}</td>
-                                            <td class="text-xs-right">{{ props.item.fat }}</td>
-                                            <td class="text-xs-right">{{ props.item.carbs }}</td>
-                                            <td class="text-xs-right">{{ props.item.protein }}</td>
-                                            <td class="text-xs-right">{{ props.item.iron }}</td>
-                                        </template>
-                                    </v-data-table>
-
+                                    <ag-grid-vue id="ag-Grid" :gridOptions="gridOptions"
+                                        style="width: 100%;  height: calc(100vh - 130px);"
+                                        :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
+                                        :rowData="rowData" :enableSorting="true" :enableFilter="true"
+                                        :suppressRowClickSelection="true" :enableRangeSelection="true"
+                                        rowSelection="multiple" :rowDeselection="true" :enableColResize="true"
+                                        :floatingFilter="true" :groupMultiAutoColumn="true" :gridReady="onGridReady">
+                                    </ag-grid-vue>
                                 </v-card-text>
                             </v-flex>
                         </v-layout>
@@ -71,7 +56,21 @@
 </template>
 
 <script>
+    import Axios from 'axios';
+
+    import {
+        AgGridVue
+    } from "ag-grid-vue";
+
+    import Button from "./button.vue";
+
     export default {
+        name: "config",
+        components: {
+            AgGridVue,
+            Button,
+        },
+
         data() {
             return {
                 dialog: false,
@@ -89,121 +88,73 @@
                         icon: 'gavel'
                     }
                 ],
-                headers: [{
-                        text: 'Dessert (100g serving)',
-                        align: 'left',
-                        sortable: false,
-                        value: 'name'
+                filterText: '',
+                columnDefs: [],
+                rowData: [],
+                defaultColDef: {},
+                gridOptions: {
+                    rowHeight: 35,
+                    pinnedTopRowData: [],
+                    pinnedBottomRowData: [],
+                    context: {
+                        componentParent: self
                     },
-                    {
-                        text: 'Calories',
-                        value: 'calories'
-                    },
-                    {
-                        text: 'Fat (g)',
-                        value: 'fat'
-                    },
-                    {
-                        text: 'Carbs (g)',
-                        value: 'carbs'
-                    },
-                    {
-                        text: 'Protein (g)',
-                        value: 'protein'
-                    },
-                    {
-                        text: 'Iron (%)',
-                        value: 'iron'
+                    rowClassRules: {
+                        'disabled-line': 'data.can_edit'
                     }
-                ],
-                desserts: [{
-                        name: 'Frozen Yogurt',
-                        calories: 159,
-                        fat: 6.0,
-                        carbs: 24,
-                        protein: 4.0,
-                        iron: '1%'
-                    },
-                    {
-                        name: 'Ice cream sandwich',
-                        calories: 237,
-                        fat: 9.0,
-                        carbs: 37,
-                        protein: 4.3,
-                        iron: '1%'
-                    },
-                    {
-                        name: 'Eclair',
-                        calories: 262,
-                        fat: 16.0,
-                        carbs: 23,
-                        protein: 6.0,
-                        iron: '7%'
-                    },
-                    {
-                        name: 'Cupcake',
-                        calories: 305,
-                        fat: 3.7,
-                        carbs: 67,
-                        protein: 4.3,
-                        iron: '8%'
-                    },
-                    {
-                        name: 'Gingerbread',
-                        calories: 356,
-                        fat: 16.0,
-                        carbs: 49,
-                        protein: 3.9,
-                        iron: '16%'
-                    },
-                    {
-                        name: 'Jelly bean',
-                        calories: 375,
-                        fat: 0.0,
-                        carbs: 94,
-                        protein: 0.0,
-                        iron: '0%'
-                    },
-                    {
-                        name: 'Lollipop',
-                        calories: 392,
-                        fat: 0.2,
-                        carbs: 98,
-                        protein: 0,
-                        iron: '2%'
-                    },
-                    {
-                        name: 'Honeycomb',
-                        calories: 408,
-                        fat: 3.2,
-                        carbs: 87,
-                        protein: 6.5,
-                        iron: '45%'
-                    },
-                    {
-                        name: 'Donut',
-                        calories: 452,
-                        fat: 25.0,
-                        carbs: 51,
-                        protein: 4.9,
-                        iron: '22%'
-                    },
-                    {
-                        name: 'KitKat',
-                        calories: 518,
-                        fat: 26.0,
-                        carbs: 65,
-                        protein: 7,
-                        iron: '6%'
-                    }
-                ]
+                },
             }
+        },
+        created() {
+            this.gridOptions.context.componentParent = this;
+            this.getItems();
+        },
+        computed: {},
+        beforeMount() {
+            let self = this;
+            self.columnDefs = require('./headers.json');
+        },
+        mounted() {
+            let self = this;
+
+            document.addEventListener('DOMContentLoaded', function () {
+                var gridID = document.querySelector('#ag-grid');
+                new agGrid.Grid(gridID, self.gridOptions);
+            });
         },
         methods: {
             show(afterReturn) {
                 let self = this;
                 self.afterReturn = afterReturn;
                 self.dialog = true;
+            },
+            onFilterTextBoxChanged() {
+                let self = this;
+                this.gridApi.setQuickFilter(self.filterText);
+            },
+            onGridReady(params) {
+                let self = this;
+                self.gridApi = params.api;
+                self.columnApi = params.columnApi;
+            },
+            openEdit(item) {
+                let self = this;
+                self.$refs.maint.show(false, item, newItem => {
+                    for (var prop in item) {
+                        item[prop] = newItem[prop];
+                    }
+                });
+            },
+            getItems() {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + `Event_Sheet_Resource`)
+                    .then(r => {
+                        self.rowData = r.data;
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
             },
         }
     }

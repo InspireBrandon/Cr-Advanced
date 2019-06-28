@@ -1,0 +1,19 @@
+[{
+        "headerName": "Fisrt Name",
+        "field": "displayname"
+    },
+    {
+        "headerName": "Last Name",
+        "field": "lastname"
+    },
+    {
+        "headerName": "Type",
+        "field": "type"
+    },
+    {
+        "headerName": "Actions",
+        "field": "",
+        "cellRendererFramework": "Button",
+        "pinned": "right"
+    }
+]
