@@ -34,12 +34,12 @@
                             <v-list>
                                 <div v-for="(item,index) in spacePlans" :key="index">
                                     <v-list-tile>
-                                        
+
                                         <v-list-tile-content v-if="item.fileName!=undefined">
-                                            {{item.fileName}}  {{item.id}}
+                                            {{item.fileName}} {{item.id}}
                                         </v-list-tile-content>
                                         <v-list-tile-content v-if="item.name!=undefined">
-                                            {{item.name}}  {{item.id}}
+                                            {{item.name}} {{item.id}}
                                         </v-list-tile-content>
                                         <v-list-tile-action>
                                             <v-btn @click="UpdateField(item)">update</v-btn>
@@ -125,18 +125,18 @@
         methods: {
             UpdateField(item) {
                 let self = this
-                 self.currentFileIndex = 0
-                    self.totalFiles = 1
+                self.currentFileIndex = 0
+                self.totalFiles = 1
                 self.getSystemFile(item.systemFileID, callback => {
-                   
+
                 })
             },
             selectSingle() {
                 let self = this
-                 self.currentFileIndex = 0
-                    self.totalFiles = 1
+                self.currentFileIndex = 0
+                self.totalFiles = 1
                 self.$refs.SpacePlanSelector.show(data => {
-                   
+
                     self.getSystemFile(data, callback => {
 
                     })
@@ -171,6 +171,7 @@
                     "displays": parseInt(item.dimensionData.displays),
                     "pallettes": parseInt(item.dimensionData.pallettes),
                     "supplierStands": parseInt(item.dimensionData.supplierStands),
+                    "fixtureType": item.clusterData.fixtureType,
                     "bins": parseInt(item.dimensionData.bins)
                 }
 
@@ -178,14 +179,14 @@
                 Axios.post(process.env.VUE_APP_API + 'Planogram_Details/Save', sendRequst).then(
                     r => {
                         console.log(r);
-                        
+
                         callback(r)
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
             getSystemFile(item, callback) {
                 let self = this
-                
+
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 let config = {
                     onDownloadProgress: progressEvent => {
@@ -196,14 +197,15 @@
                         // maybe dispatch an action that will update a progress bar or something
                     }
                 }
-                Axios.get(process.env.VUE_APP_API + `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${item}&file=config_advanced` , config).then(
+                Axios.get(process.env.VUE_APP_API +
+                    `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${item}&file=config_advanced`, config).then(
                     res => {
-                        if (res.data!=false) {
-                             self.currentPlanoName = res.data.jsonObject.name
-                        }else{
-                            self.currentPlanoName="File not found"
+                        if (res.data != false) {
+                            self.currentPlanoName = res.data.jsonObject.name
+                        } else {
+                            self.currentPlanoName = "File not found"
                         }
-                       
+
                         self.currentFileIndex = self.currentFileIndex + 1
 
                         if (res.data != false) {
@@ -213,16 +215,17 @@
                             //     self.getSystemFile(self.spacePlans[self.index].id, data => {})
                             // }, 2000)
                             self.createDetailTX(res.data.jsonObject, item, data => {
-                               setTimeout(() => {
-                               if (self.currentFileIndex == self.totalFiles) {
+                                setTimeout(() => {
+                                    if (self.currentFileIndex == self.totalFiles) {
 
-                                    self.currentPlanoName = "All Files Loaded"
+                                        self.currentPlanoName = "All Files Loaded"
 
-                                } else {
-                                    self.index = self.index + 1
-                                    self.getSystemFile(self.spacePlans[self.index].id, data => {})
-                                }
-                            }, 200)
+                                    } else {
+                                        self.index = self.index + 1
+                                        self.getSystemFile(self.spacePlans[self.index].id,
+                                            data => {})
+                                    }
+                                }, 200)
 
                             })
                         } else {
@@ -253,7 +256,7 @@
 
                         })
                     })
-                   
+
             },
             loadData() {
                 let self = this
