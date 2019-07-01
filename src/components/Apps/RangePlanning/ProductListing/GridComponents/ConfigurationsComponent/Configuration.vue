@@ -51,7 +51,7 @@
                 </v-dialog>
                 <v-dialog v-model="AddDialog" persistent max-width="600px" height="500px">
                     <v-card>
-                        <v-form @submit.prevent="saveForm">
+                        <v-form @submit.prevent="saveForm" ref="form">
                             <v-toolbar dark flat color="blue darken-2" scroll-off-screen>
                                 <v-toolbar-title>Configuration Add</v-toolbar-title>
                             </v-toolbar>
@@ -163,6 +163,7 @@
             openAdd() {
                 let self = this;
                 self.AddDialog = true;
+                self.$refs.form.reset()
             },
             saveForm() {
                 let self = this;
