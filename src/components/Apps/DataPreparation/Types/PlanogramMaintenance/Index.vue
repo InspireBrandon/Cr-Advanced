@@ -25,10 +25,10 @@
               Code</v-btn>
             <v-btn @click="move" :disabled="selectedItems.length <= 0" color="primary">move</v-btn>
           </v-toolbar>
-          <ag-grid-vue :selectionChanged="onSelectionChanged" :sideBar='true' style="width: 100%;  height: 70vh;" class="ag-theme-balham"
-            :columnDefs="columnDefs" :gridOptions="gridOptions" :rowData="rowData" :enableSorting="true" :enableFilter="true"
+          <ag-grid-vue @selection-changed="onSelectionChanged" :sideBar='true' style="width: 100%;  height: 70vh;" class="ag-theme-balham"
+            :columnDefs="columnDefs"  :gridOptions="gridOptions" :rowData="rowData" :enableSorting="true" :enableFilter="true"
             rowSelection="multiple" :rowDeselection="true" :enableColResize="true" :suppressRowClickSelection="true"
-            :floatingFilter="true" :gridReady="onGridReady" :groupMultiAutoColumn="true">
+            :floatingFilter="true" :onGridReady="onGridReady" :groupMultiAutoColumn="true">
           </ag-grid-vue>
           <div>
             <p>{{ rowData.length }} Rows</p>
@@ -83,7 +83,8 @@
       this.gridOptions = {
         context: {
           componentParent: this
-        }
+        },
+        selectionChanged: this.onSelectionChanged
       };
     },
     data() {
@@ -207,6 +208,8 @@
         self.gridApi.onFilterChanged();
       },
       onSelectionChanged(e) {
+        console.log(e);
+
         var rows = e.api.getSelectedNodes();
         this.selectedItems = rows;
       },

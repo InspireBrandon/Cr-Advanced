@@ -16,7 +16,7 @@
             :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs" :rowData="rowData"
             :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true"
             rowSelection="multiple" :rowDeselection="true" :enableColResize="true" :floatingFilter="true"
-            :groupMultiAutoColumn="true" :gridReady="onGridReady">
+            :groupMultiAutoColumn="true" :onGridReady="onGridReady">
         </ag-grid-vue>
         <SimpleMaint :hasCode="hasCode" :name="name" :headerName="headerName" ref="maint"></SimpleMaint>
     </div>
@@ -52,7 +52,7 @@
                     pinnedTopRowData: [],
                     pinnedBottomRowData: [],
                     context: {
-                        componentParent: self
+                        componentParent: this
                     },
                     rowClassRules: {
                         'disabled-line': 'data.can_edit'
@@ -81,7 +81,7 @@
         methods: {
             onFilterTextBoxChanged() {
                 let self = this;
-                this.gridApi.setQuickFilter(self.filterText);
+                self.gridApi.setQuickFilter(self.filterText);
             },
             onGridReady(params) {
                 let self = this;

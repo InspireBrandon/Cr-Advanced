@@ -1,8 +1,8 @@
 <template>
     <div style="text-align: center; cursor: pointer;">
-        <a href="#">change</a>
-        <a href="#" @click.prevent="duplicateLine" style="margin-left: 15px;">duplicate</a>
-        <a href="#" @click.prevent="removeLine" style="color: red; margin-left: 15px;">delete</a>
+        <a href="#">Edit</a>
+        <a href="#" @click.prevent="duplicateLine" style="margin-left: 15px;">Duplicate</a>
+        <a href="#" @click.prevent="removeLine" style="color: red; margin-left: 15px;">Delete</a>
         <YesNoModal ref="yesNo"></YesNoModal>
     </div>
 </template>
