@@ -221,7 +221,78 @@
                                 </v-tab-item>
                                 <v-tab-item>
                                     <v-card flat tile>
-                                        <v-card-text>Perimiters</v-card-text>
+                                        <v-card-text>
+                                            <v-layout row wrap align-center justify-center>
+                                                <v-flex md12>
+                                                    <span>Details</span>
+                                                </v-flex>
+                                                <v-flex md12>
+                                                    <v-text-field v-model="objectProperties.name" box label="Name"
+                                                        hide-details>
+                                                    </v-text-field>
+                                                </v-flex>
+                                                <v-flex md12 class="pa-0">
+                                                    <v-divider></v-divider>
+                                                </v-flex>
+                                                <v-flex md12>
+                                                    <span>Position</span>
+                                                </v-flex>
+                                                <v-flex md4 class="pt-0">
+                                                    <v-text-field @change="changeObjectProperties" type="number" v-model="objectProperties.position.x"
+                                                        box label="X" hide-details>
+                                                    </v-text-field>
+                                                </v-flex>
+                                                <v-flex md4 class="pt-0">
+                                                    <v-text-field @change="changeObjectProperties" type="number" v-model="objectProperties.position.y"
+                                                        box label="y" hide-details>
+                                                    </v-text-field>
+                                                </v-flex>
+                                                <v-flex md4 class="pt-0">
+                                                    <v-text-field @change="changeObjectProperties" type="number" v-model="objectProperties.position.z"
+                                                        box label="Z" hide-details>
+                                                    </v-text-field>
+                                                </v-flex>
+                                                <v-flex md12 class="pa-0">
+                                                    <v-divider></v-divider>
+                                                </v-flex>
+                                                <v-flex md12>
+                                                    <span>Dimension</span>
+                                                </v-flex>
+                                                <v-flex md4 class="pt-0">
+                                                    <v-text-field type="number" box label="X" hide-details>
+                                                    </v-text-field>
+                                                </v-flex>
+                                                <v-flex md4 class="pt-0">
+                                                    <v-text-field type="number" box label="y" hide-details>
+                                                    </v-text-field>
+                                                </v-flex>
+                                                <v-flex md4 class="pt-0">
+                                                    <v-text-field type="number" box label="Z" hide-details>
+                                                    </v-text-field>
+                                                </v-flex>
+                                                <v-flex md12 class="pa-0">
+                                                    <v-divider></v-divider>
+                                                </v-flex>
+                                                <v-flex md12>
+                                                    <span>Rotation</span>
+                                                </v-flex>
+                                                <v-flex md4 class="pt-0">
+                                                    <v-text-field type="number" box label="X" hide-details>
+                                                    </v-text-field>
+                                                </v-flex>
+                                                <v-flex md4 class="pt-0">
+                                                    <v-text-field type="number" box label="y" hide-details>
+                                                    </v-text-field>
+                                                </v-flex>
+                                                <v-flex md4 class="pt-0">
+                                                    <v-text-field type="number" box label="Z" hide-details>
+                                                    </v-text-field>
+                                                </v-flex>
+                                                <v-flex md12 class="pa-0">
+                                                    <v-divider></v-divider>
+                                                </v-flex>
+                                            </v-layout>
+                                        </v-card-text>
                                     </v-card>
                                 </v-tab-item>
                                 <v-tab-item>
@@ -322,7 +393,25 @@
                             title: 'List Item'
                         }]
                     }
-                ]
+                ],
+                objectProperties: {
+                    name: "",
+                    position: {
+                        x: null,
+                        y: null,
+                        z: null
+                    },
+                    dimension: {
+                        x: null,
+                        y: null,
+                        z: null
+                    },
+                    rotation: {
+                        x: null,
+                        y: null,
+                        z: null
+                    },
+                }
             }
         },
         mounted() {
@@ -402,6 +491,11 @@
 
                 if (pickInfo.hit) {
                     self.currentMesh = pickInfo.pickedMesh;
+
+                    self.objectProperties.position.x = self.currentMesh.position.x;
+                    self.objectProperties.position.y = self.currentMesh.position.y;
+                    self.objectProperties.position.z = self.currentMesh.position.z;
+
                     self.startingPoint = self.getGroundPosition(evt);
 
                     if (self.startingPoint) { // we need to disconnect camera from canvas
@@ -446,14 +540,14 @@
                         self.startingPoint = current;
                     }
                     break;
-                    case "SCALE": {
-                        self.currentMesh.scaling.x = diff.x;
-                    }
-                    break;
-                    case "ROTATE": {
-                        self.currentMesh.rotation.y = Math.sqrt(diff.x, diff.z) == NaN ? 0 : Math.sqrt(diff.x, diff.z);
-                    }
-                    break;
+                case "SCALE": {
+                    self.currentMesh.scaling.x = diff.x;
+                }
+                break;
+                case "ROTATE": {
+                    self.currentMesh.rotation.y = Math.sqrt(diff.x, diff.z) == NaN ? 0 : Math.sqrt(diff.x, diff.z);
+                }
+                break;
                 }
             },
             getGroundPosition() {
@@ -468,6 +562,13 @@
                 }
 
                 return null;
+            },
+            changeObjectProperties() {
+                let self = this;
+
+                self.objectProperties.position.x = self.currentMesh.position.x;
+                self.objectProperties.position.y = self.currentMesh.position.y;
+                self.objectProperties.position.z = self.currentMesh.position.z;
             }
             //#endregion
         }
