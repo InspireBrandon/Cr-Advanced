@@ -59,11 +59,11 @@
                                 <v-container grid-list-md>
                                     <v-layout wrap>
                                         <v-flex xs12 sm6 md6>
-                                            <v-text-field label="First name" counter="40" :rules="nameRules" v-model="addForm.firstname" required>
+                                            <v-text-field label="First name" maxlength="40" counter="40" :rules="nameRules" v-model="addForm.firstname" required>
                                             </v-text-field>
                                         </v-flex>
                                         <v-flex xs12 sm6 md6>
-                                            <v-text-field label="Last name" counter="40" :rules="nameRules" v-model="addForm.lastname" required>
+                                            <v-text-field label="Last name" maxlength="40" counter="40" :rules="nameRules" v-model="addForm.lastname" required>
                                             </v-text-field>
                                         </v-flex>
                                         <v-flex xs12>
