@@ -1,6 +1,6 @@
 <template>
     <div style="text-align: center; cursor: pointer;">
-        <v-btn @click="openEdit" class="ma-0" small icon>
+        <v-btn @click="openEdit(params)" class="ma-0" small icon>
             <v-icon color="secondary">edit</v-icon>
         </v-btn>
         <v-btn @click="removeLine" class="ma-0" small icon>
@@ -13,16 +13,16 @@
                 <v-toolbar dark flat color="blue darken-2" scroll-off-screen>
                     <v-toolbar-title>Configuration Edit</v-toolbar-title>
                 </v-toolbar>
-                <v-form @submit.prevent="saveForm">
+                <v-form @submit.prevent="saveForm(params)">
                     <v-card-text>
                         <v-container grid-list-md>
                             <v-layout wrap>
                                 <v-flex xs12 sm6 md6>
-                                    <v-text-field label="First name" v-model="editForm.firstname" required>
+                                    <v-text-field label="First name" counter="40" :rules="nameRules" v-model="editForm.firstname" required>
                                     </v-text-field>
                                 </v-flex>
                                 <v-flex xs12 sm6 md6>
-                                    <v-text-field label="Last name" v-model="editForm.lastname" required>
+                                    <v-text-field label="Last name" counter="40" :rules="nameRules" v-model="editForm.lastname" required>
                                     </v-text-field>
                                 </v-flex>
                                 <v-flex xs12>
@@ -77,7 +77,10 @@
                         text: "Order Clerk"
                     }
                 ],
-
+                nameRules: [
+                    v => !!v || 'Field is required',
+                    v => (v && v.length <= 40) || 'Name must be less than 40 characters'
+                ],
             }
         },
         components: {
@@ -112,16 +115,21 @@
             openEdit(item) {
                 let self = this;
                 self.EditDialog = true;
-                self.editForm = item;
+                self.editForm = item.data;
             },
             saveForm(item) {
                 let self = this;
+                let tmp = item.data
+                let node = item.node
+
+                tmp = self.editForm;
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.put(process.env.VUE_APP_API + `Event_Sheet_Resource`, self.editForm)
                     .then(r => {
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                        node.setData(tmp)
                         self.EditDialog = false;
                     })
             },
