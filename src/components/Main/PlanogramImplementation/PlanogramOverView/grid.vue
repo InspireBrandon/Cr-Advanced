@@ -202,8 +202,8 @@
             },
             createProjectTransaction(request, callback) {
                 let self = this;
-                    console.log(request);
-                    
+                console.log(request);
+
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.post(process.env.VUE_APP_API + `ProjectTX`, request).then(r => {
@@ -214,7 +214,7 @@
                     callback(r.data.projectTX)
                 })
             },
-           
+
             getProjectOwner(projectID, callback) {
                 let self = this
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -291,12 +291,12 @@
                 let overallFits = false
                 let storeClusterFit = false
 
-                console.log(listItem.height, listItem.detailHeight)
+                console.log(listItem.modules + "<" + listItem.detailModules)
 
                 if (listItem.modules < listItem.detailModules) {
                     moduleFit = true
                 }
-
+                console.log(listItem.height + "<" + listItem.detailHeight)
                 if (parseFloat(listItem.height) < listItem.detailHeight) {
                     heightFit = true
                 }
@@ -339,7 +339,7 @@
                     })
             },
             UpdateLine(item) {
-                let self = this
+                   let self = this
                 let tmp = item.data
                 let node = item.node
                 self.createStorePlano(tmp, data => {

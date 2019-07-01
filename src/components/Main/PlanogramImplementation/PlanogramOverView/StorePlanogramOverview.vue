@@ -316,6 +316,7 @@
                                 listItem.currentStatusText = "Assigned"
                                 listItem.heightFit = heightFit
                                 listItem.storeClusterFit = storeClusterFit
+                                listItem.project_ID=self.selectedProject
                                 listItem.planogramFit = planogramFit
                                 listItem.modulesFit = moduleFit
                                 listItem.fits = fits
