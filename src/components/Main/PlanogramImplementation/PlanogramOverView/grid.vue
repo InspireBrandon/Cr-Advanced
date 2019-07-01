@@ -202,7 +202,8 @@
             },
             createProjectTransaction(request, callback) {
                 let self = this;
-
+                    console.log(request);
+                    
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.post(process.env.VUE_APP_API + `ProjectTX`, request).then(r => {
@@ -230,6 +231,9 @@
                 let item = data.data
                 let node = data.node
                 self.getProjectOwner(item.project_ID, ownerCallback => {
+                    console.log("ownerCallback");
+                    console.log(ownerCallback);
+                    let owner = ownerCallback.systemUserID
                     let encoded_details = jwt.decode(sessionStorage.accessToken);
                     let systemUserID = encoded_details.USER_ID;
                     self.$refs.VariationOrderModal.show(item, VariationCB => {
@@ -253,7 +257,7 @@
                                         "store_ID": item.store_ID,
                                         "notes": notes,
                                         "status": 14,
-                                        "systemUserID": ownerCallback.systemUserID,
+                                        "systemUserID": owner,
                                         "planogram_ID": item.planogramID,
                                         "systemFileID": item.systemFileID,
                                         "rangeFileID": item.rangeID,
