@@ -125,6 +125,10 @@
                       <v-flex xs4>
                         <v-text-field v-model="bins" type="number" hide-details label="Bins"></v-text-field>
                       </v-flex>
+                      <v-flex xs12>
+                        <v-select hide-details :items="FixtureTypes" v-model="selectedFixtureType" label="Fixture Type">
+                        </v-select>
+                      </v-flex>
                     </v-layout>
                   </v-container>
                 </v-card-text>
@@ -337,6 +341,14 @@
           planogramName: null,
           tag: null
         },
+        FixtureTypes: [
+          "Standard",
+          "Industrial",
+          "Supplier Stand",
+          "Till point",
+          "Custom"
+        ],
+        selectedFixtureType: null,
         gotData: false,
         products: [],
         PlanogramObject: {
@@ -920,6 +932,9 @@
           planogramName += " - S" + self.supplierStands;
           planogramName += " - B" + self.bins;
         }
+        if (planogramName != "" && self.selectedFixtureType != null) {
+          planogramName += " - " + self.selectedFixtureType;
+        }
         console.log('names______________________');
 
         console.log(planogramName);
@@ -942,9 +957,9 @@
                   self.saveFile(false)
                 }
               })
-            }else{
+            } else {
               self.saveFile(false)
-            } 
+            }
           })
       },
       CheckExists() {
@@ -1030,7 +1045,7 @@
         clusterData["storeName"] = vscd.storeName;
         clusterData["categoryCluster"] = vscd.categoryCluster;
         let tmpSpacePlanID = self.spacePlanID
-       
+
         if (vscd.rangeID != null) {
           self.$store.getters.getAllPlanogramActiveProducts.forEach(el => {
             self.rangingController.setAllProductData(el.Data);
@@ -1056,12 +1071,13 @@
                     displays: self.displays,
                     pallettes: self.pallettes,
                     supplierStands: self.supplierStands,
-                    bins: self.bins
+                    bins: self.bins,
+                    FixtureType: self.selectedFixtureType
                   }, self.spacePlanID, self.spacePlanName, true, image, self.updateLoader, self.$refs.SizeLoader
-                  .close,data=>{
-                    
-                    console.log("[NEW SPACEPLANID]",data);
-                    self.spacePlanID=data
+                  .close, data => {
+
+                    console.log("[NEW SPACEPLANID]", data);
+                    self.spacePlanID = data
                   })
                 // self.$refs.SizeLoader.close()
               } else {
@@ -1076,9 +1092,10 @@
                       displays: self.displays,
                       pallettes: self.pallettes,
                       supplierStands: self.supplierStands,
+                      FixtureType: self.selectedFixtureType,
                       bins: self.bins
                     }, self.spacePlanID, self.spacePlanName, value, image, self.updateLoader, self.$refs
-                    .SizeLoader.close,callback=>{} )
+                    .SizeLoader.close, callback => {})
                 })
               }
             })
@@ -1089,6 +1106,7 @@
             self.planogramHelper.save(self.$store, stage, clusterData, {
               modules: self.modules,
               height: self.height,
+              FixtureType: self.selectedFixtureType,
               width: self.width
             }, self.spacePlanID, self.spacePlanName, true, image)
           } else {
@@ -1097,13 +1115,14 @@
               self.planogramHelper.save(self.$store, stage, clusterData, {
                   modules: self.modules,
                   height: self.height,
-                  width: self.width
+                  width: self.width,
+                  FixtureType: self.selectedFixtureType,
                 }, self.spacePlanID, self.spacePlanName, value, image, self.updateLoader, self.$refs.SizeLoader
-                .close,callback=>{})
+                .close, callback => {})
             })
           }
         }
-       
+
       },
       saveNew(isNew) {
         let self = this;
@@ -1124,7 +1143,7 @@
         clusterData["storeName"] = vscd.storeName;
         clusterData["categoryCluster"] = vscd.categoryCluster;
         let tmpSpacePlanID = self.spacePlanID
-        self.spacePlanID=null
+        self.spacePlanID = null
         if (vscd.rangeID != null) {
           self.$store.getters.getAllPlanogramActiveProducts.forEach(el => {
             self.rangingController.setAllProductData(el.Data);
@@ -1150,14 +1169,15 @@
                     displays: self.displays,
                     pallettes: self.pallettes,
                     supplierStands: self.supplierStands,
+                    FixtureType: self.selectedFixtureType,
                     bins: self.bins
                   }, self.spacePlanID, self.spacePlanName, true, image, self.updateLoader, self.$refs.SizeLoader
-                  .close,data=>{
-                    
-                    console.log("[NEW SPACEPLANID]",data);
-                    self.spacePlanID=data
+                  .close, data => {
+
+                    console.log("[NEW SPACEPLANID]", data);
+                    self.spacePlanID = data
                   })
-              } 
+              }
             })
         } else {
           self.planogramHelper.setCreate(self.spacePlanID == null || isNew);
@@ -1167,9 +1187,9 @@
               height: self.height,
               width: self.width
             }, self.spacePlanID, self.spacePlanName, true, image)
-          } 
+          }
         }
-       
+
       },
       setRangingClusterData(data) {
         let self = this;
