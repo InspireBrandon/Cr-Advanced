@@ -39,7 +39,8 @@
                         Settings
                     </v-btn>
                     <v-list light dense>
-                        <v-list-tile @click="configOpen()" :class="{ 'pulse': rowData.length == 0 }" color="blue-grey darken-4">Configuration
+                        <v-list-tile @click="configOpen()" :class="{ 'pulse': rowData.length == 0 }"
+                            color="blue-grey darken-4">Configuration
                         </v-list-tile>
                     </v-list>
                 </v-menu>
@@ -86,15 +87,18 @@
                         <v-layout row wrap>
                             <v-flex md12><span class="font-weight-light">Please select a file type:</span></v-flex>
                             <v-flex md4 v-for="file_type in file_types" :key="file_type.title">
-                                <v-card @click="set_file_type(file_type.title)" style="cursor: pointer;" color="primary"
-                                    dark class="elevation-3">
-                                    <v-card-title>
-                                        <div style="text-align: center; width: 100%;">{{ file_type.title }}</div>
-                                    </v-card-title>
-                                    <v-card-text class="pt-0" style="text-align: center;">
-                                        <v-icon>{{ file_type.icon }}</v-icon>
-                                    </v-card-text>
-                                </v-card>
+                                <v-hover>
+                                    <v-card @click="set_file_type(file_type.title)" style="cursor: pointer;"
+                                        color="primary" dark class="elevation-3" slot-scope="{ hover }"
+                                        :class="`elevation-${hover ? 12 : 2}`">
+                                        <v-card-title>
+                                            <div style="text-align: center; width: 100%;">{{ file_type.title }}</div>
+                                        </v-card-title>
+                                        <v-card-text class="pt-0" style="text-align: center;">
+                                            <v-icon>{{ file_type.icon }}</v-icon>
+                                        </v-card-text>
+                                    </v-card>
+                                </v-hover>
                             </v-flex>
                         </v-layout>
                     </v-container>
@@ -140,7 +144,7 @@
     import DescriptionLength from "./GridComponents/DescriptionLength.vue";
     import Selector from "./GridComponents/Selector.vue";
     import ConsignmentSelector from "./GridComponents/ConsignmentSelector.vue";
-    import Configuration from "./GridComponents/Configuration.vue";
+    import Configuration from "./GridComponents/ConfigurationsComponent/Configuration.vue";
 
     const tabs = ['Standard', 'Vendor', 'Hierachy', 'Item Status', 'Images', 'Supporting Documents', 'Resources',
         'Stock Control', 'Price and Margin', 'Opening Orders'
