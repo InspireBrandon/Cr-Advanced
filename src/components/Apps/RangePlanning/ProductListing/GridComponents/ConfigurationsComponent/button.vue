@@ -18,11 +18,11 @@
                         <v-container grid-list-md>
                             <v-layout wrap>
                                 <v-flex xs12 sm6 md6>
-                                    <v-text-field label="First name" v-model="editForm.firstname" required>
+                                    <v-text-field label="First name" counter="40" :rules="nameRules" v-model="editForm.firstname" required>
                                     </v-text-field>
                                 </v-flex>
                                 <v-flex xs12 sm6 md6>
-                                    <v-text-field label="Last name" v-model="editForm.lastname" required>
+                                    <v-text-field label="Last name" counter="40" :rules="nameRules" v-model="editForm.lastname" required>
                                     </v-text-field>
                                 </v-flex>
                                 <v-flex xs12>
@@ -77,7 +77,10 @@
                         text: "Order Clerk"
                     }
                 ],
-
+                nameRules: [
+                    v => !!v || 'Field is required',
+                    v => (v && v.length <= 40) || 'Name must be less than 40 characters'
+                ],
             }
         },
         components: {

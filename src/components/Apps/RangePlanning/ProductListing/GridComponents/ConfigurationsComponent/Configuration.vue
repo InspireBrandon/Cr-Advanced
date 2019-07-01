@@ -59,11 +59,11 @@
                                 <v-container grid-list-md>
                                     <v-layout wrap>
                                         <v-flex xs12 sm6 md6>
-                                            <v-text-field label="First name" v-model="addForm.firstname" required>
+                                            <v-text-field label="First name" counter="40" :rules="nameRules" v-model="addForm.firstname" required>
                                             </v-text-field>
                                         </v-flex>
                                         <v-flex xs12 sm6 md6>
-                                            <v-text-field label="Last name" v-model="addForm.lastname" required>
+                                            <v-text-field label="Last name" counter="40" :rules="nameRules" v-model="addForm.lastname" required>
                                             </v-text-field>
                                         </v-flex>
                                         <v-flex xs12>
@@ -140,6 +140,10 @@
                         icon: 'gavel'
                     }
                 ],
+                nameRules: [
+                    v => !!v || 'Field is required',
+                    v => (v && v.length <= 40) || 'Name must be less than 40 characters'
+                ],
                 filterText: '',
                 rowData: [],
                 selectedItem: null
@@ -164,6 +168,7 @@
                 let self = this;
                 self.AddDialog = true;
                 self.$refs.form.reset()
+                self.$refs.form.resetValidation()
             },
             saveForm() {
                 let self = this;
