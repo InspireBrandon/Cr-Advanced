@@ -1,5 +1,5 @@
 <template>
-    <!-- <div style=" cursor: pointer; display:flex;">
+    <div style=" cursor: pointer; display:flex;">
         <div>
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
@@ -74,11 +74,7 @@
                 <span>Remove category from store</span>
             </v-tooltip>
         </div>
-
-    </div> -->
-    <v-btn @click="params.context.componentParent.$parent.$parent.$parent.$parent.Distribute(params)">
-        distribute
-    </v-btn>
+    </div>
 </template>
 <script>
     import YesNoModal from '@/components/Common/YesNoModal'
