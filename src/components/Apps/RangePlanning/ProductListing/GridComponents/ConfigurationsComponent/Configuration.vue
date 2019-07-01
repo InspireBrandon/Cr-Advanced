@@ -43,19 +43,47 @@
                                     </v-btn>
                                 </v-toolbar>
                                 <div>
-                                    <Grid ref="grid" :rowData="rowData" />
+                                    <Grid ref="grid" :rowData="rowData" :resourceTypeItems="ResourceTypeItems" />
                                 </div>
                             </v-flex>
                         </v-layout>
-
-                        <v-divider></v-divider>
-
-                        <v-card-actions>
-                            <v-spacer></v-spacer>
-                            <v-btn color="info" flat @click="dialog = false">Cancel</v-btn>
-                        </v-card-actions>
                     </v-card>
                 </v-dialog>
+                <v-dialog v-model="AddDialog" persistent max-width="600px" height="500px">
+                    <v-card>
+                        <v-form @submit.prevent="saveForm">
+                            <v-toolbar dark flat color="blue darken-2" scroll-off-screen>
+                                <v-toolbar-title>Configuration Add</v-toolbar-title>
+                            </v-toolbar>
+                            <v-card-text>
+                                <v-container grid-list-md>
+                                    <v-layout wrap>
+                                        <v-flex xs12 sm6 md6>
+                                            <v-text-field label="First name" v-model="addForm.firstname" required>
+                                            </v-text-field>
+                                        </v-flex>
+                                        <v-flex xs12 sm6 md6>
+                                            <v-text-field label="Last name" v-model="addForm.lastname" required>
+                                            </v-text-field>
+                                        </v-flex>
+                                        <v-flex xs12>
+                                            <v-select required v-model="addForm.resourceType" :items="ResourceTypeItems"
+                                                item-text="text" item-value="key" label="Resource Type">
+                                            </v-select>
+                                        </v-flex>
+                                    </v-layout>
+                                </v-container>
+                            </v-card-text>
+                            <v-divider></v-divider>
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn color="secondary" flat @click="AddDialog = false">Close</v-btn>
+                                <v-btn color="primary" type="submit">Save</v-btn>
+                            </v-card-actions>
+                        </v-form>
+                    </v-card>
+                </v-dialog>
+
             </v-layout>
         </v-container>
     </div>
@@ -73,6 +101,30 @@
         },
         data() {
             return {
+                AddDialog: false,
+                addForm: {
+                    id: 0,
+                    firstname: '',
+                    lastname: '',
+                    resourceType: 0
+                },
+                ResourceTypeItems: [{
+                        value: 0,
+                        text: "Retail Buyer"
+                    },
+                    {
+                        value: 1,
+                        text: "Retail Stock Planner"
+                    },
+                    {
+                        value: 2,
+                        text: "Buyer Assistant"
+                    },
+                    {
+                        value: 3,
+                        text: "Order Clerk"
+                    }
+                ],
                 dialog: false,
                 drawer: null,
                 items: [{
@@ -110,9 +162,19 @@
             },
             openAdd() {
                 let self = this;
+                self.AddDialog = true;
             },
-            removeLine() {
+            saveForm() {
+                let self = this;
 
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `Event_Sheet_Resource`, self.addForm)
+                    .then(r => {
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                        self.AddDialog = false;
+                        self.rowData.push(r.data.event_Sheet_Resource);
+                    })
             },
             getItems() {
                 let self = this;
