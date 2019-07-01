@@ -412,12 +412,13 @@
                         self.currentStorePlanograms = []
                         self.currentStorePlanograms = r.data.store_PlanogramList;
                         self.currentStorePlanograms.forEach(e => {
-                            e.GeneratedName = self.GenerateName(e)
                             e.currentStatusText = self.StoreStatusList[e.planogramStoreStatus].text
                         })
                         self.rowData = self.currentStorePlanograms
                         setTimeout(() => {}, 300);
                         console.log(self.rowData);
+                    delete Axios.defaults.headers.common["TenantID"];
+
                     })
             },
             GenerateName(data) {

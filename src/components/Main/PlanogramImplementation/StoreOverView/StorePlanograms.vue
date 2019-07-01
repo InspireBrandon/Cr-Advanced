@@ -71,7 +71,6 @@
                         r.data.queryResult.forEach((e) => {
                             e.GeneratedName = self.GenerateName(e)
                             e.currentStatusText = self.StoreStatusList[e.planogramStoreStatus].text
-                            self.currentStorePlanograms.push(e);
                         })
 
                         self.rowData = self.currentStorePlanograms
