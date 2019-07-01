@@ -1,87 +1,186 @@
 <template>
     <div>
-        <v-container fluid class="pa-0 ma-0" grid-list-md>
+        <v-toolbar flat dense dark>
+            <v-toolbar-title>Report</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-text-field append-icon="search" type="text" id="filter-text-box" placeholder="Filter..."
+                @input="onFilterTextBoxChanged" v-model="filterText">
+            </v-text-field>
+            <v-spacer></v-spacer>
+            <!-- <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <v-icon color="info" dark v-on="on">info</v-icon>
+                </template>
+                <span>For more information hover over points of interest.<br>
+                    You can create your own chart by selecting data to display on the grid and right
+                    clicking
+                </span>
+            </v-tooltip>
+            <v-btn dark color="primary" class="my-0">
+                <v-icon>add</v-icon>
+            </v-btn> -->
+        </v-toolbar>
+        <v-container grid-list-md>
             <v-layout row wrap class="pa-0 ma-0">
-                <v-flex md12 class="pa-0 ma-0">
-                    <v-toolbar flat dense dark>
-                        <v-toolbar-title>Report</v-toolbar-title>
-                        <v-spacer></v-spacer>
-                        <v-text-field append-icon="search" type="text" id="filter-text-box" placeholder="Filter..."
-                            @input="onFilterTextBoxChanged" v-model="filterText">
-                        </v-text-field>
-                        <v-spacer></v-spacer>
-                        <v-tooltip bottom>
-                            <template v-slot:activator="{ on }">
-                                <v-icon color="info" dark v-on="on">info</v-icon>
-                            </template>
-                            <span>For more information hover over points of interest.<br>
-                                You can create your own chart by selecting data to display on the grid and right
-                                clicking
-                            </span>
-                        </v-tooltip>
-                        <v-btn dark color="primary" class="my-0">
-                            <v-icon>add</v-icon>
-                        </v-btn>
-                    </v-toolbar>
+                <v-flex md12 class="pl-0">
+                    <v-layout row wrap class="mt-0">
+                        <v-flex md3>
+                            <v-card class="pa-3">
+                                <v-layout row wrap>
+                                    <v-flex md8>
+                                        <v-card color="success" dark style="width: 53px; margin-top: -30px;"
+                                            class="elevation-5">
+                                            <v-icon size="50">trending_up</v-icon>
+                                        </v-card>
+                                    </v-flex>
+                                    <v-flex md4 class="pa-2" style="text-align: right;">
+                                        <div style="width: 100%;">
+                                            <span style="width: 95%;" class="headline">Sales</span>
+                                        </div>
+                                        <span class="font-weight-light">R500 000</span>
+                                    </v-flex>
+                                    <v-flex md12>
+                                        <v-divider></v-divider>
+                                    </v-flex>
+                                    <v-flex md12 class="font-weight-light">
+                                        view performance
+                                    </v-flex>
+                                </v-layout>
+                            </v-card>
+                        </v-flex>
+                        <v-flex md3>
+                            <v-card class="pa-3">
+                                <v-layout row wrap>
+                                    <v-flex md8>
+                                        <v-card color="success" dark style="width: 53px; margin-top: -30px;"
+                                            class="elevation-5">
+                                            <v-icon size="50">trending_up</v-icon>
+                                        </v-card>
+                                    </v-flex>
+                                    <v-flex md4 class="pa-2" style="text-align: right;">
+                                        <div style="width: 100%;">
+                                            <span style="width: 95%;" class="headline">Profit</span>
+                                        </div>
+                                        <span class="font-weight-light">R375 000</span>
+                                    </v-flex>
+                                    <v-flex md12>
+                                        <v-divider></v-divider>
+                                    </v-flex>
+                                    <v-flex md12 class="font-weight-light">
+                                        view performance
+                                    </v-flex>
+                                </v-layout>
+                            </v-card>
+                        </v-flex>
+                        <v-flex md3>
+                            <v-card class="pa-3">
+                                <v-layout row wrap>
+                                    <v-flex md6>
+                                        <v-card color="warning" dark style="width: 53px; margin-top: -30px;"
+                                            class="elevation-5">
+                                            <v-icon size="50">trending_flat</v-icon>
+                                        </v-card>
+                                    </v-flex>
+                                    <v-flex md6 class="pa-2" style="text-align: right;">
+                                        <div style="width: 100%;">
+                                            <span style="width: 95%;" class="headline">Item Movement</span>
+                                        </div>
+                                        <span class="font-weight-light">20 000 units</span>
+                                    </v-flex>
+                                    <v-flex md12>
+                                        <v-divider></v-divider>
+                                    </v-flex>
+                                    <v-flex md12 class="font-weight-light">
+                                        view performance
+                                    </v-flex>
+                                </v-layout>
+                            </v-card>
+                        </v-flex>
+                        <v-flex md3>
+                            <v-card class="pa-3">
+                                <v-layout row wrap>
+                                    <v-flex md8>
+                                        <v-card color="error" dark style="width: 53px; margin-top: -30px;"
+                                            class="elevation-5">
+                                            <v-icon size="50">trending_down</v-icon>
+                                        </v-card>
+                                    </v-flex>
+                                    <v-flex md4 class="pa-2" style="text-align: right;">
+                                        <div style="width: 100%;">
+                                            <span style="width: 95%;" class="headline">Productivity</span>
+                                        </div>
+                                        <span class="font-weight-light">-2%</span>
+                                    </v-flex>
+                                    <v-flex md12>
+                                        <v-divider></v-divider>
+                                    </v-flex>
+                                    <v-flex md12 class="font-weight-light">
+                                        view performance
+                                    </v-flex>
+                                </v-layout>
+                            </v-card>
+                        </v-flex>
+                    </v-layout>
                 </v-flex>
-                <!-- <button @click="createChart1('stackedBar')">Stacked Bar Chart</button>
-                    <button @click="createChart1('groupedBar')">Grouped Bar Chart</button>
-                    <button @click="createChart1('line')">Line Chart</button> -->
-                <v-flex md8>
+                <v-flex md6 class="pl-0">
                     <v-card>
-                        <v-toolbar flat dark>
+                        <v-toolbar dense flat dark>
                             <v-toolbar-title>Monthly Sales</v-toolbar-title>
                         </v-toolbar>
                         <v-card-text>
-                            <ag-grid-vue id="ag-Grid" :gridOptions="gridOptions" style="width: 100%; height: 35vh;"
+                            <ag-grid-vue id="ag-Grid" :gridOptions="gridOptions" style="width: 100%; height: 60vh;"
                                 :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
                                 :rowData="rowData" :filter="true" :suppressRowClickSelection="true"
                                 :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true"
                                 :resizable="true" :floatingFilter="true" :groupMultiAutoColumn="true"
-                                :onGridReady="onGridReady" :sortable="true">
+                                :onGridReady="onGridReady" :sortable="true" :processChartOptions="processChartOptions">
                             </ag-grid-vue>
                         </v-card-text>
                     </v-card>
                 </v-flex>
-                <v-flex md4>
-                    <v-card>
-                        <v-toolbar flat dark>
-                            <v-toolbar-title>Sales Value 6MMA</v-toolbar-title>
-                        </v-toolbar>
-                        <v-card-text>
-                            <div id="myChart1" class="ag-theme-balham-dark my-chart chart"></div>
-                        </v-card-text>
-                    </v-card>
-                </v-flex>
-                <v-flex md4>
-                    <v-card>
-                        <v-toolbar flat dark>
-                            <v-toolbar-title>Customers/Employee</v-toolbar-title>
-                        </v-toolbar>
-                        <v-card-text>
-                            <div id="myChart2" class="ag-theme-balham-dark my-chart chart"></div>
-                        </v-card-text>
-                    </v-card>
-                </v-flex>
-                <v-flex md4>
-                    <v-card>
-                        <v-toolbar flat dark>
-                            <v-toolbar-title>Amount of sales</v-toolbar-title>
-                        </v-toolbar>
-                        <v-card-text>
-                            <div id="myChart3" class="ag-theme-balham-dark my-chart chart"></div>
-                        </v-card-text>
-                    </v-card>
-                </v-flex>
-                <v-flex md4>
-                    <v-card>
-                        <v-toolbar flat dark>
-                            <v-toolbar-title>Amount of sales</v-toolbar-title>
-                        </v-toolbar>
-                        <v-card-text>
-                            <div id="myChart4" class="ag-theme-balham-dark my-chart chart"></div>
-                        </v-card-text>
-                    </v-card>
+                <v-flex md6 class="pr-0">
+                    <v-layout row wrap>
+                        <v-flex md6>
+                            <v-card>
+                                <v-toolbar dense flat dark>
+                                    <v-toolbar-title>Sales Value 6MMA</v-toolbar-title>
+                                </v-toolbar>
+                                <v-card-text>
+                                    <div id="myChart1" class="ag-theme-balham-dark my-chart chart"></div>
+                                </v-card-text>
+                            </v-card>
+                        </v-flex>
+                        <v-flex md6>
+                            <v-card>
+                                <v-toolbar dense flat dark>
+                                    <v-toolbar-title>Customers/Employee</v-toolbar-title>
+                                </v-toolbar>
+                                <v-card-text>
+                                    <div id="myChart2" class="ag-theme-balham-dark my-chart chart"></div>
+                                </v-card-text>
+                            </v-card>
+                        </v-flex>
+                        <v-flex md6>
+                            <v-card>
+                                <v-toolbar dense flat dark>
+                                    <v-toolbar-title>Amount of sales</v-toolbar-title>
+                                </v-toolbar>
+                                <v-card-text>
+                                    <div id="myChart3" class="ag-theme-balham-dark my-chart chart"></div>
+                                </v-card-text>
+                            </v-card>
+                        </v-flex>
+                        <v-flex md6>
+                            <v-card>
+                                <v-toolbar dense flat dark>
+                                    <v-toolbar-title>Amount of sales</v-toolbar-title>
+                                </v-toolbar>
+                                <v-card-text>
+                                    <div id="myChart4" class="ag-theme-balham-dark my-chart chart"></div>
+                                </v-card-text>
+                            </v-card>
+                        </v-flex>
+                    </v-layout>
                 </v-flex>
             </v-layout>
         </v-container>
@@ -131,7 +230,6 @@
         self.chartContainer = params.chartContainer;
         self.suppressChartRanges = params.suppressChartRanges;
         self.aggregate = params.aggregate;
-        self.seriesDefaults = params.seriesDefaults;
     }
 
     function Line(params) {
@@ -202,14 +300,6 @@
                             chartContainer: document.querySelector('#myChart4'),
                             suppressChartRanges: true,
                             aggregate: true,
-                            seriesDefaults: {
-                                shadow : {
-                                    color: "rgba(0, 0, 0, 0.3)",
-                                    offset: [5, 5],
-                                    blur: 8
-                                },
-                                labelFont : "italic 15px Arial, sans-serif"
-                            }
                         })
 
                         chart1Ref = params.api.chartRange(chart1RangeParams);
@@ -269,9 +359,9 @@
                 },
                 {
                     name: "Brendan",
-                    sales: 3,
-                    customers: 12,
-                    value: 15051
+                    sales: 420,
+                    customers: 420,
+                    value: 42000
                 }
             ]
         },
@@ -279,6 +369,96 @@
             onFilterTextBoxChanged() {
                 let self = this;
                 self.gridApi.setQuickFilter(self.filterText);
+            },
+            processChartOptions(params) {
+                var options = params.options;
+                // console.log("chart options:", options);
+                // if (params.type !== "stackedBar" && params.type !== "groupedBar" && params.type !== "line") {
+                //     console.log("chart type is " + params.type + ", making no changes.");
+                //     return params.options;
+                // }
+                // options.height = 500;
+                // options.width = 1000;
+                // options.padding = {
+                //     top: 20,
+                //     right: 10,
+                //     bottom: 10,
+                //     left: 20
+                // };
+                // options.tooltipClass = "my-tool-tip-class";
+                // options.legendPosition = "bottom";
+                // options.legendPadding = 20;
+                // var legend = options.legend;
+                // legend.markerStrokeWidth = 2;
+                // legend.markerSize = 25;
+                // legend.markerPadding = 10;
+                // legend.itemPaddingX = 120;
+                // legend.itemPaddingY = 20;
+                // legend.labelFont = "bold 18px Arial, sans-serif";
+                // legend.labelColor = "#555";
+                // var xAxis = options.xAxis;
+                // xAxis.lineWidth = 2;
+                // xAxis.lineColor = "gray";
+                // xAxis.tickWidth = 2;
+                // xAxis.tickSize = 10;
+                // xAxis.tickPadding = 10;
+                // xAxis.tickColor = "gray";
+                // xAxis.labelFont = "bold 15px Arial, sans-serif";
+                // xAxis.labelColor = "#de7b73";
+                // xAxis.labelRotation = 20;
+                // xAxis.labelFormatter = function (value) {
+                //     return value === "United Kingdom" ? "UK" : "(" + String(value) + ")";
+                // };
+                // xAxis.gridStyle = [{
+                //     stroke: "rgba(94,100,178,0.5)"
+                // }];
+                // var yAxis = options.yAxis;
+                // yAxis.lineWidth = 2;
+                // yAxis.lineColor = "gray";
+                // yAxis.tickWidth = 2;
+                // yAxis.tickSize = 10;
+                // yAxis.tickPadding = 10;
+                // yAxis.tickColor = "gray";
+                // yAxis.labelFont = "bold 15px Arial, sans-serif";
+                // yAxis.labelColor = "#de7b73";
+                // yAxis.labelRotation = 20;
+                // yAxis.labelFormatter = function (value) {
+                //     return value.toString().toUpperCase();
+                // };
+                // yAxis.gridStyle = [{
+                //         stroke: "#80808044",
+                //         lineDash: undefined
+                //     },
+                //     {
+                //         stroke: "#80808044",
+                //         lineDash: [6, 3]
+                //     }
+                // ];
+                // var seriesDefaults = options.seriesDefaults;
+                // seriesDefaults.fills = ["#e1ba00", "silver", "peru"];
+                // seriesDefaults.strokes = ["black"];
+                // seriesDefaults.strokeWidth = 2;
+                // seriesDefaults.labelEnabled = true;
+                // seriesDefaults.labelFont = "italic 15px Arial, sans-serif";
+                // seriesDefaults.labelPadding = {
+                //     x: 10,
+                //     y: 10
+                // };
+                // seriesDefaults.labelColor = "green";
+                // seriesDefaults.shadow = {
+                //     color: "rgba(0, 0, 0, 0.3)",
+                //     offset: [5, 5],
+                //     blur: 8
+                // };
+                // seriesDefaults.tooltipRenderer = function (params) {
+                //     var xField = params.xField;
+                //     var yField = params.yField;
+                //     var x = params.datum[xField];
+                //     var y = params.datum[yField];
+                //     return "<b>" + xField.toUpperCase() + ":</b> " + x + "<br/><b>" + yField.toUpperCase() +
+                //         ":</b> " + y;
+                // };
+                return options;
             },
             onGridReady(params) {
                 let self = this;
@@ -383,7 +563,7 @@
 
 <style>
     .chart {
-        height: 350px;
-        width: 600px;
+        height: 246px;
+        /* width: 600px; */
     }
 </style>
