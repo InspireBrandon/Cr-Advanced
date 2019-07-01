@@ -125,7 +125,17 @@
             </v-toolbar-items>
         </v-toolbar>
         <v-toolbar color="grey darken-3" dark flat dense>
-            Details toolbar
+            <v-btn-toggle v-model="currentMode" mandatory>
+                <v-btn flat value="MOVE">
+                    <v-icon>open_with</v-icon>
+                </v-btn>
+                <v-btn flat value="SCALE">
+                    <v-icon>launch</v-icon>
+                </v-btn>
+                <v-btn flat value="ROTATE">
+                    <v-icon>rotate_right</v-icon>
+                </v-btn>
+            </v-btn-toggle>
         </v-toolbar>
         <v-content>
             <v-card flat tile color="grey darken-2" style="height: calc(100vh - 136px)">
@@ -246,6 +256,7 @@
         },
         data() {
             return {
+                currentMode: "MOVE",
                 active: null,
                 drawer: true,
                 sceneObj: null,
@@ -426,9 +437,24 @@
 
                 var diff = current.subtract(self.startingPoint);
 
-                self.currentMesh.position.addInPlace(diff);
-
-                self.startingPoint = current;
+                switch (self.currentMode) {
+                    case "MOVE": {
+                        console.log(diff)
+                        self.currentMesh.position.x = diff.x - diff.y;
+                        self.currentMesh.position.z = diff.z - diff.y;
+                        // self.currentMesh.rotation.y = Math.sqrt(diff.x, diff.z) == NaN ? 0 : Math.sqrt(diff.x, diff.z);
+                        self.startingPoint = current;
+                    }
+                    break;
+                    case "SCALE": {
+                        self.currentMesh.scaling.x = diff.x;
+                    }
+                    break;
+                    case "ROTATE": {
+                        self.currentMesh.rotation.y = Math.sqrt(diff.x, diff.z) == NaN ? 0 : Math.sqrt(diff.x, diff.z);
+                    }
+                    break;
+                }
             },
             getGroundPosition() {
                 let self = this;
