@@ -222,12 +222,12 @@
                                 <v-tab-item>
                                     <v-card flat tile>
                                         <v-card-text>
-                                            <v-layout row wrap align-center justify-center>
+                                            <v-layout row wrap align-center justify-center v-if="currentMesh != null">
                                                 <v-flex md12>
                                                     <span>Details</span>
                                                 </v-flex>
                                                 <v-flex md12>
-                                                    <v-text-field v-model="objectProperties.name" box label="Name"
+                                                    <v-text-field v-model="currentMesh.name" box label="Name"
                                                         hide-details>
                                                     </v-text-field>
                                                 </v-flex>
@@ -238,17 +238,17 @@
                                                     <span>Position</span>
                                                 </v-flex>
                                                 <v-flex md4 class="pt-0">
-                                                    <v-text-field @change="changeObjectProperties" type="number" v-model="objectProperties.position.x"
+                                                    <v-text-field type="number" v-model="currentMesh.position.x"
                                                         box label="X" hide-details>
                                                     </v-text-field>
                                                 </v-flex>
                                                 <v-flex md4 class="pt-0">
-                                                    <v-text-field @change="changeObjectProperties" type="number" v-model="objectProperties.position.y"
+                                                    <v-text-field type="number" v-model="currentMesh.position.y"
                                                         box label="y" hide-details>
                                                     </v-text-field>
                                                 </v-flex>
                                                 <v-flex md4 class="pt-0">
-                                                    <v-text-field @change="changeObjectProperties" type="number" v-model="objectProperties.position.z"
+                                                    <v-text-field type="number" v-model="currentMesh.position.z"
                                                         box label="Z" hide-details>
                                                     </v-text-field>
                                                 </v-flex>
@@ -259,15 +259,15 @@
                                                     <span>Dimension</span>
                                                 </v-flex>
                                                 <v-flex md4 class="pt-0">
-                                                    <v-text-field type="number" box label="X" hide-details>
+                                                    <v-text-field type="number" box label="X" hide-details v-model="currentMesh.scaling.x">
                                                     </v-text-field>
                                                 </v-flex>
                                                 <v-flex md4 class="pt-0">
-                                                    <v-text-field type="number" box label="y" hide-details>
+                                                    <v-text-field type="number" box label="y" hide-details v-model="currentMesh.scaling.y">
                                                     </v-text-field>
                                                 </v-flex>
                                                 <v-flex md4 class="pt-0">
-                                                    <v-text-field type="number" box label="Z" hide-details>
+                                                    <v-text-field type="number" box label="Z" hide-details v-model="currentMesh.scaling.z">
                                                     </v-text-field>
                                                 </v-flex>
                                                 <v-flex md12 class="pa-0">
@@ -277,15 +277,15 @@
                                                     <span>Rotation</span>
                                                 </v-flex>
                                                 <v-flex md4 class="pt-0">
-                                                    <v-text-field type="number" box label="X" hide-details>
+                                                    <v-text-field type="number" box label="X" hide-details v-model="currentMesh.rotation.x">
                                                     </v-text-field>
                                                 </v-flex>
                                                 <v-flex md4 class="pt-0">
-                                                    <v-text-field type="number" box label="y" hide-details>
+                                                    <v-text-field type="number" box label="y" hide-details v-model="currentMesh.rotation.y">
                                                     </v-text-field>
                                                 </v-flex>
                                                 <v-flex md4 class="pt-0">
-                                                    <v-text-field type="number" box label="Z" hide-details>
+                                                    <v-text-field type="number" box label="Z" hide-details v-model="currentMesh.rotation.z">
                                                     </v-text-field>
                                                 </v-flex>
                                                 <v-flex md12 class="pa-0">
@@ -393,25 +393,7 @@
                             title: 'List Item'
                         }]
                     }
-                ],
-                objectProperties: {
-                    name: "",
-                    position: {
-                        x: null,
-                        y: null,
-                        z: null
-                    },
-                    dimension: {
-                        x: null,
-                        y: null,
-                        z: null
-                    },
-                    rotation: {
-                        x: null,
-                        y: null,
-                        z: null
-                    },
-                }
+                ]
             }
         },
         mounted() {
@@ -492,9 +474,7 @@
                 if (pickInfo.hit) {
                     self.currentMesh = pickInfo.pickedMesh;
 
-                    self.objectProperties.position.x = self.currentMesh.position.x;
-                    self.objectProperties.position.y = self.currentMesh.position.y;
-                    self.objectProperties.position.z = self.currentMesh.position.z;
+                    console.log(self.currentMesh)
 
                     self.startingPoint = self.getGroundPosition(evt);
 
@@ -562,13 +542,6 @@
                 }
 
                 return null;
-            },
-            changeObjectProperties() {
-                let self = this;
-
-                self.objectProperties.position.x = self.currentMesh.position.x;
-                self.objectProperties.position.y = self.currentMesh.position.y;
-                self.objectProperties.position.z = self.currentMesh.position.z;
             }
             //#endregion
         }
