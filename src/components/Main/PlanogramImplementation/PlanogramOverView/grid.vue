@@ -4,8 +4,8 @@
             style="width: 100%;  height: calc(100vh - 235px);" :defaultColDef="defaultColDef" class="ag-theme-balham"
             :columnDefs="headers" :rowData="rowData" :enableSorting="true" :enableFilter="true"
             :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
-            :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :gridReady="gridReady" :onGridReady="onGridReady"
-            :groupMultiAutoColumn="true">
+            :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :gridReady="gridReady"
+            :onGridReady="onGridReady" :groupMultiAutoColumn="true">
         </ag-grid-vue>
         rows : {{rowData.length}}
         <VariationOrderModal ref="VariationOrderModal" />
@@ -17,7 +17,7 @@
     import Button from "./button.vue"
     import Fits from "./Fits.vue"
     import height from "./height.vue"
-
+    import jwt from 'jsonwebtoken';
     import FixtureType from "./FixtureType.vue"
     import YesNoModal from '@/components/Common/YesNoModal'
     import VariationOrderModal from '@/components/Main/PlanogramImplementation/VariationOrderModal'
@@ -195,6 +195,8 @@
 
                 Axios.post(process.env.VUE_APP_API + `ProjectTXGroup`, request).then(r => {
                     delete Axios.defaults.headers.common["TenantID"];
+                    console.log(`ProjectTXGroup`);
+                    console.log(r);
                     callback(r.data.projectTXGroup);
                 })
             },
@@ -205,28 +207,70 @@
 
                 Axios.post(process.env.VUE_APP_API + `ProjectTX`, request).then(r => {
                     delete Axios.defaults.headers.common["TenantID"];
+                    console.log(`ProjectTX`);
+                    console.log(r);
+
                     callback(r.data.projectTX)
+                })
+            },
+           
+            getProjectOwner(projectID, callback) {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.get(process.env.VUE_APP_API + `Project?projectID=${projectID}`).then(r => {
+                    console.log(r);
+
+                    callback(r.data.projectList[0])
+                }).catch(e => {
+                    alert("Failed to get project owner: " + e)
                 })
             },
             openOrder(data) {
                 let self = this
                 let item = data.data
                 let node = data.node
-                self.$refs.VariationOrderModal.show(item, callback => {
-                    item.planogramStoreStatus = 5
-                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                    Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
-                        .then(r => {
-                            console.log(r);
-                            item.currentStatusText="Variation"
-                            node.setData(item)
-                             delete Axios.defaults.headers.common["TenantID"];
-                        }).catch(e => {
-                            console.log(e);
-                            delete Axios.defaults.headers.common["TenantID"];
+                self.getProjectOwner(item.project_ID, ownerCallback => {
+                    let encoded_details = jwt.decode(sessionStorage.accessToken);
+                    let systemUserID = encoded_details.USER_ID;
+                    self.$refs.VariationOrderModal.show(item, VariationCB => {
+                        let notes = VariationCB
+                        item.planogramStoreStatus = 5
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                        Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
+                            .then(r => {
+                                console.log(r);
+                                item.currentStatusText = "Variation"
+                                node.setData(item)
+                                let groupRequest = {
+                                    ProjectID: item.project_ID
+                                }
+                                self.createProjectTransactionGroup(groupRequest, callback => {
+                                    let TXrequest = {
+                                        "project_ID": item.project_ID,
+                                        "projectTXGroup_ID": callback.id,
+                                        "type": 3,
+                                        "storeCluster_ID": item.clusterID,
+                                        "store_ID": item.store_ID,
+                                        "notes": notes,
+                                        "status": 14,
+                                        "systemUserID": ownerCallback.systemUserID,
+                                        "planogram_ID": item.planogramID,
+                                        "systemFileID": item.systemFileID,
+                                        "rangeFileID": item.rangeID,
+                                    }
+                                    self.createProjectTransaction(TXrequest, txCallback => {
 
-                        })
+                                    })
+                                })
+                                delete Axios.defaults.headers.common["TenantID"];
+                            }).catch(e => {
+                                console.log(e);
+                                delete Axios.defaults.headers.common["TenantID"];
+                            })
+                    })
+
                 })
+
             },
             getSelectedRows() {
                 let self = this
@@ -400,9 +444,9 @@
                 self.$refs.YesNoModal.show(text, val => {
                     if (val) {
                         self.remove(item, state, Status, data => {
-                             console.log("node data");
-                           console.log(data);
-                            
+                            console.log("node data");
+                            console.log(data);
+
                             node.setData(data)
                         })
                     }
@@ -417,15 +461,15 @@
 
                     listItem.planogramDetail_ID = null
                     listItem.HeightFit = false
-                    listItem.fileName=null
+                    listItem.fileName = null
                     listItem.modulesFit = false
                     listItem.storeClusterFit = false
                     listItem.PlanogramFit = false
                     listItem.Fits = false
                     listItem.systemFileID = 0
                     listItem.currentStatusText = "On Hold"
-                }else{
-                     listItem.currentStatusText = "Unassigned"
+                } else {
+                    listItem.currentStatusText = "Unassigned"
                 }
                 console.log("status");
                 console.log(status);

@@ -217,24 +217,49 @@
                     this.gridApi.sizeColumnsToFit()
                 }, 200);
             },
-            openOrder(item) {
+            openOrder(data) {
                 let self = this
+                let item = data.data
+                let node = data.node
+                self.getProjectOwner(item.project_ID, ownerCallback => {
+                    let encoded_details = jwt.decode(sessionStorage.accessToken);
+                    let systemUserID = encoded_details.USER_ID;
+                    self.$refs.VariationOrderModal.show(item, VariationCB => {
+                        let notes = VariationCB
+                        item.planogramStoreStatus = 5
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                        Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
+                            .then(r => {
+                                console.log(r);
+                                item.currentStatusText = "Variation"
+                                node.setData(item)
+                                let groupRequest = {
+                                    ProjectID: item.project_ID
+                                }
+                                self.createProjectTransactionGroup(groupRequest, callback => {
+                                    let TXrequest = {
+                                        "project_ID": item.project_ID,
+                                        "projectTXGroup_ID": callback.id,
+                                        "type": 3,
+                                        "storeCluster_ID": item.clusterID,
+                                        "store_ID": item.store_ID,
+                                        "notes": notes,
+                                        "status": 14,
+                                        "systemUserID": ownerCallback.systemUserID,
+                                        "planogram_ID": item.planogramID,
+                                        "systemFileID": item.systemFileID,
+                                        "rangeFileID": item.rangeID,
+                                    }
+                                    self.createProjectTransaction(TXrequest, txCallback => {
 
-                let tmp = item.data
-                let node = item.node
-
-                self.$refs.VariationOrderModal.show(tmp, callback => {
-                    tmp.planogramStoreStatus = 5
-                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                    Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', tmp)
-                        .then(r => {
-                            delete Axios.defaults.headers.common["TenantID"];
-                            tmp.currentStatusText = "Variation"
-                            node.setData(tmp)
-                        }).catch(e => {
-                            delete Axios.defaults.headers.common["TenantID"];
-
-                        })
+                                    })
+                                })
+                                delete Axios.defaults.headers.common["TenantID"];
+                            }).catch(e => {
+                                console.log(e);
+                                delete Axios.defaults.headers.common["TenantID"];
+                            })
+                    })
                 })
             },
             onGridReady(params) {
@@ -311,9 +336,8 @@
                                 listItem.modulesFit = moduleFit
                                 listItem.fits = fits
                                 listItem.planogramStoreStatus = 1
-
+                                listItem.systemFileID=data.systemFileID
                                 node.setData(listItem)
-
                                 delete Axios.defaults.headers.common["TenantID"];
                             }).catch(e => {
                                 delete Axios.defaults.headers.common["TenantID"];

@@ -10,7 +10,7 @@
             </template>
             <span>Remove Planogram</span>
         </v-tooltip>
-        {{params.data.fileName}} |||{{params.data.planogramStoreStatus}}
+        {{params.data.fileName}} 
     </div>
 </template>
 <script>

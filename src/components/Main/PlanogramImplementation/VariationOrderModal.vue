@@ -50,7 +50,7 @@
             </v-container>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="success" @click="submit(123)">
+                <v-btn color="success" @click="submit()">
                     send
                 </v-btn>
             </v-card-actions>
@@ -73,7 +73,7 @@
                     "pallettes",
                     "Custom"
                 ],
-                FixtureType:null,
+                FixtureType: null,
                 dialog: false,
                 height: null,
                 width: null,
@@ -94,6 +94,7 @@
         methods: {
             show(item, afterReturn) {
                 let self = this
+                self.getPlanoDetails()
                 self.listitem = item
                 self.dialog = true
                 self.height = item.height
@@ -105,6 +106,7 @@
                 self.supplierStands = item.supplierStands
                 self.pallettes = item.pallettes
                 self.FixtureType = item.fixtureType
+                self.additionalNotes =""
                 if (item.planogramDetail_ID != 0) {
                     self.selectedPlanoDetail = item.planogramDetail_ID
                 }
@@ -122,8 +124,10 @@
             },
             getPlanoDetails() {
                 let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.get(process.env.VUE_APP_API + "Planogram_Details").then(r => {
                     console.log(r.data);
+                    self.planoDetails = [];
                     r.data.planogram_DetailsList.forEach(element => {
                         self.planoDetails.push({
                             text: element.fileName,
@@ -151,6 +155,8 @@
                 string += "Displays: " + self.displays + "\r\n"
                 string += "Supplier Stands: " + self.supplierStands + "\r\n"
                 string += "Palettes: " + self.pallettes + "\r\n"
+                string += "Store: " + self.storeName + "\r\n"
+                string += "Fixture Type: " + self.FixtureType + "\r\n"
                 string += "Additional Notes: " + self.additionalNotes
                 return string
             },
@@ -174,16 +180,16 @@
                     callback(r.data.projectTX)
                 })
             },
-            submit(status) {
+            submit() {
                 let self = this
-
+                let text = self.buildString()
 
                 // let projectTXGroupRequest = {
                 //     projectID: listitem.project_ID
                 // }
 
                 // request.type = 3;
-                // request.status = 41;
+                // request.status = 41;s
                 // request.systemUserID = null;
                 // request.actionedByUserID = systemUserID;
 
@@ -195,8 +201,11 @@
                 // request.notes = self.buildString()
                 // create tx group
                 // then create tx with notes = text 
+                self.additionalNotes = text
+
+
                 self.dialog = false
-                self.afterReturn(status);
+                self.afterReturn(text);
             },
         },
         created() {

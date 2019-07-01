@@ -68,7 +68,7 @@
             style="width: 100%;  height: calc(100vh - 113px);" :defaultColDef="defaultColDef" class="ag-theme-balham"
             :columnDefs="columnDefs" :rowData="rowData" :enableSorting="true" :enableFilter="true"
             :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
-            :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :gridReady="onGridReady"
+            :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :onGridReady="onGridReady"
             :groupMultiAutoColumn="true" :cellEditingStarted="onRowEditingStarted">
         </ag-grid-vue>
         <v-snackbar v-model="snackbar" bottom :timeout="snackbarTimeout">
