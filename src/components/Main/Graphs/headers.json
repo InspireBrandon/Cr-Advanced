@@ -3,11 +3,15 @@
         "field": "name"
     },
     {
-        "headerName": "Value",
-        "field": "value"
+        "headerName": "Sales",
+        "field": "sales"
     },
     {
-        "headerName": "Other",
-        "field": "other"
-    } 
+        "headerName": "Customers",
+        "field": "customers"
+    },
+    {
+        "headerName": "Value of sales",
+        "field": "value"
+    }
 ]

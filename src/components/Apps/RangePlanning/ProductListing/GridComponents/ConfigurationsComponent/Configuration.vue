@@ -128,7 +128,7 @@
                 dialog: false,
                 drawer: null,
                 items: [{
-                        title: 'Event sheet',
+                        title: 'Resources',
                         icon: 'dashboard'
                     },
                     {
