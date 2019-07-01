@@ -1,5 +1,5 @@
 <template>
-    <div style=" cursor: pointer; display:flex;">
+    <!-- <div style=" cursor: pointer; display:flex;">
         <div>
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
@@ -50,6 +50,7 @@
                 <span>Distribute</span>
             </v-tooltip>
         </div>
+        
         <div
             v-if="params.data.planogramStoreStatus!=0&&params.data.planogramStoreStatus!=6&&params.data.planogramStoreStatus!=5">
             <v-tooltip bottom>
@@ -74,7 +75,10 @@
             </v-tooltip>
         </div>
 
-    </div>
+    </div> -->
+    <v-btn @click="params.context.componentParent.$parent.$parent.$parent.$parent.Distribute(params)">
+        distribute
+    </v-btn>
 </template>
 <script>
     import YesNoModal from '@/components/Common/YesNoModal'

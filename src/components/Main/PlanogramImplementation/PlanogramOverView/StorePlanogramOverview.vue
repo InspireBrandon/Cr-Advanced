@@ -37,7 +37,7 @@
 <script>
     import Axios from 'axios'
     import YesNoModal from '@/components/Common/YesNoModal'
-
+    import jwt from 'jsonwebtoken';
     import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector'
     import StorePlanograms from '@/components/Main/PlanogramImplementation/StoreOverView/StorePlanograms'
     import {
@@ -89,7 +89,40 @@
             }
         },
         methods: {
+            createProjectTransactionGroup(request, callback) {
+                let self = this;
 
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `ProjectTXGroup`, request).then(r => {
+                    delete Axios.defaults.headers.common["TenantID"];
+                    console.log(`ProjectTXGroup`);
+                    console.log(r);
+                    callback(r.data.projectTXGroup);
+                })
+            },
+            createProjectTransaction(request, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `ProjectTX`, request).then(r => {
+                    delete Axios.defaults.headers.common["TenantID"];
+                    console.log(`ProjectTX`);
+                    console.log(r);
+
+                    callback(r.data.projectTX)
+                })
+            },
+            getStoreUser(StoreID, callback) {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.get(process.env.VUE_APP_API + `SystemUser?store_ID=${StoreID}`).then(r => {
+                    console.log("getStoreUser");
+                    console.log(r);
+                    callback(r.data)
+                })
+            },
             checkFits(storePlan, planDetails, callback) {
                 let self = this
                 let retval = false
@@ -106,21 +139,62 @@
             },
             Distribute(rowData) {
                 let self = this;
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
                 let data = rowData.data
+                let systemFile = data.systemFileID
+                console.log(systemFile);
+                
                 let node = rowData.node
-                data.planogramStoreStatus = 2
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', data)
-                    .then(r => {
-                        console.log(r);
-                        data.currentStatusText="Distributed"
-                        node.setData(data)
-                        delete Axios.defaults.headers.common["TenantID"];
-                    }).catch(e => {
-                        console.log(e);
-                        delete Axios.defaults.headers.common["TenantID"];
-                        callback(e)
-                    })
+                console.log(data);
+
+                self.getStoreUser(data.store_ID, storeUserCallback => {
+                    if (storeUserCallback.length > 0) {
+                        data.planogramStoreStatus = 2
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                        Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', data)
+                            .then(r => {
+                                console.log(r);
+                                let groupRequest = {
+                                    ProjectID: data.project_ID
+                                }
+
+                                self.createProjectTransactionGroup(groupRequest, callback => {
+                                    console.log("createProjectTransactionGroup");
+                                    let TXrequest = {
+                                        "project_ID": data.project_ID,
+                                        "projectTXGroup_ID": callback.id,
+                                        "type": 3,
+                                        "storeCluster_ID": data.clusterID,
+                                        "store_ID": data.store_ID,
+                                        "status": 13,
+                                        "systemUserID": storeUserCallback[0]
+                                        .systemUserID, //store user
+                                        "systemFileID": systemFile,
+                                        "rangeFileID": data.rangeID,
+                                    }
+                                    console.log(TXrequest);
+
+                                    self.createProjectTransaction(TXrequest, txCallback => {
+                                        console.log("txCallback");
+                                        console.log(txCallback);
+                                        data.currentStatusText = "Distributed"
+                                        node.setData(data)
+                                        delete Axios.defaults.headers.common["TenantID"];
+                                    })
+
+                                })
+
+                            }).catch(e => {
+                                console.log(e);
+                                delete Axios.defaults.headers.common["TenantID"];
+                                callback(e)
+                            })
+                    } else {
+                        alert("There are no users assigned to this store")
+                    }
+                })
+
             },
             assignGroups() {
                 let self = this
@@ -249,6 +323,7 @@
                                 listItem.planogramDetail_ID = data.id
                                 listItem.detailHeight = data.height
                                 listItem.detailModules = data.modules
+                                listItem.systemFileID= data.systemFileID
                                 node.setData(listItem)
 
                                 self.index = idx
