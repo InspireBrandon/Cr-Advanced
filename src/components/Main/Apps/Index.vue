@@ -42,7 +42,8 @@
                 applicationConfigHelper: null,
                 applicationDetailsHelper: null,
                 hasDatabases: false,
-                userType: -1
+                userType: -1,
+                systemUserID: -1
             }
         },
         created() {
@@ -52,6 +53,9 @@
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
                 let tenantID = sessionStorage.currentDatabase;
+
+                self.systemUserID = encoded_details.USER_ID;
+
                 self.getUserDetails(systemUserID, tenantID)
                     .then(userType => {
                         self.userType = userType;
@@ -93,8 +97,6 @@
                         self.applicationDetailsHelper.getApplicationDetailsBySystemCode(app.system_code),
                         app.system_code
                     )
-
-                    console.log(newConfigDetail)
 
                     let handledUserApp = self.handleUserApps(newConfigDetail)
 
@@ -183,13 +185,28 @@
                 return app;
             },
             handleBuyer(app) {
+                let self = this;
+
                 switch (app.system_code) {
                     case "RANGE-PLANNING": {
                         app["demo"] = true;
                     }
                     break;
                 case "SPACE-PLANNING": {
-                    app["demo"] = true;
+                    console.log(self.systemUserID);
+
+                    if (self.systemUserID == 16 || self.systemUserID == 48 || self.systemUserID == 43) {
+                        app.config.routes = [{
+                            "route": "/PlanogramDistribution",
+                            "routeName": "plannogram_distribution",
+                            "title": "Planogram Distribution",
+                            "openInNewWindow": false
+                        }];
+
+                        app["demo"] = false;
+                    }
+                    else
+                        app["demo"] = true;
                 }
                 break;
                 case "PRODUCT-MAINTENANCE": {
