@@ -4,7 +4,7 @@
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                     <v-btn icon v-on="on"
-                        @click="params.context.componentParent.$parent.$parent.$parent.$parent.$refs.StorePlanograms.show(params.data)"
+                     @click="params.context.componentParent.$parent.$parent.showStore(params.data)"
                         class="ma-0">
                         <v-icon>
                             store
@@ -29,7 +29,7 @@
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                     <v-btn v-on="on"
-                        @click="params.context.componentParent.$parent.$parent.$parent.$parent.assignPlanogramToStore(params)"
+                        @click="params.context.componentParent.$parent.$parent.assignPlanogramToStore(params)"
                         icon flat small color="primary" class="ma-0">
                         <v-icon>assignment</v-icon>
                     </v-btn>
@@ -82,10 +82,17 @@
         components: {
             YesNoModal
         },
-        methods: {},
+        methods: {
+            log(data){
+console.log(data);
+
+            }
+        },
         created() {
             let self = this;
             self.selectedUser = self.params.context.componentParent.selectedUser;
         }
+
+        //   
     }
 </script>

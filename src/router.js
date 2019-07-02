@@ -191,11 +191,11 @@ export default new Router({
           name: 'apps_report_list',
           component: AppsReportList
         }, {
-          path: "/PlanogramImplementation",
+          path: "/PlanogramImplementation/",
           name: "planogram_implementation",
           component: PlanogramImplementation
         }, {
-          path: "/PlanogramDistribution",
+          path: "/PlanogramDistribution/:ProjectID/:projectGroupID",
           name: "Planogram_distribution",
           component: PlanogramDistribution
         },

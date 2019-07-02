@@ -17,7 +17,7 @@
         "title": "Planogram Implementation",
         "openInNewWindow": false
     },{
-        "route": "/PlanogramDistribution",
+        "route": "/PlanogramDistribution/:ProjectID/:projectGroupID",
         "routeName": "Planogram_distribution",
         "title": "Planogram Distribution",
         "openInNewWindow": false

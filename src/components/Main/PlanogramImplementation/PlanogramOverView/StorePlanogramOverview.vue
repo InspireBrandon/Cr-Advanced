@@ -30,7 +30,7 @@
             :assign="assignGroups" />
 
         <StorePlanograms ref="StorePlanograms" :getStoreData="getStorePlanograms" />
-        <PlanogramDetailsSelector ref="PlanogramDetailsSelector" />
+        <PlanogramDetailsSelector :PlanoName="title" ref="PlanogramDetailsSelector" />
         <!-- :PlanoName="ProjectName.text" -->
         <YesNoModal ref="YesNoModal" />
 
@@ -99,6 +99,10 @@
             this.open()
         },
         methods: {
+            showStore(data) {
+                let self = this
+                self.$refs.StorePlanograms.show(data)
+            },
             createProjectTransactionGroup(request, callback) {
                 let self = this;
 
@@ -513,6 +517,9 @@
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                     self.$nextTick(() => {
+                        if (self.params.ProjectID != null) {
+                            self.selectedProject = self.params.ProjectID
+                        }
                         let projectGroupID = self.selectedProjectGroup;
 
                         Axios.get(process.env.VUE_APP_API +
@@ -546,7 +553,11 @@
                     self.title = self.ProjectName.text
 
                 }
-                self.getProjectGroups()
+                self.selectedProject = self.params.ProjectID
+                self.getProjectGroups().then(r => {
+                    self.selectedProjectGroup = self.params.projectGroupID
+
+                })
                 self.storeView = true
                 self.$refs.grid.resize()
 
