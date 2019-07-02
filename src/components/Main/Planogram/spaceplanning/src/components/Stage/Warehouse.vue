@@ -773,6 +773,7 @@
         self.supplierStands = dimension == undefined || dimension.supplierStands == undefined ? 0 : dimension
           .supplierStands;
         self.bins = dimension == undefined || dimension.bins == undefined ? 0 : dimension.bins;
+        self.selectedFixtureType = dimension == undefined || dimension.fixtureType == undefined ? 0 : dimension.fixtureType;
 
         if (clusterData.rangeID != null) {
 
@@ -829,6 +830,7 @@
                 self.rangingData.planogramID = clusterData.planogramID;
                 self.rangingData.planogramName = clusterData.planogramName;
                 self.rangingData.tag = clusterData.tag;
+                self.selectedFixtureType = clusterData.fixtureType;
 
                 if (clusterData.storeID != null || clusterData.storeID != undefined) {
 
@@ -1039,6 +1041,7 @@
         clusterData["storeCluster"] = self.getClusterName();
         clusterData["clusterID"] = vscd.clusterID;
         clusterData["clusterType"] = vscd.clusterType;
+        clusterData["fixtureType"] = self.selectedFixtureType;
         clusterData["clusterName"] = vscd.clusterName;
         clusterData["rangeID"] = vscd.rangeID;
         clusterData["storeID"] = vscd.storeID;
@@ -1139,6 +1142,7 @@
         clusterData["clusterType"] = vscd.clusterType;
         clusterData["clusterName"] = vscd.clusterName;
         clusterData["rangeID"] = vscd.rangeID;
+        clusterData["fixtureType"] = self.selectedFixtureType;
         clusterData["storeID"] = vscd.storeID;
         clusterData["storeName"] = vscd.storeName;
         clusterData["categoryCluster"] = vscd.categoryCluster;
@@ -1445,7 +1449,7 @@
   }
 
   .details_open {
-    max-height: calc(100vh - 500px)
+    max-height: calc(100vh - 570px)
   }
 
   .details_closed {
