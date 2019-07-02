@@ -454,6 +454,8 @@
                 let self = this;
                 let route;
 
+                console.log(item);
+
                 switch (item.type) {
                     case 1: {
                         route = `/DataPreparation`
@@ -466,9 +468,10 @@
                 case 3: {
                     if (item.status == 1 || item.status == 8 || item.status == 41) {
                         route = `/SpacePlanning`
+                    } else if(item.status == 19 || item.status == 21 || item.status == 27) {
+                        route = `/PlanogramDistribution/${item.project_ID}/${item.project_Group_ID}`
                     } else {
-                        route =
-                            `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
+                        route = `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
                     }
                 }
                 break;

@@ -553,11 +553,14 @@
                     self.title = self.ProjectName.text
 
                 }
-                self.selectedProject = self.params.ProjectID
-                self.getProjectGroups().then(r => {
-                    self.selectedProjectGroup = self.params.projectGroupID
 
+                self.selectedProject = self.$route.params.ProjectID
+                self.selectedProject = self.$route.params.ProjectID
+
+                self.getProjectGroups().then(r => {
+                    self.selectedProjectGroup = self.$route.params.projectGroupID
                 })
+
                 self.storeView = true
                 self.$refs.grid.resize()
 

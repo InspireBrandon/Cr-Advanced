@@ -119,8 +119,6 @@
                                     </v-flex>
                                 </v-layout>
                             </v-card>
-<<<<<<< HEAD
-=======
                             <v-flex md6 class="pr-0">
                                 <v-layout row wrap>
                                     <v-flex md6>
@@ -225,7 +223,6 @@
                                     </v-flex>
                                 </v-layout>
                             </v-flex>
->>>>>>> da72956e50eb9fc4eeea417e2a6725b0ce91cc57
                         </v-flex>
                     </v-layout>
                 </v-flex>
