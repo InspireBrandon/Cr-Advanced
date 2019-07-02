@@ -433,7 +433,6 @@ class LoadSavePlanogramBase {
       }
     }
 
-    console.log(detailTXcallback);
 
     axios.post(self.ServerAddress + "SystemFolder?db=CR-Devinspire", tmp, config).then(resp => {
       console.log("[save transaction]_______________________________________");
@@ -443,7 +442,7 @@ class LoadSavePlanogramBase {
 
       this.createDetailTX(clusterData, dimensionData, resultSpace, detailTXcallback => {
         console.log("detailTXcallback");
-        console.log(detailTXcallback);
+        console.log(detailTXcallback.data.planogram_Details);
 
         output.image = null
         let startTime = new Date()
