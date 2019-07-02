@@ -15,13 +15,14 @@
                         </v-btn>
                     </v-flex>
                     <v-flex lg2 md3>
-                        <v-select :items="projectGroups" @change="getProjectsByProjectGroup()"
+                        <v-autocomplete :items="projectGroups" @change="getProjectsByProjectGroup()"
                             v-model="selectedProjectGroup" label="Project Group">
-                        </v-select>
+                        </v-autocomplete>
+
                     </v-flex>
                     <v-flex lg2 md3>
-                        <v-select :items="projects" @change="getStorePlanograms()" v-model="selectedProject"
-                            label="Project"></v-select>
+                        <v-autocomplete :items="projects" @change="getStorePlanograms()" v-model="selectedProject"
+                            label="Project"></v-autocomplete>
                     </v-flex>
                 </v-layout>
             </v-container>
@@ -517,11 +518,9 @@
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                     self.$nextTick(() => {
-                        if (self.params.ProjectID != null) {
-                            self.selectedProject = self.params.ProjectID
-                        }
-                        let projectGroupID = self.selectedProjectGroup;
 
+
+                        let projectGroupID = self.selectedProjectGroup
                         Axios.get(process.env.VUE_APP_API +
                                 `Project?projectGroupID=${projectGroupID}`)
                             .then(r => {
@@ -536,7 +535,6 @@
                                         value: el.id
                                     })
                                 })
-
                                 resolve();
                             })
                             .catch(e => {
@@ -549,23 +547,23 @@
             },
             open() {
                 let self = this
-                if (self.title != null || self.title != undefined) {
-                    self.title = self.ProjectName.text
-
-                }
-
-                self.selectedProject = self.$route.params.ProjectID
-                self.selectedProject = self.$route.params.ProjectID
 
                 self.getProjectGroups().then(r => {
-                    self.selectedProjectGroup = self.$route.params.projectGroupID
+                    console.log("[START]");
+                    console.log(self.projectGroups);
+                    if (self.$route.params.projectGroupID != null || self.$route.params.projectGroupID !=
+                        undefined) {
+                        self.selectedProjectGroup = parseInt(self.$route.params.projectGroupID)
+                        if (self.$route.params.ProjectID != null || self.$route.params.ProjectID != undefined) {
+                            self.selectedProject = parseInt(self.$route.params.ProjectID)
+                            self.getProjectsByProjectGroup()
+                                .then(() => {
+                                    self.getStorePlanograms();
+                                })
+                        }
+                    }
                 })
-
-                self.storeView = true
-                self.$refs.grid.resize()
-
             },
-
         }
     }
 </script>

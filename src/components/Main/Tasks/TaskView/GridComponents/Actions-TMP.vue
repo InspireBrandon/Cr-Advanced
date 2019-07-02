@@ -16,6 +16,14 @@
             </template>
             <span>{{ button.button_2.tooltip }}</span>
         </v-tooltip>
+         <v-tooltip bottom v-if="button.button_3.show">
+            <template v-slot:activator="{ on }">
+                <v-btn @click="button.button_3.click(params.data)" flat icon small>
+                    <v-icon :color="button.button_3.color" v-on="on">{{ button.button_3.icon }}</v-icon>
+                </v-btn>
+            </template>
+            <span>{{ button.button_3.tooltip }}</span>
+        </v-tooltip>
     </div>
 </template>
 <script>
@@ -45,6 +53,8 @@
     function handle_button(item, cp, self) {
         let button_1 = new buttonItem();
         let button_2 = new buttonItem();
+         let button_3 = new buttonItem();
+         
 
         switch (item.status) {
             case 0: {
@@ -158,8 +168,10 @@
             }
         }
         break;
+        // distribution
         case 19: {
-            button_1.set('success', 'visibility', cp.setDistributionInProgress, "View")
+            button_1.set('success', 'visibility', cp.setDistributionViewed, "View")
+            button_2.set('error', 'local_parking', cp.setParked, "Park")
         }
         break;
         case 20: {
@@ -168,6 +180,8 @@
         break;
         case 21: {
             button_1.set('warning', 'visibility', cp.routeToView, "View")
+            button_2.set('success', 'visibility', cp.setDistributionViewed, "Set to viewed")
+            button_3.set('error', 'local_parking', cp.setParked, "Park")
         }
         break;
         case 24: {
@@ -248,11 +262,22 @@
             button_1.set('error', 'close', cp.closeTask, "Close")
         }
         break;
+        case 44: {
+            button_1.set('warning', 'visibility', cp.routeToView, "View") //implementation
+             button_2.set('success', 'visibility', cp.setDistributionInProgress, "Distribute")
+            button_3.set('error', 'local_parking', cp.setParked, "Park")
+        }
+        break;
+        case 45: {
+            button_2.set('success', 'visibility', cp.setDistributionViewed, "Set to viewed")
+        }
+        break;
         }
 
         let retval = {
             button_1,
-            button_2
+            button_2,
+               button_3
         }
 
         return retval;

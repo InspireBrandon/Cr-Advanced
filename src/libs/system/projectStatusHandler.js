@@ -286,10 +286,24 @@ class projectStatusHandler {
             },
             {
                 text: "Mail",
-                value: 42,
+                value: 43,
                 type: [7],
                 color: "#ff7200",
                 friendly: "Mail"
+            },
+            {
+                text: "Distribution Viewed",
+                value: 44,
+                type: [3],
+                color: "#ff7200",
+                friendly: "Distribution Viewed"
+            },
+            {
+                text: "Park",
+                value: 45,
+                type: [3],
+                color: "#ff7200",
+                friendly: "Parked"
             }
         ]
 

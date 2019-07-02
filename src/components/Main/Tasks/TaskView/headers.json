@@ -61,7 +61,7 @@
         "editable": false,
         "hide": false,
         "cellRendererFramework": "Actions",
-        "width": 130
+        "width": 200
     },
     {
         "headerName": "Notes",
