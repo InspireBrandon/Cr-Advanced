@@ -53,23 +53,23 @@
 
                         <v-menu offset-y>
                             <template v-slot:activator="{ on }">
-                                <v-btn flat dark v-on="on">View</v-btn>
+                                <v-btn flat dark v-on="on">Hide</v-btn>
                             </template>
                             <v-list dense>
                                 <v-list-tile tile @click="change_view_state(0)">
-                                    <v-list-tile-title>All</v-list-tile-title>
+                                    <v-list-tile-title>Sent Subtasks</v-list-tile-title>
                                 </v-list-tile>
                                 <v-divider></v-divider>
                                 <v-list-tile tile @click="change_view_state(1)">
-                                    <v-list-tile-title>Approvals</v-list-tile-title>
+                                    <v-list-tile-title>Distributed</v-list-tile-title>
                                 </v-list-tile>
                                 <v-divider></v-divider>
                                 <v-list-tile tile @click="change_view_state(2)">
-                                    <v-list-tile-title>Distribution</v-list-tile-title>
+                                    <v-list-tile-title>Implemented</v-list-tile-title>
                                 </v-list-tile>
                                 <v-divider></v-divider>
                                 <v-list-tile tile @click="change_view_state(3)">
-                                    <v-list-tile-title>No Subtasks</v-list-tile-title>
+                                    <v-list-tile-title>Show All</v-list-tile-title>
                                 </v-list-tile>
                             </v-list>
                         </v-menu>
@@ -288,23 +288,29 @@
 
                 switch (self.viewState) {
                     case 0: {
-                        canView = true;
+                        if (item.status == 6 && item.rollingUserID == self.selectedUser)
+                            canView = false;
+                        else
+                            canView = true;
                     }
                     break;
-                case 1: {
-                    if (item.status == 10 || item.status == 12 || item.status == 20)
+                    case 1: {
+                        if (item.status == 27 || item.status == 21)
+                            canView = false;
+                        else
+                            canView = true;
+                    }
+                    break;
+                    case 2: {
+                        if (item.status == 24 || item.status == 26)
+                            canView = false;
+                        else 
+                            canView = true;
+                    }
+                    break;
+                    case 3: {
                         canView = true;
-                }
-                break;
-                case 2: {
-                    if (item.status == 19)
-                        canView = true;
-                }
-                break;
-                case 3: {
-                    if (item.type != 6)
-                        canView = true;
-                }
+                    }
                 }
 
                 return canView;
