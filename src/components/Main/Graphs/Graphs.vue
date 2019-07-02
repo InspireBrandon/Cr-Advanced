@@ -119,6 +119,113 @@
                                     </v-flex>
                                 </v-layout>
                             </v-card>
+<<<<<<< HEAD
+=======
+                            <v-flex md6 class="pr-0">
+                                <v-layout row wrap>
+                                    <v-flex md6>
+                                        <v-card class="pa-3">
+                                            <v-layout row wrap>
+                                                <v-flex md8>
+                                                    <v-card color="success" dark style="width: 53px; margin-top: -30px;"
+                                                        class="elevation-5">
+                                                        <v-icon size="50">trending_up</v-icon>
+                                                    </v-card>
+                                                </v-flex>
+                                                <v-flex md4 class="pa-2" style="text-align: right;">
+                                                    <div style="width: 100%;">
+                                                        <span style="width: 95%;" class="headline">Sales</span>
+                                                    </div>
+                                                    <span class="font-weight-light">R500 000</span>
+                                                </v-flex>
+                                                <v-flex md12>
+                                                    <v-divider></v-divider>
+                                                </v-flex>
+                                                <v-flex md12 class="font-weight-light">
+                                                    view performance
+                                                </v-flex>
+                                            </v-layout>
+                                        </v-card>
+                                    </v-flex>
+                                    <v-flex md6>
+                                        <v-card class="pa-3">
+                                            <v-layout row wrap>
+                                                <v-flex md8>
+                                                    <v-card color="success" dark style="width: 53px; margin-top: -30px;"
+                                                        class="elevation-5">
+                                                        <v-icon size="50">trending_up</v-icon>
+                                                    </v-card>
+                                                </v-flex>
+                                                <v-flex md4 class="pa-2" style="text-align: right;">
+                                                    <div style="width: 100%;">
+                                                        <span style="width: 95%;" class="headline">Profit</span>
+                                                    </div>
+                                                    <span class="font-weight-light">R375 000</span>
+                                                </v-flex>
+                                                <v-flex md12>
+                                                    <v-divider></v-divider>
+                                                </v-flex>
+                                                <v-flex md12 class="font-weight-light">
+                                                    view performance
+                                                </v-flex>
+                                            </v-layout>
+                                        </v-card>
+                                    </v-flex>
+                                </v-layout>
+                            </v-flex>
+                            <v-flex md6>
+                                <v-layout row wrap>
+                                    <v-flex md6>
+                                        <v-card class="pa-3">
+                                            <v-layout row wrap>
+                                                <v-flex md6>
+                                                    <v-card color="warning" dark style="width: 53px; margin-top: -30px;"
+                                                        class="elevation-5">
+                                                        <v-icon size="50">trending_flat</v-icon>
+                                                    </v-card>
+                                                </v-flex>
+                                                <v-flex md6 class="pa-2" style="text-align: right;">
+                                                    <div style="width: 100%;">
+                                                        <span style="width: 95%;" class="headline">Item Movement</span>
+                                                    </div>
+                                                    <span class="font-weight-light">20 000 units</span>
+                                                </v-flex>
+                                                <v-flex md12>
+                                                    <v-divider></v-divider>
+                                                </v-flex>
+                                                <v-flex md12 class="font-weight-light">
+                                                    view performance
+                                                </v-flex>
+                                            </v-layout>
+                                        </v-card>
+                                    </v-flex>
+                                    <v-flex md6>
+                                        <v-card class="pa-3">
+                                            <v-layout row wrap>
+                                                <v-flex md8>
+                                                    <v-card color="error" dark style="width: 53px; margin-top: -30px;"
+                                                        class="elevation-5">
+                                                        <v-icon size="50">trending_down</v-icon>
+                                                    </v-card>
+                                                </v-flex>
+                                                <v-flex md4 class="pa-2" style="text-align: right;">
+                                                    <div style="width: 100%;">
+                                                        <span style="width: 95%;" class="headline">Productivity</span>
+                                                    </div>
+                                                    <span class="font-weight-light">-2%</span>
+                                                </v-flex>
+                                                <v-flex md12>
+                                                    <v-divider></v-divider>
+                                                </v-flex>
+                                                <v-flex md12 class="font-weight-light">
+                                                    view performance
+                                                </v-flex>
+                                            </v-layout>
+                                        </v-card>
+                                    </v-flex>
+                                </v-layout>
+                            </v-flex>
+>>>>>>> da72956e50eb9fc4eeea417e2a6725b0ce91cc57
                         </v-flex>
                     </v-layout>
                 </v-flex>
