@@ -50,7 +50,7 @@
                                         </v-layout>
                                     </v-card>
                                 </v-flex>
-                                <v-flex md3>
+                                <v-flex md6>
                                     <v-card class="pa-3">
                                         <v-layout row wrap>
                                             <v-flex md8>
@@ -77,6 +77,7 @@
                             </v-layout>
                         </v-flex>
                         <v-flex md6>
+                            <v-layout row wrap>
                             <v-flex md6>
                                 <v-card class="pa-3">
                                     <v-layout row wrap>
@@ -125,6 +126,7 @@
                                     </v-layout>
                                 </v-card>
                             </v-flex>
+                            </v-layout>
                         </v-flex>
                     </v-layout>
                 </v-flex>
