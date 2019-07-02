@@ -16,6 +16,11 @@
         "routeName": "plannogram_implementation",
         "title": "Planogram Implementation",
         "openInNewWindow": false
+    },{
+        "route": "/PlanogramDistribution",
+        "routeName": "Planogram_distribution",
+        "title": "Planogram Distribution",
+        "openInNewWindow": false
     }],
     "ReportListRoute":{
         "route": "/SpacePlanningReportList",

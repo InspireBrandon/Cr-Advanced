@@ -1,38 +1,41 @@
 <template>
-    <v-dialog persistent fullscreen v-model="storeView">
-        <v-card>
-            <v-toolbar color="primary" dark>
-                <v-toolbar-title>
-                    Planogram Overview: <strong>{{title}}</strong>
-                </v-toolbar-title>
-                <v-spacer></v-spacer>
-                <v-btn icon flat dark @click="storeView=false">
-                    <v-icon>close</v-icon>
-                </v-btn>
-            </v-toolbar>
-            <v-toolbar dark flat dense>
-                <v-btn @click="assignGroups" color="blue-grey darken-2">
-                    group assign
-                </v-btn>
+    <v-card>
+        <v-toolbar color="primary" dark dense>
+            <v-toolbar-title>
+                Planogram Overview: <strong v-if="selectedProject!=null">{{title}}</strong>
+            </v-toolbar-title>
+            <v-spacer></v-spacer>
+        </v-toolbar>
+        <v-toolbar dark flat dense>
+            <v-container class="pa-0" fluid grid-list-lg>
+                <v-layout row wrap>
+                    <v-flex lg1 md2>
+                        <v-btn @click="assignGroups" color="blue-grey darken-2">
+                            group assign
+                        </v-btn>
+                    </v-flex>
+                    <v-flex lg2 md3>
+                        <v-select :items="projectGroups" @change="getProjectsByProjectGroup()"
+                            v-model="selectedProjectGroup" label="Project Group">
+                        </v-select>
+                    </v-flex>
+                    <v-flex lg2 md3>
+                        <v-select :items="projects" @change="getStorePlanograms()" v-model="selectedProject"
+                            label="Project"></v-select>
+                    </v-flex>
+                </v-layout>
+            </v-container>
+        </v-toolbar>
+        <grid ref="grid" :getRowData="getStorePlanograms" :selectedProject="selectedProject" :rowData="rowData"
+            :assign="assignGroups" />
 
-                <!-- <v-menu>
-                    <v-btn slot="activator">options</v-btn>
-                    <v-list>
-                        <v-list-tile>asdf</v-list-tile>
-                        <v-list-tile>asdf</v-list-tile>
-                        <v-list-tile>asdf</v-list-tile>
-                    </v-list>
-                </v-menu> -->
-            </v-toolbar>
-            <grid ref="grid" :getRowData="getStorePlanograms" :selectedProject="selectedProject" :rowData="rowData"
-                :assign="assignGroups" />
+        <StorePlanograms ref="StorePlanograms" :getStoreData="getStorePlanograms" />
+        <PlanogramDetailsSelector ref="PlanogramDetailsSelector" />
+        <!-- :PlanoName="ProjectName.text" -->
+        <YesNoModal ref="YesNoModal" />
 
-            <StorePlanograms ref="StorePlanograms" :getStoreData="getStorePlanograms" />
-            <PlanogramDetailsSelector :PlanoName="ProjectName.text" ref="PlanogramDetailsSelector" />
-            <YesNoModal ref="YesNoModal" />
+    </v-card>
 
-        </v-card>
-    </v-dialog>
 </template>
 <script>
     import Axios from 'axios'
@@ -49,7 +52,7 @@
     } from 'timers';
 
     export default {
-        props: ['ProjectName', 'selectedProject', ],
+        props: ['ProjectName', ],
         components: {
             grid,
             YesNoModal,
@@ -59,11 +62,15 @@
         },
         data() {
             return {
+                projects: [],
+                projectGroups: [],
+                selectedProjectGroup: null,
                 index: null,
                 rowData: [],
                 title: null,
                 StoreClusters: [],
                 allStoreDialog: false,
+                selectedProject: null,
                 StoreStatusList: [{
                         text: "Unassigned"
                     }, {
@@ -87,6 +94,9 @@
                 currentStorePlanograms: [],
                 storeView: false,
             }
+        },
+        mounted() {
+            this.open()
         },
         methods: {
             createProjectTransactionGroup(request, callback) {
@@ -144,7 +154,7 @@
                 let data = rowData.data
                 let systemFile = data.systemFileID
                 console.log(systemFile);
-                
+
                 let node = rowData.node
                 console.log(data);
 
@@ -169,7 +179,7 @@
                                         "store_ID": data.store_ID,
                                         "status": 13,
                                         "systemUserID": storeUserCallback[0]
-                                        .systemUserID, //store user
+                                            .systemUserID, //store user
                                         "systemFileID": systemFile,
                                         "rangeFileID": data.rangeID,
                                     }
@@ -316,7 +326,7 @@
                                 listItem.currentStatusText = "Assigned"
                                 listItem.heightFit = heightFit
                                 listItem.storeClusterFit = storeClusterFit
-                                listItem.project_ID=self.selectedProject
+                                listItem.project_ID = self.selectedProject
                                 listItem.planogramFit = planogramFit
                                 listItem.modulesFit = moduleFit
                                 listItem.fits = fits
@@ -324,11 +334,12 @@
                                 listItem.planogramDetail_ID = data.id
                                 listItem.detailHeight = data.height
                                 listItem.detailModules = data.modules
-                                listItem.systemFileID= data.systemFileID
+                                listItem.systemFileID = data.systemFileID
                                 node.setData(listItem)
 
                                 self.index = idx
                                 // self.getStorePlanograms()
+
                                 delete Axios.defaults.headers.common["TenantID"];
                             }).catch(e => {
                                 console.log(e);
@@ -402,25 +413,60 @@
             },
             getStorePlanograms() {
                 let self = this
+                self.$nextTick(() => {
+                    self.currentStorePlanograms = [];
 
-                self.currentStorePlanograms = [];
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                    Axios.get(process.env.VUE_APP_API + 'Store_Planogram?project_ID=' + self.selectedProject)
+                        .then(r => {
+                            self.rowData = []
+                            self.currentStorePlanograms = []
+                            self.currentStorePlanograms = r.data.store_PlanogramList;
+                            self.currentStorePlanograms.forEach(e => {
+                                e.currentStatusText = self.StoreStatusList[e.planogramStoreStatus]
+                                    .text
+                            })
+                            self.rowData = self.currentStorePlanograms
+                            setTimeout(() => {}, 300);
+                            console.log(self.rowData);
+                            delete Axios.defaults.headers.common["TenantID"];
+                            self.projects.forEach(e => {
+                                if (e.value == self.selectedProject) {
+                                    self.title = e.text
+                                }
+                            })
 
-                Axios.get(process.env.VUE_APP_API + 'Store_Planogram?project_ID=' + self.selectedProject)
-                    .then(r => {
-                        self.rowData = []
-                        self.currentStorePlanograms = []
-                        self.currentStorePlanograms = r.data.store_PlanogramList;
-                        self.currentStorePlanograms.forEach(e => {
-                            e.currentStatusText = self.StoreStatusList[e.planogramStoreStatus].text
                         })
-                        self.rowData = self.currentStorePlanograms
-                        setTimeout(() => {}, 300);
-                        console.log(self.rowData);
-                    delete Axios.defaults.headers.common["TenantID"];
+                })
+            },
+            getProjectGroups() {
+                let self = this;
 
-                    })
+                return new Promise((resolve, reject) => {
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    Axios.get(process.env.VUE_APP_API + `ProjectGroup`)
+                        .then(r => {
+                            delete Axios.defaults.headers.common["TenantID"];
+                            let tmp = r.data.projectGroupList;
+
+                            self.projectGroups = [];
+
+                            tmp.forEach(el => {
+                                self.projectGroups.push({
+                                    text: el.name,
+                                    value: el.id
+                                })
+                            })
+
+                            resolve(r);
+                        })
+                        .catch(e => {
+                            delete Axios.defaults.headers.common["TenantID"];
+                            reject(e);
+                        })
+                })
             },
             GenerateName(data) {
                 if (data.planogramID == 0) {
@@ -461,12 +507,49 @@
                 }
                 return planogramName
             },
+            getProjectsByProjectGroup() {
+                let self = this;
+                return new Promise((resolve, reject) => {
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    self.$nextTick(() => {
+                        let projectGroupID = self.selectedProjectGroup;
+
+                        Axios.get(process.env.VUE_APP_API +
+                                `Project?projectGroupID=${projectGroupID}`)
+                            .then(r => {
+                                delete Axios.defaults.headers.common["TenantID"];
+                                let tmp = r.data.projectList;
+
+                                self.projects = [];
+
+                                tmp.forEach(el => {
+                                    self.projects.push({
+                                        text: el.name,
+                                        value: el.id
+                                    })
+                                })
+
+                                resolve();
+                            })
+                            .catch(e => {
+                                delete Axios.defaults.headers.common["TenantID"];
+
+                                reject();
+                            })
+                    })
+                })
+            },
             open() {
                 let self = this
-                self.title = self.ProjectName.text
+                if (self.title != null || self.title != undefined) {
+                    self.title = self.ProjectName.text
+
+                }
+                self.getProjectGroups()
                 self.storeView = true
                 self.$refs.grid.resize()
-                self.getStorePlanograms()
+
             },
 
         }

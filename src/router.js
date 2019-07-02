@@ -28,7 +28,7 @@ import DataPreparationViewSelection from '@/components/Main/DataPreparation/View
 
 import PlanogramDetailTool from '@/components/Main/PlanogramImplementation/PlanogramDetailTool.vue'
 import PlanogramImplementation from '@/components/Main/PlanogramImplementation/Index.vue'
-
+import PlanogramDistribution from '@/components/Main/PlanogramImplementation/PlanogramOverView/StorePlanogramOverview.vue'
 import RequestNewPlanogram from '@/components/Main/PlanogramImplementation/RequestNewPlanogram.vue'
 
 // Images
@@ -194,6 +194,10 @@ export default new Router({
           path: "/PlanogramImplementation",
           name: "planogram_implementation",
           component: PlanogramImplementation
+        }, {
+          path: "/PlanogramDistribution",
+          name: "Planogram_distribution",
+          component: PlanogramDistribution
         },
         {
           path: "/PlanogramDetailTool",
