@@ -583,26 +583,34 @@
         "children": [{
                 "headerName": "Retail Buyer",
                 "field": "retail_Buyer",
-                "editable": true,
-                "hide": true
+                "editable": false,
+                "hide": true,
+                "cellRendererFramework": "ResourceSelector",
+                "dropdownName": "retail_buyers"
             },
             {
                 "headerName": "Retail Stock Planner",
                 "field": "retail_Stock_Planner",
-                "editable": true,
-                "hide": true
+                "editable": false,
+                "hide": true,
+                "cellRendererFramework": "ResourceSelector",
+                "dropdownName": "retail_stock_planners"
             },
             {
                 "headerName": "Buyer Assistant",
                 "field": "buyer_Assistant",
-                "editable": true,
-                "hide": true
+                "editable": false,
+                "hide": true,
+                "cellRendererFramework": "ResourceSelector",
+                "dropdownName": "buyer_assistants"
             },
             {
                 "headerName": "Order Clerk",
                 "field": "order_Clerk",
-                "editable": true,
-                "hide": true
+                "editable": false,
+                "hide": true,
+                "cellRendererFramework": "ResourceSelector",
+                "dropdownName": "order_clerks"
             }
         ]
     },

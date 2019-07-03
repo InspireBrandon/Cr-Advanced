@@ -145,6 +145,7 @@
     import Selector from "./GridComponents/Selector.vue";
     import ConsignmentSelector from "./GridComponents/ConsignmentSelector.vue";
     import Configuration from "./GridComponents/ConfigurationsComponent/Configuration.vue";
+    import ResourceSelector from "./GridComponents/ResourceSelector";
 
     const tabs = ['Standard', 'Vendor', 'Hierachy', 'Item Status', 'Images', 'Supporting Documents', 'Resources',
         'Stock Control', 'Price and Margin', 'Opening Orders'
@@ -169,7 +170,8 @@
             DescriptionLength,
             Selector,
             ConsignmentSelector,
-            Configuration
+            Configuration,
+            ResourceSelector
         },
         data() {
             return {
@@ -252,8 +254,12 @@
                 ],
                 suppliers: [],
                 category_CodeDetails: [],
-                categoryCode: []
-
+                categoryCode: [],
+                resources: [],
+                retail_buyers: [],
+                retail_stock_planners: [],
+                buyer_assistants: [],
+                order_clerks: []
             }
         },
         computed: {
@@ -521,6 +527,7 @@
                 self.getSegments();
                 self.getActiveShopCodes();
                 self.getItemStatuses();
+                self.getResources();
             },
             getManufacturers() {
                 let self = this;
@@ -577,6 +584,43 @@
 
                 return retval;
             },
+            getResources() {
+                let self = this;
+
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + `Event_Sheet_Resource`)
+                    .then(r => {
+                        self.resources = r.data.event_Sheet_Resources;
+
+
+                        self.resources.forEach(resource => {
+                            switch (resource.resourceType) {
+                                case 0: {
+                                    self.retail_buyers.push(resource.firstname + " " + resource.lastname)
+                                }
+                                break;
+                            case 1: {
+                                self.retail_stock_planners.push(resource.firstname + " " + resource
+                                    .lastname)
+                            }
+                            break;
+                            case 2: {
+                                self.buyer_assistants.push(resource.firstname + " " + resource.lastname)
+                            }
+                            break;
+                            case 3: {
+                                self.order_clerks.push(resource.firstname + " " + resource.lastname)
+                            }
+                            break;
+                            }
+                        });
+
+                        console.log("This is resources", r.data.event_Sheet_Resources);
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+            },
             getBrands() {
                 let self = this;
 
@@ -586,13 +630,10 @@
 
                 Axios.get(process.env.VUE_APP_API + "Retailer/Brand")
                     .then(r => {
-
                         self.brands = [];
-
                         r.data.forEach(brand => {
                             self.brands.push(brand.displayname)
                         })
-
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
