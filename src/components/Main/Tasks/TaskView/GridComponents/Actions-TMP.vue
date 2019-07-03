@@ -180,7 +180,7 @@
         break;
         case 21: {
             button_1.set('warning', 'visibility', cp.routeToView, "View")
-            button_2.set('success', 'visibility', cp.setDistributionViewed, "Set to viewed")
+            button_2.set('success', 'settings_backup_restore', cp.setDistributionViewed, "Recall")
             button_3.set('error', 'local_parking', cp.setParked, "Park")
         }
         break;
@@ -264,12 +264,12 @@
         break;
         case 44: {
             button_1.set('warning', 'visibility', cp.routeToView, "View") //implementation
-             button_2.set('success', 'visibility', cp.setDistributionInProgress, "Distribute")
+            button_2.set('success', 'visibility', cp.setDistributionInProgress, "Distribute")
             button_3.set('error', 'local_parking', cp.setParked, "Park")
         }
         break;
         case 45: {
-            button_2.set('success', 'visibility', cp.setDistributionViewed, "Set to viewed")
+            button_1.set('success', 'visibility', cp.setDistributionViewed, "View")
         }
         break;
         }

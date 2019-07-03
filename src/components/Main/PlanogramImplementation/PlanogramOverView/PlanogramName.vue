@@ -3,7 +3,7 @@
         <v-tooltip bottom >
             <template v-slot:activator="{ on }">
                 <v-btn v-on="on"
-                   @click="params.context.componentParent.$parent.$parent.$parent.$parent.unassignPlanogram(params)"
+                   @click="params.context.componentParent.$parent.$parent.unassignPlanogram(params)"
                     icon flat small color="error" class="ma-0">
                     <v-icon>close</v-icon>
                 </v-btn>

@@ -42,7 +42,7 @@
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                     <v-btn v-on="on"
-                        @click="params.context.componentParent.$parent.$parent.$parent.$parent.Distribute(params)" icon
+                        @click="params.context.componentParent.$parent.$parent.Distribute(params)" icon
                         flat small color="success" class="ma-0">
                         <v-icon>send</v-icon>
                     </v-btn>
