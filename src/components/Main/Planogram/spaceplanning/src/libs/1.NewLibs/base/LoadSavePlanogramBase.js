@@ -97,10 +97,7 @@ class LoadSavePlanogramBase {
         planogramName += " - S" + dimensionData.supplierStands;
         planogramName += " - B" + dimensionData.bins;
       }
-
-      if (planogramName != "") {
-        planogramName += " - " + dimensionData.FixtureType;
-      }
+      
     } else {
       planogramName = spacePlanName;
     }

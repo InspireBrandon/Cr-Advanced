@@ -133,7 +133,7 @@
                                 :rowData="rowData" :filter="true" :suppressRowClickSelection="true"
                                 :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true"
                                 :resizable="true" :floatingFilter="true" :groupMultiAutoColumn="true"
-                                :onGridReady="onGridReady" :sortable="true">
+                                :onGridReady="onGridReady" :sortable="true" @first-data-rendered="onFirstDataRendered">
                                 <!-- :processChartOptions="processChartOptions" -->
                             </ag-grid-vue>
                         </v-card-text>
@@ -279,14 +279,14 @@
                             columns: ['name', 'value'],
                             chartContainer: document.querySelector('#myGroupedBar1'),
                             suppressChartRanges: true,
-                            aggregate: true,
+                            aggregate: true
                         })
 
                         var firstLineGraphRangeParams = new Line({
                             columns: ['name', 'customers'],
                             chartContainer: document.querySelector('#myLineGraph1'),
                             suppressChartRanges: true,
-                            aggregate: true,
+                            aggregate: true
                         })
 
                         var firstPieChartRangeParams = new Pie({
@@ -300,7 +300,7 @@
                             columns: ['name', 'sales', 'customers'],
                             chartContainer: document.querySelector('#myStackedBarBar1'),
                             suppressChartRanges: true,
-                            aggregate: true,
+                            aggregate: true
                         })
 
                         firstGroupedBar = params.api.chartRange(firstGroupedBarRangeParams);
@@ -527,6 +527,7 @@
             //         break;
             // }
             // },
+
             onGridReady(params) {
                 let self = this;
 

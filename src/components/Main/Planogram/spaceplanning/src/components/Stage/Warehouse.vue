@@ -934,9 +934,7 @@
           planogramName += " - S" + self.supplierStands;
           planogramName += " - B" + self.bins;
         }
-        if (planogramName != "" && self.selectedFixtureType != null) {
-          planogramName += " - " + self.selectedFixtureType;
-        }
+      
         console.log('names______________________');
 
         console.log(planogramName);
