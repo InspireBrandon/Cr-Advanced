@@ -11,13 +11,23 @@
             <v-container grid-list-md>
                 <v-layout row wrap>
                     <v-flex lg12 md12 sm12 xs12>
-                        <v-select :items="types" v-model="form.accessType" label="Type"></v-select>
+                        <v-select :items="types" v-model="form.accessType" label="Type" @change="accessTypeChange">
+                        </v-select>
                     </v-flex>
                     <v-flex v-if="form.accessType == 2" lg12 md12 sm12 xs12>
-                        <v-autocomplete multiple :items="planograms" v-model="selectedPlanograms" label="Planograms"></v-autocomplete>
+                        <v-autocomplete multiple :items="planograms" v-model="selectedPlanograms" label="Planograms">
+                        </v-autocomplete>
                     </v-flex>
                     <v-flex v-if="form.accessType == 3" lg12 md12 sm12 xs12>
                         <v-autocomplete :items="stores" v-model="form.storeID" label="Store"></v-autocomplete>
+                    </v-flex>
+                    <v-flex v-if="form.accessType == 4" lg12 md12 sm12 xs12>
+                        <v-container fluid>
+                            <v-checkbox v-model="allowDistribution" label="Distribution" hide-details>
+                            </v-checkbox>
+                            <v-checkbox v-model="allowApproval" label="Approval" hide-details>
+                            </v-checkbox>
+                        </v-container>
                     </v-flex>
                 </v-layout>
             </v-container>
@@ -42,6 +52,10 @@
                         value: 0
                     },
                     {
+                        text: 'Operations',
+                        value: 4
+                    },
+                    {
                         text: 'Buyer',
                         value: 1
                     },
@@ -58,13 +72,17 @@
                 stores: [],
                 store: null,
                 planograms: [],
+                allowDistribution: false,
+                allowApproval: false,
                 selectedPlanograms: [],
-              form: {
+                operationsSettings: null,
+                form: {
                     accessType: null,
                     storeID: null
                 },
                 systemUserID: null,
-                tenantID: null
+                tenantID: null,
+                tenantLink_AccessTypeID: null
             }
         },
         methods: {
@@ -76,12 +94,21 @@
                     .then(r => {
                         if (r.data.tenantLink_AccessTypeList.length > 0) {
                             self.form = r.data.tenantLink_AccessTypeList[0];
+
+                            console.log(self.form);
+
+                            self.tenantLink_AccessTypeID = self.form.tenantLink_AccessTypeID;
+
                             self.selectedPlanograms = [];
 
-                            if(self.form.accessType == 2) {
+                            if (self.form.accessType == 3) {
                                 self.form.supplierPlanogramList.forEach(element => {
                                     self.selectedPlanograms.push(element.planogram_ID)
                                 });
+                            }
+
+                            if(self.form.accessType == 4) {
+                                self.getOperationsSettings();
                             }
                         } else {
                             for (var prop in self.form) {
@@ -112,7 +139,7 @@
                 Axios.get(process.env.VUE_APP_API + "Planogram")
                     .then(r => {
                         self.planograms = [];
-                        
+
                         r.data.planogramList.forEach(element => {
                             self.planograms.push({
                                 text: element.displayname,
@@ -122,6 +149,42 @@
                         callback();
                     })
             },
+            getOperationsSettings() {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API + "OperationsSetting?tenantLink_AccessTypeID=" + self.tenantLink_AccessTypeID)
+                    .then(r => {
+                        // Return object
+                        // do a check to see if its null
+
+                        if(r.data == null) {
+                            self.operationsSettings = {
+                                id: -1,
+                                uid: ""
+                            }
+
+                            self.allowDistribution = false;
+                            self.allowApproval = false;
+                        } else {
+                            self.operationsSettings = {
+                                id: r.data.operationsSettingsID,
+                                uid: r.data.operationsSettingsUID
+                            }
+
+                            self.allowDistribution = r.data.Distribution;
+                            self.allowApproval = r.data.Approval;
+                        }
+                    });
+            },
+            accessTypeChange() {
+                let self = this;
+
+                self.$nextTick(() => {
+                    if (self.form.accessType == 4) {
+                        self.getOperationsSettings();
+                    }
+                })
+            },
             submit() {
                 let self = this;
 
@@ -130,11 +193,11 @@
                 self.selectedPlanograms.forEach(selectedPlanogram => {
                     var selected = false;
                     self.planograms.forEach(planogram => {
-                        if(planogram.value == selectedPlanogram)
+                        if (planogram.value == selectedPlanogram)
                             selected = true;
                     })
 
-                    if(selected) {
+                    if (selected) {
                         tmp.push({
                             planogram_ID: selectedPlanogram
                         })
@@ -148,27 +211,30 @@
                     .then(r => {
                         let accessType = "";
 
+                        console.log(self.form.accessType);
+
                         switch (self.form.accessType) {
-                            case 0:
-                                {
-                                    accessType = "Super User";
-                                }
-                                break;
-                            case 1:
-                                {
-                                    accessType = "Buyer";
-                                }
-                                break;
-                            case 2:
-                                {
-                                    accessType = "Supplier";
-                                }
-                                break;
-                            case 3:
-                                {
-                                    accessType = "Store";
-                                }
-                                break;
+                            case 0: {
+                                accessType = "Super User";
+                            }
+                            break;
+                        case 1: {
+                            accessType = "Buyer";
+                        }
+                        break;
+                        case 2: {
+                            accessType = "Supplier";
+                        }
+                        break;
+                        case 3: {
+                            accessType = "Store";
+                        }
+                        break;
+                        case 4: {
+                            accessType = "Operations";
+                            self.saveOperationSettings();
+                        }
+                        break;
                         }
 
                         self.afterClose(accessType);
@@ -190,6 +256,23 @@
                     self.afterClose = callback;
                     self.modalShow = true
                 })
+            },
+            saveOperationSettings() {
+                let self = this;
+
+                let isAdd = self.operationsSettings.id == -1;
+
+                let request = {
+                    operationsSettingsID: self.operationsSettings.id,
+                    operationsSettingsUID: self.operationsSettings.uid,
+                    tenantLink_AccessTypeID: self.tenantLink_AccessTypeID,
+                    distribution: self.allowDistribution,
+                    approval: self.allowApproval,
+                }
+
+                Axios[isAdd ? "post" : "put"](process.env.VUE_APP_API + "OperationsSetting", request)
+                    .then(r => {
+                    });
             }
         }
     }
