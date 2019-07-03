@@ -193,11 +193,9 @@
                     }
                     break;
                 case "SPACE-PLANNING": {
-                    console.log(self.systemUserID);
-
                     if (self.systemUserID == 16 || self.systemUserID == 48 || self.systemUserID == 43) {
                         app.config.routes = [{
-                            "route": "/PlanogramDistribution",
+                            "route": "/PlanogramDistribution/null/null",
                             "routeName": "plannogram_distribution",
                             "title": "Planogram Distribution",
                             "openInNewWindow": false
