@@ -51,9 +51,7 @@
                                 Status: {{status[timelineItems[0].status].text}}
                             </v-toolbar-title>
                         </v-toolbar>
-                        <v-divider></v-divider>
-                        <v-toolbar color="primary" dark dense flat
-                            v-if="selectedPlanogram != null || routeProjectID != null">
+                        <v-toolbar dark dense flat v-if="selectedPlanogram != null || routeProjectID != null">
                             <v-btn v-if="(projectsStatus.status==20||routeStatus==20)" flat outline @click="approve()">
                                 Approve</v-btn>
                             <v-btn flat
@@ -62,14 +60,12 @@
                                 Variation</v-btn>
                             <v-btn outline flat v-if="routeStatus == 24" @click="requestStoreVariation">Variation
                             </v-btn>
-                            <!-- <v-btn flat v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==20||routeStatus==20)" outline @click="decline(projectsStatus.status,2,timelineItems[0])">Decline</v-btn> -->
-                            <!-- <v-btn
-                                v-if="authorityType == 0||(authorityType == 1)&&(projectsStatus.status==21||routeStatus==21)"
-                                flat outline @click="approve()">Assign</v-btn> -->
                             <v-btn flat v-if="(projectsStatus.status==24||routeStatus==24)" outline
                                 @click="implement(projectsStatus.status,3,timelineItems[0])">Implemented</v-btn>
-                            <v-btn flat v-if="(projectsStatus.status==21||routeStatus==21)" outline
+                            <v-btn color="blue-grey darken-3" v-if="(projectsStatus.status== 44||routeStatus== 44)"
                                 @click="distribute(projectsStatus.status,4,timelineItems[0])">Distribute</v-btn>
+                            <v-btn color="blue-grey darken-3" v-if="(projectsStatus.status== 44 || routeStatus == 44)"
+                                @click="setParked()">Park</v-btn>
                         </v-toolbar>
                     </v-flex>
                     <v-flex v-if="planogramObj != null && !showLoader" lg12 md12 sm12 xs12>
@@ -156,7 +152,7 @@
         <NotesModal ref="notesModal"></NotesModal>
         <SpacePlanSelector ref="SpacePlanSelector" />
         <PlanogramDetailsSelector ref="PlanogramDetailsSelector" />
-        
+
         <SizeLoader ref="SizeLoader" />
     </v-card>
 </template>
@@ -622,7 +618,7 @@
                                 delete Axios.defaults.headers.common["TenantID"];
                                 self.projects = r.data.projectList;
                                 console.log(self.projects);
-                                
+
                                 self.projectsSelect = [];
 
                                 self.projects.forEach(el => {
@@ -1110,35 +1106,13 @@
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
 
-                let projectTXGroupRequest = {
-                    projectID: request.project_ID
-                }
+                request.status = 21;
 
-                // Select a store
-                self.$refs.PlanogramIplementationModal.show("Distribute Planogram?", 4, null, null, null,
-                    data => {
-                        request.status = 40;
-                        request.actionedByUserID = data.users;
-                        request.systemUserID = null;
-                        // Create new process assigned
-                        // Create new process group
-                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
-                            // Create new process assigned against new group
-                            request.actionedByUserID = null;
-                            request.systemUserID = data.users;
-                            request.projectTXGroup_ID = newGroup.id;
-                            self.createProjectTransaction(request, processAssigned => {
-                                request.status = 13;
-                                request.notes = data.notes;
-                                request.store_ID = data.stores;
-                                self.createProjectTransaction(request,
-                                    implementationPendingResponse => {
-                                        self.getProjectTransactionsByProjectID(
-                                            request.project_ID);
-                                    })
-                            })
-                        })
-                    })
+                console.log(request);
+
+                self.createProjectTransaction(request, processAssigned => {
+                    self.$router.push(`/PlanogramDistribution/${request.project_ID}/${request.project_Group_ID}`)
+                })
             },
             implement() {
                 let self = this;
@@ -1284,6 +1258,16 @@
                 Axios.post(process.env.VUE_APP_API + `ProjectTX`, request).then(r => {
                     delete Axios.defaults.headers.common["TenantID"];
                     callback(r.data.projectTX)
+                })
+            },
+            setParked() {
+                let self = this;
+
+                let request = JSON.parse(JSON.stringify(self.tmpRequest))
+                request.status = 45;
+
+                self.createProjectTransaction(request, newItem => {
+                    self.getProjectTransactionsByProjectID(request.project_ID);
                 })
             },
             expandImage() {
