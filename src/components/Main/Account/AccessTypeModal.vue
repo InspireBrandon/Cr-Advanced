@@ -95,7 +95,7 @@
                         if (r.data.tenantLink_AccessTypeList.length > 0) {
                             self.form = r.data.tenantLink_AccessTypeList[0];
 
-                            console.log(self.form);
+                            console.log("Access Type 1", self.form);
 
                             self.tenantLink_AccessTypeID = self.form.tenantLink_AccessTypeID;
 
@@ -107,7 +107,7 @@
                                 });
                             }
 
-                            if(self.form.accessType == 4) {
+                            if (self.form.accessType == 4) {
                                 self.getOperationsSettings();
                             }
                         } else {
@@ -152,12 +152,14 @@
             getOperationsSettings() {
                 let self = this;
 
-                Axios.get(process.env.VUE_APP_API + "OperationsSetting?tenantLink_AccessTypeID=" + self.tenantLink_AccessTypeID)
+                        console.log("passed data", self.tenantLink_AccessTypeID);
+                Axios.get(process.env.VUE_APP_API + "OperationsSetting?tenantLink_AccessTypeID=" +
+                        self.tenantLink_AccessTypeID)
                     .then(r => {
                         // Return object
                         // do a check to see if its null
 
-                        if(r.data == null) {
+                        if (r.data == null) {
                             self.operationsSettings = {
                                 id: -1,
                                 uid: ""
@@ -165,15 +167,18 @@
 
                             self.allowDistribution = false;
                             self.allowApproval = false;
-                        } else {
+                        } else if (r.data != null) {
                             self.operationsSettings = {
                                 id: r.data.operationsSettingsID,
                                 uid: r.data.operationsSettingsUID
                             }
 
-                            self.allowDistribution = r.data.Distribution;
-                            self.allowApproval = r.data.Approval;
+                            self.allowDistribution = r.data.distribution;
+                            self.allowApproval = r.data.approval;
                         }
+                    })
+                    .catch(er => {
+                        console.log("Error", er)
                     });
             },
             accessTypeChange() {
@@ -211,7 +216,7 @@
                     .then(r => {
                         let accessType = "";
 
-                        console.log(self.form.accessType);
+                        console.log("Access Type", self.form.accessType);
 
                         switch (self.form.accessType) {
                             case 0: {
@@ -271,8 +276,7 @@
                 }
 
                 Axios[isAdd ? "post" : "put"](process.env.VUE_APP_API + "OperationsSetting", request)
-                    .then(r => {
-                    });
+                    .then(r => {});
             }
         }
     }
