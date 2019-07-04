@@ -64,45 +64,15 @@ class LoadSavePlanogramBase {
     let planogramName = "";
 
     if (updateName) {
-      if (clusterData.planogramName != null)
-        planogramName += clusterData.planogramName
-      if (clusterData.periodic != null) {
-        if (clusterData.periodic)
-          planogramName += " - " + clusterData.monthsBetween + "MMA";
-        else
-          planogramName += " - " + clusterData.dateFromString + " to " + clusterData.dateToString;
-      }
-      if (clusterData.tag != null && clusterData.tag != "")
-        planogramName += clusterData.tag;
-
-      if (clusterData.storeCluster != null && clusterData.storeCluster != "") {
-        planogramName += " - " + clusterData.storeCluster;
-      }
-
-      if (clusterData.storeName != null && clusterData.storeName != "") {
-        planogramName += " - " + clusterData.storeName;
-      }
-
-      if (planogramName != "")
-        planogramName += " - XXX";
-
-      planogramName += " - " + dimensionData.modules + " Module " + "(" + dimensionData.height + "M" + " x " + dimensionData.width + "M)";
-
-      if (planogramName[1] == "-")
-        planogramName = planogramName.replace(' -', "");
-
-      if (planogramName != "") {
-        planogramName += " - D" + dimensionData.displays;
-        planogramName += " - P" + dimensionData.pallettes;
-        planogramName += " - S" + dimensionData.supplierStands;
-        planogramName += " - B" + dimensionData.bins;
-      }
-      
+      planogramName = spacePlanName
     } else {
       planogramName = spacePlanName;
     }
+    console.log("this one_______________________________");
 
-    output.name = planogramName;
+    console.log(spacePlanName);
+      
+    output.name = spacePlanName;
     output = JSON.parse(JSON.stringify(output));
 
     // if (self.Create == true) {
@@ -158,9 +128,7 @@ class LoadSavePlanogramBase {
       console.log(resp);
       console.log("[save transaction]_______________________________________");
       let resultSpace = resp.data.systemFileID
-      this.createDetailTX(clusterData, dimensionData, resultSpace, detailTXcallback => {
-        console.log("detailTXcallback");
-        console.log(detailTXcallback);
+       
         
         if (resp.success == true) {
           alert("folder created")
@@ -304,7 +272,6 @@ class LoadSavePlanogramBase {
           })
         })
         callback(resultSpace)
-      })
     })
   }
 
@@ -378,8 +345,11 @@ class LoadSavePlanogramBase {
     } else {
       planogramName = spacePlanName;
     }
+    console.log("spacePlanName____________________________");
 
-    output.name = planogramName;
+    console.log(spacePlanName);
+    
+    output.name = spacePlanName;
     output = JSON.parse(JSON.stringify(output));
 
     // if (self.Create == true) {
@@ -437,9 +407,7 @@ class LoadSavePlanogramBase {
       console.log("[save transaction]_______________________________________");
       let resultSpace = resp.data.systemFileID
 
-      this.createDetailTX(clusterData, dimensionData, resultSpace, detailTXcallback => {
-        console.log("detailTXcallback");
-        console.log(detailTXcallback.data.planogram_Details);
+       
 
         output.image = null
         let startTime = new Date()
@@ -594,7 +562,6 @@ class LoadSavePlanogramBase {
 
         })
       })
-    })
   }
   createDetailTX(clusterData, dimensionData, systemFileID, callback) {
     console.log("making detailTX");
@@ -626,14 +593,14 @@ class LoadSavePlanogramBase {
       "bins": parseInt(dimensionData.bins)
     }
 
-    axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-    axios.post(process.env.VUE_APP_API + 'Planogram_Details/Save', sendRequst).then(
-      r => {
-        console.log(r);
+    // axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+    // axios.post(process.env.VUE_APP_API + 'Planogram_Details/Save', sendRequst).then(
+    //   r => {
+    //     console.log(r);
 
-        callback(r)
-        delete axios.defaults.headers.common["TenantID"];
-      })
+    //     callback(r)
+    //     delete axios.defaults.headers.common["TenantID"];
+    //   })
   }
   determinePlanogramName(allPlanogramItems, clusterData) {
     // TODO: Make sure that we change the name to the correct standard.

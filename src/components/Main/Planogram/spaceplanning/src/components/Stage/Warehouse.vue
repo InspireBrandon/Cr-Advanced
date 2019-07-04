@@ -271,6 +271,7 @@
     <PlanogramRetractionModal ref="PlanogramRetractionModal"></PlanogramRetractionModal>
     <JoinPlanogram ref="JoinPlanogram"></JoinPlanogram>
     <SizeLoader ref="SizeLoader" />
+    <SaveDetailsModal ref="SaveDetailsModal" />
 
   </div>
 </template>
@@ -292,6 +293,8 @@
   import PlanogramAprovalModal from "@/components/Main/Planogram/spaceplanning/src/components/Modals/PlanogramAproval/PlanogramAprovalModal.vue";
   import PlanogramRetractionModal from "@/components/Main/Planogram/spaceplanning/src/components/Modals/PlanogramAproval/PlanogramRetractionModal.vue";
   import JoinPlanogram from "@/components/Main/Planogram/spaceplanning/src/components/Modals/JoinPlanogram/JoinPlanogram.vue";
+  import SaveDetailsModal from "@/components/Main/Planogram/spaceplanning/src/components/Modals/SaveDetails/SaveDetailsModal";
+
 
   function textValue(data) {
     let self = this;
@@ -313,7 +316,8 @@
       PlanogramAprovalModal,
       PlanogramRetractionModal,
       JoinPlanogram,
-      SizeLoader
+      SizeLoader,
+      SaveDetailsModal
     },
     data() {
       let width = 0;
@@ -479,6 +483,12 @@
       }
     },
     methods: {
+      openModal() {
+        let self = this
+        let cluster = self.getStoreName()
+        self.$refs.SaveDetailsModal.show(null, self.rangingData, cluster)
+
+      },
       updateLoader(data) {
 
         console.log(data);
@@ -773,7 +783,8 @@
         self.supplierStands = dimension == undefined || dimension.supplierStands == undefined ? 0 : dimension
           .supplierStands;
         self.bins = dimension == undefined || dimension.bins == undefined ? 0 : dimension.bins;
-        self.selectedFixtureType = dimension == undefined || dimension.fixtureType == undefined ? 0 : dimension.fixtureType;
+        self.selectedFixtureType = dimension == undefined || dimension.fixtureType == undefined ? 0 : dimension
+          .fixtureType;
 
         if (clusterData.rangeID != null) {
 
@@ -934,7 +945,7 @@
           planogramName += " - S" + self.supplierStands;
           planogramName += " - B" + self.bins;
         }
-      
+
         console.log('names______________________');
 
         console.log(planogramName);
@@ -1063,7 +1074,9 @@
 
               if (self.spacePlanID == null) {
                 console.log("spacePlanID is null");
+                // self.$refs.SaveDetailsModal.show(null,self.rangingData,cluster,callback=>{
 
+                // })
                 self.$refs.SizeLoader.show()
                 self.planogramHelper.save(self.$store, stage, clusterData, {
                     modules: self.modules,
@@ -1085,18 +1098,37 @@
                 console.log("spacePlanID is not null");
 
                 self.$refs.yesNoModal.show('Update file name with latest configuration?', value => {
-                  self.$refs.SizeLoader.show()
-                  self.planogramHelper.save(self.$store, stage, clusterData, {
-                      modules: self.modules,
-                      height: self.height,
-                      width: self.width,
-                      displays: self.displays,
-                      pallettes: self.pallettes,
-                      supplierStands: self.supplierStands,
-                      FixtureType: self.selectedFixtureType,
-                      bins: self.bins
-                    }, self.spacePlanID, self.spacePlanName, value, image, self.updateLoader, self.$refs
-                    .SizeLoader.close, callback => {})
+
+                  if (value == true) {
+                    self.$refs.SaveDetailsModal.show(clusterData, vscd.storeName, self.spacePlanID,
+                      detailsCallback => {
+                        self.$refs.SizeLoader.show()
+                        self.planogramHelper.save(self.$store, stage, clusterData, {
+                            modules: self.modules,
+                            height: self.height,
+                            width: self.width,
+                            displays: self.displays,
+                            pallettes: self.pallettes,
+                            supplierStands: self.supplierStands,
+                            FixtureType: self.selectedFixtureType,
+                            bins: self.bins
+                          }, self.spacePlanID, detailsCallback, value, image, self.updateLoader, self.$refs
+                          .SizeLoader.close, callback => {})
+                      })
+                  } else {
+                    self.$refs.SizeLoader.show()
+                    self.planogramHelper.save(self.$store, stage, clusterData, {
+                        modules: self.modules,
+                        height: self.height,
+                        width: self.width,
+                        displays: self.displays,
+                        pallettes: self.pallettes,
+                        supplierStands: self.supplierStands,
+                        FixtureType: self.selectedFixtureType,
+                        bins: self.bins
+                      }, self.spacePlanID, self.spacePlanName, value, image, self.updateLoader, self.$refs
+                      .SizeLoader.close, callback => {})
+                  }
                 })
               }
             })
@@ -1104,22 +1136,39 @@
           self.planogramHelper.setCreate(self.spacePlanID == null || isNew);
 
           if (self.spacePlanID == null) {
-            self.planogramHelper.save(self.$store, stage, clusterData, {
-              modules: self.modules,
-              height: self.height,
-              FixtureType: self.selectedFixtureType,
-              width: self.width
-            }, self.spacePlanID, self.spacePlanName, true, image)
+            self.$refs.SaveDetailsModal.show(clusterData, vscd.storeName, self.spacePlanID, detailsCallback => {
+              self.planogramHelper.save(self.$store, stage, clusterData, {
+                modules: self.modules,
+                height: self.height,
+                FixtureType: self.selectedFixtureType,
+                width: self.width
+              }, self.spacePlanID, detailsCallback, true, image)
+            })
           } else {
             self.$refs.yesNoModal.show('Update file name with latest configuration?', value => {
-              self.$refs.SizeLoader.show()
-              self.planogramHelper.save(self.$store, stage, clusterData, {
-                  modules: self.modules,
-                  height: self.height,
-                  width: self.width,
-                  FixtureType: self.selectedFixtureType,
-                }, self.spacePlanID, self.spacePlanName, value, image, self.updateLoader, self.$refs.SizeLoader
-                .close, callback => {})
+              if (value) {
+                self.$refs.SaveDetailsModal.show(clusterData, vscd.storeName, self.spacePlanID, detailsCallback => {
+                  self.$refs.SizeLoader.show()
+                  self.planogramHelper.save(self.$store, stage, clusterData, {
+                      modules: self.modules,
+                      height: self.height,
+                      width: self.width,
+                      FixtureType: self.selectedFixtureType,
+                    }, self.spacePlanID, detailsCallback, value, image, self.updateLoader, self.$refs
+                    .SizeLoader
+                    .close, callback => {})
+                })
+              } else {
+                self.$refs.SizeLoader.show()
+                self.planogramHelper.save(self.$store, stage, clusterData, {
+                    modules: self.modules,
+                    height: self.height,
+                    width: self.width,
+                    FixtureType: self.selectedFixtureType,
+                  }, self.spacePlanID, self.spacePlanName, value, image, self.updateLoader, self.$refs.SizeLoader
+                  .close, callback => {})
+              }
+
             })
           }
         }
@@ -1129,10 +1178,8 @@
         let self = this;
         let parent = self.$parent.$children[0].$children[2];
         let stage = parent.getStage();
-
         let b64 = parent.$parent.getImageBytes(2);
         let image = parent.$parent.b64toBlob(b64, "image/png")
-
         let clusterData = self.rangingData;
         let vscd = self.$store.getters.getClusterData;
         clusterData["storeCluster"] = self.getClusterName();
@@ -1152,9 +1199,7 @@
           })
 
           let rangingFileUpdated = self.rangingController.getRangingFile();
-
           console.log("Saving Range File");
-
           axios.put(process.env.VUE_APP_API + "SystemFile/JSON/NoRename?db=CR-Devinspire&id=" + vscd.rangeID,
               rangingFileUpdated)
             .then(r => {
@@ -1162,36 +1207,40 @@
 
               if (self.spacePlanID == null) {
                 console.log("spacePlanID is null");
+                self.$refs.SaveDetailsModal.show(clusterData, vscd.storeName, self.spacePlanID, detailsCallback => {
 
-                self.$refs.SizeLoader.show()
-                self.planogramHelper.save(self.$store, stage, clusterData, {
-                    modules: self.modules,
-                    height: self.height,
-                    width: self.width,
-                    displays: self.displays,
-                    pallettes: self.pallettes,
-                    supplierStands: self.supplierStands,
-                    FixtureType: self.selectedFixtureType,
-                    bins: self.bins
-                  }, self.spacePlanID, self.spacePlanName, true, image, self.updateLoader, self.$refs.SizeLoader
-                  .close, data => {
+                  self.$refs.SizeLoader.show()
 
-                    console.log("[NEW SPACEPLANID]", data);
-                    self.spacePlanID = data
-                  })
+                  self.planogramHelper.save(self.$store, stage, clusterData, {
+                      modules: self.modules,
+                      height: self.height,
+                      width: self.width,
+                      displays: self.displays,
+                      pallettes: self.pallettes,
+                      supplierStands: self.supplierStands,
+                      FixtureType: self.selectedFixtureType,
+                      bins: self.bins
+                    }, self.spacePlanID, detailsCallback, true, image, self.updateLoader, self.$refs.SizeLoader
+                    .close, data => {
+
+                      console.log("[NEW SPACEPLANID]", data);
+                      self.spacePlanID = data
+                    })
+                })
               }
             })
         } else {
           self.planogramHelper.setCreate(self.spacePlanID == null || isNew);
           if (self.spacePlanID == null) {
-            self.planogramHelper.save(self.$store, stage, clusterData, {
-              modules: self.modules,
-              height: self.height,
-              width: self.width
-            }, self.spacePlanID, self.spacePlanName, true, image)
+            self.$refs.SaveDetailsModal.show(clusterData, vscd.storeName, self.spacePlanID, detailsCallback => {
+              self.planogramHelper.save(self.$store, stage, clusterData, {
+                modules: self.modules,
+                height: self.height,
+                width: self.width
+              }, self.spacePlanID, detailsCallback, true, image)
+            })
           }
         }
-
       },
       setRangingClusterData(data) {
         let self = this;
