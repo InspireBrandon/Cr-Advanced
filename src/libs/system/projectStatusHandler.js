@@ -622,7 +622,20 @@ function returnAcumulator(status, type) {
         acumulator = (0 - type) + 7;
     }
     break;
+    case 43: {
+        acumulator = 0;
     }
+    break;
+    case 44: {
+        acumulator = 0;
+    }
+    break;
+    case 45: {
+        acumulator = 0;
+    }
+    break;
+    }
+    
 
     return acumulator;
 }
