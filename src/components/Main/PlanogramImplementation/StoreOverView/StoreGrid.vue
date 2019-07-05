@@ -88,38 +88,39 @@
                             'success-green': 'data.heightFit == false && data.planogramStoreStatus!=0',
                             'error-red': 'data.heightFit == true && data.planogramStoreStatus!=0',
                         }
-                    }, {
-                        "headerName": "Fixture Type",
-                        "field": "fixtureType",
-                        "cellEditor": "agRichSelectCellEditor",
-                        "cellEditorParams": {
-                            values: ["Standard",
-                                "Industrial",
-                                "Supplier Stand",
-                                "Till point",
-                                "pallettes",
-                                "Custom"
-                            ],
-                        },
-                        "editable": true,
-                        "minWidth": 150,
-                    }, {
-                        "headerName": "Displays",
-                        "minWidth": 50,
-                        "field": "displays"
-                    }, {
-                        "headerName": "Pallettes",
-                        "minWidth": 50,
-                        "field": "pallettes"
-                    }, {
-                        "headerName": "Supplier Stands",
-                        "minWidth": 50,
-                        "field": "supplierStands"
-                    }, {
-                        "headerName": "Bins",
-                        "field": "bins",
-                        "minWidth": 50,
-                    }
+                    },
+                    //  {
+                    //     "headerName": "Fixture Type",
+                    //     "field": "fixtureType",
+                    //     "cellEditor": "agRichSelectCellEditor",
+                    //     "cellEditorParams": {
+                    //         values: ["Standard",
+                    //             "Industrial",
+                    //             "Supplier Stand",
+                    //             "Till point",
+                    //             "pallettes",
+                    //             "Custom"
+                    //         ],
+                    //     },
+                    //     "editable": true,
+                    //     "minWidth": 150,
+                    // }, {
+                    //     "headerName": "Displays",
+                    //     "minWidth": 50,
+                    //     "field": "displays"
+                    // }, {
+                    //     "headerName": "Pallettes",
+                    //     "minWidth": 50,
+                    //     "field": "pallettes"
+                    // }, {
+                    //     "headerName": "Supplier Stands",
+                    //     "minWidth": 50,
+                    //     "field": "supplierStands"
+                    // }, {
+                    //     "headerName": "Bins",
+                    //     "field": "bins",
+                    //     "minWidth": 50,
+                    // }
                 ],
                 StoreStatusList: [{
                         text: "Unassigned"

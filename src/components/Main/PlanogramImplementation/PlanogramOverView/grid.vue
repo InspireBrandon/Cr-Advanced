@@ -137,43 +137,43 @@
                     //     "editable": true,
                     //     "field": "width"
                     // }, 
-                    {
-                        "headerName": "Fixture Type",
-                        "field": "fixtureType",
-                        "cellEditor": "agRichSelectCellEditor",
-                        "cellEditorParams": {
-                            values: ["Standard",
-                                "Industrial",
-                                "Supplier Stand",
-                                "Till point",
-                                "pallettes",
-                                "Custom"
-                            ],
-                        },
-                        "editable": true,
-                        "minWidth": 150,
-                    },
-                    {
-                        "headerName": "Displays",
-                        "minWidth": 50,
-                        "editable": true,
-                        "field": "displays"
-                    }, {
-                        "headerName": "Pallettes",
-                        "minWidth": 50,
-                        "editable": true,
-                        "field": "pallettes"
-                    }, {
-                        "headerName": "Supplier Stands",
-                        "minWidth": 50,
-                        "editable": true,
-                        "field": "supplierStands"
-                    }, {
-                        "headerName": "Bins",
-                        "field": "bins",
-                        "minWidth": 50,
-                        "editable": true,
-                    }
+                    // {
+                    //     "headerName": "Fixture Type",
+                    //     "field": "fixtureType",
+                    //     "cellEditor": "agRichSelectCellEditor",
+                    //     "cellEditorParams": {
+                    //         values: ["Standard",
+                    //             "Industrial",
+                    //             "Supplier Stand",
+                    //             "Till point",
+                    //             "pallettes",
+                    //             "Custom"
+                    //         ],
+                    //     },
+                    //     "editable": true,
+                    //     "minWidth": 150,
+                    // },
+                    // {
+                    //     "headerName": "Displays",
+                    //     "minWidth": 50,
+                    //     "editable": true,
+                    //     "field": "displays"
+                    // }, {
+                    //     "headerName": "Pallettes",
+                    //     "minWidth": 50,
+                    //     "editable": true,
+                    //     "field": "pallettes"
+                    // }, {
+                    //     "headerName": "Supplier Stands",
+                    //     "minWidth": 50,
+                    //     "editable": true,
+                    //     "field": "supplierStands"
+                    // }, {
+                    //     "headerName": "Bins",
+                    //     "field": "bins",
+                    //     "minWidth": 50,
+                    //     "editable": true,
+                    // }
                 ],
                 defaultColDef: {
                     onCellValueChanged: this.UpdateLine

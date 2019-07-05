@@ -1074,25 +1074,31 @@
 
               if (self.spacePlanID == null) {
                 console.log("spacePlanID is null");
-                // self.$refs.SaveDetailsModal.show(null,self.rangingData,cluster,callback=>{
+                self.$refs.SaveDetailsModal.show(clusterData, vscd.storeName, self.spacePlanID, detailsCallback => {
 
-                // })
-                self.$refs.SizeLoader.show()
-                self.planogramHelper.save(self.$store, stage, clusterData, {
-                    modules: self.modules,
-                    height: self.height,
-                    width: self.width,
-                    displays: self.displays,
-                    pallettes: self.pallettes,
-                    supplierStands: self.supplierStands,
-                    bins: self.bins,
-                    FixtureType: self.selectedFixtureType
-                  }, self.spacePlanID, self.spacePlanName, true, image, self.updateLoader, self.$refs.SizeLoader
-                  .close, data => {
+                  if (self.spacePlanID == null) {
+                    self.spacePlanID = detailsCallback.spaceID
+                  }
+                  self.$refs.SizeLoader.show()
+                  self.planogramHelper.save(self.$store, stage, clusterData, {
+                      modules: self.modules,
+                      height: self.height,
+                      width: self.width,
+                      displays: self.displays,
+                      pallettes: self.pallettes,
+                      supplierStands: self.supplierStands,
+                      bins: self.bins,
+                      FixtureType: self.selectedFixtureType
+                    }, self.spacePlanID, detailsCallback, true, image, self.updateLoader, self.$refs
+                    .SizeLoader
+                    .close, data => {
 
-                    console.log("[NEW SPACEPLANID]", data);
-                    self.spacePlanID = data
-                  })
+                      console.log("[NEW SPACEPLANID]", data);
+                      self.spacePlanID = data
+                    })
+                })
+
+
                 // self.$refs.SizeLoader.close()
               } else {
                 console.log("spacePlanID is not null");
@@ -1112,7 +1118,8 @@
                             supplierStands: self.supplierStands,
                             FixtureType: self.selectedFixtureType,
                             bins: self.bins
-                          }, self.spacePlanID, detailsCallback, value, image, self.updateLoader, self.$refs
+                          }, self.spacePlanID, detailsCallback.name, value, image, self.updateLoader, self
+                          .$refs
                           .SizeLoader.close, callback => {})
                       })
                   } else {
@@ -1136,13 +1143,17 @@
           self.planogramHelper.setCreate(self.spacePlanID == null || isNew);
 
           if (self.spacePlanID == null) {
+
             self.$refs.SaveDetailsModal.show(clusterData, vscd.storeName, self.spacePlanID, detailsCallback => {
+              if (self.spacePlanID == null) {
+                self.spacePlanID = detailsCallback.spaceID
+              }
               self.planogramHelper.save(self.$store, stage, clusterData, {
                 modules: self.modules,
                 height: self.height,
                 FixtureType: self.selectedFixtureType,
                 width: self.width
-              }, self.spacePlanID, detailsCallback, true, image)
+              }, self.spacePlanID, detailsCallback.name, true, image)
             })
           } else {
             self.$refs.yesNoModal.show('Update file name with latest configuration?', value => {
@@ -1154,7 +1165,7 @@
                       height: self.height,
                       width: self.width,
                       FixtureType: self.selectedFixtureType,
-                    }, self.spacePlanID, detailsCallback, value, image, self.updateLoader, self.$refs
+                    }, self.spacePlanID, detailsCallback.name, value, image, self.updateLoader, self.$refs
                     .SizeLoader
                     .close, callback => {})
                 })
@@ -1208,7 +1219,9 @@
               if (self.spacePlanID == null) {
                 console.log("spacePlanID is null");
                 self.$refs.SaveDetailsModal.show(clusterData, vscd.storeName, self.spacePlanID, detailsCallback => {
-
+                  if (self.spacePlanID == null) {
+                    self.spacePlanID = detailsCallback.spaceID
+                  }
                   self.$refs.SizeLoader.show()
 
                   self.planogramHelper.save(self.$store, stage, clusterData, {
@@ -1220,7 +1233,8 @@
                       supplierStands: self.supplierStands,
                       FixtureType: self.selectedFixtureType,
                       bins: self.bins
-                    }, self.spacePlanID, detailsCallback, true, image, self.updateLoader, self.$refs.SizeLoader
+                    }, self.spacePlanID, detailsCallback.name, true, image, self.updateLoader, self.$refs
+                    .SizeLoader
                     .close, data => {
 
                       console.log("[NEW SPACEPLANID]", data);
@@ -1233,11 +1247,14 @@
           self.planogramHelper.setCreate(self.spacePlanID == null || isNew);
           if (self.spacePlanID == null) {
             self.$refs.SaveDetailsModal.show(clusterData, vscd.storeName, self.spacePlanID, detailsCallback => {
+              if (self.spacePlanID == null) {
+                self.spacePlanID = detailsCallback.spaceID
+              }
               self.planogramHelper.save(self.$store, stage, clusterData, {
                 modules: self.modules,
                 height: self.height,
                 width: self.width
-              }, self.spacePlanID, detailsCallback, true, image)
+              }, self.spacePlanID, detailsCallback.name, true, image)
             })
           }
         }

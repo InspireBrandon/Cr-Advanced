@@ -54,11 +54,17 @@
         methods: {
             GetData(SystemFileID) {
                 let self = this
+                console.log(SystemFileID);
+                if(SystemFileID==null){
+                    SystemFileID=0
+                }
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.get(process.env.VUE_APP_API + `Planogram_Details?SystemFileID=${SystemFileID}`).then(r => {
                     console.log(r);
+                   
                     self.PlanoDetail = r.data.planogram_DetailsList[0]
+                    self.fileID=self.PlanoDetail.systemFileID
                     self.RowData = r.data.planogramDetails_fixtures
                     delete Axios.defaults.headers.common["TenantID"];
                 })
@@ -171,7 +177,10 @@
                 let self = this
                 self.save(() => {
                     self.dialog = false
-                    self.callback(self.genName)
+                    self.callback({name:self.genName,
+                    spaceID:self.fileID
+                    
+                    })
                 })
 
             }
