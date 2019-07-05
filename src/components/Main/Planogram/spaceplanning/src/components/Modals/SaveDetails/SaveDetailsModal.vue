@@ -54,20 +54,22 @@
         methods: {
             GetData(SystemFileID) {
                 let self = this
-                console.log(SystemFileID);
-                if(SystemFileID==null){
-                    SystemFileID=0
+
+                if (SystemFileID == null) {
+                    SystemFileID = 0
                 }
+
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.get(process.env.VUE_APP_API + `Planogram_Details?SystemFileID=${SystemFileID}`).then(r => {
-                    console.log(r);
-                   
-                    self.PlanoDetail = r.data.planogram_DetailsList[0]
-                    self.fileID=self.PlanoDetail.systemFileID
-                    self.RowData = r.data.planogramDetails_fixtures
-                    delete Axios.defaults.headers.common["TenantID"];
-                })
+                Axios.get(process.env.VUE_APP_API +
+                    `Planogram_Details?SystemFileID=${SystemFileID}&name=${self.generateName(self.RowData)}`).then(
+                    r => {
+                        self.PlanoDetail = r.data.planogram_DetailsList[0]
+                        self.fileID = self.PlanoDetail.systemFileID
+
+                        self.RowData = r.data.planogramDetails_fixtures
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
             },
             generateName(rowdata) {
                 let self = this
@@ -112,7 +114,7 @@
                 rowdata.forEach(e => {
 
                     if (parseInt(e.modules) != 0 && e.modules != null && e.modules != undefined) {
-                        planogramName += " - " + e.code+"(" + e.modules + " x " + e.height+"M)"
+                        planogramName += " - " + e.code + "(" + e.modules + " x " + e.height + "M)"
                     }
                 })
                 return planogramName
@@ -142,7 +144,6 @@
                     "height": parseFloat(selected.height),
                     "modules": parseInt(self.totalModules),
                 }
-                console.log(PlanoDetails);
 
                 let request = {
                     planogramDetails_fixtures: data,
@@ -152,7 +153,6 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + 'Planogram_Details/Save', request).then(
                     r => {
-                        console.log(r);
                         callback(r)
 
                         delete Axios.defaults.headers.common["TenantID"];
@@ -163,6 +163,9 @@
 
             },
             show(rangingData, cluster, fileID, callback) {
+
+                console.log(rangingData, cluster)
+
                 let self = this
                 self.dialog = true
                 self.cluster = cluster
@@ -175,13 +178,19 @@
             },
             close() {
                 let self = this
-                self.save(() => {
-                    self.dialog = false
-                    self.callback({name:self.genName,
-                    spaceID:self.fileID                   
-                    })
-                })
 
+                self.genName = self.generateName(self.RowData)
+
+                Axios.post(process.env.VUE_APP_API + `SystemFile/Rename?id=${self.fileID}&name=${self.genName}`)
+                    .then(r => {
+                        self.save(() => {
+                            self.dialog = false
+                            self.callback({
+                                name: self.genName,
+                                spaceID: self.fileID
+                            })
+                        })
+                    })
             }
         }
     }

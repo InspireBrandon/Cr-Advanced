@@ -1079,6 +1079,9 @@
                   if (self.spacePlanID == null) {
                     self.spacePlanID = detailsCallback.spaceID
                   }
+
+                  console.log(self.spacePlanID)
+
                   self.$refs.SizeLoader.show()
                   self.planogramHelper.save(self.$store, stage, clusterData, {
                       modules: self.modules,
@@ -1217,11 +1220,12 @@
               self.planogramHelper.setCreate(self.spacePlanID == null || isNew);
 
               if (self.spacePlanID == null) {
-                console.log("spacePlanID is null");
                 self.$refs.SaveDetailsModal.show(clusterData, vscd.storeName, self.spacePlanID, detailsCallback => {
+
                   if (self.spacePlanID == null) {
                     self.spacePlanID = detailsCallback.spaceID
                   }
+
                   self.$refs.SizeLoader.show()
 
                   self.planogramHelper.save(self.$store, stage, clusterData, {
