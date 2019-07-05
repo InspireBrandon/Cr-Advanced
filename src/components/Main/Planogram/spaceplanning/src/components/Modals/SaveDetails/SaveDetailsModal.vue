@@ -28,15 +28,18 @@
             </v-card-actions>
 
         </v-card>
+        <YesNoModal ref="yesNoModal"></YesNoModal>
     </v-dialog>
 </template>
 
 <script>
     import grid from "./Grid"
     import Axios from 'axios'
+    import YesNoModal from '@/components/Common/YesNoModal';
     export default {
         components: {
-            grid
+            grid,
+            YesNoModal
         },
         data() {
             return {
@@ -49,6 +52,7 @@
                 cluster: null,
                 callback: null,
                 fileID: null,
+                isNew: false,
             }
         },
         methods: {
@@ -123,6 +127,8 @@
                 let self = this
                 let data = self.$refs.grid.getRowData()
                 self.genName = self.generateName(data)
+
+
                 let selected = self.$refs.grid.getSelectedItems()
                 let PlanoDetails = {
                     "systemFileID": self.fileID,
@@ -172,6 +178,9 @@
                 self.rangingData = rangingData
                 self.callback = callback
                 self.fileID = fileID
+                if (fileID == null) {
+                    self.isNew = true
+                }
                 console.log(self.rangingData);
                 self.PlanoDetail = null
                 self.GetData(fileID)
@@ -180,17 +189,52 @@
                 let self = this
 
                 self.genName = self.generateName(self.RowData)
-
-                Axios.post(process.env.VUE_APP_API + `SystemFile/Rename?id=${self.fileID}&name=${self.genName}`)
-                    .then(r => {
-                        self.save(() => {
-                            self.dialog = false
-                            self.callback({
-                                name: self.genName,
-                                spaceID: self.fileID
-                            })
+                if (self.isNew == true) {
+                    let tmp = {
+                        systemFile: {
+                            folder: "Space Planning",
+                            name: self.genName,
+                            isFolder: true,
+                            extension: "",
+                            id: self.fileID,
+                        },
+                    }
+                    Axios.post(process.env.VUE_APP_API + "SystemFile/ExistsID?db=cr-devinspire", tmp).then(
+                        r => {
+                            if (r.data == true) {
+                                self.$refs.yesNoModal.show(
+                                    'File already exists Would you like to overwrite it?',
+                                    value => {
+                                        if (value == true) {
+                                            Axios.post(process.env.VUE_APP_API +
+                                                    `SystemFile/Rename?id=${self.fileID}&name=${self.genName}`)
+                                                .then(r => {
+                                                    self.save(() => {
+                                                        self.dialog = false
+                                                        self.callback({
+                                                            name: self.genName,
+                                                            spaceID: self.fileID
+                                                        })
+                                                    })
+                                                })
+                                        }
+                                    })
+                            } else {
+                                Axios.post(process.env.VUE_APP_API +
+                                        `SystemFile/Rename?id=${self.fileID}&name=${self.genName}`)
+                                    .then(r => {
+                                        self.save(() => {
+                                            self.dialog = false
+                                            self.callback({
+                                                name: self.genName,
+                                                spaceID: self.fileID
+                                            })
+                                        })
+                                    })
+                            }
                         })
-                    })
+                }
+
             }
         }
     }
