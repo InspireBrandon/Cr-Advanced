@@ -178,8 +178,7 @@
                 self.save(() => {
                     self.dialog = false
                     self.callback({name:self.genName,
-                    spaceID:self.fileID
-                    
+                    spaceID:self.fileID                   
                     })
                 })
 

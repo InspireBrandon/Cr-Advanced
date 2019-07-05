@@ -1089,7 +1089,7 @@
                       supplierStands: self.supplierStands,
                       bins: self.bins,
                       FixtureType: self.selectedFixtureType
-                    }, self.spacePlanID, detailsCallback, true, image, self.updateLoader, self.$refs
+                    }, self.spacePlanID, detailsCallback.name, true, image, self.updateLoader, self.$refs
                     .SizeLoader
                     .close, data => {
 
