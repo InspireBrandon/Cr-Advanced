@@ -16,6 +16,7 @@
 <script>
     import YesNoModal from '@/components/Common/YesNoModal'
     import VariationOrderModal from '@/components/Main/PlanogramImplementation/VariationOrderModal'
+    import jwt from 'jsonwebtoken';
     import PlanogramName from "./PlanogramName.vue"
     import Button from "./StoreButton.vue"
     import Fits from "./Fits.vue"
@@ -217,6 +218,17 @@
                 setTimeout(() => {
                     this.gridApi.sizeColumnsToFit()
                 }, 200);
+            },
+            getProjectOwner(projectID, callback) {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.get(process.env.VUE_APP_API + `Project?projectID=${projectID}`).then(r => {
+                    console.log(r);
+
+                    callback(r.data.projectList[0])
+                }).catch(e => {
+                    alert("Failed to get project owner: " + e)
+                })
             },
             openOrder(data) {
                 let self = this
