@@ -5,7 +5,7 @@
                 <v-toolbar-title>Fixture Type</v-toolbar-title>
                 <v-divider class="mx-2" inset vertical></v-divider>
                 <v-spacer></v-spacer>
-                <v-dialog v-model="dialog" max-width="800px">
+                <v-dialog v-model="dialog" max-width="800px" persistent>
                     <template v-slot:activator="{ on }">
                         <v-btn color="primary" dark class="mb-2" v-on="on">New Item</v-btn>
                     </template>
@@ -27,7 +27,7 @@
                                         </v-text-field>
                                     </v-flex>
                                     <v-flex xs12 sm6 md4>
-                                        <v-text-field v-model="editedItem.order_Index" label="Order Index">
+                                        <v-text-field type="number" v-model="editedItem.order_Index" label="Order Index">
                                         </v-text-field>
                                     </v-flex>
                                 </v-layout>
@@ -77,8 +77,8 @@
                 items: [{
                     id: 0,
                     name: '',
-                    code: 0,
-                    displayName: 0,
+                    code: '',
+                    displayName: '',
                     order_Index: 0,
                 }],
                 headers: [{
@@ -89,30 +89,35 @@
                     },
                     {
                         text: 'Code',
-                        value: 'code'
+                        value: 'code',
+                        sortable: false,
                     },
                     {
                         text: 'Display Name',
-                        value: 'DisplayName'
+                        value: 'DisplayName',
+                        sortable: false,
                     },
                     {
                         text: 'Index',
-                        value: 'Index'
+                        value: 'Index',
+                        sortable: false,
                     },
                     {
                         text: 'Actions',
-                        value: 'Actions'
+                        value: 'Actions',
+                        sortable: false,
                     },
                     {
                         text: '',
-                        value: 'buttons'
+                        value: 'buttons',
+                        sortable: false,
                     }
                 ],
                 editedItem: {
                     id: 0,
                     name: '',
-                    code: 0,
-                    displayName: 0,
+                    code: '',
+                    displayName: '',
                     order_Index: 0,
                 },
             }

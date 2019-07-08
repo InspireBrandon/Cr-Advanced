@@ -46,7 +46,7 @@
             <v-list-tile @click="importRange">
               <v-list-tile-title>Select Range</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile @click="CheckExistsID()">
+            <v-list-tile @click="saveFile(false)">
               <v-list-tile-title>Save</v-list-tile-title>
             </v-list-tile>
             <v-list-tile @click="CheckExists()">
@@ -98,37 +98,38 @@
                     <div v-else class="details">Range: {{ rangingData.dateFromString }} to {{ rangingData.dateToString
                       }}</div>
                   </div>
-                  <v-container class="pa-0" grid-list-md>
+                  <v-container class="pa-0 mt-2" grid-list-md>
                     <v-layout row wrap>
-                      <v-flex xs4>
-                        <v-text-field v-model="height" type="number" suffix="M" hide-details label="Height">
-                        </v-text-field>
-                      </v-flex>
-                      <v-flex xs4>
-                        <v-text-field v-model="width" type="number" suffix="M" hide-details label="Width">
-                        </v-text-field>
-                      </v-flex>
-                      <v-flex xs4></v-flex>
-                      <v-flex xs4>
-                        <v-text-field v-model="modules" type="number" hide-details label="Modules"></v-text-field>
-                      </v-flex>
-                      <v-flex xs4>
-                        <v-text-field v-model="displays" type="number" hide-details label="Displays"></v-text-field>
-                      </v-flex>
-                      <v-flex xs4>
-                        <v-text-field v-model="pallettes" type="number" hide-details label="Pallettes"></v-text-field>
-                      </v-flex>
-                      <v-flex xs4>
-                        <v-text-field v-model="supplierStands" type="number" hide-details label="Supplier Stands">
-                        </v-text-field>
-                      </v-flex>
-                      <v-flex xs4>
-                        <v-text-field v-model="bins" type="number" hide-details label="Bins"></v-text-field>
-                      </v-flex>
-                      <v-flex xs12>
-                        <v-select hide-details :items="FixtureTypes" v-model="selectedFixtureType" label="Fixture Type">
-                        </v-select>
-                      </v-flex>
+                      <table style="width: 100%;">
+                        <thead>
+                          <th style="width: 70px;">Code</th>
+                          <th>Modules</th>
+                          <th>Height</th>
+                          <th>Width</th>
+                          <th>Depth</th>
+                          <th style="width: 70px;">Default</th>
+                        </thead>
+                        <tbody>
+                          <tr v-for="(item, idx) in fixture_types" :key="idx">
+                            <td>{{ item.code }}</td>
+                            <td>
+                              <input v-model="item.modules" style="width: 100%;" type="number">
+                            </td>
+                            <td>
+                              <input v-model="item.height" style="width: 100%;" type="number">
+                            </td>
+                            <td>
+                              <input v-model="item.segmentWidth" style="width: 100%;" type="number">
+                            </td>
+                            <td>
+                              <input v-model="item.depth" style="width: 100%;" type="number">
+                            </td>
+                            <td style="text-align: center;">
+                              <input v-model="item.isDefault" style="width: 100%; text-align: right;" type="checkbox">
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </v-layout>
                   </v-container>
                 </v-card-text>
@@ -271,7 +272,7 @@
     <PlanogramRetractionModal ref="PlanogramRetractionModal"></PlanogramRetractionModal>
     <JoinPlanogram ref="JoinPlanogram"></JoinPlanogram>
     <SizeLoader ref="SizeLoader" />
-    <SaveDetailsModal ref="SaveDetailsModal" />
+    <!-- <SaveDetailsModal ref="SaveDetailsModal" /> -->
 
   </div>
 </template>
@@ -293,7 +294,7 @@
   import PlanogramAprovalModal from "@/components/Main/Planogram/spaceplanning/src/components/Modals/PlanogramAproval/PlanogramAprovalModal.vue";
   import PlanogramRetractionModal from "@/components/Main/Planogram/spaceplanning/src/components/Modals/PlanogramAproval/PlanogramRetractionModal.vue";
   import JoinPlanogram from "@/components/Main/Planogram/spaceplanning/src/components/Modals/JoinPlanogram/JoinPlanogram.vue";
-  import SaveDetailsModal from "@/components/Main/Planogram/spaceplanning/src/components/Modals/SaveDetails/SaveDetailsModal";
+  // import SaveDetailsModal from "@/components/Main/Planogram/spaceplanning/src/components/Modals/SaveDetails/SaveDetailsModal";
 
 
   function textValue(data) {
@@ -316,13 +317,14 @@
       PlanogramAprovalModal,
       PlanogramRetractionModal,
       JoinPlanogram,
-      SizeLoader,
-      SaveDetailsModal
+      SizeLoader
     },
     data() {
       let width = 0;
       width = window.innerWidth * 0.4;
       return {
+        fixture_types: [],
+        planogramDetailsID: null,
         toggle: 0,
         spacePlanID: null,
         spacePlanName: null,
@@ -432,6 +434,8 @@
         pixelToCmRatio,
         self.warehouseKonva
       );
+
+      self.getFixtureType();
     },
     computed: {
       filteredItems() {
@@ -483,10 +487,34 @@
       }
     },
     methods: {
+      getFixtureType() {
+        let self = this;
+
+        axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+        axios.get(process.env.VUE_APP_API + "Fixture_Type/Get")
+          .then(r => {
+            self.fixture_types = [];
+
+            r.data.fixture_TypeList.forEach(el => {
+              el["modules"] = 0;
+              el["height"] = 0;
+              el["segmentWidth"] = 0;
+              el["depth"] = 0;
+              el["isDefault"] = false;
+              self.fixture_types.push(el);
+            })
+
+            delete axios.defaults.headers.common["TenantID"];
+          })
+          .catch(er => {
+            console.log("Error", er)
+          });
+      },
       openModal() {
         let self = this
         let cluster = self.getStoreName()
-        self.$refs.SaveDetailsModal.show(null, self.rangingData, cluster)
+        // self.$refs.SaveDetailsModal.show(null, self.rangingData, cluster)
 
       },
       updateLoader(data) {
@@ -745,6 +773,21 @@
             })
         })
       },
+      getFixtureDetails(spacePlanID) {
+        let self = this;
+
+        axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+        axios.get(process.env.VUE_APP_API +
+          `Planogram_Details_Simple?SystemFileID=${spacePlanID}&name=${self.generateName(self.fixture_types)}`).then(
+          r => {
+            self.fixture_types = [];
+
+            delete axios.defaults.headers.common["TenantID"];
+
+            self.fixture_types = r.data.planogramDetails_fixtures;
+          })
+      },
       openFile() {
         let self = this;
 
@@ -764,6 +807,9 @@
             // self.$refs.spinner.show();
             self.$refs.SizeLoader.show()
             self.spacePlanID = spacePlanID;
+
+            self.getFixtureDetails(self.spacePlanID);
+
             self.planogramHelper.loadPlanogram(spacePlanID, self.$store, masterLayer, stage, pxlRatio, self
               .setClusterAndDimensionData,
               self.$refs.SizeLoader.close, self.updateLoader);
@@ -853,8 +899,6 @@
                   self.selectedClusterOption = clusterData.storeID
 
                   self.onClusterOptionChange()
-
-
                 }
                 self.updateLoader({
                   text1: "Rendering Planogram"
@@ -907,49 +951,20 @@
         self.supplierStands = 0
         self.bins = 0
         self.spacePlanID = null;
+
+        self.fixture_types.forEach(el => {
+          el.modules = 0;
+          el.height = 0;
+          el.segmentWidth = 0;
+          el.depth = 0;
+          el.isDefault = false;
+        })
       },
       CheckExistsID() {
         let self = this
-        let planogramName = ""
-        if (self.rangingData.planogramName != null)
-          planogramName += self.rangingData.planogramName
-        if (self.rangingData.periodic != null) {
-          if (self.rangingData.periodic)
-            planogramName += " - " + self.rangingData.monthsBetween + "MMA";
-          else
-            planogramName += " - " + self.rangingData.dateFromString + " to " + self.rangingData.dateToString;
-        }
-        if (self.rangingData.tag != null && self.rangingData.tag != "")
-          planogramName += self.rangingData.tag;
 
-        let cluster = self.getStoreName()
-        planogramName += " - " + cluster;
+        let planogramName = self.generateName(self.fixture_types);
 
-
-        if (self.rangingData.storeName != null && self.rangingData.storeName != "") {
-          planogramName += " - " + self.rangingData.storeName;
-        }
-
-        if (planogramName != "")
-          planogramName += " - XXX";
-
-        planogramName += " - " + self.modules + " Module " + "(" + self.height + "M" + " x " +
-          self.width + "M)";
-
-        if (planogramName[1] == "-")
-          planogramName = planogramName.replace(' -', "");
-
-        if (planogramName != "") {
-          planogramName += " - D" + self.displays;
-          planogramName += " - P" + self.pallettes;
-          planogramName += " - S" + self.supplierStands;
-          planogramName += " - B" + self.bins;
-        }
-
-        console.log('names______________________');
-
-        console.log(planogramName);
-        console.log(self.spacePlanName);
         let tmp = {
           systemFile: {
             systemUserID: 10,
@@ -960,6 +975,7 @@
             id: self.spacePlanID,
           },
         }
+
         axios.post(process.env.VUE_APP_API + "SystemFile/ExistsID?db=cr-devinspire", tmp).then(
           r => {
             if (r.data == true) {
@@ -969,51 +985,14 @@
                 }
               })
             } else {
-              self.saveFile(false)
+              self.saveNew(false)
             }
           })
       },
       CheckExists() {
         let self = this
-        let planogramName = ""
-        if (self.rangingData.planogramName != null)
-          planogramName += self.rangingData.planogramName
-        if (self.rangingData.periodic != null) {
-          if (self.rangingData.periodic)
-            planogramName += " - " + self.rangingData.monthsBetween + "MMA";
-          else
-            planogramName += " - " + self.rangingData.dateFromString + " to " + self.rangingData.dateToString;
-        }
-        if (self.rangingData.tag != null && self.rangingData.tag != "")
-          planogramName += self.rangingData.tag;
+        let planogramName = self.generateName(self.fixture_types);
 
-        let cluster = self.getStoreName()
-        planogramName += " - " + cluster;
-
-
-        if (self.rangingData.storeName != null && self.rangingData.storeName != "") {
-          planogramName += " - " + self.rangingData.storeName;
-        }
-
-        if (planogramName != "")
-          planogramName += " - XXX";
-
-        planogramName += " - " + self.modules + " Module " + "(" + self.height + "M" + " x " +
-          self.width + "M)";
-
-        if (planogramName[1] == "-")
-          planogramName = planogramName.replace(' -', "");
-
-        if (planogramName != "") {
-          planogramName += " - D" + self.displays;
-          planogramName += " - P" + self.pallettes;
-          planogramName += " - S" + self.supplierStands;
-          planogramName += " - B" + self.bins;
-        }
-        console.log('names______________________');
-
-        console.log(planogramName);
-        console.log(self.spacePlanName);
         let tmp = {
           systemFile: {
             systemUserID: 10,
@@ -1047,6 +1026,7 @@
 
         let clusterData = self.rangingData;
         let vscd = self.$store.getters.getClusterData;
+
         clusterData["storeCluster"] = self.getClusterName();
         clusterData["clusterID"] = vscd.clusterID;
         clusterData["clusterType"] = vscd.clusterType;
@@ -1056,137 +1036,75 @@
         clusterData["storeID"] = vscd.storeID;
         clusterData["storeName"] = vscd.storeName;
         clusterData["categoryCluster"] = vscd.categoryCluster;
+
         let tmpSpacePlanID = self.spacePlanID
 
-        if (vscd.rangeID != null) {
+        self.saveRangeFile(vscd.rangeID, () => {
           self.$store.getters.getAllPlanogramActiveProducts.forEach(el => {
             self.rangingController.setAllProductData(el.Data);
           })
 
           let rangingFileUpdated = self.rangingController.getRangingFile();
 
-          console.log("Saving Range File");
-
-          axios.put(process.env.VUE_APP_API + "SystemFile/JSON/NoRename?db=CR-Devinspire&id=" + vscd.rangeID,
-              rangingFileUpdated)
-            .then(r => {
-              self.planogramHelper.setCreate(self.spacePlanID == null || isNew);
-
-              if (self.spacePlanID == null) {
-                console.log("spacePlanID is null");
-                self.$refs.SaveDetailsModal.show(clusterData, vscd.storeName, self.spacePlanID, detailsCallback => {
-
-                  if (self.spacePlanID == null) {
-                    self.spacePlanID = detailsCallback.spaceID
-                  }
-
-                  console.log(self.spacePlanID)
-
-                  self.$refs.SizeLoader.show()
-                  self.planogramHelper.save(self.$store, stage, clusterData, {
-                      modules: self.modules,
-                      height: self.height,
-                      width: self.width,
-                      displays: self.displays,
-                      pallettes: self.pallettes,
-                      supplierStands: self.supplierStands,
-                      bins: self.bins,
-                      FixtureType: self.selectedFixtureType
-                    }, self.spacePlanID, detailsCallback.name, true, image, self.updateLoader, self.$refs
-                    .SizeLoader
-                    .close, data => {
-
-                      console.log("[NEW SPACEPLANID]", data);
-                      self.spacePlanID = data
-                    })
-                })
-
-
-                // self.$refs.SizeLoader.close()
-              } else {
-                console.log("spacePlanID is not null");
-
-                self.$refs.yesNoModal.show('Update file name with latest configuration?', value => {
-
-                  if (value == true) {
-                    self.$refs.SaveDetailsModal.show(clusterData, vscd.storeName, self.spacePlanID,
-                      detailsCallback => {
-                        self.$refs.SizeLoader.show()
-                        self.planogramHelper.save(self.$store, stage, clusterData, {
-                            modules: self.modules,
-                            height: self.height,
-                            width: self.width,
-                            displays: self.displays,
-                            pallettes: self.pallettes,
-                            supplierStands: self.supplierStands,
-                            FixtureType: self.selectedFixtureType,
-                            bins: self.bins
-                          }, self.spacePlanID, detailsCallback.name, value, image, self.updateLoader, self
-                          .$refs
-                          .SizeLoader.close, callback => {})
-                      })
-                  } else {
-                    self.$refs.SizeLoader.show()
-                    self.planogramHelper.save(self.$store, stage, clusterData, {
-                        modules: self.modules,
-                        height: self.height,
-                        width: self.width,
-                        displays: self.displays,
-                        pallettes: self.pallettes,
-                        supplierStands: self.supplierStands,
-                        FixtureType: self.selectedFixtureType,
-                        bins: self.bins
-                      }, self.spacePlanID, self.spacePlanName, value, image, self.updateLoader, self.$refs
-                      .SizeLoader.close, callback => {})
-                  }
-                })
-              }
-            })
-        } else {
           self.planogramHelper.setCreate(self.spacePlanID == null || isNew);
 
           if (self.spacePlanID == null) {
 
-            self.$refs.SaveDetailsModal.show(clusterData, vscd.storeName, self.spacePlanID, detailsCallback => {
-              if (self.spacePlanID == null) {
-                self.spacePlanID = detailsCallback.spaceID
-              }
-              self.planogramHelper.save(self.$store, stage, clusterData, {
+            self.$refs.SizeLoader.show()
+
+            self.planogramHelper.save(self.$store, stage, clusterData, {
                 modules: self.modules,
                 height: self.height,
-                FixtureType: self.selectedFixtureType,
-                width: self.width
-              }, self.spacePlanID, detailsCallback.name, true, image)
-            })
+                width: self.width,
+                displays: self.displays,
+                pallettes: self.pallettes,
+                supplierStands: self.supplierStands,
+                bins: self.bins,
+                FixtureType: self.selectedFixtureType
+              }, self.spacePlanID, self.generateName(self.fixture_types), true, image, self.updateLoader, self
+              .$refs.SizeLoader.close, self.fixture_types, data => {
+                self.spacePlanID = data
+              })
           } else {
             self.$refs.yesNoModal.show('Update file name with latest configuration?', value => {
-              if (value) {
-                self.$refs.SaveDetailsModal.show(clusterData, vscd.storeName, self.spacePlanID, detailsCallback => {
-                  self.$refs.SizeLoader.show()
-                  self.planogramHelper.save(self.$store, stage, clusterData, {
-                      modules: self.modules,
-                      height: self.height,
-                      width: self.width,
-                      FixtureType: self.selectedFixtureType,
-                    }, self.spacePlanID, detailsCallback.name, value, image, self.updateLoader, self.$refs
-                    .SizeLoader
-                    .close, callback => {})
-                })
+              if (value == true) {
+                self.$refs.SizeLoader.show()
+                self.planogramHelper.save(self.$store, stage, clusterData, {
+                    modules: self.modules,
+                    height: self.height,
+                    width: self.width,
+                    displays: self.displays,
+                    pallettes: self.pallettes,
+                    supplierStands: self.supplierStands,
+                    FixtureType: self.selectedFixtureType,
+                    bins: self.bins
+                  }, self.spacePlanID, self.generateName(self.fixture_types), value, image, self.updateLoader,
+                  self
+                  .$refs
+                  .SizeLoader.close, self.fixture_types, callback => {
+                    console.log("[New space plan]", callback);
+                    self.spacePlanID = callback
+                  })
               } else {
                 self.$refs.SizeLoader.show()
                 self.planogramHelper.save(self.$store, stage, clusterData, {
                     modules: self.modules,
                     height: self.height,
                     width: self.width,
+                    displays: self.displays,
+                    pallettes: self.pallettes,
+                    supplierStands: self.supplierStands,
                     FixtureType: self.selectedFixtureType,
-                  }, self.spacePlanID, self.spacePlanName, value, image, self.updateLoader, self.$refs.SizeLoader
-                  .close, callback => {})
+                    bins: self.bins
+                  }, self.spacePlanID, self.spacePlanName, value, image, self.updateLoader, self.$refs
+                  .SizeLoader.close, self.fixture_types, callback => {
+                    console.log("[New space plan]", callback);
+                    self.spacePlanID = callback
+                  })
               }
-
             })
           }
-        }
-
+        })
       },
       saveNew(isNew) {
         let self = this;
@@ -1196,6 +1114,7 @@
         let image = parent.$parent.b64toBlob(b64, "image/png")
         let clusterData = self.rangingData;
         let vscd = self.$store.getters.getClusterData;
+
         clusterData["storeCluster"] = self.getClusterName();
         clusterData["clusterID"] = vscd.clusterID;
         clusterData["clusterType"] = vscd.clusterType;
@@ -1207,60 +1126,54 @@
         clusterData["categoryCluster"] = vscd.categoryCluster;
         let tmpSpacePlanID = self.spacePlanID
         self.spacePlanID = null
-        if (vscd.rangeID != null) {
+
+        self.saveRangeFile(vscd.rangeID, () => {
+          self.$store.getters.getAllPlanogramActiveProducts.forEach(el => {
+            self.planogramHelper.setCreate(self.spacePlanID == null || isNew);
+          })
+
+          if (self.spacePlanID == null) {
+
+            self.$refs.SizeLoader.show()
+
+            self.planogramHelper.save(self.$store, stage, clusterData, {
+                modules: self.modules,
+                height: self.height,
+                width: self.width,
+                displays: self.displays,
+                pallettes: self.pallettes,
+                supplierStands: self.supplierStands,
+                FixtureType: self.selectedFixtureType,
+                bins: self.bins
+              }, self.spacePlanID, self.generateName(self.fixture_types), true, image, self.updateLoader,
+              self
+              .$refs
+              .SizeLoader
+              .close, self.fixture_types, data => {
+                console.log("[NEW SPACEPLANID]", data);
+                self.spacePlanID = data
+              })
+          }
+        })
+      },
+      saveRangeFile(rangeID, callback) {
+        let self = this;
+
+        if (rangeID != null) {
           self.$store.getters.getAllPlanogramActiveProducts.forEach(el => {
             self.rangingController.setAllProductData(el.Data);
           })
 
           let rangingFileUpdated = self.rangingController.getRangingFile();
-          console.log("Saving Range File");
-          axios.put(process.env.VUE_APP_API + "SystemFile/JSON/NoRename?db=CR-Devinspire&id=" + vscd.rangeID,
+
+          axios.put(process.env.VUE_APP_API + "SystemFile/JSON/NoRename?db=CR-Devinspire&id=" + rangeID,
               rangingFileUpdated)
             .then(r => {
-              self.planogramHelper.setCreate(self.spacePlanID == null || isNew);
-
-              if (self.spacePlanID == null) {
-                self.$refs.SaveDetailsModal.show(clusterData, vscd.storeName, self.spacePlanID, detailsCallback => {
-
-                  if (self.spacePlanID == null) {
-                    self.spacePlanID = detailsCallback.spaceID
-                  }
-
-                  self.$refs.SizeLoader.show()
-
-                  self.planogramHelper.save(self.$store, stage, clusterData, {
-                      modules: self.modules,
-                      height: self.height,
-                      width: self.width,
-                      displays: self.displays,
-                      pallettes: self.pallettes,
-                      supplierStands: self.supplierStands,
-                      FixtureType: self.selectedFixtureType,
-                      bins: self.bins
-                    }, self.spacePlanID, detailsCallback.name, true, image, self.updateLoader, self.$refs
-                    .SizeLoader
-                    .close, data => {
-
-                      console.log("[NEW SPACEPLANID]", data);
-                      self.spacePlanID = data
-                    })
-                })
-              }
+              callback();
             })
+
         } else {
-          self.planogramHelper.setCreate(self.spacePlanID == null || isNew);
-          if (self.spacePlanID == null) {
-            self.$refs.SaveDetailsModal.show(clusterData, vscd.storeName, self.spacePlanID, detailsCallback => {
-              if (self.spacePlanID == null) {
-                self.spacePlanID = detailsCallback.spaceID
-              }
-              self.planogramHelper.save(self.$store, stage, clusterData, {
-                modules: self.modules,
-                height: self.height,
-                width: self.width
-              }, self.spacePlanID, detailsCallback.name, true, image)
-            })
-          }
+          callback();
         }
       },
       setRangingClusterData(data) {
@@ -1506,7 +1419,59 @@
         self.$refs.JoinPlanogram.show(() => {
 
         })
-      }
+      },
+      generateName(rowdata) {
+        let self = this
+        let planogramName = ""
+        let modules = 0
+        let totalModules = 0
+        // get total modules
+        rowdata.forEach(element => {
+          totalModules = totalModules + parseInt(element.modules)
+        });
+
+        rowdata.forEach(e => {
+          modules = modules + parseInt(e.modules)
+        })
+
+        planogramName += self.rangingData.planogramName
+        // get period
+        if (self.rangingData.periodic != null) {
+          if (self.rangingData.periodic)
+            planogramName += " - " + self.rangingData.monthsBetween + "MMA";
+          else
+            planogramName += " - " + self.rangingData.dateFromString + " to " + self.rangingData
+            .dateToString;
+        }
+        // // get TAg
+        if (self.rangingData.tag != null && self.rangingData.tag != "")
+          planogramName += self.rangingData.tag;
+
+        // // get Cluster
+        let cluster = self.cluster
+        if (cluster != null || cluster != undefined) {
+          planogramName += " - " + cluster;
+        }
+
+        // // get StoreName
+        if (self.rangingData.storeName != null && self.rangingData.storeName != "") {
+          planogramName += " - " + self.rangingData.storeName;
+        }
+
+        if (planogramName != "")
+          planogramName += " - XXX";
+        // GetRowData Modules for each fixture Type
+        planogramName += " - " + totalModules + " Module"
+
+        rowdata.forEach(e => {
+
+          if (parseInt(e.modules) != 0 && e.modules != null && e.modules != undefined) {
+            planogramName += " - " + e.code + "(" + e.modules + " x " + e.height + "M)"
+          }
+        })
+
+        return planogramName
+      },
     }
   }
 </script>
@@ -1522,5 +1487,28 @@
 
   .details_closed {
     max-height: calc(100vh - 235px)
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+
+  table,
+  td,
+  th {
+    border: 1px solid gray;
+  }
+
+  td {
+    background: white;
+    color: black;
+  }
+
+  th {
+    text-align: center;
+    background: black;
+    color: white;
+    padding: 2px;
+    border: 1px solid gray;
   }
 </style>
