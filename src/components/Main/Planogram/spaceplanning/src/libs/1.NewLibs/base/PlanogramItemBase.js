@@ -322,6 +322,10 @@ class PlanogramItemBase {
         typeArr = ["SHELF", "BASE", "PEGBAR", "PEGBOARD", "DIVIDER", "PALETTE", "LABELHOLDER"];
       }
       break;
+      case "PEG": {
+        typeArr = ["PEGBAR"];
+      }
+      break;
       case "PEGBAR": {
         typeArr = ["GONDOLA", "AREA"];
       }

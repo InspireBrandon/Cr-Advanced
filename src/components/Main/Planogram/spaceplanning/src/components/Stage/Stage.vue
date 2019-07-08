@@ -65,6 +65,7 @@
   import TextHeaderNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/TextHeaderBase.js";
   import AreaNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/AreaBase.js";
   import LabelHolderNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/LabelHolderBase.js";
+  import PegNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PegBase.js";
 
   //calculations
   import CalculationHandler from "@/components/Main/Planogram/spaceplanning/src/libs/CalculationLib/calculationHandler.js";
@@ -1206,6 +1207,24 @@
 
         ctrl_basket.Initialise(dropPos);
       },
+      addNewPeg(fixtureID, data, dropPos) {
+        let self = this;
+        let stage = self.$refs.stage.getStage();
+
+        let ctrl_peg = new PegNew(
+          self.$store,
+          stage,
+          self.MasterLayer,
+          JSON.parse(JSON.stringify(data)),
+          self.$PixelToCmRatio,
+          "PEG",
+          fixtureID
+        );
+
+        // Set all json values
+
+        ctrl_peg.Initialise(dropPos);
+      },
       addNewBase(gondolaID, data, dropPos) {
         let self = this;
         let stage = self.$refs.stage.getStage();
@@ -1614,6 +1633,27 @@
                 console.log("[LIBARY ADD] BASKET", result)
                 if (result.intersects == true) {
                   self.addNewBasket(result.ID, data.data, result.ContainerPosition);
+                }
+              })
+
+            }
+            break;
+            case "PEG":
+            {
+              data.data["Type"] = "PEG";
+
+              let ctrl_intersectionTester = new IntersectionTester();
+
+              let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
+
+              console.log("PEG ADD - STAGE", dropPos);
+              ctrl_intersectionTester.TestIntersectsWithMany(stage, "PEG", ["PEGBAR"],
+                self.$store,
+                dropPos)
+              .then(result => {
+                console.log("[LIBARY ADD] PEG", result)
+                if (result.intersects == true) {
+                  self.addNewPeg(result.ID, data.data, result.ContainerPosition);
                 }
               })
 
