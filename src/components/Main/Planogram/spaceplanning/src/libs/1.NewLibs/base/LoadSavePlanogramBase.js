@@ -509,7 +509,12 @@ class LoadSavePlanogramBase {
 
   createDetailTX(clusterData, dimensionData, systemFileID, fixtureData, callback) {
     console.log("making detailTX");
-
+    let defaultItem = null
+    fixtureData.forEach(item=>{
+      if(item.isDefault==true){
+        defaultItem=item
+      }
+    })
     let sendRequst = {
       "systemFileID": systemFileID,
       "dateFromString": clusterData.dateFromString,
@@ -528,7 +533,7 @@ class LoadSavePlanogramBase {
       "storeName": clusterData.storeName,
       "categoryCluster": clusterData.categoryCluster,
       "modules": parseInt(dimensionData.modules),
-      "height": parseFloat(dimensionData.height),
+      "height": parseFloat(defaultItem.height),
       "width": parseFloat(dimensionData.width),
       "displays": parseInt(dimensionData.displays),
       "pallettes": parseInt(dimensionData.pallettes),

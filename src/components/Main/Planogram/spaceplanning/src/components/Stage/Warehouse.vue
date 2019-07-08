@@ -125,7 +125,7 @@
                               <input v-model="item.depth" style="width: 100%;" type="number">
                             </td>
                             <td style="text-align: center;">
-                              <input v-model="item.isDefault" style="width: 100%; text-align: right;" type="checkbox">
+                              <input v-model="item.isDefault" @change="handleDefault(item)" style="width: 100%; text-align: right;" type="checkbox">
                             </td>
                           </tr>
                         </tbody>
@@ -487,6 +487,17 @@
       }
     },
     methods: {
+      handleDefault(item){
+        // handle default flag and set comparii9torsd for dist process
+        let self = this
+        self.fixture_types.forEach(e=>{
+          if(e==item){
+            e.isDefault=true;
+          }else{
+            e.isDefault=false;
+          }
+        })
+      },
       getFixtureType() {
         let self = this;
 

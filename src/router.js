@@ -90,7 +90,7 @@ import ProductListing from '@/components/Apps/RangePlanning/ProductListing/Index
 // Floor Planning
 import FloorPlanning from '@/components/Main/FloorPlanning/index.vue'
 
-import Fixture_Type from '@/components/Main/Fixture_type/Fixture_Type.vue'
+import Fixture_Type from '@/components/Main/Fixture_Type/Fixture_Type.vue'
 
 Vue.use(Router)
 
