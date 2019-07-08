@@ -19,8 +19,8 @@
                         <v-text-field label="Store Name" disabled v-model="storeName"></v-text-field>
                     </v-flex>
                     <v-flex md6>
-                        <v-select :items="FixtureTypes" label="Fixture Type" v-model="FixtureType">
-                        </v-select>
+                        <!-- <v-select :items="FixtureTypes" label="Fixture Type" v-model="FixtureType">
+                        </v-select> -->
                     </v-flex>
                     <v-flex md4>
                         <v-text-field v-model="height" label="Height"></v-text-field>
@@ -156,7 +156,7 @@
                 string += "Supplier Stands: " + self.supplierStands + "\r\n"
                 string += "Palettes: " + self.pallettes + "\r\n"
                 string += "Store: " + self.storeName + "\r\n"
-                string += "Fixture Type: " + self.FixtureType + "\r\n"
+                // string += "Fixture Type: " + self.FixtureType + "\r\n"
                 string += "Additional Notes: " + self.additionalNotes
                 return string
             },
