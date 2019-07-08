@@ -99,19 +99,19 @@
                       }}</div>
                   </div>
                   <v-container class="pa-0 mt-2" grid-list-md>
-                    <v-layout row wrap>
+                    <v-layout row wrap style="overflow-y: auto;">
                       <table style="width: 100%;">
                         <thead>
-                          <th style="width: 70px;">Code</th>
+                          <th style="min-width: 130px;">Name</th>
                           <th>Modules</th>
-                          <th>Height</th>
-                          <th>Width</th>
-                          <th>Depth</th>
-                          <th style="width: 70px;">Default</th>
+                          <th>Height (M)</th>
+                          <th>Seg Width (CM)</th>
+                          <th>Depth (CM)</th>
+                          <th style="width: 50px;">Default</th>
                         </thead>
                         <tbody>
                           <tr v-for="(item, idx) in fixture_types" :key="idx">
-                            <td>{{ item.code }}</td>
+                            <td>{{ item.displayName }}</td>
                             <td>
                               <input v-model="item.modules" style="width: 100%;" type="number">
                             </td>
@@ -125,7 +125,8 @@
                               <input v-model="item.depth" style="width: 100%;" type="number">
                             </td>
                             <td style="text-align: center;">
-                              <input v-model="item.isDefault" @change="handleDefault(item)" style="width: 100%; text-align: right;" type="checkbox">
+                              <input v-model="item.isDefault" @change="handleDefault(item)"
+                                style="width: 100%; text-align: right;" type="checkbox">
                             </td>
                           </tr>
                         </tbody>
@@ -487,15 +488,18 @@
       }
     },
     methods: {
-      handleDefault(item){
+      handleDefault(item) {
         // handle default flag and set comparii9torsd for dist process
         let self = this
-        self.fixture_types.forEach(e=>{
-          if(e==item){
-            e.isDefault=true;
-          }else{
-            e.isDefault=false;
-          }
+
+        self.$nextTick(() => {
+          self.fixture_types.forEach(e => {
+            if (e == item) {
+              e.isDefault = true;
+            } else {
+              e.isDefault = false;
+            }
+          })
         })
       },
       getFixtureType() {
@@ -507,12 +511,12 @@
           .then(r => {
             self.fixture_types = [];
 
-            r.data.fixture_TypeList.forEach(el => {
+            r.data.fixture_TypeList.forEach((el, idx) => {
               el["modules"] = 0;
               el["height"] = 0;
               el["segmentWidth"] = 0;
               el["depth"] = 0;
-              el["isDefault"] = false;
+              el["isDefault"] = idx == 0 ? true : false;
               self.fixture_types.push(el);
             })
 
@@ -1459,8 +1463,9 @@
           planogramName += self.rangingData.tag;
 
         // // get Cluster
-        let cluster = self.cluster
-        if (cluster != null || cluster != undefined) {
+        let cluster = self.getClusterName();
+
+        if (cluster != null && cluster != undefined && cluster != "") {
           planogramName += " - " + cluster;
         }
 
@@ -1516,7 +1521,7 @@
   }
 
   th {
-    text-align: center;
+    text-align: left;
     background: black;
     color: white;
     padding: 2px;
