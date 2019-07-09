@@ -64,6 +64,8 @@
 
                 Axios.get(process.env.VUE_APP_API + `Store_Planogram?Store_ID=${StoreID.store_ID}`)
                     .then(r => {
+                        console.log(r);
+                        
                        self.rowData=[]   
                         self.currentStorePlanograms = []
                         self.currentStorePlanograms = r.data.queryResult;

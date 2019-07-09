@@ -556,7 +556,7 @@ class LoadSavePlanogramBase {
       "fixtureType": clusterData.fixtureType,
       "bins": parseInt(dimensionData.bins)
     }
-
+      
     let request = {
       planogram_Details: sendRequst,
       PlanogramDetails_fixtures: fixtureData

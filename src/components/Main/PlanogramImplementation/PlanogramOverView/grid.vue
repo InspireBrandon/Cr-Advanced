@@ -93,18 +93,9 @@
                         "headerName": "Store Cluster",
                         "field": "cluster",
                         "minWidth": 75,
-                        cellStyle: function (params) {
-                            if (params.data.storeClusterFit == true) {
-                                //mark police cells as red
-                                return {
-                                    // color: 'red',
-                                    backgroundColor: " rgb(240, 125, 125)"
-                                };
-                            } else {
-                                return {
-                                    backgroundColor: "#C8E6C9"
-                                };
-                            }
+                        cellClassRules: {
+                            'success-green': 'data.storeClusterFit == false && data.planogramStoreStatus!=0 && data.planogramStoreStatus!=6',
+                            'error-red': 'data.storeClusterFit == true && data.planogramStoreStatus!=0 && data.planogramStoreStatus!=6',
                         }
                     }, {
                         "headerName": "Category Cluster",
