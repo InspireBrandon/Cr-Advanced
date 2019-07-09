@@ -2,7 +2,7 @@
   <div class="ranging">
     <v-toolbar dense dark>
 
-      <v-toolbar-items>
+      <v-toolbar-items v-if="!$route.path.includes('RangePlanningView')">
         <v-menu dark offset-y style="margin-bottom: 10px;">
           <v-btn slot="activator" flat>
             File
