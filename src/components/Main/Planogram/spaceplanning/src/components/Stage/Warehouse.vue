@@ -800,6 +800,16 @@
 
             delete axios.defaults.headers.common["TenantID"];
 
+            let hasDefault = false;
+
+            r.data.planogramDetails_fixtures.forEach(el => {
+              if(el.isDefault == true)
+                hasDefault = true;
+            })
+
+            if(!hasDefault)
+              r.data.planogramDetails_fixtures[0].isDefault = true;
+
             self.fixture_types = r.data.planogramDetails_fixtures;
           })
       },
@@ -967,12 +977,12 @@
         self.bins = 0
         self.spacePlanID = null;
 
-        self.fixture_types.forEach(el => {
+        self.fixture_types.forEach((el, idx) => {
           el.modules = 0;
           el.height = 0;
           el.segmentWidth = 0;
           el.depth = 0;
-          el.isDefault = false;
+          el.isDefault = idx == 0 ? true : false;
         })
       },
       CheckExistsID() {
