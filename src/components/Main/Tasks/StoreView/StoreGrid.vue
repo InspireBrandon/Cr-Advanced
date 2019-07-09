@@ -50,6 +50,11 @@
                         "field": "projectName",
                         "minWidth": 200,
                     }, {
+                        "headerName": "Last Modified",
+                        "field": "dateString",
+                        "minWidth": 200,
+                    }
+                    ,{
                         "headerName": "Planogram Name",
                         "cellRendererFramework": "PlanogramName",
                         "minWidth": 700,
