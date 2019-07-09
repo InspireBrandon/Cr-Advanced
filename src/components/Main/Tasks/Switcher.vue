@@ -42,7 +42,7 @@
                         </v-btn>
                     </v-toolbar>
                     <v-toolbar v-if="userAccess!=4" dense flat dark>
-                        <v-autocomplete v-if="selectedView==2" placeholder="Please Select a Store" :items="stores"
+                        <v-autocomplete v-if="selectedView==2" @change="getStoreViewData()" placeholder="Please Select a Store" :items="stores"
                             v-model="selectedStore"></v-autocomplete>
                         <v-autocomplete v-if="selectedView==0" placeholder="users " :items="users"
                             v-model="selectedUser" @change="getTaskViewData"></v-autocomplete>
@@ -130,7 +130,7 @@
                                     :accessType="userAccess" />
                             </v-flex>
                             <v-flex md12 class="pa-0" v-if="selectedView==2">
-                                <StoreView :data="filteredData" :typeList="typeList" :statusList="statusList" />
+                                <StoreView :rowdata="storeData" :typeList="typeList" :statusList="statusList" />
                             </v-flex>
                         </v-layout>
                     </v-container>
@@ -163,7 +163,7 @@
     // Components
     import TaskView from "./TaskView/Index.vue"
     import ProjectView from "./ProjectView.vue"
-    import StoreView from "./StoreView.vue"
+    import StoreView from "./StoreView/StorePlanograms.vue"
     import SplashLoader from "@/components/Common/SplashLoader.vue"
     import ProjectShare from "./ProjectShare.vue"
     import NoticeBoard from '@/components/Main/NoticeBoard/Noticeboard.vue'
@@ -201,6 +201,28 @@
                 searchType: [],
                 selectedView: 0,
                 systemUserID: -1,
+                store_ID: null,
+                storeData:null,
+                  StoreStatusList: [{
+                        text: "Unassigned"
+                    }, {
+                        text: "Assigned"
+                    },
+                    {
+                        text: "Distrubuted"
+                    },
+                    {
+                        text: "Implementation In Progress"
+                    },
+                    {
+                        text: "Implemented"
+                    },
+                    {
+                        text: "Variation"
+                    },{
+                        text:"On Hold"
+                    }
+                ],
                 views: [{
                     text: "Tasks",
                     value: 0
@@ -294,23 +316,23 @@
                             canView = true;
                     }
                     break;
-                    case 1: {
-                        if (item.status == 27 || item.status == 21)
-                            canView = false;
-                        else
-                            canView = true;
-                    }
-                    break;
-                    case 2: {
-                        if (item.status == 24 || item.status == 26)
-                            canView = false;
-                        else 
-                            canView = true;
-                    }
-                    break;
-                    case 3: {
+                case 1: {
+                    if (item.status == 27 || item.status == 21)
+                        canView = false;
+                    else
                         canView = true;
-                    }
+                }
+                break;
+                case 2: {
+                    if (item.status == 24 || item.status == 26)
+                        canView = false;
+                    else
+                        canView = true;
+                }
+                break;
+                case 3: {
+                    canView = true;
+                }
                 }
 
                 return canView;
@@ -372,8 +394,15 @@
                         if (r.data.isDatabaseOwner == true) {
                             self.userAccess = 0
                         } else {
+                            console.log("[tenenant]");
+                            console.log(r.data);
+
                             self.userAccess = r.data.tenantLink_AccessTypeList[0].accessType
                             self.userAccessTypeID = r.data.tenantLink_AccessTypeList[0].tenantLink_AccessTypeID
+                            if (self.userAccess == 3) {
+                                self.selectedStore = r.data.tenantLink_AccessTypeList[0].storeID
+                                self.store_ID = r.data.tenantLink_AccessTypeList[0].storeID
+                            }
                         }
                         callback();
                     })
@@ -534,53 +563,83 @@
 
 
             },
-            getStoreViewData() {
+            getStoreViewData(callback) {
                 let self = this
+                let store = null
                 self.$refs.SplashLoader.show()
                 let filterList = []
+                if (self.selectedStore == null) {
+                    store = self.store_ID
+                    if(store==null){
+                        self.selectedStore=self.stores[0].value
+                        store=self.selectedStore
+                    }
+                } else {
+                    store = self.selectedStore
+                }
                 self.$nextTick(() => {
-
-
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                    Axios.get(process.env.VUE_APP_API + `StoreProjectTX`).then(r => {
-                        self.storeViewData = r.data.projectTXList;
-                        if (self.userAccess == 2) {
-                            self.filterOutSupplierPlanograms(() => {
+                    Axios.get(process.env.VUE_APP_API + `Store_Planogram/Store?Store_ID=${store}`)
+                        .then(r => {
 
-                                filterList.push({
-                                    text: "All",
-                                    value: null
-                                })
+                            let currentStorePlanograms = []
+                            currentStorePlanograms = r.data.queryResult;
 
-                                self.storeViewData.forEach(e => {
-                                    if (!filterList.includes(e.planogram_ID)) {
-                                        filterList.push({
-                                            text: e.planogram,
-                                            value: e.planogram_ID
-                                        })
-                                    }
-                                })
-                                self.filterList = filterList
-                                self.$refs.SplashLoader.close()
+                            r.data.queryResult.forEach((e) => {
+                                e.currentStatusText = self.StoreStatusList[e.planogramStoreStatus]
+                                    .text
                             })
-                        } else {
-                            filterList.push({
-                                text: "All",
-                                value: null
-                            })
-                            self.storeViewData.forEach(e => {
-                                if (!filterList.includes(e.planogram_ID)) {
-                                    filterList.push({
-                                        text: e.planogram,
-                                        value: e.planogram_ID
-                                    })
-                                }
-                            })
-                            self.filterList = filterList
+
+                            self.storeData = currentStorePlanograms
                             self.$refs.SplashLoader.close()
-                        }
-                    })
+                            console.log(self.storeData);
+
+                        }).catch(e => {
+                            console.log(e);
+
+                        })
+
+                    // Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    // Axios.get(process.env.VUE_APP_API + `StoreProjectTX`).then(r => {
+                    //     self.storeViewData = r.data.projectTXList;
+                    //     if (self.userAccess == 2) {
+                    //         self.filterOutSupplierPlanograms(() => {
+
+                    //             filterList.push({
+                    //                 text: "All",
+                    //                 value: null
+                    //             })
+
+                    //             self.storeViewData.forEach(e => {
+                    //                 if (!filterList.includes(e.planogram_ID)) {
+                    //                     filterList.push({
+                    //                         text: e.planogram,
+                    //                         value: e.planogram_ID
+                    //                     })
+                    //                 }
+                    //             })
+                    //             self.filterList = filterList
+                    //             self.$refs.SplashLoader.close()
+                    //         })
+                    //     } else {
+                    //         filterList.push({
+                    //             text: "All",
+                    //             value: null
+                    //         })
+                    //         self.storeViewData.forEach(e => {
+                    //             if (!filterList.includes(e.planogram_ID)) {
+                    //                 filterList.push({
+                    //                     text: e.planogram,
+                    //                     value: e.planogram_ID
+                    //                 })
+                    //             }
+                    //         })
+                    //         self.filterList = filterList
+                    //         self.$refs.SplashLoader.close()
+                    //     }
+                    // })
                 })
             },
             filterOutSupplierPlanograms(callback) {
@@ -613,10 +672,7 @@
             },
             getStores(callback) {
                 let self = this
-                let list = [{
-                    text: "All",
-                    value: null
-                }]
+                let list = []
 
                 Axios.get(process.env.VUE_APP_API + `Store?db=Hinterland-Live`).then(r => {
                     r.data.forEach(element => {
