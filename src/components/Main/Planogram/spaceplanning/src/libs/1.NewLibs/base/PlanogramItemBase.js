@@ -1674,6 +1674,10 @@ class PlanogramItemBase {
       event.modal_load(EventBus, "FIXTURE", "LABELHOLDER", self, self.ID, self);
     }
     break;
+    case "PEG": {
+      event.modal_load(EventBus, "FIXTURE", "PEG", self, self.ID, self);
+    }
+    break;
     }
 
   }
