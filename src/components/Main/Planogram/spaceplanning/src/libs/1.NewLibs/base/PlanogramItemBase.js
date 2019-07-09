@@ -1837,6 +1837,29 @@ class PlanogramItemBase {
       }
     }
     break;
+    case "PEG": {
+      retVal = {
+        Type: self.Type.toUpperCase(),
+        RelativePosition: {
+          x: self.Group.getX(),
+          y: self.Group.getY(),
+        },
+        AbsolutePosition: {
+          x: self.Group.getAbsolutePosition().x,
+          y: self.Group.getAbsolutePosition().y
+        },
+        Data: {
+          Data: self.Data,
+          ID: self.ID,
+          ParentID: self.ParentID,
+          Config: self.Config,
+          TotalChildren: newTotalChildren
+        },
+        Position: self.Position,
+        // Label: self.LabelText
+      }
+    }
+    break;
     case "BASE": {
       retVal = {
         Type: self.Type.toUpperCase(),

@@ -9,6 +9,7 @@ import PegboardNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.Ne
 import PegBarNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PegBarBase.js";
 import ProductGroupNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/ProductBase.js";
 import BasketNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/BasketBase.js";
+import PegNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PegBase.js";
 import PlanogramNamer from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PlanogramNamer.js";
 import axios from 'axios';
 import StageWarehouseMiddleware from '@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/stage-warehouse-middleware.js';
@@ -158,12 +159,14 @@ class LoadSavePlanogramBase {
         output.image = null
 
         output.planogramData.forEach(e => {
-          e.Data.Data.image = null
+          if (e != null) {
+            e.Data.image = null
 
-          if (e.Type != "PRODUCT" && e.Data.Data.renderings != null) {
-            e.Data.Data.renderings.forEach(render => {
-              render.image = null
-            })
+            if (e.Type != "PRODUCT" && e.Data.Data.renderings != null) {
+              e.Data.Data.renderings.forEach(render => {
+                render.image = null
+              })
+            }
           }
         })
         let startTime = new Date()
@@ -510,9 +513,9 @@ class LoadSavePlanogramBase {
   createDetailTX(clusterData, dimensionData, systemFileID, fixtureData, callback) {
     console.log("making detailTX");
     let defaultItem = null
-    fixtureData.forEach(item=>{
-      if(item.isDefault==true){
-        defaultItem=item
+    fixtureData.forEach(item => {
+      if (item.isDefault == true) {
+        defaultItem = item
       }
     })
     let sendRequst = {
@@ -851,6 +854,32 @@ class LoadSavePlanogramBase {
       ctrl_item.ApplyZIndexing();
     }
     break;
+    case "PEG": {
+      let ctrl_item = new PegNew(
+        VueStore,
+        Stage,
+        MasterLayer,
+        CurrentItem.Data.Data,
+        PxlRatio,
+        "PEG",
+        ParentID
+      )
+
+      if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+        ctrl_item.Position = CurrentItem.Position;
+      }
+
+      // set json data values to the object
+      ctrl_item.ID = CurrentItem.Data.ID;
+      ctrl_item.Config = CurrentItem.Data.Config;
+      if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
+        ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
+      }
+
+      ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+      ctrl_item.ApplyZIndexing();
+    }
+    break;
     case "PEGBAR": {
       let ctrl_item = new PegBarNew(
         VueStore,
@@ -1013,8 +1042,10 @@ class LoadSavePlanogramBase {
       fixture.AddProductRenderings();
     });
 
-    lastItem.ApplyZIndexing();
-    lastItem.Layer.draw();
+    if (lastItem != null) {
+      lastItem.ApplyZIndexing();
+      lastItem.Layer.draw();
+    }
   }
 }
 
