@@ -516,13 +516,19 @@ class LoadSavePlanogramBase {
     let defaultItem = null
     let totalModules = 0;
 
+    console.log(fixtureData)
+
     fixtureData.forEach(item => {
       if (item.isDefault == true) {
         defaultItem = item
       }
 
+      console.log(item)
+
       totalModules += parseInt(item.modules);
     })
+
+    console.log('[TOTAL MODULES]', totalModules)
 
     let sendRequst = {
       "systemFileID": systemFileID,
