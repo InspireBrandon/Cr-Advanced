@@ -114,16 +114,22 @@
           count: 0,
           add: false
         }
+
+        
         if (listitem.planogramName == null) {
           listitem.planogramName = ""
         }
         if (self.PlanoName.toUpperCase() == listitem.planogramName.toUpperCase()) {
           canAdd.add = true
         }
+        if(listitem.modules){}
         if (item.modules >= listitem.modules) {
           canAdd.count++
         }
         if (item.height >= listitem.height) {
+         canAdd.count++
+        }
+         if (listitem.storeCluster == item.storeCluster) {
          canAdd.count++
         }
 
