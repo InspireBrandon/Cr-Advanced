@@ -1,6 +1,6 @@
 <template>
     <div style="text-align: center; cursor: pointer; display: flex;">
-        <div v-if="params.data.planogramStoreStatus==0||params.data.planogramStoreStatus==5">
+        <div v-if="params.data.planogramStoreStatus==0||params.data.planogramStoreStatus==5||params.data.planogramStoreStatus==7">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                     <v-btn v-on="on" @click="params.context.componentParent.assignPlanogramToStore(params)" icon flat

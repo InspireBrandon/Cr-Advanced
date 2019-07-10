@@ -94,8 +94,8 @@
                         "field": "cluster",
                         "minWidth": 75,
                         cellClassRules: {
-                            'success-green': 'data.storeClusterFit == false && data.planogramStoreStatus!=0 && data.planogramStoreStatus!=6',
-                            'error-red': 'data.storeClusterFit == true && data.planogramStoreStatus!=0 && data.planogramStoreStatus!=6',
+                            'success-green': 'data.storeClusterFit == false && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                            'error-red': 'data.storeClusterFit == true && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
                         }
                     }, {
                         "headerName": "Category Cluster",
@@ -107,8 +107,8 @@
                         "editable": true,
                         "field": "modules",
                         cellClassRules: {
-                            'success-green': 'data.modulesFit == false && data.planogramStoreStatus!=0 && data.planogramStoreStatus!=6',
-                            'error-red': 'data.modulesFit == true && data.planogramStoreStatus!=0 && data.planogramStoreStatus!=6',
+                            'success-green': 'data.modulesFit == false && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                            'error-red': 'data.modulesFit == true && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
                         }
 
                     }, {
@@ -118,8 +118,8 @@
                         "editable": true,
                         "field": "height",
                         cellClassRules: {
-                            'success-green': 'data.heightFit == false && data.planogramStoreStatus!=0 && data.planogramStoreStatus!=6',
-                            'error-red': 'data.heightFit == true && data.planogramStoreStatus!=0 && data.planogramStoreStatus!=6',
+                            'success-green': 'data.heightFit == false && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                            'error-red': 'data.heightFit == true && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
                         }
                     },
                     //  {
@@ -287,8 +287,11 @@
                 if (listItem.modules < listItem.detailModules) {
                     moduleFit = true
                 }
-                console.log(listItem.height + "<" + listItem.detailHeight)
-                if (parseFloat(listItem.height) < listItem.detailHeight) {
+                let Lheight = listItem.detailHeight * 0.9
+                let Uheight = listItem.detailHeight * 1.1
+
+                console.log(Lheight + "<" + listItem.height + ">" + Uheight)
+                if (parseFloat(listItem.height) < Lheight || Uheight < parseFloat(listItem.height)) {
                     heightFit = true
                 }
 
@@ -330,7 +333,7 @@
                     })
             },
             UpdateLine(item) {
-                   let self = this
+                let self = this
                 let tmp = item.data
                 let node = item.node
                 self.createStorePlano(tmp, data => {

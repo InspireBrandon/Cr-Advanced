@@ -1,5 +1,5 @@
 <template>
-    <div v-if="params.data.planogramStoreStatus!=0&&params.data.fileName!=null">
+    <div v-if="params.data.planogramStoreStatus!=0&&params.data.fileName!=null&&params.data.planogramStoreStatus!=7">
         <v-tooltip bottom >
             <template v-slot:activator="{ on }">
                 <v-btn v-on="on"

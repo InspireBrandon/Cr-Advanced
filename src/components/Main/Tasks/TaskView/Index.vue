@@ -402,6 +402,32 @@
                     })
                 })
             },
+            recall(item) {
+                let self = this
+
+                let request = JSON.parse(JSON.stringify(item))
+                let tmpUser = request.systemUserID;
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                console.log(item);
+                
+
+                Axios.post(process.env.VUE_APP_API + `Store_Planogram/ReCall?SystemFileID=${item.systemFileID}`).then(
+                    r => {
+                        console.log(r);
+                    delete Axios.defaults.headers.common["TenantID"];
+
+                    })
+                // self.checkTaskTakeover(request, () => {
+                //     request.systemUserID = tmpUser;
+                //     request.status = 44;
+                //     request.notes = self.findAndReplaceNote(request.notes);
+
+                //     self.createProjectTransaction(request, newItem => {
+                //         self.routeToView(newItem)
+                //     })
+                // })
+            },
             setDistributionViewed(item) {
                 let self = this;
 
@@ -418,7 +444,7 @@
                     })
                 })
             },
-             setParked(item) {
+            setParked(item) {
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(item))
@@ -500,7 +526,7 @@
                 case 3: {
                     if (item.status == 1 || item.status == 8 || item.status == 41) {
                         route = `/SpacePlanning`
-                    } else if( item.status == 21 || item.status == 27) {
+                    } else if (item.status == 21 || item.status == 27) {
                         route = `/PlanogramDistribution/${item.project_ID}/${item.project_Group_ID}`
                     } else {
                         route = `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`

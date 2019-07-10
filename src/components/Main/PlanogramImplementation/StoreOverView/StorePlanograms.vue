@@ -10,7 +10,7 @@
                     <v-icon>close</v-icon>
                 </v-btn>
             </v-toolbar>
-             <v-toolbar dark flat dense>
+            <v-toolbar dark flat dense>
             </v-toolbar>
             <StoreGrid ref="StoreGrid" :rowData="rowData" :method="GetData" :StoreID="store_ID" />
             <PlanogramDetailsSelector :PlanoName="'Select'" ref="PlanogramDetailsSelector" />
@@ -27,15 +27,15 @@
             StoreGrid,
             PlanogramDetailsSelector,
         },
-        props: ["StoreID","getStoreData"],
+        props: ["StoreID", "getStoreData"],
         data() {
             return {
-                currentStorePlanograms:[],
-                store_ID:null,
+                currentStorePlanograms: [],
+                store_ID: null,
                 dialog: false,
                 rowData: [],
                 title: null,
-                  StoreStatusList: [{
+                StoreStatusList: [{
                         text: "Unassigned"
                     }, {
                         text: "Assigned"
@@ -51,8 +51,10 @@
                     },
                     {
                         text: "Variation"
-                    },{
-                        text:"On Hold"
+                    }, {
+                        text: "On Hold"
+                    }, {
+                        text: "Recalled"
                     }
                 ],
             }
@@ -65,11 +67,11 @@
                 Axios.get(process.env.VUE_APP_API + `Store_Planogram?Store_ID=${StoreID.store_ID}`)
                     .then(r => {
                         console.log(r);
-                        
-                       self.rowData=[]   
+
+                        self.rowData = []
                         self.currentStorePlanograms = []
                         self.currentStorePlanograms = r.data.queryResult;
-                        
+
                         r.data.queryResult.forEach((e) => {
                             e.GeneratedName = self.GenerateName(e)
                             e.currentStatusText = self.StoreStatusList[e.planogramStoreStatus].text
@@ -78,16 +80,16 @@
                         self.rowData = self.currentStorePlanograms
 
                         console.log(self.rowData);
-                        
-                    }).catch(e=>{
+
+                    }).catch(e => {
                         console.log(e);
-                        
+
                     })
             },
             show(data) {
                 let self = this
                 self.dialog = true
-                self.store_ID=data.store_ID
+                self.store_ID = data.store_ID
                 self.title = data.storeName
                 self.$refs.StoreGrid.resize()
                 self.GetData(data)

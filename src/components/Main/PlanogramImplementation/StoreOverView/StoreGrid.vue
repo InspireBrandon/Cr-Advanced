@@ -76,8 +76,8 @@
                         "editable": true,
                         "field": "modules",
                         cellClassRules: {
-                            'success-green': 'data.modulesFit == false && data.planogramStoreStatus!=0',
-                            'error-red': 'data.modulesFit == true && data.planogramStoreStatus!=0',
+                            'success-green': 'data.modulesFit == false && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                            'error-red': 'data.modulesFit == true && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
                         }
                     }, {
                         "headerName": "Height",
@@ -86,8 +86,8 @@
                         "editable": true,
                         "field": "height",
                         cellClassRules: {
-                            'success-green': 'data.heightFit == false && data.planogramStoreStatus!=0',
-                            'error-red': 'data.heightFit == true && data.planogramStoreStatus!=0',
+                            'success-green': 'data.heightFit == false && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                            'error-red': 'data.heightFit == true && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
                         }
                     },
                     //  {
@@ -314,7 +314,9 @@
                             moduleFit = true
                         }
 
-                        if (listItem.height < data.height) {
+                        let Lheight = listItem.height * 0.9
+                        let Uheight = listItem.height * 1.1
+                        if (Lheight < data.height && data.height < Uheight) {
                             heightFit = true
                         }
 
@@ -349,7 +351,7 @@
                                 listItem.modulesFit = moduleFit
                                 listItem.fits = fits
                                 listItem.planogramStoreStatus = 1
-                                listItem.systemFileID=data.systemFileID
+                                listItem.systemFileID = data.systemFileID
                                 node.setData(listItem)
                                 delete Axios.defaults.headers.common["TenantID"];
                             }).catch(e => {

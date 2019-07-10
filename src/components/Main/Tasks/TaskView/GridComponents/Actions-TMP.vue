@@ -180,7 +180,7 @@
         break;
         case 21: {
             button_1.set('warning', 'visibility', cp.routeToView, "View")
-            button_2.set('success', 'settings_backup_restore', cp.setDistributionViewed, "Recall")
+            button_2.set('success', 'settings_backup_restore', cp.recall, "Recall")
             button_3.set('error', 'local_parking', cp.setParked, "Park")
         }
         break;

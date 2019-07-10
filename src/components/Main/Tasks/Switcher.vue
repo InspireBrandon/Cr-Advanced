@@ -42,7 +42,9 @@
                         </v-btn>
                     </v-toolbar>
                     <v-toolbar v-if="userAccess!=4" dense flat dark>
-                        <v-autocomplete v-if="selectedView==2" @change="getStoreViewData()" placeholder="Please Select a Store" :items="stores"
+                        <v-autocomplete v-if="selectedView==2 &&userAccess != 3 " @change="getStoreViewData()" placeholder="Please Select a Store" :items="stores"
+                            v-model="selectedStore"></v-autocomplete>
+                             <v-autocomplete v-if="selectedView==2 &&userAccess == 3" disabled @change="getStoreViewData()" placeholder="Please Select a Store" :items="stores"
                             v-model="selectedStore"></v-autocomplete>
                         <v-autocomplete v-if="selectedView==0" placeholder="users " :items="users"
                             v-model="selectedUser" @change="getTaskViewData"></v-autocomplete>
@@ -219,8 +221,10 @@
                     },
                     {
                         text: "Variation"
+                    }, {
+                        text: "On Hold"
                     },{
-                        text:"On Hold"
+                        text: "Recalled"
                     }
                 ],
                 views: [{

@@ -90,6 +90,8 @@
                         text: "Variation"
                     }, {
                         text: "On Hold"
+                    },{
+                        text: "Recalled"
                     }
                 ],
                 currentStorePlanograms: [],
@@ -165,6 +167,9 @@
 
                 self.getStoreUser(data.store_ID, storeUserCallback => {
                     if (storeUserCallback.length > 0) {
+                        if (storeUserCallback.length>1) {
+                            alert("there are 2 users assigned to this store assigning to first one")
+                        }
                         data.planogramStoreStatus = 2
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                         Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', data)
@@ -240,7 +245,9 @@
                     if (listItem.modules < data.modules) {
                         moduleFit = true
                     }
-                    if (listItem.height < data.height) {
+                    let Lheight = listItem.height * 0.9
+                    let Uheight = listItem.height * 1.1
+                    if   (parseFloat(data.height) < Lheight || Uheight < parseFloat(data.height)) {
                         heightFit = true
                     }
                     if (listItem.cluster != data.clusterName) {
@@ -288,17 +295,24 @@
                 let storeClusterFit = false
                 let planogramFit = false
                 let listItem = data.data
+
+
                 let node = data.node
                 self.$refs.PlanogramDetailsSelector.show(listItem, true, data => {
 
                     self.checkFits(listItem, data, fits => {
+
                         console.log(listItem.modules + " : " + data.modules)
                         console.log(listItem.modules < data.modules);
 
                         if (listItem.modules < data.modules) {
                             moduleFit = true
                         }
-                        if (listItem.height < data.height) {
+                        let Lheight = listItem.height * 0.9
+                        let Uheight = listItem.height * 1.1
+                        console.log(Lheight+" < "+data.height + " < "+ Uheight);
+                        
+                        if ((parseFloat(data.height) < Lheight || Uheight < parseFloat(data.height))) {
                             heightFit = true
                         }
                         if (listItem.cluster != data.clusterName) {

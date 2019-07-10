@@ -83,8 +83,8 @@
                         "editable": false,
                         "field": "modules",
                         cellClassRules: {
-                            'success-green': 'data.modulesFit == false && data.planogramStoreStatus!=0',
-                            'error-red': 'data.modulesFit == true && data.planogramStoreStatus!=0',
+                            'success-green': 'data.modulesFit == false &&( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                            'error-red': 'data.modulesFit == true && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
                         }
                     }, {
                         "headerName": "Height",
@@ -93,8 +93,8 @@
                         "editable": false,
                         "field": "height",
                         cellClassRules: {
-                            'success-green': 'data.heightFit == false && data.planogramStoreStatus!=0',
-                            'error-red': 'data.heightFit == true && data.planogramStoreStatus!=0',
+                            'success-green': 'data.heightFit == false && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                            'error-red': 'data.heightFit == true && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
                         }
                     },
                     //  {
