@@ -72,9 +72,11 @@
                 StoreClusters: [],
                 allStoreDialog: false,
                 selectedProject: null,
-                StoreStatusList: [{
+                StoreStatusList: [
+                    {
                         text: "Unassigned"
-                    }, {
+                    }, 
+                    {
                         text: "Assigned"
                     },
                     {
@@ -88,9 +90,11 @@
                     },
                     {
                         text: "Variation"
-                    }, {
+                    },
+                    {
                         text: "On Hold"
-                    },{
+                    },
+                    {
                         text: "Recalled"
                     }
                 ],
@@ -167,7 +171,7 @@
 
                 self.getStoreUser(data.store_ID, storeUserCallback => {
                     if (storeUserCallback.length > 0) {
-                        if (storeUserCallback.length>1) {
+                        if (storeUserCallback.length > 1) {
                             alert("there are 2 users assigned to this store assigning to first one")
                         }
                         data.planogramStoreStatus = 2
@@ -247,7 +251,7 @@
                     }
                     let Lheight = listItem.height * 0.9
                     let Uheight = listItem.height * 1.1
-                    if   (parseFloat(data.height) < Lheight || Uheight < parseFloat(data.height)) {
+                    if (parseFloat(data.height) < Lheight || Uheight < parseFloat(data.height)) {
                         heightFit = true
                     }
                     if (listItem.cluster != data.clusterName) {
@@ -310,8 +314,8 @@
                         }
                         let Lheight = listItem.height * 0.9
                         let Uheight = listItem.height * 1.1
-                        console.log(Lheight+" < "+data.height + " < "+ Uheight);
-                        
+                        console.log(Lheight + " < " + data.height + " < " + Uheight);
+
                         if ((parseFloat(data.height) < Lheight || Uheight < parseFloat(data.height))) {
                             heightFit = true
                         }

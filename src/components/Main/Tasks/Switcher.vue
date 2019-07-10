@@ -583,7 +583,8 @@
                 }
                 self.$nextTick(() => {
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
+                    console.log(store+"||"+self.selectedStore);
+                    
                     Axios.get(process.env.VUE_APP_API + `Store_Planogram/Store?Store_ID=${store}`)
                         .then(r => {
 
