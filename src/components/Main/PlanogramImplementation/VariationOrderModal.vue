@@ -16,10 +16,10 @@
                         <v-select v-model="selectedPlanoDetail" :items="planoDetails" label="Planogram"></v-select>
                     </v-flex>
                     <v-flex md6>
-                        <v-text-field label="Store Name" disabled v-model="storeName"></v-text-field>
+                        <v-text-field label="Store Name" disabled v-model="storeName"  v-if="variationType==0"></v-text-field>
                     </v-flex>
                     <v-flex md6>
-                        <!-- <v-select :items="FixtureTypes" label="Fixture Type" v-model="FixtureType">
+                        <!-- <v-select :items="FixtureTypes" label="Variation Type" v-model="FixtureType">
                         </v-select> -->
                     </v-flex>
                     <v-flex md4>
@@ -66,14 +66,15 @@
     export default {
         data() {
             return {
-                FixtureTypes: ["Standard",
-                    "Industrial",
-                    "Supplier Stand",
-                    "Till point",
-                    "pallettes",
-                    "Custom"
-                ],
+                FixtureTypes: [{
+                    text: "Model",
+                    value:0
+                }, {
+                    text: "Store",
+                    value:0
+                }],
                 FixtureType: null,
+                variationType:null,
                 dialog: false,
                 height: null,
                 width: null,
@@ -92,11 +93,12 @@
             }
         },
         methods: {
-            show(item, afterReturn) {
+            show(item,variationType, afterReturn) {
                 let self = this
                 self.getPlanoDetails()
                 self.listitem = item
                 self.dialog = true
+                self.variationType=variationType
                 self.height = item.height
                 self.width = item.width
                 self.modules = item.width
@@ -106,7 +108,7 @@
                 self.supplierStands = item.supplierStands
                 self.pallettes = item.pallettes
                 self.FixtureType = item.fixtureType
-                self.additionalNotes =""
+                self.additionalNotes = ""
                 if (item.planogramDetail_ID != 0) {
                     self.selectedPlanoDetail = item.planogramDetail_ID
                 }
@@ -148,6 +150,7 @@
                 })
 
                 let string = "Variation requested for " + name + " with the following details  " + "\r\n" + "\r\n"
+                
                 string += "Height: " + self.height + "\r\n"
                 string += "Width: " + self.width + "\r\n"
                 string += "Modules: " + self.modules + "\r\n"
@@ -155,7 +158,9 @@
                 string += "Displays: " + self.displays + "\r\n"
                 string += "Supplier Stands: " + self.supplierStands + "\r\n"
                 string += "Palettes: " + self.pallettes + "\r\n"
+                if(self.variationType==0){
                 string += "Store: " + self.storeName + "\r\n"
+                }
                 // string += "Fixture Type: " + self.FixtureType + "\r\n"
                 string += "Additional Notes: " + self.additionalNotes
                 return string
