@@ -26,8 +26,8 @@
 
               </v-list-tile-content>
               <v-spacer></v-spacer>
-              <v-list-tile-action v-if="bestFit==sp.count"> BEST FIT</v-list-tile-action>
-              <!-- <v-list-tile-action>h:{{sp.height}} w:{{sp.width}} modules:{{sp.modules}}</v-list-tile-action> -->
+              <v-list-tile-action v-if="bestFit==sp.count">BEST FIT</v-list-tile-action>
+              <!-- <v-list-tile-action> - h:{{sp.count}} w:{{sp.width}} modules:{{sp.modules}}</v-list-tile-action> -->
             </v-list-tile>
           </v-list>
         </v-card-text>
@@ -60,7 +60,7 @@
     },
     data() {
       return {
-        bestFit:0,
+        bestFit: 0,
         doCheck: false,
         filterProject: null,
         searchText: null,
@@ -115,29 +115,31 @@
           add: false
         }
 
-        
         if (listitem.planogramName == null) {
           listitem.planogramName = ""
         }
+
         if (self.PlanoName.toUpperCase() == listitem.planogramName.toUpperCase()) {
           canAdd.add = true
         }
-        if(listitem.modules){}
+
         if (item.modules >= listitem.modules) {
           canAdd.count++
         }
+
         if (item.height >= listitem.height) {
-         canAdd.count++
+          canAdd.count++
         }
-         if (listitem.storeCluster == item.storeCluster) {
-         canAdd.count++
+
+        if (listitem.storeCluster == item.cluster) {
+          canAdd.count++
         }
 
         callback(canAdd)
       },
       getSpacePlans(data, callback) {
         let self = this;
-        self.bestFit=0
+        self.bestFit = 0
         self.spaceData = [];
         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
@@ -148,13 +150,13 @@
               r.data.planogram_DetailsList.forEach(element => {
                 self.checkAdd(data, element, retval => {
                   if (retval.add == true) {
-                    element.count=retval.count
+                    element.count = retval.count
                     self.spaceData.push(element)
                   }
                 })
               });
               self.spaceData.sort((a, b) => (a.count < b.count) ? 1 : -1)
-               self.bestFit=self.spaceData[0].count
+              self.bestFit = self.spaceData[0].count
             } else {
               self.spaceData = r.data.planogram_DetailsList
             }
