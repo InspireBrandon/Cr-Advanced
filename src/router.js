@@ -92,6 +92,7 @@ import ProductListing from '@/components/Apps/RangePlanning/ProductListing/Index
 import FloorPlanning from '@/components/Main/FloorPlanning/index.vue'
 
 import Fixture_Type from '@/components/Main/Fixture_Type/Fixture_Type.vue'
+import FileStatus from '@/components/Main/FileStatus'
 
 Vue.use(Router)
 
@@ -129,6 +130,11 @@ export default new Router({
           path: '/Fixture_Type',
           name: 'Fixture_Type',
           component: Fixture_Type
+        },
+        {
+          path: '/FileStatus',
+          name: 'FileStatus',
+          component: FileStatus
         },
         {
           path: '/Testing',

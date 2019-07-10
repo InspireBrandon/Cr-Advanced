@@ -409,24 +409,17 @@
                 let tmpUser = request.systemUserID;
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                console.log(item);
-                
-
                 Axios.post(process.env.VUE_APP_API + `Store_Planogram/ReCall?SystemFileID=${item.systemFileID}`).then(
                     r => {
-                        console.log(r);
-                    delete Axios.defaults.headers.common["TenantID"];
 
+                        Axios.post(process.env.VUE_APP_API +
+                                `SystemFile/UpdateStatus?db=CR-Devinspire&systemFileID=${item.systemFileID}&newStatus=1`
+                            )
+                            .then(nsr => {
+                                console.log(r);
+                                delete Axios.defaults.headers.common["TenantID"];
+                            })
                     })
-                // self.checkTaskTakeover(request, () => {
-                //     request.systemUserID = tmpUser;
-                //     request.status = 44;
-                //     request.notes = self.findAndReplaceNote(request.notes);
-
-                //     self.createProjectTransaction(request, newItem => {
-                //         self.routeToView(newItem)
-                //     })
-                // })
             },
             setDistributionViewed(item) {
                 let self = this;
@@ -496,17 +489,35 @@
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(item))
-                let tmpUser = request.systemUserID;
 
-                self.checkTaskTakeover(request, () => {
-                    request.systemUserID = tmpUser;
-                    request.status = 24;
-                    request.notes = self.findAndReplaceNote(request.notes);
+                self.checkFileStatus(request.systemFileID, data => {
+                    if (data.status == 1) {
+                        alert("this planogram has been recalled, task will be removed");
+                    } else if (data.status == 2) {
+                        alert("A variation has been requested for this planogram, task will be removed");
+                    } else {
+                        let tmpUser = request.systemUserID;
 
-                    self.createProjectTransaction(request, newItem => {
-                        self.routeToView(newItem)
-                    })
+                        self.checkTaskTakeover(request, () => {
+                            request.systemUserID = tmpUser;
+                            request.status = 24;
+                            request.notes = self.findAndReplaceNote(request.notes);
+
+                            self.createProjectTransaction(request, newItem => {
+                                self.routeToView(newItem)
+                            })
+                        })
+                    }
                 })
+            },
+            checkFileStatus(fileID, callback) {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API + "SystemFile?db=CR-DEVINSPIRE&id=" + fileID)
+                    .then(r => {
+                        console.log(r.data);
+                        callback(r.data);
+                    })
             },
             routeToView(item) {
                 let self = this;
@@ -529,13 +540,23 @@
                     } else if (item.status == 21 || item.status == 27) {
                         route = `/PlanogramDistribution/${item.project_ID}/${item.project_Group_ID}`
                     } else {
-                        route = `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
+                        self.checkFileStatus(item.systemFileID, data => {
+                            if (data.status == 1) {
+                                alert("this planogram has been recalled, task will be removed");
+                            } else if (data.status == 2) {
+                                alert(
+                                "A variation has been requested for this planogram, task will be removed");
+                            } else {
+                                route = `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
+                            }
+                        })
                     }
                 }
                 break;
                 }
 
-                self.$router.push(route);
+                if(route != undefined)
+                    self.$router.push(route);
             },
             setComplete(item) {
                 let self = this;
