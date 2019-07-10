@@ -17,6 +17,9 @@
                 }, {
                     name: "Graphs",
                     route: "/Graphs"
+                }, {
+                    name: "File Status",
+                    route: "FileStatus"
                 }]
             }
         }
