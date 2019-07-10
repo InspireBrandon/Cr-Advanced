@@ -36,7 +36,7 @@
         <div v-if="params.data.planogramStoreStatus!=0&&params.data.planogramStoreStatus!=6">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
-                    <v-btn v-on="on" @click="params.context.componentParent.openOrder(params)" icon flat small
+                    <v-btn v-on="on" @click="params.context.componentParent.openOrder(params,1)" icon flat small
                         color="warning" class="ma-0">
                         <v-icon>edit_attributes</v-icon>
                     </v-btn>
