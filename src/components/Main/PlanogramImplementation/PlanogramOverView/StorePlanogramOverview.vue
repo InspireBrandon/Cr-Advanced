@@ -21,7 +21,7 @@
             </v-toolbar-items>
         </v-toolbar>
         <grid ref="grid" :getRowData="getStorePlanograms" :selectedProject="selectedProject" :rowData="rowData"
-            :assign="assignGroups" />
+            :assign="assignGroups" :Planogram_ID="Planogram_ID" />
 
         <StorePlanograms ref="StorePlanograms" :getStoreData="getStorePlanograms" />
         <PlanogramDetailsSelector :PlanoName="title" ref="PlanogramDetailsSelector" />
@@ -55,6 +55,8 @@
         },
         data() {
             return {
+                projectsObject:[],
+                Planogram_ID:null,
                 projects: [],
                 projectGroups: [],
                 selectedProjectGroup: null,
@@ -219,7 +221,7 @@
                     return
                 }
                 let count = 0
-                self.$refs.PlanogramDetailsSelector.show(data[0], true, detailID => {
+                self.$refs.PlanogramDetailsSelector.show(data[0], true,self.Planogram_ID, detailID => {
                     data.forEach(e => {
                         self.assignPlanogramToStoreNoRefresh(e.data, detailID, () => {
                             count = count + 1
@@ -293,7 +295,7 @@
 
 
                 let node = data.node
-                self.$refs.PlanogramDetailsSelector.show(listItem, true, data => {
+                self.$refs.PlanogramDetailsSelector.show(listItem, true, self.Planogram_ID,data => {
 
                     self.checkFits(listItem, data, fits => {
 
@@ -435,6 +437,13 @@
                     Axios.get(process.env.VUE_APP_API + 'Store_Planogram?project_ID=' + self.selectedProject)
                         .then(r => {
                             self.rowData = []
+                            console.log(self.projectsObject);
+                            
+                            self.projectsObject.forEach(element => {
+                                if(element.id==self.selectedProject){
+                                    self.Planogram_ID=element.planogram_ID
+                                }
+                            });
                             self.currentStorePlanograms = []
                             self.currentStorePlanograms = r.data.store_PlanogramList;
                             self.currentStorePlanograms.forEach(e => {
@@ -450,6 +459,7 @@
                                     self.title = e.text
                                 }
                             })
+                        
 
                         })
                 })
@@ -535,7 +545,7 @@
                             .then(r => {
                                 delete Axios.defaults.headers.common["TenantID"];
                                 let tmp = r.data.projectList;
-
+                                self.projectsObject=tmp    
                                 self.projects = [];
 
                                 tmp.forEach(el => {
