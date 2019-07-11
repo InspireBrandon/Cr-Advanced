@@ -1135,14 +1135,27 @@
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
 
+                let projectTXGroupRequest = {
+                    projectID: request.project_ID
+                }
+
                 self.$refs.PlanogramIplementationModal.show("Implement Planogram?", 3, null, null, null,
                     data => {
                         request.status = 26;
-                        request.notes = data.notes;
-                        request.systemUserID = systemUserID;
                         self.createProjectTransaction(request, () => {
-                            self.updateStorePlanogramStatus(request.store_ID, request.systemFileID, 4, sp => {
-                                self.getProjectTransactionsByProjectID(request.project_ID);
+                            request.notes = data.notes;
+                            request.systemUserID = systemUserID;
+                            self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
+                                request.projectTXGroup_ID = newGroup.id;
+                                self.createProjectTransaction(request, () => {
+                                    self.updateStorePlanogramStatus(request.store_ID,
+                                        request
+                                        .systemFileID, 4, sp => {
+                                            self.getProjectTransactionsByProjectID(
+                                                request
+                                                .project_ID);
+                                        })
+                                })
                             })
                         })
                     })

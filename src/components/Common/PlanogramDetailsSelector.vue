@@ -119,6 +119,8 @@
           listitem.planogramName = ""
         }
 
+        console.log(self.PlanoName, listitem.planogramName)
+
         if (self.PlanoName.toUpperCase() == listitem.planogramName.toUpperCase()) {
           canAdd.add = true
         }
@@ -145,6 +147,9 @@
 
         Axios.get(process.env.VUE_APP_API + "/Planogram_Details")
           .then(r => {
+
+            console.log(r)
+
             self.spaceData = []
             if (self.doCheck == true) {
               r.data.planogram_DetailsList.forEach(element => {
