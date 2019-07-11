@@ -241,12 +241,12 @@
                 // request.notes = self.buildString()
                 // create tx group
                 // then create tx with notes = text 
-                self.additionalNotes = text
-                console.log(self.selectedStores);
+                // self.additionalNotes = text
+                // console.log(self.selectedStores);
 
 
-                // self.dialog = false
-                // self.afterReturn(text);
+                self.dialog = false
+                self.afterReturn(text);
             },
         },
         created() {
