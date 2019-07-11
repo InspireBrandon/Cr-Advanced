@@ -444,6 +444,18 @@
         let tmp = [];
         let final = [];
 
+
+        self.products.forEach(el => {
+          if (el.height == undefined || el.height == null || parseFloat(el.height) <= 0)
+            el.height = 10
+
+          if (el.width == undefined || el.width == null || parseFloat(el.width) <= 0)
+            el.width = 10
+
+          if (el.depth == undefined || el.depth == null || parseFloat(el.depth) <= 0)
+            el.depth = 10
+        })
+
         if (self.searchText == "") {
           tmp = self.products;
         } else {
@@ -534,8 +546,6 @@
       },
       updateLoader(data) {
 
-        console.log(data);
-
         let self = this
         // if (data.spaceplanID != 0) {
         //   self.spacePlanID = data.spaceplanID
@@ -557,7 +567,6 @@
 
             }
             self.PlanogramObject.status = 6
-            console.log(self.PlanogramObject);
 
             // axios.put(process.env.VUE_APP_API+`SystemFileApproval?db=CR-Devinspire&buyerID=`+self.spacePlanID,{})
             let storeID = self.PlanogramObject.storeID
@@ -803,11 +812,11 @@
             let hasDefault = false;
 
             r.data.planogramDetails_fixtures.forEach(el => {
-              if(el.isDefault == true)
+              if (el.isDefault == true)
                 hasDefault = true;
             })
 
-            if(!hasDefault)
+            if (!hasDefault)
               r.data.planogramDetails_fixtures[0].isDefault = true;
 
             self.fixture_types = r.data.planogramDetails_fixtures;
@@ -1386,7 +1395,6 @@
         let self = this
         self.showCategoryCluster = true
         axios.get(process.env.VUE_APP_API + `Store?db=CR-Devinspire`).then(r => {
-          // console.log(r.data);
           r.data.forEach(store => {
             self.clusterOptions.stores.push({
               text: store.storeName,
