@@ -2,7 +2,7 @@
     <div>
         <v-layout row justify-center>
             <v-dialog v-model="dialog" persistent fullscreen>
-                <v-card style="height: calc(100vh - 200px); overflow: auto;">
+                <v-card>
                     <v-toolbar prominent dark color="primary">
                         <v-toolbar-title>Planogram Report</v-toolbar-title>
                         <v-spacer></v-spacer>
@@ -13,7 +13,7 @@
                             <v-icon>close</v-icon>
                         </v-btn>
                     </v-toolbar>
-                    <v-card-text id="planogram-report">
+                    <v-card-text style="height: calc(100vh - 64px); overflow: auto;" id="planogram-report">
                         <v-card class="mb-3">
                             <v-toolbar flat dark dense>
                                 <v-toolbar-title>Title</v-toolbar-title>
@@ -81,7 +81,7 @@
                             <v-toolbar flat dark dense>
                                 <v-toolbar-title>Fixture Report</v-toolbar-title>
                             </v-toolbar>
-                            <v-card-text style=" overflow: auto;">
+                            <v-card-text>
                                 <table>
                                     <tr>
                                         <th style="min-width:400px">Name</th>
@@ -115,7 +115,7 @@
                             <v-toolbar flat dark dense>
                                 <v-toolbar-title>Product Report - Weekly Average</v-toolbar-title>
                             </v-toolbar>
-                            <v-card-text style="height: calc(100vh - 200px); overflow: auto;">
+                            <v-card-text>
                                 <table>
                                     <tr><th style="min-width:150px">Product Code</th>
                                         <th style="min-width:150px">Barcode</th>
@@ -140,11 +140,11 @@
                             </v-card-text>
                         </v-card>
                         <div class="print-break-page"></div>
-                        <v-card class="mb-3" style=" overflow: auto;">
+                        <v-card class="mb-3">
                             <v-toolbar flat dark dense>
                                 <v-toolbar-title>Product Fixture Report</v-toolbar-title>
                             </v-toolbar>
-                            <v-card-text style="height: calc(100vh - 200px); overflow: auto;">
+                            <v-card-text>
                                 <TreeVue style="border: 1px solid black; margin-bottom: 10px;"
                                     v-for="(parent, idx) in productFixtureReport" :childdark="false" :key="idx"
                                     :data="parent" />
@@ -382,6 +382,12 @@
 </script>
 
 <style scoped>
+    .header-item {
+        padding: 0px 0px;
+        padding-bottom: 8px;
+        margin-top: 5px;
+    }
+
     table {
         border-collapse: collapse;
         width: 100%;
@@ -395,8 +401,8 @@
     table,
     th,
     td {
-        border: 1px solid black;
-        padding: 1px;
+        padding: 0px 2px;
+        border: 1px solid;
     }
 
     @media print {

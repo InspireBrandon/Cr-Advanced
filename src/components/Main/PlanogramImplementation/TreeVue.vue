@@ -14,18 +14,18 @@
                 <item v-for="(item, index) in data.children" :childdark="!childdark" :key="index" :data="item">
                 </item>
             </div>
-            <div v-if="data.Type != 'GONDOLA' " style="background: white ;overflow: auto;">
+            <div v-if="data.Type != 'GONDOLA' " style="background: white ;overflow: hidden;">
                 <table>
                     <tr>
                         <th>Position</th>
-                        <th style="min-width:150px">Product Code</th>
+                        <th style="width:100px">Product Code</th>
                         <th>Barcode</th>
                         <th style="min-width:400px">Description </th>
 
 
-                        <th style="min-width:100px">X Facings</th>
-                        <th style="min-width:100px">Y Facings</th>
-                        <th style="min-width:100px">Z Facings</th>
+                        <th style="width:90px">X Facings</th>
+                        <th style="width:90px">Y Facings</th>
+                        <th style="width:90px">Z Facings</th>
                         <th>Caps</th>
                         <th>Orientation</th>
                         <th style="min-width:100px">Total Facings</th>
@@ -97,7 +97,7 @@
 
 <style scoped>
     .header-item {
-        padding: 0px 10px;
+        padding: 0px 0px;
         padding-bottom: 8px;
         margin-top: 5px;
     }
@@ -115,7 +115,7 @@
     table,
     th,
     td {
-        padding: 5px;
+        padding: 0px 2px;
         border: 1px solid;
     }
 
