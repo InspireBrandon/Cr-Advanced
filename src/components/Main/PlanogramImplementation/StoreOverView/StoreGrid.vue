@@ -302,7 +302,7 @@
                 let listItem = data.data
                 let node = data.node
                 self.selectedCat = listItem.projectName
-                self.$refs.PlanogramDetailsSelector.show(listItem, true, data => {
+                self.$refs.PlanogramDetailsSelector.show(listItem, true,listItem.planogram_ID, data => {
                     //   busy here with fits addition for store view
                     let moduleFit = false
                     let heightFit = false

@@ -68,6 +68,7 @@
         spaceData: [],
         afterComplete: null,
         selectedSpacePlan: null,
+        planogram_ID:null,
         status: [{
           type: 0,
           friendy: "New",
@@ -118,10 +119,7 @@
         if (listitem.planogramName == null) {
           listitem.planogramName = ""
         }
-
-        console.log(self.PlanoName, listitem.planogramName)
-
-        if (self.PlanoName.toUpperCase() == listitem.planogramName.toUpperCase()) {
+        if (self.planogram_ID== listitem.planogramID) {
           canAdd.add = true
         }
 
@@ -169,9 +167,11 @@
             callback();
           })
       },
-      show(data, doCheck, afterComplete) {
+      show(data, doCheck,planogram_ID ,afterComplete) {
         let self = this;
         self.doCheck = doCheck
+        
+        self.planogram_ID=planogram_ID
         self.getSpacePlans(data, callback => {
           self.dialog = true;
           self.afterComplete = afterComplete;
