@@ -504,7 +504,10 @@
                             request.notes = self.findAndReplaceNote(request.notes);
 
                             self.createProjectTransaction(request, newItem => {
-                                self.routeToView(newItem)
+                                self.updateStorePlanogramStatus(request.store_ID, request
+                                    .systemFileID, 3, sp => {
+                                        self.routeToView(newItem)
+                                    })
                             })
                         })
                     }
@@ -519,44 +522,65 @@
                         callback(r.data);
                     })
             },
+            updateStorePlanogramStatus(store_id, system_file_id, new_status, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API +
+                        `Store_Planogram/Status?store_id=${store_id}&system_file_id=${system_file_id}&new_status=${new_status}`
+                        )
+                    .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        callback(r.data);
+                    })
+            },
             routeToView(item) {
                 let self = this;
                 let route;
 
-                console.log(item);
+                console.log("BRUH", item);
 
                 switch (item.type) {
                     case 1: {
                         route = `/DataPreparation`
+                        self.$router.push(route);
                     }
                     break;
                 case 2: {
                     route = `/RangePlanning/${item.rangeFileID}`
+                    self.$router.push(route);
                 }
                 break;
                 case 3: {
                     if (item.status == 1 || item.status == 8 || item.status == 41) {
                         route = `/SpacePlanning`
+                        self.$router.push(route);
                     } else if (item.status == 21 || item.status == 27) {
                         route = `/PlanogramDistribution/${item.project_ID}/${item.project_Group_ID}`
+                        self.$router.push(route);
                     } else {
                         self.checkFileStatus(item.systemFileID, data => {
+                            route =
+                                `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
+
                             if (data.status == 1) {
                                 alert("this planogram has been recalled, task will be removed");
-                            } else if (data.status == 2) {
-                                alert(
-                                "A variation has been requested for this planogram, task will be removed");
-                            } else {
-                                route = `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
                             }
+
+                            if (data.status == 2) {
+                                alert(
+                                    "A variation has been requested for this planogram, task will be removed"
+                                );
+                            }
+
+                            if (route != undefined)
+                                self.$router.push(route);
                         })
                     }
                 }
                 break;
                 }
-
-                if(route != undefined)
-                    self.$router.push(route);
             },
             setComplete(item) {
                 let self = this;

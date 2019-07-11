@@ -1,38 +1,30 @@
 <template>
     <v-card>
-        <v-toolbar color="primary" dark dense>
+        <v-toolbar tile color="grey darken-3" dark dense>
             <v-toolbar-title>
                 Planogram Overview: <strong v-if="selectedProject!=null">{{title}}</strong>
             </v-toolbar-title>
             <v-spacer></v-spacer>
         </v-toolbar>
-        <v-toolbar dark flat dense>
-            <v-container class="pa-0" fluid grid-list-lg>
-                <v-layout row wrap>
-                    <v-flex lg1 md2>
-                        <v-btn @click="assignGroups" color="blue-grey darken-2">
-                            group assign
-                        </v-btn>
-                    </v-flex>
-                    <v-flex lg2 md3>
-                        <v-autocomplete :items="projectGroups" @change="getProjectsByProjectGroup()"
-                            v-model="selectedProjectGroup" label="Project Group">
-                        </v-autocomplete>
+        <v-toolbar dark flat>
+            <v-btn @click="assignGroups" color="blue-grey darken-2 ma-2">
+                group assign
+            </v-btn>
+            <v-toolbar-items>
+                <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 300px" :items="projectGroups"
+                    @change="getProjectsByProjectGroup()" v-model="selectedProjectGroup" label="Project Group">
+                </v-autocomplete>
 
-                    </v-flex>
-                    <v-flex lg2 md3>
-                        <v-autocomplete :items="projects" @change="getStorePlanograms()" v-model="selectedProject"
-                            label="Project"></v-autocomplete>
-                    </v-flex>
-                </v-layout>
-            </v-container>
+                <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 300px" :items="projects"
+                    @change="getStorePlanograms()" v-model="selectedProject" label="Project">
+                </v-autocomplete>
+            </v-toolbar-items>
         </v-toolbar>
         <grid ref="grid" :getRowData="getStorePlanograms" :selectedProject="selectedProject" :rowData="rowData"
             :assign="assignGroups" />
 
         <StorePlanograms ref="StorePlanograms" :getStoreData="getStorePlanograms" />
         <PlanogramDetailsSelector :PlanoName="title" ref="PlanogramDetailsSelector" />
-        <!-- :PlanoName="ProjectName.text" -->
         <YesNoModal ref="YesNoModal" />
 
     </v-card>
@@ -72,10 +64,9 @@
                 StoreClusters: [],
                 allStoreDialog: false,
                 selectedProject: null,
-                StoreStatusList: [
-                    {
+                StoreStatusList: [{
                         text: "Unassigned"
-                    }, 
+                    },
                     {
                         text: "Assigned"
                     },

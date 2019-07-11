@@ -1,13 +1,15 @@
 <template>
     <div>
         <ag-grid-vue :gridOptions="gridOptions" @selection-changed="onSelectionChanged" :sideBar='false'
-            style="width: 100%;  height: calc(100vh - 235px);" :defaultColDef="defaultColDef" class="ag-theme-balham"
+            style="width: 100%;  height: calc(100vh - 220px);" :defaultColDef="defaultColDef" class="ag-theme-balham"
             :columnDefs="headers" :rowData="rowData" :enableSorting="true" :enableFilter="true"
             :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
             :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :gridReady="gridReady"
             :onGridReady="onGridReady" :groupMultiAutoColumn="true">
         </ag-grid-vue>
-        rows : {{rowData.length}}
+        <v-toolbar dark dense class="pa-0">
+            <span>rows : {{rowData.length}}</span>
+        </v-toolbar>
         <VariationOrderModal ref="VariationOrderModal" />
         <YesNoModal ref="YesNoModal" />
     </div>
@@ -15,6 +17,7 @@
 <script>
     import PlanogramName from "./PlanogramName.vue"
     import Button from "./button.vue"
+    import Audit from "./audit.vue"
     import Fits from "./Fits.vue"
     import height from "./height.vue"
     import jwt from 'jsonwebtoken';
@@ -40,6 +43,7 @@
             PlanogramName,
             height,
             YesNoModal,
+            Audit
         },
         data() {
             return {
@@ -60,7 +64,7 @@
                         "headerName": "Planogram Name",
                         "cellRendererFramework": "PlanogramName",
 
-                        "minWidth": 500,
+                        "minWidth": 300,
                         cellStyle: function (params) {
                             if (params.data.planogramFit == true) {
                                 //mark police cells as red
@@ -75,11 +79,11 @@
                             }
                         }
                     }, {
-                        "headerName": "Current Status",
+                        "headerName": "Status",
                         "field": "currentStatusText",
                         "minWidth": 100,
                     }, {
-                        "headerName": "",
+                        "headerName": "Actions",
                         "editable": false,
                         "hide": false,
                         "minWidth": 180,
@@ -87,7 +91,8 @@
                     },
                     {
                         "headerName": "Best Fit",
-                        "cellRendererFramework": "Fits"
+                        "cellRendererFramework": "Fits",
+                        "minWidth": 50
                     },
                     {
                         "headerName": "Store Cluster",
@@ -121,50 +126,12 @@
                             'success-green': 'data.heightFit == false && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
                             'error-red': 'data.heightFit == true && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
                         }
-                    },
-                    //  {
-                    //     "headerName": "Width",
-                    //     "minWidth": 50,
-                    //     "editable": true,
-                    //     "field": "width"
-                    // }, 
-                    // {
-                    //     "headerName": "Fixture Type",
-                    //     "field": "fixtureType",
-                    //     "cellEditor": "agRichSelectCellEditor",
-                    //     "cellEditorParams": {
-                    //         values: ["Standard",
-                    //             "Industrial",
-                    //             "Supplier Stand",
-                    //             "Till point",
-                    //             "pallettes",
-                    //             "Custom"
-                    //         ],
-                    //     },
-                    //     "editable": true,
-                    //     "minWidth": 150,
-                    // },
-                    // {
-                    //     "headerName": "Displays",
-                    //     "minWidth": 50,
-                    //     "editable": true,
-                    //     "field": "displays"
-                    // }, {
-                    //     "headerName": "Pallettes",
-                    //     "minWidth": 50,
-                    //     "editable": true,
-                    //     "field": "pallettes"
-                    // }, {
-                    //     "headerName": "Supplier Stands",
-                    //     "minWidth": 50,
-                    //     "editable": true,
-                    //     "field": "supplierStands"
-                    // }, {
-                    //     "headerName": "Bins",
-                    //     "field": "bins",
-                    //     "minWidth": 50,
-                    //     "editable": true,
-                    // }
+                    }, {
+                        "headerName": "Audit",
+                        "minWidth": 50,
+                        "field": "audit",
+                        "cellRendererFramework": "Audit"
+                    }
                 ],
                 defaultColDef: {
                     onCellValueChanged: this.UpdateLine
@@ -282,15 +249,13 @@
                 let overallFits = false
                 let storeClusterFit = false
 
-                console.log(listItem.modules + "<" + listItem.detailModules)
-
                 if (listItem.modules < listItem.detailModules) {
                     moduleFit = true
                 }
+
                 let Lheight = listItem.detailHeight * 0.9
                 let Uheight = listItem.detailHeight * 1.1
 
-                console.log(Lheight + "<" + listItem.height + ">" + Uheight)
                 if (parseFloat(listItem.height) < Lheight || Uheight < parseFloat(listItem.height)) {
                     heightFit = true
                 }
@@ -316,7 +281,8 @@
                     "SupplierStands": listItem.supplierStands,
                     "Bins": listItem.bins,
                     "FixtureType": listItem.fixtureType,
-                    "Fits": overallFits
+                    "Fits": overallFits,
+                    "audit": listItem.audit
                 }
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;

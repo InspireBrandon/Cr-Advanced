@@ -434,6 +434,19 @@
                 break;
                 }
             },
+            updateStorePlanogramStatus(store_id, system_file_id, new_status, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API +
+                        `Store_Planogram/Status?store_id=${store_id}&system_file_id=${system_file_id}&new_status=${new_status}`
+                    )
+                    .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        callback(r.data);
+                    })
+            },
             processSuperUser() {
                 let self = this;
 
@@ -1111,7 +1124,8 @@
                 console.log(request);
 
                 self.createProjectTransaction(request, processAssigned => {
-                    self.$router.push(`/PlanogramDistribution/${request.project_ID}/${request.project_Group_ID}`)
+                    self.$router.push(
+                        `/PlanogramDistribution/${request.project_ID}/${request.project_Group_ID}`)
                 })
             },
             implement() {
@@ -1127,7 +1141,9 @@
                         request.notes = data.notes;
                         request.systemUserID = systemUserID;
                         self.createProjectTransaction(request, () => {
-                            self.getProjectTransactionsByProjectID(request.project_ID);
+                            self.updateStorePlanogramStatus(request.store_ID, request.systemFileID, 4, sp => {
+                                self.getProjectTransactionsByProjectID(request.project_ID);
+                            })
                         })
                     })
             },
