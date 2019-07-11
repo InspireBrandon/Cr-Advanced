@@ -55,9 +55,9 @@
             v-if="params.data.planogramStoreStatus!=0&&params.data.planogramStoreStatus!=6&&params.data.planogramStoreStatus!=5&&params.data.planogramStoreStatus!=7">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
-                    <v-btn v-on="on" @click="params.context.componentParent.openOrder(params,1)" icon flat small
+                    <v-btn v-on="on" @click="params.context.componentParent.openOrder(params,1,'Model Variation')" icon flat small
                         color="warning" class="ma-0">
-                        <v-icon>edit_attributes</v-icon>
+                        M
                     </v-btn>
                 </template>
                 <span>request model variation</span>
@@ -68,9 +68,9 @@
             v-if="params.data.planogramStoreStatus!=0&&params.data.planogramStoreStatus!=6&&params.data.planogramStoreStatus!=5&&params.data.planogramStoreStatus!=7">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
-                    <v-btn v-on="on" @click="params.context.componentParent.openOrder(params,0)" icon flat small
+                    <v-btn v-on="on" @click="params.context.componentParent.openOrder(params,0,'Store Variation')" icon flat small
                         color="warning" class="ma-0">
-                        <v-icon>edit_attributes</v-icon>
+                        S
                     </v-btn>
                 </template>
                 <span>request store variation</span>

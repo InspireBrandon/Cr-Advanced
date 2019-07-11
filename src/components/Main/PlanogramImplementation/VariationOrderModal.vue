@@ -3,7 +3,7 @@
         <v-card>
             <v-toolbar dark flat color="primary">
                 <v-toolbar-title>
-                    Order Variation
+                    {{title}}
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-btn icon @click="dialog = false">
@@ -15,8 +15,13 @@
                     <v-flex md12>
                         <v-select v-model="selectedPlanoDetail" :items="planoDetails" label="Planogram"></v-select>
                     </v-flex>
-                    <v-flex md6>
-                        <v-text-field label="Store Name" disabled v-model="storeName"  v-if="variationType==0"></v-text-field>
+                    <v-flex md6 v-if="variationType==0">
+                        <v-text-field label="Store Name" disabled v-model="storeName">
+                        </v-text-field>
+                    </v-flex>
+                    <v-flex md6 v-if="variationType!=0">
+                        <v-autocomplete label="Store Name" multiple :items="stores" v-model="selectedStores">
+                        </v-autocomplete>
                     </v-flex>
                     <v-flex md6>
                         <!-- <v-select :items="FixtureTypes" label="Variation Type" v-model="FixtureType">
@@ -26,22 +31,7 @@
                         <v-text-field v-model="height" label="Height"></v-text-field>
                     </v-flex>
                     <v-flex md4>
-                        <v-text-field v-model="width" label="Width"></v-text-field>
-                    </v-flex>
-                    <v-flex md4>
                         <v-text-field v-model="modules" label="Modules"></v-text-field>
-                    </v-flex>
-                    <v-flex md3>
-                        <v-text-field v-model="displays" label="Displays"></v-text-field>
-                    </v-flex>
-                    <v-flex md3>
-                        <v-text-field v-model="pallettes" label="Pallettes"></v-text-field>
-                    </v-flex>
-                    <v-flex md3>
-                        <v-text-field v-model="supplierStands" label="Supplier Stands"></v-text-field>
-                    </v-flex>
-                    <v-flex md3>
-                        <v-text-field v-model="bins" label="Bins"></v-text-field>
                     </v-flex>
                     <v-flex md12>
                         <v-textarea v-model="additionalNotes" outline label="Additional Notes"></v-textarea>
@@ -68,13 +58,16 @@
             return {
                 FixtureTypes: [{
                     text: "Model",
-                    value:0
+                    value: 0
                 }, {
                     text: "Store",
-                    value:0
+                    value: 0
                 }],
+                title: null,
+                selectedStores: [],
                 FixtureType: null,
-                variationType:null,
+                variationType: null,
+                stores: [],
                 dialog: false,
                 height: null,
                 width: null,
@@ -93,12 +86,14 @@
             }
         },
         methods: {
-            show(item,variationType, afterReturn) {
+            show(item, variationType, title, afterReturn) {
                 let self = this
+                self.getStores(() => {})
                 self.getPlanoDetails()
                 self.listitem = item
                 self.dialog = true
-                self.variationType=variationType
+                self.variationType = variationType
+                self.title = title
                 self.height = item.height
                 self.width = item.width
                 self.modules = item.width
@@ -123,6 +118,23 @@
             close() {
                 let self = this
                 self.dialog = false
+            },
+            getStores(callback) {
+                let self = this
+                let list = []
+
+                Axios.get(process.env.VUE_APP_API + `Store?db=Hinterland-Live`).then(r => {
+                    r.data.forEach(element => {
+
+                        list.push({
+                            text: element.storeName,
+                            value: element.storeID
+                        })
+                    });
+
+                    self.stores = list
+                    callback();
+                })
             },
             getPlanoDetails() {
                 let self = this
@@ -150,20 +162,43 @@
                 })
 
                 let string = "Variation requested for " + name + " with the following details  " + "\r\n" + "\r\n"
-                
+
                 string += "Height: " + self.height + "\r\n"
-                string += "Width: " + self.width + "\r\n"
+                // string += "Width: " + self.width + "\r\n"
                 string += "Modules: " + self.modules + "\r\n"
-                string += "Bins: " + self.bins + "\r\n"
-                string += "Displays: " + self.displays + "\r\n"
-                string += "Supplier Stands: " + self.supplierStands + "\r\n"
-                string += "Palettes: " + self.pallettes + "\r\n"
-                if(self.variationType==0){
-                string += "Store: " + self.storeName + "\r\n"
+                // string += "Bins: " + self.bins + "\r\n"
+                // string += "Displays: " + self.displays + "\r\n"
+                // string += "Supplier Stands: " + self.supplierStands + "\r\n"
+                // string += "Palettes: " + self.pallettes + "\r\n"
+                if (self.variationType == 0) {
+                    string += "Store: " + self.storeName + "\r\n"
+                } else {
+                    if (self.selectedStores > 0) {
+                        string += "Stores: " + "\r\n"
+                        self.selectedStores.forEach(e => {
+                            self.getstoreName(e, name => {
+                                if (name != undefined) {
+                                    string += " - " + name + "\r\n"
+                                }
+                            })
+                        })
+                    }
+
                 }
                 // string += "Fixture Type: " + self.FixtureType + "\r\n"
                 string += "Additional Notes: " + self.additionalNotes
                 return string
+            },
+            getstoreName(id, callback) {
+                let self = this
+                self.stores.forEach(e => {
+                    if (e.value == id) {
+                        console.log(e.text);
+                        callback(e.text)
+                    } else {
+                        callback()
+                    }
+                })
             },
             createProjectTransactionGroup(request, callback) {
                 let self = this;
@@ -207,10 +242,11 @@
                 // create tx group
                 // then create tx with notes = text 
                 self.additionalNotes = text
+                console.log(self.selectedStores);
 
 
-                self.dialog = false
-                self.afterReturn(text);
+                // self.dialog = false
+                // self.afterReturn(text);
             },
         },
         created() {

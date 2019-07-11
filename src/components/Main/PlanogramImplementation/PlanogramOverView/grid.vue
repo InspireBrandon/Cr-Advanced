@@ -184,7 +184,7 @@
                     alert("Failed to get project owner: " + e)
                 })
             },
-            openOrder(data,type) {
+            openOrder(data,type,title) {
                 let self = this
                 let item = data.data
                 let node = data.node
@@ -194,7 +194,7 @@
                     let owner = ownerCallback.systemUserID
                     let encoded_details = jwt.decode(sessionStorage.accessToken);
                     let systemUserID = encoded_details.USER_ID;
-                    self.$refs.VariationOrderModal.show(item,type, VariationCB => {
+                    self.$refs.VariationOrderModal.show(item,type,title ,VariationCB => {
                         let notes = VariationCB
                         item.planogramStoreStatus = 5
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
