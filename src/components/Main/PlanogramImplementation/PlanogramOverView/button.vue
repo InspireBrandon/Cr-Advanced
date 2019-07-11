@@ -52,7 +52,7 @@
         </div>
         
         <div
-            v-if="params.data.planogramStoreStatus!=0&&params.data.planogramStoreStatus!=6&&params.data.planogramStoreStatus!=5">
+            v-if="params.data.planogramStoreStatus!=0&&params.data.planogramStoreStatus!=6&&params.data.planogramStoreStatus!=5&&params.data.planogramStoreStatus!=7">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                     <v-btn v-on="on" @click="params.context.componentParent.openOrder(params,1)" icon flat small
@@ -65,7 +65,7 @@
         </div>
           
         <div
-            v-if="params.data.planogramStoreStatus!=0&&params.data.planogramStoreStatus!=6&&params.data.planogramStoreStatus!=5">
+            v-if="params.data.planogramStoreStatus!=0&&params.data.planogramStoreStatus!=6&&params.data.planogramStoreStatus!=5&&params.data.planogramStoreStatus!=7">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                     <v-btn v-on="on" @click="params.context.componentParent.openOrder(params,0)" icon flat small

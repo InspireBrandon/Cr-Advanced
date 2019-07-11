@@ -60,7 +60,7 @@
                         "headerName": "Planogram Name",
                         "cellRendererFramework": "PlanogramName",
 
-                        "minWidth": 550,
+                        "minWidth": 500,
                         cellStyle: function (params) {
                             if (params.data.planogramFit == true) {
                                 //mark police cells as red
@@ -82,7 +82,7 @@
                         "headerName": "",
                         "editable": false,
                         "hide": false,
-                        "minWidth": 140,
+                        "minWidth": 180,
                         "cellRendererFramework": "Button"
                     },
                     {

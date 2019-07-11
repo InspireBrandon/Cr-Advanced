@@ -52,7 +52,7 @@
                     }, {
                         "headerName": "Planogram Name",
                         "cellRendererFramework": "PlanogramName",
-                        "minWidth": 550,
+                        "minWidth": 500,
                     }, {
                         "headerName": "Current Status",
                         "field": "currentStatusText",
@@ -61,7 +61,7 @@
                         "headerName": "",
                         "editable": false,
                         "hide": false,
-                        "minWidth": 140,
+                        "minWidth": 180,
                         "cellRendererFramework": "Button"
                     }, {
                         "headerName": "Best Fit",
