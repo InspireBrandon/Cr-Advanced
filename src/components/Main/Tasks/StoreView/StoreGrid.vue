@@ -254,14 +254,17 @@
                     })
 
             },
-            openOrder(data) {
+          openOrder(data,type,title) {
                 let self = this
                 let item = data.data
                 let node = data.node
                 self.getProjectOwner(item.project_ID, ownerCallback => {
+                    console.log("ownerCallback");
+                    console.log(ownerCallback);
+                    let owner = ownerCallback.systemUserID
                     let encoded_details = jwt.decode(sessionStorage.accessToken);
                     let systemUserID = encoded_details.USER_ID;
-                    self.$refs.VariationOrderModal.show(item, VariationCB => {
+                    self.$refs.VariationOrderModal.show(item,type,title ,VariationCB => {
                         let notes = VariationCB
                         item.planogramStoreStatus = 5
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -282,7 +285,7 @@
                                         "store_ID": item.store_ID,
                                         "notes": notes,
                                         "status": 14,
-                                        "systemUserID": ownerCallback.systemUserID,
+                                        "systemUserID": owner,
                                         "planogram_ID": item.planogramID,
                                         "systemFileID": item.systemFileID,
                                         "rangeFileID": item.rangeID,
@@ -297,7 +300,9 @@
                                 delete Axios.defaults.headers.common["TenantID"];
                             })
                     })
+
                 })
+
             },
             onGridReady(params) {
                 this.gridApi = params.api;

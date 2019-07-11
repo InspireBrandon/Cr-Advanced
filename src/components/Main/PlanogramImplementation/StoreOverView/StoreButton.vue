@@ -36,12 +36,23 @@
         <div v-if="params.data.planogramStoreStatus!=0&&params.data.planogramStoreStatus!=6&&params.data.planogramStoreStatus!=7">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
-                    <v-btn v-on="on" @click="params.context.componentParent.openOrder(params,1)" icon flat small
+                    <v-btn v-on="on" @click="params.context.componentParent.openOrder(params,0,'Store Variation')" icon flat small
                         color="warning" class="ma-0">
-                        <v-icon>edit_attributes</v-icon>
+                        S
                     </v-btn>
                 </template>
-                <span>request variation</span>
+                <span>request Store variation</span>
+            </v-tooltip>
+        </div>
+          <div v-if="params.data.planogramStoreStatus!=0&&params.data.planogramStoreStatus!=6&&params.data.planogramStoreStatus!=7">
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <v-btn v-on="on" @click="params.context.componentParent.openOrder(params,1,'Model Variation')" icon flat small
+                        color="warning" class="ma-0">
+                        M
+                    </v-btn>
+                </template>
+                <span>request Model variation</span>
             </v-tooltip>
         </div>
     </div>
