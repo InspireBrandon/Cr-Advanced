@@ -53,8 +53,7 @@
                         "headerName": "Last Modified",
                         "field": "dateString",
                         "minWidth": 200,
-                    }
-                    ,{
+                    }, {
                         "headerName": "Planogram Name",
                         "cellRendererFramework": "PlanogramName",
                         "minWidth": 500,
@@ -254,7 +253,7 @@
                     })
 
             },
-          openOrder(data,type,title) {
+            openOrder(data, type, title) {
                 let self = this
                 let item = data.data
                 let node = data.node
@@ -264,7 +263,7 @@
                     let owner = ownerCallback.systemUserID
                     let encoded_details = jwt.decode(sessionStorage.accessToken);
                     let systemUserID = encoded_details.USER_ID;
-                    self.$refs.VariationOrderModal.show(item,type,title ,VariationCB => {
+                    self.$refs.VariationOrderModal.show(item, type, title, VariationCB => {
                         let notes = VariationCB
                         item.planogramStoreStatus = 5
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -277,12 +276,18 @@
                                     ProjectID: item.project_ID
                                 }
                                 self.createProjectTransactionGroup(groupRequest, callback => {
+                                    let storeID = null
+                                    if (type == 0) {
+                                        storeID = item.store_ID
+                                    } else {
+                                        storeID = null
+                                    }
                                     let TXrequest = {
                                         "project_ID": item.project_ID,
                                         "projectTXGroup_ID": callback.id,
                                         "type": 3,
                                         "storeCluster_ID": item.clusterID,
-                                        "store_ID": item.store_ID,
+                                        "store_ID": storeID,
                                         "notes": notes,
                                         "status": 14,
                                         "systemUserID": owner,

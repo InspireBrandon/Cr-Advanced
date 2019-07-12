@@ -250,12 +250,18 @@
                                     ProjectID: item.project_ID
                                 }
                                 self.createProjectTransactionGroup(groupRequest, callback => {
+                                      let storeID = null
+                                    if (type == 0) {
+                                        storeID = item.store_ID
+                                    } else {
+                                        storeID = null
+                                    }
                                     let TXrequest = {
                                         "project_ID": item.project_ID,
                                         "projectTXGroup_ID": callback.id,
                                         "type": 3,
                                         "storeCluster_ID": item.clusterID,
-                                        "store_ID": item.store_ID,
+                                        "store_ID": storeID,
                                         "notes": notes,
                                         "status": 14,
                                         "systemUserID": ownerCallback.systemUserID,

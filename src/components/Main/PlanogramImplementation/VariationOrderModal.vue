@@ -173,7 +173,9 @@
                 if (self.variationType == 0) {
                     string += "Store: " + self.storeName + "\r\n"
                 } else {
-                    if (self.selectedStores > 0) {
+                    console.log("self.selectedStores");
+                    console.log(self.selectedStores);
+                    if (self.selectedStores.length > 0) {
                         string += "Stores: " + "\r\n"
                         self.selectedStores.forEach(e => {
                             self.getstoreName(e, name => {

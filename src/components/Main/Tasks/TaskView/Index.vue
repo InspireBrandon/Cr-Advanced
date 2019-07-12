@@ -9,12 +9,12 @@
                     :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :onGridReady="onGridReady"
                     :groupMultiAutoColumn="true">
                 </ag-grid-vue>
-                <v-dialog v-model="notesDialog" max-width="500px">
+                <v-dialog v-model="notesDialog" max-width="600px" >
                     <v-card>
                         <v-card-title>
                             <v-menu bottom left>
                                 <template v-slot:activator="{ on }">
-                                    <v-textarea readonly outline label="Notes" :value="currentNotes">
+                                    <v-textarea rows="15" readonly outline label="Notes" :value="currentNotes">
                                     </v-textarea>
                                 </template>
                             </v-menu>
