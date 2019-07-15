@@ -19,7 +19,7 @@ class DragDropHelper {
         // now we find relative point
         let pos = stage.getPointerPosition();
         let dropPos = transform.point(pos);
-
+        
         dropPos.x -= group.x();
         dropPos.y -= group.y();
 

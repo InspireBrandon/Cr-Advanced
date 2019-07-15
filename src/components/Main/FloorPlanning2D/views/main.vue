@@ -202,7 +202,7 @@
             let stage = self.$refs.stage.getStage();
             self.InitialiseStageResponsive();
             self.InitialiseScroll();
-            let floor = new Floor(stage, self.stageData.layer, self.stageData.group, 50, 50);
+            let floor = new Floor(stage, self.stageData.layer, self.stageData.group, 200, 100);
             floor.Initialise();
             window.addEventListener('resize', self.InitialiseStageResponsive);
         },

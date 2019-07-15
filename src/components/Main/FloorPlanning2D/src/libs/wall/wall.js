@@ -7,8 +7,8 @@ class Wall {
         this.layer = layer;
         this.dropPos = dropPos;
         this.data = data;
-        this.Width = 10 * this.Ratio;
-        this.Height = 2 * this.Ratio;
+        this.Width = 1 * this.Ratio;
+        this.Height = 1 * this.Ratio;
         this.Group = null;
         this.Wall = null;
     }
