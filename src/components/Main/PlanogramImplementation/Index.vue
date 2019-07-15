@@ -52,7 +52,7 @@
                             </v-toolbar-title>
                         </v-toolbar>
                         <v-toolbar dark dense flat v-if="selectedPlanogram != null || routeProjectID != null">
-                            <v-btn v-if="(projectsStatus.status==20||routeStatus==20)" flat outline @click="approve()">
+                            <v-btn v-if="(projectsStatus.status==20||routeStatus==20)" flat outline @click="approve()" :disabled="Disableapprove">
                                 Approve</v-btn>
                             <v-btn flat
                                 v-if="(projectsStatus.status==20||routeStatus==20||routeStatus==21||projectsStatus.status==21||routeStatus==26)"
@@ -61,7 +61,7 @@
                             <v-btn outline flat v-if="routeStatus == 24" @click="requestStoreVariation">Variation
                             </v-btn>
                             <v-btn flat v-if="(projectsStatus.status==24||routeStatus==24)" outline
-                                @click="implement(projectsStatus.status,3,timelineItems[0])">Implemented</v-btn>
+                                @click="implement(projectsStatus.status,3,timelineItems[0])" :disabled="Disableapprove">Implemented</v-btn>
                             <v-btn color="blue-grey darken-3" v-if="(projectsStatus.status== 44||routeStatus== 44)"
                                 @click="distribute(projectsStatus.status,4,timelineItems[0])">Distribute</v-btn>
                             <v-btn color="blue-grey darken-3" v-if="(projectsStatus.status== 44 || routeStatus == 44)"
@@ -191,7 +191,7 @@
         },
         data: () => {
             return {
-
+                Disableapprove:false,
                 active: null,
                 storeView: false,
                 displayName: null,
@@ -1084,7 +1084,7 @@
             // },
             approve() {
                 let self = this;
-
+                self.Disableapprove=true
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
 
@@ -1109,6 +1109,7 @@
                         self.createProjectTransaction(request, latestTransaction => {
                             self.getProjectTransactionsByProjectID(request
                                 .project_ID);
+                               
                         })
                     })
                 })
@@ -1131,7 +1132,7 @@
             implement() {
                 let self = this;
                 let request = JSON.parse(JSON.stringify(self.tmpRequest))
-
+                 self.Disableapprove=true
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
 
@@ -1154,6 +1155,7 @@
                                             self.getProjectTransactionsByProjectID(
                                                 request
                                                 .project_ID);
+                                              
                                         })
                                 })
                             })
