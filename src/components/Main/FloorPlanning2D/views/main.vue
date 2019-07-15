@@ -187,6 +187,7 @@
             return {
                 stageData: {
                     layer: null,
+                    group: null,
                     stageWidth: 1000,
                     stageHeight: 1000,
                     stageConfiguration: {
@@ -201,7 +202,7 @@
             let stage = self.$refs.stage.getStage();
             self.InitialiseStageResponsive();
             self.InitialiseScroll();
-            let floor = new Floor(stage, self.stageData.layer, 50, 50);
+            let floor = new Floor(stage, self.stageData.layer, self.stageData.group, 50, 50);
             floor.Initialise();
             window.addEventListener('resize', self.InitialiseStageResponsive);
         },
@@ -211,10 +212,12 @@
                 let container = document.querySelector('#stage-parent');
                 let stage = self.$refs.stage.getStage();
 
-                self.stageData.layer = new Konva.Layer({
+                self.stageData.layer = new Konva.Layer();
+                stage.add(self.stageData.layer);
+                self.stageData.group = new Konva.Group({
                     draggable: true
                 });
-                stage.add(self.stageData.layer);
+                self.stageData.layer.add(self.stageData.group);
 
                 // now we need to fit stage into parent
                 let containerWidth = container.offsetWidth;
@@ -284,7 +287,7 @@
                 switch (data.toUpperCase()) {
                     case "WALL": {
                         let helper = new DragDropFixtureHelper();
-                        helper.AddWall(stage, self.stageData.layer, data, )
+                        helper.AddWall(stage, self.stageData.layer, self.stageData.group, data)
                     }
                     break;
                 case "LIBRARY": {

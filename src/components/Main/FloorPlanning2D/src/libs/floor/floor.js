@@ -1,8 +1,9 @@
 import Konva from 'konva';
 class Floor {
-    constructor(stage, layer, width, height) {
+    constructor(stage, layer, group, width, height) {
         this.ratio = 10;
         this.Floor = null;
+        this.MasterGroup = group;
         this.stage = stage;
         this.layer = layer;
         this.blockSnapSize = 1 * this.ratio;
@@ -46,7 +47,7 @@ class Floor {
                 strokeWidth: 0.5,
             }));
         }
-        self.layer.add(grid);
+        self.MasterGroup.add(grid);
         self.layer.draw();
     }
 
@@ -68,7 +69,7 @@ class Floor {
             self.stage.container().style.cursor = 'default';
         })
 
-        self.layer.add(self.Floor);
+        self.MasterGroup.add(self.Floor);
         self.layer.draw();
     }
 }

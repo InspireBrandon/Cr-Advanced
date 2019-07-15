@@ -1,7 +1,8 @@
 import Konva from 'konva';
 class Wall {
-    constructor(stage, layer, data, dropPos) {
+    constructor(stage, layer, group, data, dropPos) {
         this.Ratio = 10;
+        this.MasterGroup = group;
         this.stage = stage;
         this.layer = layer;
         this.dropPos = dropPos;
@@ -41,9 +42,8 @@ class Wall {
             // }
         })
         self.Group.add(self.Wall);
-        self.layer.add(self.Group);
+        self.MasterGroup.add(self.Group);
         self.layer.draw();
-        console.log("hi")
     }
 }
 
