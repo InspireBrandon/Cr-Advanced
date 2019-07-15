@@ -9,7 +9,7 @@
                     :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :onGridReady="onGridReady"
                     :groupMultiAutoColumn="true">
                 </ag-grid-vue>
-                <v-dialog v-model="notesDialog" max-width="600px" >
+                <v-dialog v-model="notesDialog" max-width="600px">
                     <v-card>
                         <v-card-title>
                             <v-menu bottom left>
@@ -424,16 +424,18 @@
             setDistributionViewed(item) {
                 let self = this;
 
-                let request = JSON.parse(JSON.stringify(item))
-                let tmpUser = request.systemUserID;
+                self.setCanDistribute(item.systemFileID, () => {
+                    let request = JSON.parse(JSON.stringify(item))
+                    let tmpUser = request.systemUserID;
 
-                self.checkTaskTakeover(request, () => {
-                    request.systemUserID = tmpUser;
-                    request.status = 44;
-                    request.notes = self.findAndReplaceNote(request.notes);
+                    self.checkTaskTakeover(request, () => {
+                        request.systemUserID = tmpUser;
+                        request.status = 44;
+                        request.notes = self.findAndReplaceNote(request.notes);
 
-                    self.createProjectTransaction(request, newItem => {
-                        self.routeToView(newItem)
+                        self.createProjectTransaction(request, newItem => {
+                            self.routeToView(newItem)
+                        })
                     })
                 })
             },
@@ -469,19 +471,34 @@
                     })
                 })
             },
+            setCanDistribute(sp, callback) {
+                let self = this;
+
+                self.$nextTick(() => {
+                    Axios.post(process.env.VUE_APP_API +
+                            `SystemFile/SetDistribute?db=CR-DEVINSPIRE&systemFileID=${sp}&canDistribute=true`
+                        )
+                        .then(r => {
+                            console.log(r.data);
+                            callback();
+                        })
+                })
+            },
             setDistributionInProgress(item) {
                 let self = this;
 
-                let request = JSON.parse(JSON.stringify(item))
-                let tmpUser = request.systemUserID;
+                self.setCanDistribute(item.systemFileID, () => {
+                    let request = JSON.parse(JSON.stringify(item))
+                    let tmpUser = request.systemUserID;
 
-                self.checkTaskTakeover(request, () => {
-                    request.systemUserID = tmpUser;
-                    request.status = 21;
-                    request.notes = self.findAndReplaceNote(request.notes);
+                    self.checkTaskTakeover(request, () => {
+                        request.systemUserID = tmpUser;
+                        request.status = 21;
+                        request.notes = self.findAndReplaceNote(request.notes);
 
-                    self.createProjectTransaction(request, newItem => {
-                        self.routeToView(newItem)
+                        self.createProjectTransaction(request, newItem => {
+                            self.routeToView(newItem)
+                        })
                     })
                 })
             },
@@ -529,7 +546,7 @@
 
                 Axios.post(process.env.VUE_APP_API +
                         `Store_Planogram/Status?store_id=${store_id}&system_file_id=${system_file_id}&new_status=${new_status}`
-                        )
+                    )
                     .then(r => {
                         delete Axios.defaults.headers.common["TenantID"];
                         callback(r.data);
@@ -674,44 +691,52 @@
                 let self = this;
 
                 self.$refs.UserNotesModal.show(modalData => {
-                    let request = JSON.parse(JSON.stringify(item));
-                    let tmpUser = request.systemUserID;
 
-                    self.checkTaskTakeover(request, () => {
-                        request.systemUserID = tmpUser;
+                    self.setCanDistribute(item.systemFileID, () => {
+                        let request = JSON.parse(JSON.stringify(item));
+                        let tmpUser = request.systemUserID;
 
-                        let projectTXGroupRequest = {
-                            projectID: item.project_ID
-                        }
+                        self.checkTaskTakeover(request, () => {
+                            request.systemUserID = tmpUser;
 
-                        request.status = 40;
-                        request.systemUserID = null;
-                        request.actionedByUserID = self.systemUserID;
-                        request.notes = self.findAndReplaceNote(request.notes);
-                        // Create New Process Assigned for complete group
-                        self.createProjectTransaction(request, processEndProjectTX => {
-                            // Create "New Group"
-                            self.createProjectTransactionGroup(projectTXGroupRequest,
-                                newGroupTX => {
-                                    // Create New Process Assigned for "New Group"
-                                    request.systemUserID = modalData.systemUserID;
-                                    request.actionedByUserID = null;
-                                    request.projectTXGroup_ID = newGroupTX.id;
-                                    request.notes = self.findAndReplaceNote(request.notes);
-                                    self.createProjectTransaction(request,
-                                        processStartProjectTX => {
-                                            // Create Requesting Approval process for "New Group"
-                                            request.status = 19;
-                                            request.notes = self.findAndReplaceNote(
-                                                modalData
-                                                .notes);
-                                            self.createProjectTransaction(request,
-                                                approvalTransaction => {
-                                                    self.$parent.$parent
-                                                        .getTaskViewData();
-                                                })
-                                        })
-                                })
+                            let projectTXGroupRequest = {
+                                projectID: item.project_ID
+                            }
+
+                            request.status = 40;
+                            request.systemUserID = null;
+                            request.actionedByUserID = self.systemUserID;
+                            request.notes = self.findAndReplaceNote(request.notes);
+                            // Create New Process Assigned for complete group
+                            self.createProjectTransaction(request, processEndProjectTX => {
+                                // Create "New Group"
+                                self.createProjectTransactionGroup(
+                                    projectTXGroupRequest,
+                                    newGroupTX => {
+                                        // Create New Process Assigned for "New Group"
+                                        request.systemUserID = modalData
+                                            .systemUserID;
+                                        request.actionedByUserID = null;
+                                        request.projectTXGroup_ID = newGroupTX.id;
+                                        request.notes = self.findAndReplaceNote(
+                                            request.notes);
+                                        self.createProjectTransaction(request,
+                                            processStartProjectTX => {
+                                                // Create Requesting Approval process for "New Group"
+                                                request.status = 19;
+                                                request.notes = self
+                                                    .findAndReplaceNote(
+                                                        modalData
+                                                        .notes);
+                                                self.createProjectTransaction(
+                                                    request,
+                                                    approvalTransaction => {
+                                                        self.$parent.$parent
+                                                            .getTaskViewData();
+                                                    })
+                                            })
+                                    })
+                            })
                         })
                     })
                 })

@@ -117,7 +117,13 @@ export default new Router({
       path: '/FloorPlanning',
       name: 'floor_planning',
       component: FloorPlanning
-    }, {
+    },
+    // {
+    //   path: '/FloorPlanning2D',
+    //   name: 'floor_planning_2d',
+    //   component: FloorPlanning2D
+    // }, 
+    {
       path: '/Menu',
       name: 'main',
       component: Main,
