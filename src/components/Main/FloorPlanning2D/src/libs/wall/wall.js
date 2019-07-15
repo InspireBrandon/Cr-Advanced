@@ -34,7 +34,11 @@ class Wall {
             width: self.Width,
             height: self.Height,
             fill:'red',
-            draggable: true
+            draggable: true,
+            // dragBoundFunc: function(pos) {
+            //     let x = 0;
+            //     let y = 0;
+            // }
         })
         self.Group.add(self.Wall);
         self.layer.add(self.Group);

@@ -6,14 +6,13 @@ class DragDropHelper {
 
     AddWall(stage, layer, data, ev) {
         let self = this;
-        // let container = stage.container().getBoundingClientRect();
-        stage.setPointersPositions(ev);
-        let dropPos = self.GetTransformedMousePoint(stage, layer);
+        let dropPos = self.GetTransformedMousePoint(stage, layer, ev);
         let wall = new Wall(stage, layer, data, dropPos);
         wall.Initialise();
     }
 
-    GetTransformedMousePoint(stage, layer) {
+    GetTransformedMousePoint(stage, layer, ev) {
+        stage.setPointersPositions(ev);
         let transform = stage.getAbsoluteTransform().copy();
         // to detect relative position we need to invert transform
         transform.invert();
@@ -23,7 +22,7 @@ class DragDropHelper {
 
         dropPos.x -= layer.x();
         dropPos.y -= layer.y();
-        
+
         return dropPos;
     }
 }
