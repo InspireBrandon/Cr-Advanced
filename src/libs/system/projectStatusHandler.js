@@ -304,6 +304,25 @@ class projectStatusHandler {
                 type: [3],
                 color: "#ff7200",
                 friendly: "Parked"
+            },
+            {
+                text: "Variation in progress",
+                value: 46,
+                type: [3],
+                color: "#ff7200",
+                friendly: "Variation in progress"
+            }, {
+                text: "Variation complete",
+                value: 47,
+                type: [3],
+                color: "#ff7200",
+                friendly: "Variation complete"
+            },{
+                text: "Variation Sent",
+                value: 48,
+                type: [3],
+                color: "#ff7200",
+                friendly: "Variation Sent"
             }
         ]
 

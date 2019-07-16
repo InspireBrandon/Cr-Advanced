@@ -251,7 +251,7 @@
                 self.afterReturn({
                     totalModules: self.modules,
                     height: self.height,
-                    notes: self.additionalNotes,
+                    notes: self.buildString(),
                     stores: self.selectedStores
                 });
             },

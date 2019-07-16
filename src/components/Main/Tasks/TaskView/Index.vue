@@ -570,7 +570,8 @@
                 }
                 break;
                 case 3: {
-                    if (item.status == 1 || item.status == 8 || item.status == 41) {
+                    if (item.status == 1 || item.status == 8 || item.status == 41 || item.status == 46 || item.status ==
+                        47) {
                         route = `/SpacePlanning`
                         self.$router.push(route);
                     } else if (item.status == 21 || item.status == 27) {
@@ -923,6 +924,82 @@
                 })
 
                 return userName;
+            },
+            setVariationComplete(item) {
+                let self = this;
+
+                let newItem = JSON.parse(JSON.stringify(item))
+
+                self.$refs.SpacePlanSelector.show(spacePlanID => {
+                    self.$refs.RangeSelectorModal.show(rangePlanID => {
+
+                        let self = this;
+                        let request = JSON.parse(JSON.stringify(item))
+
+                        let tmpUser = request.systemUserID;
+
+                        self.checkTaskTakeover(request, () => {
+                            request.systemUserID = tmpUser;
+                            request.status = 47;
+                            request.projectTXGroup_ID = item.projectTXGroup_ID
+                            request.systemFileID = spacePlanID;
+                            request.rangeFileID = rangePlanID;
+                            self.createProjectTransaction(request, newItem => {
+                                // self.updateStorePlanogramStatus(request.store_ID, request
+                                //     .systemFileID, 3, sp => {
+                                //         self.routeToView(newItem)
+                                //     })
+                                self.$parent.$parent.getTaskViewData();
+                            })
+                        })
+                    })
+                })
+            },
+            sendVariation(item) {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.post(process.env.VUE_APP_API +
+                    `Variation_Order?projectTXID=${item.id}&systemFileID=${item.systemFileID}`).then(r => {
+ let request = JSON.parse(JSON.stringify(item))
+
+                let tmpUser = request.systemUserID;
+                    self.checkTaskTakeover(request, () => {
+                        request.systemUserID = tmpUser;
+                        request.status = 48;
+
+                        request.projectTXGroup_ID = item.projectTXGroup_ID
+                        self.createProjectTransaction(request, newItem => {
+                            // self.updateStorePlanogramStatus(request.store_ID, request
+                            //     .systemFileID, 3, sp => {
+                            //         self.routeToView(newItem)
+                            //     })
+                            self.$parent.$parent.getTaskViewData();
+
+                        })
+                    })
+                    delete Axios.defaults.headers.common["TenantID"];
+                })
+            },
+            setVariationInProgressandView(item) {
+                let self = this;
+                let request = JSON.parse(JSON.stringify(item))
+
+                let tmpUser = request.systemUserID;
+
+                self.checkTaskTakeover(request, () => {
+                    request.systemUserID = tmpUser;
+                    request.status = 46;
+                    console.log(request.notes);
+
+                    request.projectTXGroup_ID = item.projectTXGroup_ID
+                    self.createProjectTransaction(request, newItem => {
+                        // self.updateStorePlanogramStatus(request.store_ID, request
+                        //     .systemFileID, 3, sp => {
+                        //         self.routeToView(newItem)
+                        //     })
+                        self.routeToView(newItem)
+                    })
+                })
             },
             getUsers(callback) {
                 let self = this
