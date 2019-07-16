@@ -155,7 +155,7 @@
         }
         break;
         case 14: {
-            button_1.set('success', 'visibility', cp.assign, "View")
+            button_1.set('success', 'visibility', cp.setVariationInProgressandView, "View")
         }
         break;
         case 16: {
@@ -271,8 +271,22 @@
         case 45: {
             button_1.set('success', 'visibility', cp.setDistributionViewed, "View")
         }
+        
+        break;
+        case 46: {
+            button_1.set('warning', 'visibility', cp.routeToView, "View")
+            button_2.set('success', 'check', cp.setVariationComplete, "Complete")
+        }
+         break;
+        case 47: {
+              button_1.set('warning', 'visibility', cp.routeToView, "View")
+            button_2.set('primary', 'send', cp.sendVariation, "Send Variation")
+        }
+        
         break;
         }
+          
+        
 
         let retval = {
             button_1,
