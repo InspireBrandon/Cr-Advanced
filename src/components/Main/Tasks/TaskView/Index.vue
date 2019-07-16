@@ -66,7 +66,7 @@
 
     export default {
         name: 'TaskView',
-        props: ['data', 'typeList', 'statusList', 'systemUserID'],
+        props: ['data', 'typeList', 'statusList', 'systemUserID', 'accessType'],
         components: {
             UserSelector,
             AssignTask,

@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-menu left>
-            <v-btn small v-if="params.context.componentParent.userAccess != 3" icon slot="activator">
+            <v-btn small v-if="params.context.componentParent.accessType != 3" icon slot="activator">
                 <v-icon>more_vert</v-icon>
             </v-btn>
             <v-list dense class="pa-0 ma-0">

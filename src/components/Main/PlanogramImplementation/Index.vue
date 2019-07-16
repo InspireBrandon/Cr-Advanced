@@ -58,7 +58,7 @@
                                 v-if="(projectsStatus.status==20||routeStatus==20||routeStatus==21||projectsStatus.status==21||routeStatus==26)"
                                 outline @click="requestVariation">
                                 Variation</v-btn>
-                            <v-btn outline flat v-if="routeStatus == 24" @click="requestStoreVariation">Variation
+                            <v-btn outline flat v-if="routeStatus == 24" @click="requestStoreVariation">Request
                             </v-btn>
                             <v-btn flat v-if="(projectsStatus.status==24||routeStatus==24)" outline
                                 @click="implement(projectsStatus.status,3,timelineItems[0])" :disabled="Disableapprove">Implemented</v-btn>
@@ -1205,8 +1205,8 @@
             },
             requestStoreVariation() {
                 let self = this;
-                self.$refs.notesModal.show('Please describe the variation you request', notes => {
-                    self.requestExisting({
+                self.$refs.notesModal.show('Please describe the request', notes => {
+                    self.requestExistingStore({
                         notes: notes
                     });
                 })
@@ -1255,6 +1255,43 @@
                     self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
                         // Create ON Hold transaction for new projectGroup
                         request.systemUserID = request.projectOwnerID;
+                        request.actionedByUserID = null;
+                        request.projectTXGroup_ID = newGroup.id;
+                        self.createProjectTransaction(request, newOnHold => {
+                            request.status = 14;
+                            request.notes = data.notes;
+                            request.store_ID = data.store;
+                            self.createProjectTransaction(request,
+                                variantRequest => {
+                                    self.getProjectTransactionsByProjectID(
+                                        request
+                                        .project_ID);
+                                })
+                        })
+                    })
+                })
+            },
+            requestExistingStore() { // TEMPORARY RUPERT METHOD
+                let self = this;
+
+                let request = JSON.parse(JSON.stringify(self.tmpRequest))
+
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+
+                let projectTXGroupRequest = {
+                    projectID: request.project_ID
+                }
+
+                request.status = 16;
+                request.systemUserID = null;
+                request.actionedByUserID = systemUserID;
+                // Create On Hold transaction
+                self.createProjectTransaction(request, actionedOnHold => {
+                    // Create new projectGroup
+                    self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
+                        // Create ON Hold transaction for new projectGroup
+                        request.systemUserID = 16;
                         request.actionedByUserID = null;
                         request.projectTXGroup_ID = newGroup.id;
                         self.createProjectTransaction(request, newOnHold => {
