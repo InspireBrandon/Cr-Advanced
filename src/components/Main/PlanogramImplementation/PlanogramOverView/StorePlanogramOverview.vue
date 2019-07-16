@@ -429,6 +429,8 @@
             },
             getStorePlanograms() {
                 let self = this
+                console.log("[REFRESH]");
+                
                 self.$nextTick(() => {
                     self.currentStorePlanograms = [];
 

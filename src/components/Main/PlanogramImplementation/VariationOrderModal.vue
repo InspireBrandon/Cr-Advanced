@@ -248,7 +248,12 @@
 
 
                 self.dialog = false
-                self.afterReturn(text);
+                self.afterReturn({
+                    totalModules: self.modules,
+                    height: self.height,
+                    notes: self.additionalNotes,
+                    stores: self.selectedStores
+                });
             },
         },
         created() {

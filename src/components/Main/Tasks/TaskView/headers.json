@@ -85,6 +85,7 @@
         "editable": false,
         "hide": false,
         "cellRendererFramework": "Options",
-        "width": 80 
+        "width": 80, 
+        "minWidth":30
     }
 ]
