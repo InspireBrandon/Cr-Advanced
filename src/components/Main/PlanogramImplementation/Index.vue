@@ -1271,7 +1271,7 @@
                     })
                 })
             },
-            requestExistingStore() { // TEMPORARY RUPERT METHOD
+            requestExistingStore(data) { // TEMPORARY RUPERT METHOD
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(self.tmpRequest))

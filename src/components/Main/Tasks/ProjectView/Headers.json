@@ -1,22 +1,59 @@
 [
     {
         "headerName": "Project",
-        "field": "planogram",
+        "field": "projectName",
         "editable": false,
-        "hide": false
+        "hide": false,
+        "width": 120
     },
     {
         "headerName": "Data Preparation",
-        "field": "type",
+        "field": "dataPrepStatus",
         "editable": false,
         "hide": false,
-        "cellRendererFramework": "Type"
+        "width": 70
     },
     {
         "headerName": "Action",
         "field": "status",
         "editable": false,
         "hide": false,
-        "cellRendererFramework": "Status"
+        "width": 50,
+        "cellRendererFramework": "Actions"
+    },
+    {
+        "headerName": "Ranging",
+        "field": "rangingStatus",
+        "editable": false,
+        "hide": false,
+        "width": 50
+    },
+    {
+        "headerName": "Action",
+        "field": "status",
+        "editable": false,
+        "hide": false,
+        "width": 50
+    },
+    {
+        "headerName": "Planogram",
+        "field": "planogramName",
+        "editable": false,
+        "hide": false,
+        "width": 400
+    },
+    {
+        "headerName": "Status",
+        "field": "spacePlanStatus",
+        "editable": false,
+        "hide": false,
+        "width": 50
+    },
+    {
+        "headerName": "Action",
+        "field": "status",
+        "editable": false,
+        "hide": false,
+        "width": 50
     }
 ]

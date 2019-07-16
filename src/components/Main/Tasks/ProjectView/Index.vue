@@ -1,17 +1,15 @@
 <template>
-    <v-container grid-list-md fluid>
-        <v-layout row wrap>
-            <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 180px);"
-                :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
-                :selectionChanged="onSelectionChanged" :rowData="data" :enableSorting="true" :enableFilter="true"
-                :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
-                :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :onGridReady="onGridReady"
-                :groupMultiAutoColumn="true">
-            </ag-grid-vue>
-        </v-layout>
+    <div>
+        <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 180px);"
+            :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
+            :selectionChanged="onSelectionChanged" :rowData="data" :enableSorting="true" :enableFilter="true"
+            :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
+            :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :onGridReady="onGridReady"
+            :groupMultiAutoColumn="true">
+        </ag-grid-vue>
         <AssignTask ref="assignTask" />
         <SubtaskModal ref="SubtaskModal" />
-    </v-container>
+    </div>
 </template>
 
 <script>
@@ -28,6 +26,7 @@
     } from "ag-grid-vue";
     import Type from "./GridComponents/Type.vue";
     import Status from "./GridComponents/Status.vue";
+    import Actions from "./GridComponents/Actions.vue";
     import AssignTask from '@/components/Common/AssignTask'
     import SubtaskModal from './../Subtask.vue'
 
@@ -39,7 +38,8 @@
             SubtaskModal,
             AgGridVue,
             Status,
-            Type
+            Type,
+            Actions
         },
         data() {
             return {

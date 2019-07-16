@@ -53,7 +53,7 @@
                         </v-btn>
                         <v-spacer></v-spacer>
 
-                        <v-btn v-if="userAccess == 3" @click="$refs.guide.click()" flat dark>Guide</v-btn>
+                        <v-btn v-if="userAccess == 3" @click="$refs.guide.click()" flat dark>Help</v-btn>
                         <a style="display: none;" ref="guide" download href="guides/CR TRAINING GUIDE 1.pdf">guide</a>
 
                         <v-menu offset-y>
@@ -533,9 +533,10 @@
                         value: null
                     })
 
+                    self.projectViewData = r.data.takeoverViewList;
+
                     Axios.get(process.env.VUE_APP_API + `GetLastTransactions`).then(res => {
 
-                        self.projectViewData = res.data.projectTXList;
                         if (self.userAccess == 2) {
                             self.filterOutSupplierPlanograms(() => {
                                 self.projectViewData.forEach(e => {
