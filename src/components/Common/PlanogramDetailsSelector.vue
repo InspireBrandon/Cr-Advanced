@@ -31,6 +31,7 @@
             </v-list-tile>
           </v-list>
         </v-card-text>
+        <v-card-text v-if="spaceData.length == 0">No space plans distributed</v-card-text>
         <v-spacer></v-spacer>
         <v-card-actions>
 
@@ -146,8 +147,6 @@
         Axios.get(process.env.VUE_APP_API + "/Planogram_Details")
           .then(r => {
 
-            console.log(r)
-
             self.spaceData = []
             if (self.doCheck == true) {
               r.data.planogram_DetailsList.forEach(element => {
@@ -159,7 +158,8 @@
                 })
               });
               self.spaceData.sort((a, b) => (a.count < b.count) ? 1 : -1)
-              self.bestFit = self.spaceData[0].count
+              if(self.spaceData.length > 0)
+                self.bestFit = self.spaceData[0].count
             } else {
               self.spaceData = r.data.planogram_DetailsList
             }

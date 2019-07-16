@@ -1,0 +1,22 @@
+[
+    {
+        "headerName": "Project",
+        "field": "planogram",
+        "editable": false,
+        "hide": false
+    },
+    {
+        "headerName": "Data Preparation",
+        "field": "type",
+        "editable": false,
+        "hide": false,
+        "cellRendererFramework": "Type"
+    },
+    {
+        "headerName": "Action",
+        "field": "status",
+        "editable": false,
+        "hide": false,
+        "cellRendererFramework": "Status"
+    }
+]

@@ -164,7 +164,7 @@
 
     // Components
     import TaskView from "./TaskView/Index.vue"
-    import ProjectView from "./ProjectView.vue"
+    import ProjectView from "./ProjectView/Index.vue"
     import StoreView from "./StoreView/StorePlanograms.vue"
     import SplashLoader from "@/components/Common/SplashLoader.vue"
     import ProjectShare from "./ProjectShare.vue"
@@ -524,7 +524,7 @@
 
                 self.projectViewData = [];
 
-                Axios.get(process.env.VUE_APP_API + `Project`).then(r => {
+                Axios.get(process.env.VUE_APP_API + `ProjectTX/TakeoverView`).then(r => {
                     filterList.push({
                         text: "All",
                         value: null
@@ -560,7 +560,7 @@
                             self.filterList = filterList
                             self.$refs.SplashLoader.close()
                         }
-                        console.log(self.projectViewData);
+                        console.log("Switcher", self.projectViewData);
 
                     })
                 })

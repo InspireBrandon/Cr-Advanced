@@ -90,6 +90,7 @@ import ProductListing from '@/components/Apps/RangePlanning/ProductListing/Index
 
 // Floor Planning
 import FloorPlanning from '@/components/Main/FloorPlanning/index.vue'
+import FloorPlanning2D from '@/components/Main/FloorPlanning2D/views/main.vue'
 
 import Fixture_Type from '@/components/Main/Fixture_Type/Fixture_Type.vue'
 import FileStatus from '@/components/Main/FileStatus'
@@ -117,7 +118,13 @@ export default new Router({
       path: '/FloorPlanning',
       name: 'floor_planning',
       component: FloorPlanning
-    }, {
+    },
+    {
+      path: '/FloorPlanning2D',
+      name: 'floor_planning_2d',
+      component: FloorPlanning2D
+    }, 
+    {
       path: '/Menu',
       name: 'main',
       component: Main,
