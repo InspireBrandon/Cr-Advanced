@@ -410,6 +410,7 @@
                                 listItem.fits = fits
                                 listItem.planogramStoreStatus = 1
                                 listItem.systemFileID = data.systemFileID
+                                listItem.rangeID = data.rangeID
                                 node.setData(listItem)
                                 delete Axios.defaults.headers.common["TenantID"];
                             }).catch(e => {

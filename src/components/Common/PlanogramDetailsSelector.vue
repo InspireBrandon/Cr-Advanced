@@ -120,9 +120,12 @@
         if (listitem.planogramName == null) {
           listitem.planogramName = ""
         }
-        if (self.planogram_ID== listitem.planogramID) {
+
+        if (self.planogram_ID == listitem.planogramID) {
           canAdd.add = true
         }
+
+        console.log(self.planogram_ID, listitem.planogramID)
 
         if (item.modules >= listitem.modules) {
           canAdd.count++
