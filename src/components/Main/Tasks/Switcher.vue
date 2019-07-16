@@ -53,6 +53,9 @@
                         </v-btn>
                         <v-spacer></v-spacer>
 
+                        <v-btn v-if="userAccess == 3" @click="$refs.guide.click()" flat dark>Guide</v-btn>
+                        <a style="display: none;" ref="guide" download href="guides/CR TRAINING GUIDE 1.pdf">guide</a>
+
                         <v-menu offset-y>
                             <template v-slot:activator="{ on }">
                                 <v-btn flat dark v-on="on">Hide</v-btn>
@@ -113,7 +116,7 @@
                         <v-layout row wrap class="pa-0">
                             <v-flex :class="{ 'md10 sm6 xs6': showNotices, 'md12 sm12 xs12': !showNotices }"
                                 v-if="selectedView==0">
-                                <TaskView :data="filteredData" :typeList="typeList" :statusList="statusList"
+                                <TaskView :accessType="userAccess" :data="filteredData" :typeList="typeList" :statusList="statusList"
                                     :systemUserID="selectedUser" />
                             </v-flex>
                             <v-flex v-if="selectedView==0 && showNotices"
