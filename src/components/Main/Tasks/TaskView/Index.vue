@@ -574,8 +574,10 @@
                         route = `/SpacePlanning`
                         self.$router.push(route);
                     } else if (item.status == 21 || item.status == 27) {
-                        route = `/PlanogramDistribution/${item.project_ID}/${item.project_Group_ID}`
-                        self.$router.push(route);
+                        self.setCanDistribute(item.systemFileID, () => {
+                            route = `/PlanogramDistribution/${item.project_ID}/${item.project_Group_ID}`
+                            self.$router.push(route);
+                        })
                     } else {
                         self.checkFileStatus(item.systemFileID, data => {
                             route =

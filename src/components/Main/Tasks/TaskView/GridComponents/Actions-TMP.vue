@@ -155,7 +155,7 @@
         }
         break;
         case 14: {
-            button_1.set('secondary', 'assign', cp.assign, "Assign")
+            button_1.set('success', 'visibility', cp.assign, "View")
         }
         break;
         case 16: {
