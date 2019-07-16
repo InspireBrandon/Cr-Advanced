@@ -32,6 +32,9 @@
     import {
         stat
     } from 'fs';
+    import {
+        request
+    } from 'http';
     export default {
         props: ["rowData", "selectedProject", "getRowData", "assign"],
         components: {
@@ -99,8 +102,8 @@
                         "field": "cluster",
                         "minWidth": 75,
                         cellClassRules: {
-                            'success-green': 'data.storeClusterFit == false && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                            'error-red': 'data.storeClusterFit == true && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                            'success-green': 'data.storeClusterFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                            'error-red': 'data.storeClusterFit == true && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
                         }
                     }, {
                         "headerName": "Category Cluster",
@@ -112,8 +115,8 @@
                         "editable": true,
                         "field": "modules",
                         cellClassRules: {
-                            'success-green': 'data.modulesFit == false && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                            'error-red': 'data.modulesFit == true && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                            'success-green': 'data.modulesFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                            'error-red': 'data.modulesFit == true && ( data.planogramStoreStatus!=5 && data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
                         }
 
                     }, {
@@ -123,8 +126,8 @@
                         "editable": true,
                         "field": "height",
                         cellClassRules: {
-                            'success-green': 'data.heightFit == false && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                            'error-red': 'data.heightFit == true && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                            'success-green': 'data.heightFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                            'error-red': 'data.heightFit == true && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
                         }
                     }, {
                         "headerName": "Audit",
@@ -160,7 +163,11 @@
             },
             createProjectTransaction(request, callback) {
                 let self = this;
-                console.log(request);
+                let tmp = {
+                    request
+                }
+                console.log("tmp");
+                console.log(tmp);
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
@@ -182,6 +189,23 @@
                     callback(r.data.projectList[0])
                 }).catch(e => {
                     alert("Failed to get project owner: " + e)
+                })
+            },
+            createVariationRequest(variation_Order, order_Detail, variation_Order_Store_Links, stores, callback) {
+                let self = this
+
+                let request = {
+                    Variation_Order: variation_Order,
+                    Variaton_Order_Detail: order_Detail,
+                    Variaton_Order_Store_Link: variation_Order_Store_Links,
+                    Stores: stores
+                }
+                console.log(request);
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.post(process.env.VUE_APP_API + 'Variation_Order', request).then(r => {
+                    console.log(r);
+                    callback()
+                    delete Axios.defaults.headers.common["TenantID"];
                 })
             },
             openOrder(data, type, title) {
@@ -219,7 +243,7 @@
                                         "type": 3,
                                         "storeCluster_ID": item.clusterID,
                                         "store_ID": storeID,
-                                        "notes": notes,
+                                        "notes": VariationCB.notes,
                                         "status": 14,
                                         "systemUserID": owner,
                                         "planogram_ID": item.planogramID,
@@ -227,7 +251,45 @@
                                         "rangeFileID": item.rangeID,
                                     }
                                     self.createProjectTransaction(TXrequest, txCallback => {
+                                        console.log("txCallback");
+                                        console.log(txCallback);
 
+                                        let variation_Order = {
+                                            Planogram_Detail_ID: item
+                                                .planogramDetail_ID,
+                                            Project_TX_ID: txCallback.id,
+                                            DateRequested: new Date(),
+                                            Status: 0,
+                                        }
+                                        let order_Detail = {
+                                            Height: VariationCB.height,
+                                            Modules: VariationCB.totalModules,
+                                            Notes: VariationCB.notes,
+                                        }
+                                        if (type == 0) {
+                                            let variation_Order_Store_Links = [{
+                                                Store_Planogram_ID: item.id
+
+                                            }]
+                                            self.createVariationRequest(
+                                                variation_Order,
+                                                order_Detail,
+                                                variation_Order_Store_Links,
+                                                null,
+                                                callback => {
+                                                    self.getRowData()
+                                                })
+                                        } else {
+                                            let stores = VariationCB.stores
+                                            self.createVariationRequest(
+                                                variation_Order,
+                                                order_Detail,
+                                                null,
+                                                stores,
+                                                callback => {
+                                                    self.getRowData()
+                                                })
+                                        }
                                     })
                                 })
                                 delete Axios.defaults.headers.common["TenantID"];
