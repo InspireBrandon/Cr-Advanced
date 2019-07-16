@@ -282,6 +282,10 @@
               button_1.set('warning', 'visibility', cp.routeToView, "View")
             button_2.set('primary', 'send', cp.sendVariation, "Send Variation")
         }
+         case 48: {
+            button_1.set('error', 'close', cp.closeTask, "Close")
+        }
+        break;
         
         break;
         }
