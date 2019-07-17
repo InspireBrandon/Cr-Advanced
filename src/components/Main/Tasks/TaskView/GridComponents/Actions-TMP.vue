@@ -128,19 +128,25 @@
             }
         }
         break;
-        case 3: {}
-        break;
-        case 4: {}
-        break;
-        case 5: {}
-        break;
+        // case 3: {
+
+        // }
+        // break;
+        // case 4: {
+
+        // }
+        // break;
+        // case 5: {
+
+        // }
+        // break;
         case 6: {
             button_1.set('success', 'visibility', cp.setInProgressAndView, "View")
         }
         break;
         case 7: {
             button_1.set('success', 'visibility', cp.setInProgressAndView, "View")
-        }
+        }break;
         case 8: {
             button_1.set('success', 'visibility', cp.setInProgressAndView, "View")
         }
@@ -292,14 +298,12 @@
             button_1.set('warning', 'visibility', cp.routeToView, "View")
             button_2.set('primary', 'send', cp.sendVariation, "Send Variation")
         }
+        break;
         case 48: {
             button_1.set('error', 'close', cp.closeTask, "Close")
         }
         break;
-        break;
         }
-
-
 
         let retval = {
             button_1,

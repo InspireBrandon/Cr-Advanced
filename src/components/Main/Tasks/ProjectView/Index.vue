@@ -1,6 +1,6 @@
 <template>
     <div>
-        <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 180px);"
+        <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 158px);"
             :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
             :selectionChanged="onSelectionChanged" :rowData="data" :enableSorting="true" :enableFilter="true"
             :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"

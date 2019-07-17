@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-toolbar dark color="primary" app clipped-left>
+        <v-toolbar flat dark color="primary" app clipped-left>
             <v-btn icon @click="$router.push('/Apps')">
                 <v-icon>home</v-icon>
             </v-btn>

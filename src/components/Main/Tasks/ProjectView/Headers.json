@@ -4,14 +4,15 @@
         "field": "projectName",
         "editable": false,
         "hide": false,
-        "width": 120
+        "width": 200,
+        "filter": "agTextColumnFilter"
     },
     {
         "headerName": "Data Preparation",
         "field": "dataPrepStatus",
         "editable": false,
         "hide": false,
-        "width": 70,
+        "width": 100,
         "cellRendererFramework": "Status"
     },
     {
@@ -19,7 +20,7 @@
         "field": "status",
         "editable": false,
         "hide": false,
-        "width": 50,
+        "width": 80,
         "cellRendererFramework": "Actions"
     },
     {
@@ -27,7 +28,7 @@
         "field": "rangingStatus",
         "editable": false,
         "hide": false,
-        "width": 50,
+        "width": 100,
         "cellRendererFramework": "Status"
     },
     {
@@ -35,7 +36,8 @@
         "field": "status",
         "editable": false,
         "hide": false,
-        "width": 50
+        "width": 80,
+        "cellRendererFramework": "Actions"
     },
     {
         "headerName": "Planogram",
@@ -49,7 +51,7 @@
         "field": "spacePlanStatus",
         "editable": false,
         "hide": false,
-        "width": 50,
+        "width": 100,
         "cellRendererFramework": "Status"
     },
     {
@@ -57,6 +59,7 @@
         "field": "status",
         "editable": false,
         "hide": false,
-        "width": 50
+        "width": 80,
+        "cellRendererFramework": "Actions"
     }
 ]
