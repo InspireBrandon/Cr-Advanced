@@ -16,7 +16,7 @@
             </template>
             <span>{{ button.button_2.tooltip }}</span>
         </v-tooltip>
-         <v-tooltip bottom v-if="button.button_3.show">
+        <v-tooltip bottom v-if="button.button_3.show">
             <template v-slot:activator="{ on }">
                 <v-btn @click="button.button_3.click(params.data)" flat icon small>
                     <v-icon :color="button.button_3.color" v-on="on">{{ button.button_3.icon }}</v-icon>
@@ -53,8 +53,8 @@
     function handle_button(item, cp, self) {
         let button_1 = new buttonItem();
         let button_2 = new buttonItem();
-         let button_3 = new buttonItem();
-         
+        let button_3 = new buttonItem();
+
 
         switch (item.status) {
             case 0: {
@@ -271,31 +271,31 @@
         case 45: {
             button_1.set('success', 'visibility', cp.setDistributionViewed, "View")
         }
-        
+
         break;
         case 46: {
             button_1.set('warning', 'visibility', cp.routeToView, "View")
             button_2.set('success', 'check', cp.setVariationComplete, "Complete")
         }
-         break;
+        break;
         case 47: {
-              button_1.set('warning', 'visibility', cp.routeToView, "View")
+            button_1.set('warning', 'visibility', cp.routeToView, "View")
             button_2.set('primary', 'send', cp.sendVariation, "Send Variation")
         }
-         case 48: {
+        case 48: {
             button_1.set('error', 'close', cp.closeTask, "Close")
         }
         break;
-        
+
         break;
         }
-          
-        
+
+
 
         let retval = {
             button_1,
             button_2,
-               button_3
+            button_3
         }
 
         return retval;
