@@ -351,6 +351,7 @@
                                 listItem.detailHeight = data.height
                                 listItem.detailModules = data.modules
                                 listItem.systemFileID = data.systemFileID
+                                listItem.rangeID = data.rangeID
                                 node.setData(listItem)
 
                                 self.index = idx
@@ -410,6 +411,7 @@
                                 listItem.planogramFit = false
                                 listItem.fits = false
                                 listItem.systemFileID = 0
+                                listItem.rangeID = 0
                                 listItem.planogramStoreStatus = 0
                                 listItem.currentStatusText = "Unassigned"
                                 node.setData(listItem)
