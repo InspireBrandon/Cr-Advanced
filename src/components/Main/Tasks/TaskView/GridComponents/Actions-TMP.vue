@@ -16,13 +16,21 @@
             </template>
             <span>{{ button.button_2.tooltip }}</span>
         </v-tooltip>
-         <v-tooltip bottom v-if="button.button_3.show">
+        <v-tooltip bottom v-if="button.button_3.show">
             <template v-slot:activator="{ on }">
                 <v-btn @click="button.button_3.click(params.data)" flat icon small>
                     <v-icon :color="button.button_3.color" v-on="on">{{ button.button_3.icon }}</v-icon>
                 </v-btn>
             </template>
             <span>{{ button.button_3.tooltip }}</span>
+        </v-tooltip>
+        <v-tooltip bottom v-if="button.button_4.show">
+            <template v-slot:activator="{ on }">
+                <v-btn @click="button.button_4.click(params.data)" flat icon small>
+                    <v-icon :color="button.button_4.color" v-on="on">{{ button.button_4.icon }}</v-icon>
+                </v-btn>
+            </template>
+            <span>{{ button.button_4.tooltip }}</span>
         </v-tooltip>
     </div>
 </template>
@@ -53,8 +61,9 @@
     function handle_button(item, cp, self) {
         let button_1 = new buttonItem();
         let button_2 = new buttonItem();
-         let button_3 = new buttonItem();
-         
+        let button_3 = new buttonItem();
+        let button_4 = new buttonItem();
+
 
         switch (item.status) {
             case 0: {
@@ -179,9 +188,10 @@
         }
         break;
         case 21: {
-            button_1.set('warning', 'visibility', cp.routeToView, "View")
-            button_2.set('success', 'settings_backup_restore', cp.recall, "Recall")
-            button_3.set('error', 'local_parking', cp.setParked, "Park")
+            button_1.set('warning', 'visibility', cp.routeToImplementation, "View")
+            button_2.set('primary', 'send', cp.routeToView, "Distribute")
+            button_3.set('success', 'settings_backup_restore', cp.recall, "Recall")
+            button_4.set('error', 'local_parking', cp.setParked, "Park")
         }
         break;
         case 24: {
@@ -263,39 +273,37 @@
         }
         break;
         case 44: {
-            button_1.set('warning', 'visibility', cp.routeToView, "View") //implementation
-            button_2.set('success', 'visibility', cp.setDistributionInProgress, "Distribute")
+            button_1.set('success', 'visibility', cp.routeToView, "View") //implementation
+            button_2.set('primary', 'send', cp.setDistributionInProgress, "Distribute")
             button_3.set('error', 'local_parking', cp.setParked, "Park")
         }
         break;
         case 45: {
             button_1.set('success', 'visibility', cp.setDistributionViewed, "View")
         }
-        
+
         break;
         case 46: {
             button_1.set('warning', 'visibility', cp.routeToView, "View")
             button_2.set('success', 'check', cp.setVariationComplete, "Complete")
         }
-         break;
+        break;
         case 47: {
-              button_1.set('warning', 'visibility', cp.routeToView, "View")
+            button_1.set('warning', 'visibility', cp.routeToView, "View")
             button_2.set('primary', 'send', cp.sendVariation, "Send Variation")
         }
-         case 48: {
+        case 48: {
             button_1.set('error', 'close', cp.closeTask, "Close")
         }
         break;
-        
         break;
         }
-          
-        
 
         let retval = {
             button_1,
             button_2,
-               button_3
+            button_3,
+            button_4
         }
 
         return retval;

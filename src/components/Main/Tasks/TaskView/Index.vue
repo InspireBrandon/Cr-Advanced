@@ -602,6 +602,10 @@
                 break;
                 }
             },
+            routeToImplementation(item) {
+                let self = this;
+                self.$router.push(`/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`)
+            },
             setComplete(item) {
                 let self = this;
                 let request = JSON.parse(JSON.stringify(item));

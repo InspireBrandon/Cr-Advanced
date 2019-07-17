@@ -1,6 +1,6 @@
 <template>
     <div>
-        {{ params.context.componentParent.statusList[params.data.status == -1 ? 18 : params.data.status].text }}
+        {{ params.context.componentParent.statusList[params.data[params.colDef.field] == -1 ? 18 : params.data[params.colDef.field]].text }}
     </div>
 </template>
 
