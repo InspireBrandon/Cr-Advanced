@@ -29,7 +29,7 @@
         "editable": false,
         "hide": false,
         "width": 80,
-        "cellRendererFramework": "Actions"
+        "cellRendererFramework": "DataPrepAction"
     },
     {
         "headerName": "Ranging",
@@ -45,7 +45,7 @@
         "editable": false,
         "hide": false,
         "width": 80,
-        "cellRendererFramework": "Actions"
+        "cellRendererFramework": "RangeAction"
     },
     {
         "headerName": "Planogram",
@@ -68,7 +68,7 @@
         "editable": false,
         "hide": false,
         "width": 80,
-        "cellRendererFramework": "Actions"
+        "cellRendererFramework": "PlanogramAction"
     },
     {
         "headerName": "Store Count",
