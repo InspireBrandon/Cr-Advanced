@@ -198,6 +198,8 @@
     function productReportItem(item, allItems) {
         let self = this;
 
+        console.log(item, allItems)
+
         self.id = item.Data.Data.id;
         self.name = item.Data.Data.description;
         self.product_Code = item.Data.Data.product_System_ID;

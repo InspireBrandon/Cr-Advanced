@@ -53,14 +53,12 @@
                     onCellValueChanged: this.onCellValueChanged
                 },
                 gridOptions: {
+                    groupMultiAutoColumn : true,
                     rowHeight: 35,
                     pinnedTopRowData: [],
                     pinnedBottomRowData: [],
                     context: {
                         componentParent: this
-                    },
-                    rowClassRules: {
-                        'disabled-line': 'data.can_edit'
                     },
                     suppressRowTransform: true
                 },

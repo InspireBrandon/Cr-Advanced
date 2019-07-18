@@ -55,7 +55,7 @@ class LoadSavePlanogramBase {
 
     allProducts.forEach(ap => {
       output.planogramData.forEach(pdi => {
-        if (ap.Barcode == pdi.Data.Barcode) {
+        if (ap.Data.barcode == pdi.Data.Data.barcode) {
           let calcData = calculate(ap, vuex);
           pdi.Data["CalcData"] = calcData;
         }
@@ -285,7 +285,7 @@ class LoadSavePlanogramBase {
 
     allProducts.forEach(ap => {
       output.planogramData.forEach(pdi => {
-        if (ap.Barcode == pdi.Data.Barcode) {
+        if (ap.Data.barcode == pdi.Data.Data.barcode) {
           let calcData = calculate(ap, vuex);
           pdi.Data["CalcData"] = calcData;
         }

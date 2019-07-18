@@ -93,9 +93,6 @@
                     rowHeight: 35,
                     context: {
                         componentParent: this
-                    },
-                    rowClassRules: {
-                        'audit-image-breach': 'data.imageAudit'
                     }
                 },
                 notesDialog: false,

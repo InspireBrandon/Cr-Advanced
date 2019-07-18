@@ -1,9 +1,9 @@
 <template>
-    <div>
+    <div v-if="params.data != undefined">
         <!-- <v-btn color="success" icon flat small>
             <v-icon>play_arrow</v-icon>
         </v-btn> -->
-        <div class="btn_grid start">
+        <div @click="$router.push('/DataPreparation')" class="btn_grid start">
             <div class="btn_text">Start</div>
         </div>
     </div>
@@ -22,12 +22,21 @@
         color: white;
     }
 
+    .link {
+        background: #fff;
+        border: 1px solid blue;
+        color: blue;
+    }
+
     .btn_grid {
         height: 20px;
         border-radius: 3px;
-        margin-top: 8px;
+        margin-top: 5px;
         text-align: center;
         font-size: 18px;
+        width: 80px;
+        font-weight: 600;
+        margin: 8px 3px;
     }
 
     .start:hover {
