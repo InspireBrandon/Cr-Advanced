@@ -2,7 +2,7 @@
     <div v-if="systemUserID != undefined && systemUserID != null" style="display: flex;">
         <v-tooltip bottom v-if="button.button_1.show">
             <template v-slot:activator="{ on }">
-                <v-btn @click="button.button_1.click(params.data)" flat icon small>
+                <v-btn :disabled="button.button_1.disabled" @click="button.button_1.click(params.data),button.button_1.disabled=true" flat icon small>
                     <v-icon :color="button.button_1.color" v-on="on">{{ button.button_1.icon }}</v-icon>
                 </v-btn>
             </template>
@@ -10,7 +10,7 @@
         </v-tooltip>
         <v-tooltip bottom v-if="button.button_2.show">
             <template v-slot:activator="{ on }">
-                <v-btn @click="button.button_2.click(params.data)" flat icon small>
+                <v-btn :disabled="button.button_2.disabled" @click="button.button_2.click(params.data),button.button_2.disabled=true" flat icon small>
                     <v-icon :color="button.button_2.color" v-on="on">{{ button.button_2.icon }}</v-icon>
                 </v-btn>
             </template>
@@ -18,7 +18,7 @@
         </v-tooltip>
         <v-tooltip bottom v-if="button.button_3.show">
             <template v-slot:activator="{ on }">
-                <v-btn @click="button.button_3.click(params.data)" flat icon small>
+                <v-btn :disabled="button.button_3.disabled" @click="button.button_3.click(params.data),button.button_3.disabled=true" flat icon small>
                     <v-icon :color="button.button_3.color" v-on="on">{{ button.button_3.icon }}</v-icon>
                 </v-btn>
             </template>
@@ -26,7 +26,7 @@
         </v-tooltip>
         <v-tooltip bottom v-if="button.button_4.show">
             <template v-slot:activator="{ on }">
-                <v-btn @click="button.button_4.click(params.data)" flat icon small>
+                <v-btn :disabled="button.button_4.disabled" @click="button.button_4.click(params.data),button.button_4.disabled=true" flat icon small>
                     <v-icon :color="button.button_4.color" v-on="on">{{ button.button_4.icon }}</v-icon>
                 </v-btn>
             </template>
@@ -322,6 +322,7 @@
         self.icon = null;
         self.click = null;
         self.tooltip = null;
+        self.disabled = false;
 
         this.set = function (color, icon, click, tooltip) {
             self.show = true;
