@@ -85,127 +85,128 @@
                     <v-icon>add</v-icon>
                 </v-btn>
             </v-toolbar>
-
-            <v-data-table v-if="project!=null" :headers="headers" :items="ProjectTXs" hide-actions>
-                <template v-slot:items="props">
-                    <td>
-                        <v-checkbox hide-details v-model="selectedDelete" :value="props.item.id"></v-checkbox>
-                    </td>
-                    <td>
-                        <!-- {{ props.item.dateTimeString }} -->
-                        <v-edit-dialog :return-value.sync="props.item.type" large lazy persistent
-                            @save="saveLine(props.item,0)" @cancel="''" @open="''" @close="''">
-                            <div>{{ props.item.dateTimeString }}</div>
-                            <template v-slot:input>
-                                <div class="mt-3 title">Update Iron</div>
-                            </template>
-                            <template v-slot:input>
-                                <v-menu ref="menu" :close-on-content-click="false" lazy transition="scale-transition"
-                                    offset-y full-width min-width="290px">
-                                    <template v-slot:activator="{ on }">
-                                        <v-text-field v-model="props.item.dateTimeString" label="please select a date"
-                                            prepend-icon="event" readonly v-on="on"></v-text-field>
-                                    </template>
-                                    <v-date-picker v-model="props.item.dateTimeString" no-title scrollable>
-                                        <!-- <v-spacer></v-spacer>
+            <div style="overflow-x: auto; height: calc(100vh - 130px)">
+                <v-data-table v-if="project!=null" :headers="headers" :items="ProjectTXs" hide-actions>
+                    <template v-slot:items="props">
+                        <td>
+                            <v-checkbox hide-details v-model="selectedDelete" :value="props.item.id"></v-checkbox>
+                        </td>
+                        <td>
+                            <!-- {{ props.item.dateTimeString }} -->
+                            <v-edit-dialog :return-value.sync="props.item.type" large lazy persistent
+                                @save="saveLine(props.item,0)" @cancel="''" @open="''" @close="''">
+                                <div>{{ props.item.dateTimeString }}</div>
+                                <template v-slot:input>
+                                    <div class="mt-3 title">Update Iron</div>
+                                </template>
+                                <template v-slot:input>
+                                    <v-menu ref="menu" :close-on-content-click="false" lazy
+                                        transition="scale-transition" offset-y full-width min-width="290px">
+                                        <template v-slot:activator="{ on }">
+                                            <v-text-field v-model="props.item.dateTimeString"
+                                                label="please select a date" prepend-icon="event" readonly v-on="on">
+                                            </v-text-field>
+                                        </template>
+                                        <v-date-picker v-model="props.item.dateTimeString" no-title scrollable>
+                                            <!-- <v-spacer></v-spacer>
                                         <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
                                         <v-btn flat color="primary" @click="$refs.menu.save()">OK</v-btn> -->
-                                    </v-date-picker>
-                                    <!-- <v-time-picker v-model="timePicker"></v-time-picker> -->
-                                </v-menu>
-                            </template>
-                        </v-edit-dialog>
-                    </td>
-                    <td>
-                        <v-edit-dialog :return-value.sync="props.item.type" large lazy persistent
-                            @save="saveLine(props.item)" @cancel="''" @open="''" @close="''">
-                            <div>
-                                {{typeList[props.item.type == -1 ?  5 :  props.item.type].text}}
+                                        </v-date-picker>
+                                        <!-- <v-time-picker v-model="timePicker"></v-time-picker> -->
+                                    </v-menu>
+                                </template>
+                            </v-edit-dialog>
+                        </td>
+                        <td>
+                            <v-edit-dialog :return-value.sync="props.item.type" large lazy persistent
+                                @save="saveLine(props.item)" @cancel="''" @open="''" @close="''">
+                                <div>
+                                    {{typeList[props.item.type == -1 ?  5 :  props.item.type].text}}
 
-                            </div>
-                            <template v-slot:input>
-                                <div class="mt-3 title">Update Iron</div>
-                            </template>
-                            <template v-slot:input>
-                                <v-select v-model="props.item.type" :items="typeList2" label="Edit" single-line counter
-                                    autofocus></v-select>
-                            </template>
-                        </v-edit-dialog>
-                    </td>
-                    <td>
+                                </div>
+                                <template v-slot:input>
+                                    <div class="mt-3 title">Update Iron</div>
+                                </template>
+                                <template v-slot:input>
+                                    <v-select v-model="props.item.type" :items="typeList2" label="Edit" single-line
+                                        counter autofocus></v-select>
+                                </template>
+                            </v-edit-dialog>
+                        </td>
+                        <td>
 
-                        <v-edit-dialog :return-value.sync="props.item.status" large lazy persistent
-                            @save="saveLine(props.item)" @cancel="''" @open="''" @close="''">
-                            <div>
-                                <v-icon :color="getColor(props.item.type, props.item.status)">
-                                    fiber_manual_record</v-icon>
-                                {{status[props.item.status].friendly }}
-                            </div>
-                            <template v-slot:input>
-                                <div class="mt-3 title">Update Iron</div>
-                            </template>
-                            <template v-slot:input>
-                                <v-select v-model="props.item.status" :items="status" label="Edit" single-line counter
-                                    autofocus></v-select>
-                            </template>
-                        </v-edit-dialog>
-                    </td>
+                            <v-edit-dialog :return-value.sync="props.item.status" large lazy persistent
+                                @save="saveLine(props.item)" @cancel="''" @open="''" @close="''">
+                                <div>
+                                    <v-icon :color="getColor(props.item.type, props.item.status)">
+                                        fiber_manual_record</v-icon>
+                                    {{status[props.item.status].friendly }}
+                                </div>
+                                <template v-slot:input>
+                                    <div class="mt-3 title">Update Iron</div>
+                                </template>
+                                <template v-slot:input>
+                                    <v-select v-model="props.item.status" :items="status" label="Edit" single-line
+                                        counter autofocus></v-select>
+                                </template>
+                            </v-edit-dialog>
+                        </td>
 
-                    <td>
-                        <!-- {{ props.item.store}} -->
-                        <v-edit-dialog large lazy persistent @save="saveLine(props.item,3)" @cancel="''" @open="''"
-                            @close="''">
-                            <div>{{ props.item.store}}</div>
-                            <template v-slot:input>
-                                <div class="mt-3 title">Update Iron</div>
-                            </template>
-                            <template v-slot:input>
-                                <v-select v-model="props.item.store" :items="stores" label="Edit" single-line counter
-                                    autofocus></v-select>
-                            </template>
-                        </v-edit-dialog>
+                        <td>
+                            <!-- {{ props.item.store}} -->
+                            <v-edit-dialog large lazy persistent @save="saveLine(props.item,3)" @cancel="''" @open="''"
+                                @close="''">
+                                <div>{{ props.item.store}}</div>
+                                <template v-slot:input>
+                                    <div class="mt-3 title">Update Iron</div>
+                                </template>
+                                <template v-slot:input>
+                                    <v-select v-model="props.item.store" :items="stores" label="Edit" single-line
+                                        counter autofocus></v-select>
+                                </template>
+                            </v-edit-dialog>
 
-                    </td>
-                    <td>
-                        <v-edit-dialog large lazy persistent @save="saveLine(props.item,4)" @cancel="''" @open="''"
-                            @close="''">
-                            <div>{{ props.item.storeCluster}}</div>
-                            <template v-slot:input>
-                                <div class="mt-3 title">Update Iron</div>
-                            </template>
-                            <template v-slot:input>
-                                <v-select v-model="props.item.storeCluster" :items="StoreClusters" label="Edit"
-                                    single-line autofocus></v-select>
-                            </template>
-                        </v-edit-dialog>
-                    </td>
-                    <td>{{ props.item.categoryCluster }}</td>
+                        </td>
+                        <td>
+                            <v-edit-dialog large lazy persistent @save="saveLine(props.item,4)" @cancel="''" @open="''"
+                                @close="''">
+                                <div>{{ props.item.storeCluster}}</div>
+                                <template v-slot:input>
+                                    <div class="mt-3 title">Update Iron</div>
+                                </template>
+                                <template v-slot:input>
+                                    <v-select v-model="props.item.storeCluster" :items="StoreClusters" label="Edit"
+                                        single-line autofocus></v-select>
+                                </template>
+                            </v-edit-dialog>
+                        </td>
+                        <td>{{ props.item.categoryCluster }}</td>
 
-                    <td>
-                        <v-edit-dialog large lazy persistent @save="saveLine(props.item,6)" @cancel="''" @open="''"
-                            @close="''">
-                            <div>{{ props.item.username}}</div>
-                            <template v-slot:input>
-                            </template>
-                            <template v-slot:input>
-                                <v-select v-model="props.item.username" :items="users" label="Edit" single-line
-                                    autofocus></v-select>
-                            </template>
-                        </v-edit-dialog>
-                    </td>
-                    <td>
-                        <v-edit-dialog large lazy persistent @save="saveLine(props.item,7)" @cancel="''" @open="''"
-                            @close="''">
-                            <div>{{ props.item.actionedByUserName }}</div>
-                            <template v-slot:input>
-                            </template>
-                            <template v-slot:input>
-                                <v-select v-model="props.item.actionedByUserName" :items="users" label="Edit"
-                                    single-line autofocus></v-select>
-                            </template>
-                        </v-edit-dialog>
-                    </td>
-                    <!-- <td>
+                        <td>
+                            <v-edit-dialog large lazy persistent @save="saveLine(props.item,6)" @cancel="''" @open="''"
+                                @close="''">
+                                <div>{{ props.item.username}}</div>
+                                <template v-slot:input>
+                                </template>
+                                <template v-slot:input>
+                                    <v-select v-model="props.item.username" :items="users" label="Edit" single-line
+                                        autofocus></v-select>
+                                </template>
+                            </v-edit-dialog>
+                        </td>
+                        <td>
+                            <v-edit-dialog large lazy persistent @save="saveLine(props.item,7)" @cancel="''" @open="''"
+                                @close="''">
+                                <div>{{ props.item.actionedByUserName }}</div>
+                                <template v-slot:input>
+                                </template>
+                                <template v-slot:input>
+                                    <v-select v-model="props.item.actionedByUserName" :items="users" label="Edit"
+                                        single-line autofocus></v-select>
+                                </template>
+                            </v-edit-dialog>
+                        </td>
+                        <!-- <td>
                         <v-edit-dialog large lazy persistent @save="saveLine(props.item,8)" @cancel="''" @open="''"
                             @close="''">
                             <div>{{ props.item.spacePlanName }}</div>
@@ -218,46 +219,46 @@
                         </v-edit-dialog>
                     </td> -->
 
-                    <td>
-                        <v-tooltip bottom>
-                            <template v-slot:activator="{ on }">
-                                <v-icon v-on="on" v-if="props.item.rangeFileName!=null">
-                                    assessment</v-icon>
-                            </template>
-                            <span> {{props.item.rangeFileName}}</span>
-                        </v-tooltip>
-                    </td>
-                    <td>
-                        <v-tooltip bottom>
-                            <template v-slot:activator="{ on }">
-                                <v-icon v-on="on" v-if="props.item.systemFileName!=null">
-                                    web</v-icon>
-                            </template>
-                            <span> {{props.item.systemFileName}}</span>
-                        </v-tooltip>
-                    </td>
-                    <td>
-                        <v-checkbox @change="setRemoved(props.item)" v-model="props.item.removed" hide-details>
-                        </v-checkbox>
-                    </td>
-                    <td>
-                        <v-menu left>
-                            <v-btn slot="activator" icon>
-                                <v-icon>more_vert</v-icon>
-                            </v-btn>
-                            <v-list dense>
-                                <v-list-tile @click="openProjectTXEdit(props.item)">Edit</v-list-tile>
-                                <v-divider></v-divider>
-                            </v-list>
-                            <v-list dense>
-                                <v-list-tile @click="deleteProjectTX(props.item)">Delete</v-list-tile>
-                                <v-divider></v-divider>
-                            </v-list>
-                        </v-menu>
-                    </td>
-                </template>
-            </v-data-table>
-
+                        <td>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-icon v-on="on" v-if="props.item.rangeFileName!=null">
+                                        assessment</v-icon>
+                                </template>
+                                <span> {{props.item.rangeFileName}}</span>
+                            </v-tooltip>
+                        </td>
+                        <td>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-icon v-on="on" v-if="props.item.systemFileName!=null">
+                                        web</v-icon>
+                                </template>
+                                <span> {{props.item.systemFileName}}</span>
+                            </v-tooltip>
+                        </td>
+                        <td>
+                            <v-checkbox @change="setRemoved(props.item)" v-model="props.item.removed" hide-details>
+                            </v-checkbox>
+                        </td>
+                        <td>
+                            <v-menu left>
+                                <v-btn slot="activator" icon>
+                                    <v-icon>more_vert</v-icon>
+                                </v-btn>
+                                <v-list dense>
+                                    <v-list-tile @click="openProjectTXEdit(props.item)">Edit</v-list-tile>
+                                    <v-divider></v-divider>
+                                </v-list>
+                                <v-list dense>
+                                    <v-list-tile @click="deleteProjectTX(props.item)">Delete</v-list-tile>
+                                    <v-divider></v-divider>
+                                </v-list>
+                            </v-menu>
+                        </td>
+                    </template>
+                </v-data-table>
+            </div>
 
             <YesNoModal ref="yesNoModal"></YesNoModal>
             <ProjectGroupModal ref="ProjectGroupModal"> </ProjectGroupModal>
@@ -350,7 +351,7 @@
                 ProjectsGroups: [],
                 storeObjects: [],
                 StoreClusters: [],
-                typeList2:[],
+                typeList2: [],
                 databaseUsers: [],
                 users: [{
                     text: "None",
@@ -409,11 +410,11 @@
                 let self = this
                 let statushandler = new StatusHandler()
                 self.typeList = statushandler.getTypeList()
-                self.typeList2=statushandler.getTypeList()
-                self.typeList2.splice(5,1)
+                self.typeList2 = statushandler.getTypeList()
+                self.typeList2.splice(5, 1)
                 //   console.log(self.typeList);
                 // console.log(self.typeList2);
-                
+
             },
             getStatusList() {
                 let self = this

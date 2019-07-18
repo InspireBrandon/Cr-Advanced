@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <v-card flat>
         <!-- <v-toolbar flat dense dark>
             <v-toolbar-title>Report</v-toolbar-title>
             <v-spacer></v-spacer>
@@ -20,12 +20,12 @@
                 <v-icon>add</v-icon>
             </v-btn>
         </v-toolbar> -->
-        <v-container grid-list-md>
-            <v-layout row wrap class="pa-0 ma-0">
+        <v-container fluid grid-list-md>
+            <v-layout light row wrap class="pa-0 ma-0">
                 <v-flex md12 class="pl-0">
                     <v-layout row wrap class="mt-0">
                         <v-flex md3 xs12 sm12>
-                            <v-card class="pa-3 mt-3">
+                            <v-card light class="pa-3 mt-3">
                                 <v-layout row wrap>
                                     <v-flex md8>
                                         <v-card color="success" dark style="width: 53px; margin-top: -30px;"
@@ -49,10 +49,10 @@
                             </v-card>
                         </v-flex>
                         <v-flex md3 xs12 sm12>
-                            <v-card class="pa-3 mt-3">
+                            <v-card light class="pa-3 mt-3">
                                 <v-layout row wrap>
                                     <v-flex md8>
-                                        <v-card color="success" dark style="width: 53px; margin-top: -30px;"
+                                        <v-card light color="success" dark style="width: 53px; margin-top: -30px;"
                                             class="elevation-5">
                                             <v-icon size="50">trending_up</v-icon>
                                         </v-card>
@@ -73,10 +73,10 @@
                             </v-card>
                         </v-flex>
                         <v-flex md3 xs12 sm12>
-                            <v-card class="pa-3 mt-3">
+                            <v-card light class="pa-3 mt-3">
                                 <v-layout row wrap>
                                     <v-flex md6>
-                                        <v-card color="warning" dark style="width: 53px; margin-top: -30px;"
+                                        <v-card light color="warning" dark style="width: 53px; margin-top: -30px;"
                                             class="elevation-5">
                                             <v-icon size="50">trending_flat</v-icon>
                                         </v-card>
@@ -97,7 +97,7 @@
                             </v-card>
                         </v-flex>
                         <v-flex md3 xs12 sm12>
-                            <v-card class="pa-3 mt-3">
+                            <v-card light class="pa-3 mt-3">
                                 <v-layout row wrap>
                                     <v-flex md8>
                                         <v-card color="error" dark style="width: 53px; margin-top: -30px;"
@@ -123,7 +123,7 @@
                     </v-layout>
                 </v-flex>
                 <v-flex md6 class="pl-0">
-                    <v-card>
+                    <v-card light>
                         <v-toolbar dense flat dark>
                             <v-toolbar-title>Monthly Sales</v-toolbar-title>
                         </v-toolbar>
@@ -142,7 +142,7 @@
                 <v-flex md6 class="pr-0">
                     <v-layout row wrap>
                         <v-flex md6 xs12 sm12>
-                            <v-card>
+                            <v-card light>
                                 <v-toolbar dense flat dark>
                                     <v-toolbar-title>Sales Value 6MMA</v-toolbar-title>
                                 </v-toolbar>
@@ -152,7 +152,7 @@
                             </v-card>
                         </v-flex>
                         <v-flex md6 xs12 sm12>
-                            <v-card>
+                            <v-card light>
                                 <v-toolbar dense flat dark>
                                     <v-toolbar-title>Customers/Employee</v-toolbar-title>
                                 </v-toolbar>
@@ -162,7 +162,7 @@
                             </v-card>
                         </v-flex>
                         <v-flex md6 xs12 sm12>
-                            <v-card>
+                            <v-card light>
                                 <v-toolbar dense flat dark>
                                     <v-toolbar-title>Amount of sales</v-toolbar-title>
                                 </v-toolbar>
@@ -172,7 +172,7 @@
                             </v-card>
                         </v-flex>
                         <v-flex md6 xs12 sm12>
-                            <v-card>
+                            <v-card light>
                                 <v-toolbar dense flat dark>
                                     <v-toolbar-title>Amount of sales</v-toolbar-title>
                                 </v-toolbar>
@@ -185,7 +185,7 @@
                 </v-flex>
             </v-layout>
         </v-container>
-    </div>
+    </v-card>
 </template>
 
 <script>

@@ -78,7 +78,7 @@
 
       <v-toolbar-title>
         <span>Range Planning</span>
-        <HelpFileViewer component="Ranging"></HelpFileViewer>
+        <HelpFileViewer style="margin-left: 10px;" component="Ranging"></HelpFileViewer>
       </v-toolbar-title>
     </v-toolbar>
     <div fluid grid-list-lg>
@@ -87,18 +87,18 @@
           <!-- <v-layout row wrap v-if="gotData"> -->
           <v-toolbar-items v-if="gotData">
             <v-select style="margin-left: 10px; margin-top: 8px; width: 300px" placeholder="Select cluster type"
-              @change="onClusterTypeChange" dense :items="clusterTypes" v-model="selectedClusterType" solo hide-details>
+              @change="onClusterTypeChange" dense :items="clusterTypes" v-model="selectedClusterType" hide-details>
             </v-select>
 
             <v-select style="margin-left: 10px; margin-top: 8px; width: 300px" @change="onClusterOptionChange"
               v-if="selectedClusterType != null" :placeholder="'Select ' + selectedClusterType + ' cluster'" dense
-              :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" solo hide-details>
+              :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" hide-details>
             </v-select>
 
-            <span style="margin-left: 10px; margin-top: 20px; " v-show="storesInCluster > -1">{{ storesInCluster }}
+            <span style="margin-left: 30px; margin-top: 30px; " v-show="storesInCluster > -1">{{ storesInCluster }}
               Stores </span>
             <span v-show="getItemsToAudit() > 0"
-              style="font-weight: bold; color: red;margin-left: 10px; margin-top: 20px;"> - {{ getItemsToAudit() }}
+              style="font-weight: bold; color: red;margin-left: 10px; margin-top: 30px;"> - {{ getItemsToAudit() }}
               product(s) need auditing</span>
 
           </v-toolbar-items>
@@ -126,18 +126,20 @@
           <!-- </v-flex> -->
           <!-- </v-layout> -->
         </v-toolbar>
-        <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%;  height: calc(100vh - 200px);"
+        <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%;  height: calc(100vh - 220px);"
           :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
           @selection-changed="onSelectionChanged" :rowData="rowData" :enableSorting="true" :enableFilter="true"
           :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true"
           :enableColResize="true" :floatingFilter="true" :onGridReady="onGridReady" :groupMultiAutoColumn="true">
         </ag-grid-vue>
-        <div>
-          <p>{{ rowData.length }} Rows</p>
-        </div>
-        <div style="margin-left: 10px;">
-          <p>{{ selectedItems.length }} Selected</p>
-        </div>
+        <v-toolbar dark dense class="pa-0">
+          <div>
+            <span>{{ rowData.length }} Rows</span>
+          </div>
+          <div style="margin-left: 10px;">
+            <span>{{ selectedItems.length }} Selected</span>
+          </div>
+        </v-toolbar>
       </v-layout>
     </div>
     <PlanogramSelector ref="planogramSelector"></PlanogramSelector>
@@ -478,12 +480,15 @@
         return new Promise((resolve, reject) => {
           try {
             self.columnDefs = require('./headers.json');
-            self.columnDefs.push({
-              headerName: 'Options',
-              field: 'barcode',
-              cellRendererFramework: 'optionsComponent',
-              pinned: 'right'
-            })
+
+            if (self.columnDefs[self.columnDefs.length - 1].headerName != "Options") {
+              self.columnDefs.push({
+                headerName: 'Options',
+                field: 'barcode',
+                cellRendererFramework: 'optionsComponent',
+                pinned: 'right'
+              })
+            }
             resolve(true);
           } catch (exc) {
             reject();

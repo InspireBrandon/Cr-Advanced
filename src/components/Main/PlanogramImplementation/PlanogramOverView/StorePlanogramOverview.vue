@@ -1,6 +1,6 @@
 <template>
-    <v-card>
-        <v-toolbar tile color="grey darken-3" dark dense>
+    <v-card tile>
+        <v-toolbar color="grey darken-3" dark dense flat>
             <v-toolbar-title>
                 Planogram Overview: <strong v-if="selectedProject!=null">{{title}}</strong>
             </v-toolbar-title>
