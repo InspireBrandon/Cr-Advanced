@@ -86,7 +86,7 @@
                 </v-btn>
             </v-toolbar>
             <div style="overflow-x: auto; height: calc(100vh - 130px)">
-                <v-data-table v-if="project!=null" :headers="headers" :items="ProjectTXs" hide-actions>
+                <v-data-table v-if="project!=null" :headers="headers" :items="ProjectTXs">
                     <template v-slot:items="props">
                         <td>
                             <v-checkbox hide-details v-model="selectedDelete" :value="props.item.id"></v-checkbox>
@@ -722,19 +722,12 @@
                 if (self.project == item) {
                     return
                 }
+
                 self.project = item
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.get(process.env.VUE_APP_API + `ProjectTX?projectID=${item.id}`).then(r => {
-                    // console.log(r);
 
-                    r.data.projectTXList.forEach(e => {
-                        // console.log(e);
-
-                        if (e.deleted != true) {
-                            self.ProjectTXs.push(e)
-                        }
-                    })
-                    console.log(self.ProjectTXs);
+                    self.ProjectTXs = r.data.projectTXList;
 
                     delete Axios.defaults.headers.common["TenantID"];
                 })
