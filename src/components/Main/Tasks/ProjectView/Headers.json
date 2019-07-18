@@ -1,5 +1,13 @@
 [
     {
+        "headerName": "Project Group",
+        "field": "projectGroupName",
+        "editable": false,
+        "hide": false,
+        "width": 200,
+        "filter": "agTextColumnFilter"
+    },
+    {
         "headerName": "Project",
         "field": "projectName",
         "editable": false,
@@ -61,5 +69,12 @@
         "hide": false,
         "width": 80,
         "cellRendererFramework": "Actions"
+    },
+    {
+        "headerName": "Store Count",
+        "field": "storeCount",
+        "editable": false,
+        "hide": false,
+        "width": 80
     }
 ]

@@ -49,19 +49,19 @@
         created() {
             let self = this;
 
-            setTimeout(() => {
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
-                let systemUserID = encoded_details.USER_ID;
-                let tenantID = sessionStorage.currentDatabase;
+            // IF DOING KAK then set timeout
+            let encoded_details = jwt.decode(sessionStorage.accessToken);
 
-                self.systemUserID = encoded_details.USER_ID;
+            let systemUserID = encoded_details.USER_ID;
+            let tenantID = sessionStorage.currentDatabase;
 
-                self.getUserDetails(systemUserID, tenantID)
-                    .then(userType => {
-                        self.userType = userType;
-                        self.getAppsFromManifest();
-                    })
-            }, 1000);
+            self.systemUserID = encoded_details.USER_ID;
+
+            self.getUserDetails(systemUserID, tenantID)
+                .then(userType => {
+                    self.userType = userType;
+                    self.getAppsFromManifest();
+                })
         },
         methods: {
             getUserDetails(systemUserID, tenantID) {
@@ -202,8 +202,7 @@
                         }];
 
                         app["demo"] = false;
-                    }
-                    else
+                    } else
                         app["demo"] = true;
                 }
                 break;

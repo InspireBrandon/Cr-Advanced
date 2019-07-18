@@ -56,7 +56,8 @@
                     },
                     rowClassRules: {
                         'disabled-line': 'data.can_edit'
-                    }
+                    },
+                    suppressRowTransform: true
                 },
                 searchType: null,
                 filterList: [],

@@ -36,8 +36,6 @@
                                 </template>
                                 <span>Planogram</span>
                             </v-tooltip>
-                            <!-- <v-divider vertical></v-divider>
-                            <v-switch v-model="show_subtasks" dark color="secondary" class="ml-2" label="Show subtasks" hide-details></v-switch> -->
                         </v-btn-toggle>
                         <v-btn v-if="userAccess != 0 && userAccess != 4" @click="shareProjects" class="ml-2" small dark
                             icon>
@@ -59,7 +57,7 @@
                         <v-spacer></v-spacer>
 
                         <v-btn v-if="userAccess == 3" @click="$refs.guide.click()" flat dark>Help</v-btn>
-                        <a style="display: none;" ref="guide" download href="guides/CR TRAINING GUIDE 1.pdf">guide</a>
+                        <a style="display: none;" ref="guide" download href="guides/CR TRAINING GUIDELINE 16.07.2019.pdf">guide</a>
 
                         <v-menu offset-y>
                             <template v-slot:activator="{ on }">
