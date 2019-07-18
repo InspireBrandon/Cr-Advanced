@@ -3,15 +3,21 @@
         <v-card>
             <v-toolbar dark color="primary">
                 <v-toolbar-title>
-                    Planograms : <strong>{{title}}</strong>
+                  Store Overview
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-btn icon flat dark @click="close">
                     <v-icon>close</v-icon>
                 </v-btn>
             </v-toolbar>
+             <v-toolbar dark flat color="grey darken-3" dense>
+                 <v-toolbar-title>
+                    Planograms : <strong>{{title}}</strong>
+                </v-toolbar-title>
+            </v-toolbar>
             <v-toolbar dark flat dense>
             </v-toolbar>
+           
             <StoreGrid ref="StoreGrid" :rowData="rowData" :method="GetData" :StoreID="store_ID" />
             <PlanogramDetailsSelector :PlanoName="'Select'" ref="PlanogramDetailsSelector" />
         </v-card>

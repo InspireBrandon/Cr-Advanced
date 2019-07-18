@@ -1,16 +1,18 @@
 <template>
     <div v-if="rowData.length>0">
-        <ag-grid-vue :gridOptions="gridOptions" :sideBar='false' style="width: 100%;  height: calc(100vh - 235px);"
+        <ag-grid-vue :gridOptions="gridOptions" :sideBar='false' style="width: 100%;  height: calc(100vh - 208px);"
             :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
             :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true"
             rowSelection="multiple" :rowDeselection="true" :enableColResize="true" :floatingFilter="true"
-            :gridReady="onGridReady" :groupMultiAutoColumn="true">
+            :onGridReady="onGridReady" :groupMultiAutoColumn="true">
         </ag-grid-vue>
         <PlanogramDetailsSelector :PlanoName="selectedCat" ref="PlanogramDetailsSelector" />
-        rows:{{rowData.length}}
+        
         <YesNoModal ref="YesNoModal" />
         <VariationOrderModal ref="VariationOrderModal" />
-
+ <v-toolbar dark dense class="pa-0">
+            <span>rows : {{rowData.length}}</span>
+        </v-toolbar>
     </div>
 </template>
 <script>
@@ -216,6 +218,7 @@
             },
             resize() {
                 setTimeout(() => {
+                    this.gridApi.resetRowHeights();
                     this.gridApi.sizeColumnsToFit()
                 }, 200);
             },
