@@ -563,7 +563,7 @@
 </script>
 <style>
     .ag-theme-balham .audit-image-breach {
-        background-color: rgb(247, 199, 65) !important;
+       background-color: lightcoral !important;
     }
 
     .success-green {

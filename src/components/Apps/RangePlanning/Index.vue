@@ -1,6 +1,6 @@
 <template>
   <div class="ranging">
-    <v-toolbar dense dark>
+    <v-toolbar dense dark color="grey darken-3"> 
 
       <v-toolbar-items v-if="!$route.path.includes('RangePlanningView')">
         <v-menu dark offset-y style="margin-bottom: 10px;">
@@ -81,9 +81,9 @@
         <HelpFileViewer component="Ranging"></HelpFileViewer>
       </v-toolbar-title>
     </v-toolbar>
-    <v-container fluid grid-list-lg>
+    <div fluid grid-list-lg>
       <v-layout row wrap>
-        <v-toolbar dark>
+        <v-toolbar dark >
           <v-layout row wrap v-if="gotData">
             <v-flex lg2 md3>
               <v-select placeholder="Select cluster type" @change="onClusterTypeChange" dense :items="clusterTypes"
@@ -119,7 +119,7 @@
             </v-flex>
           </v-layout>
         </v-toolbar>
-        <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%;  height: calc(100vh - 235px);"
+        <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%;  height: calc(100vh - 175px);"
           :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
           :selectionChanged="onSelectionChanged" :rowData="rowData" :enableSorting="true" :enableFilter="true"
           :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true"
@@ -132,7 +132,7 @@
           <p>{{ selectedItems.length }} Selected</p>
         </div>
       </v-layout>
-    </v-container>
+    </div>
     <PlanogramSelector ref="planogramSelector"></PlanogramSelector>
     <Spinner ref="spinner"></Spinner>
     <StoreIndicatorSelector ref="storeIndicatorSelector"></StoreIndicatorSelector>
