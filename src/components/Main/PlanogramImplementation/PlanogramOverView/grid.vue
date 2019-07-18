@@ -62,6 +62,8 @@
                         "headerName": "Store",
                         "checkboxSelection": true,
                         "field": "storeName",
+                        "headerCheckboxSelection": true,
+                        "headerCheckboxSelectionFilteredOnly": true,
                         "minWidth": 200,
                     }, {
                         "headerName": "Planogram Name",
