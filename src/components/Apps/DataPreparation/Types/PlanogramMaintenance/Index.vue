@@ -25,10 +25,11 @@
               Code</v-btn>
             <v-btn @click="move" :disabled="selectedItems.length <= 0" color="primary">move</v-btn>
           </v-toolbar>
-          <ag-grid-vue @selection-changed="onSelectionChanged" :sideBar='true' style="width: 100%;  height: 70vh;" class="ag-theme-balham"
-            :columnDefs="columnDefs"  :gridOptions="gridOptions" :rowData="rowData" :enableSorting="true" :enableFilter="true"
-            rowSelection="multiple" :rowDeselection="true" :enableColResize="true" :suppressRowClickSelection="true"
-            :floatingFilter="true" :onGridReady="onGridReady" :groupMultiAutoColumn="true">
+          <ag-grid-vue @selection-changed="onSelectionChanged" :sideBar='true' style="width: 100%;  height: 70vh;"
+            class="ag-theme-balham" :columnDefs="columnDefs" :gridOptions="gridOptions" :rowData="rowData"
+            :enableSorting="true" :enableFilter="true" rowSelection="multiple" :rowDeselection="true"
+            :enableColResize="true" :suppressRowClickSelection="true" :floatingFilter="true" :onGridReady="onGridReady"
+            :groupMultiAutoColumn="true">
           </ag-grid-vue>
           <div>
             <p>{{ rowData.length }} Rows</p>
@@ -42,6 +43,7 @@
       <NewOrExistingSelector ref="newOrExist"></NewOrExistingSelector>
       <ActiveShopCodeSelector ref="activeShopCodeSelector"></ActiveShopCodeSelector>
       <Prompt ref="prompt"></Prompt>
+      <Dialog ref="Dialog" />
       <div class="text-xs-center">
         <v-dialog v-model="dialog" width="500">
           <v-card dark>
@@ -73,6 +75,7 @@
   import NewOrExistingSelector from '@/components/Common/NewOrExistingSelector'
   import ActiveShopCodeSelector from '@/components/Common/ActiveShopCodeSelector'
   import Prompt from '@/components/Common/Prompt'
+  import Dialog from '@/components/Common/Dialog'
   import {
     AgGridVue
   } from "ag-grid-vue";
@@ -104,6 +107,7 @@
       PlanogramSelector,
       NewOrExistingSelector,
       Prompt,
+      Dialog,
       ActiveShopCodeSelector,
       imageComponent: {
         template: `<div @dblclick="openImage" style="text-align: center; cursor: pointer;">
@@ -146,7 +150,7 @@
         }, {
           headerName: 'Category',
           field: 'category',
-        },{
+        }, {
           headerName: 'Subcategory',
           field: 'subcategory',
           hide: true
@@ -219,32 +223,39 @@
         self.$refs.newOrExist.show("New or Existing?", noe => {
           if (noe == 'new') {
             self.$refs.prompt.show('', 'Please enter a planogram name', 'planogram name:', planoName => {
+              // CHECK NAME HERE
               Axios.post(process.env.VUE_APP_API + "Planogram?db=CR-Hinterland-Live&planogramName=" +
                   planoName)
                 .then(newPlanoRes => {
-
-                  let request = []
-
-                  self.selectedItems.forEach(el => {
-
-                    request.push({
-                      "id": el.data.id,
-                      "product_ID": el.data.product_ID,
-                      "planogram_ID": newPlanoRes.data.id,
-                      "default_Planogram": true,
-                      "packaging_Type": ""
-                    })
-                  })
-
-                  Axios.put(process.env.VUE_APP_API + "Planogram?db=CR-Hinterland-Live", request)
-                    .then(r => {
-                      console.log(r);
-
-                      var rows = self.gridApi.getSelectedRows();
-                      self.gridApi.updateRowData({
-                        remove: rows
+                  console.log(newPlanoRes);
+                  if (newPlanoRes.data == "exists") {
+                   let tmp = {
+                      headline: "Name already in use",
+                      text: "Please Use another name and try again"
+                    }
+                    self.$refs.Dialog.openDialog(tmp)
+                  } else {
+                    let request = []
+                    self.selectedItems.forEach(el => {
+                      request.push({
+                        "id": el.data.id,
+                        "product_ID": el.data.product_ID,
+                        "planogram_ID": newPlanoRes.data.id,
+                        "default_Planogram": true,
+                        "packaging_Type": ""
                       })
                     })
+
+                    // Axios.put(process.env.VUE_APP_API + "Planogram?db=CR-Hinterland-Live", request)
+                    //   .then(r => {
+                    //     console.log(r);
+
+                    //     var rows = self.gridApi.getSelectedRows();
+                    //     self.gridApi.updateRowData({
+                    //       remove: rows
+                    //     })
+                    //   })
+                  }
                 })
             })
           }
