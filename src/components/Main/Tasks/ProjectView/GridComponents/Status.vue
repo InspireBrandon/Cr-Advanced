@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="params.data != undefined">
         {{ params.context.componentParent.statusList[params.data[params.colDef.field] == -1 ? 18 : params.data[params.colDef.field]].text }}
     </div>
 </template>

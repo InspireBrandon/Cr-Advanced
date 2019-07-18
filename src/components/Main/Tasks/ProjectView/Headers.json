@@ -3,17 +3,19 @@
         "headerName": "Project Group",
         "field": "projectGroupName",
         "editable": false,
-        "hide": false,
+        "hide": true,
         "width": 200,
-        "filter": "agTextColumnFilter"
+        "filter": "agTextColumnFilter",
+        "rowGroup": true
     },
     {
         "headerName": "Project",
         "field": "projectName",
         "editable": false,
-        "hide": false,
+        "hide": true,
         "width": 200,
-        "filter": "agTextColumnFilter"
+        "filter": "agTextColumnFilter",
+        "rowGroup": true
     },
     {
         "headerName": "Data Preparation",
@@ -67,7 +69,7 @@
         "field": "status",
         "editable": false,
         "hide": false,
-        "width": 80,
+        "width": 160,
         "cellRendererFramework": "PlanogramAction"
     },
     {
