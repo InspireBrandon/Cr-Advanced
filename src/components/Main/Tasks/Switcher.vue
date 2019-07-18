@@ -1,11 +1,14 @@
 <template>
-    <v-container fluid grid-list-xs pa-2>
+    <v-container fluid grid-list-xs pa-0>
         <v-layout row wrap>
-            <v-flex v-if="hasDatabases" xs12 sm12 md12>
+            <v-flex v-if="hasDatabases" xs12 sm12 md12 class="pa-0">
                 <v-card>
-                    <v-toolbar flat dark dense color="primary">
-                        <v-text-field prepend-inner-icon="search" placeholder="Search" v-model="filter_text">
-                        </v-text-field>
+                    <v-toolbar flat dark dense color="grey darken-3">
+                        <v-toolbar-items>
+                            <v-text-field style="margin-left: 10px; width: 400px; margin-top: -5px;" prepend-inner-icon="search"
+                                placeholder="Search" v-model="filter_text">
+                            </v-text-field>
+                        </v-toolbar-items>
                         <v-spacer></v-spacer>
                         <v-btn-toggle v-model="searchType" class="transparent" multiple>
                             <v-tooltip bottom>
@@ -42,10 +45,12 @@
                         </v-btn>
                     </v-toolbar>
                     <v-toolbar v-if="userAccess!=4" dense flat dark>
-                        <v-autocomplete v-if="selectedView==2 &&userAccess != 3 " @change="getStoreViewData()" placeholder="Please Select a Store" :items="stores"
-                            v-model="selectedStore"></v-autocomplete>
-                             <v-autocomplete v-if="selectedView==2 &&userAccess == 3" disabled @change="getStoreViewData()" placeholder="Please Select a Store" :items="stores"
-                            v-model="selectedStore"></v-autocomplete>
+                        <v-autocomplete v-if="selectedView==2 &&userAccess != 3 " @change="getStoreViewData()"
+                            placeholder="Please Select a Store" :items="stores" v-model="selectedStore">
+                        </v-autocomplete>
+                        <v-autocomplete v-if="selectedView==2 &&userAccess == 3" disabled @change="getStoreViewData()"
+                            placeholder="Please Select a Store" :items="stores" v-model="selectedStore">
+                        </v-autocomplete>
                         <v-autocomplete v-if="selectedView==0" placeholder="users " :items="users"
                             v-model="selectedUser" @change="getTaskViewData"></v-autocomplete>
                         <v-btn icon @click="homeView">
@@ -114,12 +119,13 @@
                     </v-toolbar>
                     <v-container style="max-width: 100vw;" fluid grid-list-xs class="pa-0">
                         <v-layout row wrap class="pa-0">
-                            <v-flex :class="{ 'md10 sm6 xs6': showNotices, 'md12 sm12 xs12': !showNotices }"
+                            <v-flex class="pa-0"
+                                :class="{ 'md10 sm6 xs6': showNotices, 'md12 sm12 xs12': !showNotices }"
                                 v-if="selectedView==0">
-                                <TaskView :accessType="userAccess" :data="filteredData" :typeList="typeList" :statusList="statusList"
-                                    :systemUserID="selectedUser" />
+                                <TaskView :accessType="userAccess" :data="filteredData" :typeList="typeList"
+                                    :statusList="statusList" :systemUserID="selectedUser" />
                             </v-flex>
-                            <v-flex v-if="selectedView==0 && showNotices"
+                            <v-flex class="pa-0" v-if="selectedView==0 && showNotices"
                                 :class="{ 'md2 sm6 xs6': showNotices, 'md1 sm1 xs1': !showNotices }">
                                 <v-card tile flat style="border-left: 1px solid lightgrey;">
                                     <v-toolbar flat dark dense color="grey darken-3">
@@ -130,7 +136,7 @@
                                     </v-card-text>
                                 </v-card>
                             </v-flex>
-                            <v-flex md12 class="pa-0" v-if="selectedView==1">
+                            <v-flex class="pa-0" md12 v-if="selectedView==1">
                                 <ProjectView :data="filteredData" :typeList="typeList" :statusList="statusList"
                                     :accessType="userAccess" />
                             </v-flex>
@@ -207,8 +213,8 @@
                 selectedView: 0,
                 systemUserID: -1,
                 store_ID: null,
-                storeData:null,
-                  StoreStatusList: [{
+                storeData: null,
+                StoreStatusList: [{
                         text: "Unassigned"
                     }, {
                         text: "Assigned"
@@ -226,7 +232,7 @@
                         text: "Variation"
                     }, {
                         text: "On Hold"
-                    },{
+                    }, {
                         text: "Recalled"
                     }
                 ],
@@ -346,26 +352,24 @@
             },
             getData() {
                 let self = this;
-                setTimeout(() => {
-                    self.getDatabases(() => {
-                        if (self.hasDatabases) {
-                            self.getLists(() => {
-                                self.checkAccessType(() => {
-                                    self.getUsers(() => {
-                                        self.getStores(() => {
-                                            self.getTaskViewData(() => {
-                                                self.loading =
-                                                    false;
-                                            })
+                self.getDatabases(() => {
+                    if (self.hasDatabases) {
+                        self.getLists(() => {
+                            self.checkAccessType(() => {
+                                self.getUsers(() => {
+                                    self.getStores(() => {
+                                        self.getTaskViewData(() => {
+                                            self.loading =
+                                                false;
                                         })
                                     })
                                 })
                             })
-                        } else {
-                            self.loading = false;
-                        }
-                    })
-                }, 1000);
+                        })
+                    } else {
+                        self.loading = false;
+                    }
+                })
             },
             getDatabases(callback) {
                 let self = this;
@@ -534,39 +538,40 @@
                     })
 
                     self.projectViewData = r.data.takeoverViewList;
+                    self.$refs.SplashLoader.close()
 
-                    Axios.get(process.env.VUE_APP_API + `GetLastTransactions`).then(res => {
+                    // Axios.get(process.env.VUE_APP_API + `GetLastTransactions`).then(res => {
 
-                        if (self.userAccess == 2) {
-                            self.filterOutSupplierPlanograms(() => {
-                                self.projectViewData.forEach(e => {
-                                    if (!filterList.includes(e.planogram_ID)) {
-                                        filterList.push({
-                                            text: e.planogram,
-                                            value: e.planogram_ID
-                                        })
-                                    }
-                                })
+                    //     if (self.userAccess == 2) {
+                    //         self.filterOutSupplierPlanograms(() => {
+                    //             self.projectViewData.forEach(e => {
+                    //                 if (!filterList.includes(e.planogram_ID)) {
+                    //                     filterList.push({
+                    //                         text: e.planogram,
+                    //                         value: e.planogram_ID
+                    //                     })
+                    //                 }
+                    //             })
 
-                                self.filterList = filterList
-                                self.$refs.SplashLoader.close()
-                            });
-                        } else {
-                            self.projectViewData.forEach(e => {
-                                if (!filterList.includes(e.planogram_ID)) {
-                                    filterList.push({
-                                        text: e.planogram,
-                                        value: e.planogram_ID
-                                    })
-                                }
-                            })
+                    //             self.filterList = filterList
+                    //             self.$refs.SplashLoader.close()
+                    //         });
+                    //     } else {
+                    //         self.projectViewData.forEach(e => {
+                    //             if (!filterList.includes(e.planogram_ID)) {
+                    //                 filterList.push({
+                    //                     text: e.planogram,
+                    //                     value: e.planogram_ID
+                    //                 })
+                    //             }
+                    //         })
 
-                            self.filterList = filterList
-                            self.$refs.SplashLoader.close()
-                        }
-                        console.log("Switcher", self.projectViewData);
+                    //         self.filterList = filterList
+                    //         self.$refs.SplashLoader.close()
+                    //     }
+                    //     console.log("Switcher", self.projectViewData);
 
-                    })
+                    // })
                 })
 
 
@@ -578,17 +583,17 @@
                 let filterList = []
                 if (self.selectedStore == null) {
                     store = self.store_ID
-                    if(store==null){
-                        self.selectedStore=self.stores[0].value
-                        store=self.selectedStore
+                    if (store == null) {
+                        self.selectedStore = self.stores[0].value
+                        store = self.selectedStore
                     }
                 } else {
                     store = self.selectedStore
                 }
                 self.$nextTick(() => {
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                    console.log(store+"||"+self.selectedStore);
-                    
+                    console.log(store + "||" + self.selectedStore);
+
                     Axios.get(process.env.VUE_APP_API + `Store_Planogram/Store?Store_ID=${store}`)
                         .then(r => {
 
@@ -768,7 +773,7 @@
 
 <style scoped>
     .scrollable {
-        height: calc(100vh - 230px);
+        height: calc(100vh - 209px);
         overflow-x: auto;
     }
 

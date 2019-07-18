@@ -2,7 +2,7 @@
     <v-container grid-list-md fluid class="pa-0">
         <v-layout row wrap>
             <v-flex md12 class="pt-0">
-                <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 180px);"
+                <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 158px);"
                     :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
                     :selectionChanged="onSelectionChanged" :rowData="data" :enableSorting="true" :enableFilter="true"
                     :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
@@ -225,11 +225,8 @@
                 let self = this;
                 this.gridApi = params.api;
                 this.columnApi = params.columnApi;
-
-                setTimeout(() => {
-                    self.gridApi.resetRowHeights();
-                    self.gridApi.sizeColumnsToFit()
-                }, 60);
+                self.gridApi.resetRowHeights();
+                self.gridApi.sizeColumnsToFit();
             },
             onSelectionChanged() {
 
