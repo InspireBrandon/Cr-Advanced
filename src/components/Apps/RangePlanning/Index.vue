@@ -1,6 +1,6 @@
 <template>
   <div class="ranging">
-    <v-toolbar dense dark color="grey darken-3"> 
+    <v-toolbar dense dark color="grey darken-3">
 
       <v-toolbar-items v-if="!$route.path.includes('RangePlanningView')">
         <v-menu dark offset-y style="margin-bottom: 10px;">
@@ -83,45 +83,52 @@
     </v-toolbar>
     <div fluid grid-list-lg>
       <v-layout row wrap>
-        <v-toolbar dark >
-          <v-layout row wrap v-if="gotData">
-            <v-flex lg2 md3>
-              <v-select placeholder="Select cluster type" @change="onClusterTypeChange" dense :items="clusterTypes"
-                v-model="selectedClusterType" solo hide-details></v-select>
-            </v-flex>
-            <v-flex lg2 md3>
-              <v-select @change="onClusterOptionChange" v-if="selectedClusterType != null"
-                :placeholder="'Select ' + selectedClusterType + ' cluster'" dense
-                :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" solo hide-details>
-              </v-select>
-            </v-flex>
-            <v-flex lg4 md4 style="margin-top: 15px;">
-              <span v-show="storesInCluster > -1">{{ storesInCluster }} Stores </span>
-              <span v-show="getItemsToAudit() > 0" style="font-weight: bold; color: red;"> - {{ getItemsToAudit() }}
-                product(s) need auditing</span>
-            </v-flex>
-            <!-- <v-flex lg2 md-and-down></v-flex> -->
-            <v-flex lg4 md2 style="text-align: right;">
-              <v-menu offset-y>
-                <v-btn :disabled="selectedItems.length == 0" slot="activator" color="primary" dark>Set Indicator</v-btn>
-                <v-list dark>
-                  <v-list-tile @click="setIndicator('YES')">
-                    <v-list-tile-title>YES</v-list-tile-title>
-                  </v-list-tile>
-                  <v-list-tile @click="setIndicator('NO')">
-                    <v-list-tile-title>NO</v-list-tile-title>
-                  </v-list-tile>
-                  <v-list-tile @click="setSelectedStores">
-                    <v-list-tile-title>SELECTED</v-list-tile-title>
-                  </v-list-tile>
-                </v-list>
-              </v-menu>
-            </v-flex>
-          </v-layout>
+        <v-toolbar dark>
+          <!-- <v-layout row wrap v-if="gotData"> -->
+          <v-toolbar-items v-if="gotData">
+            <v-select style="margin-left: 10px; margin-top: 8px; width: 300px" placeholder="Select cluster type"
+              @change="onClusterTypeChange" dense :items="clusterTypes" v-model="selectedClusterType" solo hide-details>
+            </v-select>
+
+            <v-select style="margin-left: 10px; margin-top: 8px; width: 300px" @change="onClusterOptionChange"
+              v-if="selectedClusterType != null" :placeholder="'Select ' + selectedClusterType + ' cluster'" dense
+              :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" solo hide-details>
+            </v-select>
+
+            <span style="margin-left: 10px; margin-top: 20px; " v-show="storesInCluster > -1">{{ storesInCluster }}
+              Stores </span>
+            <span v-show="getItemsToAudit() > 0"
+              style="font-weight: bold; color: red;margin-left: 10px; margin-top: 20px;"> - {{ getItemsToAudit() }}
+              product(s) need auditing</span>
+
+          </v-toolbar-items>
+          <v-spacer></v-spacer>
+          <v-menu offset-y>
+            <v-btn :disabled="selectedItems.length == 0" slot="activator" color="primary" dark>Set Indicator</v-btn>
+            <v-list dark>
+              <v-list-tile @click="setIndicator('YES')">
+                <v-list-tile-title>YES</v-list-tile-title>
+              </v-list-tile>
+              <v-list-tile @click="setIndicator('NO')">
+                <v-list-tile-title>NO</v-list-tile-title>
+              </v-list-tile>
+              <v-list-tile @click="setSelectedStores">
+                <v-list-tile-title>SELECTED</v-list-tile-title>
+              </v-list-tile>
+            </v-list>
+          </v-menu>
+          <!-- <v-flex lg4 md4 style="margin-top: 15px;">
+             
+            </v-flex> -->
+          <!-- <v-flex lg2 md-and-down></v-flex> -->
+          <!-- <v-flex lg4 md2 style="text-align: right;"> -->
+
+          <!-- </v-flex> -->
+          <!-- </v-layout> -->
         </v-toolbar>
-        <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%;  height: calc(100vh - 175px);"
+        <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%;  height: calc(100vh - 200px);"
           :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
-          :selectionChanged="onSelectionChanged" :rowData="rowData" :enableSorting="true" :enableFilter="true"
+          @selection-changed="onSelectionChanged" :rowData="rowData" :enableSorting="true" :enableFilter="true"
           :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true"
           :enableColResize="true" :floatingFilter="true" :onGridReady="onGridReady" :groupMultiAutoColumn="true">
         </ag-grid-vue>
