@@ -85,8 +85,8 @@
                     <v-icon>add</v-icon>
                 </v-btn>
             </v-toolbar>
-            <div style="overflow-x: auto; height: calc(100vh - 130px)">
-                <v-data-table v-if="project!=null" :headers="headers" :rows-per-page-items="[20,50,75,100]" :items="ProjectTXs" hide-actions>
+            <div style="overflow-x: auto; height: calc(100vh - 118px)">
+                <v-data-table v-if="project!=null" :headers="headers" :rows-per-page-items="[15,50,75,100]" :items="ProjectTXs" >
                     <template v-slot:items="props">
                         <td>
                             <v-checkbox hide-details v-model="selectedDelete" :value="props.item.id"></v-checkbox>
