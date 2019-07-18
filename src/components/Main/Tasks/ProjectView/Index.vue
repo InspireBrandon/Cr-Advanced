@@ -26,9 +26,12 @@
     } from "ag-grid-vue";
     import Type from "./GridComponents/Type.vue";
     import Status from "./GridComponents/Status.vue";
-    import Actions from "./GridComponents/Actions.vue";
     import AssignTask from '@/components/Common/AssignTask'
     import SubtaskModal from './../Subtask.vue'
+
+    import DataPrepAction from "./GridComponents/DataPrepAction.vue";
+    import RangeAction from "./GridComponents/RangeAction.vue";
+    import PlanogramAction from "./GridComponents/PlanogramAction.vue";
 
     export default {
         name: 'ProjectView',
@@ -39,7 +42,9 @@
             AgGridVue,
             Status,
             Type,
-            Actions
+            DataPrepAction,
+            RangeAction,
+            PlanogramAction
         },
         data() {
             return {
