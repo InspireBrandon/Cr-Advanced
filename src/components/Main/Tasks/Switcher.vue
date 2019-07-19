@@ -144,7 +144,7 @@
                                     :accessType="userAccess" />
                             </v-flex>
                             <v-flex md12 class="pa-0" v-if="selectedView==2">
-                                <StoreView :rowdata="storeData" :typeList="typeList" :statusList="statusList" />
+                                <StoreView :rowdata="storeData" :typeList="typeList" :statusList="statusList" :getStoreViewData="getStoreViewData"/>
                             </v-flex>
                         </v-layout>
                     </v-container>
