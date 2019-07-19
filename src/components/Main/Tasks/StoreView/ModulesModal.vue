@@ -11,6 +11,7 @@
                     </v-card-text>
                     <v-divider></v-divider>
                     <v-card-actions>
+                        Total Modules: {{ $refs.FixtureDetails.totalModules }}
                         <v-spacer></v-spacer>
                         <v-btn color="error darken-1" @click.native="dialog = false">Cancel</v-btn>
                         <v-btn color="primary darken-1" @click.native="returnText">Continue</v-btn>
@@ -34,7 +35,6 @@
                 dialog: false,
                 afterRuturn: null,
                 store_Planogram_ID: null,
-                store_planogram_fixtures: []
             }
         },
         methods: {

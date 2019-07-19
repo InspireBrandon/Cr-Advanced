@@ -24,6 +24,21 @@
                 fixture_types: []
             }
         },
+        computed: {
+            totalModules() {
+                let self = this;
+                let total = 0;
+
+                self.fixture_types.forEach(element => {
+                    total += parseInt(element.modules);
+                });
+
+                if(isNaN(total))
+                    return 0;
+                else 
+                    return total;
+            }
+        },
         methods: {
             getFixtureTypes() {
                 let self = this;
@@ -40,7 +55,7 @@
                         self.fixture_types = [];
 
                         r.data.store_Planogram_FixtureList.forEach(element => {
-                            if(element.modules > 0)
+                            if (element.modules > 0)
                                 self.fixture_types.push(element)
                         });
                     })
