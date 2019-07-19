@@ -17,7 +17,7 @@
     </div>
 </template>
 <script>
-    import UserNotesModal from '@/components/Common/UserNotesModal.vue'
+    import UserNotesModal from '@/components/Common/userNotesStoreView.vue'
 
     import YesNoModal from '@/components/Common/YesNoModal'
     import VariationOrderModal from '@/components/Main/PlanogramImplementation/VariationOrderModal'
@@ -151,7 +151,7 @@
                     }
                 ],
                 defaultColDef: {
-                    onCellValueChanged: this.updateCheck
+                    onCellValueChanged: this.UpdateLine
                 },
                 gridOptions: {
                     rowHeight: 35,
@@ -252,6 +252,26 @@
                     })
                 })
             },
+            createProjectTransaction(request, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `ProjectTX`, request).then(r => {
+                    delete Axios.defaults.headers.common["TenantID"];
+                    callback(r.data.projectTX)
+                })
+            },
+            createProjectTransactionGroup(request, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `ProjectTXGroup`, request).then(r => {
+                    delete Axios.defaults.headers.common["TenantID"];
+                    callback(r.data.projectTXGroup);
+                })
+            },
             viewSetinProgress(item) {
                 let self = this
                 item.planogramStoreStatus = 3
@@ -277,6 +297,7 @@
                 let route;
 
                 console.log("BRUH", item);
+                            console.log("[planogramStoreStatus]",item.planogramStoreStatus);
 
                 switch (item.planogramStoreStatus) {
                     //     case 1: {
@@ -292,6 +313,7 @@
                     case 2: {
                         self.checkFileStatus(item.systemFileID, data => {
                             let status = 13
+                            
                             route =
                                 `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${status}`
 
@@ -312,8 +334,7 @@
                     case 3: {
                         self.checkFileStatus(item.systemFileID, data => {
                             let status = 24
-                            route =
-                                `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${status}`
+                            route = `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${status}`
 
                             if (data.status == 1) {
                                 alert("this planogram has been recalled, task will be removed");
@@ -745,7 +766,9 @@
 
                 let Lheight = listItem.detailHeight * 0.9
                 let Uheight = listItem.detailHeight * 1.1
-
+                    // console.log(listItem.height +">" +  Uheight)
+                    console.log(listItem.height+"||"+listItem.detailHeight);
+                    
                 if (parseFloat(listItem.height) < Lheight || Uheight < parseFloat(listItem.height)) {
                     heightFit = true
                 }
@@ -757,7 +780,7 @@
                 let item = {
                     "id": listItem.id,
                     "store_ID": listItem.store_ID,
-                    "project_ID": self.selectedProject,
+                    "project_ID": listItem.project_ID,
                     "planogramDetail_ID": listItem.planogramDetail_ID,
                     "planogramStoreStatus": listItem.planogramStoreStatus,
                     "Modules": listItem.modules,
