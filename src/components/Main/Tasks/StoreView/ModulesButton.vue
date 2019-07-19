@@ -6,7 +6,7 @@
                     <v-icon>settings</v-icon>
                 </v-btn>
             </template>
-            <span>Configure</span>
+            <span>Settings</span>
         </v-tooltip>
         {{params.data.modules}}
         <ModulesModal ref="modules_modal" />
@@ -23,10 +23,11 @@
         methods: {
             openModal() {
                 let self = this;
-                self.$refs.modules_modal.show(self.params.data, (fixtureData, totalModules) => {
+                self.$refs.modules_modal.show(self.params.data, (fixtureData, totalModules, height) => {
                     self.params.context.componentParent.saveStoreFixtureDetails(fixtureData, () => {
                         let request = self.params;
                         request.data.modules = totalModules;
+                        request.data.height = height;
                         self.params.context.componentParent.UpdateLine(request, () => {
 
                         })

@@ -10,7 +10,7 @@
                             </v-text-field>
                         </v-toolbar-items>
                         <v-spacer></v-spacer>
-                        <v-btn-toggle v-model="searchType" class="transparent" multiple>
+                        <v-btn-toggle v-if="userAccess != 3 " v-model="searchType" class="transparent" multiple>
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
                                     <v-btn v-on="on" :value="1" flat>

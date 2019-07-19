@@ -64,7 +64,7 @@
                     }, {
                         "headerName": "Current Status",
                         "field": "currentStatusText",
-                        "minWidth": 100,
+                        "minWidth": 120,
                     }, {
                         "headerName": "",
                         "editable": false,
@@ -74,10 +74,6 @@
                     }, {
                         "headerName": "Best Fit",
                         "cellRendererFramework": "Fits"
-                    }, {
-                        "headerName": "Category Cluster",
-                        "field": "categoryCluster",
-                        "minWidth": 50,
                     }, {
                         "headerName": "Modules",
                         "field": "Modules",

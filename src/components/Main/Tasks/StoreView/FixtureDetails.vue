@@ -3,12 +3,20 @@
         <thead>
             <th style="min-width: 130px;">Name</th>
             <th>Modules</th>
+            <th>Height</th>
+            <th>Default</th>
         </thead>
         <tbody>
             <tr v-for="(item, idx) in fixture_types" :key="idx">
                 <td>{{ item.displayName }}</td>
                 <td>
                     <input v-model="item.modules" style="width: 100%;" type="number">
+                </td>
+                <td>
+                    <input v-model="item.height" style="width: 100%;" type="number">
+                </td>
+                <td>
+                    <v-icon>{{ item.isDefault ? 'check' : 'close' }}</v-icon>
                 </td>
             </tr>
         </tbody>
@@ -64,7 +72,14 @@
             },
             getFixtureData() {
                 let self = this;
-                return { fixture_types: self.fixture_types, totalModules: self.totalModules };
+                let def = null;
+
+                self.fixture_types.forEach(el => {
+                    if(el.isDefault)
+                        def = el;
+                })
+
+                return { fixture_types: self.fixture_types, totalModules: self.totalModules, height: def.height };
             }
         }
     }

@@ -43,13 +43,12 @@
                 self.afterRuturn = afterRuturn;
                 self.store_Planogram_ID = data.id;
                 self.dialog = true;
-                console.log(self.$refs)
                 self.$refs.fixtureDetails.getStorePlanogramModules(data.id);
             },
             returnText() {
                 let self = this;
                 var newData = self.$refs.fixtureDetails.getFixtureData();
-                self.afterRuturn(newData.fixture_types, newData.totalModules);
+                self.afterRuturn(newData.fixture_types, newData.totalModules, newData.height);
                 self.dialog = false;
             }
         }
