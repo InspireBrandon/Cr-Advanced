@@ -56,10 +56,10 @@
                                 :disabled="Disableapprove">
                                 Approve</v-btn>
                             <v-btn flat
-                                v-if="(projectsStatus.status==20||routeStatus==20||routeStatus==21||projectsStatus.status==21||routeStatus==26)"
+                                v-if="(projectsStatus.status==20||routeStatus==20||routeStatus==21||projectsStatus.status==21)"
                                 outline @click="requestVariation">
                                 Variation</v-btn>
-                            <v-btn outline flat v-if="routeStatus == 24" @click="requestStoreVariation">Request
+                            <v-btn outline flat v-if="routeStatus == 24||routeStatus == 26" @click="requestStoreVariation">Request
                             </v-btn>
                             <v-btn flat v-if="(projectsStatus.status==24||routeStatus==24)" outline
                                 @click="implement(projectsStatus.status,3,timelineItems[0])" :disabled="Disableapprove">
