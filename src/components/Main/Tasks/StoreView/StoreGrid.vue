@@ -330,7 +330,7 @@
                             if (route != undefined)
                                 self.$router.push(route);
                         })
-                    }
+                    } break;
                     case 3: {
                         self.checkFileStatus(item.systemFileID, data => {
                             let status = 24
@@ -349,7 +349,7 @@
                             if (route != undefined)
                                 self.$router.push(route);
                         })
-                    }
+                    } break;
                     case 4: {
                         self.checkFileStatus(item.systemFileID, data => {
                             let status = 26
