@@ -25,9 +25,9 @@
                 let self = this;
                 self.$refs.modules_modal.show(self.params.data, (fixtureData, totalModules) => {
                     self.params.context.componentParent.saveStoreFixtureDetails(fixtureData, () => {
-                        let request = self.params.data;
-                        request.modules = totalModules
-                        self.params.context.componentParent.createStorePlano(request, () => {
+                        let request = self.params;
+                        request.data.modules = totalModules;
+                        self.params.context.componentParent.UpdateLine(request, () => {
 
                         })
                     })

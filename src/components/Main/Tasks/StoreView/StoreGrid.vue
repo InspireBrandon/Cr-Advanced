@@ -80,6 +80,7 @@
                         "minWidth": 50,
                     }, {
                         "headerName": "Modules",
+                        "field": "Modules",
                         "minWidth": 50,
                         "editable": false,
 
