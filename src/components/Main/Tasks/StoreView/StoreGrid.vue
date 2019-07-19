@@ -89,7 +89,7 @@
                         "headerName": "Height",
                         "minWidth": 50,
                         // "cellRendererFramework": "height",
-                        "editable": true,
+                        "editable": false,
                         "field": "height",
                         cellClassRules: {
                             'success-green': 'data.heightFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
