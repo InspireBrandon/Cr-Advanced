@@ -5,8 +5,8 @@
                 <v-card>
                     <v-toolbar flat dark dense color="grey darken-3">
                         <v-toolbar-items>
-                            <v-text-field style="margin-left: 10px; width: 400px; margin-top: -5px;" prepend-inner-icon="search"
-                                placeholder="Search" v-model="filter_text">
+                            <v-text-field style="margin-left: 10px; width: 400px; margin-top: -5px;"
+                                prepend-inner-icon="search" placeholder="Search" v-model="filter_text">
                             </v-text-field>
                         </v-toolbar-items>
                         <v-spacer></v-spacer>
@@ -56,31 +56,34 @@
                         </v-btn>
                         <v-spacer></v-spacer>
 
-                        <v-btn v-if="userAccess == 3" @click="$refs.guide.click()" flat dark>Help</v-btn>
-                        <a style="display: none;" ref="guide" download href="guides/CR TRAINING GUIDELINE 16.07.2019.pdf">guide</a>
+                        <v-btn v-show="userAccess == 3" @click="$refs.guide.click()" dark outline>Help</v-btn>
+                        <a style="display: none;" ref="guide" download
+                            href="guides/CR TRAINING GUIDELINE 16.07.2019.pdf">guide</a>
 
-                        <v-menu offset-y>
-                            <template v-slot:activator="{ on }">
-                                <v-btn flat dark v-on="on">Hide</v-btn>
-                            </template>
-                            <v-list dense>
-                                <v-list-tile tile @click="change_view_state(0)">
-                                    <v-list-tile-title>Sent Subtasks</v-list-tile-title>
-                                </v-list-tile>
-                                <v-divider></v-divider>
-                                <v-list-tile tile @click="change_view_state(1)">
-                                    <v-list-tile-title>Distributed</v-list-tile-title>
-                                </v-list-tile>
-                                <v-divider></v-divider>
-                                <v-list-tile tile @click="change_view_state(2)">
-                                    <v-list-tile-title>Implemented</v-list-tile-title>
-                                </v-list-tile>
-                                <v-divider></v-divider>
-                                <v-list-tile tile @click="change_view_state(3)">
-                                    <v-list-tile-title>Show All</v-list-tile-title>
-                                </v-list-tile>
-                            </v-list>
-                        </v-menu>
+                        <div>
+                            <v-menu offset-y>
+                                <template v-slot:activator="{ on }">
+                                    <v-btn outline dark v-on="on">Hide</v-btn>
+                                </template>
+                                <v-list dense>
+                                    <v-list-tile tile @click="change_view_state(0)">
+                                        <v-list-tile-title>Sent Subtasks</v-list-tile-title>
+                                    </v-list-tile>
+                                    <v-divider></v-divider>
+                                    <v-list-tile tile @click="change_view_state(1)">
+                                        <v-list-tile-title>Distributed</v-list-tile-title>
+                                    </v-list-tile>
+                                    <v-divider></v-divider>
+                                    <v-list-tile tile @click="change_view_state(2)">
+                                        <v-list-tile-title>Implemented</v-list-tile-title>
+                                    </v-list-tile>
+                                    <v-divider></v-divider>
+                                    <v-list-tile tile @click="change_view_state(3)">
+                                        <v-list-tile-title>Show All</v-list-tile-title>
+                                    </v-list-tile>
+                                </v-list>
+                            </v-menu>
+                        </div>
 
                         <v-btn-toggle v-model="selectedView" @change="onViewChanged" class="transparent" mandatory>
                             <v-tooltip bottom>
@@ -94,7 +97,7 @@
                             </v-tooltip>
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
-                                    <v-btn v-on="on" :value="1" flat>
+                                    <v-btn v-show="userAccess != 3" v-on="on" :value="1" flat>
                                         <v-icon>bookmarks</v-icon>
                                     </v-btn>
                                 </template>
@@ -106,14 +109,16 @@
                                         <v-icon>account_balance</v-icon>
                                     </v-btn>
                                 </template>
-                                <span>Stores</span>
+                                <span>Planograms</span>
                             </v-tooltip>
                         </v-btn-toggle>
-                        <v-btn v-if="selectedView==0" style="margin-left: 20px;" icon small color="secondary">
+
+                        <v-btn v-show="selectedView==0" style="margin-left: 20px;" icon small color="secondary">
                             <v-icon @click="showNotices = !showNotices" v-if="showNotices">
                                 visibility_off</v-icon>
                             <v-icon @click="showNotices = !showNotices" v-else>visibility</v-icon>
                         </v-btn>
+
                     </v-toolbar>
                     <v-container style="max-width: 100vw;" fluid grid-list-xs class="pa-0">
                         <v-layout row wrap class="pa-0">
