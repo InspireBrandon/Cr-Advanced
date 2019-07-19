@@ -1,15 +1,18 @@
 <template>
-    <div v-if="rowData.length>0">
-        <ag-grid-vue :gridOptions="gridOptions" :sideBar='false' style="width: 100%;  height: calc(100vh - 159px);"
+    <div >
+        <ag-grid-vue :gridOptions="gridOptions" :sideBar='false' style="width: 100%;  height: calc(100vh - 203px);"
             :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
             :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true"
             rowSelection="multiple" :rowDeselection="true" :enableColResize="true" :floatingFilter="true"
             :onGridReady="onGridReady" :groupMultiAutoColumn="true">
         </ag-grid-vue>
         <PlanogramDetailsSelector :PlanoName="selectedCat" ref="PlanogramDetailsSelector" />
+        
         <YesNoModal ref="YesNoModal" />
         <VariationOrderModal ref="VariationOrderModal" />
-
+ <v-toolbar dark dense class="pa-0">
+            <span>rows : {{rowData.length}}</span>
+        </v-toolbar>
     </div>
 </template>
 <script>
@@ -20,6 +23,7 @@
     import Button from "./StoreButton.vue"
     import Fits from "./Fits.vue"
     import Axios from 'axios'
+    import ModulesButton from "./ModulesButton.vue"
     import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector'
     import {
         AgGridVue
@@ -30,6 +34,7 @@
             VariationOrderModal,
             YesNoModal,
             Fits,
+            ModulesButton,
             AgGridVue,
             Button,
             PlanogramDetailsSelector,
@@ -49,24 +54,18 @@
                         "field": "projectName",
                         "minWidth": 200,
                     }, {
-                        "headerName": "Last Modified",
-                        "field": "dateString",
-                        "minWidth": 200,
-                    }, {
                         "headerName": "Planogram Name",
                         "cellRendererFramework": "PlanogramName",
                         "minWidth": 500,
-                        "editable": false,
                     }, {
-                        "headerName": "Status",
+                        "headerName": "Current Status",
                         "field": "currentStatusText",
                         "minWidth": 100,
-                        "editable": false,
                     }, {
                         "headerName": "",
                         "editable": false,
                         "hide": false,
-                        "minWidth": 50,
+                        "minWidth": 180,
                         "cellRendererFramework": "Button"
                     }, {
                         "headerName": "Best Fit",
@@ -79,20 +78,21 @@
                         "headerName": "Modules",
                         "minWidth": 50,
                         "editable": false,
-                        "field": "modules",
+                       
+                        "cellRendererFramework": "ModulesButton",
                         cellClassRules: {
-                            'success-green': 'data.modulesFit == false &&( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                            'error-red': 'data.modulesFit == true && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                            'success-green': 'data.modulesFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                            'error-red': 'data.modulesFit == true && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
                         }
                     }, {
                         "headerName": "Height",
                         "minWidth": 50,
                         // "cellRendererFramework": "height",
-                        "editable": false,
+                        "editable": true,
                         "field": "height",
                         cellClassRules: {
-                            'success-green': 'data.heightFit == false && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                            'error-red': 'data.heightFit == true && ( data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                            'success-green': 'data.heightFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                            'error-red': 'data.heightFit == true && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
                         }
                     },
                     //  {
@@ -221,6 +221,7 @@
             },
             resize() {
                 setTimeout(() => {
+                    this.gridApi.resetRowHeights();
                     this.gridApi.sizeColumnsToFit()
                 }, 200);
             },
@@ -235,35 +236,32 @@
                     alert("Failed to get project owner: " + e)
                 })
             },
-            openImp(data) {
+            createVariationRequest(variation_Order, order_Detail, variation_Order_Store_Links, stores, callback) {
                 let self = this
+
+                let request = {
+                    Variation_Order: variation_Order,
+                    Variaton_Order_Detail: order_Detail,
+                    Variaton_Order_Store_Link: variation_Order_Store_Links,
+                    Stores: stores
+                }
+                console.log(request);
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                Axios.get(process.env.VUE_APP_API + `ProjectTX?projectID=${data.project_ID}`)
-                    .then(r => {
-                        console.log(r);
-                        let status = r.data.projectTXList[0].status
-                        self.$router.push(
-                            `/PlanogramImplementation/${data.project_ID}/${data.systemFileID}/${status}`)
-
-                        delete Axios.defaults.headers.common["TenantID"];
-                    }).catch(e => {
-                        console.log(e);
-                        delete Axios.defaults.headers.common["TenantID"];
-                    })
-
+                Axios.post(process.env.VUE_APP_API + 'Variation_Order', request).then(r => {
+                    console.log(r);
+                    callback()
+                    delete Axios.defaults.headers.common["TenantID"];
+                })
             },
-            openOrder(data, type, title) {
+            openOrder(data, type,title) {
                 let self = this
                 let item = data.data
                 let node = data.node
                 self.getProjectOwner(item.project_ID, ownerCallback => {
-                    console.log("ownerCallback");
-                    console.log(ownerCallback);
-                    let owner = ownerCallback.systemUserID
                     let encoded_details = jwt.decode(sessionStorage.accessToken);
                     let systemUserID = encoded_details.USER_ID;
                     self.$refs.VariationOrderModal.show(item, type, title, VariationCB => {
-                        let notes = VariationCB
+                        let notes = VariationCB.notes
                         item.planogramStoreStatus = 5
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                         Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
@@ -287,15 +285,50 @@
                                         "type": 3,
                                         "storeCluster_ID": item.clusterID,
                                         "store_ID": storeID,
-                                        "notes": notes,
+                                        "notes": VariationCB.notes,
                                         "status": 14,
-                                        "systemUserID": owner,
+                                        "systemUserID": ownerCallback.systemUserID,
                                         "planogram_ID": item.planogramID,
                                         "systemFileID": item.systemFileID,
                                         "rangeFileID": item.rangeID,
                                     }
                                     self.createProjectTransaction(TXrequest, txCallback => {
+                                        let variation_Order = {
+                                            Planogram_Detail_ID: item
+                                                .planogramDetail_ID,
+                                            Project_TX_ID: txCallback.id,
+                                            DateRequested: new Date(),
+                                            Status: 0,
+                                        }
+                                        let order_Detail = {
+                                            Height: VariationCB.height,
+                                            Modules: VariationCB.totalModules,
+                                            Notes: VariationCB.notes,
+                                        }
+                                        if (type == 0) {
+                                            let variation_Order_Store_Links = [{
+                                                Store_Planogram_ID: item.id
 
+                                            }]
+                                            self.createVariationRequest(
+                                                variation_Order,
+                                                order_Detail,
+                                                variation_Order_Store_Links,
+                                                null,
+                                                callback => {
+                                                    self.getRowData()
+                                                })
+                                        } else {
+                                            let stores = VariationCB.stores
+                                            self.createVariationRequest(
+                                                variation_Order,
+                                                order_Detail,
+                                                null,
+                                                stores,
+                                                callback => {
+                                                    self.getRowData()
+                                                })
+                                        }
                                     })
                                 })
                                 delete Axios.defaults.headers.common["TenantID"];
@@ -304,17 +337,13 @@
                                 delete Axios.defaults.headers.common["TenantID"];
                             })
                     })
-
                 })
-
             },
             onGridReady(params) {
                 this.gridApi = params.api;
                 this.columnApi = params.columnApi;
                 setTimeout(() => {
-                    console.log("resizing");
-                    this
-                        .gridApi.resetRowHeights();
+                    this.gridApi.resetRowHeights();
                     this.gridApi.sizeColumnsToFit()
                 }, 300);
             },
@@ -337,7 +366,7 @@
                 let listItem = data.data
                 let node = data.node
                 self.selectedCat = listItem.projectName
-                self.$refs.PlanogramDetailsSelector.show(listItem, true, data => {
+                self.$refs.PlanogramDetailsSelector.show(listItem, true, listItem.planogram_ID, data => {
                     //   busy here with fits addition for store view
                     let moduleFit = false
                     let heightFit = false
@@ -349,7 +378,9 @@
                             moduleFit = true
                         }
 
-                        if (listItem.height < data.height) {
+                        let Lheight = listItem.height * 0.9
+                        let Uheight = listItem.height * 1.1
+                        if (Lheight < data.height && data.height < Uheight) {
                             heightFit = true
                         }
 
@@ -385,6 +416,7 @@
                                 listItem.fits = fits
                                 listItem.planogramStoreStatus = 1
                                 listItem.systemFileID = data.systemFileID
+                                listItem.rangeID = data.rangeID
                                 node.setData(listItem)
                                 delete Axios.defaults.headers.common["TenantID"];
                             }).catch(e => {

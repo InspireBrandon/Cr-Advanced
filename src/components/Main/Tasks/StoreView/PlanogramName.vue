@@ -1,11 +1,6 @@
 <template>
-    <div v-if="params.data.planogramStoreStatus!=0&&params.data.planogramStoreStatus!=6">
-        <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              
-            </template>
-            <span>Remove Planogram</span>
-        </v-tooltip>
+    <div v-if="params.data.planogramStoreStatus!=0&&params.data.planogramStoreStatus!=6&&params.data.planogramStoreStatus!=7">
+       
         {{params.data.fileName}}
     </div>
 </template>

@@ -1,12 +1,10 @@
 <template>
-    <v-card flat>
-        <StoreGrid ref="StoreGrid" :rowData="rowdata" :method="GetData" :StoreID="store_ID" />
-        <v-card v-if="rowdata.length==0">
-            <v-card-text>
-                No Planograms Have been assigned</v-card-text>
+   
+        <v-card>
+            <StoreGrid ref="StoreGrid" :rowData="rowdata" :method="GetData" :StoreID="store_ID" />
+            <PlanogramDetailsSelector :PlanoName="'Select'" ref="PlanogramDetailsSelector" />
         </v-card>
-        <PlanogramDetailsSelector :PlanoName="'Select'" ref="PlanogramDetailsSelector" />
-    </v-card>
+   
 </template>
 <script>
     import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector'
@@ -18,13 +16,13 @@
             StoreGrid,
             PlanogramDetailsSelector,
         },
-        props: ["StoreID", "getStoreData", "rowdata"],
+        props: ["StoreID", "getStoreData","rowdata"],
         data() {
             return {
                 currentStorePlanograms: [],
                 store_ID: null,
                 dialog: false,
-                rowData: [],
+              
                 title: null,
                 StoreStatusList: [{
                         text: "Unassigned"
@@ -44,31 +42,27 @@
                         text: "Variation"
                     }, {
                         text: "On Hold"
+                    }, {
+                        text: "Recalled"
                     }
                 ],
             }
         },
-        mounted() {
-            let self = this
-
-
-            // self.GetData(() => {
-
-            // });
-        },
         methods: {
-            GetData(store_ID) {
+            GetData(StoreID) {
                 let self = this
-                store_ID = 124489
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.get(process.env.VUE_APP_API + `Store_Planogram?Store_ID=${store_ID}`)
+                Axios.get(process.env.VUE_APP_API + `Store_Planogram?Store_ID=${StoreID.store_ID}`)
                     .then(r => {
+                        console.log(r);
+
                         self.rowData = []
                         self.currentStorePlanograms = []
                         self.currentStorePlanograms = r.data.queryResult;
 
                         r.data.queryResult.forEach((e) => {
+                            e.GeneratedName = self.GenerateName(e)
                             e.currentStatusText = self.StoreStatusList[e.planogramStoreStatus].text
                         })
 
@@ -87,7 +81,7 @@
                 self.store_ID = data.store_ID
                 self.title = data.storeName
                 self.$refs.StoreGrid.resize()
-                self.GetData(data)
+              
             },
             close() {
                 let self = this

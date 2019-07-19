@@ -605,6 +605,8 @@
 
                             self.storeData = currentStorePlanograms
                             self.$refs.SplashLoader.close()
+                            console.log("self.storeData");
+
                             console.log(self.storeData);
 
                         }).catch(e => {
