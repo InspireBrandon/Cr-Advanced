@@ -60,7 +60,7 @@
                         <a style="display: none;" ref="guide" download
                             href="guides/CR TRAINING GUIDELINE 16.07.2019.pdf">guide</a>
 
-                        <div>
+                        <div v-if="userAccess !=3">
                             <v-menu offset-y>
                                 <template v-slot:activator="{ on }">
                                     <v-btn outline dark v-on="on">Hide</v-btn>

@@ -12,7 +12,7 @@
                 <span>mail</span>
             </v-tooltip>
         </div>
-           <div v-if="params.data.planogramStoreStatus==3">
+           <!-- <div v-if="params.data.planogramStoreStatus==3">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                     <v-btn v-on="on" @click="params.context.componentParent.setImplemented(params.data)" icon flat
@@ -22,7 +22,7 @@
                 </template>
                 <span>complete Implementation</span>
             </v-tooltip>
-        </div>
+        </div> -->
         <div v-if="params.data.planogramStoreStatus==2">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
