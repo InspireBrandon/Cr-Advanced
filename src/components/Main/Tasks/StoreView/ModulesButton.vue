@@ -22,8 +22,8 @@
         methods: {
             openModal() {
                 let self = this;
-                self.$refs.modules_modal.show(data => {
-
+                self.$refs.modules_modal.show(self.params.data, data => {
+                    
                 })
             }
         }
