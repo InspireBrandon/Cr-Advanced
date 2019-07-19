@@ -50,7 +50,8 @@
                                             </v-flex>
                                         </v-flex>
                                         <v-flex md4>
-                                            <img style="max-height: 400px; max-width: 400px;" src="http://project1.devinspire.co.za/static/img/Chain-Research-Logo1.a3c73b4.png"
+                                            <img style="max-height: 400px; max-width: 400px;"
+                                                src="http://project1.devinspire.co.za/static/img/Chain-Research-Logo1.a3c73b4.png"
                                                 alt="">
                                         </v-flex>
                                     </v-layout>
@@ -111,18 +112,20 @@
                             </v-card-text>
                         </v-card>
                         <div class="print-break-page"></div>
-                        <v-card class="mb-3" >
+                        <v-card class="mb-3">
                             <v-toolbar flat dark dense>
                                 <v-toolbar-title>Product Report - Weekly Average</v-toolbar-title>
                             </v-toolbar>
                             <v-card-text>
                                 <table>
-                                    <tr><th style="min-width:150px">Product Code</th>
+                                    <tr>
+                                        <th style="min-width:150px">Product Code</th>
                                         <th style="min-width:150px">Barcode</th>
                                         <th style="min-width:400px">Description</th>
                                         <th style="min-width:100px">Capacity</th>
+                                        <th style="min-width:100px">Forward Capacity</th>
                                         <th style="min-width:100px">DOS</th>
-                                        <th  style="min-width:100px" v-if="accesstype!=2">Sales Cost</th>
+                                        <th style="min-width:100px" v-if="accesstype!=2">Sales Cost</th>
                                         <th style="min-width:100px">Sales Retail</th>
                                         <th style="min-width:100px">Sales Units</th>
                                     </tr>
@@ -131,8 +134,10 @@
                                         <td>{{ item.barcode }}</td>
                                         <td>{{ item.name }}</td>
                                         <td style="text-align: right;">{{ item.qty }}</td>
+                                        <td style="text-align: right;">{{ item.xyqty }}</td>
                                         <td style="text-align: right;">{{ item.daysOfSupply }}</td>
-                                        <td style="text-align: right;" v-if="accesstype!=2">{{ item.weeklySalesCost }}</td>
+                                        <td style="text-align: right;" v-if="accesstype!=2">{{ item.weeklySalesCost }}
+                                        </td>
                                         <td style="text-align: right;">{{ item.weeklySalesRetail }}</td>
                                         <td style="text-align: right;">{{ item.weeklySalesUnits }}</td>
                                     </tr>
@@ -198,35 +203,46 @@
     function productReportItem(item, allItems) {
         let self = this;
 
-        console.log(item, allItems)
-
         self.id = item.Data.Data.id;
         self.name = item.Data.Data.description;
         self.product_Code = item.Data.Data.product_System_ID;
         self.barcode = item.Data.Data.barcode;
         self.capacity = 0;
+        self.forwardCapacity = 0;
         self.daysOfSupply = item.Data.CalcData.DaysOfSupply;
         self.weeklyProfit = item.Data.CalcData.Weekly_Profit;
         self.weeklySalesCost = item.Data.CalcData.Weekly_Sales_Cost;
         self.weeklySalesRetail = item.Data.CalcData.Weekly_Sales_Retail;
         self.weeklySalesUnits = item.Data.CalcData.Weekly_Sales_Units;
         self.qty = 0;
+        self.xyqty = 0;
 
         allItems.forEach(el => {
             if (self.id == undefined) {
                 if (el.Data.Data.barcode == self.barcode) {
                     self.capacity += el.Data.CalcData.Capacity;
+
+                    if (el.Data.CalcData.ForwardCapacity != undefined)
+                        self.forwardCapacity += el.Data.CalcData.ForwardCapacity;
+
                     self.qty++;
+                    self.xyqty++;
                 }
             } else {
                 if (el.Data.Data.id == self.id) {
                     self.capacity += el.Data.CalcData.Capacity;
+
+                    if (el.Data.CalcData.ForwardCapacity != undefined)
+                        self.forwardCapacity += el.Data.CalcData.ForwardCapacity;
+
                     self.qty++;
+                    self.xyqty++;
                 }
             }
         })
 
         self.qty = self.qty * item.Data.Facings.x * item.Data.Facings.y * item.Data.Facings.z;
+        self.xyqty = self.xyqty * item.Data.Facings.x * item.Data.Facings.y;
     }
 
     export default {
@@ -340,14 +356,16 @@
                     }
                 });
                 console.log(tmp);
-                
+
                 tmp.sort(function (a, b) {
-                   if(a.weeklySalesUnits!="N/A"){if (parseFloat(a.weeklySalesUnits) > parseFloat(b.weeklySalesUnits)) {
-                        return 1;
-                    } else {
-                        return -1;
-                    }}
-                   
+                    if (a.weeklySalesUnits != "N/A") {
+                        if (parseFloat(a.weeklySalesUnits) > parseFloat(b.weeklySalesUnits)) {
+                            return 1;
+                        } else {
+                            return -1;
+                        }
+                    }
+
                 });
                 self.productReport = tmp;
             },
