@@ -1,7 +1,7 @@
 <template>
    
         <v-card>
-            <StoreGrid ref="StoreGrid" :rowData="rowdata" :method="GetData" :StoreID="store_ID" />
+            <StoreGrid ref="StoreGrid" :rowData="rowdata" :method="getStoreViewData" :StoreID="store_ID" />
             <PlanogramDetailsSelector :PlanoName="'Select'" ref="PlanogramDetailsSelector" />
         </v-card>
    
@@ -16,7 +16,7 @@
             StoreGrid,
             PlanogramDetailsSelector,
         },
-        props: ["StoreID", "getStoreData","rowdata"],
+        props: ["StoreID", "getStoreData","rowdata","getStoreViewData"],
         data() {
             return {
                 currentStorePlanograms: [],

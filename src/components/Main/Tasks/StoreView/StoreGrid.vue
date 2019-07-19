@@ -1,5 +1,5 @@
 <template>
-    <div >
+    <div>
         <ag-grid-vue :gridOptions="gridOptions" :sideBar='false' style="width: 100%;  height: calc(100vh - 203px);"
             :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
             :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true"
@@ -7,15 +7,18 @@
             :onGridReady="onGridReady" :groupMultiAutoColumn="true">
         </ag-grid-vue>
         <PlanogramDetailsSelector :PlanoName="selectedCat" ref="PlanogramDetailsSelector" />
-        
+
         <YesNoModal ref="YesNoModal" />
         <VariationOrderModal ref="VariationOrderModal" />
- <v-toolbar dark dense class="pa-0">
+        <UserNotesModal ref="UserNotesModal"></UserNotesModal>
+        <v-toolbar dark dense class="pa-0">
             <span>rows : {{rowData.length}}</span>
         </v-toolbar>
     </div>
 </template>
 <script>
+    import UserNotesModal from '@/components/Common/UserNotesModal.vue'
+
     import YesNoModal from '@/components/Common/YesNoModal'
     import VariationOrderModal from '@/components/Main/PlanogramImplementation/VariationOrderModal'
     import jwt from 'jsonwebtoken';
@@ -37,6 +40,7 @@
             ModulesButton,
             AgGridVue,
             Button,
+            UserNotesModal,
             PlanogramDetailsSelector,
             PlanogramName,
 
@@ -78,7 +82,7 @@
                         "headerName": "Modules",
                         "minWidth": 50,
                         "editable": false,
-                       
+
                         "cellRendererFramework": "ModulesButton",
                         cellClassRules: {
                             'success-green': 'data.modulesFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
@@ -219,6 +223,145 @@
 
 
             },
+            sendMail(currentItem) {
+                let self = this;
+
+                self.$refs.UserNotesModal.show(modalData => {
+                    let request = JSON.parse(JSON.stringify(currentItem));
+
+                    let projectTXGroupRequest = {
+                        projectID: request.project_ID
+                    }
+
+                    // Create New Project Group
+                    self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
+                        request.systemUserID = modalData.systemUserID;
+                        request.actionedByUserID = null;
+                        request.rollingUserID = null;
+                        request.notes = modalData.notes;
+                        request.projectTXGroup_ID = newGroup.id;
+                        request.type = 7;
+                        request.status = 43;
+                        // Create New Project Transaction
+                        self.createProjectTransaction(request, data => {
+                            self.method(() => {
+                                console.log("gotdata");
+
+                            })
+                        })
+                    })
+                })
+            },
+            viewSetinProgress(item) {
+                let self = this
+                item.planogramStoreStatus = 2
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item).then(r => {
+                    self.routeToView(item)
+                })
+            },
+            setImplemented(item) {
+                let self = this
+                item.planogramStoreStatus = 3
+                item.height=item.detailHeight
+                item.modules=item.detailModules
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item).then(r => {
+                    self.method(
+                        () => {}
+                    )
+                })
+            },
+            routeToView(item) {
+                let self = this;
+                let route;
+
+                console.log("BRUH", item);
+
+                switch (item.planogramStoreStatus) {
+                    //     case 1: {
+                    //         route = `/DataPreparation`
+                    //         self.$router.push(route);
+                    //     }
+                    //     break;
+                    // case 2: {
+                    //     route = `/RangePlanning/${item.rangeFileID}`
+                    //     self.$router.push(route);
+                    // }
+                    // break;
+                    case 2: {
+                        self.checkFileStatus(item.systemFileID, data => {
+                            let status = 13
+                            route =
+                                `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${status}`
+
+                            if (data.status == 1) {
+                                alert("this planogram has been recalled, task will be removed");
+                            }
+
+                            if (data.status == 2) {
+                                alert(
+                                    "A variation has been requested for this planogram, task will be removed"
+                                );
+                            }
+
+                            if (route != undefined)
+                                self.$router.push(route);
+                        })
+                    }
+                    case 3: {
+                        self.checkFileStatus(item.systemFileID, data => {
+                            let status = 24
+                            route =
+                                `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${status}`
+
+                            if (data.status == 1) {
+                                alert("this planogram has been recalled, task will be removed");
+                            }
+
+                            if (data.status == 2) {
+                                alert(
+                                    "A variation has been requested for this planogram, task will be removed"
+                                );
+                            }
+
+                            if (route != undefined)
+                                self.$router.push(route);
+                        })
+                    }
+                    case 4: {
+                        self.checkFileStatus(item.systemFileID, data => {
+                            let status = 26
+                            route =
+                                `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${status}`
+
+                            if (data.status == 1) {
+                                alert("this planogram has been recalled, task will be removed");
+                            }
+
+                            if (data.status == 2) {
+                                alert(
+                                    "A variation has been requested for this planogram, task will be removed"
+                                );
+                            }
+
+                            if (route != undefined)
+                                self.$router.push(route);
+                        })
+                    }
+                    break;
+                }
+
+            },
+            checkFileStatus(fileID, callback) {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API + "SystemFile?db=CR-DEVINSPIRE&id=" + fileID)
+                    .then(r => {
+                        console.log(r.data);
+                        callback(r.data);
+                    })
+            },
             resize() {
                 setTimeout(() => {
                     this.gridApi.resetRowHeights();
@@ -253,7 +396,7 @@
                     delete Axios.defaults.headers.common["TenantID"];
                 })
             },
-            openOrder(data, type,title) {
+            openOrder(data, type, title) {
                 let self = this
                 let item = data.data
                 let node = data.node
@@ -425,17 +568,18 @@
                     })
                 })
             },
-            updateCheck(item) {
+           UpdateLine(item) {
                 let self = this
                 let tmp = item.data
                 let node = item.node
-
-                self.createUpdate(tmp, data => {
+                self.createStorePlano(tmp, data => {
                     tmp.id = data.store_Planogram.id
                     tmp.heightFit = data.store_Planogram.heightFit;
                     tmp.modulesFit = data.store_Planogram.modulesFit;
+                    tmp.fits = data.store_Planogram.fits;
                     node.setData(tmp)
                 })
+                // self.createPlanoGramDetailTX(tmp)
             },
             createUpdate(listItem, callback) {
 
@@ -588,16 +732,58 @@
                         callback(e)
                     })
             },
-            createStorePlano(listItem, callback) {
+             createStorePlano(listItem, callback) {
                 let self = this;
+                let moduleFit = false
+                let heightFit = false
+                let overallFits = false
+                let storeClusterFit = false
 
-                listItem.requiredInStore = !listItem.requiredInStore
+                if (listItem.modules < listItem.detailModules) {
+                    moduleFit = true
+                }
+
+                let Lheight = listItem.detailHeight * 0.9
+                let Uheight = listItem.detailHeight * 1.1
+
+                if (parseFloat(listItem.height) < Lheight || Uheight < parseFloat(listItem.height)) {
+                    heightFit = true
+                }
+
+                if (listItem.storeClusterFit == true || heightFit == true || moduleFit == true) {
+                    overallFits = true
+                }
+
+                let item = {
+                    "id": listItem.id,
+                    "store_ID": listItem.store_ID,
+                    "project_ID": self.selectedProject,
+                    "planogramDetail_ID": listItem.planogramDetail_ID,
+                    "planogramStoreStatus": listItem.planogramStoreStatus,
+                    "Modules": listItem.modules,
+                    "Height": parseFloat(listItem.height),
+                    "Width": parseFloat(listItem.width),
+                    "modulesFit": moduleFit,
+                    "storeClusterFit": listItem.storeClusterFit,
+                    "Displays": listItem.displays,
+                    "Pallettes": listItem.pallettes,
+                    "heightFit": heightFit,
+                    "SupplierStands": listItem.supplierStands,
+                    "Bins": listItem.bins,
+                    "FixtureType": listItem.fixtureType,
+                    "Fits": overallFits,
+                    "audit": listItem.audit
+                }
+
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', listItem)
+
+                Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
                     .then(r => {
+                        console.log(r);
                         delete Axios.defaults.headers.common["TenantID"];
-                        callback(r)
+                        callback(r.data)
                     }).catch(e => {
+                        console.log(e);
                         delete Axios.defaults.headers.common["TenantID"];
                         callback(e)
                     })
