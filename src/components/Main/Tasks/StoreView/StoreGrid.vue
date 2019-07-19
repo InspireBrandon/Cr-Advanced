@@ -254,7 +254,7 @@
             },
             viewSetinProgress(item) {
                 let self = this
-                item.planogramStoreStatus = 2
+                item.planogramStoreStatus = 3
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item).then(r => {
                     self.routeToView(item)
@@ -262,7 +262,7 @@
             },
             setImplemented(item) {
                 let self = this
-                item.planogramStoreStatus = 3
+                item.planogramStoreStatus = 4
                 item.height=item.detailHeight
                 item.modules=item.detailModules
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -629,22 +629,22 @@
                         callback(e)
                     })
             },
-            UpdateLine(item) {
-                let self = this
-                let text = ""
-                if (item.requiredInStore == true) {
-                    text = "Do you want to innclude this category in this store?"
-                } else {
-                    text = "Are you sure you want to remove this category ?"
-                }
-                self.$refs.YesNoModal.show(text, data => {
-                    if (data) {
-                        self.createStorePlano(item, data => {
+            // UpdateLine(item) {
+            //     let self = this
+            //     let text = ""
+            //     if (item.requiredInStore == true) {
+            //         text = "Do you want to innclude this category in this store?"
+            //     } else {
+            //         text = "Are you sure you want to remove this category ?"
+            //     }
+            //     self.$refs.YesNoModal.show(text, data => {
+            //         if (data) {
+            //             self.createStorePlano(item, data => {
 
-                        })
-                    }
-                })
-            },
+            //             })
+            //         }
+            //     })
+            // },
             removeFromStore(item, state, Status) {
                 let self = this
                 let tmp = item.data
