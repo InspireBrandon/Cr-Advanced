@@ -19,6 +19,7 @@
                         <v-text-field label="Store Name" disabled v-model="storeName">
                         </v-text-field>
                     </v-flex>
+
                     <v-flex md6 v-if="variationType!=0">
                         <v-autocomplete label="Store Name" multiple :items="stores" v-model="selectedStores">
                         </v-autocomplete>
@@ -26,6 +27,9 @@
                     <v-flex md6>
                         <!-- <v-select :items="FixtureTypes" label="Variation Type" v-model="FixtureType">
                         </v-select> -->
+                    </v-flex>
+                    <v-flex md12 v-show="variationType==0">
+                        <FixtureDetails ref="FixtureDetails" />
                     </v-flex>
                     <v-flex md4>
                         <v-text-field v-model="height" label="Height"></v-text-field>
@@ -44,16 +48,21 @@
                     send
                 </v-btn>
             </v-card-actions>
+
         </v-card>
     </v-dialog>
 </template>
 
 <script>
+    import FixtureDetails from '@/components/Main/Tasks/StoreView/FixtureDetails'
     import Axios from 'axios'
     import {
         request
     } from 'http';
     export default {
+        components: {
+            FixtureDetails
+        },
         data() {
             return {
                 FixtureTypes: [{
@@ -91,8 +100,8 @@
                 self.getStores(() => {})
                 self.getPlanoDetails()
                 self.listitem = item
-                self.dialog = true
                 self.variationType = variationType
+                self.dialog = true
                 self.title = title
                 self.height = item.height
                 self.width = item.width
@@ -104,6 +113,12 @@
                 self.pallettes = item.pallettes
                 self.FixtureType = item.fixtureType
                 self.additionalNotes = ""
+                console.log("variationType");
+                console.log(variationType);
+                if (variationType == 0) {
+                    console.log(item);
+                    self.$refs.FixtureDetails.getStorePlanogramModules(item.id)
+                }
                 if (item.planogramDetail_ID != 0) {
                     self.selectedPlanoDetail = item.planogramDetail_ID
                 }
@@ -171,7 +186,21 @@
                 // string += "Supplier Stands: " + self.supplierStands + "\r\n"
                 // string += "Palettes: " + self.pallettes + "\r\n"
                 if (self.variationType == 0) {
-                    string += "Store: " + self.storeName + "\r\n"
+                    string += "Store: " + self.storeName + "\r\n" + "\r\n"
+                    string += "Fixtures: " + "\r\n" + "\r\n"
+
+                    let fixtures = []
+                    fixtures = self.$refs.FixtureDetails.getFixtureData()
+                    self.saveStoreFixtureDetails(fixtures,()=>{
+
+                    })
+                    // console.log("fixtures");
+                    // console.log(fixtures);
+
+                    fixtures.fixture_types.forEach(e=>{
+                        string += "- " +e.displayName + ":" +  " Modules " +e.modules +    "- Height " +e.height+"M" +"\r\n"
+                    })
+                 string += "\r\n"
                 } else {
                     console.log("self.selectedStores");
                     console.log(self.selectedStores);
@@ -225,7 +254,7 @@
             submit() {
                 let self = this
                 let text = self.buildString()
-
+                // self.additionalNotes = text
                 // let projectTXGroupRequest = {
                 //     projectID: listitem.project_ID
                 // }
@@ -247,13 +276,27 @@
                 // console.log(self.selectedStores);
 
 
-                self.dialog = false
+                // self.dialog = false
                 self.afterReturn({
                     totalModules: self.modules,
                     height: self.height,
                     notes: self.buildString(),
                     stores: self.selectedStores
                 });
+            },
+            saveStoreFixtureDetails(store_planogram_fixture_list, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + 'Store_Planogram_Fixture', store_planogram_fixture_list)
+                    .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        callback(r.data)
+                    }).catch(e => {
+                        console.error(e);
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
             },
         },
         created() {

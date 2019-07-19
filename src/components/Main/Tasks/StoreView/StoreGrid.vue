@@ -423,6 +423,9 @@
                 self.getProjectOwner(item.project_ID, ownerCallback => {
                     let encoded_details = jwt.decode(sessionStorage.accessToken);
                     let systemUserID = encoded_details.USER_ID;
+                    console.log("type");
+                    console.log(type);
+                    
                     self.$refs.VariationOrderModal.show(item, type, title, VariationCB => {
                         let notes = VariationCB.notes
                         item.planogramStoreStatus = 5
