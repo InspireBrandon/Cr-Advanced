@@ -1068,6 +1068,7 @@ function calculate(productItem, vuex) {
   var calcData = {
     XFacings: null,
     Capacity: null,
+    ForwardCapacity: null,
     DaysOfSupply: null,
     Weekly_Sales_Retail: null,
     Weekly_Sales_Cost: null,
@@ -1090,7 +1091,8 @@ function calculate(productItem, vuex) {
     Facings_X: 0,
     Facings_Y: 0,
     Facings_Z: 0,
-    TotalFacings: 0
+    TotalFacings: 0,
+    XYFacings: 0
   };
 
   productStoreCopy.forEach((element, index) => {
@@ -1099,6 +1101,7 @@ function calculate(productItem, vuex) {
       productData.Facings_Y += element.Facings_Y;
       productData.Facings_Z += element.Facings_Z;
       productData.TotalFacings += element.TotalFacings;
+      productData.XYFacings += element.Facings_X + element.Facings_Y;
     }
   });
 
@@ -1113,6 +1116,7 @@ function calculate(productItem, vuex) {
   calcData.Weekly_Profit = calculationHandler.Calculate_Weekly_Profit(productData.ProductData.sales_Profit);
   calcData.XFacings = productData.Facings_X;
   calcData.Capacity = productData.TotalFacings;
+  calcData.ForwardCapacity = productData.XYFacings;
 
   return calcData;
 }
