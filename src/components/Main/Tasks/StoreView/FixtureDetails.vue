@@ -58,11 +58,13 @@
                             if (element.modules > 0)
                                 self.fixture_types.push(element)
                         });
+
+                        console.log(self.fixture_types);
                     })
             },
             getFixtureData() {
                 let self = this;
-                return self.fixture_types;
+                return { fixture_types: self.fixture_types, totalModules: self.totalModules };
             }
         }
     }

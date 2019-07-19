@@ -283,8 +283,8 @@
             setImplemented(item) {
                 let self = this
                 item.planogramStoreStatus = 4
-                item.height=item.detailHeight
-                item.modules=item.detailModules
+                item.height = item.detailHeight
+                item.modules = item.detailModules
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item).then(r => {
                     self.method(
@@ -297,7 +297,7 @@
                 let route;
 
                 console.log("BRUH", item);
-                            console.log("[planogramStoreStatus]",item.planogramStoreStatus);
+                console.log("[planogramStoreStatus]", item.planogramStoreStatus);
 
                 switch (item.planogramStoreStatus) {
                     //     case 1: {
@@ -313,46 +313,7 @@
                     case 2: {
                         self.checkFileStatus(item.systemFileID, data => {
                             let status = 13
-                            
-                            route =
-                                `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${status}`
 
-                            if (data.status == 1) {
-                                alert("this planogram has been recalled, task will be removed");
-                            }
-
-                            if (data.status == 2) {
-                                alert(
-                                    "A variation has been requested for this planogram, task will be removed"
-                                );
-                            }
-
-                            if (route != undefined)
-                                self.$router.push(route);
-                        })
-                    } break;
-                    case 3: {
-                        self.checkFileStatus(item.systemFileID, data => {
-                            let status = 24
-                            route = `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${status}`
-
-                            if (data.status == 1) {
-                                alert("this planogram has been recalled, task will be removed");
-                            }
-
-                            if (data.status == 2) {
-                                alert(
-                                    "A variation has been requested for this planogram, task will be removed"
-                                );
-                            }
-
-                            if (route != undefined)
-                                self.$router.push(route);
-                        })
-                    } break;
-                    case 4: {
-                        self.checkFileStatus(item.systemFileID, data => {
-                            let status = 26
                             route =
                                 `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${status}`
 
@@ -371,6 +332,47 @@
                         })
                     }
                     break;
+                case 3: {
+                    self.checkFileStatus(item.systemFileID, data => {
+                        let status = 24
+                        route = `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${status}`
+
+                        if (data.status == 1) {
+                            alert("this planogram has been recalled, task will be removed");
+                        }
+
+                        if (data.status == 2) {
+                            alert(
+                                "A variation has been requested for this planogram, task will be removed"
+                            );
+                        }
+
+                        if (route != undefined)
+                            self.$router.push(route);
+                    })
+                }
+                break;
+                case 4: {
+                    self.checkFileStatus(item.systemFileID, data => {
+                        let status = 26
+                        route =
+                            `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${status}`
+
+                        if (data.status == 1) {
+                            alert("this planogram has been recalled, task will be removed");
+                        }
+
+                        if (data.status == 2) {
+                            alert(
+                                "A variation has been requested for this planogram, task will be removed"
+                            );
+                        }
+
+                        if (route != undefined)
+                            self.$router.push(route);
+                    })
+                }
+                break;
                 }
 
             },
@@ -589,7 +591,7 @@
                     })
                 })
             },
-           UpdateLine(item) {
+            UpdateLine(item) {
                 let self = this
                 let tmp = item.data
                 let node = item.node
@@ -753,7 +755,21 @@
                         callback(e)
                     })
             },
-             createStorePlano(listItem, callback) {
+            saveStoreFixtureDetails(store_planogram_fixture_list, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + 'Store_Planogram_Fixture', store_planogram_fixture_list)
+                    .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        callback(r.data)
+                    }).catch(e => {
+                        console.error(e);
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+            },
+            createStorePlano(listItem, callback) {
                 let self = this;
                 let moduleFit = false
                 let heightFit = false
@@ -766,9 +782,9 @@
 
                 let Lheight = listItem.detailHeight * 0.9
                 let Uheight = listItem.detailHeight * 1.1
-                    // console.log(listItem.height +">" +  Uheight)
-                    console.log(listItem.height+"||"+listItem.detailHeight);
-                    
+                // console.log(listItem.height +">" +  Uheight)
+                console.log(listItem.height + "||" + listItem.detailHeight);
+
                 if (parseFloat(listItem.height) < Lheight || Uheight < parseFloat(listItem.height)) {
                     heightFit = true
                 }

@@ -14,6 +14,7 @@
 </template>
 <script>
     import ModulesModal from './ModulesModal';
+    import Axios from 'axios';
 
     export default {
         components: {
@@ -22,8 +23,14 @@
         methods: {
             openModal() {
                 let self = this;
-                self.$refs.modules_modal.show(self.params.data, data => {
-                    
+                self.$refs.modules_modal.show(self.params.data, (fixtureData, totalModules) => {
+                    self.params.context.componentParent.saveStoreFixtureDetails(fixtureData, () => {
+                        let request = self.params.data;
+                        request.modules = totalModules
+                        self.params.context.componentParent.createStorePlano(request, () => {
+
+                        })
+                    })
                 })
             }
         }

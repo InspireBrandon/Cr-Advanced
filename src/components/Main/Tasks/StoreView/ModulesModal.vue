@@ -7,11 +7,11 @@
                         <v-toolbar-title>Configure Modules</v-toolbar-title>
                     </v-toolbar>
                     <v-card-text style="height: 300px; overflow-x: auto;">
-                        <FixtureDetails ref="FixtureDetails" />
+                        <FixtureDetails ref="fixtureDetails" />
                     </v-card-text>
                     <v-divider></v-divider>
                     <v-card-actions>
-                        Total Modules: {{ $refs.FixtureDetails.totalModules }}
+                        Total Modules: <span v-if="$refs.fixtureDetails != undefined">{{ $refs.fixtureDetails.totalModules }}</span> 
                         <v-spacer></v-spacer>
                         <v-btn color="error darken-1" @click.native="dialog = false">Cancel</v-btn>
                         <v-btn color="primary darken-1" @click.native="returnText">Continue</v-btn>
@@ -42,12 +42,14 @@
                 let self = this;
                 self.afterRuturn = afterRuturn;
                 self.store_Planogram_ID = data.id;
-                self.$refs.FixtureDetails.getStorePlanogramModules(data.id);
                 self.dialog = true;
+                console.log(self.$refs)
+                self.$refs.fixtureDetails.getStorePlanogramModules(data.id);
             },
             returnText() {
                 let self = this;
-                self.afterRuturn();
+                var newData = self.$refs.fixtureDetails.getFixtureData();
+                self.afterRuturn(newData.fixture_types, newData.totalModules);
                 self.dialog = false;
             }
         }
