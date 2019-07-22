@@ -79,10 +79,53 @@
             </v-btn-toggle>
         </v-toolbar>
         <v-content>
-            <v-card flat tile color="grey darken-2" style="height: calc(100vh - 136px)">
+            <v-card dark flat tile color="grey darken-2" style="height: calc(100vh - 136px)">
                 <v-container class="pa-0 ma-0" grid-list-lg style="max-width: 100%">
                     <v-layout row wrap>
-                        <v-flex class="pa-0" md10>
+                        <v-flex class="pa-0" md3>
+                            <v-card style="height: calc(100vh -136px)">
+                                <v-toolbar dark flat dense>
+                                    <v-toolbar-title>
+                                        Categories
+                                    </v-toolbar-title>
+                                    <v-spacer></v-spacer>
+                                </v-toolbar>
+                                <v-card-text>
+                                    insert items
+                                </v-card-text>
+                                <v-card-actions>
+                                    <table style="width: 100%;">
+                                        <thead>
+                                            <th style="min-width: 130px;">Name</th>
+                                            <th>Modules</th>
+                                            <th>Height (M)</th>
+                                            <th>Seg Width (CM)</th>
+                                            <th>Depth (CM)</th>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(item, idx) in fixture_types" :key="idx">
+                                                <td>{{ item.displayName }}</td>
+                                                <td>
+                                                    <input v-model="item.modules" style="width: 100%;" type="number">
+                                                </td>
+                                                <td>
+                                                    <input v-model="item.height" style="width: 100%;" type="number">
+                                                </td>
+                                                <td>
+                                                    <input v-model="item.segmentWidth" style="width: 100%;"
+                                                        type="number">
+                                                </td>
+                                                <td>
+                                                    <input v-model="item.depth" style="width: 100%;" type="number">
+                                                </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </v-card-actions>
+                            </v-card>
+                        </v-flex>
+                        <v-flex class="pa-0" md7>
                             <v-card flat color="grey darken-2" tile style="height: calc(100vh - 136px)">
                                 <v-card-text class="pa-0">
                                     <!-- <canvas id="renderCanvas" touch-action="none"></canvas> -->
@@ -177,7 +220,7 @@
 </template>
 
 <script>
-    // import axios from "axios";
+    import axios from "axios";
     // import Konva from 'konva';
     import Floor from "@/components/Main/FloorPlanning2D/src/libs/floor/floor.js";
     import DragDropFixtureHelper from "@/components/Main/FloorPlanning2D/src/libs/DragDrop/drag-drop-helper.js";
@@ -185,6 +228,7 @@
     export default {
         data() {
             return {
+                fixture_types: [],
                 stageData: {
                     layer: null,
                     group: null,
@@ -205,8 +249,33 @@
             let floor = new Floor(stage, self.stageData.layer, self.stageData.group, 200, 100);
             floor.Initialise();
             window.addEventListener('resize', self.InitialiseStageResponsive);
+            this.getFixtureType()
         },
         methods: {
+            getFixtureType() {
+                let self = this;
+
+                axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                axios.get(process.env.VUE_APP_API + "Fixture_Type/Get")
+                    .then(r => {
+                        self.fixture_types = [];
+
+                        r.data.fixture_TypeList.forEach((el, idx) => {
+                            el["modules"] = 0;
+                            el["height"] = 0;
+                            el["segmentWidth"] = 0;
+                            el["depth"] = 0;
+                            el["isDefault"] = idx == 0 ? true : false;
+                            self.fixture_types.push(el);
+                        })
+
+                        delete axios.defaults.headers.common["TenantID"];
+                    })
+                    .catch(er => {
+                        console.log("Error", er)
+                    });
+            },
             InitialiseStageResponsive() {
                 let self = this;
                 let container = document.querySelector('#stage-parent');
@@ -313,5 +382,40 @@
 <style>
     #stage-parent {
         width: 100%;
+    }
+
+    .details {
+        font-size: 12px;
+    }
+
+    .details_open {
+        max-height: calc(100vh - 570px)
+    }
+
+    .details_closed {
+        max-height: calc(100vh - 235px)
+    }
+
+    table {
+        border-collapse: collapse;
+    }
+
+    table,
+    td,
+    th {
+        border: 1px solid gray;
+    }
+
+    td {
+        background: white;
+        color: black;
+    }
+
+    th {
+        text-align: left;
+        background: black;
+        color: white;
+        padding: 2px;
+        border: 1px solid gray;
     }
 </style>
