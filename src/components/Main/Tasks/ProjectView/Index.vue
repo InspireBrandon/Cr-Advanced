@@ -31,7 +31,7 @@
 
     import DataPrepAction from "./GridComponents/DataPrepAction.vue";
     import RangeAction from "./GridComponents/RangeAction.vue";
-    import PlanogramAction from "./GridComponents/PlanogramAction.vue";
+    import PlanogramAction from "./GridComponents/PlanogramAction/Index.vue";
 
     export default {
         name: 'ProjectView',

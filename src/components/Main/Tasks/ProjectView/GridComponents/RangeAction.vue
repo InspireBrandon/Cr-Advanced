@@ -3,7 +3,7 @@
         <!-- <v-btn color="success" icon flat small>
             <v-icon>play_arrow</v-icon>
         </v-btn> -->
-        <div @click="$router.push(`/RangePlanning/${params.data.rangeFileID}`)" class="btn_grid start">
+        <div @click="$router.push(`/RangePlanning/${params.data.rangeID}`)" class="btn_grid start">
             <div class="btn_text">Start</div>
         </div>
     </div>
@@ -34,7 +34,7 @@
         margin-top: 5px;
         text-align: center;
         font-size: 18px;
-        width: 80px;
+        width: 55px;
         font-weight: 600;
         margin: 8px 3px;
     }

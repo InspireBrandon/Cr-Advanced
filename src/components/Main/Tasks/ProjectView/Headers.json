@@ -18,15 +18,7 @@
         "rowGroup": true
     },
     {
-        "headerName": "Data Preparation",
-        "field": "dataPrepStatus",
-        "editable": false,
-        "hide": false,
-        "width": 100,
-        "cellRendererFramework": "Status"
-    },
-    {
-        "headerName": "Action",
+        "headerName": "Data Prep",
         "field": "status",
         "editable": false,
         "hide": false,
@@ -35,6 +27,13 @@
     },
     {
         "headerName": "Ranging",
+        "field": "rangeName",
+        "editable": false,
+        "hide": false,
+        "width": 200
+    },
+    {
+        "headerName": "Range",
         "field": "rangingStatus",
         "editable": false,
         "hide": false,
