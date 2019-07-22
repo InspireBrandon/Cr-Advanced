@@ -425,10 +425,41 @@
                     let systemUserID = encoded_details.USER_ID;
                     console.log("type");
                     console.log(type);
-                    
+
                     self.$refs.VariationOrderModal.show(item, type, title, VariationCB => {
                         let notes = VariationCB.notes
                         item.planogramStoreStatus = 5
+                        item.height = VariationCB.height;
+                        item.modules = VariationCB.totalModules;
+
+                        let moduleFit = false
+                        let heightFit = false
+                        let overallFits = false
+                        let storeClusterFit = false
+
+                        if (item.modules < item.detailModules) {
+                            moduleFit = true
+                        }
+
+                        let Lheight = item.detailHeight * 0.9
+                        let Uheight = item.detailHeight * 1.1
+                        // console.log(listItem.height +">" +  Uheight)
+                        console.log(item.height + "||" + item.detailHeight);
+
+                        if (parseFloat(item.height) < Lheight || Uheight < parseFloat(item
+                                .height)) {
+                            heightFit = true
+                        }
+
+                        if (item.storeClusterFit == true || heightFit == true || moduleFit ==
+                            true) {
+                            overallFits = true
+                        }
+
+                        item.heightFit = heightFit;
+                        item.modulesFit = moduleFit;
+                        item.fits = overallFits;
+
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                         Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
                             .then(r => {
@@ -482,7 +513,6 @@
                                                 variation_Order_Store_Links,
                                                 null,
                                                 callback => {
-                                                    self.getRowData()
                                                 })
                                         } else {
                                             let stores = VariationCB.stores
@@ -492,7 +522,6 @@
                                                 null,
                                                 stores,
                                                 callback => {
-                                                    self.getRowData()
                                                 })
                                         }
                                     })
