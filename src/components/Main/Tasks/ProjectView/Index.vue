@@ -53,7 +53,7 @@
                     onCellValueChanged: this.onCellValueChanged
                 },
                 gridOptions: {
-                    groupMultiAutoColumn : true,
+                    groupMultiAutoColumn: true,
                     rowHeight: 35,
                     pinnedTopRowData: [],
                     pinnedBottomRowData: [],
@@ -144,6 +144,18 @@
         return retval;
     }
 </script>
+
+<style>
+    .prominent {
+        background: #424242;
+        color: white;
+    }
+
+    .ag-theme-balham .ag-root {
+        border-top: 0px !important;
+    }
+</style>
+
 
 <style scoped>
     .scrollable {

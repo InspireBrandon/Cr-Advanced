@@ -23,14 +23,16 @@
         "editable": false,
         "hide": false,
         "width": 80,
-        "cellRendererFramework": "DataPrepAction"
+        "cellRendererFramework": "DataPrepAction",
+        "headerClass": "prominent"
     },
     {
         "headerName": "Ranging",
         "field": "rangeName",
         "editable": false,
         "hide": false,
-        "width": 200
+        "width": 200,
+        "headerClass": "prominent"
     },
     {
         "headerName": "Range",
@@ -53,7 +55,8 @@
         "field": "planogramName",
         "editable": false,
         "hide": false,
-        "width": 400
+        "width": 400,
+        "headerClass": "prominent"
     },
     {
         "headerName": "Status",
