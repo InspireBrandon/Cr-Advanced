@@ -20,26 +20,63 @@
         },
         created() {},
         methods: {
-            link(item) {
-
-              
+            checkTaskTakeover(request, callback) {
                 let self = this;
-                Axios.get(process.env.VUE_APP_API +`ProjectTXSingle?projectTXID=${item.txid}`).then(res=>{
-                    console.log(res);
-                    
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+
+                if (request.systemUserID != systemUserID) {
+                    request.systemUserID = systemUserID;
+                    request.actionedByUserID = null;
+                    request.status = 42;
+                    request.Closed = true;
+
+                    self.createProjectTransaction(request, () => {
+                        callback();
+                    })
+                } else {
+                    callback();
+                }
+            },
+            createProjectTransaction(request, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `ProjectTX`, request).then(r => {
+                    delete Axios.defaults.headers.common["TenantID"];
+                    callback(r.data.projectTX)
                 })
-               console.log(item);
+            },
+            link(item) {
+                let self = this
+                console.log(item);
+                self.$refs.planogramDetailSelector.show(null, false, -1, data => {
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                    Axios.post(process.env.VUE_APP_API +
+                        `Variation_Order?projectTXID=${item.txid}&systemFileID=${data.systemFileID}`).then(
+                        r => {
+                            Axios.get(process.env.VUE_APP_API + `ProjectTXSingle?projectTXID=${item.txid}`)
+                                .then(res => {
+                                    let request = JSON.parse(JSON.stringify(res))
 
-                // self.$refs.planogramDetailSelector.show(null, false, -1, data => {
-                //     let self = this
-                //     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                //     Axios.post(process.env.VUE_APP_API +
-                //         `Variation_Order?projectTXID=${item.txid}&systemFileID=${data.systemFileID}`).then(
-                //         r => {
-
-                //             delete Axios.defaults.headers.common["TenantID"];
-                //         })
-                // })
+                                    let tmpUser = request.systemUserID;
+                                    self.checkTaskTakeover(request, () => {
+                                        request.systemUserID = tmpUser;
+                                        request.status = 48;
+                                        request.projectTXGroup_ID = item.projectTXGroup_ID
+                                        self.createProjectTransaction(request, newItem => {
+                                            // self.updateStorePlanogramStatus(request.store_ID, request
+                                            //     .systemFileID, 3, sp => {
+                                            //         self.routeToView(newItem)
+                                            //     })
+                                            // self.$parent.$parent.getTaskViewData();
+                                        })
+                                    })
+                                })
+                            delete Axios.defaults.headers.common["TenantID"];
+                        })
+                })
             }
         }
     }

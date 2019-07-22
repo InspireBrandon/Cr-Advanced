@@ -958,9 +958,9 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API +
                     `Variation_Order?projectTXID=${item.id}&systemFileID=${item.systemFileID}`).then(r => {
- let request = JSON.parse(JSON.stringify(item))
+                    let request = JSON.parse(JSON.stringify(item))
 
-                let tmpUser = request.systemUserID;
+                    let tmpUser = request.systemUserID;
                     self.checkTaskTakeover(request, () => {
                         request.systemUserID = tmpUser;
                         request.status = 48;
