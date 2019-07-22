@@ -3,7 +3,7 @@
         <div @click="$router.push('/SpacePlanning')" class="btn_grid start">
             <div class="btn_text">Start</div>
         </div>
-        <div @click="link" class="btn_grid link">
+        <div @click="link(params.data)" class="btn_grid link">
             <div class="btn_text">Link</div>
         </div>
         <PlanogramDetailsSelector ref="planogramDetailSelector" />
@@ -12,18 +12,34 @@
 
 <script>
     import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector.vue'
-
+    import Axios from 'axios'
     export default {
+        props: ['params'],
         components: {
             PlanogramDetailsSelector
         },
         created() {},
         methods: {
-            link() {
+            link(item) {
+
+              
                 let self = this;
-                self.$refs.planogramDetailSelector.show(null, false, -1, data => {
-                    // OVER HERE
+                Axios.get(process.env.VUE_APP_API +`ProjectTXSingle?projectTXID=${item.txid}`).then(res=>{
+                    console.log(res);
+                    
                 })
+               console.log(item);
+
+                // self.$refs.planogramDetailSelector.show(null, false, -1, data => {
+                //     let self = this
+                //     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                //     Axios.post(process.env.VUE_APP_API +
+                //         `Variation_Order?projectTXID=${item.txid}&systemFileID=${data.systemFileID}`).then(
+                //         r => {
+
+                //             delete Axios.defaults.headers.common["TenantID"];
+                //         })
+                // })
             }
         }
     }
