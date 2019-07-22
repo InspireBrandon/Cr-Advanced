@@ -1,6 +1,6 @@
 <template>
     <div v-if="params.data != undefined">
-        <Variation v-if="params.data.planogramStoreStatus == 5" />
+        <Variation v-if="params.data.spacePlanStatus == 14" />
         <General v-else />
     </div>
 </template>
