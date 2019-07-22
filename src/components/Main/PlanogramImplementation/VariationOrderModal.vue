@@ -276,7 +276,7 @@
                 // console.log(self.selectedStores);
 
 
-                // self.dialog = false
+                self.dialog = false
                 self.afterReturn({
                     totalModules: self.modules,
                     height: self.height,

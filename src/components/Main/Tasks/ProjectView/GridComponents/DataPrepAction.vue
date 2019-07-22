@@ -34,7 +34,7 @@
         margin-top: 5px;
         text-align: center;
         font-size: 18px;
-        width: 80px;
+        width: 55px;
         font-weight: 600;
         margin: 8px 3px;
     }

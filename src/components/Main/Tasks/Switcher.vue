@@ -37,7 +37,7 @@
                                 <span>Planogram</span>
                             </v-tooltip>
                         </v-btn-toggle>
-                        <v-btn v-if="userAccess != 0 && userAccess != 4" @click="shareProjects" class="ml-2" small dark
+                        <v-btn v-if="userAccess != 0 && userAccess != 4 && userAccess != 3" @click="shareProjects" class="ml-2" small dark
                             icon>
                             <v-icon>share</v-icon>
                         </v-btn>

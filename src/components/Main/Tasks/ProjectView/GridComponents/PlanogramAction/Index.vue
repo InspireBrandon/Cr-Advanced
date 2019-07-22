@@ -1,0 +1,17 @@
+<template>
+    <div v-if="params.data != undefined">
+        <Variation v-if="params.data.planogramStoreStatus == 5" />
+        <General v-else />
+    </div>
+</template>
+
+<script>
+    import General from './General.vue'
+    import Variation from './Variation.vue'
+
+    export default {
+        components: { Variation, General },
+        created() {
+        }
+    }
+</script>

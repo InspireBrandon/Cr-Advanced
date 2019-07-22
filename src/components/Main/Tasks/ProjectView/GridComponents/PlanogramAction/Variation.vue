@@ -1,20 +1,30 @@
 <template>
-    <div v-if="params.data != undefined" style="display: flex;">
-        <!-- <v-btn color="success" icon flat small>
-            <v-icon>play_arrow</v-icon>
-        </v-btn> -->
-        <div class="btn_grid start">
+    <div style="display: flex;">
+        <div @click="$router.push('/SpacePlanning')" class="btn_grid start">
             <div class="btn_text">Start</div>
         </div>
-        <div class="btn_grid link">
+        <div @click="link" class="btn_grid link">
             <div class="btn_text">Link</div>
         </div>
+        <PlanogramDetailsSelector ref="planogramDetailSelector" />
     </div>
 </template>
 
 <script>
+    import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector.vue'
+
     export default {
-        created() {
+        components: {
+            PlanogramDetailsSelector
+        },
+        created() {},
+        methods: {
+            link() {
+                let self = this;
+                self.$refs.planogramDetailSelector.show(null, false, -1, data => {
+                    // OVER HERE
+                })
+            }
         }
     }
 </script>
