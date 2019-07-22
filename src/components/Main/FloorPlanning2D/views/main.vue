@@ -379,7 +379,7 @@
     }
 </script>
 
-<style>
+<style scoped>
     #stage-parent {
         width: 100%;
     }
