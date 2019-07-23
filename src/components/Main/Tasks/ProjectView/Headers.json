@@ -10,7 +10,7 @@
     },
     {
         "headerName": "Project",
-        "field": "projectName",
+        "field": "projectGroupName",
         "editable": false,
         "hide": true,
         "width": 200,

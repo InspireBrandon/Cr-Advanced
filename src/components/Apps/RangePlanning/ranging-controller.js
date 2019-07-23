@@ -497,6 +497,7 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
   })
 
   let tmp = GetRanks(storeSales, clusters, clusterType, clusterID)
+  
   for (let i = 0; i < allProducts.length; i++) {
     const product = allProducts[i];
 
