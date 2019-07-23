@@ -10,7 +10,7 @@
         </v-tooltip>
         <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-                <v-btn class="icon_button" flat icon small>
+                <v-btn @click="recall(params.data, 1)" class="icon_button" flat icon small>
                     <v-icon color="success">settings_backup_restore</v-icon>
                 </v-btn>
             </template>
@@ -18,7 +18,7 @@
         </v-tooltip>
         <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-                <v-btn class="icon_button" flat icon small>
+                <v-btn @click="recall(params.data, 45)" class="icon_button" flat icon small>
                     <v-icon color="error">local_parking</v-icon>
                 </v-btn>
             </template>
@@ -26,7 +26,7 @@
         </v-tooltip>
         <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-                <div @click="replace(params.data)" class="btn_grid link">
+                <div @click="replace(params.data)" class="btn_grid link" v-if="params.data.spacePlanStatus == 48 || params.data.spacePlanStatus == 13 || params.data.spacePlanStatus == 21 || params.data.spacePlanStatus == 19 || params.data.spacePlanStatus == 24">
                     <div class="btn_text">R</div>
                 </div>
             </template>
@@ -34,7 +34,7 @@
         </v-tooltip>
         <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-                <div class="btn_grid link" @click="link(params.data)">
+                <div class="btn_grid link" @click="link(params.data)" v-if="params.data.spacePlanStatus == 47">
                     <div class="btn_text">></div>
                 </div>
             </template>
@@ -52,7 +52,7 @@
 
     export default {
         props: ['params'],
-        components:{
+        components: {
             PlanogramDetailsSelector
         },
         created() {},
@@ -118,8 +118,6 @@
                 // get project transaction
                 Axios.get(process.env.VUE_APP_API + `ProjectTXSingle?projectTXID=${item.txid}`)
                     .then(res => {
-                        console.log("res");
-                        console.log(res);
 
                         proTX = res.data.projectTX
                         // get Project  owner For task
@@ -132,17 +130,15 @@
                             Axios.get(process.env.VUE_APP_API +
                                     `Store_Planogram?SystemFileID=${item.planogramID}`)
                                 .then(r => {
-                                    console.log("Store_Planogram");
-                                    console.log(r);
 
                                     store_planos = r.data.store_PlanogramList
                                     // build store array
                                     let storeArray = []
                                     for (let index = 0; index < store_planos.length; index++) {
                                         const e = store_planos[index];
-                                          storeArray.push(e.store_ID)
+                                        storeArray.push(e.store_ID)
                                     }
-                                  
+
                                     let notes = "Replace"
                                     item.planogramStoreStatus = 5
                                     Axios.defaults.headers.common["TenantID"] = sessionStorage
@@ -152,47 +148,44 @@
                                     let groupRequest = {
                                         ProjectID: proTX.project_ID
                                     }
-                                    self.createProjectTransactionGroup(groupRequest, callback => {
-                                        let storeID = null
-                                        let TXrequest = {
-                                            "project_ID": proTX.project_ID,
-                                            "projectTXGroup_ID": callback.id,
-                                            "type": 3,
-                                            "storeCluster_ID": item.clusterID,
-                                            "store_ID": storeID,
-                                            "notes": notes,
-                                            "status": 14,
-                                            "systemUserID": owner,
-                                            "planogram_ID": item.planogramID,
-                                            "systemFileID": item.systemFileID,
-                                            "rangeFileID": item.rangeID,
-                                        }
-                                        self.createProjectTransaction(TXrequest, txCallback => {
-                                            console.log("txCallback");
-                                            console.log(txCallback);
 
-                                            let variation_Order = {
-                                                Planogram_Detail_ID: store_planos[0]
-                                                    .planogramDetail_ID,
-                                                Project_TX_ID: txCallback.id,
-                                                DateRequested: new Date(),
-                                                Status: 0,
-                                            }
-                                            let order_Detail = {
-                                                Height: 0,
-                                                Modules: 0,
-                                                Notes: notes,
-                                            }
-                                            let stores = storeArray
-                                            self.createVariationRequest(
-                                                variation_Order,
-                                                order_Detail,
-                                                null,
-                                                stores,
-                                                callback => {})
-                                        })
-                                        delete Axios.defaults.headers.common["TenantID"];
+                                    let storeID = null
+
+                                    let TXrequest = {
+                                        "project_ID": proTX.project_ID,
+                                        "projectTXGroup_ID": proTX.projectTXGroup_ID,
+                                        "type": 3,
+                                        "storeCluster_ID": item.clusterID,
+                                        "store_ID": storeID,
+                                        "notes": notes,
+                                        "status": 14,
+                                        "systemUserID": owner,
+                                        "systemFileID": item.planogramID,
+                                        "rangeFileID": item.rangeID,
+                                    }
+
+                                    self.createProjectTransaction(TXrequest, txCallback => {
+
+                                        let variation_Order = {
+                                            Planogram_Detail_ID: item.planogramDetailsID,
+                                            Project_TX_ID: txCallback.id,
+                                            DateRequested: new Date(),
+                                            Status: 0,
+                                        }
+                                        let order_Detail = {
+                                            Height: 0,
+                                            Modules: 0,
+                                            Notes: notes,
+                                        }
+                                        let stores = storeArray
+                                        self.createVariationRequest(
+                                            variation_Order,
+                                            order_Detail,
+                                            null,
+                                            stores,
+                                            callback => {})
                                     })
+                                    delete Axios.defaults.headers.common["TenantID"];
                                 })
 
                         })
@@ -207,10 +200,9 @@
                     Variaton_Order_Store_Link: variation_Order_Store_Links,
                     Stores: stores
                 }
-                console.log(request);
+
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + 'Variation_Order', request).then(r => {
-                    console.log(r);
                     callback()
                     delete Axios.defaults.headers.common["TenantID"];
                 })
@@ -219,8 +211,7 @@
                 let self = this
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.get(process.env.VUE_APP_API + `Project?projectID=${projectID}`).then(r => {
-                    console.log(r);
-
+                    console.log(r.data)
                     callback(r.data.projectList[0])
                 }).catch(e => {
                     alert("Failed to get project owner: " + e)
@@ -228,33 +219,55 @@
             },
             link(item) {
                 let self = this
-                console.log(item);
-                self.$refs.planogramDetailSelector.show(null, false, -1, data => {
-                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                    Axios.post(process.env.VUE_APP_API +
-                        `Variation_Order?projectTXID=${item.txid}&systemFileID=${data.systemFileID}`).then(
-                        r => {
-                            Axios.get(process.env.VUE_APP_API + `ProjectTXSingle?projectTXID=${item.txid}`)
-                                .then(res => {
-                                    let request = JSON.parse(JSON.stringify(res))
 
-                                    let tmpUser = request.systemUserID;
-                                    self.checkTaskTakeover(request, () => {
-                                        request.systemUserID = tmpUser;
-                                        request.status = 48;
-                                        request.projectTXGroup_ID = item.projectTXGroup_ID
-                                        self.createProjectTransaction(request, newItem => {
-                                            // self.updateStorePlanogramStatus(request.store_ID, request
-                                            //     .systemFileID, 3, sp => {
-                                            //         self.routeToView(newItem)
-                                            //     })
-                                            // self.$parent.$parent.getTaskViewData();
-                                        })
-                                    })
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.post(process.env.VUE_APP_API +
+                    `Variation_Order?projectTXID=${item.txid}&systemFileID=${item.planogramID}`).then(
+                    r => {
+                        Axios.get(process.env.VUE_APP_API + `ProjectTXSingle?projectTXID=${item.txid}`)
+                            .then(res => {
+                                let request = JSON.parse(JSON.stringify(res.data.projectTX))
+
+                                let tmpUser = request.systemUserID;
+                                self.checkTaskTakeover(request, () => {
+                                    request.systemUserID = tmpUser;
+                                    request.status = 48;
+                                    self.createProjectTransaction(request, newItem => {})
                                 })
-                            delete Axios.defaults.headers.common["TenantID"];
-                        })
-                })
+
+                                delete Axios.defaults.headers.common["TenantID"];
+                            })
+                    })
+            },
+            recall(item, status) {
+                let self = this
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `Store_Planogram/ReCall?SystemFileID=${item.planogramID}`).then(
+                    r => {
+
+                        Axios.post(process.env.VUE_APP_API +
+                                `SystemFile/UpdateStatus?db=CR-Devinspire&systemFileID=${item.planogramID}&newStatus=1`
+                            )
+                            .then(nsr => {
+                                Axios.get(process.env.VUE_APP_API + `ProjectTXSingle?projectTXID=${item.txid}`)
+                                    .then(res => {
+                                        let request = JSON.parse(JSON.stringify(res.data.projectTX))
+
+                                        let tmpUser = request.systemUserID;
+                                        self.checkTaskTakeover(request, () => {
+                                            request.systemUserID = tmpUser;
+                                            request.status = status;
+                                            request.projectTXGroup_ID = item.projectTXGroup_ID
+                                            self.createProjectTransaction(request, newItem => {})
+                                        })
+
+                                        delete Axios.defaults.headers.common["TenantID"];
+                                    })
+                            })
+                    })
             }
         }
     }

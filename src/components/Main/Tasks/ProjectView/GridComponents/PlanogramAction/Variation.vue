@@ -10,7 +10,7 @@
         <SpacePlanSelector ref="SpacePlanSelector"></SpacePlanSelector>
         <RangeSelectorModal ref="RangeSelectorModal"></RangeSelectorModal>
     </div>
-    
+
 </template>
 
 <script>
@@ -19,6 +19,8 @@
     import RangeSelectorModal from '@/components/Common/RangeSelectorModal.vue'
 
     import Axios from 'axios'
+    import jwt from 'jsonwebtoken';
+
     export default {
         props: ['params'],
         components: {
@@ -37,7 +39,7 @@
                     request.systemUserID = systemUserID;
                     request.actionedByUserID = null;
                     request.status = 42;
-                    request.Closed = true;
+                    request.closed = true;
 
                     self.createProjectTransaction(request, () => {
                         callback();
@@ -56,37 +58,27 @@
                     callback(r.data.projectTX)
                 })
             },
-             setVariationComplete(item) {
+            setVariationComplete(item) {
                 let self = this;
-
-                let newItem = JSON.parse(JSON.stringify(item))
 
                 self.$refs.SpacePlanSelector.show(spacePlanID => {
                     self.$refs.RangeSelectorModal.show(rangePlanID => {
 
-                        let self = this;
-                        let request = JSON.parse(JSON.stringify(item))
+                        Axios.get(process.env.VUE_APP_API + `ProjectTXSingle?projectTXID=${item.txid}`)
+                            .then(res => {
+                                let request = JSON.parse(JSON.stringify(res.data.projectTX))
 
-                        let tmpUser = request.systemUserID;
+                                request.status = 47;
+                                request.systemFileID = spacePlanID;
+                                request.rangeFileID = rangePlanID;
+                                self.createProjectTransaction(request, newItem => {})
 
-                        self.checkTaskTakeover(request, () => {
-                            request.systemUserID = tmpUser;
-                            request.status = 47;
-                            request.projectTXGroup_ID = item.projectTXGroup_ID
-                            request.systemFileID = spacePlanID;
-                            request.rangeFileID = rangePlanID;
-                            self.createProjectTransaction(request, newItem => {
-                                // self.updateStorePlanogramStatus(request.store_ID, request
-                                //     .systemFileID, 3, sp => {
-                                //         self.routeToView(newItem)
-                                //     })
-                                self.$parent.$parent.getTaskViewData();
+                                delete Axios.defaults.headers.common["TenantID"];
                             })
-                        })
                     })
                 })
             },
-           
+
         }
     }
 </script>
