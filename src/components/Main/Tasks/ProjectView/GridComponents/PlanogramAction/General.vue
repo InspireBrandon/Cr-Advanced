@@ -32,7 +32,7 @@
             </template>
             <span></span>
         </v-tooltip>
-                <v-tooltip bottom>
+        <v-tooltip bottom>
             <template v-slot:activator="{ on }">
                 <div class="btn_grid link">
                     <div class="btn_text">></div>
@@ -44,8 +44,47 @@
 </template>
 
 <script>
+    import Axios from 'axios';
+
     export default {
-        created() {}
+        props: ['params'],
+        created() {},
+        methods: {
+            createProjectTransactionGroup(request, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `ProjectTXGroup`, request).then(r => {
+                    delete Axios.defaults.headers.common["TenantID"];
+                    callback(r.data.projectTXGroup);
+                })
+            },
+            createProjectTransaction(request, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `ProjectTX`, request).then(r => {
+                    delete Axios.defaults.headers.common["TenantID"];
+                    callback(r.data.projectTX)
+                })
+            },
+            setParked(item) {
+                let self = this;
+
+                let request = JSON.parse(JSON.stringify(item))
+                let tmpUser = request.systemUserID;
+
+                request.systemUserID = tmpUser;
+                request.status = 45;
+                request.notes = self.findAndReplaceNote(request.notes);
+
+                self.createProjectTransaction(request, newItem => {
+                    self.$parent.$parent.getTaskViewData();
+                })
+            },
+        }
     }
 </script>
 
