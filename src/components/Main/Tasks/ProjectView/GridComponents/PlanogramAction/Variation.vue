@@ -3,7 +3,7 @@
         <div @click="$router.push('/SpacePlanning')" class="btn_grid start">
             <div class="btn_text">Start</div>
         </div>
-        <div @click="setVariationComplete(params.data)" class="btn_grid link">
+        <div @click="setVariationComplete(params)" class="btn_grid link">
             <div class="btn_text">Link</div>
         </div>
         <PlanogramDetailsSelector ref="planogramDetailSelector" />
@@ -30,6 +30,10 @@
         },
         created() {},
         methods: {
+            updateNode(node, data) {
+                let self = this
+                node.setData(data)
+            },
             checkTaskTakeover(request, callback) {
                 let self = this;
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
@@ -58,9 +62,13 @@
                     callback(r.data.projectTX)
                 })
             },
-            setVariationComplete(item) {
+            setVariationComplete(params) {
                 let self = this;
-
+                let item = params.data
+                console.log("here");
+                console.log(item);
+                
+                let node = params.node
                 self.$refs.SpacePlanSelector.show(spacePlanID => {
                     self.$refs.RangeSelectorModal.show(rangePlanID => {
 
@@ -71,8 +79,12 @@
                                 request.status = 47;
                                 request.systemFileID = spacePlanID;
                                 request.rangeFileID = rangePlanID;
-                                self.createProjectTransaction(request, newItem => {})
-
+                                self.createProjectTransaction(request, newItem => {
+                                    item.spacePlanStatus = newItem.status
+                                    item.rangeID = rangePlanID
+                                    item.txid = newItem.id
+                                    self.updateNode(node, item)
+                                })
                                 delete Axios.defaults.headers.common["TenantID"];
                             })
                     })

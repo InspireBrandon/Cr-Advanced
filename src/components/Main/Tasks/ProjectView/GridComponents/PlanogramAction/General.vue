@@ -10,7 +10,7 @@
         </v-tooltip>
         <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-                <v-btn @click="recall(params.data, 1)" class="icon_button" flat icon small>
+                <v-btn @click="recall(params, 1)" class="icon_button" flat icon small>
                     <v-icon color="success">settings_backup_restore</v-icon>
                 </v-btn>
             </template>
@@ -18,7 +18,7 @@
         </v-tooltip>
         <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-                <v-btn @click="recall(params.data, 45)" class="icon_button" flat icon small>
+                <v-btn @click="recall(params, 45)" class="icon_button" flat icon small>
                     <v-icon color="error">local_parking</v-icon>
                 </v-btn>
             </template>
@@ -26,7 +26,8 @@
         </v-tooltip>
         <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-                <div @click="replace(params.data)" class="btn_grid link" v-if="params.data.spacePlanStatus == 48 || params.data.spacePlanStatus == 13 || params.data.spacePlanStatus == 21 || params.data.spacePlanStatus == 19 || params.data.spacePlanStatus == 24">
+                <div @click="replace(params)" class="btn_grid link"
+                    v-if="params.data.spacePlanStatus == 48 || params.data.spacePlanStatus == 13 || params.data.spacePlanStatus == 21 || params.data.spacePlanStatus == 19 || params.data.spacePlanStatus == 24">
                     <div class="btn_text">R</div>
                 </div>
             </template>
@@ -34,7 +35,7 @@
         </v-tooltip>
         <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-                <div class="btn_grid link" @click="link(params.data)" v-if="params.data.spacePlanStatus == 47">
+                <div class="btn_grid link" @click="link(params)" v-if="params.data.spacePlanStatus == 47">
                     <div class="btn_text">></div>
                 </div>
             </template>
@@ -109,8 +110,11 @@
                     callback();
                 }
             },
-            replace(item) {
+            replace(params) {
                 let self = this
+                let item = params.data
+                let node = params.node
+                console.log(item);
                 let proTX = null
                 // openOrder(data, type, title) {
                 console.log("item");
@@ -183,7 +187,11 @@
                                             order_Detail,
                                             null,
                                             stores,
-                                            callback => {})
+                                            callback => {
+                                                item.spacePlanStatus = 14
+                                                item.txid = txCallback.id
+                                                self.updateNode(node, item)
+                                            })
                                     })
                                     delete Axios.defaults.headers.common["TenantID"];
                                 })
@@ -217,9 +225,14 @@
                     alert("Failed to get project owner: " + e)
                 })
             },
-            link(item) {
+            updateNode(node, data) {
                 let self = this
-
+                node.setData(data)
+            },
+            link(params) {
+                let self = this
+                let item = params.data
+                let node = params.node
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API +
@@ -230,19 +243,23 @@
                                 let request = JSON.parse(JSON.stringify(res.data.projectTX))
 
                                 let tmpUser = request.systemUserID;
-                                self.checkTaskTakeover(request, () => {
-                                    request.systemUserID = tmpUser;
-                                    request.status = 48;
-                                    self.createProjectTransaction(request, newItem => {})
+
+                                request.systemUserID = tmpUser;
+                                request.status = 48;
+                                self.createProjectTransaction(request, newItem => {
+                                    item.spacePlanStatus = 48
+                                    item.txid = newItem.id
+                                    self.updateNode(node, item)
                                 })
 
                                 delete Axios.defaults.headers.common["TenantID"];
                             })
                     })
             },
-            recall(item, status) {
+            recall(params, status) {
                 let self = this
-
+                let item = params.data
+                let node = params.node
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.post(process.env.VUE_APP_API + `Store_Planogram/ReCall?SystemFileID=${item.planogramID}`).then(
@@ -257,15 +274,17 @@
                                         let request = JSON.parse(JSON.stringify(res.data.projectTX))
 
                                         let tmpUser = request.systemUserID;
-                                        self.checkTaskTakeover(request, () => {
-                                            request.systemUserID = tmpUser;
-                                            request.status = status;
-                                            request.projectTXGroup_ID = item.projectTXGroup_ID
-                                            self.createProjectTransaction(request, newItem => {})
+                                        request.systemUserID = tmpUser;
+                                        request.status = status;
+                                        request.projectTXGroup_ID = item.projectTXGroup_ID
+                                        self.createProjectTransaction(request, newItem => {
+                                            item.spacePlanStatus = status
+                                            item.txid = newItem.id
+                                            self.updateNode(node, item)
                                         })
-
-                                        delete Axios.defaults.headers.common["TenantID"];
                                     })
+
+                                delete Axios.defaults.headers.common["TenantID"];
                             })
                     })
             }
