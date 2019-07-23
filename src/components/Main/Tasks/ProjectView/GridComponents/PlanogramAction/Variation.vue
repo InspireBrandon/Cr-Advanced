@@ -3,20 +3,28 @@
         <div @click="$router.push('/SpacePlanning')" class="btn_grid start">
             <div class="btn_text">Start</div>
         </div>
-        <div @click="link(params.data)" class="btn_grid link">
+        <div @click="setVariationComplete(params.data)" class="btn_grid link">
             <div class="btn_text">Link</div>
         </div>
         <PlanogramDetailsSelector ref="planogramDetailSelector" />
+        <SpacePlanSelector ref="SpacePlanSelector"></SpacePlanSelector>
+        <RangeSelectorModal ref="RangeSelectorModal"></RangeSelectorModal>
     </div>
+    
 </template>
 
 <script>
     import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector.vue'
+    import SpacePlanSelector from '@/components/Common/SpacePlanSelector.vue'
+    import RangeSelectorModal from '@/components/Common/RangeSelectorModal.vue'
+
     import Axios from 'axios'
     export default {
         props: ['params'],
         components: {
-            PlanogramDetailsSelector
+            PlanogramDetailsSelector,
+            SpacePlanSelector,
+            RangeSelectorModal
         },
         created() {},
         methods: {
@@ -48,36 +56,37 @@
                     callback(r.data.projectTX)
                 })
             },
-            link(item) {
-                let self = this
-                console.log(item);
-                self.$refs.planogramDetailSelector.show(null, false, -1, data => {
-                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                    Axios.post(process.env.VUE_APP_API +
-                        `Variation_Order?projectTXID=${item.txid}&systemFileID=${data.systemFileID}`).then(
-                        r => {
-                            Axios.get(process.env.VUE_APP_API + `ProjectTXSingle?projectTXID=${item.txid}`)
-                                .then(res => {
-                                    let request = JSON.parse(JSON.stringify(res))
+             setVariationComplete(item) {
+                let self = this;
 
-                                    let tmpUser = request.systemUserID;
-                                    self.checkTaskTakeover(request, () => {
-                                        request.systemUserID = tmpUser;
-                                        request.status = 48;
-                                        request.projectTXGroup_ID = item.projectTXGroup_ID
-                                        self.createProjectTransaction(request, newItem => {
-                                            // self.updateStorePlanogramStatus(request.store_ID, request
-                                            //     .systemFileID, 3, sp => {
-                                            //         self.routeToView(newItem)
-                                            //     })
-                                            // self.$parent.$parent.getTaskViewData();
-                                        })
-                                    })
-                                })
-                            delete Axios.defaults.headers.common["TenantID"];
+                let newItem = JSON.parse(JSON.stringify(item))
+
+                self.$refs.SpacePlanSelector.show(spacePlanID => {
+                    self.$refs.RangeSelectorModal.show(rangePlanID => {
+
+                        let self = this;
+                        let request = JSON.parse(JSON.stringify(item))
+
+                        let tmpUser = request.systemUserID;
+
+                        self.checkTaskTakeover(request, () => {
+                            request.systemUserID = tmpUser;
+                            request.status = 47;
+                            request.projectTXGroup_ID = item.projectTXGroup_ID
+                            request.systemFileID = spacePlanID;
+                            request.rangeFileID = rangePlanID;
+                            self.createProjectTransaction(request, newItem => {
+                                // self.updateStorePlanogramStatus(request.store_ID, request
+                                //     .systemFileID, 3, sp => {
+                                //         self.routeToView(newItem)
+                                //     })
+                                self.$parent.$parent.getTaskViewData();
+                            })
                         })
+                    })
                 })
-            }
+            },
+           
         }
     }
 </script>

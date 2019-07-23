@@ -26,7 +26,7 @@
         </v-tooltip>
         <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-                <div class="btn_grid link">
+                <div @click="replace(params.data)" class="btn_grid link">
                     <div class="btn_text">R</div>
                 </div>
             </template>
@@ -34,20 +34,27 @@
         </v-tooltip>
         <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-                <div class="btn_grid link">
+                <div class="btn_grid link" @click="link(params.data)">
                     <div class="btn_text">></div>
                 </div>
             </template>
             <span></span>
         </v-tooltip>
+        <PlanogramDetailsSelector ref="planogramDetailSelector" />
+
     </div>
 </template>
 
 <script>
     import Axios from 'axios';
+    import jwt from 'jsonwebtoken';
+    import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector.vue'
 
     export default {
         props: ['params'],
+        components:{
+            PlanogramDetailsSelector
+        },
         created() {},
         methods: {
             createProjectTransactionGroup(request, callback) {
@@ -84,6 +91,171 @@
                     self.$parent.$parent.getTaskViewData();
                 })
             },
+            checkTaskTakeover(request, callback) {
+                let self = this;
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+
+                if (request.systemUserID != systemUserID) {
+                    request.systemUserID = systemUserID;
+                    request.actionedByUserID = null;
+                    request.status = 42;
+                    request.Closed = true;
+
+                    self.createProjectTransaction(request, () => {
+                        callback();
+                    })
+                } else {
+                    callback();
+                }
+            },
+            replace(item) {
+                let self = this
+                let proTX = null
+                // openOrder(data, type, title) {
+                console.log("item");
+                console.log(item);
+                // get project transaction
+                Axios.get(process.env.VUE_APP_API + `ProjectTXSingle?projectTXID=${item.txid}`)
+                    .then(res => {
+                        console.log("res");
+                        console.log(res);
+
+                        proTX = res.data.projectTX
+                        // get Project  owner For task
+                        self.getProjectOwner(proTX.project_ID, ownerCallback => {
+                            let owner = ownerCallback.systemUserID
+                            let encoded_details = jwt.decode(sessionStorage.accessToken);
+                            let systemUserID = encoded_details.USER_ID;
+                            let store_planos = null
+                            // get all store_planograms 
+                            Axios.get(process.env.VUE_APP_API +
+                                    `Store_Planogram?SystemFileID=${item.planogramID}`)
+                                .then(r => {
+                                    console.log("Store_Planogram");
+                                    console.log(r);
+
+                                    store_planos = r.data.store_PlanogramList
+                                    // build store array
+                                    let storeArray = []
+                                    for (let index = 0; index < store_planos.length; index++) {
+                                        const e = store_planos[index];
+                                          storeArray.push(e.store_ID)
+                                    }
+                                  
+                                    let notes = "Replace"
+                                    item.planogramStoreStatus = 5
+                                    Axios.defaults.headers.common["TenantID"] = sessionStorage
+                                        .currentDatabase;
+                                    item.currentStatusText = "Variation"
+
+                                    let groupRequest = {
+                                        ProjectID: proTX.project_ID
+                                    }
+                                    self.createProjectTransactionGroup(groupRequest, callback => {
+                                        let storeID = null
+                                        let TXrequest = {
+                                            "project_ID": proTX.project_ID,
+                                            "projectTXGroup_ID": callback.id,
+                                            "type": 3,
+                                            "storeCluster_ID": item.clusterID,
+                                            "store_ID": storeID,
+                                            "notes": notes,
+                                            "status": 14,
+                                            "systemUserID": owner,
+                                            "planogram_ID": item.planogramID,
+                                            "systemFileID": item.systemFileID,
+                                            "rangeFileID": item.rangeID,
+                                        }
+                                        self.createProjectTransaction(TXrequest, txCallback => {
+                                            console.log("txCallback");
+                                            console.log(txCallback);
+
+                                            let variation_Order = {
+                                                Planogram_Detail_ID: store_planos[0]
+                                                    .planogramDetail_ID,
+                                                Project_TX_ID: txCallback.id,
+                                                DateRequested: new Date(),
+                                                Status: 0,
+                                            }
+                                            let order_Detail = {
+                                                Height: 0,
+                                                Modules: 0,
+                                                Notes: notes,
+                                            }
+                                            let stores = storeArray
+                                            self.createVariationRequest(
+                                                variation_Order,
+                                                order_Detail,
+                                                null,
+                                                stores,
+                                                callback => {})
+                                        })
+                                        delete Axios.defaults.headers.common["TenantID"];
+                                    })
+                                })
+
+                        })
+                    })
+            },
+            createVariationRequest(variation_Order, order_Detail, variation_Order_Store_Links, stores, callback) {
+                let self = this
+
+                let request = {
+                    Variation_Order: variation_Order,
+                    Variaton_Order_Detail: order_Detail,
+                    Variaton_Order_Store_Link: variation_Order_Store_Links,
+                    Stores: stores
+                }
+                console.log(request);
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.post(process.env.VUE_APP_API + 'Variation_Order', request).then(r => {
+                    console.log(r);
+                    callback()
+                    delete Axios.defaults.headers.common["TenantID"];
+                })
+            },
+            getProjectOwner(projectID, callback) {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.get(process.env.VUE_APP_API + `Project?projectID=${projectID}`).then(r => {
+                    console.log(r);
+
+                    callback(r.data.projectList[0])
+                }).catch(e => {
+                    alert("Failed to get project owner: " + e)
+                })
+            },
+            link(item) {
+                let self = this
+                console.log(item);
+                self.$refs.planogramDetailSelector.show(null, false, -1, data => {
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                    Axios.post(process.env.VUE_APP_API +
+                        `Variation_Order?projectTXID=${item.txid}&systemFileID=${data.systemFileID}`).then(
+                        r => {
+                            Axios.get(process.env.VUE_APP_API + `ProjectTXSingle?projectTXID=${item.txid}`)
+                                .then(res => {
+                                    let request = JSON.parse(JSON.stringify(res))
+
+                                    let tmpUser = request.systemUserID;
+                                    self.checkTaskTakeover(request, () => {
+                                        request.systemUserID = tmpUser;
+                                        request.status = 48;
+                                        request.projectTXGroup_ID = item.projectTXGroup_ID
+                                        self.createProjectTransaction(request, newItem => {
+                                            // self.updateStorePlanogramStatus(request.store_ID, request
+                                            //     .systemFileID, 3, sp => {
+                                            //         self.routeToView(newItem)
+                                            //     })
+                                            // self.$parent.$parent.getTaskViewData();
+                                        })
+                                    })
+                                })
+                            delete Axios.defaults.headers.common["TenantID"];
+                        })
+                })
+            }
         }
     }
 </script>
