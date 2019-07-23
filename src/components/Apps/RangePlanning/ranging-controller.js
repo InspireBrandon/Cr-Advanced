@@ -19,6 +19,7 @@ class RangingController {
     this.periodic = rangingData.periodic;
     this.monthsBetween = rangingData.monthsBetween;
     this.tag = rangingData.tag;
+    console.log(rangingData)
   }
 
   getRangingFile() {
@@ -72,13 +73,13 @@ class RangingController {
       let itemFirstIndex = 0;
 
       finalArr.forEach((element2, idx) => {
-        if(element1.ID == element2.ID) {
-          itemCount ++;
+        if (element1.ID == element2.ID) {
+          itemCount++;
           itemFirstIndex = idx;
         }
       });
 
-      if(itemCount == 2) {
+      if (itemCount == 2) {
         finalArr.splice(itemFirstIndex, 1);
       }
     });
@@ -163,10 +164,15 @@ class RangingController {
     })
   }
 
+  getSalesDataByStore(storeID) {
+    let store = getStoreByID(storeID, this.storeSales);
+    let sales = getSalesDataByStore(store, this.storeSales);
+  }
+
   getSalesDataByCluster(clusterType, clusterID) {
     let stores = getStoresByCluster(this.clusterData, clusterType, clusterID);
 
-    let sales = getSalesDataByStore(stores, this.allRangeProducts, this.storeSales, this.clusterData, clusterType, clusterID);
+    let sales = getSalesDataByStores(stores, this.allRangeProducts, this.storeSales, this.clusterData, clusterType, clusterID);
     return sales;
   }
 
@@ -260,6 +266,17 @@ class RangingController {
 }
 
 export default RangingController;
+
+function getStoreByID(storeID, storeSales) {
+  let retval = null;
+
+  storeSales.forEach(store => {
+    if (store.storeID == storeID)
+      retval = store;
+  })
+
+  return retval;
+}
 
 // Get all the stores that belong to a cluster
 function getStoresByCluster(clusters, clusterType, clusterID) {
@@ -431,8 +448,13 @@ function GetRanks(storeSales, clusters, clusterType, clusterID) {
 
 
 }
+
+function getSalesDataByStore(store, allProducts, storeSales) {
+  let sales = [];
+}
+
 // Get all the sum of sales data by stores
-function getSalesDataByStore(stores, allProducts, storeSales, clusters, clusterType, clusterID) {
+function getSalesDataByStores(stores, allProducts, storeSales, clusters, clusterType, clusterID) {
   let sales = [];
 
   for (let i = 0; i < stores.length; i++) {
@@ -473,6 +495,7 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
       totalSales += numberifySales(product.sales_Retail);
     })
   })
+
   let tmp = GetRanks(storeSales, clusters, clusterType, clusterID)
   for (let i = 0; i < allProducts.length; i++) {
     const product = allProducts[i];
@@ -554,7 +577,6 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
     const element = productSales[index];
     element.volume_potential_rank = productSales.length - index
   }
-  console.log(productSales);
 
   return productSales;
 }
@@ -667,25 +689,6 @@ function RangeProduct(productData, salesData, indicator) {
   self.store_Range_Indicator = indicator;
 }
 
-// Class total product sales by product
-function getTotalProductSalesByProduct(storeSales, productID) {
-  let total = 0;
-
-  for (let i = 0; i < storeSales.length; i++) {
-    let store = storeSales[i];
-
-    if (storeStocksProduct(storeSales, store.storeID, productID)) {
-      for (let j = 0; j < store.salesData.length; j++) {
-        let sale = store.salesData[j];
-        total += numberifySales(sale.sales_Retail);
-      }
-    }
-  }
-
-  return total;
-}
-
-
 function storeStocksProduct(storeSales, storeID, productID) {
   let storeStocksProduct = false;
 
@@ -699,38 +702,4 @@ function storeStocksProduct(storeSales, storeID, productID) {
   })
 
   return storeStocksProduct;
-}
-
-function setDefaultValuesIfNull(obj) {
-  for (var prop in obj) {
-    if ((prop.toUpperCase().includes('HEIGHT') || prop.toUpperCase().includes('WIDTH') || prop.toUpperCase().includes('DEPTH')) && !prop.toUpperCase().includes('DIRTY')) {
-      if (parseFloat(obj[prop]) <= 0) {
-        obj[prop] = 10;
-      }
-    }
-  }
-}
-
-function getCSVDate() {
-  let d = new Date();
-
-  let date = "";
-
-  if (d.getDate().length == 1) {
-    date = "0" + d.getDate().toString();
-  } else {
-    date = d.getDate().toString();
-  }
-
-  let month = "";
-
-  if ((d.getMonth() + 1) <= 9) {
-    month = "0" + (d.getMonth() + 1).toString();
-  } else {
-    month = (d.getMonth() + 1).toString();
-  }
-
-  let year = d.getFullYear().toString();
-
-  return date + " " + month + " " + year;
 }

@@ -368,10 +368,10 @@
         clusterTypes: [{
             text: "All Stores Cluster",
             value: "allStores"
-          }, //{
-          //text: "Select Stores",
-          //value: "stores"
-          //},
+          }, {
+            text: "Select Stores",
+            value: "stores"
+          },
           {
             text: "Store Cluster",
             value: "store"
@@ -1371,22 +1371,18 @@
 
             if (self.selectedClusterType == "stores") {
               let store = []
+              
               store.push({
                 storeID: self.selectedClusterOption
               })
 
               self.$store.commit("setStoreID", self.selectedClusterOption)
               self.$store.commit("setStoreName", self.getStoreName())
+              self.$store.commit("setClusterName", self.getClusterName());
+              self.$store.commit("setClusterType", self.selectedClusterType);
+              self.$store.commit("setClusterID", self.selectedClusterOption);
 
-
-              // self.$store.commit("setClusterName", self.getClusterName());
-              // self.$store.commit("setClusterType", self.selectedClusterType);
-              // self.$store.commit("setClusterID", self.selectedClusterOption);
-
-              let clusterType = "store"
-              self.products = self.rangingController.getSalesDataBySingleStore(store, clusterType, self
-                .clusterOptions
-                .stores.storeClusterID)
+              self.products = self.rangingController.getSalesDataByStore(self.selectedClusterOption)
             }
           }
         })
