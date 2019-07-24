@@ -1,6 +1,6 @@
 <template>
     <div v-if="params.data != undefined">
-        <Variation v-if="params.data.spacePlanStatus == 14" :params="params" />
+        <Variation v-if="params.data.spacePlanStatus == 14 || params.data.spacePlanStatus == 49" :params="params" />
         <General v-else :params="params" />
     </div>
 </template>

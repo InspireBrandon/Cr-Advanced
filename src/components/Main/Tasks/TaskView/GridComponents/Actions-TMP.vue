@@ -303,6 +303,22 @@
             button_1.set('error', 'close', cp.closeTask, "Close")
         }
         break;
+        case 49: {
+            button_1.set('success', 'visibility', cp.setRecallInProgressandView, "View")
+        }
+        break;
+        case 50: {
+            button_1.set('warning', 'visibility', cp.routeToView, "View")
+            button_2.set('success', 'check', cp.setRecalledComplete, "Complete")
+        }break;
+        case 51: {
+            button_1.set('warning', 'visibility', cp.routeToView, "View")
+            button_2.set('primary', 'send', cp.sendRecall, "Send")
+        }
+        break;
+        case 52: {
+            button_1.set('error', 'close', cp.closeTask, "Close")
+        }
         }
 
         let retval = {

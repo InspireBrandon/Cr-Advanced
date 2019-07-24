@@ -10,7 +10,7 @@
         </v-tooltip>
         <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-                <v-btn @click="recall(params, 1)" class="icon_button" flat icon small>
+                <v-btn @click="recall(params, 49)" class="icon_button" flat icon small>
                     <v-icon color="success">settings_backup_restore</v-icon>
                 </v-btn>
             </template>
@@ -262,7 +262,7 @@
                 let node = params.node
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.post(process.env.VUE_APP_API + `Store_Planogram/ReCall?SystemFileID=${item.planogramID}`).then(
+                Axios.post(process.env.VUE_APP_API + `Store_Planogram/ReCallTakeover?SystemFileID=${item.planogramID}`).then(
                     r => {
 
                         Axios.post(process.env.VUE_APP_API +
@@ -273,10 +273,10 @@
                                     .then(res => {
                                         let request = JSON.parse(JSON.stringify(res.data.projectTX))
 
-                                        let tmpUser = request.systemUserID;
-                                        request.systemUserID = tmpUser;
+                                        request.systemUserID = request.projectOwnerID;
                                         request.status = status;
-                                        request.projectTXGroup_ID = item.projectTXGroup_ID
+                                        request.deleted = null;
+
                                         self.createProjectTransaction(request, newItem => {
                                             item.spacePlanStatus = status
                                             item.txid = newItem.id

@@ -323,7 +323,34 @@ class projectStatusHandler {
                 type: [3],
                 color: "#ff7200",
                 friendly: "Variation Sent"
-            }
+            },{
+                text: "Recalled",
+                value: 49,
+                type: [3],
+                color: "#ff7200",
+                friendly: "Variation Sent"
+            },
+            {
+                text: "Recalled In Progress",
+                value: 50,
+                type: [3],
+                color: "#ff7200",
+                friendly: "Variation Sent"
+            },
+            {
+                text: "Recalled Complete",
+                value: 51,
+                type: [3],
+                color: "#ff7200",
+                friendly: "Variation Sent"
+            },
+            {
+                text: "Recalled Sent",
+                value: 52,
+                type: [3],
+                color: "#ff7200",
+                friendly: "Variation Sent"
+            },
         ]
 
         if (componentType == null) {
@@ -655,7 +682,6 @@ function returnAcumulator(status, type) {
     break;
     }
     
-
     return acumulator;
 }
 

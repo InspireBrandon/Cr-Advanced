@@ -550,8 +550,6 @@
                 let self = this;
                 let route;
 
-                console.log("BRUH", item);
-
                 switch (item.type) {
                     case 1: {
                         route = `/DataPreparation`
@@ -565,7 +563,7 @@
                 break;
                 case 3: {
                     if (item.status == 1 || item.status == 8 || item.status == 41 || item.status == 46 || item.status ==
-                        47) {
+                        47 || item.status == 50 || item.status == 51) {
                         route = `/SpacePlanning`
                         self.$router.push(route);
                     } else if (item.status == 21 || item.status == 27) {
@@ -943,14 +941,68 @@
                             request.systemFileID = spacePlanID;
                             request.rangeFileID = rangePlanID;
                             self.createProjectTransaction(request, newItem => {
-                                // self.updateStorePlanogramStatus(request.store_ID, request
-                                //     .systemFileID, 3, sp => {
-                                //         self.routeToView(newItem)
-                                //     })
                                 self.$parent.$parent.getTaskViewData();
                             })
                         })
                     })
+                })
+            },
+            setRecallInProgressandView(item) {
+                let self = this;
+                let request = JSON.parse(JSON.stringify(item))
+
+                let tmpUser = request.systemUserID;
+
+                self.checkTaskTakeover(request, () => {
+                    request.systemUserID = tmpUser;
+                    request.status = 50;
+                    self.createProjectTransaction(request, newItem => {
+                        self.routeToView(newItem)
+                    })
+                })
+            },
+            setRecalledComplete(item) {
+                let self = this;
+
+                let newItem = JSON.parse(JSON.stringify(item))
+
+                self.$refs.SpacePlanSelector.show(spacePlanID => {
+                    self.$refs.RangeSelectorModal.show(rangePlanID => {
+
+                        let self = this;
+                        let request = JSON.parse(JSON.stringify(item))
+
+                        let tmpUser = request.systemUserID;
+
+                        self.checkTaskTakeover(request, () => {
+                            request.systemUserID = tmpUser;
+                            request.status = 51;
+                            request.systemFileID = spacePlanID;
+                            request.rangeFileID = rangePlanID;
+                            self.createProjectTransaction(request, newItem => {
+                                self.$parent.$parent.getTaskViewData();
+                            })
+                        })
+                    })
+                })
+            },
+            sendRecall(item) {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.post(process.env.VUE_APP_API +
+                    `Variation_Order?projectTXID=${item.id}&systemFileID=${item.systemFileID}`).then(r => {
+                    let request = JSON.parse(JSON.stringify(item))
+
+                    let tmpUser = request.systemUserID;
+                    self.checkTaskTakeover(request, () => {
+                        request.systemUserID = tmpUser;
+                        request.status = 52;
+                        self.createProjectTransaction(request, newItem => {
+                            self.$parent.$parent.getTaskViewData();
+
+                        })
+                    })
+                    delete Axios.defaults.headers.common["TenantID"];
                 })
             },
             sendVariation(item) {

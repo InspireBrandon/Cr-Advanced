@@ -370,10 +370,10 @@
             text: "All Stores Cluster",
             value: "allStores"
           },
-          // {
-          //   text: "Select Stores",
-          //   value: "stores"
-          // },
+          {
+            text: "Select Stores",
+            value: "stores"
+          },
           {
             text: "Store Cluster",
             value: "store"
