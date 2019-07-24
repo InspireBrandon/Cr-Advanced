@@ -717,7 +717,7 @@
           self.facings.Facings_X = self.planoData.object.Facings_X;
           self.facings.Facings_Y = self.planoData.object.Facings_Y;
           self.facings.Facings_Z = self.planoData.object.Facings_Z;
-          self.CalculationHandler = new CalculationHandler(self.$store.state.daysBetween)
+          self.CalculationHandler = new CalculationHandler(self.$store.state.daysBetween, self.$store.state.currentStoreCount)
         } else {
           self.facings.Facings_X = null;
           self.facings.Facings_Y = null;

@@ -5,7 +5,7 @@
                 <span @click="$router.push(appConfigDetail.config.configName + '_Details')"
                     class="app_name">{{ appConfigDetail.detail.name }}</span>
             </v-toolbar>
-            <v-img :src="appConfigDetail.detail.imgSrc" height="200px">
+            <v-img :src="appConfigDetail.detail.imgSrc" height="180px">
                 <v-container fill-height fluid pa-2>
                     <v-layout fill-height>
                         <v-flex xs12 align-end flexbox>

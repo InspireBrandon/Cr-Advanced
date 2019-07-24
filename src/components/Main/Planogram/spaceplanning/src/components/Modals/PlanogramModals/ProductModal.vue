@@ -161,6 +161,7 @@ export default {
         self.id = eventData.id;
         self.type = eventData.type;
         self.ProductObj = eventData.object;
+        self.CalculationHandler = new CalculationHandler(self.$store.state.daysBetween, self.$store.state.currentStoreCount);
         self.Calculate();
       } else {
         self.destroy();

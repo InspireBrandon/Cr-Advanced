@@ -1,8 +1,8 @@
 import calculations from './calculations';
 
 class calculationHandler {
-  constructor(daysBetween) {
-    this._calculations = new calculations(daysBetween);
+  constructor(daysBetween, storeCount) {
+    this._calculations = new calculations(daysBetween, storeCount);
   }
 
   Calculate_Weekly_Sales_Units(units) {

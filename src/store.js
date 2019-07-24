@@ -39,7 +39,8 @@ export const store = new Vuex.Store({
     storeName:null,
     rangeID: null,
     categoryCluster:null,
-    daysBetween: 0
+    daysBetween: 0,
+    currentStoreCount: 0
   },
   mutations: {
     setCtrlDown(state, data) {
@@ -119,6 +120,9 @@ export const store = new Vuex.Store({
     },
     setDaysBetween(state, days) {
       state.daysBetween = days;
+    },
+    setCurrentStoreCount(state, count) {
+      state.currentStoreCount = count;
     },
     setProductData(state, data) {
       state.activePlanogramProducts.forEach(el => {

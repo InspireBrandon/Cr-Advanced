@@ -501,12 +501,6 @@
     created() {
       let self = this;
 
-      self.cloudinary = new cloudinary.Cloudinary({
-        cloud_name: "brandonlostboy",
-        api_key: '284359386998856',
-        api_secret: 'tzv-VJW-mZyOy3LXMRtc8b4qj6k'
-      })
-
       EventBus.$on("MODAL_LOAD", function (data) {
 
         if (data.type.toUpperCase() === "PRODUCT") {
@@ -700,12 +694,15 @@
         self.$refs.cropper.replace("");
         self.product_type = 0;
 
+        console.log("[currentStoreCount]", self.$store.state.currentStoreCount);
+
         if (args.planoData != undefined && args.planoData != null) {
           self.planoData = args.planoData;
           self.facings.Facings_X = self.planoData.object.Facings_X;
           self.facings.Facings_Y = self.planoData.object.Facings_Y;
           self.facings.Facings_Z = self.planoData.object.Facings_Z;
-          self.CalculationHandler = new CalculationHandler(self.$store.state.daysBetween)
+
+          self.CalculationHandler = new CalculationHandler(self.$store.state.daysBetween, self.$store.state.currentStoreCount)
         } else {
           self.facings.Facings_X = null;
           self.facings.Facings_Y = null;

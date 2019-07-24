@@ -1,0 +1,38 @@
+{
+    "configName": "Streategy",
+    "report": true,
+    "routes": [{
+        "route": "/SpacePlanning",
+        "routeName": "space_planning",
+        "title": "Basket Analysis",
+        "openInNewWindow": false
+    }, {
+        "route": "/Fixtures",
+        "routeName": "fixtures",
+        "title": "Turnover Groups",
+        "openInNewWindow": false
+    }, {
+        "route": "/PlanogramImplementation",
+        "routeName": "plannogram_implementation",
+        "title": "Target Markets",
+        "openInNewWindow": false
+    },{
+        "route": "/PlanogramDistribution/:ProjectID/:projectGroupID",
+        "routeName": "Planogram_distribution",
+        "title": "Store Clustering",
+        "openInNewWindow": false
+    },
+    {
+        "route": "/PlanogramDistribution/:ProjectID/:projectGroupID",
+        "routeName": "Planogram_distribution",
+        "title": "Category Clustering",
+        "openInNewWindow": false
+    }
+],
+    "ReportListRoute":{
+        "route": "/SpacePlanningReportList",
+        "routeName": "space_planning_report_list",
+        "title": "Space Planning Report List",
+        "openInNewWindow": false
+    }
+}

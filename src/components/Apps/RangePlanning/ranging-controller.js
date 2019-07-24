@@ -87,6 +87,10 @@ class RangingController {
     return finalArr
   }
 
+  getStoreCountByCluster(clusterType, clusterID) {
+    return this.getStoresByCluster(clusterType, clusterID).length;
+  }
+
   getStoresByCluster(clusterType, clusterID) {
     return getStoresByCluster(this.clusterData, clusterType, clusterID)
   }
@@ -497,7 +501,7 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
   })
 
   let tmp = GetRanks(storeSales, clusters, clusterType, clusterID)
-  
+
   for (let i = 0; i < allProducts.length; i++) {
     const product = allProducts[i];
 

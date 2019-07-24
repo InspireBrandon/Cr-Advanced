@@ -1,6 +1,7 @@
 class Calculations {
-  constructor(TotalDays) {
+  constructor(TotalDays, storeCount) {
     this.TotalDays = 30;
+    this.storeCount = storeCount;
   }
 
   Weekly_Sales_Units(sales_units) {
@@ -12,7 +13,7 @@ class Calculations {
       return "N/A"
     }
 
-    var calc = parseFloat(sales_units) / this.TotalDays * 7;
+    var calc = (parseFloat(sales_units) / this.storeCount) / this.TotalDays * 7;
     return calc.toFixed(2);
   }
 
@@ -25,9 +26,7 @@ class Calculations {
       return "N/A"
     }
 
-    // console.log(parseFloat(sales_retail), this.TotalDays);
-
-    var calc = parseFloat(sales_retail) / this.TotalDays * 7;
+    var calc = (parseFloat(sales_retail) / this.storeCount) / this.TotalDays * 7;
     return calc.toFixed(2);
   }
 
@@ -39,7 +38,7 @@ class Calculations {
     if (parseFloat(sales_cost) == 0) {
       return "N/A"
     }
-    var calc = parseFloat(sales_cost) / this.TotalDays * 7;
+    var calc = (parseFloat(sales_cost) / this.storeCount) / this.TotalDays * 7;
     return calc.toFixed(2);
   }
 

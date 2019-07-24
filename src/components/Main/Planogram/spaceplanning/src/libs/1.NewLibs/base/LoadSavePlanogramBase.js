@@ -31,7 +31,7 @@ class LoadSavePlanogramBase {
     this.Create = create;
   }
 
-  save(vuex, stage, clusterData, dimensionData, spacePlanID, spacePlanName, updateName, image, updateLoader, close, fixtureData, callback) {
+  save(vuex, stage, clusterData, dimensionData, spacePlanID, spacePlanName, updateName, image, updateLoader, close, fixtureData, storeCount, callback) {
     let self = this;
     let ctrl_store = new StoreHelper();
     let allItems = ctrl_store.getAllPlanogramItems(vuex);
@@ -56,7 +56,7 @@ class LoadSavePlanogramBase {
     allProducts.forEach(ap => {
       output.planogramData.forEach(pdi => {
         if (ap.Data.barcode == pdi.Data.Data.barcode) {
-          let calcData = calculate(ap, vuex);
+          let calcData = calculate(ap, vuex, storeCount);
           pdi.Data["CalcData"] = calcData;
         }
       })
@@ -261,7 +261,7 @@ class LoadSavePlanogramBase {
     })
   }
 
-  saveNew(vuex, stage, clusterData, dimensionData, spacePlanID, spacePlanName, updateName, image, updateLoader, close, fixtureData, callback) {
+  saveNew(vuex, stage, clusterData, dimensionData, spacePlanID, spacePlanName, updateName, image, updateLoader, close, fixtureData, storeCount, callback) {
     let self = this;
     let ctrl_store = new StoreHelper();
     let allItems = ctrl_store.getAllPlanogramItems(vuex);
@@ -286,7 +286,7 @@ class LoadSavePlanogramBase {
     allProducts.forEach(ap => {
       output.planogramData.forEach(pdi => {
         if (ap.Data.barcode == pdi.Data.Data.barcode) {
-          let calcData = calculate(ap, vuex);
+          let calcData = calculate(ap, vuex, storeCount);
           pdi.Data["CalcData"] = calcData;
         }
       })
@@ -1063,7 +1063,7 @@ class LoadSavePlanogramBase {
 
 function calculate(productItem, vuex) {
   let self = this;
-  let calculationHandler = new CalculationHandler();
+  let calculationHandler = new CalculationHandler(0);
 
   var calcData = {
     XFacings: null,

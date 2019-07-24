@@ -324,6 +324,7 @@
       let width = 0;
       width = window.innerWidth * 0.4;
       return {
+        storeCount: 1,
         fixture_types: [],
         planogramDetailsID: null,
         toggle: 0,
@@ -368,10 +369,11 @@
         clusterTypes: [{
             text: "All Stores Cluster",
             value: "allStores"
-          }, {
-            text: "Select Stores",
-            value: "stores"
           },
+          // {
+          //   text: "Select Stores",
+          //   value: "stores"
+          // },
           {
             text: "Store Cluster",
             value: "store"
@@ -786,6 +788,10 @@
                 if (self.selectedClusterType != null && self.selectedClusterOption != null) {
                   self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
                     .selectedClusterOption);
+
+                  self.storeCount = self.rangingController.getStoreCountByCluster(self.selectedClusterType, self
+                    .selectedClusterOption);
+                  self.$store.commit("setCurrentStoreCount", self.storeCount);
                 }
                 self.gotData = true;
               } else {
@@ -925,7 +931,6 @@
 
                 if (clusterData.storeID != null || clusterData.storeID != undefined) {
 
-
                   self.getStores()
                   self.selectedClusterType = "stores"
                   // self.clusterOptions[stores]=clusterData.storeID
@@ -945,6 +950,10 @@
                     self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType,
                       self
                       .selectedClusterOption);
+
+                    self.storeCount = self.rangingController.getStoreCountByCluster(self.selectedClusterType,
+                      self.selectedClusterOption);
+                    self.$store.commit("setCurrentStoreCount", self.storeCount);
                   }
                   self.$refs.SizeLoader.close()
                   updatePlanoDataCallback(self.products);
@@ -1096,7 +1105,7 @@
                 bins: self.bins,
                 FixtureType: self.selectedFixtureType
               }, self.spacePlanID, self.generateName(self.fixture_types), true, image, self.updateLoader, self
-              .$refs.SizeLoader.close, self.fixture_types, data => {
+              .$refs.SizeLoader.close, self.fixture_types, self.storeCount, data => {
                 self.spacePlanID = data
               })
           } else {
@@ -1115,7 +1124,7 @@
                   }, self.spacePlanID, self.generateName(self.fixture_types), value, image, self.updateLoader,
                   self
                   .$refs
-                  .SizeLoader.close, self.fixture_types, callback => {
+                  .SizeLoader.close, self.fixture_types, self.storeCount, callback => {
                     console.log("[New space plan]", callback);
                     self.spacePlanID = callback
                   })
@@ -1131,7 +1140,7 @@
                     FixtureType: self.selectedFixtureType,
                     bins: self.bins
                   }, self.spacePlanID, self.spacePlanName, value, image, self.updateLoader, self.$refs
-                  .SizeLoader.close, self.fixture_types, callback => {
+                  .SizeLoader.close, self.fixture_types, self.storeCount, callback => {
                     console.log("[New space plan]", callback);
                     self.spacePlanID = callback
                   })
@@ -1183,7 +1192,7 @@
               self
               .$refs
               .SizeLoader
-              .close, self.fixture_types, data => {
+              .close, self.fixture_types, self.storeCount, data => {
                 console.log("[NEW SPACEPLANID]", data);
                 self.spacePlanID = data
               })
@@ -1212,7 +1221,6 @@
       },
       setRangingClusterData(data) {
         let self = this;
-
 
         data.allStoresClusters.forEach(element => {
           self.clusterOptions.allStores.push(new textValue(element));
@@ -1342,6 +1350,10 @@
 
         self.$nextTick(() => {
           if (self.selectedClusterOption != null) {
+            self.storeCount = self.rangingController.getStoreCountByCluster(self.selectedClusterType, self
+              .selectedClusterOption);
+            self.$store.commit("setCurrentStoreCount", self.storeCount);
+
             if (self.selectedClusterType != "stores") {
               self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
                 .selectedClusterOption);
@@ -1371,7 +1383,7 @@
 
             if (self.selectedClusterType == "stores") {
               let store = []
-              
+
               store.push({
                 storeID: self.selectedClusterOption
               })
@@ -1438,6 +1450,10 @@
             indicator);
           self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
             .selectedClusterOption);
+
+          self.storeCount = self.rangingController.getStoreCountByCluster(self.selectedClusterType, self
+            .selectedClusterOption);
+          self.$store.commit("setCurrentStoreCount", self.storeCount);
         } else {
           alert("This feature is still coming");
         }
