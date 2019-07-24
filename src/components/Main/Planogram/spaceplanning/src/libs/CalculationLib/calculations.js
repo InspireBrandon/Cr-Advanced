@@ -1,7 +1,8 @@
 class Calculations {
-  constructor(TotalDays, storeCount) {
+  constructor(TotalDays, storeCount, usePotential) {
     this.TotalDays = 30;
     this.storeCount = storeCount;
+    this.usePotential = usePotential;
   }
 
   Weekly_Sales_Units(sales_units) {

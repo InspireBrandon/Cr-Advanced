@@ -510,9 +510,9 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
     let sales_units = 0;
 
     // Get Indicator
-    for (let j = 0; j < sales.length; j++) {
-      const sale = sales[j];
-    }
+    // for (let j = 0; j < sales.length; j++) {
+    //   const sale = sales[j];
+    // }
 
     for (let j = 0; j < sales.length; j++) {
       const sale = sales[j];
