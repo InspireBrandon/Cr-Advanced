@@ -35,6 +35,7 @@ export const store = new Vuex.Store({
     clusterName: null,
     clusterType: null,
     clusterID: null,
+    usePotential:false,
     storeID:null,
     storeName:null,
     rangeID: null,
@@ -108,6 +109,9 @@ export const store = new Vuex.Store({
     },
     setRangeID(state, rangeID) {
       state.rangeID = rangeID;
+    },
+    setUsepotential(state, potential) {
+      state.usePotential = potential;
     },
     setStoreID(state, storeID) {
       state.storeID = storeID;
@@ -198,6 +202,9 @@ export const store = new Vuex.Store({
   getters: {
     getCtrlDown: (state) => {
       return state.CtrlDown;
+    },
+    getUsePotential: (state) => {
+      return state.usePotential;
     },
     getCloneItem: (state) => {
       return state.CloneItem;

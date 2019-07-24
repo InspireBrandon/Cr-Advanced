@@ -150,6 +150,11 @@
             :placeholder="'Select ' + selectedClusterType + ' cluster'" dense
             :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" solo hide-details></v-select>
         </v-flex>
+        <v-flex v-if="rangingData.planogramID != null && gotData" md6 style="padding: 2px;">
+          <v-checkbox label="Use Potential" @change="setPotentail" v-model="usePotential">
+
+          </v-checkbox>
+        </v-flex>
         <v-flex xs12 v-if="rangingData.planogramID != null">
           <div>
             <v-layout row wrap>
@@ -366,6 +371,7 @@
         selectedCategoryCluster: null,
         showCategoryCluster: false,
         selectedClusterType: null,
+        usePotential:false,
         clusterTypes: [{
             text: "All Stores Cluster",
             value: "allStores"
@@ -553,6 +559,12 @@
         //   self.spacePlanID = data.spaceplanID
         // }
         self.$refs.SizeLoader.updateLoader(data)
+
+      },
+      setPotentail(){
+        let self = this
+        // clusterData["storeCluster"] = self.usePotential;
+         self.$store.commit("setUsepotential", self.usePotential);
 
       },
       RetractPlanogram() {
@@ -908,6 +920,7 @@
                 self.updateLoader({
                   currentFile: 2,
                 })
+
                 self.$store.commit("setRangeID", clusterData.rangeID);
                 self.$store.commit("setPlanogramName", r.data.planogramName);
                 self.setRangingClusterData(r.data.clusterData);
