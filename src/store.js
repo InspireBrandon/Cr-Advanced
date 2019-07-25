@@ -41,7 +41,9 @@ export const store = new Vuex.Store({
     rangeID: null,
     categoryCluster:null,
     daysBetween: 0,
-    currentStoreCount: 0
+    currentStoreCount: 0,
+    currentSalesPotential: 0,
+    currentVolumePotential: 0
   },
   mutations: {
     setCtrlDown(state, data) {
@@ -128,6 +130,12 @@ export const store = new Vuex.Store({
     setCurrentStoreCount(state, count) {
       state.currentStoreCount = count;
     },
+    setCurrentSalesPotential(state, number) {
+      state.currentSalesPotential = number;
+    },
+    setCurrentVolumePotential(state, number) {
+      state.currentVolumePotential = number;
+    },
     setProductData(state, data) {
       state.activePlanogramProducts.forEach(el => {
         if (el.Data.barcode == data.data.barcode) {
@@ -158,12 +166,18 @@ export const store = new Vuex.Store({
           el.Data.pallet_Height = data.data.pallet_Height;
           el.Data.pallet_Width = data.data.pallet_Width;
           el.Data.pallet_Depth = data.data.pallet_Depth;
+
+          el.Data.sales_potential = data.data.sales_potential;
+          el.Data.volume_potential = data.data.volume_potential;
         }
       })
 
       state.activePlanogramProducts.forEach(el => {
         if (el.Type == "PRODUCT") {
           if (el.Data.barcode == data.barcode) {
+            console.log(data.barcode)
+
+
             el.Data.height = data.data.height;
             el.Data.width = data.data.width;
             el.Data.depth = data.data.depth;
@@ -191,6 +205,9 @@ export const store = new Vuex.Store({
             el.Data.pallet_Height = data.data.pallet_Height;
             el.Data.pallet_Width = data.data.pallet_Width;
             el.Data.pallet_Depth = data.data.pallet_Depth;
+
+            el.Data.sales_potential = data.data.sales_potential;
+            el.Data.volume_potential = data.data.volume_potential;
           }
         }
       })

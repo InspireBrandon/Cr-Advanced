@@ -330,34 +330,61 @@ function getStoresByProductAndCluster(storeSales, productID, clusters, clusterTy
 function getNumericDistribution(storeSales, productID, clusters, clusterType, clusterID) {
   let stores = 0;
 
+  let clusterStores = getStoresByCluster(clusters, clusterType, clusterID);
+
   storeSales.forEach(store => {
-    store.salesData.forEach(product => {
-      if (product.productID == productID) {
-        if (numberifySales(product.sales_Retail) > 0)
-          stores++;
-      }
-    })
+    if (storeInCluster(store.storeID, clusterStores)) {
+      store.salesData.forEach(product => {
+        if (product.productID == productID) {
+          if (numberifySales(product.sales_Retail) > 0)
+            stores++;
+        }
+      })
+    }
   })
 
-  return (stores / storeSales.length) * 100;
+  return (stores / clusterStores.length) * 100;
 }
 
 function getWeightedDistribution(storeSales, productID, clusters, clusterType, clusterID) {
   let productSales = 0;
   let totalStoreSales = 0;
 
+  let clusterStores = getStoresByCluster(clusters, clusterType, clusterID);
+
   storeSales.forEach(store => {
-    store.salesData.forEach(product => {
-      totalStoreSales += numberifySales(product.sales_Retail);
-      if (product.productID == productID) {
-        if (numberifySales(product.sales_Retail) > 0) {
-          productSales += numberifySales(product.sales_Retail);
+    if (storeInCluster(store.storeID, clusterStores)) {
+      store.salesData.forEach(product => {
+        totalStoreSales += numberifySales(product.sales_Retail);
+        if (product.productID == productID) {
+          if (numberifySales(product.sales_Retail) > 0) {
+            store.salesData.forEach(product => {
+              productSales += numberifySales(product.sales_Retail);
+            })
+          }
         }
-      }
-    })
+      })
+    }
   })
 
   return (productSales / totalStoreSales) * 100;
+}
+
+function getDaysOfSupplyFacings(clusters, clusterType, clusterID, volume_potential, depth) {
+    let clusterStores = getStoresByCluster(clusters, clusterType, clusterID);
+    let storeCount = clusterStores.length;
+    let fdepth = parseFloat(depth);
+
+    if(fdepth < 1)
+      fdepth = 1;
+
+    let capacity = ((38 / fdepth));
+
+    capacity = parseInt(capacity);
+
+    let other = capacity / (volume_potential / storeCount) * 30;
+
+    return other;
 }
 
 function IsClusterStore(clusterStores, storeID) {
@@ -510,9 +537,9 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
     let sales_units = 0;
 
     // Get Indicator
-    for (let j = 0; j < sales.length; j++) {
-      const sale = sales[j];
-    }
+    // for (let j = 0; j < sales.length; j++) {
+    //   const sale = sales[j];
+    // }
 
     for (let j = 0; j < sales.length; j++) {
       const sale = sales[j];
@@ -534,6 +561,7 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
 
     let sales_potential = 0;
     let volume_potential = 0;
+    let profit_potential = 0;
     let item_sales_rank = 0
     let item_volume_rank = 0
     let item_profit_rank = 0
@@ -547,11 +575,17 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
         item_profit_rank = t.itemProfitRank
       }
     })
+
     if (weighted_distribution != 0 && sales_retail != 0)
-      sales_potential = sales_retail / weighted_distribution;
+      (sales_potential = sales_retail / weighted_distribution * 100).toFixed(0);
 
     if (weighted_distribution != 0 && sales_units != 0)
-      volume_potential = sales_units / weighted_distribution;
+      (volume_potential = sales_units / weighted_distribution * 100).toFixed(0);
+
+    if (weighted_distribution != 0 && sales_units != 0)
+      (profit_potential = sales_profit / weighted_distribution * 100).toFixed(0);
+
+    let dos_fac = getDaysOfSupplyFacings(clusters, clusterType, clusterID, volume_potential, product.depth)
 
     productSales.push(new RangeProduct(product, {
       sales_retail: sales_retail.toFixed(2),
@@ -566,11 +600,11 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
       item_volume_rank: item_volume_rank,
       item_profit_rank: item_profit_rank,
       sales_potential_rank: sales_potential_rank,
-      volume_potential_rank: volume_potential_rank
+      volume_potential_rank: volume_potential_rank,
+      dos_fac: dos_fac.toFixed(1)
     }, getProductIndicator(product.productID, storeSales, stores)))
-
-
   }
+  
   productSales.sort((a, b) => (parseFloat(a.sales_potential) > parseFloat(b.sales_potential)) ? 1 : ((parseFloat(b.sales_potential) > parseFloat(a.sales_potential)) ? -1 : 0));
   for (let index = 0; index < productSales.length; index++) {
     const element = productSales[index];
@@ -691,6 +725,7 @@ function RangeProduct(productData, salesData, indicator) {
   self.item_volume_rank = salesData.item_volume_rank
   self.item_sales_rank = salesData.item_sales_rank
   self.item_profit_rank = salesData.item_profit_rank
+  self.dos_fac = salesData.dos_fac;
   self.store_Range_Indicator = indicator;
 }
 

@@ -8,7 +8,7 @@
         </div>
       </v-flex>
       <v-flex xs3 id="warehouseMain">
-        <WarehouseMain></WarehouseMain>
+        <WarehouseMain ref="warehouse"></WarehouseMain>
       </v-flex>
     </v-layout>
     <!-- <v-navigation-drawer width="500" dark v-model="warehouse" right permanent fixed hide-overlay>
@@ -79,11 +79,13 @@
           let productEventData = eventData.data;
 
           let planogramID = productEventData.ID;
+
           let productID = productEventData.Data.productID;
 
           let productData;
 
           let ctrl_store = new StoreHelper();
+
           let productStoreCopy = ctrl_store.getAllPlanogramItemsByType(
             self.$store,
             "PRODUCT"
@@ -116,31 +118,35 @@
               productData.TotalFacings += element.TotalFacings;
             }
           });
+
           var sales_retail = productData.ProductData.sales_Retail,
+            sales_potential = productData.ProductData.sales_potential,
             sales_cost = productData.ProductData.sales_Cost,
             sales_units = productData.ProductData.sales_Units,
+            volume_potential =  productData.ProductData.volume_potential,
             weighted_distribution = productData.ProductData.Weighted_Distribution,
             total_facings = productData.TotalFacings;
 
           self.CalculationHandler = new CalculationHandler(self.$store.state.daysBetween, self.$store.state.currentStoreCount)
 
           var weekly_profit = this.CalculationHandler.Calculate_Weekly_Profit(
-              sales_retail,
+              self.$store.state.usePotential ? sales_potential : sales_retail,
               sales_cost
             ),
             weekly_volume_potential = this.CalculationHandler.Calculate_Weekly_Volume_Potential(
-              sales_units,
+              self.$store.state.usePotential ? volume_potential : sales_units,
               weighted_distribution
             ),
             weekly_sales_potential = this.CalculationHandler.Calculate_Weekly_Sales_Potential(
-              sales_retail,
+              self.$store.state.usePotential ? sales_potential : sales_retail,
               weighted_distribution
             ),
             days_of_supply = this.CalculationHandler.Calculate_Days_Of_Supply_Potential(
               total_facings,
-              sales_units
-            ),
-            weekly_sales_units = this.CalculationHandler.Calculate_Weekly_Sales_Units(sales_units);
+              self.$store.state.usePotential ? volume_potential : sales_units
+            )
+
+            var weekly_sales_units = this.CalculationHandler.Calculate_Weekly_Sales_Units(self.$store.state.usePotential ? volume_potential : sales_units)
 
           // if (eventData.show == true) {
           //   // populate footer
@@ -160,49 +166,50 @@
 
           if (productData.ProductData.useAlternateBarcode != undefined) {
             switch (productData.ProductData.alternatePackingType) {
-              case 0:
-                {
-                  if (productData.ProductData.useAlternateBarcode)
-                    barcode = productData.ProductData.alternateBarcode;
-                }
-                break;
-              case 1:
-                {
-                  if (productData.ProductData.tray_Barcode != undefined && productData.ProductData.tray_Barcode != null &&
-                    productData.ProductData.tray_Barcode != "")
-                    barcode = productData.ProductData.tray_Barcode;
-                }
-                break;
-              case 2:
-                {
-                  if (productData.ProductData.case_Barcode != undefined && productData.ProductData.case_Barcode != null &&
-                    productData.ProductData.case_Barcode != "")
-                    barcode = productData.ProductData.case_Barcode;
-                }
-                break;
-              case 3:
-                {
-                  if (productData.ProductData.shrink_Barcode != undefined && productData.ProductData.shrink_Barcode !=
-                    null &&
-                    productData.ProductData.shrink_Barcode != "")
-                    barcode = productData.ProductData.shrink_Barcode;
-                }
-                break;
-              case 4:
-                {
-                  if (productData.ProductData.pallet_Barcode != undefined && productData.ProductData.pallet_Barcode !=
-                    null &&
-                    productData.ProductData.pallet_Barcode != "")
-                    barcode = productData.ProductData.pallet_Barcode;
-                }
-                break;
+              case 0: {
+                if (productData.ProductData.useAlternateBarcode)
+                  barcode = productData.ProductData.alternateBarcode;
+              }
+              break;
+            case 1: {
+              if (productData.ProductData.tray_Barcode != undefined && productData.ProductData.tray_Barcode != null &&
+                productData.ProductData.tray_Barcode != "")
+                barcode = productData.ProductData.tray_Barcode;
+            }
+            break;
+            case 2: {
+              if (productData.ProductData.case_Barcode != undefined && productData.ProductData.case_Barcode != null &&
+                productData.ProductData.case_Barcode != "")
+                barcode = productData.ProductData.case_Barcode;
+            }
+            break;
+            case 3: {
+              if (productData.ProductData.shrink_Barcode != undefined && productData.ProductData.shrink_Barcode !=
+                null &&
+                productData.ProductData.shrink_Barcode != "")
+                barcode = productData.ProductData.shrink_Barcode;
+            }
+            break;
+            case 4: {
+              if (productData.ProductData.pallet_Barcode != undefined && productData.ProductData.pallet_Barcode !=
+                null &&
+                productData.ProductData.pallet_Barcode != "")
+                barcode = productData.ProductData.pallet_Barcode;
+            }
+            break;
             }
           }
 
           // populate footer
           self.footerTooltip = "";
-          self.selectedItem =
-            `${barcode} ${productData.ProductData.brand} ${productData.ProductData.description} FAC: ${productData.Facings_X} CAP: ${productData.TotalFacings} UNITS: ${weekly_sales_units} CAT: ${productData.ProductData.category} SUB: ${productData.ProductData.subcategory} SEG: ${productData.ProductData.segment} DOS: ${days_of_supply}`
+          if (self.$store.getters.getUsePotential) {
+            self.selectedItem =
+              `${barcode} ${productData.ProductData.brand} ${productData.ProductData.description} FAC: ${productData.Facings_X} CAP: ${productData.TotalFacings} UNITS: ${weekly_sales_units} CAT: ${productData.ProductData.category} SUB: ${productData.ProductData.subcategory} SEG: ${productData.ProductData.segment} DOS: ${days_of_supply}`
+          } else {
+            self.selectedItem =
+              `${barcode} ${productData.ProductData.brand} ${productData.ProductData.description} FAC: ${productData.Facings_X} CAP: ${productData.TotalFacings} UNITS: ${weekly_sales_units} CAT: ${productData.ProductData.category} SUB: ${productData.ProductData.subcategory} SEG: ${productData.ProductData.segment} DOS: ${days_of_supply}`
+          }
+
           // self.selectedItem = `DESCRIPTION : ${productData.ProductData.description},
           //     X-FACINGS : ${productData.Facings_X},
           //     CAPACITY : ${productData.TotalFacings},

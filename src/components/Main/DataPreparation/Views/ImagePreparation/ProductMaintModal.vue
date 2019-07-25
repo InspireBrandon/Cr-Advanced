@@ -422,6 +422,16 @@
                                     <v-card-text>Weekly Profit: {{ calculationData.Weekly_Sales_Profit }}</v-card-text>
                                   </v-card>
                                 </v-flex>
+                                <v-flex md12>
+                                  <v-card class="elevation-5">
+                                    <v-card-text>Sales Potential: {{ currentSalesPotential }}</v-card-text>
+                                  </v-card>
+                                </v-flex>
+                                <v-flex md12>
+                                  <v-card class="elevation-5">
+                                    <v-card-text>Volume Potential: {{ currentVolumePotential }}</v-card-text>
+                                  </v-card>
+                                </v-flex>
                               </v-layout>
                             </v-card-text>
                           </v-card>
@@ -685,7 +695,9 @@
         onDelete: null,
         CalculationHandler: null,
         currentImageMenu: 0,
-        selectedAltCode: -1
+        selectedAltCode: -1,
+        currentSalesPotential: 0,
+        currentVolumePotential: 0
       }
     },
     computed: {
@@ -717,7 +729,8 @@
           self.facings.Facings_X = self.planoData.object.Facings_X;
           self.facings.Facings_Y = self.planoData.object.Facings_Y;
           self.facings.Facings_Z = self.planoData.object.Facings_Z;
-          self.CalculationHandler = new CalculationHandler(self.$store.state.daysBetween, self.$store.state.currentStoreCount)
+          self.CalculationHandler = new CalculationHandler(self.$store.state.daysBetween, self.$store.state
+            .currentStoreCount)
         } else {
           self.facings.Facings_X = null;
           self.facings.Facings_Y = null;
@@ -1174,23 +1187,22 @@
         let dimensionTypes = ['Height', 'Width', 'Depth', 'Qty'];
         let packagingTypes = ['', 'tray', 'case', 'shrink', 'pallet'];
 
-        packagingTypes.forEach(packagingType => { 
+        packagingTypes.forEach(packagingType => {
           dimensionTypes.forEach(dimensionType => {
             let propName;
 
-            if(packagingType == '') {
+            if (packagingType == '') {
               propName = dimensionType.toLowerCase();
-            }
-            else {
+            } else {
               propName = packagingType + "_" + dimensionType;
             }
 
-            if(propName != 'qty') {
-              if(self.form[propName] == undefined || self.form[propName] == undefined || self.form[propName] <= 0) {
-                if(dimensionType == "Qty") {
+            if (propName != 'qty') {
+              if (self.form[propName] == undefined || self.form[propName] == undefined || self.form[propName] <=
+                0) {
+                if (dimensionType == "Qty") {
                   self.form[propName] = 1;
-                }
-                else {
+                } else {
                   self.form[propName] = 10;
                 }
               }
@@ -1238,6 +1250,9 @@
           productData.TotalFacings,
           productData.ProductData.sales_Units
         );
+
+        self.currentSalesPotential = productEventData.Data.sales_potential;
+        self.currentVolumePotential = productEventData.Data.volume_potential;
 
         calcData.Weekly_Sales_Retail = self.CalculationHandler.Calculate_Weekly_Sales_Retail(productData.ProductData
           .sales_Retail);

@@ -1,7 +1,8 @@
 class Calculations {
-  constructor(TotalDays, storeCount) {
+  constructor(TotalDays, storeCount, usePotential) {
     this.TotalDays = 30;
     this.storeCount = storeCount;
+    this.usePotential = usePotential;
   }
 
   Weekly_Sales_Units(sales_units) {
@@ -13,7 +14,7 @@ class Calculations {
       return "N/A"
     }
 
-    var calc = (parseFloat(sales_units) / this.storeCount) / this.TotalDays * 7;
+    var calc = ((parseFloat(sales_units) / this.storeCount) / this.TotalDays) * 7;
     return calc.toFixed(2);
   }
 

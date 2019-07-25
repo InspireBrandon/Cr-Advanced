@@ -23,10 +23,7 @@
     {
         "headerName": "Description",
         "field": "description"
-    }, {
-        "headerName": "Item Sales Rank",
-        "field": "item_sales_rank"
-    },
+    }, 
     {
         "headerName": "Size Description",
         "field": "size_Description",
@@ -91,17 +88,21 @@
     {
         "headerName": "Weighted Distribution",
         "field": "weighted_Distribution"
-    }, {
-        "headerName": "Sales Potential Rank",
-        "field": "sales_potential_rank"
-    },
+    }, 
     {
         "headerName": "Sales Potential",
         "field": "sales_potential"
     },
     {
-        "headerName": "Item Volume Rank",
-        "field": "item_volume_rank"
+        "headerName": "Sales Potential Rank",
+        "field": "sales_potential_rank",
+        "cellStyle": {
+            "background-color": "#e4e4e4"
+        }
+    },
+    {
+        "headerName": "DOS FAC",
+        "field": "dos_fac"
     },
     {
         "headerName": "Volume Potential",
@@ -109,7 +110,31 @@
     },
     {
         "headerName": "Volume Potential rank",
-        "field": "volume_potential_rank"
+        "field": "volume_potential_rank",
+        "cellStyle": {
+            "background-color": "#e4e4e4"
+        }
+    },
+    {
+        "headerName": "Item Sales Rank",
+        "field": "item_sales_rank",
+        "cellStyle": {
+            "background-color": "#e4e4e4"
+        }
+    },
+    {
+        "headerName": "Item Volume Rank",
+        "field": "item_volume_rank",
+        "cellStyle": {
+            "background-color": "#e4e4e4"
+        }
+    },
+    {
+        "headerName": "Item Profit Rank",
+        "field": "item_profit_rank",
+        "cellStyle": {
+            "background-color": "#e4e4e4"
+        }
     },
     {
         "headerName": "Sales",
@@ -122,10 +147,5 @@
     {
         "headerName": "Profit",
         "field": "sales_Profit"
-    },
-    {
-        "headerName": "Item Profit Rank",
-        "field": "item_profit_rank"
     }
-
 ]

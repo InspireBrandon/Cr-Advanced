@@ -150,10 +150,15 @@
             :placeholder="'Select ' + selectedClusterType + ' cluster'" dense
             :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" solo hide-details></v-select>
         </v-flex>
-        <v-flex v-if="rangingData.planogramID != null && gotData" md6 style="padding: 2px;">
-          <v-checkbox label="Use Potential" @change="setPotentail" v-model="usePotential">
-
-          </v-checkbox>
+        <v-flex xs2 v-if="rangingData.planogramID != null && gotData" md6 style="padding: 2px;">
+          <v-checkbox label="Use Potential" v-model="$store.state.usePotential"></v-checkbox>
+        </v-flex>
+        <v-flex xs10 v-if="rangingData.planogramID != null && gotData" md6 style="padding: 2px;">
+          <h4>Active Items Selected</h4>
+          <div>
+            <div>Sales: R{{ ais_Sales }}</div>
+            <div>Sales Potential: R{{ ais_SalesPotential }}</div>
+          </div>
         </v-flex>
         <v-flex xs12 v-if="rangingData.planogramID != null">
           <div>
@@ -329,6 +334,8 @@
       let width = 0;
       width = window.innerWidth * 0.4;
       return {
+        ais_Sales: 0,
+        ais_SalesPotential: 0,
         storeCount: 1,
         fixture_types: [],
         planogramDetailsID: null,
@@ -371,7 +378,7 @@
         selectedCategoryCluster: null,
         showCategoryCluster: false,
         selectedClusterType: null,
-        usePotential:false,
+        usePotential: false,
         clusterTypes: [{
             text: "All Stores Cluster",
             value: "allStores"
@@ -561,10 +568,10 @@
         self.$refs.SizeLoader.updateLoader(data)
 
       },
-      setPotentail(){
+      setPotentail() {
         let self = this
         // clusterData["storeCluster"] = self.usePotential;
-         self.$store.commit("setUsepotential", self.usePotential);
+        self.$store.commit("setUsepotential", self.usePotential);
 
       },
       RetractPlanogram() {
@@ -627,7 +634,7 @@
       rangeToPlanogram() {
         let self = this;
         let ctrl_store = new StoreHelper();
-        let allProducts = self.rangingController.getAllRangeProducts();
+        let allProducts = self.products;
 
         let storeProducts = self.$store.state.activePlanogramProducts;
         let storePlanogramItemProducts = ctrl_store.getAllPlanogramItemsByType(self.$store, "PRODUCT");
@@ -663,6 +670,9 @@
               storeProduct.Data.pallet_Height = parseFloat(product.pallet_Height);
               storeProduct.Data.pallet_Width = parseFloat(product.pallet_Width);
               storeProduct.Data.pallet_Depth = parseFloat(product.pallet_Depth);
+
+              storeProduct.Data.volume_potential = parseFloat(product.volume_potential);
+              storeProduct.Data.sales_potential = parseFloat(product.sales_potential);
 
               ctrl_store.setProductData(self.$store, storeProduct.Data, product.barcode);
               storeProduct.ChangeDimensions(storeProduct);
@@ -800,6 +810,18 @@
                 if (self.selectedClusterType != null && self.selectedClusterOption != null) {
                   self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
                     .selectedClusterOption);
+
+          self.ais_Sales = 0;
+          self.ais_SalesPotential = 0;
+
+                    self.products.forEach(el => {
+                      if (el.store_Range_Indicator == "YES") {
+                        self.ais_Sales = (parseFloat(self.ais_Sales) + ((parseFloat(el.sales_Retail) /
+                          4) / self.storeCount)).toFixed(2);
+                        self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + ((parseFloat(el
+                          .sales_potential) / 4)) / self.storeCount).toFixed(2);
+                      }
+                    })
 
                   self.storeCount = self.rangingController.getStoreCountByCluster(self.selectedClusterType, self
                     .selectedClusterOption);
@@ -960,6 +982,7 @@
                     .clusterType !=
                     undefined && clusterData.storeID == undefined) {
                     self.selectedClusterOption = clusterData.clusterID;
+
                     self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType,
                       self
                       .selectedClusterOption);
@@ -967,6 +990,18 @@
                     self.storeCount = self.rangingController.getStoreCountByCluster(self.selectedClusterType,
                       self.selectedClusterOption);
                     self.$store.commit("setCurrentStoreCount", self.storeCount);
+
+                    self.ais_Sales = 0;
+                    self.ais_SalesPotential = 0;
+
+                    self.products.forEach(el => {
+                      if (el.store_Range_Indicator == "YES") {
+                        self.ais_Sales = (parseFloat(self.ais_Sales) + ((parseFloat(el.sales_Retail) /
+                          4) / self.storeCount)).toFixed(2);
+                        self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + ((parseFloat(el
+                          .sales_potential) / 4)) / self.storeCount).toFixed(2);
+                      }
+                    })
                   }
                   self.$refs.SizeLoader.close()
                   updatePlanoDataCallback(self.products);
@@ -1371,6 +1406,18 @@
               self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
                 .selectedClusterOption);
 
+              self.ais_Sales = 0;
+              self.ais_SalesPotential = 0;
+
+                    self.products.forEach(el => {
+                      if (el.store_Range_Indicator == "YES") {
+                        self.ais_Sales = (parseFloat(self.ais_Sales) + ((parseFloat(el.sales_Retail) /
+                          4) / self.storeCount)).toFixed(2);
+                        self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + ((parseFloat(el
+                          .sales_potential) / 4)) / self.storeCount).toFixed(2);
+                      }
+                    })
+
               self.$store.commit("setClusterName", self.getClusterName());
               self.$store.commit("setClusterType", self.selectedClusterType);
               self.$store.commit("setClusterID", self.selectedClusterOption);
@@ -1464,6 +1511,18 @@
           self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
             .selectedClusterOption);
 
+          self.ais_Sales = 0;
+          self.ais_SalesPotential = 0;
+
+                    self.products.forEach(el => {
+                      if (el.store_Range_Indicator == "YES") {
+                        self.ais_Sales = (parseFloat(self.ais_Sales) + ((parseFloat(el.sales_Retail) /
+                          4) / self.storeCount)).toFixed(2);
+                        self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + ((parseFloat(el
+                          .sales_potential) / 4)) / self.storeCount).toFixed(2);
+                      }
+                    })
+
           self.storeCount = self.rangingController.getStoreCountByCluster(self.selectedClusterType, self
             .selectedClusterOption);
           self.$store.commit("setCurrentStoreCount", self.storeCount);
@@ -1531,6 +1590,17 @@
 
         return planogramName
       },
+      getProductPotentailData(productID) {
+        let self = this;
+        let selectedProduct = null;
+
+        self.products.forEach(el => {
+          if (el.productID == productID)
+            selectedProduct = el
+        })
+
+        return selectedProduct;
+      }
     }
   }
 </script>

@@ -103,6 +103,12 @@
 
           </v-toolbar-items>
           <v-spacer></v-spacer>
+          <div v-show="storesInCluster > -1">
+            <h4>Active Items Selected</h4>
+            <div>Sales: R{{ (ais_Sales < 0 ? (ais_Sales * -1) : ais_Sales) }}</div>
+            <div>Sales Potential: R{{ (ais_SalesPotential < 0 ? (ais_SalesPotential * -1) : ais_SalesPotential) }}</div>
+          </div>
+          <v-spacer></v-spacer>
           <v-menu offset-y>
             <v-btn :disabled="selectedItems.length == 0" slot="activator" color="primary" dark>Set Indicator</v-btn>
             <v-list dark>
@@ -277,7 +283,9 @@
           active_Shop_Code_ID: 0
         },
         canRefresh: false,
-        tmpString: ""
+        tmpString: "",
+        ais_Sales: 0,
+        ais_SalesPotential: 0
       }
     },
     created() {
@@ -309,6 +317,18 @@
               if (self.selectedClusterType != null && self.selectedClusterOption != null) {
                 self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
                   .selectedClusterOption);
+
+                self.ais_Sales = 0;
+                self.ais_SalesPotential = 0;
+
+                self.rowData.forEach(el => {
+                  if (el.store_Range_Indicator == "YES") {
+                    self.ais_Sales = (parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)).toFixed(2);
+                    self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + parseFloat(el
+                      .sales_potential)).toFixed(2);
+                  }
+                })
+
                 self.fitColumns();
               }
               self.$refs.spinner.hide();
@@ -373,7 +393,19 @@
                 if (self.selectedClusterType != null && self.selectedClusterOption != null) {
                   self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
                     .selectedClusterOption);
-                  console.log(self.rowData);
+
+                  self.ais_Sales = 0;
+                  self.ais_SalesPotential = 0;
+
+                  self.rowData.forEach(el => {
+                    if (el.store_Range_Indicator == "YES") {
+                      self.ais_Sales = (parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)).toFixed(
+                        2);
+                      self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + parseFloat(el
+                        .sales_potential)).toFixed(2);
+                    }
+                  })
+
                   self.fitColumns();
                 }
                 self.$refs.spinner.hide();
@@ -431,6 +463,18 @@
               if (self.selectedClusterType != null && self.selectedClusterOption != null) {
                 self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
                   .selectedClusterOption);
+
+                self.ais_Sales = 0;
+                self.ais_SalesPotential = 0;
+
+                self.rowData.forEach(el => {
+                  if (el.store_Range_Indicator == "YES") {
+                    self.ais_Sales = (parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)).toFixed(2);
+                    self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + parseFloat(el
+                      .sales_potential)).toFixed(2);
+                  }
+                })
+
                 self.fitColumns();
               }
               self.$refs.SizeLoader.close()
@@ -468,6 +512,18 @@
               if (self.selectedClusterType != null && self.selectedClusterOption != null) {
                 self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
                   .selectedClusterOption);
+
+                self.ais_Sales = 0;
+                self.ais_SalesPotential = 0;
+
+                self.rowData.forEach(el => {
+                  if (el.store_Range_Indicator == "YES") {
+                    self.ais_Sales = (parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)).toFixed(2);
+                    self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + parseFloat(el
+                      .sales_potential)).toFixed(2);
+                  }
+                })
+
                 self.fitColumns();
               }
               self.$refs.spinner.hide();
@@ -579,6 +635,17 @@
         })
         self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
           .selectedClusterOption);
+
+        self.ais_Sales = 0;
+        self.ais_SalesPotential = 0;
+
+        self.rowData.forEach(el => {
+          if (el.store_Range_Indicator == "YES") {
+            self.ais_Sales = (parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)).toFixed(2);
+            self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + parseFloat(el.sales_potential))
+              .toFixed(2);
+          }
+        })
       },
       onCellValueChanged(e) {
         let self = this;
@@ -609,11 +676,32 @@
                   self.rangingController.setStoreIndicatorByProductID(newStores, e.data.productID);
                   self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
                     .selectedClusterOption);
+
+                  self.ais_Sales = 0;
+                  self.ais_SalesPotential = 0;
+
+                  self.rowData.forEach(el => {
+                    if (el.store_Range_Indicator == "YES") {
+                      self.ais_Sales = (parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)).toFixed(2);
+                      self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + parseFloat(el
+                        .sales_potential)).toFixed(2);
+                    }
+                  })
                 })
             } else {
               self.rangingController.setClusterIndicator(self.selectedClusterType, self.selectedClusterOption, e.data
-                .productID,
-                e.newValue);
+                .productID, e.newValue);
+
+              self.ais_Sales = 0;
+              self.ais_SalesPotential = 0;
+
+              self.rowData.forEach(el => {
+                if (el.store_Range_Indicator == "YES") {
+                  self.ais_Sales = (parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)).toFixed(2);
+                  self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + parseFloat(el.sales_potential))
+                    .toFixed(2);
+                }
+              })
             }
           }
         }
@@ -738,6 +826,17 @@
               })
               self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
                 .selectedClusterOption);
+
+              self.ais_Sales = 0;
+              self.ais_SalesPotential = 0;
+
+              self.rowData.forEach(el => {
+                if (el.store_Range_Indicator == "YES") {
+                  self.ais_Sales = (parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)).toFixed(2);
+                  self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + parseFloat(el.sales_potential))
+                    .toFixed(2);
+                }
+              })
             })
         } else {
           let productID = self.selectedItems[0].data.productID;
@@ -750,6 +849,17 @@
               self.rangingController.setStoreIndicatorByProductID(newStores, productID);
               self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
                 .selectedClusterOption);
+
+              self.ais_Sales = 0;
+              self.ais_SalesPotential = 0;
+
+              self.rowData.forEach(el => {
+                if (el.store_Range_Indicator == "YES") {
+                  self.ais_Sales = (parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)).toFixed(2);
+                  self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + parseFloat(el.sales_potential))
+                    .toFixed(2);
+                }
+              })
             })
         }
       },
@@ -789,11 +899,34 @@
             self.columnDefs = require('./headers.json');
             self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
               .selectedClusterOption);
+
+            self.ais_Sales = 0;
+            self.ais_SalesPotential = 0;
+
+            self.rowData.forEach(el => {
+              if (el.store_Range_Indicator == "YES") {
+                self.ais_Sales = (parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)).toFixed(2);
+                self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + parseFloat(el.sales_potential))
+                  .toFixed(2);
+              }
+            })
           }
           break;
         case 'STORE': {
           let storelevel = self.rangingController.getStoreIndicators(self.selectedClusterType, self
             .selectedClusterOption);
+
+          self.ais_Sales = 0;
+          self.ais_SalesPotential = 0;
+
+          self.rowData.forEach(el => {
+            if (el.store_Range_Indicator == "YES") {
+              self.ais_Sales = (parseFloat(self.ais_Sales) + (parseFloat(el.sales_Retail) / self.storesInCluster))
+                .toFixed(2);
+              self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + (parseFloat(el.sales_potential) /
+                self.storesInCluster)).toFixed(2);
+            }
+          })
           self.columnDefs = storelevel.headers;
           self.rowData = storelevel.data;
         }
