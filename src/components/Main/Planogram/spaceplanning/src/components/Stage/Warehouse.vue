@@ -1574,9 +1574,9 @@
         }
 
         // // get StoreName
-        if (self.rangingData.storeName != null && self.rangingData.storeName != "") {
-          planogramName += " - " + self.rangingData.storeName;
-        }
+        // if (self.rangingData.storeName != null && self.rangingData.storeName != "") {
+        //   planogramName += " - " + self.rangingData.storeName;
+        // }
 
         if (planogramName != "")
           planogramName += " - XXX";
