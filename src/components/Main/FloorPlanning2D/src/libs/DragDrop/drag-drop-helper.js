@@ -1,4 +1,6 @@
 import Wall from '@/components/Main/FloorPlanning2D/src/libs/wall/wall.js';
+import Department from '../department/department.js'
+
 class DragDropHelper {
     constructor() {
 
@@ -9,6 +11,12 @@ class DragDropHelper {
         let dropPos = self.GetTransformedMousePoint(stage, layer, group, ev);
         let wall = new Wall(stage, layer, group, data, dropPos);
         wall.Initialise();
+    }
+
+    AddDepartment(stage, layer, group, data, ev) {
+        let self = this;
+        let department = new Department(stage, layer, group, data);
+        department.Initialise(department.Build);
     }
 
     GetTransformedMousePoint(stage, layer, group, ev) {
