@@ -1545,7 +1545,7 @@
   }
 
   .details_closed {
-    max-height: calc(100vh - 235px)
+    max-height: calc(100vh - 295px)
   }
 
   table {
