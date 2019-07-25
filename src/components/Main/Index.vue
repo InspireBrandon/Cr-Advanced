@@ -73,14 +73,14 @@
 
                             <v-divider></v-divider>
 
-                            <v-list-tile @click="$router.push('/Tasks')">
+                            <!-- <v-list-tile @click="$router.push('/Tasks')">
                                 <v-list-tile-avatar>
                                     <v-icon>inbox</v-icon>
                                 </v-list-tile-avatar>
                                 <v-list-tile-title>Tasks</v-list-tile-title>
                             </v-list-tile>
 
-                            <v-divider v-if="databases.length > 0"></v-divider>
+                            <v-divider v-if="databases.length > 0"></v-divider> -->
 
                             <v-list-tile v-if="databases.length > 0" @click="sheet = true">
                                 <v-list-tile-avatar>
