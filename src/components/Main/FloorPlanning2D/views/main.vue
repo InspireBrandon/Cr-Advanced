@@ -1,6 +1,6 @@
 <template>
     <v-app>
-        <v-toolbar color="grey darken-3" dark flat dense>
+        <v-toolbar color="primary" dark flat dense>
             <v-toolbar-side-icon>
                 <v-icon>home</v-icon>
             </v-toolbar-side-icon>
@@ -82,18 +82,14 @@
             <v-card dark flat tile color="grey darken-2" style="height: calc(100vh - 136px)">
                 <v-container class="pa-0 ma-0" grid-list-lg style="max-width: 100%">
                     <v-layout row wrap>
-                        <v-flex md3 >
-                             <v-toolbar dark flat dense>
-                                    <v-toolbar-title>
-                                        Categories
-                                    </v-toolbar-title>
-                                    <v-spacer></v-spacer>
-                                    <v-autocomplete label="Select Store" :items="stores" @change="getPlanograms"
-                                        v-model="selectedStore">
-                                    </v-autocomplete>
-                                </v-toolbar>
+                        <v-flex md3>
+                            <v-toolbar dark flat dense>
+                                <v-toolbar-title>
+                                    Categories
+                                </v-toolbar-title>
+                            </v-toolbar>
                             <v-card flat tile style="height: calc(100% - 30px); overflow: auto;">
-                               
+
                                 <v-card-text>
 
                                     <v-card height="400px" style="overflow: auto;">
@@ -169,6 +165,9 @@
                                 <v-tab ripple>
                                     <v-icon>tab_unselected</v-icon>
                                 </v-tab>
+                                <v-tab ripple>
+                                    <v-icon>settings</v-icon>
+                                </v-tab>
                                 <v-tab-item>
                                     <v-card flat tile>
                                         <v-list dark class="pa-0">
@@ -233,6 +232,20 @@
                                 <v-tab-item>
                                     <v-card flat tile>
                                         <v-card-text>Assets</v-card-text>
+                                    </v-card>
+                                </v-tab-item>
+                                <v-tab-item>
+                                    <v-card flat tile>
+                                        <v-card-text>
+                                            <div style="text-decoration: underline">Configuration</div>
+                                            <v-autocomplete label="Select Store" :items="stores" @change="getPlanograms"
+                                                v-model="selectedStore">
+                                            </v-autocomplete>
+                                            <div>
+                                                Current Planograms: 3
+                                                <v-btn small>set up</v-btn>
+                                            </div>
+                                        </v-card-text>
                                     </v-card>
                                 </v-tab-item>
                             </v-tabs>

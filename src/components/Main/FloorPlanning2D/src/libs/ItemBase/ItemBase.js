@@ -1,4 +1,5 @@
 import Konva from 'konva';
+
 class ItemBase {
     constructor(data) {
         this.ratio = 10;

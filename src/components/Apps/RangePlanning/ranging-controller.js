@@ -725,6 +725,7 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
 
     // complex calculations;
     let sales_profit = sales_retail - sales_cost;
+    let gross_profit = (sales_profit / sales_cost) * 100;
 
     // let totalProductSales = getTotalProductSalesByProduct(storeSales, product.productID);
 
@@ -773,7 +774,8 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
       item_profit_rank: item_profit_rank,
       sales_potential_rank: sales_potential_rank,
       volume_potential_rank: volume_potential_rank,
-      dos_fac: dos_fac.toFixed(1)
+      dos_fac: dos_fac.toFixed(1),
+      gross_profit: gross_profit.toFixed(2)
     }, getProductIndicator(product.productID, storeSales, stores)))
   }
 
@@ -887,6 +889,7 @@ function RangeProduct(productData, salesData, indicator) {
   self.item_sales_rank = salesData.item_sales_rank
   self.item_profit_rank = salesData.item_profit_rank
   self.dos_fac = salesData.dos_fac;
+  self.gross_profit = (isNaN(salesData.gross_profit) ? 0 : salesData.gross_profit) + "%";
   self.store_Range_Indicator = indicator;
 }
 

@@ -3,11 +3,13 @@
         "field": "product_System_ID",
         "headerCheckboxSelection": true,
         "headerCheckboxSelectionFilteredOnly": true,
-        "checkboxSelection": true
+        "checkboxSelection": true,
+        "hide": true
     },
     {
         "headerName": "Barcode",
-        "field": "barcode"
+        "field": "barcode",
+        "hide": true
     },
     {
         "headerName": "Brand",
@@ -38,8 +40,7 @@
     {
         "headerName": "Subcategory",
         "field": "subcategory",
-        "editable": true,
-        "hide": true
+        "editable": true
     },
     {
         "headerName": "Segment",
@@ -49,7 +50,8 @@
     },
     {
         "headerName": "Active Shop Code",
-        "field": "active_Shop_Code"
+        "field": "active_Shop_Code",
+        "hide": true
     },
     {
         "headerName": "Height",
@@ -83,7 +85,8 @@
     },
     {
         "headerName": "Numeric Distribution",
-        "field": "number_Distribution"
+        "field": "number_Distribution",
+        "hide": true
     },
     {
         "headerName": "Weighted Distribution",
@@ -106,28 +109,32 @@
     },
     {
         "headerName": "Volume Potential",
-        "field": "volume_potential"
+        "field": "volume_potential",
+        "hide": true
     },
     {
         "headerName": "Volume Potential rank",
         "field": "volume_potential_rank",
         "cellStyle": {
             "background-color": "#e4e4e4"
-        }
+        },
+        "hide": true
     },
     {
         "headerName": "Item Sales Rank",
         "field": "item_sales_rank",
         "cellStyle": {
             "background-color": "#e4e4e4"
-        }
+        },
+        "hide": true
     },
     {
         "headerName": "Item Volume Rank",
         "field": "item_volume_rank",
         "cellStyle": {
             "background-color": "#e4e4e4"
-        }
+        },
+        "hide": true
     },
     {
         "headerName": "Item Profit Rank",
@@ -138,14 +145,20 @@
     },
     {
         "headerName": "Sales",
-        "field": "sales_Retail"
+        "field": "sales_Retail",
+        "hide": true
     },
     {
         "headerName": "Volume",
-        "field": "sales_Units"
+        "field": "sales_Units",
+        "hide": true
     },
     {
         "headerName": "Profit",
         "field": "sales_Profit"
+    },
+    {
+        "headerName": "GP%",
+        "field": "gross_profit"
     }
 ]
