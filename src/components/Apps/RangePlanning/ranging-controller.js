@@ -19,7 +19,6 @@ class RangingController {
     this.periodic = rangingData.periodic;
     this.monthsBetween = rangingData.monthsBetween;
     this.tag = rangingData.tag;
-    console.log(rangingData)
   }
 
   getRangingFile() {
@@ -169,8 +168,10 @@ class RangingController {
   }
 
   getSalesDataByStore(storeID) {
+    console.log("INSIDE GET SALES DATA BY STORE")
     let store = getStoreByID(storeID, this.storeSales);
-    let sales = getSalesDataByStore(store, this.storeSales);
+    let sales = getSalesDataByStore(store, this.allRangeProducts, this.storeSales);
+    return sales;
   }
 
   getSalesDataByCluster(clusterType, clusterID) {
@@ -371,20 +372,20 @@ function getWeightedDistribution(storeSales, productID, clusters, clusterType, c
 }
 
 function getDaysOfSupplyFacings(clusters, clusterType, clusterID, volume_potential, depth) {
-    let clusterStores = getStoresByCluster(clusters, clusterType, clusterID);
-    let storeCount = clusterStores.length;
-    let fdepth = parseFloat(depth);
+  let clusterStores = getStoresByCluster(clusters, clusterType, clusterID);
+  let storeCount = clusterStores.length;
+  let fdepth = parseFloat(depth);
 
-    if(fdepth < 1)
-      fdepth = 1;
+  if (fdepth < 1)
+    fdepth = 1;
 
-    let capacity = ((38 / fdepth));
+  let capacity = ((38 / fdepth));
 
-    capacity = parseInt(capacity);
+  capacity = parseInt(capacity);
 
-    let other = capacity / (volume_potential / storeCount) * 30;
+  let other = capacity / (volume_potential / storeCount) * 30;
 
-    return other;
+  return other;
 }
 
 function IsClusterStore(clusterStores, storeID) {
@@ -417,6 +418,65 @@ function getStoresByProduct(storeSales, productID) {
   return storeArr;
 }
 
+function GetStoreRanks(storeSales, storeID) {
+  let retArr = [];
+
+  storeSales[0].salesData.forEach(el => {
+    retArr.push({
+      productID: el.productID,
+      itemSales: 0,
+      itemSalesRank: 0,
+      itemVolume: 0,
+      itemVolumeRank: 0,
+      itemProfit: 0,
+      itemProfitRank: 0,
+    })
+  })
+
+  storeSales.forEach(ss => {
+    if (ss.storeID == storeID) {
+      ss.salesData.forEach(sd => {
+
+
+        retArr.forEach(rA => {
+          if (rA.productID == sd.productID) {
+            rA.itemSales += parseFloat(sd.sales_Retail)
+            rA.itemVolume += parseFloat(sd.sales_Units)
+            rA.itemProfit += parseFloat(sd.sales_Profit)
+            rA.salesPotential += parseFloat(sd.sales_potential)
+            rA.volumePotential += parseFloat(sd.volume_potential)
+          }
+        })
+      })
+    }
+  })
+
+  // getting sales rank by sort
+  retArr.sort((a, b) => (a.itemSales > b.itemSales) ? 1 : ((b.itemSales > a.itemSales) ? -1 : 0));
+  for (let index = 0; index < retArr.length; index++) {
+    const element = retArr[index];
+    element.itemSalesRank = retArr.length - index
+  }
+  // getting volumeRank by sort
+
+  retArr.sort((a, b) => (a.itemVolume > b.itemVolume) ? 1 : ((b.itemVolume > a.itemVolume) ? -1 : 0));
+
+  for (let index = 0; index < retArr.length; index++) {
+    const element = retArr[index];
+    element.itemVolumeRank = retArr.length - index
+  }
+  // getting ItemProfitRank by sort
+
+  retArr.sort((a, b) => (a.itemProfit > b.itemProfit) ? 1 : ((b.itemProfit > a.itemProfit) ? -1 : 0));
+
+  for (let index = 0; index < retArr.length; index++) {
+    const element = retArr[index];
+    element.itemProfitRank = retArr.length - index
+  }
+
+  return retArr
+}
+
 function GetRanks(storeSales, clusters, clusterType, clusterID) {
   let stores = getStoresByCluster(clusters, clusterType, clusterID)
 
@@ -433,7 +493,6 @@ function GetRanks(storeSales, clusters, clusterType, clusterID) {
       itemProfitRank: 0,
     })
   })
-
 
   storeSales.forEach(ss => {
     if (storeInCluster(ss.storeID, stores)) {
@@ -476,12 +535,22 @@ function GetRanks(storeSales, clusters, clusterType, clusterID) {
   }
 
   return retArr
-
-
 }
 
 function getSalesDataByStore(store, allProducts, storeSales) {
   let sales = [];
+
+  console.log(storeSales)
+
+  let salesArr = getStoreSalesByStoreID(storeSales, store.storeID);
+
+  for (let i = 0; i < salesArr.length; i++) {
+    const salesItem = salesArr[i];
+    sales.push(salesItem);
+  }
+
+  let totalSales = getTotalStoreProductSales(allProducts, sales, storeSales, [store], store.storeID);
+  return totalSales;
 }
 
 // Get all the sum of sales data by stores
@@ -515,6 +584,114 @@ function getStoreSalesByStoreID(storeSales, storeID) {
   return sales;
 }
 
+function getTotalStoreProductSales(allProducts, sales, storeSales, stores, storeID) {
+  let productSales = [];
+
+  let totalSales = 0;
+
+  storeSales.forEach(storeSale => {
+    storeSale.salesData.forEach(product => {
+      totalSales += numberifySales(product.sales_Retail);
+    })
+  })
+
+  let tmp = GetStoreRanks(storeSales, storeID)
+
+  for (let i = 0; i < allProducts.length; i++) {
+    const product = allProducts[i];
+
+    let sales_retail = 0;
+    let sales_cost = 0;
+    let sales_units = 0;
+
+    for (let j = 0; j < sales.length; j++) {
+      const sale = sales[j];
+
+      if (sale.productID == product.productID) {
+        sales_retail += numberifySales(sale.sales_Retail)
+        sales_cost += numberifySales(sale.sales_Cost)
+        sales_units += numberifySales(sale.sales_Units)
+      }
+    };
+
+    // complex calculations;
+    let sales_profit = sales_retail - sales_cost;
+
+    let number_distribution = 0;
+    let weighted_distribution = 0;
+
+    let sales_potential = 0;
+    let volume_potential = 0;
+    let profit_potential = 0;
+    let item_sales_rank = 0
+    let item_volume_rank = 0
+    let item_profit_rank = 0
+    let sales_potential_rank = 0
+    let volume_potential_rank = 0
+
+    tmp.forEach(t => {
+      if (product.productID == t.productID) {
+        item_sales_rank = t.itemSalesRank
+        item_volume_rank = t.itemVolumeRank
+        item_profit_rank = t.itemProfitRank
+      }
+    })
+
+    if (weighted_distribution != 0 && sales_retail != 0)
+      (sales_potential = sales_retail / weighted_distribution * 100).toFixed(0);
+
+    if (weighted_distribution != 0 && sales_units != 0)
+      (volume_potential = sales_units / weighted_distribution * 100).toFixed(0);
+
+    if (weighted_distribution != 0 && sales_units != 0)
+      (profit_potential = sales_profit / weighted_distribution * 100).toFixed(0);
+
+    let dos_fac = 0; // getDaysOfSupplyFacings(clusters, clusterType, clusterID, volume_potential, product.depth)
+
+    productSales.push(new RangeProduct(product, {
+      sales_retail: sales_retail.toFixed(2),
+      sales_cost: sales_cost.toFixed(2),
+      sales_units: sales_units.toFixed(0),
+      sales_profit: sales_profit.toFixed(2),
+      number_distribution: number_distribution.toFixed(2),
+      weighted_distribution: weighted_distribution.toFixed(2),
+      sales_potential: sales_potential.toFixed(2),
+      volume_potential: volume_potential.toFixed(2),
+      item_sales_rank: item_sales_rank,
+      item_volume_rank: item_volume_rank,
+      item_profit_rank: item_profit_rank,
+      sales_potential_rank: sales_potential_rank,
+      volume_potential_rank: volume_potential_rank,
+      dos_fac: dos_fac.toFixed(1)
+    }, getProductIndicator(product.productID, storeSales, stores)))
+  }
+
+  productSales.sort((a, b) => (parseFloat(a.sales_potential) > parseFloat(b.sales_potential)) ? 1 : ((parseFloat(b.sales_potential) > parseFloat(a.sales_potential)) ? -1 : 0));
+  for (let index = 0; index < productSales.length; index++) {
+    const element = productSales[index];
+    element.sales_potential_rank = productSales.length - index
+  }
+
+  productSales.sort((a, b) => (parseFloat(a.volume_potential) > parseFloat(b.volume_potential)) ? 1 : ((parseFloat(b.volume_potential) > parseFloat(a.volume_potential)) ? -1 : 0));
+  for (let index = 0; index < productSales.length; index++) {
+    const element = productSales[index];
+    element.volume_potential_rank = productSales.length - index
+  }
+
+  return productSales;
+}
+
+function storeInCluster(storeID, clusterStores) {
+  let inCluster = false;
+
+  clusterStores.forEach(store => {
+    if (store.storeID == storeID)
+      inCluster = true;
+  })
+
+  return inCluster;
+}
+
 // Get total product sales
 function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, clusterType, clusterID) {
   let productSales = [];
@@ -535,11 +712,6 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
     let sales_retail = 0;
     let sales_cost = 0;
     let sales_units = 0;
-
-    // Get Indicator
-    // for (let j = 0; j < sales.length; j++) {
-    //   const sale = sales[j];
-    // }
 
     for (let j = 0; j < sales.length; j++) {
       const sale = sales[j];
@@ -604,7 +776,7 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
       dos_fac: dos_fac.toFixed(1)
     }, getProductIndicator(product.productID, storeSales, stores)))
   }
-  
+
   productSales.sort((a, b) => (parseFloat(a.sales_potential) > parseFloat(b.sales_potential)) ? 1 : ((parseFloat(b.sales_potential) > parseFloat(a.sales_potential)) ? -1 : 0));
   for (let index = 0; index < productSales.length; index++) {
     const element = productSales[index];
@@ -618,17 +790,6 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
   }
 
   return productSales;
-}
-
-function storeInCluster(storeID, clusterStores) {
-  let inCluster = false;
-
-  clusterStores.forEach(store => {
-    if (store.storeID == storeID)
-      inCluster = true;
-  })
-
-  return inCluster;
 }
 
 function setStoreIndicatorByProductID(stores, storeSales, productID) {
