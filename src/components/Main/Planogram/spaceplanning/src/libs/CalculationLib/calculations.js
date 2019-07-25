@@ -14,7 +14,7 @@ class Calculations {
       return "N/A"
     }
 
-    var calc = (parseFloat(sales_units) / this.storeCount) / this.TotalDays * 7;
+    var calc = ((parseFloat(sales_units) / this.storeCount) / this.TotalDays) * 7;
     return calc.toFixed(2);
   }
 
