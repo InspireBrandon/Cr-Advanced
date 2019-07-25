@@ -82,16 +82,41 @@
             <v-card dark flat tile color="grey darken-2" style="height: calc(100vh - 136px)">
                 <v-container class="pa-0 ma-0" grid-list-lg style="max-width: 100%">
                     <v-layout row wrap>
-                        <v-flex class="pa-0" md3>
-                            <v-card style="height: calc(100vh -136px)">
-                                <v-toolbar dark flat dense>
+                        <v-flex md3 >
+                             <v-toolbar dark flat dense>
                                     <v-toolbar-title>
                                         Categories
                                     </v-toolbar-title>
                                     <v-spacer></v-spacer>
+                                    <v-autocomplete label="Select Store" :items="stores" @change="getPlanograms"
+                                        v-model="selectedStore">
+                                    </v-autocomplete>
                                 </v-toolbar>
+                            <v-card flat tile style="height: calc(100% - 30px); overflow: auto;">
+                               
                                 <v-card-text>
-                                    insert items
+
+                                    <v-card height="400px" style="overflow: auto;">
+                                        <v-card-text style="display: block;">
+                                            <v-list class="pa-0" dense hover v-for="(sp, idx) in planograms" :key="idx">
+                                                <v-divider></v-divider>
+                                                <v-list-tile :class="{ 'highlighted': selectedSpacePlan == sp  }" avatar
+                                                    @click="selectedSpacePlan = sp">
+                                                    <v-list-tile-content>
+                                                        <v-list-tile-title v-text="sp.name"></v-list-tile-title>
+                                                    </v-list-tile-content>
+                                                </v-list-tile>
+                                            </v-list>
+                                        </v-card-text>
+                                    </v-card>
+                                    <!-- <v-list dense hover v-for="(item,index) in planograms" :key="index">
+                                        <v-divider></v-divider>
+                                        <v-list-tile>
+                                            <v-list-tile-content>
+                                                <v-list-tile-title>{{item.name}}</v-list-tile-title>
+                                            </v-list-tile-content>
+                                        </v-list-tile>
+                                    </v-list> -->
                                 </v-card-text>
                                 <v-card-actions>
                                     <table style="width: 100%;">
@@ -229,6 +254,10 @@
         data() {
             return {
                 fixture_types: [],
+                selectedStore: null,
+                selectedSpacePlan: null,
+                stores: [],
+                planograms: [],
                 stageData: {
                     layer: null,
                     group: null,
@@ -250,8 +279,37 @@
             floor.Initialise();
             window.addEventListener('resize', self.InitialiseStageResponsive);
             this.getFixtureType()
+            this.getStores()
         },
         methods: {
+            getStores() {
+                let self = this
+                self.showCategoryCluster = true
+                axios.get(process.env.VUE_APP_API + `Store?db=CR-Devinspire`).then(r => {
+                    r.data.forEach(store => {
+                        self.stores.push({
+                            text: store.storeName,
+                            value: store.storeID,
+                        })
+                    })
+                })
+            },
+            getPlanograms() {
+                let self = this
+
+                self.planograms = [];
+
+                axios.get(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire&folder=Space Planning")
+                    .then(r => {
+                        self.planograms = r.data;
+                        console.log(self.planograms);
+
+                    })
+                    .catch(e => {
+                        alert("Failed to get data...");
+                    })
+
+            },
             getFixtureType() {
                 let self = this;
 
@@ -409,6 +467,10 @@
     td {
         background: white;
         color: black;
+    }
+
+    .highlighted {
+        background-color: #1976d2;
     }
 
     th {
