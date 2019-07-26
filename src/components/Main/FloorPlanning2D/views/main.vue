@@ -77,44 +77,70 @@
                     <v-icon>rotate_right</v-icon>
                 </v-btn>
             </v-btn-toggle>
+            <v-btn icon @click="toggleFixtureList(true)">
+                <v-icon>close</v-icon>
+            </v-btn>
         </v-toolbar>
         <v-content>
             <v-card dark flat tile color="grey darken-2" style="height: calc(100vh - 136px)">
                 <v-layout row wrap>
-                    <v-flex md3>
+
+                    <v-flex md3 v-show="showFixtures">
                         <v-toolbar dark flat dense>
                             <v-toolbar-title>
                                 Fixtures
                             </v-toolbar-title>
+                            <v-spacer></v-spacer>
+                            <v-btn icon @click="toggleFixtureList(false)">
+                                <v-icon>close</v-icon>
+                            </v-btn>
                         </v-toolbar>
                         <v-card flat tile style="height: calc(100% - 30px); overflow: auto;">
-
-                            <v-card-text>
-
-                                <v-card height="400px" style="overflow: auto;">
-                                    <v-card-text style="display: block;">
-                                        <v-list class="pa-0" three-line hover v-for="(sp, idx) in planograms"
-                                            :key="idx">
-                                            <!-- <v-list> -->
-                                            <v-divider></v-divider>
-
-                                            <v-list-tile :class="{ 'highlighted': selectedSpacePlan == sp  }" avatar>
-                                                <!-- <v-list-tile> -->
-                                                <v-list-tile-avatar>
-                                                    image
-                                                </v-list-tile-avatar>
-                                                <v-list-tile-content>
-                                                    <v-list-tile-title v-text="sp.name"></v-list-tile-title>
-                                                </v-list-tile-content>
-                                                <v-list-tile-action>
-                                                    total amount
-                                                </v-list-tile-action>
-
-                                            </v-list-tile>
-                                        </v-list>
-                                    </v-card-text>
+                            <v-card-title>
+                                <v-autocomplete label="Select Group" :items="stores" @change="getPlanograms"
+                                    v-model="selectedStore">
+                                </v-autocomplete>
+                            </v-card-title>
+                            <v-card-text style="display: block;">
+                                <v-list class="pa-0">
+                                    <!-- <v-list> -->
+                                    <v-divider></v-divider>
+                                    <v-list-tile avatar>
+                                        <!-- <v-list-tile> -->
+                                        <v-list-tile-avatar>
+                                            image
+                                        </v-list-tile-avatar>
+                                        <v-list-tile-content>
+                                            <v-list-tile-title> Fixture Name</v-list-tile-title>
+                                        </v-list-tile-content>
+                                        <v-list-tile-action>
+                                            total amount
+                                        </v-list-tile-action>
+                                    </v-list-tile>
+                                </v-list>
+                                <hr>
+                                <v-card flat tile color="grey lighten-1">
+                                    <v-list class="pa-0">
+                                        <!-- <v-list> -->
+                                        <v-divider></v-divider>
+                                        <v-list-tile avatar>
+                                            <!-- <v-list-tile> -->
+                                            <v-list-tile-avatar>
+                                                image
+                                            </v-list-tile-avatar>
+                                            <v-list-tile-content>
+                                                <v-list-tile-title> {Fixture Name}</v-list-tile-title>
+                                            </v-list-tile-content>
+                                            <v-list-tile-action>
+                                                {total amount}
+                                            </v-list-tile-action>
+                                        </v-list-tile>
+                                        <v-divider></v-divider>
+                                    </v-list>
                                 </v-card>
-                                <!-- <v-list dense hover v-for="(item,index) in planograms" :key="index">
+
+                            </v-card-text>
+                            <!-- <v-list dense hover v-for="(item,index) in planograms" :key="index">
                                         <v-divider></v-divider>
                                         <v-list-tile>
                                             <v-list-tile-content>
@@ -122,13 +148,12 @@
                                             </v-list-tile-content>
                                         </v-list-tile>
                                     </v-list> -->
-                            </v-card-text>
                             <v-card-actions>
 
                             </v-card-actions>
                         </v-card>
                     </v-flex>
-                    <v-flex class="pa-0" md7>
+                    <v-flex id="asd" class="pa-0" :class="{ 'md7': showFixtures, 'md10': !showFixtures }">
                         <v-card flat color="grey darken-2" tile style="height: calc(100vh - 136px)">
                             <v-card-text class="pa-0">
                                 <!-- <canvas id="renderCanvas" touch-action="none"></canvas> -->
@@ -138,7 +163,7 @@
                             </v-card-text>
                         </v-card>
                     </v-flex>
-                    <v-flex md2 class="pa-0">
+                    <v-flex class="pa-0">
                         <v-tabs dark color="grey darken-4" slider-color="yellow"
                             style="width: 100%; overflow-y: hidden;">
                             <v-tab ripple>
@@ -254,6 +279,7 @@
         },
         data() {
             return {
+                showFixtures: true,
                 selectedPlanograms: [],
                 fixture_types: [],
                 selectedStore: null,
@@ -284,6 +310,11 @@
             this.getStores()
         },
         methods: {
+            toggleFixtureList(value) {
+                let self = this
+                self.showFixtures = value
+                self.fitStageIntoParentContainer()
+            },
             addPlanogramToSelection() {
                 let self = this
                 self.$refs.PlanogramDetailsSelector.show((spacePlanID, item) => {})
@@ -364,6 +395,26 @@
                     y: scale
                 });
                 stage.draw();
+            },
+            fitStageIntoParentContainer() {
+                let self = this
+                let stage = self.$refs.stage.getStage();
+                var container = document.querySelector('#asd');
+
+                // now we need to fit stage into parent
+                var containerWidth = container.offsetWidth;
+                // to do this we need to scale the stage
+                var scale = containerWidth / self.stageData.stageWidth;
+                this.stageWidth = container.clientWidth
+                this.stageHeight = container.clientHeight
+                stage.width(container.clientWidth);
+                stage.height(container.clientHeight);
+                stage.scale({
+                    x: scale,
+                    y: scale
+                });
+                stage.draw();
+
             },
             InitialiseScroll() {
                 let self = this;

@@ -109,6 +109,9 @@
             <div>Sales Potential: R{{ (ais_SalesPotential < 0 ? (ais_SalesPotential * -1) : ais_SalesPotential) }}</div>
           </div>
           <v-spacer></v-spacer>
+          <v-btn v-if="rowData.length>0" @click="ShowGraph=true">
+            show graphs
+          </v-btn>
           <v-menu offset-y>
             <v-btn :disabled="selectedItems.length == 0" slot="activator" color="primary" dark>Set Indicator</v-btn>
             <v-list dark>
@@ -136,7 +139,8 @@
           :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
           @selection-changed="onSelectionChanged" :rowData="rowData" :enableSorting="true" :enableFilter="true"
           :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true"
-          :enableColResize="true" :floatingFilter="true" :onGridReady="onGridReady" :groupMultiAutoColumn="true">
+          :enableColResize="true" :floatingFilter="true" :onGridReady="onGridReady" :groupMultiAutoColumn="true"
+         @first-data-rendered="onFirstDataRendered">
         </ag-grid-vue>
         <v-toolbar dark dense class="pa-0">
           <div>
@@ -147,6 +151,18 @@
           </div>
         </v-toolbar>
       </v-layout>
+      <v-dialog v-model="ShowGraph">
+        <v-card>
+          <v-toolbar>
+            <v-toolbar-title>
+              graph
+            </v-toolbar-title>
+          </v-toolbar>
+          <v-card-text>
+            <div id="myGroupedBar1" class="ag-theme-balham-dark my-chart chart"></div>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
     </div>
     <PlanogramSelector ref="planogramSelector"></PlanogramSelector>
     <Spinner ref="spinner"></Spinner>
@@ -164,6 +180,20 @@
 </template>
 
 <script>
+  function GroupedBar(params) {
+    let self = this;
+
+    self.cellRange = {
+      columns: params.columns
+    }
+
+    self.chartType = 'groupedBar';
+    self.chartContainer = params.chartContainer;
+    self.suppressChartRanges = params.suppressChartRanges;
+    self.aggregate = params.aggregate;
+  }
+  var firstGroupedBar;
+
   import SoftwareToolbar from "@/components/Common/SoftwareToolbar"
   import PlanogramSelector from '@/components/Common/PlanogramSelector';
   import DateRangeSelector from '@/components/Common/DateRangeSelector';
@@ -213,6 +243,7 @@
     },
     data() {
       return {
+        ShowGraph: false,
         isAdd: true,
         rangingController: null,
         storesInCluster: -1,
@@ -221,12 +252,23 @@
         columnDefs: [],
         rowData: [],
         gridOptions: {
+          enableCharts: true,
+          enableRangeSelection: true,
           context: {
             componentParent: this
           },
           rowClassRules: {
             'audit-image-breach': 'data.imageAudit'
-          }
+          },
+          onFirstDataRendered(params) {
+            var firstGroupedBarRangeParams = new GroupedBar({
+              columns: ['sales_Retail', 'sales_Units'],
+              chartContainer: document.querySelector('#myGroupedBar1'),
+              suppressChartRanges: true,
+              aggregate: true
+            })
+            firstGroupedBar = params.api.chartRange(firstGroupedBarRangeParams);
+          },
         },
         gotData: false,
         defaultColDef: {
@@ -290,6 +332,7 @@
     },
     created() {
       let self = this;
+      self.gridOptions.context.componentParent = this;
       self.getColumnDefenitions();
       self.checkparams()
     },
@@ -620,6 +663,7 @@
           self.clusterOptions.store.push(new textValue(element));
         });
       },
+
       onSelectionChanged(e) {
         let self = this;
         var rows = e.api.getSelectedNodes();
