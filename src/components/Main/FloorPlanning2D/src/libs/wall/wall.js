@@ -2,6 +2,7 @@ import Konva from 'konva';
 
 class Wall {
     constructor(stage, layer, group, data, dropPos) {
+        console.log(stage);
         this.Ratio = 10;
         this.MasterGroup = group;
         this.stage = stage;
@@ -40,7 +41,7 @@ class Wall {
             height: self.Height,
             fill: 'red',
         })
-        
+
         self.Group.add(self.Wall);
         self.MasterGroup.add(self.Group);
         self.layer.draw();
@@ -139,14 +140,15 @@ class Wall {
         anchor.on('mouseover', function () {
             var layer = this.getLayer();
             document.body.style.cursor = 'pointer';
-            this.strokeWidth(1.5);
+            // this.strokeWidth(1.5 * self.stage.scale().x);
             layer.draw();
         });
 
         anchor.on('mouseout', function () {
             var layer = this.getLayer();
             document.body.style.cursor = 'default';
-            this.strokeWidth(1);
+
+            // this.strokeWidth(1 * self.stage.scale().x);
             layer.draw();
         });
 

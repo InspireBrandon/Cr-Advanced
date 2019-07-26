@@ -419,6 +419,7 @@
 
                 switch (data.toUpperCase()) {
                     case "WALL": {
+                        console.log(stage);
                         let helper = new DragDropFixtureHelper();
                         helper.AddWall(stage, self.stageData.layer, self.stageData.group, data)
                     }
