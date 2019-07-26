@@ -66,7 +66,7 @@
             </v-toolbar-items>
         </v-toolbar>
         <v-toolbar color="grey darken-3" dark flat dense>
-            <v-btn-toggle mandatory>
+            <!-- <v-btn-toggle mandatory>
                 <v-btn flat value="MOVE">
                     <v-icon>open_with</v-icon>
                 </v-btn>
@@ -76,32 +76,32 @@
                 <v-btn flat value="ROTATE">
                     <v-icon>rotate_right</v-icon>
                 </v-btn>
-            </v-btn-toggle>
-            <v-btn icon @click="toggleFixtureList(true)">
+            </v-btn-toggle> -->
+            <!-- <v-btn icon @click="toggleFixtureList(true)">
                 <v-icon>close</v-icon>
-            </v-btn>
+            </v-btn> -->
         </v-toolbar>
         <v-content>
             <v-card dark flat tile color="grey darken-2" style="height: calc(100vh - 136px)">
                 <v-layout row wrap>
 
-                    <v-flex md3 v-show="showFixtures">
+                    <v-flex md2 v-show="showFixtures">
                         <v-toolbar dark flat dense>
                             <v-toolbar-title>
                                 Fixtures
                             </v-toolbar-title>
                             <v-spacer></v-spacer>
-                            <v-btn icon @click="toggleFixtureList(false)">
+                            <!-- <v-btn icon @click="toggleFixtureList(false)">
                                 <v-icon>close</v-icon>
-                            </v-btn>
+                            </v-btn> -->
                         </v-toolbar>
                         <v-card flat tile style="height: calc(100% - 30px); overflow: auto;">
                             <v-card-title>
-                                <v-autocomplete label="Select Group" :items="stores" @change="getPlanograms"
-                                    v-model="selectedStore">
+                                <v-autocomplete label="Select Group" :items="selectedPlanogramsSelector"
+                                    @change="GetFixtures" v-model="currentPlanogram">
                                 </v-autocomplete>
                             </v-card-title>
-                            <v-card-text style="display: block;">
+                            <v-card-text style="display: block;" v-if="currentPlanogram!=null">
                                 <v-list class="pa-0">
                                     <!-- <v-list> -->
                                     <v-divider></v-divider>
@@ -120,19 +120,19 @@
                                 </v-list>
                                 <hr>
                                 <v-card flat tile color="grey lighten-1">
-                                    <v-list class="pa-0">
+                                    <v-list class="pa-0" v-for="(item,idx) in Fixtures" :key="idx">
                                         <!-- <v-list> -->
                                         <v-divider></v-divider>
                                         <v-list-tile avatar>
                                             <!-- <v-list-tile> -->
                                             <v-list-tile-avatar>
-                                                image
+                                                {{item.img}}
                                             </v-list-tile-avatar>
                                             <v-list-tile-content>
-                                                <v-list-tile-title> {Fixture Name}</v-list-tile-title>
+                                                <v-list-tile-title> {{item.name}}</v-list-tile-title>
                                             </v-list-tile-content>
                                             <v-list-tile-action>
-                                                {total amount}
+                                                {{item.total}}
                                             </v-list-tile-action>
                                         </v-list-tile>
                                         <v-divider></v-divider>
@@ -153,7 +153,7 @@
                             </v-card-actions>
                         </v-card>
                     </v-flex>
-                    <v-flex id="asd" class="pa-0" :class="{ 'md7': showFixtures, 'md10': !showFixtures }">
+                    <v-flex id="asd" class="pa-0" :class="{ 'md8': showFixtures, 'md10': !showFixtures }">
                         <v-card flat color="grey darken-2" tile style="height: calc(100vh - 136px)">
                             <v-card-text class="pa-0">
                                 <!-- <canvas id="renderCanvas" touch-action="none"></canvas> -->
@@ -163,7 +163,7 @@
                             </v-card-text>
                         </v-card>
                     </v-flex>
-                    <v-flex class="pa-0">
+                    <v-flex md2 class="pa-0">
                         <v-tabs dark color="grey darken-4" slider-color="yellow"
                             style="width: 100%; overflow-y: hidden;">
                             <v-tab ripple>
@@ -248,10 +248,25 @@
                                         <v-autocomplete label="Select Store" :items="stores" @change="getPlanograms"
                                             v-model="selectedStore">
                                         </v-autocomplete>
-                                        <div>
+                                        <div v-if="selectedStore!=null">
                                             Current Planograms: {{selectedPlanograms.length}}
                                             <v-btn small @click="addPlanogramToSelection">set up</v-btn>
                                         </div>
+                                        <v-list v-if="selectedPlanograms!=null"
+                                            v-for="(item,index) in selectedPlanograms" :key="index">
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                    <v-list-tile>
+                                                        <v-list-tile-title v-on="on">
+                                                            {{item.planogramName}}
+                                                        </v-list-tile-title>
+                                                    </v-list-tile>
+                                                </template>
+                                                <span>{{ item.fileName }}</span>
+                                            </v-tooltip>
+
+                                            <v-divider></v-divider>
+                                        </v-list>
                                     </v-card-text>
                                 </v-card>
                             </v-tab-item>
@@ -279,9 +294,12 @@
         },
         data() {
             return {
+                selectedPlanogramsSelector: [],
                 showFixtures: true,
+                Fixtures: [],
                 selectedPlanograms: [],
                 fixture_types: [],
+                currentPlanogram: null,
                 selectedStore: null,
                 selectedSpacePlan: null,
                 stores: [],
@@ -317,7 +335,15 @@
             },
             addPlanogramToSelection() {
                 let self = this
-                self.$refs.PlanogramDetailsSelector.show((spacePlanID, item) => {})
+                self.$refs.PlanogramDetailsSelector.show(null, null, null, data => {
+                    console.log(data);
+                    self.selectedPlanogramsSelector.push({
+                        text: data.fileName,
+                        value: data.id
+                    })
+                    self.selectedPlanograms.push(data)
+
+                })
             },
             getStores() {
                 let self = this
@@ -450,6 +476,17 @@
             },
             acceptDrag(ev) {
                 ev.preventDefault();
+            },
+            GetFixtures() {
+                let self = this
+                self.Fixtures = []
+                self.Fixtures.push({
+                    img: "imgTXT",
+                    name: "Gondola",
+                    total: 3
+                })
+                console.log("Todo, Get Fixture Data");
+
             },
             dropDragItem(ev) {
                 ev.preventDefault();
