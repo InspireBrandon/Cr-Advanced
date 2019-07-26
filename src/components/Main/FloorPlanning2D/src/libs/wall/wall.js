@@ -13,6 +13,8 @@ class Wall {
         this.Height = 3 * this.Ratio;
         this.Group = null;
         this.Wall = null;
+        this.transformer = null;
+        this.transformerAttached = false;
     }
 
     Initialise() {
@@ -27,6 +29,7 @@ class Wall {
 
     AddWall() {
         let self = this;
+
         self.Group = new Konva.Group({
             x: self.dropPos.x,
             y: self.dropPos.y,
@@ -46,115 +49,37 @@ class Wall {
         self.MasterGroup.add(self.Group);
         self.layer.draw();
 
-        self.addAnchor(0, 0, 'topLeft');
-        self.addAnchor(3 * this.Ratio, 0, 'topRight');
-        self.addAnchor(3 * this.Ratio, 138, 'bottomRight');
-        self.addAnchor(0, 138, 'bottomLeft');
-    }
 
-    update(activeAnchor) {
-        var group = activeAnchor.getParent();
 
-        var topLeft = group.get('.topLeft')[0];
-        var topRight = group.get('.topRight')[0];
-        var bottomRight = group.get('.bottomRight')[0];
-        var bottomLeft = group.get('.bottomLeft')[0];
+        self.transformer = new Konva.Transformer({
+            rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315]
+        });
 
-        var image = group.children[0];
+        self.MasterGroup.add(self.transformer);
 
-        var anchorX = activeAnchor.getX();
-        var anchorY = activeAnchor.getY();
-
-        // update anchor positions
-        switch (activeAnchor.getName()) {
-          case 'topLeft':
-            topRight.y(anchorY);
-            bottomLeft.x(anchorX);
-            break;
-          case 'topRight':
-            topLeft.y(anchorY);
-            bottomRight.x(anchorX);
-            break;
-          case 'bottomRight':
-            bottomLeft.y(anchorY);
-            topRight.x(anchorX);
-            break;
-          case 'bottomLeft':
-            bottomRight.y(anchorY);
-            topLeft.x(anchorX);
-            break;
-        }
-
-        image.position(topLeft.position());
-
-        var width = topRight.getX() - topLeft.getX();
-        var height = bottomLeft.getY() - topLeft.getY();
-        if (width && height) {
-          image.width(width);
-          image.height(height);
-        }
-      }
-
-    addAnchor(x, y, name) {
-        let self = this;
-        let group = self.Group;
-        let layer = self.layer;
-
-        let anchor = new Konva.Circle({
-            x: x,
-            y: y,
-            stroke: '#666',
-            fill: '#ddd',
-            strokeWidth: 0,
-            radius: 0,
-            name: name,
-            draggable: true,
-            dragOnTop: false
+        self.Wall.on('mousedown touchstart', function() {
+            self.AddTransformer();
         })
 
-        group.on('mouseout', function () {
-            anchor.strokeWidth(0);
-            anchor.radius(0);
-        });
+        self.stage.on("mousedown touchstart", function(e) {
+            if(e.target.attrs.name == undefined || e.target.attrs.name != "Wall" && !e.target.attrs.name.includes("_anchor")) {
+                self.RemoveTransFormer();
+            }
+        })
+    }
 
-        group.on('mouseover touchstart', function () {
-            anchor.strokeWidth(1);
-            anchor.radius(2);
-        });
+    AddTransformer() {
+        let self = this;
+        self.transformer.attachTo(self.Group); 
+        self.transformerAttached = true;
+        self.layer.draw();
+    }
 
-        anchor.on('dragmove', function () {
-            self.update(this);
-            layer.draw();
-        });
-
-        anchor.on('mousedown touchstart', function () {
-            group.draggable(false);
-            this.moveToTop();
-        });
-
-        anchor.on('dragend', function () {
-            group.draggable(true);
-            layer.draw();
-        });
-        
-        anchor.on('mouseover', function () {
-            var layer = this.getLayer();
-            document.body.style.cursor = 'pointer';
-            // this.strokeWidth(1.5 * self.stage.scale().x);
-            layer.draw();
-        });
-
-        anchor.on('mouseout', function () {
-            var layer = this.getLayer();
-            document.body.style.cursor = 'default';
-
-            // this.strokeWidth(1 * self.stage.scale().x);
-            layer.draw();
-        });
-
-        console.log(group);
-
-        group.add(anchor);
+    RemoveTransFormer() {
+        let self = this;
+        self.transformer.detach();
+        self.transformerAttached = false;
+        self.layer.draw();
     }
 }
 

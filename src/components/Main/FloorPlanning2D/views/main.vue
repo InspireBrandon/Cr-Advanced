@@ -1,7 +1,7 @@
 <template>
     <v-app>
         <v-toolbar color="primary" dark flat dense>
-            <v-toolbar-side-icon>
+            <v-toolbar-side-icon @click="$router.push('/Apps')">
                 <v-icon>home</v-icon>
             </v-toolbar-side-icon>
             <v-toolbar-title>Floor Planning 2D</v-toolbar-title>
@@ -238,7 +238,11 @@
                             </v-tab-item>
                             <v-tab-item>
                                 <v-card flat tile>
-                                    <v-card-text>Assets</v-card-text>
+                                    <v-card-text>
+                                        <div>Dimensions</div>
+                                        <v-text-field type="number" hide-details label="Height:"></v-text-field>
+                                        <v-text-field type="number" hide-details label="Width:"></v-text-field>
+                                    </v-card-text>
                                 </v-card>
                             </v-tab-item>
                             <v-tab-item>
@@ -303,7 +307,7 @@
             let stage = self.$refs.stage.getStage();
             self.InitialiseStageResponsive();
             self.InitialiseScroll();
-            let floor = new Floor(stage, self.stageData.layer, self.stageData.group, 200, 100);
+            let floor = new Floor(stage, self.stageData.layer, self.stageData.group, 20, 20);
             floor.Initialise();
             window.addEventListener('resize', self.InitialiseStageResponsive);
             this.getFixtureType()
