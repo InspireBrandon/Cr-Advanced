@@ -80,32 +80,41 @@
         </v-toolbar>
         <v-content>
             <v-card dark flat tile color="grey darken-2" style="height: calc(100vh - 136px)">
-                <v-container class="pa-0 ma-0" grid-list-lg style="max-width: 100%">
-                    <v-layout row wrap>
-                        <v-flex md3>
-                            <v-toolbar dark flat dense>
-                                <v-toolbar-title>
-                                    Categories
-                                </v-toolbar-title>
-                            </v-toolbar>
-                            <v-card flat tile style="height: calc(100% - 30px); overflow: auto;">
+                <v-layout row wrap>
+                    <v-flex md3>
+                        <v-toolbar dark flat dense>
+                            <v-toolbar-title>
+                                Fixtures
+                            </v-toolbar-title>
+                        </v-toolbar>
+                        <v-card flat tile style="height: calc(100% - 30px); overflow: auto;">
 
-                                <v-card-text>
+                            <v-card-text>
 
-                                    <v-card height="400px" style="overflow: auto;">
-                                        <v-card-text style="display: block;">
-                                            <v-list class="pa-0" dense hover v-for="(sp, idx) in planograms" :key="idx">
-                                                <v-divider></v-divider>
-                                                <v-list-tile :class="{ 'highlighted': selectedSpacePlan == sp  }" avatar
-                                                    @click="selectedSpacePlan = sp">
-                                                    <v-list-tile-content>
-                                                        <v-list-tile-title v-text="sp.name"></v-list-tile-title>
-                                                    </v-list-tile-content>
-                                                </v-list-tile>
-                                            </v-list>
-                                        </v-card-text>
-                                    </v-card>
-                                    <!-- <v-list dense hover v-for="(item,index) in planograms" :key="index">
+                                <v-card height="400px" style="overflow: auto;">
+                                    <v-card-text style="display: block;">
+                                        <v-list class="pa-0" three-line hover v-for="(sp, idx) in planograms"
+                                            :key="idx">
+                                            <!-- <v-list> -->
+                                            <v-divider></v-divider>
+
+                                            <v-list-tile :class="{ 'highlighted': selectedSpacePlan == sp  }" avatar>
+                                                <!-- <v-list-tile> -->
+                                                <v-list-tile-avatar>
+                                                    image
+                                                </v-list-tile-avatar>
+                                                <v-list-tile-content>
+                                                    <v-list-tile-title v-text="sp.name"></v-list-tile-title>
+                                                </v-list-tile-content>
+                                                <v-list-tile-action>
+                                                    total amount
+                                                </v-list-tile-action>
+
+                                            </v-list-tile>
+                                        </v-list>
+                                    </v-card-text>
+                                </v-card>
+                                <!-- <v-list dense hover v-for="(item,index) in planograms" :key="index">
                                         <v-divider></v-divider>
                                         <v-list-tile>
                                             <v-list-tile-content>
@@ -113,147 +122,121 @@
                                             </v-list-tile-content>
                                         </v-list-tile>
                                     </v-list> -->
-                                </v-card-text>
-                                <v-card-actions>
-                                    <table style="width: 100%;">
-                                        <thead>
-                                            <th style="min-width: 130px;">Name</th>
-                                            <th>Modules</th>
-                                            <th>Height (M)</th>
-                                            <th>Seg Width (CM)</th>
-                                            <th>Depth (CM)</th>
-                                        </thead>
-                                        <tbody>
-                                            <tr v-for="(item, idx) in fixture_types" :key="idx">
-                                                <td>{{ item.displayName }}</td>
-                                                <td>
-                                                    <input v-model="item.modules" style="width: 100%;" type="number">
-                                                </td>
-                                                <td>
-                                                    <input v-model="item.height" style="width: 100%;" type="number">
-                                                </td>
-                                                <td>
-                                                    <input v-model="item.segmentWidth" style="width: 100%;"
-                                                        type="number">
-                                                </td>
-                                                <td>
-                                                    <input v-model="item.depth" style="width: 100%;" type="number">
-                                                </td>
+                            </v-card-text>
+                            <v-card-actions>
 
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </v-card-actions>
-                            </v-card>
-                        </v-flex>
-                        <v-flex class="pa-0" md7>
-                            <v-card flat color="grey darken-2" tile style="height: calc(100vh - 136px)">
-                                <v-card-text class="pa-0">
-                                    <!-- <canvas id="renderCanvas" touch-action="none"></canvas> -->
-                                    <div id="stage-parent" @dragover="acceptDrag" @drop="dropDragItem">
-                                        <v-stage ref="stage" :config="stageData.stageConfiguration"></v-stage>
-                                    </div>
-                                </v-card-text>
-                            </v-card>
-                        </v-flex>
-                        <v-flex md2 class="pa-0">
-                            <v-tabs dark color="grey darken-4" slider-color="yellow"
-                                style="width: 100%; overflow-y: hidden;">
-                                <v-tab ripple>
-                                    <v-icon>edit</v-icon>
-                                </v-tab>
-                                <v-tab ripple>
-                                    <v-icon>tab_unselected</v-icon>
-                                </v-tab>
-                                <v-tab ripple>
-                                    <v-icon>settings</v-icon>
-                                </v-tab>
-                                <v-tab-item>
-                                    <v-card flat tile>
-                                        <v-list dark class="pa-0">
-                                            <v-list-group prepend-icon="store">
-                                                <template v-slot:activator>
-                                                    <v-list-tile>
-                                                        <v-list-tile-content>
-                                                            <v-list-tile-title>Walls & Pillars</v-list-tile-title>
-                                                        </v-list-tile-content>
-                                                    </v-list-tile>
-                                                </template>
-
-                                                <v-divider></v-divider>
-
+                            </v-card-actions>
+                        </v-card>
+                    </v-flex>
+                    <v-flex class="pa-0" md7>
+                        <v-card flat color="grey darken-2" tile style="height: calc(100vh - 136px)">
+                            <v-card-text class="pa-0">
+                                <!-- <canvas id="renderCanvas" touch-action="none"></canvas> -->
+                                <div id="stage-parent" @dragover="acceptDrag" @drop="dropDragItem">
+                                    <v-stage ref="stage" :config="stageData.stageConfiguration"></v-stage>
+                                </div>
+                            </v-card-text>
+                        </v-card>
+                    </v-flex>
+                    <v-flex md2 class="pa-0">
+                        <v-tabs dark color="grey darken-4" slider-color="yellow"
+                            style="width: 100%; overflow-y: hidden;">
+                            <v-tab ripple>
+                                <v-icon>edit</v-icon>
+                            </v-tab>
+                            <v-tab ripple>
+                                <v-icon>tab_unselected</v-icon>
+                            </v-tab>
+                            <v-tab ripple>
+                                <v-icon>settings</v-icon>
+                            </v-tab>
+                            <v-tab-item>
+                                <v-card flat tile>
+                                    <v-list dark class="pa-0">
+                                        <v-list-group prepend-icon="store">
+                                            <template v-slot:activator>
                                                 <v-list-tile>
                                                     <v-list-tile-content>
-                                                        <v-list-tile-title draggable="true" @drag="dragFixture"
-                                                            @dragstart="dragFixtureStart($event, 'wall')"
-                                                            @dragend="clearDrag">Wall 1</v-list-tile-title>
+                                                        <v-list-tile-title>Walls & Pillars</v-list-tile-title>
                                                     </v-list-tile-content>
                                                 </v-list-tile>
-
-                                                <v-divider></v-divider>
-
-                                                <v-list-tile>
-                                                    <v-list-tile-content>
-                                                        <v-list-tile-title>Pillar</v-list-tile-title>
-                                                    </v-list-tile-content>
-                                                </v-list-tile>
-                                            </v-list-group>
+                                            </template>
 
                                             <v-divider></v-divider>
 
-                                            <v-list-group prepend-icon="store">
-                                                <template v-slot:activator>
-                                                    <v-list-tile>
-                                                        <v-list-tile-content>
-                                                            <v-list-tile-title>Doors</v-list-tile-title>
-                                                        </v-list-tile-content>
-                                                    </v-list-tile>
-                                                </template>
+                                            <v-list-tile>
+                                                <v-list-tile-content>
+                                                    <v-list-tile-title draggable="true" @drag="dragFixture"
+                                                        @dragstart="dragFixtureStart($event, 'wall')"
+                                                        @dragend="clearDrag">Wall 1</v-list-tile-title>
+                                                </v-list-tile-content>
+                                            </v-list-tile>
 
-                                                <v-divider></v-divider>
+                                            <v-divider></v-divider>
 
+                                            <v-list-tile>
+                                                <v-list-tile-content>
+                                                    <v-list-tile-title>Pillar</v-list-tile-title>
+                                                </v-list-tile-content>
+                                            </v-list-tile>
+                                        </v-list-group>
+
+                                        <v-divider></v-divider>
+
+                                        <v-list-group prepend-icon="store">
+                                            <template v-slot:activator>
                                                 <v-list-tile>
                                                     <v-list-tile-content>
-                                                        <v-list-tile-title>Door 1</v-list-tile-title>
+                                                        <v-list-tile-title>Doors</v-list-tile-title>
                                                     </v-list-tile-content>
                                                 </v-list-tile>
+                                            </template>
 
-                                                <v-divider></v-divider>
+                                            <v-divider></v-divider>
 
-                                                <v-list-tile>
-                                                    <v-list-tile-content>
-                                                        <v-list-tile-title>Door 2</v-list-tile-title>
-                                                    </v-list-tile-content>
-                                                </v-list-tile>
-                                            </v-list-group>
-                                        </v-list>
-                                    </v-card>
-                                </v-tab-item>
-                                <v-tab-item>
-                                    <v-card flat tile>
-                                        <v-card-text>Assets</v-card-text>
-                                    </v-card>
-                                </v-tab-item>
-                                <v-tab-item>
-                                    <v-card flat tile>
-                                        <v-card-text>
-                                            <div style="text-decoration: underline">Configuration</div>
-                                            <v-autocomplete label="Select Store" :items="stores" @change="getPlanograms"
-                                                v-model="selectedStore">
-                                            </v-autocomplete>
-                                            <div>
-                                                Current Planograms: 3
-                                                <v-btn small>set up</v-btn>
-                                            </div>
-                                        </v-card-text>
-                                    </v-card>
-                                </v-tab-item>
-                            </v-tabs>
-                        </v-flex>
-                    </v-layout>
-                </v-container>
+                                            <v-list-tile>
+                                                <v-list-tile-content>
+                                                    <v-list-tile-title>Door 1</v-list-tile-title>
+                                                </v-list-tile-content>
+                                            </v-list-tile>
+
+                                            <v-divider></v-divider>
+
+                                            <v-list-tile>
+                                                <v-list-tile-content>
+                                                    <v-list-tile-title>Door 2</v-list-tile-title>
+                                                </v-list-tile-content>
+                                            </v-list-tile>
+                                        </v-list-group>
+                                    </v-list>
+                                </v-card>
+                            </v-tab-item>
+                            <v-tab-item>
+                                <v-card flat tile>
+                                    <v-card-text>Assets</v-card-text>
+                                </v-card>
+                            </v-tab-item>
+                            <v-tab-item>
+                                <v-card flat tile>
+                                    <v-card-text>
+                                        <div style="text-decoration: underline">Configuration</div>
+                                        <v-autocomplete label="Select Store" :items="stores" @change="getPlanograms"
+                                            v-model="selectedStore">
+                                        </v-autocomplete>
+                                        <div>
+                                            Current Planograms: {{selectedPlanograms.length}}
+                                            <v-btn small @click="addPlanogramToSelection">set up</v-btn>
+                                        </div>
+                                    </v-card-text>
+                                </v-card>
+                            </v-tab-item>
+                        </v-tabs>
+                    </v-flex>
+                </v-layout>
             </v-card>
         </v-content>
+        <PlanogramDetailsSelector ref="PlanogramDetailsSelector"></PlanogramDetailsSelector>
+
     </v-app>
 </template>
 
@@ -262,10 +245,16 @@
     // import Konva from 'konva';
     import Floor from "@/components/Main/FloorPlanning2D/src/libs/floor/floor.js";
     import DragDropFixtureHelper from "@/components/Main/FloorPlanning2D/src/libs/DragDrop/drag-drop-helper.js";
+    import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector';
+
 
     export default {
+        components: {
+            PlanogramDetailsSelector,
+        },
         data() {
             return {
+                selectedPlanograms: [],
                 fixture_types: [],
                 selectedStore: null,
                 selectedSpacePlan: null,
@@ -295,6 +284,10 @@
             this.getStores()
         },
         methods: {
+            addPlanogramToSelection() {
+                let self = this
+                self.$refs.PlanogramDetailsSelector.show((spacePlanID, item) => {})
+            },
             getStores() {
                 let self = this
                 self.showCategoryCluster = true
