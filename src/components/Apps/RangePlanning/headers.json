@@ -160,5 +160,10 @@
     {
         "headerName": "GP%",
         "field": "gross_profit"
+    },
+    {
+        "headerName": "Markup%",
+        "field": "markup",
+        "hide": true
     }
 ]
