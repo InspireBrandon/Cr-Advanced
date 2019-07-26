@@ -725,7 +725,10 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
 
     // complex calculations;
     let sales_profit = sales_retail - sales_cost;
-    let gross_profit = (sales_profit / sales_cost) * 100;
+    let selling_price = sales_retail / sales_units;
+    let cost_price = (sales_profit - sales_retail) / sales_units;
+
+    let gross_profit = ((selling_price - cost_price) / selling_price) * 100;
 
     // let totalProductSales = getTotalProductSalesByProduct(storeSales, product.productID);
 
@@ -761,13 +764,13 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
     let dos_fac = getDaysOfSupplyFacings(clusters, clusterType, clusterID, volume_potential, product.depth)
 
     productSales.push(new RangeProduct(product, {
-      sales_retail: sales_retail.toFixed(2),
+      sales_retail: parseFloat(sales_retail.toFixed(2)),
       sales_cost: sales_cost.toFixed(2),
-      sales_units: sales_units.toFixed(0),
+      sales_units: parseFloat(sales_units.toFixed(0)),
       sales_profit: sales_profit.toFixed(2),
       number_distribution: number_distribution.toFixed(2),
       weighted_distribution: weighted_distribution.toFixed(2),
-      sales_potential: sales_potential.toFixed(2),
+      sales_potential: parseFloat(sales_potential.toFixed(2)),
       volume_potential: volume_potential.toFixed(2),
       item_sales_rank: item_sales_rank,
       item_volume_rank: item_volume_rank,
