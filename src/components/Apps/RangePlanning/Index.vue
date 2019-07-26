@@ -221,6 +221,7 @@
         columnDefs: [],
         rowData: [],
         gridOptions: {
+          enableCharts: true,
           context: {
             componentParent: this
           },
