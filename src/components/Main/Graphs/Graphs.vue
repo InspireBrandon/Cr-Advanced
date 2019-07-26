@@ -133,7 +133,7 @@
                                 :rowData="rowData" :filter="true" :suppressRowClickSelection="true"
                                 :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true"
                                 :resizable="true" :floatingFilter="true" :groupMultiAutoColumn="true"
-                                :onGridReady="onGridReady" :sortable="true" @first-data-rendered="onFirstDataRendered">
+                                :onGridReady="onGridReady" :sortable="true">
                                 <!-- :processChartOptions="processChartOptions" -->
                             </ag-grid-vue>
                         </v-card-text>

@@ -109,7 +109,7 @@
             <div>Sales Potential: R{{ (ais_SalesPotential < 0 ? (ais_SalesPotential * -1) : ais_SalesPotential) }}</div>
           </div>
           <v-spacer></v-spacer>
-          <v-btn v-if="rowData.length>0" @click="ShowGraph=true">
+          <v-btn v-if="rowData.length>0" @click="onChart1">
             show graphs
           </v-btn>
           <v-menu offset-y>
@@ -139,8 +139,7 @@
           :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
           @selection-changed="onSelectionChanged" :rowData="rowData" :enableSorting="true" :enableFilter="true"
           :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true"
-          :enableColResize="true" :floatingFilter="true" :onGridReady="onGridReady" :groupMultiAutoColumn="true"
-         @first-data-rendered="onFirstDataRendered">
+          :enableColResize="true" :floatingFilter="true" :onGridReady="onGridReady" :groupMultiAutoColumn="true">
         </ag-grid-vue>
         <v-toolbar dark dense class="pa-0">
           <div>
@@ -976,7 +975,30 @@
         }
         break;
         }
-      }
+      },
+      onChart1() {
+        var params = {
+          cellRange: {
+            columns: ["sales_Retail", "description"]
+          },
+          chartType: "line",
+          processChartOptions: function (params) {
+            let opts = params.options;
+            opts.title = {
+              text: "Product Sales"
+            };
+            opts.xAxis.labelRotation = 30;
+            opts.seriesDefaults.tooltipRenderer = function (params) {
+              let titleStyle = params.color ? ' style="color: white; background-color:' + params.color + '"' : "";
+              let title = params.title ? '<div class="title"' + titleStyle + ">" + params.title + "</div>" : "";
+              let value = params.datum[params.yField].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+              return title + '<div class="content" style="text-align: center">' + value + "</div>";
+            };
+            return opts;
+          }
+        };
+        this.gridApi.chartRange(params);
+      },
     }
   }
 </script>
