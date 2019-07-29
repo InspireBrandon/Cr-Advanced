@@ -643,6 +643,8 @@
           storeProducts.forEach(storeProduct => {
             if (storeProduct.Data.barcode == product.barcode) {
 
+              console.log(storeProduct, product);
+
               storeProduct.Data.height = parseFloat(product.height);
               storeProduct.Data.width = parseFloat(product.width);
               storeProduct.Data.depth = parseFloat(product.depth);
@@ -700,34 +702,12 @@
         storePlanogramItemProducts.forEach(spip => {
           allProducts.forEach(ap => {
 
-            ap.height = parseFloat(ap.height);
-            ap.width = parseFloat(ap.width);
-            ap.depth = parseFloat(ap.depth);
-
-            ap.tray_Barcode = ap.tray_Barcode;
-            ap.tray_Height = parseFloat(ap.tray_Height);
-            ap.tray_Width = parseFloat(ap.tray_Width);
-            ap.tray_Depth = parseFloat(ap.tray_Depth);
-
-            ap.case_Barcode = ap.case_Barcode;
-            ap.case_Height = parseFloat(ap.case_Height);
-            ap.case_Width = parseFloat(ap.case_Width);
-            ap.case_Depth = parseFloat(ap.case_Depth);
-
-            ap.shrink_Barcode = ap.shrink_Barcode;
-            ap.shrink_Height = parseFloat(ap.shrink_Height);
-            ap.shrink_Width = parseFloat(ap.shrink_Width);
-            ap.shrink_Depth = parseFloat(ap.shrink_Depth);
-
-            ap.pallet_Barcode = ap.pallet_Barcode;
-            ap.pallet_Height = parseFloat(ap.pallet_Height);
-            ap.pallet_Width = parseFloat(ap.pallet_Width);
-            ap.pallet_Depth = parseFloat(ap.pallet_Depth);
-
             if (ap.barcode == spip.Data.barcode) {
-              ap.height = parseFloat(spip.Data.height);
-              ap.width = parseFloat(spip.Data.width);
-              ap.depth = parseFloat(spip.Data.depth);
+              console.log(ap, spip)
+
+              // ap.height = parseFloat(spip.Data.height);
+              // ap.width = parseFloat(spip.Data.width);
+              // ap.depth = parseFloat(spip.Data.depth);
 
               ap.tray_Barcode = spip.Data.tray_Barcode;
               ap.tray_Height = parseFloat(spip.Data.tray_Height);
@@ -751,6 +731,8 @@
             }
           });
         })
+
+        console.log(allProducts);
 
         alert("Planogram to range complete");
       },

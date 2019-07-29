@@ -95,6 +95,8 @@ import FloorPlanning2D from '@/components/Main/FloorPlanning2D/views/main.vue'
 import Fixture_Type from '@/components/Main/Fixture_Type/Fixture_Type.vue'
 import FileStatus from '@/components/Main/FileStatus'
 
+import Sales_Monthly_Totals from '@/components/Main/Sales_Monthly_Totals/Index.vue'
+
 Vue.use(Router)
 
 export default new Router({
@@ -219,6 +221,10 @@ export default new Router({
           path: "/PlanogramImplementation/",
           name: "planogram_implementation",
           component: PlanogramImplementation
+        }, {
+          path: '/Sales_Monthly_Totals',
+          name: 'Sales_Monthly_Totals',
+          component: Sales_Monthly_Totals
         }, {
           path: "/PlanogramDistribution/:ProjectID/:projectGroupID",
           name: "Planogram_distribution",

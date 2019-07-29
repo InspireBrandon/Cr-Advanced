@@ -36,8 +36,7 @@
             AgGridVue,
             Button,
             PlanogramDetailsSelector,
-            PlanogramName,
-
+            PlanogramName
         },
         data() {
             return {
