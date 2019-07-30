@@ -107,6 +107,10 @@
                 ],
                 fact: [
                     new navItem({
+                        name: 'Category Code',
+                        route: 'CategoryCode'
+                    }),
+                    new navItem({
                         name: 'Planogram Maintenance',
                         route: 'PlanogramMaintenance'
                     }),
