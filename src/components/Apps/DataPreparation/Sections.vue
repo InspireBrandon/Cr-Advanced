@@ -100,6 +100,10 @@
                         name: 'Store',
                         route: 'Store'
                     }),
+                    new navItem({
+                        name: 'Store Cluster',
+                        route: 'StoreCluster'
+                    }),
                 ],
                 fact: [
                     new navItem({

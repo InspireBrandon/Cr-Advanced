@@ -64,6 +64,7 @@ import Active_Shop_CodeMaint from '@/components/Apps/DataPreparation/Types/Activ
 import Retail_ChainMaint from '@/components/Apps/DataPreparation/Types/Retail_Chain/Index.vue'
 import PeriodMaint from '@/components/Apps/DataPreparation/Types/Period/Index.vue'
 import StoreMaint from '@/components/Apps/DataPreparation/Types/Store/Index.vue'
+import StoreClusters from '@/components/Apps/DataPreparation/Types/Store_Cluster/Index.vue';
 import PlanogramMaintenance from '@/components/Apps/DataPreparation/Types/PlanogramMaintenance/Index.vue';
 import ProductCatalogue from '@/components/Apps/DataPreparation/Types/ProductCatalogue/ProductCatalogue.vue';
 
@@ -363,6 +364,10 @@ export default new Router({
               path: 'Store',
               name: 'Store',
               component: StoreMaint
+            }, {
+              path: 'StoreCluster',
+              name: 'StoreCluster',
+              component: StoreClusters
             }, {
               path: "PlanogramMaintenance",
               name: "planogram_maintenance",

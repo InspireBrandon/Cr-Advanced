@@ -1,0 +1,12 @@
+[{
+    "headerName": "Store Name",
+    "field": "displayname",
+    "editable": true,
+    "hide": false
+}, {
+    "headerName": "Store Cluster",
+    "editable": false,
+    "hide": false,
+    "cellRendererFramework": "Selector",
+    "dropdownName": "store_clusters"
+}]
