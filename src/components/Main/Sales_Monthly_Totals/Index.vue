@@ -74,11 +74,7 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.get(process.env.VUE_APP_API + "Sales_Monthly_Total").then(r => {
-                    console.log("[TOTALS]");
-                    console.log(r);
-
                     self.gridData=r.data.sales_Monthly_Total_List
-
                 })
             },
             getPeriods() {
@@ -90,7 +86,6 @@
                 Axios.get(process.env.VUE_APP_API + "Retailer/period")
                     .then(r => {
                         let periods = r.data;
-                        console.log(r.data);
 
                         self.periods_from = [];
                         self.periods_to = [];
@@ -100,6 +95,7 @@
                                 text: period.period_From_Date.split("T")[0],
                                 value: period.id
                             });
+                            
                             self.periods_to.push({
                                 text: period.period_To_Date.split("T")[0],
                                 value: period.id
@@ -131,10 +127,8 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.post(process.env.VUE_APP_API +
-                        `Sales_Monthly_Total?period_from_id=${self.selected_period_from}&period_to_id=${self.selected_period_to}`
-                        )
+                        `Sales_Monthly_Total?period_from_id=${self.selected_period_from}&period_to_id=${self.selected_period_to}`)
                     .then(r => {
-                        console.log(r.data);
                         self.save_loading = false;
                         self.dialog = false;
                         self.gridData.push(r.data.sales_Monthly_Total)

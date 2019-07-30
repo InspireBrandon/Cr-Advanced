@@ -326,7 +326,8 @@
         canRefresh: false,
         tmpString: "",
         ais_Sales: 0,
-        ais_SalesPotential: 0
+        ais_SalesPotential: 0,
+        periodData: []
       }
     },
     created() {
@@ -487,6 +488,8 @@
           self.$refs.SizeLoader.show()
           Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fileID}`, config)
             .then(r => {
+              console.log(r.data);
+
               self.fileData.planogramName = r.data.planogramName;
               self.fileData.planogramID = r.data.planogramID;
               self.fileData.dateFrom = r.data.dateFrom;
@@ -662,7 +665,6 @@
           self.clusterOptions.store.push(new textValue(element));
         });
       },
-
       onSelectionChanged(e) {
         let self = this;
         var rows = e.api.getSelectedNodes();

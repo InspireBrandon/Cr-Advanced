@@ -165,5 +165,17 @@
         "headerName": "Markup%",
         "field": "markup",
         "hide": true
+    },
+    {
+        "headerName": "Sales Index",
+        "field": "sales_contribution"
+    }, 
+    {
+        "headerName": "Units Index",
+        "field": "units_contribution"
+    },
+    {
+        "headerName": "Profit Index",
+        "field": "profit_contribution"
     }
 ]

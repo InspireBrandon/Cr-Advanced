@@ -4,21 +4,36 @@
 // Date: 2019-01-17
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
 import csvToDataObject from '@/libs/helpers/csvToDataObject.js'
+import Axios from 'axios';
 
 class RangingController {
   constructor(rangingData) {
-    this.allRangeProducts = rangingData.allRangeProducts;
-    this.clusterData = rangingData.clusterData;
-    this.storeSales = rangingData.storeSales;
-    this.planogramName = rangingData.planogramName;
-    this.planogramID = rangingData.planogramID;
-    this.dateFrom = rangingData.dateFrom;
-    this.dateTo = rangingData.dateTo;
-    this.dateFromString = rangingData.dateFromString;
-    this.dateToString = rangingData.dateToString;
-    this.periodic = rangingData.periodic;
-    this.monthsBetween = rangingData.monthsBetween;
-    this.tag = rangingData.tag;
+    let self = this;
+    self.allRangeProducts = rangingData.allRangeProducts;
+    self.clusterData = rangingData.clusterData;
+    self.storeSales = rangingData.storeSales;
+    self.planogramName = rangingData.planogramName;
+    self.planogramID = rangingData.planogramID;
+    self.dateFrom = rangingData.dateFrom;
+    self.dateTo = rangingData.dateTo;
+    self.dateFromString = rangingData.dateFromString;
+    self.dateToString = rangingData.dateToString;
+    self.periodic = rangingData.periodic;
+    self.monthsBetween = rangingData.monthsBetween;
+    self.tag = rangingData.tag;
+
+    self.getSalesMonthlyTotals(rangingData.dateFrom, rangingData.dateTo, totalsData => {
+      self.totalsData = totalsData.sales_Monthly_Total_List;
+      console.log("[Total Sales Data]", self.totalsData);
+    })
+  }
+
+  getSalesMonthlyTotals(data_from, date_to, callback) {
+    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+    Axios.post(process.env.VUE_APP_API + `Sales_Monthly_Total?period_from_id=${data_from}&period_to_id=${date_to}`).then(r => {
+      callback(r.data);
+    })
   }
 
   getRangingFile() {
@@ -177,7 +192,7 @@ class RangingController {
   getSalesDataByCluster(clusterType, clusterID) {
     let stores = getStoresByCluster(this.clusterData, clusterType, clusterID);
 
-    let sales = getSalesDataByStores(stores, this.allRangeProducts, this.storeSales, this.clusterData, clusterType, clusterID);
+    let sales = getSalesDataByStores(stores, this.allRangeProducts, this.storeSales, this.clusterData, clusterType, clusterID, this.totalsData);
     return sales;
   }
 
@@ -371,6 +386,96 @@ function getWeightedDistribution(storeSales, productID, clusters, clusterType, c
   return (productSales / totalStoreSales) * 100;
 }
 
+function getSalesContribution(storeSales, productID, clusters, clusterType, clusterID, totalsData) {
+  let clusterStores = getStoresByCluster(clusters, clusterType, clusterID);
+  let totalStoreSales = 0;
+  let totalProducts = 0;
+
+  // Get avg per store
+  totalsData.forEach(store => {
+    if (storeInCluster(store.store_ID, clusterStores)) {
+      totalStoreSales += parseFloat(store.sales_Retail);
+      totalProducts += parseInt(store.items_In_Business);
+    }
+  })
+
+  let avgProductSales = totalStoreSales / totalProducts;
+  let productSales = 0;
+
+  storeSales.forEach(store => {
+    if (storeInCluster(store.storeID, clusterStores)) {
+      store.salesData.forEach(product => {
+        if (product.productID == productID) {
+          productSales += parseFloat(product.sales_Retail);
+        }
+      })
+    }
+  })
+
+  let contribution = productSales == 0 ? 0 : (avgProductSales / productSales) * 100;
+  return contribution;
+}
+
+function getUnitsContribution(storeSales, productID, clusters, clusterType, clusterID, totalsData) {
+  let clusterStores = getStoresByCluster(clusters, clusterType, clusterID);
+  let totalStoreUnits = 0;
+  let totalUnits = 0;
+
+  // Get avg per store
+  totalsData.forEach(store => {
+    if (storeInCluster(store.store_ID, clusterStores)) {
+      totalStoreUnits += parseFloat(store.sales_Units);
+      totalUnits += parseInt(store.items_In_Business);
+    }
+  })
+
+  let avgProductUnits = totalStoreUnits / totalUnits;
+  let productUnits = 0;
+
+  storeSales.forEach(store => {
+    if (storeInCluster(store.storeID, clusterStores)) {
+      store.salesData.forEach(product => {
+        if (product.productID == productID) {
+          productUnits += parseFloat(product.sales_Units);
+        }
+      })
+    }
+  })
+
+  let contribution = productUnits == 0 ? 0 : (avgProductUnits / productUnits) * 100;
+  return contribution;
+}
+
+function getProfitContribution(storeSales, productID, clusters, clusterType, clusterID, totalsData) {
+  let clusterStores = getStoresByCluster(clusters, clusterType, clusterID);
+  let totalStoreProfit = 0;
+  let totalProfit = 0;
+
+  // Get avg per store
+  totalsData.forEach(store => {
+    if (storeInCluster(store.store_ID, clusterStores)) {
+      totalStoreProfit += parseFloat(store.sales_Profit);
+      totalProfit += parseInt(store.items_In_Business);
+    }
+  })
+
+  let avgProductProfit = totalStoreProfit / totalProfit;
+  let productProfit = 0;
+
+  storeSales.forEach(store => {
+    if (storeInCluster(store.storeID, clusterStores)) {
+      store.salesData.forEach(product => {
+        if (product.productID == productID) {
+          productProfit += parseFloat(product.sales_Profit);
+        }
+      })
+    }
+  })
+
+  let contribution = productProfit == 0 ? 0 : (avgProductProfit / productProfit) * 100;
+  return contribution;
+}
+
 function getDaysOfSupplyFacings(clusters, clusterType, clusterID, volume_potential, depth) {
   let clusterStores = getStoresByCluster(clusters, clusterType, clusterID);
   let storeCount = clusterStores.length;
@@ -554,7 +659,7 @@ function getSalesDataByStore(store, allProducts, storeSales) {
 }
 
 // Get all the sum of sales data by stores
-function getSalesDataByStores(stores, allProducts, storeSales, clusters, clusterType, clusterID) {
+function getSalesDataByStores(stores, allProducts, storeSales, clusters, clusterType, clusterID, totalsData) {
   let sales = [];
 
   for (let i = 0; i < stores.length; i++) {
@@ -567,7 +672,7 @@ function getSalesDataByStores(stores, allProducts, storeSales, clusters, cluster
     }
   }
 
-  let totalSales = getTotalProductSales(allProducts, sales, storeSales, stores, clusters, clusterType, clusterID);
+  let totalSales = getTotalProductSales(allProducts, sales, storeSales, stores, clusters, clusterType, clusterID, totalsData);
   return totalSales;
 }
 
@@ -693,7 +798,7 @@ function storeInCluster(storeID, clusterStores) {
 }
 
 // Get total product sales
-function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, clusterType, clusterID) {
+function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, clusterType, clusterID, totalsData) {
   let productSales = [];
 
   let totalSales = 0;
@@ -731,10 +836,11 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
     let gross_profit = ((selling_price - cost_price) / selling_price) * 100;
     let markup = ((selling_price - cost_price) / cost_price) * 100;
 
-    // let totalProductSales = getTotalProductSalesByProduct(storeSales, product.productID);
-
     let number_distribution = getNumericDistribution(storeSales, product.productID, clusters, clusterType, clusterID);
     let weighted_distribution = getWeightedDistribution(storeSales, product.productID, clusters, clusterType, clusterID);
+    let sales_contribution = getSalesContribution(storeSales, product.productID, clusters, clusterType, clusterID, totalsData);
+    let units_contribution = getUnitsContribution(storeSales, product.productID, clusters, clusterType, clusterID, totalsData);
+    let profit_contribution = getProfitContribution(storeSales, product.productID, clusters, clusterType, clusterID, totalsData);
 
     let sales_potential = 0;
     let volume_potential = 0;
@@ -780,7 +886,10 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
       volume_potential_rank: volume_potential_rank,
       dos_fac: dos_fac.toFixed(1),
       gross_profit: gross_profit.toFixed(2),
-      markup: markup.toFixed(2)
+      markup: markup.toFixed(2),
+      sales_contribution: parseFloat(sales_contribution.toFixed(0)),
+      units_contribution: parseFloat(units_contribution.toFixed(0)),
+      profit_contribution: parseFloat(profit_contribution.toFixed(0))
     }, getProductIndicator(product.productID, storeSales, stores)))
   }
 
@@ -897,6 +1006,9 @@ function RangeProduct(productData, salesData, indicator) {
   self.gross_profit = (isNaN(salesData.gross_profit) ? 0 : salesData.gross_profit) + "%";
   self.markup = (isNaN(salesData.markup) ? 0 : salesData.markup) + "%";
   self.store_Range_Indicator = indicator;
+  self.sales_contribution = salesData.sales_contribution;
+  self.units_contribution = salesData.units_contribution;
+  self.profit_contribution = salesData.profit_contribution;
 }
 
 function storeStocksProduct(storeSales, storeID, productID) {
