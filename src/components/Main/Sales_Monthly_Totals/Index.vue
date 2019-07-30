@@ -17,7 +17,8 @@
                     </v-toolbar>
 
                     <v-card-text>
-                        <v-autocomplete required v-model="selected_period_from" :items="periods_from" label="Date From:">
+                        <v-autocomplete required v-model="selected_period_from" :items="periods_from"
+                            label="Date From:">
                         </v-autocomplete>
                         <v-autocomplete required v-model="selected_period_to" :items="periods_to" label="Date To:">
                         </v-autocomplete>
@@ -32,7 +33,7 @@
                 </v-form>
             </v-card>
         </v-dialog>
-        <Grid />
+        <Grid :rowData="gridData" />
     </v-card>
 </template>
 
@@ -47,6 +48,7 @@
         name: 'sales-monthly-totals',
         data() {
             return {
+                gridData: [],
                 periods_from: [],
                 selected_period_from: null,
                 periods_to: [],
@@ -58,6 +60,7 @@
         mounted() {
             let self = this;
             self.getPeriods();
+            self.getTotals();
         },
         methods: {
             openDialog() {
@@ -66,14 +69,29 @@
                 self.selected_period_to = null;
                 self.dialog = true;
             },
+            getTotals() {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + "Sales_Monthly_Total").then(r => {
+                    console.log("[TOTALS]");
+                    console.log(r);
+
+                    self.gridData=r.data.sales_Monthly_Total_List
+
+                })
+            },
             getPeriods() {
                 let self = this;
+                console.log("here");
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.get(process.env.VUE_APP_API + "Retailer/period")
                     .then(r => {
                         let periods = r.data;
+                        console.log(r.data);
+
                         self.periods_from = [];
                         self.periods_to = [];
 
@@ -98,9 +116,9 @@
             submit() {
                 let self = this;
 
-                if(self.selected_period_from == null)
+                if (self.selected_period_from == null)
                     alert("Please select a period from date");
-                else if(self.selected_period_to == null)
+                else if (self.selected_period_to == null)
                     alert("Please select a period to date");
                 else {
                     self.save();
@@ -112,11 +130,14 @@
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.post(process.env.VUE_APP_API + `Sales_Monthly_Total?period_from_id=${self.selected_period_from}&period_to_id=${self.selected_period_to}`)
+                Axios.post(process.env.VUE_APP_API +
+                        `Sales_Monthly_Total?period_from_id=${self.selected_period_from}&period_to_id=${self.selected_period_to}`
+                        )
                     .then(r => {
                         console.log(r.data);
                         self.save_loading = false;
                         self.dialog = false;
+                        self.gridData.push(r.data.sales_Monthly_Total)
                         delete Axios.defaults.headers.common["TenantID"];
                     })
                     .catch(e => {

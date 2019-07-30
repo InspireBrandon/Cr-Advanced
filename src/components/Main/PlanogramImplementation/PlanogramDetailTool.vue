@@ -31,7 +31,27 @@
                             </v-toolbar-title>
                         </v-toolbar>
                         <div style="height: calc(100vh - 350px); overflow: auto;">
-                            <v-list>
+                            <table style="width: 100%;" border>
+                                <thead>
+                                    <th>Planogram</th>
+                                    <th>Barcode</th>
+                                    <th>Name</th>
+                                    <th>Zero Or Ten</th>
+                                    <th>Modules</th>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(item, idx) in Products" :key="idx">
+                                        <td>{{item.PlanogramName}}</td>
+                                        <td>{{item.Barcode}}</td>
+                                        <td>{{item.ProductName}}</td>
+                                        <td>{{item.ZeroOrTen}}</td>
+                                        <td>
+                                            {{item.modules}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <!-- <v-list>
                                 <div v-for="(item,index) in spacePlans" :key="index">
                                     <v-list-tile>
 
@@ -47,7 +67,7 @@
                                     </v-list-tile>
                                     <v-divider></v-divider>
                                 </div>
-                            </v-list>
+                            </v-list> -->
                         </div>
 
                     </v-card>
@@ -81,6 +101,9 @@
                                         </div>
                                     </v-progress-linear>
                                 </v-flex>
+                                <v-flex md12>
+                                    {{Products.length}}
+                                </v-flex>
                             </v-layout>
                         </v-container>
 
@@ -107,6 +130,16 @@
         },
         data() {
             return {
+                headers: [{
+                    text: 'Planogram',
+                    value: 'Planogram'
+                }, {
+                    text: 'ProductName',
+                    value: 'ProductName'
+                }, {
+                    text: 'Barcode',
+                    value: 'Barcode'
+                }],
                 spacePlans: [],
                 fileProgress: 0,
                 currentAmount: 0,
@@ -115,6 +148,7 @@
                 currentFileIndex: 0,
                 currentPlanoName: "File names",
                 planogramDetails: [],
+                Products: [],
                 index: 0,
             }
 
@@ -176,13 +210,15 @@
                 }
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                Axios.post(process.env.VUE_APP_API + 'Planogram_Details/Save', sendRequst).then(
-                    r => {
-                        console.log(r);
+                // Axios.post(process.env.VUE_APP_API + 'Planogram_Details/Save', sendRequst).then(
+                //     r => {
+                //         console.log(r);
 
-                        callback(r)
-                        delete Axios.defaults.headers.common["TenantID"];
-                    })
+                //         callback(r)
+                //         delete Axios.defaults.headers.common["TenantID"];
+                //     })
+
+                callback()
             },
             getSystemFile(item, callback) {
                 let self = this
@@ -197,11 +233,41 @@
                         // maybe dispatch an action that will update a progress bar or something
                     }
                 }
+
                 Axios.get(process.env.VUE_APP_API +
                     `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${item}&file=config_advanced`, config).then(
                     res => {
+
+
                         if (res.data != false) {
+
                             self.currentPlanoName = res.data.jsonObject.name
+                            let item = res.data
+                            
+                            item.jsonObject.planogramData.forEach(Products => {
+                                if (Products.Type == "PRODUCT") {
+
+                                    let height = parseFloat(Products.Data.Data.height);
+                                    let width = parseFloat(Products.Data.Data.width);
+                                    let depth = parseFloat(Products.Data.Data.depth);
+
+                                    let equalsTen = self.testDimensions(width, height, depth, 10);
+                                    let equalsZero = self.testDimensions(width, height, depth, 0);
+                                    // let equals10 = height == 10 && width == 10 && depth == 10;
+
+                                    if (equalsTen || equalsZero) {
+                                        self.Products.push({
+                                            PlanogramName: self.currentPlanoName,
+                                            Barcode: Products.Data.Data.barcode,
+                                            ProductName: Products.Data.Data.description,
+                                            ZeroOrTen: equalsTen ? 'Ten' : 'Zero',
+                                            modules:" " + item.jsonObject.dimensionData.modules
+                                        })
+                                    }
+                                }
+                            })
+
+
                         } else {
                             self.currentPlanoName = "File not found"
                         }
@@ -214,6 +280,7 @@
                             //     self.index = self.index + 1
                             //     self.getSystemFile(self.spacePlans[self.index].id, data => {})
                             // }, 2000)
+
                             self.createDetailTX(res.data.jsonObject, item, data => {
                                 setTimeout(() => {
                                     if (self.currentFileIndex == self.totalFiles) {
@@ -242,6 +309,11 @@
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
+            testDimensions(w, h, d, valueToTest) {
+                let testResult = w == valueToTest && h == valueToTest && d == valueToTest;
+                // console.log("[TEST DIMENSIONS]", "TEST VAL", valueToTest, testResult, w, h, d);
+                return testResult;
+            },
             getAllSpacePlans() {
                 let self = this
                 Axios.get(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire&folder=Space Planning")
@@ -254,6 +326,11 @@
                         self.getSystemFile(self.spacePlans[self.index].id, data => {
 
 
+                            r.data.jsonObject.planogramData.forEach(item => {
+                                console.log(item);
+
+
+                            })
                         })
                     })
 

@@ -15,12 +15,13 @@
     } from "ag-grid-vue";
 
     export default {
+        props: ["rowData"],
+
         components: {
             AgGridVue
         },
         data() {
             return {
-                rowData: [],
                 defaultColDef: {
                     onCellValueChanged: this.updateCheck
                 },
@@ -35,11 +36,11 @@
                 },
                 headers: [{
                         "headerName": "Period From",
-                        "field": "period_From"
+                        "field": "period_From_String"
                     },
                     {
                         "headerName": "Period To",
-                        "field": "period_To"
+                        "field": "period_To_String"
                     },
                     {
                         "headerName": "Sales Retail",
