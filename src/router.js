@@ -66,6 +66,8 @@ import PeriodMaint from '@/components/Apps/DataPreparation/Types/Period/Index.vu
 import StoreMaint from '@/components/Apps/DataPreparation/Types/Store/Index.vue'
 import PlanogramMaintenance from '@/components/Apps/DataPreparation/Types/PlanogramMaintenance/Index.vue';
 import ProductCatalogue from '@/components/Apps/DataPreparation/Types/ProductCatalogue/ProductCatalogue.vue';
+import CategoryCode from '@/components/Apps/DataPreparation/Types/CategoryCode/CategoryCode.vue';
+
 
 
 //projectPlanning
@@ -367,6 +369,11 @@ export default new Router({
               path: "PlanogramMaintenance",
               name: "planogram_maintenance",
               component: PlanogramMaintenance
+            },
+            {
+              path: "CategoryCode",
+              name: "Category_Code",
+              component: CategoryCode
             }, {
               path: 'ProductCatalogue',
               name: 'ProductCatalogue',
