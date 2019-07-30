@@ -1,6 +1,5 @@
 <template>
     <div>
-        <!-- <SimpleList name="Store"></SimpleList> -->
         <v-container fluid class="pa-0 ma-0" grid-list-md>
             <v-layout row wrap class="pa-0 ma-0">
                 <v-flex md12 class="pa-0 ma-0">
@@ -11,9 +10,6 @@
                             @input="onFilterTextBoxChanged" v-model="filterText">
                         </v-text-field>
                         <v-spacer></v-spacer>
-                        <v-btn dark @click="openAdd" color="primary" class="my-0">
-                            <v-icon>add</v-icon>
-                        </v-btn>
                     </v-toolbar>
                     <ag-grid-vue id="ag-Grid" :gridOptions="gridOptions"
                         style="width: 100%;  height: calc(100vh - 160px);" :defaultColDef="defaultColDef"
@@ -25,13 +21,11 @@
                 </v-flex>
             </v-layout>
         </v-container>
-        <ModifyStore ref="modifyStore" />
     </div>
 </template>
 
 <script>
-    import ModifyStore from '@/components/Apps/DataPreparation/Types/Store/Modify/Index.vue'
-    import Button from './Modify/GridComponents/button';
+    import Selector from "./Selector.vue";
     import Axios from 'axios'
     import {
         AgGridVue
@@ -42,12 +36,14 @@
         data() {
             return {
                 filterText: '',
+                clusterLinkDetails: '',
                 items: [],
                 pageNumber: 0,
                 allowedRecords: 25,
                 columnDefs: [],
                 rowData: [],
                 defaultColDef: {},
+                store_Cluster: [],
                 gridOptions: {
                     rowHeight: 35,
                     pinnedTopRowData: [],
@@ -59,23 +55,21 @@
                         'disabled-line': 'data.can_edit'
                     }
                 },
-
             }
         },
         components: {
-            ModifyStore,
             AgGridVue,
-            Button
+            Selector
         },
         created() {
             let self = this;
 
             self.gridOptions.context.componentParent = this;
             self.getStores();
+            self.getClusters();
         },
         beforeMount() {
             let self = this;
-            // console.log(require('./headers.json'))
             self.columnDefs = require('./headers.json');
         },
         methods: {
@@ -95,19 +89,53 @@
             getStores() {
                 let self = this
 
-
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.get(process.env.VUE_APP_API + `Retailer/Store`)
                     .then(r => {
-                        console.log(r);
+                        console.log("data", r.data);
 
                         self.rowData = r.data;
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
-            openAdd() {},
-        }
+            getClusters() {
+                let self = this
 
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + `Cluster/Store`)
+                    .then(r => {
+                        console.log("cluster", r.data);
+
+                        let store_clusters = r.data;
+                        self.store_Cluster = [];
+
+                        store_clusters.forEach(element => {
+                            console.log(element)
+
+                            self.store_Cluster.push({
+                                text: element.displayname,
+                                value: element.id
+                            })
+                        });
+
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+            },
+            saveOnChange() {
+                console.log("save");
+                let self = this
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `Cluster/Store`)
+                    .then(r => {
+                        console.log("cluster", r.data);
+
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+            }
+        }
     }
 </script>
