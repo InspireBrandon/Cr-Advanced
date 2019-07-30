@@ -1400,6 +1400,19 @@
               let changed_product = ctrl_store.getPlanogramItemById(this.$store, data.id);
               console.log('Product Changed', changed_product)
               changed_product.ChangeDimensions(data.object);
+              let allProducts = self.$parent.$refs.warehouse.products;
+              
+              allProducts.forEach(el => {
+                if(el.barcode == changed_product.Data.barcode) {
+                  for(var prop in el) {
+                    if(changed_product.Data[prop] != undefined && changed_product.Data[prop] != null) {
+                      el[prop] = changed_product.Data[prop]
+                    }
+                  }
+
+                  console.log("[Changed Range Product]", el)
+                }
+              })
             }
         }
       },

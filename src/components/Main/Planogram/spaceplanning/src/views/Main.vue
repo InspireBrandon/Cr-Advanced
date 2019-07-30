@@ -4,7 +4,7 @@
     <v-layout row wrap fill-height>
       <v-flex xs9 id="stageMain">
         <div>
-          <StageMain></StageMain>
+          <StageMain ref="stage"></StageMain>
         </div>
       </v-flex>
       <v-flex xs3 id="warehouseMain">

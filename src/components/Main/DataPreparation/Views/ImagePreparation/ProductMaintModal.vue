@@ -502,8 +502,6 @@
   import Dialog from '@/components/Common/Dialog'
   import YesNoModal from '@/components/Common/YesNoModal'
 
-  import cloudinary from 'cloudinary-core';
-
   function KeyValueArray(array) {
     let retval = [];
 
@@ -522,12 +520,6 @@
     name: 'ProductMaintModal',
     created() {
       let self = this;
-
-      self.cloudinary = new cloudinary.Cloudinary({
-        cloud_name: "brandonlostboy",
-        api_key: '284359386998856',
-        api_secret: 'tzv-VJW-mZyOy3LXMRtc8b4qj6k'
-      })
 
       EventBus.$on("MODAL_LOAD", function (data) {
 
@@ -571,9 +563,7 @@
               newObj.object.Data.alternatePackingType = self.product_type;
 
               let event = new CustomEmitter();
-              event.modal_saved(EventBus, self.planoData.type, self.planoData.subType, newObj, self.planoData
-                .id,
-                self.planoData.object);
+              event.modal_saved(EventBus, self.planoData.type, self.planoData.subType, newObj, self.planoData.id, self.planoData.object);
               self.hide();
             }
           })
