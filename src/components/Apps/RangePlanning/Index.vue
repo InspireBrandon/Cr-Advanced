@@ -276,9 +276,9 @@
             'audit-image-breach': function (params) {
 
             },
-            'auto-range-item': function (params) {
-              return params.data.autoRangeItem;
-            }
+            // 'auto-range-item': function (params) {
+            //   return params.data.autoRangeItem == undefined ? false : params.data.autoRangeItem;
+            // }
           },
         },
         autoRangeData: {
@@ -357,6 +357,7 @@
     created() {
       let self = this;
       self.gridOptions.context.componentParent = this;
+      self.gridOptions.popupParent = document.body;
       self.getColumnDefenitions();
       self.checkparams()
     },
@@ -1008,7 +1009,7 @@
         self.$refs.GraphConfigurationModal.show(graph_config => {
           var params = {
             cellRange: {
-              columns: ["sales_Retail", "description"]
+              columns: ["sales_Retail", "manufacturer"]
             },
             chartType: "line",
             processChartOptions: function (params) {
@@ -1017,6 +1018,8 @@
                 text: "Product Sales"
               };
               opts.xAxis.labelRotation = 30;
+              opts.aggregate = true;
+              opts.suppressChartRanges = true;
               opts.seriesDefaults.tooltipRenderer = function (params) {
                 let titleStyle = params.color ? ' style="color: white; background-color:' + params.color +
                   '"' : "";

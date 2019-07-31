@@ -1,5 +1,5 @@
 <template>
-    <v-dialog persistent v-model="dialog">
+    <v-dialog persistent v-model="dialog" width="600">
         <v-card>
             <v-toolbar dark color="primary">
                 <v-toolbar-title>

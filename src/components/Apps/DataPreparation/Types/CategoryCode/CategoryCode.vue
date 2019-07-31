@@ -109,7 +109,6 @@
             this.gridOptions.context.componentParent = this;
             this.getItems();
         },
-        computed: {},
         mounted() {
             let self = this;
             this.GetPlanograms()
@@ -125,7 +124,7 @@
                 let self = this
 
                 Axios.get(process.env.VUE_APP_API + "Planogram").then(r => {
-                     self.planogramList=[]
+                    self.planogramList = []
                     r.data.planogramList.forEach(element => {
                         self.planogramName.push({
                             text: element.planogram,
@@ -140,7 +139,7 @@
                 Axios.get(process.env.VUE_APP_API + "Retailer/Department").then(r => {
                     console.log("Retailer/Department");
                     console.log(r);
-                    self.departmentName=[]
+                    self.departmentName = []
 
                     r.data.forEach(element => {
                         self.departmentName.push({
@@ -161,13 +160,12 @@
                 Axios.get(process.env.VUE_APP_API + "Retailer/SubDepartment").then(r => {
                     console.log("Retailer/SubDepartment");
                     console.log(r);
-                    self.subdepartmentName=[]
+                    self.subdepartmentName = []
                     r.data.forEach(element => {
                         self.subdepartmentName.push({
                             text: element.subdepartment,
                             value: element.id,
                             department_ID: element.department_ID,
-
                         })
                     });
                     delete Axios.defaults.headers.common["TenantID"];
@@ -199,24 +197,29 @@
             },
             UpdateLine(item) {
                 let self = this
-                let tmp = item.data
-                let node = item.node
-                console.log("[UPDATElINE]");
-                
-                self.checkUniqueCode(tmp, callback => {
-                    console.log(callback);
-                    if (callback != null) {
-                        self.$refs.Dialog.openDialog({
-                            headline: "Duplicate Category Code",
-                            text: "Please Use a different Category Code"
-                        })
-                    } else {
-                        self.SaveEntry(tmp, saveCallback => {
-                            node.setData(saveCallback)
-                        })
-                    }
 
+                self.$nextTick(() => {
+                    let tmp = item.data
+                    let node = item.node
+                    console.log("[UPDATElINE]");
+
+                    self.checkUniqueCode(tmp, callback => {
+                        console.log(callback);
+                        if (callback != null) {
+                            self.$refs.Dialog.openDialog({
+                                headline: "Duplicate Category Code",
+                                text: "Please Use a different Category Code"
+                            })
+                        } else {
+                            self.SaveEntry(tmp, saveCallback => {
+                                console.log(saveCallback);
+                                node.setData(saveCallback)
+                            })
+                        }
+
+                    })
                 })
+
                 // tmp.id = data.store_Planogram.id
                 // tmp.heightFit = data.store_Planogram.heightFit;
                 // tmp.modulesFit = data.store_Planogram.modulesFit;
