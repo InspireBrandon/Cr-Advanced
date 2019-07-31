@@ -19,12 +19,12 @@
                         </v-flex>
                         <v-flex md12>
                             <v-radio-group v-if="selected_graph != null && selected_graph == 'Pareto'" v-model="selected_graph_type" label="Type">
-                                <v-radio value="Pareto" disabled label="Pareto">
+                                <v-radio color="primary" value="Pareto" disabled label="Pareto">
                                 </v-radio>
                             </v-radio-group>
                             <v-radio-group  v-if="selected_graph != null && selected_graph != 'Pareto'" v-model="selected_graph_type" label="Type">
-                                <v-radio value="Pie" label="Pie"></v-radio>
-                                <v-radio value="Bar" label="Bar"></v-radio>
+                                <v-radio color="primary" value="Pie" label="Pie"></v-radio>
+                                <v-radio color="primary" value="Bar" label="Bar"></v-radio>
                             </v-radio-group>
                         </v-flex>
                     </v-layout>
@@ -34,7 +34,7 @@
 
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="primary" flat @click="dialog = false">Continue</v-btn>
+                    <v-btn color="primary" flat @click="submit">Continue</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -48,17 +48,16 @@
                 dialog: false,
                 facts: ['Sales', 'Units', 'Profit', 'Stock On Hand - Units', 'Stock On Hand - Cost', 'GP%'],
                 selected_fact: null,
-                graphs: ['Pareto', 'By Manufacturer', 'By Brand', 'By Category', 'By Subcategory', 'By Segment',
-                    'by Size Description'
-                ],
+                graphs: ['Pareto', 'By Manufacturer', 'By Brand', 'By Category', 'By Subcategory', 'By Segment', 'by Size Description'],
                 selected_graph: null,
                 selected_graph_type: 'Pareto'
             }
         },
         methods: {
-            show(autoRangeData) {
+            show(afterReturn) {
                 let self = this;
                 self.dialog = true;
+                self.afterReturn = afterReturn;
             },
             on_selected_graph_change() {
                 let self = this;
@@ -66,8 +65,22 @@
                 self.$nextTick(() => {
                     if(self.selected_graph == 'Pareto') {
                         self.selected_graph_type = 'Pareto';
+                    } else {
+                        self.selected_graph_type = 'Pie';
                     }
                 })
+            },
+            submit() {
+                let self = this;
+                self.dialog = false;
+
+                let graphConfiguration = {
+                    selected_fact: self.selected_fact,
+                    selected_graph: self.selected_graph,
+                    selected_graph_type: self.selected_graph_type
+                }
+
+                self.afterReturn(graphConfiguration);
             }
         }
     }

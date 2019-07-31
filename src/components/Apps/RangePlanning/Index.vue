@@ -11,9 +11,6 @@
             <v-list-tile @click="newRange">
               <v-list-tile-title>New</v-list-tile-title>
             </v-list-tile>
-            <!-- <v-list-tile @click="newProductListing">
-              <v-list-tile-title>New Product Listing</v-list-tile-title>
-            </v-list-tile> -->
             <v-list-tile @click="openRange">
               <v-list-tile-title>Open</v-list-tile-title>
             </v-list-tile>
@@ -120,7 +117,8 @@
           <v-btn v-if="rowData.length>0" @click="openReport" color="primary" small dark>Report</v-btn>
           <v-btn v-if="rowData.length>0" @click="onChart1" color="primary" small dark>graphs</v-btn>
           <v-menu offset-y>
-            <v-btn :disabled="selectedItems.length == 0" slot="activator" color="primary" small dark>Set Indicator</v-btn>
+            <v-btn :disabled="selectedItems.length == 0" slot="activator" color="primary" small dark>Set Indicator
+            </v-btn>
             <v-list dark>
               <v-list-tile @click="setIndicator('YES')">
                 <v-list-tile-title>YES</v-list-tile-title>
@@ -271,18 +269,29 @@
           context: {
             componentParent: this
           },
+          // rowClassRules: {
+          //   'audit-image-breach': 'data.imageAudit'
+          // },
           rowClassRules: {
-            'audit-image-breach': 'data.imageAudit'
+            'audit-image-breach': function (params) {
+
+            },
+            'auto-range-item': function (params) {
+              return params.data.autoRangeItem;
+            }
           },
-          onFirstDataRendered(params) {
-            var firstGroupedBarRangeParams = new GroupedBar({
-              columns: ['sales_Retail', 'sales_Units'],
-              chartContainer: document.querySelector('#myGroupedBar1'),
-              suppressChartRanges: true,
-              aggregate: true
-            })
-            firstGroupedBar = params.api.chartRange(firstGroupedBarRangeParams);
-          },
+        },
+        autoRangeData: {
+          sales_index: 100,
+          profit_index: 100,
+          volume_index: 100,
+          sales: 80,
+          volume: 80,
+          profit: 80,
+          potential_sales: 80,
+          potential_volume: 80,
+          potential_profit: 80,
+          audit: false
         },
         gotData: false,
         defaultColDef: {
@@ -996,39 +1005,121 @@
       onChart1() {
         let self = this;
 
-        self.$refs.GraphConfigurationModal.show();
-
-        // var params = {
-        //   cellRange: {
-        //     columns: ["sales_Retail", "description"]
-        //   },
-        //   chartType: "line",
-        //   processChartOptions: function (params) {
-        //     let opts = params.options;
-        //     opts.title = {
-        //       text: "Product Sales"
-        //     };
-        //     opts.xAxis.labelRotation = 30;
-        //     opts.seriesDefaults.tooltipRenderer = function (params) {
-        //       let titleStyle = params.color ? ' style="color: white; background-color:' + params.color + '"' : "";
-        //       let title = params.title ? '<div class="title"' + titleStyle + ">" + params.title + "</div>" : "";
-        //       let value = params.datum[params.yField].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
-        //       return title + '<div class="content" style="text-align: center">' + value + "</div>";
-        //     };
-        //     return opts;
-        //   }
-        // };
-        // this.gridApi.chartRange(params);
+        self.$refs.GraphConfigurationModal.show(graph_config => {
+          var params = {
+            cellRange: {
+              columns: ["sales_Retail", "description"]
+            },
+            chartType: "line",
+            processChartOptions: function (params) {
+              let opts = params.options;
+              opts.title = {
+                text: "Product Sales"
+              };
+              opts.xAxis.labelRotation = 30;
+              opts.seriesDefaults.tooltipRenderer = function (params) {
+                let titleStyle = params.color ? ' style="color: white; background-color:' + params.color +
+                  '"' : "";
+                let title = params.title ? '<div class="title"' + titleStyle + ">" + params.title + "</div>" :
+                  "";
+                let value = params.datum[params.yField].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+                return title + '<div class="content" style="text-align: center">' + value + "</div>";
+              };
+              return opts;
+            }
+          };
+          this.gridApi.chartRange(params);
+        });
       },
       openAutoRangeModal() {
         let self = this;
 
-        self.$refs.AutoRangeModal.show(null);
+        self.$refs.AutoRangeModal.show(self.autoRangeData, autoRangeData => {
+          self.autoRangeData = autoRangeData;
+          self.calculateAutoRange();
+        });
       },
       openReport() {
         let self = this;
 
         self.$refs.RangingReportModal.show(null);
+      },
+      calculateAutoRange() {
+        let self = this;
+
+        self.rowData.forEach(el => {
+          el.autoRangeItem = false;
+          if (self.testAutoRangeProduct(el, self.rowData)) {
+            el.autoRangeItem = true;
+          }
+        })
+      },
+      testAutoRangeProduct(product, allProducts) {
+        let self = this;
+        let partOfRange = true;
+        let config = self.autoRangeData;
+
+        if(!config.audit && product.imageAudit) {
+          partOfRange = false;
+        }
+
+        if (product.sales_contribution <= config.sales_index) {
+          partOfRange = false;
+        }
+
+        if (product.profit_contribution <= config.profit_index) {
+          partOfRange = false;
+        }
+
+        if (product.units_contribution <= config.volume_index) {
+          partOfRange = false;
+        }
+
+        if (!self.inPercentage(allProducts, config.sales, product, 'sales_Retail')) {
+          partOfRange = false;
+        }
+
+        if (!self.inPercentage(allProducts, config.volume, product, 'sales_Units')) {
+          partOfRange = false;
+        }
+
+        if (!self.inPercentage(allProducts, config.profit, product, 'sales_Profit')) {
+          partOfRange = false;
+        }
+
+        if (!self.inPercentage(allProducts, config.potential_sales, product, 'sales_contribution')) {
+          partOfRange = false;
+        }
+
+        if (!self.inPercentage(allProducts, config.potential_volume, product, 'units_contribution')) {
+          partOfRange = false;
+        }
+
+        if (!self.inPercentage(allProducts, config.potential_profit, product, 'profit_contribution')) {
+          partOfRange = false;
+        }
+
+        return partOfRange;
+      },
+      inPercentage(allProducts, percentage, product, field) {
+        let self = this;
+
+        let sorted = allProducts.sort((a, b) => {
+          return a[field] < b[field];
+        })
+
+        let sortedCount = Math.round((percentage / 100) * sorted.length);
+        let diff = allProducts.length - sortedCount;
+        let partOfRange = false;
+
+        for (var i = allProducts.length - 1; i > diff; i--) {
+          let item = sorted[i];
+          if (item.barcode == product.barcode) {
+            partOfRange = true;
+          }
+        }
+
+        return partOfRange;
       }
     }
   }
@@ -1037,5 +1128,9 @@
 <style>
   .ag-theme-balham .audit-image-breach {
     background-color: lightcoral !important;
+  }
+
+  .ag-theme-balham .auto-range-item {
+    background-color: #cfffcf !important;
   }
 </style>

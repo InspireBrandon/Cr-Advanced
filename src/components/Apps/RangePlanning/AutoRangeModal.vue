@@ -108,7 +108,7 @@
 
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="primary" flat @click="dialog = false">Save</v-btn>
+                    <v-btn color="primary" flat @click="submit">Save</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -129,13 +129,46 @@
                 potential_sales: 80,
                 potential_volume: 80,
                 potential_profit: 80,
-                audit: false
+                audit: false,
+                afterComplete: null
             }
         },
         methods: {
-            show(autoRangeData) {
+            show(config, afterComplete) {
                 let self = this;
+                self.afterComplete = afterComplete;
+
+                self.sales_index = config.sales_index;
+                self.profit_index = config.profit_index;
+                self.volume_index = config.volume_index;
+                self.sales = config.sales;
+                self.volume = config.volume;
+                self.profit = config.profit;
+                self.potential_sales = config.potential_sales;
+                self.potential_volume = config.potential_volume;
+                self.potential_profit = config.potential_profit;
+                self.audit = config.audit;
+
                 self.dialog = true;
+            },
+            submit() {
+                let self = this;
+                self.dialog = false;
+
+                let arc = {
+                    sales_index: self.sales_index,
+                    profit_index: self.profit_index,
+                    volume_index: self.volume_index,
+                    sales: self.sales,
+                    volume: self.volume,
+                    profit: self.profit,
+                    potential_sales: self.potential_sales,
+                    potential_volume: self.potential_volume,
+                    potential_profit: self.potential_profit,
+                    audit: self.audit
+                }
+
+                self.afterComplete(arc);
             }
         }
     }

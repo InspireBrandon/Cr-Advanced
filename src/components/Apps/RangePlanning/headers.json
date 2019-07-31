@@ -21,7 +21,9 @@
     {
         "headerName": "Manufacturer",
         "field": "manufacturer",
-        "hide": true
+        "hide": true,
+        "enableRowGroup": true,
+        "chartDataType": "category"
     },
     {
         "headerName": "Description",
@@ -91,8 +93,7 @@
     },
     {
         "headerName": "Weighted Distribution",
-        "field": "weighted_Distribution",
-        "aggFunc": "avg"
+        "field": "weighted_Distribution"
     }, 
     {
         "headerName": "Sales Potential",
@@ -149,7 +150,8 @@
         "headerName": "Sales",
         "field": "sales_Retail",
         "hide": true,
-        "aggFunc": "sum"
+        "aggFunc": "sum",
+        "chartDataType": "series"
     },
     {
         "headerName": "Volume",

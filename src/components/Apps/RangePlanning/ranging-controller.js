@@ -394,12 +394,14 @@ function getSalesContribution(storeSales, productID, clusters, clusterType, clus
   // Get avg per store
   totalsData.forEach(store => {
     if (storeInCluster(store.store_ID, clusterStores)) {
-      totalStoreSales += parseFloat(store.sales_Retail);
-      totalProducts += parseInt(store.items_In_Business);
+      totalStoreSales += parseFloat(store.sales_Retail) / parseInt(store.items_In_Business);
     }
   })
 
-  let avgProductSales = totalStoreSales / totalProducts;
+  let avgProductSales = totalStoreSales;
+
+  console.log(avgProductSales);
+
   let productSales = 0;
 
   storeSales.forEach(store => {
@@ -412,7 +414,7 @@ function getSalesContribution(storeSales, productID, clusters, clusterType, clus
     }
   })
 
-  let contribution = productSales == 0 ? 0 : (avgProductSales / productSales) * 100;
+  let contribution = productSales == 0 ? 0 : (productSales / avgProductSales) * 100;
   return contribution;
 }
 
@@ -425,7 +427,7 @@ function getUnitsContribution(storeSales, productID, clusters, clusterType, clus
   totalsData.forEach(store => {
     if (storeInCluster(store.store_ID, clusterStores)) {
       totalStoreUnits += parseFloat(store.sales_Units);
-      totalUnits += parseInt(store.items_In_Business);
+      totalUnits += parseInt(store.items_In_Business) / clusterStores.length;
     }
   })
 
@@ -442,7 +444,7 @@ function getUnitsContribution(storeSales, productID, clusters, clusterType, clus
     }
   })
 
-  let contribution = productUnits == 0 ? 0 : (avgProductUnits / productUnits) * 100;
+  let contribution = productUnits == 0 ? 0 : (productUnits / avgProductUnits) * 100;
   return contribution;
 }
 
@@ -455,7 +457,7 @@ function getProfitContribution(storeSales, productID, clusters, clusterType, clu
   totalsData.forEach(store => {
     if (storeInCluster(store.store_ID, clusterStores)) {
       totalStoreProfit += parseFloat(store.sales_Profit);
-      totalProfit += parseInt(store.items_In_Business);
+      totalProfit += parseInt(store.items_In_Business) / clusterStores.length;
     }
   })
 
@@ -472,7 +474,7 @@ function getProfitContribution(storeSales, productID, clusters, clusterType, clu
     }
   })
 
-  let contribution = productProfit == 0 ? 0 : (avgProductProfit / productProfit) * 100;
+  let contribution = productProfit == 0 ? 0 : (productProfit / avgProductProfit) * 100;
   return contribution;
 }
 
@@ -1009,6 +1011,7 @@ function RangeProduct(productData, salesData, indicator) {
   self.sales_contribution = salesData.sales_contribution;
   self.units_contribution = salesData.units_contribution;
   self.profit_contribution = salesData.profit_contribution;
+  self.autoRangeItem = false;
 }
 
 function storeStocksProduct(storeSales, storeID, productID) {
