@@ -68,6 +68,14 @@
             </v-list-tile>
           </v-list>
         </v-menu>
+        <v-menu v-if="rowData.length > 0" dark offset-y style="margin-bottom: 10px;">
+          <v-btn slot="activator" flat>Configure</v-btn>
+          <v-list>
+            <v-list-tile :disabled="selectedClusterOption == null" @click="openAutoRangeModal">
+              <v-list-tile-title>Auto Range</v-list-tile-title>
+            </v-list-tile>
+          </v-list>
+        </v-menu>
       </v-toolbar-items>
 
       <v-spacer></v-spacer>
@@ -86,11 +94,11 @@
         <v-toolbar dark>
           <!-- <v-layout row wrap v-if="gotData"> -->
           <v-toolbar-items v-if="gotData">
-            <v-select style="margin-left: 10px; margin-top: 8px; width: 300px" placeholder="Select cluster type"
+            <v-select style="margin-left: 10px; margin-top: 8px; width: 200px" placeholder="Select cluster type"
               @change="onClusterTypeChange" dense :items="clusterTypes" v-model="selectedClusterType" hide-details>
             </v-select>
 
-            <v-select style="margin-left: 10px; margin-top: 8px; width: 300px" @change="onClusterOptionChange"
+            <v-select style="margin-left: 10px; margin-top: 8px; width: 200px" @change="onClusterOptionChange"
               v-if="selectedClusterType != null" :placeholder="'Select ' + selectedClusterType + ' cluster'" dense
               :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" hide-details>
             </v-select>
@@ -109,11 +117,10 @@
             <div>Sales Potential: R{{ (ais_SalesPotential < 0 ? (ais_SalesPotential * -1) : ais_SalesPotential) }}</div>
           </div>
           <v-spacer></v-spacer>
-          <v-btn v-if="rowData.length>0" @click="onChart1">
-            show graphs
-          </v-btn>
+          <v-btn v-if="rowData.length>0" @click="openReport" color="primary" small dark>Report</v-btn>
+          <v-btn v-if="rowData.length>0" @click="onChart1" color="primary" small dark>graphs</v-btn>
           <v-menu offset-y>
-            <v-btn :disabled="selectedItems.length == 0" slot="activator" color="primary" dark>Set Indicator</v-btn>
+            <v-btn :disabled="selectedItems.length == 0" slot="activator" color="primary" small dark>Set Indicator</v-btn>
             <v-list dark>
               <v-list-tile @click="setIndicator('YES')">
                 <v-list-tile-title>YES</v-list-tile-title>
@@ -175,6 +182,9 @@
     <ProductMaintModal ref="productMaint"></ProductMaintModal>
     <!-- <ProductListing ref="productListing"></ProductListing> -->
     <SizeLoader ref="SizeLoader" />
+    <AutoRangeModal ref="AutoRangeModal" />
+    <RangingReportModal ref="RangingReportModal" />
+    <GraphConfigurationModal ref="GraphConfigurationModal" />
   </div>
 </template>
 
@@ -207,7 +217,9 @@
   import ProductMaintModal from '@/components/Main/DataPreparation/Views/ImagePreparation/ProductMaintModal'
   import ProductListing from '@/components/Apps/RangePlanning/ProductListing/Index'
   import SizeLoader from '@/components/Common/SizeLoader';
-
+  import AutoRangeModal from './AutoRangeModal.vue';
+  import RangingReportModal from './RangingReportModal.vue'
+  import GraphConfigurationModal from './GraphConfigurationModal.vue'
 
   import {
     AgGridVue
@@ -238,7 +250,10 @@
       Prompt,
       optionsComponent,
       HelpFileViewer,
-      ProductListing
+      ProductListing,
+      AutoRangeModal,
+      RangingReportModal,
+      GraphConfigurationModal
     },
     data() {
       return {
@@ -326,7 +341,8 @@
         canRefresh: false,
         tmpString: "",
         ais_Sales: 0,
-        ais_SalesPotential: 0
+        ais_SalesPotential: 0,
+        periodData: []
       }
     },
     created() {
@@ -487,6 +503,8 @@
           self.$refs.SizeLoader.show()
           Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fileID}`, config)
             .then(r => {
+              console.log(r.data);
+
               self.fileData.planogramName = r.data.planogramName;
               self.fileData.planogramID = r.data.planogramID;
               self.fileData.dateFrom = r.data.dateFrom;
@@ -662,7 +680,6 @@
           self.clusterOptions.store.push(new textValue(element));
         });
       },
-
       onSelectionChanged(e) {
         let self = this;
         var rows = e.api.getSelectedNodes();
@@ -977,28 +994,42 @@
         }
       },
       onChart1() {
-        var params = {
-          cellRange: {
-            columns: ["sales_Retail", "description"]
-          },
-          chartType: "line",
-          processChartOptions: function (params) {
-            let opts = params.options;
-            opts.title = {
-              text: "Product Sales"
-            };
-            opts.xAxis.labelRotation = 30;
-            opts.seriesDefaults.tooltipRenderer = function (params) {
-              let titleStyle = params.color ? ' style="color: white; background-color:' + params.color + '"' : "";
-              let title = params.title ? '<div class="title"' + titleStyle + ">" + params.title + "</div>" : "";
-              let value = params.datum[params.yField].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
-              return title + '<div class="content" style="text-align: center">' + value + "</div>";
-            };
-            return opts;
-          }
-        };
-        this.gridApi.chartRange(params);
+        let self = this;
+
+        self.$refs.GraphConfigurationModal.show();
+
+        // var params = {
+        //   cellRange: {
+        //     columns: ["sales_Retail", "description"]
+        //   },
+        //   chartType: "line",
+        //   processChartOptions: function (params) {
+        //     let opts = params.options;
+        //     opts.title = {
+        //       text: "Product Sales"
+        //     };
+        //     opts.xAxis.labelRotation = 30;
+        //     opts.seriesDefaults.tooltipRenderer = function (params) {
+        //       let titleStyle = params.color ? ' style="color: white; background-color:' + params.color + '"' : "";
+        //       let title = params.title ? '<div class="title"' + titleStyle + ">" + params.title + "</div>" : "";
+        //       let value = params.datum[params.yField].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+        //       return title + '<div class="content" style="text-align: center">' + value + "</div>";
+        //     };
+        //     return opts;
+        //   }
+        // };
+        // this.gridApi.chartRange(params);
       },
+      openAutoRangeModal() {
+        let self = this;
+
+        self.$refs.AutoRangeModal.show(null);
+      },
+      openReport() {
+        let self = this;
+
+        self.$refs.RangingReportModal.show(null);
+      }
     }
   }
 </script>
