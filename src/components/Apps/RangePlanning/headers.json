@@ -15,7 +15,8 @@
         "headerName": "Brand",
         "field": "brand",
         "editable": true,
-        "hide": true
+        "hide": true,
+        "enableRowGroup": true
     },
     {
         "headerName": "Manufacturer",
@@ -90,7 +91,8 @@
     },
     {
         "headerName": "Weighted Distribution",
-        "field": "weighted_Distribution"
+        "field": "weighted_Distribution",
+        "aggFunc": "avg"
     }, 
     {
         "headerName": "Sales Potential",
@@ -146,7 +148,8 @@
     {
         "headerName": "Sales",
         "field": "sales_Retail",
-        "hide": true
+        "hide": true,
+        "aggFunc": "sum"
     },
     {
         "headerName": "Volume",

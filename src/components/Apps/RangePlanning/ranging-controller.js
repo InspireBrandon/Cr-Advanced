@@ -488,7 +488,7 @@ function getDaysOfSupplyFacings(clusters, clusterType, clusterID, volume_potenti
 
   capacity = parseInt(capacity);
 
-  let other = capacity / (volume_potential / storeCount) * 30;
+  let other = volume_potential == 0 ? 0 : capacity / (volume_potential / storeCount) * 30;
 
   return other;
 }
