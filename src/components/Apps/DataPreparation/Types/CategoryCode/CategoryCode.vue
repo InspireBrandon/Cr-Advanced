@@ -63,17 +63,14 @@
                         "dropdownName": "subdepartmentName"
                     }, {
                         "headerName": "Category_Code",
-                        "field": "category_Code",
-                        "editable": true,
+                        "field": "category_Code"
                     }, {
                         "headerName": "Category",
-                        "field": "category",
-                        "editable": true,
+                        "field": "category"
 
                     }, {
                         "headerName": "DisplayName",
-                        "field": "displayName",
-                        "editable": true,
+                        "field": "displayName"
                     },
                     // {
                     //     "headerName": "Supergroup_A_ID",
