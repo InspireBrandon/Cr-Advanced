@@ -9,7 +9,7 @@
                         <v-icon>close</v-icon>
                     </v-btn>
                 </v-toolbar>
-                <v-card-text>
+                <v-card-text v-if="reportData != null">
                     <table>
                         <thead>
                             <tr>
@@ -23,22 +23,22 @@
                         <tbody>
                             <tr>
                                 <td>Category Sales</td>
-                                <td></td>
-                                <td></td>
+                                <td>{{ reportData.current.sales.total_category }}</td>
+                                <td>{{ reportData.current.sales.items_selected }}</td>
                                 <td></td>
                                 <td></td>
                             </tr>
                             <tr>
                                 <td>Category Units</td>
-                                <td></td>
-                                <td></td>
+                                <td>{{ reportData.current.units.total_category }}</td>
+                                <td>{{ reportData.current.units.items_selected }}</td>
                                 <td></td>
                                 <td></td>
                             </tr>
                             <tr>
                                 <td>Category Profit</td>
-                                <td></td>
-                                <td></td>
+                                <td>{{ reportData.current.profit.total_category }}</td>
+                                <td>{{ reportData.current.profit.items_selected }}</td>
                                 <td></td>
                                 <td></td>
                             </tr>
@@ -153,22 +153,14 @@
         data() {
             return {
                 dialog: false,
-                sales_index: 100,
-                profit_index: 100,
-                volume_index: 100,
-                sales: 80,
-                volume: 80,
-                profit: 80,
-                potential_sales: 80,
-                potential_volume: 80,
-                potential_profit: 80,
-                audit: false
+                reportData: null
             }
         },
         methods: {
-            show(autoRangeData) {
+            show(reportData) {
                 let self = this;
                 self.dialog = true;
+                self.reportData = reportData;
             }
         }
     }
