@@ -7,7 +7,9 @@
                 @input="onFilterTextBoxChanged" v-model="filterText">
             </v-text-field>
             <v-spacer></v-spacer>
-
+            <v-btn color="primary" @click="openDefaultDialog">
+                set default
+            </v-btn>
             <v-btn dark @click="openAdd" color="primary" class="my-0">
                 <v-icon>add</v-icon>
             </v-btn>
@@ -22,11 +24,14 @@
         </div>
         <Dialog ref="Dialog" />
         <addModal ref="addModal" />
+        <DefaultModal ref="DefaultModal" />
+
     </div>
 </template>
 
 <script>
     import DropDown from "./DropDown"
+    import DefaultModal from "./DefaultModal"
     import Axios from 'axios'
     import {
         AgGridVue
@@ -43,10 +48,13 @@
             AgGridVue,
             Dialog,
             addModal,
-            DropDown
+            DropDown,
+            DefaultModal
         },
         data() {
             return {
+                DefaultText: "sdxsddd",
+                defaultDialog: false,
                 headers: [{
                         "headerName": "Category_Code",
                         "field": "category_Code",
@@ -120,6 +128,15 @@
             // });
         },
         methods: {
+            assignDefaults() {
+                let self = this
+            },
+            openDefaultDialog() {
+                let self = this
+                console.log("show");
+
+              self.$refs.DefaultModal.show()
+            },
             GetPlanograms() {
                 let self = this
 
