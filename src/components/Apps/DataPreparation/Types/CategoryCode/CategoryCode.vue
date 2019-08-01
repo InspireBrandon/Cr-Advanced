@@ -57,17 +57,14 @@
                 defaultDialog: false,
                 headers: [{
                         "headerName": "Category_Code",
-                        "field": "category_Code",
-                        "editable": true,
+                        "field": "category_Code"
                     }, {
                         "headerName": "Category",
-                        "field": "category",
-                        "editable": true,
+                        "field": "category"
 
                     }, {
                         "headerName": "DisplayName",
-                        "field": "displayName",
-                        "editable": true,
+                        "field": "displayName"
                     },
                     // {
                     //     "headerName": "Supergroup_A_ID",
@@ -79,18 +76,15 @@
                     {
                         "headerName": "Department",
                         "field": "department_ID",
-                        "dropdownName": "departmentName",
-                        "cellRendererFramework": "DropDown",
+                        "dropdownName": "departmentName"
                     }, {
                         "headerName": "Subdepartment",
                         "field": "subdepartment_ID",
-                        "cellRendererFramework": "DropDown",
-                        "dropdownName": "subdepartmentName"
+                        "cellRendererFramework": "DropDown"
                     }, {
                         "headerName": "Planogram",
                         "field": "planogram_ID",
-                        "cellRendererFramework": "DropDown",
-                        "dropdownName": "planogramName",
+                        "cellRendererFramework": "DropDown"
                     }
                 ],
                 filterText: '',
