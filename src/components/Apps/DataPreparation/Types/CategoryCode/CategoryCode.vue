@@ -7,9 +7,7 @@
                 @input="onFilterTextBoxChanged" v-model="filterText">
             </v-text-field>
             <v-spacer></v-spacer>
-            <v-btn color="primary" @click="openDefaultDialog">
-                set default
-            </v-btn>
+
             <v-btn dark @click="openAdd" color="primary" class="my-0">
                 <v-icon>add</v-icon>
             </v-btn>
@@ -24,14 +22,12 @@
         </div>
         <Dialog ref="Dialog" />
         <addModal ref="addModal" />
-        <DefaultModal ref="DefaultModal" />
 
     </div>
 </template>
 
 <script>
     import DropDown from "./DropDown"
-    import DefaultModal from "./DefaultModal"
     import Axios from 'axios'
     import {
         AgGridVue
@@ -49,13 +45,23 @@
             Dialog,
             addModal,
             DropDown,
-            DefaultModal
+
         },
         data() {
             return {
                 DefaultText: "sdxsddd",
                 defaultDialog: false,
                 headers: [{
+                        "headerName": "Department",
+                        "field": "department_ID",
+                        "dropdownName": "departmentName",
+                        "cellRendererFramework": "DropDown",
+                    }, {
+                        "headerName": "Subdepartment",
+                        "field": "subdepartment_ID",
+                        "cellRendererFramework": "DropDown",
+                        "dropdownName": "subdepartmentName"
+                    }, {
                         "headerName": "Category_Code",
                         "field": "category_Code",
                         "editable": true,
@@ -77,20 +83,14 @@
                     //     "field": "supergroup_B_ID"
                     // },
                     {
-                        "headerName": "Department",
-                        "field": "department_ID",
-                        "dropdownName": "departmentName",
-                        "cellRendererFramework": "DropDown",
-                    }, {
-                        "headerName": "Subdepartment",
-                        "field": "subdepartment_ID",
-                        "cellRendererFramework": "DropDown",
-                        "dropdownName": "subdepartmentName"
-                    }, {
                         "headerName": "Planogram",
                         "field": "planogram_ID",
                         "cellRendererFramework": "DropDown",
                         "dropdownName": "planogramName",
+                    }, {
+                        "headerName": "Planogram Import Name",
+                        "field": "default_Planogram",
+                        "editable": true,
                     }
                 ],
                 filterText: '',
@@ -128,6 +128,20 @@
             // });
         },
         methods: {
+            UpdateLine(params) {
+                let self = this
+                console.log("[UPDATING]");
+
+                let item = params.data
+                let node = params.node
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `Retailer/Category_Link/Default`, item).then(r => {
+                    console.log(r);
+                    self.getItems()
+                    delete Axios.defaults.headers.common["TenantID"];
+                })
+            },
             assignDefaults() {
                 let self = this
             },
@@ -135,7 +149,7 @@
                 let self = this
                 console.log("show");
 
-              self.$refs.DefaultModal.show()
+                self.$refs.DefaultModal.show()
             },
             GetPlanograms() {
                 let self = this
@@ -212,37 +226,37 @@
                         callback(r.data)
                     })
             },
-            UpdateLine(item) {
-                let self = this
+            // UpdateLine(item) {
+            //     let self = this
 
-                self.$nextTick(() => {
-                    let tmp = item.data
-                    let node = item.node
-                    console.log("[UPDATElINE]");
+            //     self.$nextTick(() => {
+            //         let tmp = item.data
+            //         let node = item.node
+            //         console.log("[UPDATElINE]");
 
-                    self.checkUniqueCode(tmp, callback => {
-                        console.log(callback);
-                        if (callback != null) {
-                            self.$refs.Dialog.openDialog({
-                                headline: "Duplicate Category Code",
-                                text: "Please Use a different Category Code"
-                            })
-                        } else {
-                            self.SaveEntry(tmp, saveCallback => {
-                                console.log(saveCallback);
-                                node.setData(saveCallback)
-                            })
-                        }
+            //         self.checkUniqueCode(tmp, callback => {
+            //             console.log(callback);
+            //             if (callback != null) {
+            //                 self.$refs.Dialog.openDialog({
+            //                     headline: "Duplicate Category Code",
+            //                     text: "Please Use a different Category Code"
+            //                 })
+            //             } else {
+            //                 self.SaveEntry(tmp, saveCallback => {
+            //                     console.log(saveCallback);
+            //                     node.setData(saveCallback)
+            //                 })
+            //             }
 
-                    })
-                })
+            //         })
+            //     })
 
-                // tmp.id = data.store_Planogram.id
-                // tmp.heightFit = data.store_Planogram.heightFit;
-                // tmp.modulesFit = data.store_Planogram.modulesFit;
-                // tmp.fits = data.store_Planogram.fits;
-                // node.setData(tmp)
-            },
+            // tmp.id = data.store_Planogram.id
+            // tmp.heightFit = data.store_Planogram.heightFit;
+            // tmp.modulesFit = data.store_Planogram.modulesFit;
+            // tmp.fits = data.store_Planogram.fits;
+            // node.setData(tmp)
+            // },
             onFilterTextBoxChanged() {
                 let self = this;
                 self.gridApi.setQuickFilter(self.filterText);
