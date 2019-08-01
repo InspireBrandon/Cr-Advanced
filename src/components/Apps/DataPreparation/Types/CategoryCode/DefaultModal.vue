@@ -16,10 +16,11 @@
             </v-toolbar>
             <v-toolbar dark flat dense color="grey darken-3">
                 <v-toolbar-items>
-                    <v-text-field style="margin-top: -6px;" hide-details placeholder="search" append-icon="search"></v-text-field>
+                    <v-text-field style="margin-top: -6px;" hide-details placeholder="search" append-icon="search"
+                        @input="onFilterTextBoxChanged" v-model="filterText"></v-text-field>
                 </v-toolbar-items>
                 <v-spacer />
-                <v-btn color="success" @click="assignDefaults">
+                <v-btn color="success" @click="''">
                     assign defaults
                 </v-btn>
             </v-toolbar>
@@ -45,6 +46,7 @@
         },
         data() {
             return {
+                filterText: null,
                 rowData: [],
                 dialog: false,
                 headers: [{
@@ -87,7 +89,10 @@
             self.getData()
         },
         methods: {
-
+            onFilterTextBoxChanged() {
+                let self = this;
+                self.gridApi.setQuickFilter(self.filterText);
+            },
             show() {
                 let self = this
                 console.log("show");
@@ -114,13 +119,18 @@
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
-            assignDefaults() {
+            UpdateLine(params) {
                 let self = this
+                console.log("[UPDATING]");
+                
+                let item = params.data
+                let node = params.node
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.post(process.env.VUE_APP_API + `Retailer/Category_Link/Default`, self.rowData).then(r => {
+                Axios.post(process.env.VUE_APP_API + `Retailer/Category_Link/Default`, item).then(r => {
                     console.log(r);
-                    self.getData()
+           
+                    node.setData(r.data)
                     delete Axios.defaults.headers.common["TenantID"];
                 })
             },
