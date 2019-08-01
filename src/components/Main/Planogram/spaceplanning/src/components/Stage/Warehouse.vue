@@ -809,26 +809,31 @@
                 self.setRangingClusterData(r.data.clusterData);
 
                 self.rangingController = new RangingController(r.data);
-                if (self.selectedClusterType != null && self.selectedClusterOption != null) {
-                  self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self.selectedClusterOption);
 
-                  self.ais_Sales = 0;
-                  self.ais_SalesPotential = 0;
+                self.rangingController.getSalesMonthlyTotals(() => {
+                  if (self.selectedClusterType != null && self.selectedClusterOption != null) {
+                    self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType,
+                      self.selectedClusterOption);
 
-                  self.products.forEach(el => {
-                    if (el.store_Range_Indicator == "YES") {
-                      self.ais_Sales = (parseFloat(self.ais_Sales) + ((parseFloat(el.sales_Retail) /
-                        4) / self.storeCount)).toFixed(2);
-                      self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + ((parseFloat(el
-                        .sales_potential) / 4)) / self.storeCount).toFixed(2);
-                    }
-                  })
+                    self.ais_Sales = 0;
+                    self.ais_SalesPotential = 0;
 
-                  self.storeCount = self.rangingController.getStoreCountByCluster(self.selectedClusterType, self
-                    .selectedClusterOption);
-                  self.$store.commit("setCurrentStoreCount", self.storeCount);
-                }
-                self.gotData = true;
+                    self.products.forEach(el => {
+                      if (el.store_Range_Indicator == "YES") {
+                        self.ais_Sales = (parseFloat(self.ais_Sales) + ((parseFloat(el.sales_Retail) /
+                          4) / self.storeCount)).toFixed(2);
+                        self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + ((parseFloat(el
+                          .sales_potential) / 4)) / self.storeCount).toFixed(2);
+                      }
+                    })
+
+                    self.storeCount = self.rangingController.getStoreCountByCluster(self.selectedClusterType,
+                      self
+                      .selectedClusterOption);
+                    self.$store.commit("setCurrentStoreCount", self.storeCount);
+                  }
+                  self.gotData = true;
+                })
               } else {
                 alert("Failed to get Range Data.");
               }
@@ -950,63 +955,72 @@
                 self.getCategoryCluster(r.data.planogramID)
                 self.gotData = true;
                 self.rangingController = new RangingController(r.data);
-                self.selectedClusterType = clusterData.clusterType;
-                self.$store.commit("setClusterName", clusterData.storeCluster);
-                self.$store.commit("setClusterType", clusterData.clusterType);
-                self.$store.commit("setClusterID", clusterData.clusterID);
-                self.$store.commit("setDaysBetween", (r.data.monthsBetween * 30));
 
-                self.rangingData.dateFromString = clusterData.dateFromString;
-                self.rangingData.dateToString = clusterData.dateToString;
-                self.rangingData.monthsBetween = clusterData.monthsBetween;
-                self.rangingData.periodic = clusterData.periodic;
-                self.rangingData.planogramID = clusterData.planogramID;
-                self.rangingData.planogramName = clusterData.planogramName;
-                self.rangingData.tag = clusterData.tag;
-                self.selectedFixtureType = clusterData.fixtureType;
+                self.rangingController.getSalesMonthlyTotals(() => {
+                  self.selectedClusterType = clusterData.clusterType;
+                  self.$store.commit("setClusterName", clusterData.storeCluster);
+                  self.$store.commit("setClusterType", clusterData.clusterType);
+                  self.$store.commit("setClusterID", clusterData.clusterID);
+                  self.$store.commit("setDaysBetween", (r.data.monthsBetween * 30));
 
-                if (clusterData.storeID != null || clusterData.storeID != undefined) {
+                  self.rangingData.dateFromString = clusterData.dateFromString;
+                  self.rangingData.dateToString = clusterData.dateToString;
+                  self.rangingData.monthsBetween = clusterData.monthsBetween;
+                  self.rangingData.periodic = clusterData.periodic;
+                  self.rangingData.planogramID = clusterData.planogramID;
+                  self.rangingData.planogramName = clusterData.planogramName;
+                  self.rangingData.tag = clusterData.tag;
+                  self.selectedFixtureType = clusterData.fixtureType;
 
-                  self.getStores()
-                  self.selectedClusterType = "stores"
-                  // self.clusterOptions[stores]=clusterData.storeID
+                  if (clusterData.storeID != null || clusterData.storeID != undefined) {
 
-                  self.selectedClusterOption = clusterData.storeID
+                    self.getStores()
+                    self.selectedClusterType = "stores"
+                    // self.clusterOptions[stores]=clusterData.storeID
 
-                  self.onClusterOptionChange()
-                }
-                self.updateLoader({
-                  text1: "Rendering Planogram"
-                })
-                setTimeout(() => {
-                  if (clusterData.clusterType != null && clusterData.storeID == null || clusterData
-                    .clusterType !=
-                    undefined && clusterData.storeID == undefined) {
-                    self.selectedClusterOption = clusterData.clusterID;
+                    self.selectedClusterOption = clusterData.storeID
 
-                    self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType,
-                      self
-                      .selectedClusterOption);
-
-                    self.storeCount = self.rangingController.getStoreCountByCluster(self.selectedClusterType,
-                      self.selectedClusterOption);
-                    self.$store.commit("setCurrentStoreCount", self.storeCount);
-
-                    self.ais_Sales = 0;
-                    self.ais_SalesPotential = 0;
-
-                    self.products.forEach(el => {
-                      if (el.store_Range_Indicator == "YES") {
-                        self.ais_Sales = (parseFloat(self.ais_Sales) + ((parseFloat(el.sales_Retail) /
-                          4) / self.storeCount)).toFixed(2);
-                        self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + ((parseFloat(el
-                          .sales_potential) / 4)) / self.storeCount).toFixed(2);
-                      }
-                    })
+                    self.onClusterOptionChange()
                   }
-                  self.$refs.SizeLoader.close()
-                  updatePlanoDataCallback(self.products);
-                }, 2000)
+
+                  self.updateLoader({
+                    text1: "Rendering Planogram"
+                  })
+
+                  setTimeout(() => {
+                    if (clusterData.clusterType != null && clusterData.storeID == null || clusterData
+                      .clusterType !=
+                      undefined && clusterData.storeID == undefined) {
+                      self.selectedClusterOption = clusterData.clusterID;
+
+                      self.products = self.rangingController.getSalesDataByCluster(self
+                        .selectedClusterType,
+                        self
+                        .selectedClusterOption);
+
+                      self.storeCount = self.rangingController.getStoreCountByCluster(self
+                        .selectedClusterType,
+                        self.selectedClusterOption);
+                      self.$store.commit("setCurrentStoreCount", self.storeCount);
+
+                      self.ais_Sales = 0;
+                      self.ais_SalesPotential = 0;
+
+                      self.products.forEach(el => {
+                        if (el.store_Range_Indicator == "YES") {
+                          self.ais_Sales = (parseFloat(self.ais_Sales) + ((parseFloat(el
+                            .sales_Retail) /
+                            4) / self.storeCount)).toFixed(2);
+                          self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + ((
+                            parseFloat(el
+                              .sales_potential) / 4)) / self.storeCount).toFixed(2);
+                        }
+                      })
+                    }
+                    self.$refs.SizeLoader.close()
+                    updatePlanoDataCallback(self.products);
+                  }, 2000)
+                })
               })
               .catch(e => {
                 alert("Failed to get range file from server");

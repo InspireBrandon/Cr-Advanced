@@ -16,13 +16,12 @@
         "field": "brand",
         "editable": true,
         "hide": true,
-        "enableRowGroup": true
+        "chartDataType": "category"
     },
     {
         "headerName": "Manufacturer",
         "field": "manufacturer",
         "hide": true,
-        "enableRowGroup": true,
         "chartDataType": "category"
     },
     {
@@ -150,7 +149,6 @@
         "headerName": "Sales",
         "field": "sales_Retail",
         "hide": true,
-        "aggFunc": "sum",
         "chartDataType": "series"
     },
     {

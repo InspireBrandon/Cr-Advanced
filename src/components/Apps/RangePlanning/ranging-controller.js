@@ -21,18 +21,16 @@ class RangingController {
     self.periodic = rangingData.periodic;
     self.monthsBetween = rangingData.monthsBetween;
     self.tag = rangingData.tag;
-
-    self.getSalesMonthlyTotals(rangingData.dateFrom, rangingData.dateTo, totalsData => {
-      self.totalsData = totalsData.sales_Monthly_Total_List;
-      console.log("[Total Sales Data]", self.totalsData);
-    })
+    self.totalsData = null;
   }
 
-  getSalesMonthlyTotals(data_from, date_to, callback) {
+  getSalesMonthlyTotals(callback) {
+    let self = this;
     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-    Axios.post(process.env.VUE_APP_API + `Sales_Monthly_Total?period_from_id=${data_from}&period_to_id=${date_to}`).then(r => {
-      callback(r.data);
+    Axios.post(process.env.VUE_APP_API + `Sales_Monthly_Total?period_from_id=${self.dateFrom}&period_to_id=${self.dateTo}`).then(r => {
+      self.totalsData = r.data.sales_Monthly_Total_List;
+      callback();
     })
   }
 
@@ -876,7 +874,7 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
       sales_retail: parseFloat(sales_retail.toFixed(2)),
       sales_cost: sales_cost.toFixed(2),
       sales_units: parseFloat(sales_units.toFixed(0)),
-      sales_profit: sales_profit.toFixed(2),
+      sales_profit: parseFloat(sales_profit.toFixed(2)),
       number_distribution: number_distribution.toFixed(2),
       weighted_distribution: weighted_distribution.toFixed(2),
       sales_potential: parseFloat(sales_potential.toFixed(2)),
@@ -887,7 +885,7 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
       sales_potential_rank: sales_potential_rank,
       volume_potential_rank: volume_potential_rank,
       dos_fac: dos_fac.toFixed(1),
-      gross_profit: gross_profit.toFixed(2),
+      gross_profit: parseFloat(gross_profit.toFixed(2)),
       markup: markup.toFixed(2),
       sales_contribution: parseFloat(sales_contribution.toFixed(0)),
       units_contribution: parseFloat(units_contribution.toFixed(0)),
@@ -1005,7 +1003,7 @@ function RangeProduct(productData, salesData, indicator) {
   self.item_sales_rank = salesData.item_sales_rank
   self.item_profit_rank = salesData.item_profit_rank
   self.dos_fac = salesData.dos_fac;
-  self.gross_profit = (isNaN(salesData.gross_profit) ? 0 : salesData.gross_profit) + "%";
+  self.gross_profit = (isNaN(salesData.gross_profit) ? 0 : salesData.gross_profit);
   self.markup = (isNaN(salesData.markup) ? 0 : salesData.markup) + "%";
   self.store_Range_Indicator = indicator;
   self.sales_contribution = salesData.sales_contribution;

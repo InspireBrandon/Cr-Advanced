@@ -276,9 +276,9 @@
             'audit-image-breach': function (params) {
 
             },
-            // 'auto-range-item': function (params) {
-            //   return params.data.autoRangeItem == undefined ? false : params.data.autoRangeItem;
-            // }
+            'auto-range-item': function (params) {
+              return params.data.autoRangeItem == undefined ? false : params.data.autoRangeItem;
+            }
           },
         },
         autoRangeData: {
@@ -381,26 +381,29 @@
               self.canRefresh = true;
 
               self.rangingController = new RangingController(r.data);
-              self.setRangingClusterData(r.data.clusterData);
-              if (self.selectedClusterType != null && self.selectedClusterOption != null) {
-                self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
-                  .selectedClusterOption);
 
-                self.ais_Sales = 0;
-                self.ais_SalesPotential = 0;
+              self.rangingController.getSalesMonthlyTotals(() => {
+                self.setRangingClusterData(r.data.clusterData);
+                if (self.selectedClusterType != null && self.selectedClusterOption != null) {
+                  self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
+                    .selectedClusterOption);
 
-                self.rowData.forEach(el => {
-                  if (el.store_Range_Indicator == "YES") {
-                    self.ais_Sales = (parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)).toFixed(2);
-                    self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + parseFloat(el
-                      .sales_potential)).toFixed(2);
-                  }
-                })
+                  self.ais_Sales = 0;
+                  self.ais_SalesPotential = 0;
 
-                self.fitColumns();
-              }
-              self.$refs.spinner.hide();
-              self.gotData = true
+                  self.rowData.forEach(el => {
+                    if (el.store_Range_Indicator == "YES") {
+                      self.ais_Sales = (parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)).toFixed(2);
+                      self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + parseFloat(el
+                        .sales_potential)).toFixed(2);
+                    }
+                  })
+
+                  self.fitColumns();
+                }
+                self.$refs.spinner.hide();
+                self.gotData = true
+              })
             })
 
         }
@@ -457,27 +460,32 @@
               )
               .then(r => {
                 self.rangingController = new RangingController(r.data);
-                self.setRangingClusterData(r.data.clusterData);
-                if (self.selectedClusterType != null && self.selectedClusterOption != null) {
-                  self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
-                    .selectedClusterOption);
 
-                  self.ais_Sales = 0;
-                  self.ais_SalesPotential = 0;
+                self.rangingController.getSalesMonthlyTotals(() => {
+                  self.setRangingClusterData(r.data.clusterData);
+                  if (self.selectedClusterType != null && self.selectedClusterOption != null) {
+                    self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType,
+                      self
+                      .selectedClusterOption);
 
-                  self.rowData.forEach(el => {
-                    if (el.store_Range_Indicator == "YES") {
-                      self.ais_Sales = (parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)).toFixed(
-                        2);
-                      self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + parseFloat(el
-                        .sales_potential)).toFixed(2);
-                    }
-                  })
+                    self.ais_Sales = 0;
+                    self.ais_SalesPotential = 0;
 
-                  self.fitColumns();
-                }
-                self.$refs.spinner.hide();
-                self.gotData = true
+                    self.rowData.forEach(el => {
+                      if (el.store_Range_Indicator == "YES") {
+                        self.ais_Sales = (parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail))
+                          .toFixed(
+                            2);
+                        self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + parseFloat(el
+                          .sales_potential)).toFixed(2);
+                      }
+                    })
+
+                    self.fitColumns();
+                  }
+                  self.$refs.spinner.hide();
+                  self.gotData = true
+                })
               })
           })
         })
@@ -529,26 +537,31 @@
               self.canRefresh = true;
 
               self.rangingController = new RangingController(r.data);
-              self.setRangingClusterData(r.data.clusterData);
-              if (self.selectedClusterType != null && self.selectedClusterOption != null) {
-                self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
-                  .selectedClusterOption);
 
-                self.ais_Sales = 0;
-                self.ais_SalesPotential = 0;
+              self.rangingController.getSalesMonthlyTotals(() => {
 
-                self.rowData.forEach(el => {
-                  if (el.store_Range_Indicator == "YES") {
-                    self.ais_Sales = (parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)).toFixed(2);
-                    self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + parseFloat(el
-                      .sales_potential)).toFixed(2);
-                  }
-                })
+                self.setRangingClusterData(r.data.clusterData);
+                if (self.selectedClusterType != null && self.selectedClusterOption != null) {
+                  self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
+                    .selectedClusterOption);
 
-                self.fitColumns();
-              }
-              self.$refs.SizeLoader.close()
-              self.gotData = true
+                  self.ais_Sales = 0;
+                  self.ais_SalesPotential = 0;
+
+                  self.rowData.forEach(el => {
+                    if (el.store_Range_Indicator == "YES") {
+                      self.ais_Sales = (parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)).toFixed(
+                        2);
+                      self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + parseFloat(el
+                        .sales_potential)).toFixed(2);
+                    }
+                  })
+
+                  self.fitColumns();
+                }
+                self.$refs.SizeLoader.close()
+                self.gotData = true
+              })
             })
         })
       },
@@ -577,27 +590,34 @@
               `RangingAdvanced?planogramID=${self.fileData.planogramID}&dateFromID=${self.fileData.dateFrom}&dateToID=${self.fileData.dateTo}`
             )
             .then(r => {
+              r.data["dateFrom"] = self.fileData.dateFrom;
+              r.data["dateTo"] = self.fileData.dateTo;
+
               self.rangingController = new RangingController(r.data);
-              self.setRangingClusterData(r.data.clusterData);
-              if (self.selectedClusterType != null && self.selectedClusterOption != null) {
-                self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
-                  .selectedClusterOption);
 
-                self.ais_Sales = 0;
-                self.ais_SalesPotential = 0;
+              self.rangingController.getSalesMonthlyTotals(() => {
+                self.setRangingClusterData(r.data.clusterData);
+                if (self.selectedClusterType != null && self.selectedClusterOption != null) {
+                  self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
+                    .selectedClusterOption);
 
-                self.rowData.forEach(el => {
-                  if (el.store_Range_Indicator == "YES") {
-                    self.ais_Sales = (parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)).toFixed(2);
-                    self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + parseFloat(el
-                      .sales_potential)).toFixed(2);
-                  }
-                })
+                  self.ais_Sales = 0;
+                  self.ais_SalesPotential = 0;
 
-                self.fitColumns();
-              }
-              self.$refs.spinner.hide();
-              self.gotData = true
+                  self.rowData.forEach(el => {
+                    if (el.store_Range_Indicator == "YES") {
+                      self.ais_Sales = (parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)).toFixed(
+                        2);
+                      self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + parseFloat(el
+                        .sales_potential)).toFixed(2);
+                    }
+                  })
+
+                  self.fitColumns();
+                }
+                self.$refs.spinner.hide();
+                self.gotData = true
+              })
             })
         })
       },
@@ -1007,31 +1027,30 @@
         let self = this;
 
         self.$refs.GraphConfigurationModal.show(graph_config => {
+
+          self.columnApi.setColumnVisible(graph_config.selected_fact, true);
+          self.columnApi.setColumnVisible(graph_config.selected_graph, true);
+
           var params = {
             cellRange: {
-              columns: ["sales_Retail", "manufacturer"]
+              columns: [graph_config.selected_fact, graph_config.selected_graph]
             },
-            chartType: "line",
+            aggregate: true,
+            chartType: graph_config.selected_graph_type,
             processChartOptions: function (params) {
               let opts = params.options;
+
               opts.title = {
-                text: "Product Sales"
+                text: graph_config.graphName
               };
-              opts.xAxis.labelRotation = 30;
-              opts.aggregate = true;
-              opts.suppressChartRanges = true;
-              opts.seriesDefaults.tooltipRenderer = function (params) {
-                let titleStyle = params.color ? ' style="color: white; background-color:' + params.color +
-                  '"' : "";
-                let title = params.title ? '<div class="title"' + titleStyle + ">" + params.title + "</div>" :
-                  "";
-                let value = params.datum[params.yField].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
-                return title + '<div class="content" style="text-align: center">' + value + "</div>";
-              };
+
               return opts;
             }
           };
+
           this.gridApi.chartRange(params);
+          self.columnApi.setColumnVisible(graph_config.selected_fact, false);
+          self.columnApi.setColumnVisible(graph_config.selected_graph, false);
         });
       },
       openAutoRangeModal() {
@@ -1045,7 +1064,9 @@
       openReport() {
         let self = this;
 
-        self.$refs.RangingReportModal.show(null);
+        let reportObj = self.calculateReport();
+
+        self.$refs.RangingReportModal.show(reportObj);
       },
       calculateAutoRange() {
         let self = this;
@@ -1062,7 +1083,7 @@
         let partOfRange = true;
         let config = self.autoRangeData;
 
-        if(!config.audit && product.imageAudit) {
+        if (!config.audit && product.imageAudit) {
           partOfRange = false;
         }
 
@@ -1115,7 +1136,7 @@
         let diff = allProducts.length - sortedCount;
         let partOfRange = false;
 
-        for (var i = allProducts.length - 1; i > diff; i--) {
+        for (var i = allProducts.length - 1; i >= diff; i--) {
           let item = sorted[i];
           if (item.barcode == product.barcode) {
             partOfRange = true;
@@ -1123,8 +1144,86 @@
         }
 
         return partOfRange;
+      },
+      calculateReport() {
+        let self = this;
+        let reportObj = new RangeReports(self.rowData);
+        return reportObj;
       }
     }
+  }
+
+  function RangeReports(rangingData) {
+    let self = this;
+    self.current = new RangeReport(rangingData, 'current');
+    self.potential = new RangeReport(rangingData, 'potential');
+  }
+
+  function RangeReport(data, type) {
+    let self = this;
+    self.type = type;
+    self.sales = new RangeReportRow(data, type, 'sales');
+    self.units = new RangeReportRow(data, type, 'units');
+    self.profit = new RangeReportRow(data, type, 'profit');
+    self.item_count = new RangeReportRow(data, type, 'item_count');
+    self.gross_profit = new RangeReportRow(data, type, 'gross_profit');
+    self.stock_on_hand_units = new RangeReportRow(data, type, 'stock_on_hand_units');
+    self.stock_on_hand_cost = new RangeReportRow(data, type, 'stock_on_hand_cost');
+  }
+
+  function RangeReportRow(rowData, report_type, type) {
+    let self = this;
+    self.total_category = 0;
+    self.items_selected = 0;
+    self.selected_stores = rowData.selected_stores;
+    self.discontinued = rowData.discontinued;
+
+    rowData.forEach(productData => {
+      switch (type) {
+        case 'sales': {
+          self.total_category += (report_type == 'current' ? parseFloat(productData.sales_Retail.toFixed(2)) : parseFloat(productData.sales_potential.toFixed(2)));
+
+          if(productData.store_Range_Indicator == 'YES')
+            self.items_selected += (report_type == 'current' ? parseFloat(productData.sales_Retail.toFixed(2)) : parseFloat(productData.sales_potential.toFixed(2)));
+        }
+        break;
+        case 'units': {
+          self.total_category += (report_type == 'current' ? parseFloat(productData.sales_Units.toFixed(2)) : parseFloat(productData.sales_Units.toFixed(2)));
+
+          if(productData.store_Range_Indicator == 'YES')
+            self.items_selected += (report_type == 'current' ? parseFloat(productData.sales_Units.toFixed(2)) : parseFloat(productData.sales_Units.toFixed(2)));
+        }
+        break;
+        case 'profit': {
+          self.total_category += (report_type == 'current' ? parseFloat(productData.sales_Profit.toFixed(2)) : parseFloat(productData.sales_Profit.toFixed(2)));
+
+          if(productData.store_Range_Indicator == 'YES')
+            self.items_selected += (report_type == 'current' ? parseFloat(productData.sales_Profit.toFixed(2)) : parseFloat(productData.sales_Profit.toFixed(2)));
+        }
+        break;
+        case 'item_count': {
+
+        }
+        break;
+        case 'gross_profit': {
+
+        }
+        break;
+        case 'stock_on_hand_units': {
+
+        }
+        break;
+        case 'stock_on_hand_cost': {
+
+        }
+        break;
+        }
+    })
+
+    self.total_category = self.total_category.toFixed(2);
+    self.items_selected = self.items_selected.toFixed(2);
+    // self.selected_stores = self.selected_stores.toFixed(2);    
+    // self.discontinued = self.discontinued.toFixed(2);    
   }
 </script>
 

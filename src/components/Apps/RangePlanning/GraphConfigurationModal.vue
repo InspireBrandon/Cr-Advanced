@@ -12,19 +12,19 @@
                 <v-card-text>
                     <v-layout row wrap>
                         <v-flex md12>
-                            <v-select :items="facts" v-model="selected_fact" label="Fact:"></v-select>
+                            <v-select return-object :items="facts" v-model="selected_fact" label="Fact:"></v-select>
                         </v-flex>
                         <v-flex md12>
-                            <v-select @change="on_selected_graph_change" :items="graphs" v-model="selected_graph" label="Graph:"></v-select>
+                            <v-select return-object @change="on_selected_graph_change" :items="graphs" v-model="selected_graph" label="Graph:"></v-select>
                         </v-flex>
                         <v-flex md12>
                             <v-radio-group v-if="selected_graph != null && selected_graph == 'Pareto'" v-model="selected_graph_type" label="Type">
-                                <v-radio color="primary" value="Pareto" disabled label="Pareto">
+                                <v-radio color="primary" value="pareto" disabled label="Pareto">
                                 </v-radio>
                             </v-radio-group>
                             <v-radio-group  v-if="selected_graph != null && selected_graph != 'Pareto'" v-model="selected_graph_type" label="Type">
-                                <v-radio color="primary" value="Pie" label="Pie"></v-radio>
-                                <v-radio color="primary" value="Bar" label="Bar"></v-radio>
+                                <v-radio color="primary" value="pie" label="Pie"></v-radio>
+                                <v-radio color="primary" value="bar" label="Bar"></v-radio>
                             </v-radio-group>
                         </v-flex>
                     </v-layout>
@@ -46,11 +46,23 @@
         data() {
             return {
                 dialog: false,
-                facts: ['Sales', 'Units', 'Profit', 'Stock On Hand - Units', 'Stock On Hand - Cost', 'GP%'],
+                facts: [
+                    { text: 'Sales', value: 'sales_Retail' }, 
+                    { text: 'Units', value: 'sales_Units' }, 
+                    { text: 'Profit', value: 'sales_Profit' }, 
+                    { text: 'Stock On Hand - Units', value: 'stock_on_hand_units' }, 
+                    { text: 'Stock On Hand - Cost', value: 'stock_on_hand_cost' }, 
+                    { text:'GP%', value: 'gross_profit' }],
                 selected_fact: null,
-                graphs: ['Pareto', 'By Manufacturer', 'By Brand', 'By Category', 'By Subcategory', 'By Segment', 'by Size Description'],
+                graphs: [{ text: 'Pareto', value: 'Pareto'}, 
+                        { text: 'By Manufacturer', value: 'manufacturer'}, 
+                        { text: 'By Brand', value: 'brand' }, 
+                        { text: 'By Category', value: 'category' }, 
+                        { text: 'By Subcategory', value: 'subcategory'}, 
+                        { text: 'By Segment', value: 'segment' }, 
+                        { text: 'by Size Description', value: 'size_Description' }],
                 selected_graph: null,
-                selected_graph_type: 'Pareto'
+                selected_graph_type: 'pareto'
             }
         },
         methods: {
@@ -64,9 +76,9 @@
 
                 self.$nextTick(() => {
                     if(self.selected_graph == 'Pareto') {
-                        self.selected_graph_type = 'Pareto';
+                        self.selected_graph_type = 'pareto';
                     } else {
-                        self.selected_graph_type = 'Pie';
+                        self.selected_graph_type = 'pie';
                     }
                 })
             },
@@ -75,9 +87,10 @@
                 self.dialog = false;
 
                 let graphConfiguration = {
-                    selected_fact: self.selected_fact,
-                    selected_graph: self.selected_graph,
-                    selected_graph_type: self.selected_graph_type
+                    selected_fact: self.selected_fact.value,
+                    selected_graph: self.selected_graph.value,
+                    selected_graph_type: self.selected_graph_type,
+                    graphName: self.selected_fact.text + " " + self.selected_graph.text
                 }
 
                 self.afterReturn(graphConfiguration);
