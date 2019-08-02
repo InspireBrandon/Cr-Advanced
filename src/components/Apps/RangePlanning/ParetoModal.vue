@@ -1,5 +1,5 @@
 <template>
-    <v-dialog persistent width=1000 v-model="dialog">
+    <v-dialog fullscreen persistent width=1000 v-model="dialog">
         <v-card >
             <v-toolbar dark dense flat color="primary">
                 <v-toolbar-title>
@@ -22,7 +22,6 @@
     import * as am4core from "@amcharts/amcharts4/core";
     import * as am4charts from "@amcharts/amcharts4/charts";
 
-
     import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 
     am4core.useTheme(am4themes_animated);
@@ -33,46 +32,22 @@
             }
         },
         mounted() {
-            this.drawChart()
         },
         methods: {
-            open() {
+            open(data, key_value) {
                 let self = this
                 self.dialog = true
+                self.drawChart(data, key_value);
             },
-            drawChart() {
+            drawChart(data, key_value) {
                 let chart = am4core.create("chartdiv", am4charts.XYChart);
                 chart.scrollbarX = new am4core.Scrollbar();
 
-                // Add data
-                chart.data = [{
-                    "country": "USA",
-                    "visits": 3025
-                }, {
-                    "country": "China",
-                    "visits": 1882
-                }, {
-                    "country": "Japan",
-                    "visits": 1809
-                }, {
-                    "country": "Germany",
-                    "visits": 1322
-                }, {
-                    "country": "UK",
-                    "visits": 1122
-                }, {
-                    "country": "France",
-                    "visits": 1114
-                }, {
-                    "country": "India",
-                    "visits": 984
-                }, {
-                    "country": "Spain",
-                    "visits": 711
-                }, {
-                    "country": "Netherlands",
-                    "visits": 665
-                },];
+                let sortedData = data.sort(function(a, b) {
+                    return b[key_value.value] - a[key_value.value];
+                })
+
+                chart.data = sortedData;
 
                 prepareParetoData();
 
@@ -80,13 +55,13 @@
                     let total = 0;
 
                     for (var i = 0; i < chart.data.length; i++) {
-                        let value = chart.data[i].visits;
+                        let value = chart.data[i][key_value.value];
                         total += value;
                     }
 
                     let sum = 0;
                     for (var i = 0; i < chart.data.length; i++) {
-                        let value = chart.data[i].visits;
+                        let value = chart.data[i][key_value.value];
                         sum += value;
                         chart.data[i].pareto = sum / total * 100;
                     }
@@ -94,7 +69,7 @@
 
                 // Create axes
                 let categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
-                categoryAxis.dataFields.category = "country";
+                categoryAxis.dataFields.category = key_value.key;
                 categoryAxis.renderer.grid.template.location = 0;
                 categoryAxis.renderer.minGridDistance = 60;
                 categoryAxis.tooltip.disabled = true;
@@ -107,8 +82,8 @@
                 // Create series
                 let series = chart.series.push(new am4charts.ColumnSeries());
                 series.sequencedInterpolation = true;
-                series.dataFields.valueY = "visits";
-                series.dataFields.categoryX = "country";
+                series.dataFields.valueY = key_value.value;
+                series.dataFields.categoryX = key_value.key;
                 series.tooltipText = "[{categoryX}: bold]{valueY}[/]";
                 series.columns.template.strokeWidth = 0;
 
@@ -141,7 +116,7 @@
 
                 let paretoSeries = chart.series.push(new am4charts.LineSeries())
                 paretoSeries.dataFields.valueY = "pareto";
-                paretoSeries.dataFields.categoryX = "country";
+                paretoSeries.dataFields.categoryX = key_value.key;
                 paretoSeries.yAxis = paretoValueAxis;
                 paretoSeries.tooltipText = "pareto: {valueY.formatNumber('#.0')}%[/]";
                 paretoSeries.bullets.push(new am4charts.CircleBullet());
@@ -159,6 +134,7 @@
 
 <style scoped>
     #chartdiv {
-       height:500px
+       height:90vh;
+       overflow-x: auto;
     }
 </style>

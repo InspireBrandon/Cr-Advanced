@@ -370,7 +370,8 @@
     methods: {
       openParetoModal(){
         let self = this
-        self.$refs.ParetoModal.open()
+
+        self.$refs.ParetoModal.open(self.rowData, { key: 'description', value: 'sales_Retail' });
       },
       checkparams() {
         let self = this
