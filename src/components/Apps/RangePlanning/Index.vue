@@ -116,6 +116,8 @@
           <v-spacer></v-spacer>
           <v-btn v-if="rowData.length>0" @click="openReport" color="primary" small dark>Report</v-btn>
           <v-btn v-if="rowData.length>0" @click="onChart1" color="primary" small dark>graphs</v-btn>
+          <v-btn  @click="openParetoModal" color="primary" small dark>Pareto</v-btn>
+         
           <v-menu offset-y>
             <v-btn :disabled="selectedItems.length == 0" slot="activator" color="primary" small dark>Set Indicator
             </v-btn>
@@ -183,6 +185,7 @@
     <AutoRangeModal ref="AutoRangeModal" />
     <RangingReportModal ref="RangingReportModal" />
     <GraphConfigurationModal ref="GraphConfigurationModal" />
+    <ParetoModal ref="ParetoModal" />
   </div>
 </template>
 
@@ -218,6 +221,8 @@
   import AutoRangeModal from './AutoRangeModal.vue';
   import RangingReportModal from './RangingReportModal.vue'
   import GraphConfigurationModal from './GraphConfigurationModal.vue'
+  import ParetoModal from './ParetoModal.vue'
+  
 
   import {
     AgGridVue
@@ -234,6 +239,7 @@
   export default {
     name: 'Ranging',
     components: {
+      ParetoModal,
       SizeLoader,
       YesNoModal,
       ProductMaintModal,
@@ -362,6 +368,10 @@
       self.checkparams()
     },
     methods: {
+      openParetoModal(){
+        let self = this
+        self.$refs.ParetoModal.open()
+      },
       checkparams() {
         let self = this
         if (self.$route.params != null) {
@@ -1047,7 +1057,8 @@
               return opts;
             }
           };
-
+          console.log(params);
+          
           this.gridApi.chartRange(params);
           self.columnApi.setColumnVisible(graph_config.selected_fact, false);
           self.columnApi.setColumnVisible(graph_config.selected_graph, false);
