@@ -762,6 +762,7 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
       weighted_distribution: weighted_distribution.toFixed(2),
       sales_potential: sales_potential.toFixed(2),
       volume_potential: volume_potential.toFixed(2),
+      profit_potential: profit_potential.toFixed(2),
       item_sales_rank: item_sales_rank,
       item_volume_rank: item_volume_rank,
       item_profit_rank: item_profit_rank,
@@ -878,7 +879,8 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
       number_distribution: number_distribution.toFixed(2),
       weighted_distribution: weighted_distribution.toFixed(2),
       sales_potential: parseFloat(sales_potential.toFixed(2)),
-      volume_potential: volume_potential.toFixed(2),
+      volume_potential: parseFloat(volume_potential.toFixed(2)),
+      profit_potential: parseFloat(profit_potential.toFixed(2)),
       item_sales_rank: item_sales_rank,
       item_volume_rank: item_volume_rank,
       item_profit_rank: item_profit_rank,
@@ -999,6 +1001,7 @@ function RangeProduct(productData, salesData, indicator) {
   self.weighted_Distribution = salesData.weighted_distribution + " %";
   self.sales_potential = salesData.sales_potential;
   self.volume_potential = salesData.volume_potential;
+  self.profit_potential = salesData.profit_potential;
   self.item_volume_rank = salesData.item_volume_rank
   self.item_sales_rank = salesData.item_sales_rank
   self.item_profit_rank = salesData.item_profit_rank

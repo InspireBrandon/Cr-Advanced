@@ -25,36 +25,36 @@
                                 <td>Category Sales</td>
                                 <td>{{ reportData.current.sales.total_category }}</td>
                                 <td>{{ reportData.current.sales.items_selected }}</td>
-                                <td></td>
-                                <td></td>
+                                <td>{{ reportData.current.sales.selected_stores }}</td>
+                                <td>{{ reportData.current.sales.discontinued }}</td>
                             </tr>
                             <tr>
                                 <td>Category Units</td>
                                 <td>{{ reportData.current.units.total_category }}</td>
                                 <td>{{ reportData.current.units.items_selected }}</td>
-                                <td></td>
-                                <td></td>
+                                <td>{{ reportData.current.units.selected_stores }}</td>
+                                <td>{{ reportData.current.units.discontinued }}</td>
                             </tr>
                             <tr>
                                 <td>Category Profit</td>
                                 <td>{{ reportData.current.profit.total_category }}</td>
                                 <td>{{ reportData.current.profit.items_selected }}</td>
-                                <td></td>
-                                <td></td>
+                                <td>{{ reportData.current.profit.selected_stores }}</td>
+                                <td>{{ reportData.current.profit.discontinued }}</td>
                             </tr>
                             <tr>
                                 <td>Item Count</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td>{{ reportData.current.item_count.total_category }}</td>
+                                <td>{{ reportData.current.item_count.items_selected }}</td>
+                                <td>{{ reportData.current.item_count.selected_stores }}</td>
+                                <td>{{ reportData.current.item_count.discontinued }}</td>
                             </tr>
                             <tr>
                                 <td>GP%</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td>{{ reportData.current.gross_profit.total_category }}</td>
+                                <td>{{ reportData.current.gross_profit.items_selected }}</td>
+                                <td>{{ reportData.current.gross_profit.selected_stores }}</td>
+                                <td>{{ reportData.current.gross_profit.discontinued }}</td>
                             </tr>
                             <tr>
                                 <td>Stock On Hand - Units</td>
@@ -86,38 +86,38 @@
                         <tbody>
                             <tr>
                                 <td>Potential Sales</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td>{{ reportData.potential.sales.total_category }}</td>
+                                <td>{{ reportData.potential.sales.items_selected }}</td>
+                                <td>{{ reportData.potential.sales.selected_stores }}</td>
+                                <td>{{ reportData.potential.sales.discontinued }}</td>
                             </tr>
                             <tr>
                                 <td>Potential Units</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td>{{ reportData.potential.units.total_category }}</td>
+                                <td>{{ reportData.potential.units.items_selected }}</td>
+                                <td>{{ reportData.potential.units.selected_stores }}</td>
+                                <td>{{ reportData.potential.units.discontinued }}</td>
                             </tr>
                             <tr>
                                 <td>Potential Profit</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td>{{ reportData.potential.profit.total_category }}</td>
+                                <td>{{ reportData.potential.profit.items_selected }}</td>
+                                <td>{{ reportData.potential.profit.selected_stores }}</td>
+                                <td>{{ reportData.potential.profit.discontinued }}</td>
                             </tr>
                             <tr>
                                 <td>Item Count</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td>{{ reportData.potential.item_count.total_category }}</td>
+                                <td>{{ reportData.potential.item_count.items_selected }}</td>
+                                <td>{{ reportData.potential.item_count.selected_stores }}</td>
+                                <td>{{ reportData.potential.item_count.discontinued }}</td>
                             </tr>
                             <tr>
                                 <td>GP%</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td>{{ reportData.potential.gross_profit.total_category }}</td>
+                                <td>{{ reportData.potential.gross_profit.items_selected }}</td>
+                                <td>{{ reportData.potential.gross_profit.selected_stores }}</td>
+                                <td>{{ reportData.potential.gross_profit.discontinued }}</td>
                             </tr>
                             <tr>
                                 <td>Stock On Hand - Units</td>

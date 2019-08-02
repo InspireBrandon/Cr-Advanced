@@ -1162,68 +1162,158 @@
   function RangeReport(data, type) {
     let self = this;
     self.type = type;
-    self.sales = new RangeReportRow(data, type, 'sales');
-    self.units = new RangeReportRow(data, type, 'units');
-    self.profit = new RangeReportRow(data, type, 'profit');
-    self.item_count = new RangeReportRow(data, type, 'item_count');
-    self.gross_profit = new RangeReportRow(data, type, 'gross_profit');
+
+
+    self.sales = new RangeReportRow(data, type, 'sales', 'money');
+    self.units = new RangeReportRow(data, type, 'units', 'number');
+    self.profit = new RangeReportRow(data, type, 'profit', 'money');
+    self.item_count = new RangeReportRow(data, type, 'item_count', 'number');
+    self.gross_profit = new RangeReportRow(data, type, 'gross_profit', 'percent');
     self.stock_on_hand_units = new RangeReportRow(data, type, 'stock_on_hand_units');
     self.stock_on_hand_cost = new RangeReportRow(data, type, 'stock_on_hand_cost');
   }
 
-  function RangeReportRow(rowData, report_type, type) {
+  function RangeReportRow(rowData, report_type, type, format) {
     let self = this;
     self.total_category = 0;
     self.items_selected = 0;
-    self.selected_stores = rowData.selected_stores;
-    self.discontinued = rowData.discontinued;
+    self.selected_stores = 0;
+    self.discontinued = 0;
 
     rowData.forEach(productData => {
       switch (type) {
         case 'sales': {
-          self.total_category += (report_type == 'current' ? parseFloat(productData.sales_Retail.toFixed(2)) : parseFloat(productData.sales_potential.toFixed(2)));
+          self.total_category += (report_type == 'current' ? parseFloat(productData.sales_Retail.toFixed(2)) :
+            parseFloat(productData.sales_potential.toFixed(2)));
 
-          if(productData.store_Range_Indicator == 'YES')
-            self.items_selected += (report_type == 'current' ? parseFloat(productData.sales_Retail.toFixed(2)) : parseFloat(productData.sales_potential.toFixed(2)));
+          if (productData.store_Range_Indicator == 'YES')
+            self.items_selected += (report_type == 'current' ? parseFloat(productData.sales_Retail.toFixed(2)) :
+              parseFloat(productData.sales_potential.toFixed(2)));
+
+          if (productData.store_Range_Indicator == 'SELECTED')
+            self.selected_stores += (report_type == 'current' ? parseFloat(productData.sales_Retail.toFixed(2)) :
+              parseFloat(productData.sales_potential.toFixed(2)));
+
+          if (productData.store_Range_Indicator == 'NO')
+            self.discontinued += (report_type == 'current' ? parseFloat(productData.sales_Retail.toFixed(2)) :
+              parseFloat(productData.sales_potential.toFixed(2)));
         }
         break;
-        case 'units': {
-          self.total_category += (report_type == 'current' ? parseFloat(productData.sales_Units.toFixed(2)) : parseFloat(productData.sales_Units.toFixed(2)));
+      case 'units': {
+        self.total_category += (report_type == 'current' ? parseFloat(productData.sales_Units.toFixed(2)) :
+          parseFloat(productData.volume_potential.toFixed(2)));
 
-          if(productData.store_Range_Indicator == 'YES')
-            self.items_selected += (report_type == 'current' ? parseFloat(productData.sales_Units.toFixed(2)) : parseFloat(productData.sales_Units.toFixed(2)));
-        }
-        break;
-        case 'profit': {
-          self.total_category += (report_type == 'current' ? parseFloat(productData.sales_Profit.toFixed(2)) : parseFloat(productData.sales_Profit.toFixed(2)));
+        if (productData.store_Range_Indicator == 'YES')
+          self.items_selected += (report_type == 'current' ? parseFloat(productData.sales_Units.toFixed(2)) :
+            parseFloat(productData.volume_potential.toFixed(2)));
 
-          if(productData.store_Range_Indicator == 'YES')
-            self.items_selected += (report_type == 'current' ? parseFloat(productData.sales_Profit.toFixed(2)) : parseFloat(productData.sales_Profit.toFixed(2)));
-        }
-        break;
-        case 'item_count': {
+        if (productData.store_Range_Indicator == 'SELECTED')
+          self.selected_stores += (report_type == 'current' ? parseFloat(productData.sales_Units.toFixed(2)) :
+            parseFloat(productData.volume_potential.toFixed(2)));
 
-        }
-        break;
-        case 'gross_profit': {
+        if (productData.store_Range_Indicator == 'NO')
+          self.discontinued += (report_type == 'current' ? parseFloat(productData.sales_Units.toFixed(2)) :
+            parseFloat(productData.volume_potential.toFixed(2)));
+      }
+      break;
+      case 'profit': {
+        self.total_category += (report_type == 'current' ? parseFloat(productData.sales_Profit.toFixed(2)) :
+          parseFloat(productData.profit_potential.toFixed(2)));
 
-        }
-        break;
-        case 'stock_on_hand_units': {
+        if (productData.store_Range_Indicator == 'YES')
+          self.items_selected += (report_type == 'current' ? parseFloat(productData.sales_Profit.toFixed(2)) :
+            parseFloat(productData.profit_potential.toFixed(2)));
 
-        }
-        break;
-        case 'stock_on_hand_cost': {
+        if (productData.store_Range_Indicator == 'SELECTED')
+          self.selected_stores += (report_type == 'current' ? parseFloat(productData.sales_Profit.toFixed(2)) :
+            parseFloat(productData.profit_potential.toFixed(2)));
 
-        }
-        break;
-        }
+        if (productData.store_Range_Indicator == 'NO')
+          self.discontinued += (report_type == 'current' ? parseFloat(productData.sales_Profit.toFixed(2)) :
+            parseFloat(productData.profit_potential.toFixed(2)));
+      }
+      break;
+      case 'item_count': {
+        self.total_category = rowData.length;
+
+        if (productData.store_Range_Indicator == 'YES')
+          self.items_selected += 1;
+
+        if (productData.store_Range_Indicator == 'SELECTED')
+          self.selected_stores += 1;
+
+        if (productData.store_Range_Indicator == 'NO')
+          self.discontinued += 1;
+      }
+      break;
+      case 'gross_profit': {
+        self.total_category = calculate_gp(rowData, '');
+        self.items_selected = calculate_gp(rowData, 'YES');
+        self.selected_stores = calculate_gp(rowData, 'SELECTED');
+        self.discontinued = calculate_gp(rowData, 'NO');
+      }
+      break;
+      case 'stock_on_hand_units': {
+
+      }
+      break;
+      case 'stock_on_hand_cost': {
+
+      }
+      break;
+      }
     })
 
-    self.total_category = self.total_category.toFixed(2);
-    self.items_selected = self.items_selected.toFixed(2);
+    switch (format) {
+      case 'money': {
+        self.total_category = 'R ' + self.total_category.toFixed(2);
+        self.items_selected = 'R ' + self.items_selected.toFixed(2);
+        self.selected_stores = 'R ' + self.selected_stores.toFixed(2);
+        self.discontinued = 'R ' + self.discontinued.toFixed(2);
+      }
+      break;
+      case 'number': {
+        self.total_category = self.total_category.toFixed(0);
+        self.items_selected = self.items_selected.toFixed(0);
+        self.selected_stores = self.selected_stores.toFixed(0);
+        self.discontinued = self.discontinued.toFixed(0);
+      }
+      break;
+      case 'percent': {
+        self.total_category = self.total_category.toFixed(2) + '%';
+        self.items_selected = + self.items_selected.toFixed(2) + '%';
+        self.selected_stores = + self.selected_stores.toFixed(2) + '%';
+        self.discontinued = + self.discontinued.toFixed(2) + '%';
+      }
+      break;
+    }
+
     // self.selected_stores = self.selected_stores.toFixed(2);    
     // self.discontinued = self.discontinued.toFixed(2);    
+  }
+
+  function calculate_gp(allProducts, indicator) {
+    let self = this;
+
+    let total_selling_price = 0;
+    let total_cost_price = 0;
+
+    allProducts.forEach(el => {
+      if (indicator == "") {
+        if (el.sales_Retail != 0 && el.sales_Units != 0 && el.sales_Profit != 0) {
+          total_selling_price += el.sales_Retail / el.sales_Units;
+          total_cost_price += (el.sales_Retail - el.sales_Profit) / el.sales_Units;
+        }
+      } else if (el.store_Range_Indicator == indicator) {
+        if (el.sales_Retail != 0 && el.sales_Units != 0 && el.sales_Profit != 0) {
+          total_selling_price += el.sales_Retail / el.sales_Units;
+          total_cost_price += (el.sales_Retail - el.sales_Profit) / el.sales_Units;
+        }
+      }
+    })
+
+    let gross_profit = ((total_selling_price - total_cost_price) / total_selling_price) * 100;
+    return gross_profit;
   }
 </script>
 
