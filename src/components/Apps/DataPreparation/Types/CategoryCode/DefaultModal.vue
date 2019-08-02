@@ -57,10 +57,6 @@
                         "headerName": "Category",
                         "field": "category",
                         "width": 150
-                    }, {
-                        "headerName": "Planogram Import Name",
-                        "field": "default_Planogram",
-                        "editable": true,
                     }
                     // {
                     //     "headerName": "Supergroup_A_ID",
@@ -119,21 +115,7 @@
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
-            UpdateLine(params) {
-                let self = this
-                console.log("[UPDATING]");
-                
-                let item = params.data
-                let node = params.node
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
-                Axios.post(process.env.VUE_APP_API + `Retailer/Category_Link/Default`, item).then(r => {
-                    console.log(r);
-           
-                    node.setData(r.data)
-                    delete Axios.defaults.headers.common["TenantID"];
-                })
-            },
+          
         },
     }
 </script>
