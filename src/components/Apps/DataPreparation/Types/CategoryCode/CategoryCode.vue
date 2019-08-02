@@ -7,7 +7,9 @@
                 @input="onFilterTextBoxChanged" v-model="filterText">
             </v-text-field>
             <v-spacer></v-spacer>
-
+            <v-btn dark @click="assignCatAsDef" color="primary" class="my-0">
+               assign category defaults
+            </v-btn>
             <v-btn dark @click="openAdd" color="primary" class="my-0">
                 <v-icon>add</v-icon>
             </v-btn>
@@ -125,6 +127,18 @@
             // });
         },
         methods: {
+            assignCatAsDef(){
+                let self = this
+                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `Retailer/Category_Link/Assign`, self.rowData).then(r => {
+                    console.log(r);
+                    self.getItems()
+                    delete Axios.defaults.headers.common["TenantID"];
+                })
+
+                
+            },
             UpdateLine(params) {
                 let self = this
                 console.log("[UPDATING]");
