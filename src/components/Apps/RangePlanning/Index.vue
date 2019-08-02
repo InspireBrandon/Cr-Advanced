@@ -116,8 +116,8 @@
           <v-spacer></v-spacer>
           <v-btn v-if="rowData.length>0" @click="openReport" color="primary" small dark>Report</v-btn>
           <v-btn v-if="rowData.length>0" @click="onChart1" color="primary" small dark>graphs</v-btn>
-          <v-btn  @click="openParetoModal" color="primary" small dark>Pareto</v-btn>
-         
+          <!-- <v-btn @click="openParetoModal" color="primary" small dark>Pareto</v-btn> -->
+
           <v-menu offset-y>
             <v-btn :disabled="selectedItems.length == 0" slot="activator" color="primary" small dark>Set Indicator
             </v-btn>
@@ -222,7 +222,7 @@
   import RangingReportModal from './RangingReportModal.vue'
   import GraphConfigurationModal from './GraphConfigurationModal.vue'
   import ParetoModal from './ParetoModal.vue'
-  
+
 
   import {
     AgGridVue
@@ -368,10 +368,13 @@
       self.checkparams()
     },
     methods: {
-      openParetoModal(){
+      openParetoModal(fact) {
         let self = this
 
-        self.$refs.ParetoModal.open(self.rowData, { key: 'description', value: 'sales_Retail' });
+        self.$refs.ParetoModal.open(self.rowData, {
+          key: 'description',
+          value: fact
+        });
       },
       checkparams() {
         let self = this
@@ -1039,30 +1042,34 @@
 
         self.$refs.GraphConfigurationModal.show(graph_config => {
 
-          self.columnApi.setColumnVisible(graph_config.selected_fact, true);
-          self.columnApi.setColumnVisible(graph_config.selected_graph, true);
+          if (graph_config.selected_graph=="Pareto") {
+            self.openParetoModal(graph_config.selected_fact)
+          } else {
+            self.columnApi.setColumnVisible(graph_config.selected_fact, true);
+            self.columnApi.setColumnVisible(graph_config.selected_graph, true);
 
-          var params = {
-            cellRange: {
-              columns: [graph_config.selected_fact, graph_config.selected_graph]
-            },
-            aggregate: true,
-            chartType: graph_config.selected_graph_type,
-            processChartOptions: function (params) {
-              let opts = params.options;
+            var params = {
+              cellRange: {
+                columns: [graph_config.selected_fact, graph_config.selected_graph]
+              },
+              aggregate: true,
+              chartType: graph_config.selected_graph_type,
+              processChartOptions: function (params) {
+                let opts = params.options;
 
-              opts.title = {
-                text: graph_config.graphName
-              };
+                opts.title = {
+                  text: graph_config.graphName
+                };
 
-              return opts;
-            }
-          };
-          console.log(params);
-          
-          this.gridApi.chartRange(params);
-          self.columnApi.setColumnVisible(graph_config.selected_fact, false);
-          self.columnApi.setColumnVisible(graph_config.selected_graph, false);
+                return opts;
+              }
+            };
+            console.log(params);
+
+            this.gridApi.chartRange(params);
+            self.columnApi.setColumnVisible(graph_config.selected_fact, false);
+            self.columnApi.setColumnVisible(graph_config.selected_graph, false);
+          }
         });
       },
       openAutoRangeModal() {

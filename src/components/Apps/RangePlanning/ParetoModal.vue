@@ -1,12 +1,12 @@
 <template>
     <v-dialog fullscreen persistent width=1000 v-model="dialog">
-        <v-card >
+        <v-card>
             <v-toolbar dark dense flat color="primary">
                 <v-toolbar-title>
                     Pareto Graph
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
-                <v-btn icon @click="dialog=false">
+                <v-btn icon @click="close">
                     <v-icon>
                         close
                     </v-icon>
@@ -29,13 +29,29 @@
         data() {
             return {
                 dialog: false,
+                chart: null,
             }
         },
-        mounted() {
-        },
+        mounted() {},
+
         methods: {
+            close() {
+                let chart = document.getElementById('chartdiv');
+                console.log(chart);
+                
+                // chart.clear();
+                chart = null;
+
+                if (this.chart) {
+                    console.log("[Destroyed]");
+                    this.chart.dispose();
+                    this.chart = null;
+                }
+                this.dialog = false
+            },
             open(data, key_value) {
                 let self = this
+
                 self.dialog = true
                 self.drawChart(data, key_value);
             },
@@ -43,7 +59,7 @@
                 let chart = am4core.create("chartdiv", am4charts.XYChart);
                 chart.scrollbarX = new am4core.Scrollbar();
 
-                let sortedData = data.sort(function(a, b) {
+                let sortedData = data.sort(function (a, b) {
                     return b[key_value.value] - a[key_value.value];
                 })
 
@@ -73,6 +89,7 @@
                 categoryAxis.renderer.grid.template.location = 0;
                 categoryAxis.renderer.minGridDistance = 60;
                 categoryAxis.tooltip.disabled = true;
+                categoryAxis.renderer.labels.template.disabled = true;
 
                 let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
                 valueAxis.renderer.minWidth = 50;
@@ -81,11 +98,13 @@
 
                 // Create series
                 let series = chart.series.push(new am4charts.ColumnSeries());
-                series.sequencedInterpolation = true;
+                series.sequencedInterpolation = false;
                 series.dataFields.valueY = key_value.value;
                 series.dataFields.categoryX = key_value.key;
                 series.tooltipText = "[{categoryX}: bold]{valueY}[/]";
                 series.columns.template.strokeWidth = 0;
+
+
 
                 series.tooltip.pointerOrientation = "vertical";
 
@@ -99,9 +118,9 @@
                 hoverState.properties.cornerRadiusTopRight = 0;
                 hoverState.properties.fillOpacity = 1;
 
-                series.columns.template.adapter.add("fill", function (fill, target) {
-                    return chart.colors.getIndex(target.dataItem.index);
-                })
+                // series.columns.template.adapter.add("fill", function (fill, target) {
+                //     return chart.colors.getIndex(target.dataItem.index);
+                // })
 
 
                 let paretoValueAxis = chart.yAxes.push(new am4charts.ValueAxis());
@@ -118,7 +137,7 @@
                 paretoSeries.dataFields.valueY = "pareto";
                 paretoSeries.dataFields.categoryX = key_value.key;
                 paretoSeries.yAxis = paretoValueAxis;
-                paretoSeries.tooltipText = "pareto: {valueY.formatNumber('#.0')}%[/]";
+                paretoSeries.tooltipText = "{categoryX}: {valueY.formatNumber('#.0')}%[/]";
                 paretoSeries.bullets.push(new am4charts.CircleBullet());
                 paretoSeries.strokeWidth = 2;
                 paretoSeries.stroke = new am4core.InterfaceColorSet().getFor("alternativeBackground");
@@ -127,14 +146,15 @@
                 // Cursor
                 chart.cursor = new am4charts.XYCursor();
                 chart.cursor.behavior = "panX";
+                this.chart = chart
             }
-            },
-        }
+        },
+
+    }
 </script>
 
 <style scoped>
     #chartdiv {
-       height:90vh;
-       overflow-x: auto;
+        height: 90vh;
     }
 </style>
