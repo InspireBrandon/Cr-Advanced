@@ -55,14 +55,10 @@
                 defaultDialog: false,
                 headers: [{
                         "headerName": "Department",
-                        "field": "department_ID",
-                        "dropdownName": "departmentName",
-                        "cellRendererFramework": "DropDown",
+                        "field": "departmentName"
                     }, {
                         "headerName": "Subdepartment",
-                        "field": "subdepartment_ID",
-                        "cellRendererFramework": "DropDown",
-                        "dropdownName": "subdepartmentName"
+                        "field": "subdepartmentName"
                     }, {
                         "headerName": "Category_Code",
                         "field": "category_Code"
@@ -83,9 +79,7 @@
                     // },
                     {
                         "headerName": "Planogram",
-                        "field": "planogram_ID",
-                        "cellRendererFramework": "DropDown",
-                        "dropdownName": "planogramName",
+                        "field": "planogramName"
                     }, {
                         "headerName": "Planogram Import Name",
                         "field": "default_Planogram",

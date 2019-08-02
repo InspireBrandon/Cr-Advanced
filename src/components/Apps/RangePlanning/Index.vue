@@ -1247,10 +1247,10 @@
       }
       break;
       case 'gross_profit': {
-        self.total_category = calculate_gp(rowData, '');
-        self.items_selected = calculate_gp(rowData, 'YES');
-        self.selected_stores = calculate_gp(rowData, 'SELECTED');
-        self.discontinued = calculate_gp(rowData, 'NO');
+        self.total_category = calculate_gp(rowData, '', report_type);
+        self.items_selected = calculate_gp(rowData, 'YES', report_type);
+        self.selected_stores = calculate_gp(rowData, 'SELECTED', report_type);
+        self.discontinued = calculate_gp(rowData, 'NO', report_type);
       }
       break;
       case 'stock_on_hand_units': {
@@ -1272,47 +1272,90 @@
         self.discontinued = 'R ' + self.discontinued.toFixed(2);
       }
       break;
-      case 'number': {
-        self.total_category = self.total_category.toFixed(0);
-        self.items_selected = self.items_selected.toFixed(0);
-        self.selected_stores = self.selected_stores.toFixed(0);
-        self.discontinued = self.discontinued.toFixed(0);
-      }
-      break;
-      case 'percent': {
-        self.total_category = self.total_category.toFixed(2) + '%';
-        self.items_selected = + self.items_selected.toFixed(2) + '%';
-        self.selected_stores = + self.selected_stores.toFixed(2) + '%';
-        self.discontinued = + self.discontinued.toFixed(2) + '%';
-      }
-      break;
+    case 'number': {
+      self.total_category = self.total_category.toFixed(0);
+      self.items_selected = self.items_selected.toFixed(0);
+      self.selected_stores = self.selected_stores.toFixed(0);
+      self.discontinued = self.discontinued.toFixed(0);
+    }
+    break;
+    case 'percent': {
+      self.total_category = self.total_category.toFixed(2) + '%';
+      self.items_selected = +self.items_selected.toFixed(2) + '%';
+      self.selected_stores = +self.selected_stores.toFixed(2) + '%';
+      self.discontinued = +self.discontinued.toFixed(2) + '%';
+    }
+    break;
     }
 
     // self.selected_stores = self.selected_stores.toFixed(2);    
     // self.discontinued = self.discontinued.toFixed(2);    
   }
 
-  function calculate_gp(allProducts, indicator) {
-    let self = this;
+  // function calculate_gp(allProducts, indicator) {
+  //   let self = this;
 
-    let total_selling_price = 0;
-    let total_cost_price = 0;
+  //   let total_selling_price = 0;
+  //   let total_cost_price = 0;
+  //   let total_Sales
+
+  //   allProducts.forEach(el => {
+  //     if (indicator == "") {
+  //       if (el.sales_Retail != 0 && el.sales_Units != 0 && el.sales_Profit != 0) {
+  //         total_selling_price += el.sales_Retail / el.sales_Units;
+  //         total_cost_price += (el.sales_Retail - el.sales_Profit) / el.sales_Units;
+  //       }
+  //     } else if (el.store_Range_Indicator == indicator) {
+  //       if (el.sales_Retail != 0 && el.sales_Units != 0 && el.sales_Profit != 0) {
+  //         total_selling_price += el.sales_Retail / el.sales_Units;
+  //         total_cost_price += (el.sales_Retail - el.sales_Profit) / el.sales_Units;
+  //       }
+  //     }
+  //   })
+
+  //   let gross_profit = ((total_selling_price - total_cost_price) / total_selling_price) * 100;
+  //   return gross_profit;
+  // }
+
+  function calculate_gp(allProducts, indicator, report_type) {
+    let total_category_sales = 0;
+    let total_category_cost = 0;
+    let total_category_units = 0;
+
+    let total_indicator_sales = 0;
+    let total_indicator_cost = 0;
+    let total_indicator_units = 0;
 
     allProducts.forEach(el => {
-      if (indicator == "") {
-        if (el.sales_Retail != 0 && el.sales_Units != 0 && el.sales_Profit != 0) {
-          total_selling_price += el.sales_Retail / el.sales_Units;
-          total_cost_price += (el.sales_Retail - el.sales_Profit) / el.sales_Units;
-        }
-      } else if (el.store_Range_Indicator == indicator) {
-        if (el.sales_Retail != 0 && el.sales_Units != 0 && el.sales_Profit != 0) {
-          total_selling_price += el.sales_Retail / el.sales_Units;
-          total_cost_price += (el.sales_Retail - el.sales_Profit) / el.sales_Units;
+      total_category_sales += parseFloat(report_type == 'current' ? el.sales_Retail : el.sales_potential);
+      total_category_cost += parseFloat(el.sales_Cost);
+      total_category_units += parseFloat(report_type == 'current' ? el.sales_Units : el.potential_volume);
+
+      if (indicator != '') {
+        if (el.store_Range_Indicator == indicator) {
+          total_indicator_sales += parseFloat(report_type == 'current' ? el.sales_Retail : el.sales_potential);
+          total_indicator_cost += parseFloat(el.sales_Cost);
+          total_indicator_units += parseFloat(report_type == 'current' ? el.sales_Units : el.potential_volume);
         }
       }
     })
 
-    let gross_profit = ((total_selling_price - total_cost_price) / total_selling_price) * 100;
+    let gross_profit = 0;
+
+    if (indicator == '') {
+      let total_sales_profit = total_category_sales - total_category_cost;
+      let total_selling_price = total_category_sales / total_category_units;
+      let total_cost_price = (total_category_sales - total_sales_profit) / total_category_units;
+
+      gross_profit = ((total_selling_price - total_cost_price) / total_selling_price) * 100;
+    } else {
+      let total_sales_profit = total_indicator_sales - total_indicator_cost;
+      let total_selling_price = total_indicator_sales / total_indicator_units;
+      let total_cost_price = (total_category_sales - total_sales_profit) / total_category_units;
+
+      gross_profit = ((total_selling_price - total_cost_price) / total_selling_price) * 100;
+    }
+
     return gross_profit;
   }
 </script>
