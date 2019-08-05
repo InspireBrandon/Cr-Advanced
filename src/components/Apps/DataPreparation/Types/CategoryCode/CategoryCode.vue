@@ -7,8 +7,11 @@
                 @input="onFilterTextBoxChanged" v-model="filterText">
             </v-text-field>
             <v-spacer></v-spacer>
+            <v-btn dark @click="assignDefaultAsPlanogram" color="primary" class="my-0">
+                assign default to planogram
+            </v-btn>
             <v-btn dark @click="assignCatAsDef" color="primary" class="my-0">
-               assign category defaults
+                assign category defaults
             </v-btn>
             <v-btn dark @click="openAdd" color="primary" class="my-0">
                 <v-icon>add</v-icon>
@@ -24,6 +27,7 @@
         </div>
         <Dialog ref="Dialog" />
         <addModal ref="addModal" />
+        <Spinner ref="Spinner" />
 
     </div>
 </template>
@@ -40,6 +44,7 @@
 
     import addModal from "./CreateModal"
     import Dialog from "@/components/Common/Dialog";
+    import Spinner from "@/components/Common/Spinner";
     export default {
         props: ['name', 'headerName', 'hasCode'],
         components: {
@@ -47,7 +52,7 @@
             Dialog,
             addModal,
             DropDown,
-
+            Spinner
         },
         data() {
             return {
@@ -121,9 +126,13 @@
             // });
         },
         methods: {
-            assignCatAsDef(){
+            assignDefaultAsPlanogram() {
                 let self = this
-                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                self.$refs.Spinner.show()
+            },
+            assignCatAsDef() {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.post(process.env.VUE_APP_API + `Retailer/Category_Link/Assign`, self.rowData).then(r => {
                     console.log(r);
@@ -131,7 +140,7 @@
                     delete Axios.defaults.headers.common["TenantID"];
                 })
 
-                
+
             },
             UpdateLine(params) {
                 let self = this

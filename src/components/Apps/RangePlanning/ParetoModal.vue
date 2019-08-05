@@ -30,6 +30,7 @@
     import Dialog from '@/components/Common/Dialog';
 
     import am4themes_animated from "@amcharts/amcharts4/themes/animated";
+import { GradientModifier } from '@amcharts/amcharts4/.internal/core/rendering/fills/GradientModifier';
 
     am4core.useTheme(am4themes_animated);
     export default {
@@ -132,7 +133,7 @@
                     for (var i = 0; i < chart.data.length; i++) {
                         let value = chart.data[i][key_value.value];
                         chart.data[i][key_value.altValue] = i + 1;
-
+                        chart.data[i][key_value.percent] = (chart.data[i][key_value.altValue] / self.rowdata.length * 100).toFixed(1);
 
                         total += value;
                     }
@@ -142,6 +143,7 @@
                         let value = chart.data[i][key_value.value];
                         sum += value;
                         chart.data[i].pareto = sum / total * 100;
+                        
                     }
                 }
                 // Create axes
@@ -212,8 +214,9 @@
                 paretoSeries.dataFields.valueY = "pareto";
                 paretoSeries.dataFields.categoryX = key_value.altValue;
                 paretoSeries.dataFields.categoryz = key_value.key;
+                paretoSeries.dataFields.categoryzz = key_value.percent;
                 paretoSeries.yAxis = paretoValueAxis;
-                paretoSeries.tooltipText = `{categoryX} / ${data.length} of the items = {valueY.formatNumber('#.0')}%[/] of ${self.fact_name}`;
+                paretoSeries.tooltipText = `{categoryzz}% of the items = {valueY.formatNumber('#.0')}%[/] of ${self.fact_name}`;
 
                 paretoSeries.bullets.push(new am4charts.CircleBullet());
 
@@ -226,7 +229,8 @@
                 chart.cursor.behavior = "panX";
                 this.chart = chart
 
-            }
+            },
+           
         }
     }
 </script>
