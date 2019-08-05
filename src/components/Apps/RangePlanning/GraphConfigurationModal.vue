@@ -48,7 +48,7 @@
                 dialog: false,
                 facts: [
                     { text: 'Sales', value: 'sales_Retail' }, 
-                    { text: 'Units', value: 'sales_Units' }, 
+                    { text: 'Sales Units', value: 'sales_Units' }, 
                     { text: 'Profit', value: 'sales_Profit' }, 
                     { text: 'Stock On Hand - Units', value: 'stock_on_hand_units' }, 
                     { text: 'Stock On Hand - Cost', value: 'stock_on_hand_cost' }, 

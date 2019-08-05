@@ -86,8 +86,8 @@
             handleClick(data, item_index, item_name) {
                 let self = this
                 let obj = {
-                    headline: "Range Handeling",
-                    text: "Would you like to cut this range after " + item_index + ":" + item_name + "?",
+                    headline: "Range Handling",
+                    text: "Would you like to cut this range after product " + item_index,
                     callback: self.HandleRowData
                 }
                 self.item_index = item_index
@@ -110,6 +110,7 @@
                 self.closeAndSendRowdata(tmp)
             },
             drawChart(data, key_value) {
+                let self = this;
                 let chart = am4core.create("chartdiv", am4charts.XYChart);
 
                 chart.events.on("hit", function (event) {
@@ -164,7 +165,7 @@
                 valueAxis.renderer.minWidth = 50;
                 valueAxis.min = 0;
                 valueAxis.cursorTooltipEnabled = false;
-                valueAxis.title.text = self.fact;
+                valueAxis.title.text = self.fact_name;
                 // valueAxis.title.rotation = 0;
                 // valueAxis.title.align = "center";
                 // valueAxis.title.valign = "top";
@@ -212,7 +213,7 @@
                 paretoSeries.dataFields.categoryX = key_value.altValue;
                 paretoSeries.dataFields.categoryz = key_value.key;
                 paretoSeries.yAxis = paretoValueAxis;
-                paretoSeries.tooltipText = "{categoryX} - Units:{categoryz} - {valueY.formatNumber('#.0')}%[/]";
+                paretoSeries.tooltipText = `{categoryX} / ${data.length} of the items = {valueY.formatNumber('#.0')}%[/] of ${self.fact_name}`;
 
                 paretoSeries.bullets.push(new am4charts.CircleBullet());
 
@@ -226,8 +227,7 @@
                 this.chart = chart
 
             }
-        },
-
+        }
     }
 </script>
 
