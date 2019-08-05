@@ -21,20 +21,20 @@
                 <div id="chartdiv"></div>
             </v-card-text>
         </v-card>
-        <Spinner ref="Spinner" />
+        <Dialog ref="Dialog" />
     </v-dialog>
 </template>
 <script>
     import * as am4core from "@amcharts/amcharts4/core";
     import * as am4charts from "@amcharts/amcharts4/charts";
-    import Spinner from '@/components/Common/SplashLoader';
+    import Dialog from '@/components/Common/Dialog';
 
     import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 
     am4core.useTheme(am4themes_animated);
     export default {
         components: {
-            Spinner
+            Dialog
         },
         data() {
             return {
@@ -42,7 +42,11 @@
                 chart: null,
                 rangeName: null,
                 fact: null,
-                fact_name: null
+                fact_name: null,
+                rowdata: [],
+                item_index: null,
+                item_name: null,
+                callback: null
             }
         },
         mounted() {},
@@ -61,29 +65,64 @@
                 }
                 this.dialog = false
             },
-            open(data, key_value) {
+            open(data, key_value, callback) {
                 let self = this
-                self.$refs.Spinner.show()
+
                 self.fact = key_value.value
                 self.rangeName = key_value.rangeName
                 self.dialog = true
                 self.fact_name = key_value.fact_name
-
-
+               
+                self.callback = callback;
                 setTimeout(() => {
-
                     self.drawChart(data, key_value);
                 }, 100);
+            },
+            closeAndSendRowdata(data) {
+                let self = this;
+                self.callback(data);
+                self.close();
+            },
+            handleClick(data, item_index, item_name) {
+                let self = this
+                let obj = {
+                    headline: "Range Handeling",
+                    text: "Would you like to cut this range after " + item_index + ":" + item_name + "?",
+                    callback: self.HandleRowData
+                }
+                self.item_index = item_index
+                self.item_name = item_name
+                self.$refs.Dialog.openDialog(obj)
+                console.log("[CLICK EVT]", item_index + " || " + item_name)
+
+            },
+            HandleRowData() {
+                let self = this
+                let tmp = []
+                for (let index = 0; index < self.rowdata.length; index++) {
+                    const element = self.rowdata[index];
+                    if (index < self.item_index) {
+                        tmp.push(element)
+                    }
+                }
+                console.log(tmp.length);
+                console.log("handleing rowdata");
+                self.closeAndSendRowdata(tmp)
             },
             drawChart(data, key_value) {
                 let chart = am4core.create("chartdiv", am4charts.XYChart);
 
+                chart.events.on("hit", function (event) {
+                    console.log("[CLICK EVT]", event)
+                    this.handleClick(data, event.target.series.values[1].tooltipDataItem.categoryX, event.target
+                        .series.values[1].tooltipDataItem.categoryz)
+                }, this);
                 let sortedData = data.sort(function (a, b) {
                     return b[key_value.value] - a[key_value.value];
                 })
 
                 chart.data = sortedData;
-
+                this.rowdata = sortedData
                 prepareParetoData();
 
                 function prepareParetoData() {
@@ -174,7 +213,9 @@
                 paretoSeries.dataFields.categoryz = key_value.key;
                 paretoSeries.yAxis = paretoValueAxis;
                 paretoSeries.tooltipText = "{categoryX} - Units:{categoryz} - {valueY.formatNumber('#.0')}%[/]";
+
                 paretoSeries.bullets.push(new am4charts.CircleBullet());
+
                 paretoSeries.strokeWidth = 2;
                 paretoSeries.stroke = new am4core.InterfaceColorSet().getFor("alternativeBackground");
                 paretoSeries.strokeOpacity = 0.5;
@@ -183,7 +224,7 @@
                 chart.cursor = new am4charts.XYCursor();
                 chart.cursor.behavior = "panX";
                 this.chart = chart
-                this.$refs.Spinner.close()
+
             }
         },
 
