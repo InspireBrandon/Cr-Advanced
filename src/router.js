@@ -99,6 +99,7 @@ import Fixture_Type from '@/components/Main/Fixture_Type/Fixture_Type.vue'
 import FileStatus from '@/components/Main/FileStatus'
 
 import Sales_Monthly_Totals from '@/components/Main/Sales_Monthly_Totals/Index.vue'
+import BasketAnalysis from '@/components/Apps/Strategy/BasketAnalysis/Index.vue'
 
 Vue.use(Router)
 
@@ -137,6 +138,11 @@ export default new Router({
           path: '/ProductListing',
           name: 'ProductListing',
           component: ProductListing
+        },
+        {
+          path: '/BasketAnalysis',
+          name: 'BasketAnalysis',
+          component: BasketAnalysis
         },
         {
           path: '/Fixture_Type',

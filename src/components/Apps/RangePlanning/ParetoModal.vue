@@ -78,6 +78,10 @@
             drawChart(data, key_value) {
                 let chart = am4core.create("chartdiv", am4charts.XYChart);
 
+                chart.events.on("hit", function (ev) {
+                    console.log("[CLICK EVT]", ev)
+                }, this);
+
                 let sortedData = data.sort(function (a, b) {
                     return b[key_value.value] - a[key_value.value];
                 })

@@ -6,21 +6,14 @@
                 <v-flex lg12 md12 sm12 xs12>
                     <v-container grid-list-md>
                         <v-layout row wrap>
-                            <v-flex lg12 md12 sm12 xs12>
+                            <v-flex md4>
                                 <v-card flat>
-                                    <v-card-title primary-title>
-                                        <v-layout class="header text-xs-center" row wrap>
-                                            <v-flex lg12 md12 sm12 xs12>
-                                                <v-avatar :tile="false" :size="150" color="white lighten-4">
-                                                    <v-img @click="openFileDialog" ref="avatarImage" :src="displayImage"
-                                                        alt="avatar"></v-img>
-                                                </v-avatar>
-                                            </v-flex>
-                                        </v-layout>
-                                    </v-card-title>
                                     <v-card-text>
                                         <v-form>
                                             <v-layout row wrap>
+                                                <v-flex md12 class="mb-3">
+                                                    <span class="headline">Update Profile</span>
+                                                </v-flex>
                                                 <v-flex md6>
                                                     <v-text-field label="First Name" v-model="profile.firstname">
                                                     </v-text-field>
@@ -42,6 +35,25 @@
                                             </v-layout>
                                         </v-form>
                                     </v-card-text>
+                                </v-card>
+                            </v-flex>
+                            <v-flex md4>
+                                <v-card flat>
+                                    <v-card-title primary-title>
+                                        <v-layout class="header text-xs-right" row wrap>
+                                            <v-flex lg12 md12 sm12 xs12>
+                                                <v-avatar tile :size="100" color="white lighten-4">
+                                                    <v-img @click="openFileDialog" ref="avatarImage" :src="displayImage"
+                                                        alt="avatar"></v-img>
+                                                </v-avatar>
+                                            </v-flex>
+                                        </v-layout>
+                                    </v-card-title>
+                                </v-card>
+                            </v-flex>
+                            <v-flex md8>
+                                <v-divider></v-divider>
+                                <v-card flat>
                                     <v-card-actions>
                                         <v-spacer></v-spacer>
                                         <v-btn color="primary" :loading="loading" @click="submit">save</v-btn>
@@ -104,7 +116,7 @@
                     systemUserID: self.profile.systemUserID,
                     systemUserUID: self.profile.systemUserUID,
                     accountID: self.profile.accountID,
-                   allowEmails:self.profile.allowEmails,
+                    allowEmails: self.profile.allowEmails,
                     firstname: self.profile.firstname,
                     lastname: self.profile.lastname,
                     emailAddress: self.profile.emailAddress,

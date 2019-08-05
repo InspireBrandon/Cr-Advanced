@@ -26,10 +26,6 @@
         "system_code": "FLOOR-PLANNING"
     },
     {
-        "id": 8,
-        "system_code": "STRATEGY"
-    },
-    {
         "id": 9,
         "system_code": "TESTING"
     }

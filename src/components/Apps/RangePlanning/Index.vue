@@ -1083,20 +1083,23 @@
                 let opts = params.options;
 
                 opts.title = {
-                  text: graph_config.graphName
+                  text: self.generateFileName() + " " + self.fileData.tag + " ",
+                  fontFamily: "Roboto, sans-serif",
+                  fontWeight: "undefined",
+                  fontSize: 12
                 };
 
-                opts.subtitle = {
-                  text: "Subtitle"
-                }
+                let clusterName = "";
 
-                // opts.seriesDefaults = {
-                //   shadow: {
-                //     color: "grey",
-                //     offset: [5, 5],
-                //     blur: 5
-                //   }
-                // }
+                self.clusterOptions[self.selectedClusterType].forEach(el => {
+                  if(el.value == self.selectedClusterOption)
+                    clusterName = el.text
+                })
+
+                opts.subtitle = {
+                  text: graph_config.graphName + " For " + clusterName + " - " + self.storesInCluster + " Stores",
+                  fontFamily: "'Roboto', sans-serif"
+                }
 
                 return opts;
               }
