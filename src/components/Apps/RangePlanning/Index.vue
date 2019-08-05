@@ -563,6 +563,7 @@
                   self.autoRangeData[prop] = r.data.autoRangeConfig[prop];
                 }
               } else {
+                console.log(self.autoRangeData)
                 self.autoRangeData.setDefaults();
               }
 
@@ -1084,7 +1085,6 @@
                 return opts;
               }
             };
-            console.log(params);
 
             this.gridApi.chartRange(params);
             self.columnApi.setColumnVisible(graph_config.selected_fact, false);
@@ -1345,15 +1345,19 @@
     allProducts.forEach(el => {
 
       total_category_sales += parseFloat(report_type == 'current' ? el.sales_Retail : el.sales_potential);
-      total_category_cost += parseFloat(el.sales_Cost) == 'current' ? el.sales_Cost : el.cost_potential;
+      total_category_cost += parseFloat(report_type == 'current' ? el.sales_Cost : el.cost_potential);
 
       if (indicator != '') {
         if (el.store_Range_Indicator == indicator) {
           total_indicator_sales += parseFloat(report_type == 'current' ? el.sales_Retail : el.sales_potential);
-          total_indicator_cost += parseFloat(el.sales_Cost) == 'current' ? el.sales_Cost : el.cost_potential;
+          total_indicator_cost += parseFloat(report_type == 'current' ? el.sales_Cost : el.cost_potential);
         }
       }
     })
+
+    console.log("[INDICATOR]", indicator);
+    console.log("[SALES]", total_category_sales);
+    console.log("[COST]", total_category_cost);
 
     let gross_profit = 0;
 

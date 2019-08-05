@@ -181,7 +181,6 @@ class RangingController {
   }
 
   getSalesDataByStore(storeID) {
-    console.log("INSIDE GET SALES DATA BY STORE")
     let store = getStoreByID(storeID, this.storeSales);
     let sales = getSalesDataByStore(store, this.allRangeProducts, this.storeSales);
     return sales;
@@ -397,8 +396,6 @@ function getSalesContribution(storeSales, productID, clusters, clusterType, clus
   })
 
   let avgProductSales = totalStoreSales;
-
-  console.log(avgProductSales);
 
   let productSales = 0;
 
@@ -644,8 +641,6 @@ function GetRanks(storeSales, clusters, clusterType, clusterID) {
 
 function getSalesDataByStore(store, allProducts, storeSales) {
   let sales = [];
-
-  console.log(storeSales)
 
   let salesArr = getStoreSalesByStoreID(storeSales, store.storeID);
 
