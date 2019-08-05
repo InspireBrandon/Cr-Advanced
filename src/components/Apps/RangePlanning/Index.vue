@@ -1355,10 +1355,6 @@
       }
     })
 
-    console.log("[INDICATOR]", indicator);
-    console.log("[SALES]", total_category_sales);
-    console.log("[COST]", total_category_cost);
-
     let gross_profit = 0;
 
     if (indicator == '') {
