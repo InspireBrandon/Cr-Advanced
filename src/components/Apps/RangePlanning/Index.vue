@@ -384,12 +384,16 @@
         let self = this
 
         self.$refs.ParetoModal.open(self.rowData, {
-          key: 'description',
-          value: fact,
-          fact_name: fact_name,
-          altValue: 'count',
-          rangeName: self.generateFileName()
-        });
+            key: 'description',
+            value: fact,
+            fact_name: fact_name,
+            altValue: 'count',
+            rangeName: self.generateFileName()
+          },
+          callback => {
+            console.log(callback);
+
+          });
       },
       checkparams() {
         let self = this
