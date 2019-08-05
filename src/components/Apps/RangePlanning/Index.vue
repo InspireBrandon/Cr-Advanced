@@ -380,14 +380,15 @@
       self.checkparams()
     },
     methods: {
-      openParetoModal(fact) {
+      openParetoModal(fact, fact_name) {
         let self = this
 
         self.$refs.ParetoModal.open(self.rowData, {
           key: 'description',
           value: fact,
-          altValue:'count',
-          rangeName:self.generateFileName()
+          fact_name: fact_name,
+          altValue: 'count',
+          rangeName: self.generateFileName()
         });
       },
       checkparams() {
@@ -846,7 +847,8 @@
 
             self.setViewType(self.viewType);
 
-            self.storesInCluster = self.rangingController.getStoresByCluster(self.selectedClusterType, self.selectedClusterOption).length;
+            self.storesInCluster = self.rangingController.getStoresByCluster(self.selectedClusterType, self
+              .selectedClusterOption).length;
             self.fitColumns();
             self.calculateAutoRange();
           }
@@ -1066,7 +1068,7 @@
         self.$refs.GraphConfigurationModal.show(graph_config => {
 
           if (graph_config.selected_graph == "Pareto") {
-            self.openParetoModal(graph_config.selected_fact)
+            self.openParetoModal(graph_config.selected_fact, graph_config.selected_fact_name)
           } else {
             self.columnApi.setColumnVisible(graph_config.selected_fact, true);
             self.columnApi.setColumnVisible(graph_config.selected_graph, true);
@@ -1083,6 +1085,18 @@
                 opts.title = {
                   text: graph_config.graphName
                 };
+
+                opts.subtitle = {
+                  text: "Subtitle"
+                }
+
+                // opts.seriesDefaults = {
+                //   shadow: {
+                //     color: "grey",
+                //     offset: [5, 5],
+                //     blur: 5
+                //   }
+                // }
 
                 return opts;
               }

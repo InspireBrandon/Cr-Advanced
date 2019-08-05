@@ -14,9 +14,7 @@
             </v-toolbar>
             <v-toolbar dark dense flat color="grey darken-3">
                 <v-spacer></v-spacer>
-                <v-toolbar-title>
-                    {{fact}} pareto {{ rangeName }}
-                </v-toolbar-title>
+                {{ rangeName }} {{fact_name}} Pareto
                 <v-spacer></v-spacer>
             </v-toolbar>
             <v-card-text>
@@ -44,6 +42,7 @@
                 chart: null,
                 rangeName: null,
                 fact: null,
+                fact_name: null
             }
         },
         mounted() {},
@@ -68,6 +67,7 @@
                 self.fact = key_value.value
                 self.rangeName = key_value.rangeName
                 self.dialog = true
+                self.fact_name = key_value.fact_name
 
 
                 setTimeout(() => {

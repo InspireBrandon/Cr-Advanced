@@ -75,7 +75,7 @@
                 let self = this;
 
                 self.$nextTick(() => {
-                    if(self.selected_graph == 'Pareto') {
+                    if(self.selected_graph.value == 'Pareto') {
                         self.selected_graph_type = 'pareto';
                     } else {
                         self.selected_graph_type = 'pie';
@@ -88,6 +88,7 @@
 
                 let graphConfiguration = {
                     selected_fact: self.selected_fact.value,
+                    selected_fact_name: self.selected_fact.text,
                     selected_graph: self.selected_graph.value,
                     selected_graph_type: self.selected_graph_type,
                     graphName: self.selected_fact.text + " " + self.selected_graph.text
