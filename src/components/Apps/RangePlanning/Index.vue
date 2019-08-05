@@ -297,7 +297,19 @@
           potential_sales: 80,
           potential_volume: 80,
           potential_profit: 80,
-          audit: false
+          audit: false,
+          setDefaults() {
+            this.sales_index = 100;
+            this.profit_index = 100;
+            this.volume_index = 100;
+            this.sales = 80;
+            this.volume = 80;
+            this.profit = 80;
+            this.potential_sales = 80;
+            this.potential_volume = 80;
+            this.potential_profit = 80;
+            this.audit = false;
+          }
         },
         gotData: false,
         defaultColDef: {
@@ -535,8 +547,6 @@
           self.$refs.SizeLoader.show()
           Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fileID}`, config)
             .then(r => {
-              console.log(r.data);
-
               self.fileData.planogramName = r.data.planogramName;
               self.fileData.planogramID = r.data.planogramID;
               self.fileData.dateFrom = r.data.dateFrom;
@@ -548,6 +558,14 @@
               self.fileData.tag = r.data.tag;
               self.fileData.active_Shop_Code_ID = r.data.active_Shop_Code_ID;
 
+              if (r.data.autoRangeConfig != undefined && r.data.autoRangeConfig != null) {
+                for (var prop in r.data.autoRangeConfig) {
+                  self.autoRangeData[prop] = r.data.autoRangeConfig[prop];
+                }
+              } else {
+                self.autoRangeData.setDefaults();
+              }
+
               self.canRefresh = true;
 
               self.rangingController = new RangingController(r.data);
@@ -555,6 +573,7 @@
               self.rangingController.getSalesMonthlyTotals(() => {
 
                 self.setRangingClusterData(r.data.clusterData);
+
                 if (self.selectedClusterType != null && self.selectedClusterOption != null) {
                   self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
                     .selectedClusterOption);
@@ -824,10 +843,9 @@
 
             self.setViewType(self.viewType);
 
-            self.storesInCluster = self.rangingController.getStoresByCluster(self.selectedClusterType, self
-                .selectedClusterOption)
-              .length;
+            self.storesInCluster = self.rangingController.getStoresByCluster(self.selectedClusterType, self.selectedClusterOption).length;
             self.fitColumns();
+            self.calculateAutoRange();
           }
         })
       },
@@ -890,6 +908,8 @@
         fileData["periodic"] = self.fileData.periodic;
         fileData["monthsBetween"] = self.fileData.monthsBetween;
         fileData["tag"] = tag;
+
+        fileData["autoRangeConfig"] = self.autoRangeData;
 
         Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
             SystemFile: {
@@ -1042,7 +1062,7 @@
 
         self.$refs.GraphConfigurationModal.show(graph_config => {
 
-          if (graph_config.selected_graph=="Pareto") {
+          if (graph_config.selected_graph == "Pareto") {
             self.openParetoModal(graph_config.selected_fact)
           } else {
             self.columnApi.setColumnVisible(graph_config.selected_fact, true);
@@ -1209,7 +1229,7 @@
             self.items_selected += (report_type == 'current' ? parseFloat(productData.sales_Retail.toFixed(2)) :
               parseFloat(productData.sales_potential.toFixed(2)));
 
-          if (productData.store_Range_Indicator == 'SELECTED')
+          if (productData.store_Range_Indicator == 'SELECT')
             self.selected_stores += (report_type == 'current' ? parseFloat(productData.sales_Retail.toFixed(2)) :
               parseFloat(productData.sales_potential.toFixed(2)));
 
@@ -1226,7 +1246,7 @@
           self.items_selected += (report_type == 'current' ? parseFloat(productData.sales_Units.toFixed(2)) :
             parseFloat(productData.volume_potential.toFixed(2)));
 
-        if (productData.store_Range_Indicator == 'SELECTED')
+        if (productData.store_Range_Indicator == 'SELECT')
           self.selected_stores += (report_type == 'current' ? parseFloat(productData.sales_Units.toFixed(2)) :
             parseFloat(productData.volume_potential.toFixed(2)));
 
@@ -1243,7 +1263,7 @@
           self.items_selected += (report_type == 'current' ? parseFloat(productData.sales_Profit.toFixed(2)) :
             parseFloat(productData.profit_potential.toFixed(2)));
 
-        if (productData.store_Range_Indicator == 'SELECTED')
+        if (productData.store_Range_Indicator == 'SELECT')
           self.selected_stores += (report_type == 'current' ? parseFloat(productData.sales_Profit.toFixed(2)) :
             parseFloat(productData.profit_potential.toFixed(2)));
 
@@ -1258,7 +1278,7 @@
         if (productData.store_Range_Indicator == 'YES')
           self.items_selected += 1;
 
-        if (productData.store_Range_Indicator == 'SELECTED')
+        if (productData.store_Range_Indicator == 'SELECT')
           self.selected_stores += 1;
 
         if (productData.store_Range_Indicator == 'NO')
@@ -1266,10 +1286,17 @@
       }
       break;
       case 'gross_profit': {
-        self.total_category = calculate_gp(rowData, '', report_type);
-        self.items_selected = calculate_gp(rowData, 'YES', report_type);
-        self.selected_stores = calculate_gp(rowData, 'SELECTED', report_type);
-        self.discontinued = calculate_gp(rowData, 'NO', report_type);
+        let cat = calculate_gp(rowData, '', report_type);
+        self.total_category = cat < 0 ? (cat * -1) : cat;
+
+        let is = calculate_gp(rowData, 'YES', report_type)
+        self.items_selected = is < 0 ? (is * -1) : is;
+
+        let ss = calculate_gp(rowData, 'SELECT', report_type);
+        self.selected_stores = ss < 0 ? (ss * -1) : ss;
+
+        let dis = calculate_gp(rowData, 'NO', report_type)
+        self.discontinued = dis < 0 ? (dis * -1) : dis;
       }
       break;
       case 'stock_on_hand_units': {
@@ -1316,13 +1343,14 @@
     let total_indicator_cost = 0;
 
     allProducts.forEach(el => {
+
       total_category_sales += parseFloat(report_type == 'current' ? el.sales_Retail : el.sales_potential);
-      total_category_cost += parseFloat(el.sales_Cost);
+      total_category_cost += parseFloat(el.sales_Cost) == 'current' ? el.sales_Cost : el.cost_potential;
 
       if (indicator != '') {
         if (el.store_Range_Indicator == indicator) {
           total_indicator_sales += parseFloat(report_type == 'current' ? el.sales_Retail : el.sales_potential);
-          total_indicator_cost += parseFloat(el.sales_Cost);
+          total_indicator_cost += parseFloat(el.sales_Cost) == 'current' ? el.sales_Cost : el.cost_potential;
         }
       }
     })

@@ -846,6 +846,7 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
     let sales_potential = 0;
     let volume_potential = 0;
     let profit_potential = 0;
+    let cost_potential = 0;
     let item_sales_rank = 0
     let item_volume_rank = 0
     let item_profit_rank = 0
@@ -869,6 +870,9 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
     if (weighted_distribution != 0 && sales_units != 0)
       (profit_potential = sales_profit / weighted_distribution * 100).toFixed(0);
 
+    if(weighted_distribution != 0 && sales_units != 0)
+      (cost_potential = sales_cost / weighted_distribution * 100).toFixed(0);
+
     let dos_fac = getDaysOfSupplyFacings(clusters, clusterType, clusterID, volume_potential, product.depth)
 
     productSales.push(new RangeProduct(product, {
@@ -881,6 +885,7 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
       sales_potential: parseFloat(sales_potential.toFixed(2)),
       volume_potential: parseFloat(volume_potential.toFixed(2)),
       profit_potential: parseFloat(profit_potential.toFixed(2)),
+      cost_potential: parseFloat(cost_potential.toFixed(2)),
       item_sales_rank: item_sales_rank,
       item_volume_rank: item_volume_rank,
       item_profit_rank: item_profit_rank,
@@ -1002,6 +1007,7 @@ function RangeProduct(productData, salesData, indicator) {
   self.sales_potential = salesData.sales_potential;
   self.volume_potential = salesData.volume_potential;
   self.profit_potential = salesData.profit_potential;
+  self.cost_potential = salesData.cost_potential;
   self.item_volume_rank = salesData.item_volume_rank
   self.item_sales_rank = salesData.item_sales_rank
   self.item_profit_rank = salesData.item_profit_rank
