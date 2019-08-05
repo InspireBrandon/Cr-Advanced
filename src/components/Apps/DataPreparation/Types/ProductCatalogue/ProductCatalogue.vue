@@ -429,6 +429,11 @@
           filter: "agTextColumnFilter"
         },
         {
+          headerName: 'Category Code',
+          field: 'category_Code',
+          filter: "agTextColumnFilter"
+        },
+        {
           headerName: 'Subcategory',
           field: 'subcategory',
           filter: "agTextColumnFilter",

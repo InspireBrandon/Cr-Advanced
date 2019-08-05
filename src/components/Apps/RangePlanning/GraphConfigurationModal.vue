@@ -18,11 +18,11 @@
                             <v-select return-object @change="on_selected_graph_change" :items="graphs" v-model="selected_graph" label="Graph:"></v-select>
                         </v-flex>
                         <v-flex md12>
-                            <v-radio-group v-if="selected_graph != null && selected_graph == 'Pareto'" v-model="selected_graph_type" label="Type">
+                            <v-radio-group v-if="selected_graph != null && selected_graph.text == 'Pareto'" v-model="selected_graph_type" label="Type">
                                 <v-radio color="primary" value="pareto" disabled label="Pareto">
                                 </v-radio>
                             </v-radio-group>
-                            <v-radio-group  v-if="selected_graph != null && selected_graph != 'Pareto'" v-model="selected_graph_type" label="Type">
+                            <v-radio-group  v-if="selected_graph != null && selected_graph.text != 'Pareto'" v-model="selected_graph_type" label="Type">
                                 <v-radio color="primary" value="pie" label="Pie"></v-radio>
                                 <v-radio color="primary" value="bar" label="Bar"></v-radio>
                             </v-radio-group>
