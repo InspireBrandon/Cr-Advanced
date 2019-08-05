@@ -373,7 +373,9 @@
 
         self.$refs.ParetoModal.open(self.rowData, {
           key: 'description',
-          value: fact
+          value: fact,
+          altValue:'count',
+          rangeName:self.generateFileName()
         });
       },
       checkparams() {
