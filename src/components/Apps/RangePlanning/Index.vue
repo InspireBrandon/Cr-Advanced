@@ -388,11 +388,37 @@
             value: fact,
             fact_name: fact_name,
             altValue: 'count',
-            rangeName: self.generateFileName()
+            rangeName: self.generateFileName(),
+            percent: 'percent'
           },
           callback => {
             console.log(callback);
 
+
+            callback.forEach(el => {
+              self.rowData.forEach(rowitem => {
+                if (el.id == rowitem.id) {
+                  console.log(rowitem);
+
+                  self.rangingController.setClusterIndicator(self.selectedClusterType, self
+                    .selectedClusterOption, rowitem.productID,
+                    "YES");
+                }
+              })
+            })
+            self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
+              .selectedClusterOption);
+
+            self.ais_Sales = 0;
+            self.ais_SalesPotential = 0;
+
+            self.rowData.forEach(el => {
+              if (el.store_Range_Indicator == "YES") {
+                self.ais_Sales = (parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)).toFixed(2);
+                self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + parseFloat(el.sales_potential))
+                  .toFixed(2);
+              }
+            })
           });
       },
       checkparams() {
@@ -1096,12 +1122,13 @@
                 let clusterName = "";
 
                 self.clusterOptions[self.selectedClusterType].forEach(el => {
-                  if(el.value == self.selectedClusterOption)
+                  if (el.value == self.selectedClusterOption)
                     clusterName = el.text
                 })
 
                 opts.subtitle = {
-                  text: graph_config.graphName + " For " + clusterName + " - " + self.storesInCluster + " Stores",
+                  text: graph_config.graphName + " For " + clusterName + " - " + self.storesInCluster +
+                    " Stores",
                   fontFamily: "'Roboto', sans-serif"
                 }
 
