@@ -117,15 +117,16 @@
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.get(process.env.VUE_APP_API + `Retailer/Category_Link`)
+                Axios.get(process.env.VUE_APP_API + `Planogram`)
                     .then(r => {
+                        console.log(r);
+                        
 
-
-                        let Category_Link = r.data;
+                        let Category_Link = r.data.planogramList;
                         self.Category_Link = [];
                         Category_Link.forEach(element => {
                             self.Category_Link.push({
-                                text: element.displayName,
+                                text: element.planogram,
                                 value: element.id
                             })
                         });
@@ -171,7 +172,7 @@
                     case "customCluster": {
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                         Axios.post(process.env.VUE_APP_API +
-                                `Store/UpdateCustomCluster?category_ID=${self.selectedCategory}&cluster_Name=${item.customCluster}&store_ID=${item.store_ID}`
+                                `Store/UpdateCustomCluster?planogram_ID=${self.selectedCategory}&cluster_Name=${item.customCluster}&store_ID=${item.store_ID}`
                             )
                             .then(r => {
                                 delete Axios.defaults.headers.common["TenantID"];
