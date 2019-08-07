@@ -235,9 +235,7 @@
                 chart.cursor = new am4charts.XYCursor();
                 chart.cursor.behavior = "panX";
                 this.chart = chart
-
-            },
-
+            }
         }
     }
 </script>
