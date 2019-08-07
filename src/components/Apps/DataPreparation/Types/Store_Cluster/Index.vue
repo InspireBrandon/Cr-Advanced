@@ -6,6 +6,10 @@
                     <v-toolbar flat dense dark>
                         <v-toolbar-title>Store</v-toolbar-title>
                         <v-spacer></v-spacer>
+                        <v-autocomplete class="pa-0 ma-0" label="Category" @change="changeCategory"
+                            v-model="selectedCategory" :items="Category_Link"></v-autocomplete>
+                        <v-spacer></v-spacer>
+                        <v-spacer></v-spacer>
                         <v-text-field append-icon="search" type="text" id="filter-text-box" placeholder="Filter..."
                             @input="onFilterTextBoxChanged" v-model="filterText">
                         </v-text-field>
@@ -35,14 +39,18 @@
     export default {
         data() {
             return {
+                selectedCategory: null,
                 filterText: '',
                 clusterLinkDetails: '',
                 items: [],
+                Category_Link: [],
                 pageNumber: 0,
                 allowedRecords: 25,
                 columnDefs: [],
                 rowData: [],
-                defaultColDef: {},
+                defaultColDef: {
+                    onCellValueChanged: this.UpdateStoreCluster
+                },
                 store_Cluster: [],
                 gridOptions: {
                     rowHeight: 35,
@@ -63,16 +71,29 @@
         },
         created() {
             let self = this;
-
             self.gridOptions.context.componentParent = this;
             self.getStores();
-            self.getClusters();
+            self.getCategories();
         },
         beforeMount() {
             let self = this;
             self.columnDefs = require('./headers.json');
         },
         methods: {
+            changeCategory() {
+                let self = this
+                self.$nextTick(() => {
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    Axios.get(process.env.VUE_APP_API + `StoreClustering?category_ID=${self.selectedCategory}`)
+                        .then(r => {
+
+                            self.rowData = r.data
+
+                            delete Axios.defaults.headers.common["TenantID"];
+                        })
+                })
+            },
             onFilterTextBoxChanged() {
                 let self = this;
                 self.gridApi.setQuickFilter(self.filterText);
@@ -89,13 +110,27 @@
             getStores() {
                 let self = this
 
+
+            },
+            getCategories() {
+                let self = this
+
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.get(process.env.VUE_APP_API + `Retailer/Store`)
+                Axios.get(process.env.VUE_APP_API + `Retailer/Category_Link`)
                     .then(r => {
-                        console.log("data", r.data);
 
-                        self.rowData = r.data;
+
+                        let Category_Link = r.data;
+                        self.Category_Link = [];
+                        Category_Link.forEach(element => {
+                            self.Category_Link.push({
+                                text: element.displayName,
+                                value: element.id
+                            })
+                        });
+                        self.selectedCategory = self.Category_Link[0].value
+                        self.changeCategory()
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
@@ -117,7 +152,7 @@
                         })
 
                         store_clusters.forEach(element => {
-                            console.log(element)
+
 
                             self.store_Cluster.push({
                                 text: element.displayname,
@@ -128,18 +163,50 @@
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
+            UpdateStoreCluster(params) {
+                let self = this
+                let item = params.data;
+                let node = params.node;
+                switch (params.colDef.field) {
+                    case "customCluster": {
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                        Axios.post(process.env.VUE_APP_API +
+                                `Store/UpdateCustomCluster?category_ID=${self.selectedCategory}&cluster_Name=${item.customCluster}&store_ID=${item.store_ID}`
+                            )
+                            .then(r => {
+
+                                self.changeCategory()
+                                delete Axios.defaults.headers.common["TenantID"];
+                            })
+                    }
+                    break;
+                case "storeCluster": {
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                    Axios.post(process.env.VUE_APP_API +
+                            `Store/UpdateStoreCluster?cluster_Name=${item.storeCluster}&store_ID=${item.store_ID}`)
+                        .then(r => {
+
+                            self.changeCategory()
+                            delete Axios.defaults.headers.common["TenantID"];
+                        })
+                    break;
+                }
+
+                }
+
+            },
             saveOnChange() {
                 console.log("save");
                 let self = this
 
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                // Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.post(process.env.VUE_APP_API + `Cluster/Store`)
-                    .then(r => {
-                        console.log("cluster", r.data);
+                // Axios.post(process.env.VUE_APP_API + `Cluster/Store`)
+                //     .then(r => {
+                //         console.log("cluster", r.data);
 
-                        delete Axios.defaults.headers.common["TenantID"];
-                    })
+                //         delete Axios.defaults.headers.common["TenantID"];
+                //     })
             }
         }
     }

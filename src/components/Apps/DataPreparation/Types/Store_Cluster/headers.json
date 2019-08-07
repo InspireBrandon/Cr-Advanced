@@ -1,12 +1,17 @@
 [{
     "headerName": "Store Name",
-    "field": "displayname",
-    "editable": true,
+    "field": "store",
+    "editable": false,
     "hide": false
 }, {
     "headerName": "Store Cluster",
-    "editable": false,
+    "editable": true,
     "hide": false,
-    "cellRendererFramework": "Selector",
-    "dropdownName": "store_clusters"
+    "field":"storeCluster"
+},
+{
+    "headerName": "Custom Cluster",
+    "field":"customCluster",
+    "editable": true,
+    "hide": false
 }]
