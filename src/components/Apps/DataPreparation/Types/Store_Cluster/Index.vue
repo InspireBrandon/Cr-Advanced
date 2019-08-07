@@ -174,8 +174,6 @@
                                 `Store/UpdateCustomCluster?category_ID=${self.selectedCategory}&cluster_Name=${item.customCluster}&store_ID=${item.store_ID}`
                             )
                             .then(r => {
-
-                                self.changeCategory()
                                 delete Axios.defaults.headers.common["TenantID"];
                             })
                     }
@@ -185,8 +183,6 @@
                     Axios.post(process.env.VUE_APP_API +
                             `Store/UpdateStoreCluster?cluster_Name=${item.storeCluster}&store_ID=${item.store_ID}`)
                         .then(r => {
-
-                            self.changeCategory()
                             delete Axios.defaults.headers.common["TenantID"];
                         })
                     break;
