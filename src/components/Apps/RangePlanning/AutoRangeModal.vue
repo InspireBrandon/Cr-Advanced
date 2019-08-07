@@ -68,7 +68,8 @@
                                 <td style="text-align: center;">Top</td>
                                 <td style="padding: 0px!important;">
                                     <div style="display: flex;">
-                                        <input v-model="potential_sales" style="width: 80%; text-align: right;" type="number">
+                                        <input v-model="potential_sales" style="width: 80%; text-align: right;"
+                                            type="number">
                                         <div style="margin-left: 5px;">%</div>
                                     </div>
                                 </td>
@@ -78,7 +79,8 @@
                                 <td style="text-align: center;">Top</td>
                                 <td style="padding: 0px!important;">
                                     <div style="display: flex;">
-                                        <input v-model="potential_volume" style="width: 80%; text-align: right;" type="number">
+                                        <input v-model="potential_volume" style="width: 80%; text-align: right;"
+                                            type="number">
                                         <div style="margin-left: 5px;">%</div>
                                     </div>
                                 </td>
@@ -88,7 +90,8 @@
                                 <td style="text-align: center;">Top</td>
                                 <td style="padding: 0px!important;">
                                     <div style="display: flex;">
-                                        <input v-model="potential_profit" style="width: 80%; text-align: right;" type="number">
+                                        <input v-model="potential_profit" style="width: 80%; text-align: right;"
+                                            type="number">
                                         <div style="margin-left: 5px;">%</div>
                                     </div>
                                 </td>
@@ -98,6 +101,13 @@
                                 <td style="text-align: center;">On/Off</td>
                                 <td style="padding: 0px!important;">
                                     <input v-model="audit" type="checkbox" style="width: 100%;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>DOS Units</td>
+                                <td style="text-align: center;">Value</td>
+                                <td style="padding: 0px!important;">
+                                    <input v-model="dos_units" type="number" style="width: 100%;">
                                 </td>
                             </tr>
                         </tbody>
@@ -130,6 +140,7 @@
                 potential_volume: 80,
                 potential_profit: 80,
                 audit: false,
+                dos_units: 6,
                 afterComplete: null
             }
         },
@@ -147,6 +158,7 @@
                 self.potential_sales = config.potential_sales;
                 self.potential_volume = config.potential_volume;
                 self.potential_profit = config.potential_profit;
+                self.dos_units = config.dos_units;
                 self.audit = config.audit;
 
                 self.dialog = true;
@@ -165,7 +177,8 @@
                     potential_sales: self.potential_sales,
                     potential_volume: self.potential_volume,
                     potential_profit: self.potential_profit,
-                    audit: self.audit
+                    audit: self.audit,
+                    dos_units: self.dos_units
                 }
 
                 self.afterComplete(arc);

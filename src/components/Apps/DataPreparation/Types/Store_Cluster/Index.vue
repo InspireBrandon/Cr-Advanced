@@ -111,6 +111,11 @@
                         let store_clusters = r.data;
                         self.store_Cluster = [];
 
+                        self.store_Cluster.push({
+                            text: "None",
+                            value: null
+                        })
+
                         store_clusters.forEach(element => {
                             console.log(element)
 

@@ -186,10 +186,10 @@ class RangingController {
     return sales;
   }
 
-  getSalesDataByCluster(clusterType, clusterID) {
+  getSalesDataByCluster(clusterType, clusterID, autoRangeData) {
     let stores = getStoresByCluster(this.clusterData, clusterType, clusterID);
 
-    let sales = getSalesDataByStores(stores, this.allRangeProducts, this.storeSales, this.clusterData, clusterType, clusterID, this.totalsData);
+    let sales = getSalesDataByStores(stores, this.allRangeProducts, this.storeSales, this.clusterData, clusterType, clusterID, this.totalsData, autoRangeData);
     return sales;
   }
 
@@ -473,6 +473,17 @@ function getProfitContribution(storeSales, productID, clusters, clusterType, clu
   return contribution;
 }
 
+function getDaysOfSupplyPerX(dos_units, clusters, clusterType, clusterID, volume_potential) {
+  let clusterStores = getStoresByCluster(clusters, clusterType, clusterID);
+  let storeCount = clusterStores.length;
+
+  let capacity = parseInt(dos_units);  ;
+
+  let other = volume_potential == 0 ? 0 : capacity / (volume_potential / storeCount) * 30;
+
+  return other;
+}
+
 function getDaysOfSupplyFacings(clusters, clusterType, clusterID, volume_potential, depth) {
   let clusterStores = getStoresByCluster(clusters, clusterType, clusterID);
   let storeCount = clusterStores.length;
@@ -654,7 +665,7 @@ function getSalesDataByStore(store, allProducts, storeSales) {
 }
 
 // Get all the sum of sales data by stores
-function getSalesDataByStores(stores, allProducts, storeSales, clusters, clusterType, clusterID, totalsData) {
+function getSalesDataByStores(stores, allProducts, storeSales, clusters, clusterType, clusterID, totalsData, autoRangeData) {
   let sales = [];
 
   for (let i = 0; i < stores.length; i++) {
@@ -667,7 +678,7 @@ function getSalesDataByStores(stores, allProducts, storeSales, clusters, cluster
     }
   }
 
-  let totalSales = getTotalProductSales(allProducts, sales, storeSales, stores, clusters, clusterType, clusterID, totalsData);
+  let totalSales = getTotalProductSales(allProducts, sales, storeSales, stores, clusters, clusterType, clusterID, totalsData, autoRangeData);
   return totalSales;
 }
 
@@ -794,7 +805,7 @@ function storeInCluster(storeID, clusterStores) {
 }
 
 // Get total product sales
-function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, clusterType, clusterID, totalsData) {
+function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, clusterType, clusterID, totalsData, autoRangeData) {
   let productSales = [];
 
   let totalSales = 0;
@@ -868,7 +879,8 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
     if(weighted_distribution != 0 && sales_units != 0)
       (cost_potential = sales_cost / weighted_distribution * 100).toFixed(0);
 
-    let dos_fac = getDaysOfSupplyFacings(clusters, clusterType, clusterID, volume_potential, product.depth)
+    // dos_fac = getDaysOfSupplyFacings(clusters, clusterType, clusterID, volume_potential, product.depth)
+    let dos_fac = (autoRangeData == undefined || autoRangeData == null) ? 0 : getDaysOfSupplyPerX(autoRangeData.dos_units, clusters, clusterType, clusterID, volume_potential)
 
     productSales.push(new RangeProduct(product, {
       sales_retail: parseFloat(sales_retail.toFixed(2)),

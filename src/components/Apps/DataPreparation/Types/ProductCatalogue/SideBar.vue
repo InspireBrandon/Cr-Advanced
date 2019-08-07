@@ -1,15 +1,15 @@
 <template>
     <div style="text-align: center; width: 100%; padding: 10px;">
         <h2>Images</h2>
-        <v-card class="elevation-5" style="margin-top: 10px" v-if="image1 != ''">
+        <v-card flat style="margin-top: 10px" v-if="image1 != ''">
             <h3>Front</h3>
             <img :src="image1" class="side-image" />
         </v-card>
-        <v-card class="elevation-5" style="margin-top: 10px" v-if="image2 != ''">
+        <v-card flat style="margin-top: 10px" v-if="image2 != ''">
             <h3>Side</h3>
             <img :src="image2" class="side-image" />
         </v-card>
-        <v-card class="elevation-5" style="margin-top: 10px" v-if="image3 != ''">
+        <v-card flat style="margin-top: 10px" v-if="image3 != ''">
             <h3>Top</h3>
             <img :src="image3" class="side-image" />
         </v-card>

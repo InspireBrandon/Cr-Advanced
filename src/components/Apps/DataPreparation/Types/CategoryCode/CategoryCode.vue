@@ -17,7 +17,7 @@
                 <v-icon>add</v-icon>
             </v-btn>
         </v-toolbar>
-        <div v-if="rowData.length>0">
+        <div>
             <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 130px);"
                 :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
                 :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true"
@@ -84,7 +84,8 @@
                     // },
                     {
                         "headerName": "Planogram",
-                        "field": "planogramName"
+                        "field": "planogramName",
+                        "editable": true
                     }, {
                         "headerName": "Planogram Import Name",
                         "field": "default_Planogram",
@@ -129,6 +130,12 @@
             assignDefaultAsPlanogram() {
                 let self = this
                 self.$refs.Spinner.show()
+
+                Axios.post(process.env.VUE_APP_API + `Planogram/AssignUnassigned?db=CR-Hinterland-Live`)
+                    .then(r => {
+                        self.$refs.Spinner.hide()
+                        self.getItems();
+                    })
             },
             assignCatAsDef() {
                 let self = this
@@ -144,17 +151,34 @@
             },
             UpdateLine(params) {
                 let self = this
-                console.log("[UPDATING]");
+                console.log(params);
 
-                let item = params.data
-                let node = params.node
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                if (params.newValue != params.oldValue) {
+                    let item = params.data;
+                    let node = params.node;
 
-                Axios.post(process.env.VUE_APP_API + `Retailer/Category_Link/Default`, item).then(r => {
-                    console.log(r);
-                    self.getItems()
-                    delete Axios.defaults.headers.common["TenantID"];
-                })
+                    switch (params.colDef.field) {
+                        case "planogramName": {
+                            Axios.post(process.env.VUE_APP_API + `Planogram/CreateNewOrUpdate?db=CR-Hinterland-Live&planogramName=${params.newValue}&planogram_ID=${item.planogram_ID}&categoryID=${item.id}`).then(r => {
+                                if(!r.data) {
+                                    alert("There was an error updating the planogram");
+                                }
+
+                                self.getItems()
+                            })
+                        }
+                        break;
+                    case "default_Planogram": {
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                        Axios.post(process.env.VUE_APP_API + `Retailer/Category_Link/Default`, item).then(r => {
+                            self.getItems()
+                            delete Axios.defaults.headers.common["TenantID"];
+                        })
+                    }
+                    break;
+                    }
+                }
             },
             assignDefaults() {
                 let self = this
