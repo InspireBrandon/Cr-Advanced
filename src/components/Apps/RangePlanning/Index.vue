@@ -186,6 +186,7 @@
     <RangingReportModal ref="RangingReportModal" />
     <GraphConfigurationModal ref="GraphConfigurationModal" />
     <ParetoModal ref="ParetoModal" />
+    <GpGraph ref="GpGraph" />
   </div>
 </template>
 
@@ -222,6 +223,7 @@
   import RangingReportModal from './RangingReportModal.vue'
   import GraphConfigurationModal from './GraphConfigurationModal.vue'
   import ParetoModal from './ParetoModal.vue'
+  import GpGraph from './GpGraph.vue'
 
 
   import {
@@ -239,6 +241,7 @@
   export default {
     name: 'Ranging',
     components: {
+      GpGraph,
       ParetoModal,
       SizeLoader,
       YesNoModal,
@@ -420,6 +423,20 @@
               }
             })
           });
+      },
+      openGPModal(fact, fact_name, selected_graph, graph_Type) {
+        let self = this
+
+        self.$refs.GpGraph.open(self.rowData, {
+            key: 'description',
+            value: fact,
+            fact_name: fact_name,
+            altValue: 'count',
+            rangeName: self.generateFileName(),
+            percent: 'percent',
+            graph: selected_graph
+          }, graph_Type,
+          callback => {});
       },
       checkparams() {
         let self = this
@@ -1092,53 +1109,60 @@
         break;
         }
       },
+
       onChart1() {
         let self = this;
 
         self.$refs.GraphConfigurationModal.show(graph_config => {
+          if (graph_config.selected_fact == "gross_profit" && graph_config.selected_graph != "Pareto") {
 
-          if (graph_config.selected_graph == "Pareto") {
-            self.openParetoModal(graph_config.selected_fact, graph_config.selected_fact_name)
+            self.openGPModal(graph_config.selected_fact, graph_config.selected_fact_name, graph_config
+              .selected_graph, graph_config.selected_graph_type)
+
           } else {
-            self.columnApi.setColumnVisible(graph_config.selected_fact, true);
-            self.columnApi.setColumnVisible(graph_config.selected_graph, true);
+            if (graph_config.selected_graph == "Pareto") {
+              self.openParetoModal(graph_config.selected_fact, graph_config.selected_fact_name)
+            } else {
+              self.columnApi.setColumnVisible(graph_config.selected_fact, true);
+              self.columnApi.setColumnVisible(graph_config.selected_graph, true);
 
-            var params = {
-              cellRange: {
-                columns: [graph_config.selected_fact, graph_config.selected_graph]
-              },
-              aggregate: true,
-              chartType: graph_config.selected_graph_type,
-              processChartOptions: function (params) {
-                let opts = params.options;
+              var params = {
+                cellRange: {
+                  columns: [graph_config.selected_fact, graph_config.selected_graph]
+                },
+                aggregate: true,
+                chartType: graph_config.selected_graph_type,
+                processChartOptions: function (params) {
+                  let opts = params.options;
 
-                opts.title = {
-                  text: self.generateFileName() + " " + self.fileData.tag + " ",
-                  fontFamily: "Roboto, sans-serif",
-                  fontWeight: "undefined",
-                  fontSize: 12
-                };
+                  opts.title = {
+                    text: self.generateFileName() + " " + self.fileData.tag + " ",
+                    fontFamily: "Roboto, sans-serif",
+                    fontWeight: "undefined",
+                    fontSize: 12
+                  };
 
-                let clusterName = "";
+                  let clusterName = "";
 
-                self.clusterOptions[self.selectedClusterType].forEach(el => {
-                  if (el.value == self.selectedClusterOption)
-                    clusterName = el.text
-                })
+                  self.clusterOptions[self.selectedClusterType].forEach(el => {
+                    if (el.value == self.selectedClusterOption)
+                      clusterName = el.text
+                  })
 
-                opts.subtitle = {
-                  text: graph_config.graphName + " For " + clusterName + " - " + self.storesInCluster +
-                    " Stores",
-                  fontFamily: "'Roboto', sans-serif"
+                  opts.subtitle = {
+                    text: graph_config.graphName + " For " + clusterName + " - " + self.storesInCluster +
+                      " Stores",
+                    fontFamily: "'Roboto', sans-serif"
+                  }
+
+                  return opts;
                 }
+              };
 
-                return opts;
-              }
-            };
-
-            this.gridApi.chartRange(params);
-            self.columnApi.setColumnVisible(graph_config.selected_fact, false);
-            self.columnApi.setColumnVisible(graph_config.selected_graph, false);
+              this.gridApi.chartRange(params);
+              self.columnApi.setColumnVisible(graph_config.selected_fact, false);
+              self.columnApi.setColumnVisible(graph_config.selected_graph, false);
+            }
           }
         });
       },

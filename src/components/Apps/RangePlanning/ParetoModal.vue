@@ -1,5 +1,5 @@
 <template>
-    <v-dialog fullscreen persistent width=1000 v-model="dialog">
+    <v-dialog persistent width=1000 v-model="dialog">
         <v-card>
             <v-toolbar dark dense flat color="primary">
                 <v-toolbar-title>
@@ -30,7 +30,9 @@
     import Dialog from '@/components/Common/Dialog';
 
     import am4themes_animated from "@amcharts/amcharts4/themes/animated";
-import { GradientModifier } from '@amcharts/amcharts4/.internal/core/rendering/fills/GradientModifier';
+    import {
+        GradientModifier
+    } from '@amcharts/amcharts4/.internal/core/rendering/fills/GradientModifier';
 
     am4core.useTheme(am4themes_animated);
     export default {
@@ -73,7 +75,7 @@ import { GradientModifier } from '@amcharts/amcharts4/.internal/core/rendering/f
                 self.rangeName = key_value.rangeName
                 self.dialog = true
                 self.fact_name = key_value.fact_name
-               
+
                 self.callback = callback;
                 setTimeout(() => {
                     self.drawChart(data, key_value);
@@ -112,6 +114,9 @@ import { GradientModifier } from '@amcharts/amcharts4/.internal/core/rendering/f
             },
             drawChart(data, key_value) {
                 let self = this;
+                console.log(data);
+                console.log(key_value);
+
                 let chart = am4core.create("chartdiv", am4charts.XYChart);
 
                 chart.events.on("hit", function (event) {
@@ -133,7 +138,8 @@ import { GradientModifier } from '@amcharts/amcharts4/.internal/core/rendering/f
                     for (var i = 0; i < chart.data.length; i++) {
                         let value = chart.data[i][key_value.value];
                         chart.data[i][key_value.altValue] = i + 1;
-                        chart.data[i][key_value.percent] = (chart.data[i][key_value.altValue] / self.rowdata.length * 100).toFixed(1);
+                        chart.data[i][key_value.percent] = (chart.data[i][key_value.altValue] / self.rowdata.length *
+                            100).toFixed(1);
 
                         total += value;
                     }
@@ -143,7 +149,7 @@ import { GradientModifier } from '@amcharts/amcharts4/.internal/core/rendering/f
                         let value = chart.data[i][key_value.value];
                         sum += value;
                         chart.data[i].pareto = sum / total * 100;
-                        
+
                     }
                 }
                 // Create axes
@@ -216,7 +222,8 @@ import { GradientModifier } from '@amcharts/amcharts4/.internal/core/rendering/f
                 paretoSeries.dataFields.categoryz = key_value.key;
                 paretoSeries.dataFields.categoryzz = key_value.percent;
                 paretoSeries.yAxis = paretoValueAxis;
-                paretoSeries.tooltipText = `{categoryzz}% of the items = {valueY.formatNumber('#.0')}%[/] of ${self.fact_name}`;
+                paretoSeries.tooltipText =
+                    `{categoryzz}% of the items = {valueY.formatNumber('#.0')}%[/] of ${self.fact_name}`;
 
                 paretoSeries.bullets.push(new am4charts.CircleBullet());
 
@@ -230,13 +237,13 @@ import { GradientModifier } from '@amcharts/amcharts4/.internal/core/rendering/f
                 this.chart = chart
 
             },
-           
+
         }
     }
 </script>
 
 <style scoped>
     #chartdiv {
-        height: 84vh;
+        height: 600px;
     }
 </style>
