@@ -66,7 +66,7 @@
           </v-list>
         </v-menu>
         <v-menu v-if="rowData.length > 0" dark offset-y style="margin-bottom: 10px;">
-          <v-btn slot="activator" flat>Configure</v-btn>
+          <v-btn slot="activator" flat>Highlight</v-btn>
           <v-list>
             <v-list-tile :disabled="selectedClusterOption == null" @click="openAutoRangeModal">
               <v-list-tile-title>Auto Range</v-list-tile-title>
@@ -723,7 +723,7 @@
                 pinned: 'right'
               })
             }
-          
+
 
             self.columnDefs[13] = {
                 headerName: "Indicator",
@@ -734,9 +734,13 @@
                   values: ["YES", "NO", "SELECTED", "SELECT"]
                 },
                 cellStyle: function (params) {
-                  if (params.data.autoRangeItem == true) {
+
+                  if (params.data.autoRangeOneItem && params.data.autoRangeItem) {
                     return {
-                      // color: 'red',
+                      backgroundColor: "#8ef58e"
+                    };
+                  } else if (params.data.autoRangeOneItem && params.data.sales_Retail > 0) {
+                    return {
                       backgroundColor: "#cfffcf"
                     };
                   } else {
@@ -1137,7 +1141,6 @@
         break;
         }
       },
-
       onChart1() {
         let self = this;
 
@@ -1227,57 +1230,90 @@
 
         self.rowData.forEach(el => {
           el.autoRangeItem = false;
-          if (self.testAutoRangeProduct(el, self.rowData)) {
+          el.autoRangeOneItem = false;
+
+          var test = self.testAutoRangeProduct(el, self.rowData)
+
+          if (test.passesOne)
+            el.autoRangeOneItem = true;
+
+          if (test.passesAll)
             el.autoRangeItem = true;
-          }
         })
       },
       testAutoRangeProduct(product, allProducts) {
         let self = this;
-        let partOfRange = true;
+        let passesAll = true;
+        let passesOne = false;
         let config = self.autoRangeData;
 
+        if(product.barcode == '6001091351914')
+          console.log(product);
+
         if (!config.audit && product.imageAudit) {
-          partOfRange = false;
+          passesAll = false;
         }
 
         if (product.sales_contribution <= config.sales_index) {
-          partOfRange = false;
+          passesAll = false;
+        } else {
+          if(product.barcode == '6001091351914')
+            console.log("PASSED AT SALES CONTR");
+          passesOne = true
         }
 
         if (product.profit_contribution <= config.profit_index) {
-          partOfRange = false;
+          passesAll = false;
+        } else {
+          passesOne = true
         }
 
         if (product.units_contribution <= config.volume_index) {
-          partOfRange = false;
+          passesAll = false;
+        } else {
+          passesOne = true
         }
 
         if (!self.inPercentage(allProducts, config.sales, product, 'sales_Retail')) {
-          partOfRange = false;
+          passesAll = false;
+        } else {
+          passesOne = true
         }
 
         if (!self.inPercentage(allProducts, config.volume, product, 'sales_Units')) {
-          partOfRange = false;
+          passesAll = false;
+        } else {
+          passesOne = true
         }
 
         if (!self.inPercentage(allProducts, config.profit, product, 'sales_Profit')) {
-          partOfRange = false;
+          passesAll = false;
+        } else {
+          passesOne = true
         }
 
         if (!self.inPercentage(allProducts, config.potential_sales, product, 'sales_contribution')) {
-          partOfRange = false;
+          passesAll = false;
+        } else {
+          passesOne = true
         }
 
         if (!self.inPercentage(allProducts, config.potential_volume, product, 'units_contribution')) {
-          partOfRange = false;
+          passesAll = false;
+        } else {
+          passesOne = true
         }
 
         if (!self.inPercentage(allProducts, config.potential_profit, product, 'profit_contribution')) {
-          partOfRange = false;
+          passesAll = false;
+        } else {
+          passesOne = true
         }
 
-        return partOfRange;
+        return {
+          passesOne: passesOne,
+          passesAll: passesAll
+        };
       },
       inPercentage(allProducts, percentage, product, field) {
         let self = this;

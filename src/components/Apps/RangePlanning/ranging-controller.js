@@ -1040,6 +1040,7 @@ function RangeProduct(productData, salesData, indicator) {
   self.units_contribution = salesData.units_contribution;
   self.profit_contribution = salesData.profit_contribution;
   self.autoRangeItem = false;
+  self.autoRangeOneItem = false;
 }
 
 function storeStocksProduct(storeSales, storeID, productID) {
