@@ -285,9 +285,9 @@
             'audit-image-breach': function (params) {
 
             },
-            'auto-range-item': function (params) {
-              return params.data.autoRangeItem == undefined ? false : params.data.autoRangeItem;
-            }
+            // 'auto-range-item': function (params) {
+            //   return params.data.autoRangeItem == undefined ? false : params.data.autoRangeItem;
+            // }
           },
         },
         autoRangeData: {
@@ -723,7 +723,31 @@
                 pinned: 'right'
               })
             }
-            resolve(true);
+          
+
+            self.columnDefs[13] = {
+                headerName: "Indicator",
+                field: "store_Range_Indicator",
+                editable: true,
+                cellEditor: "agRichSelectCellEditor",
+                cellEditorParams: {
+                  values: ["YES", "NO", "SELECTED", "SELECT"]
+                },
+                cellStyle: function (params) {
+                  if (params.data.autoRangeItem == true) {
+                    return {
+                      // color: 'red',
+                      backgroundColor: "#cfffcf"
+                    };
+                  } else {
+                    return {
+                      backgroundColor: "#E3F2FD"
+                    };
+                  }
+                },
+              },
+
+              resolve(true);
           } catch (exc) {
             reject();
           }
@@ -1184,7 +1208,8 @@
           self.rowData.forEach(el => {
             if (el.store_Range_Indicator == "YES") {
               self.ais_Sales = (parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)).toFixed(2);
-              self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + parseFloat(el.sales_potential)).toFixed(2);
+              self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + parseFloat(el.sales_potential))
+                .toFixed(2);
             }
           })
           self.calculateAutoRange();
