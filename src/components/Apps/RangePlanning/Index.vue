@@ -1247,7 +1247,7 @@
         let passesOne = false;
         let config = self.autoRangeData;
 
-        if(product.barcode == '6001091351914')
+        if (product.barcode == '6001091351914')
           console.log(product);
 
         if (!config.audit && product.imageAudit) {
@@ -1257,7 +1257,7 @@
         if (product.sales_contribution <= config.sales_index) {
           passesAll = false;
         } else {
-          if(product.barcode == '6001091351914')
+          if (product.barcode == '6001091351914')
             console.log("PASSED AT SALES CONTR");
           passesOne = true
         }
@@ -1318,8 +1318,8 @@
       inPercentage(allProducts, percentage, product, field) {
         let self = this;
 
-        let sorted = allProducts.sort((a, b) => {
-          return a[field] < b[field];
+        let sorted = allProducts.sort(function (a, b) {
+          return a[field] - b[field];
         })
 
         let sortedCount = Math.round((percentage / 100) * sorted.length);
@@ -1329,7 +1329,7 @@
         for (var i = allProducts.length - 1; i >= diff; i--) {
           let item = sorted[i];
           if (item.barcode == product.barcode) {
-            partOfRange = true;
+            partOfRange = true;0
           }
         }
 
