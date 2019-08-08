@@ -196,7 +196,7 @@
                     self.planogramList = []
                     r.data.planogramList.forEach(element => {
                         self.planogramName.push({
-                            text: element.planogram,
+                            text: element.displayname,
                             value: element.id
                         })
                     });
