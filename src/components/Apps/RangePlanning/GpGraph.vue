@@ -18,7 +18,7 @@
                 <v-spacer></v-spacer>
             </v-toolbar>
             <v-card-text>
-                <div id="chartdiv"></div>
+                <div id="bardiv"></div>
             </v-card-text>
         </v-card>
         <Dialog ref="Dialog" />
@@ -56,7 +56,7 @@
 
         methods: {
             close() {
-                let chart = document.getElementById('chartdiv');
+                let chart = document.getElementById('bardiv');
 
                 // chart.clear();
                 chart = null;
@@ -79,7 +79,7 @@
                     self.callback = callback;
                     setTimeout(() => {
                         self.drawChart(callback, key_value, graph_Type);
-                    }, 100);
+                    }, 300);
                 })
 
             },
@@ -152,7 +152,7 @@
 
 
                 if (graph_Type == "bar") {
-                    let chart = am4core.create("chartdiv", am4charts.XYChart);
+                    let chart = am4core.create("bardiv", am4charts.XYChart);
 
 
                     let sortedData = data.sort(function (a, b) {
@@ -196,7 +196,7 @@
                 {
                     console.log("drawing pie");
                     
-                    let chart = am4core.create("chartdiv", am4charts.PieChart3D);
+                    let chart = am4core.create("bardiv", am4charts.PieChart3D);
                     chart.hiddenState.properties.opacity = 0; // this creates initial fade-in
 
                     chart.legend = new am4charts.Legend();
@@ -212,6 +212,7 @@
                     series.dataFields.value = "gross_profit";
                     series.dataFields.category = "Name";
                       this.chart = chart
+                       console.log("pie finished drawing");
                 }
 
             },
@@ -221,7 +222,7 @@
 </script>
 
 <style scoped>
-    #chartdiv {
+    #bardiv {
         height: 600px;
     }
 </style>

@@ -79,7 +79,7 @@
                 self.callback = callback;
                 setTimeout(() => {
                     self.drawChart(data, key_value);
-                }, 100);
+                }, 300);
             },
             closeAndSendRowdata(data) {
                 let self = this;
@@ -158,7 +158,7 @@
                     }
                 }
                 // Create axes
-
+                  console.log("after Pareto function");
                 let categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
                 categoryAxis.dataFields.category = key_value.altValue;
                 categoryAxis.renderer.grid.template.location = 0;
