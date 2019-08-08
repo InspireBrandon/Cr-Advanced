@@ -124,6 +124,9 @@
                     this.handleClick(data, event.target.series.values[1].tooltipDataItem.categoryX, event.target
                         .series.values[1].tooltipDataItem.categoryz)
                 }, this);
+
+                console.log("sort function");
+                
                 let sortedData = data.sort(function (a, b) {
                     return b[key_value.value] - a[key_value.value];
                 })
@@ -133,6 +136,8 @@
                 prepareParetoData();
 
                 function prepareParetoData() {
+                    console.log("Pareto function");
+                    
                     let total = 0;
 
                     for (var i = 0; i < chart.data.length; i++) {
