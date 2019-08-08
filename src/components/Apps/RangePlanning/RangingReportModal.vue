@@ -58,17 +58,17 @@
                             </tr>
                             <tr>
                                 <td>Stock On Hand - Units</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td>{{ reportData.current.stock_on_hand_units.total_category }}</td>
+                                <td>{{ reportData.current.stock_on_hand_units.items_selected }}</td>
+                                <td>{{ reportData.current.stock_on_hand_units.selected_stores }}</td>
+                                <td>{{ reportData.current.stock_on_hand_units.discontinued }}</td>
                             </tr>
                             <tr>
                                 <td>Stock On Hand - Cost</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td>{{ reportData.current.stock_on_hand_cost.total_category }}</td>
+                                <td>{{ reportData.current.stock_on_hand_cost.items_selected }}</td>
+                                <td>{{ reportData.current.stock_on_hand_cost.selected_stores }}</td>
+                                <td>{{ reportData.current.stock_on_hand_cost.discontinued }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -118,20 +118,6 @@
                                 <td>{{ reportData.potential.gross_profit.items_selected }}</td>
                                 <td>{{ reportData.potential.gross_profit.selected_stores }}</td>
                                 <td>{{ reportData.potential.gross_profit.discontinued }}</td>
-                            </tr>
-                            <tr>
-                                <td>Stock On Hand - Units</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Stock On Hand - Cost</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
                             </tr>
                         </tbody>
                     </table>

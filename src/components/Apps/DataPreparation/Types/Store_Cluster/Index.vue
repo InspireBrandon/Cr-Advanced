@@ -85,7 +85,7 @@
                 self.$nextTick(() => {
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                    Axios.get(process.env.VUE_APP_API + `StoreClustering?category_ID=${self.selectedCategory}`)
+                    Axios.get(process.env.VUE_APP_API + `StoreClustering?planogram_ID=${self.selectedCategory}`)
                         .then(r => {
 
                             self.rowData = r.data

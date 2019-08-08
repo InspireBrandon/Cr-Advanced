@@ -537,6 +537,8 @@
                 `RangingAdvanced?planogramID=${planogram.planogram_ID}&dateFromID=${dateRange.dateFrom}&dateToID=${dateRange.dateTo}`
               )
               .then(r => {
+                r.data["dateFrom"] = dateRange.dateFrom;
+                r.data["dateTo"] = dateRange.dateTo;
                 self.rangingController = new RangingController(r.data);
 
                 self.rangingController.getSalesMonthlyTotals(() => {
@@ -1290,14 +1292,15 @@
     let self = this;
     self.type = type;
 
+    console.log(data)
 
     self.sales = new RangeReportRow(data, type, 'sales', 'money');
     self.units = new RangeReportRow(data, type, 'units', 'number');
     self.profit = new RangeReportRow(data, type, 'profit', 'money');
     self.item_count = new RangeReportRow(data, type, 'item_count', 'number');
     self.gross_profit = new RangeReportRow(data, type, 'gross_profit', 'percent');
-    self.stock_on_hand_units = new RangeReportRow(data, type, 'stock_on_hand_units');
-    self.stock_on_hand_cost = new RangeReportRow(data, type, 'stock_on_hand_cost');
+    self.stock_on_hand_units = new RangeReportRow(data, type, 'stock_on_hand_units', 'number');
+    self.stock_on_hand_cost = new RangeReportRow(data, type, 'stock_on_hand_cost', 'money');
   }
 
   function RangeReportRow(rowData, report_type, type, format) {
@@ -1388,11 +1391,29 @@
       }
       break;
       case 'stock_on_hand_units': {
+        self.total_category += parseFloat(productData.stock_Units.toFixed(2));
 
+        if (productData.store_Range_Indicator == 'YES')
+          self.items_selected += parseFloat(productData.stock_Units.toFixed(2));
+
+        if (productData.store_Range_Indicator == 'SELECT')
+          self.selected_stores += parseFloat(productData.stock_Units.toFixed(2));
+
+        if (productData.store_Range_Indicator == 'NO')
+          self.discontinued += parseFloat(productData.stock_Units.toFixed(2));
       }
       break;
       case 'stock_on_hand_cost': {
+        self.total_category += parseFloat(productData.stock_Cost.toFixed(2));
 
+        if (productData.store_Range_Indicator == 'YES')
+          self.items_selected += parseFloat(productData.stock_Cost.toFixed(2));
+
+        if (productData.store_Range_Indicator == 'SELECT')
+          self.selected_stores += parseFloat(productData.stock_Cost.toFixed(2));
+
+        if (productData.store_Range_Indicator == 'NO')
+          self.discontinued += parseFloat(productData.stock_Cost.toFixed(2));
       }
       break;
       }
