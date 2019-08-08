@@ -303,16 +303,36 @@
           audit: false,
           dos_units: 6,
           setDefaults() {
+            this.use_sales_index = true;
             this.sales_index = 100;
+
+            this.use_profit_index = true;
             this.profit_index = 100;
+
+            this.use_volume_index = true;
             this.volume_index = 100;
+
             this.sales = 80;
+            this.use_sales = true;
+
             this.volume = 80;
+            this.use_volume = true;
+
             this.profit = 80;
+            this.use_profit = true;
+
             this.potential_sales = 80;
+            this.use_potential_sales = true;
+
             this.potential_volume = 80;
+            this.use_potential_volume = true;
+
             this.potential_profit = 80;
+            this.use_potential_profit = true;
+
             this.audit = false;
+            this.use_audit = true;
+
             this.dos_units = 6;
           }
         },
@@ -617,8 +637,37 @@
                   self.autoRangeData[prop] = r.data.autoRangeConfig[prop];
                 }
               } else {
-                console.log(self.autoRangeData)
-                self.autoRangeData.setDefaults();
+                self.autoRangeData.sales_index = 100;
+                self.autoRangeData.use_sales_index = true;
+
+                self.autoRangeData.profit_index = 100;
+                self.autoRangeData.use_profit_index = true;
+
+                self.autoRangeData.volume_index = 100;
+                self.autoRangeData.use_volume_index = true;
+
+                self.autoRangeData.sales = 80;
+                self.autoRangeData.use_sales = true;
+
+                self.autoRangeData.volume = 80;
+                self.autoRangeData.use_volume = true;
+
+                self.autoRangeData.profit = 80;
+                self.autoRangeData.use_profit = true;
+
+                self.autoRangeData.potential_sales = 80;
+                self.autoRangeData.use_potential_sales = true;
+
+                self.autoRangeData.potential_volume = 80;
+                self.autoRangeData.use_potential_volume = true;
+
+                self.autoRangeData.potential_profit = 80;
+                self.autoRangeData.use_potential_profit = true;
+
+                self.autoRangeData.audit = false;
+                self.autoRangeData.use_audit = true;
+
+                self.autoRangeData.dos_units = 6;
               }
 
               self.canRefresh = true;
@@ -1247,67 +1296,92 @@
         let passesOne = false;
         let config = self.autoRangeData;
 
-        if(product.barcode == '6001091351914')
-          console.log(product);
-
-        if (!config.audit && product.imageAudit) {
-          passesAll = false;
+        // Audit
+        if (config.use_audit) {
+          if (!config.audit && product.imageAudit) {
+            passesAll = false;
+          }
         }
 
-        if (product.sales_contribution <= config.sales_index) {
-          passesAll = false;
-        } else {
-          if(product.barcode == '6001091351914')
-            console.log("PASSED AT SALES CONTR");
-          passesOne = true
+        // Sales Index
+        if (config.use_sales_index) {
+          if (product.sales_contribution <= config.sales_index) {
+            passesAll = false;
+          } else {
+            passesOne = true
+          }
         }
 
-        if (product.profit_contribution <= config.profit_index) {
-          passesAll = false;
-        } else {
-          passesOne = true
+        // Sales Index
+        if (config.use_profit_index) {
+          if (product.profit_contribution <= config.profit_index) {
+            passesAll = false;
+          } else {
+            passesOne = true
+          }
         }
 
-        if (product.units_contribution <= config.volume_index) {
-          passesAll = false;
-        } else {
-          passesOne = true
+        // Volume Index
+        if (config.use_volume_index) {
+          if (product.units_contribution <= config.volume_index) {
+            passesAll = false;
+          } else {
+            passesOne = true
+          }
         }
 
-        if (!self.inPercentage(allProducts, config.sales, product, 'sales_Retail')) {
-          passesAll = false;
-        } else {
-          passesOne = true
+        // Sales
+        if (config.use_sales) {
+          if (!self.inPercentage(allProducts, config.sales, product, 'sales_Retail')) {
+            passesAll = false;
+          } else {
+            passesOne = true
+          }
         }
 
-        if (!self.inPercentage(allProducts, config.volume, product, 'sales_Units')) {
-          passesAll = false;
-        } else {
-          passesOne = true
+        // Units
+        if (config.use_volume) {
+          if (!self.inPercentage(allProducts, config.volume, product, 'sales_Units')) {
+            passesAll = false;
+          } else {
+            passesOne = true
+          }
         }
 
-        if (!self.inPercentage(allProducts, config.profit, product, 'sales_Profit')) {
-          passesAll = false;
-        } else {
-          passesOne = true
+        // Profit
+        if (config.use_profit) {
+          if (!self.inPercentage(allProducts, config.profit, product, 'sales_Profit')) {
+            passesAll = false;
+          } else {
+            passesOne = true
+          }
         }
 
-        if (!self.inPercentage(allProducts, config.potential_sales, product, 'sales_contribution')) {
-          passesAll = false;
-        } else {
-          passesOne = true
+        // Potential Sales
+        if (config.use_potential_sales) {
+          if (!self.inPercentage(allProducts, config.potential_sales, product, 'sales_contribution')) {
+            passesAll = false;
+          } else {
+            passesOne = true
+          }
         }
 
-        if (!self.inPercentage(allProducts, config.potential_volume, product, 'units_contribution')) {
-          passesAll = false;
-        } else {
-          passesOne = true
+        // Potential Volume
+        if (config.use_potential_volume) {
+          if (!self.inPercentage(allProducts, config.potential_volume, product, 'units_contribution')) {
+            passesAll = false;
+          } else {
+            passesOne = true
+          }
         }
 
-        if (!self.inPercentage(allProducts, config.potential_profit, product, 'profit_contribution')) {
-          passesAll = false;
-        } else {
-          passesOne = true
+        // Potential Profit
+        if (config.use_potential_profit) {
+          if (!self.inPercentage(allProducts, config.potential_profit, product, 'profit_contribution')) {
+            passesAll = false;
+          } else {
+            passesOne = true
+          }
         }
 
         return {
