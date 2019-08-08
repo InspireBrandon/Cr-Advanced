@@ -194,6 +194,8 @@
                 } 
                 if(graph_Type=="pie")
                 {
+                    console.log("drawing pie");
+                    
                     let chart = am4core.create("chartdiv", am4charts.PieChart3D);
                     chart.hiddenState.properties.opacity = 0; // this creates initial fade-in
 
