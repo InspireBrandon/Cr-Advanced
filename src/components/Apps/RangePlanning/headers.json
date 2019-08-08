@@ -180,5 +180,15 @@
     {
         "headerName": "Profit Index",
         "field": "profit_contribution"
+    },
+    {
+        "headerName": "Stock Cost",
+        "field": "stock_Cost",
+        "hide": true
+    },
+    {
+        "headerName": "Stock Units",
+        "field": "stock_Units",
+        "hide": true
     }
 ]

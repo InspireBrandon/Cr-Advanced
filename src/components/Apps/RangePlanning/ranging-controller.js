@@ -714,6 +714,8 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
     let sales_retail = 0;
     let sales_cost = 0;
     let sales_units = 0;
+    let stock_cost = 0;
+    let stock_units = 0;
 
     for (let j = 0; j < sales.length; j++) {
       const sale = sales[j];
@@ -722,6 +724,8 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
         sales_retail += numberifySales(sale.sales_Retail)
         sales_cost += numberifySales(sale.sales_Cost)
         sales_units += numberifySales(sale.sales_Units)
+        stock_cost += numberifySales(sale.stock_Cost);
+        stock_units += numberifySales(sale.stock_Units);
       }
     };
 
@@ -764,6 +768,8 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
       sales_cost: sales_cost.toFixed(2),
       sales_units: sales_units.toFixed(0),
       sales_profit: sales_profit.toFixed(2),
+      stock_units: stock_units.toFixed(2),
+      stock_cost: stock_cost.toFixed(2),
       number_distribution: number_distribution.toFixed(2),
       weighted_distribution: weighted_distribution.toFixed(2),
       sales_potential: sales_potential.toFixed(2),
@@ -824,6 +830,8 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
     let sales_retail = 0;
     let sales_cost = 0;
     let sales_units = 0;
+    let stock_cost = 0;
+    let stock_units = 0;
 
     for (let j = 0; j < sales.length; j++) {
       const sale = sales[j];
@@ -832,6 +840,8 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
         sales_retail += numberifySales(sale.sales_Retail)
         sales_cost += numberifySales(sale.sales_Cost)
         sales_units += numberifySales(sale.sales_Units)
+        stock_cost += numberifySales(sale.stock_Cost)
+        stock_units += numberifySales(sale.stock_Units)
       }
     };
 
@@ -887,6 +897,8 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
       sales_cost: sales_cost.toFixed(2),
       sales_units: parseFloat(sales_units.toFixed(0)),
       sales_profit: parseFloat(sales_profit.toFixed(2)),
+      stock_units: parseFloat(stock_units.toFixed(2)),
+      stock_cost: parseFloat(stock_cost.toFixed(2)),
       number_distribution: number_distribution.toFixed(2),
       weighted_distribution: weighted_distribution.toFixed(2),
       sales_potential: parseFloat(sales_potential.toFixed(2)),
@@ -1009,6 +1021,8 @@ function RangeProduct(productData, salesData, indicator) {
   self.sales_Cost = salesData.sales_cost;
   self.sales_Units = salesData.sales_units;
   self.sales_Profit = salesData.sales_profit;
+  self.stock_Cost = salesData.stock_cost,
+  self.stock_Units = salesData.stock_units,
   self.number_Distribution = salesData.number_distribution + " %";
   self.weighted_Distribution = salesData.weighted_distribution + " %";
   self.sales_potential = salesData.sales_potential;
