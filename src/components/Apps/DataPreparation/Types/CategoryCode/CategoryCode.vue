@@ -297,7 +297,10 @@
             // },
             onFilterTextBoxChanged() {
                 let self = this;
-                self.gridApi.setQuickFilter(self.filterText);
+
+                self.$nextTick(() => {
+                    self.gridApi.setQuickFilter(self.filterText);
+                })
             },
             onGridReady(params) {
                 let self = this;
