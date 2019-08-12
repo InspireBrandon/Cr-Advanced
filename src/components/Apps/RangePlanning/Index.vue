@@ -77,7 +77,9 @@
 
       <v-spacer></v-spacer>
 
-      <span v-if="generateFileName() != ' Average Monthly To '">{{ generateFileName() + " " + fileData.tag }}</span>
+      <div v-if="generateFileName() != ''">
+        <span>{{ generateFileName() + fileData.tag + " (" + fileData.dateFromString + " TO " + fileData.dateToString + ")" }}</span>
+      </div>
 
       <v-spacer></v-spacer>
 
@@ -278,28 +280,20 @@
           context: {
             componentParent: this
           },
-          // rowClassRules: {
-          //   'audit-image-breach': 'data.imageAudit'
-          // },
           rowClassRules: {
-            'audit-image-breach': function (params) {
-
-            },
-            // 'auto-range-item': function (params) {
-            //   return params.data.autoRangeItem == undefined ? false : params.data.autoRangeItem;
-            // }
-          },
+            'audit-image-breach': 'data.imageAudit && !(data.autoRangeOneItem && data.autoRangeItem)'
+          }
         },
         autoRangeData: {
           sales_index: 100,
           profit_index: 100,
           volume_index: 100,
-          sales: 80,
-          volume: 80,
-          profit: 80,
-          potential_sales: 80,
-          potential_volume: 80,
-          potential_profit: 80,
+          sales: 60,
+          volume: 60,
+          profit: 60,
+          potential_sales: 60,
+          potential_volume: 60,
+          potential_profit: 60,
           audit: false,
           dos_units: 6,
           setDefaults() {
@@ -312,22 +306,22 @@
             this.use_volume_index = true;
             this.volume_index = 100;
 
-            this.sales = 80;
+            this.sales = 60;
             this.use_sales = true;
 
-            this.volume = 80;
+            this.volume = 60;
             this.use_volume = true;
 
-            this.profit = 80;
+            this.profit = 60;
             this.use_profit = true;
 
-            this.potential_sales = 80;
+            this.potential_sales = 60;
             this.use_potential_sales = true;
 
-            this.potential_volume = 80;
+            this.potential_volume = 60;
             this.use_potential_volume = true;
 
-            this.potential_profit = 80;
+            this.potential_profit = 60;
             this.use_potential_profit = true;
 
             this.audit = false;
@@ -646,22 +640,22 @@
                 self.autoRangeData.volume_index = 100;
                 self.autoRangeData.use_volume_index = true;
 
-                self.autoRangeData.sales = 80;
+                self.autoRangeData.sales = 60;
                 self.autoRangeData.use_sales = true;
 
-                self.autoRangeData.volume = 80;
+                self.autoRangeData.volume = 60;
                 self.autoRangeData.use_volume = true;
 
-                self.autoRangeData.profit = 80;
+                self.autoRangeData.profit = 60;
                 self.autoRangeData.use_profit = true;
 
-                self.autoRangeData.potential_sales = 80;
+                self.autoRangeData.potential_sales = 60;
                 self.autoRangeData.use_potential_sales = true;
 
-                self.autoRangeData.potential_volume = 80;
+                self.autoRangeData.potential_volume = 60;
                 self.autoRangeData.use_potential_volume = true;
 
-                self.autoRangeData.potential_profit = 80;
+                self.autoRangeData.potential_profit = 60;
                 self.autoRangeData.use_potential_profit = true;
 
                 self.autoRangeData.audit = false;
@@ -788,7 +782,7 @@
                     return {
                       backgroundColor: "#8ef58e"
                     };
-                  } else if (params.data.autoRangeOneItem && params.data.sales_Retail > 0) {
+                  } else if (params.data.autoRangeOneItem) {
                     return {
                       backgroundColor: "#cfffcf"
                     };
@@ -1301,6 +1295,9 @@
           if (!config.audit && product.imageAudit) {
             passesAll = false;
           }
+          else {
+            passesOne = true
+          }
         }
 
         // Sales Index
@@ -1332,7 +1329,7 @@
 
         // Sales
         if (config.use_sales) {
-          if (!self.inPercentage(allProducts, config.sales, product, 'sales_Retail')) {
+          if (!self.inPercentage(allProducts, config.sales, product, 'item_sales_rank')) {
             passesAll = false;
           } else {
             passesOne = true
@@ -1341,7 +1338,7 @@
 
         // Units
         if (config.use_volume) {
-          if (!self.inPercentage(allProducts, config.volume, product, 'sales_Units')) {
+          if (!self.inPercentage(allProducts, config.volume, product, 'item_volume_rank')) {
             passesAll = false;
           } else {
             passesOne = true
@@ -1350,7 +1347,7 @@
 
         // Profit
         if (config.use_profit) {
-          if (!self.inPercentage(allProducts, config.profit, product, 'sales_Profit')) {
+          if (!self.inPercentage(allProducts, config.profit, product, 'item_profit_rank')) {
             passesAll = false;
           } else {
             passesOne = true
@@ -1359,7 +1356,7 @@
 
         // Potential Sales
         if (config.use_potential_sales) {
-          if (!self.inPercentage(allProducts, config.potential_sales, product, 'sales_contribution')) {
+          if (!self.inPercentage(allProducts, config.potential_sales, product, 'sales_potential_rank')) {
             passesAll = false;
           } else {
             passesOne = true
@@ -1368,7 +1365,7 @@
 
         // Potential Volume
         if (config.use_potential_volume) {
-          if (!self.inPercentage(allProducts, config.potential_volume, product, 'units_contribution')) {
+          if (!self.inPercentage(allProducts, config.potential_volume, product, 'volume_potential_rank')) {
             passesAll = false;
           } else {
             passesOne = true
@@ -1377,7 +1374,7 @@
 
         // Potential Profit
         if (config.use_potential_profit) {
-          if (!self.inPercentage(allProducts, config.potential_profit, product, 'profit_contribution')) {
+          if (!self.inPercentage(allProducts, config.potential_profit, product, 'profit_potential_rank')) {
             passesAll = false;
           } else {
             passesOne = true
@@ -1392,18 +1389,23 @@
       inPercentage(allProducts, percentage, product, field) {
         let self = this;
 
+        allProducts = allProducts.filter(item => {
+          return parseInt(item.sales_Retail) > 0;
+        })
+
         let sorted = allProducts.sort(function (a, b) {
-          return a[field] - b[field];
+          return b[field] - a[field];
         })
 
         let sortedCount = Math.round((percentage / 100) * sorted.length);
-        let diff = allProducts.length - sortedCount;
+        let diff = sorted.length - sortedCount;
+
         let partOfRange = false;
 
-        for (var i = allProducts.length - 1; i >= diff; i--) {
+        for (var i = sorted.length - 1; i >= diff; i--) {
           let item = sorted[i];
-          if (item.barcode == product.barcode) {
-            partOfRange = true;0
+          if (item.barcode == product.barcode && item.sales_Retail > 0) {
+            partOfRange = true;
           }
         }
 
@@ -1426,8 +1428,6 @@
   function RangeReport(data, type) {
     let self = this;
     self.type = type;
-
-    console.log(data)
 
     self.sales = new RangeReportRow(data, type, 'sales', 'money');
     self.units = new RangeReportRow(data, type, 'units', 'number');
@@ -1613,7 +1613,7 @@
 
 <style>
   .ag-theme-balham .audit-image-breach {
-    background-color: lightcoral !important;
+    background-color: rgb(226, 195, 195) !important;
   }
 
   .ag-theme-balham .auto-range-item {

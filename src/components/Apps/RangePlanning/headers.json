@@ -161,6 +161,16 @@
         "field": "sales_Profit"
     },
     {
+        "headerName": "Profit Potential",
+        "field": "profit_potential",
+        "hide": true
+    },
+    {
+        "headerName": "Profit Potential Rank",
+        "field": "profit_potential_rank",
+        "hide": true
+    },
+    {
         "headerName": "GP%",
         "field": "gross_profit"
     },

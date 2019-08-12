@@ -1,17 +1,10 @@
 <template>
-    <v-app>
+    <v-app dark>
         <v-toolbar color="primary" dark flat dense>
             <v-toolbar-side-icon @click="$router.push('/Apps')">
                 <v-icon>home</v-icon>
             </v-toolbar-side-icon>
             <v-toolbar-title>Floor Planning 2D</v-toolbar-title>
-            <v-toolbar-items style="margin-left: 20px;" class="pt-2 pb-2">
-                <v-icon>insert_drive_file</v-icon>
-                <v-divider class="mx-1" vertical></v-divider>
-                <v-icon>folder</v-icon>
-                <v-divider class="mx-1" vertical></v-divider>
-                <v-icon>save</v-icon>
-            </v-toolbar-items>
         </v-toolbar>
         <v-toolbar color="grey darken-4" dark flat dense>
             <v-toolbar-items class="pa-0">
@@ -19,72 +12,17 @@
                     <template v-slot:activator="{ on }">
                         <v-btn flat small dark v-on="on">File</v-btn>
                     </template>
-                    <v-list dense>
-                        <v-list-tile tile>
+                    <v-list dense dark class="pa-0">
+                        <v-list-tile tile @click="newFile">
                             <v-list-tile-title>New File</v-list-tile-title>
-                        </v-list-tile>
-                    </v-list>
-                </v-menu>
-                <v-menu offset-y>
-                    <template v-slot:activator="{ on }">
-                        <v-btn flat small dark v-on="on">Options</v-btn>
-                    </template>
-                    <v-list dense>
-                        <v-list-tile>
-                            <v-list-tile-title>Options</v-list-tile-title>
-                        </v-list-tile>
-                    </v-list>
-                </v-menu>
-                <v-menu offset-y>
-                    <template v-slot:activator="{ on }">
-                        <v-btn flat small dark v-on="on">Add</v-btn>
-                    </template>
-                    <v-list dense>
-                        <v-list-tile @click="1==1">
-                            <v-list-tile-title>Pane</v-list-tile-title>
-                        </v-list-tile>
-                        <v-divider></v-divider>
-                        <v-list-tile @click="1==1">
-                            <v-list-tile-title>Box</v-list-tile-title>
-                        </v-list-tile>
-                        <v-divider></v-divider>
-                        <v-list-tile @click="1==1">
-                            <v-list-tile-title>Planogram</v-list-tile-title>
-                        </v-list-tile>
-                    </v-list>
-                </v-menu>
-                <v-menu offset-y>
-                    <template v-slot:activator="{ on }">
-                        <v-btn flat small dark v-on="on">Camera</v-btn>
-                    </template>
-                    <v-list dense>
-                        <v-list-tile @click="1==1">
-                            <v-list-tile-title>Toggle Camera</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
                 </v-menu>
             </v-toolbar-items>
         </v-toolbar>
-        <v-toolbar color="grey darken-3" dark flat dense>
-            <!-- <v-btn-toggle mandatory>
-                <v-btn flat value="MOVE">
-                    <v-icon>open_with</v-icon>
-                </v-btn>
-                <v-btn flat value="SCALE">
-                    <v-icon>launch</v-icon>
-                </v-btn>
-                <v-btn flat value="ROTATE">
-                    <v-icon>rotate_right</v-icon>
-                </v-btn>
-            </v-btn-toggle> -->
-            <!-- <v-btn icon @click="toggleFixtureList(true)">
-                <v-icon>close</v-icon>
-            </v-btn> -->
-        </v-toolbar>
         <v-content>
             <v-card dark flat tile color="grey darken-2" style="height: calc(100vh - 136px)">
                 <v-layout row wrap>
-
                     <v-flex md2 v-show="showFixtures">
                         <v-toolbar dark flat dense>
                             <v-toolbar-title>
@@ -256,8 +194,7 @@
                                             Current Planograms: {{selectedPlanograms.length}}
                                             <v-btn small @click="addPlanogramToSelection">set up</v-btn>
                                         </div>
-                                        <v-list v-if="selectedPlanograms!=null"
-                                            v-for="(item,index) in selectedPlanograms" :key="index">
+                                        <v-list v-for="(item,index) in selectedPlanograms" :key="index">
                                             <v-tooltip bottom>
                                                 <template v-slot:activator="{ on }">
                                                     <v-list-tile>
@@ -268,7 +205,6 @@
                                                 </template>
                                                 <span>{{ item.fileName }}</span>
                                             </v-tooltip>
-
                                             <v-divider></v-divider>
                                         </v-list>
                                     </v-card-text>
@@ -280,7 +216,7 @@
             </v-card>
         </v-content>
         <PlanogramDetailsSelector ref="PlanogramDetailsSelector"></PlanogramDetailsSelector>
-
+        <DocumentProperties ref="DocumentProperties"></DocumentProperties>
     </v-app>
 </template>
 
@@ -290,11 +226,12 @@
     import Floor from "@/components/Main/FloorPlanning2D/src/libs/floor/floor.js";
     import DragDropFixtureHelper from "@/components/Main/FloorPlanning2D/src/libs/DragDrop/drag-drop-helper.js";
     import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector';
-
+    import DocumentProperties from './Components/DocumentProperties.vue'
 
     export default {
         components: {
             PlanogramDetailsSelector,
+            DocumentProperties
         },
         data() {
             return {
@@ -317,7 +254,8 @@
                         width: this.stageWidth,
                         height: this.stageHeight
                     },
-                }
+                },
+                file: null
             }
         },
         mounted() {
@@ -325,11 +263,7 @@
             let stage = self.$refs.stage.getStage();
             self.InitialiseStageResponsive();
             self.InitialiseScroll();
-            let floor = new Floor(stage, self.stageData.layer, self.stageData.group, 20, 20);
-            floor.Initialise();
             window.addEventListener('resize', self.InitialiseStageResponsive);
-            this.getFixtureType()
-            this.getStores()
         },
         methods: {
             toggleFixtureList(value) {
@@ -424,6 +358,7 @@
                     x: scale,
                     y: scale
                 });
+
                 stage.draw();
             },
             fitStageIntoParentContainer() {
@@ -532,6 +467,20 @@
                 ev.currentTarget.style.border = "none";
                 window.dragData = null;
             },
+            newFile() {
+                let self = this;
+                let stage = self.$refs.stage.getStage();
+
+                self.$refs.DocumentProperties.show(data => {
+
+                    let dimensions = data.dimension;
+
+                    self.file = "File";
+
+                    let floor = new Floor(stage, self.stageData.layer, self.stageData.group, dimensions.width, dimensions.depth);
+                    floor.Initialise();
+                });
+            }
         }
     }
 </script>
