@@ -77,7 +77,9 @@
 
       <v-spacer></v-spacer>
 
-      <span v-if="generateFileName() != ' Average Monthly To '">{{ generateFileName() + " " + fileData.tag }}</span>
+      <div v-if="generateFileName() != ''">
+        <span>{{ generateFileName() + fileData.tag + " (" + fileData.dateFromString + " TO " + fileData.dateToString + ")" }}</span>
+      </div>
 
       <v-spacer></v-spacer>
 
@@ -278,17 +280,9 @@
           context: {
             componentParent: this
           },
-          // rowClassRules: {
-          //   'audit-image-breach': 'data.imageAudit'
-          // },
           rowClassRules: {
-            'audit-image-breach': function (params) {
-
-            },
-            // 'auto-range-item': function (params) {
-            //   return params.data.autoRangeItem == undefined ? false : params.data.autoRangeItem;
-            // }
-          },
+            'audit-image-breach': 'data.imageAudit && !(data.autoRangeOneItem && data.autoRangeItem)'
+          }
         },
         autoRangeData: {
           sales_index: 100,
@@ -1301,6 +1295,9 @@
           if (!config.audit && product.imageAudit) {
             passesAll = false;
           }
+          else {
+            passesOne = true
+          }
         }
 
         // Sales Index
@@ -1431,8 +1428,6 @@
   function RangeReport(data, type) {
     let self = this;
     self.type = type;
-
-    console.log(data)
 
     self.sales = new RangeReportRow(data, type, 'sales', 'money');
     self.units = new RangeReportRow(data, type, 'units', 'number');
@@ -1618,7 +1613,7 @@
 
 <style>
   .ag-theme-balham .audit-image-breach {
-    background-color: lightcoral !important;
+    background-color: rgb(226, 195, 195) !important;
   }
 
   .ag-theme-balham .auto-range-item {

@@ -6,7 +6,7 @@
                 <span>Basket Analysis</span>
             </v-toolbar-title>
         </v-toolbar>
-        <PremiumNature ref="PremiumNature" />
+        <BasketConfig ref="PremiumNature" />
 
     </v-card>
 </template>
