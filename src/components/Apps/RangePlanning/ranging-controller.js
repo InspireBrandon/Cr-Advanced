@@ -63,6 +63,23 @@ class RangingController {
       for (let j = 0; j < store.salesData.length; j++) {
         let product = store.salesData[j];
 
+        if(product.store_Range_Indicator_ID == 0) {
+          switch(product.store_Range_Indicator) {
+            case 'YES': {
+              product.store_Range_Indicator_ID = 2;
+              product["updated"] = true;
+            }break;
+            case 'NO': {
+              product.store_Range_Indicator_ID = 1;
+              product["updated"] = true;
+            }break;
+            case 'SELECT': {
+              product.store_Range_Indicator_ID = 3;
+              product["updated"] = true;
+            }break;
+          }
+        }
+
         if (product.updated != undefined && product.updated) {
 
           let storeIndicator = {
