@@ -752,6 +752,8 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
       }
     })
 
+    console.log(weighted_distribution);
+
     if (weighted_distribution != 0 && sales_retail != 0)
       (sales_potential = sales_retail / weighted_distribution * 100).toFixed(0);
 
@@ -868,6 +870,7 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
     let item_profit_rank = 0
     let sales_potential_rank = 0
     let volume_potential_rank = 0
+    let profit_potential_rank = 0
 
     tmp.forEach(t => {
       if (product.productID == t.productID) {
@@ -876,6 +879,8 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
         item_profit_rank = t.itemProfitRank
       }
     })
+
+    console.log(weighted_distribution);
 
     if (weighted_distribution != 0 && sales_retail != 0)
       (sales_potential = sales_retail / weighted_distribution * 100).toFixed(0);
@@ -902,7 +907,7 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
       number_distribution: number_distribution.toFixed(2),
       weighted_distribution: weighted_distribution.toFixed(2),
       sales_potential: parseFloat(sales_potential.toFixed(2)),
-      volume_potential: parseFloat(volume_potential.toFixed(2)),
+      volume_potential: Math.round(parseFloat(volume_potential.toFixed(2))),
       profit_potential: parseFloat(profit_potential.toFixed(2)),
       cost_potential: parseFloat(cost_potential.toFixed(2)),
       item_sales_rank: item_sales_rank,
@@ -910,6 +915,7 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
       item_profit_rank: item_profit_rank,
       sales_potential_rank: sales_potential_rank,
       volume_potential_rank: volume_potential_rank,
+      profit_potential_rank: profit_potential_rank,
       dos_fac: dos_fac.toFixed(1),
       gross_profit: parseFloat(gross_profit.toFixed(2)),
       markup: markup.toFixed(2),
@@ -929,6 +935,12 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
   for (let index = 0; index < productSales.length; index++) {
     const element = productSales[index];
     element.volume_potential_rank = productSales.length - index
+  }
+
+  productSales.sort((a, b) => (parseFloat(a.profit_potential) > parseFloat(b.profit_potential)) ? 1 : ((parseFloat(b.profit_potential) > parseFloat(a.profit_potential)) ? -1 : 0));
+  for (let index = 0; index < productSales.length; index++) {
+    const element = productSales[index];
+    element.profit_potential_rank = productSales.length - index
   }
 
   return productSales;
@@ -1029,6 +1041,7 @@ function RangeProduct(productData, salesData, indicator) {
   self.volume_potential = salesData.volume_potential;
   self.profit_potential = salesData.profit_potential;
   self.cost_potential = salesData.cost_potential;
+  self.profit_potential_rank = salesData.profit_potential_rank;
   self.item_volume_rank = salesData.item_volume_rank
   self.item_sales_rank = salesData.item_sales_rank
   self.item_profit_rank = salesData.item_profit_rank

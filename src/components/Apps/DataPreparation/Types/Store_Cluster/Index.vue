@@ -126,7 +126,7 @@
                         self.Category_Link = [];
                         Category_Link.forEach(element => {
                             self.Category_Link.push({
-                                text: element.planogram,
+                                text: element.displayname,
                                 value: element.id
                             })
                         });

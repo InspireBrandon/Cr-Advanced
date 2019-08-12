@@ -135,12 +135,12 @@
                             </tr>
                             <tr>
                                 <td style="padding: 02px!important;">
-                                    <input v-model="use_dos_units" type="checkbox" style="width: 100%;">
                                 </td>
                                 <td>DOS Units</td>
                                 <td style="text-align: center;">Value</td>
                                 <td style="padding: 02px!important;">
-                                    <input v-model="dos_units" type="number" style="width: 100%;">
+                                    <input v-model="dos_units" style="width: 80%; text-align: right;"
+                                        type="number">
                                 </td>
                             </tr>
                         </tbody>
@@ -151,6 +151,7 @@
 
                 <v-card-actions>
                     <v-spacer></v-spacer>
+                    <v-btn color="secondary" flat @click="defaults">Default</v-btn>
                     <v-btn color="primary" flat @click="submit">Save</v-btn>
                 </v-card-actions>
             </v-card>
@@ -173,23 +174,47 @@
                 use_potential_volume: true,
                 use_potential_profit: true,
                 use_audit: true,
-                use_dos_units: true,
-
                 sales_index: 100,
                 profit_index: 100,
                 volume_index: 100,
-                sales: 80,
-                volume: 80,
-                profit: 80,
-                potential_sales: 80,
-                potential_volume: 80,
-                potential_profit: 80,
+                sales: 60,
+                volume: 60,
+                profit: 60,
+                potential_sales: 60,
+                potential_volume: 60,
+                potential_profit: 60,
                 audit: false,
                 dos_units: 6,
                 afterComplete: null
             }
         },
         methods: {
+            defaults() {
+                let self = this;
+
+                self.sales_index = 100;
+                self.profit_index = 100;
+                self.volume_index = 100;
+                self.sales = 60;
+                self.volume = 60;
+                self.profit = 60;
+                self.potential_sales = 60;
+                self.potential_volume = 60;
+                self.potential_profit = 60;
+                self.dos_units = 6;
+                self.audit = false;
+
+                self.use_sales_index = true;
+                self.use_profit_index = true
+                self.use_volume_index = true
+                self.use_sales = true
+                self.use_volume = true
+                self.use_profit = true
+                self.use_potential_sales = true
+                self.use_potential_volume = true
+                self.use_potential_profit = true
+                self.use_audit = true
+            },
             show(config, afterComplete) {
                 let self = this;
                 self.afterComplete = afterComplete;
@@ -206,19 +231,18 @@
                 self.dos_units = config.dos_units;
                 self.audit = config.audit;
 
-                self.use_sales_index = config.use_sales_index,
-                    self.use_profit_index = config.use_profit_index,
-                    self.use_volume_index = config.use_volume_index,
-                    self.use_sales = config.use_sales,
-                    self.use_volume = config.use_volume,
-                    self.use_profit = config.use_profit,
-                    self.use_potential_sales = config.use_potential_sales,
-                    self.use_potential_volume = config.use_potential_volume,
-                    self.use_potential_profit = config.use_potential_profit,
-                    self.use_audit = config.use_audit,
-                    self.use_dos_units = config.use_dos_units,
+                self.use_sales_index = config.use_sales_index;
+                self.use_profit_index = config.use_profit_index
+                self.use_volume_index = config.use_volume_index
+                self.use_sales = config.use_sales
+                self.use_volume = config.use_volume
+                self.use_profit = config.use_profit
+                self.use_potential_sales = config.use_potential_sales
+                self.use_potential_volume = config.use_potential_volume
+                self.use_potential_profit = config.use_potential_profit
+                self.use_audit = config.use_audit
 
-                    self.dialog = true;
+                self.dialog = true;
             },
             submit() {
                 let self = this;
@@ -247,7 +271,6 @@
                     use_potential_volume: self.use_potential_volume,
                     use_potential_profit: self.use_potential_profit,
                     use_audit: self.use_audit,
-                    use_dos_units: self.use_dos_units,
                 }
 
                 self.afterComplete(arc);
