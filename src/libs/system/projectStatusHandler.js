@@ -79,10 +79,10 @@ class projectStatusHandler {
                 type: [2, 3]
             },
             {
-                text: "Declined",
+                text: "Approval Declined",
                 value: 11,
                 color: "green",
-                friendly: "Declined",
+                friendly: "Approval Declined",
                 type: [2, 3]
             },
             {

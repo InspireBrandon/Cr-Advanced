@@ -2,7 +2,8 @@
     <div v-if="systemUserID != undefined && systemUserID != null" style="display: flex;">
         <v-tooltip bottom v-if="button.button_1.show">
             <template v-slot:activator="{ on }">
-                <v-btn :disabled="button.button_1.disabled" @click="button.button_1.click(params.data),button.button_1.disabled=true" flat icon small>
+                <v-btn :disabled="button.button_1.disabled"
+                    @click="button.button_1.click(params.data),button.button_1.disabled=true" flat icon small>
                     <v-icon :color="button.button_1.color" v-on="on">{{ button.button_1.icon }}</v-icon>
                 </v-btn>
             </template>
@@ -10,7 +11,8 @@
         </v-tooltip>
         <v-tooltip bottom v-if="button.button_2.show">
             <template v-slot:activator="{ on }">
-                <v-btn :disabled="button.button_2.disabled" @click="button.button_2.click(params.data),button.button_2.disabled=true" flat icon small>
+                <v-btn :disabled="button.button_2.disabled"
+                    @click="button.button_2.click(params.data),button.button_2.disabled=true" flat icon small>
                     <v-icon :color="button.button_2.color" v-on="on">{{ button.button_2.icon }}</v-icon>
                 </v-btn>
             </template>
@@ -18,7 +20,8 @@
         </v-tooltip>
         <v-tooltip bottom v-if="button.button_3.show">
             <template v-slot:activator="{ on }">
-                <v-btn :disabled="button.button_3.disabled" @click="button.button_3.click(params.data),button.button_3.disabled=true" flat icon small>
+                <v-btn :disabled="button.button_3.disabled"
+                    @click="button.button_3.click(params.data),button.button_3.disabled=true" flat icon small>
                     <v-icon :color="button.button_3.color" v-on="on">{{ button.button_3.icon }}</v-icon>
                 </v-btn>
             </template>
@@ -26,7 +29,8 @@
         </v-tooltip>
         <v-tooltip bottom v-if="button.button_4.show">
             <template v-slot:activator="{ on }">
-                <v-btn :disabled="button.button_4.disabled" @click="button.button_4.click(params.data),button.button_4.disabled=true" flat icon small>
+                <v-btn :disabled="button.button_4.disabled"
+                    @click="button.button_4.click(params.data),button.button_4.disabled=true" flat icon small>
                     <v-icon :color="button.button_4.color" v-on="on">{{ button.button_4.icon }}</v-icon>
                 </v-btn>
             </template>
@@ -79,7 +83,12 @@
                 break;
             case 2: {
                 button_1.set('warning', 'visibility', cp.routeToView, "View")
-                button_2.set('error', 'check', cp.setComplete, "Complete")
+                if (item.approvalUserID == null) {
+                    button_2.set('error', 'check', cp.setComplete, "Complete")
+                }
+                if (item.approvalUserID != null) {
+                    button_2.set('error', 'send', cp.sendToApprovalUser, "Send for Approval")
+                }
             }
             break;
             case 3: {
@@ -146,7 +155,8 @@
         break;
         case 7: {
             button_1.set('success', 'visibility', cp.setInProgressAndView, "View")
-        }break;
+        }
+        break;
         case 8: {
             button_1.set('success', 'visibility', cp.setInProgressAndView, "View")
         }
@@ -155,12 +165,24 @@
             button_1.set('success', 'visibility', cp.setApprovalInProgress, "View")
         }
         break;
+        case 11: {
+            if (item.actionedByUserID == self.systemUserID) {
+                button_1.set('error', 'close', cp.closeTask, "Close")
+            }
+            if (item.systemUserID == self.systemUserID && item.type == 2) {
+                button_1.set('success', 'visibility', cp.setInProgressAndView, "View")
+            }
+        }
+        break;
         case 12: {
             if (item.actionedByUserID == self.systemUserID) {
                 button_1.set('error', 'close', cp.closeTask, "Close")
             }
 
-            if (item.systemUserID == self.systemUserID) {
+            if (item.systemUserID == self.systemUserID && item.type == 3) {
+                button_1.set('primary', 'send', cp.submitForDistribution, "Send")
+            }
+            if (item.systemUserID == self.systemUserID && item.type == 2) {
                 button_1.set('primary', 'send', cp.submitForDistribution, "Send")
             }
         }
@@ -190,7 +212,21 @@
         }
         break;
         case 20: {
+            switch (item.type) {
+                case 1: {
+                    button_1.set('warning', 'visibility', cp.routeToView, "View")
+                }
+                break;
+            case 2: {
+                button_1.set('warning', 'visibility', cp.routeToView, "View")
+                button_2.set('primary', 'check', cp.setApproved, "Approve")
+                button_3.set('error', 'close', cp.setDeclined, "Decline")
+            }
+            break;
             button_1.set('warning', 'visibility', cp.routeToView, "View")
+            break;
+            }
+
         }
         break;
         case 21: {
@@ -310,7 +346,8 @@
         case 50: {
             button_1.set('warning', 'visibility', cp.routeToView, "View")
             button_2.set('success', 'check', cp.setRecalledComplete, "Complete")
-        }break;
+        }
+        break;
         case 51: {
             button_1.set('warning', 'visibility', cp.routeToView, "View")
             button_2.set('primary', 'send', cp.sendRecall, "Send")

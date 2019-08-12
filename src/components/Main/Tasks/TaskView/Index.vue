@@ -535,6 +535,98 @@
                         callback(r.data);
                     })
             },
+            sendToApprovalUser(item) {
+                let self = this;
+
+                let request = JSON.parse(JSON.stringify(item));
+                let tmpUser = request.systemUserID;
+
+                self.checkTaskTakeover(request, () => {
+                    request.systemUserID = tmpUser;
+
+                    let projectTXGroupRequest = {
+                        projectID: item.project_ID
+                    }
+
+                    request.status = 40;
+                    request.systemUserID = null;
+                    request.actionedByUserID = self.systemUserID;
+                    request.notes = self.findAndReplaceNote(request.notes);
+                    // Create New Process Assigned for complete group
+                    self.createProjectTransaction(request, processEndProjectTX => {
+                        // Create "New Group"
+
+                        // Create New Process Assigned for "New Group"
+                        request.systemUserID = request.approvalUserID;
+                        request.actionedByUserID = null;
+                        request.notes = self.findAndReplaceNote(request.notes);
+                        self.createProjectTransaction(request,
+                            processStartProjectTX => {
+                                // Create Requesting Approval process for "New Group"
+                                request.status = 10;
+                                request.notes = self.findAndReplaceNote(
+                                    request
+                                    .notes);
+                                self.createProjectTransaction(request,
+                                    approvalTransaction => {
+                                        self.$parent.$parent
+                                            .getTaskViewData();
+                                    })
+                            })
+                    })
+                })
+            },
+            setDeclined(item) {
+                let self = this
+                let request = JSON.parse(JSON.stringify(item));
+                let tmpUser = request.systemUserID;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API +
+                        `ProjectTXGroupSingle?projectTXGroupID=${request.projectTXGroup_ID}`
+                    )
+                    .then(r => {
+                        if (r.data.projectTX == null) {
+                            alert("No user transaction")
+                        }
+                        console.log(r);
+                        self.$refs.NotesModal.show("Aproval rejection", callback => {
+                            self.checkTaskTakeover(request, () => {
+                                request.status = 11;
+                                request.actionedByUserID = tmpUser;
+                                request.systemUserID = null;
+                                request.notes = callback;
+                                // Create complete transaction
+                                self.createProjectTransaction(request,
+                                    completeTransactionCloseTask => {
+                                        let projectTXGroupRequest = {
+                                            projectID: item.project_ID
+                                        }
+                                        // Create new project transaction group
+                                        self.createProjectTransactionGroup(
+                                            projectTXGroupRequest,
+                                            newGroup => {
+                                                request.projectTXGroup_ID = newGroup.id;
+                                                request.systemUserID = r.data.projectTX
+                                                    .systemUserID;
+                                                request.actionedByUserID = null;
+                                                request.notes = callback;
+                                                // Create complete transaction for new group
+                                                self.createProjectTransaction(request,
+                                                    newGroupTransaction => {
+                                                        self.$parent.$parent
+                                                            .getTaskViewData();
+                                                    })
+                                            })
+                                    })
+                            })
+                        })
+
+                        delete Axios.defaults.headers.common["TenantID"];
+
+                    })
+            },
             updateStorePlanogramStatus(store_id, system_file_id, new_status, callback) {
                 let self = this;
 
@@ -595,6 +687,35 @@
                 }
                 break;
                 }
+            },
+            setApproved(item) {
+                let self = this;
+                let request = JSON.parse(JSON.stringify(item));
+                let tmpUser = request.systemUserID;
+
+                self.checkTaskTakeover(request, () => {
+                    request.status = 2;
+                    request.actionedByUserID = item.systemUserID;
+                    request.systemUserID = null;
+                    request.notes = self.findAndReplaceNote(request.notes);
+                    // Create complete transaction
+                    self.createProjectTransaction(request, completeTransactionCloseTask => {
+                        let projectTXGroupRequest = {
+                            projectID: item.project_ID
+                        }
+                        // Create new project transaction group
+                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
+                            request.projectTXGroup_ID = newGroup.id;
+                            request.systemUserID = item.projectOwnerID;
+                            request.actionedByUserID = null;
+                            request.notes = self.findAndReplaceNote(request.notes);
+                            // Create complete transaction for new group
+                            self.createProjectTransaction(request, newGroupTransaction => {
+                                self.$parent.$parent.getTaskViewData();
+                            })
+                        })
+                    })
+                })
             },
             routeToImplementation(item) {
                 let self = this;
