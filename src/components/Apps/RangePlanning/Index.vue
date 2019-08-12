@@ -281,7 +281,10 @@
             componentParent: this
           },
           rowClassRules: {
-            'audit-image-breach': 'data.imageAudit && !(data.autoRangeOneItem && data.autoRangeItem)'
+            'audit-image-breach': function(params) {
+              let self = params.context.componentParent;
+              return self.autoRangeData.audit && params.data.imageAudit;
+            }
           }
         },
         autoRangeData: {
@@ -411,13 +414,9 @@
             percent: 'percent'
           },
           callback => {
-            console.log(callback);
-
-
             callback.forEach(el => {
               self.rowData.forEach(rowitem => {
                 if (el.id == rowitem.id) {
-                  console.log(rowitem);
 
                   self.rangingController.setClusterIndicator(self.selectedClusterType, self
                     .selectedClusterOption, rowitem.productID,
@@ -1291,14 +1290,14 @@
         let config = self.autoRangeData;
 
         // Audit
-        if (config.use_audit) {
-          if (!config.audit && product.imageAudit) {
-            passesAll = false;
-          }
-          else {
-            passesOne = true
-          }
-        }
+        // if (config.use_audit) {
+        //   if (!config.audit && product.imageAudit) {
+        //     passesAll = false;
+        //   }
+        //   else {
+        //     passesOne = true
+        //   }
+        // }
 
         // Sales Index
         if (config.use_sales_index) {
