@@ -29,6 +29,7 @@
             return {
                 rowData: [{storeName:"asd",
                 premiumNature:"high",
+                premiumBasketPercentage:"17%"
                 }],
                 headers: [{
                     "headerName": "Store Name",

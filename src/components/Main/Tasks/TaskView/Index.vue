@@ -291,6 +291,7 @@
                     request.systemUserID = null;
                     request.rangeFileID = taskDetails.rangeFileID;
                     request.actionedByUserID = systemUserID;
+                    request.approvalUserID = taskDetails.approvalUserID;
                     request.project_ID = currentItem.project_ID;
                     request.storeCluster_ID = taskDetails.storeCluster;
                     request.categoryCluster_ID = taskDetails.categoryCluster;
@@ -335,6 +336,7 @@
                     request.type = taskDetails.type;
                     request.status = 40;
                     request.systemUserID = null;
+                    request.approvalUserID = taskDetails.approvalUserID;
                     request.rangeFileID = taskDetails.rangeFileID;
                     request.actionedByUserID = systemUserID;
                     request.project_ID = currentItem.project_ID;
