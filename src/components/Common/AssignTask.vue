@@ -28,6 +28,8 @@
                             </div>
                             <v-select :disabled="elementsDisabled" :items="users" v-model="user" label="User">
                             </v-select>
+                             <v-select v-if="task==2" :items="users" v-model="approvalUser" label="Approval User">
+                            </v-select>
                             <v-autocomplete :disabled="elementsDisabled" v-if="task==2" :items="rangeData"
                                 v-model="selectedRange" label="Ranging file">
                             </v-autocomplete>
@@ -104,6 +106,7 @@
                 task: null,
                 users: [],
                 tmpUsers: [],
+                approvalUser:null,
                 user: null,
                 notes: null,
                 systemFiles: [],
@@ -305,6 +308,7 @@
                 self.store_ID = data.store_ID;
                 self.systemFile = data.systemFileID;
                 self.user = data.projectOwnerID
+                self.approvalUser = data.approvalUserID
                 self.notes = data.notes;
 
                 self.getData(() => {
@@ -334,6 +338,7 @@
                     storeCluster: self.storeCluster,
                     categoryCluster: self.categoryCluster,
                     store: self.store,
+                    approvalUserID:self.approvalUser
                 });
 
                 self.dialog = false;
