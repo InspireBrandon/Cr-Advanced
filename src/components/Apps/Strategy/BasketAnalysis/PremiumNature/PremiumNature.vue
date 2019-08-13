@@ -4,6 +4,8 @@
             <v-toolbar-title>
                 Premium Nature
             </v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" @click="openClusterSetup">Setup </v-btn>
         </v-toolbar>
         <div v-if="rowData.length>0">
             <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 130px);"
@@ -13,23 +15,27 @@
                 :floatingFilter="true" :groupMultiAutoColumn="true" :onGridReady="onGridReady">
             </ag-grid-vue>
         </div>
-
+        <ClusterSetup ref="ClusterSetup" />
 
     </div>
 </template>
 <script>
+    import ClusterSetup from '../ClusterSetup'
+
     import {
         AgGridVue
     } from "ag-grid-vue";
     export default {
         components: {
-            AgGridVue
+            AgGridVue,
+            ClusterSetup
         },
         data() {
             return {
-                rowData: [{storeName:"asd",
-                premiumNature:"high",
-                premiumBasketPercentage:"17%"
+                rowData: [{
+                    storeName: "asd",
+                    premiumNature: "high",
+                    premiumBasketPercentage: "17%"
                 }],
                 headers: [{
                     "headerName": "Store Name",
@@ -55,6 +61,13 @@
             }
         },
         methods: {
+            openClusterSetup() {
+                let self = this
+                self.$refs.ClusterSetup.show("", callback => {
+                    console.log(callback);
+
+                })
+            },
             onGridReady(params) {
                 let self = this;
                 self.gridApi = params.api;
