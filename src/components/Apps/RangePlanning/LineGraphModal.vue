@@ -14,7 +14,7 @@
             </v-toolbar>
             <v-toolbar dark dense flat color="grey darken-3">
                 <v-spacer></v-spacer>
-                Sales Trend
+                Sales Trend - {{ barcode }} - {{ productName }}
                 <v-spacer></v-spacer>
             </v-toolbar>
             <v-card-text>
@@ -49,7 +49,10 @@
                 rowdata: [],
                 item_index: null,
                 item_name: null,
-                callback: null
+                callback: null,
+                productName: '',
+                barcode: '',
+                data: null
             }
         },
         mounted() {},
@@ -68,9 +71,11 @@
                 }
                 this.dialog = false
             },
-            open(data, callback) {
+            open(data, productName, barcode, callback) {
                 let self = this
 
+                self.productName = productName;
+                self.barcode = barcode;
 
                 self.dialog = true
 
@@ -121,8 +126,6 @@
                 let visits = 10;
                 let previousValue;
 
-
-
                 chart.data = data;
 
                 let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
@@ -135,6 +138,7 @@
                 valueAxis.renderer.minWidth = 35;
                 valueAxis.renderer.axisFills.template.disabled = true;
                 valueAxis.renderer.ticks.template.disabled = true;
+                valueAxis.renderer.opposite = true;
 
                 let series = chart.series.push(new am4charts.LineSeries());
                 series.dataFields.dateX = "period_From_Date";
@@ -147,19 +151,12 @@
                 series2.dataFields.valueY = "sales_Profit";
                 series2.strokeWidth = 2;
                 series2.tooltipText = " Profit: {sales_Profit}";
-                
-
-                let series3 = chart.series.push(new am4charts.LineSeries());
-                series3.dataFields.dateX = "period_From_Date";
-                series3.dataFields.valueY = "sales_Cost";
-                series3.strokeWidth = 2;
-                series3.tooltipText = " Cost: {sales_Cost}";
 
                 let series4 = chart.series.push(new am4charts.LineSeries());
                 series4.dataFields.dateX = "period_From_Date";
                 series4.dataFields.valueY = "sales_Units";
                 series4.strokeWidth = 2;
-                series4.tooltipText = "Units: {sales_Units}";
+                series4.tooltipText = "Volume: {sales_Units}";
 
                 // set stroke property field
                 series.propertyFields.stroke = "color";
