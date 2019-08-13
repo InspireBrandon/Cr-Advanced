@@ -675,6 +675,8 @@
                   self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
                     .selectedClusterOption, self.autoRangeData);
 
+                    console.log(self.rowData);
+
                   self.ais_Sales = 0;
                   self.ais_SalesPotential = 0;
 
@@ -1149,6 +1151,8 @@
             self.columnDefs = require('./headers.json');
             self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
               .selectedClusterOption, self.autoRangeData);
+
+              console.log(self.rowData);
 
             self.ais_Sales = 0;
             self.ais_SalesPotential = 0;

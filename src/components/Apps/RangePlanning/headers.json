@@ -12,6 +12,11 @@
         "hide": true
     },
     {
+        "headerName": "Product Code",
+        "field": "product_Code",
+        "hide": true
+    },
+    {
         "headerName": "Brand",
         "field": "brand",
         "editable": true,

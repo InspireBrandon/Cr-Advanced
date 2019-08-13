@@ -246,15 +246,15 @@
                       })
                     })
 
-                    // Axios.put(process.env.VUE_APP_API + "Planogram?db=CR-Hinterland-Live", request)
-                    //   .then(r => {
-                    //     console.log(r);
+                    Axios.put(process.env.VUE_APP_API + "Planogram?db=CR-Hinterland-Live", request)
+                      .then(r => {
+                        console.log(r);
 
-                    //     var rows = self.gridApi.getSelectedRows();
-                    //     self.gridApi.updateRowData({
-                    //       remove: rows
-                    //     })
-                    //   })
+                        var rows = self.gridApi.getSelectedRows();
+                        self.gridApi.updateRowData({
+                          remove: rows
+                        })
+                      })
                   }
                 })
             })
