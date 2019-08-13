@@ -3,7 +3,7 @@
         <v-card>
             <v-toolbar dark dense flat color="primary">
                 <v-toolbar-title>
-                 Line Graph
+                    Line Graph
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-btn icon @click="close">
@@ -71,12 +71,12 @@
             open(data, callback) {
                 let self = this
 
-               
-                self.dialog=true
+
+                self.dialog = true
 
                 self.callback = callback;
                 setTimeout(() => {
-                    self.drawChart(data );
+                    self.drawChart(data);
                 }, 300);
             },
             closeAndSendRowdata(data) {
@@ -110,35 +110,18 @@
                 console.log("handleing rowdata");
                 self.closeAndSendRowdata(tmp)
             },
-            drawChart(itemData ) {
+            drawChart(itemData) {
                 let self = this;
                 console.log(itemData);
-               
+
                 let chart = am4core.create("lineChartdiv", am4charts.XYChart);
                 chart.paddingRight = 20;
 
-                let data = [];
+                let data = itemData;
                 let visits = 10;
                 let previousValue;
 
-                for (var i = 0; i < 100; i++) {
-                    visits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
 
-                    if (i > 0) {
-                        // add color to previous data item depending on whether current value is less or more than previous value
-                        if (previousValue <= visits) {
-                            data[i - 1].color = chart.colors.getIndex(0);
-                        } else {
-                            data[i - 1].color = chart.colors.getIndex(5);
-                        }
-                    }
-
-                    data.push({
-                        date: new Date(2018, 0, i + 1),
-                        value: visits
-                    });
-                    previousValue = visits;
-                }
 
                 chart.data = data;
 
@@ -154,19 +137,34 @@
                 valueAxis.renderer.ticks.template.disabled = true;
 
                 let series = chart.series.push(new am4charts.LineSeries());
-                series.dataFields.dateX = "date";
-                series.dataFields.valueY = "value";
+                series.dataFields.dateX = "period_From_Date";
+                series.dataFields.valueY = "sales_Retail";
                 series.strokeWidth = 2;
-                series.tooltipText = "value: {valueY}, day change: {valueY.previousChange}";
+                series.tooltipText = " Sales: {sales_Retail}";
+
+                let series2 = chart.series.push(new am4charts.LineSeries());
+                series2.dataFields.dateX = "period_From_Date";
+                series2.dataFields.valueY = "sales_Profit";
+                series2.strokeWidth = 2;
+                series2.tooltipText = " Profit: {sales_Profit}";
+                
+
+                let series3 = chart.series.push(new am4charts.LineSeries());
+                series3.dataFields.dateX = "period_From_Date";
+                series3.dataFields.valueY = "sales_Cost";
+                series3.strokeWidth = 2;
+                series3.tooltipText = " Cost: {sales_Cost}";
+
+                let series4 = chart.series.push(new am4charts.LineSeries());
+                series4.dataFields.dateX = "period_From_Date";
+                series4.dataFields.valueY = "sales_Units";
+                series4.strokeWidth = 2;
+                series4.tooltipText = "Units: {sales_Units}";
 
                 // set stroke property field
                 series.propertyFields.stroke = "color";
 
                 chart.cursor = new am4charts.XYCursor();
-
-               
-
-               
                 this.chart = chart
             }
         }

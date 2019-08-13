@@ -120,7 +120,7 @@
           <v-btn v-if="rowData.length>0" @click="onChart1" color="primary" small dark>graphs</v-btn>
           <!-- <v-btn @click="openParetoModal" color="primary" small dark>Pareto</v-btn> -->
           <v-btn @click="showLineChart">
-            show line 
+            show line
           </v-btn>
           <v-menu offset-y>
             <v-btn :disabled="selectedItems.length == 0" slot="activator" color="primary" small dark>Set Indicator
@@ -408,10 +408,19 @@
       self.checkparams()
     },
     methods: {
-      showLineChart(){
+      showLineChart(params) {
         let self = this
-        self.$refs.LineGraphModal.open("data",  callback=>{})
-        
+        console.log(params);
+        Axios.get(process.env.VUE_APP_API +
+          `GetTrendData?productID=${params.productID}&periodFromID=${self.fileData.dateTo}&periodToID=${self.fileData.dateTo-11}`
+          ).then(r => {
+            console.log(r);
+            
+          self.$refs.LineGraphModal.open(r.data, callback => {})
+
+        })
+
+
       },
       openParetoModal(fact, fact_name) {
         let self = this
@@ -1431,14 +1440,15 @@
         return reportObj;
       },
       getContextMenuItems(params) {
+        let self = this;
         var result = [
           "copy",
           "paste",
           "separator",
           {
             name: "Show Trend",
-            action:() => {
-              location.replace("https://www.pornhub.com");
+            action: () => {
+              self.showLineChart(params.node.data)
             }
           }
         ];
