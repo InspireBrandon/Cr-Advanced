@@ -591,7 +591,7 @@
                             alert("No user transaction")
                         }
                         console.log(r);
-                        self.$refs.NotesModal.show("Aproval rejection", callback => {
+                        self.$refs.NotesModal.show("Reason for decline", callback => {
                             self.checkTaskTakeover(request, () => {
                                 request.status = 11;
                                 request.actionedByUserID = tmpUser;

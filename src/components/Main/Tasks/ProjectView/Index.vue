@@ -86,11 +86,6 @@
         },
         mounted() {
             let self = this;
-
-            document.addEventListener('DOMContentLoaded', function () {
-                var gridID = document.querySelector('#ag-grid');
-                new agGrid.Grid(gridID, self.gridOptions);
-            });
         },
 
         methods: {
