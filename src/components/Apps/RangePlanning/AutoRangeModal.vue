@@ -125,7 +125,7 @@
                             </tr>
                             <tr>
                                 <td style="padding: 02px!important;">
-                                    <input v-model="use_audit" type="checkbox" style="width: 100%;">
+                                    <!-- <input v-model="use_audit" type="checkbox" style="width: 100%;"> -->
                                 </td>
                                 <td>Audit</td>
                                 <td style="text-align: center;">On/Off</td>
