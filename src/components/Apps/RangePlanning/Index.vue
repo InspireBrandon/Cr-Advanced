@@ -119,7 +119,9 @@
           <v-btn v-if="rowData.length>0" @click="openReport" color="primary" small dark>Report</v-btn>
           <v-btn v-if="rowData.length>0" @click="onChart1" color="primary" small dark>graphs</v-btn>
           <!-- <v-btn @click="openParetoModal" color="primary" small dark>Pareto</v-btn> -->
-
+          <v-btn @click="showLineChart">
+            show line 
+          </v-btn>
           <v-menu offset-y>
             <v-btn :disabled="selectedItems.length == 0" slot="activator" color="primary" small dark>Set Indicator
             </v-btn>
@@ -189,6 +191,7 @@
     <GraphConfigurationModal ref="GraphConfigurationModal" />
     <ParetoModal ref="ParetoModal" />
     <GpGraph ref="GpGraph" />
+    <LineGraphModal ref="LineGraphModal" />
   </div>
 </template>
 
@@ -225,6 +228,7 @@
   import RangingReportModal from './RangingReportModal.vue'
   import GraphConfigurationModal from './GraphConfigurationModal.vue'
   import ParetoModal from './ParetoModal.vue'
+  import LineGraphModal from './LineGraphModal.vue'
   import GpGraph from './GpGraph.vue'
 
 
@@ -243,6 +247,7 @@
   export default {
     name: 'Ranging',
     components: {
+      LineGraphModal,
       GpGraph,
       ParetoModal,
       SizeLoader,
@@ -402,6 +407,11 @@
       self.checkparams()
     },
     methods: {
+      showLineChart(){
+        let self = this
+        self.$refs.LineGraphModal.open("data",  callback=>{})
+        
+      },
       openParetoModal(fact, fact_name) {
         let self = this
 
