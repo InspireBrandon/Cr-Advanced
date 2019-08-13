@@ -2,7 +2,7 @@
     <div>
         <v-toolbar dark dense flat>
             <v-toolbar-title>
-                Basket Config
+                Retailer Config
             </v-toolbar-title>
         </v-toolbar>
         <v-container>

@@ -6,7 +6,7 @@
                     <template v-slot:activator="{ on }">
                         <v-btn v-on="on" :value="1" flat>
                             <v-icon>
-                                perm_data_setting</v-icon>
+                                settings</v-icon>
                         </v-btn>
                     </template>
                     <span>Retailer Config</span>
@@ -25,8 +25,9 @@
                             <v-icon>web</v-icon>
                         </v-btn>
                     </template>
-                    <span>Planogram</span>
+                    <span>Report</span>
                 </v-tooltip>
+               
             </v-btn-toggle>
             <v-spacer></v-spacer>
             <v-toolbar-title>
@@ -36,21 +37,24 @@
         </v-toolbar>
         <BasketConfig v-if="selectedView==1" ref="BasketConfig" />
         <PremiumNature v-if="selectedView==2" ref="PremiumNature" />
-
+        <Report v-if="selectedView==3" ref="Report" />
+        
     </v-card>
 </template>
 
 <script>
+    import Report from './Report'
     import BasketConfig from './Basket_Config'
     import PremiumNature from './PremiumNature/PremiumNature.vue'
     export default {
         components: {
+            Report,
             BasketConfig,
-            PremiumNature
+            PremiumNature,
         },
         data() {
             return {
-                selectedView: null
+                selectedView: 1
 
             }
         }
