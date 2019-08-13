@@ -148,7 +148,8 @@
           :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
           @selection-changed="onSelectionChanged" :rowData="rowData" :enableSorting="true" :enableFilter="true"
           :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true"
-          :enableColResize="true" :floatingFilter="true" :onGridReady="onGridReady" :groupMultiAutoColumn="true">
+          :enableColResize="true" :floatingFilter="true" :onGridReady="onGridReady" :groupMultiAutoColumn="true"
+          :getContextMenuItems="getContextMenuItems">
         </ag-grid-vue>
         <v-toolbar dark dense class="pa-0">
           <div>
@@ -281,7 +282,7 @@
             componentParent: this
           },
           rowClassRules: {
-            'audit-image-breach': function(params) {
+            'audit-image-breach': function (params) {
               let self = params.context.componentParent;
               return self.autoRangeData.audit && params.data.imageAudit;
             }
@@ -675,7 +676,7 @@
                   self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
                     .selectedClusterOption, self.autoRangeData);
 
-                    console.log(self.rowData);
+                  console.log(self.rowData);
 
                   self.ais_Sales = 0;
                   self.ais_SalesPotential = 0;
@@ -1152,7 +1153,7 @@
             self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
               .selectedClusterOption, self.autoRangeData);
 
-              console.log(self.rowData);
+            console.log(self.rowData);
 
             self.ais_Sales = 0;
             self.ais_SalesPotential = 0;
@@ -1418,6 +1419,21 @@
         let self = this;
         let reportObj = new RangeReports(self.rowData);
         return reportObj;
+      },
+      getContextMenuItems(params) {
+        var result = [
+          "copy",
+          "paste",
+          "separator",
+          {
+            name: "Show Trend",
+            action:() => {
+              location.replace("https://www.pornhub.com");
+            }
+          }
+        ];
+
+        return result;
       }
     }
   }

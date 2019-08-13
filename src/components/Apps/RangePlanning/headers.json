@@ -12,11 +12,6 @@
         "hide": true
     },
     {
-        "headerName": "Product Code",
-        "field": "product_Code",
-        "hide": true
-    },
-    {
         "headerName": "Brand",
         "field": "brand",
         "editable": true,
@@ -204,6 +199,11 @@
     {
         "headerName": "Stock Units",
         "field": "stock_Units",
+        "hide": true
+    },
+    {
+        "headerName": "Product Code",
+        "field": "product_Code",
         "hide": true
     }
 ]
