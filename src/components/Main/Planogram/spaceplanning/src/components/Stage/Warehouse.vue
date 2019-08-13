@@ -640,12 +640,27 @@
         let storePlanogramItemProducts = ctrl_store.getAllPlanogramItemsByType(self.$store, "PRODUCT");
 
         allProducts.forEach(product => {
-          storeProducts.forEach(storeProduct => {
+          storeProducts.forEach((storeProduct, idx) => {
             if (storeProduct.Data.barcode == product.barcode) {
+
+              var needsDraw = false;
+
+              if (storeProduct.Data.height != parseFloat(product.height) || storeProduct.Data.width !=
+                parseFloat(product.width) || storeProduct.Data.depth != parseFloat(product.depth)) {
+                needsDraw = true;
+              }
 
               storeProduct.Data.height = parseFloat(product.height);
               storeProduct.Data.width = parseFloat(product.width);
               storeProduct.Data.depth = parseFloat(product.depth);
+
+              if (storeProduct.Data.tray_Barcode != product.tray_Barcode ||
+                storeProduct.Data.tray_Qty != parseInt(product.tray_Qty) ||
+                storeProduct.Data.tray_Height != parseFloat(product.tray_Height) ||
+                storeProduct.Data.tray_Width != parseFloat(product.tray_Width) ||
+                storeProduct.Data.tray_Depth != parseFloat(product.tray_Depth)) {
+                needsDraw = true;
+              }
 
               storeProduct.Data.tray_Barcode = product.tray_Barcode;
               storeProduct.Data.tray_Qty = parseInt(product.tray_Qty);
@@ -653,11 +668,27 @@
               storeProduct.Data.tray_Width = parseFloat(product.tray_Width);
               storeProduct.Data.tray_Depth = parseFloat(product.tray_Depth);
 
+              if (storeProduct.Data.case_Barcode != product.case_Barcode ||
+                storeProduct.Data.case_Qty != parseInt(product.case_Qty) ||
+                storeProduct.Data.case_Height != parseFloat(product.case_Height) ||
+                storeProduct.Data.case_Width != parseFloat(product.case_Width) ||
+                storeProduct.Data.case_Depth != parseFloat(product.case_Depth)) {
+                needsDraw = true;
+              }
+
               storeProduct.Data.case_Barcode = product.case_Barcode;
               storeProduct.Data.case_Qty = parseInt(product.case_Qty);
               storeProduct.Data.case_Height = parseFloat(product.case_Height);
               storeProduct.Data.case_Width = parseFloat(product.case_Width);
               storeProduct.Data.case_Depth = parseFloat(product.case_Depth);
+
+              if (storeProduct.Data.shrink_Barcode != product.shrink_Barcode ||
+                storeProduct.Data.shrink_Qty != parseInt(product.shrink_Qty) ||
+                storeProduct.Data.shrink_Height != parseFloat(product.shrink_Height) ||
+                storeProduct.Data.shrink_Width != parseFloat(product.shrink_Width) ||
+                storeProduct.Data.shrink_Depth != parseFloat(product.shrink_Depth)) {
+                needsDraw = true;
+              }
 
               storeProduct.Data.shrink_Barcode = product.shrink_Barcode;
               storeProduct.Data.shrink_Qty = parseInt(product.shrink_Qty);
@@ -665,17 +696,34 @@
               storeProduct.Data.shrink_Width = parseFloat(product.shrink_Width);
               storeProduct.Data.shrink_Depth = parseFloat(product.shrink_Depth);
 
+              if (storeProduct.Data.pallet_Barcode != product.pallet_Barcode ||
+                storeProduct.Data.pallet_Qty != parseInt(product.pallet_Qty) ||
+                storeProduct.Data.pallet_Height != parseFloat(product.pallet_Height) ||
+                storeProduct.Data.pallet_Width != parseFloat(product.pallet_Width) ||
+                storeProduct.Data.pallet_Depth != parseFloat(product.pallet_Depth)) {
+                needsDraw = true;
+              }
+
               storeProduct.Data.pallet_Barcode = product.pallet_Barcode;
               storeProduct.Data.pallet_Qty = parseInt(product.pallet_Qty);
               storeProduct.Data.pallet_Height = parseFloat(product.pallet_Height);
               storeProduct.Data.pallet_Width = parseFloat(product.pallet_Width);
               storeProduct.Data.pallet_Depth = parseFloat(product.pallet_Depth);
 
+              if (storeProduct.Data.volume_potential != parseInt(product.volume_potential) || storeProduct.Data
+                .sales_potential != parseFloat(product.sales_potential)) {
+                needsDraw = true;
+              }
+
               storeProduct.Data.volume_potential = parseFloat(product.volume_potential);
               storeProduct.Data.sales_potential = parseFloat(product.sales_potential);
 
-              ctrl_store.setProductData(self.$store, storeProduct.Data, product.barcode);
-              storeProduct.ChangeDimensions(storeProduct);
+              console.log(idx);
+
+              if (needsDraw) {
+                ctrl_store.setProductData(self.$store, storeProduct.Data, product.barcode);
+                storeProduct.ChangeDimensions(storeProduct);
+              }
             }
           })
         })
@@ -1009,7 +1057,7 @@
                       self.products.forEach(el => {
                         if (el.store_Range_Indicator == "YES") {
                           self.ais_Sales = (parseFloat(self.ais_Sales) + ((parseFloat(el
-                            .sales_Retail) /
+                              .sales_Retail) /
                             4) / self.storeCount)).toFixed(2);
                           self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + ((
                             parseFloat(el
