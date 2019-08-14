@@ -117,7 +117,7 @@
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.get(process.env.VUE_APP_API + `Planogram`)
+                Axios.get(process.env.VUE_APP_API + `Planogram/Distinct`)
                     .then(r => {
                         console.log(r);
                         

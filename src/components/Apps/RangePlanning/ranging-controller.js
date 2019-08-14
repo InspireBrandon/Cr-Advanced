@@ -770,8 +770,6 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
       }
     })
 
-    console.log(weighted_distribution);
-
     if (weighted_distribution != 0 && sales_retail != 0)
       (sales_potential = sales_retail / weighted_distribution * 100).toFixed(0);
 
@@ -897,8 +895,6 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
         item_profit_rank = t.itemProfitRank
       }
     })
-
-    console.log(weighted_distribution);
 
     if (weighted_distribution != 0 && sales_retail != 0)
       (sales_potential = sales_retail / weighted_distribution * 100).toFixed(0);

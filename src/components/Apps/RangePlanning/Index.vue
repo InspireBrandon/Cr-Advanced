@@ -50,6 +50,9 @@
             <v-list-tile :disabled="rowData.length < 1" @click="updateProductDetails">
               <v-list-tile-title>Update Product Details</v-list-tile-title>
             </v-list-tile>
+            <v-list-tile :disabled="rowData.length < 1" @click="getActiveShopCodes">
+              <v-list-tile-title>Get Active Shop Codes</v-list-tile-title>
+            </v-list-tile>
           </v-list>
         </v-menu>
         <v-menu v-if="selectedClusterOption != null" dark offset-y style="margin-bottom: 10px;">
@@ -410,9 +413,9 @@
         console.log(params);
         Axios.get(process.env.VUE_APP_API +
           `GetTrendData?productID=${params.productID}&periodFromID=${self.fileData.dateTo}&periodToID=${self.fileData.dateTo-11}`
-          ).then(r => {
-            console.log(r);
-            
+        ).then(r => {
+          console.log(r);
+
           self.$refs.LineGraphModal.open(r.data, params.description, params.barcode, callback => {})
 
         })
@@ -1451,6 +1454,30 @@
         ];
 
         return result;
+      },
+      getActiveShopCodes() {
+        let self = this;
+
+        let product_id_list = [];
+
+        self.rowData.forEach(product => {
+          product_id_list.push(product.productID)
+        })
+
+        Axios.post(process.env.VUE_APP_API + "Product/GetActiveShopCodes?db=CR-Hinterland-Live", { productIDList: product_id_list })
+          .then(r => {
+            let new_asc = r.data.productActiveShopCodeList
+
+            self.rowData.forEach((product, idx) => {
+              product.active_Shop_Code = new_asc[idx].active_Shop_Code;
+              product.active_Shop_Code_ID = new_asc[idx].active_Shop_Code_ID;
+            })
+
+            alert("Get Active Shop Codes Complete");
+          })
+          .catch(e => {
+            alert("An error has occured")
+          })
       }
     }
   }
