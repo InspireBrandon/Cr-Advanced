@@ -293,6 +293,25 @@
             'audit-image-breach': function (params) {
               let self = params.context.componentParent;
               return self.autoRangeData.audit && params.data.imageAudit;
+            },
+            'indicator-yes': function (params) {
+              let self = params.context.componentParent;
+              return params.data.alt_Store_Range_Indicator == "YES";
+            },
+            'indicator-no': function (params) {
+              let self = params.context.componentParent;
+              console.log(params)
+              return params.data.alt_Store_Range_Indicator == "NO";
+            },
+            'indicator-selected': function (params) {
+              let self = params.context.componentParent;
+              console.log(params)
+              return params.data.alt_Store_Range_Indicator == "selected";
+            },
+            'indicator-select': function (params) {
+              let self = params.context.componentParent;
+              console.log(params)
+              return params.data.alt_Store_Range_Indicator == "select";
             }
           }
         },
@@ -415,12 +434,29 @@
         let self = this;
         let highlightObj = self.rangingController.getClusterData();
         self.$refs.HighlightCluster.show(highlightObj, data => {
+
+          let altRowData = self.rangingController.getSalesDataByCluster(data.selectedClusterType, data
+            .selectedClusterOption, self.autoRangeData);
+
+          altRowData.forEach(element => {
+            self.rowData.forEach(el => {
+              if (el.productID == element.productID) {
+                console.log("Smack my glitch up");
+                el.alt_Store_Range_Indicator = element.store_Range_Indicator
+                el.alt_Store_Range_Indicator_ID = element.store_Range_Indicator_ID
+              }
+            });
+          });
+          self.gridApi.redrawRows();
+
+          console.log(self.rowData);
+
           // get alt rowdata (self.rangingController.getSalesDataByCluster) save as tmp variable
           // go through alt rowdata (self.rowData)
-            // go through rowdata
-            // if rowdata.productID == alt rowdata.productID
-            // rowdata.alt_Store_Range_Indicator = alt rowdata.store_Range_Indicator
-            // rowdata.alt_Store_Range_Indicator_ID = alt rowdata.store_Range_Indicator_ID
+          // go through rowdata
+          // if rowdata.productID == alt rowdata.productID
+          // rowdata.alt_Store_Range_Indicator = alt rowdata.store_Range_Indicator
+          // rowdata.alt_Store_Range_Indicator_ID = alt rowdata.store_Range_Indicator_ID
         });
       },
       showLineChart(params) {
@@ -1477,7 +1513,9 @@
           product_id_list.push(product.productID)
         })
 
-        Axios.post(process.env.VUE_APP_API + "Product/GetActiveShopCodes?db=CR-Hinterland-Live", { productIDList: product_id_list })
+        Axios.post(process.env.VUE_APP_API + "Product/GetActiveShopCodes?db=CR-Hinterland-Live", {
+            productIDList: product_id_list
+          })
           .then(r => {
             let new_asc = r.data.productActiveShopCodeList
 
@@ -1694,5 +1732,21 @@
 
   .ag-theme-balham .auto-range-item {
     background-color: #cfffcf !important;
+  }
+
+  .indicator-yes {
+    background-color: green !important;
+  }
+
+  .indicator-no {
+    background-color: red !important;
+  }
+
+  .indicator-selected {
+    background-color: orange !important;
+  }
+
+  .indicator-select {
+    background-color: blue !important;
   }
 </style>

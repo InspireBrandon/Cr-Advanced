@@ -10,18 +10,19 @@
                 </v-btn>
             </v-toolbar>
             <v-card-text>
-                <v-select @change="onClusterTypeChange" ref="selectClusterType" placeholder="Select cluster type" dense
-                    :items="clusterTypes" v-model="selectedClusterType" required :rules="[(v) => !!v || 'Cluster Type is required']">
-                </v-select>
+                <v-form>
+                    <v-select @change="onClusterTypeChange" ref="selectClusterType" placeholder="Select cluster type"
+                        dense :items="clusterTypes" v-model="selectedClusterType" required
+                        :rules="[(v) => !!v || 'Cluster Type is required']">
+                    </v-select>
 
-                <v-autocomplete color="blue" :disabled="selectedClusterType == null"
-                    :placeholder="'Select ' + selectedClusterType + ' cluster'" dense
-                    :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" required :rules="[(v) => !!v || 'Cluster Option is required']">
-                </v-autocomplete>
+                    <v-autocomplete color="blue" :disabled="selectedClusterType == null"
+                        :placeholder="'Select ' + selectedClusterType + ' cluster'" dense
+                        :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" required
+                        :rules="[(v) => !!v || 'Cluster Option is required']">
+                    </v-autocomplete>
 
-                <v-select ref="selectIndicator" placeholder="Select Indicator type" dense :items="indicator"
-                    v-model="selectedIndicator" required :rules="[(v) => !!v || 'Indicator is required']">
-                </v-select>
+                </v-form>
             </v-card-text>
 
             <v-divider></v-divider>
@@ -110,7 +111,6 @@
                 let self = this;
 
                 self.$refs.selectClusterType.reset();
-                self.$refs.selectIndicator.reset();
             },
             setRangingClusterData(data) {
                 let self = this;
@@ -147,9 +147,10 @@
             submit() {
                 let self = this;
                 self.afterReturn({
-                    selectClusterType: self.selectClusterType,
+                    selectedClusterType: self.selectedClusterType,
                     selectedClusterOption: self.selectedClusterOption
                 })
+                self.dialog = false;
             }
         }
     }
