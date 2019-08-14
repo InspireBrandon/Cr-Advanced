@@ -122,6 +122,7 @@
           <v-btn v-if="rowData.length>0" @click="openReport" color="primary" small dark>Report</v-btn>
           <v-btn v-if="rowData.length>0" @click="onChart1" color="primary" small dark>graphs</v-btn>
           <!-- <v-btn @click="openParetoModal" color="primary" small dark>Pareto</v-btn> -->
+          <v-btn v-if="rowData.length>0" @click="showClusterHighlight" color="pink" small dark>Highlight Cluster</v-btn>
           <v-menu offset-y>
             <v-btn :disabled="selectedItems.length == 0" slot="activator" color="primary" small dark>Set Indicator
             </v-btn>
@@ -186,6 +187,7 @@
     <YesNoModal ref="yesNo"></YesNoModal>
     <ProductMaintModal ref="productMaint"></ProductMaintModal>
     <!-- <ProductListing ref="productListing"></ProductListing> -->
+    <HighlightCluster ref="HighlightCluster"></HighlightCluster>
     <SizeLoader ref="SizeLoader" />
     <AutoRangeModal ref="AutoRangeModal" />
     <RangingReportModal ref="RangingReportModal" />
@@ -231,7 +233,7 @@
   import ParetoModal from './ParetoModal.vue'
   import LineGraphModal from './LineGraphModal.vue'
   import GpGraph from './GpGraph.vue'
-
+  import HighlightCluster from './HighlightCluster.vue'
 
   import {
     AgGridVue
@@ -268,7 +270,8 @@
       ProductListing,
       AutoRangeModal,
       RangingReportModal,
-      GraphConfigurationModal
+      GraphConfigurationModal,
+      HighlightCluster
     },
     data() {
       return {
@@ -408,6 +411,11 @@
       self.checkparams()
     },
     methods: {
+      showClusterHighlight() {
+        let self = this;
+        let highlightObj = self.rangingController.getClusterData();
+        self.$refs.HighlightCluster.show(highlightObj);
+      },
       showLineChart(params) {
         let self = this
         console.log(params);
