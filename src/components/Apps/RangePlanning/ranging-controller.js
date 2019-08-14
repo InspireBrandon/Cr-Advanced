@@ -50,6 +50,10 @@ class RangingController {
       tag: this.tag
     }
   }
+
+  setClusterData(clusterData) {
+    this.clusterData = clusterData;
+  }
   
   getClusterData(){
     return this.clusterData;

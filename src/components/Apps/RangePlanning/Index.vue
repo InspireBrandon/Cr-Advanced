@@ -53,6 +53,9 @@
             <v-list-tile :disabled="rowData.length < 1" @click="getActiveShopCodes">
               <v-list-tile-title>Get Active Shop Codes</v-list-tile-title>
             </v-list-tile>
+            <v-list-tile :disabled="rowData.length < 1" @click="getClusters">
+              <v-list-tile-title>Get Clusters</v-list-tile-title>
+            </v-list-tile>
           </v-list>
         </v-menu>
         <v-menu v-if="selectedClusterOption != null" dark offset-y style="margin-bottom: 10px;">
@@ -417,10 +420,10 @@
         self.$refs.HighlightCluster.show(highlightObj, data => {
           // get alt rowdata (self.rangingController.getSalesDataByCluster) save as tmp variable
           // go through alt rowdata (self.rowData)
-            // go through rowdata
-            // if rowdata.productID == alt rowdata.productID
-            // rowdata.alt_Store_Range_Indicator = alt rowdata.store_Range_Indicator
-            // rowdata.alt_Store_Range_Indicator_ID = alt rowdata.store_Range_Indicator_ID
+          // go through rowdata
+          // if rowdata.productID == alt rowdata.productID
+          // rowdata.alt_Store_Range_Indicator = alt rowdata.store_Range_Indicator
+          // rowdata.alt_Store_Range_Indicator_ID = alt rowdata.store_Range_Indicator_ID
         });
       },
       showLineChart(params) {
@@ -997,6 +1000,10 @@
       onClusterOptionChange() {
         let self = this;
 
+        let filters = self.gridApi;
+
+        console.log(filters);
+
         self.$nextTick(() => {
           if (self.selectedClusterOption != null) {
             self.rowData = [];
@@ -1477,7 +1484,9 @@
           product_id_list.push(product.productID)
         })
 
-        Axios.post(process.env.VUE_APP_API + "Product/GetActiveShopCodes?db=CR-Hinterland-Live", { productIDList: product_id_list })
+        Axios.post(process.env.VUE_APP_API + "Product/GetActiveShopCodes?db=CR-Hinterland-Live", {
+            productIDList: product_id_list
+          })
           .then(r => {
             let new_asc = r.data.productActiveShopCodeList
 
@@ -1490,6 +1499,18 @@
           })
           .catch(e => {
             alert("An error has occured")
+          })
+      },
+      getClusters() {
+        let self = this;
+
+        Axios.get(process.env.VUE_APP_API + "Ranging/GetClusterData?planogramID=" + self.fileData.planogramID)
+          .then(r => {
+            let clusterData = r.data.clusterData;
+
+            self.rangingController.setClusterData(clusterData);
+            self.setRangingClusterData(clusterData);
+            alert("Get Clusters Complete");
           })
       }
     }
