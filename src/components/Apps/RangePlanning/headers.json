@@ -27,7 +27,7 @@
     {
         "headerName": "Description",
         "field": "description"
-    }, 
+    },
     {
         "headerName": "Size Description",
         "field": "size_Description",
@@ -93,7 +93,7 @@
     {
         "headerName": "Weighted Distribution",
         "field": "weighted_Distribution"
-    }, 
+    },
     {
         "headerName": "Sales Potential",
         "field": "sales_potential"
@@ -182,7 +182,7 @@
     {
         "headerName": "Sales Index",
         "field": "sales_contribution"
-    }, 
+    },
     {
         "headerName": "Units Index",
         "field": "units_contribution"
@@ -204,6 +204,11 @@
     {
         "headerName": "Product Code",
         "field": "product_Code",
+        "hide": true
+    },
+    {
+        "headerName": "Alt INDICATOR",
+        "field": "alt_Store_Range_Indicator",
         "hide": true
     }
 ]

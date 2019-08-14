@@ -296,6 +296,25 @@
             'audit-image-breach': function (params) {
               let self = params.context.componentParent;
               return self.autoRangeData.audit && params.data.imageAudit;
+            },
+            'indicator-yes': function (params) {
+              let self = params.context.componentParent;
+              return params.data.alt_Store_Range_Indicator == "YES";
+            },
+            'indicator-no': function (params) {
+              let self = params.context.componentParent;
+              console.log(params)
+              return params.data.alt_Store_Range_Indicator == "NO";
+            },
+            'indicator-selected': function (params) {
+              let self = params.context.componentParent;
+              console.log(params)
+              return params.data.alt_Store_Range_Indicator == "selected";
+            },
+            'indicator-select': function (params) {
+              let self = params.context.componentParent;
+              console.log(params)
+              return params.data.alt_Store_Range_Indicator == "select";
             }
           }
         },
@@ -418,6 +437,23 @@
         let self = this;
         let highlightObj = self.rangingController.getClusterData();
         self.$refs.HighlightCluster.show(highlightObj, data => {
+
+          let altRowData = self.rangingController.getSalesDataByCluster(data.selectedClusterType, data
+            .selectedClusterOption, self.autoRangeData);
+
+          altRowData.forEach(element => {
+            self.rowData.forEach(el => {
+              if (el.productID == element.productID) {
+                console.log("Smack my glitch up");
+                el.alt_Store_Range_Indicator = element.store_Range_Indicator
+                el.alt_Store_Range_Indicator_ID = element.store_Range_Indicator_ID
+              }
+            });
+          });
+          self.gridApi.redrawRows();
+
+          console.log(self.rowData);
+
           // get alt rowdata (self.rangingController.getSalesDataByCluster) save as tmp variable
           // go through alt rowdata (self.rowData)
           // go through rowdata
@@ -1715,5 +1751,21 @@
 
   .ag-theme-balham .auto-range-item {
     background-color: #cfffcf !important;
+  }
+
+  .indicator-yes {
+    background-color: rgba(25, 187, 25, 0.527) !important;
+  }
+
+  .indicator-no {
+    background-color: rgba(241, 48, 48, 0.568) !important;
+  }
+
+  .indicator-selected {
+    background-color: orange !important;
+  }
+
+  .indicator-select {
+    background-color: rgba(41, 41, 251, 0.609) !important;
   }
 </style>

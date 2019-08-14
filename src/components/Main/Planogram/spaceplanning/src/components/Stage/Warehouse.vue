@@ -996,7 +996,8 @@
                 self.updateLoader({
                   currentFile: 2,
                 })
-
+                console.log(r);
+                
                 self.$store.commit("setRangeID", clusterData.rangeID);
                 self.$store.commit("setPlanogramName", r.data.planogramName);
                 self.setRangingClusterData(r.data.clusterData);
@@ -1072,6 +1073,7 @@
               })
               .catch(e => {
                 alert("Failed to get range file from server");
+                updatePlanoDataCallback(null)
                 self.$refs.SizeLoader.close()
               })
           }, 1000);

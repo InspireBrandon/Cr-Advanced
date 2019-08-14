@@ -6,7 +6,7 @@
           <v-toolbar dark color="primary">
             <v-toolbar-title >Select A Range</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-text-field v-model="searchText" append-icon="search"></v-text-field>
+            <v-text-field color="white" v-model="searchText" append-icon="search"></v-text-field>
             <v-btn icon @click.native="dialog = false"><v-icon>close</v-icon></v-btn>
           </v-toolbar>
         </v-card-title>
