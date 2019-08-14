@@ -278,6 +278,7 @@
     },
     data() {
       return {
+        filters:null,
         ShowGraph: false,
         isAdd: true,
         rangingController: null,
@@ -303,17 +304,14 @@
             },
             'indicator-no': function (params) {
               let self = params.context.componentParent;
-              console.log(params)
               return params.data.alt_Store_Range_Indicator == "NO";
             },
             'indicator-selected': function (params) {
               let self = params.context.componentParent;
-              console.log(params)
               return params.data.alt_Store_Range_Indicator == "selected";
             },
             'indicator-select': function (params) {
               let self = params.context.componentParent;
-              console.log(params)
               return params.data.alt_Store_Range_Indicator == "select";
             }
           }
@@ -452,7 +450,6 @@
           });
           self.gridApi.redrawRows();
 
-          console.log(self.rowData);
 
           // get alt rowdata (self.rangingController.getSalesDataByCluster) save as tmp variable
           // go through alt rowdata (self.rowData)
@@ -747,7 +744,6 @@
                   self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
                     .selectedClusterOption, self.autoRangeData);
 
-                  console.log(self.rowData);
 
                   self.ais_Sales = 0;
                   self.ais_SalesPotential = 0;
@@ -1037,9 +1033,11 @@
         let self = this;
 
         let filters = self.gridApi;
+        console.log("filters");
+        
+       self.filters = filters.filterManager.allFilters
 
-        console.log(filters);
-
+       console.log(self.filters);
         self.$nextTick(() => {
           if (self.selectedClusterOption != null) {
             self.rowData = [];
@@ -1050,6 +1048,7 @@
               .selectedClusterOption).length;
             self.fitColumns();
             self.calculateAutoRange();
+            self.gridApi.filterManager.allFilters=self.filters
           }
         })
       },
@@ -1224,7 +1223,7 @@
 
         switch (type) {
           case 'CLUSTER': {
-            self.columnDefs = require('./headers.json');
+            // self.columnDefs = require('./headers.json');
             self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
               .selectedClusterOption, self.autoRangeData);
 
