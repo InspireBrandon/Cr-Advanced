@@ -28,7 +28,7 @@
 
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn flat color="primary">
+                <v-btn @click="submit" flat color="primary">
                     Submit
                 </v-btn>
             </v-card-actions>
@@ -93,13 +93,15 @@
                 ],
                 selectedIndicator: null,
                 rangingClusterData: '',
-                clusterdata: []
+                clusterdata: [],
+                afterReturn: null
             }
         },
         methods: {
-            show(data) {
+            show(data, afterReturn) {
                 let self = this;
                 self.setRangingClusterData(data);
+                self.afterReturn = afterReturn;
                 self.dialog = true;
                 self.reset();
             },
@@ -142,6 +144,13 @@
 
                 self.selectedClusterOption = null;
             },
+            submit() {
+                let self = this;
+                self.afterReturn({
+                    selectClusterType: self.selectClusterType,
+                    selectedClusterOption: self.selectedClusterOption
+                })
+            }
         }
     }
 </script>

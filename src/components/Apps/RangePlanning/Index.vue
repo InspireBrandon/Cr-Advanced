@@ -414,7 +414,14 @@
       showClusterHighlight() {
         let self = this;
         let highlightObj = self.rangingController.getClusterData();
-        self.$refs.HighlightCluster.show(highlightObj);
+        self.$refs.HighlightCluster.show(highlightObj, data => {
+          // get alt rowdata (self.rangingController.getSalesDataByCluster) save as tmp variable
+          // go through alt rowdata (self.rowData)
+            // go through rowdata
+            // if rowdata.productID == alt rowdata.productID
+            // rowdata.alt_Store_Range_Indicator = alt rowdata.store_Range_Indicator
+            // rowdata.alt_Store_Range_Indicator_ID = alt rowdata.store_Range_Indicator_ID
+        });
       },
       showLineChart(params) {
         let self = this
@@ -427,8 +434,6 @@
           self.$refs.LineGraphModal.open(r.data, params.description, params.barcode, callback => {})
 
         })
-
-
       },
       openParetoModal(fact, fact_name) {
         let self = this

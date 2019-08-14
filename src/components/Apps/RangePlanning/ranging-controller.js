@@ -1072,6 +1072,8 @@ function RangeProduct(productData, salesData, indicator) {
   self.profit_contribution = salesData.profit_contribution;
   self.autoRangeItem = false;
   self.autoRangeOneItem = false;
+  self.alt_Store_Range_Indicator = "";
+  self.alt_Store_Range_Indicator_ID = null;
 }
 
 function storeStocksProduct(storeSales, storeID, productID) {
