@@ -50,6 +50,10 @@ class RangingController {
       tag: this.tag
     }
   }
+  
+  getClusterData(){
+    return this.clusterData;
+  }
 
   getAllRangeProducts() {
     return this.allRangeProducts;
@@ -770,8 +774,6 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
       }
     })
 
-    console.log(weighted_distribution);
-
     if (weighted_distribution != 0 && sales_retail != 0)
       (sales_potential = sales_retail / weighted_distribution * 100).toFixed(0);
 
@@ -897,8 +899,6 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
         item_profit_rank = t.itemProfitRank
       }
     })
-
-    console.log(weighted_distribution);
 
     if (weighted_distribution != 0 && sales_retail != 0)
       (sales_potential = sales_retail / weighted_distribution * 100).toFixed(0);
@@ -1072,6 +1072,8 @@ function RangeProduct(productData, salesData, indicator) {
   self.profit_contribution = salesData.profit_contribution;
   self.autoRangeItem = false;
   self.autoRangeOneItem = false;
+  self.alt_Store_Range_Indicator = "";
+  self.alt_Store_Range_Indicator_ID = null;
 }
 
 function storeStocksProduct(storeSales, storeID, productID) {

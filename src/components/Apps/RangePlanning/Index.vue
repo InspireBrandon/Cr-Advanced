@@ -50,6 +50,9 @@
             <v-list-tile :disabled="rowData.length < 1" @click="updateProductDetails">
               <v-list-tile-title>Update Product Details</v-list-tile-title>
             </v-list-tile>
+            <v-list-tile :disabled="rowData.length < 1" @click="getActiveShopCodes">
+              <v-list-tile-title>Get Active Shop Codes</v-list-tile-title>
+            </v-list-tile>
           </v-list>
         </v-menu>
         <v-menu v-if="selectedClusterOption != null" dark offset-y style="margin-bottom: 10px;">
@@ -119,6 +122,7 @@
           <v-btn v-if="rowData.length>0" @click="openReport" color="primary" small dark>Report</v-btn>
           <v-btn v-if="rowData.length>0" @click="onChart1" color="primary" small dark>graphs</v-btn>
           <!-- <v-btn @click="openParetoModal" color="primary" small dark>Pareto</v-btn> -->
+          <v-btn v-if="rowData.length>0" @click="showClusterHighlight" color="pink" small dark>Highlight Cluster</v-btn>
           <v-menu offset-y>
             <v-btn :disabled="selectedItems.length == 0" slot="activator" color="primary" small dark>Set Indicator
             </v-btn>
@@ -183,6 +187,7 @@
     <YesNoModal ref="yesNo"></YesNoModal>
     <ProductMaintModal ref="productMaint"></ProductMaintModal>
     <!-- <ProductListing ref="productListing"></ProductListing> -->
+    <HighlightCluster ref="HighlightCluster"></HighlightCluster>
     <SizeLoader ref="SizeLoader" />
     <AutoRangeModal ref="AutoRangeModal" />
     <RangingReportModal ref="RangingReportModal" />
@@ -228,7 +233,7 @@
   import ParetoModal from './ParetoModal.vue'
   import LineGraphModal from './LineGraphModal.vue'
   import GpGraph from './GpGraph.vue'
-
+  import HighlightCluster from './HighlightCluster.vue'
 
   import {
     AgGridVue
@@ -265,7 +270,8 @@
       ProductListing,
       AutoRangeModal,
       RangingReportModal,
-      GraphConfigurationModal
+      GraphConfigurationModal,
+      HighlightCluster
     },
     data() {
       return {
@@ -405,19 +411,29 @@
       self.checkparams()
     },
     methods: {
+      showClusterHighlight() {
+        let self = this;
+        let highlightObj = self.rangingController.getClusterData();
+        self.$refs.HighlightCluster.show(highlightObj, data => {
+          // get alt rowdata (self.rangingController.getSalesDataByCluster) save as tmp variable
+          // go through alt rowdata (self.rowData)
+            // go through rowdata
+            // if rowdata.productID == alt rowdata.productID
+            // rowdata.alt_Store_Range_Indicator = alt rowdata.store_Range_Indicator
+            // rowdata.alt_Store_Range_Indicator_ID = alt rowdata.store_Range_Indicator_ID
+        });
+      },
       showLineChart(params) {
         let self = this
         console.log(params);
         Axios.get(process.env.VUE_APP_API +
           `GetTrendData?productID=${params.productID}&periodFromID=${self.fileData.dateTo}&periodToID=${self.fileData.dateTo-11}`
-          ).then(r => {
-            console.log(r);
-            
+        ).then(r => {
+          console.log(r);
+
           self.$refs.LineGraphModal.open(r.data, params.description, params.barcode, callback => {})
 
         })
-
-
       },
       openParetoModal(fact, fact_name) {
         let self = this
@@ -1451,6 +1467,30 @@
         ];
 
         return result;
+      },
+      getActiveShopCodes() {
+        let self = this;
+
+        let product_id_list = [];
+
+        self.rowData.forEach(product => {
+          product_id_list.push(product.productID)
+        })
+
+        Axios.post(process.env.VUE_APP_API + "Product/GetActiveShopCodes?db=CR-Hinterland-Live", { productIDList: product_id_list })
+          .then(r => {
+            let new_asc = r.data.productActiveShopCodeList
+
+            self.rowData.forEach((product, idx) => {
+              product.active_Shop_Code = new_asc[idx].active_Shop_Code;
+              product.active_Shop_Code_ID = new_asc[idx].active_Shop_Code_ID;
+            })
+
+            alert("Get Active Shop Codes Complete");
+          })
+          .catch(e => {
+            alert("An error has occured")
+          })
       }
     }
   }
