@@ -1735,11 +1735,11 @@
   }
 
   .indicator-yes {
-    background-color: green !important;
+    background-color: rgba(25, 187, 25, 0.527) !important;
   }
 
   .indicator-no {
-    background-color: red !important;
+    background-color: rgba(241, 48, 48, 0.568) !important;
   }
 
   .indicator-selected {
@@ -1747,6 +1747,6 @@
   }
 
   .indicator-select {
-    background-color: blue !important;
+    background-color: rgba(41, 41, 251, 0.609) !important;
   }
 </style>
