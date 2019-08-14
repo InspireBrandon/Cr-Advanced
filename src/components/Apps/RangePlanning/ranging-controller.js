@@ -50,6 +50,10 @@ class RangingController {
       tag: this.tag
     }
   }
+  
+  getClusterData(){
+    return this.clusterData;
+  }
 
   getAllRangeProducts() {
     return this.allRangeProducts;
