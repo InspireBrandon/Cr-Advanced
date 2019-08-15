@@ -26,7 +26,8 @@
                 <v-icon>edit</v-icon>
             </v-btn>
             <v-toolbar-items>
-                <v-select :items="baskets" v-model="selectedBasket" return-object dark style="margin-left: 10px; margin-top: 4px; width: 250px" placeholder="Select a basket" dense
+                <v-select :items="baskets" v-model="selectedBasket" return-object dark
+                    style="margin-left: 10px; margin-top: 4px; width: 250px" placeholder="Select a basket" dense
                     hide-details>
                 </v-select>
             </v-toolbar-items>
@@ -39,12 +40,7 @@
 <script>
     import Axios from 'axios';
 
-    let baskets = [
-        { text: "Premium", value: 1 },
-        { text: "Agri", value: 2 },
-        { text: "DIY", value: 3 },
-        { text: "Livestock", value: 4 }
-    ]
+    let baskets = []
 
     import Grid from './Grid'
     import BasketConfig from './Basket_Config'
@@ -60,15 +56,37 @@
         data() {
             return {
                 rowData: [],
-                baskets: baskets,
+                baskets: [],
                 selectedBasket: null
             }
         },
         created() {
             let self = this;
             self.getBasketReportData();
+            self.getbaskets()
         },
         methods: {
+            getbaskets() {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + `Basket`)
+                    .then(r => {
+                        console.log(r);
+                        r.data.forEach(e => {
+                            self.baskets.push({
+                                text: e.displayname,
+                                value: e.id
+                            })
+                        })
+                         console.log(self.baskets);
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+            },
+            openBasketMaint() {
+                let self = this
+                self.$refs.basketMaint.open()
+            },
             getBasketReportData() {
                 let self = this;
 
