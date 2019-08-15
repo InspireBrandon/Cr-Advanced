@@ -1557,7 +1557,7 @@
           },
 
           {
-            name: "Show Pie",
+            name: "Store Sales",
             action: () => {
               self.showStorePieGraph(params.node.data)
             }
