@@ -212,6 +212,9 @@
     <ParetoModal ref="ParetoModal" />
     <GpGraph ref="GpGraph" />
     <LineGraphModal ref="LineGraphModal" />
+    <StorePieGraph ref="StorePieGraph" />
+
+
   </div>
 </template>
 
@@ -249,8 +252,11 @@
   import GraphConfigurationModal from './GraphConfigurationModal.vue'
   import ParetoModal from './ParetoModal.vue'
   import LineGraphModal from './LineGraphModal.vue'
+  import StorePieGraph from './StorePieGraph.vue'
   import GpGraph from './GpGraph.vue'
   import HighlightCluster from './HighlightCluster.vue'
+
+
 
   import {
     AgGridVue
@@ -267,6 +273,7 @@
   export default {
     name: 'Ranging',
     components: {
+      StorePieGraph,
       LineGraphModal,
       GpGraph,
       ParetoModal,
@@ -292,7 +299,7 @@
     },
     data() {
       return {
-        filters:null,
+        filters: null,
         ShowGraph: false,
         isAdd: true,
         rangingController: null,
@@ -453,16 +460,16 @@
             self.rangingController.setClusterIndicator(self.selectedClusterType, self.selectedClusterOption, el
               .productID, indicator);
 
-              self.gridApi.forEachNode((node, idx) => {
-                if(node.data.productID == el.productID) {
-                  node.setDataValue("alt_Store_Range_Indicator", indicator)
-                  node.setDataValue("store_Range_Indicator", indicator)
-                  node.setDataValue("alt_Store_Range_Indicator_ID", indicator == "YES" ? 2 : 1)
-                  node.setDataValue("store_Range_Indicator_ID", indicator == "YES" ? 2 : 1)
-                }
-              })
+            self.gridApi.forEachNode((node, idx) => {
+              if (node.data.productID == el.productID) {
+                node.setDataValue("alt_Store_Range_Indicator", indicator)
+                node.setDataValue("store_Range_Indicator", indicator)
+                node.setDataValue("alt_Store_Range_Indicator_ID", indicator == "YES" ? 2 : 1)
+                node.setDataValue("store_Range_Indicator_ID", indicator == "YES" ? 2 : 1)
+              }
+            })
 
-              self.gridApi.redrawRows();
+            self.gridApi.redrawRows();
           }
         })
       },
@@ -492,6 +499,18 @@
           `GetTrendData?productID=${params.productID}&periodFromID=${self.fileData.dateTo}&periodToID=${self.fileData.dateTo-11}`
         ).then(r => {
           self.$refs.LineGraphModal.open(r.data, params.description, params.barcode, callback => {})
+
+        })
+      },
+      showStorePieGraph(params) {
+        let self = this
+        Axios.get(process.env.VUE_APP_API +
+          `GetAvgStoreUnits?productID=${params.productID}&periodFromID=${self.fileData.dateTo}&periodToID=${self.fileData.dateFrom}&clusterType=${self.selectedClusterType}&clusterID=${self.selectedClusterOption}`
+        ).then(r => {
+          console.log("GetAvgStoreUnits");
+          console.log(r);
+
+          self.$refs.StorePieGraph.open(r.data, params.description, params.barcode, callback => {})
 
         })
       },
@@ -1058,10 +1077,10 @@
 
         let filters = self.gridApi;
         console.log("filters");
-        
-       self.filters = filters.filterManager.allFilters
 
-       console.log(self.filters);
+        self.filters = filters.filterManager.allFilters
+
+        console.log(self.filters);
         self.$nextTick(() => {
           if (self.selectedClusterOption != null) {
             self.rowData = [];
@@ -1072,7 +1091,7 @@
               .selectedClusterOption).length;
             self.fitColumns();
             self.calculateAutoRange();
-            self.gridApi.filterManager.allFilters=self.filters
+            self.gridApi.filterManager.allFilters = self.filters
           }
         })
       },
@@ -1529,8 +1548,17 @@
             action: () => {
               self.showLineChart(params.node.data)
             }
+          },
+
+          {
+            name: "Show Pie",
+            action: () => {
+              self.showStorePieGraph(params.node.data)
+            }
           }
         ];
+
+
 
         return result;
       },
