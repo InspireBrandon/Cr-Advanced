@@ -4,74 +4,114 @@
         "headerCheckboxSelection": true,
         "headerCheckboxSelectionFilteredOnly": true,
         "checkboxSelection": true,
-        "hide": true
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+
     },
     {
         "headerName": "Barcode",
         "field": "barcode",
-        "hide": true
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Brand",
         "field": "brand",
         "editable": true,
         "hide": true,
-        "chartDataType": "category"
+        "chartDataType": "category",
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Manufacturer",
         "field": "manufacturer",
         "hide": true,
-        "chartDataType": "category"
+        "chartDataType": "category",
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Description",
-        "field": "description"
+        "field": "description",
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Size Description",
         "field": "size_Description",
         "editable": true,
-        "hide": true
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Category",
         "field": "category",
-        "hide": true
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Subcategory",
         "field": "subcategory",
-        "editable": true
+        "editable": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Segment",
         "field": "segment",
         "editable": true,
-        "hide": true
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Active Shop Code",
         "field": "active_Shop_Code",
-        "hide": true
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Height",
         "field": "height",
         "editable": true,
-        "hide": true
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Width",
         "field": "width",
         "editable": true,
-        "hide": true
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Depth",
         "field": "depth",
         "editable": true,
-        "hide": true
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Indicator",
@@ -83,36 +123,57 @@
         },
         "cellStyle": {
             "background-color": "#E3F2FD"
+        },
+        "filterParams": {
+            "newRowsAction": "keep"
         }
     },
     {
         "headerName": "Numeric Distribution",
         "field": "number_Distribution",
-        "hide": true
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Weighted Distribution",
-        "field": "weighted_Distribution"
+        "field": "weighted_Distribution",
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Sales Potential",
-        "field": "sales_potential"
+        "field": "sales_potential",
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Sales Potential Rank",
         "field": "sales_potential_rank",
         "cellStyle": {
             "background-color": "#e4e4e4"
+        },
+        "filterParams": {
+            "newRowsAction": "keep"
         }
     },
     {
         "headerName": "DOS FAC",
-        "field": "dos_fac"
+        "field": "dos_fac",
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Volume Potential",
         "field": "volume_potential",
-        "hide": true
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Volume Potential rank",
@@ -120,7 +181,10 @@
         "cellStyle": {
             "background-color": "#e4e4e4"
         },
-        "hide": true
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Item Sales Rank",
@@ -128,7 +192,10 @@
         "cellStyle": {
             "background-color": "#e4e4e4"
         },
-        "hide": true
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Item Volume Rank",
@@ -136,79 +203,127 @@
         "cellStyle": {
             "background-color": "#e4e4e4"
         },
-        "hide": true
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Item Profit Rank",
         "field": "item_profit_rank",
         "cellStyle": {
             "background-color": "#e4e4e4"
+        },
+        "filterParams": {
+            "newRowsAction": "keep"
         }
     },
     {
         "headerName": "Sales",
         "field": "sales_Retail",
         "hide": true,
-        "chartDataType": "series"
+        "chartDataType": "series",
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Volume",
         "field": "sales_Units",
-        "hide": true
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Profit",
-        "field": "sales_Profit"
+        "field": "sales_Profit",
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Profit Potential",
         "field": "profit_potential",
-        "hide": true
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Profit Potential Rank",
         "field": "profit_potential_rank",
-        "hide": true
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "GP%",
-        "field": "gross_profit"
+        "field": "gross_profit",
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Markup%",
         "field": "markup",
-        "hide": true
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Sales Index",
-        "field": "sales_contribution"
+        "field": "sales_contribution",
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Units Index",
-        "field": "units_contribution"
+        "field": "units_contribution",
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Profit Index",
-        "field": "profit_contribution"
+        "field": "profit_contribution",
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Stock Cost",
         "field": "stock_Cost",
-        "hide": true
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Stock Units",
         "field": "stock_Units",
-        "hide": true
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Product Code",
         "field": "product_Code",
-        "hide": true
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     },
     {
         "headerName": "Alt INDICATOR",
         "field": "alt_Store_Range_Indicator",
-        "hide": true
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
     }
 ]

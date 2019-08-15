@@ -292,6 +292,7 @@
     },
     data() {
       return {
+        filters:null,
         ShowGraph: false,
         isAdd: true,
         rangingController: null,
@@ -767,7 +768,6 @@
                   self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
                     .selectedClusterOption, self.autoRangeData);
 
-                  console.log(self.rowData);
 
                   self.ais_Sales = 0;
                   self.ais_SalesPotential = 0;
@@ -1057,9 +1057,11 @@
         let self = this;
 
         let filters = self.gridApi;
+        console.log("filters");
+        
+       self.filters = filters.filterManager.allFilters
 
-        console.log(filters);
-
+       console.log(self.filters);
         self.$nextTick(() => {
           if (self.selectedClusterOption != null) {
             self.rowData = [];
@@ -1070,6 +1072,7 @@
               .selectedClusterOption).length;
             self.fitColumns();
             self.calculateAutoRange();
+            self.gridApi.filterManager.allFilters=self.filters
           }
         })
       },
@@ -1244,7 +1247,7 @@
 
         switch (type) {
           case 'CLUSTER': {
-            self.columnDefs = require('./headers.json');
+            // self.columnDefs = require('./headers.json');
             self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
               .selectedClusterOption, self.autoRangeData);
 
