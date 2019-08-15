@@ -25,16 +25,17 @@
             </v-toolbar-title>
         </v-toolbar>
         <v-toolbar flat dark>
-            <v-btn small fab color="primary">
+            <v-btn small fab color="primary" @click="openBasketMaint">
                 <v-icon>edit</v-icon>
             </v-btn>
             <v-toolbar-items>
-                <v-select dark style="margin-left: 10px; margin-top: 4px; width: 250px" placeholder="Select basket" dense
-                    hide-details>
+                <v-select dark style="margin-left: 10px; margin-top: 4px; width: 250px" placeholder="Select basket"
+                    dense hide-details>
                 </v-select>
             </v-toolbar-items>
         </v-toolbar>
         <Grid :rowData="rowData" ref="Grid" />
+        <basketMaint ref="basketMaint" />
     </v-card>
 </template>
 
@@ -44,8 +45,10 @@
     import Grid from './Grid'
     import BasketConfig from './Basket_Config'
     import PremiumNature from './PremiumNature/PremiumNature.vue'
+    import basketMaint from './basketMaint/BasketMaintenanceModal.vue'
     export default {
         components: {
+            basketMaint,
             Grid,
             BasketConfig,
             PremiumNature,
@@ -60,7 +63,11 @@
             getBasketReportData() {
                 let self = this;
 
-                // Axios.get(process.env.VUE_APP_API + "BasketAnalysis")
+                Axios.get(process.env.VUE_APP_API + "BasketAnalysis")
+            },
+            openBasketMaint() {
+                let self = this
+                self.$refs.basketMaint.open()
             }
         }
     }

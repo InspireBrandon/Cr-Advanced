@@ -1,16 +1,15 @@
 <template>
     <div>
-        <ag-grid-vue :gridOptions="gridOptions" @selection-changed="onSelectionChanged" :sideBar='false'
-            style="width: 100%;  height: calc(100vh - 220px);" :defaultColDef="defaultColDef" class="ag-theme-balham"
-            :columnDefs="headers" :rowData="rowData" :enableSorting="true" :enableFilter="true"
-            :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
-            :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :gridReady="gridReady"
-            :onGridReady="onGridReady" :groupMultiAutoColumn="true">
+        <ag-grid-vue :gridOptions="gridOptions" :sideBar='false' style="width: 100%;  height: calc(80vh - 112px);"
+            :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="data"
+            :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true"
+            rowSelection="multiple" :rowDeselection="true" :enableColResize="true" :floatingFilter="true"
+            :gridReady="gridReady" :onGridReady="onGridReady" :groupMultiAutoColumn="true">
         </ag-grid-vue>
         <v-toolbar dark dense class="pa-0">
-            <span>rows : {{rowData.length}}</span>
+            <span>rows : {{data.length}}</span>
         </v-toolbar>
-        
+
     </div>
 </template>
 <script>
@@ -20,20 +19,40 @@
         AgGridVue
     } from "ag-grid-vue";
     export default {
-        props: [],
+        props: ["data"],
         components: {
             AgGridVue,
         },
         data() {
             return {
-                rowData:[],
+
                 selectedItems: [],
-                headers: [
-                    //     {
-                    //     "headerName": "",
-                    //    "field":yeet
-                    // },
-                ],
+                headers: [{
+                    "headerName": "Basket",
+                    "editable": true,
+                    "field": "basket"
+
+                }, {
+                    "headerName": "Displayname",
+                    "editable": true,
+
+                    "field": "displayname"
+                }, {
+                    "headerName": "Description",
+                    "editable": true,
+
+                    "field": "description"
+                }, {
+                    "headerName": "Active",
+                    "editable": true,
+
+                    "field": "active"
+                }, {
+                    "headerName": "Rank",
+                    "editable": true,
+
+                    "field": "rank"
+                }, ],
                 defaultColDef: {
                     onCellValueChanged: this.UpdateLine
                 },
@@ -46,22 +65,35 @@
                 },
             }
         },
+        created() {
+            this.GetData
+        },
         methods: {
 
             UpdateLine(item) {
-                // let self = this
-                // let tmp = item.data
-                // let node = item.node
+                let self = this
+                let tmp = item.data
+                let node = item.node
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `Basket`, tmp)
+                    .then(r => {
+                        console.log(r);
+                        
+                        node.setData(tmp)
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+                // 
                 // self.createStorePlano(tmp, data => {
                 //     tmp.id = data.store_Planogram.id
                 //     tmp.heightFit = data.store_Planogram.heightFit;
                 //     tmp.modulesFit = data.store_Planogram.modulesFit;
                 //     tmp.fits = data.store_Planogram.fits;
-                //     node.setData(tmp)
+                //     
                 // })
                 // self.createPlanoGramDetailTX(tmp)
             },
-
             resize() {
                 setTimeout(() => {
                     this.gridApi.resetRowHeights();
