@@ -24,6 +24,7 @@
     "ag-grid-enterprise": "^21.0.1",
     "ag-grid-vue": "^21.0.1",
     "axios": "^0.18.0",
+    "babel-polyfill": "^6.26.0",
     "cloudinary-core": "^2.6.2",
     "jsonwebtoken": "^8.5.0",
     "konva": "^3.2.0",

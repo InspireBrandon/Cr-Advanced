@@ -77,6 +77,9 @@
             <v-list-tile :disabled="selectedClusterOption == null" @click="openAutoRangeModal">
               <v-list-tile-title>Auto Range</v-list-tile-title>
             </v-list-tile>
+            <v-list-tile :disabled="selectedClusterOption == null" @click="showClusterHighlight">
+              <v-list-tile-title>Cluster</v-list-tile-title>
+            </v-list-tile>
           </v-list>
         </v-menu>
       </v-toolbar-items>
@@ -125,7 +128,18 @@
           <v-btn v-if="rowData.length>0" @click="openReport" color="primary" small dark>Report</v-btn>
           <v-btn v-if="rowData.length>0" @click="onChart1" color="primary" small dark>graphs</v-btn>
           <!-- <v-btn @click="openParetoModal" color="primary" small dark>Pareto</v-btn> -->
-          <v-btn v-if="rowData.length>0" @click="showClusterHighlight" color="pink" small dark>Highlight Cluster</v-btn>
+          <v-menu v-if="rowData.length > 0" dark offset-y>
+            <v-btn slot="activator" v-if="rowData.length>0" color="pink" small dark>Apply Highlight</v-btn>
+            <v-list class="pa-0">
+              <v-list-tile :disabled="selectedClusterOption == null" @click="applyHighlight('YES')">
+                <v-list-tile-title>YES</v-list-tile-title>
+              </v-list-tile>
+              <v-divider></v-divider>
+              <v-list-tile :disabled="selectedClusterOption == null" @click="applyHighlight('NO')">
+                <v-list-tile-title>NO</v-list-tile-title>
+              </v-list-tile>
+            </v-list>
+          </v-menu>
           <v-menu offset-y>
             <v-btn :disabled="selectedItems.length == 0" slot="activator" color="primary" small dark>Set Indicator
             </v-btn>
@@ -303,18 +317,15 @@
             },
             'indicator-no': function (params) {
               let self = params.context.componentParent;
-              console.log(params)
               return params.data.alt_Store_Range_Indicator == "NO";
             },
             'indicator-selected': function (params) {
               let self = params.context.componentParent;
-              console.log(params)
-              return params.data.alt_Store_Range_Indicator == "selected";
+              return params.data.alt_Store_Range_Indicator == "SELECTED";
             },
             'indicator-select': function (params) {
               let self = params.context.componentParent;
-              console.log(params)
-              return params.data.alt_Store_Range_Indicator == "select";
+              return params.data.alt_Store_Range_Indicator == "SELECT";
             }
           }
         },
@@ -433,6 +444,27 @@
       self.checkparams()
     },
     methods: {
+      applyHighlight(indicator) {
+        let self = this;
+
+        self.rowData.forEach(el => {
+          if (el.alt_Store_Range_Indicator == indicator) {
+            self.rangingController.setClusterIndicator(self.selectedClusterType, self.selectedClusterOption, el
+              .productID, indicator);
+
+              self.gridApi.forEachNode((node, idx) => {
+                if(node.data.productID == el.productID) {
+                  node.setDataValue("alt_Store_Range_Indicator", indicator)
+                  node.setDataValue("store_Range_Indicator", indicator)
+                  node.setDataValue("alt_Store_Range_Indicator_ID", indicator == "YES" ? 2 : 1)
+                  node.setDataValue("store_Range_Indicator_ID", indicator == "YES" ? 2 : 1)
+                }
+              })
+
+              self.gridApi.redrawRows();
+          }
+        })
+      },
       showClusterHighlight() {
         let self = this;
         let highlightObj = self.rangingController.getClusterData();
@@ -444,32 +476,20 @@
           altRowData.forEach(element => {
             self.rowData.forEach(el => {
               if (el.productID == element.productID) {
-                console.log("Smack my glitch up");
                 el.alt_Store_Range_Indicator = element.store_Range_Indicator
                 el.alt_Store_Range_Indicator_ID = element.store_Range_Indicator_ID
               }
             });
           });
+
           self.gridApi.redrawRows();
-
-          console.log(self.rowData);
-
-          // get alt rowdata (self.rangingController.getSalesDataByCluster) save as tmp variable
-          // go through alt rowdata (self.rowData)
-          // go through rowdata
-          // if rowdata.productID == alt rowdata.productID
-          // rowdata.alt_Store_Range_Indicator = alt rowdata.store_Range_Indicator
-          // rowdata.alt_Store_Range_Indicator_ID = alt rowdata.store_Range_Indicator_ID
         });
       },
       showLineChart(params) {
         let self = this
-        console.log(params);
         Axios.get(process.env.VUE_APP_API +
           `GetTrendData?productID=${params.productID}&periodFromID=${self.fileData.dateTo}&periodToID=${self.fileData.dateTo-11}`
         ).then(r => {
-          console.log(r);
-
           self.$refs.LineGraphModal.open(r.data, params.description, params.barcode, callback => {})
 
         })
@@ -857,11 +877,11 @@
                     };
                   } else if (params.data.autoRangeOneItem) {
                     return {
-                      backgroundColor: "#cfffcf"
+                      backgroundColor: "#b0fdb0"
                     };
                   } else {
                     return {
-                      backgroundColor: "#E3F2FD"
+                      backgroundColor: "#dcdcdc"
                     };
                   }
                 },
@@ -1754,18 +1774,18 @@
   }
 
   .indicator-yes {
-    background-color: rgba(25, 187, 25, 0.527) !important;
+    background-color: rgba(94, 243, 94, 0.527) !important;
   }
 
   .indicator-no {
-    background-color: rgba(241, 48, 48, 0.568) !important;
-  }
-
-  .indicator-selected {
-    background-color: orange !important;
+    background-color: rgba(255, 158, 158, 0.568) !important;
   }
 
   .indicator-select {
-    background-color: rgba(41, 41, 251, 0.609) !important;
+    background-color: rgb(248, 204, 123) !important;
   }
+
+  /* .indicator-select {
+    background-color: rgba(148, 148, 148, 0.609) !important;
+  } */
 </style>
