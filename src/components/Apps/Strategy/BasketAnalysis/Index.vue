@@ -1,6 +1,24 @@
 <template>
     <v-card tile>
         <v-toolbar flat dense dark color="grey darken-3">
+            <v-toolbar-items>
+                <v-menu dark offset-y style="margin-bottom: 10px;">
+                    <v-btn slot="activator" flat>
+                        File
+                    </v-btn>
+                    <v-list>
+                        <v-list-tile>
+                            <v-list-tile-title>New</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile>
+                            <v-list-tile-title>Open</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile>
+                            <v-list-tile-title>Save</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
+            </v-toolbar-items>
             <v-spacer></v-spacer>
             <v-toolbar-title>
                 <span>Basket Analysis</span>
@@ -11,16 +29,18 @@
                 <v-icon>edit</v-icon>
             </v-btn>
             <v-toolbar-items>
-                <v-select style="margin-left: 10px; margin-top: 4px; width: 200px" placeholder="Select basket" dense
+                <v-select dark style="margin-left: 10px; margin-top: 4px; width: 250px" placeholder="Select basket" dense
                     hide-details>
                 </v-select>
             </v-toolbar-items>
         </v-toolbar>
-        <Grid ref="Grid" />
+        <Grid :rowData="rowData" ref="Grid" />
     </v-card>
 </template>
 
 <script>
+    import Axios from 'axios';
+
     import Grid from './Grid'
     import BasketConfig from './Basket_Config'
     import PremiumNature from './PremiumNature/PremiumNature.vue'
@@ -29,13 +49,19 @@
             Grid,
             BasketConfig,
             PremiumNature,
+            rowData: []
         },
         data() {
             return {
                 selectedView: 1
+            }
+        },
+        methods: {
+            getBasketReportData() {
+                let self = this;
 
+                // Axios.get(process.env.VUE_APP_API + "BasketAnalysis")
             }
         }
-
     }
 </script>

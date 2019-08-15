@@ -5,7 +5,7 @@
                 :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData" :sideBar='true'
                 :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true"
                 :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true" :enableColResize="true"
-                :floatingFilter="true" :groupMultiAutoColumn="true" :onGridReady="onGridReady" >
+                :floatingFilter="true" :groupMultiAutoColumn="true" :onGridReady="onGridReady">
             </ag-grid-vue>
         </div>
     </div>
@@ -15,12 +15,12 @@
         AgGridVue
     } from "ag-grid-vue";
     export default {
+        props: ['rowData'],
         components: {
             AgGridVue
         },
         data() {
             return {
-                rowData: [],
                 headers: [{
                     "headerName": "Project Group",
                     "field": "ProjectGroup"
