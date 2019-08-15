@@ -2,9 +2,7 @@
     <v-dialog persistent width=1000 v-model="dialog">
         <v-card>
             <v-toolbar dark dense flat color="primary">
-                <v-toolbar-title>
-                    Pie Graph
-                </v-toolbar-title>
+                <v-toolbar-title>Store Units</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-btn icon @click="close">
                     <v-icon>
