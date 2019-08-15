@@ -1,9 +1,9 @@
 <template>
     <div>
-        <div >
-            <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 130px);"
-                :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData" :sideBar='true'
-                :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true"
+        <div>
+            <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 175px);"
+                :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
+                :sideBar='true' :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true"
                 :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true" :enableColResize="true"
                 :floatingFilter="true" :groupMultiAutoColumn="true" :onGridReady="onGridReady">
             </ag-grid-vue>
@@ -15,50 +15,61 @@
         AgGridVue
     } from "ag-grid-vue";
     export default {
-        props: ['rowData'],
+        props: ['rowData', 'basket'],
         components: {
             AgGridVue
         },
         data() {
+            let self = this;
+
             return {
                 headers: [{
-                    "headerName": "Project Group",
-                    "field": "ProjectGroup"
-                }, {
-                    "headerName": "Planogram",
-                    "field": "Planogram"
-                }, {
-                    "headerName": "Department",
-                    "field": "Department",
-                     "hide": true,
-                }, {
-                    "headerName": "SubDepartment",
-                     "hide": true,
-                    "field": "SubDepartment"
-                    
-                }, {
-                    "headerName": "Category",
-                    "field": "Category"
-                }, {
-                    "headerName": "Subcategory",
-                    "hide": true,
-                    "field": "Subcategory"
-                }, {
-                    "headerName": "Segment",
-                    "hide": true,
-                    "field": "Segment"
-                }, {
-                    "headerName": "manufacturer",
-                    "field": "manufacturer"
-                }, {
-                    "headerName": "Brand",
-                    "hide": true,
-                    "field": "Brand"
-                }, {
-                    "headerName": "Size Description",
-                    "hide": true,
-                    "field": "SizeDescription"
-                }],
+                        "headerName": "Basket",
+                        "editable": true,
+                        "field": "yesNo",
+                        "cellEditor": "agRichSelectCellEditor",
+                        "cellEditorParams": {
+                            "values": ["YES", "NO"]
+                        }
+                    },
+                    {
+                        "headerName": "Project Group",
+                        "field": "projectGroup"
+                    }, {
+                        "headerName": "Planogram",
+                        "field": "project"
+                    }, {
+                        "headerName": "Department",
+                        "field": "department",
+                        "hide": true,
+                    }, {
+                        "headerName": "Subdepartment",
+                        "hide": true,
+                        "field": "subdepartment"
+                    }, {
+                        "headerName": "Category",
+                        "field": "category"
+                    }, {
+                        "headerName": "Subcategory",
+                        "hide": true,
+                        "field": "subcategory"
+                    }, {
+                        "headerName": "Segment",
+                        "hide": true,
+                        "field": "segment"
+                    }, {
+                        "headerName": "manufacturer",
+                        "field": "manufacturer"
+                    }, {
+                        "headerName": "Brand",
+                        "hide": true,
+                        "field": "brand"
+                    }, {
+                        "headerName": "Size Description",
+                        "hide": true,
+                        "field": "size_Description"
+                    }
+                ],
                 gridOptions: {
                     rowHeight: 35,
                     pinnedTopRowData: [],
@@ -77,8 +88,8 @@
                 let self = this;
                 self.gridApi = params.api;
                 self.columnApi = params.columnApi;
-                this.gridApi.resetRowHeights();
-                this.gridApi.sizeColumnsToFit()
+                // this.gridApi.resetRowHeights();
+                // this.gridApi.sizeColumnsToFit()
             },
         }
 

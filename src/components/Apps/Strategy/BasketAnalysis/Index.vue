@@ -8,9 +8,6 @@
                     </v-btn>
                     <v-list>
                         <v-list-tile>
-                            <v-list-tile-title>New</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile>
                             <v-list-tile-title>Open</v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile>
@@ -29,17 +26,24 @@
                 <v-icon>edit</v-icon>
             </v-btn>
             <v-toolbar-items>
-                <v-select dark style="margin-left: 10px; margin-top: 4px; width: 250px" placeholder="Select basket" dense
+                <v-select :items="baskets" v-model="selectedBasket" return-object dark style="margin-left: 10px; margin-top: 4px; width: 250px" placeholder="Select a basket" dense
                     hide-details>
                 </v-select>
             </v-toolbar-items>
         </v-toolbar>
-        <Grid :rowData="rowData" ref="Grid" />
+        <Grid v-if="selectedBasket != null" :basket="selectedBasket" :rowData="rowData" ref="Grid" />
     </v-card>
 </template>
 
 <script>
     import Axios from 'axios';
+
+    let baskets = [
+        { text: "Premium", value: 1 },
+        { text: "Agri", value: 2 },
+        { text: "DIY", value: 3 },
+        { text: "Livestock", value: 4 }
+    ]
 
     import Grid from './Grid'
     import BasketConfig from './Basket_Config'
@@ -48,19 +52,27 @@
         components: {
             Grid,
             BasketConfig,
-            PremiumNature,
-            rowData: []
+            PremiumNature
         },
         data() {
             return {
-                selectedView: 1
+                rowData: [],
+                baskets: baskets,
+                selectedBasket: null
             }
+        },
+        created() {
+            let self = this;
+            self.getBasketReportData();
         },
         methods: {
             getBasketReportData() {
                 let self = this;
 
-                // Axios.get(process.env.VUE_APP_API + "BasketAnalysis")
+                Axios.get(process.env.VUE_APP_API + "BasketAnalysis")
+                    .then(r => {
+                        self.rowData = r.data
+                    })
             }
         }
     }
