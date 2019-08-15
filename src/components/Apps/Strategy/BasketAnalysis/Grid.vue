@@ -1,10 +1,5 @@
 <template>
     <div>
-        <v-toolbar dark flat dense>
-            <v-toolbar-title>
-                Report
-            </v-toolbar-title>
-        </v-toolbar>
         <div >
             <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 130px);"
                 :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData" :sideBar='true'
@@ -13,8 +8,6 @@
                 :floatingFilter="true" :groupMultiAutoColumn="true" :onGridReady="onGridReady" >
             </ag-grid-vue>
         </div>
-
-
     </div>
 </template>
 <script>
