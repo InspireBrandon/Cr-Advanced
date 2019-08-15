@@ -460,7 +460,7 @@
             self.rangingController.setClusterIndicator(self.selectedClusterType, self.selectedClusterOption, el
               .productID, indicator);
 
-            self.gridApi.forEachNode((node, idx) => {
+            self.gridApi.forEachNodeAfterFilter((node, idx) => {
               if (node.data.productID == el.productID) {
                 node.setDataValue("alt_Store_Range_Indicator", indicator)
                 node.setDataValue("store_Range_Indicator", indicator)
@@ -1076,14 +1076,10 @@
         let self = this;
 
         let filters = self.gridApi;
-        console.log("filters");
 
-        self.filters = filters.filterManager.allFilters
-
-        console.log(self.filters);
         self.$nextTick(() => {
           if (self.selectedClusterOption != null) {
-            self.rowData = [];
+            // self.rowData = [];
 
             self.setViewType(self.viewType);
 
@@ -1091,7 +1087,6 @@
               .selectedClusterOption).length;
             self.fitColumns();
             self.calculateAutoRange();
-            self.gridApi.filterManager.allFilters = self.filters
           }
         })
       },
@@ -1266,11 +1261,22 @@
 
         switch (type) {
           case 'CLUSTER': {
-            // self.columnDefs = require('./headers.json');
-            self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self
-              .selectedClusterOption, self.autoRangeData);
+            self.columnDefs = require('./headers.json');
+            let tmp = self.rangingController.getSalesDataByCluster(self.selectedClusterType, self.selectedClusterOption,
+              self.autoRangeData);
 
-            console.log(self.rowData);
+            tmp.forEach(tmpItem => {
+              self.rowData.forEach(rowDataItem => {
+                if (tmpItem.productID == rowDataItem.productID) {
+                  tmpItem.alt_Store_Range_Indicator = rowDataItem.alt_Store_Range_Indicator;
+                  tmpItem.alt_Store_Range_Indicator_ID = rowDataItem.alt_Store_Range_Indicator_ID;
+                }
+              })
+            })
+
+            self.rowData = tmp;
+
+            self.gridApi.redrawRows();
 
             self.ais_Sales = 0;
             self.ais_SalesPotential = 0;
