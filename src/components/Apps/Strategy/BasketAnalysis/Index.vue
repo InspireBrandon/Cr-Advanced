@@ -15,6 +15,19 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
+                <v-menu dark offset-y style="margin-bottom: 10px;">
+                    <v-btn slot="activator" flat>
+                        Setup
+                    </v-btn>
+                    <v-list>
+                        <v-list-tile @click="openBasketMaint">
+                            <v-list-tile-title>Basket</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile>
+                            <v-list-tile-title @click="openClusterSetup">Clusters</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
             </v-toolbar-items>
             <v-spacer></v-spacer>
             <v-toolbar-title>
@@ -22,9 +35,9 @@
             </v-toolbar-title>
         </v-toolbar>
         <v-toolbar flat dark>
-            <v-btn small fab color="primary" @click="openBasketMaint">
+            <!-- <v-btn small fab color="primary" @click="openBasketMaint">
                 <v-icon>edit</v-icon>
-            </v-btn>
+            </v-btn> -->
             <v-toolbar-items>
                 <v-select @change="onBasketSelect" :items="baskets" v-model="selectedBasket" return-object dark
                     style="margin-left: 10px; margin-top: 4px; width: 250px" placeholder="Select a basket" dense
@@ -34,6 +47,7 @@
         </v-toolbar>
         <Grid :rowData="rowData" :basket="selectedBasket" v-if="selectedBasket != null" ref="Grid" />
         <basketMaint ref="basketMaint" />
+        <ClusterMaint ref="ClusterMaint" />
     </v-card>
 </template>
 
@@ -44,12 +58,14 @@
     import BasketConfig from './Basket_Config'
     import PremiumNature from './PremiumNature/PremiumNature.vue'
     import basketMaint from './basketMaint/BasketMaintenanceModal.vue'
+    import ClusterMaint from './ClusterMaint/ClusterMaintModal.vue'
     export default {
         components: {
             basketMaint,
             Grid,
             BasketConfig,
-            PremiumNature
+            PremiumNature,
+            ClusterMaint
         },
         data() {
             return {
@@ -63,6 +79,10 @@
             self.getbaskets()
         },
         methods: {
+            openClusterSetup() {
+                let self = this
+                self.$refs.ClusterMaint.open()
+            },
             getbaskets() {
                 let self = this
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
