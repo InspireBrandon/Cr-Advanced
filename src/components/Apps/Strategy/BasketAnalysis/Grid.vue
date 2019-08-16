@@ -11,9 +11,17 @@
     </div>
 </template>
 <script>
+    var Etat_acces = {
+        false: "NO",
+        true: "YES"
+    };
+
     import {
         AgGridVue
     } from "ag-grid-vue";
+
+    import Axios from 'axios';
+
     export default {
         props: ['rowData', 'basket'],
         components: {
@@ -23,13 +31,62 @@
             let self = this;
 
             return {
-                headers: [{
+                headers: [],
+                gridOptions: {
+                    rowHeight: 35,
+                    pinnedTopRowData: [],
+                    pinnedBottomRowData: [],
+                    context: {
+                        componentParent: this
+                    },
+                },
+                defaultColDef: {
+                    onCellValueChanged: this.UpdateLine
+                }
+            }
+        },
+        created() {
+            let self = this;
+            self.setHeaders();
+        },
+        methods: {
+            onGridReady(params) {
+                let self = this;
+                self.gridApi = params.api;
+                self.columnApi = params.columnApi;
+                // this.gridApi.resetRowHeights();
+                // this.gridApi.sizeColumnsToFit()
+            },
+            UpdateLine(params) {
+                let self = this;
+
+                let request = JSON.parse(JSON.stringify(params.data));
+
+                request["basket_ID"] = self.basket.value;
+                
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + "BasketAnalysis", request)
+                    .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+            },
+            setHeaders() {
+                let self = this;
+
+                self.headers = [{
                         "headerName": "Basket",
                         "editable": true,
-                        "field": "yesNo",
+                        "field": "active",
                         "cellEditor": "agRichSelectCellEditor",
-                        "cellEditorParams": {
-                            "values": ["YES", "NO"]
+                        cellEditorParams: {
+                            values: extractValues(Etat_acces)
+                        },
+                        valueFormatter: function (params) {
+                            return lookupValue(Etat_acces, params.value);
+                        },
+                        valueParser: function (params) {
+                            return lookupKey(Etat_acces, params.newValue);
                         }
                     },
                     {
@@ -37,7 +94,7 @@
                         "field": "projectGroup"
                     }, {
                         "headerName": "Planogram",
-                        "field": "project"
+                        "field": "planogram"
                     }, {
                         "headerName": "Department",
                         "field": "department",
@@ -58,7 +115,7 @@
                         "hide": true,
                         "field": "segment"
                     }, {
-                        "headerName": "manufacturer",
+                        "headerName": "Manufacturer",
                         "field": "manufacturer"
                     }, {
                         "headerName": "Brand",
@@ -69,29 +126,26 @@
                         "hide": true,
                         "field": "size_Description"
                     }
-                ],
-                gridOptions: {
-                    rowHeight: 35,
-                    pinnedTopRowData: [],
-                    pinnedBottomRowData: [],
-                    context: {
-                        componentParent: this
-                    },
-                },
-                defaultColDef: {
-                    // onCellValueChanged: this.UpdateLine
+                ]
+            }
+        }
+    }
+
+    function extractValues(mappings) {
+        return Object.keys(mappings);
+    }
+
+    function lookupValue(mappings, key) {
+        return mappings[key];
+    }
+
+    function lookupKey(mappings, name) {
+        for (var key in mappings) {
+            if (mappings.hasOwnProperty(key)) {
+                if (name === mappings[key]) {
+                    return key;
                 }
             }
-        },
-        methods: {
-            onGridReady(params) {
-                let self = this;
-                self.gridApi = params.api;
-                self.columnApi = params.columnApi;
-                // this.gridApi.resetRowHeights();
-                // this.gridApi.sizeColumnsToFit()
-            },
         }
-
     }
 </script>

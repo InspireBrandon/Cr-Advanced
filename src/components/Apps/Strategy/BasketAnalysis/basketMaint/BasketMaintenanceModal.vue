@@ -18,7 +18,7 @@
                 </v-btn>
             </v-toolbar>
             <grid ref="grid" :data="rowData"/>
-            <v-dialog v-model="addDialog" persistent width="800px" height="600px">
+            <v-dialog v-model="addDialog" persistent width="600px" height="600px">
                 <v-card>
                     <v-toolbar color="primary" dark flat>
                         <v-toolbar-title>
