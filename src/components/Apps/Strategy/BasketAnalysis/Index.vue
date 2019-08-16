@@ -71,7 +71,7 @@
                     .then(r => {
                         r.data.forEach(e => {
                             self.baskets.push({
-                                text: e.displayname,
+                                text: e.description,
                                 value: e.id
                             })
                         })
