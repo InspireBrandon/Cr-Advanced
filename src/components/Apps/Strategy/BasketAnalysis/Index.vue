@@ -26,21 +26,19 @@
                 <v-icon>edit</v-icon>
             </v-btn>
             <v-toolbar-items>
-                <v-select :items="baskets" v-model="selectedBasket" return-object dark
+                <v-select @change="onBasketSelect" :items="baskets" v-model="selectedBasket" return-object dark
                     style="margin-left: 10px; margin-top: 4px; width: 250px" placeholder="Select a basket" dense
                     hide-details>
                 </v-select>
             </v-toolbar-items>
         </v-toolbar>
-        <Grid :rowData="rowData" ref="Grid" />
+        <Grid :rowData="rowData" :basket="selectedBasket" v-if="selectedBasket != null" ref="Grid" />
         <basketMaint ref="basketMaint" />
     </v-card>
 </template>
 
 <script>
     import Axios from 'axios';
-
-    let baskets = []
 
     import Grid from './Grid'
     import BasketConfig from './Basket_Config'
@@ -62,7 +60,6 @@
         },
         created() {
             let self = this;
-            self.getBasketReportData();
             self.getbaskets()
         },
         methods: {
@@ -72,14 +69,12 @@
 
                 Axios.get(process.env.VUE_APP_API + `Basket`)
                     .then(r => {
-                        console.log(r);
                         r.data.forEach(e => {
                             self.baskets.push({
                                 text: e.displayname,
                                 value: e.id
                             })
                         })
-                         console.log(self.baskets);
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
@@ -90,7 +85,14 @@
             getBasketReportData() {
                 let self = this;
 
-                // Axios.get(process.env.VUE_APP_API + "BasketAnalysis")
+                Axios.get(process.env.VUE_APP_API + "BasketAnalysis?basketID=" + self.selectedBasket.value)
+                    .then(r => {
+                        self.rowData = r.data.basket_LinkList;
+                    })
+            },
+            onBasketSelect() {
+                let self = this;
+                self.getBasketReportData();
             }
         }
     }
