@@ -3,7 +3,7 @@
         <ag-grid-vue :gridOptions="gridOptions" :sideBar='false' style="width: 100%;  height: calc(40vh - 112px);"
             :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="data"
             :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true"
-            rowSelection="multiple" :rowDeselection="true" :enableColResize="true" :floatingFilter="true"
+            rowSelection="multiple" :rowDeselection="true" :enableColResize="true" 
             :gridReady="gridReady" :onGridReady="onGridReady" :groupMultiAutoColumn="true">
         </ag-grid-vue>
     </div>

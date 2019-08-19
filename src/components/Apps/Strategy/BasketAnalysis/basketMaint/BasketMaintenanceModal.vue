@@ -33,7 +33,6 @@
                         </v-btn>
                     </v-toolbar>
                     <v-card-text>
-
                         <v-form ref="BasketForm">
                             <v-text-field label="Basket" :rules="nameRules" v-model="createItem.basket">
                             </v-text-field>
