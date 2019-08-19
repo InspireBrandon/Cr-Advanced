@@ -317,13 +317,5 @@
         "filterParams": {
             "newRowsAction": "keep"
         }
-    },
-    {
-        "headerName": "Alt INDICATOR",
-        "field": "alt_Store_Range_Indicator",
-        "hide": true,
-        "filterParams": {
-            "newRowsAction": "keep"
-        }
     }
 ]

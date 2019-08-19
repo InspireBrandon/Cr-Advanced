@@ -318,22 +318,6 @@
             'audit-image-breach': function (params) {
               let self = params.context.componentParent;
               return self.autoRangeData.audit && params.data.imageAudit;
-            },
-            'indicator-yes': function (params) {
-              let self = params.context.componentParent;
-              return params.data.alt_Store_Range_Indicator == "YES";
-            },
-            'indicator-no': function (params) {
-              let self = params.context.componentParent;
-              return params.data.alt_Store_Range_Indicator == "NO";
-            },
-            'indicator-selected': function (params) {
-              let self = params.context.componentParent;
-              return params.data.alt_Store_Range_Indicator == "SELECTED";
-            },
-            'indicator-select': function (params) {
-              let self = params.context.componentParent;
-              return params.data.alt_Store_Range_Indicator == "SELECT";
             }
           }
         },
@@ -877,6 +861,27 @@
                 cellRendererFramework: 'optionsComponent',
                 pinned: 'right'
               })
+            }
+
+            self.columnDefs[4] = {
+              "headerName": "Description",
+              "field": "description",
+              "filterParams": {
+                "newRowsAction": "keep"
+              },
+              cellStyle: function (params) {
+                if (params.data.alt_Store_Range_Indicator == "YES") {
+                  return {
+                    backgroundColor: "#5ef35e86"
+                  };
+                }
+
+                if (params.data.alt_Store_Range_Indicator == "NO") {
+                  return {
+                    backgroundColor: "#ff9e9e91"
+                  };
+                }
+              }
             }
 
 
@@ -1811,11 +1816,11 @@
   }
 
   .indicator-yes {
-    background-color: rgba(94, 243, 94, 0.527) !important;
+    background-color: #5ef35e86 !important;
   }
 
   .indicator-no {
-    background-color: rgba(255, 158, 158, 0.568) !important;
+    background-color: #ff9e9e91 !important;
   }
 
   .indicator-select {
