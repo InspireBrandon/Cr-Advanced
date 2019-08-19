@@ -60,7 +60,7 @@
     import Grid from './Grid'
     import BasketConfig from './Basket_Config'
     import PremiumNature from './PremiumNature/PremiumNature.vue'
-    import basketMaint from './basketMaint/BasketMaintenanceModal.vue'
+    import basketMaint from './BasketMaint/BasketMaintenanceModal.vue'
     import ClusterMaint from './ClusterMaint/ClusterMaintModal.vue'
     import StoreBasketReport from './StoreBasketReport/StoreBasketReport.vue'
 
