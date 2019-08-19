@@ -21,10 +21,10 @@
                     </v-btn>
                     <v-list>
                         <v-list-tile @click="openBasketMaint">
-                            <v-list-tile-title>Basket</v-list-tile-title>
+                            <v-list-tile-title>Baskets</v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile @click="openClusterSetup">
-                            <v-list-tile-title >Clusters</v-list-tile-title>
+                            <v-list-tile-title>Clusters</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
                 </v-menu>
@@ -44,10 +44,13 @@
                     hide-details>
                 </v-select>
             </v-toolbar-items>
+            <v-spacer></v-spacer>
+            <v-btn @click="runReport" v-if="rowData.length > 0" color="primary">Run Report</v-btn>
         </v-toolbar>
         <Grid :rowData="rowData" :basket="selectedBasket" v-if="selectedBasket != null" ref="Grid" />
         <basketMaint ref="basketMaint" />
         <ClusterMaint ref="ClusterMaint" />
+        <StoreBasketReport ref="StoreBasketReport" />
     </v-card>
 </template>
 
@@ -57,15 +60,18 @@
     import Grid from './Grid'
     import BasketConfig from './Basket_Config'
     import PremiumNature from './PremiumNature/PremiumNature.vue'
-    import basketMaint from './basketMaint/BasketMaintenanceModal.vue'
+    import basketMaint from './BasketMaint/BasketMaintenanceModal.vue'
     import ClusterMaint from './ClusterMaint/ClusterMaintModal.vue'
+    import StoreBasketReport from './StoreBasketReport/StoreBasketReport.vue'
+
     export default {
         components: {
             basketMaint,
             Grid,
             BasketConfig,
             PremiumNature,
-            ClusterMaint
+            ClusterMaint,
+            StoreBasketReport
         },
         data() {
             return {
@@ -91,7 +97,7 @@
                     .then(r => {
                         r.data.forEach(e => {
                             self.baskets.push({
-                                text: e.displayname,
+                                text: e.description,
                                 value: e.id
                             })
                         })
@@ -113,6 +119,10 @@
             onBasketSelect() {
                 let self = this;
                 self.getBasketReportData();
+            },
+            runReport() {
+                let self = this;
+                self.$refs.StoreBasketReport.show(self.selectedBasket.text);
             }
         }
     }
