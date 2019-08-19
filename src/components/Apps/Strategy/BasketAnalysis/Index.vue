@@ -23,8 +23,8 @@
                         <v-list-tile @click="openBasketMaint">
                             <v-list-tile-title>Basket</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile>
-                            <v-list-tile-title @click="openClusterSetup">Clusters</v-list-tile-title>
+                        <v-list-tile @click="openClusterSetup">
+                            <v-list-tile-title >Clusters</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
                 </v-menu>

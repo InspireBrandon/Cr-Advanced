@@ -1,58 +1,54 @@
 <template>
     <div>
-        <ag-grid-vue :gridOptions="gridOptions" :sideBar='false' style="width: 100%;  height: calc(80vh - 112px);"
+        <ag-grid-vue :gridOptions="gridOptions" :sideBar='false' style="width: 100%;  height: calc(40vh - 112px);"
             :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="data"
             :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true"
             rowSelection="multiple" :rowDeselection="true" :enableColResize="true" :floatingFilter="true"
             :gridReady="gridReady" :onGridReady="onGridReady" :groupMultiAutoColumn="true">
         </ag-grid-vue>
-        <v-toolbar dark dense class="pa-0">
-            <span>rows : {{data.length}}</span>
-        </v-toolbar>
-
     </div>
 </template>
 <script>
     import jwt from 'jsonwebtoken';
     import Axios from 'axios'
+    import rank from "./rank"
+
     import {
         AgGridVue
     } from "ag-grid-vue";
     export default {
-        props: ["data"],
+        props: ["data", "getData"],
         components: {
             AgGridVue,
+            rank
         },
         data() {
             return {
-
                 selectedItems: [],
                 headers: [{
                     "headerName": "Basket",
                     "editable": true,
                     "field": "basket"
-
                 }, {
                     "headerName": "Displayname",
                     "editable": true,
-
                     "field": "displayname"
                 }, {
                     "headerName": "Description",
                     "editable": true,
-
                     "field": "description"
                 }, {
                     "headerName": "Active",
                     "editable": true,
-
                     "field": "active"
                 }, {
                     "headerName": "Rank",
                     "editable": true,
-
                     "field": "rank"
-                }, ],
+                }, {
+                    "headerName": "",
+                    "cellRendererFramework": "rank",
+                }],
                 defaultColDef: {
                     onCellValueChanged: this.UpdateLine
                 },
@@ -69,7 +65,63 @@
             this.GetData
         },
         methods: {
+            HandleRankUp(params) {
+                console.log("up");
+                let item = params.data
+                let node = params.node
+                let tmp
+                let self = this
+                for (let index = 0; index < self.data.length; index++) {
+                    const element = self.data[index];
+                    if (element.id == item.id) {
+                        let up = item.rank
+                        let down = self.data[index - 1].rank
+                        tmp = self.data[index - 1]
+                        item.rank = down
+                        tmp.rank = up
+                        self.UpdateLineNoNode(item, callback => {
+                            self.UpdateLineNoNode(tmp, callback2 => {
+                                self.getData()
+                            })
+                        })
+                    }
+                }
+            },
+            HandleRankDown(params) {
+                console.log("down");
+                let item = params.data
+                let node = params.node
+                let tmp
+                let self = this
+                for (let index = 0; index < self.data.length; index++) {
+                    const element = self.data[index];
+                    if (element.id == item.id) {
+                        let up = item.rank
+                        let down = self.data[index + 1].rank
+                        tmp = self.data[index + 1]
+                        item.rank = down
+                        tmp.rank = up
+                        self.UpdateLineNoNode(item, callback => {
+                            self.UpdateLineNoNode(tmp, callback2 => {
+                                self.getData()
+                            })
+                        })
+                    }
+                }
+            },
+            UpdateLineNoNode(item, callback) {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
+                Axios.post(process.env.VUE_APP_API + `Basket`, item)
+                    .then(r => {
+                        console.log(r);
+
+                        callback(r)
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+
+            },
             UpdateLine(item) {
                 let self = this
                 let tmp = item.data
@@ -80,7 +132,7 @@
                 Axios.post(process.env.VUE_APP_API + `Basket`, tmp)
                     .then(r => {
                         console.log(r);
-                        
+
                         node.setData(tmp)
                         delete Axios.defaults.headers.common["TenantID"];
                     })

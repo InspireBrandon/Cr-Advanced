@@ -1,15 +1,11 @@
 <template>
-    <v-dialog v-model="dialog" persistent>
+    <v-dialog v-model="dialog" persistent height="500" width="1000">
         <v-card>
             <v-toolbar color="primary" dark flat>
                 <v-toolbar-title>
                     Cluster Maintenance
                 </v-toolbar-title>
-                <v-btn icon @click="openAdd">
-                    <v-icon>
-                        add
-                    </v-icon>
-                </v-btn>
+
                 <v-spacer></v-spacer>
                 <v-btn icon @click="dialog=false">
                     <v-icon>
@@ -17,7 +13,13 @@
                     </v-icon>
                 </v-btn>
             </v-toolbar>
-            <grid ref="grid" :data="rowData"/>
+            <v-toolbar dark dense class="pa-0">
+                <v-spacer></v-spacer>
+                <v-btn @click="openAdd">
+                    Add Cluster
+                </v-btn>
+            </v-toolbar>
+            <grid ref="grid" :data="rowData" :getData="GetData" />
             <v-dialog v-model="addDialog" persistent width="800px" height="600px">
                 <v-card>
                     <v-toolbar color="primary" dark flat>
@@ -71,18 +73,20 @@
                     active: true,
                     rank: null,
                 },
-                rowData:[],
+                rowData: [],
             }
         },
         methods: {
             GetData() {
                 let self = this
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                console.log("[GETTING CLUSTER]");
 
                 Axios.get(process.env.VUE_APP_API + `Cluster/Get`)
                     .then(r => {
                         console.log(r);
                         self.rowData = r.data
+                        self.$refs.grid.resize()
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
@@ -101,11 +105,11 @@
                 let self = this
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                 Axios.post(process.env.VUE_APP_API + `Cluster/Save`,self.createItem)
+                Axios.post(process.env.VUE_APP_API + `Cluster/Save`, self.createItem)
                     .then(r => {
                         console.log(r);
-                         self.GetData()
-                         self.addDialog = false
+                        self.GetData()
+                        self.addDialog = false
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
