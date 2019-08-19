@@ -20,25 +20,49 @@
             :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true" :enableColResize="true"
             :floatingFilter="true" :groupMultiAutoColumn="true" :onGridReady="onGridReady">
         </ag-grid-vue>
+        <DateRangeSelector ref="DateRangeSelector" />
     </div>
 </template>
 <script>
     import Axios from "axios"
+
+    import DateRangeSelector from '@/components/Common/DateRangeSelector';
 
     import {
         AgGridVue
     } from "ag-grid-vue";
     export default {
         components: {
-            AgGridVue
+            AgGridVue,
+            DateRangeSelector
         },
         data() {
             return {
                 rowData: [],
                 planograms: [],
                 selectedPlanogram: null,
-                headers: [],
+                headers: [{
+                    headerName: 'Store Name',
+                    field: 'storeName',
+                    pivot: true
+                }, {
+                    headerName: 'Sales',
+                    field: 'sales_Retail',
+                    aggFunc: "avg",
+                }, {
+                    headerName: 'productName',
+                    field: 'productName',
+                    rowGroup: true,
+                }],
                 gridOptions: {
+                    pivotMode: true,
+                    autoGroupColumnDef: {
+                        headerName: 'Product Name', //custom header name for group
+                        pinned: 'left', //force pinned left. Does not work in columnDef
+                        cellRendererParams: {
+                            suppressCount: true, //remove number in Group Column
+                        }
+                    },
                     rowHeight: 35,
                     pinnedTopRowData: [],
                     pinnedBottomRowData: [],
@@ -47,7 +71,7 @@
                     },
                 },
                 defaultColDef: {
-                    onCellValueChanged: this.UpdateLine
+
                 }
             }
         },
@@ -64,20 +88,24 @@
                 let self = this
                 self.$nextTick(() => {
                     //get data
-                    //      Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                    // self.$refs.DateRangeSelector.show(dateRange => {
+                    // console.log(dateRange);
 
-                    // Axios.get(process.env.VUE_APP_API + `Planogram/Distinct`)
-                    //     .then(r => {
-                    //         console.log(r);
-                    //         self.planograms = []
-                    //         r.data.planogramList.forEach(e => {
-                    //             self.planograms.push({
-                    //                 text: e.displayname,
-                    //                 value: e.id
-                    //             })
-                    //         })
-                    //         delete Axios.defaults.headers.common["TenantID"];
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    Axios.get(process.env.VUE_APP_API +
+                            `ListingCluster?planogram_ID=${self.selectedPlanogram}&period_from_id=${53}&period_to_id=${58}`
+                        )
+                        .then(r => {
+                            console.log(r);
+                            self.rowData = r.data
+                            this.gridColumnApi.setPivotMode(true);
+                            delete Axios.defaults.headers.common["TenantID"];
+                        })
+
+
                     // })
+
                 })
             },
             getPlanograms() {
