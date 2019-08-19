@@ -111,7 +111,6 @@
             UpdateLineNoNode(item, callback) {
                 let self = this
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
                 Axios.post(process.env.VUE_APP_API + `Cluster/Save`, item)
                     .then(r => {
                         console.log(r);
@@ -119,7 +118,6 @@
                         callback(r)
                         delete Axios.defaults.headers.common["TenantID"];
                     })
-
             },
             UpdateLine(item) {
                 let self = this
@@ -131,19 +129,9 @@
                 Axios.post(process.env.VUE_APP_API + `Cluster/Save`, tmp)
                     .then(r => {
                         console.log(r);
-
                         node.setData(tmp)
                         delete Axios.defaults.headers.common["TenantID"];
                     })
-                // 
-                // self.createStorePlano(tmp, data => {
-                //     tmp.id = data.store_Planogram.id
-                //     tmp.heightFit = data.store_Planogram.heightFit;
-                //     tmp.modulesFit = data.store_Planogram.modulesFit;
-                //     tmp.fits = data.store_Planogram.fits;
-                //     
-                // })
-                // self.createPlanoGramDetailTX(tmp)
             },
             resize() {
                 setTimeout(() => {
