@@ -61,14 +61,9 @@
                     country: self.country
                 };
 
-                Axios.post(process.env.VUE_APP_API + `AccountProfile?userID=${self.userID}`, request)
+                Axios.put(process.env.VUE_APP_API + `AccountProfile`, request)
                     .then(r => {
-                        if (r.data) {
-
-                            request.accountID=r.data
-                          
-                            self.afterClose(request)
-                        }
+                        self.afterClose(request)
                     })
             },
             openFileDialog() {
@@ -106,14 +101,15 @@
                 let self = this
                 self.modalShow = false
             },
-            open(userID, country, domain, callback) {
+            open(userID, country, domain, accountID, callback) {
                 let self = this
-                if (country!=null||country!=undefined) {
+                if (country != null || country != undefined) {
                     self.country = country
                 }
-                if (domain!=null||domain!=undefined) {
+                if (domain != null || domain != undefined) {
                     self.domain = domain
                 }
+                self.accountID = accountID
                 self.afterClose = callback;
                 self.userID = userID;
                 self.modalShow = true

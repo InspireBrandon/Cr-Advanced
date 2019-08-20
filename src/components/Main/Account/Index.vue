@@ -1,6 +1,12 @@
 <template>
-
     <v-card>
+        <v-toolbar dark dense flat color="grey darken-3">
+            <v-spacer>
+            </v-spacer>
+            <v-toolbar-title>
+                Account Settings
+            </v-toolbar-title>
+        </v-toolbar>
         <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear>
         <v-flex v-if="!showLoader && profile.accountID != null" lg12 md12 sm12 xs12>
             <v-container grid-list-md>
@@ -233,12 +239,8 @@
 
                 Axios.get(process.env.VUE_APP_API + `Tenant?userID=${userID}`)
                     .then(r => {
-
                         callback3(self.dataBases = r.data,
-
-
                             self.showLoader = false, )
-
                         setTimeout(() => {
                             self.showLoader = false;
                         }, 1000);
@@ -255,24 +257,17 @@
             },
             openAccountModal() {
                 let self = this
-
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
-
-                self.$refs.AccountModal.open(encoded_details.USER_ID, self.country, self.domain, callback => {
-                    self.accountID = callback.accountID
-                    self.profile.accountID = callback.accountID
-                    self.getAccountDetails(self.accountID, () => {
-
-                        self.$refs.AccountModal.close();
-
-                        self.country = callback.country
-                        self.domain = callback.domain
-
-
-                    });
-
-                })
-
+                self.$refs.AccountModal.open(encoded_details.USER_ID, self.country, self.domain, self.accountID,
+                    callback => {
+                        self.accountID = callback.accountID
+                        self.profile.accountID = callback.accountID
+                        self.getAccountDetails(self.accountID, () => {
+                            self.$refs.AccountModal.close();
+                            self.country = callback.country
+                            self.domain = callback.domain
+                        });
+                    })
             },
             openDatabaseModal() {
                 let self = this;
