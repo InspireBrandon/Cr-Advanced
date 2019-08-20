@@ -27,6 +27,7 @@
     import Axios from "axios"
 
     import DateRangeSelector from '@/components/Common/DateRangeSelector';
+    import ListingClusterController from './controller.js';
 
     import {
         AgGridVue
@@ -97,15 +98,15 @@
                             `ListingCluster?planogram_ID=${self.selectedPlanogram}&period_from_id=${53}&period_to_id=${58}`
                         )
                         .then(r => {
-                            console.log(r);
                             self.rowData = r.data
-                            this.gridColumnApi.setPivotMode(true);
                             delete Axios.defaults.headers.common["TenantID"];
+
+                            ListingClusterController.GenerateClusterOutput({
+                                storeSalesData: r.data,
+                                topValue: 80
+                            });
                         })
-
-
                     // })
-
                 })
             },
             getPlanograms() {

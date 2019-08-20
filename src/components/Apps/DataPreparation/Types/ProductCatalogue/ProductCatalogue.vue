@@ -647,7 +647,7 @@
               .then(r => {
                 if (r.data) {
                   self.$refs.productMaint.hide();
-                  product.node.setData(newData);
+                  product.node.setData(r.data);
                   self.$refs.spinner.hide();
                 } else {
                   alert("Failed to update product.")
