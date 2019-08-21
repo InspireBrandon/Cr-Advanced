@@ -59,7 +59,15 @@
                 Axios.post(process.env.VUE_APP_API + `Tenant?userID=${self.userID}`, request)
                     .then(r => {
                         if (r.data) {
-                            self.afterClose(request)
+                            console.log(r.data);
+                            
+                             Axios.post(process.env.VUE_APP_API + `Initialize?databaseName=${r.data.databaseName}`).then(r=>{
+console.log(r);
+
+self.afterClose(r.data)
+
+                             })
+                            
                         }
                     })
             },
