@@ -85,6 +85,8 @@
               <div slot="header">Details</div>
               <v-card>
                 <v-card-text>
+                   <div v-if="rangingData!=null" class="details">Range Name: {{rangingData.planogramName}} {{rangingData.tag}} {{ rangingData.monthsBetween }}MMA </div>
+                   <div v-if="rangingData==null" class="details"> No range found, Please select one</div>
                   <div v-if="rangingData.planogramID != null" class="details">Planogram Name: {{
                     rangingData.planogramName
                     }}</div>
@@ -94,8 +96,8 @@
                   </div>
                   <div v-if="rangingData.planogramID != null" class="details">Category Cluster: XXX</div>
                   <div v-if="rangingData.planogramID != null">
-                    <div v-if="rangingData.periodic" class="details">Range: {{ rangingData.monthsBetween }}MMA</div>
-                    <div v-else class="details">Range: {{ rangingData.dateFromString }} to {{ rangingData.dateToString
+                    <!-- <div v-if="rangingData.periodic" class="details">Range: </div> -->
+                    <div v-if="rangingData.periodic" class="details">Period: {{ rangingData.dateFromString }} to {{ rangingData.dateToString
                       }}</div>
                   </div>
                   <v-container class="pa-0 mt-2" grid-list-md>
@@ -845,6 +847,8 @@
           axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fileID}`)
             .then(r => {
               if (r.data) {
+                console.log(r.data);
+                
                 self.getCategoryCluster(r.data.planogramID)
                 self.rangingData.dateFromString = r.data.dateFromString;
                 self.rangingData.dateToString = r.data.dateToString;
@@ -996,6 +1000,7 @@
                 self.updateLoader({
                   currentFile: 2,
                 })
+                 console.log("range");
                 console.log(r);
                 
                 self.$store.commit("setRangeID", clusterData.rangeID);
