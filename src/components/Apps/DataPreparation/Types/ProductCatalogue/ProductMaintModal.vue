@@ -831,6 +831,9 @@
               return el.value == self.form.manufacturer_ID
             })[0].text,
             supplier_ID: self.form.supplier_ID,
+            category: self.dropdownFilters.categoryLinks.filter(el => {
+              return el.value == self.form.categoryLink_ID
+            })[0].text,
             categoryLink_ID: self.form.categoryLink_ID,
             subcategory_ID: self.form.subcategory_ID,
             segment_ID: self.form.segment_ID,

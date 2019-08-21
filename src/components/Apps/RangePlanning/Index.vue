@@ -82,6 +82,17 @@
             </v-list-tile>
           </v-list>
         </v-menu>
+        <v-menu v-if="rowData.length > 0" dark offset-y style="margin-bottom: 10px;">
+          <v-btn slot="activator" flat>Export</v-btn>
+          <v-list>
+            <v-list-tile @click="exportData('Excel')">
+              <v-list-tile-title>Excel</v-list-tile-title>
+            </v-list-tile>
+            <v-list-tile @click="exportData('Csv')">
+              <v-list-tile-title>CSV</v-list-tile-title>
+            </v-list-tile>
+          </v-list>
+        </v-menu>
       </v-toolbar-items>
 
       <v-spacer></v-spacer>
@@ -488,12 +499,10 @@
       },
       showStorePieGraph(params) {
         let self = this
-        Axios.get(process.env.VUE_APP_API +
-          `GetAvgStoreUnits?productID=${params.productID}&periodFromID=${self.fileData.dateTo}&periodToID=${self.fileData.dateFrom}&clusterType=${self.selectedClusterType}&clusterID=${self.selectedClusterOption}`
-        ).then(r => {
-          console.log("GetAvgStoreUnits");
-          console.log(r);
 
+        Axios.get(process.env.VUE_APP_API +
+          `GetAvgStoreUnits?productID=${params.productID}&periodFromID=${self.fileData.dateTo}&periodToID=${self.fileData.dateTo-11}&clusterType=${self.selectedClusterType}&clusterID=${self.selectedClusterOption}`
+        ).then(r => {
           self.$refs.StorePieGraph.open(r.data, params.description, params.barcode, callback => {})
 
         })
@@ -1610,6 +1619,19 @@
             self.setRangingClusterData(clusterData);
             alert("Get Clusters Complete");
           })
+      },
+      exportData(type) {
+        let self = this;
+
+        let params = {
+          fileName: self.generateFileName() + self.fileData.tag + " (" + self.fileData.dateFromString + " TO " + self
+            .fileData.dateToString + ")",
+          sheetName: self.generateFileName() + self.fileData.tag + " (" + self.fileData.dateFromString + " TO " + self
+            .fileData.dateToString + ")",
+          allColumns: true
+        }
+
+        self.gridApi[`exportDataAs${type}`](params);
       }
     }
   }

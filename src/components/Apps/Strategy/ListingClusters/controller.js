@@ -4,58 +4,80 @@
 // Date 2019-08-19
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
 class ListingClusterController {
-    constructor() {
-    }
+    constructor() {}
 
     static GenerateClusterOutput(params) {
         let self = this;
 
-        // params variables
+        // ////////////////////////////////////////////////////////////////////////////////////////////////////
+        // PARAMS VARIABLES
+        // ////////////////////////////////////////////////////////////////////////////////////////////////////
         let storeSalesData = params.storeSalesData; // all store sales data for category over 12 months
-        let topValue = params.topValue; // this is the value used to determine the x percentage of sales
-        
-        // calculated variables
-        const stores = [...new Set(storeSalesData.map(item => item.store_ID))];
-        const products = [...new Set(storeSalesData.map(item => item.product_ID))];
-        const sumSales = accumulateStoreSales(storeSalesData);
+        let levels = params.levels; // value used to determine the x percentage of sales
 
-        console.log("[LISTING CLUSTER] STORES", stores)
-        console.log("[LISTING CLUSTER] PRODUCTS", products)
-        console.log("[LISTING CLUSTER] SUMSALES", sumSales)
+        // ////////////////////////////////////////////////////////////////////////////////////////////////////
+        // CALCULATED VARIABLES
+        // ////////////////////////////////////////////////////////////////////////////////////////////////////
+        const stores = removeDuplicates(storeSalesData.map(item => ({
+            storeName: item.storeName,
+            store_ID: item.store_ID
+        })), "store_ID"); // get all unique stores
+
+        const products = getProductsWeighted(storeSalesData); // get all unique products ordered by total weight in category
+
+        const totalStoreProductSales = getTotalStoreProductSales(stores, products, storeSalesData);
+
+        // return { totalStoreProductSales, storeSales };
     }
 }
-
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
 // METHODS
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
+function getProductsWeighted(storeSalesData) {
+    let uniqueProducts = removeDuplicates(storeSalesData.map(item => ({
+        productName: item.productName,
+        product_ID: item.product_ID
+    })), "product_ID"); // get all unique products
 
-function getSalesValues(storeSalesData, stores) {
-    let retval = [];
+    uniqueProducts.forEach(product => {
+        let allProductSales = storeSalesData.filter(storeSale => {
+            return storeSale.product_ID == product.product_ID;
+        }); // get all product sales records
 
-    stores.forEach(store => {
-        
+        let totalSalesValue = allProductSales.reduce((a, b) => {
+            return {
+                sales_Retail: a.sales_Retail + b.sales_Retail
+            }
+        }).sales_Retail // reduce array to return only total sales
+
+        totalSalesValue = parseFloat(parseFloat(totalSalesValue.toFixed(2)));
+
+        product["totalSales"] = totalSalesValue;
     });
 
-    // const stores = storeSalesData.find(x => {  }) 
+    return uniqueProducts.sort((a, b) => {
+        if (a.totalSales > b.totalSales) {
+            return -1;
+        }
+        if (a.totalSales < b.totalSales) {
+            return 1;
+        }
+        return 0;
+    })
 }
 
-function accumulateStoreSales(storeSalesData) {
-    return storeSalesData.reduce(function(a, b) { 
-        console.log(a);
-        return a.sales_Retail + b.sales_Retail; 
-    }, 0);
+function getTotalStoreProductSales(stores, products, storeSalesData) {
+    products.forEach(product => {
+        stores.forEach(store => {
+            
+        })
+    });
 }
 
-// ////////////////////////////////////////////////////////////////////////////////////////////////////
-// HELPERS
-// ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-class StoreSale {
-    constructor(sales) {
-        let self = this;
-        self.storeID = sales[0].storeID;
-        // self.totalSales = sales.
-    }
-} 
+function removeDuplicates(myArr, prop) {
+    return myArr.filter((obj, pos, arr) => {
+        return arr.map(mapObj => mapObj[prop]).indexOf(obj[prop]) === pos;
+    });
+}
 
 export default ListingClusterController;

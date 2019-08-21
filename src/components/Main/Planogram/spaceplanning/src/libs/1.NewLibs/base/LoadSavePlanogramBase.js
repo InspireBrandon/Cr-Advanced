@@ -606,7 +606,6 @@ class LoadSavePlanogramBase {
     }
     axios.get(self.ServerAddress + `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${spacePlanID}&file=config_advanced`, config)
       .then(r => {
-        console.log(r.data);
 
         let jsonData = r.data.jsonObject
 

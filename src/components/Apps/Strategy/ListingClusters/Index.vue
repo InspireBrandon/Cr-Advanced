@@ -8,7 +8,7 @@
         </v-toolbar>
         <v-toolbar dark flat>
             <v-toolbar-items>
-                <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 200px" placeholder="Select Planogram"
+                <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 300px" placeholder="Select Planogram"
                     @change="onPlanogramChange" dense :items="planograms" v-model="selectedPlanogram" hide-details>
                 </v-autocomplete>
             </v-toolbar-items>
@@ -42,21 +42,8 @@
                 rowData: [],
                 planograms: [],
                 selectedPlanogram: null,
-                headers: [{
-                    headerName: 'Store Name',
-                    field: 'storeName',
-                    pivot: true
-                }, {
-                    headerName: 'Sales',
-                    field: 'sales_Retail',
-                    aggFunc: "avg",
-                }, {
-                    headerName: 'productName',
-                    field: 'productName',
-                    rowGroup: true,
-                }],
+                headers: [],
                 gridOptions: {
-                    pivotMode: true,
                     autoGroupColumnDef: {
                         headerName: 'Product Name', //custom header name for group
                         pinned: 'left', //force pinned left. Does not work in columnDef
@@ -88,9 +75,6 @@
             onPlanogramChange() {
                 let self = this
                 self.$nextTick(() => {
-                    //get data
-                    // self.$refs.DateRangeSelector.show(dateRange => {
-                    // console.log(dateRange);
 
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
@@ -98,16 +82,63 @@
                             `ListingCluster?planogram_ID=${self.selectedPlanogram}&period_from_id=${53}&period_to_id=${58}`
                         )
                         .then(r => {
-                            self.rowData = r.data
                             delete Axios.defaults.headers.common["TenantID"];
 
-                            ListingClusterController.GenerateClusterOutput({
+                            let lcData = ListingClusterController.GenerateClusterOutput({
                                 storeSalesData: r.data,
                                 topValue: 80
                             });
+
+                            self.setHeaderDefaults();
+                            self.setStoreHeaders(lcData.storeSales);
+
+                            self.rowData = lcData.totalStoreProductSales;
+                            setTimeout(() => {
+                                self.autoSizeAll();
+                            }, 200);
                         })
-                    // })
                 })
+            },
+            autoSizeAll() {
+                let self = this;
+                var allColumnIds = [];
+                self.columnApi.getAllColumns().forEach(function (column) {
+                    allColumnIds.push(column.colId);
+                });
+                self.columnApi.autoSizeColumns(allColumnIds);
+            },
+            setHeaderDefaults() {
+                let self = this;
+
+                self.headers = [{
+                    headerName: 'Product Name',
+                    field: 'productName'
+                }]
+            },
+            setStoreHeaders(storeSales) {
+                let self = this;
+
+                storeSales.forEach(store => {
+                    self.headers.push({
+                        headerName: store.storeName,
+                        field: store.storeName,
+                        children: [{
+                            headerName: "In Store",
+                            field: store.storeName + '_inStore',
+                            cellStyle: function (params) {
+                                if (params.data[store.storeName + '_inStore']) {
+                                    return {
+                                        backgroundColor: "#5ef35e86"
+                                    };
+                                } else {
+                                    return {
+                                        backgroundColor: "#ff9e9e91"
+                                    };
+                                }
+                            },
+                        }]
+                    })
+                });
             },
             getPlanograms() {
                 let self = this
@@ -129,3 +160,7 @@
         }
     }
 </script>
+
+<style scoped>
+
+</style>

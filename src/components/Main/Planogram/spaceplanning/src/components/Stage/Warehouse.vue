@@ -718,8 +718,6 @@
               storeProduct.Data.volume_potential = parseFloat(product.volume_potential);
               storeProduct.Data.sales_potential = parseFloat(product.sales_potential);
 
-              console.log(idx);
-
               if (needsDraw) {
                 ctrl_store.setProductData(self.$store, storeProduct.Data, product.barcode);
                 storeProduct.ChangeDimensions(storeProduct);
@@ -747,8 +745,6 @@
 
         storePlanogramItemProducts.forEach(spip => {
           allProducts.forEach(ap => {
-
-            console.log(ap, spip)
 
             ap.height = parseFloat(ap.height);
             ap.width = parseFloat(ap.width);
@@ -831,7 +827,6 @@
 
         }).catch(e => {
           console.log(e);
-
         })
 
       },
@@ -975,9 +970,6 @@
                 var progress = (currentFileSize / FileTotalSize) * 100
                 var TIME_TAKEN = new Date().getTime() - startTime.getTime()
                 var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
-
-                // do whatever you like with the percentage complete
-                // maybe dispatch an action that will update a progress bar or something
                 self.updateLoader({
                   text1: "Downloading Range",
                   text2: "File Progress",
@@ -996,7 +988,6 @@
                 self.updateLoader({
                   currentFile: 2,
                 })
-                console.log(r);
                 
                 self.$store.commit("setRangeID", clusterData.rangeID);
                 self.$store.commit("setPlanogramName", r.data.planogramName);
@@ -1238,7 +1229,6 @@
                   self
                   .$refs
                   .SizeLoader.close, self.fixture_types, self.storeCount, callback => {
-                    console.log("[New space plan]", callback);
                     self.spacePlanID = callback
                   })
               } else {
@@ -1254,7 +1244,6 @@
                     bins: self.bins
                   }, self.spacePlanID, self.spacePlanName, value, image, self.updateLoader, self.$refs
                   .SizeLoader.close, self.fixture_types, self.storeCount, callback => {
-                    console.log("[New space plan]", callback);
                     self.spacePlanID = callback
                   })
               }
@@ -1306,7 +1295,6 @@
               .$refs
               .SizeLoader
               .close, self.fixture_types, self.storeCount, data => {
-                console.log("[NEW SPACEPLANID]", data);
                 self.spacePlanID = data
               })
           }

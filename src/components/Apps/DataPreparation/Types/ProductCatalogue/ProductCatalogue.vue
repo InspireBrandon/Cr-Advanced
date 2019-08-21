@@ -35,6 +35,11 @@
                   <v-autocomplete dense menu-props="auto" :items="categories" label="Category" v-model="category">
                   </v-autocomplete>
                 </v-flex>
+                <v-flex lg6 md6 sm12>
+                  <v-autocomplete dense menu-props="auto" :items="planogramsDropdown" label="Planogram"
+                    v-model="selectedPlanogram">
+                  </v-autocomplete>
+                </v-flex>
               </v-layout>
             </v-container>
           </v-card-text>
@@ -111,8 +116,8 @@
       :rowData="rowData" :enableSorting="true" :enableFilter="true" rowSelection="multiple" :rowDeselection="true"
       :onGridReady="onGridReady" :enableColResize="true" :floatingFilter="true" :gridOptions="gridOptions"
       :suppressDragLeaveHidesColumns="true" :suppressMakeColumnVisibleAfterUnGroup="true"
-      :suppressRowClickSelection="true" :enableRangeSelection="true"
-      :defaultColDef="defaultColDef" :filterChanged="filterChanged" :sideBar='sideBar' @row-clicked="rowClicked">
+      :suppressRowClickSelection="true" :enableRangeSelection="true" :defaultColDef="defaultColDef"
+      :filterChanged="filterChanged" :sideBar='sideBar' @row-clicked="rowClicked">
     </ag-grid-vue>
     <v-toolbar dark dense flat>
       <p>{{ rowData.length }} Rows</p>
@@ -206,6 +211,8 @@
         },
         filters: null,
         activeShopCodes: [],
+        planograms: [],
+        selectedPlanogram: null,
         activeShopCode: null,
         department: null,
         subdepartment: null,
@@ -357,6 +364,26 @@
 
         return tmp;
       },
+      planogramsDropdown() {
+        let self = this;
+
+        let tmp = [];
+
+        tmp.push({
+          text: 'All',
+          value: null
+        })
+
+        for (let index = 0; index < self.planograms.length; index++) {
+          const element = self.planograms[index];
+          tmp.push({
+            text: element.displayname,
+            value: element.id
+          })
+        }
+
+        return tmp;
+      },
       cRotation() {
         if (this.$refs.cropper != undefined) {
           this.$refs.cropper.rotateTo(parseInt(this.rotation))
@@ -412,6 +439,7 @@
         {
           headerName: 'Category',
           field: 'category',
+          editable: true
         },
         {
           headerName: 'Category Code',
@@ -501,7 +529,7 @@
         self.FilterDialog = false;
 
         fetch(process.env.VUE_APP_API +
-            `View/ProductCatalogue?activeShopCodeID=${self.activeShopCode}&departmentID=${self.department}&subdepartmentID=${self.subdepartment}&categoryLinkID=${self.category}`
+            `View/ProductCatalogue?activeShopCodeID=${self.activeShopCode}&departmentID=${self.department}&subdepartmentID=${self.subdepartment}&categoryLinkID=${self.category}&planogramID=${self.selectedPlanogram}`
           )
           .then(result => result.json())
           .then(rowData => {
@@ -544,6 +572,7 @@
           .then(filters => {
             self.activeShopCodes = filters.activeShopCodes;
             self.categoryCodes = filters.categoryCodes;
+            self.planograms = filters.planograms;
           });
       },
       getSelectedRows() {
@@ -694,12 +723,13 @@
         })
       },
       onCellValueChanged(e) {
-        if (e.newValue != e.oldValue) {
+        if (e.newValue != e.oldValue && e.newValue != "") {
           Axios.put(process.env.VUE_APP_API + "Product?db=CR-Hinterland-Live", e.data)
             .then(r => {
               if (!r.data) {
                 console.error("Failed to update item - " + e.data);
               }
+              e.node.setData(r.data);
             })
             .catch(ex => {
               console.error(ex);
