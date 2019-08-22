@@ -18,7 +18,7 @@
             AgGridVue,
             progressRenderer
         },
-        props: ["rowData", "stores"],
+        props: ["rowData", "stores","autosize"],
         data() {
             return {
                 gridOptions: {
@@ -46,6 +46,14 @@
             this.setHeaders(this.stores)
         },
         methods: {
+            autoSize() {
+                let self = this;
+                var allColumnIds = [];
+                self.columnApi.getAllColumns().forEach(function (column) {
+                    allColumnIds.push(column.colId);
+                });
+                self.columnApi.autoSizeColumns(allColumnIds);
+            },
             autoSizeAll() {
                 // let self = this;
                 // var allColumnIds = [];

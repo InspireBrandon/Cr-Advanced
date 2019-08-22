@@ -52,6 +52,14 @@
             }
         },
         methods: {
+             autoSize() {
+                let self = this;
+                var allColumnIds = [];
+                self.columnApi.getAllColumns().forEach(function (column) {
+                    allColumnIds.push(column.colId);
+                });
+                self.columnApi.autoSizeColumns(allColumnIds);
+            },
              autoSizeAll() {
                 let self = this;
                 var allColumnIds = [];

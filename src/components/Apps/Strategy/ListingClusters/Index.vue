@@ -1,12 +1,24 @@
 <template>
     <div>
         <v-toolbar dark flat dense color="grey darken-3">
-            <v-btn v-if="selectedView!=0" @click="changeView(0)" color="pink">
-                Product
-            </v-btn>
-            <v-btn v-if="selectedView!=1" @click="changeView(1)" color="pink">
-                Store
-            </v-btn>
+            <v-btn-toggle v-model="selectedView" class="transparent" mandatory>
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn  @click="changeView(0)" color="pink">
+                            Product
+                        </v-btn>
+                    </template>
+                    <span>Data-Prep</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn  @click="changeView(1)" color="pink">
+                            Store
+                        </v-btn>
+                    </template>
+                    <span>Ranging</span>
+                </v-tooltip>
+            </v-btn-toggle>
             <v-spacer></v-spacer>
             <v-toolbar-title>
                 Listing Clusters
@@ -21,6 +33,13 @@
                     placeholder="Item Percentage" @change="onPlanogramChange" dense :items="percentages"
                     v-model="selectedPercentage" hide-details></v-select>
             </v-toolbar-items>
+            <v-spacer></v-spacer>
+            <v-btn v-if="selectedView!=1" @click="handleResize(0)" color="primary">
+                auto Size
+            </v-btn>
+            <v-btn v-if="selectedView!=0" @click="handleResize(1)" color="primary">
+                auto Size
+            </v-btn>
         </v-toolbar>
         <ProductGrid v-if="selectedView==0" ref="ProductGrid" :rowData="productRowData" :stores="stores" />
         <storeGrid v-if="selectedView==1" ref="storeGrid" :rowData="storeRowData" />
@@ -124,6 +143,14 @@
             this.getPlanograms()
         },
         methods: {
+            handleResize(type) {
+                let self = this
+                if (type == 0) {
+                    self.$refs.ProductGrid.autoSize()
+                } else {
+                    self.$refs.storeGrid.autoSize()
+                }
+            },
             changeView(type) {
                 let self = this
                 self.selectedView = type;
@@ -151,7 +178,7 @@
                                 self.storeRowData = lcData.totalStoreProductSales;
                                 self.productRowData = lcData.productData;
                                 self.stores = lcData.stores;
-                                
+
                                 self.$refs.Spinner.hide()
                             })
                     })
