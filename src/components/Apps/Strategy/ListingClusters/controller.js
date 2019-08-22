@@ -96,7 +96,7 @@ function getTotalStoreProductSales(stores, products, storeSalesData, levels) {
                 tmpCode = "0";
             }
 
-            tmpObj[store.store_ID] = tmpCode;
+            tmpObj[store.storeName] = tmpCode;
         });
 
         tmpStoreData.push(tmpObj);
@@ -122,7 +122,7 @@ function accumulateCodes(tmpStoreData, stores) {
         }
 
         tmpStoreData.forEach(tmpStoreItem => {
-            storeCodeData.storeCode += tmpStoreItem[store.store_ID];
+            storeCodeData.storeCode += tmpStoreItem[store.storeName];
         });
 
         storeClusterCodes.push(storeCodeData);
