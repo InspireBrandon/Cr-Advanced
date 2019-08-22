@@ -95,7 +95,7 @@ function getTotalStoreProductSales(stores, products, storeSalesData, levels) {
             product_ID: product.product_ID,
             productName: product.productName,
             totalProductSales: totalProductSales,
-            cumulativProductSales: cumulativProductSales.toFixed(2) + "%"
+            cumulativProductSales: cumulativProductSales.toFixed(2)
         }
 
         stores.forEach(store => {
