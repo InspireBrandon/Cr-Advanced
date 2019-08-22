@@ -14,11 +14,11 @@
         AgGridVue
     } from "ag-grid-vue";
     export default {
-        components:{
+        components: {
             AgGridVue,
             progressRenderer
         },
-        props: ["rowData"],
+        props: ["rowData", "stores"],
         data() {
             return {
                 gridOptions: {
@@ -40,9 +40,6 @@
 
                 },
                 headers: [{
-                    headerName: 'Store Name',
-                    field: 'storeName'
-                }, {
                     headerName: 'Current Rank',
                     field: 'currentRank'
                 }, {
@@ -53,12 +50,12 @@
                     field: 'threeLevelCluster'
                 }, {
                     headerName: 'progressRenderer',
-                    cellRendererFramework:"progressRenderer"
+                    cellRendererFramework: "progressRenderer"
                 }]
             }
         },
         methods: {
-             autoSizeAll() {
+            autoSizeAll() {
                 let self = this;
                 var allColumnIds = [];
                 self.columnApi.getAllColumns().forEach(function (column) {
@@ -71,6 +68,14 @@
                 this.columnApi = params.columnApi;
                 this.gridApi.sizeColumnsToFit()
             },
+            setHeaders(stores) {
+                let self = this;
+
+                self.headers = [{
+                    headerName: 'Product Name',
+                    field: 'productName'
+                }, ]
+            }
         },
     }
 </script>

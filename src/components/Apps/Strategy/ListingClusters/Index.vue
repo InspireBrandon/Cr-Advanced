@@ -163,8 +163,10 @@
 
                                 self.storeRowData = lcData.totalStoreProductSales;
                                 self.productRowData = lcData.productData;
+                                console.log(self.productRowData);
+                                
                                 self.stores = lcData.stores;
-
+                                self.$refs.Spinner.hide()
                                 // setTimeout(() => {
                                 //     self.autoSizeAll();
                                 // }, 200);
