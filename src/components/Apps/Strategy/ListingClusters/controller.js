@@ -25,7 +25,7 @@ class ListingClusterController {
 
         const products = getProductsWeighted(storeSalesData); // get all unique products ordered by total weight in category
 
-        const totalStoreProductSales = getTotalStoreProductSales(stores, products, storeSalesData);
+        const totalStoreProductSales = getTotalStoreProductSales(stores, products, storeSalesData, levels);
 
         return { totalStoreProductSales };
     }
@@ -66,7 +66,7 @@ function getProductsWeighted(storeSalesData) {
     })
 }
 
-function getTotalStoreProductSales(stores, products, storeSalesData) {
+function getTotalStoreProductSales(stores, products, storeSalesData, levels) {
     let tmpStoreData = [];
 
     products.forEach(product => {
@@ -102,7 +102,7 @@ function getTotalStoreProductSales(stores, products, storeSalesData) {
 
     let response = accumulateCodes(tmpStoreData, stores);
     response = addRank(response);
-    response = GenerateCluster(response, 1);
+    response = GenerateCluster(response, levels);
 
     return response;
 }
@@ -153,7 +153,7 @@ function GenerateCluster(tmpStoreData, levels) {
     let itemLevels = 0;
 
     tmpStoreData.forEach(tmpStoreItem => {
-        let percentageOfStoreCode = ((levels / 10) * tmpStoreItem.storeCode.length).toFixed(0);
+        let percentageOfStoreCode = ((parseInt(levels) / 10) * tmpStoreItem.storeCode.length).toFixed(0);
         itemLevels = percentageOfStoreCode;
 
         let currentCode = tmpStoreItem.storeCode.substr(0, percentageOfStoreCode);

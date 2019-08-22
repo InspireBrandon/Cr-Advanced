@@ -149,7 +149,7 @@
 
                                 let lcData = ListingClusterController.GenerateClusterOutput({
                                     storeSalesData: r.data,
-                                    topValue: self.selectedPercentage
+                                    levels: self.selectedPercentage
                                 });
 
                                 self.setHeaderDefaults();
