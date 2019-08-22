@@ -11,6 +11,9 @@
             <v-list-tile @click="newRange">
               <v-list-tile-title>New</v-list-tile-title>
             </v-list-tile>
+            <v-list-tile @click="newCustom">
+              <v-list-tile-title>New Custom</v-list-tile-title>
+            </v-list-tile>
             <v-list-tile @click="openRange">
               <v-list-tile-title>Open</v-list-tile-title>
             </v-list-tile>
@@ -224,8 +227,7 @@
     <GpGraph ref="GpGraph" />
     <LineGraphModal ref="LineGraphModal" />
     <StorePieGraph ref="StorePieGraph" />
-
-
+    <CategorySelector ref="CategorySelector" />
   </div>
 </template>
 
@@ -246,6 +248,7 @@
 
   import SoftwareToolbar from "@/components/Common/SoftwareToolbar"
   import PlanogramSelector from '@/components/Common/PlanogramSelector';
+  import CategorySelector from '@/components/Common/CategorySelector';
   import DateRangeSelector from '@/components/Common/DateRangeSelector';
   import StoreIndicatorSelector from '@/components/Common/StoreIndicatorSelector';
   import RangeSelectorModal from '@/components/Common/RangeSelectorModal';
@@ -266,8 +269,6 @@
   import StorePieGraph from './StorePieGraph.vue'
   import GpGraph from './GpGraph.vue'
   import HighlightCluster from './HighlightCluster.vue'
-
-
 
   import {
     AgGridVue
@@ -306,7 +307,8 @@
       AutoRangeModal,
       RangingReportModal,
       GraphConfigurationModal,
-      HighlightCluster
+      HighlightCluster,
+      CategorySelector
     },
     data() {
       return {
@@ -625,6 +627,70 @@
           }
         })
       },
+      newCustom() {
+        let self = this;
+
+        self.isAdd = true;
+
+        self.canRefresh = false;
+
+        self.$refs.CategorySelector.show(category => {
+
+          self.selectedPlanogram = category;
+
+          self.$refs.dateRangeSelector.show(dateRange => {
+
+            self.selectedDateRange = dateRange;
+            self.$refs.spinner.show();
+
+            self.fileData.planogramName = category.displayName;
+            self.fileData.planogramID = category.id;
+            self.fileData.dateFrom = dateRange.dateFrom;
+            self.fileData.dateTo = dateRange.dateTo;
+            self.fileData.dateFromString = dateRange.dateFromString;
+            self.fileData.dateToString = dateRange.dateToString;
+            self.fileData.periodic = dateRange.periodic;
+            self.fileData.monthsBetween = dateRange.monthsBetween;
+            self.fileData.tag = "CATEGORY";
+            self.fileData.useType = "CATEGORY";
+
+            Axios.get(process.env.VUE_APP_API +
+                `RangingAdvanced?planogramID=${category.id}&dateFromID=${dateRange.dateFrom}&dateToID=${dateRange.dateTo}&type=CATEGORY`
+              )
+              .then(r => {
+                r.data["dateFrom"] = dateRange.dateFrom;
+                r.data["dateTo"] = dateRange.dateTo;
+                self.rangingController = new RangingController(r.data);
+
+                self.rangingController.getSalesMonthlyTotals(() => {
+                  self.setRangingClusterData(r.data.clusterData);
+                  if (self.selectedClusterType != null && self.selectedClusterOption != null) {
+                    self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType,
+                      self
+                      .selectedClusterOption, self.autoRangeData);
+
+                    self.ais_Sales = 0;
+                    self.ais_SalesPotential = 0;
+
+                    self.rowData.forEach(el => {
+                      if (el.store_Range_Indicator == "YES") {
+                        self.ais_Sales = (parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail))
+                          .toFixed(
+                            2);
+                        self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + parseFloat(el
+                          .sales_potential)).toFixed(2);
+                      }
+                    })
+
+                    self.fitColumns();
+                  }
+                  self.$refs.spinner.hide();
+                  self.gotData = true
+                })
+              })
+          })
+        })
+      },
       newRange() {
         let self = this;
 
@@ -650,9 +716,10 @@
             self.fileData.periodic = dateRange.periodic;
             self.fileData.monthsBetween = dateRange.monthsBetween;
             self.fileData.tag = "";
+            self.fileData.useType = "PLANOGRAM";
 
             Axios.get(process.env.VUE_APP_API +
-                `RangingAdvanced?planogramID=${planogram.planogram_ID}&dateFromID=${dateRange.dateFrom}&dateToID=${dateRange.dateTo}`
+                `RangingAdvanced?planogramID=${planogram.planogram_ID}&dateFromID=${dateRange.dateFrom}&dateToID=${dateRange.dateTo}&type=PLANOGRAM`
               )
               .then(r => {
                 r.data["dateFrom"] = dateRange.dateFrom;
@@ -823,7 +890,7 @@
 
           self.$refs.spinner.show();
           Axios.get(process.env.VUE_APP_API +
-              `RangingAdvanced?planogramID=${self.fileData.planogramID}&dateFromID=${self.fileData.dateFrom}&dateToID=${self.fileData.dateTo}`
+              `RangingAdvanced?planogramID=${self.fileData.planogramID}&dateFromID=${self.fileData.dateFrom}&dateToID=${self.fileData.dateTo}&type=${self.fileData.useType}`
             )
             .then(r => {
               r.data["dateFrom"] = self.fileData.dateFrom;
@@ -938,7 +1005,7 @@
           Axios.put(process.env.VUE_APP_API + `Ranging/UpdateIndicators?db=CR-Hinterland-Live`, updatedIndicators)
             .then(r => {
               if (r.data) {
-
+                alert("Successfully updated indicators")
               } else {
                 alert("There was an error updating the indicators");
               }
@@ -1577,8 +1644,6 @@
             }
           }
         ];
-
-
 
         return result;
       },

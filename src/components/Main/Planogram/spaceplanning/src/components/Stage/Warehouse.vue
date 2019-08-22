@@ -638,6 +638,8 @@
         let ctrl_store = new StoreHelper();
         let allProducts = self.products;
 
+        console.log("Starting");
+
         let storeProducts = self.$store.state.activePlanogramProducts;
         let storePlanogramItemProducts = ctrl_store.getAllPlanogramItemsByType(self.$store, "PRODUCT");
 
@@ -721,6 +723,7 @@
               storeProduct.Data.sales_potential = parseFloat(product.sales_potential);
 
               if (needsDraw) {
+                console.log("Redrawing");
                 ctrl_store.setProductData(self.$store, storeProduct.Data, product.barcode);
                 storeProduct.ChangeDimensions(storeProduct);
               }
@@ -728,7 +731,7 @@
           })
         })
 
-        alert("Range to planogram complete");
+        console.log("Redrawing done");
       },
       dimensionChange(planoProduct, rangeProduct) {
         if (planoProduct.height == rangeProduct.height && planoProduct.width == rangeProduct.width && planoProduct
@@ -939,7 +942,9 @@
 
             self.planogramHelper.loadPlanogram(spacePlanID, self.$store, masterLayer, stage, pxlRatio, self
               .setClusterAndDimensionData,
-              self.$refs.SizeLoader.close, self.updateLoader);
+              self.$refs.SizeLoader.close, self.updateLoader, () => {
+                self.rangeToPlanogram();
+              });
           }, 1000);
         })
       },

@@ -90,9 +90,10 @@
                             });
 
                             self.setHeaderDefaults();
-                            self.setStoreHeaders(lcData.storeSales);
+                            // self.setStoreHeaders(lcData.storeSales);
 
                             self.rowData = lcData.totalStoreProductSales;
+
                             setTimeout(() => {
                                 self.autoSizeAll();
                             }, 200);
@@ -111,35 +112,44 @@
                 let self = this;
 
                 self.headers = [{
-                    headerName: 'Product Name',
-                    field: 'productName'
+                    headerName: 'Store Name',
+                    field: 'storeName'
+                }, {
+                    headerName: 'Current Rank',
+                    field: 'currentRank'
+                }, {
+                    headerName: 'Current Formula',
+                    field: 'storeCode'
+                }, {
+                    headerName: '3 Level Cluster',
+                    field: 'threeLevelCluster'
                 }]
             },
-            setStoreHeaders(storeSales) {
-                let self = this;
+            // setStoreHeaders(storeSales) {
+            //     let self = this;
 
-                storeSales.forEach(store => {
-                    self.headers.push({
-                        headerName: store.storeName,
-                        field: store.storeName,
-                        children: [{
-                            headerName: "In Store",
-                            field: store.storeName + '_inStore',
-                            cellStyle: function (params) {
-                                if (params.data[store.storeName + '_inStore']) {
-                                    return {
-                                        backgroundColor: "#5ef35e86"
-                                    };
-                                } else {
-                                    return {
-                                        backgroundColor: "#ff9e9e91"
-                                    };
-                                }
-                            },
-                        }]
-                    })
-                });
-            },
+            //     storeSales.forEach(store => {
+            //         self.headers.push({
+            //             headerName: store.storeName,
+            //             field: store.storeName,
+            //             children: [{
+            //                 headerName: "In Store",
+            //                 field: store.storeName + '_inStore',
+            //                 cellStyle: function (params) {
+            //                     if (params.data[store.storeName + '_inStore']) {
+            //                         return {
+            //                             backgroundColor: "#5ef35e86"
+            //                         };
+            //                     } else {
+            //                         return {
+            //                             backgroundColor: "#ff9e9e91"
+            //                         };
+            //                     }
+            //                 },
+            //             }]
+            //         })
+            //     });
+            // },
             getPlanograms() {
                 let self = this
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;

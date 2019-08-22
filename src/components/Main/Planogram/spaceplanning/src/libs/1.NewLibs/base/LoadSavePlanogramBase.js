@@ -580,7 +580,7 @@ class LoadSavePlanogramBase {
     return PlanogramNamer.generatePlanogramName(allPlanogramItems, clusterData);
   }
 
-  loadPlanogram(spacePlanID, VueStore, MasterLayer, Stage, pxlRatio, afterGetSpacePlanFile, hideLoader, updateLoader) {
+  loadPlanogram(spacePlanID, VueStore, MasterLayer, Stage, pxlRatio, afterGetSpacePlanFile, hideLoader, updateLoader, callRedraw) {
     let self = this;
     let startTime = new Date()
     self.resetStage(VueStore, MasterLayer, Stage);
@@ -614,14 +614,15 @@ class LoadSavePlanogramBase {
             self.startLoadingPlanogram(jsonData, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
           } else {
             jsonData.planogramData = StageWarehouseMiddleware.verifyIntegrityOfWarehouseData(jsonData.planogramData, rangeProducts);
-            self.startLoadingPlanogram(jsonData, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
+            self.startLoadingPlanogram(jsonData, Stage, pxlRatio, MasterLayer, VueStore, hideLoader, () => {
+              callRedraw();
+            });
           }
         });
 
-
+        
       })
       .catch(e => {
-
         hideLoader()
         alert("Failed to get data. " + e);
       })
@@ -650,7 +651,7 @@ class LoadSavePlanogramBase {
     Stage.batchDraw();
   }
 
-  startLoadingPlanogram(fileData, Stage, PxlRatio, MasterLayer, VueStore, hideLoader) {
+  startLoadingPlanogram(fileData, Stage, PxlRatio, MasterLayer, VueStore, hideLoader, callback) {
 
     console.log("START LOADING", Stage, MasterLayer);
 
@@ -691,6 +692,9 @@ class LoadSavePlanogramBase {
     Stage.draw();
 
     hideLoader();
+
+    if(callback != undefined && callback != null)
+      callback();
   }
 
   loadItemRecursive(MasterData, CurrentItem, ParentID, Stage, MasterLayer, PxlRatio, VueStore) {
