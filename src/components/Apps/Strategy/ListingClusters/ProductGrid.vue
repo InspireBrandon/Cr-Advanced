@@ -47,12 +47,12 @@
         },
         methods: {
             autoSizeAll() {
-                let self = this;
-                var allColumnIds = [];
-                self.columnApi.getAllColumns().forEach(function (column) {
-                    allColumnIds.push(column.colId);
-                });
-                self.columnApi.autoSizeColumns(allColumnIds);
+                // let self = this;
+                // var allColumnIds = [];
+                // self.columnApi.getAllColumns().forEach(function (column) {
+                //     allColumnIds.push(column.colId);
+                // });
+                // self.columnApi.autoSizeColumns(allColumnIds);
             },
             onGridReady(params) {
                 this.gridApi = params.api;
@@ -68,7 +68,7 @@
                     headerName: 'Cumulative Sales',
                     cellRendererFramework: "progressRenderer"
                 }, {
-                    headerName: "Sales",
+                    headerName: "Sales (12 Month Average)",
                     field: "totalProductSales",
 
                 }, {

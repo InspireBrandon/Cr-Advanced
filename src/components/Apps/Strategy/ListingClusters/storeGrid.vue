@@ -46,14 +46,8 @@
                     headerName: 'Current Rank',
                     field: 'currentRank'
                 }, {
-                    headerName: 'Current Formula',
-                    field: 'storeCode'
-                }, {
-                    headerName: '3 Level Cluster',
-                    field: 'threeLevelCluster'
-                }, {
-                    headerName: 'progressRenderer',
-                    cellRendererFramework:"progressRenderer"
+                    headerName: 'Cluster',
+                    field: 'cluster'
                 }]
             }
         },

@@ -1,6 +1,12 @@
 <template>
     <div>
         <v-toolbar dark flat dense color="grey darken-3">
+            <v-btn v-if="selectedView!=0" @click="changeView(0)" color="pink">
+                Product
+            </v-btn>
+            <v-btn v-if="selectedView!=1" @click="changeView(1)" color="pink">
+                Store
+            </v-btn>
             <v-spacer></v-spacer>
             <v-toolbar-title>
                 Listing Clusters
@@ -15,12 +21,6 @@
                     placeholder="Item Percentage" @change="onPlanogramChange" dense :items="percentages"
                     v-model="selectedPercentage" hide-details></v-select>
             </v-toolbar-items>
-            <v-btn v-if="selectedView!=1" @click="changeView(1)" color="primary">
-                Store
-            </v-btn>
-            <v-btn v-if="selectedView!=0" @click="changeView(0)" color="primary">
-                Product
-            </v-btn>
         </v-toolbar>
         <ProductGrid v-if="selectedView==0" ref="ProductGrid" :rowData="productRowData" :stores="stores" />
         <storeGrid v-if="selectedView==1" ref="storeGrid" :rowData="storeRowData" />
@@ -148,12 +148,10 @@
                                     levels: self.selectedPercentage
                                 });
 
-                                self.setHeaderDefaults();
-
                                 self.storeRowData = lcData.totalStoreProductSales;
                                 self.productRowData = lcData.productData;
-                                
                                 self.stores = lcData.stores;
+                                
                                 self.$refs.Spinner.hide()
                             })
                     })

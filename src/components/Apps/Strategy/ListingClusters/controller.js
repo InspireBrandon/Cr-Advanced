@@ -191,7 +191,7 @@ function accumulateCodes(tmpStoreData, stores) {
             store_ID: store.store_ID,
             storeName: store.storeName,
             currentRank: -1,
-            threeLevelCluster: ""
+            cluster: ""
         }
 
         tmpStoreData.forEach(tmpStoreItem => {
@@ -231,12 +231,12 @@ function GenerateCluster(tmpStoreData, levels) {
         let currentCode = tmpStoreItem.storeCode.substr(0, percentageOfStoreCode);
 
         if(lastCode == "" || currentCode == lastCode) {
-            tmpStoreItem.threeLevelCluster = letters[letterIndex];
+            tmpStoreItem.cluster = letters[letterIndex];
         }
         else 
         {
             letterIndex++;
-            tmpStoreItem.threeLevelCluster = letters[letterIndex];
+            tmpStoreItem.cluster = letters[letterIndex];
         }
 
         lastCode = currentCode;
