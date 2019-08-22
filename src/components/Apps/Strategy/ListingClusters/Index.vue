@@ -1,16 +1,7 @@
 <template>
     <div>
         <v-toolbar dark flat dense color="grey darken-3">
-            <v-spacer></v-spacer>
-            <v-toolbar-title>
-                Listing Clusters
-            </v-toolbar-title>
-        </v-toolbar>
-        <v-toolbar dark flat>
             <v-toolbar-items>
-                <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 300px" placeholder="Select Planogram"
-                    @change="onPlanogramChange" dense :items="planograms" v-model="selectedPlanogram" hide-details>
-                </v-autocomplete>
                 <v-menu dark offset-y style="margin-bottom: 10px;">
                     <v-btn slot="activator" flat>
                         View
@@ -24,6 +15,20 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
+            </v-toolbar-items>
+            <v-spacer></v-spacer>
+            <v-toolbar-title>
+                Listing Clusters
+            </v-toolbar-title>
+        </v-toolbar>
+        <v-toolbar dark flat>
+            <v-toolbar-items>
+                <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 300px" placeholder="Select Planogram"
+                    @change="onPlanogramChange" dense :items="planograms" v-model="selectedPlanogram" hide-details>
+                </v-autocomplete>
+                <v-select label="Category Percent" style="margin-left: 10px; margin-top: 8px; width: 150px"
+                    placeholder="Item Percentage" @change="onPlanogramChange" dense :items="percentages"
+                    v-model="selectedPercentage" hide-details></v-select>
             </v-toolbar-items>
         </v-toolbar>
         <ProductGrid v-if="selectedView==0" ref="ProductGrid" :rowData="rowData" />
@@ -74,7 +79,49 @@
                 },
                 defaultColDef: {
 
-                }
+                },
+                percentages: [{
+                        text: "10%",
+                        value: 1
+                    },
+                    {
+                        text: "20%",
+                        value: 2
+                    },
+                    {
+                        text: "30%",
+                        value: 3
+                    },
+                    {
+                        text: "40%",
+                        value: 4
+                    },
+                    {
+                        text: "50%",
+                        value: 5
+                    },
+                    {
+                        text: "60%",
+                        value: 6
+                    },
+                    {
+                        text: "70%",
+                        value: 7
+                    },
+                    {
+                        text: "80%",
+                        value: 8
+                    },
+                    {
+                        text: "90%",
+                        value: 9
+                    },
+                    {
+                        text: "100%",
+                        value: 10
+                    },
+                ],
+                selectedPercentage: 2
             }
         },
         created() {
@@ -83,36 +130,39 @@
         methods: {
             changeView(type) {
                 let self = this
-                self.selectedView=type
+                self.selectedView = type
                 // todo : handle data set change
             },
             onPlanogramChange() {
-                let self = this
-                self.$nextTick(() => {
+                let self = this;
 
-                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                if (self.selectedPlanogram != null) {
+                    self.$nextTick(() => {
 
-                    Axios.get(process.env.VUE_APP_API +
-                            `ListingCluster?planogram_ID=${self.selectedPlanogram}&period_from_id=${53}&period_to_id=${58}`
-                        )
-                        .then(r => {
-                            delete Axios.defaults.headers.common["TenantID"];
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                            let lcData = ListingClusterController.GenerateClusterOutput({
-                                storeSalesData: r.data,
-                                topValue: 80
-                            });
+                        Axios.get(process.env.VUE_APP_API +
+                                `ListingCluster?planogram_ID=${self.selectedPlanogram}&period_from_id=${53}&period_to_id=${58}`
+                            )
+                            .then(r => {
+                                delete Axios.defaults.headers.common["TenantID"];
 
-                            self.setHeaderDefaults();
-                            // self.setStoreHeaders(lcData.storeSales);
+                                let lcData = ListingClusterController.GenerateClusterOutput({
+                                    storeSalesData: r.data,
+                                    topValue: self.selectedPercentage
+                                });
 
-                            self.rowData = lcData.totalStoreProductSales;
+                                self.setHeaderDefaults();
+                                // self.setStoreHeaders(lcData.storeSales);
 
-                            // setTimeout(() => {
-                            //     self.autoSizeAll();
-                            // }, 200);
-                        })
-                })
+                                self.rowData = lcData.totalStoreProductSales;
+
+                                // setTimeout(() => {
+                                //     self.autoSizeAll();
+                                // }, 200);
+                            })
+                    })
+                }
             },
 
             setHeaderDefaults() {
