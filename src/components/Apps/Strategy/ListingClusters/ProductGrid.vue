@@ -100,9 +100,9 @@
                         headerName: store.storeName,
                         children: [{
                             headerName: "In Store",
-                            field: store.storeName,
+                            field: store.storeName + "_inStore",
                             cellStyle: function (params) {
-                                if (params.data[store.storeName]) {
+                                if (params.data[store.storeName + "_inStore"]) {
                                     return {
                                         backgroundColor: "#5ef35e86"
                                     };

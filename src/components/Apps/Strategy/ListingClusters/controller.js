@@ -23,18 +23,56 @@ class ListingClusterController {
             store_ID: item.store_ID
         })), "store_ID"); // get all unique stores
 
+        let storeSales = getStoreSales(stores, storeSalesData);
+
         const products = getProductsWeighted(storeSalesData); // get all unique products ordered by total weight in category
 
         const response = getTotalStoreProductSales(stores, products, storeSalesData, levels);
         let totalStoreProductSales = response.response;
         let tmpStoreData = response.tmpStoreData;
 
-        return { totalStoreProductSales: totalStoreProductSales, productData: tmpStoreData, stores: stores };
+        return { totalStoreProductSales: totalStoreProductSales, productData: tmpStoreData, stores: storeSales };
     }
 }
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
 // METHODS
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
+function getStoreSales(stores, storeSales) {
+    let retval = [];
+
+    stores.forEach(store => {
+        let tmp = {
+            store_ID: store.store_ID,
+            storeName: store.storeName,
+            sumSales: 0
+        }
+
+        var totalStoreSales = storeSales.filter(sales => {
+            return sales.store_ID == store.store_ID;
+        })
+
+        let sumStoreSales = totalStoreSales.reduce((a, b) => {
+            return {
+                sales_Retail: a.sales_Retail + b.sales_Retail
+            }
+        }).sales_Retail
+
+        tmp.sumSales = sumStoreSales;
+
+        retval.push(tmp); 
+    })
+
+    return retval.sort((a, b) => {
+        if (a.sumSales > b.sumSales) {
+            return -1;
+        }
+        if (a.sumSales < b.sumSales) {
+            return 1;
+        }
+        return 0;
+    })
+}
+
 function getProductsWeighted(storeSalesData) {
     let uniqueProducts = removeDuplicates(storeSalesData.map(item => ({
         productName: item.productName,
@@ -58,10 +96,10 @@ function getProductsWeighted(storeSalesData) {
     });
 
     return uniqueProducts.sort((a, b) => {
-        if (a.totalSales < b.totalSales) {
+        if (a.totalSales > b.totalSales) {
             return -1;
         }
-        if (a.totalSales > b.totalSales) {
+        if (a.totalSales < b.totalSales) {
             return 1;
         }
         return 0;
@@ -90,11 +128,12 @@ function getTotalStoreProductSales(stores, products, storeSalesData, levels) {
         }).sales_Retail;
 
         var cumulativProductSales = currentCumulative + ((totalProductSales / totalCategorySales) * 100);
+        currentCumulative = cumulativProductSales;
 
         let tmpObj = {
             product_ID: product.product_ID,
             productName: product.productName,
-            totalProductSales: totalProductSales,
+            totalProductSales: parseFloat(parseFloat(totalProductSales.toFixed(2))),
             cumulativProductSales: cumulativProductSales.toFixed(2)
         }
 
@@ -104,12 +143,14 @@ function getTotalStoreProductSales(stores, products, storeSalesData, levels) {
             });
 
             let tmpCode = "";
+            let inStore = false;
 
             if(storeProductSale.length > 0) {
                 let storeProductSaleItem = storeProductSale[0];
 
                 if(storeProductSaleItem.sales_Retail > 0) {
                     tmpCode = "1";
+                    inStore = true;
                 } else {
                     tmpCode = "0";
                 }
@@ -118,16 +159,25 @@ function getTotalStoreProductSales(stores, products, storeSalesData, levels) {
             }
 
             tmpObj[store.storeName] = tmpCode;
+            tmpObj[store.storeName + "_inStore"] = inStore;
         });
 
         tmpStoreData.push(tmpObj);
     });
 
-    console.log(tmpStoreData);
-
     let response = accumulateCodes(tmpStoreData, stores);
     response = addRank(response);
     response = GenerateCluster(response, levels);
+
+    tmpStoreData = tmpStoreData.sort((a, b) => {
+        if (a.totalProductSales > b.totalProductSales) {
+            return -1;
+        }
+        if (a.totalProductSales < b.totalProductSales) {
+            return 1;
+        }
+        return 0;
+    })
 
     return { response, tmpStoreData };
 }
