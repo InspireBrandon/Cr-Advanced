@@ -9,13 +9,14 @@
     </div>
 </template>
 <script>
-
+    import progressRenderer from "./progressRenderer";
     import {
         AgGridVue
     } from "ag-grid-vue";
     export default {
         components:{
-            AgGridVue
+            AgGridVue,
+            progressRenderer
         },
         props: ["rowData"],
         data() {
@@ -50,6 +51,9 @@
                 }, {
                     headerName: '3 Level Cluster',
                     field: 'threeLevelCluster'
+                }, {
+                    headerName: 'progressRenderer',
+                    cellRendererFramework:"progressRenderer"
                 }]
             }
         },
