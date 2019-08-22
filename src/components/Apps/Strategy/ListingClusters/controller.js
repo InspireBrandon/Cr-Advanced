@@ -102,7 +102,7 @@ function getTotalStoreProductSales(stores, products, storeSalesData) {
 
     let response = accumulateCodes(tmpStoreData, stores);
     response = addRank(response);
-    response = GenerateCluster(response, 3);
+    response = GenerateCluster(response, 1);
 
     return response;
 }
@@ -150,8 +150,13 @@ function GenerateCluster(tmpStoreData, levels) {
     let letterIndex = 0;
     let lastCode = "";
 
+    let itemLevels = 0;
+
     tmpStoreData.forEach(tmpStoreItem => {
-        let currentCode = tmpStoreItem.storeCode.substr(0, levels);
+        let percentageOfStoreCode = ((levels / 10) * tmpStoreItem.storeCode.length).toFixed(0);
+        itemLevels = percentageOfStoreCode;
+
+        let currentCode = tmpStoreItem.storeCode.substr(0, percentageOfStoreCode);
 
         if(lastCode == "" || currentCode == lastCode) {
             tmpStoreItem.threeLevelCluster = letters[letterIndex];
