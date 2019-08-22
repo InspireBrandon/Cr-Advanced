@@ -1,6 +1,6 @@
 <template>
     <div style="display: flex;">
-        <v-btn class="pa-0 ma-0" icon v-if="params.data.rank!=1"
+        <v-btn class="pa-0 ma-0" icon v-if="params.data.rank!=0"
             @click="params.context.componentParent.HandleRankUp(params)">
             <v-icon>
                 arrow_drop_up

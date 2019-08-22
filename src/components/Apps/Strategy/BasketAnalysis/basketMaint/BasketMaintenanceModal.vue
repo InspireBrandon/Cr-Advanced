@@ -55,6 +55,7 @@
     import grid from "./Grid.vue"
     import Axios from "axios"
     export default {
+        props:["getBaskets"],
         components: {
             grid
         },
@@ -111,6 +112,7 @@
                             console.log(r);
                             self.GetData()
                             self.addDialog = false
+                            self.getBaskets()
                             delete Axios.defaults.headers.common["TenantID"];
                         })
                 }

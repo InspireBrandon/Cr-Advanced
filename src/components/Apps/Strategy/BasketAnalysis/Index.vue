@@ -48,7 +48,7 @@
             <v-btn @click="runReport" v-if="rowData.length > 0" color="primary">Run Report</v-btn>
         </v-toolbar>
         <Grid :rowData="rowData" :basket="selectedBasket" v-if="selectedBasket != null" ref="Grid" />
-        <basketMaint ref="basketMaint" />
+        <basketMaint :getBaskets="getbaskets" ref="basketMaint" />
         <ClusterMaint ref="ClusterMaint" />
         <StoreBasketReport ref="StoreBasketReport" />
     </v-card>
@@ -95,6 +95,7 @@
 
                 Axios.get(process.env.VUE_APP_API + `Basket`)
                     .then(r => {
+                        self.baskets=[]
                         r.data.forEach(e => {
                             self.baskets.push({
                                 text: e.description,
