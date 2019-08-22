@@ -960,7 +960,6 @@
               }
             }
 
-
             self.columnDefs[13] = {
                 headerName: "Indicator",
                 field: "store_Range_Indicator",
