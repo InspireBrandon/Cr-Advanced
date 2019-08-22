@@ -14,11 +14,11 @@
         AgGridVue
     } from "ag-grid-vue";
     export default {
-        components:{
+        components: {
             AgGridVue,
             progressRenderer
         },
-        props: ["rowData"],
+        props: ["rowData", "stores"],
         data() {
             return {
                 gridOptions: {
@@ -40,9 +40,6 @@
 
                 },
                 headers: [{
-                    headerName: 'Store Name',
-                    field: 'storeName'
-                }, {
                     headerName: 'Current Rank',
                     field: 'currentRank'
                 }, {
@@ -53,24 +50,73 @@
                     field: 'threeLevelCluster'
                 }, {
                     headerName: 'progressRenderer',
-                    cellRendererFramework:"progressRenderer"
+                    cellRendererFramework: "progressRenderer"
                 }]
             }
         },
+        mounted() {
+            this.setHeaders(this.stores)
+        },
         methods: {
-             autoSizeAll() {
-                let self = this;
-                var allColumnIds = [];
-                self.columnApi.getAllColumns().forEach(function (column) {
-                    allColumnIds.push(column.colId);
-                });
-                self.columnApi.autoSizeColumns(allColumnIds);
+            autoSizeAll() {
+                // let self = this;
+                // var allColumnIds = [];
+                // self.columnApi.getAllColumns().forEach(function (column) {
+                //     allColumnIds.push(column.colId);
+                // });
+                // self.columnApi.autoSizeColumns(allColumnIds);
             },
             onGridReady(params) {
                 this.gridApi = params.api;
                 this.columnApi = params.columnApi;
-                this.gridApi.sizeColumnsToFit()
+                // this.gridApi.sizeColumnsToFit()
             },
+            setHeaders(stores) {
+                let self = this;
+                console.log(stores);
+
+                self.headers = [{
+                        headerName: 'Product Name',
+                        field: 'productName'
+                    }, {
+                        headerName: 'progressRenderer',
+                        cellRendererFramework: "progressRenderer"
+                    },{
+                            headerName: "totalProductSales",
+                            field: "totalProductSales",
+
+                        }, {
+                            headerName: "cumulativProductSales",
+                            field: "cumulativProductSales",
+
+                        }
+                    //  {
+                    //     headerName: 'Total Contribution',
+                    //     field: 'totalContribution'
+                    // }, 
+                ]
+                self.stores.forEach(store => {
+                    self.headers.push({
+                        headerName: store.storeName,
+                        children: [{
+                            headerName: "In Store",
+                            field: store.storeName,
+                            cellStyle: function (params) {
+                                if (params.data[store.storeName]) {
+                                    return {
+                                        backgroundColor: "#5ef35e86"
+                                    };
+                                } else {
+                                    return {
+                                        backgroundColor: "#ff9e9e91"
+                                    };
+                                }
+                            },
+                        }, ]
+                    })
+                })
+
+            }
         },
     }
 </script>
