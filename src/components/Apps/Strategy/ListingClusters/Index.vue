@@ -11,20 +11,31 @@
                 <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 300px" placeholder="Select Planogram"
                     @change="onPlanogramChange" dense :items="planograms" v-model="selectedPlanogram" hide-details>
                 </v-autocomplete>
+                <v-menu dark offset-y style="margin-bottom: 10px;">
+                    <v-btn slot="activator" flat>
+                        View
+                    </v-btn>
+                    <v-list>
+                        <v-list-tile @click="changeView(1)">
+                            <v-list-tile-title>Store</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="changeView(0)">
+                            <v-list-tile-title>Product</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
             </v-toolbar-items>
         </v-toolbar>
-
-        <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 175px);"
-            :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
-            :sideBar='true' :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true"
-            :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true" :enableColResize="true"
-            :floatingFilter="true" :groupMultiAutoColumn="true" :onGridReady="onGridReady">
-        </ag-grid-vue>
+        <ProductGrid v-if="selectedView==0" ref="ProductGrid" :rowData="rowData" />
+        <storeGrid v-if="selectedView==1" ref="storeGrid" :rowData="rowData" />
         <DateRangeSelector ref="DateRangeSelector" />
     </div>
 </template>
 <script>
     import Axios from "axios"
+
+    import storeGrid from "./storeGrid"
+    import ProductGrid from "./ProductGrid"
 
     import DateRangeSelector from '@/components/Common/DateRangeSelector';
     import ListingClusterController from './controller.js';
@@ -34,11 +45,14 @@
     } from "ag-grid-vue";
     export default {
         components: {
+            ProductGrid,
+            storeGrid,
             AgGridVue,
             DateRangeSelector
         },
         data() {
             return {
+                selectedView: 1,
                 rowData: [],
                 planograms: [],
                 selectedPlanogram: null,
@@ -67,10 +81,10 @@
             this.getPlanograms()
         },
         methods: {
-            onGridReady(params) {
-                this.gridApi = params.api;
-                this.columnApi = params.columnApi;
-                this.gridApi.sizeColumnsToFit()
+            changeView(type) {
+                let self = this
+                self.selectedView=type
+                // todo : handle data set change
             },
             onPlanogramChange() {
                 let self = this
@@ -94,20 +108,13 @@
 
                             self.rowData = lcData.totalStoreProductSales;
 
-                            setTimeout(() => {
-                                self.autoSizeAll();
-                            }, 200);
+                            // setTimeout(() => {
+                            //     self.autoSizeAll();
+                            // }, 200);
                         })
                 })
             },
-            autoSizeAll() {
-                let self = this;
-                var allColumnIds = [];
-                self.columnApi.getAllColumns().forEach(function (column) {
-                    allColumnIds.push(column.colId);
-                });
-                self.columnApi.autoSizeColumns(allColumnIds);
-            },
+
             setHeaderDefaults() {
                 let self = this;
 
