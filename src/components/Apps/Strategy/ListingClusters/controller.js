@@ -70,11 +70,32 @@ function getProductsWeighted(storeSalesData) {
 
 function getTotalStoreProductSales(stores, products, storeSalesData, levels) {
     let tmpStoreData = [];
+    let currentCumulative = 0;
+
+    var totalCategorySales = storeSalesData.reduce((a, b) => {
+        return {
+            sales_Retail: a.sales_Retail + b.sales_Retail
+        }
+    }).sales_Retail;
 
     products.forEach(product => {
+        var productSales = storeSalesData.filter(sd => {
+            return sd.product_ID == product.product_ID;
+        });
+
+        var totalProductSales = productSales.reduce((a, b) => {
+            return {
+                sales_Retail: a.sales_Retail + b.sales_Retail
+            }
+        }).sales_Retail;
+
+        var cumulativProductSales = currentCumulative + ((totalProductSales / totalCategorySales) * 100);
+
         let tmpObj = {
             product_ID: product.product_ID,
-            productName: product.productName
+            productName: product.productName,
+            totalProductSales: totalProductSales,
+            cumulativProductSales: cumulativProductSales.toFixed(2) + "%"
         }
 
         stores.forEach(store => {
@@ -101,6 +122,8 @@ function getTotalStoreProductSales(stores, products, storeSalesData, levels) {
 
         tmpStoreData.push(tmpObj);
     });
+
+    console.log(tmpStoreData);
 
     let response = accumulateCodes(tmpStoreData, stores);
     response = addRank(response);
@@ -152,12 +175,8 @@ function GenerateCluster(tmpStoreData, levels) {
     let letterIndex = 0;
     let lastCode = "";
 
-    console.log(tmpStoreData)
-
     tmpStoreData.forEach(tmpStoreItem => {
         let percentageOfStoreCode = ((parseInt(levels) / 10) * tmpStoreItem.storeCode.length).toFixed(0);
-        console.log(percentageOfStoreCode)
-        // itemLevels = percentageOfStoreCode;
 
         let currentCode = tmpStoreItem.storeCode.substr(0, percentageOfStoreCode);
 
