@@ -34,6 +34,7 @@
         <ProductGrid v-if="selectedView==0" ref="ProductGrid" :rowData="rowData" />
         <storeGrid v-if="selectedView==1" ref="storeGrid" :rowData="rowData" />
         <DateRangeSelector ref="DateRangeSelector" />
+        <Spinner ref="Spinner" />
     </div>
 </template>
 <script>
@@ -41,6 +42,7 @@
 
     import storeGrid from "./storeGrid"
     import ProductGrid from "./ProductGrid"
+    import Spinner from '@/components/Common/Spinner';
 
     import DateRangeSelector from '@/components/Common/DateRangeSelector';
     import ListingClusterController from './controller.js';
@@ -50,6 +52,7 @@
     } from "ag-grid-vue";
     export default {
         components: {
+            Spinner,
             ProductGrid,
             storeGrid,
             AgGridVue,
@@ -137,6 +140,7 @@
                 let self = this;
 
                 if (self.selectedPlanogram != null) {
+                    self.$refs.Spinner.show()
                     self.$nextTick(() => {
 
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -156,7 +160,7 @@
                                 // self.setStoreHeaders(lcData.storeSales);
 
                                 self.rowData = lcData.totalStoreProductSales;
-
+                                self.$refs.Spinner.hide()
                                 // setTimeout(() => {
                                 //     self.autoSizeAll();
                                 // }, 200);
