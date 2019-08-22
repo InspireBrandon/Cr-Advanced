@@ -16,11 +16,14 @@ class StageWarehouseMiddleware {
         planogramData.splice(idx, 1);
       } else {
         if (currentPlanogramItem.Type.toUpperCase() == "PRODUCT") {
+
           let productData = currentPlanogramItem.Data.Data; // actual product data
           let itemExists = false;
           // Check through warehouse to see if find the correct product
           warehouseProducts.forEach(warehouseProduct => {
+
             if (warehouseProduct.productID == productData.productID) {
+              currentPlanogramItem.Data.Data = warehouseProduct;
               // verify that product exists
               itemExists = true;
               productData.store_Range_Indicator = warehouseProduct.store_Range_Indicator;

@@ -40,6 +40,7 @@
     {
         "headerName": "Description",
         "field": "description",
+        "filter": "agTextColumnFilter",
         "filterParams": {
             "newRowsAction": "keep"
         }

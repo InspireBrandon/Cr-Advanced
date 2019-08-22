@@ -27,7 +27,7 @@ class ListingClusterController {
 
         const totalStoreProductSales = getTotalStoreProductSales(stores, products, storeSalesData);
 
-        // return { totalStoreProductSales, storeSales };
+        return { totalStoreProductSales };
     }
 }
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,10 +56,10 @@ function getProductsWeighted(storeSalesData) {
     });
 
     return uniqueProducts.sort((a, b) => {
-        if (a.totalSales > b.totalSales) {
+        if (a.totalSales < b.totalSales) {
             return -1;
         }
-        if (a.totalSales < b.totalSales) {
+        if (a.totalSales > b.totalSales) {
             return 1;
         }
         return 0;
@@ -67,11 +67,105 @@ function getProductsWeighted(storeSalesData) {
 }
 
 function getTotalStoreProductSales(stores, products, storeSalesData) {
+    let tmpStoreData = [];
+
     products.forEach(product => {
+        let tmpObj = {
+            product_ID: product.product_ID,
+            productName: product.productName
+        }
+
         stores.forEach(store => {
-            
-        })
+            var storeProductSale = storeSalesData.filter(sd => {
+                return sd.product_ID == product.product_ID && sd.store_ID == store.store_ID;
+            });
+
+            let tmpCode = "";
+
+            if(storeProductSale.length > 0) {
+                let storeProductSaleItem = storeProductSale[0];
+
+                if(storeProductSaleItem.sales_Retail > 0) {
+                    tmpCode = "1";
+                } else {
+                    tmpCode = "0";
+                }
+            } else {
+                tmpCode = "0";
+            }
+
+            tmpObj[store.store_ID] = tmpCode;
+        });
+
+        tmpStoreData.push(tmpObj);
     });
+
+    let response = accumulateCodes(tmpStoreData, stores);
+    response = addRank(response);
+    response = GenerateCluster(response, 3);
+
+    return response;
+}
+
+function accumulateCodes(tmpStoreData, stores) {
+    let storeClusterCodes = []
+
+    stores.forEach(store => {
+        let storeCodeData = {
+            storeCode: "",
+            store_ID: store.store_ID,
+            storeName: store.storeName,
+            currentRank: -1,
+            threeLevelCluster: ""
+        }
+
+        tmpStoreData.forEach(tmpStoreItem => {
+            storeCodeData.storeCode += tmpStoreItem[store.store_ID];
+        });
+
+        storeClusterCodes.push(storeCodeData);
+    })
+
+    return storeClusterCodes.sort((a, b) => {
+        if (a.storeCode > b.storeCode) {
+            return -1;
+        }
+        if (a.storeCode < b.storeCode) {
+            return 1;
+        }
+        return 0;
+    })
+}
+
+function addRank(tmpStoreData) {
+    tmpStoreData.forEach((el, idx) => {
+        el.currentRank = idx + 1;
+    })
+
+    return tmpStoreData;
+}
+
+function GenerateCluster(tmpStoreData, levels) {
+    const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+    let letterIndex = 0;
+    let lastCode = "";
+
+    tmpStoreData.forEach(tmpStoreItem => {
+        let currentCode = tmpStoreItem.storeCode.substr(0, levels);
+
+        if(lastCode == "" || currentCode == lastCode) {
+            tmpStoreItem.threeLevelCluster = letters[letterIndex];
+        }
+        else 
+        {
+            letterIndex++;
+            tmpStoreItem.threeLevelCluster = letters[letterIndex];
+        }
+
+        lastCode = currentCode;
+    })
+
+    return tmpStoreData;
 }
 
 function removeDuplicates(myArr, prop) {

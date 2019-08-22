@@ -409,7 +409,8 @@
         },
         {
           headerName: 'Active Shop Code',
-          field: 'active_Shop_Code'
+          field: 'active_Shop_Code',
+          editable: true
         },
         {
           headerName: 'Barcode',
