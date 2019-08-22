@@ -81,7 +81,15 @@
                     }, {
                         headerName: 'progressRenderer',
                         cellRendererFramework: "progressRenderer"
-                    }
+                    },{
+                            headerName: "totalProductSales",
+                            field: "totalProductSales",
+
+                        }, {
+                            headerName: "cumulativProductSales",
+                            field: "cumulativProductSales",
+
+                        }
                     //  {
                     //     headerName: 'Total Contribution',
                     //     field: 'totalContribution'
@@ -90,22 +98,21 @@
                 self.stores.forEach(store => {
                     self.headers.push({
                         headerName: store.storeName,
-                        field: store.storeName,
-                        // children: [{
-                        //     headerName: "In Store",
-                        //     field: store.storeName + '_inStore',
-                        //     cellStyle: function (params) {
-                        //         if (params.data[store.storeName + '_inStore']) {
-                        //             return {
-                        //                 backgroundColor: "#5ef35e86"
-                        //             };
-                        //         } else {
-                        //             return {
-                        //                 backgroundColor: "#ff9e9e91"
-                        //             };
-                        //         }
-                        //     },
-                        // }]
+                        children: [{
+                            headerName: "In Store",
+                            field: store.storeName,
+                            cellStyle: function (params) {
+                                if (params.data[store.storeName]) {
+                                    return {
+                                        backgroundColor: "#5ef35e86"
+                                    };
+                                } else {
+                                    return {
+                                        backgroundColor: "#ff9e9e91"
+                                    };
+                                }
+                            },
+                        }, ]
                     })
                 })
 
