@@ -31,8 +31,8 @@
                     v-model="selectedPercentage" hide-details></v-select>
             </v-toolbar-items>
         </v-toolbar>
-        <ProductGrid v-if="selectedView==0" ref="ProductGrid" :rowData="rowData" />
-        <storeGrid v-if="selectedView==1" ref="storeGrid" :rowData="rowData" />
+        <ProductGrid v-if="selectedView==0" ref="ProductGrid" :rowData="productRowData" :stores="stores" />
+        <storeGrid v-if="selectedView==1" ref="storeGrid" :rowData="storeRowData" />
         <DateRangeSelector ref="DateRangeSelector" />
     </div>
 </template>
@@ -58,7 +58,9 @@
         data() {
             return {
                 selectedView: 1,
-                rowData: [],
+                storeRowData: [],
+                productRowData: [],
+                stores: [],
                 planograms: [],
                 selectedPlanogram: null,
                 headers: [],
@@ -155,7 +157,9 @@
                                 self.setHeaderDefaults();
                                 // self.setStoreHeaders(lcData.storeSales);
 
-                                self.rowData = lcData.totalStoreProductSales;
+                                self.storeRowData = lcData.totalStoreProductSales;
+                                self.productRowData = lcData.productData;
+                                self.stores = lcData.stores;
 
                                 // setTimeout(() => {
                                 //     self.autoSizeAll();
