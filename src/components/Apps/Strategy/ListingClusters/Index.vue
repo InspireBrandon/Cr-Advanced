@@ -1,21 +1,6 @@
 <template>
     <div>
         <v-toolbar dark flat dense color="grey darken-3">
-            <v-toolbar-items>
-                <v-menu dark offset-y style="margin-bottom: 10px;">
-                    <v-btn slot="activator" flat>
-                        View
-                    </v-btn>
-                    <v-list>
-                        <v-list-tile @click="changeView(1)">
-                            <v-list-tile-title>Store</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="changeView(0)">
-                            <v-list-tile-title>Product</v-list-tile-title>
-                        </v-list-tile>
-                    </v-list>
-                </v-menu>
-            </v-toolbar-items>
             <v-spacer></v-spacer>
             <v-toolbar-title>
                 Listing Clusters
@@ -30,6 +15,12 @@
                     placeholder="Item Percentage" @change="onPlanogramChange" dense :items="percentages"
                     v-model="selectedPercentage" hide-details></v-select>
             </v-toolbar-items>
+            <v-btn v-if="selectedView!=1" @click="changeView(1)" color="primary">
+                Store
+            </v-btn>
+            <v-btn v-if="selectedView!=0" @click="changeView(0)" color="primary">
+                Product
+            </v-btn>
         </v-toolbar>
         <ProductGrid v-if="selectedView==0" ref="ProductGrid" :rowData="productRowData" :stores="stores" />
         <storeGrid v-if="selectedView==1" ref="storeGrid" :rowData="storeRowData" />
@@ -164,7 +155,7 @@
                                 self.storeRowData = lcData.totalStoreProductSales;
                                 self.productRowData = lcData.productData;
                                 console.log(self.productRowData);
-                                
+
                                 self.stores = lcData.stores;
                                 self.$refs.Spinner.hide()
                                 // setTimeout(() => {
