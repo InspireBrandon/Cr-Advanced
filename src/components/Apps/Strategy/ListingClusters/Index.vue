@@ -135,8 +135,7 @@
         methods: {
             changeView(type) {
                 let self = this
-                self.selectedView = type
-                // todo : handle data set change
+                self.selectedView = type;
             },
             onPlanogramChange() {
                 let self = this;
@@ -159,64 +158,16 @@
                                 });
 
                                 self.setHeaderDefaults();
-                                // self.setStoreHeaders(lcData.storeSales);
 
                                 self.storeRowData = lcData.totalStoreProductSales;
                                 self.productRowData = lcData.productData;
-                                console.log(self.productRowData);
                                 
                                 self.stores = lcData.stores;
                                 self.$refs.Spinner.hide()
-                                // setTimeout(() => {
-                                //     self.autoSizeAll();
-                                // }, 200);
                             })
                     })
                 }
             },
-
-            setHeaderDefaults() {
-                let self = this;
-
-                self.headers = [{
-                    headerName: 'Store Name',
-                    field: 'storeName'
-                }, {
-                    headerName: 'Current Rank',
-                    field: 'currentRank'
-                }, {
-                    headerName: 'Current Formula',
-                    field: 'storeCode'
-                }, {
-                    headerName: '3 Level Cluster',
-                    field: 'threeLevelCluster'
-                }]
-            },
-            // setStoreHeaders(storeSales) {
-            //     let self = this;
-
-            //     storeSales.forEach(store => {
-            //         self.headers.push({
-            //             headerName: store.storeName,
-            //             field: store.storeName,
-            //             children: [{
-            //                 headerName: "In Store",
-            //                 field: store.storeName + '_inStore',
-            //                 cellStyle: function (params) {
-            //                     if (params.data[store.storeName + '_inStore']) {
-            //                         return {
-            //                             backgroundColor: "#5ef35e86"
-            //                         };
-            //                     } else {
-            //                         return {
-            //                             backgroundColor: "#ff9e9e91"
-            //                         };
-            //                     }
-            //                 },
-            //             }]
-            //         })
-            //     });
-            // },
             getPlanograms() {
                 let self = this
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;

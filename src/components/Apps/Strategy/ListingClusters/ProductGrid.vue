@@ -39,19 +39,7 @@
                 defaultColDef: {
 
                 },
-                headers: [{
-                    headerName: 'Current Rank',
-                    field: 'currentRank'
-                }, {
-                    headerName: 'Current Formula',
-                    field: 'storeCode'
-                }, {
-                    headerName: '3 Level Cluster',
-                    field: 'threeLevelCluster'
-                }, {
-                    headerName: 'progressRenderer',
-                    cellRendererFramework: "progressRenderer"
-                }]
+                headers: []
             }
         },
         mounted() {
@@ -59,42 +47,35 @@
         },
         methods: {
             autoSizeAll() {
-                // let self = this;
-                // var allColumnIds = [];
-                // self.columnApi.getAllColumns().forEach(function (column) {
-                //     allColumnIds.push(column.colId);
-                // });
-                // self.columnApi.autoSizeColumns(allColumnIds);
+                let self = this;
+                var allColumnIds = [];
+                self.columnApi.getAllColumns().forEach(function (column) {
+                    allColumnIds.push(column.colId);
+                });
+                self.columnApi.autoSizeColumns(allColumnIds);
             },
             onGridReady(params) {
                 this.gridApi = params.api;
                 this.columnApi = params.columnApi;
-                // this.gridApi.sizeColumnsToFit()
             },
             setHeaders(stores) {
                 let self = this;
-                console.log(stores);
 
                 self.headers = [{
-                        headerName: 'Product Name',
-                        field: 'productName'
-                    }, {
-                        headerName: 'progressRenderer',
-                        cellRendererFramework: "progressRenderer"
-                    },{
-                            headerName: "totalProductSales",
-                            field: "totalProductSales",
+                    headerName: 'Product Name',
+                    field: 'productName'
+                }, {
+                    headerName: 'Cumulative Sales',
+                    cellRendererFramework: "progressRenderer"
+                }, {
+                    headerName: "Sales",
+                    field: "totalProductSales",
 
-                        }, {
-                            headerName: "cumulativProductSales",
-                            field: "cumulativProductSales",
+                }, {
+                    headerName: "Cumulative Sales",
+                    field: "cumulativProductSales",
 
-                        }
-                    //  {
-                    //     headerName: 'Total Contribution',
-                    //     field: 'totalContribution'
-                    // }, 
-                ]
+                }]
                 self.stores.forEach(store => {
                     self.headers.push({
                         headerName: store.storeName,
@@ -116,6 +97,7 @@
                     })
                 })
 
+                self.autoSizeAll();
             }
         },
     }
