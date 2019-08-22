@@ -54,27 +54,61 @@
                 }]
             }
         },
+        mounted() {
+            this.setHeaders(this.stores)
+        },
         methods: {
             autoSizeAll() {
-                let self = this;
-                var allColumnIds = [];
-                self.columnApi.getAllColumns().forEach(function (column) {
-                    allColumnIds.push(column.colId);
-                });
-                self.columnApi.autoSizeColumns(allColumnIds);
+                // let self = this;
+                // var allColumnIds = [];
+                // self.columnApi.getAllColumns().forEach(function (column) {
+                //     allColumnIds.push(column.colId);
+                // });
+                // self.columnApi.autoSizeColumns(allColumnIds);
             },
             onGridReady(params) {
                 this.gridApi = params.api;
                 this.columnApi = params.columnApi;
-                this.gridApi.sizeColumnsToFit()
+                // this.gridApi.sizeColumnsToFit()
             },
             setHeaders(stores) {
                 let self = this;
+                console.log(stores);
 
                 self.headers = [{
-                    headerName: 'Product Name',
-                    field: 'productName'
-                }, ]
+                        headerName: 'Product Name',
+                        field: 'productName'
+                    }, {
+                        headerName: 'progressRenderer',
+                        cellRendererFramework: "progressRenderer"
+                    }
+                    //  {
+                    //     headerName: 'Total Contribution',
+                    //     field: 'totalContribution'
+                    // }, 
+                ]
+                self.stores.forEach(store => {
+                    self.headers.push({
+                        headerName: store.storeName,
+                        field: store.storeName,
+                        // children: [{
+                        //     headerName: "In Store",
+                        //     field: store.storeName + '_inStore',
+                        //     cellStyle: function (params) {
+                        //         if (params.data[store.storeName + '_inStore']) {
+                        //             return {
+                        //                 backgroundColor: "#5ef35e86"
+                        //             };
+                        //         } else {
+                        //             return {
+                        //                 backgroundColor: "#ff9e9e91"
+                        //             };
+                        //         }
+                        //     },
+                        // }]
+                    })
+                })
+
             }
         },
     }
