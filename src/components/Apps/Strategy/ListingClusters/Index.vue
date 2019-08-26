@@ -1,37 +1,34 @@
 <template>
-    <div>
+    <v-card>
         <v-toolbar dark flat dense color="grey darken-3">
-            <v-btn-toggle v-model="selectedView" class="transparent" mandatory>
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn  @click="changeView(0)" color="pink">
-                            Product
-                        </v-btn>
-                    </template>
-                    <span>Data-Prep</span>
-                </v-tooltip>
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn  @click="changeView(1)" color="pink">
-                            Store
-                        </v-btn>
-                    </template>
-                    <span>Ranging</span>
-                </v-tooltip>
+            <v-btn-toggle round v-model="selectedView" class="transparent" mandatory>
+                <v-btn class="elevation-0" style="width: 100px" round @click="changeView(0)" color="primary">
+                    Store
+                </v-btn>
+                <v-btn class="elevation-0" style="width: 100px" round @click="changeView(1)" color="primary">
+                    Product
+                </v-btn>
             </v-btn-toggle>
             <v-spacer></v-spacer>
             <v-toolbar-title>
-                Listing Clusters
+                Listing Cluster
             </v-toolbar-title>
         </v-toolbar>
         <v-toolbar dark flat>
             <v-toolbar-items>
-                <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 300px" placeholder="Select Planogram"
+                <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 350px" placeholder="Select Planogram"
                     @change="onPlanogramChange" dense :items="planograms" v-model="selectedPlanogram" hide-details>
                 </v-autocomplete>
-                <v-select label="Category Percent" style="margin-left: 10px; margin-top: 8px; width: 150px"
-                    placeholder="Item Percentage" @change="onPlanogramChange" dense :items="percentages"
-                    v-model="selectedPercentage" hide-details></v-select>
+                <v-select label="Primary Cluster" style="margin-left: 10px; margin-top: 8px; width: 150px"
+                    placeholder="Item Percentage" @change="onPercentChange" dense :items="primaryClusters"
+                    v-model="primaryCluster" hide-details></v-select>
+                <v-select label="Secondary Cluster" style="margin-left: 10px; margin-top: 8px; width: 150px"
+                    placeholder="Item Percentage" dense :items="secondaryClusters" v-model="secondaryCluster"
+                    hide-details>
+                </v-select>
+                <v-select label="Cluster Levels" style="margin-left: 10px; margin-top: 8px; width: 150px" dense
+                    :items="levels" v-model="level" hide-details>
+                </v-select>
             </v-toolbar-items>
             <v-spacer></v-spacer>
             <v-btn v-if="selectedView!=1" @click="handleResize(0)" color="primary">
@@ -41,11 +38,12 @@
                 auto Size
             </v-btn>
         </v-toolbar>
-        <ProductGrid v-if="selectedView==0" ref="ProductGrid" :rowData="productRowData" :stores="stores" />
-        <storeGrid v-if="selectedView==1" ref="storeGrid" :rowData="storeRowData" />
+        <storeGrid v-if="selectedView==0  && storeRowData.length > 0" ref="storeGrid" :rowData="storeRowData" />
+        <ProductGrid v-if="selectedView==1 && productRowData.length > 0" ref="ProductGrid" :rowData="productRowData"
+            :stores="stores" />
         <DateRangeSelector ref="DateRangeSelector" />
         <Spinner ref="Spinner" />
-    </div>
+    </v-card>
 </template>
 <script>
     import Axios from "axios"
@@ -70,7 +68,7 @@
         },
         data() {
             return {
-                selectedView: 1,
+                selectedView: 0,
                 storeRowData: [],
                 productRowData: [],
                 stores: [],
@@ -95,7 +93,8 @@
                 defaultColDef: {
 
                 },
-                percentages: [{
+                primaryCluster: 2,
+                primaryClusters: [{
                         text: "10%",
                         value: 1
                     },
@@ -114,20 +113,17 @@
                     {
                         text: "50%",
                         value: 5
-                    },
-                    {
+                    }, {
                         text: "60%",
                         value: 6
                     },
                     {
                         text: "70%",
                         value: 7
-                    },
-                    {
+                    }, {
                         text: "80%",
                         value: 8
-                    },
-                    {
+                    }, {
                         text: "90%",
                         value: 9
                     },
@@ -136,7 +132,10 @@
                         value: 10
                     },
                 ],
-                selectedPercentage: 2
+                secondaryCluster: 2,
+                level: 3,
+                levels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                salesData: null
             }
         },
         created() {
@@ -145,7 +144,7 @@
         methods: {
             handleResize(type) {
                 let self = this
-                if (type == 0) {
+                if (type == 1) {
                     self.$refs.ProductGrid.autoSize()
                 } else {
                     self.$refs.storeGrid.autoSize()
@@ -170,19 +169,32 @@
                             .then(r => {
                                 delete Axios.defaults.headers.common["TenantID"];
 
-                                let lcData = ListingClusterController.GenerateClusterOutput({
-                                    storeSalesData: r.data,
-                                    levels: self.selectedPercentage
-                                });
+                                self.salesData = r.data;
 
-                                self.storeRowData = lcData.totalStoreProductSales;
-                                self.productRowData = lcData.productData;
-                                self.stores = lcData.stores;
+                                self.onPercentChange();
 
                                 self.$refs.Spinner.hide()
                             })
                     })
                 }
+            },
+            onPercentChange() {
+                let self = this;
+
+                self.$nextTick(() => {
+                    let lcData = ListingClusterController.GenerateClusterOutput({
+                        storeSalesData: self.salesData,
+                        primaryCluster: self.primaryCluster,
+                        secondaryCluster: self.secondaryCluster,
+                        clusterLevels: self.level
+                    });
+
+                    self.storeRowData = lcData.storeData;
+                    self.stores = lcData.stores;
+
+                    self.productRowData = [];
+                    self.productRowData = lcData.productData;
+                })
             },
             getPlanograms() {
                 let self = this
@@ -190,7 +202,6 @@
 
                 Axios.get(process.env.VUE_APP_API + `Planogram/Distinct`)
                     .then(r => {
-                        console.log(r);
                         self.planograms = []
                         r.data.planogramList.forEach(e => {
                             self.planograms.push({
@@ -200,6 +211,24 @@
                         })
                         delete Axios.defaults.headers.common["TenantID"];
                     })
+            }
+        },
+        computed: {
+            secondaryClusters() {
+                let self = this;
+                
+                let addAmount = 10 - self.primaryCluster;
+
+                let tmp = [];
+
+                for(var i = 0; i < addAmount; i++) {
+                    tmp.push(                    {
+                        text: (i + 1) + "0%",
+                        value: (i + 1)
+                    })
+                }
+
+                return tmp;
             }
         }
     }

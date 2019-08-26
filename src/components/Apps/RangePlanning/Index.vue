@@ -29,7 +29,7 @@
             </v-list-tile>
           </v-list>
         </v-menu>
-        <v-menu dark offset-y style="margin-bottom: 10px;">
+        <v-menu v-if="rowData.length > 0" dark offset-y style="margin-bottom: 10px;">
           <v-btn slot="activator" flat>
             Options
           </v-btn>
@@ -42,7 +42,7 @@
             </v-list-tile> -->
           </v-list>
         </v-menu>
-        <v-menu dark offset-y style="margin-bottom: 10px;">
+        <v-menu v-if="rowData.length > 0" dark offset-y style="margin-bottom: 10px;">
           <v-btn slot="activator" flat>
             Database
           </v-btn>
@@ -61,7 +61,7 @@
             </v-list-tile>
           </v-list>
         </v-menu>
-        <v-menu v-if="selectedClusterOption != null" dark offset-y style="margin-bottom: 10px;">
+        <v-menu v-if="rowData.length > 0" dark offset-y style="margin-bottom: 10px;">
           <v-btn slot="activator" flat>
             View
           </v-btn>
@@ -100,7 +100,7 @@
 
       <v-spacer></v-spacer>
 
-      <div v-if="generateFileName() != ''">
+      <div v-if="rowData.length > 0">
         <span>{{ generateFileName() + fileData.tag + " (" + fileData.dateFromString + " TO " + fileData.dateToString + ")" }}</span>
       </div>
 
@@ -133,7 +133,7 @@
 
           </v-toolbar-items>
           <v-spacer></v-spacer>
-          <div v-show="storesInCluster > -1">
+          <div v-if="rowData.length > 0">
             <h4>Active Items Selected</h4>
             <div>Sales: R{{ (ais_Sales < 0 ? (ais_Sales * -1) : ais_Sales) }}</div>
             <div>Sales Potential: R{{ (ais_SalesPotential < 0 ? (ais_SalesPotential * -1) : ais_SalesPotential) }}</div>
@@ -155,7 +155,7 @@
             </v-list>
           </v-menu>
           <v-menu offset-y>
-            <v-btn :disabled="selectedItems.length == 0" slot="activator" color="primary" small dark>Set Indicator
+            <v-btn v-if="selectedItems.length > 0" :disabled="selectedItems.length == 0" slot="activator" color="primary" small dark>Set Indicator
             </v-btn>
             <v-list dark>
               <v-list-tile @click="setIndicator('YES')">
@@ -522,8 +522,10 @@
           },
           callback => {
             callback.forEach(el => {
+              console.log(el);
+
               self.rowData.forEach(rowitem => {
-                if (el.id == rowitem.id) {
+                if (el.productID == rowitem.productID) {
 
                   self.rangingController.setClusterIndicator(self.selectedClusterType, self
                     .selectedClusterOption, rowitem.productID,

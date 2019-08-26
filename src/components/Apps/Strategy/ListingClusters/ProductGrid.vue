@@ -69,7 +69,7 @@
             setHeaders(stores) {
                 let self = this;
 
-                self.headers = [{
+                let tmp = [{
                     headerName: 'Product Name',
                     field: 'productName'
                 }, {
@@ -84,8 +84,9 @@
                     field: "cumulativProductSales",
 
                 }]
+
                 self.stores.forEach(store => {
-                    self.headers.push({
+                    tmp.push({
                         headerName: store.storeName,
                         children: [{
                             headerName: "In Store",
@@ -105,7 +106,7 @@
                     })
                 })
 
-                self.autoSizeAll();
+                self.headers = tmp;
             }
         },
     }

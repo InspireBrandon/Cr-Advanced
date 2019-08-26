@@ -13,25 +13,32 @@ class ListingClusterController {
         // PARAMS VARIABLES
         // ////////////////////////////////////////////////////////////////////////////////////////////////////
         let storeSalesData = params.storeSalesData; // all store sales data for category over 12 months
-        let levels = params.levels; // value used to determine the x percentage of sales
+
+        let clusterData = {
+            primaryCluster: params.primaryCluster, // value used to determine the first level of the cluster
+            secondaryCluster: params.secondaryCluster, // value used to determine the second level of the cluster
+            clusterLevels: params.clusterLevels // value used to determine amount of primary clusters
+        }
 
         // ////////////////////////////////////////////////////////////////////////////////////////////////////
         // CALCULATED VARIABLES
         // ////////////////////////////////////////////////////////////////////////////////////////////////////
-        const stores = removeDuplicates(storeSalesData.map(item => ({
+        let stores = removeDuplicates(storeSalesData.map(item => ({
             storeName: item.storeName,
             store_ID: item.store_ID
         })), "store_ID"); // get all unique stores
 
-        let storeSales = getStoreSales(stores, storeSalesData);
+        let storeSales = getStoreSales(stores, storeSalesData); // get total store sales
+        let products = getProductsWeighted(storeSalesData); // get all unique products ordered by total weight in category
+        let totalStoreProductSales = getTotalStoreProductSales(storeSales, products, storeSalesData, clusterData);
+        let storeClusterCodes = accumulateCodes(totalStoreProductSales, stores, clusterData);
+        let clusters = generateCluster(storeClusterCodes, clusterData);
 
-        const products = getProductsWeighted(storeSalesData); // get all unique products ordered by total weight in category
-
-        const response = getTotalStoreProductSales(stores, products, storeSalesData, levels);
-        let totalStoreProductSales = response.response;
-        let tmpStoreData = response.tmpStoreData;
-
-        return { totalStoreProductSales: totalStoreProductSales, productData: tmpStoreData, stores: storeSales };
+        return {
+            stores: storeClusterCodes,
+            storeData: clusters,
+            productData: totalStoreProductSales
+        }
     }
 }
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,7 +66,7 @@ function getStoreSales(stores, storeSales) {
 
         tmp.sumSales = sumStoreSales;
 
-        retval.push(tmp); 
+        retval.push(tmp);
     })
 
     return retval.sort((a, b) => {
@@ -106,7 +113,7 @@ function getProductsWeighted(storeSalesData) {
     })
 }
 
-function getTotalStoreProductSales(stores, products, storeSalesData, levels) {
+function getTotalStoreProductSales(stores, products, storeSalesData, clusterData) {
     let tmpStoreData = [];
     let currentCumulative = 0;
 
@@ -145,10 +152,10 @@ function getTotalStoreProductSales(stores, products, storeSalesData, levels) {
             let tmpCode = "";
             let inStore = false;
 
-            if(storeProductSale.length > 0) {
+            if (storeProductSale.length > 0) {
                 let storeProductSaleItem = storeProductSale[0];
 
-                if(storeProductSaleItem.sales_Retail > 0) {
+                if (storeProductSaleItem.sales_Retail > 0) {
                     tmpCode = "1";
                     inStore = true;
                 } else {
@@ -165,25 +172,17 @@ function getTotalStoreProductSales(stores, products, storeSalesData, levels) {
         tmpStoreData.push(tmpObj);
     });
 
-    let response = accumulateCodes(tmpStoreData, stores);
-    response = addRank(response);
-    response = GenerateCluster(response, levels);
-
-    tmpStoreData = tmpStoreData.sort((a, b) => {
-        if (a.totalProductSales > b.totalProductSales) {
-            return -1;
-        }
-        if (a.totalProductSales < b.totalProductSales) {
-            return 1;
-        }
-        return 0;
-    })
-
-    return { response, tmpStoreData };
+    return tmpStoreData;
 }
 
-function accumulateCodes(tmpStoreData, stores) {
+function accumulateCodes(tmpStoreData, stores, clusterData) {
     let storeClusterCodes = []
+
+    let percentageOfCumulative = (clusterData.primaryCluster / 10) * 100;
+
+    let cumulativeStoreData = tmpStoreData.filter(e => {
+        return parseFloat(e.cumulativProductSales) <= percentageOfCumulative
+    })
 
     stores.forEach(store => {
         let storeCodeData = {
@@ -194,7 +193,7 @@ function accumulateCodes(tmpStoreData, stores) {
             cluster: ""
         }
 
-        tmpStoreData.forEach(tmpStoreItem => {
+        cumulativeStoreData.forEach(tmpStoreItem => {
             storeCodeData.storeCode += tmpStoreItem[store.storeName];
         });
 
@@ -220,26 +219,27 @@ function addRank(tmpStoreData) {
     return tmpStoreData;
 }
 
-function GenerateCluster(tmpStoreData, levels) {
+function generateCluster(tmpStoreData, clusterData) {
     const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
     let letterIndex = 0;
     let lastCode = "";
 
+    console.log(tmpStoreData);
+
+    let clusterLevels = clusterData.clusterLevels;
+
     tmpStoreData.forEach(tmpStoreItem => {
-        let percentageOfStoreCode = ((parseInt(levels) / 10) * tmpStoreItem.storeCode.length).toFixed(0);
+        let currentCode = tmpStoreItem.storeCode.substr(0, clusterLevels);
 
-        let currentCode = tmpStoreItem.storeCode.substr(0, percentageOfStoreCode);
-
-        if(lastCode == "" || currentCode == lastCode) {
-            tmpStoreItem.cluster = letters[letterIndex];
-        }
-        else 
+        if(lastCode != "")
         {
-            letterIndex++;
-            tmpStoreItem.cluster = letters[letterIndex];
-        }
+            if(currentCode != lastCode) {
+                letterIndex++;
+            }
+        } 
 
         lastCode = currentCode;
+        tmpStoreItem.cluster = letters[letterIndex];
     })
 
     return tmpStoreData;
