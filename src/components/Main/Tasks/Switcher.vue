@@ -84,8 +84,7 @@
                                 </v-list>
                             </v-menu>
                         </div>
-
-                        <v-btn-toggle v-model="selectedView" @change="onViewChanged" class="transparent" mandatory>
+                        <v-btn-toggle v-if="userAccess!=2" v-model="selectedView" @change="onViewChanged" class="transparent" mandatory>
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
                                     <v-btn v-on="on" :value="0" flat>
@@ -95,7 +94,7 @@
                                 </template>
                                 <span>Tasks</span>
                             </v-tooltip>
-                            <v-tooltip bottom>
+                            <v-tooltip bottom v-if="userAccess==0">
                                 <template v-slot:activator="{ on }">
                                     <v-btn v-show="userAccess != 3" v-on="on" :value="1" flat>
                                         <v-icon>bookmarks</v-icon>

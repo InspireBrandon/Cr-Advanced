@@ -47,7 +47,45 @@
             <v-spacer></v-spacer>
             <v-btn @click="runReport" v-if="rowData.length > 0" color="primary">Run Report</v-btn>
         </v-toolbar>
-        <Grid :rowData="rowData" :basket="selectedBasket" v-if="selectedBasket != null" ref="Grid" />
+        <v-tabs class="elevation-4" centered dark fixed-tabs justify-content: center>
+            <v-tabs-slider color="white"></v-tabs-slider>
+
+            <v-tab justify-content: center fixed-tabs>
+                Filter
+            </v-tab>
+            <v-tab-item>
+                <v-card>
+                    <v-container grid-list-md>
+
+                        <v-layout row wrap>
+                            <v-flex md6>
+                                <v-select v-for="(item, idx) in criteriaItems" :key="idx" :placeholder="item.field"
+                                    :items="item.values" @change="pushNewCriteria(idx)" v-model="item.selectedValue">
+                                </v-select>
+                            </v-flex>
+                            <v-flex md6>
+                                <v-select v-for="(item, idx) in items" :key="idx" :placeholder="item.field"
+                                    :items="item.values" @change="pushNewcriteriaOption(idx)"
+                                    v-model="item.selectedValue">
+                                </v-select>
+                            </v-flex>
+                        </v-layout>
+                    </v-container>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn @click="getData" color="primary">
+                            Apply
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-tab-item>
+            <v-tab justify-content: center fixed-tabs>
+                output
+            </v-tab>
+            <v-tab-item>
+                <Grid :rowData="rowData" :basket="selectedBasket" v-if="selectedBasket != null" ref="Grid" />
+            </v-tab-item>
+        </v-tabs>
         <basketMaint :getBaskets="getbaskets" ref="basketMaint" />
         <ClusterMaint ref="ClusterMaint" />
         <StoreBasketReport ref="StoreBasketReport" />
@@ -64,6 +102,12 @@
     import ClusterMaint from './ClusterMaint/ClusterMaintModal.vue'
     import StoreBasketReport from './StoreBasketReport/StoreBasketReport.vue'
 
+    function Item(values, field, selectedValue) {
+        let self = this;
+        self.values = values;
+        self.field = field;
+        self.selectedValue = selectedValue
+    }
     export default {
         components: {
             basketMaint,
@@ -75,16 +119,115 @@
         },
         data() {
             return {
+                items: [],
+                criteriaObject: [{
+                    "text": "Project Group",
+                    "value": 0
+                }, {
+                    "text": "Planogram",
+                    "value": 1
+                }, {
+                    "text": "Department",
+                    "value": 2,
+                }, {
+                    "text": "Subdepartment",
+                    "value": 3
+                }, {
+                    "text": "Category",
+                    "value": 4
+                }, {
+                    "text": "Subcategory",
+                    "value": 5
+                }, {
+                    "text": "Segment",
+                    "value": 6
+                }, {
+                    "text": "Manufacturer",
+                    "value": 7
+                }, {
+                    "text": "Brand",
+                    "value": 8
+                }, {
+                    "text": "Size Description",
+                    "value": 9
+                }],
+                criteriaItems: [new Item([{
+                    "text": "Project Group",
+                    "value": 0
+                }, {
+                    "text": "Planogram",
+                    "value": 1
+                }, {
+                    "text": "Department",
+                    "value": 2,
+                }, {
+                    "text": "Subdepartment",
+                    "value": 3
+                }, {
+                    "text": "Category",
+                    "value": 4
+                }, {
+                    "text": "Subcategory",
+                    "value": 5
+                }, {
+                    "text": "Segment",
+                    "value": 6
+                }, {
+                    "text": "Manufacturer",
+                    "value": 7
+                }, {
+                    "text": "Brand",
+                    "value": 8
+                }, {
+                    "text": "Size Description",
+                    "value": 9
+                }], "Search Criteria", null)],
                 rowData: [],
                 baskets: [],
-                selectedBasket: null
+                selectedBasket: null,
+                projectGroups: [],
+                selectedProjectGroup: null,
             }
         },
         created() {
+
             let self = this;
             self.getbaskets()
         },
         methods: {
+            pushNewCriteria(idx) {
+                let self = this
+                // todo Getdata
+                self.removeCriteriaOption(idx)
+
+                this.items.push(new Item([1, 2, 3], "Field 2", null));
+
+            },
+            pushNewcriteriaOption() {
+                let self = this
+
+                self.$nextTick(() => {
+                   console.log(this.criteriaItems[this.criteriaItems.length - 1].selectedValue);
+                    
+                    //todo get new criteria opject
+                    let arr = self.criteriaObject.splice(this.items[this.items.length - 1].selectedValue, this
+                        .items.length)
+                    console.log(arr);
+
+                    this.criteriaItems.push(new Item([1, 2, 3], "search Criteria", null));
+                })
+            },
+            removeCriteria(idx) {
+                let self = this
+                self.criteriaItems.splice(idx)
+            },
+            removeCriteriaOption(idx) {
+                let self = this
+                self.items.splice(idx)
+            },
+            getData() {
+                let self = this
+            },
             openClusterSetup() {
                 let self = this
                 self.$refs.ClusterMaint.open()
@@ -95,7 +238,7 @@
 
                 Axios.get(process.env.VUE_APP_API + `Basket`)
                     .then(r => {
-                        self.baskets=[]
+                        self.baskets = []
                         r.data.forEach(e => {
                             self.baskets.push({
                                 text: e.description,
@@ -119,11 +262,15 @@
             },
             onBasketSelect() {
                 let self = this;
+
                 self.getBasketReportData();
             },
             runReport() {
                 let self = this;
                 self.$refs.StoreBasketReport.show(self.selectedBasket.text);
+            },
+            addItem: function () {
+                this.items.push(new Item([1, 2, 3], "Field 1", null));
             }
         }
     }
