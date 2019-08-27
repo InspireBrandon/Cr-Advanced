@@ -32,6 +32,7 @@ class ListingClusterController {
         let products = getProductsWeighted(storeSalesData); // get all unique products ordered by total weight in category
         let totalStoreProductSales = getTotalStoreProductSales(storeSales, products, storeSalesData, clusterData);
         let storeClusterCodes = accumulateCodes(totalStoreProductSales, stores, clusterData);
+        storeClusterCodes = addRank(storeClusterCodes);
         let clusters = generateCluster(storeClusterCodes, clusterData);
 
         return {
@@ -113,7 +114,7 @@ function getProductsWeighted(storeSalesData) {
     })
 }
 
-function getTotalStoreProductSales(stores, products, storeSalesData, clusterData) {
+function getTotalStoreProductSales(stores, products, storeSalesData) {
     let tmpStoreData = [];
     let currentCumulative = 0;
 
@@ -179,14 +180,27 @@ function accumulateCodes(tmpStoreData, stores, clusterData) {
     let storeClusterCodes = []
 
     let percentageOfCumulative = (clusterData.primaryCluster / 10) * 100;
+    let secondLevel = (((clusterData.primaryCluster + (clusterData.secondaryCluster / 2))) / 10) * 100;
+    let lastLevel = (((clusterData.primaryCluster + clusterData.secondaryCluster)) / 10) * 100;
 
     let cumulativeStoreData = tmpStoreData.filter(e => {
         return parseFloat(e.cumulativProductSales) <= percentageOfCumulative
     })
 
+    let secondLevelStoreData = tmpStoreData.filter(e => {
+        return parseFloat(e.cumulativProductSales) >= percentageOfCumulative && parseFloat(e.cumulativProductSales) <= secondLevel;
+    })
+
+    let lastStoreData = tmpStoreData.filter(e => {
+        return parseFloat(e.cumulativProductSales) >= secondLevel && parseFloat(e.cumulativProductSales) <= lastLevel;
+    })
+
     stores.forEach(store => {
         let storeCodeData = {
             storeCode: "",
+            secondaryStoreCode: "",
+            lastStoreCode: "",
+            totalStoreCode: "",
             store_ID: store.store_ID,
             storeName: store.storeName,
             currentRank: -1,
@@ -195,16 +209,27 @@ function accumulateCodes(tmpStoreData, stores, clusterData) {
 
         cumulativeStoreData.forEach(tmpStoreItem => {
             storeCodeData.storeCode += tmpStoreItem[store.storeName];
+            storeCodeData.totalStoreCode += tmpStoreItem[store.storeName];
         });
+
+        secondLevelStoreData.forEach(tmpStoreItem => {
+            storeCodeData.secondaryStoreCode += tmpStoreItem[store.storeName];
+            storeCodeData.totalStoreCode += tmpStoreItem[store.storeName];
+        })
+
+        lastStoreData.forEach(tmpStoreItem => {
+            storeCodeData.lastStoreCode += tmpStoreItem[store.storeName];
+            storeCodeData.totalStoreCode += tmpStoreItem[store.storeName];
+        })
 
         storeClusterCodes.push(storeCodeData);
     })
 
     return storeClusterCodes.sort((a, b) => {
-        if (a.storeCode > b.storeCode) {
+        if (a.totalStoreCode > b.totalStoreCode) {
             return -1;
         }
-        if (a.storeCode < b.storeCode) {
+        if (a.totalStoreCode < b.totalStoreCode) {
             return 1;
         }
         return 0;
@@ -223,23 +248,57 @@ function generateCluster(tmpStoreData, clusterData) {
     const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
     let letterIndex = 0;
     let lastCode = "";
+    let lastNumberCode = "";
+    let number = 1;
 
-    console.log(tmpStoreData);
+    let lastLetterIndex = 0;
+    let lastLastCode = "";
 
     let clusterLevels = clusterData.clusterLevels;
 
     tmpStoreData.forEach(tmpStoreItem => {
         let currentCode = tmpStoreItem.storeCode.substr(0, clusterLevels);
 
-        if(lastCode != "")
-        {
-            if(currentCode != lastCode) {
+        // Give first letter
+        if (lastCode != "") {
+            if (currentCode != lastCode) {
                 letterIndex++;
+                currentNumberCode = "";
+                number = 1;
+                lastLastCode = "";
+                lastLetterIndex = 0;
             }
-        } 
+        }
 
         lastCode = currentCode;
         tmpStoreItem.cluster = letters[letterIndex];
+
+        let currentNumberCode = tmpStoreItem.secondaryStoreCode.substr(0, clusterLevels);
+
+        // Give number
+        if(lastNumberCode != "") {
+            if (currentNumberCode != lastNumberCode) {
+                number++;
+                lastLastCode = "";
+                lastLetterIndex = 0;
+            }
+        }
+
+        lastNumberCode = currentNumberCode;
+        tmpStoreItem.cluster = tmpStoreItem.cluster + number;
+
+        // Last Code
+        let lastCurrentCode = tmpStoreItem.lastStoreCode.substr(0, clusterLevels);
+
+        // Give number
+        if(lastLastCode != "") {
+            if (lastCurrentCode != lastLastCode) {
+                lastLetterIndex++;
+            }
+        }
+
+        lastLastCode = lastCurrentCode;
+        tmpStoreItem.cluster = tmpStoreItem.cluster + letters[lastLetterIndex].toLowerCase();
     })
 
     return tmpStoreData;

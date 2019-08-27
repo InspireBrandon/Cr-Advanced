@@ -101,9 +101,7 @@ import FileStatus from '@/components/Main/FileStatus'
 import Sales_Monthly_Totals from '@/components/Main/Sales_Monthly_Totals/Index.vue'
 import BasketAnalysis from '@/components/Apps/Strategy/BasketAnalysis/Index.vue'
 import ListingClusters from '@/components/Apps/Strategy/ListingClusters/Index.vue'
-
-
-
+import Clustering from '@/components/Apps/Strategy/Clustering/Index.vue'
 
 
 Vue.use(Router)
@@ -143,7 +141,13 @@ export default new Router({
           path: '/ProductListing',
           name: 'ProductListing',
           component: ProductListing
-        },  {
+        },  
+        {
+          path: '/Clustering',
+          name: 'clustering',
+          component: Clustering
+        },
+        {
           path: '/ListingClusters',
           name: 'ListingClusters',
           component: ListingClusters

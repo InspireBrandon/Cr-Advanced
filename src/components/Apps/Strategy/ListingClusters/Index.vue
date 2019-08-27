@@ -22,11 +22,11 @@
                 <v-select label="Primary Cluster" style="margin-left: 10px; margin-top: 8px; width: 150px"
                     placeholder="Item Percentage" @change="onPercentChange" dense :items="primaryClusters"
                     v-model="primaryCluster" hide-details></v-select>
-                <v-select label="Secondary Cluster" style="margin-left: 10px; margin-top: 8px; width: 150px"
-                    placeholder="Item Percentage" dense :items="secondaryClusters" v-model="secondaryCluster"
-                    hide-details>
+                <v-select @change="onPercentChange" v-if="primaryCluster != 10" label="Secondary Cluster"
+                    style="margin-left: 10px; margin-top: 8px; width: 150px" placeholder="Item Percentage" dense
+                    :items="secondaryClusters" v-model="secondaryCluster" hide-details>
                 </v-select>
-                <v-select label="Cluster Levels" style="margin-left: 10px; margin-top: 8px; width: 150px" dense
+                <v-select @change="onPercentChange" label="Cluster Levels" style="margin-left: 10px; margin-top: 8px; width: 150px" dense
                     :items="levels" v-model="level" hide-details>
                 </v-select>
             </v-toolbar-items>
@@ -182,18 +182,20 @@
                 let self = this;
 
                 self.$nextTick(() => {
-                    let lcData = ListingClusterController.GenerateClusterOutput({
-                        storeSalesData: self.salesData,
-                        primaryCluster: self.primaryCluster,
-                        secondaryCluster: self.secondaryCluster,
-                        clusterLevels: self.level
-                    });
+                    if (self.secondaryCluster != null) {
+                        let lcData = ListingClusterController.GenerateClusterOutput({
+                            storeSalesData: self.salesData,
+                            primaryCluster: self.primaryCluster,
+                            secondaryCluster: self.secondaryCluster,
+                            clusterLevels: self.level
+                        });
 
-                    self.storeRowData = lcData.storeData;
-                    self.stores = lcData.stores;
+                        self.storeRowData = lcData.storeData;
+                        self.stores = lcData.stores;
 
-                    self.productRowData = [];
-                    self.productRowData = lcData.productData;
+                        self.productRowData = [];
+                        self.productRowData = lcData.productData;
+                    }
                 })
             },
             getPlanograms() {
@@ -216,13 +218,13 @@
         computed: {
             secondaryClusters() {
                 let self = this;
-                
+
                 let addAmount = 10 - self.primaryCluster;
 
                 let tmp = [];
 
-                for(var i = 0; i < addAmount; i++) {
-                    tmp.push(                    {
+                for (var i = 0; i < addAmount; i++) {
+                    tmp.push({
                         text: (i + 1) + "0%",
                         value: (i + 1)
                     })

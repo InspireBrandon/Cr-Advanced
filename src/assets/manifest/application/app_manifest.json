@@ -1,5 +1,4 @@
-[
-    {
+[{
         "id": 1,
         "system_code": "RANGE-PLANNING"
     },
@@ -14,16 +13,22 @@
     {
         "id": 4,
         "system_code": "DATA-IMPORT"
-    } ,{
+    }, 
+    {
         "id": 5,
         "system_code": "PROJECT-PLANNING"
-    },{
+    }, 
+    {
         "id": 6,
         "system_code": "TASKS"
     },
     {
         "id": 7,
         "system_code": "FLOOR-PLANNING"
+    },
+    {
+        "id": 7,
+        "system_code": "STRATEGY"
     },
     {
         "id": 9,

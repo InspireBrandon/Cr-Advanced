@@ -17,13 +17,14 @@
 
         <v-card-text style="display: block;">
           <v-list class="pa-0" dense hover v-for="(sp, idx) in filteredSpacePlans" :key="idx">
-            <v-divider></v-divider>
-            <v-list-tile :class="{ 'highlighted': selectedSpacePlan == sp  }" avatar @click="selectedSpacePlan = sp">
+            <v-divider v-if="!sp.archived"></v-divider>
+            <v-list-tile :class="{ 'highlighted': selectedSpacePlan == sp  }" avatar @click="selectedSpacePlan = sp" v-if="!sp.archived">
               <v-list-tile-content>
                 <v-list-tile-title v-text="sp.name"></v-list-tile-title>
               </v-list-tile-content>
               <v-list-tile-action>
-                <v-checkbox la label="Can Distribute" @change="setCanDistribute(sp)" v-model="sp.canDistribute" hide-details color="primary"></v-checkbox>
+                <v-checkbox la label="Can Distribute" @change="setCanDistribute(sp)" v-model="sp.canDistribute"
+                  hide-details color="primary"></v-checkbox>
               </v-list-tile-action>
             </v-list-tile>
           </v-list>
@@ -32,6 +33,7 @@
         <v-card-actions>
 
           <v-btn :disabled="selectedSpacePlan == null" color="error" @click="deleteSpacePlanFile">Delete</v-btn>
+          <v-btn :disabled="selectedSpacePlan == null" color="warning" @click="archiveFile">Archive</v-btn>
 
           <v-spacer></v-spacer>
 
@@ -153,11 +155,31 @@
           }
         })
       },
+      archiveFile() {
+        let self = this;
+
+        self.$refs.dialog.openDialog({
+          headline: "Archive file?",
+          text: "Are you sure you want to archive this file?",
+          callback: function () {
+
+            Axios.post(process.env.VUE_APP_API +
+                `SystemFile/Archive?db=CR-Devinspire&fileID=${self.selectedSpacePlan.id}`)
+              .then(r => {
+                if (r.data) {
+                  self.spaceData.splice(self.spaceData.indexOf(self.selectedSpacePlan), 1);
+                  self.selectedSpacePlan = null;
+                }
+              })
+          }
+        })
+      },
       setCanDistribute(sp) {
         let self = this;
 
         self.$nextTick(() => {
-          Axios.post(process.env.VUE_APP_API + `SystemFile/SetDistribute?db=CR-DEVINSPIRE&systemFileID=${sp.id}&canDistribute=${sp.canDistribute}`)
+          Axios.post(process.env.VUE_APP_API +
+              `SystemFile/SetDistribute?db=CR-DEVINSPIRE&systemFileID=${sp.id}&canDistribute=${sp.canDistribute}`)
             .then(r => {
               console.log(r.data);
             })
