@@ -32,21 +32,8 @@
                                             <v-flex md12>
                                                 <span>Store: {{ planogramData.clusterData.storeName }}</span>
                                             </v-flex>
-                                            <v-flex md12>
-                                                <span>Displays: {{ planogramData.dimensionData.displays }}</span>
-                                            </v-flex>
-                                            <v-flex md12>
-                                                <span>Modules: {{ planogramData.dimensionData.modules }}</span>
-                                            </v-flex>
-                                            <v-flex md12>
-                                                <span>Pallettes: {{ planogramData.dimensionData.pallettes }}</span>
-                                            </v-flex>
-                                            <v-flex md12>
-                                                <span>Supplier Stands:
-                                                    {{ planogramData.dimensionData.supplierStands }}</span>
-                                            </v-flex>
-                                            <v-flex md12>
-                                                <span>Bins: {{ planogramData.dimensionData.bins }}</span>
+                                            <v-flex md12 v-for="(item, idx) in fixture_types" :key="idx" v-show="item.modules > 0">
+                                                <span>{{ item.displayName }}: {{ item.modules }}</span>
                                             </v-flex>
                                         </v-flex>
                                         <v-flex md4>
@@ -262,12 +249,14 @@
                 productReport: [],
                 productFixtureReport: [],
                 totalCost: 0,
+                fixture_types: []
             }
         },
         methods: {
-            show(item) {
+            show(item, fixture_types) {
                 let self = this;
 
+                self.fixture_types = fixture_types;
                 self.setPlanogramDetails(item);
 
                 self.dialog = true;

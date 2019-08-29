@@ -59,7 +59,8 @@
                                 v-if="(projectsStatus.status==20||routeStatus==20||routeStatus==21||projectsStatus.status==21)"
                                 outline @click="requestVariation">
                                 Variation</v-btn>
-                            <v-btn outline flat v-if="routeStatus == 24||routeStatus == 26" @click="requestStoreVariation">Request
+                            <v-btn outline flat v-if="routeStatus == 24||routeStatus == 26"
+                                @click="requestStoreVariation">Request
                             </v-btn>
                             <v-btn flat v-if="(projectsStatus.status==24||routeStatus==24)" outline
                                 @click="implement(projectsStatus.status,3,timelineItems[0])" :disabled="Disableapprove">
@@ -174,9 +175,6 @@
     import StorePlanogramOverview from '@/components/Main/PlanogramImplementation/PlanogramOverView/StorePlanogramOverview'
     import SizeLoader from '@/components/Common/SizeLoader'
 
-
-
-
     let _MODULE = "Planogram Implementation";
 
     export default {
@@ -227,11 +225,11 @@
                 tmpRequest: null,
                 userID: -1,
                 selectedProjectName: null,
+                fixture_types: []
             }
         },
         mounted() {
             let self = this;
-
             self.getTypeList()
             self.getStatusList()
             self.initialise();
@@ -261,13 +259,10 @@
             }
         },
         methods: {
-
             openStoreView() {
                 let self = this
                 self.$refs.StorePlanogramOverview.open()
             },
-
-
             ChangeSpacePlan() {
                 let self = this
                 self.$refs.SpacePlanSelector.show(data => {})
@@ -292,7 +287,7 @@
             openReport() {
                 let self = this
                 self.planogramObj.image = self.image
-                self.$refs.PlanogramReportModal.show(self.planogramObj)
+                self.$refs.PlanogramReportModal.show(self.planogramObj, self.fixture_types);
             },
             updateLoader(data) {
                 let self = this
@@ -300,10 +295,27 @@
 
                 self.$refs.SizeLoader.updateLoader(data)
             },
+            getFixtureDetails(spacePlanID) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API +
+                    `Planogram_Details_Simple?SystemFileID=${spacePlanID}`
+                    ).then(
+                    r => {
+                        self.fixture_types = [];
+                        delete Axios.defaults.headers.common["TenantID"];
+                        self.fixture_types = r.data.planogramDetails_fixtures;
+                    })
+            },
             selectPlanogram(planogram) {
                 let self = this;
                 self.showLoader = true
-                self.$refs.SizeLoader.show()
+                self.$refs.SizeLoader.show();
+
+                self.getFixtureDetails(planogram);
+
                 self.$nextTick(() => {
                     let startTime = new Date()
                     let config = {

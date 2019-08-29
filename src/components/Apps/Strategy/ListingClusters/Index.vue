@@ -26,8 +26,13 @@
                     style="margin-left: 10px; margin-top: 8px; width: 150px" placeholder="Item Percentage" dense
                     :items="secondaryClusters" v-model="secondaryCluster" hide-details>
                 </v-select>
-                <v-select @change="onPercentChange" label="Cluster Levels" style="margin-left: 10px; margin-top: 8px; width: 150px" dense
-                    :items="levels" v-model="level" hide-details>
+                <v-select @change="onPercentChange" label="Groups"
+                    style="margin-left: 10px; margin-top: 8px; width: 150px" dense :items="groups" v-model="group"
+                    hide-details>
+                </v-select>
+                <v-select @change="onPercentChange" label="Levels"
+                    style="margin-left: 10px; margin-top: 8px; width: 150px" dense :items="levels" v-model="level"
+                    hide-details>
                 </v-select>
             </v-toolbar-items>
             <v-spacer></v-spacer>
@@ -68,7 +73,7 @@
         },
         data() {
             return {
-                selectedView: 0,
+                selectedView: 1,
                 storeRowData: [],
                 productRowData: [],
                 stores: [],
@@ -93,7 +98,7 @@
                 defaultColDef: {
 
                 },
-                primaryCluster: 2,
+                primaryCluster: 5,
                 primaryClusters: [{
                         text: "10%",
                         value: 1
@@ -113,17 +118,20 @@
                     {
                         text: "50%",
                         value: 5
-                    }, {
+                    },
+                    {
                         text: "60%",
                         value: 6
                     },
                     {
                         text: "70%",
                         value: 7
-                    }, {
+                    },
+                    {
                         text: "80%",
                         value: 8
-                    }, {
+                    },
+                    {
                         text: "90%",
                         value: 9
                     },
@@ -132,9 +140,52 @@
                         value: 10
                     },
                 ],
-                secondaryCluster: 2,
+                secondaryCluster: 3,
+                secondaryClusters: [{
+                        text: "10%",
+                        value: 1
+                    },
+                    {
+                        text: "20%",
+                        value: 2
+                    },
+                    {
+                        text: "30%",
+                        value: 3
+                    },
+                    {
+                        text: "40%",
+                        value: 4
+                    },
+                    {
+                        text: "50%",
+                        value: 5
+                    },
+                    {
+                        text: "60%",
+                        value: 6
+                    },
+                    {
+                        text: "70%",
+                        value: 7
+                    },
+                    {
+                        text: "80%",
+                        value: 8
+                    },
+                    {
+                        text: "90%",
+                        value: 9
+                    },
+                    {
+                        text: "100%",
+                        value: 10
+                    },
+                ],
                 level: 3,
-                levels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                levels: [1, 2, 3, 4, 5],
+                group: 3,
+                groups: [1, 2, 3],
                 salesData: null
             }
         },
@@ -187,7 +238,8 @@
                             storeSalesData: self.salesData,
                             primaryCluster: self.primaryCluster,
                             secondaryCluster: self.secondaryCluster,
-                            clusterLevels: self.level
+                            clusterLevels: self.level,
+                            clusterGroups: self.group
                         });
 
                         self.storeRowData = lcData.storeData;
@@ -213,24 +265,6 @@
                         })
                         delete Axios.defaults.headers.common["TenantID"];
                     })
-            }
-        },
-        computed: {
-            secondaryClusters() {
-                let self = this;
-
-                let addAmount = 10 - self.primaryCluster;
-
-                let tmp = [];
-
-                for (var i = 0; i < addAmount; i++) {
-                    tmp.push({
-                        text: (i + 1) + "0%",
-                        value: (i + 1)
-                    })
-                }
-
-                return tmp;
             }
         }
     }

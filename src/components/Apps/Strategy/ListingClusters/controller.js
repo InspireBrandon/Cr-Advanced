@@ -16,8 +16,9 @@ class ListingClusterController {
 
         let clusterData = {
             primaryCluster: params.primaryCluster, // value used to determine the first level of the cluster
-            secondaryCluster: params.secondaryCluster, // value used to determine the second level of the cluster
-            clusterLevels: params.clusterLevels // value used to determine amount of primary clusters
+            secondaryCluster: params.secondaryCluster,
+            clusterLevels: params.clusterLevels, // value used to determine the second level of the cluster
+            clusterGroups: params.clusterGroups // value used to determine amount of primary clusters
         }
 
         // ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,7 +143,9 @@ function getTotalStoreProductSales(stores, products, storeSalesData) {
             product_ID: product.product_ID,
             productName: product.productName,
             totalProductSales: parseFloat(parseFloat(totalProductSales.toFixed(2))),
-            cumulativProductSales: cumulativProductSales.toFixed(2)
+            cumulativProductSales: cumulativProductSales.toFixed(2),
+            canHighlight: false,
+            highlightLevel: 0
         }
 
         stores.forEach(store => {
@@ -180,27 +183,31 @@ function accumulateCodes(tmpStoreData, stores, clusterData) {
     let storeClusterCodes = []
 
     let percentageOfCumulative = (clusterData.primaryCluster / 10) * 100;
-    let secondLevel = (((clusterData.primaryCluster + (clusterData.secondaryCluster / 2))) / 10) * 100;
-    let lastLevel = (((clusterData.primaryCluster + clusterData.secondaryCluster)) / 10) * 100;
+    let percentageOfCumulativeSecond = ((clusterData.primaryCluster + (clusterData.secondaryCluster / 2)) / 10) * 100;
+    let percentageOfCumulativeThird = ((clusterData.primaryCluster + clusterData.secondaryCluster) / 10) * 100;
 
     let cumulativeStoreData = tmpStoreData.filter(e => {
-        return parseFloat(e.cumulativProductSales) <= percentageOfCumulative
+        return parseFloat(e.cumulativProductSales) <= percentageOfCumulative;
     })
 
-    let secondLevelStoreData = tmpStoreData.filter(e => {
-        return parseFloat(e.cumulativProductSales) >= percentageOfCumulative && parseFloat(e.cumulativProductSales) <= secondLevel;
+    let cumulativeStoreDataSecondLevel = tmpStoreData.filter((e, idx) => {
+        return parseFloat(e.cumulativProductSales) >= percentageOfCumulative && parseFloat(e.cumulativProductSales) <= percentageOfCumulativeSecond;
     })
 
-    let lastStoreData = tmpStoreData.filter(e => {
-        return parseFloat(e.cumulativProductSales) >= secondLevel && parseFloat(e.cumulativProductSales) <= lastLevel;
+    let cumulativeStoreDataThirdLevel = tmpStoreData.filter((e, idx) => {
+        return parseFloat(e.cumulativProductSales) >= percentageOfCumulativeSecond && parseFloat(e.cumulativProductSales) <= percentageOfCumulativeThird;
+    })
+
+    let cumulativeStoreDataSecondAndThirdLevel = tmpStoreData.filter((e, idx) => {
+        return parseFloat(e.cumulativProductSales) >= percentageOfCumulative && parseFloat(e.cumulativProductSales) <= percentageOfCumulativeThird;
     })
 
     stores.forEach(store => {
         let storeCodeData = {
             storeCode: "",
-            secondaryStoreCode: "",
-            lastStoreCode: "",
-            totalStoreCode: "",
+            level1Code: "",
+            level2Code: "",
+            level3Code: "",
             store_ID: store.store_ID,
             storeName: store.storeName,
             currentRank: -1,
@@ -209,27 +216,44 @@ function accumulateCodes(tmpStoreData, stores, clusterData) {
 
         cumulativeStoreData.forEach(tmpStoreItem => {
             storeCodeData.storeCode += tmpStoreItem[store.storeName];
-            storeCodeData.totalStoreCode += tmpStoreItem[store.storeName];
+            storeCodeData.level1Code += tmpStoreItem[store.storeName];
+            tmpStoreItem.canHighlight = true;
+            tmpStoreItem.highlightLevel = 1;
         });
 
-        secondLevelStoreData.forEach(tmpStoreItem => {
-            storeCodeData.secondaryStoreCode += tmpStoreItem[store.storeName];
-            storeCodeData.totalStoreCode += tmpStoreItem[store.storeName];
-        })
+        if (clusterData.clusterGroups == 2) {
+            cumulativeStoreDataSecondAndThirdLevel.forEach(tmpStoreItem => {
+                storeCodeData.storeCode += tmpStoreItem[store.storeName];
+                storeCodeData.level2Code += tmpStoreItem[store.storeName];
+                tmpStoreItem.highlightLevel = 2;
+                tmpStoreItem.canHighlight = true;
+            })
+        }
 
-        lastStoreData.forEach(tmpStoreItem => {
-            storeCodeData.lastStoreCode += tmpStoreItem[store.storeName];
-            storeCodeData.totalStoreCode += tmpStoreItem[store.storeName];
-        })
+        if (clusterData.clusterGroups == 3) {
+            cumulativeStoreDataSecondLevel.forEach(tmpStoreItem => {
+                storeCodeData.storeCode += tmpStoreItem[store.storeName];
+                storeCodeData.level2Code += tmpStoreItem[store.storeName];
+                tmpStoreItem.highlightLevel = 2;
+                tmpStoreItem.canHighlight = true;
+            })
+
+            cumulativeStoreDataThirdLevel.forEach(tmpStoreItem => {
+                storeCodeData.storeCode += tmpStoreItem[store.storeName];
+                storeCodeData.level3Code += tmpStoreItem[store.storeName];
+                tmpStoreItem.highlightLevel = 3;
+                tmpStoreItem.canHighlight = true;
+            })
+        }
 
         storeClusterCodes.push(storeCodeData);
     })
 
     return storeClusterCodes.sort((a, b) => {
-        if (a.totalStoreCode > b.totalStoreCode) {
+        if (a.storeCode > b.storeCode) {
             return -1;
         }
-        if (a.totalStoreCode < b.totalStoreCode) {
+        if (a.storeCode < b.storeCode) {
             return 1;
         }
         return 0;
@@ -245,63 +269,102 @@ function addRank(tmpStoreData) {
 }
 
 function generateCluster(tmpStoreData, clusterData) {
-    const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
-    let letterIndex = 0;
-    let lastCode = "";
-    let lastNumberCode = "";
-    let number = 1;
-
-    let lastLetterIndex = 0;
-    let lastLastCode = "";
-
+    let clusterGroups = clusterData.clusterGroups;
     let clusterLevels = clusterData.clusterLevels;
+    let letters = ["A", "B", "C", "D", "E"];
 
-    tmpStoreData.forEach(tmpStoreItem => {
-        let currentCode = tmpStoreItem.storeCode.substr(0, clusterLevels);
+    let parsed = JSON.parse(JSON.stringify(tmpStoreData))
 
-        // Give first letter
-        if (lastCode != "") {
-            if (currentCode != lastCode) {
-                letterIndex++;
-                currentNumberCode = "";
-                number = 1;
-                lastLastCode = "";
-                lastLetterIndex = 0;
-            }
+    let tmpFirstLevel = parsed.sort((a, b) => {
+        if (a.level1Code > b.level1Code) {
+            return -1;
         }
-
-        lastCode = currentCode;
-        tmpStoreItem.cluster = letters[letterIndex];
-
-        let currentNumberCode = tmpStoreItem.secondaryStoreCode.substr(0, clusterLevels);
-
-        // Give number
-        if(lastNumberCode != "") {
-            if (currentNumberCode != lastNumberCode) {
-                number++;
-                lastLastCode = "";
-                lastLetterIndex = 0;
-            }
+        if (a.level1Code < b.level1Code) {
+            return 1;
         }
-
-        lastNumberCode = currentNumberCode;
-        tmpStoreItem.cluster = tmpStoreItem.cluster + number;
-
-        // Last Code
-        let lastCurrentCode = tmpStoreItem.lastStoreCode.substr(0, clusterLevels);
-
-        // Give number
-        if(lastLastCode != "") {
-            if (lastCurrentCode != lastLastCode) {
-                lastLetterIndex++;
-            }
-        }
-
-        lastLastCode = lastCurrentCode;
-        tmpStoreItem.cluster = tmpStoreItem.cluster + letters[lastLetterIndex].toLowerCase();
+        return 0;
     })
 
-    return tmpStoreData;
+    let tmpSecondLevel = parsed.sort((a, b) => {
+        if (a.level2Code > b.level2Code) {
+            return -1;
+        }
+        if (a.level2Code < b.level2Code) {
+            return 1;
+        }
+        return 0;
+    })
+
+    let tmpThirdLevel = parsed.sort((a, b) => {
+        if (a.level2Code > b.level2Code) {
+            return -1;
+        }
+        if (a.level2Code < b.level2Code) {
+            return 1;
+        }
+        return 0;
+    })
+
+    let FirstLevelIndexLevel = 1;
+    let SecondLevelIndexLevel = 1;
+    let ThirdLevelIndexLevel = 1;
+
+    tmpFirstLevel.forEach((el, idx) => {
+        SecondLevelIndexLevel = 1;
+        ThirdLevelIndexLevel = 1;
+
+        if((idx) / FirstLevelIndexLevel >= ((tmpFirstLevel.length) / clusterLevels)) {
+            FirstLevelIndexLevel++;
+            SecondLevelIndexLevel = 1;
+            ThirdLevelIndexLevel = 1;
+        }
+        
+        el.cluster = letters[FirstLevelIndexLevel - 1];
+        
+        tmpSecondLevel.forEach((el2, idx2) => {
+            // ThirdLevelIndexLevel = 1;
+
+            if((idx2) / SecondLevelIndexLevel >= ((tmpSecondLevel.length) / (clusterLevels * clusterLevels))) {
+                SecondLevelIndexLevel++;
+                ThirdLevelIndexLevel = 1;
+
+                if(SecondLevelIndexLevel > clusterLevels) {
+                    SecondLevelIndexLevel = 1;
+                    ThirdLevelIndexLevel = 1;
+                }
+            }
+
+            if(el2.store_ID == el.store_ID) {
+                el.cluster += SecondLevelIndexLevel
+                SecondLevelIndexLevel = 1;
+                ThirdLevelIndexLevel = 1;
+
+                tmpThirdLevel.forEach((el3, idx3) => {
+                    if((idx3) / ThirdLevelIndexLevel >= ((tmpThirdLevel.length) / (clusterLevels * clusterLevels * clusterLevels))) {
+                        ThirdLevelIndexLevel++;
+
+                        if(ThirdLevelIndexLevel > clusterLevels)
+                            ThirdLevelIndexLevel = 1
+                    }
+
+                    if(el3.store_ID == el2.store_ID) {
+                        el.cluster += letters[ThirdLevelIndexLevel - 1].toLowerCase();
+                        ThirdLevelIndexLevel = 1;
+                    }
+                })
+            }
+        })
+    })
+
+    return parsed.sort((a, b) => {
+        if (a.storeCode > b.storeCode) {
+            return -1;
+        }
+        if (a.storeCode < b.storeCode) {
+            return 1;
+        }
+        return 0;
+    });
 }
 
 function removeDuplicates(myArr, prop) {

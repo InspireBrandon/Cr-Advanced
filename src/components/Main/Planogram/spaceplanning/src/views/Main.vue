@@ -127,6 +127,8 @@
             weighted_distribution = productData.ProductData.Weighted_Distribution,
             total_facings = productData.TotalFacings;
 
+            console.log(weighted_distribution)
+
           self.CalculationHandler = new CalculationHandler(self.$store.state.daysBetween, self.$store.state.currentStoreCount)
 
           var weekly_profit = this.CalculationHandler.Calculate_Weekly_Profit(

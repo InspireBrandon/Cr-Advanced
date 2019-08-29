@@ -18,7 +18,7 @@
             AgGridVue,
             progressRenderer
         },
-        props: ["rowData", "stores","autosize"],
+        props: ["rowData", "stores", "autosize"],
         data() {
             return {
                 gridOptions: {
@@ -82,9 +82,28 @@
                 }, {
                     headerName: "Cumulative Sales",
                     field: "cumulativProductSales",
+                    cellStyle: function (params) {
+                        if (params.data.canHighlight) {
+                            if (params.data.highlightLevel == 1) {
+                                return {
+                                    backgroundColor: "#9c9c9c"
+                                };
+                            }
 
+                            if (params.data.highlightLevel == 2) {
+                                return {
+                                    backgroundColor: "#b9b9b9"
+                                };
+                            }
+
+                            if (params.data.highlightLevel == 3) {
+                                return {
+                                    backgroundColor: "#e0e0e0"
+                                };
+                            }
+                        }
+                    }
                 }]
-
                 self.stores.forEach(store => {
                     tmp.push({
                         headerName: store.storeName,
@@ -92,17 +111,21 @@
                             headerName: "In Store",
                             field: store.storeName + "_inStore",
                             cellStyle: function (params) {
-                                if (params.data[store.storeName + "_inStore"]) {
-                                    return {
-                                        backgroundColor: "#5ef35e86"
-                                    };
-                                } else {
-                                    return {
-                                        backgroundColor: "#ff9e9e91"
-                                    };
+                                if (params.data.canHighlight) {
+                                    if (params.data[store.storeName + "_inStore"]) {
+                                        return {
+                                            backgroundColor: "#5ef35e86"
+                                        };
+                                    }
+
+                                    if (!params.data[store.storeName + "_inStore"]) {
+                                        return {
+                                            backgroundColor: "#ff9e9e91"
+                                        };
+                                    }
                                 }
-                            },
-                        }, ]
+                            }
+                        }]
                     })
                 })
 

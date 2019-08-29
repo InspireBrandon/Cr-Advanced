@@ -556,7 +556,7 @@ class LoadSavePlanogramBase {
       "fixtureType": clusterData.fixtureType,
       "bins": parseInt(dimensionData.bins)
     }
-      
+
     let request = {
       planogram_Details: sendRequst,
       PlanogramDetails_fixtures: fixtureData
@@ -620,7 +620,7 @@ class LoadSavePlanogramBase {
           }
         });
 
-        
+
       })
       .catch(e => {
         hideLoader()
@@ -693,7 +693,7 @@ class LoadSavePlanogramBase {
 
     hideLoader();
 
-    if(callback != undefined && callback != null)
+    if (callback != undefined && callback != null)
       callback();
   }
 
@@ -1064,9 +1064,9 @@ class LoadSavePlanogramBase {
   }
 }
 
-function calculate(productItem, vuex) {
+function calculate(productItem, vuex, storeCount) {
   let self = this;
-  let calculationHandler = new CalculationHandler(0);
+  let calculationHandler = new CalculationHandler(0, storeCount);
 
   var calcData = {
     XFacings: null,
@@ -1108,15 +1108,29 @@ function calculate(productItem, vuex) {
     }
   });
 
+  console.log(productData);
+
+  var sales_retail = productData.ProductData.sales_Retail,
+    sales_potential = productData.ProductData.sales_potential,
+    sales_cost = productData.ProductData.sales_Cost,
+    sales_units = productData.ProductData.sales_Units,
+    volume_potential = productData.ProductData.volume_potential,
+    cost_potential = productData.ProductData.cost_potential,
+    weighted_distribution = productData.ProductData.Weighted_Distribution,
+    total_facings = productData.TotalFacings;
+
   calcData.DaysOfSupply = calculationHandler.Calculate_Days_Of_Supply_Potential(
-    productData.TotalFacings,
-    productData.ProductData.sales_Units
+    total_facings,
+    vuex.state.usePotential ? volume_potential : sales_units
   );
 
-  calcData.Weekly_Sales_Retail = calculationHandler.Calculate_Weekly_Sales_Retail(productData.ProductData.sales_Retail);
-  calcData.Weekly_Sales_Cost = calculationHandler.Calculate_Weekly_Sales_Cost(productData.ProductData.sales_Cost);
-  calcData.Weekly_Sales_Units = calculationHandler.Calculate_Weekly_Sales_Units(productData.ProductData.sales_Units);
-  calcData.Weekly_Profit = calculationHandler.Calculate_Weekly_Profit(productData.ProductData.sales_Profit);
+  calcData.Weekly_Sales_Retail = calculationHandler.Calculate_Weekly_Sales_Retail(vuex.state.usePotential ? sales_potential : sales_retail,);
+  calcData.Weekly_Sales_Cost = calculationHandler.Calculate_Weekly_Sales_Cost(vuex.state.usePotential ? cost_potential : sales_cost);
+  calcData.Weekly_Sales_Units = calculationHandler.Calculate_Weekly_Sales_Units(vuex.state.usePotential ? volume_potential : sales_units);
+
+  calcData.Weekly_Profit = calculationHandler.Calculate_Weekly_Profit(vuex.state.usePotential ? sales_potential : sales_retail,
+    sales_cost);
+
   calcData.XFacings = productData.Facings_X;
   calcData.Capacity = productData.TotalFacings;
   calcData.ForwardCapacity = productData.XYFacings;
