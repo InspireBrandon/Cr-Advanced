@@ -514,6 +514,8 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', listItem)
                     .then(r => {
+                        console.log("r");
+
                         console.log(r);
                         delete Axios.defaults.headers.common["TenantID"];
                         callback(listItem)

@@ -1,5 +1,6 @@
 <template>
     <div>
+        {{rowData.length}}
         <div>
             <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 175px);"
                 :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
@@ -39,6 +40,8 @@
                     context: {
                         componentParent: this
                     },
+                    afterFilterChanged: () => console.log(gridOptions.api.inMemoryRowController.rowsAfterFilter),
+
                 },
                 defaultColDef: {
                     onCellValueChanged: this.UpdateLine
@@ -50,6 +53,16 @@
             self.setHeaders();
         },
         methods: {
+            getFilteredData() {
+                let self = this
+                var tmpArr = []
+                this.gridApi.forEachNodeAfterFilter(function (rowNode, index) {
+                    tmpArr.push(rowNode.data)
+                });
+                // tmpArr.forEach(e=>{})
+              
+                return tmpArr 
+            },
             onGridReady(params) {
                 let self = this;
                 self.gridApi = params.api;
@@ -63,7 +76,7 @@
                 let request = JSON.parse(JSON.stringify(params.data));
 
                 request["basket_ID"] = self.basket.value;
-                
+
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.post(process.env.VUE_APP_API + "BasketAnalysis", request)
@@ -125,6 +138,10 @@
                         "headerName": "Size Description",
                         "hide": true,
                         "field": "size_Description"
+                    }, {
+                        "headerName": "Product",
+                        "hide": true,
+                        "field": "product_Description"
                     }
                 ]
             }
