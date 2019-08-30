@@ -1,10 +1,11 @@
 <template>
     <div>
+        rows:{{data.length}} 
         <ag-grid-vue :gridOptions="gridOptions" :sideBar='false' style="width: 100%;  height: 500px;"
-            :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
+            :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="data"
             :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true"
             rowSelection="multiple" :rowDeselection="true" :enableColResize="true" :floatingFilter="true"
-            :onGridReady="onGridReady" :groupMultiAutoColumn="true">
+            :onGridReady="onGridReady" >
         </ag-grid-vue>
     </div>
 </template>
@@ -15,7 +16,7 @@
         AgGridVue
     } from "ag-grid-vue";
     export default {
-        props: ["rowData"],
+        props: ['data'],
         components: {
             AgGridVue,
         },
@@ -24,14 +25,14 @@
                 selectedItems: [],
                 headers: [{
                     "headerName": "Store Name",
-                    "field": "storeName"
+                    "field": "displayname"
 
                 }, {
                     "headerName": "Premium Nature",
-                    "field": "premiumNature"
+                    "field": "cluster"
                 }, {
                     "headerName": "Basket Percentage",
-                    "field": "basketPercentage"
+                    "field": "percentage"
                 }],
                 defaultColDef: {
                     // onCellValueChanged: this.UpdateLine

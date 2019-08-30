@@ -1,8 +1,7 @@
 <template>
     <div>
-        {{rowData.length}}
         <div>
-            <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 175px);"
+            <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 225px);"
                 :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
                 :sideBar='true' :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true"
                 :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true" :enableColResize="true"
@@ -56,12 +55,11 @@
             getFilteredData() {
                 let self = this
                 var tmpArr = []
-                this.gridApi.forEachNodeAfterFilter(function (rowNode, index) {
+                var last = self.gridApi.getDisplayedRowAtIndex(0)
+                self.gridApi.forEachNodeAfterFilter(function (rowNode, index) {
                     tmpArr.push(rowNode.data)
                 });
-                // tmpArr.forEach(e=>{})
-              
-                return tmpArr 
+                return {tmpArr,last}
             },
             onGridReady(params) {
                 let self = this;
@@ -79,7 +77,7 @@
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.post(process.env.VUE_APP_API + "BasketAnalysis", request)
+                Axios.post(process.env.VUE_APP_API + "Basket_Product_Link", request)
                     .then(r => {
                         delete Axios.defaults.headers.common["TenantID"];
                     })

@@ -46,7 +46,8 @@
                     hide-details>
                 </v-select>
             </v-toolbar-items>
-            <v-btn @click="getFilteredData">get</v-btn>
+
+            <v-btn @click="getFilteredData">Set all to Yes</v-btn>
             <v-spacer></v-spacer>
             <v-btn @click="runReport" v-if="rowData.length > 0" color="primary">Run Report</v-btn>
         </v-toolbar>
@@ -98,7 +99,24 @@
             getFilteredData() {
                 let self = this
                 let tmp = []
-                return tmp = self.$refs.Grid.getFilteredData()
+                tmp = self.$refs.Grid.getFilteredData()
+                let comp = tmp.last.columnController.allDisplayedColumns
+                let compareCriteria = comp[comp.length - 1].colId
+                let end = tmp.tmpArr
+                end.forEach(item => {
+                    item.active = true
+                    item.basket_ID = self.selectedBasket.value;
+                })
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.post(process.env.VUE_APP_API + `Basket_Product_Link/SaveMany`, end)
+                    .then(r => {
+                        console.log(r);
+                        self.getBasketReportData()
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+
+
             },
 
             getData() {
@@ -145,9 +163,15 @@
             },
             runReport() {
                 let self = this;
-                self.$refs.StoreBasketReport.show(self.selectedBasket.text);
+                self.$refs.StoreBasketReport.show(self.selectedBasket.text, self.selectedBasket.value);
             },
 
         }
+    }
+
+    function removeDuplicates(myArr, prop) {
+        return myArr.filter((obj, pos, arr) => {
+            return arr.map(mapObj => mapObj[prop]).indexOf(obj[prop]) === pos;
+        });
     }
 </script>
