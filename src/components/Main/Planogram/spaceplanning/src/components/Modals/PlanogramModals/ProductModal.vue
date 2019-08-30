@@ -155,7 +155,6 @@ export default {
     open(eventData) {
       let self = this;
       if (eventData.type.toUpperCase() === "PRODUCT") {
-        console.log("PRODUCT MODAL EVENT :", eventData);
         self.modalShow = true;
         self.newData = eventData.object.Data;
         self.id = eventData.id;

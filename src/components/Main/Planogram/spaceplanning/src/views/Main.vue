@@ -73,6 +73,7 @@
     methods: {
       event_product_group_statistics(eventData) {
         let self = this;
+        console.log("UHM?", eventData.data.Data.barcode, eventData.data);
 
         if (eventData.show == true) {
 
@@ -81,6 +82,7 @@
           let planogramID = productEventData.ID;
 
           let productID = productEventData.Data.productID;
+          let productBarcode = productEventData.Data.barcode;
 
           let productData;
 
@@ -111,7 +113,7 @@
           };
 
           productStoreCopy.forEach((element, index) => {
-            if (element.Data.productID == productID) {
+            if (element.Data.barcode == productBarcode) {
               productData.Facings_X += element.Facings_X;
               productData.Facings_Y += element.Facings_Y;
               productData.Facings_Z += element.Facings_Z;
@@ -126,8 +128,6 @@
             volume_potential =  productData.ProductData.volume_potential,
             weighted_distribution = productData.ProductData.Weighted_Distribution,
             total_facings = productData.TotalFacings;
-
-            console.log(weighted_distribution)
 
           self.CalculationHandler = new CalculationHandler(self.$store.state.daysBetween, self.$store.state.currentStoreCount)
 
@@ -165,6 +165,8 @@
           // }
 
           let barcode = productData.ProductData.barcode;
+
+          console.log(productData.ProductData);
 
           if (productData.ProductData.useAlternateBarcode != undefined) {
             switch (productData.ProductData.alternatePackingType) {

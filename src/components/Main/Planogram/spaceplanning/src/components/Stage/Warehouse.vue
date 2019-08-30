@@ -641,6 +641,7 @@
         console.log("Starting");
 
         let storeProducts = self.$store.state.activePlanogramProducts;
+        // storeProducts = storeProducts.slice(0, productStoreCopy.length);
         let storePlanogramItemProducts = ctrl_store.getAllPlanogramItemsByType(self.$store, "PRODUCT");
 
         allProducts.forEach(product => {
@@ -721,6 +722,8 @@
 
               storeProduct.Data.volume_potential = parseFloat(product.volume_potential);
               storeProduct.Data.sales_potential = parseFloat(product.sales_potential);
+
+              console.log("[storeProduct]", storeProduct.Data);
 
               if (needsDraw) {
                 console.log("Redrawing");

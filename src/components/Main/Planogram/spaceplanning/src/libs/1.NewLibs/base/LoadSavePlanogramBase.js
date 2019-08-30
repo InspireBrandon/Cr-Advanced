@@ -37,6 +37,8 @@ class LoadSavePlanogramBase {
     let allItems = ctrl_store.getAllPlanogramItems(vuex);
     let allProducts = ctrl_store.getAllPlanogramItemsByType(vuex, "PRODUCT");
 
+    console.log(allProducts, allItems);
+
     let output = {
       name: "",
       stage: null,

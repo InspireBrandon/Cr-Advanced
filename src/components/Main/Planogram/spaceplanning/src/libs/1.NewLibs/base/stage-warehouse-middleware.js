@@ -10,6 +10,11 @@ class StageWarehouseMiddleware {
 
   // Uses the product data the planogram file and verifies against the new file if any changes have occured - Main reason is for loading of a planogram
   static verifyIntegrityOfWarehouseData(planogramData, warehouseProducts) {
+    planogramData = planogramData.slice(0, planogramData.length);
+    warehouseProducts = warehouseProducts.slice(0, warehouseProducts.length);
+
+    console.log("Planogram Data", planogramData, warehouseProducts);
+
     // loop through planogramData and check to see if item is product
     planogramData.forEach((currentPlanogramItem, idx) => {
       if (currentPlanogramItem == undefined && currentPlanogramItem == null) {
@@ -22,8 +27,15 @@ class StageWarehouseMiddleware {
           // Check through warehouse to see if find the correct product
           warehouseProducts.forEach(warehouseProduct => {
 
-            if (warehouseProduct.productID == productData.productID) {
-              currentPlanogramItem.Data.Data = warehouseProduct;
+            if (warehouseProduct.barcode == productData.barcode) {
+
+              for(var prop in productData) {
+                if(warehouseProduct[prop] != undefined && warehouseProduct[prop] != null) {
+                  productData[prop] = warehouseProduct[prop];
+                }
+              }
+
+              // currentPlanogramItem.Data.Data = warehouseProduct;
               // verify that product exists
               itemExists = true;
               productData.store_Range_Indicator = warehouseProduct.store_Range_Indicator;

@@ -94,7 +94,7 @@
                                 </template>
                                 <span>Tasks</span>
                             </v-tooltip>
-                            <v-tooltip bottom v-if="userAccess==0">
+                            <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
                                     <v-btn v-show="userAccess != 3" v-on="on" :value="1" flat>
                                         <v-icon>bookmarks</v-icon>
