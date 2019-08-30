@@ -6,34 +6,52 @@
             <v-btn icon @click="dialog=false">
                 <v-icon>close</v-icon>
             </v-btn>
+           
         </v-toolbar>
         <v-card>
-            <Grid ref="grid" :rowData="rowData" />
+            <Grid ref="grid" :data="Data"  />
         </v-card>
     </v-dialog>
 </template>
 
 <script>
     import Grid from './Grid.vue'
+    import Axios from 'axios'
+    export default {
+        components: {
+            Grid
+        },
+        data() {
+            return {
+                dialog: false,
+                basketName: "",
+                Data: [],
+                basket_ID: null,
+            }
+        },
+        methods: {
+            getReport(basket_ID, callback) {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-export default {
-    components: {
-        Grid
-    },
-    data() {
-        return {
-            dialog: false,
-            basketName: "",
-            rowData: []
-        }
-    },
-    methods: {
-        show(basketName) {
-            let self = this;
-            self.basketName = basketName;
-            self.dialog = true;
-            self.$refs.grid.resize();
+                Axios.get(process.env.VUE_APP_API + `StoreBasketReport?basket_ID=${basket_ID}`)
+                    .then(r => {
+
+                        self.Data = r.data
+                        console.log(self.Data);
+                        callback(r.data)
+                    })
+
+            },
+            show(basketName, basket_ID) {
+                let self = this;
+                self.basket_ID = basket_ID
+                self.basketName = basketName;
+                self.getReport(basket_ID, callback => {
+                    self.dialog = true;
+                    self.$refs.grid.resize();
+                })
+            }
         }
     }
-}
 </script>

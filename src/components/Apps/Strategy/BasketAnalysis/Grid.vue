@@ -1,7 +1,7 @@
 <template>
     <div>
         <div>
-            <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 175px);"
+            <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 225px);"
                 :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
                 :sideBar='true' :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true"
                 :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true" :enableColResize="true"
@@ -39,6 +39,8 @@
                     context: {
                         componentParent: this
                     },
+                    afterFilterChanged: () => console.log(gridOptions.api.inMemoryRowController.rowsAfterFilter),
+
                 },
                 defaultColDef: {
                     onCellValueChanged: this.UpdateLine
@@ -50,6 +52,15 @@
             self.setHeaders();
         },
         methods: {
+            getFilteredData() {
+                let self = this
+                var tmpArr = []
+                var last = self.gridApi.getDisplayedRowAtIndex(0)
+                self.gridApi.forEachNodeAfterFilter(function (rowNode, index) {
+                    tmpArr.push(rowNode.data)
+                });
+                return {tmpArr,last}
+            },
             onGridReady(params) {
                 let self = this;
                 self.gridApi = params.api;
@@ -63,10 +74,10 @@
                 let request = JSON.parse(JSON.stringify(params.data));
 
                 request["basket_ID"] = self.basket.value;
-                
+
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.post(process.env.VUE_APP_API + "BasketAnalysis", request)
+                Axios.post(process.env.VUE_APP_API + "Basket_Product_Link", request)
                     .then(r => {
                         delete Axios.defaults.headers.common["TenantID"];
                     })
@@ -125,6 +136,10 @@
                         "headerName": "Size Description",
                         "hide": true,
                         "field": "size_Description"
+                    }, {
+                        "headerName": "Product",
+                        "hide": true,
+                        "field": "product_Description"
                     }
                 ]
             }
