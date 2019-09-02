@@ -52,14 +52,24 @@
             self.setHeaders();
         },
         methods: {
+            changeFilter(text) {
+                let self = this
+                self.gridApi.setQuickFilter(text);
+            },
             getFilteredData() {
                 let self = this
                 var tmpArr = []
+                var tmpArrNode = []
                 var last = self.gridApi.getDisplayedRowAtIndex(0)
                 self.gridApi.forEachNodeAfterFilter(function (rowNode, index) {
                     tmpArr.push(rowNode.data)
+                    tmpArrNode.push(rowNode)
                 });
-                return {tmpArr,last}
+                return {
+                    tmpArr,
+                    last,
+                    tmpArrNode
+                }
             },
             onGridReady(params) {
                 let self = this;
@@ -92,6 +102,9 @@
                         "cellEditor": "agRichSelectCellEditor",
                         cellEditorParams: {
                             values: extractValues(Etat_acces)
+                        },
+                        cellClassRules: {
+                            'success-green': 'data.active == true',
                         },
                         valueFormatter: function (params) {
                             return lookupValue(Etat_acces, params.value);
@@ -137,7 +150,7 @@
                         "hide": true,
                         "field": "size_Description"
                     }, {
-                        "headerName": "Product",
+                        "headerName": "Description",
                         "hide": true,
                         "field": "product_Description"
                     }

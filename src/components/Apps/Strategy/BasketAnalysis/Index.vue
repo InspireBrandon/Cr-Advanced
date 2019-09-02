@@ -47,7 +47,11 @@
                 </v-select>
             </v-toolbar-items>
 
-            <v-btn @click="getFilteredData">Set all to Yes</v-btn>
+            <v-btn @click="getFilteredData" color="primary">Set Visible to yes</v-btn>
+            <v-spacer></v-spacer>
+            <v-text-field append-icon="search" type="text" id="filter-text-box" placeholder="Filter..."
+                @input="onFilterTextBoxChanged" v-model="filterText">
+            </v-text-field>
             <v-spacer></v-spacer>
             <v-btn @click="runReport" v-if="rowData.length > 0" color="primary">Run Report</v-btn>
         </v-toolbar>
@@ -56,6 +60,7 @@
         <basketMaint :getBaskets="getbaskets" ref="basketMaint" />
         <ClusterMaint ref="ClusterMaint" />
         <StoreBasketReport ref="StoreBasketReport" />
+        <Spinner ref="Spinner" />
     </v-card>
 </template>
 
@@ -68,7 +73,7 @@
     import basketMaint from './BasketMaint/BasketMaintenanceModal.vue'
     import ClusterMaint from './ClusterMaint/ClusterMaintModal.vue'
     import StoreBasketReport from './StoreBasketReport/StoreBasketReport.vue'
-
+    import Spinner from "@/components/Common/Spinner";
 
     export default {
         components: {
@@ -77,12 +82,13 @@
             BasketConfig,
             PremiumNature,
             ClusterMaint,
-            StoreBasketReport
+            StoreBasketReport,
+            Spinner
         },
         data() {
             return {
                 items: [],
-
+                filterText: null,
                 rowData: [],
                 baskets: [],
                 selectedBasket: null,
@@ -96,13 +102,24 @@
             self.getbaskets()
         },
         methods: {
+            onFilterTextBoxChanged() {
+                let self = this;
+
+                self.$nextTick(() => {
+                    self.$refs.Grid.changeFilter(self.filterText)
+
+                })
+            },
             getFilteredData() {
                 let self = this
+                self.$refs.Spinner.show()
                 let tmp = []
                 tmp = self.$refs.Grid.getFilteredData()
                 let comp = tmp.last.columnController.allDisplayedColumns
                 let compareCriteria = comp[comp.length - 1].colId
                 let end = tmp.tmpArr
+                console.log(tmp);
+
                 end.forEach(item => {
                     item.active = true
                     item.basket_ID = self.selectedBasket.value;
@@ -112,7 +129,13 @@
                 Axios.post(process.env.VUE_APP_API + `Basket_Product_Link/SaveMany`, end)
                     .then(r => {
                         console.log(r);
-                        self.getBasketReportData()
+
+                        tmp.tmpArrNode.forEach(item => {
+                            item.data.active = true
+
+                            item.setData(item.data)
+                            self.$refs.Spinner.hide()
+                        })
                         delete Axios.defaults.headers.common["TenantID"];
                     })
 
@@ -148,12 +171,15 @@
             },
             getBasketReportData() {
                 let self = this;
+                self.$refs.Spinner.show()
 
                 Axios.get(process.env.VUE_APP_API + "BasketAnalysis?basketID=" + self.selectedBasket.value)
                     .then(r => {
                         console.log(r);
 
                         self.rowData = r.data.basket_LinkList;
+                        self.$refs.Spinner.hide()
+
                     })
             },
             onBasketSelect() {
