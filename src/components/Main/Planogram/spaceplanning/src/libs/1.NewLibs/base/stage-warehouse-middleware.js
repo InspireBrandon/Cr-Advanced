@@ -29,11 +29,15 @@ class StageWarehouseMiddleware {
 
             if (warehouseProduct.barcode == productData.barcode) {
 
-              for(var prop in productData) {
-                if(warehouseProduct[prop] != undefined && warehouseProduct[prop] != null) {
-                  productData[prop] = warehouseProduct[prop];
+              for (var prop in productData) {
+                if (prop != "useAlternateBarcode" && prop != "alternateBarcode") {
+                  if (warehouseProduct[prop] != undefined && warehouseProduct[prop] != null) {
+                    productData[prop] = warehouseProduct[prop];
+                  }
                 }
               }
+
+              console.log(productData, warehouseProduct)
 
               // currentPlanogramItem.Data.Data = warehouseProduct;
               // verify that product exists
