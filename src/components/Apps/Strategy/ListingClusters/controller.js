@@ -281,16 +281,29 @@ function isEqual(a, b) {
     }
 }
 
-function codeToNumber(code) {
-    let number = 0;
+function codeToNumber(code, zeros) {
+    if(zeros < 1) {
+        code = 0;
+    } else {
+        code += "0".repeat(zeros);
+    }
 
-    return number;
+    let value = parseInt(code);
+
+    if(isNaN(value))
+        value = 0;
+
+    return value;
+}
+
+function otherToNumber(code, zeros) {
+    return parseInt(code + "0".repeat(zeros - code.length));
 }
 
 function generateCluster(tmpStoreData, clusterData) {
     let clusterGroups = clusterData.clusterGroups;
     let clusterLevels = clusterData.clusterLevels;
-    let letters = ["A", "B", "C", "D", "E"];
+    let letters = ["E", "D", "C", "B", "A"];
 
     let tmp = [];
 
@@ -315,8 +328,6 @@ function generateCluster(tmpStoreData, clusterData) {
         }
         return 0;
     })
-
-    console.log(tmpFirstLevel[0].level1Code, tmpFirstLevel[tmpFirstLevel.length - 1].level1Code);
 
     tmpFirstLevel = JSON.parse(JSON.stringify(tmpFirstLevel))
 
@@ -344,25 +355,35 @@ function generateCluster(tmpStoreData, clusterData) {
 
     tmpThirdLevel = JSON.parse(JSON.stringify(tmpThirdLevel))
 
-    let FirstLevelIndexLevel = 1;
+    let rollingIndex = 0;
+    let FirstLevelIndexLevel = clusterLevels;
     let SecondLevelIndexLevel = 1;
     let ThirdLevelIndexLevel = 1;
 
-    let highestCode = tmpFirstLevel[0].level1Code;
-    let lowestCode =  tmpFirstLevel[tmpFirstLevel.length - 1].level1Code;
+    let codeLength = tmpFirstLevel[0].storeCode.length; 
+
+    let highestCode1 = tmpFirstLevel[0].level1Code;
+    let lowestCode1 =  tmpFirstLevel[tmpFirstLevel.length - 1].level1Code;
+
+    let firstValue1 = otherToNumber(highestCode1, codeLength);
+    let secondValue2 = otherToNumber(lowestCode1, codeLength);
+
+    let dividend1 = (firstValue1 - secondValue2) / clusterLevels;
+
+    console.log("dividend1", dividend1);
 
     tmpFirstLevel.forEach((el, idx) => {
-        console.log(el);
+        let otherNumber = otherToNumber(el.level1Code, el.storeCode.length)
 
-        let timesString = el.storeCode;
-        let firstPercentageTo = (FirstLevelIndexLevel / clusterLevels) * 100;
-        let firstPercentageOfArray = (idx / tmpFirstLevel.length) * 100;
+        console.log(otherNumber, dividend1 * FirstLevelIndexLevel)
 
-        if (firstPercentageOfArray > firstPercentageTo) {
-            FirstLevelIndexLevel++;
+        if(otherNumber < dividend1 * (FirstLevelIndexLevel - 1)) {
+            console.log("IM IN HERE")
+            FirstLevelIndexLevel--;
         }
 
-        el.cluster = letters[FirstLevelIndexLevel - 1];
+        el.cluster = letters[FirstLevelIndexLevel - 1 + (clusterLevels - 1)];
+        rollingIndex++;
     })
 
     tmpSecondLevel.forEach((el, idx) => {
@@ -461,21 +482,21 @@ function generateCluster(tmpStoreData, clusterData) {
             }
         })
 
-        if(clusterGroups > 1) {
-            tmpSecondLevel.forEach(el2 => {
-                if(el.store_ID == el2.store_ID) {
-                    el.cluster += el2.cluster;
-                }
-            })
-        }
+        // if(clusterGroups > 1) {
+        //     tmpSecondLevel.forEach(el2 => {
+        //         if(el.store_ID == el2.store_ID) {
+        //             el.cluster += el2.cluster;
+        //         }
+        //     })
+        // }
 
-        if(clusterGroups > 2) {
-            tmpThirdLevel.forEach(el2 => {
-                if(el.store_ID == el2.store_ID) {
-                    el.cluster += el2.cluster;
-                }
-            })
-        }
+        // if(clusterGroups > 2) {
+        //     tmpThirdLevel.forEach(el2 => {
+        //         if(el.store_ID == el2.store_ID) {
+        //             el.cluster += el2.cluster;
+        //         }
+        //     })
+        // }
     })
 
     return tmp.sort((a, b) => {
