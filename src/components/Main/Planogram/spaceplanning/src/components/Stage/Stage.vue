@@ -7,7 +7,8 @@
     </v-btn>-->
     <h5>PLANOGRAM</h5>
     <v-divider></v-divider>
-    <div @dragover="acceptDrag" @drop="dropDragItem" class="stage_container" ref="stage_container" :style="{height: windowHeight}">
+    <div @dragover="acceptDrag" @drop="dropDragItem" class="stage_container" ref="stage_container"
+      :style="{height: windowHeight}">
       <v-stage v-if="stageShowing" ref="stage" :config="stageConfiguration"></v-stage>
     </div>
     <GondolaModal></GondolaModal>
@@ -26,6 +27,7 @@
     </v-dialog>
     <Prompt ref="prompt"></Prompt>
     <Dialog ref="dialog"></Dialog>
+    <MergeProduct ref="MergeProduct" />
   </div>
 </template>
 
@@ -50,6 +52,7 @@
   import ProductMaintModal from "@/components/Main/DataPreparation/Views/ImagePreparation/ProductMaintModal";
   import Prompt from "@/components/Common/Prompt";
   import Dialog from "@/components/Common/Dialog";
+  import MergeProduct from "@/components/Main/Planogram/spaceplanning/src/components/Modals/MergeProduct/Index.vue";
   //#endregion Modals
 
   import EventBus from "@/components/Main/Planogram/spaceplanning/src/libs/EventBus/EventBus.js";
@@ -82,7 +85,8 @@
       ProductModal,
       Prompt,
       Dialog,
-      ProductMaintModal
+      ProductMaintModal,
+      MergeProduct
     },
     name: "app",
     data() {
@@ -390,10 +394,9 @@
           console.log("OUTPUT FILE", output);
 
           switch (state.toUpperCase()) {
-            case "NEW":
-              {
-                let d = new Date();
-                axios
+            case "NEW": {
+              let d = new Date();
+              axios
                 .post(
                   process.env.VUE_APP_API + "SystemFile/Json?db=CR-Devinspire", {
                     systemFile: {
@@ -414,28 +417,27 @@
                 .catch(error => {
                   console.error("Failed to save planogram file");
                 });
-              }
-              break;
-            case "MODIFY":
-              {
-                axios
-                .put(
-                  process.env.VUE_APP_API +
-                  `SystemFile/Json?db=CR-Devinspire&id=${planogramID}&name=${planogramName}`,
-                  output
-                )
-                .then(result => {
-                  if (result.data.success == true) {
-                    // alert("saved!");
-                  } else {
-                    alert("Server responded unsuccessfully!");
-                  }
-                })
-                .catch(error => {
-                  console.error("Failed to save planogram file");
-                });
-              }
-              break;
+            }
+            break;
+          case "MODIFY": {
+            axios
+              .put(
+                process.env.VUE_APP_API +
+                `SystemFile/Json?db=CR-Devinspire&id=${planogramID}&name=${planogramName}`,
+                output
+              )
+              .then(result => {
+                if (result.data.success == true) {
+                  // alert("saved!");
+                } else {
+                  alert("Server responded unsuccessfully!");
+                }
+              })
+              .catch(error => {
+                console.error("Failed to save planogram file");
+              });
+          }
+          break;
           }
         })
       },
@@ -573,74 +575,70 @@
           self.LoadingMsg = "Loading Fixture - " + fixture.SubType.toUpperCase();
 
           switch (fixture.SubType.toUpperCase()) {
-            case "SHELF":
-              {
-                let ctrl_shelf = new Shelf(
-                  self.$store,
-                  data.Data.GondolaID,
-                  data.Data.FixtureData,
-                  self.$PixelToCmRatio
-                );
-                fixturePromiseArr.push(ctrl_shelf.LoadFromFile(stage, data));
-                // ctrl_shelf.LoadFromFile(stage, data).then(loaded => {
-                //   // load products onto this fixture
-                //   self.loadProductGroupsFromFile(data.Data.ID, result);
-                //   self.FixtureLoading = false;
-                // });
-              }
-              break;
-            case "BASE":
-              {
-                let ctrl_shelf = new Shelf(
-                  self.$store,
-                  data.Data.GondolaID,
-                  data.Data.FixtureData,
-                  self.$PixelToCmRatio
-                );
-                // ctrl_shelf.LoadFromFile(stage, data).then(loaded => {
-                //   // load products onto this fixture
-                //   self.loadProductGroupsFromFile(data.Data.ID, result);
-                //   self.FixtureLoading = false;
-                // });
+            case "SHELF": {
+              let ctrl_shelf = new Shelf(
+                self.$store,
+                data.Data.GondolaID,
+                data.Data.FixtureData,
+                self.$PixelToCmRatio
+              );
+              fixturePromiseArr.push(ctrl_shelf.LoadFromFile(stage, data));
+              // ctrl_shelf.LoadFromFile(stage, data).then(loaded => {
+              //   // load products onto this fixture
+              //   self.loadProductGroupsFromFile(data.Data.ID, result);
+              //   self.FixtureLoading = false;
+              // });
+            }
+            break;
+          case "BASE": {
+            let ctrl_shelf = new Shelf(
+              self.$store,
+              data.Data.GondolaID,
+              data.Data.FixtureData,
+              self.$PixelToCmRatio
+            );
+            // ctrl_shelf.LoadFromFile(stage, data).then(loaded => {
+            //   // load products onto this fixture
+            //   self.loadProductGroupsFromFile(data.Data.ID, result);
+            //   self.FixtureLoading = false;
+            // });
 
-                fixturePromiseArr.push(ctrl_shelf.LoadFromFile(stage, data));
-              }
-              break;
-            case "PEGBOARD":
-              {
-                let self = this;
-                let ctrl_pegboard = new Pegboard(
-                  self.$store,
-                  data.Data.GondolaID,
-                  data.Data.FixtureData,
-                  self.$PixelToCmRatio
-                );
-                // ctrl_pegboard.LoadFromFile(stage, data).then(() => {
-                //   self.loadProductGroupsFromFile(data.Data.ID, result);
-                //   self.FixtureLoading = false;
-                // });
-                // load pegs next
+            fixturePromiseArr.push(ctrl_shelf.LoadFromFile(stage, data));
+          }
+          break;
+          case "PEGBOARD": {
+            let self = this;
+            let ctrl_pegboard = new Pegboard(
+              self.$store,
+              data.Data.GondolaID,
+              data.Data.FixtureData,
+              self.$PixelToCmRatio
+            );
+            // ctrl_pegboard.LoadFromFile(stage, data).then(() => {
+            //   self.loadProductGroupsFromFile(data.Data.ID, result);
+            //   self.FixtureLoading = false;
+            // });
+            // load pegs next
 
-                fixturePromiseArr.push(ctrl_pegboard.LoadFromFile(stage, data));
-              }
-              break;
-            case "PEGBAR":
-              {
-                let self = this;
-                let ctrl_PegBar = new PegBar(
-                  self.$store,
-                  data.Data.GondolaID,
-                  data.Data.FixtureData,
-                  self.$PixelToCmRatio
-                );
-                // ctrl_PegBar.LoadFromFile(stage, data).then(() => {
-                //   self.loadProductGroupsFromFile(data.Data.ID, result);
-                //   self.FixtureLoading = false;
-                // });
+            fixturePromiseArr.push(ctrl_pegboard.LoadFromFile(stage, data));
+          }
+          break;
+          case "PEGBAR": {
+            let self = this;
+            let ctrl_PegBar = new PegBar(
+              self.$store,
+              data.Data.GondolaID,
+              data.Data.FixtureData,
+              self.$PixelToCmRatio
+            );
+            // ctrl_PegBar.LoadFromFile(stage, data).then(() => {
+            //   self.loadProductGroupsFromFile(data.Data.ID, result);
+            //   self.FixtureLoading = false;
+            // });
 
-                fixturePromiseArr.push(ctrl_PegBar.LoadFromFile(stage, data));
-              }
-              break;
+            fixturePromiseArr.push(ctrl_PegBar.LoadFromFile(stage, data));
+          }
+          break;
           }
         });
 
@@ -903,7 +901,8 @@
 
         let height = stage.getHeight() - lastY;
 
-        console.log("[download parameters]", "R", ratio, "Last Y", lastY, "TTL H DWN", height, "stage H", stage.getHeight())
+        console.log("[download parameters]", "R", ratio, "Last Y", lastY, "TTL H DWN", height, "stage H", stage
+          .getHeight())
 
         var dataURL = this.$refs.stage.getStage().toDataURL({
           x: 0,
@@ -1003,7 +1002,8 @@
         let dropPos = ctrl_positioning.GetTransformedMousePoint(stage)
         console.log("GONDOLA ADD - STAGE", dropPos, self.MasterLayer);
 
-        let ctrl_gondola = new GondolaNew(self.$store, stage, self.MasterLayer, JSON.parse(JSON.stringify(data)), self.$PixelToCmRatio,
+        let ctrl_gondola = new GondolaNew(self.$store, stage, self.MasterLayer, JSON.parse(JSON.stringify(data)), self
+          .$PixelToCmRatio,
           "GONDOLA");
 
         ctrl_gondola.Initialise(dropPos);
@@ -1349,7 +1349,7 @@
       event_gondola_selected_deselected(eventData) {
         let self = this;
         self.selectionData.selectedGondola = eventData.data;
-        self.selectionData.selectedProductGroup=null
+        self.selectionData.selectedProductGroup = null
       },
       event_product_group_selected_deselected(eventData) {
         let self = this;
@@ -1364,11 +1364,12 @@
           controls.CapButtonToggle = null;
         }
         controls.bCapsOn = eventData.data.Caps_Enabled;
-        controls.selectedOrientation = eventData.data.LastFace.toUpperCase() == "LEFT" ? "side" : eventData.data.LastFace;
+        controls.selectedOrientation = eventData.data.LastFace.toUpperCase() == "LEFT" ? "side" : eventData.data
+          .LastFace;
         //#endregion Toolbar controls PRODUCT
         let lastSelected = self.selectionData.selectedProductGroup;
         self.selectionData.selectedProductGroup = eventData.data;
-        self.selectionData.selectedGondola=null
+        self.selectionData.selectedGondola = null
 
         if (lastSelected != null) {
           lastSelected.Selected = false;
@@ -1380,40 +1381,37 @@
         console.log("GONDOLA SAVED EVENT STAGE", data);
         let self = this;
         switch (data.type.toUpperCase()) {
-          case "GONDOLA":
-            {
-              let ctrl_store = new StoreHelper();
-              let changed_gondola = ctrl_store.getPlanogramItemById(this.$store, data.id);
-              changed_gondola.ChangeDimensions(data);
-            }
-            break;
-          case "FIXTURE":
-            {
-              let ctrl_store = new StoreHelper();
-              let changed_fixture = ctrl_store.getPlanogramItemById(this.$store, data.id);
-              changed_fixture.ChangeDimensions(data);
-            }
-            break;
-          case "PRODUCT":
-            {
-              let ctrl_store = new StoreHelper();
-              let changed_product = ctrl_store.getPlanogramItemById(this.$store, data.id);
-              console.log('Product Changed', changed_product)
-              changed_product.ChangeDimensions(data.object);
-              let allProducts = self.$parent.$refs.warehouse.products;
-              
-              allProducts.forEach(el => {
-                if(el.barcode == changed_product.Data.barcode) {
-                  for(var prop in el) {
-                    if(changed_product.Data[prop] != undefined && changed_product.Data[prop] != null) {
-                      el[prop] = changed_product.Data[prop]
-                    }
-                  }
+          case "GONDOLA": {
+            let ctrl_store = new StoreHelper();
+            let changed_gondola = ctrl_store.getPlanogramItemById(this.$store, data.id);
+            changed_gondola.ChangeDimensions(data);
+          }
+          break;
+        case "FIXTURE": {
+          let ctrl_store = new StoreHelper();
+          let changed_fixture = ctrl_store.getPlanogramItemById(this.$store, data.id);
+          changed_fixture.ChangeDimensions(data);
+        }
+        break;
+        case "PRODUCT": {
+          let ctrl_store = new StoreHelper();
+          let changed_product = ctrl_store.getPlanogramItemById(this.$store, data.id);
+          console.log('Product Changed', changed_product)
+          changed_product.ChangeDimensions(data.object);
+          let allProducts = self.$parent.$refs.warehouse.products;
 
-                  console.log("[Changed Range Product]", el)
+          allProducts.forEach(el => {
+            if (el.barcode == changed_product.Data.barcode) {
+              for (var prop in el) {
+                if (changed_product.Data[prop] != undefined && changed_product.Data[prop] != null) {
+                  el[prop] = changed_product.Data[prop]
                 }
-              })
+              }
+
+              console.log("[Changed Range Product]", el)
             }
+          })
+        }
         }
       },
       event_delete_gondola(data) {
@@ -1455,18 +1453,35 @@
       event_delete_product(data) {
         let self = this;
 
-        let ctrl_store = new StoreHelper();
-        let productGroup = ctrl_store.getPlanogramItemById(this.$store, data.product_object.ID);
+        let canMerge = false;
 
-        if (productGroup == null) {
-          console.error(
-            "[DELETE] Product : could not find Product Group :",
-            data.product_object.ID
-          );
-          return;
-        }
+        let product1 = data.data;
+        let product2 = null;
 
-        productGroup.Delete();
+        self.$parent.$refs.warehouse.products.forEach(el => {
+          if (el.productID == product1.productID) {
+
+            if (el.barcode != product1.barcode) {
+              canMerge = true;
+              product2 = el;
+            }
+          }
+        })
+
+        self.$refs.MergeProduct.show(canMerge, product1, product2, () => {
+          let ctrl_store = new StoreHelper();
+          let productGroup = ctrl_store.getPlanogramItemById(self.$store, data.product_object.ID);
+
+          if (productGroup == null) {
+            console.error(
+              "[DELETE] Product : could not find Product Group :",
+              data.product_object.ID
+            );
+            return;
+          }
+
+          productGroup.Delete();
+        })
       },
       event_notify_cluster_change() {
         let self = this;
@@ -1503,16 +1518,14 @@
         //#endregion
 
         switch (dragType.toUpperCase()) {
-          case "WAREHOUSE":
-            {
-              self.addWarehouseProduct(stage, data, ev);
-            }
-            break;
-          case "LIBRARY":
-            {
-              self.addLibraryItem(stage, data, ev);
-            }
-            break;
+          case "WAREHOUSE": {
+            self.addWarehouseProduct(stage, data, ev);
+          }
+          break;
+        case "LIBRARY": {
+          self.addLibraryItem(stage, data, ev);
+        }
+        break;
         }
       },
       addWarehouseProduct(stage, data, ev) {
@@ -1559,223 +1572,213 @@
         }
 
         switch (data.type.toUpperCase()) {
-          case "GONDOLA":
-            {
-              self.addNewGondola(data.data);
-            }
-            break;
-            case "LABELHOLDER": {
-              data.data["Type"] = "LABELHOLDER";
+          case "GONDOLA": {
+            self.addNewGondola(data.data);
+          }
+          break;
+        case "LABELHOLDER": {
+          data.data["Type"] = "LABELHOLDER";
 
-              let ctrl_intersectionTester = new IntersectionTester();
+          let ctrl_intersectionTester = new IntersectionTester();
 
-              let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
+          let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
 
-              console.log("LABELHOLDER ADD - STAGE", dropPos);
-              ctrl_intersectionTester.TestIntersectsWithMany(stage, "LABELHOLDER", ["PEGBOARD"], self.$store, dropPos)
-              .then(result => {
-                console.log("[LIBARY ADD] LABELHOLDER", result)
-                if (result.intersects == true) {
-                  self.addNewLabelHolder(result.ID, data.data, result.ContainerPosition);
-                }
-              })
-            } break;
-            case "AREA":
-            {
-              data.data["Type"] = "AREA";
-
-              let ctrl_intersectionTester = new IntersectionTester();
-
-              let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
-
-              console.log("AREA ADD - STAGE", dropPos);
-              ctrl_intersectionTester.TestIntersectsWithMany(stage, "AREA", ["GONDOLA"], self.$store, dropPos)
-              .then(result => {
-                console.log("[LIBARY ADD] AREA", result)
-                if (result.intersects == true) {
-                  self.addNewArea(result.ID, data.data, result.ContainerPosition);
-                }
-              })
-            }
-            break;
-          case "TEXTHEADER":
-            {
-              self.addNewTextHeader(data.data, {
-                ScaleX: 1,
-                ScaleY: 1
-              })
-            }
-            break;
-          case "PALETTE":
-            {
-
-              data.data["Type"] = "PALETTE";
-
-              let ctrl_intersectionTester = new IntersectionTester();
-
-              let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
-
-              console.log("SHELF ADD - STAGE", dropPos);
-              // ctrl_intersectionTester.TestIntersectsWithMany(stage, ["SHELF", "BASE", "PEGBAR", "BASKET"], dropPos)
-              ctrl_intersectionTester.TestIntersectsWithMany(stage, "PALETTE", ["GONDOLA"], self.$store,
-                dropPos)
-              .then(result => {
-                console.log("[LIBARY ADD] PALETTE", result)
-                if (result.intersects == true) {
-                  self.addNewPalette(result.ID, data.data, result.ContainerPosition);
-                }
-              })
-            }
-            break;
-          case "BASKET":
-            {
-              data.data["Type"] = "BASKET";
-
-              let ctrl_intersectionTester = new IntersectionTester();
-
-              let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
-
-              console.log("SHELF ADD - STAGE", dropPos);
-              // ctrl_intersectionTester.TestIntersectsWithMany(stage, ["SHELF", "BASE", "PEGBAR", "BASKET"], dropPos)
-              ctrl_intersectionTester.TestIntersectsWithMany(stage, "BASKET", ["SHELF", "BASE", "PEGBAR", "PEGBOARD",
-                  "PALETTE"
-                ],
-                self.$store,
-                dropPos)
-              .then(result => {
-                console.log("[LIBARY ADD] BASKET", result)
-                if (result.intersects == true) {
-                  self.addNewBasket(result.ID, data.data, result.ContainerPosition);
-                }
-              })
-
-            }
-            break;
-            case "PEG":
-            {
-              data.data["Type"] = "PEG";
-
-              let ctrl_intersectionTester = new IntersectionTester();
-
-              let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
-
-              console.log("PEG ADD - STAGE", dropPos);
-              ctrl_intersectionTester.TestIntersectsWithMany(stage, "PEG", ["PEGBAR"],
-                self.$store,
-                dropPos)
-              .then(result => {
-                console.log("[LIBARY ADD] PEG", result)
-                if (result.intersects == true) {
-                  self.addNewPeg(result.ID, data.data, result.ContainerPosition);
-                }
-              })
-
-            }
-            break;
-          case "OBSTRUCTION":
-            {
-              //
-            }
-            break;
-          case "SHELF":
-            {
-              data.data["Type"] = "SHELF";
-
-              let ctrl_intersectionTester = new IntersectionTester();
-
-              let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
-
-              console.log("SHELF ADD - STAGE", dropPos);
-              ctrl_intersectionTester.TestIntersectsWithMany(stage, "SHELF", ["GONDOLA", "AREA"], dropPos)
-              .then(result => {
-                console.log("[LIBARY ADD] SHELF", result)
-                if (result.intersects == true) {
-
-                  self.addNewShelf(result.ID, data.data, result.ContainerPosition);
-
-                }
-              })
-
-            }
-            break;
-          case "BASE":
-            {
-              data.data["Type"] = "BASE";
-
-              let ctrl_intersectionTester = new IntersectionTester();
-
-              let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
-
-              console.log("SHELF ADD - STAGE", dropPos);
-              ctrl_intersectionTester.TestIntersectsWithMany(stage, "BASE", ["GONDOLA", "AREA"], dropPos)
-              // ctrl_intersectionTester.TestIntersectsWithItem(stage, "BASE", "GONDOLA", dropPos)
-              .then(result => {
-                console.log("[LIBARY ADD] SHELF", result)
-                if (result.intersects == true) {
-
-                  let ctrl_store = new StoreHelper();
-                  let existingBaseItems = ctrl_store.getAllPlanogramItemsByType(this.$store, "BASE", result.ID);
-
-                  if (existingBaseItems != undefined && existingBaseItems.length > 0) {
-                    alert('This gondola already contains a base, delete the base first and try again.');
-                    return;
-                  }
-
-                  // test if a gondola already has a base
-                  self.addNewBase(result.ID, data.data, result.ContainerPosition);
-                }
-              })
-            }
-            break;
-          case "PEGBOARD":
-            {
-              if (data.data.defaultPegDetails == null) {
-                console.error("[PEGBOARD] Pegboar has no default peg assigned");
-                // TODO: Call generic error modal
-                self.$refs.dialog.openDialog({
-                  headline: "Pegboard Error!",
-                  text: "Pegboard has no default peg assigned"
-                })
-                return;
+          console.log("LABELHOLDER ADD - STAGE", dropPos);
+          ctrl_intersectionTester.TestIntersectsWithMany(stage, "LABELHOLDER", ["PEGBOARD"], self.$store, dropPos)
+            .then(result => {
+              console.log("[LIBARY ADD] LABELHOLDER", result)
+              if (result.intersects == true) {
+                self.addNewLabelHolder(result.ID, data.data, result.ContainerPosition);
               }
+            })
+        }
+        break;
+        case "AREA": {
+          data.data["Type"] = "AREA";
 
-              data.data["Type"] = "PEGBOARD";
+          let ctrl_intersectionTester = new IntersectionTester();
 
-              // add to gondola if intersects
-              let ctrl_intersectionTester = new IntersectionTester();
+          let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
 
-              let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
+          console.log("AREA ADD - STAGE", dropPos);
+          ctrl_intersectionTester.TestIntersectsWithMany(stage, "AREA", ["GONDOLA"], self.$store, dropPos)
+            .then(result => {
+              console.log("[LIBARY ADD] AREA", result)
+              if (result.intersects == true) {
+                self.addNewArea(result.ID, data.data, result.ContainerPosition);
+              }
+            })
+        }
+        break;
+        case "TEXTHEADER": {
+          self.addNewTextHeader(data.data, {
+            ScaleX: 1,
+            ScaleY: 1
+          })
+        }
+        break;
+        case "PALETTE": {
 
-              console.log("PEGBOARD ADD - STAGE", dropPos);
-              // ctrl_intersectionTester.TestIntersectsWithItem(stage, "PEGBOARD", "GONDOLA", dropPos)
-              ctrl_intersectionTester.TestIntersectsWithMany(stage, "PEGBOARD", ["GONDOLA", "AREA"], dropPos)
-              .then(result => {
-                console.log("[LIBARY ADD] PEGBOARD", result)
-                if (result.intersects == true) {
-                  self.addNewPegboard(result.ID, data.data, result.ContainerPosition);
+          data.data["Type"] = "PALETTE";
+
+          let ctrl_intersectionTester = new IntersectionTester();
+
+          let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
+
+          console.log("SHELF ADD - STAGE", dropPos);
+          // ctrl_intersectionTester.TestIntersectsWithMany(stage, ["SHELF", "BASE", "PEGBAR", "BASKET"], dropPos)
+          ctrl_intersectionTester.TestIntersectsWithMany(stage, "PALETTE", ["GONDOLA"], self.$store,
+              dropPos)
+            .then(result => {
+              console.log("[LIBARY ADD] PALETTE", result)
+              if (result.intersects == true) {
+                self.addNewPalette(result.ID, data.data, result.ContainerPosition);
+              }
+            })
+        }
+        break;
+        case "BASKET": {
+          data.data["Type"] = "BASKET";
+
+          let ctrl_intersectionTester = new IntersectionTester();
+
+          let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
+
+          console.log("SHELF ADD - STAGE", dropPos);
+          // ctrl_intersectionTester.TestIntersectsWithMany(stage, ["SHELF", "BASE", "PEGBAR", "BASKET"], dropPos)
+          ctrl_intersectionTester.TestIntersectsWithMany(stage, "BASKET", ["SHELF", "BASE", "PEGBAR", "PEGBOARD",
+                "PALETTE"
+              ],
+              self.$store,
+              dropPos)
+            .then(result => {
+              console.log("[LIBARY ADD] BASKET", result)
+              if (result.intersects == true) {
+                self.addNewBasket(result.ID, data.data, result.ContainerPosition);
+              }
+            })
+
+        }
+        break;
+        case "PEG": {
+          data.data["Type"] = "PEG";
+
+          let ctrl_intersectionTester = new IntersectionTester();
+
+          let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
+
+          console.log("PEG ADD - STAGE", dropPos);
+          ctrl_intersectionTester.TestIntersectsWithMany(stage, "PEG", ["PEGBAR"],
+              self.$store,
+              dropPos)
+            .then(result => {
+              console.log("[LIBARY ADD] PEG", result)
+              if (result.intersects == true) {
+                self.addNewPeg(result.ID, data.data, result.ContainerPosition);
+              }
+            })
+
+        }
+        break;
+        case "OBSTRUCTION": {
+          //
+        }
+        break;
+        case "SHELF": {
+          data.data["Type"] = "SHELF";
+
+          let ctrl_intersectionTester = new IntersectionTester();
+
+          let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
+
+          console.log("SHELF ADD - STAGE", dropPos);
+          ctrl_intersectionTester.TestIntersectsWithMany(stage, "SHELF", ["GONDOLA", "AREA"], dropPos)
+            .then(result => {
+              console.log("[LIBARY ADD] SHELF", result)
+              if (result.intersects == true) {
+
+                self.addNewShelf(result.ID, data.data, result.ContainerPosition);
+
+              }
+            })
+
+        }
+        break;
+        case "BASE": {
+          data.data["Type"] = "BASE";
+
+          let ctrl_intersectionTester = new IntersectionTester();
+
+          let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
+
+          console.log("SHELF ADD - STAGE", dropPos);
+          ctrl_intersectionTester.TestIntersectsWithMany(stage, "BASE", ["GONDOLA", "AREA"], dropPos)
+            // ctrl_intersectionTester.TestIntersectsWithItem(stage, "BASE", "GONDOLA", dropPos)
+            .then(result => {
+              console.log("[LIBARY ADD] SHELF", result)
+              if (result.intersects == true) {
+
+                let ctrl_store = new StoreHelper();
+                let existingBaseItems = ctrl_store.getAllPlanogramItemsByType(this.$store, "BASE", result.ID);
+
+                if (existingBaseItems != undefined && existingBaseItems.length > 0) {
+                  alert('This gondola already contains a base, delete the base first and try again.');
+                  return;
                 }
-              })
-            }
-            break;
-          case "PEGBAR":
-            {
-              data.data["Type"] = "PEGBAR";
 
-              let ctrl_intersectionTester = new IntersectionTester();
+                // test if a gondola already has a base
+                self.addNewBase(result.ID, data.data, result.ContainerPosition);
+              }
+            })
+        }
+        break;
+        case "PEGBOARD": {
+          if (data.data.defaultPegDetails == null) {
+            console.error("[PEGBOARD] Pegboar has no default peg assigned");
+            // TODO: Call generic error modal
+            self.$refs.dialog.openDialog({
+              headline: "Pegboard Error!",
+              text: "Pegboard has no default peg assigned"
+            })
+            return;
+          }
 
-              let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
+          data.data["Type"] = "PEGBOARD";
 
-              console.log("PEGBAR ADD - STAGE", dropPos);
-              ctrl_intersectionTester.TestIntersectsWithMany(stage, "PEGBAR", ["GONDOLA", "AREA"], dropPos)
-              // ctrl_intersectionTester.TestIntersectsWithItem(stage, "PEGBAR", "GONDOLA", dropPos)
-              .then(result => {
-                console.log("[LIBARY ADD] PEGBAR", result)
-                if (result.intersects == true) {
-                  self.addNewPegBar(result.ID, data.data, result.ContainerPosition);
-                }
-              })
-            }
-            break;
+          // add to gondola if intersects
+          let ctrl_intersectionTester = new IntersectionTester();
+
+          let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
+
+          console.log("PEGBOARD ADD - STAGE", dropPos);
+          // ctrl_intersectionTester.TestIntersectsWithItem(stage, "PEGBOARD", "GONDOLA", dropPos)
+          ctrl_intersectionTester.TestIntersectsWithMany(stage, "PEGBOARD", ["GONDOLA", "AREA"], dropPos)
+            .then(result => {
+              console.log("[LIBARY ADD] PEGBOARD", result)
+              if (result.intersects == true) {
+                self.addNewPegboard(result.ID, data.data, result.ContainerPosition);
+              }
+            })
+        }
+        break;
+        case "PEGBAR": {
+          data.data["Type"] = "PEGBAR";
+
+          let ctrl_intersectionTester = new IntersectionTester();
+
+          let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
+
+          console.log("PEGBAR ADD - STAGE", dropPos);
+          ctrl_intersectionTester.TestIntersectsWithMany(stage, "PEGBAR", ["GONDOLA", "AREA"], dropPos)
+            // ctrl_intersectionTester.TestIntersectsWithItem(stage, "PEGBAR", "GONDOLA", dropPos)
+            .then(result => {
+              console.log("[LIBARY ADD] PEGBAR", result)
+              if (result.intersects == true) {
+                self.addNewPegBar(result.ID, data.data, result.ContainerPosition);
+              }
+            })
+        }
+        break;
         }
 
         stage.draw();
@@ -1805,7 +1808,6 @@
       }
     }
   };
-
 </script>
 <style scoped>
   .canvasOperations {
@@ -1818,5 +1820,4 @@
     overflow-y: hidden;
     overflow-x: hidden;
   }
-
 </style>

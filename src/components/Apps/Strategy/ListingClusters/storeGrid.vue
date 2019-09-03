@@ -43,6 +43,15 @@
                     headerName: 'Store Name',
                     field: 'storeName'
                 }, {
+                    headerName: 'Formula 1',
+                    field: 'level1Code'
+                },{
+                    headerName: 'Formula 2',
+                    field: 'level2Code'
+                },{
+                    headerName: 'Formula 3',
+                    field: 'level3Code'
+                }, {
                     headerName: 'Current Rank',
                     field: 'currentRank'
                 }, {

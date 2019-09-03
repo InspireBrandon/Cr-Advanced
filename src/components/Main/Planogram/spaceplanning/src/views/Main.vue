@@ -73,7 +73,6 @@
     methods: {
       event_product_group_statistics(eventData) {
         let self = this;
-        console.log("UHM?", eventData.data.Data.barcode, eventData.data);
 
         if (eventData.show == true) {
 
@@ -165,8 +164,6 @@
           // }
 
           let barcode = productData.ProductData.barcode;
-
-          console.log(productData.ProductData);
 
           if (productData.ProductData.useAlternateBarcode != undefined) {
             switch (productData.ProductData.alternatePackingType) {

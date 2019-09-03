@@ -13,8 +13,6 @@ class StageWarehouseMiddleware {
     planogramData = planogramData.slice(0, planogramData.length);
     warehouseProducts = warehouseProducts.slice(0, warehouseProducts.length);
 
-    console.log("Planogram Data", planogramData, warehouseProducts);
-
     // loop through planogramData and check to see if item is product
     planogramData.forEach((currentPlanogramItem, idx) => {
       if (currentPlanogramItem == undefined && currentPlanogramItem == null) {
@@ -29,8 +27,10 @@ class StageWarehouseMiddleware {
 
             if (warehouseProduct.barcode == productData.barcode) {
 
+              console.log(productData)
+
               for (var prop in productData) {
-                if (prop != "useAlternateBarcode" && prop != "alternateBarcode") {
+                if (prop != "useAlternateBarcode" && prop != "alternateBarcode" && prop != "alternatePackingType") {
                   if (warehouseProduct[prop] != undefined && warehouseProduct[prop] != null) {
                     productData[prop] = warehouseProduct[prop];
                   }

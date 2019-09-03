@@ -6,8 +6,6 @@ class Calculations {
   }
 
   Weekly_Sales_Units(sales_units) {
-    console.log("CALC HANDLER - SALES UNITS", sales_units, this);
-
     if (sales_units == undefined || sales_units == null) {
       return "N/A"
     }
@@ -91,8 +89,6 @@ class Calculations {
   }
 
   Days_Of_Supply_Potential(cube_capacity, sales_units) {
-    console.log("[CALCULATIONS] DAYS OF SUPPLY", "CC", cube_capacity, "SU", sales_units);
-
     if (cube_capacity == undefined || cube_capacity == null || sales_units == undefined || sales_units == null) {
       return "N/A"
     }
@@ -101,8 +97,6 @@ class Calculations {
       return "N/A"
     }
     var calc = cube_capacity / parseFloat(this.Weekly_Sales_Units(sales_units)) * 7;
-
-    console.log("calc", calc);
 
     return calc.toFixed(2);
   }

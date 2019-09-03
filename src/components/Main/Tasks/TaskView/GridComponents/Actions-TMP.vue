@@ -223,10 +223,12 @@
                 button_3.set('error', 'close', cp.setDeclined, "Decline")
             }
             break;
+            case 3: {
+                button_1.set('warning', 'visibility', cp.routeToView, "View")
+            }break;
             button_1.set('warning', 'visibility', cp.routeToView, "View")
             break;
             }
-
         }
         break;
         case 21: {

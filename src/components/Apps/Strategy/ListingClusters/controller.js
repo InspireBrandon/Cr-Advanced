@@ -282,7 +282,7 @@ function isEqual(a, b) {
 }
 
 function codeToNumber(code, zeros) {
-    if(zeros < 1) {
+    if (zeros < 1) {
         code = 0;
     } else {
         code += "0".repeat(zeros);
@@ -290,7 +290,7 @@ function codeToNumber(code, zeros) {
 
     let value = parseInt(code);
 
-    if(isNaN(value))
+    if (isNaN(value))
         value = 0;
 
     return value;
@@ -303,14 +303,14 @@ function otherToNumber(code, zeros) {
 function generateCluster(tmpStoreData, clusterData) {
     let clusterGroups = clusterData.clusterGroups;
     let clusterLevels = clusterData.clusterLevels;
-    let letters = ["E", "D", "C", "B", "A"];
+    let letters = ["A", "B", "C", "D", "E"];
 
     let tmp = [];
 
     tmpStoreData.forEach(element => {
         let tmpObj = {};
 
-        for(var prop in element) {
+        for (var prop in element) {
             tmpObj[prop] = element[prop];
         }
 
@@ -355,144 +355,97 @@ function generateCluster(tmpStoreData, clusterData) {
 
     tmpThirdLevel = JSON.parse(JSON.stringify(tmpThirdLevel))
 
-    let rollingIndex = 0;
-    let FirstLevelIndexLevel = clusterLevels;
-    let SecondLevelIndexLevel = 1;
-    let ThirdLevelIndexLevel = 1; 
-
-    let highestCode1 = tmpFirstLevel[0].level1Code;
-    let lowestCode1 =  tmpFirstLevel[tmpFirstLevel.length - 1].level1Code;
-    let codeLength = tmpFirstLevel[0].level1Code.length;
-
-    let firstValue1 = otherToNumber(highestCode1, codeLength);
-    let secondValue2 = otherToNumber(lowestCode1, codeLength);
-
-    let dividend1 = (firstValue1 - secondValue2) / clusterLevels;
+    let firstHighest = parseInt(tmpFirstLevel[0].level1Code);
+    let firstLowest = parseInt(tmpFirstLevel[tmpFirstLevel.length - 1].level1Code);
+    let countValue =  parseFloat((firstHighest - firstLowest) / clusterLevels);
+    let checkNum = 0;
+    let counter = 0;
 
     tmpFirstLevel.forEach((el, idx) => {
-        let otherNumber = otherToNumber(el.level1Code, el.storeCode.length)
+        counter = 0;
+        checkNum = parseInt(firstHighest - countValue);
 
-        console.log(otherNumber, dividend1 * FirstLevelIndexLevel)
+        for(var i = 0; i < 5; i++) {
+            console.log("Values", parseInt(el.level1Code), checkNum)
 
-        if(otherNumber < dividend1 * (FirstLevelIndexLevel - 1)) {
-            FirstLevelIndexLevel--;
+            if (parseInt(el.level1Code) < checkNum) {
+                if(checkNum - countValue > 0) {
+                    counter++;
+                    console.log("counter", counter);
+                    checkNum = checkNum - countValue;
+                }
+            }
         }
 
-        el.cluster = letters[FirstLevelIndexLevel - 1 + (clusterLevels - 1)];
-        rollingIndex++;
+        el.cluster = letters[counter];
     })
+
+    let secondHighest = parseInt(tmpSecondLevel[0].level2Code);
+    let secondLowest = parseInt(tmpSecondLevel[tmpFirstLevel.length - 1].level2Code);
+    countValue =  parseFloat((secondHighest - secondLowest) / clusterLevels);
+    checkNum = (secondHighest - countValue);
+    counter = 1;
 
     tmpSecondLevel.forEach((el, idx) => {
-        let firstPercentageTo = (SecondLevelIndexLevel / clusterLevels) * 100;
-        let firstPercentageOfArray = (idx / tmpSecondLevel.length) * 100;
+        counter = 1;
+        checkNum = secondHighest - countValue;
 
-        if (firstPercentageOfArray > firstPercentageTo) {
-            SecondLevelIndexLevel++;
+        for(var i = 0; i < 5; i++) {
+            if (parseInt(el.level2Code) < checkNum) {
+                if(checkNum - countValue > 0) {
+                    counter++;
+                    checkNum = checkNum - countValue;
+                }
+            }
         }
 
-        el.cluster = SecondLevelIndexLevel;
+        el.cluster = counter;
     })
+
+    let thirdHighest = parseInt(tmpThirdLevel[0].level3Code);
+    let thirdLowest = parseInt(tmpThirdLevel[tmpFirstLevel.length - 1].level3Code);
+    countValue = parseFloat((thirdHighest - thirdLowest) / clusterLevels);
+    checkNum = thirdHighest - countValue;
+    counter = 0;
 
     tmpThirdLevel.forEach((el, idx) => {
-        let firstPercentageTo = (ThirdLevelIndexLevel / clusterLevels) * 100;
-        let firstPercentageOfArray = (idx / tmpThirdLevel.length) * 100;
+        counter = 0;
+        checkNum = thirdHighest - countValue;
 
-        if (firstPercentageOfArray > firstPercentageTo) {
-            ThirdLevelIndexLevel++;
+        for(var i = 0; i < 5; i++) {
+            if (parseInt(el.level3Code) < checkNum) {
+                if(checkNum - countValue > 0) {
+                    counter++;
+                    checkNum = checkNum - countValue;
+                }
+            }
         }
 
-        el.cluster = letters[ThirdLevelIndexLevel - 1].toLowerCase();
+        el.cluster = letters[counter].toLowerCase();
     })
-
-    // tmpFirstLevel.forEach((el, idx) => {
-    //     SecondLevelIndexLevel = 1;
-    //     ThirdLevelIndexLevel = 1;
-
-    //     let firstPercentageTo = (FirstLevelIndexLevel / clusterLevels) * 100;
-    //     let firstPercentageOfArray = (idx / tmpFirstLevel.length) * 100;
-
-    //     if (firstPercentageOfArray > firstPercentageTo) {
-    //         FirstLevelIndexLevel++;
-    //         SecondLevelIndexLevel = 1;
-    //         ThirdLevelIndexLevel = 1;
-    //     }
-
-    //     el.cluster = letters[FirstLevelIndexLevel - 1];
-    // })
-
-    // if (clusterGroups > 1) {
-    //     tmpFirstLevel.forEach((el, idx) => {
-    //         var count = getCountOfDistinct(tmpFirstLevel, el.cluster);
-
-    //         tmpSecondLevel.forEach((el2, idx2) => {
-    //             let secondPercentageTo = (SecondLevelIndexLevel / count) * 100;
-    //             let secondPercentageOfArray = (((idx2 * count) / tmpSecondLevel.length) * 100);
-
-    //             if (secondPercentageOfArray >= secondPercentageTo) {
-    //                 SecondLevelIndexLevel++;
-
-    //                 if (SecondLevelIndexLevel > clusterLevels) {
-    //                     SecondLevelIndexLevel = 1;
-    //                 }
-    //             }
-
-    //             if (el2.store_ID == el.store_ID) {
-    //                 el.cluster += SecondLevelIndexLevel;
-    //                 SecondLevelIndexLevel = 1;
-    //             }
-    //         })
-    //     })
-    // }
-
-    // if (clusterGroups > 2) {
-    //     tmpFirstLevel.forEach((el, idx) => {
-
-    //         var count2 = getCountOfDistinct(tmpFirstLevel, el.cluster);
-
-    //         console.log(el.cluster, count2);
-
-    //         tmpThirdLevel.forEach((el3, idx3) => {
-    //             let thirdPercentageTo = (ThirdLevelIndexLevel / count2) * 100;
-    //             let thirdPercentageOfArray = (idx3 / tmpSecondLevel.length) * 100;
-
-    //             if (thirdPercentageOfArray >= thirdPercentageTo) {
-    //                 ThirdLevelIndexLevel++;
-
-    //                 if (ThirdLevelIndexLevel > clusterLevels) {
-    //                     ThirdLevelIndexLevel = 1;
-    //                 }
-    //             }
-
-    //             if (el3.store_ID == el.store_ID) {
-    //                 el3.cluster += letters[ThirdLevelIndexLevel - 1].toLowerCase();
-    //                 ThirdLevelIndexLevel = 1;
-    //             }
-    //         })
-    //     })
-    // }
 
     tmp.forEach(el => {
         tmpFirstLevel.forEach(el2 => {
-            if(el.store_ID == el2.store_ID) {
+            if (el.store_ID == el2.store_ID) {
                 el.cluster = el2.cluster;
             }
         })
 
-        // if(clusterGroups > 1) {
-        //     tmpSecondLevel.forEach(el2 => {
-        //         if(el.store_ID == el2.store_ID) {
-        //             el.cluster += el2.cluster;
-        //         }
-        //     })
-        // }
+        if(clusterGroups > 1) {
+            tmpSecondLevel.forEach(el2 => {
+                if(el.store_ID == el2.store_ID) {
+                    el.cluster += el2.cluster;
+                }
+            })
+        }
 
-        // if(clusterGroups > 2) {
-        //     tmpThirdLevel.forEach(el2 => {
-        //         if(el.store_ID == el2.store_ID) {
-        //             el.cluster += el2.cluster;
-        //         }
-        //     })
-        // }
+        if(clusterGroups > 2) {
+            tmpThirdLevel.forEach(el2 => {
+                if(el.store_ID == el2.store_ID) {
+                    el.cluster += el2.cluster;
+                }
+            })
+        }
     })
 
     return tmp.sort((a, b) => {
