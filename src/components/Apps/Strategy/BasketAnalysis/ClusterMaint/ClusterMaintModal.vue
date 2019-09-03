@@ -3,7 +3,7 @@
         <v-card>
             <v-toolbar color="primary" dark flat>
                 <v-toolbar-title>
-                    Cluster Maintenance
+                    Levels Maintenance
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-btn icon @click="dialog=false">
@@ -15,7 +15,7 @@
             <v-toolbar dark dense class="pa-0">
                 <v-spacer></v-spacer>
                 <v-btn @click="openAdd" color="primary">
-                    Add Cluster
+                    Add Level
                 </v-btn>
             </v-toolbar>
             <grid ref="grid" :data="rowData" :getData="GetData" />
@@ -23,7 +23,7 @@
                 <v-card>
                     <v-toolbar color="primary" dark flat>
                         <v-toolbar-title>
-                            Add Cluster
+                            Add Level
                         </v-toolbar-title>
                         <v-spacer></v-spacer>
                         <v-btn icon @click="addDialog=false">
@@ -34,7 +34,7 @@
                     </v-toolbar>
                     <v-card-text>
                         <v-form ref="clusterForm">
-                            <v-text-field label="Cluster Name" :rules="nameRules" required
+                            <v-text-field label="Level Name" :rules="nameRules" required
                                 v-model="createItem.clusterName">
                             </v-text-field>
                             <v-text-field label="Display Name" :rules="nameRules" required
@@ -60,6 +60,7 @@
         components: {
             grid
         },
+        props:["basket_ID"],
         data() {
             return {
                 nameRules: [
@@ -74,6 +75,7 @@
                     value: null,
                     active: true,
                     rank: null,
+                    basket_ID:null,
                 },
                 rowData: [],
             }
@@ -84,7 +86,7 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 console.log("[GETTING CLUSTER]");
 
-                Axios.get(process.env.VUE_APP_API + `Cluster/Get`)
+                Axios.get(process.env.VUE_APP_API + `Cluster/Get?Basket_ID=${self.basket_ID}`)
                     .then(r => {
                         console.log(r);
                         self.rowData = r.data
@@ -108,7 +110,7 @@
             },
             submitADD() {
                 let self = this
-
+                self.createItem.basket_ID=self.basket_ID
                 if (this.$refs.clusterForm.validate()) {
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 

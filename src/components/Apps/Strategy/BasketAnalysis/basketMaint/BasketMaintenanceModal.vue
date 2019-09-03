@@ -40,6 +40,8 @@
                             </v-text-field>
                             <v-text-field label="Description" :rules="nameRules" v-model="createItem.description">
                             </v-text-field>
+                             <v-text-field label="Levels" :rules="nameRules" v-model="createItem.levels">
+                            </v-text-field>
                         </v-form>
                     </v-card-text>
                     <v-card-actions>
@@ -73,6 +75,7 @@
                     description: null,
                     active: true,
                     rank: null,
+                    levels:null
                 },
                 rowData: [],
             }

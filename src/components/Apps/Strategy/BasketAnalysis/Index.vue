@@ -24,7 +24,7 @@
                             <v-list-tile-title>Baskets</v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile @click="openClusterSetup">
-                            <v-list-tile-title>Clusters</v-list-tile-title>
+                            <v-list-tile-title>Basket Levels</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
                 </v-menu>
@@ -58,7 +58,7 @@
         <Grid :rowData="rowData" :basket="selectedBasket" v-if="selectedBasket != null" ref="Grid" />
 
         <basketMaint :getBaskets="getbaskets" ref="basketMaint" />
-        <ClusterMaint ref="ClusterMaint" />
+        <ClusterMaint :basket_ID="basket_ID" ref="ClusterMaint" />
         <StoreBasketReport ref="StoreBasketReport" />
         <Spinner ref="Spinner" />
     </v-card>
@@ -95,6 +95,7 @@
                 selectedBasket: null,
                 projectGroups: [],
                 selectedProjectGroup: null,
+                basket_ID:null
             }
         },
         created() {
@@ -173,7 +174,7 @@
             getBasketReportData(datePicker) {
                 let self = this;
                 self.$refs.Spinner.show()
-
+                self.basket_ID=self.selectedBasket.value
                 Axios.get(process.env.VUE_APP_API + "BasketAnalysis?basketID=" + self.selectedBasket.value)
                     .then(r => {
                         console.log(r);
