@@ -358,19 +358,16 @@ function generateCluster(tmpStoreData, clusterData) {
     let rollingIndex = 0;
     let FirstLevelIndexLevel = clusterLevels;
     let SecondLevelIndexLevel = 1;
-    let ThirdLevelIndexLevel = 1;
-
-    let codeLength = tmpFirstLevel[0].storeCode.length; 
+    let ThirdLevelIndexLevel = 1; 
 
     let highestCode1 = tmpFirstLevel[0].level1Code;
     let lowestCode1 =  tmpFirstLevel[tmpFirstLevel.length - 1].level1Code;
+    let codeLength = tmpFirstLevel[0].level1Code.length;
 
     let firstValue1 = otherToNumber(highestCode1, codeLength);
     let secondValue2 = otherToNumber(lowestCode1, codeLength);
 
     let dividend1 = (firstValue1 - secondValue2) / clusterLevels;
-
-    console.log("dividend1", dividend1);
 
     tmpFirstLevel.forEach((el, idx) => {
         let otherNumber = otherToNumber(el.level1Code, el.storeCode.length)
@@ -378,7 +375,6 @@ function generateCluster(tmpStoreData, clusterData) {
         console.log(otherNumber, dividend1 * FirstLevelIndexLevel)
 
         if(otherNumber < dividend1 * (FirstLevelIndexLevel - 1)) {
-            console.log("IM IN HERE")
             FirstLevelIndexLevel--;
         }
 
