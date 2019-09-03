@@ -45,6 +45,10 @@
                     "headerName": "Rank",
                     "editable": true,
                     "field": "rank"
+                },{
+                    "headerName": "Levels",
+                    "editable": true,
+                    "field": "Levels"
                 }, {
                     "headerName": "",
                     "cellRendererFramework": "rank",

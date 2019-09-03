@@ -154,7 +154,7 @@
                         "field": "size_Description"
                     }, {
                         "headerName": "Description",
-                        "hide": true,
+                        "hide": false,
                         "field": "product_Description"
                     }
                 ]

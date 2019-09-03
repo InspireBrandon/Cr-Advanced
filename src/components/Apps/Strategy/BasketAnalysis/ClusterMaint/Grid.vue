@@ -25,7 +25,7 @@
             return {
                 selectedItems: [],
                 headers: [{
-                    "headerName": "Cluster Name",
+                    "headerName": "Level Name",
                     "editable": true,
                     "field": "clusterName"
                 }, {
