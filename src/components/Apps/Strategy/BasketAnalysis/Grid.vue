@@ -1,5 +1,6 @@
 <template>
     <div>
+        {{rowData.length}}
         <div>
             <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 225px);"
                 :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"

@@ -6,20 +6,25 @@
             <v-btn icon @click="dialog=false">
                 <v-icon>close</v-icon>
             </v-btn>
-           
+
         </v-toolbar>
         <v-card>
-            <Grid ref="grid" :data="Data"  />
+            <Grid ref="grid" :data="Data" />
         </v-card>
+        <DateRangeSelector ref="DateRangeSelector" />
+
     </v-dialog>
 </template>
 
 <script>
+    import DateRangeSelector from "@/components/Common/DateRangeSelector"
     import Grid from './Grid.vue'
     import Axios from 'axios'
     export default {
         components: {
+            DateRangeSelector,
             Grid
+
         },
         data() {
             return {
@@ -32,15 +37,19 @@
         methods: {
             getReport(basket_ID, callback) {
                 let self = this
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                self.$refs.DateRangeSelector.show(dateCall => {
 
-                Axios.get(process.env.VUE_APP_API + `StoreBasketReport?basket_ID=${basket_ID}`)
-                    .then(r => {
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                        self.Data = r.data
-                        console.log(self.Data);
-                        callback(r.data)
-                    })
+                    Axios.get(process.env.VUE_APP_API + `StoreBasketReport?basket_ID=${basket_ID}&PeriodFrom=${dateCall.dateFrom}&PeriodTo=${dateCall.dateTo}`)
+                        .then(r => {
+                            self.Data = r.data
+                            console.log(self.Data);
+                            callback(r.data)
+                        })
+
+                })
+
 
             },
             show(basketName, basket_ID) {
