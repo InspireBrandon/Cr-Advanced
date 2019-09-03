@@ -420,7 +420,8 @@
         {
           headerName: 'Brand',
           field: 'brand',
-          hide: true
+          hide: true,
+          editable: true
         },
         {
           headerName: 'Manufacturer',
@@ -661,7 +662,8 @@
       },
       openEdit(product) {
         let self = this
-
+        console.log(product);
+        
         this.$refs.productMaint.show({
           isAdd: false,
           formData: product.data,
@@ -675,6 +677,8 @@
 
             Axios.put(process.env.VUE_APP_API + "Product?db=CR-Hinterland-Live", product.data)
               .then(r => {
+                console.log(r);
+                
                 if (r.data) {
                   self.$refs.productMaint.hide();
                   product.node.setData(r.data);
