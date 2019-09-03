@@ -47,7 +47,7 @@
                 </v-select>
             </v-toolbar-items>
 
-            <v-btn @click="getFilteredData" color="primary">Set Visible to yes</v-btn>
+            <v-btn @click="getFilteredData" color="primary" v-if="rowData.length>0">Set Visible to yes</v-btn>
             <v-spacer></v-spacer>
             <v-text-field append-icon="search" type="text" id="filter-text-box" placeholder="Filter..."
                 @input="onFilterTextBoxChanged" v-model="filterText">
@@ -73,6 +73,7 @@
     import basketMaint from './BasketMaint/BasketMaintenanceModal.vue'
     import ClusterMaint from './ClusterMaint/ClusterMaintModal.vue'
     import StoreBasketReport from './StoreBasketReport/StoreBasketReport.vue'
+
     import Spinner from "@/components/Common/Spinner";
 
     export default {
@@ -169,7 +170,7 @@
                 let self = this
                 self.$refs.basketMaint.open()
             },
-            getBasketReportData() {
+            getBasketReportData(datePicker) {
                 let self = this;
                 self.$refs.Spinner.show()
 
@@ -184,7 +185,6 @@
             },
             onBasketSelect() {
                 let self = this;
-
                 self.getBasketReportData();
             },
             runReport() {
