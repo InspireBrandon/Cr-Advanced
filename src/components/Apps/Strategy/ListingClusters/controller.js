@@ -36,8 +36,6 @@ class ListingClusterController {
         storeClusterCodes = addRank(storeClusterCodes);
         let clusters = generateCluster(storeClusterCodes, clusterData);
 
-        console.log(clusters)
-
         return {
             stores: storeClusterCodes,
             storeData: clusters,
@@ -281,28 +279,10 @@ function isEqual(a, b) {
     }
 }
 
-function codeToNumber(code, zeros) {
-    if (zeros < 1) {
-        code = 0;
-    } else {
-        code += "0".repeat(zeros);
-    }
-
-    let value = parseInt(code);
-
-    if (isNaN(value))
-        value = 0;
-
-    return value;
-}
-
-function otherToNumber(code, zeros) {
-    return parseInt(code + "0".repeat(zeros - code.length));
-}
-
 function generateCluster(tmpStoreData, clusterData) {
     let clusterGroups = clusterData.clusterGroups;
     let clusterLevels = clusterData.clusterLevels;
+
     let letters = ["A", "B", "C", "D", "E"];
 
     let tmp = [];
@@ -357,21 +337,20 @@ function generateCluster(tmpStoreData, clusterData) {
 
     let firstHighest = parseInt(tmpFirstLevel[0].level1Code);
     let firstLowest = parseInt(tmpFirstLevel[tmpFirstLevel.length - 1].level1Code);
-    let countValue =  parseFloat((firstHighest - firstLowest) / clusterLevels);
+
+    let countValue = Math.floor(parseFloat((firstHighest - firstLowest) / clusterLevels));
+
     let checkNum = 0;
     let counter = 0;
 
     tmpFirstLevel.forEach((el, idx) => {
         counter = 0;
-        checkNum = parseInt(firstHighest - countValue);
+        checkNum = parseInt((countValue * clusterLevels) - countValue);
 
-        for(var i = 0; i < 5; i++) {
-            console.log("Values", parseInt(el.level1Code), checkNum)
-
+        for(var i = 0; i < clusterLevels; i++) {
             if (parseInt(el.level1Code) < checkNum) {
-                if(checkNum - countValue > 0) {
+                if(checkNum - countValue >= 0) {
                     counter++;
-                    console.log("counter", counter);
                     checkNum = checkNum - countValue;
                 }
             }
@@ -381,18 +360,20 @@ function generateCluster(tmpStoreData, clusterData) {
     })
 
     let secondHighest = parseInt(tmpSecondLevel[0].level2Code);
-    let secondLowest = parseInt(tmpSecondLevel[tmpFirstLevel.length - 1].level2Code);
-    countValue =  parseFloat((secondHighest - secondLowest) / clusterLevels);
-    checkNum = (secondHighest - countValue);
+    let secondLowest = parseInt(tmpSecondLevel[tmpSecondLevel.length - 1].level2Code);
+
+    countValue = Math.floor(parseFloat((secondHighest - secondLowest) / clusterLevels));
+
+    checkNum = 0;
     counter = 1;
 
     tmpSecondLevel.forEach((el, idx) => {
         counter = 1;
-        checkNum = secondHighest - countValue;
+        checkNum = parseInt((countValue * clusterLevels) - countValue);
 
-        for(var i = 0; i < 5; i++) {
+        for(var i = 0; i < clusterLevels; i++) {
             if (parseInt(el.level2Code) < checkNum) {
-                if(checkNum - countValue > 0) {
+                if(checkNum - countValue >= 0) {
                     counter++;
                     checkNum = checkNum - countValue;
                 }
@@ -403,18 +384,20 @@ function generateCluster(tmpStoreData, clusterData) {
     })
 
     let thirdHighest = parseInt(tmpThirdLevel[0].level3Code);
-    let thirdLowest = parseInt(tmpThirdLevel[tmpFirstLevel.length - 1].level3Code);
-    countValue = parseFloat((thirdHighest - thirdLowest) / clusterLevels);
-    checkNum = thirdHighest - countValue;
+    let thirdLowest = parseInt(tmpThirdLevel[tmpThirdLevel.length - 1].level3Code);
+    
+    countValue = Math.floor(parseFloat((thirdHighest - thirdLowest) / clusterLevels));
+    
+    checkNum = 0;
     counter = 0;
 
     tmpThirdLevel.forEach((el, idx) => {
         counter = 0;
-        checkNum = thirdHighest - countValue;
+        checkNum = parseInt((countValue * clusterLevels) - countValue);
 
         for(var i = 0; i < 5; i++) {
             if (parseInt(el.level3Code) < checkNum) {
-                if(checkNum - countValue > 0) {
+                if(checkNum - countValue >= 0) {
                     counter++;
                     checkNum = checkNum - countValue;
                 }
