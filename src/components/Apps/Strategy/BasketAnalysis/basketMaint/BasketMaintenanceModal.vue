@@ -80,6 +80,7 @@
             }
         },
         methods: {
+            
             GetData() {
                 let self = this
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;

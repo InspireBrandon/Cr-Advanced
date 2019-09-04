@@ -23,9 +23,7 @@
                         <v-list-tile @click="openBasketMaint">
                             <v-list-tile-title>Baskets</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile @click="openClusterSetup">
-                            <v-list-tile-title>Basket Levels</v-list-tile-title>
-                        </v-list-tile>
+
                     </v-list>
                 </v-menu>
             </v-toolbar-items>
@@ -47,7 +45,8 @@
                 </v-select>
             </v-toolbar-items>
 
-            <v-btn @click="getFilteredData" color="primary" v-if="rowData.length>0">Set Visible to yes</v-btn>
+            <v-btn @click="getFilteredData(true)" color="primary" v-if="rowData.length>0">apply yes</v-btn>
+            <v-btn @click="getFilteredData(false)" color="primary" v-if="rowData.length>0">apply no</v-btn>
             <v-spacer></v-spacer>
             <v-text-field append-icon="search" type="text" id="filter-text-box" placeholder="Filter..."
                 @input="onFilterTextBoxChanged" v-model="filterText">
@@ -61,6 +60,7 @@
         <ClusterMaint :basket_ID="basket_ID" ref="ClusterMaint" />
         <StoreBasketReport ref="StoreBasketReport" />
         <Spinner ref="Spinner" />
+        <YesNoModal ref="YesNoModal" />
     </v-card>
 </template>
 
@@ -75,10 +75,13 @@
     import StoreBasketReport from './StoreBasketReport/StoreBasketReport.vue'
 
     import Spinner from "@/components/Common/Spinner";
+    import YesNoModal from "@/components/Common/YesNoModal";
+
 
     export default {
         components: {
             basketMaint,
+            YesNoModal,
             Grid,
             BasketConfig,
             PremiumNature,
@@ -95,7 +98,7 @@
                 selectedBasket: null,
                 projectGroups: [],
                 selectedProjectGroup: null,
-                basket_ID:null
+                basket_ID: null
             }
         },
         created() {
@@ -112,36 +115,36 @@
 
                 })
             },
-            getFilteredData() {
+            getFilteredData(value) {
                 let self = this
-                self.$refs.Spinner.show()
-                let tmp = []
-                tmp = self.$refs.Grid.getFilteredData()
-                let comp = tmp.last.columnController.allDisplayedColumns
-                let compareCriteria = comp[comp.length - 1].colId
-                let end = tmp.tmpArr
-                console.log(tmp);
-
-                end.forEach(item => {
-                    item.active = true
-                    item.basket_ID = self.selectedBasket.value;
-                })
-
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                Axios.post(process.env.VUE_APP_API + `Basket_Product_Link/SaveMany`, end)
-                    .then(r => {
-                        console.log(r);
-
-                        tmp.tmpArrNode.forEach(item => {
-                            item.data.active = true
-
-                            item.setData(item.data)
-                            self.$refs.Spinner.hide()
+                let title = "Confirm yes/no application to visible data?"
+              
+                self.$refs.YesNoModal.show(title, yesNoValue => {
+                    if (yesNoValue) {
+                        self.$refs.Spinner.show()
+                        let tmp = []
+                        tmp = self.$refs.Grid.getFilteredData()
+                        let comp = tmp.last.columnController.allDisplayedColumns
+                        let compareCriteria = comp[comp.length - 1].colId
+                        let end = tmp.tmpArr
+                        console.log(tmp);
+                        end.forEach(item => {
+                            item.active = value
+                            item.basket_ID = self.selectedBasket.value;
                         })
-                        delete Axios.defaults.headers.common["TenantID"];
-                    })
-
-
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                        Axios.post(process.env.VUE_APP_API + `Basket_Product_Link/SaveMany`, end)
+                            .then(r => {
+                                console.log(r);
+                                tmp.tmpArrNode.forEach(item => {
+                                    item.data.active = value
+                                    item.setData(item.data)
+                                    self.$refs.Spinner.hide()
+                                })
+                                delete Axios.defaults.headers.common["TenantID"];
+                            })
+                    }
+                })
             },
 
             getData() {
@@ -174,7 +177,7 @@
             getBasketReportData(datePicker) {
                 let self = this;
                 self.$refs.Spinner.show()
-                self.basket_ID=self.selectedBasket.value
+                self.basket_ID = self.selectedBasket.value
                 Axios.get(process.env.VUE_APP_API + "BasketAnalysis?basketID=" + self.selectedBasket.value)
                     .then(r => {
                         console.log(r);

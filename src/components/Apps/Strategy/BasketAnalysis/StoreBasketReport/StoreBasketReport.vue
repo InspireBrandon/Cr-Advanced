@@ -1,28 +1,31 @@
 <template>
-    <v-dialog v-model="dialog" persistent width="800px">
-        <v-toolbar color="primary" dark flat>
-            <v-toolbar-title>Store Basket Report - {{ basketName }}</v-toolbar-title>
-            <v-spacer></v-spacer>
-            <v-btn icon @click="dialog=false">
-                <v-icon>close</v-icon>
-            </v-btn>
-
-        </v-toolbar>
+    <v-dialog v-model="dialog" fullscreen="" persistent >
         <v-card>
+            <v-toolbar color="primary" dark flat>
+                <v-toolbar-title>Store Basket Report - {{ basketName }}</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-btn icon @click="dialog=false">
+                    <v-icon>close</v-icon>
+                </v-btn>
+            </v-toolbar>
             <Grid ref="grid" :data="Data" />
+            <DateRangeSelector ref="DateRangeSelector" />
+            <Spinner ref="Spinner" />
         </v-card>
-        <DateRangeSelector ref="DateRangeSelector" />
-
     </v-dialog>
 </template>
 
 <script>
+    import Spinner from "@/components/Common/Spinner";
     import DateRangeSelector from "@/components/Common/DateRangeSelector"
+
     import Grid from './Grid.vue'
     import Axios from 'axios'
+
     export default {
         components: {
             DateRangeSelector,
+            Spinner,
             Grid
 
         },
@@ -38,14 +41,21 @@
             getReport(basket_ID, callback) {
                 let self = this
                 self.$refs.DateRangeSelector.show(dateCall => {
-
+                    self.$refs.Spinner.show()
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                    Axios.get(process.env.VUE_APP_API + `StoreBasketReport?basket_ID=${basket_ID}&PeriodFrom=${dateCall.dateFrom}&PeriodTo=${dateCall.dateTo}`)
+                    Axios.get(process.env.VUE_APP_API +
+                            `StoreBasketReport?basket_ID=${basket_ID}&PeriodFrom=${dateCall.dateFrom}&PeriodTo=${dateCall.dateTo}`
+                        )
                         .then(r => {
                             self.Data = r.data
                             console.log(self.Data);
+                            self.$refs.Spinner.hide()
+
                             callback(r.data)
+                        }).catch(e => {
+                            self.$refs.Spinner.hide()
+                            alert("failed to load report data")
                         })
 
                 })

@@ -1,10 +1,10 @@
 <template>
     <div>
-        <ag-grid-vue :gridOptions="gridOptions" :sideBar='false' style="width: 100%;  height: 500px;"
+        <ag-grid-vue :gridOptions="gridOptions" :sideBar='false' style="width: 100%;  height: calc(100vh - 64px);"
             :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="data"
             :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true"
             rowSelection="multiple" :rowDeselection="true" :enableColResize="true" :floatingFilter="true"
-            :onGridReady="onGridReady" >
+            :onGridReady="onGridReady">
         </ag-grid-vue>
     </div>
 </template>
@@ -27,11 +27,17 @@
                     "field": "displayname"
 
                 }, {
-                    "headerName": "Premium Nature",
+                    "headerName": "Level ",
                     "field": "cluster"
                 }, {
-                    "headerName": "Basket Percentage",
+                    "headerName": "Store Percentage",
                     "field": "percentage"
+                }, {
+                    "headerName": "Basket Percentage",
+                    "field": "basketSalesPercentage"
+                }, {
+                    "headerName": "Sales",
+                    "field": "sales"
                 }],
                 defaultColDef: {
                     // onCellValueChanged: this.UpdateLine
@@ -44,8 +50,7 @@
                 },
             }
         },
-        created() {
-        },
+        created() {},
         methods: {
             resize() {
                 this.gridApi.sizeColumnsToFit()
