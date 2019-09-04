@@ -205,7 +205,7 @@ class LoadSavePlanogramBase {
           }
           let xhrObj = new XMLHttpRequest();
           let url = self.ServerAddress +
-            `SystemFile/JSON/PlanogramImage?db=CR-Devinspire&fileName=${output.name}`;
+            `SystemFile/JSON/PlanogramImage?db=CR-Devinspire&fileName=${encodeURIComponent(output.name)}`
 
           xhrObj.open("Post", url);
           let startTime = new Date()

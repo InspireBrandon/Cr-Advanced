@@ -291,8 +291,10 @@ function getMostCommonGroups(codeData, levels, group) {
         tmp = tmp.filter(fel => {
             return fel["level" + group + "Code"] != currentHighestString;
         });
-        
-        retval.push(currentHighestString);
+
+        if(currentHighest > 1) {
+            retval.push(currentHighestString);   
+        }
     }
 
     return retval.sort((a, b) => {
@@ -310,7 +312,7 @@ function generateClusterNew(tmpStoreData, clusterData) {
     let clusterGroups = clusterData.clusterGroups;
     let clusterLevels = clusterData.clusterLevels;
 
-    let letters = ["A", "B", "C", "D", "E"];
+    let letters = ["A", "B", "C", "D", "E", "X"];
     let tmp = [];
 
     tmpStoreData.forEach(element => {
@@ -370,11 +372,13 @@ function generateClusterNew(tmpStoreData, clusterData) {
     let highestFirst = tmpFirstLevel[0].level1Code;
     let commonGroups1 = getMostCommonGroups(tmpFirstLevel, clusterLevels, 1);
 
+    console.log("Common Group", commonGroups1)
+
     tmpFirstLevel.forEach((el, idx) => {
         let counter = 0;
         let assigned = false;
 
-        for (var i = 0; i < (clusterLevels - 1); i++) {
+        for (var i = 0; i < (commonGroups1.length - 1); i++) {
             let highest = commonGroups1[i];
             let lowest = commonGroups1[i + 1];
 
@@ -393,7 +397,7 @@ function generateClusterNew(tmpStoreData, clusterData) {
         }
 
         if(!assigned)
-            counter = (clusterLevels - 1);
+            counter = letters.length - 1;
 
         el.cluster = letters[counter];
     })
@@ -405,7 +409,7 @@ function generateClusterNew(tmpStoreData, clusterData) {
         let counter = 0;
         let assigned = false;
 
-        for (var i = 0; i < (clusterLevels - 1); i++) {
+        for (var i = 0; i < (commonGroups2.length - 1); i++) {
             let highest = commonGroups2[i];
             let lowest = commonGroups2[i + 1];
 
@@ -424,9 +428,9 @@ function generateClusterNew(tmpStoreData, clusterData) {
         }
 
         if(!assigned)
-            counter = (clusterLevels - 1);
+            counter = letters.length - 1;
 
-        el.cluster = counter;
+        el.cluster = (counter == (letters.length - 1)) ? letters[counter] : counter;
     })
 
     let highestThird = tmpThirdLevel[0].level3Code;
@@ -436,7 +440,7 @@ function generateClusterNew(tmpStoreData, clusterData) {
         let counter = 0;
         let assigned = false;
 
-        for (var i = 0; i < (clusterLevels - 1); i++) {
+        for (var i = 0; i < (commonGroups3.length - 1); i++) {
             let highest = commonGroups3[i];
             let lowest = commonGroups3[i + 1];
 
@@ -455,9 +459,9 @@ function generateClusterNew(tmpStoreData, clusterData) {
         }
 
         if(!assigned)
-            counter = (clusterLevels - 1);
+            counter = letters.length - 1;
 
-        el.cluster = letters[counter].toLowerCase();
+        el.cluster = (counter == (letters.length - 1)) ? letters[counter] : letters[counter].toLowerCase();
     })
 
     tmp.forEach(el => {
