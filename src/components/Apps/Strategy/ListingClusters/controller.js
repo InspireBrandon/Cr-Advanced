@@ -34,9 +34,7 @@ class ListingClusterController {
         let totalStoreProductSales = getTotalStoreProductSales(storeSales, products, storeSalesData, clusterData);
         let storeClusterCodes = accumulateCodes(totalStoreProductSales, stores, clusterData);
         storeClusterCodes = addRank(storeClusterCodes);
-        let clusters = generateCluster(storeClusterCodes, clusterData);
-
-        console.log(clusters)
+        let clusters = generateClusterNew(storeClusterCodes, clusterData);
 
         return {
             stores: storeClusterCodes,
@@ -270,41 +268,49 @@ function addRank(tmpStoreData) {
     return tmpStoreData;
 }
 
-function isEqual(a, b) {
-    if (a.length != b.length)
-        return "False";
-    else {
-        for (var i = 0; i < a.length; i++)
-            if (a[i] != b[i])
-                return "False";
-        return "True";
+function getMostCommonGroups(codeData, levels, group) {
+    let tmp = JSON.parse(JSON.stringify(codeData))
+    let currentCount = 0;
+    let retval = [];
+
+    for(var i = 0; i < levels; i++) {
+        let currentHighest = 0;
+        let currentHighestString = "";
+
+        tmp.forEach(el => {
+            let count = tmp.filter(fel => {
+                return fel["level" + group + "Code"] == el["level" + group + "Code"];
+            }).length;
+
+            if(count > currentHighest) {
+                currentHighest = count;
+                currentHighestString = el["level" + group + "Code"];
+            }
+        })
+
+        tmp = tmp.filter(fel => {
+            return fel["level" + group + "Code"] != currentHighestString;
+        });
+        
+        retval.push(currentHighestString);
     }
+
+    return retval.sort((a, b) => {
+        if (a > b) {
+            return -1;
+        }
+        if (a < b) {
+            return 1;
+        }
+        return 0;
+    });
 }
 
-function codeToNumber(code, zeros) {
-    if (zeros < 1) {
-        code = 0;
-    } else {
-        code += "0".repeat(zeros);
-    }
-
-    let value = parseInt(code);
-
-    if (isNaN(value))
-        value = 0;
-
-    return value;
-}
-
-function otherToNumber(code, zeros) {
-    return parseInt(code + "0".repeat(zeros - code.length));
-}
-
-function generateCluster(tmpStoreData, clusterData) {
+function generateClusterNew(tmpStoreData, clusterData) {
     let clusterGroups = clusterData.clusterGroups;
     let clusterLevels = clusterData.clusterLevels;
-    let letters = ["A", "B", "C", "D", "E"];
 
+    let letters = ["A", "B", "C", "D", "E"];
     let tmp = [];
 
     tmpStoreData.forEach(element => {
@@ -357,69 +363,99 @@ function generateCluster(tmpStoreData, clusterData) {
 
     let firstHighest = parseInt(tmpFirstLevel[0].level1Code);
     let firstLowest = parseInt(tmpFirstLevel[tmpFirstLevel.length - 1].level1Code);
-    let countValue =  parseFloat((firstHighest - firstLowest) / clusterLevels);
-    let checkNum = 0;
-    let counter = 0;
+
+    let countValue = Math.floor(parseFloat((firstHighest - firstLowest) / clusterLevels));
+    let highestPoint = countValue * clusterLevels;
+
+    let highestFirst = tmpFirstLevel[0].level1Code;
+    let commonGroups1 = getMostCommonGroups(tmpFirstLevel, clusterLevels, 1);
 
     tmpFirstLevel.forEach((el, idx) => {
-        counter = 0;
-        checkNum = parseInt(firstHighest - countValue);
+        let counter = 0;
+        let assigned = false;
 
-        for(var i = 0; i < 5; i++) {
-            console.log("Values", parseInt(el.level1Code), checkNum)
+        for (var i = 0; i < (clusterLevels - 1); i++) {
+            let highest = commonGroups1[i];
+            let lowest = commonGroups1[i + 1];
 
-            if (parseInt(el.level1Code) < checkNum) {
-                if(checkNum - countValue > 0) {
-                    counter++;
-                    console.log("counter", counter);
-                    checkNum = checkNum - countValue;
+            if(el.level1Code >= lowest && el.level1Code <= highest) {
+                let closest = closestTo(el.level1Code, lowest, highest);
+
+                if(closest.highest > closest.lowest) {
+                    counter = i;
                 }
+                else {
+                    counter = i + 1;
+                }
+
+                assigned = true;
             }
         }
+
+        if(!assigned)
+            counter = (clusterLevels - 1);
 
         el.cluster = letters[counter];
     })
 
-    let secondHighest = parseInt(tmpSecondLevel[0].level2Code);
-    let secondLowest = parseInt(tmpSecondLevel[tmpFirstLevel.length - 1].level2Code);
-    countValue =  parseFloat((secondHighest - secondLowest) / clusterLevels);
-    checkNum = (secondHighest - countValue);
-    counter = 1;
+    let highestSecond = tmpSecondLevel[0].level2Code;
+    let commonGroups2 = getMostCommonGroups(tmpSecondLevel, clusterLevels, 2);
 
     tmpSecondLevel.forEach((el, idx) => {
-        counter = 1;
-        checkNum = secondHighest - countValue;
+        let counter = 0;
+        let assigned = false;
 
-        for(var i = 0; i < 5; i++) {
-            if (parseInt(el.level2Code) < checkNum) {
-                if(checkNum - countValue > 0) {
-                    counter++;
-                    checkNum = checkNum - countValue;
+        for (var i = 0; i < (clusterLevels - 1); i++) {
+            let highest = commonGroups2[i];
+            let lowest = commonGroups2[i + 1];
+
+            if(el.level2Code >= lowest && el.level2Code <= highest) {
+                let closest = closestTo(el.level2Code, lowest, highest);
+
+                if(closest.highest > closest.lowest) {
+                    counter = i + 1;
                 }
+                else {
+                    counter = i + 2;
+                }
+
+                assigned = true;
             }
         }
+
+        if(!assigned)
+            counter = (clusterLevels - 1);
 
         el.cluster = counter;
     })
 
-    let thirdHighest = parseInt(tmpThirdLevel[0].level3Code);
-    let thirdLowest = parseInt(tmpThirdLevel[tmpFirstLevel.length - 1].level3Code);
-    countValue = parseFloat((thirdHighest - thirdLowest) / clusterLevels);
-    checkNum = thirdHighest - countValue;
-    counter = 0;
+    let highestThird = tmpThirdLevel[0].level3Code;
+    let commonGroups3 = getMostCommonGroups(tmpThirdLevel, clusterLevels, 3);
 
     tmpThirdLevel.forEach((el, idx) => {
-        counter = 0;
-        checkNum = thirdHighest - countValue;
+        let counter = 0;
+        let assigned = false;
 
-        for(var i = 0; i < 5; i++) {
-            if (parseInt(el.level3Code) < checkNum) {
-                if(checkNum - countValue > 0) {
-                    counter++;
-                    checkNum = checkNum - countValue;
+        for (var i = 0; i < (clusterLevels - 1); i++) {
+            let highest = commonGroups3[i];
+            let lowest = commonGroups3[i + 1];
+
+            if(el.level3Code >= lowest && el.level3Code <= highest) {
+                let closest = closestTo(el.level3Code, lowest, highest);
+
+                if(closest.highest > closest.lowest) {
+                    counter = i;
                 }
+                else {
+                    counter = i + 1;
+                }
+
+                assigned = true;
             }
         }
+
+        if(!assigned)
+            counter = (clusterLevels - 1);
 
         el.cluster = letters[counter].toLowerCase();
     })
@@ -431,17 +467,17 @@ function generateCluster(tmpStoreData, clusterData) {
             }
         })
 
-        if(clusterGroups > 1) {
+        if (clusterGroups > 1) {
             tmpSecondLevel.forEach(el2 => {
-                if(el.store_ID == el2.store_ID) {
+                if (el.store_ID == el2.store_ID) {
                     el.cluster += el2.cluster;
                 }
             })
         }
 
-        if(clusterGroups > 2) {
+        if (clusterGroups > 2) {
             tmpThirdLevel.forEach(el2 => {
-                if(el.store_ID == el2.store_ID) {
+                if (el.store_ID == el2.store_ID) {
                     el.cluster += el2.cluster;
                 }
             })
@@ -459,15 +495,23 @@ function generateCluster(tmpStoreData, clusterData) {
     });
 }
 
-function getCountOfDistinct(arr, val) {
-    let count = 0;
+function closestTo(comparitor, lowest, highest) {
+    let counter = {
+        lowest: 0,
+        highest: 0
+    }
 
-    arr.forEach(el => {
-        if (el.cluster.includes(val))
-            count++;
-    })
+    for(var i = 0; i < comparitor.length; i++) {
+        if(comparitor[i] == lowest[i]) {
+            counter.lowest++;
+        }
 
-    return count;
+        if(comparitor[i] == highest[i]) {
+            counter.highest++;
+        }
+    }
+
+    return counter;
 }
 
 function removeDuplicates(myArr, prop) {

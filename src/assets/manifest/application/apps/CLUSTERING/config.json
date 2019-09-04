@@ -1,5 +1,5 @@
 {
-    "configName": "Streategy",
+    "configName": "CLUSTERING",
     "report": true,
     "routes": [{
         "route": "/Clustering",

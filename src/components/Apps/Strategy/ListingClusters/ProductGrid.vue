@@ -1,11 +1,14 @@
 <template>
     <div>
-        <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 223px);"
+        <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 272px);"
             :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
             :sideBar='true' :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true"
             :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true" :enableColResize="true"
             :floatingFilter="true" :groupMultiAutoColumn="true" :onGridReady="onGridReady">
         </ag-grid-vue>
+        <v-toolbar dark flat dense>
+            Rows: {{rowData.length}}
+        </v-toolbar>
     </div>
 </template>
 <script>
@@ -29,7 +32,6 @@
                             suppressCount: true, //remove number in Group Column
                         }
                     },
-                    rowHeight: 35,
                     pinnedTopRowData: [],
                     pinnedBottomRowData: [],
                     context: {

@@ -20,12 +20,6 @@
                 }, {
                     name: "File Status",
                     route: "FileStatus"
-                }, {
-                    name: "Basket Analysis",
-                    route: "BasketAnalysis"
-                },{
-                    name: "ListingClusters",
-                    route: "ListingClusters"
                 }]
             }
         }
