@@ -3,8 +3,8 @@
         <ag-grid-vue :gridOptions="gridOptions" :sideBar='false' style="width: 100%;  height: calc(40vh - 112px);"
             :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="data"
             :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true"
-            rowSelection="multiple" :rowDeselection="true" :enableColResize="true" 
-            :gridReady="gridReady" :onGridReady="onGridReady" :groupMultiAutoColumn="true">
+            rowSelection="multiple" :rowDeselection="true" :enableColResize="true" :gridReady="gridReady"
+            :onGridReady="onGridReady" :groupMultiAutoColumn="true">
         </ag-grid-vue>
     </div>
 </template>
@@ -45,7 +45,7 @@
                     "headerName": "Rank",
                     "editable": true,
                     "field": "rank"
-                },{
+                }, {
                     "headerName": "Levels",
                     "editable": true,
                     "field": "Levels"
@@ -69,6 +69,18 @@
             this.GetData
         },
         methods: {
+            deleteBasket(params) {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `Basket/Delete?Basket_ID=${params.data.id}`)
+                    .then(r => {
+                        console.log(r);
+                        self.getData()
+                        self.$refs.grid.resize()
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+            },
             HandleRankUp(params) {
                 console.log("up");
                 let item = params.data
