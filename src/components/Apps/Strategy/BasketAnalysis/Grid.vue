@@ -42,7 +42,7 @@
                     context: {
                         componentParent: this
                     },
-                    afterFilterChanged: () => console.log(gridOptions.api.inMemoryRowController.rowsAfterFilter),
+                    afterFilterChanged: () => console.log("gridOptions.api.inMemoryRowController.rowsAfterFilter"),
 
                 },
                 defaultColDef: {

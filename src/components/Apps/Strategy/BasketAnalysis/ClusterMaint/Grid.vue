@@ -9,6 +9,10 @@
     </div>
 </template>
 <script>
+ var Etat_acces = {
+        false: "NO",
+        true: "YES"
+    };
     import jwt from 'jsonwebtoken';
     import Axios from 'axios'
     import rank from "./rank"
@@ -39,7 +43,20 @@
                 }, {
                     "headerName": "Active",
                     "editable": true,
-                    "field": "active"
+                    "field": "active",
+                      "cellEditor": "agRichSelectCellEditor",
+                        cellEditorParams: {
+                            values: extractValues(Etat_acces)
+                        },
+                        cellClassRules: {
+                            'success-green': 'data.active == true',
+                        },
+                        valueFormatter: function (params) {
+                            return lookupValue(Etat_acces, params.value);
+                        },
+                        valueParser: function (params) {
+                            return lookupKey(Etat_acces, params.newValue);
+                        }
                 }, {
                     "headerName": "Rank",
                     "editable": true,
@@ -168,6 +185,23 @@
                 console.log("redrawing rows")
                 this.gridApi.redrawRows();
             },
+        }
+    }
+    function extractValues(mappings) {
+        return Object.keys(mappings);
+    }
+
+    function lookupValue(mappings, key) {
+        return mappings[key];
+    }
+
+    function lookupKey(mappings, name) {
+        for (var key in mappings) {
+            if (mappings.hasOwnProperty(key)) {
+                if (name === mappings[key]) {
+                    return key;
+                }
+            }
         }
     }
 </script>
