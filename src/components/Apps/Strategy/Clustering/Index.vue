@@ -1,8 +1,8 @@
 <template>
     <v-card tile>
-        <v-toolbar dense dark color="primary">
+        <v-toolbar dense dark color="grey darken-4">
             <v-toolbar-items>
-                <v-tabs fixed-tabs v-model="active" dark color="primary">
+                <v-tabs fixed-tabs v-model="active" dark color="grey darken-4">
                     <v-tab v-for="tab in tabs" :key="tab.name" ripple>
                         {{ tab.name }}
                     </v-tab>
@@ -42,7 +42,7 @@
                     new TabItem("Basket", "BasketAnalysis"),
                     new TabItem("Listing", "ListingClusters"),
                     new TabItem("Store", "Main"),
-                    new TabItem("User", "Main"),
+                    // new TabItem("User", "Main"),
                 ]
             }
         },

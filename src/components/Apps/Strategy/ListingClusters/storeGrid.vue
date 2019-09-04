@@ -1,11 +1,14 @@
 <template>
     <div>
-        <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 223px);"
+        <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 272px);"
             :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
             :sideBar='true' :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true"
             :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true" :enableColResize="true"
             :floatingFilter="true" :groupMultiAutoColumn="true" :onGridReady="onGridReady">
         </ag-grid-vue>
+        <v-toolbar dark flat dense>
+            Rows: {{rowData.length}}
+        </v-toolbar>
     </div>
 </template>
 <script>
@@ -14,7 +17,7 @@
         AgGridVue
     } from "ag-grid-vue";
     export default {
-        components:{
+        components: {
             AgGridVue,
             progressRenderer
         },
@@ -29,7 +32,6 @@
                             suppressCount: true, //remove number in Group Column
                         }
                     },
-                    rowHeight: 35,
                     pinnedTopRowData: [],
                     pinnedBottomRowData: [],
                     context: {
@@ -44,13 +46,16 @@
                     field: 'storeName'
                 }, {
                     headerName: 'Formula 1',
-                    field: 'level1Code'
-                },{
+                    field: 'level1Code',
+                    hide: true
+                }, {
                     headerName: 'Formula 2',
-                    field: 'level2Code'
-                },{
+                    field: 'level2Code',
+                    hide: true
+                }, {
                     headerName: 'Formula 3',
-                    field: 'level3Code'
+                    field: 'level3Code',
+                    hide: true
                 }, {
                     headerName: 'Current Rank',
                     field: 'currentRank'
@@ -61,7 +66,7 @@
             }
         },
         methods: {
-             autoSize() {
+            autoSize() {
                 let self = this;
                 var allColumnIds = [];
                 self.columnApi.getAllColumns().forEach(function (column) {
@@ -69,7 +74,7 @@
                 });
                 self.columnApi.autoSizeColumns(allColumnIds);
             },
-             autoSizeAll() {
+            autoSizeAll() {
                 let self = this;
                 var allColumnIds = [];
                 self.columnApi.getAllColumns().forEach(function (column) {

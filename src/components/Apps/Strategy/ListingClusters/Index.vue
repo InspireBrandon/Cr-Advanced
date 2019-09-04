@@ -88,7 +88,6 @@
                             suppressCount: true, //remove number in Group Column
                         }
                     },
-                    rowHeight: 35,
                     pinnedTopRowData: [],
                     pinnedBottomRowData: [],
                     context: {
