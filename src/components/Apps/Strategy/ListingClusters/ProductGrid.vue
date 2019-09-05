@@ -112,12 +112,27 @@
                         children: [{
                             headerName: "In Store",
                             field: store.storeName + "_inStore",
+                            width: 50,
                             cellStyle: function (params) {
                                 if (params.data.canHighlight) {
                                     if (params.data[store.storeName + "_inStore"]) {
-                                        return {
-                                            backgroundColor: "#5ef35e86"
-                                        };
+                                        if (params.data.highlightLevel == 1) {
+                                            return {
+                                                backgroundColor: "#5ef35e86"
+                                            };
+                                        }
+
+                                        if (params.data.highlightLevel == 2) {
+                                            return {
+                                                backgroundColor: "#5ef35e40"
+                                            };
+                                        }
+
+                                        if (params.data.highlightLevel == 3) {
+                                            return {
+                                                backgroundColor: "#5ef35e17"
+                                            };
+                                        }
                                     }
 
                                     if (!params.data[store.storeName + "_inStore"]) {

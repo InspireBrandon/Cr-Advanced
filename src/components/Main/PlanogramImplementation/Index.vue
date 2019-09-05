@@ -364,7 +364,7 @@
             },
             getImage(name) {
                 let self = this
-                let tmpname = "Space Planning\\" + name
+                let tmpname = "Space Planning\\" + encodeURIComponent(name)
                 self.image = process.env.VUE_APP_API +
                     `SystemFile/PlanogramImage?folder=${tmpname}&file=image.png&compress=false&rng=${Math.random()}`;
             },
