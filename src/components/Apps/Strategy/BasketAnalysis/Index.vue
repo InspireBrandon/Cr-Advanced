@@ -7,10 +7,10 @@
                         File
                     </v-btn>
                     <v-list>
-                        <v-list-tile>
+                        <v-list-tile @click="getSavedBasket()">
                             <v-list-tile-title>Open</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile>
+                        <v-list-tile @click="saveData()">
                             <v-list-tile-title>Save</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
@@ -23,7 +23,6 @@
                         <v-list-tile @click="openBasketMaint">
                             <v-list-tile-title>Baskets</v-list-tile-title>
                         </v-list-tile>
-
                     </v-list>
                 </v-menu>
             </v-toolbar-items>
@@ -31,20 +30,14 @@
             <v-toolbar-title>
                 <span>Basket Analysis</span>
             </v-toolbar-title>
-            <!-- <v-btn small fab color="primary" @click="openBasketMaint">
-                <v-icon>edit</v-icon>
-            </v-btn> -->
-
         </v-toolbar>
         <v-toolbar dark flat>
-
             <v-toolbar-items>
                 <v-select @change="onBasketSelect" :items="baskets" v-model="selectedBasket" return-object dark
                     style="margin-left: 10px; margin-top: 4px; width: 250px" placeholder="Select a basket" dense
                     hide-details>
                 </v-select>
             </v-toolbar-items>
-
             <v-btn @click="getFilteredData(true)" color="primary" v-if="rowData.length>0">apply yes</v-btn>
             <v-btn @click="getFilteredData(false)" color="primary" v-if="rowData.length>0">apply no</v-btn>
             <v-spacer></v-spacer>
@@ -52,15 +45,18 @@
                 @input="onFilterTextBoxChanged" v-model="filterText">
             </v-text-field>
             <v-spacer></v-spacer>
+            <v-btn color="primary" @click="openReport">Open Report</v-btn>
             <v-btn @click="runReport" v-if="rowData.length > 0" color="primary">Run Report</v-btn>
         </v-toolbar>
-        <Grid :rowData="rowData" :basket="selectedBasket" v-if="selectedBasket != null" ref="Grid" />
-
+        <Grid :rowData="rowData" :basket="selectedBasket" v-if="rowData.length != 0" ref="Grid" />
         <basketMaint :getBaskets="getbaskets" ref="basketMaint" />
         <ClusterMaint :basket_ID="basket_ID" ref="ClusterMaint" />
         <StoreBasketReport ref="StoreBasketReport" />
         <Spinner ref="Spinner" />
         <YesNoModal ref="YesNoModal" />
+        <SystemFileSelector ref="SystemFileSelector" />
+        <SizeLoader ref="SizeLoader" />
+
     </v-card>
 </template>
 
@@ -74,7 +70,9 @@
     import ClusterMaint from './ClusterMaint/ClusterMaintModal.vue'
     import StoreBasketReport from './StoreBasketReport/StoreBasketReport.vue'
 
+    import SystemFileSelector from "@/components/Common/SystemFileSelector";
     import Spinner from "@/components/Common/Spinner";
+    import SizeLoader from '@/components/Common/SizeLoader';
     import YesNoModal from "@/components/Common/YesNoModal";
 
 
@@ -82,6 +80,8 @@
         components: {
             basketMaint,
             YesNoModal,
+            SystemFileSelector,
+            SizeLoader,
             Grid,
             BasketConfig,
             PremiumNature,
@@ -102,23 +102,59 @@
             }
         },
         created() {
-
             let self = this;
             self.getbaskets()
         },
         methods: {
+            updateLoader(data) {
+                let self = this
+                self.$refs.SizeLoader.updateLoader(data)
+            },
+            getSavedBasket() {
+                let self = this
+                self.$refs.SystemFileSelector.show("CLUSTERING-BASKETS", callback => {
+                    console.log(callback);
+                    var startTime = new Date()
+                    let config = {
+                        onDownloadProgress: progressEvent => {
+                            var currentFileSize = progressEvent.loaded * 0.000001
+                            var FileTotalSize = progressEvent.total * 0.000001
+
+                            var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+                            var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
+                            self.updateLoader({
+                                text1: "Downloading Basket",
+                                currentFileSize: currentFileSize,
+                                FileTotalSize: FileTotalSize,
+                                DownloadSpeed: DownloadSpeed,
+                            })
+                        }
+                    }
+                    self.$refs.SizeLoader.show()
+                    Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${callback}`,
+                        config).then(
+                        resp => {
+                            console.log(resp);
+                            self.baskets.forEach(e => {
+                                if (e.value == resp.data.Basket_ID) {
+                                    self.selectedBasket = e
+                                }
+                            })
+                            self.rowData = resp.data.data
+                            self.$refs.SizeLoader.close()
+
+                        })
+                })
+            },
             onFilterTextBoxChanged() {
                 let self = this;
-
                 self.$nextTick(() => {
                     self.$refs.Grid.changeFilter(self.filterText)
-
                 })
             },
             getFilteredData(value) {
                 let self = this
                 let title = "Confirm yes/no application to visible data?"
-              
                 self.$refs.YesNoModal.show(title, yesNoValue => {
                     if (yesNoValue) {
                         self.$refs.Spinner.show()
@@ -146,7 +182,28 @@
                     }
                 })
             },
-
+            saveData() {
+                let self = this
+                let tmp = {
+                    Basket_ID: self.selectedBasket.value,
+                    data: self.rowData,
+                }
+                Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
+                        SystemFile: {
+                            SystemUser_ID: -1,
+                            Folder: "CLUSTERING-BASKETS",
+                            Name: self.selectedBasket.text,
+                            Extension: '.json',
+                        },
+                        Data: tmp
+                    })
+                    .then(r => {
+                        console.log(r);
+                    })
+                    .catch(e => {
+                        alert("Failed to save")
+                    })
+            },
             getData() {
                 let self = this
             },
@@ -181,10 +238,8 @@
                 Axios.get(process.env.VUE_APP_API + "BasketAnalysis?basketID=" + self.selectedBasket.value)
                     .then(r => {
                         console.log(r);
-
                         self.rowData = r.data.basket_LinkList;
                         self.$refs.Spinner.hide()
-
                     })
             },
             onBasketSelect() {
@@ -193,9 +248,12 @@
             },
             runReport() {
                 let self = this;
-                self.$refs.StoreBasketReport.show(self.selectedBasket.text, self.selectedBasket.value);
+                self.$refs.StoreBasketReport.show(self.selectedBasket.text, self.selectedBasket.value, true);
             },
-
+            openReport() {
+                let self = this;
+                self.$refs.StoreBasketReport.show(self.selectedBasket.text, self.selectedBasket.value, false);
+            },
         }
     }
 

@@ -1,8 +1,9 @@
 <template>
-    <v-dialog v-model="dialog" fullscreen="" persistent >
+    <v-dialog v-model="dialog" fullscreen="" persistent>
         <v-card>
             <v-toolbar color="primary" dark flat>
                 <v-toolbar-title>Store Basket Report - {{ basketName }}</v-toolbar-title>
+                <v-btn @click="saveData"> save report </v-btn>
                 <v-spacer></v-spacer>
                 <v-btn icon @click="dialog=false">
                     <v-icon>close</v-icon>
@@ -12,10 +13,12 @@
             <DateRangeSelector ref="DateRangeSelector" />
             <Spinner ref="Spinner" />
         </v-card>
+        <SystemFileSelector ref="SystemFileSelector" />
     </v-dialog>
 </template>
 
 <script>
+    import SystemFileSelector from "@/components/Common/SystemFileSelector";
     import Spinner from "@/components/Common/Spinner";
     import DateRangeSelector from "@/components/Common/DateRangeSelector"
 
@@ -25,9 +28,9 @@
     export default {
         components: {
             DateRangeSelector,
+            SystemFileSelector,
             Spinner,
             Grid
-
         },
         data() {
             return {
@@ -35,13 +38,35 @@
                 basketName: "",
                 Data: [],
                 basket_ID: null,
+                PeriodFrom: null,
+                PeriodTo: null,
             }
         },
         methods: {
+            saveData() {
+                let self = this
+                Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
+                        SystemFile: {
+                            SystemUser_ID: -1,
+                            Folder: "CLUSTERING-BASKETS-REPORT",
+                            Name: self.basketName + " " + self.PeriodFrom + " - " + self.PeriodTo,
+                            Extension: '.json',
+                        },
+                        Data: self.Data
+                    })
+                    .then(r => {
+                        console.log(r);
+                    })
+                    .catch(e => {
+                        alert("Failed to save")
+                    })
+            },
             getReport(basket_ID, callback) {
                 let self = this
                 self.$refs.DateRangeSelector.show(dateCall => {
                     self.$refs.Spinner.show()
+                    self.PeriodFrom = dateCall.dateFromString
+                    self.PeriodTo = dateCall.dateToString
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                     Axios.get(process.env.VUE_APP_API +
@@ -62,14 +87,37 @@
 
 
             },
-            show(basketName, basket_ID) {
+            getFile(id, comeback) {
+                let self = this
+                console.log("getFile");
+                
+                Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${id}`).then(
+                    resp => {
+                        console.log(resp);
+                        self.Data = resp.data
+                        comeback()
+                    })
+            },
+            show(basketName, basket_ID, isNew) {
                 let self = this;
                 self.basket_ID = basket_ID
                 self.basketName = basketName;
-                self.getReport(basket_ID, callback => {
-                    self.dialog = true;
-                    self.$refs.grid.resize();
-                })
+                if (isNew) {
+                    self.getReport(basket_ID, callback => {
+                        self.dialog = true;
+                        self.$refs.grid.resize();
+                    })
+                } else {
+                    self.$refs.SystemFileSelector.show("CLUSTERING-BASKETS-REPORT", selectorCallback => {
+                        console.log("CLUSTERING-BASKETS-REPORT");
+                        
+                        self.getFile(selectorCallback, comeback => {
+                            self.dialog = true;
+                            self.$refs.grid.resize();
+                        })
+
+                    })
+                }
             }
         }
     }
