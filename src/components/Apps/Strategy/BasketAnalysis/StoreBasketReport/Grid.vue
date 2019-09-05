@@ -27,17 +27,20 @@
                     "field": "displayname"
 
                 }, {
-                    "headerName": "Level ",
+                    "headerName": "Level",
                     "field": "cluster"
                 }, {
-                    "headerName": "Store Percentage",
+                    "headerName": "% Store",
                     "field": "percentage"
                 }, {
-                    "headerName": "Basket Percentage",
+                    "headerName": "% Basket",
                     "field": "basketSalesPercentage"
                 }, {
                     "headerName": "Sales",
-                    "field": "sales"
+                    "field": "sales",
+                    // valueFormatter: function (params) {
+                    //         return formatter.format(params.value).replace("$", "R");
+                    //     }
                 }],
                 defaultColDef: {
                     // onCellValueChanged: this.UpdateLine
@@ -62,6 +65,11 @@
             }
         }
     }
+    const formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2
+    })
 </script>
 
 <style>
