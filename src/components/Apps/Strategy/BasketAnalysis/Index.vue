@@ -207,6 +207,7 @@
                     })
                     .then(r => {
                         console.log(r);
+                        alert("Successfully Saved")
                     })
                     .catch(e => {
                         alert("Failed to save")
