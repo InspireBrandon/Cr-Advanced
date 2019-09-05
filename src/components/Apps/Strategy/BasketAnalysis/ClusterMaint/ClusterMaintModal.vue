@@ -19,6 +19,9 @@
                 </v-btn>
             </v-toolbar>
             <grid ref="grid" :data="rowData" :getData="GetData" />
+              <v-card-actions>
+                <v-btn color="primary" @click="goNext" >proceed </v-btn>
+            </v-card-actions>
             <v-dialog v-model="addDialog" persistent width="600px" height="600px">
                 <v-card>
                     <v-toolbar color="primary" dark flat>
@@ -78,6 +81,7 @@
                     basket_ID:null,
                 },
                 rowData: [],
+                callback:null
             }
         },
         methods: {
@@ -102,11 +106,19 @@
                 self.createItem.value = null
                  self.$refs.clusterForm.reset()
             },
-            open() {
+            open(callback) {
                 let self = this
                 self.dialog = true
                 self.GetData()
+                self.callback=callback
 
+            },
+            goNext(){
+                let self = this 
+                self.dialog=false
+                console.log( self.dialog);
+                
+                self.callback()
             },
             submitADD() {
                 let self = this

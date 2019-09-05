@@ -216,9 +216,9 @@
             getData() {
                 let self = this
             },
-            openClusterSetup() {
+            openClusterSetup(calllback) {
                 let self = this
-                self.$refs.ClusterMaint.open()
+
             },
             getbaskets() {
                 let self = this
@@ -257,7 +257,11 @@
             },
             runReport() {
                 let self = this;
-                self.$refs.StoreBasketReport.show(self.selectedBasket.text, self.selectedBasket.value, true);
+                self.$refs.ClusterMaint.open(callback => {
+                    self.$refs.StoreBasketReport.show(self.selectedBasket.text, self.selectedBasket.value,
+                    true);
+                })
+
             },
             openReport() {
                 let self = this;
