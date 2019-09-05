@@ -137,27 +137,52 @@
                 let lowestVal = data[data.length - 1].totalSales;
                 let average = highestVal / 3;
 
+                let mp = self.getMidPoints(data, 3);
+
                 data.forEach(el => {
-                    let currentHigh = average * 3;
-                    let currentLow = (average * 3) - average;
+                    let hasValue = false;
 
-                    console.log(el.displayname);
+                    for (var i = 0; i < 2; i++) {
+                        let highestMP = mp[i];
+                        let lowestMP = mp[i + 1];
 
-                    for (var i = 0; i < 3; i++) {
-                        console.log(el.totalSales, currentLow, currentHigh)
+                        if (!hasValue) {
+                            if (el.totalSales > highestMP) {
+                                el["level"] = levels[i];
+                                hasValue = true;
+                            } else {
+                                if (el.totalSales > lowestMP) {
+                                    // find closest
+                                    let highDiff = highestMP - el.totalSales;
+                                    let lowestDiff = el.totalSales - lowestMP;
 
-                        if (el.totalSales >= currentLow && el.totalSales <= currentHigh) {
-                            el["level"] = levels[i];
+                                    if (highDiff < lowestDiff) {
+                                        el["level"] = levels[i];
+                                        hasValue = true;
+                                    } else {
+                                        el["level"] = levels[i + 1];
+                                        hasValue = true;
+                                    }
+                                }
+                            }
                         }
-
-                        currentHigh = currentLow;
-                        currentLow = currentLow - average;
                     }
 
-                    console.log("**************************************");
+                    // Handle Low Values ERROR
+                    if (el.level == undefined) {
+                        let highDiff = mp[mp.length - 2] - el.totalSales;
+                        let lowestDiff = el.totalSales - mp[mp.length - 1];
+
+                        if (highDiff < lowestDiff) {
+                            el["level"] = levels[mp.length - 2];
+                            hasValue = true;
+                        } else {
+                            el["level"] = levels[mp.length - 1];
+                            hasValue = true;
+                        }
+                    }
                 })
 
-                console.log(data)
                 self.rowData = data;
             },
             nearestTenth(number) {
@@ -167,6 +192,20 @@
                 let self = this;
 
                 return (highest - lowest) / levels;
+            },
+            getMidPoints(data, levels) {
+                let self = this;
+                let totalLength = data.length;
+                let levelDescrep = Math.floor(totalLength / levels);
+                let mids = [];
+
+                for (var i = 0; i < levels; i++) {
+                    let mp = (levelDescrep * (i + 1)) / 2;
+                    let val = data[mp].totalSales
+                    mids.push(val);
+                }
+
+                return mids;
             },
             getMostCommonGroups(data, levels) {
                 let self = this;
@@ -179,8 +218,6 @@
                     let currentHighestString = "";
 
                     tmp.forEach(el => {
-                        console.log(self.nearestTenth(el.cumulativePercent))
-
                         let count = tmp.filter(fel => {
                             return self.nearestTenth(fel.cumulativePercent) == self.nearestTenth(el
                                 .cumulativePercent);
@@ -227,7 +264,6 @@
                 let comp = tmp.last.columnController.allDisplayedColumns
                 let compareCriteria = comp[comp.length - 1].colId
                 let end = tmp.tmpArr
-                console.log(tmp);
 
                 end.forEach(item => {
                     item.active = true
@@ -238,8 +274,6 @@
 
                 Axios.post(process.env.VUE_APP_API + `Basket_Product_Link/SaveMany`, end)
                     .then(r => {
-                        console.log(r);
-
                         tmp.tmpArrNode.forEach(item => {
                             item.data.active = true
 
@@ -281,8 +315,6 @@
                 self.basket_ID = self.selectedBasket.value
                 Axios.get(process.env.VUE_APP_API + "BasketAnalysis?basketID=" + self.selectedBasket.value)
                     .then(r => {
-                        console.log(r);
-
                         self.rowData = r.data.basket_LinkList;
                         self.$refs.Spinner.hide()
 

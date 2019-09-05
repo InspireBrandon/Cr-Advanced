@@ -1,24 +1,42 @@
 <template>
     <v-card>
         <v-toolbar dark flat dense color="grey darken-3">
-            <v-btn-toggle round v-model="selectedView" class="transparent" mandatory>
-                <v-btn class="elevation-0" style="width: 100px" round @click="changeView(0)" color="primary">
-                    Store
+            <v-toolbar-items>
+                <v-menu dark offset-y style="margin-bottom: 10px;">
+                    <v-btn slot="activator" flat>
+                        File
+                    </v-btn>
+                    <v-list>
+                        <v-list-tile @click="newFile">
+                            <v-list-tile-title>New</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="openFile">
+                            <v-list-tile-title>Open</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="saveFile">
+                            <v-list-tile-title>Save</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="closeFile">
+                            <v-list-tile-title>Close</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
+                <v-btn flat v-if="selectedView!=1" @click="handleResize(0)">
+                    auto Size
                 </v-btn>
-                <v-btn class="elevation-0" style="width: 100px" round @click="changeView(1)" color="primary">
-                    Product
+                <v-btn flat v-if="selectedView!=0" @click="handleResize(1)">
+                    auto Size
                 </v-btn>
-            </v-btn-toggle>
+            </v-toolbar-items>
+            <v-spacer></v-spacer>
+            {{ generateScreenName() }}
             <v-spacer></v-spacer>
             <v-toolbar-title>
                 Listing Cluster
             </v-toolbar-title>
         </v-toolbar>
         <v-toolbar dark flat>
-            <v-toolbar-items>
-                <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 350px" placeholder="Select Planogram"
-                    @change="onPlanogramChange" dense :items="planograms" v-model="selectedPlanogram" hide-details>
-                </v-autocomplete>
+            <v-toolbar-items v-if="storeRowData.length > 0">
                 <v-select label="Primary Cluster" style="margin-left: 10px; margin-top: 8px; width: 150px"
                     placeholder="Item Percentage" @change="onPercentChange" dense :items="primaryClusters"
                     v-model="primaryCluster" hide-details></v-select>
@@ -36,18 +54,22 @@
                 </v-select>
             </v-toolbar-items>
             <v-spacer></v-spacer>
-            <v-btn v-if="selectedView!=1" @click="handleResize(0)" color="primary">
-                auto Size
-            </v-btn>
-            <v-btn v-if="selectedView!=0" @click="handleResize(1)" color="primary">
-                auto Size
-            </v-btn>
+            <v-btn-toggle v-if="storeRowData.length > 0" round v-model="selectedView" class="transparent" mandatory>
+                <v-btn class="elevation-0" style="width: 100px" round @click="changeView(0)" color="primary">
+                    Store
+                </v-btn>
+                <v-btn class="elevation-0" style="width: 100px" round @click="changeView(1)" color="primary">
+                    Product
+                </v-btn>
+            </v-btn-toggle>
         </v-toolbar>
         <storeGrid v-if="selectedView==0  && storeRowData.length > 0" ref="storeGrid" :rowData="storeRowData" />
         <ProductGrid v-if="selectedView==1 && productRowData.length > 0" ref="ProductGrid" :rowData="productRowData"
             :stores="stores" />
         <DateRangeSelector ref="DateRangeSelector" />
         <Spinner ref="Spinner" />
+        <PlanogramSelector ref="PlanogramSelector" />
+        <FileSelector ref="FileSelector" />
     </v-card>
 </template>
 <script>
@@ -59,17 +81,22 @@
 
     import DateRangeSelector from '@/components/Common/DateRangeSelector';
     import ListingClusterController from './controller.js';
+    import PlanogramSelector from './PlanogramSelector'
+    import FileSelector from './FileSelector'
 
     import {
         AgGridVue
     } from "ag-grid-vue";
+
     export default {
         components: {
             Spinner,
             ProductGrid,
             storeGrid,
             AgGridVue,
-            DateRangeSelector
+            DateRangeSelector,
+            PlanogramSelector,
+            FileSelector
         },
         data() {
             return {
@@ -79,6 +106,7 @@
                 stores: [],
                 planograms: [],
                 selectedPlanogram: null,
+                selectedPeriod: null,
                 headers: [],
                 gridOptions: {
                     autoGroupColumnDef: {
@@ -94,9 +122,7 @@
                         componentParent: this
                     },
                 },
-                defaultColDef: {
-
-                },
+                defaultColDef: {},
                 primaryCluster: 5,
                 primaryClusters: [{
                         text: "10%",
@@ -188,9 +214,6 @@
                 salesData: null
             }
         },
-        created() {
-            this.getPlanograms()
-        },
         methods: {
             handleResize(type) {
                 let self = this
@@ -204,29 +227,27 @@
                 let self = this
                 self.selectedView = type;
             },
-            onPlanogramChange() {
+            runQuery(planogram, from, to) {
                 let self = this;
 
-                if (self.selectedPlanogram != null) {
-                    self.$refs.Spinner.show()
-                    self.$nextTick(() => {
+                self.$refs.Spinner.show()
+                self.$nextTick(() => {
 
-                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                        Axios.get(process.env.VUE_APP_API +
-                                `ListingCluster?planogram_ID=${self.selectedPlanogram}&period_from_id=${53}&period_to_id=${58}`
-                            )
-                            .then(r => {
-                                delete Axios.defaults.headers.common["TenantID"];
+                    Axios.get(process.env.VUE_APP_API +
+                            `ListingCluster?planogram_ID=${planogram}&period_from_id=${from}&period_to_id=${to}`
+                        )
+                        .then(r => {
+                            delete Axios.defaults.headers.common["TenantID"];
 
-                                self.salesData = r.data;
+                            self.salesData = r.data;
 
-                                self.onPercentChange();
+                            self.onPercentChange();
 
-                                self.$refs.Spinner.hide()
-                            })
-                    })
-                }
+                            self.$refs.Spinner.hide()
+                        })
+                })
             },
             onPercentChange() {
                 let self = this;
@@ -243,27 +264,113 @@
 
                         self.storeRowData = lcData.storeData;
                         self.stores = lcData.stores;
-
-                        self.productRowData = [];
                         self.productRowData = lcData.productData;
                     }
                 })
             },
-            getPlanograms() {
-                let self = this
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+            newFile() {
+                let self = this;
 
-                Axios.get(process.env.VUE_APP_API + `Planogram/Distinct`)
-                    .then(r => {
-                        self.planograms = []
-                        r.data.planogramList.forEach(e => {
-                            self.planograms.push({
-                                text: e.displayname,
-                                value: e.id
-                            })
-                        })
-                        delete Axios.defaults.headers.common["TenantID"];
+                self.$refs.PlanogramSelector.show(planogram => {
+                    self.$refs.DateRangeSelector.show(dateRange => {
+                        self.selectedPlanogram = planogram;
+                        self.selectedPeriod = dateRange;
+                        self.runQuery(planogram.id, dateRange.dateFrom, dateRange.dateTo)
                     })
+                })
+            },
+            openFile() {
+                let self = this;
+
+                self.$refs.FileSelector.show(file => {
+                    // TODO add loader
+                    Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${file.id}`)
+                        .then(r => {
+                            self.salesData = r.data.salesData;
+                            self.selectedPlanogram = r.data.config.planogramData;
+                            self.selectedPeriod = r.data.config.periodData;
+
+                            self.primaryCluster = r.data.config.setup.primaryCluster;
+                            self.secondaryCluster = r.data.config.setup.secondaryCluster;
+                            self.level = r.data.config.setup.level;
+                            self.group = r.data.config.setup.group;
+
+                            self.onPercentChange();
+                        })
+                })
+            },
+            closeFile() {
+                let self = this;
+
+                self.salesData = null;
+                self.selectedPlanogram = null;
+                self.selectedPeriod = null;
+
+                self.primaryCluster = 5;
+                self.secondaryCluster = 3;
+                self.level = 3;
+                self.group = 3;
+
+                self.storeRowData = [];
+                self.stores = [];
+                self.productRowData = [];
+            },
+            saveFile() {
+                let self = this;
+
+                Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
+                        SystemFile: {
+                            SystemUser_ID: -1,
+                            Folder: "CLUSTERING - LISTING",
+                            Name: self.generateName(),
+                            Extension: '.json'
+                        },
+                        Data: {
+                            salesData: self.salesData,
+                            config: {
+                                planogramData: self.selectedPlanogram,
+                                periodData: self.selectedPeriod,
+                                setup: {
+                                    primaryCluster: self.primaryCluster,
+                                    secondaryCluster: self.secondaryCluster,
+                                    level: self.level,
+                                    group: self.group
+                                }
+                            }
+                        }
+                    })
+                    .then(r => {
+                        alert("Successfully saved");
+                    })
+                    .catch(e => {
+                        alert("Failed to save");
+                    })
+            },
+            generateName() {
+                let self = this;
+
+                if (self.selectedPeriod != null) {
+                    if (self.selectedPeriod.periodic) {
+                        return `${self.selectedPlanogram.id} - ${self.selectedPeriod.monthsBetween} MMA`;
+                    } else {
+                        return `${self.selectedPlanogram.id} Average Monthly ${self.selectedPeriod.dateFromString} To ${self.selectedPeriod.dateToString}`;
+                    }
+                } else {
+                    return "";
+                }
+            },
+            generateScreenName() {
+                let self = this;
+
+                if (self.selectedPeriod != null) {
+                    if (self.selectedPeriod.periodic) {
+                        return `${self.selectedPlanogram.displayname} - ${self.selectedPeriod.monthsBetween} MMA`;
+                    } else {
+                        return `${self.selectedPlanogram.displayname} Average Monthly ${self.selectedPeriod.dateFromString} To ${self.selectedPeriod.dateToString}`;
+                    }
+                } else {
+                    return "";
+                }
             }
         }
     }
