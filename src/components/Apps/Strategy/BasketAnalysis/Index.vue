@@ -13,6 +13,9 @@
                         <v-list-tile @click="saveData()">
                             <v-list-tile-title>Save</v-list-tile-title>
                         </v-list-tile>
+                        <v-list-tile @click="close()">
+                            <v-list-tile-title>Close</v-list-tile-title>
+                        </v-list-tile>
                     </v-list>
                 </v-menu>
                 <v-menu dark offset-y style="margin-bottom: 10px;">
@@ -45,7 +48,7 @@
                 @input="onFilterTextBoxChanged" v-model="filterText">
             </v-text-field>
             <v-spacer></v-spacer>
-            <v-btn color="primary" @click="openReport">Open Report</v-btn>
+            <v-btn color="primary" v-if="rowData.length > 0" @click="openReport">Open Report</v-btn>
             <v-btn @click="runReport" v-if="rowData.length > 0" color="primary">Run Report</v-btn>
         </v-toolbar>
         <Grid :rowData="rowData" :basket="selectedBasket" v-if="rowData.length != 0" ref="Grid" />
@@ -106,6 +109,11 @@
             self.getbaskets()
         },
         methods: {
+            close() {
+                let self = this
+                self.selectedBasket = null
+                self.rowData = []
+            },
             updateLoader(data) {
                 let self = this
                 self.$refs.SizeLoader.updateLoader(data)
