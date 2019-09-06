@@ -12,6 +12,7 @@
             <Grid ref="grid" :data="Data" />
             <DateRangeSelector ref="DateRangeSelector" />
             <Spinner ref="Spinner" />
+          
         </v-card>
         <SystemFileSelector ref="SystemFileSelector" />
     </v-dialog>
@@ -111,12 +112,10 @@
                 } else {
                     self.$refs.SystemFileSelector.show("CLUSTERING-BASKETS-REPORT", selectorCallback => {
                         console.log("CLUSTERING-BASKETS-REPORT");
-                        
                         self.getFile(selectorCallback, comeback => {
                             self.dialog = true;
                             self.$refs.grid.resize();
                         })
-
                     })
                 }
             }
