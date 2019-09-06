@@ -3,7 +3,7 @@
         <v-card>
             <v-toolbar color="primary" dark flat>
                 <v-toolbar-title>Store Basket Report - {{ basketName }}</v-toolbar-title>
-                <v-btn @click="saveData"> save report </v-btn>
+                <v-btn @click="saveFile()"> save report </v-btn>
                 <v-spacer></v-spacer>
                 <v-btn icon @click="dialog=false">
                     <v-icon>close</v-icon>
@@ -12,7 +12,7 @@
             <Grid ref="grid" :data="Data" />
             <DateRangeSelector ref="DateRangeSelector" />
             <Spinner ref="Spinner" />
-          
+
         </v-card>
         <SystemFileSelector ref="SystemFileSelector" />
     </v-dialog>
@@ -92,7 +92,7 @@
             getFile(id, comeback) {
                 let self = this
                 console.log("getFile");
-                
+
                 Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${id}`).then(
                     resp => {
                         console.log(resp);
@@ -118,7 +118,79 @@
                         })
                     })
                 }
-            }
+            },
+            // start region save to main file
+            getFile(callback) {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API +
+                        `SystemFile/JSON?db=CR-Devinspire&folder=CLUSTER REPORT&file=REPORT`)
+                    .then(r => {
+                        callback(r.data);
+                    })
+            },
+            saveFile() {
+                let self = this;
+                console.log("SAve fiel");
+
+                self.getFile(fileTransaction => {
+                    console.log(fileTransaction);
+
+                    if (fileTransaction == null || fileTransaction == false) {
+                        let tmp = {
+                            basket: {}
+                        }
+
+                        tmp.basket[self.basketName] = self.Data;
+
+                        self.appendAndSaveFile(tmp);
+                    } else {
+                        self.getFileData(fileTransaction.id, fileData => {
+                            let tmp = fileData;
+                            console.log("tmp");
+                            console.log(tmp);
+                            if (tmp == false) {
+                                tmp = {
+                                    basket: {}
+                                }
+                            }
+                            if (tmp.basket == undefined)
+                                tmp.basket = {};
+
+                            tmp.basket[self.basketName] = self.Data;
+
+                            self.appendAndSaveFile(tmp);
+                        })
+                    }
+                })
+            },
+            getFileData(id, callback) {
+                let self = this;
+                Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${id}`)
+                    .then(r => {
+                        callback(r.data);
+                    })
+            },
+            appendAndSaveFile(fileData) {
+                alert("in here")
+                Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
+                        SystemFile: {
+                            SystemUser_ID: -1,
+                            Folder: "CLUSTER REPORT",
+                            Name: "REPORT",
+                            Extension: '.json'
+                        },
+                        Data: fileData
+                            
+                        
+                    })
+                    .then(r => {
+                        alert("Successfully saved");
+                    })
+                    .catch(e => {
+                        alert("Failed to save");
+                    })
+            },
         }
     }
 </script>
