@@ -257,6 +257,7 @@
                 let self = this;
                 self.$refs.StoreBasketReport.show(self.selectedBasket.text, self.selectedBasket.value, false);
             },
+            
         }
     }
     function removeDuplicates(myArr, prop) {

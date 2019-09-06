@@ -45,11 +45,11 @@
                 items: [],
                 filterText: null,
                 rowData: [],
-                baskets: [],
-                selectedBasket: null,
+                storeAnalysiss: [],
+                selectedstoreAnalysis: null,
                 projectGroups: [],
                 selectedProjectGroup: null,
-                basket_ID: null,
+                storeAnalysis_ID: null,
                 superGroups: [],
                 selectedSuperGroup: null
             }
@@ -240,9 +240,75 @@
             openFile() {
                 let self = this;
             },
+             getFile(callback) {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API +
+                        `SystemFile/JSON?db=CR-Devinspire&folder=CLUSTER REPORT&file=REPORT`)
+                    .then(r => {
+                        callback(r.data);
+                    })
+            },
             saveFile() {
                 let self = this;
-            }
+                
+
+                self.getFile(fileTransaction => {
+                    console.log(fileTransaction);
+
+                    if (fileTransaction == null || fileTransaction == false) {
+                        let tmp = {
+                            storeAnalysis: {}
+                        }
+
+                        tmp.storeAnalysis = self.rowData;
+
+                        self.appendAndSaveFile(tmp);
+                    } else {
+                        self.getFileData(fileTransaction.id, fileData => {
+                            let tmp = fileData;
+                            console.log("tmp");
+                            console.log(tmp);
+                            if (tmp == false) {
+                                tmp = {
+                                    storeAnalysis: {}
+                                }
+                            }
+                            if (tmp.storeAnalysis == undefined)
+                                tmp.storeAnalysis = {};
+
+                            tmp.storeAnalysis = self.rowData;
+
+                            self.appendAndSaveFile(tmp);
+                        })
+                    }
+                })
+            },
+            getFileData(id, callback) {
+                let self = this;
+                Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${id}`)
+                    .then(r => {
+                        callback(r.data);
+                    })
+            },
+            appendAndSaveFile(fileData) {
+                alert("in here")
+                Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
+                        SystemFile: {
+                            SystemUser_ID: -1,
+                            Folder: "CLUSTER REPORT",
+                            Name: "REPORT",
+                            Extension: '.json'
+                        },
+                          Data: fileData
+                    })
+                    .then(r => {
+                        alert("Successfully saved");
+                    })
+                    .catch(e => {
+                        alert("Failed to save");
+                    })
+            },
         }
     }
 
