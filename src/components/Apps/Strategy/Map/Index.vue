@@ -8,9 +8,7 @@
     import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 
     export default {
-        created() {
-            this.drawMap();
-        },
+        mounted() {},
         methods: {
             drawMap() {
                 am4core.ready(function () {
@@ -19,46 +17,19 @@
                     am4core.useTheme(am4themes_animated);
                     // Themes end
 
-                    var availableCountries = ["US", "SS", "NZ", "LT", "LU", "MK", "MG", "MW", "MY", "ML", "MR",
-                        "MX", "MD", "MN", "ME", "MA", "MZ", "NA", "NP", "NL", "KW", "KG", "LA", "LV", "LB",
-                        "LS", "LR", "LY", "KR", "JO", "KZ", "KE", "KP", "JP", "IT", "JM", "IL", "IR", "IQ",
-                        "IE", "ID", "IN", "HN", "HU", "IS", "HT", "ER", "EE", "ET", "FI", "FR", "GA", "GM",
-                        "GE", "DE", "GH", "GR", "GL", "GQ", "EC", "EG", "SV", "DJ", "DK", "CZ", "CY", "CU",
-                        "HR", "CI", "CR", "CG", "CD", "CO", "CN", "CL", "TD", "CF", "CA", "KH", "CM", "BI",
-                        "MM", "BF", "BG", "BR", "BW", "BA", "BO", "BT", "BJ", "BZ", "BE", "BY", "AM", "AZ",
-                        "BD", "AT", "AU", "AR", "AO", "DZ", "AL", "GT", "GN", "GW", "GY", "NI", "NE", "NG",
-                        "NO", "OM", "PK", "PA", "PG", "PY", "PE", "PH", "PL", "PT", "PR", "RO", "RU", "RW",
-                        "SA", "SN", "RS", "SL", "SK", "SI", "SO", "ZA", "ES", "LK", "SD", "SR", "SZ", "SE",
-                        "CH", "SY", "TW", "TJ", "TZ", "TH", "TN", "TR", "TM", "UG", "UA", "AE", "GB", "UY",
-                        "UZ", "VE", "VN", "YE", "ZM", "ZW"
-                    ];
+                    var availableCountries = ["ZA"];
 
                     var selectedPolygon;
-                    var userCountryId;
+                    var userCountryId = "ZA";
                     var mapChart;
                     var continentsSeries;
                     var countriesSeries;
-                    var nextButton;
-                    var slider;
                     var mainContainer;
                     var flagContainer;
                     var colorSet = new am4core.ColorSet();
                     var heartAnimation;
                     var flag;
                     var countryName;
-
-                    // detect user country
-                    var ds = new am4core.DataSource();
-                    ds.url = "https://services.amcharts.com/ip/?v=xz6Z";
-                    ds.events.on("ended", function (ev) {
-                        if (ev.target.data) {
-                            userCountryId = ev.target.data.country_code;
-                        }
-                    });
-
-                    ds.load();
-
-                    ds.events.on("ended", init);
 
                     function init() {
                         mainContainer = am4core.create("map", am4core.Container);
@@ -68,31 +39,6 @@
                         mainContainer.height = am4core.percent(100);
                         mainContainer.preloader.disabled = true;
 
-                        slider = mainContainer.createChild(am4core.Slider);
-                        slider.isMeasured = false;
-                        slider.background.fillOpacity = 0.15;
-
-                        slider.x = am4core.percent(50);
-                        slider.y = am4core.percent(90);
-                        slider.start = 0;
-                        slider.horizontalCenter = "middle";
-                        slider.verticalCenter = "middle";
-                        slider.width = 300;
-                        slider.zIndex = 100;
-                        slider.background.fillOpacity = 0.15;
-
-                        slider.startGrip.background.fillOpacity = 0.8;
-                        slider.startGrip.background.fill = am4core.color("#0975da");
-                        slider.startGrip.background.stroke = am4core.color("#0975da");
-                        slider.startGrip.background.states.getKey("hover").properties.fill = am4core.color(
-                            "#0975da");
-
-                        var downState = slider.startGrip.background.states.getKey("down");
-                        downState.properties.fill = am4core.color("#0996f2");
-
-
-                        slider.events.on("rangechanged", handleSlider);
-
                         var triangle = new am4core.Triangle();
                         triangle.width = 8;
                         triangle.height = 10;
@@ -101,43 +47,6 @@
                         triangle.valign = "middle";
                         triangle.align = "center";
                         triangle.dx = 1;
-
-                        nextButton = mainContainer.createChild(am4core.Button);
-                        nextButton.horizontalCenter = "middle";
-                        nextButton.verticalCenter = "middle";
-                        nextButton.padding(0, 0, 0, 0);
-                        nextButton.background.cornerRadius(25, 25, 25, 25);
-                        nextButton.x = am4core.percent(80);
-                        nextButton.y = am4core.percent(90);
-                        nextButton.width = 40;
-                        nextButton.height = 40;
-                        nextButton.zIndex = 101;
-                        nextButton.icon = triangle;
-                        nextButton.background.fillOpacity = 0;
-                        nextButton.background.states.getKey("hover").properties.fill = am4core.color("#0975da");
-                        nextButton.background.stroke = am4core.color("#0975da");
-
-                        nextButton.background.states.getKey("down").properties.fill = am4core.color("#0975da");
-
-                        var label = mainContainer.createChild(am4core.Label)
-                        label.text = "next";
-                        label.x = am4core.percent(80);
-                        label.y = am4core.percent(90);
-                        label.verticalCenter = "middle";
-                        label.horizontalCenter = "right";
-                        label.dx = -25;
-                        label.dy = -2;
-                        label.fill = am4core.color("#ffffff");
-
-                        label.events.on("over", function () {
-                            nextButton.isHover = true;
-                        });
-                        label.events.on("out", function () {
-                            nextButton.isHover = false;
-                        });
-
-                        nextButton.events.on("hit", handleNext);
-                        label.events.on("hit", handleNext);
 
                         flagContainer = mainContainer.createChild(am4core.Container);
                         flagContainer.horizontalCenter = "middle";
@@ -164,7 +73,7 @@
                         // MAP CHART
                         mapChart = mainContainer.createChild(am4maps.MapChart);
                         mapChart.zIndex = -1;
-                        mapChart.maxZoomLevel = 2000;
+                        mapChart.maxZoomLevel = 3000;
                         mapChart.projection = new am4maps.projections.Mercator();
                         mapChart.seriesContainer.events.disableType("doublehit");
                         mapChart.chartContainer.background.events.disableType("doublehit");
@@ -211,19 +120,7 @@
                                 .length)];
                         }
 
-                        if (slider.start > 0) {
-                            var animation = slider.animate({
-                                property: "start",
-                                to: 0
-                            }, 500);
-                            animation.events.on("animationended", function () {
-                                setTimeout(function () {
-                                    zoomToSelectedPolygon()
-                                }, 100);
-                            });
-                        } else {
-                            zoomToSelectedPolygon();
-                        }
+                        zoomToSelectedPolygon();
                     }
 
                     function zoomToSelectedPolygon() {
@@ -238,7 +135,7 @@
                         selectedPolygon.defaultState.properties.opacity = 1;
                         selectedPolygon.toFront();
 
-                        var showAnimation = selectedPolygon.show(1000);
+                        var showAnimation = selectedPolygon.show(500);
 
                         showAnimation.events.on("animationended", function () {
 
@@ -284,7 +181,7 @@
                                 y: y - w / 3
                             });
 
-                            var points = am4core.path.pathToPoints(path, 300);
+                            var points = am4core.path.pathToPoints(path, 2000);
 
                             var middleLatitude = mapChart.zoomGeoPoint.latitude + (selectedPolygon
                                 .latitude - mapChart.zoomGeoPoint.latitude) / 2;
@@ -292,6 +189,7 @@
                                 .longitude - mapChart.zoomGeoPoint.longitude) / 2;
 
                             mapChart.zoomEasing = am4core.ease.sinOut;
+                            
                             var zoomOutAnimation = mapChart.zoomToGeoPoint({
                                 latitude: middleLatitude,
                                 longitude: middleLongitude
@@ -299,8 +197,8 @@
 
                             zoomOutAnimation.events.on("animationended", function () {
                                 mapChart.zoomEasing = am4core.ease.cubicInOut;
-                                mapChart.zoomToMapObject(selectedPolygon, 400 / Math.max(w, h) *
-                                    mapChart.scaleRatio, true, 1500);
+                                mapChart.zoomToMapObject(selectedPolygon, 1000 / Math.max(w / 1, h / 20000) *
+                                    1, true, 1500);
                                 selectedPolygon.polygon.points;
                                 selectedPolygon.polygon.morpher.morphToSingle = true;
                                 var animation;
@@ -318,40 +216,7 @@
                         })
                     }
 
-                    function handleSlider() {
-                        if (selectedPolygon) {
-                            selectedPolygon.polygon.morpher.morphProgress = slider.start;
-
-                            if (slider.start >= 0.999) {
-                                if (!heartAnimation) {
-                                    heartBeet(mapChart.zoomLevel / 1000);
-                                }
-                            } else {
-                                if (heartAnimation) {
-                                    heartAnimation.kill();
-                                    heartAnimation = undefined;
-                                }
-                            }
-                        }
-                    }
-
-                    function heartBeet(scale) {
-                        heartAnimation = mapChart.animate({
-                            property: "scale",
-                            to: 1 + scale / 7
-                        }, 200);
-                        heartAnimation.events.on("animationended", function () {
-                            heartAnimation = mapChart.animate([{
-                                property: "scale",
-                                to: 1
-                            }], 100);
-                            heartAnimation.events.on("animationended", function () {
-                                setTimeout(function () {
-                                    heartBeet(scale)
-                                }, 500)
-                            })
-                        })
-                    }
+                    init();
                 });
             }
         }
@@ -360,6 +225,6 @@
 
 <style scoped>
     .map {
-        height: calc(100vh - 136px);
+        height: calc(100vh - 112px);
     }
 </style>

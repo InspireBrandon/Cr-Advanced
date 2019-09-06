@@ -3,7 +3,7 @@
         <v-toolbar dense dark color="grey darken-4">
             <v-toolbar-items>
                 <v-tabs fixed-tabs v-model="active" dark color="grey darken-4">
-                    <v-tab v-for="tab in tabs" :key="tab.name" ripple>
+                    <v-tab v-for="tab in tabs" :key="tab.name" ripple @click="handleMap(tab)">
                         {{ tab.name }}
                     </v-tab>
                 </v-tabs>
@@ -16,7 +16,7 @@
         <v-tabs-items v-model="active">
             <v-tab-item v-for="tab in tabs" :key="tab.name">
                 <v-card flat tile>
-                    <component :is="tab.component"></component>
+                    <component ref="component" :is="tab.component"></component>
                 </v-card>
             </v-tab-item>
         </v-tabs-items>
@@ -26,8 +26,8 @@
 <script>
     import BasketAnalysis from '../BasketAnalysis/Index'
     import ListingClusters from '../ListingClusters/Index'
-    import StoreAnalysis from '../StoreAnalysis/Index'        
-    import Map from '../Map/Index'        
+    import StoreAnalysis from '../StoreAnalysis/Index'
+    import Map from '../Map/Index'
 
     function TabItem(name, component) {
         this.name = name;
@@ -35,10 +35,15 @@
     }
 
     export default {
-        components: { BasketAnalysis, ListingClusters, StoreAnalysis, Map },
+        components: {
+            BasketAnalysis,
+            ListingClusters,
+            StoreAnalysis,
+            Map
+        },
         data() {
             return {
-                active: null,
+                active: 0,
                 tabs: [
                     new TabItem("Main", "Main"),
                     new TabItem("Basket", "BasketAnalysis"),
@@ -53,6 +58,15 @@
             next() {
                 const active = parseInt(this.active)
                 this.active = (active < 2 ? active + 1 : 0)
+            },
+            handleMap(tab) {
+                let self = this;
+
+                setTimeout(() => {
+                    if (tab.name == "Map") {
+                        self.$refs.component[4].drawMap();
+                    }
+                }, 1000);
             }
         }
     }
