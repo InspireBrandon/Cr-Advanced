@@ -59,7 +59,6 @@
         <YesNoModal ref="YesNoModal" />
         <SystemFileSelector ref="SystemFileSelector" />
         <SizeLoader ref="SizeLoader" />
-
     </v-card>
 </template>
 
@@ -213,17 +212,9 @@
                         alert("Failed to save")
                     })
             },
-            getData() {
-                let self = this
-            },
-            openClusterSetup(calllback) {
-                let self = this
-
-            },
             getbaskets() {
                 let self = this
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
                 Axios.get(process.env.VUE_APP_API + `Basket`)
                     .then(r => {
                         self.baskets = []
@@ -261,7 +252,6 @@
                     self.$refs.StoreBasketReport.show(self.selectedBasket.text, self.selectedBasket.value,
                     true);
                 })
-
             },
             openReport() {
                 let self = this;
@@ -269,7 +259,6 @@
             },
         }
     }
-
     function removeDuplicates(myArr, prop) {
         return myArr.filter((obj, pos, arr) => {
             return arr.map(mapObj => mapObj[prop]).indexOf(obj[prop]) === pos;
