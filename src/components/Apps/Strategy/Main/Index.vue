@@ -37,8 +37,25 @@
         },
         created() {
             let self = this;
+            self.getData();
         },
         methods: {
+            getData() {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API +
+                        `SystemFile/JSON?db=CR-Devinspire&folder=CLUSTER REPORT&file=REPORT`)
+                    .then(fd => {
+                        Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fd.data.id}`)
+                            .then(r => {
+                                self.handleData(r.data);
+                            })
+                    })
+            },
+            handleData(data) {
+                let self = this;
+                console.log(data);
+            },
             setup() {
                 let self = this;
                 self.$refs.Setup.show(() => {
