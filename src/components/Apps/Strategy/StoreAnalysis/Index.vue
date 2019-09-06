@@ -2,89 +2,43 @@
     <v-card tile>
         <v-toolbar flat dense dark color="grey darken-3">
             <v-toolbar-items>
-                <!-- <v-menu dark offset-y style="margin-bottom: 10px;">
+                <v-menu dark offset-y style="margin-bottom: 10px;">
                     <v-btn slot="activator" flat>
                         File
                     </v-btn>
                     <v-list>
-                        <v-list-tile>
+                        <v-list-tile @click="openFile">
                             <v-list-tile-title>Open</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile>
+                        <v-list-tile @click="saveFile">
                             <v-list-tile-title>Save</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
                 </v-menu>
-                <v-menu dark offset-y style="margin-bottom: 10px;">
-                    <v-btn slot="activator" flat>
-                        Setup
-                    </v-btn>
-                    <v-list>
-                        <v-list-tile @click="openBasketMaint">
-                            <v-list-tile-title>Baskets</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="openClusterSetup">
-                            <v-list-tile-title>Basket Levels</v-list-tile-title>
-                        </v-list-tile>
-                    </v-list>
-                </v-menu> -->
             </v-toolbar-items>
             <v-spacer></v-spacer>
             <v-toolbar-title>
                 <span>Store Analysis</span>
             </v-toolbar-title>
-            <!-- <v-btn small fab color="primary" @click="openBasketMaint">
-                <v-icon>edit</v-icon>
-            </v-btn> -->
-
         </v-toolbar>
         <v-toolbar dark flat>
-
-            <!-- <v-toolbar-items>
-                <v-select @change="onBasketSelect" :items="baskets" v-model="selectedBasket" return-object dark
-                    style="margin-left: 10px; margin-top: 4px; width: 250px" placeholder="Select a basket" dense
-                    hide-details>
-                </v-select>
+            <v-toolbar-items>
+                <v-select label="Supergroup A" style="margin-left: 10px; margin-top: 8px; width: 300px"
+                    placeholder="Please select one" @change="onSuperGroupChange" dense :items="superGroups"
+                    v-model="selectedSuperGroup" hide-details></v-select>
             </v-toolbar-items>
-
-            <v-btn @click="getFilteredData" color="primary" v-if="rowData.length>0">Set Visible to yes</v-btn>
-            <v-spacer></v-spacer>
-            <v-text-field append-icon="search" type="text" id="filter-text-box" placeholder="Filter..."
-                @input="onFilterTextBoxChanged" v-model="filterText">
-            </v-text-field>
-            <v-spacer></v-spacer>
-            <v-btn @click="runReport" v-if="rowData.length > 0" color="primary">Run Report</v-btn> -->
         </v-toolbar>
         <Grid :rowData="rowData" ref="Grid" />
-
-        <!-- <basketMaint :getBaskets="getbaskets" ref="basketMaint" />
-        <ClusterMaint :basket_ID="basket_ID" ref="ClusterMaint" />
-        <StoreBasketReport ref="StoreBasketReport" />
-        <Spinner ref="Spinner" /> -->
     </v-card>
 </template>
 
 <script>
     import Axios from 'axios';
-
     import Grid from './Grid'
-    // import BasketConfig from './Basket_Config'
-    // import PremiumNature from './PremiumNature/PremiumNature.vue'
-    // import basketMaint from './BasketMaint/BasketMaintenanceModal.vue'
-    // import ClusterMaint from './ClusterMaint/ClusterMaintModal.vue'
-    // import StoreBasketReport from './StoreBasketReport/StoreBasketReport.vue'
-
-    // import Spinner from "@/components/Common/Spinner";
 
     export default {
         components: {
-            // basketMaint,
             Grid,
-            // BasketConfig,
-            // PremiumNature,
-            // ClusterMaint,
-            // StoreBasketReport,
-            // Spinner
         },
         data() {
             return {
@@ -95,12 +49,14 @@
                 selectedBasket: null,
                 projectGroups: [],
                 selectedProjectGroup: null,
-                basket_ID: null
+                basket_ID: null,
+                superGroups: [],
+                selectedSuperGroup: null
             }
         },
         created() {
             let self = this;
-            self.getData();
+            self.getSuperGroups();
         },
         methods: {
             getData() {
@@ -108,7 +64,8 @@
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.get(process.env.VUE_APP_API + `StoreAnalysis`)
+                Axios.get(process.env.VUE_APP_API +
+                        `StoreAnalysis?supergroup_a_id=${self.selectedSuperGroup}&periodFrom_ID=66&periodTo_ID=71`)
                     .then(r => {
                         self.prepareTurnoverGroups(r.data)
                         delete Axios.defaults.headers.common["TenantID"];
@@ -126,8 +83,11 @@
 
                 let currentPercent = 0;
 
+                let highest = data[0].totalSales;
+
                 data.forEach(el => {
                     let storePercent = currentPercent + ((el.totalSales / totalStoreSales) * 100);
+                    el["salesPercent"] = ((el.totalSales / highest) * 100);
                     el["cumulativePercent"] = storePercent;
                     currentPercent = storePercent;
                 })
@@ -147,6 +107,7 @@
                         let lowestMP = mp[i + 1];
 
                         if (!hasValue) {
+
                             if (el.totalSales > highestMP) {
                                 el["level"] = levels[i];
                                 hasValue = true;
@@ -200,7 +161,7 @@
                 let mids = [];
 
                 for (var i = 0; i < levels; i++) {
-                    let mp = (levelDescrep * (i + 1)) / 2;
+                    let mp = Math.ceil((levelDescrep * (i + 1)) / 2);
                     let val = data[mp].totalSales
                     mids.push(val);
                 }
@@ -248,87 +209,40 @@
                     return 0;
                 });
             },
-            onFilterTextBoxChanged() {
+            getSuperGroups() {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + `Retailer/Supergroup_A`)
+                    .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+
+                        let tmp = [];
+
+                        r.data.forEach(el => {
+                            tmp.push({
+                                text: el.displayname,
+                                value: el.id
+                            })
+                        })
+
+                        self.superGroups = tmp;
+                    })
+            },
+            onSuperGroupChange() {
                 let self = this;
 
                 self.$nextTick(() => {
-                    self.$refs.Grid.changeFilter(self.filterText)
-
+                    self.getData();
                 })
             },
-            getFilteredData() {
-                let self = this
-                self.$refs.Spinner.show()
-                let tmp = []
-                tmp = self.$refs.Grid.getFilteredData()
-                let comp = tmp.last.columnController.allDisplayedColumns
-                let compareCriteria = comp[comp.length - 1].colId
-                let end = tmp.tmpArr
-
-                end.forEach(item => {
-                    item.active = true
-                    item.basket_ID = self.selectedBasket.value;
-                })
-
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
-                Axios.post(process.env.VUE_APP_API + `Basket_Product_Link/SaveMany`, end)
-                    .then(r => {
-                        tmp.tmpArrNode.forEach(item => {
-                            item.data.active = true
-
-                            item.setData(item.data)
-                            self.$refs.Spinner.hide()
-                        })
-                        delete Axios.defaults.headers.common["TenantID"];
-                    })
-
-
-            },
-            openClusterSetup() {
-                let self = this
-                self.$refs.ClusterMaint.open()
-            },
-            getbaskets() {
-                let self = this
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
-                Axios.get(process.env.VUE_APP_API + `Basket`)
-                    .then(r => {
-                        self.baskets = []
-                        r.data.forEach(e => {
-                            self.baskets.push({
-                                text: e.description,
-                                value: e.id
-                            })
-                        })
-                        delete Axios.defaults.headers.common["TenantID"];
-                    })
-            },
-            openBasketMaint() {
-                let self = this
-                self.$refs.basketMaint.open()
-            },
-            getBasketReportData(datePicker) {
+            openFile() {
                 let self = this;
-                self.$refs.Spinner.show()
-                self.basket_ID = self.selectedBasket.value
-                Axios.get(process.env.VUE_APP_API + "BasketAnalysis?basketID=" + self.selectedBasket.value)
-                    .then(r => {
-                        self.rowData = r.data.basket_LinkList;
-                        self.$refs.Spinner.hide()
-
-                    })
             },
-            onBasketSelect() {
+            saveFile() {
                 let self = this;
-                self.getBasketReportData();
-            },
-            runReport() {
-                let self = this;
-                self.$refs.StoreBasketReport.show(self.selectedBasket.text, self.selectedBasket.value);
-            },
-
+            }
         }
     }
 

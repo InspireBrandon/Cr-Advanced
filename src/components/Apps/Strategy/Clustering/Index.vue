@@ -24,6 +24,7 @@
 </template>
 
 <script>
+    import Main from '../Main/Index'
     import BasketAnalysis from '../BasketAnalysis/Index'
     import ListingClusters from '../ListingClusters/Index'
     import StoreAnalysis from '../StoreAnalysis/Index'
@@ -36,6 +37,7 @@
 
     export default {
         components: {
+            Main,
             BasketAnalysis,
             ListingClusters,
             StoreAnalysis,
