@@ -5,219 +5,229 @@
 <script>
     import * as am4core from "@amcharts/amcharts4/core";
     import * as am4maps from "@amcharts/amcharts4/maps";
-    import am4themes_animated from "@amcharts/amcharts4/themes/animated";
+    import * as am4themes_animated from "@amcharts/amcharts4/themes/animated";
+    import am4geodata_usaLow from "@amcharts/amcharts4-geodata/usaLow";
 
     export default {
         mounted() {},
         methods: {
             drawMap() {
-                am4core.ready(function () {
+                am4core.useTheme(am4themes_animated);
+                // Themes end
 
-                    // Themes begin
-                    am4core.useTheme(am4themes_animated);
-                    // Themes end
+                // Create map instance
+                let chart = am4core.create("map", am4maps.MapChart);
+                chart.maxZoomLevel = 64;
 
-                    var availableCountries = ["ZA"];
+                // Set map definition
+                chart.geodata = am4geodata_usaLow;
 
-                    var selectedPolygon;
-                    var userCountryId = "ZA";
-                    var mapChart;
-                    var continentsSeries;
-                    var countriesSeries;
-                    var mainContainer;
-                    var flagContainer;
-                    var colorSet = new am4core.ColorSet();
-                    var heartAnimation;
-                    var flag;
-                    var countryName;
+                // Set projection
+                chart.projection = new am4maps.projections.AlbersUsa();
 
-                    function init() {
-                        mainContainer = am4core.create("map", am4core.Container);
-                        mainContainer.background.fillOpacity = 1;
-                        mainContainer.background.fill = am4core.color("#313950");
-                        mainContainer.width = am4core.percent(100);
-                        mainContainer.height = am4core.percent(100);
-                        mainContainer.preloader.disabled = true;
-
-                        var triangle = new am4core.Triangle();
-                        triangle.width = 8;
-                        triangle.height = 10;
-                        triangle.fill = am4core.color("#ffffff");
-                        triangle.direction = "right";
-                        triangle.valign = "middle";
-                        triangle.align = "center";
-                        triangle.dx = 1;
-
-                        flagContainer = mainContainer.createChild(am4core.Container);
-                        flagContainer.horizontalCenter = "middle";
-                        flagContainer.hiddenState.properties.dy = -180;
-                        flagContainer.x = am4core.percent(50);
-                        flagContainer.y = 30;
-                        flagContainer.layout = "horizontal";
-
-                        flag = flagContainer.createChild(am4core.Image);
-                        flag.width = 50;
-                        flag.height = 50;
-
-                        countryName = flagContainer.createChild(am4core.Label);
-                        countryName.marginLeft = 15;
-                        countryName.fontSize = 25;
-                        countryName.x = 100;
-                        countryName.valign = "middle";
-                        countryName.fill = am4core.color("#ffffff");
-
-                        createMap();
+                // Add button
+                let zoomOut = chart.tooltipContainer.createChild(am4core.ZoomOutButton);
+                zoomOut.align = "right";
+                zoomOut.valign = "top";
+                zoomOut.margin(20, 20, 20, 20);
+                zoomOut.events.on("hit", function () {
+                    if (currentSeries) {
+                        currentSeries.hide();
                     }
-
-                    function createMap() {
-                        // MAP CHART
-                        mapChart = mainContainer.createChild(am4maps.MapChart);
-                        mapChart.zIndex = -1;
-                        mapChart.maxZoomLevel = 3000;
-                        mapChart.projection = new am4maps.projections.Mercator();
-                        mapChart.seriesContainer.events.disableType("doublehit");
-                        mapChart.chartContainer.background.events.disableType("doublehit");
-
-                        mapChart.deltaLongitude = -11;
-                        mapChart.seriesContainer.draggable = false;
-                        mapChart.geodataSource.url =
-                            "//www.amcharts.com/lib/4/geodata/json/continentsHigh.json";
-                        mapChart.seriesContainer.resizable = false;
-                        mapChart.mouseWheelBehavior = "none";
-
-                        continentsSeries = mapChart.series.push(new am4maps.MapPolygonSeries());
-                        continentsSeries.useGeodata = true;
-                        continentsSeries.exclude = ["antarctica"];
-                        continentsSeries.mapPolygons.template.fill = am4core.color("#283047");
-                        continentsSeries.mapPolygons.template.strokeOpacity = 0;
-                        continentsSeries.toBack();
-
-                        countriesSeries = mapChart.series.push(new am4maps.MapPolygonSeries());
-                        countriesSeries.useGeodata = true;
-                        // countriesSeries.geodata = am4geodata_worldIndiaHigh;
-                        countriesSeries.exclude = ["AQ"];
-                        countriesSeries.mapPolygons.template.visible = false;
-                        countriesSeries.mapPolygons.template.hiddenState.properties.opacity = 0;
-
-                        countriesSeries.geodataSource.url =
-                            "//www.amcharts.com/wp-content/uploads/assets/maps/worldCustomHigh.json";
-                        countriesSeries.mapPolygons.template.fill = am4core.color("#0975da");
-                        countriesSeries.mapPolygons.template.strokeOpacity = 0;
-
-                        countriesSeries.geodataSource.events.on("ended", function () {
-                            setTimeout(function () {
-                                handleNext(userCountryId);
-                            }, 500)
-                        });
-                    }
-
-                    function handleNext(countryId) {
-
-                        flagContainer.hide(1000);
-
-                        if (availableCountries.indexOf(countryId) == -1) {
-                            userCountryId = availableCountries[Math.floor(Math.random() * availableCountries
-                                .length)];
-                        }
-
-                        zoomToSelectedPolygon();
-                    }
-
-                    function zoomToSelectedPolygon() {
-
-                        if (selectedPolygon) {
-                            selectedPolygon.hide();
-                        }
-
-                        selectedPolygon = countriesSeries.getPolygonById(userCountryId);
-                        selectedPolygon.hide(0);
-                        selectedPolygon.opacity = 0;
-                        selectedPolygon.defaultState.properties.opacity = 1;
-                        selectedPolygon.toFront();
-
-                        var showAnimation = selectedPolygon.show(500);
-
-                        showAnimation.events.on("animationended", function () {
-
-                            flag.href = "//www.amcharts.com/wp-content/uploads/assets/flags/" +
-                                userCountryId.toLowerCase() + ".svg";
-                            countryName.text = selectedPolygon.dataItem.dataContext.name;
-
-                            setTimeout(function () {
-                                flagContainer.show();
-                            }, 1000)
-
-                            selectedPolygon.polygon.validate();
-                            var w = selectedPolygon.polygon.bbox.width;
-                            var h = selectedPolygon.polygon.bbox.height;
-
-                            var x = selectedPolygon.polygon.bbox.x + w / 2;
-                            var y = selectedPolygon.polygon.bbox.y + h / 2;
-
-                            w = Math.max(w, h);
-
-                            var path = am4core.path.moveTo({
-                                x: x,
-                                y: y + w / 3
-                            });
-                            path += am4core.path.cubicCurveTo({
-                                x: x,
-                                y: y - w / 4
-                            }, {
-                                x: x - w / 2 - w / 4,
-                                y: y - w / 3
-                            }, {
-                                x: x - w / 8,
-                                y: y - w / 2
-                            });
-                            path += am4core.path.cubicCurveTo({
-                                x: x,
-                                y: y + w / 3
-                            }, {
-                                x: x + w / 8,
-                                y: y - w / 2
-                            }, {
-                                x: x + w / 2 + w / 4,
-                                y: y - w / 3
-                            });
-
-                            var points = am4core.path.pathToPoints(path, 2000);
-
-                            var middleLatitude = mapChart.zoomGeoPoint.latitude + (selectedPolygon
-                                .latitude - mapChart.zoomGeoPoint.latitude) / 2;
-                            var middleLongitude = mapChart.zoomGeoPoint.longitude + (selectedPolygon
-                                .longitude - mapChart.zoomGeoPoint.longitude) / 2;
-
-                            mapChart.zoomEasing = am4core.ease.sinOut;
-                            
-                            var zoomOutAnimation = mapChart.zoomToGeoPoint({
-                                latitude: middleLatitude,
-                                longitude: middleLongitude
-                            }, 2, true);
-
-                            zoomOutAnimation.events.on("animationended", function () {
-                                mapChart.zoomEasing = am4core.ease.cubicInOut;
-                                mapChart.zoomToMapObject(selectedPolygon, 1000 / Math.max(w / 1, h / 20000) *
-                                    1, true, 1500);
-                                selectedPolygon.polygon.points;
-                                selectedPolygon.polygon.morpher.morphToSingle = true;
-                                var animation;
-                                if (points) {
-                                    animation = selectedPolygon.polygon.morpher.morphToPolygon([
-                                        [points]
-                                    ]);
-                                } else {
-                                    animation = selectedPolygon.polygon.morpher.morphToCircle();
-                                }
-
-
-                                animation.stop();
-                            })
-                        })
-                    }
-
-                    init();
+                    chart.goHome();
+                    zoomOut.hide();
+                    currentSeries = regionalSeries.US.series;
+                    currentSeries.show();
                 });
+                zoomOut.hide();
+
+
+                // Create map polygon series
+                let polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
+                polygonSeries.useGeodata = true;
+                polygonSeries.calculateVisualCenter = true;
+
+                // Configure series
+                let polygonTemplate = polygonSeries.mapPolygons.template;
+                polygonTemplate.tooltipText = "{name}";
+                polygonTemplate.fill = chart.colors.getIndex(0);
+
+                // Load data when map polygons are ready
+                chart.events.on("ready", loadStores);
+
+                // Loads store data
+                function loadStores() {
+                    let loader = new am4core.DataSource();
+                    loader.url = "https://s3-us-west-2.amazonaws.com/s.cdpn.io/t-160/TargetStores.json";
+                    loader.events.on("parseended", function (ev) {
+                        setupStores(ev.target.data);
+                    });
+                    loader.load();
+                }
+
+                // Creates a series
+                function createSeries(heatfield) {
+                    let series = chart.series.push(new am4maps.MapImageSeries());
+                    series.dataFields.value = heatfield;
+
+                    let template = series.mapImages.template;
+                    template.verticalCenter = "middle";
+                    template.horizontalCenter = "middle";
+                    template.propertyFields.latitude = "lat";
+                    template.propertyFields.longitude = "long";
+                    template.tooltipText = "{name}:\n[bold]{stores} stores[/]";
+
+                    let circle = template.createChild(am4core.Circle);
+                    circle.radius = 10;
+                    circle.fillOpacity = 0.7;
+                    circle.verticalCenter = "middle";
+                    circle.horizontalCenter = "middle";
+                    circle.nonScaling = true;
+
+                    let label = template.createChild(am4core.Label);
+                    label.text = "{stores}";
+                    label.fill = am4core.color("#fff");
+                    label.verticalCenter = "middle";
+                    label.horizontalCenter = "middle";
+                    label.nonScaling = true;
+
+                    let heat = series.heatRules.push({
+                        target: circle,
+                        property: "radius",
+                        min: 10,
+                        max: 30
+                    });
+
+                    // Set up drill-down
+                    series.mapImages.template.events.on("hit", function (ev) {
+
+                        // Determine what we've clicked on
+                        let data = ev.target.dataItem.dataContext;
+
+                        // No id? Individual store - nothing to drill down to further
+                        if (!data.target) {
+                            return;
+                        }
+
+                        // Create actual series if it hasn't been yet created
+                        if (!regionalSeries[data.target].series) {
+                            regionalSeries[data.target].series = createSeries("count");
+                            regionalSeries[data.target].series.data = data.markerData;
+                        }
+
+                        // Hide current series
+                        if (currentSeries) {
+                            currentSeries.hide();
+                        }
+
+                        // Control zoom
+                        if (data.type == "state") {
+                            let statePolygon = polygonSeries.getPolygonById("US-" + data.state);
+                            chart.zoomToMapObject(statePolygon);
+                        } else if (data.type == "city") {
+                            chart.zoomToGeoPoint({
+                                latitude: data.lat,
+                                longitude: data.long
+                            }, 64, true);
+                        }
+                        zoomOut.show();
+
+                        // Show new targert series
+                        currentSeries = regionalSeries[data.target].series;
+                        currentSeries.show();
+                    });
+
+                    return series;
+                }
+
+                let regionalSeries = {};
+                let currentSeries;
+
+                function setupStores(data) {
+
+                    // Init country-level series
+                    regionalSeries.US = {
+                        markerData: [],
+                        series: createSeries("stores")
+                    };
+
+                    // Set current series
+                    currentSeries = regionalSeries.US.series;
+
+                    // Process data
+                    am4core.array.each(data.query_results, function (store) {
+
+                        // Get store data
+                        var store = {
+                            state: store.MAIL_ST_PROV_C,
+                            long: am4core.type.toNumber(store.LNGTD_I),
+                            lat: am4core.type.toNumber(store.LATTD_I),
+                            location: store.co_loc_n,
+                            city: store.mail_city_n,
+                            count: am4core.type.toNumber(store.count)
+                        };
+
+                        // Process state-level data
+                        if (regionalSeries[store.state] == undefined) {
+                            let statePolygon = polygonSeries.getPolygonById("US-" + store.state);
+                            if (statePolygon) {
+
+                                // Add state data
+                                regionalSeries[store.state] = {
+                                    target: store.state,
+                                    type: "state",
+                                    name: statePolygon.dataItem.dataContext.name,
+                                    count: store.count,
+                                    stores: 1,
+                                    lat: statePolygon.visualLatitude,
+                                    long: statePolygon.visualLongitude,
+                                    state: store.state,
+                                    markerData: []
+                                };
+                                regionalSeries.US.markerData.push(regionalSeries[store.state]);
+
+                            } else {
+                                // State not found
+                                return;
+                            }
+                        } else {
+                            regionalSeries[store.state].stores++;
+                            regionalSeries[store.state].count += store.count;
+                        }
+
+                        // Process city-level data
+                        if (regionalSeries[store.city] == undefined) {
+                            regionalSeries[store.city] = {
+                                target: store.city,
+                                type: "city",
+                                name: store.city,
+                                count: store.count,
+                                stores: 1,
+                                lat: store.lat,
+                                long: store.long,
+                                state: store.state,
+                                markerData: []
+                            };
+                            regionalSeries[store.state].markerData.push(regionalSeries[store.city]);
+                        } else {
+                            regionalSeries[store.city].stores++;
+                            regionalSeries[store.city].count += store.count;
+                        }
+
+                        // Process individual store
+                        regionalSeries[store.city].markerData.push({
+                            name: store.location,
+                            count: store.count,
+                            stores: 1,
+                            lat: store.lat,
+                            long: store.long,
+                            state: store.state
+                        });
+
+                    });
+
+                    regionalSeries.US.series.data = regionalSeries.US.markerData;
+                }
             }
         }
     }

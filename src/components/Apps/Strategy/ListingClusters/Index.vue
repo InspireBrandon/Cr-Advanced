@@ -315,28 +315,61 @@
                 self.stores = [];
                 self.productRowData = [];
             },
+            getFile(callback) {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API +
+                        `SystemFile/JSON?db=CR-Devinspire&folder=CLUSTER REPORT&file=REPORT`)
+                    .then(r => {
+                        callback(r.data);
+                    })
+            },
             saveFile() {
                 let self = this;
+
+                self.getFile(fileTransaction => {
+                    if (fileTransaction == null || fileTransaction == false) {
+                        let tmp = {
+                            listing: {}
+                        }
+
+                        tmp.listing[self.selectedPlanogram.displayname] = self.storeRowData;
+
+                        self.appendAndSaveFile(tmp);
+                    } else {
+                        self.getFileData(fileTransaction.id, fileData => {
+                            let tmp = fileData;
+
+                            if(tmp.listing == undefined)
+                                tmp.listing = {};
+
+                            tmp.listing[self.selectedPlanogram.displayname] = self.storeRowData;
+
+                            self.appendAndSaveFile(tmp);
+                        })
+                    }
+                })
+            },
+            getFileData(id, callback) {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${id}`)
+                    .then(r => {
+                        callback(r.data);
+                    })
+            },
+            appendAndSaveFile(fileData) {
+                alert("in here")
 
                 Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
                         SystemFile: {
                             SystemUser_ID: -1,
-                            Folder: "CLUSTERING - LISTING",
-                            Name: self.generateName(),
+                            Folder: "CLUSTER REPORT",
+                            Name: "REPORT",
                             Extension: '.json'
                         },
                         Data: {
-                            salesData: self.salesData,
-                            config: {
-                                planogramData: self.selectedPlanogram,
-                                periodData: self.selectedPeriod,
-                                setup: {
-                                    primaryCluster: self.primaryCluster,
-                                    secondaryCluster: self.secondaryCluster,
-                                    level: self.level,
-                                    group: self.group
-                                }
-                            }
+                            output: fileData
                         }
                     })
                     .then(r => {
