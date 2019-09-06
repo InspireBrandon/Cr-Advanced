@@ -32,6 +32,8 @@ class Calculations {
   }
 
   Weekly_Sales_Cost(sales_cost) {
+    console.log(sales_cost);
+
     if (sales_cost == undefined || sales_cost == null) {
       return "N/A"
     }

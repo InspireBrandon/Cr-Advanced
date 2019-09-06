@@ -304,6 +304,14 @@
         }
     },
     {
+        "headerName": "Cost Potential",
+        "field": "cost_potential",
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
         "headerName": "Stock Units",
         "field": "stock_Units",
         "hide": true,

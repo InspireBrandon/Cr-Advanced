@@ -1112,6 +1112,8 @@ function calculate(productItem, vuex, storeCount) {
 
   console.log(productData);
 
+  console.log("VUEX", vuex.state.usePotential)
+
   var sales_retail = productData.ProductData.sales_Retail,
     sales_potential = productData.ProductData.sales_potential,
     sales_cost = productData.ProductData.sales_Cost,
@@ -1126,8 +1128,18 @@ function calculate(productItem, vuex, storeCount) {
     vuex.state.usePotential ? volume_potential : sales_units
   );
 
+  console.log(productData.ProductData);
+
   calcData.Weekly_Sales_Retail = calculationHandler.Calculate_Weekly_Sales_Retail(vuex.state.usePotential ? sales_potential : sales_retail,);
-  calcData.Weekly_Sales_Cost = calculationHandler.Calculate_Weekly_Sales_Cost(vuex.state.usePotential ? cost_potential : sales_cost);
+
+  if(vuex.state.usePotential) {
+    calcData.Weekly_Sales_Cost = calculationHandler.Calculate_Weekly_Sales_Cost(cost_potential);
+  }
+
+  if(!vuex.state.usePotential) {
+    calcData.Weekly_Sales_Cost = calculationHandler.Calculate_Weekly_Sales_Cost(sales_cost);
+  }
+
   calcData.Weekly_Sales_Units = calculationHandler.Calculate_Weekly_Sales_Units(vuex.state.usePotential ? volume_potential : sales_units);
 
   calcData.Weekly_Profit = calculationHandler.Calculate_Weekly_Profit(vuex.state.usePotential ? sales_potential : sales_retail,
