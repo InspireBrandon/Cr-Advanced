@@ -57,6 +57,18 @@
         created() {
             let self = this;
             self.getSuperGroups();
+            self.getFile(data => {
+                if (data != null && data != false) {
+                    self.getFileData(data.id, fileData => {
+                        if(fileData.config != undefined && fileData.config != null) {
+                            if(fileData.config.supergroup_a_id != undefined && fileData.config.supergroup_a_id != null) {
+                                self.selectedSuperGroup = fileData.config.supergroup_a_id;
+                                self.getData();
+                            }
+                        }
+                    })
+                }
+            })
         },
         methods: {
             getData() {
@@ -73,7 +85,7 @@
             },
             prepareTurnoverGroups(data) {
                 let self = this;
-                let levels = ["HIGH", "MEDIUM", "LOW"]
+                let levels = ["LARGE", "MEDIUM", "SMALL"]
 
                 let totalStoreSales = data.reduce((a, b) => {
                     return {
@@ -113,7 +125,6 @@
                                 hasValue = true;
                             } else {
                                 if (el.totalSales > lowestMP) {
-                                    // find closest
                                     let highDiff = highestMP - el.totalSales;
                                     let lowestDiff = el.totalSales - lowestMP;
 
@@ -129,7 +140,6 @@
                         }
                     }
 
-                    // Handle Low Values ERROR
                     if (el.level == undefined) {
                         let highDiff = mp[mp.length - 2] - el.totalSales;
                         let lowestDiff = el.totalSales - mp[mp.length - 1];
@@ -161,9 +171,10 @@
                 let mids = [];
 
                 for (var i = 0; i < levels; i++) {
-                    let mp = Math.ceil((levelDescrep * (i + 1)) / 2);
-                    let val = data[mp].totalSales
-                    mids.push(val);
+                    let high = data[levelDescrep * i];
+                    let low = data[levelDescrep * (i + 1)]
+                    let diff = high.totalSales - low.totalSales;
+                    mids.push(diff);
                 }
 
                 return mids;
@@ -240,7 +251,7 @@
             openFile() {
                 let self = this;
             },
-             getFile(callback) {
+            getFile(callback) {
                 let self = this;
 
                 Axios.get(process.env.VUE_APP_API +
@@ -251,14 +262,16 @@
             },
             saveFile() {
                 let self = this;
-                
+
 
                 self.getFile(fileTransaction => {
-                    console.log(fileTransaction);
 
                     if (fileTransaction == null || fileTransaction == false) {
                         let tmp = {
-                            store: {}
+                            store: {},
+                            config: {
+                                supergroup_a_id: self.selectedSuperGroup
+                            }
                         }
 
                         tmp.store = self.rowData;
@@ -267,17 +280,21 @@
                     } else {
                         self.getFileData(fileTransaction.id, fileData => {
                             let tmp = fileData;
-                            console.log("tmp");
-                            console.log(tmp);
+
                             if (tmp == false) {
                                 tmp = {
-                                    store: {}
+                                    store: {},
+                                    config: {
+                                        supergroup_a_id: self.selectedSuperGroup
+                                    }
                                 }
                             }
+
                             if (tmp.store == undefined)
                                 tmp.store = {};
 
                             tmp.store = self.rowData;
+                            tmp.config = { supergroup_a_id: self.selectedSuperGroup };
 
                             self.appendAndSaveFile(tmp);
                         })
@@ -299,7 +316,7 @@
                             Name: "REPORT",
                             Extension: '.json'
                         },
-                          Data: fileData
+                        Data: fileData
                     })
                     .then(r => {
                         alert("Successfully saved");

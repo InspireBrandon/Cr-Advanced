@@ -5,7 +5,7 @@
                 :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
                 :sideBar='true' :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true"
                 :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true" :enableColResize="true"
-                :floatingFilter="true" :groupMultiAutoColumn="true" :onGridReady="onGridReady">
+                :floatingFilter="true" :groupMultiAutoColumn="true" :onGridReady="onGridReady" :animateRows="true">
             </ag-grid-vue>
         </div>
         <v-toolbar dark flat dense>
