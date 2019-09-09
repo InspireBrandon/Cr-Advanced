@@ -15,6 +15,16 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
+                <v-menu dark offset-y style="margin-bottom: 10px;">
+                    <v-btn slot="activator" flat>
+                        Setup
+                    </v-btn>
+                    <v-list>
+                        <v-list-tile @click="openLevels">
+                            <v-list-tile-title>Levels</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
             </v-toolbar-items>
             <v-spacer></v-spacer>
             <v-toolbar-title>
@@ -28,6 +38,54 @@
                     v-model="selectedSuperGroup" hide-details></v-select>
             </v-toolbar-items>
         </v-toolbar>
+        <v-dialog v-model="clusterDialog" persistent width="800px">
+            <v-card>
+                <v-toolbar dark flat color="primary">
+                    <v-toolbar-title> Clusters </v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-btn icon @click="clusterDialog=false">
+                        <v-icon>close</v-icon>
+                    </v-btn>
+                </v-toolbar>
+                <v-card-text>
+                    <v-container grid-list-md>
+                        <v-layout row wrap>
+                            <v-flex md6>
+                                <v-select @change="generateLevels" label="Clusters" :items="levelItems"
+                                    v-model="selectedLevel">
+                                </v-select>
+                            </v-flex>
+                            <v-flex md6>
+
+                            </v-flex>
+                            <v-flex md12>
+                                <v-divider></v-divider>
+                            </v-flex>
+                            <v-flex md6>
+                                <v-text-field label="Cluster 1" v-model="level1">
+                                </v-text-field>
+                                <v-text-field label="Cluster 2" v-if="selectedLevel>=1" v-model="level2">
+                                </v-text-field>
+                                <v-text-field label="Cluster 3" v-if="selectedLevel>=2" v-model="level3">
+                                </v-text-field>
+                            </v-flex>
+                            <v-flex md6>
+                                <v-text-field label="Cluster 4" v-if="selectedLevel>=3" v-model="level4">
+                                </v-text-field>
+                                <v-text-field label="Cluster 5" v-if="selectedLevel>=4" v-model="level5">
+                                </v-text-field>
+                            </v-flex>
+                        </v-layout>
+                    </v-container>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" @click="submitLevels">
+                        Submit
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
         <Grid :rowData="rowData" ref="Grid" />
     </v-card>
 </template>
@@ -42,6 +100,28 @@
         },
         data() {
             return {
+                level1: "Large",
+                level2: "Medium",
+                level3: "Small",
+                level4: "Extra Large",
+                level5: "Extra Small",
+                selectedLevel: 2,
+                levelItems: [{
+                    text: "1",
+                    value: 0
+                }, {
+                    text: "2",
+                    value: 1
+                }, {
+                    text: "3",
+                    value: 2
+                }, {
+                    text: "4",
+                    value: 3
+                }, {
+                    text: "5",
+                    value: 4
+                }],
                 items: [],
                 filterText: null,
                 rowData: [],
@@ -51,7 +131,9 @@
                 selectedProjectGroup: null,
                 storeAnalysis_ID: null,
                 superGroups: [],
-                selectedSuperGroup: null
+                selectedSuperGroup: null,
+                clusterDialog: false,
+                levelsCallback: null,
             }
         },
         created() {
@@ -59,6 +141,45 @@
             self.getSuperGroups();
         },
         methods: {
+            openLevels() {
+                let self = this
+                self.openClusterLevels(callback => {
+                    console.log(callback);
+
+                })
+            },
+            submitLevels() {
+                let self = this
+                self.levelsCallback([self.level1,
+                    self.level2,
+                    self.level3,
+                    self.level4,
+                    self.level5
+                ])
+            },
+            generateLevels(amount) {
+                let self = this
+                if (self.selectedLevel >= 3) {
+                    self.level1 = "Extra Large"
+                    self.level2 = "Large"
+                    self.level3 = "Medium"
+                    self.level4 = "Small"
+                    self.level5 = "Extra Small"
+                } else {
+                    self.level1 = "Large"
+                    self.level2 = "Medium"
+                    self.level3 = "Small"
+                    self.level4 = "Extra Large"
+                    self.level5 = "Extra Small"
+                }
+            },
+            openClusterLevels(callback) {
+                let self = this
+                self.clusterDialog = true
+                self.levelsCallback = callback
+                console.log(self.levelsCallback);
+                
+            },
             getData() {
                 let self = this;
 
@@ -240,7 +361,7 @@
             openFile() {
                 let self = this;
             },
-             getFile(callback) {
+            getFile(callback) {
                 let self = this;
 
                 Axios.get(process.env.VUE_APP_API +
@@ -251,7 +372,7 @@
             },
             saveFile() {
                 let self = this;
-                
+
 
                 self.getFile(fileTransaction => {
                     console.log(fileTransaction);
@@ -299,7 +420,7 @@
                             Name: "REPORT",
                             Extension: '.json'
                         },
-                          Data: fileData
+                        Data: fileData
                     })
                     .then(r => {
                         alert("Successfully saved");
