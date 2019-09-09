@@ -359,8 +359,6 @@
                     })
             },
             appendAndSaveFile(fileData) {
-                alert("in here")
-
                 Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
                         SystemFile: {
                             SystemUser_ID: -1,
@@ -368,9 +366,7 @@
                             Name: "REPORT",
                             Extension: '.json'
                         },
-                        Data: {
-                            output: fileData
-                        }
+                        Data: fileData
                     })
                     .then(r => {
                         alert("Successfully saved");

@@ -172,7 +172,6 @@
                     })
             },
             appendAndSaveFile(fileData) {
-                alert("in here")
                 Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
                         SystemFile: {
                             SystemUser_ID: -1,

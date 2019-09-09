@@ -27,7 +27,7 @@
     import Axios from 'axios';
 
     export default {
-        props: ['rowData'],
+        props: ['rowData', 'headers'],
         components: {
             AgGridVue
         },
@@ -35,7 +35,6 @@
             let self = this;
 
             return {
-                headers: [],
                 gridOptions: {
                     rowHeight: 35,
                     pinnedTopRowData: [],
@@ -52,32 +51,12 @@
         },
         created() {
             let self = this;
-            self.setHeaders();
         },
         methods: {
             onGridReady(params) {
                 let self = this;
                 self.gridApi = params.api;
                 self.columnApi = params.columnApi;
-            },
-            setHeaders() {
-                let self = this;
-
-                self.headers = [
-                    {
-                        "headerName": "Store",
-                        "field": "displayname",
-                    },
-                    {
-                        "headerName": "Basket",
-                    },
-                    {
-                        "headerName": "Listing",
-                    },
-                    {
-                        "headerName": "Store",
-                    }
-                ]
             }
         }
     }

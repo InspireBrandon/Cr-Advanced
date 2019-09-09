@@ -258,10 +258,10 @@
 
                     if (fileTransaction == null || fileTransaction == false) {
                         let tmp = {
-                            storeAnalysis: {}
+                            store: {}
                         }
 
-                        tmp.storeAnalysis = self.rowData;
+                        tmp.store = self.rowData;
 
                         self.appendAndSaveFile(tmp);
                     } else {
@@ -271,13 +271,13 @@
                             console.log(tmp);
                             if (tmp == false) {
                                 tmp = {
-                                    storeAnalysis: {}
+                                    store: {}
                                 }
                             }
-                            if (tmp.storeAnalysis == undefined)
-                                tmp.storeAnalysis = {};
+                            if (tmp.store == undefined)
+                                tmp.store = {};
 
-                            tmp.storeAnalysis = self.rowData;
+                            tmp.store = self.rowData;
 
                             self.appendAndSaveFile(tmp);
                         })
@@ -292,7 +292,6 @@
                     })
             },
             appendAndSaveFile(fileData) {
-                alert("in here")
                 Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
                         SystemFile: {
                             SystemUser_ID: -1,

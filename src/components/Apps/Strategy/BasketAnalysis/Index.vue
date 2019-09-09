@@ -120,7 +120,7 @@
             getSavedBasket() {
                 let self = this
                 self.$refs.SystemFileSelector.show("CLUSTERING-BASKETS", callback => {
-                    console.log(callback);
+            
                     var startTime = new Date()
                     let config = {
                         onDownloadProgress: progressEvent => {
@@ -141,7 +141,6 @@
                     Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${callback}`,
                         config).then(
                         resp => {
-                            console.log(resp);
                             self.baskets.forEach(e => {
                                 if (e.value == resp.data.Basket_ID) {
                                     self.selectedBasket = e
@@ -170,7 +169,6 @@
                         let comp = tmp.last.columnController.allDisplayedColumns
                         let compareCriteria = comp[comp.length - 1].colId
                         let end = tmp.tmpArr
-                        console.log(tmp);
                         end.forEach(item => {
                             item.active = value
                             item.basket_ID = self.selectedBasket.value;
@@ -178,7 +176,6 @@
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                         Axios.post(process.env.VUE_APP_API + `Basket_Product_Link/SaveMany`, end)
                             .then(r => {
-                                console.log(r);
                                 tmp.tmpArrNode.forEach(item => {
                                     item.data.active = value
                                     item.setData(item.data)
@@ -189,27 +186,71 @@
                     }
                 })
             },
+            getFile(callback) {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API +
+                        `SystemFile/JSON?db=CR-Devinspire&folder=CLUSTER REPORT&file=REPORT`)
+                    .then(r => {
+                        callback(r.data);
+                    })
+            },
             saveData() {
-                let self = this
-                let tmp = {
-                    Basket_ID: self.selectedBasket.value,
-                    data: self.rowData,
-                }
+                let self = this;
+
+
+                self.getFile(fileTransaction => {
+
+                    if (fileTransaction == null || fileTransaction == false) {
+                        let tmp = {
+                            baskets: {}
+                        }
+
+                        tmp.baskets[self.selectedBasket.text] = self.rowData;
+
+                        self.appendAndSaveFile(tmp);
+                    } else {
+                        self.getFileData(fileTransaction.id, fileData => {
+                            let tmp = fileData;
+
+                            if (tmp == false) {
+                                tmp = {
+                                    baskets: {}
+                                }
+                            }
+
+                            if (tmp.baskets == undefined)
+                                tmp.baskets = {};
+
+                            tmp.baskets[self.selectedBasket.text] = self.rowData;
+
+                            self.appendAndSaveFile(tmp);
+                        })
+                    }
+                })
+            },
+            getFileData(id, callback) {
+                let self = this;
+                Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${id}`)
+                    .then(r => {
+                        callback(r.data);
+                    })
+            },
+            appendAndSaveFile(fileData) {
                 Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
                         SystemFile: {
                             SystemUser_ID: -1,
-                            Folder: "CLUSTERING-BASKETS",
-                            Name: self.selectedBasket.text,
-                            Extension: '.json',
+                            Folder: "CLUSTER REPORT",
+                            Name: "REPORT",
+                            Extension: '.json'
                         },
-                        Data: tmp
+                        Data: fileData
                     })
                     .then(r => {
-                        console.log(r);
-                        alert("Successfully Saved")
+                        alert("Successfully saved");
                     })
                     .catch(e => {
-                        alert("Failed to save")
+                        alert("Failed to save");
                     })
             },
             getbaskets() {
@@ -237,7 +278,6 @@
                 self.basket_ID = self.selectedBasket.value
                 Axios.get(process.env.VUE_APP_API + "BasketAnalysis?basketID=" + self.selectedBasket.value)
                     .then(r => {
-                        console.log(r);
                         self.rowData = r.data.basket_LinkList;
                         self.$refs.Spinner.hide()
                     })
@@ -250,16 +290,17 @@
                 let self = this;
                 self.$refs.ClusterMaint.open(callback => {
                     self.$refs.StoreBasketReport.show(self.selectedBasket.text, self.selectedBasket.value,
-                    true);
+                        true);
                 })
             },
             openReport() {
                 let self = this;
                 self.$refs.StoreBasketReport.show(self.selectedBasket.text, self.selectedBasket.value, false);
             },
-            
+
         }
     }
+
     function removeDuplicates(myArr, prop) {
         return myArr.filter((obj, pos, arr) => {
             return arr.map(mapObj => mapObj[prop]).indexOf(obj[prop]) === pos;
