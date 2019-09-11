@@ -43,15 +43,13 @@
             </v-toolbar-title>
         </v-toolbar>
         <v-toolbar dark flat>
-            <v-toolbar-items>
-            </v-toolbar-items>
-            <v-spacer></v-spacer>
-            <v-spacer></v-spacer>
+            <v-btn v-if="rowData.length > 0" color="primary" @click="refreshFile">Refresh</v-btn>
         </v-toolbar>
         <Grid ref="Grid" :rowData="rowData" />
         <BasketSelector ref="BasketSelector" />
         <DateRangeSelector ref="DateRangeSelector" />
         <BasketMaintenanceModal ref="BasketMaintenanceModal" />
+        <FileDataSelector ref="FileDataSelector" />
         <!-- Modal -->
         <v-dialog v-model="dialog" persistent width="600px">
             <v-card>
@@ -118,20 +116,23 @@
     import BasketSelector from './BasketSelector'
     import DateRangeSelector from "@/components/Common/DateRangeSelector"
     import BasketMaintenanceModal from './basketMaint/BasketMaintenanceModal';
+    import FileDataSelector from './FileDataSelector';
 
     export default {
         components: {
             Grid,
             BasketSelector,
             DateRangeSelector,
-            BasketMaintenanceModal
+            BasketMaintenanceModal,
+            FileDataSelector
         },
         data() {
             return {
                 selectedBasket: null,
                 selectedPeriod: null,
                 rowData: [],
-                storeData: null,
+                storeData: [],
+                runData: [],
                 level1: "LARGE",
                 level2: "MEDIUM",
                 level3: "SMALL",
@@ -160,6 +161,42 @@
         },
         created() {
             let self = this;
+            self.getFile(data => {
+                if (data != null && data != false) {
+                    self.getFileData(data.id, fileData => {
+                        if (!Array.isArray(fileData.store)) {
+                            self.runData = [];
+
+                            if (fileData.config != undefined && fileData.config != null) {
+                                if (fileData.config.basket != undefined && fileData.config.basket !=
+                                    null) {
+                                    let tg = fileData.config.basket.turnoverGroups;
+                                    let tgv = fileData.config.basket.turnoverGroupUserValues;
+
+                                    for (var i = 0; i < tg.length; i++) {
+                                        self["level" + (i + 1)] = tg[i];
+                                    }
+
+                                    for (var i = 0; i < tgv.length; i++) {
+                                        self["level" + (i + 1) + "Value"] = tgv[i];
+                                    }
+                                }
+                            }
+
+                            self.fileData = fileData.basket;
+
+                            for (var prop in fileData.basket) {
+                                self.runData.push({
+                                    prop: prop,
+                                    name: self.generateNameParams(fileData.basket[prop].config
+                                        .selectedBasket, fileData.basket[prop].config
+                                        .selectedPeriod)
+                                })
+                            }
+                        }
+                    })
+                }
+            })
         },
         methods: {
             newFile() {
@@ -245,11 +282,31 @@
                     }
                 })
 
+                data = self.getUserDefined(data, levels)
+
                 self.rowData = data;
 
                 self.$nextTick(() => {
                     self.$refs.Grid.gridApi.redrawRows();
                 })
+            },
+            getUserDefined(data, levels) {
+                let self = this;
+
+                for (var i = (data.length - 1); i >= 0; i--) {
+                    let currentElement = data[i];
+                    let valueIDX = 1;
+
+                    for (var j = 0; j < (levels.length - 1); j++) {
+                        if (currentElement.sales > parseFloat(self["level" + (j + 1) + "Value"])) {
+                            valueIDX++;
+                        }
+
+                        currentElement["userDefinedCluster"] = levels[levels.length - valueIDX];
+                    }
+                }
+
+                return data;
             },
             getMidPoints(data, levels) {
                 let self = this;
@@ -275,6 +332,14 @@
             },
             openFile() {
                 let self = this;
+
+                self.$refs.FileDataSelector.show(self.runData, fileData => {
+                    self.showingSaved = true;
+                    let reader = self.fileData[fileData.prop];
+                    self.selectedBasket = reader.config.selectedBasket;
+                    self.selectedPeriod = reader.config.selectedPeriod;
+                    self.rowData = reader.data;
+                });
             },
             saveFile() {
                 let self = this;
@@ -312,6 +377,15 @@
                     return "";
                 }
             },
+            generateNameParams(selectedBasket, selectedPeriod) {
+                let self = this;
+
+                if (selectedPeriod.periodic) {
+                    return `${selectedBasket.description} - ${selectedPeriod.monthsBetween} MMA (${selectedPeriod.dateFromString} TO ${selectedPeriod.dateToString})`;
+                } else {
+                    return `${selectedBasket.description} Average Monthly ${selectedPeriod.dateFromString} TO ${selectedPeriod.dateToString}`;
+                }
+            },
             generateLevels(amount) {
                 let self = this
 
@@ -347,7 +421,128 @@
 
                     self.levelsCallback(tmp);
                 })
-            }
+            },
+            refreshFile() {
+                let self = this;
+
+                self.$refs.DateRangeSelector.show(period => {
+                    self.selectedPeriod = period;
+                    self.getData();
+                })
+            },
+            getFile(callback) {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API +
+                        `SystemFile/JSON?db=CR-Devinspire&folder=CLUSTER REPORT&file=REPORT`)
+                    .then(r => {
+                        callback(r.data);
+                    })
+            },
+            saveFile() {
+                let self = this;
+
+                self.getFile(fileTransaction => {
+
+                    let levelValues = [];
+
+                    for (var i = 0; i < self.levels.length; i++) {
+                        levelValues.push(self[`level${(i + 1)}Value`])
+                    }
+
+                    if (fileTransaction == null || fileTransaction == false) {
+                        let tmp = {
+                            basket: {},
+                            config: {
+                                basket: {
+                                    turnoverGroups: self.levels,
+                                    turnoverGroupUserValues: levelValues
+                                }
+                            }
+                        }
+
+                        tmp.basket[self.selectedBasket.description] = {
+                            data: self.rowData,
+                            config: {
+                                selectedBasket: self.selectedBasket,
+                                selectedPeriod: self.selectedPeriod
+                            }
+                        };
+
+                        self.appendAndSaveFile(tmp);
+                    } else {
+                        self.getFileData(fileTransaction.id, fileData => {
+                            let tmp = fileData;
+
+                            if (tmp == false) {
+                                tmp = {
+                                    basket: {},
+                                    config: {
+                                        basket: {
+                                            turnoverGroups: self.levels,
+                                            turnoverGroupUserValues: levelValues
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (tmp.basket == undefined)
+                                tmp.basket = {};
+
+                            if (Array.isArray(tmp.basket))
+                                tmp.basket = {};
+
+                            if (tmp.config == undefined || tmp.config == null) {
+                                tmp.config = {
+                                    basket: {
+                                        turnoverGroups: self.levels,
+                                        turnoverGroupUserValues: levelValues
+                                    }
+                                }
+                            } else {
+                                tmp.config.basket = {
+                                    turnoverGroups: self.levels,
+                                    turnoverGroupUserValues: levelValues
+                                }
+                            }
+
+                            tmp.basket[self.selectedBasket.description] = {
+                                data: self.rowData,
+                                config: {
+                                    selectedBasket: self.selectedBasket,
+                                    selectedPeriod: self.selectedPeriod
+                                }
+                            };
+
+                            self.appendAndSaveFile(tmp);
+                        })
+                    }
+                })
+            },
+            getFileData(id, callback) {
+                let self = this;
+                Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${id}`)
+                    .then(r => {
+                        callback(r.data);
+                    })
+            },
+            appendAndSaveFile(fileData) {
+                Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
+                        SystemFile: {
+                            SystemUser_ID: -1,
+                            Folder: "CLUSTER REPORT",
+                            Name: "REPORT",
+                            Extension: '.json'
+                        },
+                        Data: fileData
+                    })
+                    .then(r => {
+                        alert("Successfully saved");
+                    })
+                    .catch(e => {
+                        alert("Failed to save");
+                    })
+            },
         }
     }
 </script>

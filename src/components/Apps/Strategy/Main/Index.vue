@@ -156,9 +156,9 @@
                     if (data.basket != undefined) {
                         for (var basket in data.basket) {
 
-                            data.basket[basket].forEach(el => {
+                            data.basket[basket].data.forEach(el => {
                                 if (el.displayname == element) {
-                                    tmpBasket["basket_" + basket] = el.cluster
+                                    tmpBasket["basket_" + basket] = el.level
                                 }
                             })
                         }
