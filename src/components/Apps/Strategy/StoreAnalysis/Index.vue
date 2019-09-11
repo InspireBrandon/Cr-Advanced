@@ -179,6 +179,8 @@
                                     let tg = fileData.config.store.turnoverGroups;
                                     let tgv = fileData.config.store.turnoverGroupUserValues;
 
+                                    self.selectedLevel = tg.length - 1;
+
                                     for (var i = 0; i < tg.length; i++) {
                                         self["level" + (i + 1)] = tg[i];
                                     }
@@ -255,13 +257,13 @@
                 self.$nextTick(() => {
                     self.levels = tmp;
                     self.clusterDialog = false;
-                })
 
-                if (self.showingSaved) {
-                    self.getData();
-                } else {
-                    self.levelsCallback(tmp);
-                }
+                    if (self.showingSaved) {
+                        self.prepareTurnoverGroups(self.rowData);
+                    } else {
+                        self.levelsCallback(tmp);
+                    }
+                })
             },
             generateLevels(amount) {
                 let self = this
