@@ -25,6 +25,12 @@
     import Grid from './Grid'
     import Setup from './Setup'
 
+    const formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2
+    })
+
     export default {
         components: {
             Grid,
@@ -63,16 +69,50 @@
                         self.getData(r.data)
                     })
             },
-            handleData(data, stores) {
+            handleData(data) {
                 let self = this;
 
                 let final = [];
                 let headers = [];
 
+                let stores = [];
+
                 headers.push({
                     "headerName": "Store",
                     "field": "storeName",
                 })
+
+                if (data.store != undefined) {
+                    for (var store in data.store) {
+                        data.store[store].data.forEach(el => {
+                            stores.push(el.displayname);
+                        })
+
+                        headers.push({
+                            headerName: 'Sales %',
+                            cellRendererFramework: "ProgressRenderer",
+                            width: 500
+                        }, {
+                            "headerName": "Sales",
+                            "field": "totalSales",
+                            valueFormatter: function (params) {
+                                return formatter.format(params.value).replace("$", "R");
+                            }
+                        }, {
+                            "headerName": "Cumulative Sales %",
+                            "field": "cumulativePercent",
+                            valueFormatter: function (params) {
+                                return params.value.toFixed(1) + "%";
+                            }
+                        }, {
+                            "headerName": "System Turnover Group",
+                            "field": "level"
+                        }, {
+                            "headerName": "User Turnover Group",
+                            "field": "userDefinedCluster"
+                        })
+                    }
+                }
 
                 if (data.basket != undefined) {
                     for (var basket in data.basket) {
@@ -92,24 +132,32 @@
                     }
                 }
 
-                if (data.store != undefined) {
-                    headers.push({
-                        "headerName": "Store",
-                        "field": "store",
-                    })
-                }
-
                 stores.forEach(element => {
 
                     let tmpBasket = {
-                        storeName: element.storeName
+                        storeName: element
                     };
+
+                    if (data.store != undefined) {
+                        for (var store in data.store) {
+
+                            data.store[store].data.forEach(el => {
+                                if (el.displayname == element) {
+                                    tmpBasket["totalSales"] = el.totalSales;
+                                    tmpBasket["cumulativePercent"] = el.cumulativePercent;
+                                    tmpBasket["level"] = el.level;
+                                    tmpBasket["userDefinedCluster"] = el.userDefinedCluster;
+                                    tmpBasket["salesPercent"] = el.salesPercent
+                                }
+                            })
+                        }
+                    }
 
                     if (data.basket != undefined) {
                         for (var basket in data.basket) {
 
                             data.basket[basket].forEach(el => {
-                                if (el.displayname == element.storeName) {
+                                if (el.displayname == element) {
                                     tmpBasket["basket_" + basket] = el.cluster
                                 }
                             })
@@ -120,19 +168,11 @@
                         for (var listing in data.listing) {
 
                             data.listing[listing].forEach(el => {
-                                if (el.storeName == element.storeName) {
+                                if (el.storeName == element) {
                                     tmpBasket["listing_" + listing] = el.cluster
                                 }
                             })
                         }
-                    }
-
-                    if (data.store != undefined) {
-                        data.store.forEach(el => {
-                            if (el.displayname == element.storeName) {
-                                tmpBasket["store"] = el.level
-                            }
-                        })
                     }
 
                     final.push(tmpBasket);

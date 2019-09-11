@@ -18,6 +18,8 @@
         AgGridVue
     } from "ag-grid-vue";
 
+    import ProgressRenderer from './ProgressRenderer'
+
     const formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
@@ -29,7 +31,8 @@
     export default {
         props: ['rowData', 'headers'],
         components: {
-            AgGridVue
+            AgGridVue,
+            ProgressRenderer
         },
         data() {
             let self = this;

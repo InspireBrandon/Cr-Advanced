@@ -112,10 +112,8 @@
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                     Axios.post(process.env.VUE_APP_API + `Basket`, self.createItem)
                         .then(r => {
-                            console.log(r);
                             self.GetData()
                             self.addDialog = false
-                            self.getBaskets()
                             delete Axios.defaults.headers.common["TenantID"];
                         })
                 }

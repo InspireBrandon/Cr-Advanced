@@ -1,9 +1,9 @@
 <template>
   <div>
     <v-layout row justify-center>
-      <v-dialog v-model="dialog" persistent width="80vw">
+      <v-dialog v-model="dialog" persistent width="600">
         <v-card >
-          <v-toolbar color="primary" dark flat dense>
+          <v-toolbar color="primary" dark flat>
             <v-toolbar-title>
               Date Range Selector
             </v-toolbar-title>
@@ -26,9 +26,8 @@
               </v-layout>
             </v-container>
           </v-card-text>
-          <v-card-actions style="text-align: right; display: block;">
+          <v-card-actions>
             <v-spacer></v-spacer>
-            <!-- <v-btn color="error" @click.native="dialog = false">Cancel</v-btn> -->
             <v-btn color="primary" @click.native="returnDateRange">Continue</v-btn>
           </v-card-actions>
         </v-card>

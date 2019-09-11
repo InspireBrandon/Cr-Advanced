@@ -6,7 +6,10 @@
                     <v-btn slot="activator" flat>
                         File
                     </v-btn>
-                    <v-list>
+                    <v-list tile>
+                        <v-list-tile @click="newFile">
+                            <v-list-tile-title>New</v-list-tile-title>
+                        </v-list-tile>
                         <v-list-tile @click="openFile">
                             <v-list-tile-title>Open</v-list-tile-title>
                         </v-list-tile>
@@ -15,30 +18,30 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
-                <v-menu dark offset-y style="margin-bottom: 10px;">
+                <v-menu dark offset-y style="margin-bottom: 10px;" v-if="rowData.length > 0 && !showingSaved">
                     <v-btn slot="activator" flat>
                         Setup
                     </v-btn>
                     <v-list>
                         <v-list-tile @click="openLevels">
-                            <v-list-tile-title>Levels</v-list-tile-title>
+                            <v-list-tile-title>Turnover Groups</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
                 </v-menu>
             </v-toolbar-items>
+            <v-spacer></v-spacer>
+            <div style="display: flex">
+                <div>{{ generateName() }}</div>
+            </div>
             <v-spacer></v-spacer>
             <v-toolbar-title>
                 <span>Store Analysis</span>
             </v-toolbar-title>
         </v-toolbar>
         <v-toolbar dark flat>
-            <v-toolbar-items>
-                <v-select label="Supergroup A" style="margin-left: 10px; margin-top: 8px; width: 300px"
-                    placeholder="Please select one" @change="onSuperGroupChange" dense :items="superGroups"
-                    v-model="selectedSuperGroup" hide-details></v-select>
-            </v-toolbar-items>
+            <v-btn v-if="selectedSupergroup != null" color="primary" @click="refreshFile">Refresh</v-btn>
         </v-toolbar>
-        <v-dialog v-model="clusterDialog" persistent width="800px">
+        <v-dialog v-model="clusterDialog" persistent width="600px">
             <v-card>
                 <v-toolbar dark flat color="primary">
                     <v-toolbar-title> Clusters </v-toolbar-title>
@@ -47,38 +50,45 @@
                         <v-icon>close</v-icon>
                     </v-btn>
                 </v-toolbar>
-                <v-card-text>
-                    <v-container grid-list-md>
+                <v-card-text class="pb-0">
+                    <v-container grid-list-md class="pa-0">
                         <v-layout row wrap>
                             <v-flex md6>
-                                <v-select @change="generateLevels" label="Clusters" :items="levelItems"
+                                <v-select @change="generateLevels" label="Clusters" :items="levelItems" class="mb-3"
                                     v-model="selectedLevel">
                                 </v-select>
                             </v-flex>
+                            <v-flex md6></v-flex>
                             <v-flex md6>
-
-                            </v-flex>
-                            <v-flex md12>
-                                <v-divider></v-divider>
-                            </v-flex>
-                            <v-flex md6>
-                                <v-text-field label="Cluster 1" v-model="level1">
-                                </v-text-field>
+                                <v-text-field label="Cluster 1" v-model="level1"></v-text-field>
                                 <v-text-field label="Cluster 2" v-if="selectedLevel>=1" v-model="level2">
                                 </v-text-field>
                                 <v-text-field label="Cluster 3" v-if="selectedLevel>=2" v-model="level3">
                                 </v-text-field>
-                            </v-flex>
-                            <v-flex md6>
                                 <v-text-field label="Cluster 4" v-if="selectedLevel>=3" v-model="level4">
                                 </v-text-field>
                                 <v-text-field label="Cluster 5" v-if="selectedLevel>=4" v-model="level5">
                                 </v-text-field>
                             </v-flex>
+                            <v-flex md6>
+                                <v-text-field type="number" label="Greater than" v-model="level1Value"></v-text-field>
+                                <v-text-field type="number" label="Greater than" v-if="selectedLevel>=1"
+                                    v-model="level2Value">
+                                </v-text-field>
+                                <v-text-field :disabled="selectedLevel == 2" type="number" label="Greater than"
+                                    v-if="selectedLevel>=2" v-model="level3Value">
+                                </v-text-field>
+                                <v-text-field :disabled="selectedLevel == 3" type="number" label="Greater than"
+                                    v-if="selectedLevel>=3" v-model="level4Value">
+                                </v-text-field>
+                                <v-text-field :disabled="selectedLevel == 4" type="number" label="Greater than"
+                                    v-if="selectedLevel>=4" v-model="level5Value">
+                                </v-text-field>
+                            </v-flex>
                         </v-layout>
                     </v-container>
                 </v-card-text>
-                <v-card-actions>
+                <v-card-actions class="pr-3">
                     <v-spacer></v-spacer>
                     <v-btn color="primary" @click="submitLevels">
                         Submit
@@ -87,32 +97,43 @@
             </v-card>
         </v-dialog>
         <Grid :rowData="rowData" ref="Grid" />
+        <FileDataSelector ref="FileDataSelector" />
+        <SupergroupSelector ref="SupergroupSelector" />
+        <DateRangeSelector ref="DateRangeSelector" />
+        <SizeLoader ref="SizeLoader" />
     </v-card>
 </template>
 
 <script>
     import Axios from 'axios';
-    import Grid from './Grid'
+    import Grid from './Grid';
+    import FileDataSelector from './FileDataSelector';
+    import SupergroupSelector from './SupergroupSelector';
+    import DateRangeSelector from "@/components/Common/DateRangeSelector"
+    import SizeLoader from '@/components/Common/SizeLoader';
 
     export default {
         components: {
             Grid,
+            FileDataSelector,
+            SupergroupSelector,
+            DateRangeSelector,
+            SizeLoader
         },
         data() {
             return {
-                level1: "Large",
-                level2: "Medium",
-                level3: "Small",
-                level4: "Extra Large",
-                level5: "Extra Small",
+                level1: "LARGE",
+                level2: "MEDIUM",
+                level3: "SMALL",
+                level4: "Extra LARGE",
+                level5: "Extra SMALL",
+                level1Value: 0,
+                level2Value: 0,
+                level3Value: 0,
+                level4Value: 0,
+                level5Value: 0,
                 selectedLevel: 2,
                 levelItems: [{
-                    text: "1",
-                    value: 0
-                }, {
-                    text: "2",
-                    value: 1
-                }, {
                     text: "3",
                     value: 2
                 }, {
@@ -122,6 +143,7 @@
                     text: "5",
                     value: 4
                 }],
+                levels: ["LARGE", "MEDIUM", "SMALL"],
                 items: [],
                 filterText: null,
                 rowData: [],
@@ -131,21 +153,49 @@
                 selectedProjectGroup: null,
                 storeAnalysis_ID: null,
                 superGroups: [],
-                selectedSuperGroup: null,
+                selectedSupergroup: null,
+                selectedPeriod: null,
                 clusterDialog: false,
                 levelsCallback: null,
+                storeData: [],
+                runData: [],
+                possibleFiles: [],
+                fileData: null,
+                showingSaved: false
             }
         },
         created() {
             let self = this;
-            self.getSuperGroups();
             self.getFile(data => {
                 if (data != null && data != false) {
                     self.getFileData(data.id, fileData => {
-                        if(fileData.config != undefined && fileData.config != null) {
-                            if(fileData.config.supergroup_a_id != undefined && fileData.config.supergroup_a_id != null) {
-                                self.selectedSuperGroup = fileData.config.supergroup_a_id;
-                                self.getData();
+                        if (!Array.isArray(fileData.store)) {
+                            self.runData = [];
+
+                            if(fileData.config != undefined && fileData.config != null) {
+                                if(fileData.config.store != undefined && fileData.config.store != null) {
+                                    let tg = fileData.config.store.turnoverGroups;
+                                    let tgv = fileData.config.store.turnoverGroupUserValues;
+
+                                    for(var i = 0; i < tg.length; i++) {
+                                        self["level" + (i + 1)] = tg[i];
+                                    }
+
+                                    for(var i = 0; i < tgv.length; i++) {
+                                        self["level" + (i + 1) + "Value"] = tgv[i];
+                                    }
+                                }
+                            }
+
+                            self.fileData = fileData.store;
+
+                            for (var prop in fileData.store) {
+                                self.runData.push({
+                                    prop: prop,
+                                    name: self.generateNameParams(fileData.store[prop].config
+                                        .selectedSupergroup, fileData.store[prop].config
+                                        .selectedPeriod)
+                                })
                             }
                         }
                     })
@@ -153,60 +203,126 @@
             })
         },
         methods: {
+            updateLoader(data) {
+                let self = this
+                self.$refs.SizeLoader.updateLoader(data)
+            },
+            generateNameParams(selectedSupergroup, selectedPeriod) {
+                let self = this;
+
+                if (selectedPeriod.periodic) {
+                    return `${selectedSupergroup.displayname} - ${selectedPeriod.monthsBetween} MMA (${selectedPeriod.dateFromString} TO ${selectedPeriod.dateToString})`;
+                } else {
+                    return `${selectedSupergroup.displayname} Average Monthly ${selectedPeriod.dateFromString} TO ${selectedPeriod.dateToString}`;
+                }
+            },
+            generateName() {
+                let self = this;
+
+                if (self.selectedPeriod != null) {
+                    if (self.selectedPeriod.periodic) {
+                        return `${self.selectedSupergroup.displayname} - ${self.selectedPeriod.monthsBetween} MMA (${self.selectedPeriod.dateFromString} TO ${self.selectedPeriod.dateToString})`;
+                    } else {
+                        return `${self.selectedSupergroup.displayname} Average Monthly ${self.selectedPeriod.dateFromString} TO ${self.selectedPeriod.dateToString}`;
+                    }
+                } else {
+                    return "";
+                }
+            },
             openLevels() {
                 let self = this
-                self.openClusterLevels(callback => {
-                    console.log(callback);
-
+                self.openClusterLevels(levels => {
+                    self.$nextTick(() => {
+                        self.levels = levels;
+                        self.clusterDialog = false;
+                        self.rowData = [];
+                        self.prepareTurnoverGroups(self.storeData);
+                    })
                 })
             },
             submitLevels() {
                 let self = this
-                self.levelsCallback([self.level1,
-                    self.level2,
-                    self.level3,
-                    self.level4,
-                    self.level5
-                ])
+                let tmp = [];
+
+                self.$nextTick(() => {
+                    for (var i = 0; i < (self.selectedLevel + 1); i++) {
+                        tmp.push(self["level" + (i + 1)]);
+                    }
+
+                    self.levelsCallback(tmp);
+                })
             },
             generateLevels(amount) {
                 let self = this
+
+                self["level" + (self.selectedLevel + 1) + "Value"] = 0;
+
                 if (self.selectedLevel >= 3) {
-                    self.level1 = "Extra Large"
-                    self.level2 = "Large"
-                    self.level3 = "Medium"
-                    self.level4 = "Small"
-                    self.level5 = "Extra Small"
+                    self.level1 = "EXTRA LARGE"
+                    self.level2 = "LARGE"
+                    self.level3 = "MEDIUM"
+                    self.level4 = "SMALL"
+                    self.level5 = "EXTRA SMALL"
                 } else {
-                    self.level1 = "Large"
-                    self.level2 = "Medium"
-                    self.level3 = "Small"
-                    self.level4 = "Extra Large"
-                    self.level5 = "Extra Small"
+                    self.level1 = "LARGE"
+                    self.level2 = "MEDIUM"
+                    self.level3 = "SMALL"
+                    self.level4 = "EXTRA LARGE"
+                    self.level5 = "EXTRA SMALL"
+                }
+
+                if (self.selectedLevel == 1) {
+                    self.level1 = "LARGE"
+                    self.level2 = "SMALL"
                 }
             },
             openClusterLevels(callback) {
                 let self = this
                 self.clusterDialog = true
                 self.levelsCallback = callback
-                console.log(self.levelsCallback);
-                
             },
             getData() {
                 let self = this;
 
+                self.showingSaved = false;
+
+                var startTime = new Date()
+
+                let config = {
+                    onDownloadProgress: progressEvent => {
+                        var currentFileSize = progressEvent.loaded * 0.000001
+                        var FileTotalSize = progressEvent.total * 0.000001
+
+                        var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+                        var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
+                        self.updateLoader({
+                            text1: "Downloading Basket",
+                            currentFileSize: currentFileSize,
+                            FileTotalSize: FileTotalSize,
+                            DownloadSpeed: DownloadSpeed,
+                        })
+                    }
+                }
+
+                self.$refs.SizeLoader.show();
+
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.get(process.env.VUE_APP_API +
-                        `StoreAnalysis?supergroup_a_id=${self.selectedSuperGroup}&periodFrom_ID=66&periodTo_ID=71`)
+                        `StoreAnalysis?supergroup_a_id=${self.selectedSupergroup.id}&periodFrom_ID=${self.selectedPeriod.dateFrom}&periodTo_ID=${self.selectedPeriod.dateTo}`,
+                        config)
                     .then(r => {
+                        self.storeData = r.data;
                         self.prepareTurnoverGroups(r.data)
                         delete Axios.defaults.headers.common["TenantID"];
+                        self.$refs.SizeLoader.close();
                     })
             },
             prepareTurnoverGroups(data) {
                 let self = this;
-                let levels = ["LARGE", "MEDIUM", "SMALL"]
+                let levels = JSON.parse(JSON.stringify(self.levels))
+
+                let levelLength = self.levels.length;
 
                 let totalStoreSales = data.reduce((a, b) => {
                     return {
@@ -225,17 +341,18 @@
                     currentPercent = storePercent;
                 })
 
-                let mcg = self.getMostCommonGroups(data, 3);
                 let highestVal = data[0].totalSales;
                 let lowestVal = data[data.length - 1].totalSales;
-                let average = highestVal / 3;
+                let average = highestVal / levelLength;
 
-                let mp = self.getMidPoints(data, 3);
+                let mp = self.getMidPoints(data, levelLength);
 
                 data.forEach(el => {
                     let hasValue = false;
 
-                    for (var i = 0; i < 2; i++) {
+                    el.level == undefined
+
+                    for (var i = 0; i < (levelLength - 2); i++) {
                         let highestMP = mp[i];
                         let lowestMP = mp[i + 1];
 
@@ -261,7 +378,8 @@
                         }
                     }
 
-                    if (el.level == undefined) {
+                    if (!hasValue) {
+
                         let highDiff = mp[mp.length - 2] - el.totalSales;
                         let lowestDiff = el.totalSales - mp[mp.length - 1];
 
@@ -275,10 +393,32 @@
                     }
                 })
 
+                // get user defined values
+                data = self.getUserDefined(data, levels)
+
                 self.rowData = data;
+
+                self.$nextTick(() => {
+                    self.$refs.Grid.gridApi.redrawRows();
+                })
             },
-            nearestTenth(number) {
-                return Math.ceil(number / 10) * 10;
+            getUserDefined(data, levels) {
+                let self = this;
+
+                for (var i = (data.length - 1); i >= 0; i--) {
+                    let currentElement = data[i];
+                    let valueIDX = 1;
+
+                    for (var j = 0; j < (levels.length - 1); j++) {
+                        if (currentElement.totalSales > parseFloat(self["level" + (j + 1) + "Value"])) {
+                            valueIDX++;
+                        }
+
+                        currentElement["userDefinedCluster"] = levels[levels.length - valueIDX];
+                    }
+                }
+
+                return data;
             },
             getAverage(levels, highest, lowest) {
                 let self = this;
@@ -289,88 +429,46 @@
                 let self = this;
                 let totalLength = data.length;
                 let levelDescrep = Math.floor(totalLength / levels);
+
                 let mids = [];
 
                 for (var i = 0; i < levels; i++) {
-                    let high = data[levelDescrep * i];
-                    let low = data[levelDescrep * (i + 1)]
-                    let diff = high.totalSales - low.totalSales;
+                    let total = 0;
+
+                    for (var j = 0; j < levelDescrep; j++) {
+                        let currentElIDX = (levelDescrep * i) + j;
+                        let currentEL = data[currentElIDX];
+                        total += currentEL.totalSales;
+                    }
+
+                    let diff = total / levelDescrep;
                     mids.push(diff);
                 }
 
                 return mids;
             },
-            getMostCommonGroups(data, levels) {
+            newFile() {
                 let self = this;
-                let tmp = JSON.parse(JSON.stringify(data))
-                let currentCount = 0;
-                let retval = [];
 
-                for (var i = 0; i < levels; i++) {
-                    let currentHighest = 0;
-                    let currentHighestString = "";
+                self.$refs.SupergroupSelector.show(supergroup => {
+                    self.selectedSupergroup = supergroup;
 
-                    tmp.forEach(el => {
-                        let count = tmp.filter(fel => {
-                            return self.nearestTenth(fel.cumulativePercent) == self.nearestTenth(el
-                                .cumulativePercent);
-                        }).length;
-
-                        if (count > currentHighest) {
-                            currentHighest = count;
-                            currentHighestString = self.nearestTenth(el.cumulativePercent);
-                        }
+                    self.$refs.DateRangeSelector.show(period => {
+                        self.selectedPeriod = period;
+                        self.getData();
                     })
-
-                    tmp = tmp.filter(fel => {
-                        return self.nearestTenth(fel.cumulativePercent) != currentHighestString;
-                    });
-
-                    if (currentHighest > 1) {
-                        retval.push(currentHighestString);
-                    }
-                }
-
-                return retval.sort((a, b) => {
-                    if (a > b) {
-                        return -1;
-                    }
-                    if (a < b) {
-                        return 1;
-                    }
-                    return 0;
-                });
-            },
-            getSuperGroups() {
-                let self = this;
-
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
-                Axios.get(process.env.VUE_APP_API + `Retailer/Supergroup_A`)
-                    .then(r => {
-                        delete Axios.defaults.headers.common["TenantID"];
-
-                        let tmp = [];
-
-                        r.data.forEach(el => {
-                            tmp.push({
-                                text: el.displayname,
-                                value: el.id
-                            })
-                        })
-
-                        self.superGroups = tmp;
-                    })
-            },
-            onSuperGroupChange() {
-                let self = this;
-
-                self.$nextTick(() => {
-                    self.getData();
                 })
             },
             openFile() {
                 let self = this;
+
+                self.$refs.FileDataSelector.show(self.runData, fileData => {
+                    self.showingSaved = true;
+                    let reader = self.fileData[fileData.prop];
+                    self.selectedSupergroup = reader.config.selectedSupergroup;
+                    self.selectedPeriod = reader.config.selectedPeriod;
+                    self.rowData = reader.data;
+                });
             },
             getFile(callback) {
                 let self = this;
@@ -384,18 +482,32 @@
             saveFile() {
                 let self = this;
 
-
                 self.getFile(fileTransaction => {
+
+                    let levelValues = [];
+
+                    for (var i = 0; i < self.levels.length; i++) {
+                        levelValues.push(self[`level${(i + 1)}Value`])
+                    }
 
                     if (fileTransaction == null || fileTransaction == false) {
                         let tmp = {
                             store: {},
                             config: {
-                                supergroup_a_id: self.selectedSuperGroup
+                                store: {
+                                    turnoverGroups: self.levels,
+                                    turnoverGroupUserValues: levelValues
+                                }
                             }
                         }
 
-                        tmp.store = self.rowData;
+                        tmp.store[self.selectedSupergroup.displayname] = {
+                            data: self.rowData,
+                            config: {
+                                selectedSupergroup: self.selectedSupergroup,
+                                selectedPeriod: self.selectedPeriod
+                            }
+                        };
 
                         self.appendAndSaveFile(tmp);
                     } else {
@@ -406,7 +518,10 @@
                                 tmp = {
                                     store: {},
                                     config: {
-                                        supergroup_a_id: self.selectedSuperGroup
+                                        store: {
+                                            turnoverGroups: self.levels,
+                                            turnoverGroupUserValues: levelValues
+                                        }
                                     }
                                 }
                             }
@@ -414,8 +529,23 @@
                             if (tmp.store == undefined)
                                 tmp.store = {};
 
-                            tmp.store = self.rowData;
-                            tmp.config = { supergroup_a_id: self.selectedSuperGroup };
+                            if (Array.isArray(tmp.store))
+                                tmp.store = {};
+
+                            tmp.config = {
+                                store: {
+                                    turnoverGroups: self.levels,
+                                    turnoverGroupUserValues: levelValues
+                                }
+                            }
+
+                            tmp.store[self.selectedSupergroup.displayname] = {
+                                data: self.rowData,
+                                config: {
+                                    selectedSupergroup: self.selectedSupergroup,
+                                    selectedPeriod: self.selectedPeriod
+                                }
+                            };
 
                             self.appendAndSaveFile(tmp);
                         })
@@ -446,6 +576,14 @@
                         alert("Failed to save");
                     })
             },
+            refreshFile() {
+                let self = this;
+
+                self.$refs.DateRangeSelector.show(period => {
+                    self.selectedPeriod = period;
+                    self.getData();
+                })
+            }
         }
     }
 

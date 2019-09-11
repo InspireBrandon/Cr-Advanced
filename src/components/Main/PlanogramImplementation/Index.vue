@@ -302,7 +302,7 @@
 
                 Axios.get(process.env.VUE_APP_API +
                     `Planogram_Details_Simple?SystemFileID=${spacePlanID}`
-                    ).then(
+                ).then(
                     r => {
                         self.fixture_types = [];
                         delete Axios.defaults.headers.common["TenantID"];
@@ -1104,6 +1104,8 @@
 
                 let request = JSON.parse(JSON.stringify(self.tmpRequest))
 
+                console.log(request);
+
                 let projectTXGroupRequest = {
                     projectID: request.project_ID
                 }
@@ -1112,18 +1114,20 @@
                 request.actionedByUserID = systemUserID;
                 request.systemUserID = null;
 
-                // Create Approved Project Transaction
-                self.createProjectTransaction(request, newTransaction => {
-                    // Create New Group Project Transaction
-                    self.createProjectTransactionGroup(projectTXGroupRequest, newProjectGroup => {
-                        // Create Approved Project Transaction For New Group
-                        request.actionedByUserID = null;
-                        request.systemUserID = request.projectOwnerID;
-                        request.projectTXGroup_ID = newProjectGroup.id;
-                        self.createProjectTransaction(request, latestTransaction => {
-                            self.getProjectTransactionsByProjectID(request
-                                .project_ID);
+                self.getProject(request.project_ID, project => {
+                    // Create Approved Project Transaction
+                    self.createProjectTransaction(request, newTransaction => {
+                        // Create New Group Project Transaction
+                        self.createProjectTransactionGroup(projectTXGroupRequest, newProjectGroup => {
+                            // Create Approved Project Transaction For New Group
+                            request.actionedByUserID = null;
+                            request.systemUserID = project.projectList[0].systemUserID;
+                            request.projectTXGroup_ID = newProjectGroup.id;
+                            self.createProjectTransaction(request, latestTransaction => {
+                                self.getProjectTransactionsByProjectID(request
+                                    .project_ID);
 
+                            })
                         })
                     })
                 })
@@ -1234,17 +1238,20 @@
                     projectID: request.project_ID
                 }
 
-                // Create new projectGroup
-                self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
-                    // Create ON Hold transaction for new projectGroup
-                    request.status = 41;
-                    request.systemUserID = request.projectOwnerID;
-                    request.actionedByUserID = null;
-                    request.projectTXGroup_ID = newGroup.id;
-                    request.notes = data.notes;
-                    request.store_ID = data.store;
-                    self.createProjectTransaction(request, newOnHold => {
-                        self.getProjectTransactionsByProjectID(request.project_ID);
+                self.getProject(request.project_ID, project => {
+                    // Create new projectGroup
+                    self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
+                        // Create ON Hold transaction for new projectGroup
+                        request.status = 41;
+                        request.systemUserID = project.projectList[0].systemUserID;
+                        // request.systemUserID = request.projectOwnerID;
+                        request.actionedByUserID = null;
+                        request.projectTXGroup_ID = newGroup.id;
+                        request.notes = data.notes;
+                        request.store_ID = data.store;
+                        self.createProjectTransaction(request, newOnHold => {
+                            self.getProjectTransactionsByProjectID(request.project_ID);
+                        })
                     })
                 })
             },
@@ -1264,23 +1271,25 @@
                 request.systemUserID = null;
                 request.actionedByUserID = systemUserID;
                 // Create On Hold transaction
-                self.createProjectTransaction(request, actionedOnHold => {
-                    // Create new projectGroup
-                    self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
-                        // Create ON Hold transaction for new projectGroup
-                        request.systemUserID = request.projectOwnerID;
-                        request.actionedByUserID = null;
-                        request.projectTXGroup_ID = newGroup.id;
-                        self.createProjectTransaction(request, newOnHold => {
-                            request.status = 14;
-                            request.notes = data.notes;
-                            request.store_ID = data.store;
-                            self.createProjectTransaction(request,
-                                variantRequest => {
-                                    self.getProjectTransactionsByProjectID(
-                                        request
-                                        .project_ID);
-                                })
+                self.getProject(request.project_ID, project => {
+                    self.createProjectTransaction(request, actionedOnHold => {
+                        // Create new projectGroup
+                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
+                            // Create ON Hold transaction for new projectGroup
+                            request.systemUserID = project.projectList[0].systemUserID;
+                            request.actionedByUserID = null;
+                            request.projectTXGroup_ID = newGroup.id;
+                            self.createProjectTransaction(request, newOnHold => {
+                                request.status = 14;
+                                request.notes = data.notes;
+                                request.store_ID = data.store;
+                                self.createProjectTransaction(request,
+                                    variantRequest => {
+                                        self.getProjectTransactionsByProjectID(
+                                            request
+                                            .project_ID);
+                                    })
+                            })
                         })
                     })
                 })
@@ -1362,6 +1371,20 @@
                 } else {
                     elementStyle.maxHeight = 'calc(100vh - 100px)';
                 }
+            },
+            getProject(id, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + `Project?projectID=${id}`)
+                    .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        callback(r.data);
+                    })
+                    .catch(e => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
             }
         }
     }

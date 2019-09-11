@@ -72,7 +72,8 @@
                     },
                     {
                         headerName: 'Sales %',
-                        cellRendererFramework: "ProgressRenderer"
+                        cellRendererFramework: "ProgressRenderer",
+                        width: 500
                     },
                     {
                         "headerName": "Sales",
@@ -89,8 +90,13 @@
                         }
                     },
                     {
-                        "headerName": "Cluster",
+                        "headerName": "System Turnover Group",
                         "field": "level"
+                    },
+                    {
+                        "headerName": "User Turnover Group",
+                        "field": "userDefinedCluster",
+                        "editable": true
                     }
                 ]
             }
