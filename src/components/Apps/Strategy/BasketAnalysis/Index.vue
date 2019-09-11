@@ -119,7 +119,9 @@
     import Grid from './Grid'
     import BasketSelector from './BasketSelector'
     import DateRangeSelector from "@/components/Common/DateRangeSelector"
-    import BasketMaintenanceModal from './basketMaint/BasketMaintenanceModal';
+    import BasketMaintenanceModal from './BasketMaint/BasketMaintenanceModal';
+    import BasketSetup from './BasketSetup/BasketSetup';
+
     import FileDataSelector from './FileDataSelector';
 
 
@@ -128,6 +130,7 @@
             Grid,
             BasketSelector,
             DateRangeSelector,
+            BasketSetup,
             BasketMaintenanceModal,
             FileDataSelector
         },
