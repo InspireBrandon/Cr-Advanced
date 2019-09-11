@@ -32,6 +32,9 @@
                         <v-list-tile @click="openLevels">
                             <v-list-tile-title>Basket Levels</v-list-tile-title>
                         </v-list-tile>
+                        <v-list-tile @click="openBasket">
+                            <v-list-tile-title>Basket Items</v-list-tile-title>
+                        </v-list-tile>
                     </v-list>
                 </v-menu>
             </v-toolbar-items>
@@ -108,6 +111,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <BasketSetup ref="BasketSetup" />
     </v-card>
 </template>
 
@@ -117,14 +121,17 @@
     import Grid from './Grid'
     import BasketSelector from './BasketSelector'
     import DateRangeSelector from "@/components/Common/DateRangeSelector"
-    import BasketMaintenanceModal from './basketMaint/BasketMaintenanceModal';
+    import BasketMaintenanceModal from './BasketMaint/BasketMaintenanceModal';
+    import BasketSetup from './BasketSetup/BasketSetup';
+
 
     export default {
         components: {
             Grid,
             BasketSelector,
             DateRangeSelector,
-            BasketMaintenanceModal
+            BasketMaintenanceModal,
+            BasketSetup
         },
         data() {
             return {
@@ -162,6 +169,10 @@
             let self = this;
         },
         methods: {
+            openBasket(){
+                let self = this         
+                self.$refs.BasketSetup.open()
+            },
             newFile() {
                 let self = this;
 
