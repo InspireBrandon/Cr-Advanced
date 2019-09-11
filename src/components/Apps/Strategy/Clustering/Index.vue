@@ -48,10 +48,9 @@
                 active: 0,
                 tabs: [
                     new TabItem("Main", "Main"),
+                    new TabItem("Store", "StoreAnalysis"),
                     new TabItem("Basket", "BasketAnalysis"),
                     new TabItem("Listing", "ListingClusters"),
-                    new TabItem("Store", "StoreAnalysis"),
-                    new TabItem("Map", "Map"),
                     // new TabItem("User", "Main"),
                 ]
             }
