@@ -181,6 +181,8 @@
                                     let tg = fileData.config.basket.turnoverGroups;
                                     let tgv = fileData.config.basket.turnoverGroupUserValues;
 
+                                    self.selectedLevel = tg.length - 1;
+
                                     for (var i = 0; i < tg.length; i++) {
                                         self["level" + (i + 1)] = tg[i];
                                     }

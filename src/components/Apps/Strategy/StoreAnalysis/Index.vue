@@ -18,7 +18,7 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
-                <v-menu dark offset-y style="margin-bottom: 10px;" v-if="rowData.length > 0 && !showingSaved">
+                <!-- <v-menu dark offset-y style="margin-bottom: 10px;" v-if="rowData.length > 0 && !showingSaved">
                     <v-btn slot="activator" flat>
                         Setup
                     </v-btn>
@@ -27,7 +27,7 @@
                             <v-list-tile-title>Turnover Groups</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
-                </v-menu>
+                </v-menu> -->
             </v-toolbar-items>
             <v-spacer></v-spacer>
             <div style="display: flex">
@@ -40,6 +40,7 @@
         </v-toolbar>
         <v-toolbar dark flat>
             <v-btn v-if="selectedSupergroup != null" color="primary" @click="refreshFile">Refresh</v-btn>
+            <v-btn v-if="selectedSupergroup != null" color="primary" @click="openLevels">Setup</v-btn>
         </v-toolbar>
         <v-dialog v-model="clusterDialog" persistent width="600px">
             <v-card>
@@ -172,16 +173,19 @@
                         if (!Array.isArray(fileData.store)) {
                             self.runData = [];
 
-                            if(fileData.config != undefined && fileData.config != null) {
-                                if(fileData.config.store != undefined && fileData.config.store != null) {
+                            if (fileData.config != undefined && fileData.config != null) {
+                                if (fileData.config.store != undefined && fileData.config.store !=
+                                    null) {
                                     let tg = fileData.config.store.turnoverGroups;
                                     let tgv = fileData.config.store.turnoverGroupUserValues;
 
-                                    for(var i = 0; i < tg.length; i++) {
+                                    self.selectedLevel = tg.length - 1;
+
+                                    for (var i = 0; i < tg.length; i++) {
                                         self["level" + (i + 1)] = tg[i];
                                     }
 
-                                    for(var i = 0; i < tgv.length; i++) {
+                                    for (var i = 0; i < tgv.length; i++) {
                                         self["level" + (i + 1) + "Value"] = tgv[i];
                                     }
                                 }
@@ -248,8 +252,17 @@
                     for (var i = 0; i < (self.selectedLevel + 1); i++) {
                         tmp.push(self["level" + (i + 1)]);
                     }
+                })
 
-                    self.levelsCallback(tmp);
+                self.$nextTick(() => {
+                    self.levels = tmp;
+                    self.clusterDialog = false;
+
+                    if (self.showingSaved) {
+                        self.prepareTurnoverGroups(self.rowData);
+                    } else {
+                        self.levelsCallback(tmp);
+                    }
                 })
             },
             generateLevels(amount) {
