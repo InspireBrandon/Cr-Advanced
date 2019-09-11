@@ -88,7 +88,7 @@
                     },
                     {
                         "headerName": "User Basket Group",
-                        "field": "userBasketGroup",
+                        "field": "userDefinedCluster",
                         "editable": true
                     },
                 ]

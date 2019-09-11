@@ -532,8 +532,15 @@
                             if (Array.isArray(tmp.store))
                                 tmp.store = {};
 
-                            tmp.config = {
-                                store: {
+                            if (tmp.config == undefined || tmp.config == null) {
+                                tmp.config = {
+                                    store: {
+                                        turnoverGroups: self.levels,
+                                        turnoverGroupUserValues: levelValues
+                                    }
+                                }
+                            } else {
+                                tmp.config.store = {
                                     turnoverGroups: self.levels,
                                     turnoverGroupUserValues: levelValues
                                 }
