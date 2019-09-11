@@ -20,6 +20,10 @@
                 }, {
                     name: "File Status",
                     route: "FileStatus"
+                },
+                {
+                    name: "mAp",
+                    route: "/map"
                 }]
             }
         }

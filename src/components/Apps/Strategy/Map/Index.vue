@@ -1,22 +1,23 @@
 <template>
-    <div id="map" class="map"></div>
+    <div id="thisone" class="map"></div>
 </template>
 
 <script>
-    import * as am4core from "@amcharts/amcharts4/core";
-    import * as am4maps from "@amcharts/amcharts4/maps";
-    import * as am4themes_animated from "@amcharts/amcharts4/themes/animated";
-    import am4geodata_usaLow from "@amcharts/amcharts4-geodata/usaLow";
+   import * as am4core from "@amcharts/amcharts4/core";
+import * as am4maps from "@amcharts/amcharts4/maps";
+import am4geodata_usaLow from "@amcharts/amcharts4-geodata/usaLow";
 
     export default {
-        mounted() {},
+        mounted() {
+            this.drawMap()
+        },
         methods: {
             drawMap() {
-                am4core.useTheme(am4themes_animated);
+                // am4core.useTheme(am4themes_animated);
                 // Themes end
 
                 // Create map instance
-                let chart = am4core.create("map", am4maps.MapChart);
+                let chart = am4core.create("thisone", am4maps.MapChart);
                 chart.maxZoomLevel = 64;
 
                 // Set map definition
