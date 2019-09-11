@@ -117,7 +117,7 @@
                 if (data.basket != undefined) {
                     for (var basket in data.basket) {
                         headers.push({
-                            "headerName": basket + " Basket",
+                            "headerName": basket,
                             "field": "basket_" + basket,
                         })
                     }
