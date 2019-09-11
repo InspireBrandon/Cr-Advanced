@@ -24,7 +24,7 @@
             </v-btn-toggle>
         </v-toolbar>
         <Grid v-if="selectedView == 0" :rowData="rowData" :headers="headers" ref="Grid" />
-        <Grid v-if="selectedView == 0" :rowData="rowData" :headers="headers" ref="Grid" />
+        <Map v-if="selectedView == 1" ref="Map" />
         <Setup ref="Setup" />
         <Spinner ref="Spinner" />
     </v-card>
@@ -35,6 +35,7 @@
     import Grid from './Grid'
     import Setup from './Setup'
     import Spinner from '@/components/Common/Spinner';
+    import Map from '../Map/Index'
 
     const formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -46,7 +47,8 @@
         components: {
             Grid,
             Setup,
-            Spinner
+            Spinner,
+            Map
         },
         data() {
             return {

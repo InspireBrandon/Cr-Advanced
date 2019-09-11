@@ -5,7 +5,7 @@
 <script>
    import * as am4core from "@amcharts/amcharts4/core";
 import * as am4maps from "@amcharts/amcharts4/maps";
-import am4geodata_usaLow from "@amcharts/amcharts4-geodata/usaLow";
+import am4geodata_southAfricaLow from "@amcharts/amcharts4-geodata/southAfricaLow";
 
     export default {
         mounted() {
@@ -21,10 +21,7 @@ import am4geodata_usaLow from "@amcharts/amcharts4-geodata/usaLow";
                 chart.maxZoomLevel = 64;
 
                 // Set map definition
-                chart.geodata = am4geodata_usaLow;
-
-                // Set projection
-                chart.projection = new am4maps.projections.AlbersUsa();
+                chart.geodata = am4geodata_southAfricaLow;
 
                 // Add button
                 let zoomOut = chart.tooltipContainer.createChild(am4core.ZoomOutButton);
@@ -236,6 +233,6 @@ import am4geodata_usaLow from "@amcharts/amcharts4-geodata/usaLow";
 
 <style scoped>
     .map {
-        height: calc(100vh - 112px);
+        height: calc(100vh - 125px);
     }
 </style>
