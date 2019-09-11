@@ -103,6 +103,7 @@ import BasketAnalysis from '@/components/Apps/Strategy/BasketAnalysis/Index.vue'
 import ListingClusters from '@/components/Apps/Strategy/ListingClusters/Index.vue'
 import Clustering from '@/components/Apps/Strategy/Clustering/Index.vue'
 
+import map from '@/components/Apps/Strategy/Map/Index.vue'
 
 Vue.use(Router)
 
@@ -132,16 +133,20 @@ export default new Router({
       path: '/FloorPlanning2D',
       name: 'floor_planning_2d',
       component: FloorPlanning2D
-    }, 
+    },
     {
       path: '/Menu',
       name: 'main',
       component: Main,
       children: [{
+          path: '/map',
+          name: 'map',
+          component: map
+        }, {
           path: '/ProductListing',
           name: 'ProductListing',
           component: ProductListing
-        },  
+        },
         {
           path: '/Clustering',
           name: 'clustering',
@@ -338,71 +343,72 @@ export default new Router({
             name: 'DataPrep',
             component: DataPrepSections,
             children: [{
-              path: 'Manufacturer',
-              name: 'Manufacturer',
-              component: ManufacturerMaint
-            }, {
-              path: 'Brand',
-              name: 'Brand',
-              component: BrandMaint
-            }, {
-              path: 'Supergroup_A',
-              name: 'Supergroup_A',
-              component: Supergroup_AMaint
-            }, {
-              path: 'Supergroup_B',
-              name: 'Supergroup_B',
-              component: Supergroup_BMaint
-            }, {
-              path: 'Department',
-              name: 'Department',
-              component: DepartmentMaint
-            }, {
-              path: 'Supplier',
-              name: 'Supplier',
-              component: SupplierMaint
-            }, {
-              path: 'Segment',
-              name: 'Segment',
-              component: SegmentMaint
-            }, {
-              path: 'Item_Status',
-              name: 'Item_Status',
-              component: Item_StatusMaint
-            }, {
-              path: 'Active_Shop_Code',
-              name: 'Active_Shop_Code',
-              component: Active_Shop_CodeMaint
-            }, {
-              path: 'Retail_Chain',
-              name: 'Retail_Chain',
-              component: Retail_ChainMaint
-            }, {
-              path: 'Period',
-              name: 'Period',
-              component: PeriodMaint
-            }, {
-              path: 'Store',
-              name: 'Store',
-              component: StoreMaint
-            }, {
-              path: 'StoreCluster',
-              name: 'StoreCluster',
-              component: StoreClusters
-            }, {
-              path: "PlanogramMaintenance",
-              name: "planogram_maintenance",
-              component: PlanogramMaintenance
-            },
-            {
-              path: "CategoryCode",
-              name: "Category_Code",
-              component: CategoryCode
-            }, {
-              path: 'ProductCatalogue',
-              name: 'ProductCatalogue',
-              component: ProductCatalogue
-            }]
+                path: 'Manufacturer',
+                name: 'Manufacturer',
+                component: ManufacturerMaint
+              }, {
+                path: 'Brand',
+                name: 'Brand',
+                component: BrandMaint
+              }, {
+                path: 'Supergroup_A',
+                name: 'Supergroup_A',
+                component: Supergroup_AMaint
+              }, {
+                path: 'Supergroup_B',
+                name: 'Supergroup_B',
+                component: Supergroup_BMaint
+              }, {
+                path: 'Department',
+                name: 'Department',
+                component: DepartmentMaint
+              }, {
+                path: 'Supplier',
+                name: 'Supplier',
+                component: SupplierMaint
+              }, {
+                path: 'Segment',
+                name: 'Segment',
+                component: SegmentMaint
+              }, {
+                path: 'Item_Status',
+                name: 'Item_Status',
+                component: Item_StatusMaint
+              }, {
+                path: 'Active_Shop_Code',
+                name: 'Active_Shop_Code',
+                component: Active_Shop_CodeMaint
+              }, {
+                path: 'Retail_Chain',
+                name: 'Retail_Chain',
+                component: Retail_ChainMaint
+              }, {
+                path: 'Period',
+                name: 'Period',
+                component: PeriodMaint
+              }, {
+                path: 'Store',
+                name: 'Store',
+                component: StoreMaint
+              }, {
+                path: 'StoreCluster',
+                name: 'StoreCluster',
+                component: StoreClusters
+              }, {
+                path: "PlanogramMaintenance",
+                name: "planogram_maintenance",
+                component: PlanogramMaintenance
+              },
+              {
+                path: "CategoryCode",
+                name: "Category_Code",
+                component: CategoryCode
+              }, {
+                path: 'ProductCatalogue',
+                name: 'ProductCatalogue',
+                component: ProductCatalogue
+              }
+            ]
           }]
         }
       ]
