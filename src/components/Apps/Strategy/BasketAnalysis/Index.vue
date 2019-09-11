@@ -207,8 +207,8 @@
             })
         },
         methods: {
-            openBasket(){
-                let self = this         
+            openBasket() {
+                let self = this
                 self.$refs.BasketSetup.open()
             },
             newFile() {
@@ -430,7 +430,57 @@
                     for (var i = 0; i < (self.selectedLevel + 1); i++) {
                         tmp.push(self["level" + (i + 1)]);
                     }
+                    self.getFile(fileTransaction => {
 
+                        let levelValues = [];
+
+                        for (var i = 0; i < self.levels.length; i++) {
+                            levelValues.push(self[`level${(i + 1)}Value`])
+                        }
+
+                        if (fileTransaction == null || fileTransaction == false) {
+                            let tmp = {
+                                basket: {},
+                                config: {
+                                    basket: {
+                                        turnoverGroups: self.levels,
+                                        turnoverGroupUserValues: levelValues
+                                    }
+                                }
+                            }
+                            self.appendAndSaveFile(tmp);
+                        } else {
+                            self.getFileData(fileTransaction.id, fileData => {
+                                let tmp = fileData;
+
+                                if (tmp == false) {
+                                    tmp = {
+                                        basket: {},
+                                        config: {
+                                            basket: {
+                                                turnoverGroups: self.levels,
+                                                turnoverGroupUserValues: levelValues
+                                            }
+                                        }
+                                    }
+                                }
+                                if (tmp.config == undefined || tmp.config == null) {
+                                    tmp.config = {
+                                        basket: {
+                                            turnoverGroups: self.levels,
+                                            turnoverGroupUserValues: levelValues
+                                        }
+                                    }
+                                } else {
+                                    tmp.config.basket = {
+                                        turnoverGroups: self.levels,
+                                        turnoverGroupUserValues: levelValues
+                                    }
+                                }
+                                self.appendAndSaveFile(tmp);
+                            })
+                        }
+                    })
                     self.levelsCallback(tmp);
                 })
             },
