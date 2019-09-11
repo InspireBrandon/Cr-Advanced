@@ -102,6 +102,7 @@
         <SupergroupSelector ref="SupergroupSelector" />
         <DateRangeSelector ref="DateRangeSelector" />
         <SizeLoader ref="SizeLoader" />
+        <Spinner ref="Spinner" />
     </v-card>
 </template>
 
@@ -112,6 +113,7 @@
     import SupergroupSelector from './SupergroupSelector';
     import DateRangeSelector from "@/components/Common/DateRangeSelector"
     import SizeLoader from '@/components/Common/SizeLoader';
+    import Spinner from '@/components/Common/Spinner';
 
     export default {
         components: {
@@ -119,7 +121,8 @@
             FileDataSelector,
             SupergroupSelector,
             DateRangeSelector,
-            SizeLoader
+            SizeLoader,
+            Spinner
         },
         data() {
             return {
@@ -249,19 +252,22 @@
                 let tmp = [];
 
                 self.$nextTick(() => {
+
                     for (var i = 0; i < (self.selectedLevel + 1); i++) {
                         tmp.push(self["level" + (i + 1)]);
                     }
-                })
 
-                self.$nextTick(() => {
                     self.levels = tmp;
                     self.clusterDialog = false;
 
-                    if (self.showingSaved) {
-                        self.prepareTurnoverGroups(self.rowData);
-                    } else {
-                        self.levelsCallback(tmp);
+                    if (self.rowData.length > 0) {
+                        self.$nextTick(() => {
+                            if (self.showingSaved) {
+                                self.prepareTurnoverGroups(self.rowData);
+                            } else {
+                                self.levelsCallback(tmp);
+                            }
+                        })
                     }
                 })
             },
@@ -317,7 +323,7 @@
                     }
                 }
 
-                self.$refs.SizeLoader.show();
+                self.$refs.Spinner.show();
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
@@ -328,7 +334,7 @@
                         self.storeData = r.data;
                         self.prepareTurnoverGroups(r.data)
                         delete Axios.defaults.headers.common["TenantID"];
-                        self.$refs.SizeLoader.close();
+                        self.$refs.Spinner.hide();
                     })
             },
             prepareTurnoverGroups(data) {
@@ -580,6 +586,8 @@
                     })
             },
             appendAndSaveFile(fileData) {
+                let self = this;
+
                 Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
                         SystemFile: {
                             SystemUser_ID: -1,

@@ -23,17 +23,17 @@
                 </v-menu>
                 <v-menu dark offset-y style="margin-bottom: 10px;">
                     <v-btn slot="activator" flat>
-                        Setup
+                        Baskets
                     </v-btn>
                     <v-list>
                         <v-list-tile @click="setupBaskets">
-                            <v-list-tile-title>Baskets</v-list-tile-title>
+                            <v-list-tile-title>Add</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile @click="openLevels">
+                        <!-- <v-list-tile @click="openLevels">
                             <v-list-tile-title>Basket Levels</v-list-tile-title>
-                        </v-list-tile>
+                        </v-list-tile> -->
                         <v-list-tile @click="openBasket">
-                            <v-list-tile-title>Basket Items</v-list-tile-title>
+                            <v-list-tile-title>Line items</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
                 </v-menu>
@@ -47,6 +47,7 @@
         </v-toolbar>
         <v-toolbar dark flat>
             <v-btn v-if="rowData.length > 0" color="primary" @click="refreshFile">Refresh</v-btn>
+            <v-btn v-if="rowData.length > 0" color="primary" @click="openLevels">Setup</v-btn>
         </v-toolbar>
         <Grid ref="Grid" :rowData="rowData" />
         <BasketSelector ref="BasketSelector" />
@@ -110,6 +111,7 @@
             </v-card>
         </v-dialog>
         <BasketSetup ref="BasketSetup" />
+        <Spinner ref="Spinner" />
     </v-card>
 </template>
 
@@ -121,6 +123,7 @@
     import DateRangeSelector from "@/components/Common/DateRangeSelector"
     import BasketMaintenanceModal from './BasketMaint/BasketMaintenanceModal';
     import BasketSetup from './BasketSetup/BasketSetup';
+    import Spinner from '@/components/Common/Spinner';
 
     import FileDataSelector from './FileDataSelector';
 
@@ -132,7 +135,8 @@
             DateRangeSelector,
             BasketSetup,
             BasketMaintenanceModal,
-            FileDataSelector
+            FileDataSelector,
+            Spinner
         },
         data() {
             return {
@@ -164,7 +168,8 @@
                 }],
                 levels: ["LARGE", "MEDIUM", "SMALL"],
                 dialog: false,
-                levelsCallback: null
+                levelsCallback: null,
+                showingSaved: false
             }
         },
         created() {
@@ -174,6 +179,8 @@
                     self.getFileData(data.id, fileData => {
                         if (!Array.isArray(fileData.store)) {
                             self.runData = [];
+
+                            console.log(fileData);
 
                             if (fileData.config != undefined && fileData.config != null) {
                                 if (fileData.config.basket != undefined && fileData.config.basket !=
@@ -228,6 +235,8 @@
                 let self = this;
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                self.$refs.Spinner.show();
 
                 Axios.get(process.env.VUE_APP_API +
                         `StoreBasketReport?basket_ID=${self.selectedBasket.id}&periodFrom=${self.selectedPeriod.dateFrom}&periodTo=${self.selectedPeriod.dateTo}`
@@ -302,6 +311,7 @@
 
                 self.$nextTick(() => {
                     self.$refs.Grid.gridApi.redrawRows();
+                    self.$refs.Spinner.hide();
                 })
             },
             getUserDefined(data, levels) {
@@ -429,61 +439,23 @@
                 let tmp = [];
 
                 self.$nextTick(() => {
+
                     for (var i = 0; i < (self.selectedLevel + 1); i++) {
                         tmp.push(self["level" + (i + 1)]);
                     }
-                    self.getFile(fileTransaction => {
 
-                        let levelValues = [];
+                    self.levels = tmp;
+                    self.dialog = false;
 
-                        for (var i = 0; i < self.levels.length; i++) {
-                            levelValues.push(self[`level${(i + 1)}Value`])
-                        }
-
-                        if (fileTransaction == null || fileTransaction == false) {
-                            let tmp = {
-                                basket: {},
-                                config: {
-                                    basket: {
-                                        turnoverGroups: self.levels,
-                                        turnoverGroupUserValues: levelValues
-                                    }
-                                }
+                    if (self.rowData.length > 0) {
+                        self.$nextTick(() => {
+                            if (self.showingSaved) {
+                                self.setData(self.rowData);
+                            } else {
+                                self.levelsCallback(tmp);
                             }
-                            self.appendAndSaveFile(tmp);
-                        } else {
-                            self.getFileData(fileTransaction.id, fileData => {
-                                let tmp = fileData;
-
-                                if (tmp == false) {
-                                    tmp = {
-                                        basket: {},
-                                        config: {
-                                            basket: {
-                                                turnoverGroups: self.levels,
-                                                turnoverGroupUserValues: levelValues
-                                            }
-                                        }
-                                    }
-                                }
-                                if (tmp.config == undefined || tmp.config == null) {
-                                    tmp.config = {
-                                        basket: {
-                                            turnoverGroups: self.levels,
-                                            turnoverGroupUserValues: levelValues
-                                        }
-                                    }
-                                } else {
-                                    tmp.config.basket = {
-                                        turnoverGroups: self.levels,
-                                        turnoverGroupUserValues: levelValues
-                                    }
-                                }
-                                self.appendAndSaveFile(tmp);
-                            })
-                        }
-                    })
-                    self.levelsCallback(tmp);
+                        })
+                    }
                 })
             },
             refreshFile() {

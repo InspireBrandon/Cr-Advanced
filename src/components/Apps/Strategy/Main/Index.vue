@@ -12,11 +12,21 @@
             </v-toolbar-title>
         </v-toolbar>
         <v-toolbar dark flat>
-            <v-toolbar-items>
-            </v-toolbar-items>
+            <v-btn color="primary" @click="getData">Refresh</v-btn>
+            <v-spacer></v-spacer>
+            <v-btn-toggle v-model="selectedView" round class="transparent" mandatory>
+                <v-btn class="elevation-0" style="width: 100px" round color="primary">
+                    Output
+                </v-btn>
+                <v-btn class="elevation-0" style="width: 100px" round color="primary">
+                    Map
+                </v-btn>
+            </v-btn-toggle>
         </v-toolbar>
-        <Grid :rowData="rowData" :headers="headers" ref="Grid" />
+        <Grid v-if="selectedView == 0" :rowData="rowData" :headers="headers" ref="Grid" />
+        <Grid v-if="selectedView == 0" :rowData="rowData" :headers="headers" ref="Grid" />
         <Setup ref="Setup" />
+        <Spinner ref="Spinner" />
     </v-card>
 </template>
 
@@ -24,6 +34,7 @@
     import Axios from 'axios';
     import Grid from './Grid'
     import Setup from './Setup'
+    import Spinner from '@/components/Common/Spinner';
 
     const formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -34,22 +45,27 @@
     export default {
         components: {
             Grid,
-            Setup
+            Setup,
+            Spinner
         },
         data() {
             return {
                 headers: [],
                 rowData: [],
-                stores: []
+                stores: [],
+                selectedView: 0
             }
         },
-        created() {
+        mounted() {
             let self = this;
+            self.$refs.Spinner.show();
             self.getStores();
         },
         methods: {
             getData(stores) {
                 let self = this;
+
+                self.$refs.Spinner.show();
 
                 Axios.get(process.env.VUE_APP_API +
                         `SystemFile/JSON?db=CR-Devinspire&folder=CLUSTER REPORT&file=REPORT`)
@@ -180,6 +196,7 @@
 
                 self.headers = headers;
                 self.rowData = final;
+                self.$refs.Spinner.hide();
             },
             setup() {
                 let self = this;
