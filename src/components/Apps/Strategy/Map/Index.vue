@@ -8,7 +8,7 @@
     import am4geodata_worldLow from "@amcharts/amcharts4-geodata/southAfricaHigh";
 
     export default {
-        props:["rowData"],   
+        props: ["rowData"],
         mounted() {
             this.drawMap()
         },
@@ -16,12 +16,18 @@
             drawMap() {
                 let self = this
                 console.log(self.rowData);
-                
+
+                let formattedData = [];
+
                 let chart = am4core.create("thisone2", am4maps.MapChart);
                 var title = chart.titles.create();
                 title.text = "[bold font-size: 20]Store sales Heatmap[/]";
                 title.textAlign = "middle";
 
+                self.rowData.forEach((element, idx) => {
+                    element["color"] = '#424242'
+                    formattedData.push(element);
+                });
 
                 chart.geodata = am4geodata_worldLow;
                 let polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
@@ -38,33 +44,32 @@
                 // create capital markers
                 let imageSeries = chart.series.push(new am4maps.MapImageSeries());
                 // define template
-                imageSeries.data = self.rowData
+                imageSeries.data = formattedData
                 imageSeries.dataFields.value = "totalSales";
-
-
 
                 let imageSeriesTemplate = imageSeries.mapImages.template;
                 imageSeriesTemplate.propertyFields.latitude = "lat";
                 imageSeriesTemplate.propertyFields.longitude = "long";
+                imageSeriesTemplate.nonScaling = true
 
                 var circle = imageSeriesTemplate.createChild(am4core.Circle);
                 circle.fillOpacity = 0.7;
-                circle.propertyFields.fill = am4core.color("#fff");
+                circle.propertyFields.fill = 'color';
                 // circle.fill=am4core.color("#fff");
-                // circle.tooltipText = "{title}: [bold]{value}[/]";
+                circle.tooltipText = "{storeName}: [bold]R{totalSales}[/]";
 
-                let label = imageSeriesTemplate.createChild(am4core.Label);
-                label.text = "{storeName}:\n[bold]Sales : {totalSales} [/]";
-                label.fill = am4core.color("#fff");
-                label.verticalCenter = "middle";
-                label.horizontalCenter = "middle";
-                label.nonScaling = true;
+                // let label = imageSeriesTemplate.createChild(am4core.Label);
+                // label.text = "{storeName}";
+                // label.fill = am4core.color("#fff");
+                // label.verticalCenter = "middle";
+                // label.horizontalCenter = "middle";
+                // label.nonScaling = false;
 
                 imageSeries.heatRules.push({
                     "target": circle,
                     "property": "radius",
                     "min": 4,
-                    "max": 10,
+                    "max": 30,
                     "dataField": "value"
                 })
             }
@@ -74,6 +79,6 @@
 
 <style scoped>
     .map {
-        height: calc(100vh - 125px);
+        height: calc(100vh - 225px);
     }
 </style>

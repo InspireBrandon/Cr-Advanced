@@ -210,11 +210,11 @@
                     tmpBasket["long"] = long;
                     tmpBasket["lat"] = lat;
 
-                    if(storeFound)
+                    if (storeFound)
                         final.push(tmpBasket);
                 })
-
-                console.log(final)
+                
+                final = removeDuplicates(final, 'storeName')
 
                 self.headers = headers;
                 self.rowData = final;
@@ -243,5 +243,11 @@
                 self.getData(stores)
             }
         }
+    }
+
+    function removeDuplicates(myArr, prop) {
+        return myArr.filter((obj, pos, arr) => {
+            return arr.map(mapObj => mapObj[prop]).indexOf(obj[prop]) === pos;
+        });
     }
 </script>
