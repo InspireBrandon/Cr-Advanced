@@ -3,9 +3,9 @@
 </template>
 
 <script>
-   import * as am4core from "@amcharts/amcharts4/core";
-import * as am4maps from "@amcharts/amcharts4/maps";
-import am4geodata_southAfricaLow from "@amcharts/amcharts4-geodata/southAfricaLow";
+    import * as am4core from "@amcharts/amcharts4/core";
+    import * as am4maps from "@amcharts/amcharts4/maps";
+    import am4geodata_southAfricaHigh from "@amcharts/amcharts4-geodata/southAfricaHigh";
 
     export default {
         mounted() {
@@ -21,7 +21,7 @@ import am4geodata_southAfricaLow from "@amcharts/amcharts4-geodata/southAfricaLo
                 chart.maxZoomLevel = 64;
 
                 // Set map definition
-                chart.geodata = am4geodata_southAfricaLow;
+                chart.geodata = am4geodata_southAfricaHigh;
 
                 // Add button
                 let zoomOut = chart.tooltipContainer.createChild(am4core.ZoomOutButton);
@@ -34,7 +34,7 @@ import am4geodata_southAfricaLow from "@amcharts/amcharts4-geodata/southAfricaLo
                     }
                     chart.goHome();
                     zoomOut.hide();
-                    currentSeries = regionalSeries.US.series;
+                    currentSeries = regionalSeries.ZA.series;
                     currentSeries.show();
                 });
                 zoomOut.hide();
@@ -58,7 +58,149 @@ import am4geodata_southAfricaLow from "@amcharts/amcharts4-geodata/southAfricaLo
                     let loader = new am4core.DataSource();
                     loader.url = "https://s3-us-west-2.amazonaws.com/s.cdpn.io/t-160/TargetStores.json";
                     loader.events.on("parseended", function (ev) {
-                        setupStores(ev.target.data);
+                        let data = {
+                            query_results: [{
+                                co_loc_n: "Klerksdorp",
+                                CO_LOC_REF_I: "1043",
+                                MAIL_ST_PROV_C: "GAUTENG",
+                                LNGTD_I: "-26.762155",
+                                LATTD_I: "26.662590",
+                                mail_city_n: "Klerksdorp",
+                                count: 1128
+                            },{
+                                co_loc_n: "Klerksdorp",
+                                CO_LOC_REF_I: "1043",
+                                MAIL_ST_PROV_C: "NC",
+                                LNGTD_I: "26.662590",
+                                LATTD_I: "-26.762155",
+                                mail_city_n: "Klerksdorp",
+                                count: 1128
+                            },{
+                                co_loc_n: "Klerksdorp",
+                                CO_LOC_REF_I: "1043",
+                                MAIL_ST_PROV_C: "NC",
+                                LNGTD_I: "26.662590",
+                                LATTD_I: "-26.762155",
+                                mail_city_n: "Klerksdorp",
+                                count: 1128
+                            },
+                            {
+                                co_loc_n: "Klerksdorp",
+                                CO_LOC_REF_I: "1043",
+                                MAIL_ST_PROV_C: "NW",
+                                LNGTD_I: "-26.762155",
+                                LATTD_I: "26.662590",
+                                mail_city_n: "Klerksdorp",
+                                count: 1128
+                            },{
+                                co_loc_n: "Klerksdorp",
+                                CO_LOC_REF_I: "1043",
+                                MAIL_ST_PROV_C: "NW",
+                                LNGTD_I: "-26.762155",
+                                LATTD_I: "26.662590",
+                                mail_city_n: "Klerksdorp",
+                                count: 1128
+                            },{
+                                co_loc_n: "Klerksdorp",
+                                CO_LOC_REF_I: "1043",
+                                MAIL_ST_PROV_C: "NW",
+                                LNGTD_I: "-26.762155",
+                                LATTD_I: "26.662590",
+                                mail_city_n: "Klerksdorp",
+                                count: 1128
+                            },
+                            {
+                                co_loc_n: "Klerksdorp",
+                                CO_LOC_REF_I: "1043",
+                                MAIL_ST_PROV_C: "WC",
+                                LNGTD_I: "-26.762155",
+                                LATTD_I: "26.662590",
+                                mail_city_n: "Klerksdorp",
+                                count: 1128
+                            },
+                            {
+                                co_loc_n: "Klerksdorp",
+                                CO_LOC_REF_I: "1043",
+                                MAIL_ST_PROV_C: "EC",
+                                LNGTD_I: "-26.762155",
+                                LATTD_I: "26.662590",
+                                mail_city_n: "Klerksdorp",
+                                count: 1128
+                            },
+                            {
+                                co_loc_n: "Klerksdorp",
+                                CO_LOC_REF_I: "1043",
+                                MAIL_ST_PROV_C: "EC",
+                                LNGTD_I: "-26.762155",
+                                LATTD_I: "26.662590",
+                                mail_city_n: "Klerksdorp",
+                                count: 1128
+                            },
+                            {
+                                co_loc_n: "Klerksdorp",
+                                CO_LOC_REF_I: "1043",
+                                MAIL_ST_PROV_C: "EC",
+                                LNGTD_I: "-26.762155",
+                                LATTD_I: "26.662590",
+                                mail_city_n: "Klerksdorp",
+                                count: 1128
+                            },
+                            {
+                                co_loc_n: "Klerksdorp",
+                                CO_LOC_REF_I: "1043",
+                                MAIL_ST_PROV_C: "FS",
+                                LNGTD_I: "26.662590",
+                                LATTD_I: "-26.762155",
+                                mail_city_n: "Klerksdorp",
+                                count: 1128
+                            },
+                            {
+                                co_loc_n: "Klerksdorp",
+                                CO_LOC_REF_I: "1043",
+                                MAIL_ST_PROV_C: "GT",
+                                LNGTD_I: "-26.762155",
+                                LATTD_I: "26.662590",
+                                mail_city_n: "Klerksdorp",
+                                count: 1128
+                            },
+                            {
+                                co_loc_n: "Klerksdorp",
+                                CO_LOC_REF_I: "1043",
+                                MAIL_ST_PROV_C: "GT",
+                                LNGTD_I: "-26.762155",
+                                LATTD_I: "26.662590",
+                                mail_city_n: "Klerksdorp",
+                                count: 1128
+                            },
+                            {
+                                co_loc_n: "Klerksdorp",
+                                CO_LOC_REF_I: "1043",
+                                MAIL_ST_PROV_C: "GT",
+                                LNGTD_I: "-26.762155",
+                                LATTD_I: "26.662590",
+                                mail_city_n: "Klerksdorp",
+                                count: 1128
+                            },
+                            {
+                                co_loc_n: "Klerksdorp",
+                                CO_LOC_REF_I: "1043",
+                                MAIL_ST_PROV_C: "GT",
+                                LNGTD_I: "-26.762155",
+                                LATTD_I: "26.662590",
+                                mail_city_n: "Klerksdorp",
+                                count: 1128
+                            },
+                            {
+                                co_loc_n: "Klerksdorp",
+                                CO_LOC_REF_I: "1043",
+                                MAIL_ST_PROV_C: "GT",
+                                LNGTD_I: "-26.762155",
+                                LATTD_I: "26.662590",
+                                mail_city_n: "Klerksdorp",
+                                count: 1128
+                            }]
+                        }
+                        setupStores(data);
                     });
                     loader.load();
                 }
@@ -73,7 +215,7 @@ import am4geodata_southAfricaLow from "@amcharts/amcharts4-geodata/southAfricaLo
                     template.horizontalCenter = "middle";
                     template.propertyFields.latitude = "lat";
                     template.propertyFields.longitude = "long";
-                    template.tooltipText = "{name}:\n[bold]{stores} stores[/]";
+                    template.tooltipText = "{name}:\n[bold]{count} stores[/]";
 
                     let circle = template.createChild(am4core.Circle);
                     circle.radius = 10;
@@ -83,7 +225,7 @@ import am4geodata_southAfricaLow from "@amcharts/amcharts4-geodata/southAfricaLo
                     circle.nonScaling = true;
 
                     let label = template.createChild(am4core.Label);
-                    label.text = "{stores}";
+                    label.text = "{count}";
                     label.fill = am4core.color("#fff");
                     label.verticalCenter = "middle";
                     label.horizontalCenter = "middle";
@@ -120,7 +262,7 @@ import am4geodata_southAfricaLow from "@amcharts/amcharts4-geodata/southAfricaLo
 
                         // Control zoom
                         if (data.type == "state") {
-                            let statePolygon = polygonSeries.getPolygonById("US-" + data.state);
+                            let statePolygon = polygonSeries.getPolygonById("ZA-" + data.state);
                             chart.zoomToMapObject(statePolygon);
                         } else if (data.type == "city") {
                             chart.zoomToGeoPoint({
@@ -144,13 +286,13 @@ import am4geodata_southAfricaLow from "@amcharts/amcharts4-geodata/southAfricaLo
                 function setupStores(data) {
 
                     // Init country-level series
-                    regionalSeries.US = {
+                    regionalSeries.ZA = {
                         markerData: [],
                         series: createSeries("stores")
                     };
 
                     // Set current series
-                    currentSeries = regionalSeries.US.series;
+                    currentSeries = regionalSeries.ZA.series;
 
                     // Process data
                     am4core.array.each(data.query_results, function (store) {
@@ -165,9 +307,11 @@ import am4geodata_southAfricaLow from "@amcharts/amcharts4-geodata/southAfricaLo
                             count: am4core.type.toNumber(store.count)
                         };
 
+                        console.log("store", store);
+
                         // Process state-level data
                         if (regionalSeries[store.state] == undefined) {
-                            let statePolygon = polygonSeries.getPolygonById("US-" + store.state);
+                            let statePolygon = polygonSeries.getPolygonById("ZA-" + store.state);
                             if (statePolygon) {
 
                                 // Add state data
@@ -182,7 +326,7 @@ import am4geodata_southAfricaLow from "@amcharts/amcharts4-geodata/southAfricaLo
                                     state: store.state,
                                     markerData: []
                                 };
-                                regionalSeries.US.markerData.push(regionalSeries[store.state]);
+                                regionalSeries.ZA.markerData.push(regionalSeries[store.state]);
 
                             } else {
                                 // State not found
@@ -224,7 +368,7 @@ import am4geodata_southAfricaLow from "@amcharts/amcharts4-geodata/southAfricaLo
 
                     });
 
-                    regionalSeries.US.series.data = regionalSeries.US.markerData;
+                    regionalSeries.ZA.series.data = regionalSeries.ZA.markerData;
                 }
             }
         }
