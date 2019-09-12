@@ -21,10 +21,14 @@
                 <v-btn class="elevation-0" style="width: 100px" round color="primary">
                     Map
                 </v-btn>
+                <v-btn class="elevation-0" style="width: 100px" round color="primary">
+                    Model
+                </v-btn>
             </v-btn-toggle>
         </v-toolbar>
         <Grid v-if="selectedView == 0" :rowData="rowData" :headers="headers" ref="Grid" />
-        <Map v-if="selectedView == 1" ref="Map" />
+        <Map v-if="selectedView == 1" :rowData="rowData" ref="Map" />
+        <ClusterModels :fileData="rowData" v-if="selectedView == 2" ref="ClusterModels" />
         <Setup ref="Setup" />
         <Spinner ref="Spinner" />
     </v-card>
@@ -36,6 +40,7 @@
     import Setup from './Setup'
     import Spinner from '@/components/Common/Spinner';
     import Map from '../Map/Index'
+    import ClusterModels from '../ClusterModels/Index'
 
     const formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -48,20 +53,23 @@
             Grid,
             Setup,
             Spinner,
-            Map
+            Map,
+            ClusterModels
         },
         data() {
             return {
                 headers: [],
                 rowData: [],
                 stores: [],
-                selectedView: 0
+                selectedView: 0,
+                mapData: null
             }
         },
         mounted() {
             let self = this;
             self.$refs.Spinner.show();
-            self.getStores();
+            self.getHinterlandStores();
+            // self.getStores();
         },
         methods: {
             getData(stores) {
@@ -87,7 +95,7 @@
                         self.getData(r.data)
                     })
             },
-            handleData(data) {
+            handleData(data, storeData) {
                 let self = this;
 
                 let final = [];
@@ -102,9 +110,6 @@
 
                 if (data.store != undefined) {
                     for (var store in data.store) {
-                        data.store[store].data.forEach(el => {
-                            stores.push(el.displayname);
-                        })
 
                         headers.push({
                             headerName: 'Sales %',
@@ -150,17 +155,20 @@
                     }
                 }
 
-                stores.forEach(element => {
+                storeData.forEach(element => {
+                    let storeFound = false;
 
                     let tmpBasket = {
-                        storeName: element
+                        storeName: element.PlaceGroup.toUpperCase()
                     };
 
                     if (data.store != undefined) {
                         for (var store in data.store) {
 
                             data.store[store].data.forEach(el => {
-                                if (el.displayname == element) {
+                                if (el.displayname == element.PlaceGroup.toUpperCase()) {
+                                    storeFound = true;
+
                                     tmpBasket["totalSales"] = el.totalSales;
                                     tmpBasket["cumulativePercent"] = el.cumulativePercent;
                                     tmpBasket["level"] = el.level;
@@ -175,7 +183,8 @@
                         for (var basket in data.basket) {
 
                             data.basket[basket].data.forEach(el => {
-                                if (el.displayname == element) {
+                                if (el.displayname == element.PlaceGroup.toUpperCase()) {
+                                    storeFound = true;
                                     tmpBasket["basket_" + basket] = el.level
                                 }
                             })
@@ -186,15 +195,26 @@
                         for (var listing in data.listing) {
 
                             data.listing[listing].forEach(el => {
-                                if (el.storeName == element) {
+                                if (el.storeName == element.PlaceGroup.toUpperCase()) {
+                                    storeFound = true;
                                     tmpBasket["listing_" + listing] = el.cluster
                                 }
                             })
                         }
                     }
 
-                    final.push(tmpBasket);
+                    let longLat = element.OfficeGPS.split(",");
+                    let long = longLat[0];
+                    let lat = longLat[1];
+
+                    tmpBasket["long"] = long;
+                    tmpBasket["lat"] = lat;
+
+                    if(storeFound)
+                        final.push(tmpBasket);
                 })
+
+                console.log(final)
 
                 self.headers = headers;
                 self.rowData = final;
@@ -205,6 +225,22 @@
                 self.$refs.Setup.show(() => {
 
                 })
+            },
+            getHinterlandStores() {
+                let self = this;
+
+                let stores = require('@/assets/storeData/Hinterland.json');
+                self.prepareStoreResults(stores.Response);
+            },
+            prepareStoreResults(storeData) {
+                let self = this;
+
+                let stores = storeData.filter(e => {
+                    return e.siteType == "SHOP";
+                })
+
+                self.stores = stores;
+                self.getData(stores)
             }
         }
     }
