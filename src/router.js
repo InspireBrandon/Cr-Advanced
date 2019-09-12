@@ -104,6 +104,8 @@ import ListingClusters from '@/components/Apps/Strategy/ListingClusters/Index.vu
 import Clustering from '@/components/Apps/Strategy/Clustering/Index.vue'
 
 import map from '@/components/Apps/Strategy/Map/Index.vue'
+import map2 from '@/components/Apps/Strategy/Map/tesmap.vue'
+
 
 Vue.use(Router)
 
@@ -142,6 +144,10 @@ export default new Router({
           path: '/map',
           name: 'map',
           component: map
+        },{
+          path: '/map2',
+          name: 'map2',
+          component: map2
         }, {
           path: '/ProductListing',
           name: 'ProductListing',
