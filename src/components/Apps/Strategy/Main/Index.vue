@@ -169,7 +169,7 @@
                                 if (el.displayname == element.PlaceGroup.toUpperCase()) {
                                     storeFound = true;
 
-                                    tmpBasket["totalSales"] = el.totalSales;
+                                    tmpBasket["totalSales"] = el.totalSales.toFixed(0);
                                     tmpBasket["cumulativePercent"] = el.cumulativePercent;
                                     tmpBasket["level"] = el.level;
                                     tmpBasket["userDefinedCluster"] = el.userDefinedCluster;
@@ -204,8 +204,8 @@
                     }
 
                     let longLat = element.OfficeGPS.split(",");
-                    let long = longLat[0];
-                    let lat = longLat[1];
+                    let long = parseFloat(longLat[1]);
+                    let lat = parseFloat(longLat[0]);
 
                     tmpBasket["long"] = long;
                     tmpBasket["lat"] = lat;
