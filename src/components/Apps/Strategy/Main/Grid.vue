@@ -2,7 +2,7 @@
     <div>
         <div>
             <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 272px);"
-                :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData" 
+                :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
                 :sideBar='true' :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true"
                 :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true" :enableColResize="true"
                 :floatingFilter="true" :groupMultiAutoColumn="true" :onGridReady="onGridReady">
@@ -60,6 +60,25 @@
                 let self = this;
                 self.gridApi = params.api;
                 self.columnApi = params.columnApi;
+            },
+            setOrder() {
+                let self = this;
+                
+                var defaultSortModel = [{
+                        colId: "userDefinedCluster",
+                        sort: "asc"
+                    },
+                    {
+                        colId: "basket_Premium Basket",
+                        sort: "asc"
+                    },
+                    {
+                        colId: "totalSales",
+                        sort: "desc"
+                    }
+                ];
+
+                self.gridApi.setSortModel(defaultSortModel);
             }
         }
     }

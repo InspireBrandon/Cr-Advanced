@@ -129,7 +129,8 @@
                             }
                         }, {
                             "headerName": "System Turnover Group",
-                            "field": "level"
+                            "field": "level",
+                            "hide": true
                         }, {
                             "headerName": "User Turnover Group",
                             "field": "userDefinedCluster"
@@ -213,12 +214,16 @@
                     if (storeFound)
                         final.push(tmpBasket);
                 })
-                
+
                 final = removeDuplicates(final, 'storeName')
 
                 self.headers = headers;
                 self.rowData = final;
                 self.$refs.Spinner.hide();
+
+                setTimeout(() => {
+                    self.$refs.Grid.setOrder();
+                }, 60);
             },
             setup() {
                 let self = this;

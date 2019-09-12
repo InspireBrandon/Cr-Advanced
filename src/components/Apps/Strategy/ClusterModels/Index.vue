@@ -1,10 +1,10 @@
 <template>
-    <v-card tile flat>
-        <v-container grid-list-md>
+    <v-card tile flat style="height: calc(100vh - 200px); overflow: auto;">
+        <v-container grid-list-md fluid>
             <v-layout row wrap>
                 <v-flex md12>
                     <v-layout row wrap>
-                        <v-flex md3 class="pa-0">
+                        <v-flex md3 class="pa-0 pr-1">
                             <v-card tile flat>
                                 <v-layout row wrap>
                                     <v-flex md12 class="pa-0">
@@ -12,7 +12,7 @@
                                 </v-layout>
                             </v-card>
                         </v-flex>
-                        <v-flex md3 class="pa-0">
+                        <v-flex md3 class="pa-0 pr-1">
                             <v-card tile flat>
                                 <v-layout row wrap style="margin-bottom: 0px;">
                                     <v-flex md12 class="pa-0">
@@ -27,7 +27,7 @@
                                 </v-layout>
                             </v-card>
                         </v-flex>
-                        <v-flex md3 class="pa-0">
+                        <v-flex md3 class="pa-0 pr-1">
                             <v-card tile flat>
                                 <v-layout row wrap style="margin-bottom: 0px;">
                                     <v-flex md12 class="pa-0">
@@ -42,7 +42,7 @@
                                 </v-layout>
                             </v-card>
                         </v-flex>
-                        <v-flex md3 class="pa-0">
+                        <v-flex md3 class="pa-0 pr-1">
                             <v-card tile flat>
                                 <v-layout row wrap style="margin-bottom: 0px;">
                                     <v-flex md12 class="pa-0">
@@ -69,7 +69,7 @@
                                 </v-card-text>
                             </v-card>
                         </v-flex>
-                        <v-flex md3 class="pa-0 pr-1" v-for="i in 3" :key="i">
+                        <v-flex md3 class="pa-0 pr-1" v-for="i in 3" :key="i + 'a'">
                             <v-card tile flat>
                                 <div style="display: flex; text-align: center;">
                                     <div class="headline" style="height: 48px; width: 25%; padding-top: 10px;">
@@ -189,7 +189,7 @@
                                 </v-card-text>
                             </v-card>
                         </v-flex>
-                        <v-flex md3 class="pa-0 pr-1" v-for="i in 3" :key="i">
+                        <v-flex md3 class="pa-0 pr-1" v-for="i in 3" :key="i + 'b'">
                             <v-card tile flat>
                                 <div style="display: flex; text-align: center;">
                                     <div class="headline" style="height: 48px; width: 25%; padding-top: 10px;">
@@ -309,7 +309,7 @@
                                 </v-card-text>
                             </v-card>
                         </v-flex>
-                        <v-flex md3 class="pa-0 pr-1" v-for="i in 3" :key="i">
+                        <v-flex md3 class="pa-0 pr-1" v-for="i in 3" :key="i + 'c'">
                             <v-card tile flat>
                                 <div style="display: flex; text-align: center;">
                                     <div class="headline" style="height: 48px; width: 25%; padding-top: 10px;">
@@ -475,7 +475,7 @@
                 }
             }
         },
-        mounted() {
+        created() {
             let self = this;
             self.setGrid();
         },
@@ -507,21 +507,21 @@
                 // LARGE
 
                 let ltm1 = storeClusterData.filter(e => {
-                    return e.userDefinedCluster == "L" && e.basket_Chad == "TM1";
+                    return e.userDefinedCluster == "L" && e["basket_Premium Basket"] == "TM1";
                 })
 
                 self.clusterValues.ltm1v = ltm1.length;
                 self.clusterValues.ltm1p = ((ltm1.length / totalStores) * 100).toFixed(0);
 
                 let ltm2 = storeClusterData.filter(e => {
-                    return e.userDefinedCluster == "L" && e.basket_Chad == "TM2";
+                    return e.userDefinedCluster == "L" && e["basket_Premium Basket"] == "TM2";
                 })
 
                 self.clusterValues.ltm2v = ltm2.length;
                 self.clusterValues.ltm2p = ((ltm2.length / totalStores) * 100).toFixed(0);
 
                 let ltm3 = storeClusterData.filter(e => {
-                    return e.userDefinedCluster == "L" && e.basket_Chad == "TM3";
+                    return e.userDefinedCluster == "L" && e["basket_Premium Basket"] == "TM3";
                 })
 
                 self.clusterValues.ltm3v = ltm3.length;
@@ -530,21 +530,21 @@
                 // MEDIUM
 
                 let mtm1 = storeClusterData.filter(e => {
-                    return e.userDefinedCluster == "M" && e.basket_Chad == "TM1";
+                    return e.userDefinedCluster == "M" && e["basket_Premium Basket"] == "TM1";
                 })
 
                 self.clusterValues.mtm1v = mtm1.length;
                 self.clusterValues.mtm1p = ((mtm1.length / totalStores) * 100).toFixed(0);
 
                 let mtm2 = storeClusterData.filter(e => {
-                    return e.userDefinedCluster == "M" && e.basket_Chad == "TM2";
+                    return e.userDefinedCluster == "M" && e["basket_Premium Basket"] == "TM2";
                 })
 
                 self.clusterValues.mtm2v = mtm2.length;
                 self.clusterValues.mtm2p = ((mtm2.length / totalStores) * 100).toFixed(0);
 
                 let mtm3 = storeClusterData.filter(e => {
-                    return e.userDefinedCluster == "M" && e.basket_Chad == "TM3";
+                    return e.userDefinedCluster == "M" && e["basket_Premium Basket"] == "TM3";
                 })
 
                 self.clusterValues.mtm3v = mtm3.length;
@@ -553,21 +553,21 @@
                 // SMALL
 
                 let stm1 = storeClusterData.filter(e => {
-                    return e.userDefinedCluster == "S" && e.basket_Chad == "TM1";
+                    return e.userDefinedCluster == "S" && e["basket_Premium Basket"] == "TM1";
                 })
 
                 self.clusterValues.stm1v = stm1.length;
                 self.clusterValues.stm1p = ((stm1.length / totalStores) * 100).toFixed(0);
 
                 let stm2 = storeClusterData.filter(e => {
-                    return e.userDefinedCluster == "S" && e.basket_Chad == "TM2";
+                    return e.userDefinedCluster == "S" && e["basket_Premium Basket"] == "TM2";
                 })
 
                 self.clusterValues.stm2v = stm2.length;
                 self.clusterValues.stm2p = ((stm2.length / totalStores) * 100).toFixed(0);
 
                 let stm3 = storeClusterData.filter(e => {
-                    return e.userDefinedCluster == "S" && e.basket_Chad == "TM3";
+                    return e.userDefinedCluster == "S" && e["basket_Premium Basket"] == "TM3";
                 })
 
                 self.clusterValues.stm3v = stm3.length;
