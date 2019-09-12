@@ -9,11 +9,16 @@
 
     export default {
         props: ["rowData"],
+        data() {
+            return {
+                labels: false
+            }
+        },
         mounted() {
-            this.drawMap()
+            this.drawMap(false)
         },
         methods: {
-            drawMap() {
+            drawMap(state) {
                 let self = this
                 console.log(self.rowData);
 
@@ -58,12 +63,26 @@
                 // circle.fill=am4core.color("#fff");
                 circle.tooltipText = "{storeName}: [bold]R{totalSales}[/]";
 
-                // let label = imageSeriesTemplate.createChild(am4core.Label);
-                // label.text = "{storeName}";
-                // label.fill = am4core.color("#fff");
-                // label.verticalCenter = "middle";
-                // label.horizontalCenter = "middle";
-                // label.nonScaling = false;
+
+
+
+                let label = imageSeriesTemplate.createChild(am4core.Label);
+                label.text = "{storeName}";
+                label.fill = am4core.color("#fff");
+
+                label.nonScaling = false;
+                label.hidden = state
+
+                let button = chart.chartContainer.createChild(am4core.Button);
+                button.label.text = "toggle labels";
+                button.padding(5, 5, 5, 5);
+                button.width = 100;
+                button.align = "right";
+                button.marginRight = 120;
+                button.events.on("hit", function () {
+                    self.labels = !self.labels
+                    self.drawMap(self.labels)
+                });
 
                 imageSeries.heatRules.push({
                     "target": circle,
