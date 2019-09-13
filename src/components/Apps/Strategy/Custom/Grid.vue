@@ -5,7 +5,7 @@
                 :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
                 :sideBar='true' :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true"
                 :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true" :enableColResize="true"
-                :floatingFilter="true" :groupMultiAutoColumn="true" :onGridReady="onGridReady" :animateRows="true">
+                :floatingFilter="true" :groupMultiAutoColumn="true" :onGridReady="onGridReady">
             </ag-grid-vue>
         </div>
         <v-toolbar dark flat dense>
@@ -18,7 +18,6 @@
         AgGridVue
     } from "ag-grid-vue";
 
-    import ProgressRenderer from './ProgressRenderer'
 
     const formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -29,16 +28,14 @@
     import Axios from 'axios';
 
     export default {
-        props: ['rowData'],
+        props: ['rowData', 'headers'],
         components: {
             AgGridVue,
-            ProgressRenderer
         },
         data() {
             let self = this;
 
             return {
-                headers: [],
                 gridOptions: {
                     rowHeight: 35,
                     pinnedTopRowData: [],
@@ -55,7 +52,6 @@
         },
         created() {
             let self = this;
-            self.setHeaders();
         },
         methods: {
             onGridReady(params) {
@@ -63,39 +59,24 @@
                 self.gridApi = params.api;
                 self.columnApi = params.columnApi;
             },
-            setHeaders() {
+            setOrder() {
                 let self = this;
-
-                self.headers = [{
-                        "headerName": "Store",
-                        "field": "displayname",
+                
+                var defaultSortModel = [{
+                        colId: "userDefinedCluster",
+                        sort: "asc"
                     },
                     {
-                        headerName: 'Sales %',
-                        cellRendererFramework: "ProgressRenderer",
-                        width: 500
+                        colId: "basket_Premium Basket",
+                        sort: "asc"
                     },
                     {
-                        "headerName": "Sales",
-                        "field": "sales",
-                        valueFormatter: function (params) {
-                            return formatter.format(params.value).replace("$", "R");
-                        }
-                    },
-                    {
-                        "headerName": "System Basket Group",
-                        "field": "level",
-                    },
-                    {
-                        "headerName": "User Basket Group",
-                        "field": "userDefinedCluster",
-                        "editable": true
-                    },{
-                        "headerName": "Basket percentage",
-                        "field": "basketSalesPercentage",
-                        "editable": false
+                        colId: "totalSales",
+                        sort: "desc"
                     }
-                ]
+                ];
+
+                self.gridApi.setSortModel(defaultSortModel);
             }
         }
     }
