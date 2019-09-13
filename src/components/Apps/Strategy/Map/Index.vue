@@ -11,11 +11,11 @@
         props: ["rowData"],
         data() {
             return {
-                labels: false
+                labels: true
             }
         },
         mounted() {
-            this.drawMap(false)
+            this.drawMap(this.labels)
         },
         methods: {
             drawMap(state) {
@@ -26,7 +26,7 @@
 
                 let chart = am4core.create("thisone2", am4maps.MapChart);
                 var title = chart.titles.create();
-                title.text = "[bold font-size: 20]Store sales Heatmap[/]";
+                title.text = "[bold font-size: 20]Store Sales Heatmap[/]";
                 title.textAlign = "middle";
 
                 self.rowData.forEach((element, idx) => {
@@ -50,7 +50,7 @@
                 let imageSeries = chart.series.push(new am4maps.MapImageSeries());
                 // define template
                 imageSeries.data = formattedData
-                imageSeries.dataFields.value = "totalSales";
+                imageSeries.dataFields.value = "sales";
 
                 let imageSeriesTemplate = imageSeries.mapImages.template;
                 imageSeriesTemplate.propertyFields.latitude = "lat";
@@ -61,7 +61,7 @@
                 circle.fillOpacity = 0.7;
                 circle.propertyFields.fill = 'color';
                 // circle.fill=am4core.color("#fff");
-                circle.tooltipText = "{storeName}: [bold]R{totalSales}[/]";
+                circle.tooltipText = "{storeName}: [bold]{sales}[/]";
 
 
 

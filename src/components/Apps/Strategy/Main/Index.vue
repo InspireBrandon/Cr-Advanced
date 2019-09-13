@@ -12,7 +12,7 @@
             </v-toolbar-title>
         </v-toolbar>
         <v-toolbar dark flat>
-            <v-btn color="primary" @click="getData">Refresh</v-btn>
+            <v-btn color="primary" @click="getHinterlandStores">Refresh</v-btn>
             <v-spacer></v-spacer>
             <v-btn-toggle v-model="selectedView" round class="transparent" mandatory>
                 <v-btn class="elevation-0" style="width: 100px" round color="primary">
@@ -171,6 +171,7 @@
                                     storeFound = true;
 
                                     tmpBasket["totalSales"] = el.totalSales.toFixed(0);
+                                    tmpBasket["sales"] = formatter.format(el.totalSales).replace("$", "R");
                                     tmpBasket["cumulativePercent"] = el.cumulativePercent;
                                     tmpBasket["level"] = el.level;
                                     tmpBasket["userDefinedCluster"] = el.userDefinedCluster;
