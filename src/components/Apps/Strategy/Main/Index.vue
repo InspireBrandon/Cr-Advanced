@@ -2,6 +2,19 @@
     <v-card tile>
         <v-toolbar flat dense dark color="grey darken-3">
             <v-toolbar-items>
+                <v-menu dark offset-y style="margin-bottom: 10px;">
+                    <v-btn slot="activator" flat>
+                        File
+                    </v-btn>
+                    <v-list>
+                        <v-list-tile @click="openFile">
+                            <v-list-tile-title>Open</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="saveFile">
+                            <v-list-tile-title>Save</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
                 <v-btn slot="activator" flat @click="setup">
                     Setup
                 </v-btn>
@@ -13,6 +26,11 @@
         </v-toolbar>
         <v-toolbar dark flat>
             <v-btn color="primary" @click="getHinterlandStores">Refresh</v-btn>
+            <v-toolbar-items>
+                <v-select @change="changeFile" style="margin-left: 10px; margin-top: 8px; width: 300px"
+                    placeholder="Select File" dense :items="files" v-model="selectedFile" hide-details>
+                </v-select>
+            </v-toolbar-items>
             <v-spacer></v-spacer>
             <v-btn-toggle v-model="selectedView" round class="transparent" mandatory>
                 <v-btn class="elevation-0" style="width: 100px" round color="primary">
@@ -31,6 +49,7 @@
         <ClusterModels :fileData="rowData" v-if="selectedView == 2" ref="ClusterModels" />
         <Setup ref="Setup" />
         <Spinner ref="Spinner" />
+        <Prompt ref="Prompt" />
     </v-card>
 </template>
 
@@ -41,6 +60,7 @@
     import Spinner from '@/components/Common/Spinner';
     import Map from '../Map/Index'
     import ClusterModels from '../ClusterModels/Index'
+    import Prompt from '@/components/Common/Prompt'
 
     const formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -54,7 +74,8 @@
             Setup,
             Spinner,
             Map,
-            ClusterModels
+            ClusterModels,
+            Prompt
         },
         data() {
             return {
@@ -62,14 +83,17 @@
                 rowData: [],
                 stores: [],
                 selectedView: 0,
-                mapData: null
+                mapData: null,
+                fileData: null,
+                fileName: null,
+                selectedFile: null,
+                files: null,
+                firstLoad: true
             }
         },
         mounted() {
             let self = this;
-            self.$refs.Spinner.show();
             self.getHinterlandStores();
-            // self.getStores();
         },
         methods: {
             getData(stores) {
@@ -82,9 +106,33 @@
                     .then(fd => {
                         Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fd.data.id}`)
                             .then(r => {
-                                self.handleData(r.data, stores);
+                                self.fileData = r.data;
+
+                                if (!self.firstLoad) {
+                                    self.handleData(r.data, stores);
+                                } else {
+                                    self.prepareFiles(r.data)
+                                    self.$refs.Spinner.hide();
+                                }
+
+                                self.firstLoad = false;
                             })
                     })
+            },
+            prepareFiles(data) {
+                let self = this;
+
+                self.files = [];
+
+                if (data.report != undefined && data.report != null) {
+                    for (var report in data.report) {
+                        self.files.push(report);
+                    }
+                }
+
+                if (self.files.length == 0) {
+                    self.handleData(self.fileData, self.stores);
+                }
             },
             getStores(cb) {
                 let self = this;
@@ -140,18 +188,37 @@
 
                 if (data.basket != undefined) {
                     for (var basket in data.basket) {
+
+                        let hide = false;
+
+                        if (self.fileData.report != undefined || self.fileData.report != null) {
+                            if (self.selectedFile != undefined && self.selectedFile != null) {
+                                hide = self.fileData.report[self.selectedFile]["basket_" + basket];
+                            }
+                        }
+
                         headers.push({
                             "headerName": basket,
                             "field": "basket_" + basket,
+                            "hide": hide
                         })
                     }
                 }
 
                 if (data.listing != undefined) {
                     for (var listing in data.listing) {
+                        let hide = false;
+
+                        if (self.fileData.report != undefined || self.fileData.report != null) {
+                            if (self.selectedFile != undefined && self.selectedFile != null) {
+                                hide = self.fileData.report[self.selectedFile]["listing_" + listing];
+                            }
+                        }
+
                         headers.push({
                             "headerName": listing + " Listing",
                             "field": "listing_" + listing,
+                            "hide": hide
                         })
                     }
                 }
@@ -171,7 +238,8 @@
                                     storeFound = true;
 
                                     tmpBasket["totalSales"] = el.totalSales.toFixed(0);
-                                    tmpBasket["sales"] = formatter.format(el.totalSales).replace("$", "R");
+                                    tmpBasket["sales"] = formatter.format(el.totalSales).replace("$",
+                                        "R");
                                     tmpBasket["cumulativePercent"] = el.cumulativePercent;
                                     tmpBasket["level"] = el.level;
                                     tmpBasket["userDefinedCluster"] = el.userDefinedCluster;
@@ -246,7 +314,57 @@
                 })
 
                 self.stores = stores;
-                self.getData(stores)
+                self.getData(stores);
+            },
+            openFile() {
+                let self = this;
+            },
+            saveFile() {
+                let self = this;
+
+                self.$refs.Prompt.show("", "File Name", "", text => {
+                    let columns = self.$refs.Grid.getState();
+                    let output = {};
+
+                    columns.forEach(el => {
+                        output[el.colId] = el.hide;
+                    })
+
+                    if (self.fileData.report == undefined || self.fileData.report == null) {
+                        self.fileData.report = {};
+                    }
+
+                    self.fileData.report[text] = output;
+
+                    self.files.push(text);
+                    self.selectedFile = text;
+
+                    self.appendAndSaveFile(self.fileData);
+                })
+            },
+            appendAndSaveFile(fileData) {
+                Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
+                        SystemFile: {
+                            SystemUser_ID: -1,
+                            Folder: "CLUSTER REPORT",
+                            Name: "REPORT",
+                            Extension: '.json'
+                        },
+                        Data: fileData
+                    })
+                    .then(r => {
+                        alert("Successfully saved");
+                    })
+                    .catch(e => {
+                        alert("Failed to save");
+                    })
+            },
+            changeFile() {
+                let self = this;
+
+                self.$nextTick(() => {
+                    self.handleData(self.fileData, self.stores);
+                })
             }
         }
     }

@@ -79,6 +79,10 @@
                 ];
 
                 self.gridApi.setSortModel(defaultSortModel);
+            },
+            getState() {
+                let self = this;
+                return self.columnApi.getColumnState();
             }
         }
     }

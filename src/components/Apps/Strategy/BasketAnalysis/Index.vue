@@ -127,7 +127,6 @@
 
     import FileDataSelector from './FileDataSelector';
 
-
     export default {
         components: {
             Grid,
