@@ -7,6 +7,9 @@
                         File
                     </v-btn>
                     <v-list>
+                        <v-list-tile @click="openFileDialog">
+                            <v-list-tile-title>Import</v-list-tile-title>
+                        </v-list-tile>
                         <v-list-tile>
                             <v-list-tile-title>New</v-list-tile-title>
                         </v-list-tile>
@@ -15,6 +18,9 @@
                         </v-list-tile>
                         <v-list-tile>
                             <v-list-tile-title>Save</v-list-tile-title>
+                        </v-list-tile>
+                         <v-list-tile @click="close">
+                            <v-list-tile-title>close</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
                 </v-menu>
@@ -44,5 +50,85 @@
             <v-btn color="primary">Refresh</v-btn>
             <v-btn color="primary">Setup</v-btn>
         </v-toolbar>
+        <Grid  :rowData="rowData" :headers="headers" ref="Grid" />
+
+        <input @change="onFileChange" accept=".csv" ref="fileInput" style="display: none" type="file">
+
     </v-card>
 </template>
+
+<script>
+    import Grid from './Grid'
+
+    export default {
+        components:{Grid},
+        data() {
+            return {
+                rowData:[],
+                headers:[{
+                    "headerName": "Store",
+                    "field": "STORE_NAME",
+                },{
+                    "headerName": "Sales",
+                    "field": "SALES_RETAIL",
+                }]
+            }
+        },
+        methods: {
+            close(){
+                let self = this
+                self.rowData = []    
+            },
+            openFileDialog() {
+                let self = this;
+                self.$refs.fileInput.value = null;
+                self.$refs.fileInput.click();
+            },
+            onFileChange(e) {
+                let self = this;
+                self.$nextTick(() => {
+                    let data = []
+                    const files = e.target.files;
+                    let file = files[0];
+                    let reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        data = csvToDataObject(e.currentTarget.result);
+                        self.rowData=data
+                        console.log(data)
+                    }
+
+
+                    reader.readAsText(file);
+                })
+            },
+        }
+    }
+
+    function csvToDataObject(data) {
+        let lines = data.split('\n');
+        let result = [];
+
+        let brokenHeaders = lines[0].split(',');
+        let headers = [];
+
+        brokenHeaders.forEach(el => {
+            headers.push(el.replace(/ /g, "_").replace(/"/g, "").replace(/\r/g, ""));
+        })
+
+        for (let i = 1; i < lines.length; i++) {
+            let obj = {};
+            let currentLine = lines[i].split(",");
+
+            if (currentLine[0] != "") {
+                for (let j = 0; j < headers.length; j++) {
+                    obj[headers[j]] = currentLine[j].replace(/"/g, "").replace(/\r/g, "");
+                }
+
+                result.push(obj);
+            }
+
+        }
+        return result;
+    }
+</script>

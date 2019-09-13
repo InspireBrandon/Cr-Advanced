@@ -5,6 +5,16 @@
                 <v-btn slot="activator" flat @click="setup">
                     Setup
                 </v-btn>
+                <v-menu dark offset-y style="margin-bottom: 10px;">
+                    <v-btn slot="activator" flat>
+                        File
+                    </v-btn>
+                    <v-list>
+                        <v-list-tile @click="close">
+                            <v-list-tile-title>close</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
             </v-toolbar-items>
             <v-spacer></v-spacer>
             <v-toolbar-title>
@@ -13,6 +23,13 @@
         </v-toolbar>
         <v-toolbar dark flat>
             <v-btn color="primary" @click="getHinterlandStores">Refresh</v-btn>
+            <v-toolbar-items v-if="selectedView == 1">
+                <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 200px"
+                    placeholder="Select cluster type" :items="clusters" v-model="selectedCluster"
+                    @change="onClusterChange"> </v-autocomplete>
+                <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 200px"
+                    placeholder="Select cluster data" :items="dataFields" v-model="selectedDataField"> </v-autocomplete>
+            </v-toolbar-items>
             <v-spacer></v-spacer>
             <v-btn-toggle v-model="selectedView" round class="transparent" mandatory>
                 <v-btn class="elevation-0" style="width: 100px" round color="primary">
@@ -58,9 +75,26 @@
         },
         data() {
             return {
+                clusters: [{
+                    text: "store",
+                    value: "store"
+                }, {
+                    text: "basket",
+                    value: "basket"
+                }, {
+                    text: "listing",
+                    value: "listing"
+                }, {
+                    text: "custom",
+                    value: "custom"
+                }, ],
+                selectedCluster: [],
+                dataFields: [],
+                selectedDataField: null,
                 headers: [],
                 rowData: [],
                 stores: [],
+                unhandledReportData: null,
                 selectedView: 0,
                 mapData: null
             }
@@ -72,6 +106,45 @@
             // self.getStores();
         },
         methods: {
+            close() {
+                let self = this
+                self.selectedDataField = null
+                self.selectedCluster = null
+                self.rowData = []
+            },
+            onClusterChange() {
+                let self = this
+                let tmp = []
+                self.$nextTick(() => {
+                    self.dataFields = []
+                    console.log(self.unhandledReportData);
+                    tmp.push(self.unhandledReportData[self.selectedCluster])
+                    var names = Object.getOwnPropertyNames(tmp[0])
+                    console.log(names);
+                    let obj = tmp[0]
+                    console.log(obj);
+
+                    for (var item in obj) {
+                        let count = 0
+                        console.log(item);
+
+                        self.dataFields.push({
+                            text: item
+                        })
+                        count++
+                    }
+
+                    // for (let index = 0; index < obj.length; index++) {
+                    //     const element = obj[index];
+                    //     self.dataFields.push({
+                    //         text: names[index],
+                    //         value: element[names[index]].data
+                    //     })
+                    // }
+
+                    console.log(self.dataFields);
+                })
+            },
             getData(stores) {
                 let self = this;
 
@@ -82,6 +155,7 @@
                     .then(fd => {
                         Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fd.data.id}`)
                             .then(r => {
+                                self.unhandledReportData = r.data
                                 self.handleData(r.data, stores);
                             })
                     })
@@ -171,11 +245,31 @@
                                     storeFound = true;
 
                                     tmpBasket["totalSales"] = el.totalSales.toFixed(0);
-                                    tmpBasket["sales"] = formatter.format(el.totalSales).replace("$", "R");
+                                    tmpBasket["sales"] = formatter.format(el.totalSales).replace("$",
+                                        "R");
                                     tmpBasket["cumulativePercent"] = el.cumulativePercent;
                                     tmpBasket["level"] = el.level;
                                     tmpBasket["userDefinedCluster"] = el.userDefinedCluster;
                                     tmpBasket["salesPercent"] = el.salesPercent
+                                    tmpBasket["width"]=20
+                                    tmpBasket["height"]=20
+                                    tmpBasket["pieData"] = [{
+                                            "category": "Category #1",
+                                            "value": 1200
+                                        },
+                                        {
+                                            "category": "Category #2",
+                                            "value": 500
+                                        },
+                                        {
+                                            "category": "Category #3",
+                                            "value": 765
+                                        },
+                                        {
+                                            "category": "Category #4",
+                                            "value": 260
+                                        }
+                                    ]
                                 }
                             })
                         }
@@ -220,6 +314,8 @@
 
                 self.headers = headers;
                 self.rowData = final;
+                console.log(self.rowData);
+
                 self.$refs.Spinner.hide();
 
                 setTimeout(() => {

@@ -16,9 +16,9 @@
                         <v-list-tile @click="saveFile">
                             <v-list-tile-title>Save</v-list-tile-title>
                         </v-list-tile>
-                        <!-- <v-list-tile>
+                        <v-list-tile @click="close">
                             <v-list-tile-title>Close</v-list-tile-title>
-                        </v-list-tile> -->
+                        </v-list-tile>
                     </v-list>
                 </v-menu>
                 <v-menu dark offset-y style="margin-bottom: 10px;">
@@ -216,6 +216,13 @@
             })
         },
         methods: {
+            close(){
+                let self = this
+                self.rowData=[]
+                self.selectedBasket=null
+                self.selectedPeriod=null
+                
+            },
             openBasket() {
                 let self = this
                 self.$refs.BasketSetup.open()
@@ -308,6 +315,8 @@
                 data = self.getUserDefined(data, levels)
 
                 self.rowData = data;
+                console.log(self.rowData);
+                
 
                 self.$nextTick(() => {
                     self.$refs.Grid.gridApi.redrawRows();
@@ -363,6 +372,8 @@
                     self.selectedBasket = reader.config.selectedBasket;
                     self.selectedPeriod = reader.config.selectedPeriod;
                     self.rowData = reader.data;
+                    console.log(self.rowData);
+                    
                 });
             },
             saveFile() {
