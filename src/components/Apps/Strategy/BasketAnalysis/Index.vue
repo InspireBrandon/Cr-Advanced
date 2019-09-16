@@ -179,26 +179,6 @@
                         if (!Array.isArray(fileData.store)) {
                             self.runData = [];
 
-                            console.log(fileData);
-
-                            if (fileData.config != undefined && fileData.config != null) {
-                                if (fileData.config.basket != undefined && fileData.config.basket !=
-                                    null) {
-                                    let tg = fileData.config.basket.turnoverGroups;
-                                    let tgv = fileData.config.basket.turnoverGroupUserValues;
-
-                                    self.selectedLevel = tg.length - 1;
-
-                                    for (var i = 0; i < tg.length; i++) {
-                                        self["level" + (i + 1)] = tg[i];
-                                    }
-
-                                    for (var i = 0; i < tgv.length; i++) {
-                                        self["level" + (i + 1) + "Value"] = tgv[i];
-                                    }
-                                }
-                            }
-
                             self.fileData = fileData.basket;
 
                             for (var prop in fileData.basket) {
@@ -215,12 +195,12 @@
             })
         },
         methods: {
-            close(){
+            close() {
                 let self = this
-                self.rowData=[]
-                self.selectedBasket=null
-                self.selectedPeriod=null
-                
+                self.rowData = []
+                self.selectedBasket = null
+                self.selectedPeriod = null
+
             },
             openBasket() {
                 let self = this
@@ -278,6 +258,7 @@
 
                             if (el.sales > highestMP) {
                                 el["level"] = levels[i];
+                                el["levelValue"] = i;
                                 hasValue = true;
                             } else {
                                 if (el.sales > lowestMP) {
@@ -286,9 +267,11 @@
 
                                     if (highDiff < lowestDiff) {
                                         el["level"] = levels[i];
+                                        el["levelValue"] = i;
                                         hasValue = true;
                                     } else {
                                         el["level"] = levels[i + 1];
+                                        el["levelValue"] = i + 1;
                                         hasValue = true;
                                     }
                                 }
@@ -303,9 +286,11 @@
 
                         if (highDiff < lowestDiff) {
                             el["level"] = levels[mp.length - 2];
+                            el["levelValue"] = mp.length - 2;
                             hasValue = true;
                         } else {
                             el["level"] = levels[mp.length - 1];
+                            el["levelValue"] = mp.length - 1;
                             hasValue = true;
                         }
                     }
@@ -315,7 +300,7 @@
 
                 self.rowData = data;
                 console.log(self.rowData);
-                
+
 
                 self.$nextTick(() => {
                     self.$refs.Grid.gridApi.redrawRows();
@@ -335,6 +320,7 @@
                         }
 
                         currentElement["userDefinedCluster"] = levels[levels.length - valueIDX];
+                        currentElement["userDefinedClusterValue"] = levels.length - valueIDX;
                     }
                 }
 
@@ -370,9 +356,23 @@
                     let reader = self.fileData[fileData.prop];
                     self.selectedBasket = reader.config.selectedBasket;
                     self.selectedPeriod = reader.config.selectedPeriod;
+
+                    if (reader.config.turnoverGroups != undefined && reader.config.turnoverGroups != null) {
+                        let tg = reader.config.turnoverGroups;
+                        let tgv = reader.config.turnoverGroupUserValues;
+
+                        self.selectedLevel = tg.length - 1;
+
+                        for (var i = 0; i < tg.length; i++) {
+                            self["level" + (i + 1)] = tg[i];
+                        }
+
+                        for (var i = 0; i < tgv.length; i++) {
+                            self["level" + (i + 1) + "Value"] = tgv[i];
+                        }
+                    }
+
                     self.rowData = reader.data;
-                    console.log(self.rowData);
-                    
                 });
             },
             saveFile() {
@@ -498,20 +498,16 @@
 
                     if (fileTransaction == null || fileTransaction == false) {
                         let tmp = {
-                            basket: {},
-                            config: {
-                                basket: {
-                                    turnoverGroups: self.levels,
-                                    turnoverGroupUserValues: levelValues
-                                }
-                            }
+                            basket: {}
                         }
 
                         tmp.basket[self.selectedBasket.description] = {
                             data: self.rowData,
                             config: {
                                 selectedBasket: self.selectedBasket,
-                                selectedPeriod: self.selectedPeriod
+                                selectedPeriod: self.selectedPeriod,
+                                turnoverGroups: self.levels,
+                                turnoverGroupUserValues: levelValues
                             }
                         };
 
@@ -522,13 +518,7 @@
 
                             if (tmp == false) {
                                 tmp = {
-                                    basket: {},
-                                    config: {
-                                        basket: {
-                                            turnoverGroups: self.levels,
-                                            turnoverGroupUserValues: levelValues
-                                        }
-                                    }
+                                    basket: {}
                                 }
                             }
 
@@ -538,25 +528,13 @@
                             if (Array.isArray(tmp.basket))
                                 tmp.basket = {};
 
-                            if (tmp.config == undefined || tmp.config == null) {
-                                tmp.config = {
-                                    basket: {
-                                        turnoverGroups: self.levels,
-                                        turnoverGroupUserValues: levelValues
-                                    }
-                                }
-                            } else {
-                                tmp.config.basket = {
-                                    turnoverGroups: self.levels,
-                                    turnoverGroupUserValues: levelValues
-                                }
-                            }
-
                             tmp.basket[self.selectedBasket.description] = {
                                 data: self.rowData,
                                 config: {
                                     selectedBasket: self.selectedBasket,
-                                    selectedPeriod: self.selectedPeriod
+                                    selectedPeriod: self.selectedPeriod,
+                                    turnoverGroups: self.levels,
+                                    turnoverGroupUserValues: levelValues
                                 }
                             };
 
@@ -583,6 +561,7 @@
                         Data: fileData
                     })
                     .then(r => {
+                        self.fileData = fileData;
                         alert("Successfully saved");
                     })
                     .catch(e => {

@@ -15,6 +15,12 @@
                 <v-btn slot="activator" flat @click="setup">
                     Setup
                 </v-btn>
+                <!-- <v-btn slot="activator" flat @click="showColorPicker">
+                    Color
+                </v-btn> -->
+                <v-btn slot="activator" flat @click="customQuery">
+                    Custom
+                </v-btn>
             </v-toolbar-items>
             <v-spacer></v-spacer>
             <v-toolbar-title>
@@ -22,6 +28,7 @@
             </v-toolbar-title>
         </v-toolbar>
         <v-toolbar dark flat>
+            <v-btn color="primary" @click="setSystemUserHeaders">{{ currentToggle }}</v-btn>
             <v-btn color="primary" @click="getHinterlandStores">Refresh</v-btn>
             <v-toolbar-items>
                 <v-select @change="changeFile" style="margin-left: 10px; margin-top: 8px; width: 300px"
@@ -54,6 +61,8 @@
         <Setup ref="Setup" />
         <Spinner ref="Spinner" />
         <Prompt ref="Prompt" />
+        <CustomSelector ref="CustomSelector" />
+        <!-- <ColorPicker ref="ColorPicker" /> -->
     </v-card>
 </template>
 
@@ -65,6 +74,8 @@
     import Map from '../Map/Index'
     import ClusterModels from '../ClusterModels/Index'
     import Prompt from '@/components/Common/Prompt'
+    import ColorPicker from '@/components/Common/ColorPicker'
+    import CustomSelector from './CustomSelector'
 
     const formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -79,10 +90,13 @@
             Spinner,
             Map,
             ClusterModels,
-            Prompt
+            Prompt,
+            ColorPicker,
+            CustomSelector
         },
         data() {
             return {
+                currentToggle: 'User',
                 clusters: [{
                     text: "store",
                     value: "store"
@@ -117,6 +131,13 @@
             self.getHinterlandStores();
         },
         methods: {
+            customQuery() {
+                let self = this;
+
+                self.$refs.CustomSelector.show(() => {
+
+                })
+            },
             close() {
                 let self = this
                 self.selectedDataField = null
@@ -129,7 +150,7 @@
                 self.$nextTick(() => {
                     self.dataFields = []
                     tmp.push(self.unhandledReportData[self.selectedCluster])
-                    var names = Object.getOwnPropertyNames(tmp[0])
+                    var names = Object.getOwnPropertyNames(tmp[0]);
                     let obj = tmp[0]
 
                     for (var item in obj) {
@@ -166,6 +187,13 @@
                                 self.handleData(r.data, stores);
                             })
                     })
+            },
+            showColorPicker() {
+                let self = this;
+
+                self.$refs.ColorPicker.show(() => {
+
+                });
             },
             prepareFiles(data) {
                 let self = this;
@@ -226,10 +254,48 @@
                         }, {
                             "headerName": "System Turnover Group",
                             "field": "level",
-                            "hide": true
+                            "hide": true,
+                            cellStyle: function (params) {
+                                if (params.data.levelValue == 0) {
+                                    return {
+                                        backgroundColor: "#1976d2"
+                                    };
+                                }
+
+                                if (params.data.levelValue == 1) {
+                                    return {
+                                        backgroundColor: "#1976d2c2"
+                                    };
+                                }
+
+                                if (params.data.levelValue == 2) {
+                                    return {
+                                        backgroundColor: "#1976d294"
+                                    };
+                                }
+                            }
                         }, {
                             "headerName": "User Turnover Group",
-                            "field": "userDefinedCluster"
+                            "field": "userDefinedCluster",
+                            cellStyle: function (params) {
+                                if (params.data.userDefinedClusterValue == 0) {
+                                    return {
+                                        backgroundColor: "#1976d2"
+                                    };
+                                }
+
+                                if (params.data.userDefinedClusterValue == 1) {
+                                    return {
+                                        backgroundColor: "#1976d2c2"
+                                    };
+                                }
+
+                                if (params.data.userDefinedClusterValue == 2) {
+                                    return {
+                                        backgroundColor: "#1976d294"
+                                    };
+                                }
+                            }
                         })
                     }
                 }
@@ -245,11 +311,7 @@
                             }
                         }
 
-                        headers.push({
-                            "headerName": basket,
-                            "field": "basket_" + basket,
-                            "hide": hide
-                        })
+                        headers.push(self.addBasketHeader(basket));
                     }
                 }
 
@@ -290,10 +352,12 @@
                                         "R");
                                     tmpBasket["cumulativePercent"] = el.cumulativePercent;
                                     tmpBasket["level"] = el.level;
+                                    tmpBasket["levelValue"] = el.levelValue;
                                     tmpBasket["userDefinedCluster"] = el.userDefinedCluster;
+                                    tmpBasket["userDefinedClusterValue"] = el.userDefinedClusterValue;
                                     tmpBasket["salesPercent"] = el.salesPercent
-                                    tmpBasket["width"]=20
-                                    tmpBasket["height"]=20
+                                    tmpBasket["width"] = 20
+                                    tmpBasket["height"] = 20
                                     tmpBasket["pieData"] = [{
                                             "category": "Category #1",
                                             "value": 1200
@@ -322,7 +386,11 @@
                             data.basket[basket].data.forEach(el => {
                                 if (el.displayname == element.PlaceGroup.toUpperCase()) {
                                     storeFound = true;
-                                    tmpBasket["basket_" + basket] = el.level
+                                    tmpBasket["user_basket_" + basket] = el.level;
+                                    tmpBasket["user_basket_value_" + basket] = el.levelValue;
+                                    tmpBasket["system_basket_" + basket] = el.userDefinedCluster;
+                                    tmpBasket["system_basket_value_" + basket] = el
+                                        .userDefinedClusterValue;
                                 }
                             })
                         }
@@ -353,16 +421,70 @@
 
                 final = removeDuplicates(final, 'storeName')
 
-                self.headers = headers;
+                self.headers = [];
                 self.rowData = final;
-                console.log(self.rowData);
-
-                self.$refs.Spinner.hide();
 
                 setTimeout(() => {
+                    self.headers = headers;
+                    self.$refs.Spinner.hide();
                     self.$refs.Grid.setOrder();
                 }, 60);
             },
+            addBasketHeader(basket) {
+                let self = this;
+
+                return {
+                    "headerName": basket,
+                    children: [{
+                        "headerName": "User",
+                        "field": "user_basket_" + basket,
+                        "hide": false,
+                        "cellStyle": function (params) {
+                            if (params.data["user_basket_value_" + basket] == 0) {
+                                return {
+                                    backgroundColor: "#9c9c9c"
+                                };
+                            }
+
+                            if (params.data["user_basket_value_" + basket] == 1) {
+                                return {
+                                    backgroundColor: "#b9b9b9"
+                                };
+                            }
+
+                            if (params.data["user_basket_value_" + basket] == 2) {
+                                return {
+                                    backgroundColor: "#e0e0e0"
+                                };
+                            }
+                        }
+                    }, {
+                        "headerName": "System",
+                        "field": "system_basket_" + basket,
+                        "hide": true,
+                        "cellStyle": function (params) {
+                            if (params.data["system_basket_value_" + basket] == 0) {
+                                return {
+                                    backgroundColor: "#9c9c9c"
+                                };
+                            }
+
+                            if (params.data["system_basket_value_" + basket] == 1) {
+                                return {
+                                    backgroundColor: "#b9b9b9"
+                                };
+                            }
+
+                            if (params.data["system_basket_value_" + basket] == 2) {
+                                return {
+                                    backgroundColor: "#e0e0e0"
+                                };
+                            }
+                        }
+                    }]
+                }
+            },
+            addListingHeader(listing) {},
             setup() {
                 let self = this;
                 self.$refs.Setup.show(() => {
@@ -434,6 +556,35 @@
                 self.$nextTick(() => {
                     self.handleData(self.fileData, self.stores);
                 })
+            },
+            setSystemUserHeaders() {
+                let self = this;
+
+                if (self.currentToggle == 'User') {
+                    self.currentToggle = 'System';
+                } else {
+                    self.currentToggle = 'User';
+                }
+
+                let onesToSetVisible = [];
+                let onesToSetInvisible = [];
+
+                self.$refs.Grid.headers.forEach(el => {
+                    if (el.children != undefined && el.children.length > 0) {
+                        if (el.hide != true) {
+                            el.children.forEach(subHeader => {
+                                if (subHeader.headerName != self.currentToggle) {
+                                    onesToSetInvisible.push(subHeader.field);
+                                } else {
+                                    onesToSetVisible.push(subHeader.field);
+                                }
+                            })
+                        }
+                    }
+                })
+
+                self.$refs.Grid.columnApi.setColumnsVisible(onesToSetVisible, true);
+                self.$refs.Grid.columnApi.setColumnsVisible(onesToSetInvisible, false);
             }
         }
     }

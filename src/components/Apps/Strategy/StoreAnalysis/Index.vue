@@ -16,6 +16,9 @@
                         <v-list-tile @click="saveFile">
                             <v-list-tile-title>Save</v-list-tile-title>
                         </v-list-tile>
+                        <v-list-tile @click="close">
+                            <v-list-tile-title>Close</v-list-tile-title>
+                        </v-list-tile>
                     </v-list>
                 </v-menu>
                 <!-- <v-menu dark offset-y style="margin-bottom: 10px;" v-if="rowData.length > 0 && !showingSaved">
@@ -176,24 +179,6 @@
                         if (!Array.isArray(fileData.store)) {
                             self.runData = [];
 
-                            if (fileData.config != undefined && fileData.config != null) {
-                                if (fileData.config.store != undefined && fileData.config.store !=
-                                    null) {
-                                    let tg = fileData.config.store.turnoverGroups;
-                                    let tgv = fileData.config.store.turnoverGroupUserValues;
-
-                                    self.selectedLevel = tg.length - 1;
-
-                                    for (var i = 0; i < tg.length; i++) {
-                                        self["level" + (i + 1)] = tg[i];
-                                    }
-
-                                    for (var i = 0; i < tgv.length; i++) {
-                                        self["level" + (i + 1) + "Value"] = tgv[i];
-                                    }
-                                }
-                            }
-
                             self.fileData = fileData.store;
 
                             for (var prop in fileData.store) {
@@ -210,6 +195,12 @@
             })
         },
         methods: {
+            close() {
+                let self = this
+                self.rowData = []
+                self.selectedBasket = null
+                self.selectedPeriod = null
+            },
             updateLoader(data) {
                 let self = this
                 self.$refs.SizeLoader.updateLoader(data)
@@ -379,6 +370,7 @@
 
                             if (el.totalSales > highestMP) {
                                 el["level"] = levels[i];
+                                el["levelValue"] = i;
                                 hasValue = true;
                             } else {
                                 if (el.totalSales > lowestMP) {
@@ -387,9 +379,11 @@
 
                                     if (highDiff < lowestDiff) {
                                         el["level"] = levels[i];
+                                        el["levelValue"] = i;
                                         hasValue = true;
                                     } else {
                                         el["level"] = levels[i + 1];
+                                        el["levelValue"] = i + 1;
                                         hasValue = true;
                                     }
                                 }
@@ -398,15 +392,16 @@
                     }
 
                     if (!hasValue) {
-
                         let highDiff = mp[mp.length - 2] - el.totalSales;
                         let lowestDiff = el.totalSales - mp[mp.length - 1];
 
                         if (highDiff < lowestDiff) {
                             el["level"] = levels[mp.length - 2];
+                            el["levelValue"] = mp.length - 2;
                             hasValue = true;
                         } else {
                             el["level"] = levels[mp.length - 1];
+                            el["levelValue"] = mp.length - 1;
                             hasValue = true;
                         }
                     }
@@ -434,6 +429,7 @@
                         }
 
                         currentElement["userDefinedCluster"] = levels[levels.length - valueIDX];
+                        currentElement["userDefinedClusterValue"] = levels.length - valueIDX;
                     }
                 }
 
@@ -486,6 +482,22 @@
                     let reader = self.fileData[fileData.prop];
                     self.selectedSupergroup = reader.config.selectedSupergroup;
                     self.selectedPeriod = reader.config.selectedPeriod;
+
+                    if (reader.config.turnoverGroups != undefined && reader.config.turnoverGroups != null) {
+                        let tg = reader.config.turnoverGroups;
+                        let tgv = reader.config.turnoverGroupUserValues;
+
+                        self.selectedLevel = tg.length - 1;
+
+                        for (var i = 0; i < tg.length; i++) {
+                            self["level" + (i + 1)] = tg[i];
+                        }
+
+                        for (var i = 0; i < tgv.length; i++) {
+                            self["level" + (i + 1) + "Value"] = tgv[i];
+                        }
+                    }
+
                     self.rowData = reader.data;
                 });
             },
@@ -511,20 +523,16 @@
 
                     if (fileTransaction == null || fileTransaction == false) {
                         let tmp = {
-                            store: {},
-                            config: {
-                                store: {
-                                    turnoverGroups: self.levels,
-                                    turnoverGroupUserValues: levelValues
-                                }
-                            }
+                            store: {}
                         }
 
                         tmp.store[self.selectedSupergroup.displayname] = {
                             data: self.rowData,
                             config: {
                                 selectedSupergroup: self.selectedSupergroup,
-                                selectedPeriod: self.selectedPeriod
+                                selectedPeriod: self.selectedPeriod,
+                                turnoverGroups: self.levels,
+                                turnoverGroupUserValues: levelValues
                             }
                         };
 
@@ -535,13 +543,7 @@
 
                             if (tmp == false) {
                                 tmp = {
-                                    store: {},
-                                    config: {
-                                        store: {
-                                            turnoverGroups: self.levels,
-                                            turnoverGroupUserValues: levelValues
-                                        }
-                                    }
+                                    store: {}
                                 }
                             }
 
@@ -551,25 +553,13 @@
                             if (Array.isArray(tmp.store))
                                 tmp.store = {};
 
-                            if (tmp.config == undefined || tmp.config == null) {
-                                tmp.config = {
-                                    store: {
-                                        turnoverGroups: self.levels,
-                                        turnoverGroupUserValues: levelValues
-                                    }
-                                }
-                            } else {
-                                tmp.config.store = {
-                                    turnoverGroups: self.levels,
-                                    turnoverGroupUserValues: levelValues
-                                }
-                            }
-
                             tmp.store[self.selectedSupergroup.displayname] = {
                                 data: self.rowData,
                                 config: {
                                     selectedSupergroup: self.selectedSupergroup,
-                                    selectedPeriod: self.selectedPeriod
+                                    selectedPeriod: self.selectedPeriod,
+                                    turnoverGroups: self.levels,
+                                    turnoverGroupUserValues: levelValues
                                 }
                             };
 
@@ -598,6 +588,7 @@
                         Data: fileData
                     })
                     .then(r => {
+                        self.fileData = fileData;
                         alert("Successfully saved");
                     })
                     .catch(e => {
