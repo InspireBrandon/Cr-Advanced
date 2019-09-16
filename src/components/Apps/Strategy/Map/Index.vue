@@ -1,33 +1,45 @@
 <template>
-    <div id="thisone2" class="map"></div>
+    <div oncontextmenu="return false;">
+        <div id="thisone2" class="map">
+        </div>
+        <YesNoModal ref="yesNo"></YesNoModal>
+    </div>
 </template>
 
 <script>
     import * as am4core from "@amcharts/amcharts4/core";
     import * as am4charts from "@amcharts/amcharts4/charts";
     import * as am4maps from "@amcharts/amcharts4/maps";
+    import YesNoModal from '@/components/Common/YesNoModal'
+
     import am4geodata_worldLow from "@amcharts/amcharts4-geodata/southAfricaHigh";
 
 
 
     export default {
+        components: {
+            YesNoModal
+        },
         props: ["rowData"],
         data() {
             return {
-                labels: true
+                labels: true,
+                lines: true,
             }
         },
         mounted() {
             this.drawMap(this.labels, 0)
         },
         methods: {
-            drawMap(labelState, type) {
+            drawMap(labelState) {
                 let self = this
                 console.log(self.rowData);
-
                 let formattedData = [];
-
                 let chart = am4core.create("thisone2", am4maps.MapChart);
+                chart.name = "Map"
+                // chart.seriesContainer.events.on("hit", function (ev) {
+                //     console.log(chart.svgPointToGeo(ev.svgPoint));
+                // });
                 var title = chart.titles.create();
                 title.text = "[bold font-size: 20]Store Sales Heatmap[/]";
                 title.textAlign = "middle";
@@ -35,6 +47,18 @@
                     element["color"] = '#424242'
                     formattedData.push(element);
                 });
+                /////////////////////////////////////////////////
+                //potential Code for image fill
+                ////////////////////////////
+                // var pattern_europe = new am4core.Pattern();
+                // var image = new am4core.Image();
+                // image.href = "http://www.climbing.co.za/w/images/2/2f/Rsamap.png";
+                // image.width = 4;
+                // image.height = 4;
+                // pattern_europe.width = 4;
+                // pattern_europe.height = 4;
+                // pattern_europe.addElement(image.element);
+                /////////////////////////////////////////////////
 
                 chart.geodata = am4geodata_worldLow;
                 let polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
@@ -45,97 +69,144 @@
                 // Configure series
                 let polygonTemplate = polygonSeries.mapPolygons.template;
                 polygonTemplate.tooltipText = "{name}";
+                //  polygonTemplate.fill = pattern_europe;
                 polygonTemplate.fill = chart.colors.getIndex(0);
                 polygonTemplate.strokeOpacity = 0.5;
                 polygonTemplate.nonScalingStroke = true;
 
-
                 // create capital markers
                 let imageSeries = chart.series.push(new am4maps.MapImageSeries());
                 // define template
+                imageSeries.name = "Heatmap"
                 imageSeries.data = formattedData
                 imageSeries.dataFields.value = "sales";
-                if (type == 0) {
-                    let imageSeriesTemplate = imageSeries.mapImages.template;
-                    imageSeriesTemplate.propertyFields.latitude = "lat";
-                    imageSeriesTemplate.propertyFields.longitude = "long";
-                    imageSeriesTemplate.nonScaling = true
 
-                    var circle = imageSeriesTemplate.createChild(am4core.Circle);
-                    circle.fillOpacity = 0.7;
-                    circle.propertyFields.fill = 'color';
-                    // circle.fill=am4core.color("#fff");
-                    circle.tooltipText = "{storeName}: [bold]{sales}[/]";
+                // if (type == 0) {
+                let imageSeriesTemplate = imageSeries.mapImages.template;
+                imageSeriesTemplate.propertyFields.latitude = "lat";
+                imageSeriesTemplate.propertyFields.longitude = "long";
+                imageSeriesTemplate.nonScaling = true
 
-
-
-
-                    let label = imageSeriesTemplate.createChild(am4core.Label);
-                    label.text = "{storeName}";
-                    label.fill = am4core.color("#fff");
-
-                    label.nonScaling = false;
-                    label.hidden = labelState
-
-                    imageSeries.heatRules.push({
-                        "target": circle,
-                        "property": "radius",
-                        "min": 4,
-                        "max": 30,
-                        "dataField": "value"
-                    })
-                }
-                if (type == 1) { // start pie chart series
-                    let pieSeries = chart.series.push(new am4maps.MapImageSeries());
-                    let pieTemplate = pieSeries.mapImages.template;
-                    pieTemplate.propertyFields.latitude = "lat";
-                    pieTemplate.propertyFields.longitude = "long";
-                    pieTemplate.nonScaling = true
-                    let pieChartTemplate = pieTemplate.createChild(am4charts.PieChart);
-                    pieChartTemplate.adapter.add("data", function (data, target) {
-                        if (target.dataItem) {
-                            return target.dataItem.dataContext.pieData;
-                        } else {
-                            return [];
+                chart.seriesContainer.events.on("hit", function (ev) {
+                    if (ev.preventDefault != undefined)
+                        ev.preventDefault();
+                    if (ev.stopPropagation != undefined)
+                        ev.stopPropagation();
+                    console.log(ev);
+                    self.$refs.yesNo.show('Would you like to make a tag here?', goThrough => {
+                        if (goThrough) {
+                            var mapMarker = imageSeriesTemplate.createChild(am4core.Sprite);
+                            mapMarker.path =
+                                "M4 12 A12 12 0 0 1 28 12 C28 20, 16 32, 16 32 C16 32, 4 20 4 12 M11 12 A5 5 0 0 0 21 12 A5 5 0 0 0 11 12 Z";
+                            mapMarker.width = 32;
+                            mapMarker.height = 32;
+                            mapMarker.scale = 0.7;
+                            mapMarker.fill = am4core.color("#3F4B3B");
+                            mapMarker.fillOpacity = 0.8;
+                            mapMarker.horizontalCenter = "middle";
+                            mapMarker.verticalCenter = "bottom";
+                            console.log(chart.svgPointToGeo(ev.svgPoint));
+                            var coords = chart.svgPointToGeo(ev.svgPoint);
+                            var marker = imageSeries.mapImages.create();
+                            marker.latitude = coords.latitude;
+                            marker.longitude = coords.longitude;
+                            marker.events.on("rightclick", function (dataItem, ev) {
+                                if (dataItem.hidden)
+                                    marker.show(dataItem.index)
+                                else
+                                    marker.hide(dataItem.index);
+                                event.stopPropagation();
+                                // marker.latitude = dispose();
+                                // marker.longitude = dispose();
+                            })
                         }
-                    });
-                    pieChartTemplate.propertyFields.width = "width";
-                    pieChartTemplate.propertyFields.height = "height";
-                    pieChartTemplate.horizontalCenter = "middle";
-                    pieChartTemplate.verticalCenter = "middle";
+                    })
+                });
 
-                    // let pieTitle = pieChartTemplate.titles.create();
-                    // pieTitle.text = "{storeName}";
+                var circle = imageSeriesTemplate.createChild(am4core.Circle);
+                circle.fillOpacity = 0.7;
+                circle.propertyFields.fill = 'color';
+                circle.tooltipText = "{storeName}: [bold]{sales}[/]";
 
-                    let pieSeriesTemplate = pieChartTemplate.series.push(new am4charts.PieSeries);
-                    pieSeriesTemplate.dataFields.category = "category";
-                    pieSeriesTemplate.dataFields.value = "value";
-                    pieSeriesTemplate.labels.template.disabled = true;
-                    // pieSeriesTemplate.ticks.template.disabled = true;
-                    pieSeries.nonScalingStroke = false
+                let label = imageSeriesTemplate.createChild(am4core.Label);
+                label.text = "{storeName}";
+                label.fill = am4core.color("#fff");
 
+                label.nonScaling = false;
+                label.hidden = labelState
 
+                imageSeries.heatRules.push({
+                    "target": circle,
+                    "property": "radius",
+                    "min": 4,
+                    "max": 30,
+                    "dataField": "value"
+                })
+                let pieSeries = chart.series.push(new am4maps.MapImageSeries());
+                let pieTemplate = pieSeries.mapImages.template;
+                pieTemplate.propertyFields.latitude = "lat";
+                pieTemplate.propertyFields.longitude = "long";
+                pieTemplate.nonScaling = true
+                let pieChartTemplate = pieTemplate.createChild(am4charts.PieChart);
+                pieChartTemplate.adapter.add("data", function (data, target) {
+                    if (target.dataItem) {
+                        return target.dataItem.dataContext.pieData;
+                    } else {
+                        return [];
+                    }
+                });
+                pieChartTemplate.propertyFields.width = "width";
+                pieChartTemplate.propertyFields.height = "height";
+                pieChartTemplate.horizontalCenter = "middle";
+                pieChartTemplate.verticalCenter = "middle";
+
+                let pieSeriesTemplate = pieChartTemplate.series.push(new am4charts.PieSeries);
+                pieSeriesTemplate.dataFields.category = "category";
+                pieSeriesTemplate.dataFields.value = "value";
+                pieSeriesTemplate.labels.template.disabled = true;
+                pieSeries.nonScalingStroke = false
+                pieSeries.name = "Pie Charts"
+
+                if (self.lines) {
                     let graticuleSeries = chart.series.push(new am4maps.GraticuleSeries());
                     graticuleSeries.mapLines.template.line.strokeOpacity = 0.2;
                     graticuleSeries.longitudeStep = 2;
                     graticuleSeries.latitudeStep = 2
-
-
-                    pieSeries.data = self.rowData
+                    graticuleSeries.name = "lines"
                 }
+                pieSeries.data = self.rowData
 
+                let linkContainer = chart.createChild(am4core.Container);
+                linkContainer.isMeasured = false;
+                linkContainer.layout = "horizontal";
+                linkContainer.x = am4core.percent(0);
+                linkContainer.y = am4core.percent(0);
 
-                let button = chart.chartContainer.createChild(am4core.Button);
-                button.label.text = "toggle labels";
+                let button = linkContainer.createChild(am4core.Button);
+                button.label.text = "Toggle Labels";
                 button.padding(5, 5, 5, 5);
                 button.width = 100;
                 button.align = "right";
-                button.marginRight = 120;
                 button.events.on("hit", function () {
                     self.labels = !self.labels
                     self.drawMap(self.labels)
                 });
 
+                let equirectangular = linkContainer.createChild(am4core.Button);
+                equirectangular.label.text = "Toggle Line";
+                equirectangular.padding(5, 5, 5, 5);
+                equirectangular.width = 100;
+                equirectangular.align = "left";
+                equirectangular.marginLeft = 5;
+                equirectangular.events.on("hit", function () {
+                    // toggle draw lines
+                    self.lines = !self.lines
+                    self.drawMap(self.labels)
+                })
+
+                chart.legend = new am4maps.Legend();
+                chart.legend.position = "right";
+                chart.legend.align = "right";
             }
         }
     }
@@ -144,5 +215,6 @@
 <style scoped>
     .map {
         height: calc(100vh - 225px);
+        /* background-image: "http://www.climbing.co.za/w/images/2/2f/Rsamap.png" */
     }
 </style>
