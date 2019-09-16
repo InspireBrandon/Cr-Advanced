@@ -7,7 +7,6 @@
     import * as am4charts from "@amcharts/amcharts4/charts";
     import * as am4maps from "@amcharts/amcharts4/maps";
     import am4geodata_worldLow from "@amcharts/amcharts4-geodata/southAfricaHigh";
-    import am4themes_themes from "@amcharts/amcharts4/themes/themes/dark.js";
 
     export default {
         props: ["rowData"],
@@ -22,8 +21,6 @@
         methods: {
             drawMap(state) {
                 let self = this
-                am4core.useTheme(am4themes_themes);
-                console.log(self.rowData);
 
                 let formattedData = [];
 
@@ -37,6 +34,7 @@
                 });
 
                 chart.geodata = am4geodata_worldLow;
+                chart.projection = new am4maps.projections.Mercator();
                 let polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
                 polygonSeries.useGeodata = true;
                 polygonSeries.exclude = ["antarctica"];

@@ -52,7 +52,7 @@
                     new TabItem("Store", "StoreAnalysis"),
                     new TabItem("Basket", "BasketAnalysis"),
                     new TabItem("Listing", "ListingClusters"),
-                    new TabItem("Custom", "Custom"),
+                    new TabItem("Custom Import", "Custom"),
                     // new TabItem("User", "Main"),
                 ]
             }
