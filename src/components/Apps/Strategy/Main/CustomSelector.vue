@@ -56,8 +56,9 @@
             save() {
                 let self = this;
             },
-            show() {
+            show(afterReturn) {
                 let self = this;
+                self.afterReturn = afterReturn;
                 self.field = null;
                 self.value = null;
                 self.getCategories();

@@ -134,8 +134,27 @@
             customQuery() {
                 let self = this;
 
-                self.$refs.CustomSelector.show(() => {
+                self.$refs.CustomSelector.show(data => {
+                    Axios.get(process.env.VUE_APP_API + `Cluster/Advanced?field=${data.field}&fieldID=${data.fieldID}`)
+                        .then(r => {
+                            let queryStores = r.data;
+                            let output = [];
+                            self.rowData.forEach(rd => {
+                                queryStores.forEach(qs => {
+                                    if(rd.storeName == qs.displayname) {
+                                        output.push({
+                                            storeName: rd.storeName,
+                                            long: rd.long,
+                                            lat: rd.lat,
+                                            totalSales: qs.Sales_Retail
+                                        })
+                                    }
+                                })
+                            })
 
+                            // tj stuff
+                            // use output
+                        })
                 })
             },
             close() {
