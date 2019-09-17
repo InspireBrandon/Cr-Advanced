@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-dialog v-model="dialog" width="800" persistent>
-            <v-card style="overflow: auto;">
+            <v-card>
                 <v-toolbar dark flat color="primary">
                     <v-toolbar-title>Custom Cluster Setup</v-toolbar-title>
                     <v-spacer></v-spacer>
@@ -10,40 +10,32 @@
                     </v-btn>
                 </v-toolbar>
                 <v-card-text>
-                    <v-container grid-list-md>
+                    <v-container grid-list-md class="pa-0">
                         <v-layout row wrap>
+                            <v-flex md12>
+                                <v-select :items="planograms" style="width: 300px" placeholder="Select a planogram" dense hide-details>
+                                </v-select>
+                                <v-divider class="mt-3"></v-divider>
+                            </v-flex>
                             <v-flex md4>
-                                <v-checkbox v-model="selected" value="System Turnover Group" hide-details
-                                    label="System Turnover Group"></v-checkbox>
-                                <v-checkbox v-model="selected" value="User Turnover Group" hide-details
-                                    label="User Turnover Group"></v-checkbox>
-                                <v-checkbox v-model="selected" value="User Premium Basket" hide-details
-                                    label="User Premium Basket"></v-checkbox>
-                                <v-checkbox v-model="selected" value="System Premium Basket" hide-details
-                                    label="System Premium Basket"></v-checkbox>
-                                <v-checkbox v-model="selected" value="User Sheep Farming" hide-details
-                                    label="User Sheep Farming"></v-checkbox>
-                                <v-checkbox v-model="selected" value="System Sheep Farming" hide-details
-                                    label="System Sheep Farming"></v-checkbox>
+                                <v-checkbox v-for="(item, idx) in items" :key="idx" v-model="selected" :value="item" hide-details
+                                    :label="item"></v-checkbox>
                             </v-flex>
                             <v-flex md8>
                                 <v-card flat>
                                     <v-list dense>
-                                        <v-list-tile>
-                                            <v-list-tile-avatar>1</v-list-tile-avatar>
-                                            <v-list-tile-content>Store Cluster</v-list-tile-content>
-                                        </v-list-tile>
                                         <v-list-tile v-for="(item, idx) in selected" :key="idx">
-                                            <v-list-tile-avatar>{{ (idx + 2) }}</v-list-tile-avatar>
+                                            <v-list-tile-avatar>{{ (idx + 1) }}.</v-list-tile-avatar>
                                             <v-list-tile-content>{{ item }}</v-list-tile-content>
-                                            <v-list-tile-actions>
-                                                <v-btn flat small :disabled="idx == 0">
-                                                    <v-icon>arrow_upward</v-icon>
-                                                </v-btn>
-                                                <v-btn flat small :disabled="idx == selected.length - 1">
-                                                    <v-icon>arrow_downward</v-icon>
-                                                </v-btn>
-                                            </v-list-tile-actions>
+                                            <v-btn @click="swapUp(idx)" flat small :disabled="idx == 0"
+                                                style="width: 30px">
+                                                <v-icon>arrow_upward</v-icon>
+                                            </v-btn>
+                                            <v-btn @click="swapDown(idx)" flat small style="width: 30px"
+                                                :disabled="idx == selected.length - 1">
+                                                <v-icon>arrow_downward</v-icon>
+                                            </v-btn>
+                                            <v-icon @click="remove(idx)">close</v-icon>
                                         </v-list-tile>
                                     </v-list>
                                 </v-card>
@@ -69,13 +61,28 @@
             return {
                 dialog: false,
                 afterComplete: null,
-                selected: []
+                selected: [],
+                planograms: [],
+                items: []
             }
         },
         methods: {
-            show(afterComplete) {
+            show(items, afterComplete) {
                 let self = this;
+                self.getPlanograms();
                 self.dialog = true;
+                self.items = [];
+
+                items = JSON.parse(JSON.stringify(items))
+
+                items = items.splice(4, items.length - 1);
+
+                self.items.push("Store Cluster");
+
+                items.forEach(el => {
+                    self.items.push(el.headerName);
+                })
+
                 self.afterComplete = afterComplete;
             },
             returnSetupConfig() {
@@ -83,7 +90,59 @@
 
                 self.dialog = false;
                 self.afterComplete();
+            },
+            remove(idx) {
+                let self = this;
+                self.selected.splice(idx, 1);
+            },
+            swapUp(index) {
+                let self = this;
+
+                let aboveIndex = index - 1;
+
+                self.swapArrayElements(index, aboveIndex);
+            },
+            swapDown(index) {
+                let self = this;
+
+                let belowIndex = index + 1;
+
+                self.swapArrayElements(belowIndex, index);
+            },
+            swapArrayElements(indexA, indexB) {
+                let self = this;
+                let tmpArr = JSON.parse(JSON.stringify(self.selected));
+
+                var temp = tmpArr[indexA];
+                tmpArr[indexA] = tmpArr[indexB];
+                tmpArr[indexB] = temp;
+
+                self.selected = tmpArr;
+            },
+            getPlanograms() {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + `Planogram/Distinct`)
+                    .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        self.planograms = TextValueArray(r.data.planogramList, 'displayname', 'planogram_ID');
+                    })
             }
         }
+    }
+
+    function TextValueArray(arr, text, value) {
+        let tmp = [];
+
+        arr.forEach(element => {
+            tmp.push({
+                text: element[text],
+                value: element[value],
+            })
+        });
+
+        return tmp;
     }
 </script>

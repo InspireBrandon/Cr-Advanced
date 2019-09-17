@@ -38,7 +38,9 @@
             </v-toolbar-title>
         </v-toolbar>
         <v-toolbar dark flat>
-            <v-btn color="primary" @click="setSystemUserHeaders">{{ currentToggle }}</v-btn>
+            <v-btn color="primary" @click="setSystemUserHeaders">
+                {{ currentToggle }}
+            </v-btn>
             <v-btn color="primary" @click="getHinterlandStores">Refresh</v-btn>
             <v-toolbar-items v-if="selectedView == 0">
                 <v-select @change="changeFile" style="margin-left: 10px; margin-top: 8px; width: 300px"
@@ -268,6 +270,8 @@
                 if (data.store != undefined) {
                     for (var store in data.store) {
 
+                        let options = self.fileData.store[store].config.turnoverGroups;
+
                         headers.push({
                             headerName: 'Sales %',
                             cellRendererFramework: "ProgressRenderer",
@@ -285,47 +289,52 @@
                                 return params.value.toFixed(1) + "%";
                             }
                         }, {
-                            "headerName": "System Turnover Group",
-                            "field": "level",
-                            "hide": true,
+                            "headerName": "Turnover Group",
+                            "field": self.currentToggle == "User" ? ("userDefinedClusterValue") : (
+                                "levelValue"),
+                            "valueFormatter": function (params) {
+                                let text = params.data[self.currentToggle == "User" ? (
+                                    "userDefinedCluster") : ("level")];
+                                let value = params.data[self.currentToggle == "User" ? (
+                                    "userDefinedClusterValue") : ("levelValue")];
+
+                                let inOptions = isInOptions(options, text);
+
+                                if (inOptions) {
+                                    return options[value];
+                                } else {
+                                    return text;
+                                }
+                            },
                             cellStyle: function (params) {
-                                if (params.data.levelValue == 0) {
-                                    return {
-                                        backgroundColor: "#1976d2"
-                                    };
-                                }
+                                let text = params.data[self.currentToggle == "User" ? "userDefinedCluster" :
+                                    "level"];
+                                let value = params.data[self.currentToggle == "User" ?
+                                    "userDefinedClusterValue" : "levelValue"];
 
-                                if (params.data.levelValue == 1) {
-                                    return {
-                                        backgroundColor: "#1976d2c2"
-                                    };
-                                }
+                                let inOptions = isInOptions(options, text);
 
-                                if (params.data.levelValue == 2) {
-                                    return {
-                                        backgroundColor: "#1976d294"
-                                    };
-                                }
-                            }
-                        }, {
-                            "headerName": "User Turnover Group",
-                            "field": "userDefinedCluster",
-                            cellStyle: function (params) {
-                                if (params.data.userDefinedClusterValue == 0) {
-                                    return {
-                                        backgroundColor: "#1976d2"
-                                    };
-                                }
+                                if (inOptions) {
+                                    if (value == 0) {
+                                        return {
+                                            backgroundColor: "#1976d2"
+                                        };
+                                    }
 
-                                if (params.data.userDefinedClusterValue == 1) {
-                                    return {
-                                        backgroundColor: "#1976d2c2"
-                                    };
-                                }
+                                    if (value == 1) {
+                                        return {
+                                            backgroundColor: "#1976d2c2"
+                                        };
+                                    }
 
-                                if (params.data.userDefinedClusterValue == 2) {
+                                    if (value == 2) {
+                                        return {
+                                            backgroundColor: "#1976d294"
+                                        };
+                                    }
+                                } else {
                                     return {
-                                        backgroundColor: "#1976d294"
+                                        backgroundColor: "#fff"
                                     };
                                 }
                             }
@@ -344,7 +353,11 @@
                             }
                         }
 
-                        headers.push(self.addBasketHeader(basket));
+                        let options = self.fileData.basket[basket].config.turnoverGroups;
+
+                        console.log(options)
+
+                        headers.push(self.addBasketHeader(basket, options));
                     }
                 }
 
@@ -463,58 +476,59 @@
                     self.$refs.Grid.setOrder();
                 }, 60);
             },
-            addBasketHeader(basket) {
+            addBasketHeader(basket, options) {
                 let self = this;
 
                 return {
                     "headerName": basket,
-                    children: [{
-                        "headerName": "User",
-                        "field": "user_basket_" + basket,
-                        "hide": false,
-                        "cellStyle": function (params) {
-                            if (params.data["user_basket_value_" + basket] == 0) {
+                    "field": self.currentToggle == "User" ? ("user_basket_value_" + basket) : ("system_basket_value_" +
+                        basket),
+                    "valueFormatter": function (params) {
+                        let text = params.data[self.currentToggle == "User" ? ("user_basket_" + basket) : (
+                            "system_basket_" + basket)];
+                        let value = params.data[self.currentToggle == "User" ? ("user_basket_value_" + basket) : (
+                            "system_basket_value_" + basket)];
+
+                        let inOptions = isInOptions(options, text);
+
+                        if (inOptions) {
+                            return options[value];
+                        } else {
+                            return text;
+                        }
+                    },
+                    "cellStyle": function (params) {
+                        let text = params.data[self.currentToggle == "User" ? ("user_basket_" + basket) : (
+                            "system_basket_" + basket)];
+                        let value = params.data[self.currentToggle == "User" ? ("user_basket_value_" + basket) : (
+                            "system_basket_value_" + basket)];
+
+                        let inOptions = isInOptions(options, text);
+
+                        if (inOptions) {
+                            if (value == 0) {
                                 return {
                                     backgroundColor: "#9c9c9c"
                                 };
                             }
 
-                            if (params.data["user_basket_value_" + basket] == 1) {
+                            if (value == 1) {
                                 return {
                                     backgroundColor: "#b9b9b9"
                                 };
                             }
 
-                            if (params.data["user_basket_value_" + basket] == 2) {
+                            if (value == 2) {
                                 return {
                                     backgroundColor: "#e0e0e0"
                                 };
                             }
+                        } else {
+                            return {
+                                backgroundColor: "#fff"
+                            };
                         }
-                    }, {
-                        "headerName": "System",
-                        "field": "system_basket_" + basket,
-                        "hide": true,
-                        "cellStyle": function (params) {
-                            if (params.data["system_basket_value_" + basket] == 0) {
-                                return {
-                                    backgroundColor: "#9c9c9c"
-                                };
-                            }
-
-                            if (params.data["system_basket_value_" + basket] == 1) {
-                                return {
-                                    backgroundColor: "#b9b9b9"
-                                };
-                            }
-
-                            if (params.data["system_basket_value_" + basket] == 2) {
-                                return {
-                                    backgroundColor: "#e0e0e0"
-                                };
-                            }
-                        }
-                    }]
+                    }
                 }
             },
             addListingHeader(listing) {},
@@ -526,7 +540,7 @@
             },
             customSetup() {
                 let self = this;
-                self.$refs.CustomSetup.show(() => {
+                self.$refs.CustomSetup.show(self.headers, () => {
 
                 })
             },
@@ -605,27 +619,20 @@
                     self.currentToggle = 'User';
                 }
 
-                let onesToSetVisible = [];
-                let onesToSetInvisible = [];
-
-                self.$refs.Grid.headers.forEach(el => {
-                    if (el.children != undefined && el.children.length > 0) {
-                        if (el.hide != true) {
-                            el.children.forEach(subHeader => {
-                                if (subHeader.headerName != self.currentToggle) {
-                                    onesToSetInvisible.push(subHeader.field);
-                                } else {
-                                    onesToSetVisible.push(subHeader.field);
-                                }
-                            })
-                        }
-                    }
-                })
-
-                self.$refs.Grid.columnApi.setColumnsVisible(onesToSetVisible, true);
-                self.$refs.Grid.columnApi.setColumnsVisible(onesToSetInvisible, false);
+                self.$refs.Grid.gridApi.redrawRows();
             }
         }
+    }
+
+    function isInOptions(optionsArr, text) {
+        let retval = false;
+
+        optionsArr.forEach(el => {
+            if (el == text)
+                retval = true;
+        })
+
+        return retval;
     }
 
     function removeDuplicates(myArr, prop) {
