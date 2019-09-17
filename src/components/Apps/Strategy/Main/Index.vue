@@ -12,9 +12,19 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
-                <v-btn slot="activator" flat @click="setup">
-                    Setup
-                </v-btn>
+                <v-menu dark offset-y style="margin-bottom: 10px;">
+                    <v-btn slot="activator" flat>
+                        Setup
+                    </v-btn>
+                    <v-list>
+                        <v-list-tile @click="setup">
+                            <v-list-tile-title>Store</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="customSetup">
+                            <v-list-tile-title>Custom</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
                 <!-- <v-btn slot="activator" flat @click="showColorPicker">
                     Color
                 </v-btn> -->
@@ -30,18 +40,18 @@
         <v-toolbar dark flat>
             <v-btn color="primary" @click="setSystemUserHeaders">{{ currentToggle }}</v-btn>
             <v-btn color="primary" @click="getHinterlandStores">Refresh</v-btn>
-            <v-toolbar-items>
+            <v-toolbar-items v-if="selectedView == 0">
                 <v-select @change="changeFile" style="margin-left: 10px; margin-top: 8px; width: 300px"
                     placeholder="Select File" dense :items="files" v-model="selectedFile" hide-details>
                 </v-select>
             </v-toolbar-items>
-            <v-toolbar-items v-if="selectedView == 1">
+            <!-- <v-toolbar-items v-if="selectedView == 1">
                 <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 200px"
                     placeholder="Select cluster type" :items="clusters" v-model="selectedCluster"
                     @change="onClusterChange"> </v-autocomplete>
                 <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 200px"
                     placeholder="Select cluster data" :items="dataFields" v-model="selectedDataField"> </v-autocomplete>
-            </v-toolbar-items>
+            </v-toolbar-items> -->
             <v-spacer></v-spacer>
             <v-btn-toggle v-model="selectedView" round class="transparent" mandatory>
                 <v-btn class="elevation-0" style="width: 100px" round color="primary">
@@ -59,6 +69,7 @@
         <Map v-if="selectedView == 1" :rowData="rowData" ref="Map" />
         <ClusterModels :fileData="rowData" v-if="selectedView == 2" ref="ClusterModels" />
         <Setup ref="Setup" />
+        <CustomSetup ref="CustomSetup" />
         <Spinner ref="Spinner" />
         <Prompt ref="Prompt" />
         <CustomSelector ref="CustomSelector" />
@@ -70,6 +81,7 @@
     import Axios from 'axios';
     import Grid from './Grid'
     import Setup from './Setup'
+    import CustomSetup from './CustomSetup'
     import Spinner from '@/components/Common/Spinner';
     import Map from '../Map/Index'
     import ClusterModels from '../ClusterModels/Index'
@@ -92,7 +104,8 @@
             ClusterModels,
             Prompt,
             ColorPicker,
-            CustomSelector
+            CustomSelector,
+            CustomSetup
         },
         data() {
             return {
@@ -135,13 +148,14 @@
                 let self = this;
 
                 self.$refs.CustomSelector.show(data => {
-                    Axios.get(process.env.VUE_APP_API + `Cluster/Advanced?field=${data.field}&fieldID=${data.fieldID}`)
+                    Axios.get(process.env.VUE_APP_API +
+                            `Cluster/Advanced?field=${data.field}&fieldID=${data.fieldID}`)
                         .then(r => {
                             let queryStores = r.data;
                             let output = [];
                             self.rowData.forEach(rd => {
                                 queryStores.forEach(qs => {
-                                    if(rd.storeName == qs.displayname) {
+                                    if (rd.storeName == qs.displayname) {
                                         output.push({
                                             storeName: rd.storeName,
                                             long: rd.long,
@@ -507,6 +521,12 @@
             setup() {
                 let self = this;
                 self.$refs.Setup.show(() => {
+
+                })
+            },
+            customSetup() {
+                let self = this;
+                self.$refs.CustomSetup.show(() => {
 
                 })
             },
