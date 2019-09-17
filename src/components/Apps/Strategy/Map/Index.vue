@@ -33,7 +33,7 @@
         methods: {
             drawMap(labelState) {
                 let self = this
-
+                console.log(self.rowData);
                 let formattedData = [];
                 let chart = am4core.create("thisone2", am4maps.MapChart);
                 chart.name = "Map"
