@@ -12,19 +12,9 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
-                <v-menu dark offset-y style="margin-bottom: 10px;">
-                    <v-btn slot="activator" flat>
-                        Setup
-                    </v-btn>
-                    <v-list>
-                        <v-list-tile @click="setup">
-                            <v-list-tile-title>Store</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="customSetup">
-                            <v-list-tile-title>Custom</v-list-tile-title>
-                        </v-list-tile>
-                    </v-list>
-                </v-menu>
+                <v-btn slot="activator" flat @click="setup">
+                    Setup
+                </v-btn>
                 <!-- <v-btn slot="activator" flat @click="showColorPicker">
                     Color
                 </v-btn> -->
@@ -40,18 +30,19 @@
         <v-toolbar dark flat>
             <v-btn color="primary" @click="setSystemUserHeaders">{{ currentToggle }}</v-btn>
             <v-btn color="primary" @click="getHinterlandStores">Refresh</v-btn>
-            <v-toolbar-items v-if="selectedView == 0">
+            <v-toolbar-items>
                 <v-select @change="changeFile" style="margin-left: 10px; margin-top: 8px; width: 300px"
                     placeholder="Select File" dense :items="files" v-model="selectedFile" hide-details>
                 </v-select>
             </v-toolbar-items>
-            <!-- <v-toolbar-items v-if="selectedView == 1">
+            <v-toolbar-items v-if="selectedView == 1">
                 <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 200px"
                     placeholder="Select cluster type" :items="clusters" v-model="selectedCluster"
                     @change="onClusterChange"> </v-autocomplete>
                 <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 200px"
                     placeholder="Select cluster data" :items="dataFields" v-model="selectedDataField"> </v-autocomplete>
-            </v-toolbar-items> -->
+            </v-toolbar-items>
+            <v-btn color="primary" @click="openMapSetup">Setup Map </v-btn>
             <v-spacer></v-spacer>
             <v-btn-toggle v-model="selectedView" round class="transparent" mandatory>
                 <v-btn class="elevation-0" style="width: 100px" round color="primary">
@@ -66,10 +57,9 @@
             </v-btn-toggle>
         </v-toolbar>
         <Grid v-if="selectedView == 0" :rowData="rowData" :headers="headers" ref="Grid" />
-        <Map v-if="selectedView == 1" :rowData="rowData" ref="Map" />
+        <Map v-if="selectedView == 1" :rowData="rowData" :setupData="setupMapData" ref="Map" />
         <ClusterModels :fileData="rowData" v-if="selectedView == 2" ref="ClusterModels" />
         <Setup ref="Setup" />
-        <CustomSetup ref="CustomSetup" />
         <Spinner ref="Spinner" />
         <Prompt ref="Prompt" />
         <CustomSelector ref="CustomSelector" />
@@ -81,7 +71,6 @@
     import Axios from 'axios';
     import Grid from './Grid'
     import Setup from './Setup'
-    import CustomSetup from './CustomSetup'
     import Spinner from '@/components/Common/Spinner';
     import Map from '../Map/Index'
     import ClusterModels from '../ClusterModels/Index'
@@ -104,8 +93,7 @@
             ClusterModels,
             Prompt,
             ColorPicker,
-            CustomSelector,
-            CustomSetup
+            CustomSelector
         },
         data() {
             return {
@@ -136,7 +124,8 @@
                 fileName: null,
                 selectedFile: null,
                 files: null,
-                firstLoad: true
+                firstLoad: true,
+                setupMapData: []
             }
         },
         mounted() {
@@ -144,6 +133,11 @@
             self.getHinterlandStores();
         },
         methods: {
+            openMapSetup() {
+                let self = this
+                self.getMapSetupData()
+                self.$refs.Map.openSetup()
+            },
             customQuery() {
                 let self = this;
 
@@ -165,6 +159,7 @@
                                     }
                                 })
                             })
+                            console.log(self.rowData);
 
                             // tj stuff
                             // use output
@@ -196,6 +191,34 @@
                     }
                 })
             },
+            getMapSetupData() {
+                let self = this
+                let tmp = []
+                self.setupMapData = []
+                self.clusters.forEach((e, idx) => {
+
+                    tmp.push(self.unhandledReportData[e.value])
+                    var names = Object.getOwnPropertyNames(tmp[0]);
+
+
+                    let obj = tmp[idx]
+                    // console.log(obj);
+                    for (var item in obj) {
+                        let count = 0
+                        console.log(item);
+
+                        self.setupMapData.push({
+                            text: item,
+                            cluster:e.value
+                        })
+                        count++
+                    }
+                })
+                console.log(tmp);
+
+                console.log(self.setupMapData);
+
+            },
             getData(stores) {
                 let self = this;
 
@@ -218,6 +241,7 @@
                                 self.firstLoad = false;
                                 self.unhandledReportData = r.data
                                 self.handleData(r.data, stores);
+
                             })
                     })
             },
@@ -521,12 +545,6 @@
             setup() {
                 let self = this;
                 self.$refs.Setup.show(() => {
-
-                })
-            },
-            customSetup() {
-                let self = this;
-                self.$refs.CustomSetup.show(() => {
 
                 })
             },

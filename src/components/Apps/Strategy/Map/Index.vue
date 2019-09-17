@@ -3,6 +3,7 @@
         <div id="thisone2" class="map">
         </div>
         <YesNoModal ref="yesNo"></YesNoModal>
+        <Mapsetup ref="Mapsetup" />
     </div>
 </template>
 
@@ -11,16 +12,17 @@
     import * as am4charts from "@amcharts/amcharts4/charts";
     import * as am4maps from "@amcharts/amcharts4/maps";
     import YesNoModal from '@/components/Common/YesNoModal'
-
+    import Mapsetup from "./setup.vue"
     import am4geodata_worldLow from "@amcharts/amcharts4-geodata/southAfricaHigh";
 
-
+    // http://www.climbing.co.za/wp-content/uploads/2012/10/rsamap.png
 
     export default {
         components: {
-            YesNoModal
+            YesNoModal,
+            Mapsetup
         },
-        props: ["rowData"],
+        props: ["rowData", "setupData"],
         data() {
             return {
                 labels: true,
@@ -28,18 +30,24 @@
             }
         },
         mounted() {
+            // this.openSetup()
             this.drawMap(this.labels, 0)
         },
         methods: {
+            openSetup() {
+                let self = this
+                self.$refs.Mapsetup.open(self.setupData, callback => {
+
+                })
+            },
             drawMap(labelState) {
                 let self = this
-                console.log(self.rowData);
                 let formattedData = [];
                 let chart = am4core.create("thisone2", am4maps.MapChart);
                 chart.name = "Map"
-                // chart.seriesContainer.events.on("hit", function (ev) {
-                //     console.log(chart.svgPointToGeo(ev.svgPoint));
-                // });
+                chart.projection = new am4maps.projections.Miller();
+                console.log(am4geodata_worldLow);
+
                 var title = chart.titles.create();
                 title.text = "[bold font-size: 20]Store Sales Heatmap[/]";
                 title.textAlign = "middle";
@@ -50,28 +58,54 @@
                 /////////////////////////////////////////////////
                 //potential Code for image fill
                 ////////////////////////////
-                // var pattern_europe = new am4core.Pattern();
-                // var image = new am4core.Image();
-                // image.href = "http://www.climbing.co.za/w/images/2/2f/Rsamap.png";
-                // image.width = 4;
-                // image.height = 4;
-                // pattern_europe.width = 4;
-                // pattern_europe.height = 4;
-                // pattern_europe.addElement(image.element);
-                /////////////////////////////////////////////////
 
-                chart.geodata = am4geodata_worldLow;
+
+                /////////////////////////////////////////////////
+                let asd = am4geodata_worldLow
+                chart.geodata = asd;
+                if (chart.geodata.features[9].geometry.coordinates.length == 3) {
+                    chart.geodata.features[9].geometry.coordinates.splice(2, 1)
+                    chart.geodata.features[9].geometry.coordinates.splice(0, 1)
+                }
+
+
                 chart.projection = new am4maps.projections.Mercator();
                 let polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
+
+                polygonSeries.strokeOpacity = 0.1;
                 polygonSeries.useGeodata = true;
-                polygonSeries.exclude = ["antarctica"];
-                polygonSeries.exclude = ["AQ"];
+                // polygonSeries.exclude = ["ZA-WC"];
+
 
                 // Configure series
                 let polygonTemplate = polygonSeries.mapPolygons.template;
+
                 polygonTemplate.tooltipText = "{name}";
-                //  polygonTemplate.fill = pattern_europe;
-                polygonTemplate.fill = chart.colors.getIndex(0);
+
+                // polygonTemplate.background.dom.style.backgroundImage =
+                //     "http://www.climbing.co.za/w/images/2/2f/Rsamap.png";
+                var pattern_europe = new am4core.Pattern();
+                var image = new am4core.Image();
+                image.href ="imageedit_7_8566582854.png"
+                //  "Picture1.png"
+                // "https://i.dlpng.com/static/png/4679756_thumb.png"
+                // "http://www.climbing.co.za/w/images/2/2f/Rsamap.png";
+                // // image.href = "https://pbs.twimg.com/profile_images/1847786693/John_Dorfling_400x400.jpg";
+
+                console.log("polygonTemplate");
+                console.log(polygonTemplate);
+
+                image.width =  865;
+                image.height = 744;
+                pattern_europe.x = -325
+                pattern_europe.y = 0
+                pattern_europe.width = image.width;
+                pattern_europe.height = image.height;
+                pattern_europe.addElement(image.element);
+
+
+                polygonTemplate.fill = pattern_europe
+                // polygonTemplate.fill= chart.colors.getIndex(3);
                 polygonTemplate.strokeOpacity = 0.5;
                 polygonTemplate.nonScalingStroke = true;
 
@@ -93,7 +127,6 @@
                         ev.preventDefault();
                     if (ev.stopPropagation != undefined)
                         ev.stopPropagation();
-                    console.log(ev);
                     self.$refs.yesNo.show('Would you like to make a tag here?', goThrough => {
                         if (goThrough) {
                             var mapMarker = imageSeriesTemplate.createChild(am4core.Sprite);
@@ -106,9 +139,10 @@
                             mapMarker.fillOpacity = 0.8;
                             mapMarker.horizontalCenter = "middle";
                             mapMarker.verticalCenter = "bottom";
-                            console.log(chart.svgPointToGeo(ev.svgPoint));
                             var coords = chart.svgPointToGeo(ev.svgPoint);
                             var marker = imageSeries.mapImages.create();
+                            console.log(coords);
+
                             marker.latitude = coords.latitude;
                             marker.longitude = coords.longitude;
                             marker.events.on("rightclick", function (dataItem, ev) {
@@ -208,6 +242,7 @@
                 chart.legend = new am4maps.Legend();
                 chart.legend.position = "right";
                 chart.legend.align = "right";
+
             }
         }
     }
@@ -216,6 +251,12 @@
 <style scoped>
     .map {
         height: calc(100vh - 225px);
-        /* background-image: "http://www.climbing.co.za/w/images/2/2f/Rsamap.png" */
+        background-color: #cccccc;
+        /* background-image: url("http://www.climbing.co.za/w/images/2/2f/Rsamap.png");
+         
+        background-position: center;
+         background-repeat: no-repeat;
+        background-size: contain;
+        overflow: auto; */
     }
 </style>
