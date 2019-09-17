@@ -3,7 +3,7 @@
         <v-dialog v-model="dialog" width="800" persistent>
             <v-card style="overflow: auto;">
                 <v-toolbar dark flat color="primary">
-                    <v-toolbar-title>Store Cluster Setup</v-toolbar-title>
+                    <v-toolbar-title>Custom Cluster Setup</v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-btn icon @click.native="dialog = false">
                         <v-icon>close</v-icon>
@@ -29,8 +29,12 @@
                             <v-flex md8>
                                 <v-card flat>
                                     <v-list dense>
+                                        <v-list-tile>
+                                            <v-list-tile-avatar>1</v-list-tile-avatar>
+                                            <v-list-tile-content>Store Cluster</v-list-tile-content>
+                                        </v-list-tile>
                                         <v-list-tile v-for="(item, idx) in selected" :key="idx">
-                                            <v-list-tile-avatar>{{ (idx + 1) }}</v-list-tile-avatar>
+                                            <v-list-tile-avatar>{{ (idx + 2) }}</v-list-tile-avatar>
                                             <v-list-tile-content>{{ item }}</v-list-tile-content>
                                             <v-list-tile-actions>
                                                 <v-btn flat small :disabled="idx == 0">

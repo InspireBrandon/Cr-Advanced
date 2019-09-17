@@ -89,6 +89,8 @@
                                     v-if="selectedLevel>=4" v-model="level5Value">
                                 </v-text-field>
                             </v-flex>
+                            <v-checkbox label="Update user" v-model="updateUser">
+                            </v-checkbox>
                         </v-layout>
                     </v-container>
                 </v-card-text>
@@ -168,7 +170,8 @@
                 runData: [],
                 possibleFiles: [],
                 fileData: null,
-                showingSaved: false
+                showingSaved: false,
+                updateUser: false
             }
         },
         created() {
@@ -407,8 +410,8 @@
                     }
                 })
 
-                // get user defined values
-                data = self.getUserDefined(data, levels)
+                if(self.updateUser)
+                    data = self.getUserDefined(data, levels)
 
                 self.rowData = data;
 
@@ -486,8 +489,10 @@
                     if (reader.config.turnoverGroups != undefined && reader.config.turnoverGroups != null) {
                         let tg = reader.config.turnoverGroups;
                         let tgv = reader.config.turnoverGroupUserValues;
+                        let updateUser = reader.config.updateUser;
 
                         self.selectedLevel = tg.length - 1;
+                        self.updateUser = (updateUser == undefined || updateUser == null) ? false : updateUser;
 
                         for (var i = 0; i < tg.length; i++) {
                             self["level" + (i + 1)] = tg[i];
@@ -532,7 +537,8 @@
                                 selectedSupergroup: self.selectedSupergroup,
                                 selectedPeriod: self.selectedPeriod,
                                 turnoverGroups: self.levels,
-                                turnoverGroupUserValues: levelValues
+                                turnoverGroupUserValues: levelValues,
+                                updateUser: self.updateUser
                             }
                         };
 
@@ -559,7 +565,8 @@
                                     selectedSupergroup: self.selectedSupergroup,
                                     selectedPeriod: self.selectedPeriod,
                                     turnoverGroups: self.levels,
-                                    turnoverGroupUserValues: levelValues
+                                    turnoverGroupUserValues: levelValues,
+                                    updateUser: self.updateUser
                                 }
                             };
 
@@ -588,7 +595,7 @@
                         Data: fileData
                     })
                     .then(r => {
-                        self.fileData = fileData;
+                        self.fileData = fileData.store;
                         alert("Successfully saved");
                     })
                     .catch(e => {
