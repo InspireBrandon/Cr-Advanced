@@ -10,6 +10,9 @@
                         <v-list-tile @click="saveFile">
                             <v-list-tile-title>Save</v-list-tile-title>
                         </v-list-tile>
+                        <v-list-tile @click="openFile">
+                            <v-list-tile-title>Open</v-list-tile-title>
+                        </v-list-tile>
                     </v-list>
                 </v-menu>
                 <v-menu dark offset-y style="margin-bottom: 10px;">
@@ -45,9 +48,9 @@
             </v-btn>
             <v-btn color="primary" @click="getHinterlandStores">Refresh</v-btn>
             <v-toolbar-items>
-                <v-select @change="changeFile" style="margin-left: 10px; margin-top: 8px; width: 300px"
+                <!-- <v-select @change="changeFile" style="margin-left: 10px; margin-top: 8px; width: 300px"
                     placeholder="Select File" dense :items="files" v-model="selectedFile" hide-details>
-                </v-select>
+                </v-select> -->
             </v-toolbar-items>
             <v-toolbar-items v-if="selectedView == 1">
                 <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 200px"
@@ -56,7 +59,7 @@
                 <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 200px"
                     placeholder="Select cluster data" :items="dataFields" v-model="selectedDataField"> </v-autocomplete>
             </v-toolbar-items>
-            <v-btn color="primary" @click="openMapSetup">Setup Map </v-btn>
+            <!-- <v-btn color="primary" @click="openMapSetup">Setup Map </v-btn> -->
             <v-spacer></v-spacer>
             <v-btn-toggle v-model="selectedView" round class="transparent" mandatory>
                 <v-btn class="elevation-0" style="width: 100px" round color="primary">
@@ -79,6 +82,7 @@
         <Prompt ref="Prompt" />
         <CustomSelector ref="CustomSelector" />
         <!-- <ColorPicker ref="ColorPicker" /> -->
+        <FileSelector ref="FileSelector" />
     </v-card>
 </template>
 
@@ -93,6 +97,7 @@
     import Prompt from '@/components/Common/Prompt'
     import ColorPicker from '@/components/Common/ColorPicker'
     import CustomSelector from './CustomSelector'
+    import FileSelector from './FileSelector';
 
     const formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -112,7 +117,8 @@
             ClusterModels,
             Prompt,
             ColorPicker,
-            CustomSelector
+            CustomSelector,
+            FileSelector
         },
         data() {
             return {
@@ -148,6 +154,7 @@
                 setupMapData: [],
                 selectedClusterType: 0,
                 currentConfig: null,
+                selectableFiles: []
             }
         },
         mounted() {
@@ -252,6 +259,17 @@
                         Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fd.data.id}`)
                             .then(r => {
                                 self.fileData = r.data;
+
+                                // getFileNames
+
+                                if (self.fileData.report != undefined && self.fileData.report.clusters !=
+                                    undefined) {
+                                    self.selectableFiles = [];
+
+                                    for (var prop in self.fileData.report.clusters) {
+                                        self.selectableFiles.push(prop);
+                                    }
+                                }
 
                                 if (!self.firstLoad) {
                                     self.handleData(r.data, stores);
@@ -618,7 +636,7 @@
                 self.$refs.Grid.columnApi.setColumnsVisible(hide, false);
 
                 // handle system/user : set these incorrectly so that i can call change method
-                if(data.useSystemValues) {
+                if (data.useSystemValues) {
                     self.currentToggle = 'User';
                 } else {
                     self.currentToggle = 'System';
@@ -632,11 +650,49 @@
                 self.$refs.CustomSetup.show(self.headers, setup => {
                     self.currentConfig = setup;
                     self.selectedClusterType = 1;
-                    console.log(setup);
+                    self.handleCustomSetup(setup);
                 })
             },
             handleCustomSetup(data) {
                 let self = this;
+
+                // Set title
+                self.title = data.selectedPlanogram.text + " - Custom Cluster";
+
+                // handle headers
+                let hide = [];
+                let show = [];
+
+                self.headers.forEach(h => {
+                    let inSelected = false;
+
+                    data.selectedItems.forEach(si => {
+                        if (h.headerName == si) {
+                            inSelected = true;
+                        }
+                    })
+
+                    if (inSelected) {
+                        show.push(h.field)
+                    } else {
+                        if (h.field != 'storeName' && h.field != undefined && h.field != 'totalSales' && h
+                            .field != 'cumulativePercent') {
+                            hide.push(h.field)
+                        }
+                    }
+                })
+
+                self.$refs.Grid.columnApi.setColumnsVisible(show, true);
+                self.$refs.Grid.columnApi.setColumnsVisible(hide, false);
+
+                // handle system/user : set these incorrectly so that i can call change method
+                if (data.useSystemValues) {
+                    self.currentToggle = 'User';
+                } else {
+                    self.currentToggle = 'System';
+                }
+
+                self.setSystemUserHeaders();
             },
             getHinterlandStores() {
                 let self = this;
@@ -656,29 +712,38 @@
             },
             openFile() {
                 let self = this;
+
+                self.$refs.FileSelector.show(self.selectableFiles, file => {
+                    let config = self.fileData.report.clusters[file];
+                    self.currentConfig = config;
+                    self.selectedClusterType = file == 'Store Cluster' ? 0 : 1;
+                    if(self.selectedClusterType == 0) {
+                        self.handleSetup(config);
+                    } else {
+                        self.handleCustomSetup(config);
+                    }
+                })
             },
             saveFile() {
                 let self = this;
 
-                self.$refs.Prompt.show("", "File Name", "", text => {
-                    let columns = self.$refs.Grid.getState();
-                    let output = {};
+                let columns = self.$refs.Grid.getState();
+                let output = {};
 
-                    columns.forEach(el => {
-                        output[el.colId] = el.hide;
-                    })
+                if (self.fileData.report == undefined || self.fileData.report == null) {
+                    self.fileData.report = {
+                        clusters: {}
+                    };
+                }
 
-                    if (self.fileData.report == undefined || self.fileData.report == null) {
-                        self.fileData.report = {};
-                    }
+                if (self.fileData.report.clusters == undefined || self.fileData.report.clusters == null) {
+                    self.fileData.report.clusters = {};
+                }
 
-                    self.fileData.report[text] = output;
+                self.fileData.report.clusters[self.title] = self.currentConfig;
+                self.selectableFiles.push(self.title);
 
-                    self.files.push(text);
-                    self.selectedFile = text;
-
-                    self.appendAndSaveFile(self.fileData);
-                })
+                self.appendAndSaveFile(self.fileData);
             },
             appendAndSaveFile(fileData) {
                 Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
@@ -691,6 +756,7 @@
                         Data: fileData
                     })
                     .then(r => {
+                        self.fileData = fileData;
                         alert("Successfully saved");
                     })
                     .catch(e => {

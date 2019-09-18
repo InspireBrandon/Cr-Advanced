@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-dialog v-model="dialog" width="800" persistent>
+        <v-dialog v-model="dialog" width="1200" persistent>
             <v-card>
                 <v-toolbar dark flat color="primary">
                     <v-toolbar-title>Custom Cluster Setup</v-toolbar-title>
@@ -13,36 +13,46 @@
                     <v-container grid-list-md class="pa-0">
                         <v-layout row wrap>
                             <v-flex md12>
-                                <v-select return-object :items="planograms" v-model="selectedPlanogram"
+                                <v-autocomplete return-object :items="planograms" v-model="selectedPlanogram"
                                     style="width: 300px" placeholder="Select a planogram" dense hide-details>
-                                </v-select>
+                                </v-autocomplete>
                                 <v-divider class="mt-3"></v-divider>
                             </v-flex>
                             <v-flex md12>
                                 <v-switch v-model="useSystemValues" hide-details label="Use system values"></v-switch>
                             </v-flex>
-                            <v-flex md4>
-                                <v-checkbox color="primary" v-for="(item, idx) in items" :key="idx" v-model="selected" :value="item"
-                                    hide-details :label="item"></v-checkbox>
+                            <v-flex md4 class="mt-3">
+                                <v-toolbar dark flat dense color="primary">
+                                    <v-toolbar-title>Fields</v-toolbar-title>
+                                </v-toolbar>
+                                <div style="height: 300px; overflow-y: scroll;">
+                                    <v-checkbox color="primary" v-for="(item, idx) in items" :key="idx"
+                                        v-model="selected" :value="item" hide-details :label="item"></v-checkbox>
+                                </div>
                             </v-flex>
-                            <v-flex md8>
-                                <v-card flat>
-                                    <v-list dense>
-                                        <v-list-tile v-for="(item, idx) in selected" :key="idx">
-                                            <v-list-tile-avatar>{{ (idx + 1) }}.</v-list-tile-avatar>
-                                            <v-list-tile-content>{{ item }}</v-list-tile-content>
-                                            <v-btn @click="swapUp(idx)" flat small :disabled="idx == 0"
-                                                style="width: 30px">
-                                                <v-icon>arrow_upward</v-icon>
-                                            </v-btn>
-                                            <v-btn @click="swapDown(idx)" flat small style="width: 30px"
-                                                :disabled="idx == selected.length - 1">
-                                                <v-icon>arrow_downward</v-icon>
-                                            </v-btn>
-                                            <v-icon @click="remove(idx)">close</v-icon>
-                                        </v-list-tile>
-                                    </v-list>
-                                </v-card>
+                            <v-flex md8 class="mt-3">
+                                <v-toolbar dark flat dense color="primary">
+                                    <v-toolbar-title>Selected</v-toolbar-title>
+                                </v-toolbar>
+                                <div style="height: 300px; overflow-y: scroll;">
+                                    <v-card flat>
+                                        <v-list dense>
+                                            <v-list-tile v-for="(item, idx) in selected" :key="idx">
+                                                <v-list-tile-avatar>{{ (idx + 1) }}</v-list-tile-avatar>
+                                                <v-list-tile-content>{{ item }}</v-list-tile-content>
+                                                <v-btn @click="swapUp(idx)" flat small :disabled="idx == 0"
+                                                    style="width: 30px">
+                                                    <v-icon>arrow_upward</v-icon>
+                                                </v-btn>
+                                                <v-btn @click="swapDown(idx)" flat small style="width: 30px"
+                                                    :disabled="idx == selected.length - 1">
+                                                    <v-icon>arrow_downward</v-icon>
+                                                </v-btn>
+                                                <v-icon @click="remove(idx)">close</v-icon>
+                                            </v-list-tile>
+                                        </v-list>
+                                    </v-card>
+                                </div>
                             </v-flex>
                         </v-layout>
                     </v-container>
@@ -78,13 +88,15 @@
                 self.getPlanograms();
                 self.selectedPlanogram = null;
                 self.items = [];
+                self.useSystemValues = false;
+                self.selected = [];
                 self.dialog = true;
 
                 items = JSON.parse(JSON.stringify(items))
 
                 items = items.splice(4, items.length - 1);
 
-                self.items.push("Store Cluster");
+                // self.items.push("Store Cluster");
 
                 items.forEach(el => {
                     self.items.push(el.headerName);
