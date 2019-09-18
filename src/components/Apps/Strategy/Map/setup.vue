@@ -34,7 +34,7 @@
                         <v-card>
                             <v-toolbar flat dark dense color="primary">Piechart Fields </v-toolbar>
                             <v-card-text style="height: 500px; overflow: auto;">
-                                <v-checkbox hide-details v-for="(item,idx) in piechartItems" :key="idx"
+                                <v-checkbox  hide-details v-for="(item,idx) in piechartItems"  :key="idx"
                                     :label="item.text+' - '+item.cluster" :value="item.text"
                                     v-model="selectedPiechartItems"></v-checkbox>
                             </v-card-text>
@@ -59,7 +59,7 @@
                 heatMapRadius: 0,
                 usePiecharts: false,
                 useHeatmap: false,
-                selectedPiechartItems: null,
+                selectedPiechartItems: [],
                 selectedHeatmapField: null,
                 piechartItems: [],
                 heatmapItems: [],
@@ -72,7 +72,11 @@
                 self.dialog = true
                 self.callback = callback
                 self.heatmapItems = setupData
-
+                setupData.forEach(element => {
+                    if (element.cluster == "basket") {
+                        self.piechartItems.push(element)
+                    }
+                });
                 console.log("MapDatra", setupData);
 
             },
@@ -85,7 +89,7 @@
                     selectedPiechartItems: self.selectedPiechartItems,
                     selectedHeatmapField: self.selectedHeatmapField
                 }
-                self.dialog=false
+                self.dialog = false
                 self.callback(item)
 
             }

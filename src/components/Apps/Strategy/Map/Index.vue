@@ -14,6 +14,7 @@
     import YesNoModal from '@/components/Common/YesNoModal'
     import Mapsetup from "./setup.vue"
     import am4geodata_worldLow from "@amcharts/amcharts4-geodata/southAfricaHigh";
+    import Axios from 'axios'
 
     // http://www.climbing.co.za/wp-content/uploads/2012/10/rsamap.png
 
@@ -33,8 +34,20 @@
         mounted() {
             // this.openSetup()
             // this.drawMap(this.labels)
+            this.getData()
         },
         methods: {
+             getData() {
+                let self = this;
+                Axios.get(process.env.VUE_APP_API +
+                        `SystemFile/JSON?db=CR-Devinspire&folder=CLUSTER REPORT&file=REPORT`)
+                    .then(fd => {
+                        Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fd.data.id}`)
+                            .then(r => {
+                                console.log(r.data);
+                            })
+                    })
+            },
             openSetup() {
                 let self = this
                 self.$refs.Mapsetup.open(self.setupData, callback => {
@@ -44,8 +57,7 @@
             },
             drawMap(labelState, config) {
                 let self = this
-
-
+                self.radius = parseInt(config.heatMapRadius)
                 console.log(self.rowData);
                 // todo sort rowdata by sales for heatmap legend
                 let formattedData = [];
