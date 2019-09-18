@@ -13,13 +13,17 @@
                     <v-container grid-list-md class="pa-0">
                         <v-layout row wrap>
                             <v-flex md12>
-                                <v-select :items="planograms" style="width: 300px" placeholder="Select a planogram" dense hide-details>
+                                <v-select return-object :items="planograms" v-model="selectedPlanogram"
+                                    style="width: 300px" placeholder="Select a planogram" dense hide-details>
                                 </v-select>
                                 <v-divider class="mt-3"></v-divider>
                             </v-flex>
+                            <v-flex md12>
+                                <v-switch v-model="useSystemValues" hide-details label="Use system values"></v-switch>
+                            </v-flex>
                             <v-flex md4>
-                                <v-checkbox v-for="(item, idx) in items" :key="idx" v-model="selected" :value="item" hide-details
-                                    :label="item"></v-checkbox>
+                                <v-checkbox color="primary" v-for="(item, idx) in items" :key="idx" v-model="selected" :value="item"
+                                    hide-details :label="item"></v-checkbox>
                             </v-flex>
                             <v-flex md8>
                                 <v-card flat>
@@ -63,15 +67,18 @@
                 afterComplete: null,
                 selected: [],
                 planograms: [],
-                items: []
+                selectedPlanogram: null,
+                items: [],
+                useSystemValues: false
             }
         },
         methods: {
             show(items, afterComplete) {
                 let self = this;
                 self.getPlanograms();
-                self.dialog = true;
+                self.selectedPlanogram = null;
                 self.items = [];
+                self.dialog = true;
 
                 items = JSON.parse(JSON.stringify(items))
 
@@ -88,8 +95,16 @@
             returnSetupConfig() {
                 let self = this;
 
-                self.dialog = false;
-                self.afterComplete();
+                if (self.selectedPlanogram == null) {
+                    alert("Please select a planogram");
+                } else {
+                    self.dialog = false;
+                    self.afterComplete({
+                        selectedPlanogram: self.selectedPlanogram,
+                        selectedItems: self.selected,
+                        useSystemValues: self.useSystemValues
+                    });
+                }
             },
             remove(idx) {
                 let self = this;

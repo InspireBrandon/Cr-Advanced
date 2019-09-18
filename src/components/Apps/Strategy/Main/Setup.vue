@@ -12,19 +12,12 @@
                 <v-card-text>
                     <v-container grid-list-md class="pa-0">
                         <v-layout row wrap>
+                            <v-flex md12>
+                                <v-switch v-model="useSystemValues" hide-details label="Use system values"></v-switch>
+                            </v-flex>
                             <v-flex md4>
-                                <v-checkbox v-model="selected" value="System Turnover Group" hide-details
-                                    label="System Turnover Group"></v-checkbox>
-                                <v-checkbox v-model="selected" value="User Turnover Group" hide-details
-                                    label="User Turnover Group"></v-checkbox>
-                                <v-checkbox v-model="selected" value="User Premium Basket" hide-details
-                                    label="User Premium Basket"></v-checkbox>
-                                <v-checkbox v-model="selected" value="System Premium Basket" hide-details
-                                    label="System Premium Basket"></v-checkbox>
-                                <v-checkbox v-model="selected" value="User Sheep Farming" hide-details
-                                    label="User Sheep Farming"></v-checkbox>
-                                <v-checkbox v-model="selected" value="System Sheep Farming" hide-details
-                                    label="System Sheep Farming"></v-checkbox>
+                                <v-checkbox color="primary" v-for="(item, idx) in items" :key="idx" v-model="selected" :value="item"
+                                    hide-details :label="item"></v-checkbox>
                             </v-flex>
                             <v-flex md8>
                                 <v-card flat>
@@ -66,20 +59,35 @@
             return {
                 dialog: false,
                 afterComplete: null,
-                selected: []
+                selected: [],
+                useSystemValues: false,
+                items: []
             }
         },
         methods: {
-            show(afterComplete) {
+            show(items, afterComplete) {
                 let self = this;
+                self.items = [];
                 self.dialog = true;
+
+                items = JSON.parse(JSON.stringify(items))
+
+                items = items.splice(4, items.length - 1);
+
+                items.forEach(el => {
+                    self.items.push(el.headerName);
+                })
+
                 self.afterComplete = afterComplete;
             },
             returnSetupConfig() {
                 let self = this;
 
                 self.dialog = false;
-                self.afterComplete();
+                self.afterComplete({
+                    selectedItems: self.selected,
+                    useSystemValues: self.useSystemValues
+                });
             },
             remove(idx) {
                 let self = this;
@@ -91,13 +99,11 @@
                 let aboveIndex = index - 1;
 
                 self.swapArrayElements(index, aboveIndex);
-
-                console.log(self.selected)
             },
             swapDown(index) {
                 let self = this;
 
-                let belowIndex = index - 1;
+                let belowIndex = index + 1;
 
                 self.swapArrayElements(belowIndex, index);
             },
@@ -110,7 +116,7 @@
                 tmpArr[indexB] = temp;
 
                 self.selected = tmpArr;
-            }
+            },
         }
     }
 </script>

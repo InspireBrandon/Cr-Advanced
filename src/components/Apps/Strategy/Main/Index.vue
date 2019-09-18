@@ -12,9 +12,19 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
-                <v-btn slot="activator" flat @click="setup">
-                    Setup
-                </v-btn>
+                <v-menu dark offset-y style="margin-bottom: 10px;">
+                    <v-btn slot="activator" flat>
+                        Setup
+                    </v-btn>
+                    <v-list>
+                        <v-list-tile @click="setup">
+                            <v-list-tile-title>Store Cluster</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="customSetup">
+                            <v-list-tile-title>Custom Clusters</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
                 <!-- <v-btn slot="activator" flat @click="showColorPicker">
                     Color
                 </v-btn> -->
@@ -22,6 +32,8 @@
                     Custom
                 </v-btn>
             </v-toolbar-items>
+            <v-spacer></v-spacer>
+            {{ title }}
             <v-spacer></v-spacer>
             <v-toolbar-title>
                 <span>Main</span>
@@ -62,6 +74,7 @@
         <Map v-if="selectedView == 1" :rowData="rowData" :setupData="setupMapData" ref="Map" />
         <ClusterModels :fileData="rowData" v-if="selectedView == 2" ref="ClusterModels" />
         <Setup ref="Setup" />
+        <CustomSetup ref="CustomSetup" />
         <Spinner ref="Spinner" />
         <Prompt ref="Prompt" />
         <CustomSelector ref="CustomSelector" />
@@ -73,6 +86,7 @@
     import Axios from 'axios';
     import Grid from './Grid'
     import Setup from './Setup'
+    import CustomSetup from './CustomSetup'
     import Spinner from '@/components/Common/Spinner';
     import Map from '../Map/Index'
     import ClusterModels from '../ClusterModels/Index'
@@ -86,10 +100,13 @@
         minimumFractionDigits: 2
     })
 
+    const clusterTypes = ["Store", "Custom"]
+
     export default {
         components: {
             Grid,
             Setup,
+            CustomSetup,
             Spinner,
             Map,
             ClusterModels,
@@ -99,6 +116,7 @@
         },
         data() {
             return {
+                title: '',
                 currentToggle: 'User',
                 clusters: [{
                     text: "store",
@@ -127,7 +145,9 @@
                 selectedFile: null,
                 files: null,
                 firstLoad: true,
-                setupMapData: []
+                setupMapData: [],
+                selectedClusterType: 0,
+                currentConfig: null,
             }
         },
         mounted() {
@@ -211,7 +231,7 @@
 
                         self.setupMapData.push({
                             text: item,
-                            cluster:e.value
+                            cluster: e.value
                         })
                         count++
                     }
@@ -558,15 +578,65 @@
             addListingHeader(listing) {},
             setup() {
                 let self = this;
-                self.$refs.Setup.show(() => {
 
+                self.$refs.Setup.show(self.headers, setup => {
+                    self.currentConfig = setup;
+                    self.selectedClusterType = 0;
+                    self.handleSetup(setup);
                 })
+            },
+            handleSetup(data) {
+                let self = this;
+
+                // Set title
+                self.title = "Store Cluster";
+
+                // handle headers
+                let hide = [];
+                let show = [];
+
+                self.headers.forEach(h => {
+                    let inSelected = false;
+
+                    data.selectedItems.forEach(si => {
+                        if (h.headerName == si) {
+                            inSelected = true;
+                        }
+                    })
+
+                    if (inSelected) {
+                        show.push(h.field)
+                    } else {
+                        if (h.field != 'storeName' && h.field != undefined && h.field != 'totalSales' && h
+                            .field != 'cumulativePercent') {
+                            hide.push(h.field)
+                        }
+                    }
+                })
+
+                self.$refs.Grid.columnApi.setColumnsVisible(show, true);
+                self.$refs.Grid.columnApi.setColumnsVisible(hide, false);
+
+                // handle system/user : set these incorrectly so that i can call change method
+                if(data.useSystemValues) {
+                    self.currentToggle = 'User';
+                } else {
+                    self.currentToggle = 'System';
+                }
+
+                self.setSystemUserHeaders();
             },
             customSetup() {
                 let self = this;
-                self.$refs.CustomSetup.show(self.headers, () => {
 
+                self.$refs.CustomSetup.show(self.headers, setup => {
+                    self.currentConfig = setup;
+                    self.selectedClusterType = 1;
+                    console.log(setup);
                 })
+            },
+            handleCustomSetup(data) {
+                let self = this;
             },
             getHinterlandStores() {
                 let self = this;
@@ -631,6 +701,7 @@
                 let self = this;
 
                 self.$nextTick(() => {
+                    self.title = self.selectedFile;
                     self.handleData(self.fileData, self.stores);
                 })
             },
