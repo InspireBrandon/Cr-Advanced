@@ -87,7 +87,7 @@
                 //     "http://www.climbing.co.za/w/images/2/2f/Rsamap.png";
                 var pattern_europe = new am4core.Pattern();
                 var image = new am4core.Image();
-                image.href = "imageedit_7_8566582854.png"
+                image.href ="sa hm.png"
                 //  "Picture1.png"
                 // "https://i.dlpng.com/static/png/4679756_thumb.png"
                 // "http://www.climbing.co.za/w/images/2/2f/Rsamap.png";
@@ -96,10 +96,10 @@
                 console.log("polygonTemplate");
                 console.log(polygonTemplate);
 
-                image.width = 865;
-                image.height = 744;
-                pattern_europe.x = -325
-                pattern_europe.y = 0
+                image.width =  841.05;
+                image.height = 750;
+                pattern_europe.x = -300
+                pattern_europe.y = -5
                 pattern_europe.width = image.width;
                 pattern_europe.height = image.height;
                 pattern_europe.addElement(image.element);
