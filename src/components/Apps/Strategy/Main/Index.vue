@@ -56,7 +56,7 @@
                 <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 200px"
                     placeholder="Select cluster data" :items="dataFields" v-model="selectedDataField"> </v-autocomplete>
             </v-toolbar-items>
-            <v-btn color="primary" @click="openMapSetup">Setup Map </v-btn>
+            <v-btn color="primary" @click="openMapSetup" v-if="selectedView == 1">Setup Map </v-btn>
             <v-spacer></v-spacer>
             <v-btn-toggle v-model="selectedView" round class="transparent" mandatory>
                 <v-btn class="elevation-0" style="width: 100px" round color="primary">
@@ -227,7 +227,6 @@
                     // console.log(obj);
                     for (var item in obj) {
                         let count = 0
-                        console.log(item);
 
                         self.setupMapData.push({
                             text: item,
@@ -236,10 +235,6 @@
                         count++
                     }
                 })
-                console.log(tmp);
-
-                console.log(self.setupMapData);
-
             },
             getData(stores) {
                 let self = this;
@@ -300,6 +295,8 @@
             },
             handleData(data, storeData) {
                 let self = this;
+
+                console.log(data);
 
                 let final = [];
                 let headers = [];

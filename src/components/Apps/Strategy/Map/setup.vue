@@ -11,27 +11,33 @@
             <v-container grid-list-md>
                 <v-layout row wrap>
                     <v-flex md4>
-                        <v-checkbox label="heatmap" hide-details> </v-checkbox>
-                        <v-text-field label="radius" number hide-details></v-text-field>
+                        <v-checkbox label="heatmap" hide-details v-model="useHeatmap"> </v-checkbox>
+                        <v-text-field label="radius" type="number" v-if="useHeatmap" hide-details
+                            v-model="heatMapRadius"></v-text-field>
                     </v-flex>
                     <v-flex md4>
-                        <v-checkbox label="Pie Charts" hide-details> </v-checkbox>
+                        <v-checkbox label="Pie Charts" hide-details v-model="usePiecharts"> </v-checkbox>
 
                     </v-flex>
                     <v-flex md4> </v-flex>
                     <v-flex md4>
-                        <v-card height="500px">
+                        <v-card>
                             <v-toolbar flat dark dense color="primary">HeatMap Fields </v-toolbar>
-                            <v-card-text>
+                            <v-card-text style="height: 500px; overflow: auto;">
                                 <v-checkbox hide-details v-for="(item,idx) in heatmapItems" :key="idx"
                                     :label="item.text+' - '+item.cluster" :value="item.text"
-                                    v-model="selectedHeatmapField" ></v-checkbox>
+                                    v-model="selectedHeatmapField"></v-checkbox>
                             </v-card-text>
                         </v-card>
                     </v-flex>
                     <v-flex md4>
-                        <v-card height="500px">
+                        <v-card>
                             <v-toolbar flat dark dense color="primary">Piechart Fields </v-toolbar>
+                            <v-card-text style="height: 500px; overflow: auto;">
+                                <v-checkbox hide-details v-for="(item,idx) in piechartItems" :key="idx"
+                                    :label="item.text+' - '+item.cluster" :value="item.text"
+                                    v-model="selectedPiechartItems"></v-checkbox>
+                            </v-card-text>
                         </v-card>
                     </v-flex>
                     <v-flex md4> </v-flex>
@@ -39,7 +45,7 @@
             </v-container>
             <v-card-actions>
                 <v-spacer> </v-spacer>
-                <v-btn color="primary"> submit </v-btn>
+                <v-btn color="primary" @click="close"> submit </v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -50,8 +56,14 @@
             return {
                 dialog: false,
                 callback: null,
+                heatMapRadius: 0,
+                usePiecharts: false,
+                useHeatmap: false,
+                selectedPiechartItems: null,
+                selectedHeatmapField: null,
+                piechartItems: [],
                 heatmapItems: [],
-                selectedHeatmapField: null
+
             }
         },
         methods: {
@@ -66,7 +78,16 @@
             },
             close() {
                 let self = this
-                self.callback()
+                let item = {
+                    heatMapRadius: self.heatMapRadius,
+                    usePiecharts: self.usePiecharts,
+                    useHeatmap: self.useHeatmap,
+                    selectedPiechartItems: self.selectedPiechartItems,
+                    selectedHeatmapField: self.selectedHeatmapField
+                }
+                self.dialog=false
+                self.callback(item)
+
             }
         }
     }

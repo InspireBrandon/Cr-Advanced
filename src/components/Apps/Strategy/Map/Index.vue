@@ -32,19 +32,20 @@
         },
         mounted() {
             // this.openSetup()
-            this.drawMap(this.labels, 0)
+            // this.drawMap(this.labels)
         },
         methods: {
             openSetup() {
                 let self = this
                 self.$refs.Mapsetup.open(self.setupData, callback => {
-
+                    console.log(callback);
+                    self.drawMap(this.labels, callback)
                 })
             },
-            drawMap(labelState) {
+            drawMap(labelState, config) {
                 let self = this
-               
-                
+
+
                 console.log(self.rowData);
                 // todo sort rowdata by sales for heatmap legend
                 let formattedData = [];
@@ -82,17 +83,18 @@
 
 
                 // Configure series
-               
+
                 let polygonTemplate = polygonSeries.mapPolygons.template;
                 // polygonTemplate.tooltipText = "{name}";
-                polygonTemplate.tooltipHTML ='<a href="https://en.wikipedia.org/wiki/{category.urlEncode()}">{name}</a>'
+                polygonTemplate.tooltipHTML =
+                    '<a href="https://en.wikipedia.org/wiki/{category.urlEncode()}">{name}</a>'
                 var pattern_europe = new am4core.Pattern();
                 var image = new am4core.Image();
                 image.href = "sa hm.png"
                 console.log("polygonTemplate");
                 console.log(polygonTemplate);
                 polygonTemplate.tooltipColorSource = "rgb(103,148,220)"
-                var height= this.$refs.thisone2.clientHeight
+                var height = this.$refs.thisone2.clientHeight
                 console.log(this.$refs.thisone2);
                 console.log(this.$refs.thisone2.children);
 
@@ -100,7 +102,7 @@
                 image.height = height;
                 pattern_europe.x = -300
                 pattern_europe.y = -5
-                  
+
                 pattern_europe.width = image.width;
                 pattern_europe.height = image.height;
                 pattern_europe.addElement(image.element);
@@ -153,65 +155,67 @@
                                 else
                                     marker.hide(dataItem.index);
                                 event.stopPropagation();
-                                // marker.latitude = dispose();
-                                // marker.longitude = dispose();
                             })
                         }
                     })
                 });
 
-                var circle = imageSeriesTemplate.createChild(am4core.Circle);
-                circle.fillOpacity = 0.7;
-                circle.tooltipText = "{storeName}: [bold]{sales}[/]";
-                circle.radius = self.radius
-                let label = imageSeriesTemplate.createChild(am4core.Label);
-                label.text = "{storeName}";
-                label.fill = am4core.color("#fff");
 
-                label.nonScaling = false;
-                label.hidden = labelState
+                if (config.useHeatmap) {
+                    var circle = imageSeriesTemplate.createChild(am4core.Circle);
+                    circle.fillOpacity = 0.7;
+                    circle.tooltipText = "{storeName}: [bold]{sales}[/]";
+                    circle.radius = self.radius
+                    let label = imageSeriesTemplate.createChild(am4core.Label);
+                    label.text = "{storeName}";
+                    label.fill = am4core.color("#fff");
 
-                imageSeries.heatRules.push({
-                    property: "fill",
-                    target: circle,
-                    min: chart.colors.getIndex(1).brighten(1),
-                    max: chart.colors.getIndex(1).brighten(-1)
-                });
-                let heatLegend = chart.createChild(am4maps.HeatLegend);
-                heatLegend.series = imageSeries;
-                heatLegend.align = "right";
-                heatLegend.width = am4core.percent(25);
-                heatLegend.marginRight = am4core.percent(4);
-                heatLegend.minValue = 0;
-                heatLegend.maxValue = 40000000;
-                heatLegend.valign = "bottom";
+                    label.nonScaling = false;
+                    label.hidden = labelState
 
+                    imageSeries.heatRules.push({
+                        property: "fill",
+                        target: circle,
+                        min: chart.colors.getIndex(1).brighten(1),
+                        max: chart.colors.getIndex(1).brighten(-1)
+                    });
+                    let heatLegend = chart.createChild(am4maps.HeatLegend);
+                    heatLegend.series = imageSeries;
+                    heatLegend.align = "right";
+                    heatLegend.width = am4core.percent(25);
+                    heatLegend.marginRight = am4core.percent(4);
+                    heatLegend.minValue = 0;
+                    heatLegend.maxValue = 40000000;
+                    heatLegend.valign = "bottom";
+                }
 
-                let pieSeries = chart.series.push(new am4maps.MapImageSeries());
-                let pieTemplate = pieSeries.mapImages.template;
-                pieTemplate.propertyFields.latitude = "lat";
-                pieTemplate.propertyFields.longitude = "long";
-                pieTemplate.nonScaling = true
-                let pieChartTemplate = pieTemplate.createChild(am4charts.PieChart);
-                pieChartTemplate.adapter.add("data", function (data, target) {
-                    if (target.dataItem) {
-                        return target.dataItem.dataContext.pieData;
-                    } else {
-                        return [];
-                    }
-                });
-                pieChartTemplate.propertyFields.width = "width";
-                pieChartTemplate.propertyFields.height = "height";
-                pieChartTemplate.horizontalCenter = "middle";
-                pieChartTemplate.verticalCenter = "middle";
+                if (config.usePiecharts) {
+                    let pieSeries = chart.series.push(new am4maps.MapImageSeries());
+                    let pieTemplate = pieSeries.mapImages.template;
+                    pieTemplate.propertyFields.latitude = "lat";
+                    pieTemplate.propertyFields.longitude = "long";
+                    pieTemplate.nonScaling = true
+                    let pieChartTemplate = pieTemplate.createChild(am4charts.PieChart);
+                    pieChartTemplate.adapter.add("data", function (data, target) {
+                        if (target.dataItem) {
+                            return target.dataItem.dataContext.pieData;
+                        } else {
+                            return [];
+                        }
+                    });
+                    pieChartTemplate.propertyFields.width = "width";
+                    pieChartTemplate.propertyFields.height = "height";
+                    pieChartTemplate.horizontalCenter = "middle";
+                    pieChartTemplate.verticalCenter = "middle";
 
-                let pieSeriesTemplate = pieChartTemplate.series.push(new am4charts.PieSeries);
-                pieSeriesTemplate.dataFields.category = "category";
-                pieSeriesTemplate.dataFields.value = "value";
-                pieSeriesTemplate.labels.template.disabled = true;
-                pieSeries.nonScalingStroke = false
-                pieSeries.name = "Pie Charts"
-
+                    let pieSeriesTemplate = pieChartTemplate.series.push(new am4charts.PieSeries);
+                    pieSeriesTemplate.dataFields.category = "category";
+                    pieSeriesTemplate.dataFields.value = "value";
+                    pieSeriesTemplate.labels.template.disabled = true;
+                    pieSeries.nonScalingStroke = false
+                    pieSeries.name = "Pie Charts"
+                    pieSeries.data = self.rowData
+                }
                 if (self.lines) {
                     let graticuleSeries = chart.series.push(new am4maps.GraticuleSeries());
                     graticuleSeries.mapLines.template.line.strokeOpacity = 0.2;
@@ -219,8 +223,6 @@
                     graticuleSeries.latitudeStep = 2
                     graticuleSeries.name = "lines"
                 }
-                pieSeries.data = self.rowData
-
                 let linkContainer = chart.createChild(am4core.Container);
                 linkContainer.isMeasured = false;
                 linkContainer.layout = "horizontal";
@@ -252,7 +254,7 @@
                 chart.legend = new am4maps.Legend();
                 chart.legend.position = "right";
                 chart.legend.align = "right";
-                
+
 
             }
         }
