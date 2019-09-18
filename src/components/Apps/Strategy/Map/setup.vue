@@ -40,7 +40,9 @@
                             </v-card-text>
                         </v-card>
                     </v-flex>
-                    <v-flex md4> </v-flex>
+                    <v-flex md4>
+                        <ImageSelector ref="ImageSelector" />
+                    </v-flex>
                 </v-layout>
             </v-container>
             <v-card-actions>
@@ -51,7 +53,10 @@
     </v-dialog>
 </template>
 <script>
+    import ImageSelector from './ImageSelector'
+
     export default {
+        components: {ImageSelector},
         data() {
             return {
                 dialog: false,
@@ -62,8 +67,7 @@
                 selectedPiechartItems: null,
                 selectedHeatmapField: null,
                 piechartItems: [],
-                heatmapItems: [],
-
+                heatmapItems: []
             }
         },
         methods: {
@@ -78,6 +82,9 @@
             },
             close() {
                 let self = this
+
+                let imageDetails = self.$refs.ImageSelector.returnData;
+
                 let item = {
                     heatMapRadius: self.heatMapRadius,
                     usePiecharts: self.usePiecharts,
