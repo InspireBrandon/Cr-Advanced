@@ -1,6 +1,6 @@
 <template>
     <div oncontextmenu="return false;">
-        <div id="thisone2" class="map">
+        <div id="thisone2" class="map" ref="thisone2">
         </div>
         <YesNoModal ref="yesNo"></YesNoModal>
         <Mapsetup ref="Mapsetup" />
@@ -43,6 +43,8 @@
             },
             drawMap(labelState) {
                 let self = this
+               
+                
                 console.log(self.rowData);
                 // todo sort rowdata by sales for heatmap legend
                 let formattedData = [];
@@ -74,38 +76,35 @@
                 chart.projection = new am4maps.projections.Mercator();
                 let polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
 
-                polygonSeries.strokeOpacity = 0.1;
+                polygonSeries.strokeOpacity = 0.9;
                 polygonSeries.useGeodata = true;
                 // polygonSeries.exclude = ["ZA-WC"];
 
 
                 // Configure series
+               
                 let polygonTemplate = polygonSeries.mapPolygons.template;
-
-                polygonTemplate.tooltipText = "{name}";
-                // polygonTemplate.tooltip.getFillFromObject = false;
-                // polygonTemplate.tooltip.background.fill = am4core.color("#CEB1BE");
-
+                // polygonTemplate.tooltipText = "{name}";
+                polygonTemplate.tooltipHTML ='<a href="https://en.wikipedia.org/wiki/{category.urlEncode()}">{name}</a>'
                 var pattern_europe = new am4core.Pattern();
                 var image = new am4core.Image();
                 image.href = "sa hm.png"
-                //  "Picture1.png"
-                // "https://i.dlpng.com/static/png/4679756_thumb.png"
-                // "http://www.climbing.co.za/w/images/2/2f/Rsamap.png";
-                // // image.href = "https://pbs.twimg.com/profile_images/1847786693/John_Dorfling_400x400.jpg";
-
                 console.log("polygonTemplate");
                 console.log(polygonTemplate);
-                polygonTemplate.tooltipColorSource=chart.colors.getIndex(1)
+                polygonTemplate.tooltipColorSource = "rgb(103,148,220)"
+                var height= this.$refs.thisone2.clientHeight
+                console.log(this.$refs.thisone2);
+                console.log(this.$refs.thisone2.children);
 
                 image.width = 841.05;
-                image.height = 750;
+                image.height = height;
                 pattern_europe.x = -300
                 pattern_europe.y = -5
+                  
                 pattern_europe.width = image.width;
                 pattern_europe.height = image.height;
                 pattern_europe.addElement(image.element);
-                pattern_europe.fill= chart.colors.getIndex(3);
+                pattern_europe.fill = chart.colors.getIndex(3);
                 // polygonTemplate.fill = chart.colors.getIndex(3);
 
                 polygonTemplate.fill = pattern_europe
@@ -124,7 +123,7 @@
                 imageSeriesTemplate.propertyFields.latitude = "lat";
                 imageSeriesTemplate.propertyFields.longitude = "long";
                 imageSeriesTemplate.nonScaling = false
-
+                imageSeriesTemplate.fill = chart.colors.getIndex(1)
                 chart.seriesContainer.events.on("hit", function (ev) {
                     if (ev.preventDefault != undefined)
                         ev.preventDefault();
@@ -162,9 +161,7 @@
                 });
 
                 var circle = imageSeriesTemplate.createChild(am4core.Circle);
-                // todo make opacity in heat rules
                 circle.fillOpacity = 0.7;
-                // circle.propertyFields.fill = 'color';
                 circle.tooltipText = "{storeName}: [bold]{sales}[/]";
                 circle.radius = self.radius
                 let label = imageSeriesTemplate.createChild(am4core.Label);
@@ -173,22 +170,6 @@
 
                 label.nonScaling = false;
                 label.hidden = labelState
-
-
-
-                // imageSeries.heatRules.push({
-                //     "target": circle,
-                //     "property": "fill",
-                //     // target: polygonSeries.mapPolygons.template,
-                //     "min": chart.colors.getIndex(2).brighten(1),
-                //     "max": chart.colors.getIndex(2).brighten(-0.3),
-                //     // "target": circle,
-                //     // "property": "radius",
-                //     // // todo make circles radius configureable
-                //     // "min": self.radius,
-                //     // "max": self.radius,
-                //     "dataField": "value"
-                // })
 
                 imageSeries.heatRules.push({
                     property: "fill",
@@ -205,32 +186,31 @@
                 heatLegend.maxValue = 40000000;
                 heatLegend.valign = "bottom";
 
-// ////////////////////////////////////////////////////////////
 
-                // let pieSeries = chart.series.push(new am4maps.MapImageSeries());
-                // let pieTemplate = pieSeries.mapImages.template;
-                // pieTemplate.propertyFields.latitude = "lat";
-                // pieTemplate.propertyFields.longitude = "long";
-                // pieTemplate.nonScaling = true
-                // let pieChartTemplate = pieTemplate.createChild(am4charts.PieChart);
-                // pieChartTemplate.adapter.add("data", function (data, target) {
-                //     if (target.dataItem) {
-                //         return target.dataItem.dataContext.pieData;
-                //     } else {
-                //         return [];
-                //     }
-                // });
-                // pieChartTemplate.propertyFields.width = "width";
-                // pieChartTemplate.propertyFields.height = "height";
-                // pieChartTemplate.horizontalCenter = "middle";
-                // pieChartTemplate.verticalCenter = "middle";
+                let pieSeries = chart.series.push(new am4maps.MapImageSeries());
+                let pieTemplate = pieSeries.mapImages.template;
+                pieTemplate.propertyFields.latitude = "lat";
+                pieTemplate.propertyFields.longitude = "long";
+                pieTemplate.nonScaling = true
+                let pieChartTemplate = pieTemplate.createChild(am4charts.PieChart);
+                pieChartTemplate.adapter.add("data", function (data, target) {
+                    if (target.dataItem) {
+                        return target.dataItem.dataContext.pieData;
+                    } else {
+                        return [];
+                    }
+                });
+                pieChartTemplate.propertyFields.width = "width";
+                pieChartTemplate.propertyFields.height = "height";
+                pieChartTemplate.horizontalCenter = "middle";
+                pieChartTemplate.verticalCenter = "middle";
 
-                // let pieSeriesTemplate = pieChartTemplate.series.push(new am4charts.PieSeries);
-                // pieSeriesTemplate.dataFields.category = "category";
-                // pieSeriesTemplate.dataFields.value = "value";
-                // pieSeriesTemplate.labels.template.disabled = true;
-                // pieSeries.nonScalingStroke = false
-                // pieSeries.name = "Pie Charts"
+                let pieSeriesTemplate = pieChartTemplate.series.push(new am4charts.PieSeries);
+                pieSeriesTemplate.dataFields.category = "category";
+                pieSeriesTemplate.dataFields.value = "value";
+                pieSeriesTemplate.labels.template.disabled = true;
+                pieSeries.nonScalingStroke = false
+                pieSeries.name = "Pie Charts"
 
                 if (self.lines) {
                     let graticuleSeries = chart.series.push(new am4maps.GraticuleSeries());
@@ -239,7 +219,7 @@
                     graticuleSeries.latitudeStep = 2
                     graticuleSeries.name = "lines"
                 }
-                // pieSeries.data = self.rowData
+                pieSeries.data = self.rowData
 
                 let linkContainer = chart.createChild(am4core.Container);
                 linkContainer.isMeasured = false;
@@ -272,6 +252,7 @@
                 chart.legend = new am4maps.Legend();
                 chart.legend.position = "right";
                 chart.legend.align = "right";
+                
 
             }
         }
