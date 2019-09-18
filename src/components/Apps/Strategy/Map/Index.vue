@@ -27,6 +27,7 @@
             return {
                 labels: true,
                 lines: true,
+                radius: 15,
             }
         },
         mounted() {
@@ -86,7 +87,7 @@
                 //     "http://www.climbing.co.za/w/images/2/2f/Rsamap.png";
                 var pattern_europe = new am4core.Pattern();
                 var image = new am4core.Image();
-                image.href ="imageedit_7_8566582854.png"
+                image.href = "imageedit_7_8566582854.png"
                 //  "Picture1.png"
                 // "https://i.dlpng.com/static/png/4679756_thumb.png"
                 // "http://www.climbing.co.za/w/images/2/2f/Rsamap.png";
@@ -95,7 +96,7 @@
                 console.log("polygonTemplate");
                 console.log(polygonTemplate);
 
-                image.width =  865;
+                image.width = 865;
                 image.height = 744;
                 pattern_europe.x = -325
                 pattern_europe.y = 0
@@ -159,6 +160,7 @@
                 });
 
                 var circle = imageSeriesTemplate.createChild(am4core.Circle);
+                // todo make opacity in heat rules
                 circle.fillOpacity = 0.7;
                 circle.propertyFields.fill = 'color';
                 circle.tooltipText = "{storeName}: [bold]{sales}[/]";
@@ -170,11 +172,19 @@
                 label.nonScaling = false;
                 label.hidden = labelState
 
+
+
                 imageSeries.heatRules.push({
                     "target": circle,
-                    "property": "radius",
-                    "min": 4,
-                    "max": 30,
+                    property: "fill",
+                    // target: polygonSeries.mapPolygons.template,
+                    min: chart.colors.getIndex(1).brighten(1),
+                    max: chart.colors.getIndex(1).brighten(-0.3),
+                    // "target": circle,
+                    // "property": "radius",
+                    // // todo make circles radius configureable
+                    // "min": self.radius,
+                    // "max": self.radius,
                     "dataField": "value"
                 })
                 let pieSeries = chart.series.push(new am4maps.MapImageSeries());
