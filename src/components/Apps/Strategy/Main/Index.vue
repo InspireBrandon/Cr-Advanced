@@ -52,13 +52,13 @@
                     placeholder="Select File" dense :items="files" v-model="selectedFile" hide-details>
                 </v-select> -->
             </v-toolbar-items>
-            <v-toolbar-items v-if="selectedView == 1">
+            <!-- <v-toolbar-items v-if="selectedView == 1">
                 <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 200px"
                     placeholder="Select cluster type" :items="clusters" v-model="selectedCluster"
                     @change="onClusterChange"> </v-autocomplete>
                 <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 200px"
                     placeholder="Select cluster data" :items="dataFields" v-model="selectedDataField"> </v-autocomplete>
-            </v-toolbar-items>
+            </v-toolbar-items> -->
             <v-btn color="primary" @click="openMapSetup" v-if="selectedView == 1">Setup Map </v-btn>
             <v-spacer></v-spacer>
             <v-btn-toggle v-model="selectedView" round class="transparent" mandatory>
@@ -73,7 +73,7 @@
                 </v-btn>
             </v-btn-toggle>
         </v-toolbar>
-        <Grid v-if="selectedView == 0" :rowData="rowData" :headers="headers" ref="Grid" />
+        <Grid v-show="selectedView == 0" :rowData="rowData" :headers="headers" ref="Grid" />
         <Map v-if="selectedView == 1" :rowData="rowData" :setupData="setupMapData" ref="Map" />
         <ClusterModels :fileData="rowData" v-if="selectedView == 2" ref="ClusterModels" />
         <Setup ref="Setup" />
@@ -189,9 +189,6 @@
                                 })
                             })
                             console.log(self.rowData);
-
-                            // tj stuff
-                            // use output
                         })
                 })
             },
@@ -452,7 +449,7 @@
                                 if (el.displayname == element.PlaceGroup.toUpperCase()) {
                                     storeFound = true;
 
-                                    tmpBasket["totalSales"] = el.totalSales.toFixed(0);
+                                    tmpBasket["totalSales"] = parseInt(el.totalSales.toFixed(0));
                                     tmpBasket["sales"] = formatter.format(el.totalSales).replace("$",
                                         "R");
                                     tmpBasket["cumulativePercent"] = el.cumulativePercent;

@@ -90,7 +90,7 @@
                     '<a href="https://en.wikipedia.org/wiki/{category.urlEncode()}">{name}</a>'
                 var pattern_europe = new am4core.Pattern();
                 var image = new am4core.Image();
-                image.href = "sa hm.png"
+                image.href = "https://www.southafrica.to/provinces/RSA_by_provinces.jpg"
                 console.log("polygonTemplate");
                 console.log(polygonTemplate);
                 polygonTemplate.tooltipColorSource = "rgb(103,148,220)"
