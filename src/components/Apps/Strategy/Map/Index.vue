@@ -37,7 +37,7 @@
             this.getData()
         },
         methods: {
-             getData() {
+            getData() {
                 let self = this;
                 Axios.get(process.env.VUE_APP_API +
                         `SystemFile/JSON?db=CR-Devinspire&folder=CLUSTER REPORT&file=REPORT`)
@@ -102,7 +102,7 @@
                     '<a href="https://en.wikipedia.org/wiki/{category.urlEncode()}">{name}</a>'
                 var pattern_europe = new am4core.Pattern();
                 var image = new am4core.Image();
-                image.href = "https://www.southafrica.to/provinces/RSA_by_provinces.jpg"
+
                 console.log("polygonTemplate");
                 console.log(polygonTemplate);
                 polygonTemplate.tooltipColorSource = "rgb(103,148,220)"
@@ -117,14 +117,20 @@
 
                 pattern_europe.width = image.width;
                 pattern_europe.height = image.height;
-                pattern_europe.addElement(image.element);
-                pattern_europe.fill = chart.colors.getIndex(3);
-                // polygonTemplate.fill = chart.colors.getIndex(3);
-
-                polygonTemplate.fill = pattern_europe
+                if (config.imageDetails.imageType != "none") {
+                    if (config.imageDetails.imageType == "upload") {
+                        image.href = config.imageDetails.imgURL
+                    }
+                    if (config.imageDetails.imageType == "link") {
+                        image.href = config.imageDetails.imageLinkAddress
+                    }
+                    pattern_europe.addElement(image.element);
+                    polygonTemplate.fill = pattern_europe
+                } else {
+                    polygonTemplate.fill = chart.colors.getIndex(3);
+                }
                 polygonTemplate.strokeOpacity = 0.5;
                 polygonTemplate.nonScalingStroke = true;
-
                 // create capital markers
                 let imageSeries = chart.series.push(new am4maps.MapImageSeries());
                 // define template

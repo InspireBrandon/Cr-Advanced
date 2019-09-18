@@ -87,14 +87,15 @@
             close() {
                 let self = this
 
-                let imageDetails = self.$refs.ImageSelector.returnData;
+                let imageDetails = self.$refs.ImageSelector.returnData();
 
                 let item = {
                     heatMapRadius: self.heatMapRadius,
                     usePiecharts: self.usePiecharts,
                     useHeatmap: self.useHeatmap,
                     selectedPiechartItems: self.selectedPiechartItems,
-                    selectedHeatmapField: self.selectedHeatmapField
+                    selectedHeatmapField: self.selectedHeatmapField,
+                    imageDetails:imageDetails
                 }
                 self.dialog = false
                 self.callback(item)
