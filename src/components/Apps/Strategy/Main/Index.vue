@@ -7,6 +7,9 @@
                         File
                     </v-btn>
                     <v-list>
+                        <v-list-tile @click="newFile">
+                            <v-list-tile-title>New</v-list-tile-title>
+                        </v-list-tile>
                         <v-list-tile @click="saveFile">
                             <v-list-tile-title>Save</v-list-tile-title>
                         </v-list-tile>
@@ -172,7 +175,7 @@
 
                 self.$refs.CustomSelector.show(data => {
                     Axios.get(process.env.VUE_APP_API +
-                            `Cluster/Advanced?field=${data.field}&fieldID=${data.fieldID}`)
+                            `Cluster/Advanced?field=${data.field}`)
                         .then(r => {
                             let queryStores = r.data;
                             let output = [];
@@ -704,6 +707,11 @@
                 self.stores = stores;
                 self.getData(stores);
             },
+            newFile() {
+                let self = this;
+
+                self.customSetup();
+            },
             openFile() {
                 let self = this;
 
@@ -711,7 +719,7 @@
                     let config = self.fileData.report.clusters[file];
                     self.currentConfig = config;
                     self.selectedClusterType = file == 'Store Cluster' ? 0 : 1;
-                    if(self.selectedClusterType == 0) {
+                    if (self.selectedClusterType == 0) {
                         self.handleSetup(config);
                     } else {
                         self.handleCustomSetup(config);

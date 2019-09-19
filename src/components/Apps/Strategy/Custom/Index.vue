@@ -7,10 +7,7 @@
                         File
                     </v-btn>
                     <v-list>
-                        <v-list-tile @click="openFileDialog">
-                            <v-list-tile-title>Import</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile>
+                        <v-list-tile @click="newFile">
                             <v-list-tile-title>New</v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile>
@@ -21,20 +18,6 @@
                         </v-list-tile>
                         <v-list-tile @click="close">
                             <v-list-tile-title>close</v-list-tile-title>
-                        </v-list-tile>
-                    </v-list>
-                </v-menu>
-                <v-menu dark offset-y style="margin-bottom: 10px;">
-                    <v-btn slot="activator" flat>Baskets</v-btn>
-                    <v-list>
-                        <v-list-tile>
-                            <v-list-tile-title>Add</v-list-tile-title>
-                        </v-list-tile>
-                        <!-- <v-list-tile @click="openLevels">
-                            <v-list-tile-title>Basket Levels</v-list-tile-title>
-                        </v-list-tile> -->
-                        <v-list-tile>
-                            <v-list-tile-title>Line items</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
                 </v-menu>
@@ -51,18 +34,22 @@
             <v-btn color="primary">Setup</v-btn>
         </v-toolbar>
         <Grid :rowData="rowData" :headers="headers" ref="Grid" />
-
-        <input @change="onFileChange" accept=".csv" ref="fileInput" style="display: none" type="file">
-
+        <CustomSelector ref="CustomSelector" />
+        <Spinner ref="Spinner" />
     </v-card>
 </template>
 
 <script>
+    import Axios from 'axios';
     import Grid from './Grid'
+    import CustomSelector from './CustomSelector';
+    import Spinner from '@/components/Common/Spinner';
 
     export default {
         components: {
-            Grid
+            Grid,
+            CustomSelector,
+            Spinner
         },
         data() {
             return {
@@ -71,75 +58,64 @@
             }
         },
         methods: {
-            close() {
-                let self = this
-                self.rowData = []
-            },
-            openFileDialog() {
-                let self = this;
-                self.$refs.fileInput.value = null;
-                self.$refs.fileInput.click();
-            },
-            onFileChange(e) {
+            newFile() {
                 let self = this;
 
-                self.$nextTick(() => {
-                    const files = e.target.files;
-                    let file = files[0];
-                    let reader = new FileReader();
-
-                    reader.onload = function (e) {
-                        let data = csvToDataObject(e.currentTarget.result);
-                        self.headers = convertToGridHeaders(data.headers);
-                        self.rowData = data.data;
-                    }
-
-                    reader.readAsText(file);
+                self.$refs.CustomSelector.show(data => {
+                    self.$refs.Spinner.show();
+                    self.customQuery(data)
                 })
             },
-        }
-    }
+            customQuery(data) {
+                let self = this;
+                Axios.get(process.env.VUE_APP_API + `Cluster/Advanced?field=${data.field}`)
+                    .then(r => {
+                        self.processData(r.data, data.field);
+                    })
+            },
+            processData(data, field) {
+                let self = this;
+                let uniqueStores = getUniqueStores(data);
 
-    function convertToGridHeaders(headers) {
-        let tmp = [];
+                self.headers = [{
+                    "headerName": "Store",
+                    "field": "storeName",
+                    "pivot": true,
+                    "enablePivot": true
+                }, {
+                    "headerName": field,
+                    "field": field.toLowerCase(),
+                    "rowGroup": true,
+                    "enableRowGroup": true
+                }, {
+                    "headerName": "Sales",
+                    "field": "sales",
+                    "aggFunc": "sum",
+                    "enableValue": true
+                }]
 
-        headers.forEach(el => {
-            tmp.push({
-                "headerName": el,
-                "field": el,
-            })
-        })
+                self.rowData = data;
 
-        return tmp;
-    }
-
-    function csvToDataObject(data) {
-        let lines = data.split('\n');
-        let result = [];
-
-        let brokenHeaders = lines[0].split(',');
-        let headers = [];
-
-        brokenHeaders.forEach(el => {
-            headers.push(el.replace(/ /g, "_").replace(/"/g, "").replace(/\r/g, ""));
-        })
-
-        for (let i = 1; i < lines.length; i++) {
-            let obj = {};
-            let currentLine = lines[i].split(",");
-
-            if (currentLine[0] != "") {
-                for (let j = 0; j < headers.length; j++) {
-                    obj[headers[j]] = currentLine[j].replace(/"/g, "").replace(/\r/g, "");
-                }
-
-                result.push(obj);
+                self.$refs.Spinner.hide();
             }
-
         }
-        return {
-            data: result,
-            headers: headers
-        };
+    }
+
+    function getUniqueStores(data) {
+        let stores = [];
+
+        data.forEach(ss => {
+            let canAdd = true;
+
+            stores.forEach(s => {
+                if (ss.storeName == s)
+                    canAdd = false;
+            })
+
+            if (canAdd)
+                stores.push(ss.storeName);
+        });
+
+        return stores;
     }
 </script>

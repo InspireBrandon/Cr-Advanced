@@ -28,6 +28,7 @@
     import BasketAnalysis from '../BasketAnalysis/Index'
     import ListingClusters from '../ListingClusters/Index'
     import StoreAnalysis from '../StoreAnalysis/Index'
+    import Research from '../Research/Index'
     import Custom from '../Custom/Index'
 
     function TabItem(name, component) {
@@ -42,6 +43,7 @@
             ListingClusters,
             StoreAnalysis,
             Map,
+            Research,
             Custom
         },
         data() {
@@ -52,7 +54,8 @@
                     new TabItem("Store", "StoreAnalysis"),
                     new TabItem("Basket", "BasketAnalysis"),
                     new TabItem("Listing", "ListingClusters"),
-                    new TabItem("Research", "Custom")
+                    new TabItem("Custom", "Custom"),
+                    new TabItem("Research", "Research")
                 ]
             }
         },
