@@ -36,7 +36,7 @@
         request
     } from 'http';
     export default {
-        props: ["rowData", "selectedProject", "getRowData", "assign"],
+        props: ["rowData", "selectedProject", "getRowData", "assign", "accessType"],
         components: {
             AgGridVue,
             VariationOrderModal,
@@ -91,7 +91,7 @@
                         "headerName": "Actions",
                         "editable": false,
                         "hide": false,
-                        "minWidth": 220,
+                        "minWidth": 340,
                         "cellRendererFramework": "Button"
                     },
                     {
