@@ -943,6 +943,12 @@ class GeneralPosition {
 
     let ctrl_store = new StoreHelper();
     let parentItem = ctrl_store.getPlanogramItemById(productGroup.VueStore, productGroup.ParentID);
+    let nestingApplies = false;
+    let nestingHeight = 0;
+    if (productGroup.Data.nesting_Height != undefined && productGroup.Data.nesting_Height != null && productGroup.Data.nesting_Height != "" && yFacings > 0) {
+      nestingApplies = true;
+      nestingHeight = parseFloat(productGroup.Data.nesting_Height) * productGroup.Ratio;
+    }
 
     switch (parentItem.Type.toUpperCase()) {
       case "SHELF": {
@@ -976,7 +982,12 @@ class GeneralPosition {
         //   return retVal;
         // }
 
-        retVal.y = productGroup.Group.getHeight() - ((yFacings + 1) * productGroup.Orientation_Height);
+        if (nestingApplies == true && nestingHeight > 0) {
+          retVal.y = productGroup.Group.getHeight() - productGroup.Orientation_Height - ((yFacings) * (nestingHeight));
+        } else {
+          retVal.y = productGroup.Group.getHeight() - ((yFacings + 1) * productGroup.Orientation_Height);
+        }
+
         retVal.x = (xFacings * productGroup.Orientation_Width);
         return retVal;
       }
