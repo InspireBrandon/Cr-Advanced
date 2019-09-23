@@ -1,13 +1,18 @@
 <template>
-    <div>
+    <div width="100%">
         <div oncontextmenu="return false;" class="mapContainer">
             <div id="thisone2" class="map" ref="thisone2">
             </div>
             <div class="sideBar">
                 <v-toolbar dark flat dense color="primary">Image </v-toolbar>
-               
+                <v-card>
+                    <v-img @click="openFileDialog" :src="imgURL == '' ? tmpImageURL : imgURL" aspect-ratio="1"
+                        class="grey lighten-2" width="100%" max-height="200" style="cursor: pointer;"></v-img>
+                </v-card>
             </div>
         </div>
+        <input type="file" style="display: none;" ref="fileInput" @change="onImageChange">
+
         <YesNoModal ref="yesNo"></YesNoModal>
         <Mapsetup ref="Mapsetup" />
     </div>
@@ -23,7 +28,11 @@
     import Axios from 'axios'
 
     // http://www.climbing.co.za/wp-content/uploads/2012/10/rsamap.png
-
+    const formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2
+    })
     export default {
         components: {
             YesNoModal,
@@ -36,7 +45,11 @@
                 lines: true,
                 radius: 20,
                 stores: [],
-                config: null
+                config: null,
+                tmpImageURL: 'https://www.okcballet.org/wp-content/uploads/2016/09/placeholder-image.png',
+                imgURL: '',
+                imageLinkAddress: '',
+                fileData: null,
             }
         },
         mounted() {
@@ -45,6 +58,27 @@
             this.getHinterlandStores()
         },
         methods: {
+
+            openFileDialog() {
+                let self = this;
+                self.$refs.fileInput.value = null
+                self.$refs.fileInput.click();
+            },
+            onImageChange(e) {
+                let self = this;
+                const files = e.target.files;
+                let file = files[0];
+                self.blobToDataUrl(file, url => {
+                    self.imgURL = url;
+                })
+            },
+            blobToDataUrl(blob, callback) {
+                var a = new FileReader();
+                a.onload = function () {
+                    callback(a.result);
+                }
+                a.readAsDataURL(blob);
+            },
             getHinterlandStores() {
                 let self = this;
 
@@ -59,6 +93,8 @@
                 })
 
                 self.stores = stores;
+
+
                 self.getData(stores);
             },
             getData(stores) {
@@ -68,25 +104,138 @@
                     .then(fd => {
                         Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fd.data.id}`)
                             .then(r => {
-                                console.log("r.data");
-                                console.log(r.data);
+
+                                self.fileData = r.data
+
                             })
                     })
             },
             openSetup() {
                 let self = this
                 self.$refs.Mapsetup.open(self.setupData, callback => {
-                    console.log(callback);
+                    let tmp = {
+                        heatmap: [],
+                        piechart: [],
+                    }
+
+
+                    if (callback.useHeatmap) {
+                        callback.selectedHeatmapField.forEach(field => {
+                            tmp.heatmap.push(self.fileData.basket[field])
+                        })
+                        tmp.heatmap.forEach(field => {
+                            field.graphArr = self.handelData(field, false)
+                        })
+                    }
+                    let pieArr = []
+                    if (callback.usePiecharts) {
+                        callback.selectedPiechartItems.forEach(field => {
+                            tmp.piechart.push(self.fileData.basket[field])
+                        })
+                        pieArr = self.handelPiechartData(tmp.piechart, true)
+                    }
+
+                    console.log(pieArr);
+
                     self.config = callback
-                    self.drawMap(this.labels, callback)
+                    self.drawMap(this.labels, callback, tmp, pieArr)
                 })
             },
-            drawMap(labelState, config) {
+            handelData(data, usePiechart) {
+                let self = this
+                console.log(data);
+                let final = [];
+                self.stores.forEach(element => {
+                    let storeFound = false;
+                    let tmpBasket = {
+                        storeName: element.PlaceGroup.toUpperCase()
+                    };
+                    for (var store in data.data) {
+
+
+                        data.data.forEach(el => {
+                            if (el.displayname == element.PlaceGroup.toUpperCase()) {
+                                storeFound = true;
+                                tmpBasket["sales"] = formatter.format(el.sales)
+                                    .replace("$",
+                                        "R");
+                                tmpBasket["width"] = 20
+                                tmpBasket["height"] = 20
+                                tmpBasket["salesPercent"] = el.salesPercent
+                                // if (usePiechart) {
+                                //     tmpBasket["pieData"] = [{
+                                //             "category": "Category #1",
+                                //             "value": 1200
+                                //         },
+                                //         {
+                                //             "category": "Category #2",
+                                //             "value": 500
+                                //         },
+                                //         {
+                                //             "category": "Category #3",
+                                //             "value": 765
+                                //         },
+                                //         {
+                                //             "category": "Category #4",
+                                //             "value": 260
+                                //         }
+                                //     ]
+                                // }
+
+                            }
+                        })
+                    }
+                    let longLat = element.OfficeGPS.split(",");
+                    let long = parseFloat(longLat[1]);
+                    let lat = parseFloat(longLat[0]);
+                    tmpBasket["long"] = long;
+                    tmpBasket["lat"] = lat;
+                    final.push(tmpBasket);
+                })
+                final = removeDuplicates(final, 'storeName')
+                return final
+            },
+            handelPiechartData(data, usePiechart) {
+                let self = this
+                console.log(data);
+                let final = [];
+                self.stores.forEach(element => {
+                    let storeFound = false;
+                    let tmpBasket = {
+                        storeName: element.PlaceGroup.toUpperCase()
+                    };
+                    let longLat = element.OfficeGPS.split(",");
+                    let long = parseFloat(longLat[1]);
+                    let lat = parseFloat(longLat[0]);
+                    tmpBasket["long"] = long;
+                    tmpBasket["lat"] = lat;
+                    tmpBasket["pieData"] = []
+                    tmpBasket["width"] = 100
+                    tmpBasket["height"] = 100
+                    final.push(tmpBasket);
+                })
+                final = removeDuplicates(final, 'storeName')
+                data.forEach((el, idx) => {
+                    console.log(el);
+                    final.forEach(finalStore => {
+                        el.data.forEach(store => {
+                            if (finalStore.storeName == store.displayname) {
+                                finalStore.pieData.push({
+                                    "category": el.config.selectedBasket.basket,
+                                    "value": store.sales
+                                })
+                            }
+                        })
+                    })
+                })
+
+                return final
+            },
+            drawMap(labelState, config, setupdata, piechartArray) {
                 let self = this
                 let screeWidth = returnInnerWidth()
 
                 self.radius = parseInt(config.heatMapRadius)
-                console.log(self.rowData);
                 // todo sort rowdata by sales for heatmap legend
                 let formattedData = [];
                 let chart = am4core.create("thisone2", am4maps.MapChart);
@@ -134,11 +283,9 @@
                 var pattern_europe = new am4core.Pattern();
                 var image = new am4core.Image();
 
-                console.log("polygonTemplate");
-                // console.log(polygonTemplate);
+                ;
                 polygonTemplate.tooltipColorSource = "rgb(103,148,220)"
                 var height = this.$refs.thisone2.clientHeight
-                console.log(height);
 
                 image.width = screeWidth.width;
                 image.height = height + 80;
@@ -170,11 +317,11 @@
 
 
                 if (config.useHeatmap) {
-                    config.selectedHeatmapField.forEach((heatmapItem, idx) => {
+                    setupdata.heatmap.forEach((heatmapItem, idx) => {
                         let imageSeries = chart.series.push(new am4maps.MapImageSeries());
                         // define template
-                        imageSeries.name = heatmapItem
-                        imageSeries.data = formattedData
+                        imageSeries.name = heatmapItem.config.selectedBasket.basket
+                        imageSeries.data = heatmapItem.graphArr
                         imageSeries.dataFields.value = "sales";
 
                         // if (type == 0) {
@@ -203,7 +350,6 @@
                                     mapMarker.verticalCenter = "bottom";
                                     var coords = chart.svgPointToGeo(ev.svgPoint);
                                     var marker = imageSeries.mapImages.create();
-                                    console.log(coords);
 
                                     marker.latitude = coords.latitude;
                                     marker.longitude = coords.longitude;
@@ -228,13 +374,15 @@
 
                         label.nonScaling = false;
                         label.hidden = labelState
-
+                        console.log("chart.colors");
+                        console.log(chart.colors);
                         imageSeries.heatRules.push({
                             property: "fill",
                             target: circle,
-                            min: chart.colors.getIndex(1 + (idx + 1)).brighten(1),
-                            max: chart.colors.getIndex(1 + (idx + 1)).brighten(-1)
+                            min: chart.colors.getIndex(11).brighten(1),
+                            max: chart.colors.getIndex(11).brighten(-1)
                         });
+                        // + (idx + 1)
                         let heatLegend = chart.createChild(am4maps.HeatLegend);
                         heatLegend.series = imageSeries;
                         heatLegend.align = "right";
@@ -252,6 +400,7 @@
                     pieTemplate.propertyFields.latitude = "lat";
                     pieTemplate.propertyFields.longitude = "long";
                     pieTemplate.nonScaling = true
+
                     let pieChartTemplate = pieTemplate.createChild(am4charts.PieChart);
                     pieChartTemplate.adapter.add("data", function (data, target) {
                         if (target.dataItem) {
@@ -268,10 +417,16 @@
                     let pieSeriesTemplate = pieChartTemplate.series.push(new am4charts.PieSeries);
                     pieSeriesTemplate.dataFields.category = "category";
                     pieSeriesTemplate.dataFields.value = "value";
+                    pieSeriesTemplate.slices.template.stroke = am4core.color("#fff");
+                    pieSeriesTemplate.slices.template.strokeWidth = 1;
+                    pieSeriesTemplate.slices.template.strokeOpacity = 1;
                     pieSeriesTemplate.labels.template.disabled = true;
-                    pieSeries.nonScalingStroke = false
+
+                    pieSeries.nonScalingStroke = true
                     pieSeries.name = "Pie Charts"
-                    pieSeries.data = self.rowData
+                    pieSeries.data = piechartArray
+
+
                 }
                 // if (self.lines) {
                 //     let graticuleSeries = chart.series.push(new am4maps.GraticuleSeries());
@@ -311,9 +466,6 @@
                 chart.legend = new am4maps.Legend();
                 chart.legend.position = "right";
                 chart.legend.align = "right";
-                console.log(chart);
-                console.log(chart.seriesWidth)
-
             }
         }
     }
@@ -332,17 +484,20 @@
         //     retval = 800;
         // }
 
-        // if (width > 1366) {
-        //     retval = 800;
-        // }
+        if (width > 1365) {
+            cw = 737.05;
+            offsetX = 3.5
+        }
 
-        // if (width > 1440) {
-        //     retval = 800;
-        // }
+        if (width > 1439) {
+            cw = 737.05;
+            offsetX = 3.1
+        }
 
-        // if (width > 1600) {
-        //     retval = 1000;
-        // }
+        if (width > 1599) {
+            cw = 737.05;
+            offsetX = 2.4
+        }
 
         if (width > 1768) {
             cw = 841.05;
@@ -353,6 +508,12 @@
             width: cw,
             offsetX: offsetX,
         };
+    }
+
+    function removeDuplicates(myArr, prop) {
+        return myArr.filter((obj, pos, arr) => {
+            return arr.map(mapObj => mapObj[prop]).indexOf(obj[prop]) === pos;
+        });
     }
 </script>
 
@@ -367,17 +528,39 @@
     .mapContainer {
         display: inline-flex;
         width: 100%
-        
-    }
-    .sideBar{
-        float: right; 
-        width:17%      
     }
 
-    @media screen and (max-width:1280px) {
+    .sideBar {
+        float: right;
+        width: 17%
+    }
+
+    @media screen and (min-width:1280px) {
         .map {
             width: 1000px;
-            
+        }
+    }
+
+    @media screen and (min-width:1336px) {
+        .map {
+            width: 1200px;
+        }
+    }
+
+    @media screen and (min-width:1440px) {
+        .map {
+            width: 1200px;
+        }
+    }
+
+    @media screen and (min-width:1600px) {
+        .map {
+            width: 1400px;
+        }
+    }
+     @media screen and (min-width:1920px) {
+        .map {
+            width: 1600px;
         }
     }
 </style>

@@ -521,6 +521,7 @@
 
                 setTimeout(() => {
                     self.headers = headers;
+                     self.getMapSetupData()
                     self.$refs.Spinner.hide();
                     self.$refs.Grid.setOrder();
                 }, 60);

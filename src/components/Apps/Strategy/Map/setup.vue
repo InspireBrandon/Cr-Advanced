@@ -74,15 +74,18 @@
             open(setupData, callback) {
                 let self = this
                 self.dialog = true
+                let tmp =[]
                 self.callback = callback
-                self.heatmapItems = setupData
+                console.log(setupData);
+                
                 setupData.forEach(element => {
                     if (element.cluster == "basket") {
-                        self.piechartItems.push(element)
+                        tmp.push(element)
                     }
                 });
+                self.heatmapItems = tmp
+                self.piechartItems = tmp
                 console.log("MapDatra", setupData);
-
             },
             close() {
                 let self = this
