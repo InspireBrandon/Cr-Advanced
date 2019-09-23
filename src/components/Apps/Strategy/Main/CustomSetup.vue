@@ -121,11 +121,12 @@
             returnSetupConfig() {
                 let self = this;
 
-                if (self.selectedPlanogram == null) {
+                if (self.clusterType == 1 && self.selectedPlanogram == null) {
                     alert("Please select a planogram");
                 } else {
                     self.dialog = false;
                     self.afterComplete({
+                        clusterType: self.clusterType,
                         selectedPlanogram: self.selectedPlanogram,
                         selectedItems: self.selected,
                         useSystemValues: self.useSystemValues

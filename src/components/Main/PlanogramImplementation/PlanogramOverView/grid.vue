@@ -486,63 +486,41 @@
                 let item = rowdata.data
                 let node = rowdata.node
 
+                let text = "Do you want to park this store?";
 
-                let text = ""
-                console.log("status");
+                if(item.state == 6)
+                    text = "Do you want to un-park this store?"
 
-                console.log(Status);
-
-                if (item.requiredInStore == true) {
-                    text = "Do you want to innclude this category in this store?"
-                } else {
-                    text = "Are you sure you want to remove this category ?"
-                }
                 self.$refs.YesNoModal.show(text, val => {
                     if (val) {
                         self.remove(item, state, Status, data => {
-                            console.log("node data");
-                            console.log(data);
-
                             node.setData(data)
                         })
                     }
                 })
-
-                // self.createPlanoGramDetailTX(tmp)
             },
             remove(listItem, state, status, callback) {
                 let self = this;
+
                 if (state == true) {
-                    console.log("removing state");
-
-                    listItem.planogramDetail_ID = null
-                    listItem.HeightFit = false
-                    listItem.fileName = null
-                    listItem.modulesFit = false
-                    listItem.storeClusterFit = false
-                    listItem.PlanogramFit = false
-                    listItem.Fits = false
-                    listItem.systemFileID = 0
-                    listItem.currentStatusText = "On Hold"
+                    listItem.planogramStoreStatus = 6
+                    listItem.currentStatusText = "Parked"
                 } else {
-                    listItem.currentStatusText = "Unassigned"
+                    if(listItem.planogramDetail_ID == null) {
+                        listItem.currentStatusText = "Unassigned"
+                        listItem.planogramStoreStatus = 0
+                    } else {
+                        listItem.currentStatusText = "Assigned"
+                        listItem.planogramStoreStatus = 1
+                    }
                 }
-                console.log("status");
-                console.log(status);
 
-                listItem.requiredInStore = state
-
-                listItem.planogramStoreStatus = status
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', listItem)
                     .then(r => {
-                        console.log("r");
-
-                        console.log(r);
                         delete Axios.defaults.headers.common["TenantID"];
                         callback(listItem)
                     }).catch(e => {
-                        console.log(e);
                         delete Axios.defaults.headers.common["TenantID"];
                         callback(e)
                     })
@@ -557,9 +535,6 @@
                 this.gridApi = params.api;
                 this.columnApi = params.columnApi;
 
-                console.log("From on grid ready")
-                console.log(params, this.gridApi);
-
                 setTimeout(() => {
                     this.gridApi.resetRowHeights();
                     this.gridApi.sizeColumnsToFit()
@@ -569,9 +544,6 @@
                 this.gridApi = params.api;
                 this.columnApi = params.columnApi;
 
-                console.log("From grid ready")
-                console.log(params, this.gridApi);
-
                 setTimeout(() => {
                     this.gridApi.resetRowHeights();
                     this.gridApi.sizeColumnsToFit()
@@ -579,7 +551,6 @@
             },
             redrawAllRows() {
                 let self = this;
-                console.log("redrawing rows")
                 this.gridApi.redrawRows();
             },
         }

@@ -465,6 +465,23 @@
                             </v-card-text>
                           </v-card>
                         </v-flex>
+                        <v-flex md4>
+                          <v-card class="elevation-5 card-height">
+                            <v-toolbar dense>
+                              <v-spacer></v-spacer>
+                              <v-toolbar-title>Properties</v-toolbar-title>
+                              <v-spacer></v-spacer>
+                            </v-toolbar>
+                            <v-card-text>
+                              <v-layout row wrap>
+                                <v-flex md12>
+                                  <v-text-field v-model="form.nesting_Height" type="number" dense hide-details
+                                    label="Nesting Height"></v-text-field>
+                                </v-flex>
+                              </v-layout>
+                            </v-card-text>
+                          </v-card>
+                        </v-flex>
                       </v-layout>
                     </v-container>
                   </v-card>
@@ -659,6 +676,7 @@
           pallet_Height: null,
           pallet_Width: null,
           pallet_Depth: null,
+          nesting_Height: null
         },
         facings: {
           Facings_X: 0,
@@ -887,6 +905,7 @@
             pallet_Height: self.form.pallet_Height,
             pallet_Width: self.form.pallet_Width,
             pallet_Depth: self.form.pallet_Depth,
+            nesting_Height: self.form.nesting_Height
           }
 
           self.afterClose(request);
@@ -959,6 +978,7 @@
         self.form.pallet_Height = null;
         self.form.pallet_Width = null;
         self.form.pallet_Depth = null;
+        self.form.nesting_Height = null;
       },
       openFile(facing) {
         let self = this;

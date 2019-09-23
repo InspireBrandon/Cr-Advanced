@@ -31,15 +31,12 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
-                <!-- <v-btn slot="activator" flat @click="showColorPicker">
-                    Color
-                </v-btn> -->
                 <v-btn slot="activator" flat @click="customQuery">
                     Custom
                 </v-btn>
             </v-toolbar-items>
             <v-spacer></v-spacer>
-            {{ title }}
+            {{ currentToggle + ' - ' + title }}
             <v-spacer></v-spacer>
             <v-toolbar-title>
                 <span>Main</span>
@@ -279,13 +276,6 @@
 
                             })
                     })
-            },
-            showColorPicker() {
-                let self = this;
-
-                self.$refs.ColorPicker.show(() => {
-
-                });
             },
             prepareFiles(data) {
                 let self = this;
@@ -646,8 +636,13 @@
 
                 self.$refs.CustomSetup.show(self.headers, setup => {
                     self.currentConfig = setup;
-                    self.selectedClusterType = 1;
-                    self.handleCustomSetup(setup);
+                    self.selectedClusterType = setup.clusterType;
+
+                    if(self.selectedClusterType == 0) {
+                        self.handleSetup(setup);
+                    } else {
+                        self.handleCustomSetup(setup);
+                    }
                 })
             },
             handleCustomSetup(data) {

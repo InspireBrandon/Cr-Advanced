@@ -92,14 +92,14 @@
         <div>
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
-                    <v-btn icon v-on="on" @click="params.context.componentParent.$parent.$parent.showStore(params.data)"
+                    <v-btn icon v-on="on" @click="params.context.componentParent.removeFromStore(params ,true,0)"
                         class="ma-0">
                         <v-icon>
                             time_to_leave
                         </v-icon>
                     </v-btn>
                 </template>
-                <span>Store overview</span>
+                <span>Park</span>
             </v-tooltip>
         </div>
         <div
