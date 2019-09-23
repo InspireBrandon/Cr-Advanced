@@ -5,8 +5,8 @@
                 <v-card>
                     <v-toolbar flat dark dense color="grey darken-3">
                         <v-toolbar-items>
-                            <v-text-field style="margin-left: 10px; width: 400px; margin-top: -5px;"
-                                prepend-inner-icon="search" placeholder="Search" v-model="filter_text">
+                            <v-text-field style="width: 400px; margin-top: -5px;" prepend-inner-icon="search"
+                                placeholder="Search" v-model="filter_text">
                             </v-text-field>
                         </v-toolbar-items>
                         <v-spacer></v-spacer>
@@ -37,25 +37,28 @@
                                 <span>Planogram</span>
                             </v-tooltip>
                         </v-btn-toggle>
-                        <v-btn v-if="userAccess != 0 && userAccess != 4 && userAccess != 3" @click="shareProjects" class="ml-2" small dark
-                            icon>
+                        <v-btn v-if="userAccess != 0 && userAccess != 4 && userAccess != 3" @click="shareProjects"
+                            class="ml-2" small dark icon>
                             <v-icon>share</v-icon>
                         </v-btn>
                     </v-toolbar>
-                    <v-toolbar v-if="userAccess!=4" dense flat dark>
-                        <v-autocomplete v-if="selectedView==2 &&userAccess != 3 " @change="getStoreViewData()"
-                            placeholder="Please Select a Store" :items="stores" v-model="selectedStore">
-                        </v-autocomplete>
-                        <v-autocomplete v-if="selectedView==2 &&userAccess == 3" disabled @change="getStoreViewData()"
-                            placeholder="Please Select a Store" :items="stores" v-model="selectedStore">
-                        </v-autocomplete>
-                        <v-autocomplete v-if="selectedView==0" placeholder="users " :items="users"
-                            v-model="selectedUser" @change="getTaskViewData"></v-autocomplete>
-                        <v-btn icon @click="homeView">
-                            <v-icon>home</v-icon>
-                        </v-btn>
+                    <v-toolbar v-if="userAccess!=4" flat dark>
+                        <v-toolbar-items>
+                            <v-autocomplete v-if="selectedView==2 &&userAccess != 3 " @change="getStoreViewData()"
+                                placeholder="Please Select a Store" :items="stores" v-model="selectedStore">
+                            </v-autocomplete>
+                            <v-autocomplete v-if="selectedView==2 &&userAccess == 3" disabled
+                                @change="getStoreViewData()" placeholder="Please Select a Store" :items="stores"
+                                v-model="selectedStore">
+                            </v-autocomplete>
+                            <v-autocomplete style="width: 400px;" v-if="selectedView==0" placeholder="users "
+                                :items="users" v-model="selectedUser" @change="getTaskViewData"></v-autocomplete>
+                            <v-btn class="ml-3" icon @click="homeView">
+                                <v-icon>home</v-icon>
+                            </v-btn>
+                        </v-toolbar-items>
+                        <v-btn v-if="userAccess == 0" color="primary" @click="startNewTask">Start new task</v-btn>
                         <v-spacer></v-spacer>
-
                         <v-btn v-show="userAccess == 3" @click="$refs.guide.click()" dark outline>Help</v-btn>
                         <a style="display: none;" ref="guide" download
                             href="guides/CR TRAINING GUIDELINE 16.07.2019.pdf">guide</a>
@@ -84,7 +87,8 @@
                                 </v-list>
                             </v-menu>
                         </div>
-                        <v-btn-toggle v-if="userAccess!=2" v-model="selectedView" @change="onViewChanged" class="transparent" mandatory>
+                        <v-btn-toggle v-if="userAccess!=2" v-model="selectedView" @change="onViewChanged"
+                            class="transparent" mandatory>
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
                                     <v-btn v-on="on" :value="0" flat>
@@ -143,7 +147,8 @@
                                     :accessType="userAccess" />
                             </v-flex>
                             <v-flex md12 class="pa-0" v-if="selectedView==2">
-                                <StoreView :rowdata="storeData" :typeList="typeList" :statusList="statusList" :getStoreViewData="getStoreViewData"/>
+                                <StoreView :rowdata="storeData" :typeList="typeList" :statusList="statusList"
+                                    :getStoreViewData="getStoreViewData" />
                             </v-flex>
                         </v-layout>
                     </v-container>
@@ -161,6 +166,8 @@
             </v-flex>
         </v-layout>
         <ProjectShare ref="ProjectShare"></ProjectShare>
+        <NewTask ref="NewTask"></NewTask>
+        <AssignTask ref="AssignTask"></AssignTask>
     </v-container>
 </template>
 
@@ -180,6 +187,8 @@
     import SplashLoader from "@/components/Common/SplashLoader.vue"
     import ProjectShare from "./ProjectShare.vue"
     import NoticeBoard from '@/components/Main/NoticeBoard/Noticeboard.vue'
+    import NewTask from './NewTask'
+    import AssignTask from '@/components/Common/AssignTask'
 
     export default {
         components: {
@@ -188,7 +197,9 @@
             StoreView,
             SplashLoader,
             ProjectShare,
-            NoticeBoard
+            NoticeBoard,
+            NewTask,
+            AssignTask
         },
         data() {
             return {
@@ -594,7 +605,6 @@
                 }
                 self.$nextTick(() => {
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                    console.log(store + "||" + self.selectedStore);
 
                     Axios.get(process.env.VUE_APP_API + `Store_Planogram/Store?Store_ID=${store}`)
                         .then(r => {
@@ -609,10 +619,6 @@
 
                             self.storeData = currentStorePlanograms
                             self.$refs.SplashLoader.close()
-                            console.log("self.storeData");
-
-                            console.log(self.storeData);
-
                         }).catch(e => {
                             console.log(e);
 
@@ -770,7 +776,56 @@
                 }
 
                 return retval;
-            }
+            },
+            startNewTask() {
+                let self = this;
+
+                self.$refs.NewTask.show(data => {
+                    let projectTXGroupRequest = {
+                        projectID: data.project
+                    }
+
+                    self.createProjectTransactionGroup(projectTXGroupRequest, projectTXGroup => {
+
+                        let status = 6 + (data.task - 1);
+
+                        let txRequest = {
+                            type: data.task,
+                            status: status,
+                            systemUserID: data.user,
+                            projectTXGroup_ID: projectTXGroup.id,
+                            project_Group_ID: data.projectGroup,
+                            project_ID: data.project,
+                            rangeFileID: data.rangeFile,
+                            systemFileID: data.spacePlanFile
+                        }
+
+                        self.createProjectTransaction(txRequest, newItem => {
+
+                        })
+                    })
+                })
+            },
+            createProjectTransactionGroup(request, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `ProjectTXGroup`, request).then(r => {
+                    delete Axios.defaults.headers.common["TenantID"];
+                    callback(r.data.projectTXGroup);
+                })
+            },
+            createProjectTransaction(request, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `ProjectTX`, request).then(r => {
+                    delete Axios.defaults.headers.common["TenantID"];
+                    callback(r.data.projectTX)
+                })
+            },
         }
     }
 </script>

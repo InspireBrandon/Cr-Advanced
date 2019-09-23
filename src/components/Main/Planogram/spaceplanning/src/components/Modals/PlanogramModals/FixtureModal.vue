@@ -66,7 +66,8 @@
                       v-model="newData.defaultPeg" label="Default peg:">
                     </v-select>
                   </v-flex>
-                  <v-flex lg8 md12 sm12 xs12 v-if="!newData.rendering && !(newData.fixtureType == 0 && newData.type == 3)">
+                  <v-flex lg8 md12 sm12 xs12
+                    v-if="!newData.rendering && !(newData.fixtureType == 0 && newData.type == 3)">
                     <v-select placeholder="please select" :items="spreadProducts" v-model="newData.spreadProducts"
                       label="Spread products:">
                     </v-select>
@@ -78,6 +79,9 @@
                   </v-flex>
                   <v-flex lg8 md12 sm12 xs12 v-if="!newData.rendering && newData.type == 2">
                     <v-checkbox hide-details label="Border" v-model="newData.border"></v-checkbox>
+                  </v-flex>
+                  <v-flex lg8 md12 sm12 xs12 v-if="!newData.rendering && newData.type == 2">
+                    <v-checkbox hide-details label="Stackable" v-model="newData.stackable"></v-checkbox>
                   </v-flex>
                   <v-flex lg8 md12 sm12 xs12 v-if="!newData.rendering && newData.type == 3 && newData.fixtureType == 1">
                     <v-checkbox hide-details label="Snap Left" v-model="newData.snapLeft"></v-checkbox>
@@ -207,7 +211,8 @@
                   </v-expansion-panel>
 
                   <!-- start of  render display settings -->
-                  <v-expansion-panel v-model="renderingPanel" inset expand v-if="!(newData.type == 3 && newData.fixtureType == 0)">
+                  <v-expansion-panel v-model="renderingPanel" inset expand
+                    v-if="!(newData.type == 3 && newData.fixtureType == 0)">
                     <v-expansion-panel-content class="elevation-0">
                       <div slot="header">Rendering Options</div>
                       <v-flex
