@@ -992,7 +992,11 @@ class GeneralPosition {
         return retVal;
       }
       case "BASE": {
-        retVal.y = productGroup.Group.getHeight() - ((yFacings + 1) * productGroup.Orientation_Height);
+        if (nestingApplies == true && nestingHeight > 0) {
+          retVal.y = productGroup.Group.getHeight() - productGroup.Orientation_Height - ((yFacings) * (nestingHeight));
+        } else {
+          retVal.y = productGroup.Group.getHeight() - ((yFacings + 1) * productGroup.Orientation_Height);
+        }
         retVal.x = (xFacings * productGroup.Orientation_Width);
         return retVal;
       }

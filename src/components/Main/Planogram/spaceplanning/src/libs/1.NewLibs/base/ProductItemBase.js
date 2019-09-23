@@ -443,14 +443,14 @@ class ProductItemBase extends PlanogramItemBase {
             if (image_rect_og.image() != undefined) {
               let mHr = nestingHeight / self.image_orientation_height;
               let pH = image_rect_og.image().height * mHr;
-  
+
               image_rect = image_rect_og.crop({
                 x: 0,
                 y: 0,
                 width: image_rect_og.image().width,
                 height: pH
               });
-  
+
               image_rect.setWidth(self.image_orientation_width);
               image_rect.setHeight(nestingHeight);
               image_rect.offset({
@@ -460,18 +460,18 @@ class ProductItemBase extends PlanogramItemBase {
               image_rect.rotation(self.Rotation);
             } else {
               image_rect.rotation(0);
-            image_rect.image(self.image_front);
-            image_rect.setX(rect.getX() + rect.width() / 2);
-            image_rect.setY(rect.getY() + rect.height() / 2);
+              image_rect.image(self.image_front);
+              image_rect.setX(rect.getX() + rect.width() / 2);
+              image_rect.setY(rect.getY() + rect.height() / 2);
 
-            image_rect.offset({
-              x: self.image_orientation_width / 2,
-              y: self.image_orientation_height / 2
-            })
+              image_rect.offset({
+                x: self.image_orientation_width / 2,
+                y: self.image_orientation_height / 2
+              })
 
-            image_rect.setWidth(self.image_orientation_width);
-            image_rect.setHeight(self.image_orientation_height);
-            image_rect.rotation(self.Rotation);
+              image_rect.setWidth(self.image_orientation_width);
+              image_rect.setHeight(self.image_orientation_height);
+              image_rect.rotation(self.Rotation);
             }
           } else {
             image_rect.rotation(0);
