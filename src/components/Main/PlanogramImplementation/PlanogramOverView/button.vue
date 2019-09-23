@@ -1,10 +1,23 @@
 <template>
     <div style=" cursor: pointer; display:flex;">
-        <div>
+        <div
+            v-if="params.data.systemFileID != undefined && params.data.systemFileID != null && params.data.systemFileID != 0">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                     <v-btn icon v-on="on"
-                     @click="params.context.componentParent.$parent.$parent.showStore(params.data)"
+                        @click="params.context.componentParent.$parent.$parent.viewPlanogram(params.data)" class="ma-0">
+                        <v-icon color="orange">
+                            visibility
+                        </v-icon>
+                    </v-btn>
+                </template>
+                <span>View Planogram</span>
+            </v-tooltip>
+        </div>
+        <div>
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <v-btn icon v-on="on" @click="params.context.componentParent.$parent.$parent.showStore(params.data)"
                         class="ma-0">
                         <v-icon>
                             store
@@ -25,12 +38,13 @@
                 <span>Add Category to store</span>
             </v-tooltip>
         </div>
-        <div v-if="params.data.planogramStoreStatus==0||params.data.planogramStoreStatus==5||params.data.planogramStoreStatus==7">
+        <div
+            v-if="params.data.planogramStoreStatus==0||params.data.planogramStoreStatus==5||params.data.planogramStoreStatus==7">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                     <v-btn v-on="on"
-                        @click="params.context.componentParent.$parent.$parent.assignPlanogramToStore(params)"
-                        icon flat small color="primary" class="ma-0">
+                        @click="params.context.componentParent.$parent.$parent.assignPlanogramToStore(params)" icon flat
+                        small color="primary" class="ma-0">
                         <v-icon>assignment</v-icon>
                     </v-btn>
                 </template>
@@ -41,8 +55,7 @@
         <div v-if="params.data.planogramStoreStatus==1">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
-                    <v-btn v-on="on"
-                        @click="params.context.componentParent.$parent.$parent.Distribute(params)" icon
+                    <v-btn v-on="on" @click="params.context.componentParent.$parent.$parent.Distribute(params)" icon
                         flat small color="success" class="ma-0">
                         <v-icon>send</v-icon>
                     </v-btn>
@@ -50,41 +63,55 @@
                 <span>Distribute</span>
             </v-tooltip>
         </div>
-        
+
         <div
             v-if="params.data.planogramStoreStatus!=0&&params.data.planogramStoreStatus!=4&&params.data.planogramStoreStatus!=6&&params.data.planogramStoreStatus!=5&&params.data.planogramStoreStatus!=7">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
-                    <v-btn v-on="on" @click="params.context.componentParent.openOrder(params,1,'Model Variation')" icon flat small
-                        color="warning" class="ma-0">
+                    <v-btn v-on="on" @click="params.context.componentParent.openOrder(params,1,'Model Variation')" icon
+                        flat small color="warning" class="ma-0">
                         M
                     </v-btn>
                 </template>
                 <span>request model variation</span>
             </v-tooltip>
         </div>
-          
+
         <div
             v-if="params.data.planogramStoreStatus!=0&&params.data.planogramStoreStatus!=4&&params.data.planogramStoreStatus!=6&&params.data.planogramStoreStatus!=5&&params.data.planogramStoreStatus!=7">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
-                    <v-btn v-on="on" @click="params.context.componentParent.openOrder(params,0,'Store Variation')" icon flat small
-                        color="warning" class="ma-0">
+                    <v-btn v-on="on" @click="params.context.componentParent.openOrder(params,0,'Store Variation')" icon
+                        flat small color="warning" class="ma-0">
                         S
                     </v-btn>
                 </template>
                 <span>request store variation</span>
             </v-tooltip>
         </div>
-        <div v-if="params.data.requiredInStore!=true">
+        <div>
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <v-btn icon v-on="on" @click="params.context.componentParent.$parent.$parent.showStore(params.data)"
+                        class="ma-0">
+                        <v-icon>
+                            time_to_leave
+                        </v-icon>
+                    </v-btn>
+                </template>
+                <span>Store overview</span>
+            </v-tooltip>
+        </div>
+        <div
+            v-if="params.data.planogramStoreStatus == 2 || params.data.planogramStoreStatus == 3 || params.data.planogramStoreStatus == 4">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                     <v-btn v-on="on" icon flat small color="error" class="ma-0"
-                        @click="params.context.componentParent.removeFromStore(params,true,6)">
+                        @click="params.context.componentParent.removePlanogramFromStore(params)">
                         <v-icon>remove_circle_outline</v-icon>
                     </v-btn>
                 </template>
-                <span>Remove category from store</span>
+                <span>Remove planogram from store</span>
             </v-tooltip>
         </div>
     </div>
@@ -96,8 +123,8 @@
             YesNoModal
         },
         methods: {
-            log(data){
-console.log(data);
+            log(data) {
+                console.log(data);
 
             }
         },

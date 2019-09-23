@@ -1142,9 +1142,13 @@
 
                 console.log(request);
 
-                self.createProjectTransaction(request, processAssigned => {
-                    self.$router.push(
-                        `/PlanogramDistribution/${request.project_ID}/${request.project_Group_ID}`)
+                self.getProject(request.project_ID, project => {
+                    let p = project.projectList[0];
+                    request.project_Group_ID = p.projectGroupID
+                    self.createProjectTransaction(request, processAssigned => {
+                        self.$router.push(
+                            `/PlanogramDistribution/${request.project_ID}/${request.project_Group_ID}`)
+                    })
                 })
             },
             implement() {

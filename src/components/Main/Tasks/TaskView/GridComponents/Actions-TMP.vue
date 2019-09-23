@@ -208,7 +208,7 @@
         // distribution
         case 19: {
             button_1.set('success', 'visibility', cp.setDistributionViewed, "View")
-            button_2.set('error', 'local_parking', cp.setParked, "Park")
+            // button_2.set('error', 'local_parking', cp.setParked, "Park")
         }
         break;
         case 20: {
@@ -234,8 +234,8 @@
         case 21: {
             button_1.set('warning', 'visibility', cp.routeToImplementation, "View")
             button_2.set('primary', 'send', cp.routeToView, "Distribute")
-            button_3.set('success', 'settings_backup_restore', cp.recall, "Recall")
-            button_4.set('error', 'local_parking', cp.setParked, "Park")
+            // button_3.set('success', 'settings_backup_restore', cp.recall, "Recall")
+            // button_4.set('error', 'local_parking', cp.setParked, "Park")
         }
         break;
         case 24: {
@@ -319,7 +319,7 @@
         case 44: {
             button_1.set('success', 'visibility', cp.routeToView, "View") //implementation
             button_2.set('primary', 'send', cp.setDistributionInProgress, "Distribute")
-            button_3.set('error', 'local_parking', cp.setParked, "Park")
+            // button_3.set('error', 'local_parking', cp.setParked, "Park")
         }
         break;
         case 45: {

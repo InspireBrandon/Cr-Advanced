@@ -9,19 +9,24 @@
                         <v-icon>close</v-icon>
                     </v-btn>
                 </v-toolbar>
-                <v-card-text>
+                <v-card-text style="height: 615px;">
                     <v-container grid-list-md class="pa-0">
                         <v-layout row wrap>
                             <v-flex md12>
-                                <v-autocomplete return-object :items="planograms" v-model="selectedPlanogram"
+                                <v-radio-group v-model="clusterType">
+                                    <v-radio :value="0" label="Store Cluster"></v-radio>
+                                    <v-radio :value="1" label="Custom Cluster"></v-radio>
+                                </v-radio-group>
+                            </v-flex>
+                            <v-flex md12 style="height: 56px;">
+                                <v-autocomplete class="pt-0" v-if="clusterType == 1" return-object :items="planograms" v-model="selectedPlanogram"
                                     style="width: 300px" placeholder="Select a planogram" dense hide-details>
                                 </v-autocomplete>
-                                <v-divider class="mt-3"></v-divider>
                             </v-flex>
-                            <v-flex md12>
+                            <v-flex md12 v-if="clusterType != null">
                                 <v-switch v-model="useSystemValues" hide-details label="Use system values"></v-switch>
                             </v-flex>
-                            <v-flex md4 class="mt-3">
+                            <v-flex md4 class="mt-3" v-if="clusterType != null">
                                 <v-toolbar dark flat dense color="primary">
                                     <v-toolbar-title>Fields</v-toolbar-title>
                                 </v-toolbar>
@@ -30,7 +35,7 @@
                                         v-model="selected" :value="item" hide-details :label="item"></v-checkbox>
                                 </div>
                             </v-flex>
-                            <v-flex md8 class="mt-3">
+                            <v-flex md8 class="mt-3" v-if="clusterType != null">
                                 <v-toolbar dark flat dense color="primary">
                                     <v-toolbar-title>Selected</v-toolbar-title>
                                 </v-toolbar>
@@ -59,8 +64,14 @@
                 </v-card-text>
                 <v-divider class="mx-2"></v-divider>
                 <v-card-actions>
+                    <div v-if="clusterType == null" style="color: red">Please select store or custom cluster</div>
+                    <div v-if="clusterType == 1 && selectedPlanogram == null" style="color: red">Please select a planogram</div>
+                    <div v-if="clusterType == 1 && selectedPlanogram != null && selected.length == 0" style="color: red">Please select at least one field</div>
+                    <div v-if="clusterType == 0 && selected.length == 0" style="color: red">Please select at least one field</div>
                     <v-spacer></v-spacer>
-                    <v-btn color="primary" @click="returnSetupConfig">Continue</v-btn>
+                    <v-btn v-if="clusterType == null" disabled>Continue</v-btn>
+                    <v-btn v-if="clusterType == 1" :disabled="selectedPlanogram == null || selected.length == 0" color="primary" @click="returnSetupConfig">Continue</v-btn>
+                    <v-btn v-if="clusterType == 0" :disabled="selected.length == 0" color="primary" @click="returnSetupConfig">Continue</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -69,6 +80,8 @@
 
 <script>
     import Axios from 'axios';
+
+    const clusterTypes = ["store", "custom"]
 
     export default {
         data() {
@@ -79,7 +92,8 @@
                 planograms: [],
                 selectedPlanogram: null,
                 items: [],
-                useSystemValues: false
+                useSystemValues: false,
+                clusterType: null
             }
         },
         methods: {

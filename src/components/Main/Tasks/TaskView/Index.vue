@@ -503,28 +503,28 @@
 
                 let request = JSON.parse(JSON.stringify(item))
 
-                self.checkFileStatus(request.systemFileID, data => {
-                    if (data.status == 1) {
-                        alert("this planogram has been recalled, task will be removed");
-                    } else if (data.status == 2) {
-                        alert("A variation has been requested for this planogram, task will be removed");
-                    } else {
-                        let tmpUser = request.systemUserID;
+                let tmpUser = request.systemUserID;
 
-                        self.checkTaskTakeover(request, () => {
-                            request.systemUserID = tmpUser;
-                            request.status = 24;
-                            request.notes = self.findAndReplaceNote(request.notes);
+                self.checkTaskTakeover(request, () => {
+                    request.systemUserID = tmpUser;
+                    request.status = 24;
+                    request.notes = self.findAndReplaceNote(request.notes);
 
-                            self.createProjectTransaction(request, newItem => {
-                                self.updateStorePlanogramStatus(request.store_ID, request
-                                    .systemFileID, 3, sp => {
-                                        self.routeToView(newItem)
-                                    })
+                    self.createProjectTransaction(request, newItem => {
+                        self.updateStorePlanogramStatus(request.store_ID, request
+                            .systemFileID, 3, sp => {
+                                self.routeToView(newItem)
                             })
-                        })
-                    }
+                    })
                 })
+
+                // self.checkFileStatus(request.systemFileID, data => {
+                //     if (data.status == 1) {
+                //         alert("this planogram has been recalled, task will be removed");
+                //     } else if (data.status == 2) {
+                //         alert("A variation has been requested for this planogram, task will be removed");
+                //     } else {}
+                // })
             },
             checkFileStatus(fileID, callback) {
                 let self = this;
@@ -670,15 +670,15 @@
                             route =
                                 `/PlanogramImplementation/${item.project_ID}/${item.systemFileID}/${item.status}`
 
-                            if (data.status == 1) {
-                                alert("this planogram has been recalled, task will be removed");
-                            }
+                            // if (data.status == 1) {
+                            //     alert("this planogram has been recalled, task will be removed");
+                            // }
 
-                            if (data.status == 2) {
-                                alert(
-                                    "A variation has been requested for this planogram, task will be removed"
-                                );
-                            }
+                            // if (data.status == 2) {
+                            //     alert(
+                            //         "A variation has been requested for this planogram, task will be removed"
+                            //     );
+                            // }
 
                             if (route != undefined)
                                 self.$router.push(route);

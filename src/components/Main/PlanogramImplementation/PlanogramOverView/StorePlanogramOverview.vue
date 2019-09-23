@@ -103,6 +103,11 @@
                 let self = this
                 self.$refs.StorePlanograms.show(data)
             },
+            viewPlanogram(data) {
+                let self = this;
+
+                self.$router.push(`/PlanogramImplementation/${self.selectedProject}/${data.systemFileID}/21`);
+            },
             createProjectTransactionGroup(request, callback) {
                 let self = this;
 
@@ -587,6 +592,11 @@
                     }
                 })
             },
+            parkStoreDistribution(row) {
+                let self = this;
+                let data = row.data;
+                let node = row.node;
+            }
         }
     }
 </script>

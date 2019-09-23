@@ -457,6 +457,10 @@
                                   <v-text-field v-model="facings.Facings_Z" type="number" dense hide-details
                                     label="Facings Z"></v-text-field>
                                 </v-flex>
+                                <v-flex md12>
+                                  <v-text-field v-model="facings.Facings_Z_Max" type="number" dense hide-details
+                                    label="Facings Z Max"></v-text-field>
+                                </v-flex>
                               </v-layout>
                             </v-card-text>
                           </v-card>
@@ -540,6 +544,7 @@
               newObj.object.Facings_X = self.facings.Facings_X;
               newObj.object.Facings_Y = self.facings.Facings_Y;
               newObj.object.Facings_Z = self.facings.Facings_Z;
+              newObj.object.Facings_Z_Max = self.facings.Facings_Z_Max;
 
               for (var prop in self.form) {
                 newObj.object.Data[prop] = self.form[prop];
@@ -563,7 +568,8 @@
               newObj.object.Data.alternatePackingType = self.product_type;
 
               let event = new CustomEmitter();
-              event.modal_saved(EventBus, self.planoData.type, self.planoData.subType, newObj, self.planoData.id, self.planoData.object);
+              event.modal_saved(EventBus, self.planoData.type, self.planoData.subType, newObj, self.planoData
+                .id, self.planoData.object);
               self.hide();
             }
           })
@@ -658,6 +664,7 @@
           Facings_X: 0,
           Facings_Y: 0,
           Facings_Z: 0,
+          Facings_Z_Max: 0,
         },
         planoData: null,
         dropdownFilters: {
@@ -719,11 +726,14 @@
           self.facings.Facings_X = self.planoData.object.Facings_X;
           self.facings.Facings_Y = self.planoData.object.Facings_Y;
           self.facings.Facings_Z = self.planoData.object.Facings_Z;
-          self.CalculationHandler = new CalculationHandler(self.$store.state.daysBetween, self.$store.state.currentStoreCount);
+          self.facings.Facings_Z_Max = self.planoData.object.Facings_Z_Max;
+          self.CalculationHandler = new CalculationHandler(self.$store.state.daysBetween, self.$store.state
+            .currentStoreCount);
         } else {
           self.facings.Facings_X = null;
           self.facings.Facings_Y = null;
           self.facings.Facings_Z = null;
+          self.facings.Facings_Z_Max = null;
         }
 
         self.getProductDropdownData(() => {

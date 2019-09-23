@@ -91,7 +91,7 @@
                         "headerName": "Actions",
                         "editable": false,
                         "hide": false,
-                        "minWidth": 180,
+                        "minWidth": 220,
                         "cellRendererFramework": "Button"
                     },
                     {
@@ -209,6 +209,28 @@
                     callback()
                     delete Axios.defaults.headers.common["TenantID"];
                 })
+            },
+            removePlanogramFromStore(params) {
+                let self = this;
+                let item = params.data;
+                let node = params.node;
+
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+
+                item.planogramStoreStatus = 1;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
+                    .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        node.setData(item)
+                    })
+                    .catch(ex => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        console.error(ex);
+                    })
             },
             openOrder(data, type, title) {
                 let self = this
@@ -565,7 +587,7 @@
 </script>
 <style>
     .ag-theme-balham .audit-image-breach {
-       background-color: lightcoral !important;
+        background-color: lightcoral !important;
     }
 
     .success-green {
