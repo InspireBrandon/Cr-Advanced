@@ -592,6 +592,11 @@
                     }
                 })
             },
+            parkStoreDistribution(row) {
+                let self = this;
+                let data = row.data;
+                let node = row.node;
+            }
         }
     }
 </script>

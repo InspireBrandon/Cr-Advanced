@@ -125,7 +125,7 @@
           canAdd.add = true
         }
 
-        console.log(self.planogram_ID, listitem.planogramID)
+        console.log("[PLANO MODAL]", self.planogram_ID, listitem.planogramID);
 
         if (item.modules >= listitem.modules) {
           canAdd.count++
@@ -173,6 +173,8 @@
       show(data, doCheck,planogram_ID ,afterComplete) {
         let self = this;
         self.doCheck = doCheck
+
+        console.log(planogram_ID);
         
         self.planogram_ID=planogram_ID
         self.getSpacePlans(data, callback => {

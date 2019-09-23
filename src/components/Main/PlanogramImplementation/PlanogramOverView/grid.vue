@@ -91,7 +91,7 @@
                         "headerName": "Actions",
                         "editable": false,
                         "hide": false,
-                        "minWidth": 180,
+                        "minWidth": 220,
                         "cellRendererFramework": "Button"
                     },
                     {

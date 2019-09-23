@@ -1,16 +1,17 @@
 <template>
     <div style=" cursor: pointer; display:flex;">
-        <div v-if="params.data.systemFileID != undefined && params.data.systemFileID != null && params.data.systemFileID != 0">
+        <div
+            v-if="params.data.systemFileID != undefined && params.data.systemFileID != null && params.data.systemFileID != 0">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
-                    <v-btn icon v-on="on" @click="params.context.componentParent.$parent.$parent.viewPlanogram(params.data)"
-                        class="ma-0">
+                    <v-btn icon v-on="on"
+                        @click="params.context.componentParent.$parent.$parent.viewPlanogram(params.data)" class="ma-0">
                         <v-icon color="orange">
                             visibility
                         </v-icon>
                     </v-btn>
                 </template>
-                <span>Store overview</span>
+                <span>View Planogram</span>
             </v-tooltip>
         </div>
         <div>
@@ -86,6 +87,19 @@
                     </v-btn>
                 </template>
                 <span>request store variation</span>
+            </v-tooltip>
+        </div>
+        <div>
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <v-btn icon v-on="on" @click="params.context.componentParent.$parent.$parent.showStore(params.data)"
+                        class="ma-0">
+                        <v-icon>
+                            time_to_leave
+                        </v-icon>
+                    </v-btn>
+                </template>
+                <span>Store overview</span>
             </v-tooltip>
         </div>
         <div
