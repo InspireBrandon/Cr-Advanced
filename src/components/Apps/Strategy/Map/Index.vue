@@ -1,6 +1,12 @@
 <template>
-    <div oncontextmenu="return false;">
-        <div id="thisone2" class="map" ref="thisone2">
+    <div>
+        <div oncontextmenu="return false;" class="mapContainer">
+            <div id="thisone2" class="map" ref="thisone2">
+            </div>
+            <div class="sideBar">
+                <v-toolbar dark flat dense color="primary">Image </v-toolbar>
+               
+            </div>
         </div>
         <YesNoModal ref="yesNo"></YesNoModal>
         <Mapsetup ref="Mapsetup" />
@@ -29,21 +35,40 @@
                 labels: true,
                 lines: true,
                 radius: 20,
+                stores: [],
+                config: null
             }
         },
         mounted() {
             // this.openSetup()
             // this.drawMap(this.labels)
-            this.getData()
+            this.getHinterlandStores()
         },
         methods: {
-            getData() {
+            getHinterlandStores() {
+                let self = this;
+
+                let stores = require('@/assets/storeData/Hinterland.json');
+                self.prepareStoreResults(stores.Response);
+            },
+            prepareStoreResults(storeData) {
+                let self = this;
+
+                let stores = storeData.filter(e => {
+                    return e.siteType == "SHOP";
+                })
+
+                self.stores = stores;
+                self.getData(stores);
+            },
+            getData(stores) {
                 let self = this;
                 Axios.get(process.env.VUE_APP_API +
                         `SystemFile/JSON?db=CR-Devinspire&folder=CLUSTER REPORT&file=REPORT`)
                     .then(fd => {
                         Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fd.data.id}`)
                             .then(r => {
+                                console.log("r.data");
                                 console.log(r.data);
                             })
                     })
@@ -52,11 +77,14 @@
                 let self = this
                 self.$refs.Mapsetup.open(self.setupData, callback => {
                     console.log(callback);
+                    self.config = callback
                     self.drawMap(this.labels, callback)
                 })
             },
             drawMap(labelState, config) {
                 let self = this
+                let screeWidth = returnInnerWidth()
+
                 self.radius = parseInt(config.heatMapRadius)
                 console.log(self.rowData);
                 // todo sort rowdata by sales for heatmap legend
@@ -64,6 +92,7 @@
                 let chart = am4core.create("thisone2", am4maps.MapChart);
                 chart.name = "Map"
                 chart.projection = new am4maps.projections.Miller();
+                // chart.width=800
 
                 var title = chart.titles.create();
                 title.text = "[bold font-size: 20]Store Sales Heatmap[/]";
@@ -90,6 +119,7 @@
                 let polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
 
                 polygonSeries.strokeOpacity = 0.9;
+                // polygonSeries.width=600
                 polygonSeries.useGeodata = true;
                 // polygonSeries.exclude = ["ZA-WC"];
 
@@ -97,24 +127,26 @@
                 // Configure series
 
                 let polygonTemplate = polygonSeries.mapPolygons.template;
+
                 // polygonTemplate.tooltipText = "{name}";
                 polygonTemplate.tooltipHTML =
-                    '<a href="https://en.wikipedia.org/wiki/{category.urlEncode()}">{name}</a>'
+                    '<a style="background-color: #cccccc;" href="https://en.wikipedia.org/wiki/{category.urlEncode()}">{name}</a>'
                 var pattern_europe = new am4core.Pattern();
                 var image = new am4core.Image();
 
                 console.log("polygonTemplate");
-                console.log(polygonTemplate);
+                // console.log(polygonTemplate);
                 polygonTemplate.tooltipColorSource = "rgb(103,148,220)"
                 var height = this.$refs.thisone2.clientHeight
-                console.log(this.$refs.thisone2);
-                console.log(this.$refs.thisone2.children);
+                console.log(height);
 
-                image.width = 841.05;
-                image.height = height;
-                pattern_europe.x = -300
-                pattern_europe.y = -5
+                image.width = screeWidth.width;
+                image.height = height + 80;
 
+                pattern_europe.x = screeWidth.width / screeWidth.offsetX
+                pattern_europe.y = -45
+                // pattern_europe.x = screeWidth/2.2
+                // pattern_europe.y = -45
                 pattern_europe.width = image.width;
                 pattern_europe.height = image.height;
                 if (config.imageDetails.imageType != "none") {
@@ -126,85 +158,92 @@
                     }
                     pattern_europe.addElement(image.element);
                     polygonTemplate.fill = pattern_europe
+                    polygonTemplate.strokeOpacity = 1;
                 } else {
-                    polygonTemplate.fill = chart.colors.getIndex(3);
+                    polygonTemplate.fill = chart.colors.getIndex(1);
+                    polygonTemplate.strokeOpacity = 1;
                 }
-                polygonTemplate.strokeOpacity = 0.5;
+
                 polygonTemplate.nonScalingStroke = true;
                 // create capital markers
-                let imageSeries = chart.series.push(new am4maps.MapImageSeries());
-                // define template
-                imageSeries.name = "Heatmap"
-                imageSeries.data = formattedData
-                imageSeries.dataFields.value = "sales";
 
-                // if (type == 0) {
-                let imageSeriesTemplate = imageSeries.mapImages.template;
-                imageSeriesTemplate.propertyFields.latitude = "lat";
-                imageSeriesTemplate.propertyFields.longitude = "long";
-                imageSeriesTemplate.nonScaling = false
-                imageSeriesTemplate.fill = chart.colors.getIndex(1)
-                chart.seriesContainer.events.on("hit", function (ev) {
-                    if (ev.preventDefault != undefined)
-                        ev.preventDefault();
-                    if (ev.stopPropagation != undefined)
-                        ev.stopPropagation();
-                    self.$refs.yesNo.show('Would you like to make a tag here?', goThrough => {
-                        if (goThrough) {
-                            var mapMarker = imageSeriesTemplate.createChild(am4core.Sprite);
-                            mapMarker.path =
-                                "M4 12 A12 12 0 0 1 28 12 C28 20, 16 32, 16 32 C16 32, 4 20 4 12 M11 12 A5 5 0 0 0 21 12 A5 5 0 0 0 11 12 Z";
-                            mapMarker.width = 32;
-                            mapMarker.height = 32;
-                            mapMarker.scale = 0.7;
-                            mapMarker.fill = am4core.color("#3F4B3B");
-                            mapMarker.fillOpacity = 0.8;
-                            mapMarker.horizontalCenter = "middle";
-                            mapMarker.verticalCenter = "bottom";
-                            var coords = chart.svgPointToGeo(ev.svgPoint);
-                            var marker = imageSeries.mapImages.create();
-                            console.log(coords);
-
-                            marker.latitude = coords.latitude;
-                            marker.longitude = coords.longitude;
-                            marker.events.on("rightclick", function (dataItem, ev) {
-                                if (dataItem.hidden)
-                                    marker.show(dataItem.index)
-                                else
-                                    marker.hide(dataItem.index);
-                                event.stopPropagation();
-                            })
-                        }
-                    })
-                });
 
 
                 if (config.useHeatmap) {
-                    var circle = imageSeriesTemplate.createChild(am4core.Circle);
-                    circle.fillOpacity = 0.7;
-                    circle.tooltipText = "{storeName}: [bold]{sales}[/]";
-                    circle.radius = self.radius
-                    let label = imageSeriesTemplate.createChild(am4core.Label);
-                    label.text = "{storeName}";
-                    label.fill = am4core.color("#fff");
+                    config.selectedHeatmapField.forEach((heatmapItem, idx) => {
+                        let imageSeries = chart.series.push(new am4maps.MapImageSeries());
+                        // define template
+                        imageSeries.name = heatmapItem
+                        imageSeries.data = formattedData
+                        imageSeries.dataFields.value = "sales";
 
-                    label.nonScaling = false;
-                    label.hidden = labelState
+                        // if (type == 0) {
+                        let imageSeriesTemplate = imageSeries.mapImages.template;
+                        imageSeriesTemplate.propertyFields.latitude = "lat";
+                        imageSeriesTemplate.propertyFields.longitude = "long";
+                        imageSeriesTemplate.nonScaling = false
+                        imageSeriesTemplate.fill = chart.colors.getIndex(1)
+                        chart.seriesContainer.events.on("hit", function (ev) {
+                            if (ev.preventDefault != undefined)
+                                ev.preventDefault();
+                            if (ev.stopPropagation != undefined)
+                                ev.stopPropagation();
+                            self.$refs.yesNo.show('Would you like to make a tag here?', goThrough => {
+                                if (goThrough) {
+                                    var mapMarker = imageSeriesTemplate.createChild(am4core
+                                        .Sprite);
+                                    mapMarker.path =
+                                        "M4 12 A12 12 0 0 1 28 12 C28 20, 16 32, 16 32 C16 32, 4 20 4 12 M11 12 A5 5 0 0 0 21 12 A5 5 0 0 0 11 12 Z";
+                                    mapMarker.width = 32;
+                                    mapMarker.height = 32;
+                                    mapMarker.scale = 0.7;
+                                    mapMarker.fill = am4core.color("#3F4B3B");
+                                    mapMarker.fillOpacity = 0.8;
+                                    mapMarker.horizontalCenter = "middle";
+                                    mapMarker.verticalCenter = "bottom";
+                                    var coords = chart.svgPointToGeo(ev.svgPoint);
+                                    var marker = imageSeries.mapImages.create();
+                                    console.log(coords);
 
-                    imageSeries.heatRules.push({
-                        property: "fill",
-                        target: circle,
-                        min: chart.colors.getIndex(1).brighten(1),
-                        max: chart.colors.getIndex(1).brighten(-1)
-                    });
-                    let heatLegend = chart.createChild(am4maps.HeatLegend);
-                    heatLegend.series = imageSeries;
-                    heatLegend.align = "right";
-                    heatLegend.width = am4core.percent(25);
-                    heatLegend.marginRight = am4core.percent(4);
-                    heatLegend.minValue = 0;
-                    heatLegend.maxValue = 40000000;
-                    heatLegend.valign = "bottom";
+                                    marker.latitude = coords.latitude;
+                                    marker.longitude = coords.longitude;
+                                    marker.events.on("rightclick", function (dataItem, ev) {
+                                        if (dataItem.hidden)
+                                            marker.show(dataItem.index)
+                                        else
+                                            marker.hide(dataItem.index);
+                                        event.stopPropagation();
+                                    })
+                                }
+                            })
+                        });
+
+                        var circle = imageSeriesTemplate.createChild(am4core.Circle);
+                        circle.fillOpacity = 0.5;
+                        circle.tooltipText = heatmapItem + ":{storeName}: [bold]{sales}[/]";
+                        circle.radius = self.radius + idx
+                        let label = imageSeriesTemplate.createChild(am4core.Label);
+                        label.text = "{storeName}";
+                        label.fill = am4core.color("#fff");
+
+                        label.nonScaling = false;
+                        label.hidden = labelState
+
+                        imageSeries.heatRules.push({
+                            property: "fill",
+                            target: circle,
+                            min: chart.colors.getIndex(1 + (idx + 1)).brighten(1),
+                            max: chart.colors.getIndex(1 + (idx + 1)).brighten(-1)
+                        });
+                        let heatLegend = chart.createChild(am4maps.HeatLegend);
+                        heatLegend.series = imageSeries;
+                        heatLegend.align = "right";
+                        heatLegend.width = am4core.percent(25);
+                        heatLegend.marginRight = am4core.percent(4);
+                        heatLegend.minValue = 0;
+                        heatLegend.maxValue = 40000000;
+                        heatLegend.valign = "bottom";
+                    })
                 }
 
                 if (config.usePiecharts) {
@@ -234,13 +273,13 @@
                     pieSeries.name = "Pie Charts"
                     pieSeries.data = self.rowData
                 }
-                if (self.lines) {
-                    let graticuleSeries = chart.series.push(new am4maps.GraticuleSeries());
-                    graticuleSeries.mapLines.template.line.strokeOpacity = 0.2;
-                    graticuleSeries.longitudeStep = 2;
-                    graticuleSeries.latitudeStep = 2
-                    graticuleSeries.name = "lines"
-                }
+                // if (self.lines) {
+                //     let graticuleSeries = chart.series.push(new am4maps.GraticuleSeries());
+                //     graticuleSeries.mapLines.template.line.strokeOpacity = 0.2;
+                //     graticuleSeries.longitudeStep = 2;
+                //     graticuleSeries.latitudeStep = 2
+                //     graticuleSeries.name = "lines"
+                // }
                 let linkContainer = chart.createChild(am4core.Container);
                 linkContainer.isMeasured = false;
                 linkContainer.layout = "horizontal";
@@ -272,16 +311,73 @@
                 chart.legend = new am4maps.Legend();
                 chart.legend.position = "right";
                 chart.legend.align = "right";
-
+                console.log(chart);
+                console.log(chart.seriesWidth)
 
             }
         }
+    }
+
+    function returnInnerWidth() {
+        let width = screen.width;
+        let cw = 613;
+        let offsetX = 3.1;
+
+        // if (width > 1280) {
+        //     cw = 800;
+        //     offsetX = 800;
+        // }
+
+        // if (width > 1360) {
+        //     retval = 800;
+        // }
+
+        // if (width > 1366) {
+        //     retval = 800;
+        // }
+
+        // if (width > 1440) {
+        //     retval = 800;
+        // }
+
+        // if (width > 1600) {
+        //     retval = 1000;
+        // }
+
+        if (width > 1768) {
+            cw = 841.05;
+            offsetX = 2.2
+        }
+
+        return {
+            width: cw,
+            offsetX: offsetX,
+        };
     }
 </script>
 
 <style scoped>
     .map {
         height: calc(100vh - 225px);
+        width: 1600px;
         background-color: #cccccc;
+        float: left;
+    }
+
+    .mapContainer {
+        display: inline-flex;
+        width: 100%
+        
+    }
+    .sideBar{
+        float: right; 
+        width:17%      
+    }
+
+    @media screen and (max-width:1280px) {
+        .map {
+            width: 1000px;
+            
+        }
     }
 </style>
