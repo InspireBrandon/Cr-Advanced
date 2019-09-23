@@ -61,11 +61,11 @@
             return {
                 dialog: false,
                 callback: null,
-                heatMapRadius: 0,
+                heatMapRadius: 15,
                 usePiecharts: false,
                 useHeatmap: false,
                 selectedPiechartItems: [],
-                selectedHeatmapField: null,
+                selectedHeatmapField: [],
                 piechartItems: [],
                 heatmapItems: []
             }
