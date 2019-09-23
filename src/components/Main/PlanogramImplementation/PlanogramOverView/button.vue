@@ -14,7 +14,7 @@
                 <span>View Planogram</span>
             </v-tooltip>
         </div>
-        <div>
+        <div v-if="params.data.planogramStoreStatus != 6">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                     <v-btn icon v-on="on" @click="params.context.componentParent.$parent.$parent.showStore(params.data)"
@@ -89,7 +89,7 @@
                 <span>request store variation</span>
             </v-tooltip>
         </div>
-        <div>
+        <div v-if="params.data.planogramStoreStatus != 6">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                     <v-btn icon v-on="on" @click="params.context.componentParent.removeFromStore(params ,true,0)"
@@ -100,6 +100,19 @@
                     </v-btn>
                 </template>
                 <span>Park</span>
+            </v-tooltip>
+        </div>
+        <div v-if="params.data.planogramStoreStatus == 6">
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <v-btn icon v-on="on" @click="params.context.componentParent.removeFromStore(params ,false, 0)"
+                        class="ma-0">
+                        <v-icon>
+                            play_arrow
+                        </v-icon>
+                    </v-btn>
+                </template>
+                <span>Continue</span>
             </v-tooltip>
         </div>
         <div
