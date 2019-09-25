@@ -2,7 +2,7 @@
     <v-dialog v-model="dialog" persistent max-width="600">
         <v-card>
             <v-toolbar dark flat color="primary">
-                <v-toolbar-title>Assign User</v-toolbar-title>
+                <v-toolbar-title>Mail User</v-toolbar-title>
             </v-toolbar>
             <v-card-text>
                 <v-autocomplete return-object v-model="selectedUser" :items="users" label="Select a user"></v-autocomplete>
