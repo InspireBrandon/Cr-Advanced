@@ -98,7 +98,7 @@
                         text: "Variation"
                     },
                     {
-                        text: "On Hold"
+                        text: "Parked"
                     },
                     {
                         text: "Recalled"

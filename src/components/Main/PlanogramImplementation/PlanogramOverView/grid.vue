@@ -36,7 +36,7 @@
         request
     } from 'http';
     export default {
-        props: ["rowData", "selectedProject", "getRowData", "assign"],
+        props: ["rowData", "selectedProject", "getRowData", "assign", "accessType"],
         components: {
             AgGridVue,
             VariationOrderModal,
@@ -91,7 +91,7 @@
                         "headerName": "Actions",
                         "editable": false,
                         "hide": false,
-                        "minWidth": 250,
+                        "minWidth": 340,
                         "cellRendererFramework": "Button"
                     },
                     {
@@ -488,8 +488,8 @@
 
                 let text = "Do you want to park this store?";
 
-                if(item.state == 6)
-                    text = "Do you want to un-park this store?"
+                if(!state)
+                    text = "Do you want to continue distribution to this store?"
 
                 self.$refs.YesNoModal.show(text, val => {
                     if (val) {
@@ -502,11 +502,13 @@
             remove(listItem, state, status, callback) {
                 let self = this;
 
+                console.log(listItem);
+
                 if (state == true) {
                     listItem.planogramStoreStatus = 6
                     listItem.currentStatusText = "Parked"
                 } else {
-                    if(listItem.planogramDetail_ID == null) {
+                    if(listItem.planogramDetail_ID == null || listItem.planogramDetail_ID == 0) {
                         listItem.currentStatusText = "Unassigned"
                         listItem.planogramStoreStatus = 0
                     } else {
@@ -514,6 +516,8 @@
                         listItem.planogramStoreStatus = 1
                     }
                 }
+
+                listItem.project_ID = self.selectedProject
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', listItem)

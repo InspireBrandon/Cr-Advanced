@@ -65,56 +65,51 @@ class ProductItemBase extends PlanogramItemBase {
   SetProductStateData() {
     let productDataStatus = this.GetProductStateData();
     switch (productDataStatus.ProductType.toUpperCase()) {
-      case "":
-        { // normal product
-          this.ProductWidth = this.Data.width * this.Ratio;
-          this.ProductHeight = this.Data.height * this.Ratio;
-          this.ProductDepth = this.Data.depth * this.Ratio;
-          this.Orientation_Width = this.Data.width * this.Ratio;
-          this.Orientation_Height = this.Data.height * this.Ratio;
-          this.Orientation_Depth = this.Data.depth * this.Ratio;
-        }
-        break;
-      case "T":
-        { // tray packaging
-          this.ProductWidth = this.Data.tray_Width * this.Ratio;
-          this.ProductHeight = this.Data.tray_Height * this.Ratio;
-          this.ProductDepth = this.Data.tray_Depth * this.Ratio;
-          this.Orientation_Width = this.Data.tray_Width * this.Ratio;
-          this.Orientation_Height = this.Data.tray_Height * this.Ratio;
-          this.Orientation_Depth = this.Data.tray_Depth * this.Ratio;
-        }
-        break;
-      case "C":
-        { // case packaging
-          this.ProductWidth = this.Data.case_Width * this.Ratio;
-          this.ProductHeight = this.Data.case_Height * this.Ratio;
-          this.ProductDepth = this.Data.case_Depth * this.Ratio;
-          this.Orientation_Width = this.Data.case_Width * this.Ratio;
-          this.Orientation_Height = this.Data.case_Height * this.Ratio;
-          this.Orientation_Depth = this.Data.case_Depth * this.Ratio;
-        }
-        break;
-      case "S":
-        { // shrink packaging
-          this.ProductWidth = this.Data.shrink_Width * this.Ratio;
-          this.ProductHeight = this.Data.shrink_Height * this.Ratio;
-          this.ProductDepth = this.Data.shrink_Depth * this.Ratio;
-          this.Orientation_Width = this.Data.shrink_Width * this.Ratio;
-          this.Orientation_Height = this.Data.shrink_Height * this.Ratio;
-          this.Orientation_Depth = this.Data.shrink_Depth * this.Ratio;
-        }
-        break;
-      case "P":
-        { // palette packaging
-          this.ProductWidth = this.Data.pallet_Width * this.Ratio;
-          this.ProductHeight = this.Data.pallet_Height * this.Ratio;
-          this.ProductDepth = this.Data.pallet_Depth * this.Ratio;
-          this.Orientation_Width = this.Data.pallet_Width * this.Ratio;
-          this.Orientation_Height = this.Data.pallet_Height * this.Ratio;
-          this.Orientation_Depth = this.Data.pallet_Depth * this.Ratio;
-        }
-        break;
+      case "": { // normal product
+        this.ProductWidth = this.Data.width * this.Ratio;
+        this.ProductHeight = this.Data.height * this.Ratio;
+        this.ProductDepth = this.Data.depth * this.Ratio;
+        this.Orientation_Width = this.Data.width * this.Ratio;
+        this.Orientation_Height = this.Data.height * this.Ratio;
+        this.Orientation_Depth = this.Data.depth * this.Ratio;
+      }
+      break;
+    case "T": { // tray packaging
+      this.ProductWidth = this.Data.tray_Width * this.Ratio;
+      this.ProductHeight = this.Data.tray_Height * this.Ratio;
+      this.ProductDepth = this.Data.tray_Depth * this.Ratio;
+      this.Orientation_Width = this.Data.tray_Width * this.Ratio;
+      this.Orientation_Height = this.Data.tray_Height * this.Ratio;
+      this.Orientation_Depth = this.Data.tray_Depth * this.Ratio;
+    }
+    break;
+    case "C": { // case packaging
+      this.ProductWidth = this.Data.case_Width * this.Ratio;
+      this.ProductHeight = this.Data.case_Height * this.Ratio;
+      this.ProductDepth = this.Data.case_Depth * this.Ratio;
+      this.Orientation_Width = this.Data.case_Width * this.Ratio;
+      this.Orientation_Height = this.Data.case_Height * this.Ratio;
+      this.Orientation_Depth = this.Data.case_Depth * this.Ratio;
+    }
+    break;
+    case "S": { // shrink packaging
+      this.ProductWidth = this.Data.shrink_Width * this.Ratio;
+      this.ProductHeight = this.Data.shrink_Height * this.Ratio;
+      this.ProductDepth = this.Data.shrink_Depth * this.Ratio;
+      this.Orientation_Width = this.Data.shrink_Width * this.Ratio;
+      this.Orientation_Height = this.Data.shrink_Height * this.Ratio;
+      this.Orientation_Depth = this.Data.shrink_Depth * this.Ratio;
+    }
+    break;
+    case "P": { // palette packaging
+      this.ProductWidth = this.Data.pallet_Width * this.Ratio;
+      this.ProductHeight = this.Data.pallet_Height * this.Ratio;
+      this.ProductDepth = this.Data.pallet_Depth * this.Ratio;
+      this.Orientation_Width = this.Data.pallet_Width * this.Ratio;
+      this.Orientation_Height = this.Data.pallet_Height * this.Ratio;
+      this.Orientation_Depth = this.Data.pallet_Depth * this.Ratio;
+    }
+    break;
     }
   }
 
@@ -125,30 +120,30 @@ class ProductItemBase extends PlanogramItemBase {
     if (self.Data.alternatePackingType != undefined) {
       switch (self.Data.alternatePackingType) {
         case 0: // product
-          {
-            qty = 1;
-          }
-          break;
-        case 1: // tray
-          {
-            qty = self.Data.tray_Qty;
-          }
-          break;
-        case 2: // case
-          {
-            qty = self.Data.case_Qty;
-          }
-          break;
-        case 3: // shrink
-          {
-            qty = self.Data.shrink_Qty;
-          }
-          break;
-        case 4: // palette
-          {
-            qty = self.Data.pallet_Qty;
-          }
-          break;
+        {
+          qty = 1;
+        }
+        break;
+      case 1: // tray
+      {
+        qty = self.Data.tray_Qty;
+      }
+      break;
+      case 2: // case
+      {
+        qty = self.Data.case_Qty;
+      }
+      break;
+      case 3: // shrink
+      {
+        qty = self.Data.shrink_Qty;
+      }
+      break;
+      case 4: // palette
+      {
+        qty = self.Data.pallet_Qty;
+      }
+      break;
       }
     }
 
@@ -174,40 +169,35 @@ class ProductItemBase extends PlanogramItemBase {
 
     if (self.Data.alternatePackingType != undefined) {
       switch (self.Data.alternatePackingType) {
-        case 0:
-          {
-            retVal.ProductType = "";
-            if (self.Data.useAlternateBarcode == false)
-              retVal.Barcode = self.Data.barcode;
-            else {
-              retVal.Barcode = self.Data.alternateBarcode;
-            }
-          }
-          break;
-        case 1:
-          {
-            retVal.ProductType = "T";
+        case 0: {
+          retVal.ProductType = "";
+          if (self.Data.useAlternateBarcode == false)
             retVal.Barcode = self.Data.barcode;
+          else {
+            retVal.Barcode = self.Data.alternateBarcode;
           }
-          break;
-        case 2:
-          {
-            retVal.ProductType = "C";
-            retVal.Barcode = self.Data.barcode;
-          }
-          break;
-        case 3:
-          {
-            retVal.ProductType = "S";
-            retVal.Barcode = self.Data.barcode;
-          }
-          break;
-        case 4:
-          {
-            retVal.ProductType = "P";
-            retVal.Barcode = self.Data.barcode;
-          }
-          break;
+        }
+        break;
+      case 1: {
+        retVal.ProductType = "T";
+        retVal.Barcode = self.Data.barcode;
+      }
+      break;
+      case 2: {
+        retVal.ProductType = "C";
+        retVal.Barcode = self.Data.barcode;
+      }
+      break;
+      case 3: {
+        retVal.ProductType = "S";
+        retVal.Barcode = self.Data.barcode;
+      }
+      break;
+      case 4: {
+        retVal.ProductType = "P";
+        retVal.Barcode = self.Data.barcode;
+      }
+      break;
       }
     }
 
@@ -262,67 +252,61 @@ class ProductItemBase extends PlanogramItemBase {
         .then(response => {
 
           switch (type) {
-            case "FRONT":
-              {
-                self.ImageAvailable.front = response.data;
-              }
-              break;
-            case "SIDE":
-              {
-                self.ImageAvailable.side = response.data;
-              }
-              break;
-            case "TOP":
-              {
-                self.ImageAvailable.top = response.data;
-              }
-              break;
+            case "FRONT": {
+              self.ImageAvailable.front = response.data;
+            }
+            break;
+          case "SIDE": {
+            self.ImageAvailable.side = response.data;
+          }
+          break;
+          case "TOP": {
+            self.ImageAvailable.top = response.data;
+          }
+          break;
           }
           if (response.data == true) {
 
             switch (type) {
-              case "FRONT":
-                {
-                  if (self.image_front != null && self.image_front != undefined && force == false) {
+              case "FRONT": {
+                if (self.image_front != null && self.image_front != undefined && force == false) {
+                  resolve(true);
+                } else {
+                  self.image_front = new Image();
+                  self.image_front.onload = function () {
                     resolve(true);
-                  } else {
-                    self.image_front = new Image();
-                    self.image_front.onload = function () {
-                      resolve(true);
-                    };
-                    self.image_front.src = imageURL;
-                    self.image_front.crossOrigin = 'Anonymous';
-                  }
+                  };
+                  self.image_front.src = imageURL;
+                  self.image_front.crossOrigin = 'Anonymous';
                 }
-                break;
-              case "SIDE":
-                {
-                  if (self.image_side != null && self.image_side != undefined && force == false) {
-                    resolve(true);
-                  } else {
-                    self.image_side = new Image();
-                    self.image_side.onload = function () {
-                      resolve(true);
-                    };
-                    self.image_side.src = imageURL;
-                    self.image_side.crossOrigin = 'Anonymous';
-                  }
-                }
-                break;
-              case "TOP":
-                {
-                  if (self.image_top != null && self.image_top != undefined && force == false) {
-                    resolve(true);
-                  } else {
-                    self.image_top = new Image();
-                    self.image_top.onload = function () {
-                      resolve(true);
-                    };
-                    self.image_top.src = imageURL;
-                    self.image_top.crossOrigin = 'Anonymous';
-                  }
-                }
-                break;
+              }
+              break;
+            case "SIDE": {
+              if (self.image_side != null && self.image_side != undefined && force == false) {
+                resolve(true);
+              } else {
+                self.image_side = new Image();
+                self.image_side.onload = function () {
+                  resolve(true);
+                };
+                self.image_side.src = imageURL;
+                self.image_side.crossOrigin = 'Anonymous';
+              }
+            }
+            break;
+            case "TOP": {
+              if (self.image_top != null && self.image_top != undefined && force == false) {
+                resolve(true);
+              } else {
+                self.image_top = new Image();
+                self.image_top.onload = function () {
+                  resolve(true);
+                };
+                self.image_top.src = imageURL;
+                self.image_top.crossOrigin = 'Anonymous';
+              }
+            }
+            break;
             }
           } else {
             resolve(false);
@@ -373,6 +357,8 @@ class ProductItemBase extends PlanogramItemBase {
     let self = this;
     let w = self.Orientation_Width;
     let h = self.Orientation_Height;
+    let nestingHeight = 0;
+    let nestingApplies = false;
 
     let ctrl_store = new StoreHelper();
     let ctrl_position = new GeneralPositionHelper();
@@ -388,6 +374,16 @@ class ProductItemBase extends PlanogramItemBase {
 
     for (var y = 0; y < self.Facings_Y; y++) {
       for (var x = 0; x < self.Facings_X; x++) {
+
+        if (self.Data.nesting_Height != undefined && self.Data.nesting_Height != null && self.Data.nesting_Height != "" && y > 0) {
+          nestingHeight = parseFloat(self.Data.nesting_Height) * self.Ratio;
+          nestingApplies = true;
+          h = nestingHeight;
+        } else {
+          nestingHeight = 0
+          nestingApplies = false;
+          h = self.Orientation_Height;
+        }
 
         let placeY = ctrl_position.PositionProductItems(y, x, self).y;
         let placeX = ctrl_position.PositionProductItems(y, x, self).x;
@@ -425,20 +421,74 @@ class ProductItemBase extends PlanogramItemBase {
         self.Group.add(rect);
 
         if (self.LastFace.toUpperCase() === "FRONT") {
-          image_rect.rotation(0);
-          image_rect.image(self.image_front);
-          image_rect.setX(rect.getX() + rect.width() / 2);
-          image_rect.setY(rect.getY() + rect.height() / 2);
+          if (nestingApplies) {
+            let image_rect_og = new Konva.Image({
+              name: 'nromal-facing',
+              listening: false
+            })
+            image_rect_og.rotation(0);
+            image_rect_og.image(self.image_front);
+            image_rect_og.setX(rect.getX() + rect.width() / 2);
+            image_rect_og.setY(rect.getY() + rect.height() / 2);
 
-          image_rect.offset({
-            x: self.image_orientation_width / 2,
-            y: self.image_orientation_height / 2
-          })
+            image_rect_og.offset({
+              x: self.image_orientation_width / 2,
+              y: self.image_orientation_height / 2
+            })
 
-          image_rect.setWidth(self.image_orientation_width);
-          image_rect.setHeight(self.image_orientation_height);
+            image_rect_og.setWidth(self.image_orientation_width);
+            image_rect_og.setHeight(self.image_orientation_height);
+            image_rect_og.rotation(self.Rotation);
 
-          image_rect.rotation(self.Rotation);
+            if (image_rect_og.image() != undefined) {
+              let mHr = nestingHeight / self.image_orientation_height;
+              let pH = image_rect_og.image().height * mHr;
+
+              image_rect = image_rect_og.crop({
+                x: 0,
+                y: 0,
+                width: image_rect_og.image().width,
+                height: pH
+              });
+
+              image_rect.setWidth(self.image_orientation_width);
+              image_rect.setHeight(nestingHeight);
+              image_rect.offset({
+                x: self.image_orientation_width / 2,
+                y: nestingHeight / 2
+              })
+              image_rect.rotation(self.Rotation);
+            } else {
+              image_rect.rotation(0);
+              image_rect.image(self.image_front);
+              image_rect.setX(rect.getX() + rect.width() / 2);
+              image_rect.setY(rect.getY() + rect.height() / 2);
+
+              image_rect.offset({
+                x: self.image_orientation_width / 2,
+                y: self.image_orientation_height / 2
+              })
+
+              image_rect.setWidth(self.image_orientation_width);
+              image_rect.setHeight(self.image_orientation_height);
+              image_rect.rotation(self.Rotation);
+            }
+          } else {
+            image_rect.rotation(0);
+            image_rect.image(self.image_front);
+            image_rect.setX(rect.getX() + rect.width() / 2);
+            image_rect.setY(rect.getY() + rect.height() / 2);
+
+            image_rect.offset({
+              x: self.image_orientation_width / 2,
+              y: self.image_orientation_height / 2
+            })
+
+            image_rect.setWidth(self.image_orientation_width);
+            image_rect.setHeight(self.image_orientation_height);
+            image_rect.rotation(self.Rotation);
+
+          }
 
           self.ImageRects.push(image_rect);
           self.Group.add(image_rect);
@@ -746,288 +796,273 @@ class ProductItemBase extends PlanogramItemBase {
     self.LastFace = face;
 
     switch (face.toUpperCase()) {
-      case "FRONT":
-        {
-          switch (self.Rotation) {
-            case 0:
-              {
-                // no rotation
-                self.Orientation_Width = self.ProductWidth;
-                self.Orientation_Height = self.ProductHeight;
-                self.Orientation_Depth = self.ProductDepth;
+      case "FRONT": {
+        switch (self.Rotation) {
+          case 0: {
+            // no rotation
+            self.Orientation_Width = self.ProductWidth;
+            self.Orientation_Height = self.ProductHeight;
+            self.Orientation_Depth = self.ProductDepth;
 
-                self.image_used = self.image_front;
+            self.image_used = self.image_front;
 
-                self.image_orientation_width = self.Orientation_Width;
-                self.image_orientation_height = self.Orientation_Height;
+            self.image_orientation_width = self.Orientation_Width;
+            self.image_orientation_height = self.Orientation_Height;
 
-                // set cap details
-                self.Caps_Face = "TOP";
-                self.Cap_Orientation_Width = self.Orientation_Width;
-                self.Cap_Orientation_Height = self.Orientation_Depth;
-                self.Cap_Orientation_Depth = self.ProductHeight;
-                self.caps_image_orientation_width = self.Cap_Orientation_Width;
-                self.caps_image_orientation_height = self.Cap_Orientation_Height;
-                self.Cap_Rotation = 0;
-              }
-              break;
-            case 90:
-              {
-                // 90 degree rotation
-                self.Orientation_Width = self.ProductHeight;
-                self.Orientation_Height = self.ProductWidth;
-                self.Orientation_Depth = self.ProductDepth;
-
-                self.image_used = self.image_front;
-
-                self.image_orientation_width = self.Orientation_Height;
-                self.image_orientation_height = self.Orientation_Width;
-
-                // set cap details
-                self.Caps_Face = "LEFT";
-                self.Cap_Orientation_Width = self.Orientation_Width;
-                self.Cap_Orientation_Height = self.Orientation_Depth;
-                self.Cap_Orientation_Depth = self.ProductWidth;
-                self.caps_image_orientation_width = self.Cap_Orientation_Width;
-                self.caps_image_orientation_height = self.Cap_Orientation_Height;
-                self.Cap_Rotation = 0;
-              }
-              break;
-            case 180:
-              {
-                // 180 degree rotation
-                self.Orientation_Width = self.ProductWidth;
-                self.Orientation_Height = self.ProductHeight;
-                self.Orientation_Depth = self.ProductDepth;
-
-                self.image_used = self.image_front;
-
-                self.image_orientation_width = self.ProductWidth;
-                self.image_orientation_height = self.ProductHeight;
-
-                // set cap details
-                self.Caps_Face = "TOP";
-                self.Cap_Orientation_Width = self.Orientation_Width;
-                self.Cap_Orientation_Height = self.Orientation_Depth;
-                self.Cap_Orientation_Depth = self.ProductHeight;
-                self.caps_image_orientation_width = self.Cap_Orientation_Width;
-                self.caps_image_orientation_height = self.Cap_Orientation_Height;
-                self.Cap_Rotation = 0;
-              }
-              break;
-            case 270:
-              {
-                // 270 degree rotation
-                self.Orientation_Width = self.ProductHeight;
-                self.Orientation_Height = self.ProductWidth;
-                self.Orientation_Depth = self.ProductDepth;
-
-                self.image_used = self.image_front;
-
-                self.image_orientation_width = self.Orientation_Height;
-                self.image_orientation_height = self.Orientation_Width;
-
-                // set cap details
-                self.Caps_Face = "LEFT";
-                self.Cap_Orientation_Width = self.Orientation_Width;
-                self.Cap_Orientation_Height = self.Orientation_Depth;
-                self.Cap_Orientation_Depth = self.ProductWidth;
-                self.caps_image_orientation_width = self.Cap_Orientation_Width;
-                self.caps_image_orientation_height = self.Cap_Orientation_Height;
-                self.Cap_Rotation = 0;
-              }
-              break;
+            // set cap details
+            self.Caps_Face = "TOP";
+            self.Cap_Orientation_Width = self.Orientation_Width;
+            self.Cap_Orientation_Height = self.Orientation_Depth;
+            self.Cap_Orientation_Depth = self.ProductHeight;
+            self.caps_image_orientation_width = self.Cap_Orientation_Width;
+            self.caps_image_orientation_height = self.Cap_Orientation_Height;
+            self.Cap_Rotation = 0;
           }
+          break;
+        case 90: {
+          // 90 degree rotation
+          self.Orientation_Width = self.ProductHeight;
+          self.Orientation_Height = self.ProductWidth;
+          self.Orientation_Depth = self.ProductDepth;
+
+          self.image_used = self.image_front;
+
+          self.image_orientation_width = self.Orientation_Height;
+          self.image_orientation_height = self.Orientation_Width;
+
+          // set cap details
+          self.Caps_Face = "LEFT";
+          self.Cap_Orientation_Width = self.Orientation_Width;
+          self.Cap_Orientation_Height = self.Orientation_Depth;
+          self.Cap_Orientation_Depth = self.ProductWidth;
+          self.caps_image_orientation_width = self.Cap_Orientation_Width;
+          self.caps_image_orientation_height = self.Cap_Orientation_Height;
+          self.Cap_Rotation = 0;
         }
         break;
-      case "LEFT":
-        {
-          switch (self.Rotation) {
-            case 0:
-              {
-                // no rotation
-                self.Orientation_Width = self.ProductDepth;
-                self.Orientation_Height = self.ProductHeight;
-                self.Orientation_Depth = self.ProductWidth;
+        case 180: {
+          // 180 degree rotation
+          self.Orientation_Width = self.ProductWidth;
+          self.Orientation_Height = self.ProductHeight;
+          self.Orientation_Depth = self.ProductDepth;
 
-                self.image_used = self.image_side;
+          self.image_used = self.image_front;
 
-                self.image_orientation_width = self.Orientation_Width;
-                self.image_orientation_height = self.Orientation_Height;
+          self.image_orientation_width = self.ProductWidth;
+          self.image_orientation_height = self.ProductHeight;
 
-                // set cap details
-                self.Caps_Face = "TOP";
-                self.Cap_Orientation_Width = self.ProductDepth;
-                self.Cap_Orientation_Height = self.ProductWidth;
-                self.Cap_Orientation_Depth = self.ProductHeight;
-                self.caps_image_orientation_width = self.Cap_Orientation_Height;
-                self.caps_image_orientation_height = self.Cap_Orientation_Width;
-                self.Cap_Rotation = 90;
-              }
-              break;
-            case 90:
-              {
-                // 90 degree rotation
-                self.Orientation_Width = self.ProductHeight;
-                self.Orientation_Height = self.ProductDepth;
-                self.Orientation_Depth = self.ProductWidth;
-
-                self.image_used = self.image_side;
-
-                self.image_orientation_width = self.Orientation_Height;
-                self.image_orientation_height = self.Orientation_Width;
-
-                // set cap details
-                self.Caps_Face = "FRONT";
-                self.Cap_Orientation_Width = self.ProductHeight;
-                self.Cap_Orientation_Height = self.ProductWidth;
-                self.Cap_Orientation_Depth = self.ProductDepth;
-                self.caps_image_orientation_width = self.Cap_Orientation_Height;
-                self.caps_image_orientation_height = self.Cap_Orientation_Width;
-                self.Cap_Rotation = 90;
-              }
-              break;
-            case 180:
-              {
-                // 180 degree rotation
-                self.Orientation_Width = self.ProductDepth;
-                self.Orientation_Height = self.ProductHeight;
-                self.Orientation_Depth = self.ProductWidth;
-
-                self.image_used = self.image_side;
-
-                self.image_orientation_width = self.Orientation_Width;
-                self.image_orientation_height = self.Orientation_Height;
-
-                // set cap details
-                self.Caps_Face = "TOP";
-                self.Cap_Orientation_Width = self.ProductDepth;
-                self.Cap_Orientation_Height = self.ProductWidth;
-                self.Cap_Orientation_Depth = self.ProductHeight;
-                self.caps_image_orientation_width = self.Cap_Orientation_Height;
-                self.caps_image_orientation_height = self.Cap_Orientation_Width;
-                self.Cap_Rotation = 90;
-              }
-              break;
-            case 270:
-              {
-                // 270 degree rotation
-                self.Orientation_Width = self.ProductHeight;
-                self.Orientation_Height = self.ProductDepth;
-                self.Orientation_Depth = self.ProductWidth;
-
-                self.image_used = self.image_side;
-
-                self.image_orientation_width = self.Orientation_Height;
-                self.image_orientation_height = self.Orientation_Width;
-
-                // set cap details
-                self.Caps_Face = "FRONT";
-                self.Cap_Orientation_Width = self.ProductHeight;
-                self.Cap_Orientation_Height = self.ProductWidth;
-                self.Cap_Orientation_Depth = self.ProductDepth;
-                self.caps_image_orientation_width = self.Cap_Orientation_Height;
-                self.caps_image_orientation_height = self.Cap_Orientation_Width;
-                self.Cap_Rotation = 90;
-              }
-              break;
-          }
+          // set cap details
+          self.Caps_Face = "TOP";
+          self.Cap_Orientation_Width = self.Orientation_Width;
+          self.Cap_Orientation_Height = self.Orientation_Depth;
+          self.Cap_Orientation_Depth = self.ProductHeight;
+          self.caps_image_orientation_width = self.Cap_Orientation_Width;
+          self.caps_image_orientation_height = self.Cap_Orientation_Height;
+          self.Cap_Rotation = 0;
         }
         break;
-      case "TOP":
-        {
-          switch (self.Rotation) {
-            case 0:
-              {
-                // no rotation
-                self.Orientation_Width = self.ProductWidth;
-                self.Orientation_Height = self.ProductDepth;
-                self.Orientation_Depth = self.ProductHeight;
+        case 270: {
+          // 270 degree rotation
+          self.Orientation_Width = self.ProductHeight;
+          self.Orientation_Height = self.ProductWidth;
+          self.Orientation_Depth = self.ProductDepth;
 
-                self.image_used = self.image_top;
+          self.image_used = self.image_front;
 
-                self.image_orientation_width = self.Orientation_Width;
-                self.image_orientation_height = self.Orientation_Height;
+          self.image_orientation_width = self.Orientation_Height;
+          self.image_orientation_height = self.Orientation_Width;
 
-                // set cap details
-                self.Caps_Face = "FRONT";
-                self.Cap_Orientation_Width = self.ProductWidth;
-                self.Cap_Orientation_Height = self.ProductHeight;
-                self.Cap_Orientation_Depth = self.ProductDepth;
-                self.caps_image_orientation_width = self.Cap_Orientation_Width;
-                self.caps_image_orientation_height = self.Cap_Orientation_Height;
-                self.Cap_Rotation = 0;
-              }
-              break;
-            case 90:
-              {
-                // 90 degree rotation
-                self.Orientation_Width = self.ProductDepth;
-                self.Orientation_Height = self.ProductWidth;
-                self.Orientation_Depth = self.ProductHeight;
-
-                self.image_used = self.image_top;
-
-                self.image_orientation_width = self.Orientation_Height;
-                self.image_orientation_height = self.Orientation_Width;
-
-                // set cap details
-                self.Caps_Face = "LEFT";
-                self.Cap_Orientation_Width = self.ProductDepth;
-                self.Cap_Orientation_Height = self.ProductHeight;
-                self.Cap_Orientation_Depth = self.ProductWidth;
-                self.caps_image_orientation_width = self.Cap_Orientation_Height;
-                self.caps_image_orientation_height = self.Cap_Orientation_Width;
-                self.Cap_Rotation = 90;
-              }
-              break;
-            case 180:
-              {
-                // 180 degree rotation
-                self.Orientation_Width = self.ProductWidth;
-                self.Orientation_Height = self.ProductDepth;
-                self.Orientation_Depth = self.ProductHeight;
-
-                self.image_used = self.image_top;
-
-                self.image_orientation_width = self.Orientation_Width;
-                self.image_orientation_height = self.Orientation_Height;
-
-                // set cap details
-                self.Caps_Face = "FRONT";
-                self.Cap_Orientation_Width = self.ProductWidth;
-                self.Cap_Orientation_Height = self.ProductHeight;
-                self.Cap_Orientation_Depth = self.ProductDepth;
-                self.caps_image_orientation_width = self.Cap_Orientation_Width;
-                self.caps_image_orientation_height = self.Cap_Orientation_Height;
-                self.Cap_Rotation = 0;
-              }
-              break;
-            case 270:
-              {
-                // 270 degree rotation
-                self.Orientation_Width = self.ProductDepth;
-                self.Orientation_Height = self.ProductWidth;
-                self.Orientation_Depth = self.ProductHeight;
-
-                self.image_used = self.image_top;
-
-                self.image_orientation_width = self.Orientation_Height;
-                self.image_orientation_height = self.Orientation_Width;
-
-                // set cap details
-                self.Caps_Face = "LEFT";
-                self.Cap_Orientation_Width = self.ProductDepth;
-                self.Cap_Orientation_Height = self.ProductHeight;
-                self.Cap_Orientation_Depth = self.ProductWidth;
-                self.caps_image_orientation_width = self.Cap_Orientation_Height;
-                self.caps_image_orientation_height = self.Cap_Orientation_Width;
-                self.Cap_Rotation = 90;
-              }
-              break;
-          }
+          // set cap details
+          self.Caps_Face = "LEFT";
+          self.Cap_Orientation_Width = self.Orientation_Width;
+          self.Cap_Orientation_Height = self.Orientation_Depth;
+          self.Cap_Orientation_Depth = self.ProductWidth;
+          self.caps_image_orientation_width = self.Cap_Orientation_Width;
+          self.caps_image_orientation_height = self.Cap_Orientation_Height;
+          self.Cap_Rotation = 0;
         }
         break;
+        }
+      }
+      break;
+    case "LEFT": {
+      switch (self.Rotation) {
+        case 0: {
+          // no rotation
+          self.Orientation_Width = self.ProductDepth;
+          self.Orientation_Height = self.ProductHeight;
+          self.Orientation_Depth = self.ProductWidth;
+
+          self.image_used = self.image_side;
+
+          self.image_orientation_width = self.Orientation_Width;
+          self.image_orientation_height = self.Orientation_Height;
+
+          // set cap details
+          self.Caps_Face = "TOP";
+          self.Cap_Orientation_Width = self.ProductDepth;
+          self.Cap_Orientation_Height = self.ProductWidth;
+          self.Cap_Orientation_Depth = self.ProductHeight;
+          self.caps_image_orientation_width = self.Cap_Orientation_Height;
+          self.caps_image_orientation_height = self.Cap_Orientation_Width;
+          self.Cap_Rotation = 90;
+        }
+        break;
+      case 90: {
+        // 90 degree rotation
+        self.Orientation_Width = self.ProductHeight;
+        self.Orientation_Height = self.ProductDepth;
+        self.Orientation_Depth = self.ProductWidth;
+
+        self.image_used = self.image_side;
+
+        self.image_orientation_width = self.Orientation_Height;
+        self.image_orientation_height = self.Orientation_Width;
+
+        // set cap details
+        self.Caps_Face = "FRONT";
+        self.Cap_Orientation_Width = self.ProductHeight;
+        self.Cap_Orientation_Height = self.ProductWidth;
+        self.Cap_Orientation_Depth = self.ProductDepth;
+        self.caps_image_orientation_width = self.Cap_Orientation_Height;
+        self.caps_image_orientation_height = self.Cap_Orientation_Width;
+        self.Cap_Rotation = 90;
+      }
+      break;
+      case 180: {
+        // 180 degree rotation
+        self.Orientation_Width = self.ProductDepth;
+        self.Orientation_Height = self.ProductHeight;
+        self.Orientation_Depth = self.ProductWidth;
+
+        self.image_used = self.image_side;
+
+        self.image_orientation_width = self.Orientation_Width;
+        self.image_orientation_height = self.Orientation_Height;
+
+        // set cap details
+        self.Caps_Face = "TOP";
+        self.Cap_Orientation_Width = self.ProductDepth;
+        self.Cap_Orientation_Height = self.ProductWidth;
+        self.Cap_Orientation_Depth = self.ProductHeight;
+        self.caps_image_orientation_width = self.Cap_Orientation_Height;
+        self.caps_image_orientation_height = self.Cap_Orientation_Width;
+        self.Cap_Rotation = 90;
+      }
+      break;
+      case 270: {
+        // 270 degree rotation
+        self.Orientation_Width = self.ProductHeight;
+        self.Orientation_Height = self.ProductDepth;
+        self.Orientation_Depth = self.ProductWidth;
+
+        self.image_used = self.image_side;
+
+        self.image_orientation_width = self.Orientation_Height;
+        self.image_orientation_height = self.Orientation_Width;
+
+        // set cap details
+        self.Caps_Face = "FRONT";
+        self.Cap_Orientation_Width = self.ProductHeight;
+        self.Cap_Orientation_Height = self.ProductWidth;
+        self.Cap_Orientation_Depth = self.ProductDepth;
+        self.caps_image_orientation_width = self.Cap_Orientation_Height;
+        self.caps_image_orientation_height = self.Cap_Orientation_Width;
+        self.Cap_Rotation = 90;
+      }
+      break;
+      }
+    }
+    break;
+    case "TOP": {
+      switch (self.Rotation) {
+        case 0: {
+          // no rotation
+          self.Orientation_Width = self.ProductWidth;
+          self.Orientation_Height = self.ProductDepth;
+          self.Orientation_Depth = self.ProductHeight;
+
+          self.image_used = self.image_top;
+
+          self.image_orientation_width = self.Orientation_Width;
+          self.image_orientation_height = self.Orientation_Height;
+
+          // set cap details
+          self.Caps_Face = "FRONT";
+          self.Cap_Orientation_Width = self.ProductWidth;
+          self.Cap_Orientation_Height = self.ProductHeight;
+          self.Cap_Orientation_Depth = self.ProductDepth;
+          self.caps_image_orientation_width = self.Cap_Orientation_Width;
+          self.caps_image_orientation_height = self.Cap_Orientation_Height;
+          self.Cap_Rotation = 0;
+        }
+        break;
+      case 90: {
+        // 90 degree rotation
+        self.Orientation_Width = self.ProductDepth;
+        self.Orientation_Height = self.ProductWidth;
+        self.Orientation_Depth = self.ProductHeight;
+
+        self.image_used = self.image_top;
+
+        self.image_orientation_width = self.Orientation_Height;
+        self.image_orientation_height = self.Orientation_Width;
+
+        // set cap details
+        self.Caps_Face = "LEFT";
+        self.Cap_Orientation_Width = self.ProductDepth;
+        self.Cap_Orientation_Height = self.ProductHeight;
+        self.Cap_Orientation_Depth = self.ProductWidth;
+        self.caps_image_orientation_width = self.Cap_Orientation_Height;
+        self.caps_image_orientation_height = self.Cap_Orientation_Width;
+        self.Cap_Rotation = 90;
+      }
+      break;
+      case 180: {
+        // 180 degree rotation
+        self.Orientation_Width = self.ProductWidth;
+        self.Orientation_Height = self.ProductDepth;
+        self.Orientation_Depth = self.ProductHeight;
+
+        self.image_used = self.image_top;
+
+        self.image_orientation_width = self.Orientation_Width;
+        self.image_orientation_height = self.Orientation_Height;
+
+        // set cap details
+        self.Caps_Face = "FRONT";
+        self.Cap_Orientation_Width = self.ProductWidth;
+        self.Cap_Orientation_Height = self.ProductHeight;
+        self.Cap_Orientation_Depth = self.ProductDepth;
+        self.caps_image_orientation_width = self.Cap_Orientation_Width;
+        self.caps_image_orientation_height = self.Cap_Orientation_Height;
+        self.Cap_Rotation = 0;
+      }
+      break;
+      case 270: {
+        // 270 degree rotation
+        self.Orientation_Width = self.ProductDepth;
+        self.Orientation_Height = self.ProductWidth;
+        self.Orientation_Depth = self.ProductHeight;
+
+        self.image_used = self.image_top;
+
+        self.image_orientation_width = self.Orientation_Height;
+        self.image_orientation_height = self.Orientation_Width;
+
+        // set cap details
+        self.Caps_Face = "LEFT";
+        self.Cap_Orientation_Width = self.ProductDepth;
+        self.Cap_Orientation_Height = self.ProductHeight;
+        self.Cap_Orientation_Depth = self.ProductWidth;
+        self.caps_image_orientation_width = self.Cap_Orientation_Height;
+        self.caps_image_orientation_height = self.Cap_Orientation_Width;
+        self.Cap_Rotation = 90;
+      }
+      break;
+      }
+    }
+    break;
     }
 
     console.log(self)
@@ -1138,8 +1173,7 @@ class ProductItemBase extends PlanogramItemBase {
 
         self.TotalFacings += totalCapsFacings;
       }
-    }
-    else if (parentItem.Type.toUpperCase() === "LABELHOLDER") {
+    } else if (parentItem.Type.toUpperCase() === "LABELHOLDER") {
 
       let actualDepth = (parentItem.Data.depth + parentItem.Data.overhang) * self.Ratio;
 
@@ -1235,76 +1269,62 @@ class ProductItemBase extends PlanogramItemBase {
     }
 
     switch (barcode.length) {
-      case 2:
-        {
-          retval.file = barcode;
-        }
-        break;
-      case 3:
-        {
-          retval.file = barcode;
-        }
-        break;
-      case 4:
-        {
-          retval.file = barcode;
-        }
-        break;
-      case 5:
-        {
-          retval.file = barcode;
-        }
-        break;
-      case 6:
-        {
-          retval = self.getFolderFile(barcode, 1)
-        }
-        break;
-      case 7:
-        {
-          retval = self.getFolderFile(barcode, 2)
-        }
-        break;
-      case 8:
-        {
-          retval = self.getFolderFile(barcode, 5)
-        }
-        break;
-      case 9:
-        {
-          retval = self.getFolderFile(barcode, 4)
-        }
-        break;
-      case 10:
-        {
-          retval = self.getFolderFile(barcode, 5)
-        }
-        break;
-      case 11:
-        {
-          retval = self.getFolderFile(barcode, 6)
-        }
-        break;
-      case 12:
-        {
-          retval = self.getFolderFile(barcode, 7)
-        }
-        break;
-      case 13:
-        {
-          retval = self.getFolderFile(barcode, 7)
-        }
-        break;
-      case 14:
-        {
-          retval = self.getFolderFile(barcode, 9)
-        }
-        break;
-      case 15:
-        {
-          retval = self.getFolderFile(barcode, 10)
-        }
-        break;
+      case 2: {
+        retval.file = barcode;
+      }
+      break;
+    case 3: {
+      retval.file = barcode;
+    }
+    break;
+    case 4: {
+      retval.file = barcode;
+    }
+    break;
+    case 5: {
+      retval.file = barcode;
+    }
+    break;
+    case 6: {
+      retval = self.getFolderFile(barcode, 1)
+    }
+    break;
+    case 7: {
+      retval = self.getFolderFile(barcode, 2)
+    }
+    break;
+    case 8: {
+      retval = self.getFolderFile(barcode, 5)
+    }
+    break;
+    case 9: {
+      retval = self.getFolderFile(barcode, 4)
+    }
+    break;
+    case 10: {
+      retval = self.getFolderFile(barcode, 5)
+    }
+    break;
+    case 11: {
+      retval = self.getFolderFile(barcode, 6)
+    }
+    break;
+    case 12: {
+      retval = self.getFolderFile(barcode, 7)
+    }
+    break;
+    case 13: {
+      retval = self.getFolderFile(barcode, 7)
+    }
+    break;
+    case 14: {
+      retval = self.getFolderFile(barcode, 9)
+    }
+    break;
+    case 15: {
+      retval = self.getFolderFile(barcode, 10)
+    }
+    break;
     }
 
     return retval;

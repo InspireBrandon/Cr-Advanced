@@ -73,7 +73,6 @@
                     </v-select>
                   </v-flex>
 
-
                   <v-flex lg8 md12 sm12 xs12 v-if="!newData.rendering && newData.fixtureType==4&&newData.type==3">
                     <v-checkbox hide-details label="Float" v-model="newData.float"></v-checkbox>
                   </v-flex>
