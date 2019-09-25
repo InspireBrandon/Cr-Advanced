@@ -18,9 +18,12 @@
                 <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 300px" :items="projects"
                     @change="getStorePlanograms()" v-model="selectedProject" label="Project">
                 </v-autocomplete>
+
+                <v-autocomplete @change="updateProjectOwner" v-if="projectOwer != undefined && projectOwer != null" style="margin-left: 10px; margin-top: 8px; width: 300px" :items="systemUsers" v-model="projectOwer" label="Project Owner">
+                </v-autocomplete>
             </v-toolbar-items>
         </v-toolbar>
-        <grid ref="grid" :getRowData="getStorePlanograms" :selectedProject="selectedProject" :rowData="rowData"
+        <grid  :userAccess="userAccess" ref="grid" :getRowData="getStorePlanograms" :selectedProject="selectedProject" :rowData="rowData"
             :assign="assignGroups" :Planogram_ID="Planogram_ID" />
 
         <StorePlanograms ref="StorePlanograms" :getStoreData="getStorePlanograms" />
@@ -45,7 +48,7 @@
     } from 'timers';
 
     export default {
-        props: ['ProjectName', ],
+        props: ['ProjectName', 'userAccess'],
         components: {
             grid,
             YesNoModal,
@@ -55,11 +58,13 @@
         },
         data() {
             return {
-                projectsObject:[],
-                Planogram_ID:null,
+                projectsObject: [],
+                Planogram_ID: null,
                 projects: [],
                 projectGroups: [],
                 selectedProjectGroup: null,
+                projectOwer: null,
+                systemUsers: [],
                 index: null,
                 rowData: [],
                 title: null,
@@ -93,10 +98,12 @@
                 ],
                 currentStorePlanograms: [],
                 storeView: false,
+                currentProject: null
             }
         },
         mounted() {
             this.open()
+            this.getSystemUsers();
         },
         methods: {
             showStore(data) {
@@ -115,8 +122,6 @@
 
                 Axios.post(process.env.VUE_APP_API + `ProjectTXGroup`, request).then(r => {
                     delete Axios.defaults.headers.common["TenantID"];
-                    console.log(`ProjectTXGroup`);
-                    console.log(r);
                     callback(r.data.projectTXGroup);
                 })
             },
@@ -127,9 +132,6 @@
 
                 Axios.post(process.env.VUE_APP_API + `ProjectTX`, request).then(r => {
                     delete Axios.defaults.headers.common["TenantID"];
-                    console.log(`ProjectTX`);
-                    console.log(r);
-
                     callback(r.data.projectTX)
                 })
             },
@@ -137,8 +139,6 @@
                 let self = this
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.get(process.env.VUE_APP_API + `SystemUser?store_ID=${StoreID}`).then(r => {
-                    console.log("getStoreUser");
-                    console.log(r);
                     callback(r.data)
                 })
             },
@@ -162,10 +162,7 @@
                 let systemUserID = encoded_details.USER_ID;
                 let data = rowData.data
                 let systemFile = data.systemFileID
-                console.log(systemFile);
-
                 let node = rowData.node
-                console.log(data);
 
                 self.getStoreUser(data.store_ID, storeUserCallback => {
                     if (storeUserCallback.length > 0) {
@@ -176,13 +173,11 @@
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                         Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', data)
                             .then(r => {
-                                console.log(r);
                                 let groupRequest = {
                                     ProjectID: data.project_ID
                                 }
 
                                 self.createProjectTransactionGroup(groupRequest, callback => {
-                                    console.log("createProjectTransactionGroup");
                                     let TXrequest = {
                                         "project_ID": data.project_ID,
                                         "projectTXGroup_ID": callback.id,
@@ -195,11 +190,8 @@
                                         "systemFileID": systemFile,
                                         "rangeFileID": data.rangeID,
                                     }
-                                    console.log(TXrequest);
 
                                     self.createProjectTransaction(TXrequest, txCallback => {
-                                        console.log("txCallback");
-                                        console.log(txCallback);
                                         data.currentStatusText = "Distributed"
                                         node.setData(data)
                                         delete Axios.defaults.headers.common["TenantID"];
@@ -208,7 +200,6 @@
                                 })
 
                             }).catch(e => {
-                                console.log(e);
                                 delete Axios.defaults.headers.common["TenantID"];
                                 callback(e)
                             })
@@ -226,7 +217,7 @@
                     return
                 }
                 let count = 0
-                self.$refs.PlanogramDetailsSelector.show(data[0], true,self.Planogram_ID, detailID => {
+                self.$refs.PlanogramDetailsSelector.show(data[0], true, self.Planogram_ID, detailID => {
                     data.forEach(e => {
                         self.assignPlanogramToStoreNoRefresh(e.data, detailID, () => {
                             count = count + 1
@@ -277,20 +268,16 @@
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                     Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
                         .then(r => {
-                            console.log(r);
                             delete Axios.defaults.headers.common["TenantID"];
                             callback()
                         }).catch(e => {
-                            console.log(e);
                             delete Axios.defaults.headers.common["TenantID"];
                             callback()
                         })
                 })
             },
-
             assignPlanogramToStore(data) {
                 let self = this;
-                console.log(data);
                 let idx = data.rowIndex
                 let moduleFit = false
                 let heightFit = false
@@ -300,19 +287,15 @@
 
 
                 let node = data.node
-                self.$refs.PlanogramDetailsSelector.show(listItem, true, self.Planogram_ID,data => {
+                self.$refs.PlanogramDetailsSelector.show(listItem, true, self.Planogram_ID, data => {
 
                     self.checkFits(listItem, data, fits => {
-
-                        console.log(listItem.modules + " : " + data.modules)
-                        console.log(listItem.modules < data.modules);
 
                         if (listItem.modules < data.modules) {
                             moduleFit = true
                         }
                         let Lheight = listItem.height * 0.9
                         let Uheight = listItem.height * 1.1
-                        console.log(Lheight + " < " + data.height + " < " + Uheight);
 
                         if ((parseFloat(data.height) < Lheight || Uheight < parseFloat(data.height))) {
                             heightFit = true
@@ -364,7 +347,6 @@
 
                                 delete Axios.defaults.headers.common["TenantID"];
                             }).catch(e => {
-                                console.log(e);
                                 delete Axios.defaults.headers.common["TenantID"];
                             })
                     })
@@ -407,7 +389,6 @@
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                         Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
                             .then(r => {
-                                console.log(r);
                                 listItem.planogramDetail_ID = null
                                 listItem.heightFit = false
                                 listItem.fileName = null
@@ -422,7 +403,6 @@
                                 node.setData(listItem)
                                 delete Axios.defaults.headers.common["TenantID"];
                             }).catch(e => {
-                                console.log(e);
                                 delete Axios.defaults.headers.common["TenantID"];
                             })
                     }
@@ -436,8 +416,7 @@
             },
             getStorePlanograms() {
                 let self = this
-                console.log("[REFRESH]");
-                
+
                 self.$nextTick(() => {
                     self.currentStorePlanograms = [];
 
@@ -446,13 +425,15 @@
                     Axios.get(process.env.VUE_APP_API + 'Store_Planogram?project_ID=' + self.selectedProject)
                         .then(r => {
                             self.rowData = []
-                            console.log(self.projectsObject);
-                            
+
                             self.projectsObject.forEach(element => {
-                                if(element.id==self.selectedProject){
-                                    self.Planogram_ID=element.planogram_ID
+                                if (element.id == self.selectedProject) {
+                                    self.Planogram_ID = element.planogram_ID
+                                    self.projectOwer = element.systemUserID;
+                                    self.currentProject = element;
                                 }
                             });
+
                             self.currentStorePlanograms = []
                             self.currentStorePlanograms = r.data.store_PlanogramList;
                             self.currentStorePlanograms.forEach(e => {
@@ -460,15 +441,15 @@
                                     .text
                             })
                             self.rowData = self.currentStorePlanograms
-                            setTimeout(() => {}, 300);
-                            console.log(self.rowData);
+
                             delete Axios.defaults.headers.common["TenantID"];
+
                             self.projects.forEach(e => {
                                 if (e.value == self.selectedProject) {
                                     self.title = e.text
                                 }
                             })
-                        
+
 
                         })
                 })
@@ -500,6 +481,21 @@
                             reject(e);
                         })
                 })
+            },
+            getSystemUsers() {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API + "SystemUser")
+                    .then(r => {
+                        self.systemUsers = [];
+
+                            r.data.forEach(el => {
+                            self.systemUsers.push({
+                                text: el.firstname + " " + el.lastname,
+                                value: el.systemUserID
+                            })
+                        })
+                    })
             },
             GenerateName(data) {
                 if (data.planogramID == 0) {
@@ -554,7 +550,7 @@
                             .then(r => {
                                 delete Axios.defaults.headers.common["TenantID"];
                                 let tmp = r.data.projectList;
-                                self.projectsObject=tmp    
+                                self.projectsObject = tmp
                                 self.projects = [];
 
                                 tmp.forEach(el => {
@@ -577,8 +573,6 @@
                 let self = this
 
                 self.getProjectGroups().then(r => {
-                    console.log("[START]");
-                    console.log(self.projectGroups);
                     if (self.$route.params.projectGroupID != null || self.$route.params.projectGroupID !=
                         undefined) {
                         self.selectedProjectGroup = parseInt(self.$route.params.projectGroupID)
@@ -596,6 +590,20 @@
                 let self = this;
                 let data = row.data;
                 let node = row.node;
+            },
+            updateProjectOwner() {
+                let self = this;
+
+                self.$nextTick(() => {
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    self.currentProject.systemUserID = self.projectOwer;
+
+                    Axios.put(process.env.VUE_APP_API + "Project", self.currentProject)
+                        .then(r => {
+                            console.log(r.data);
+                        })
+                })
             }
         }
     }

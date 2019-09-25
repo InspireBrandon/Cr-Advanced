@@ -1,7 +1,7 @@
 <template>
     <div style=" cursor: pointer; display:flex;">
         <div v-for="(button, idx) in buttons" :key="idx"
-            v-if="button.availableStatuses.includes(params.data.planogramStoreStatus)">
+            v-if="button.availableStatuses.includes(params.data.planogramStoreStatus) && button.allowedUsers.includes(params.context.componentParent.userAccess)">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                     <v-btn icon v-on="on" @click="handleClick(button)" class="ma-0" :color="button.buttonColor">

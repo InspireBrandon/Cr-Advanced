@@ -20,28 +20,33 @@ function StatusHandler() {
                 PlanogramStoreStatus.Implemented
             ],
             allowedUsers: [
-                UserTypes.SuperUser
+                UserTypes.SuperUser,
+                UserTypes.Buyer,
+                UserTypes.Supplier,
+                UserTypes.Store
             ]
         }),
-        new ButtonItem({
-            id: 'store_overview',
-            icon: 'store',
-            buttonColor: '',
-            iconColor: 'black',
-            tooltip: 'Store overview',
-            availableStatuses: [
-                PlanogramStoreStatus.Assigned,
-                PlanogramStoreStatus.Distrubuted,
-                PlanogramStoreStatus.ImplementationInProgress,
-                PlanogramStoreStatus.Implemented,
-                PlanogramStoreStatus.Recalled,
-                PlanogramStoreStatus.Unassigned,
-                PlanogramStoreStatus.Variation
-            ],
-            allowedUsers: [
-                UserTypes.SuperUser
-            ]
-        }),
+        // new ButtonItem({
+        //     id: 'store_overview',
+        //     icon: 'store',
+        //     buttonColor: '',
+        //     iconColor: 'black',
+        //     tooltip: 'Store overview',
+        //     availableStatuses: [
+        //         PlanogramStoreStatus.Assigned,
+        //         PlanogramStoreStatus.Distrubuted,
+        //         PlanogramStoreStatus.ImplementationInProgress,
+        //         PlanogramStoreStatus.Implemented,
+        //         PlanogramStoreStatus.Recalled,
+        //         PlanogramStoreStatus.Unassigned,
+        //         PlanogramStoreStatus.Variation
+        //     ],
+        //     allowedUsers: [
+        //         UserTypes.SuperUser,
+        //         UserTypes.Buyer,
+        //         UserTypes.Supplier
+        //     ]
+        // }),
         new ButtonItem({
             id: 'assign',
             icon: 'assignment',
@@ -84,7 +89,8 @@ function StatusHandler() {
                 PlanogramStoreStatus.Assigned
             ],
             allowedUsers: [
-                UserTypes.SuperUser
+                UserTypes.SuperUser,
+                UserTypes.Store
             ]
         }),
         new ButtonItem({
@@ -116,7 +122,8 @@ function StatusHandler() {
                 PlanogramStoreStatus.Implemented
             ],
             allowedUsers: [
-                UserTypes.SuperUser
+                UserTypes.SuperUser,
+                UserTypes.Store
             ]
         }),
         new ButtonItem({

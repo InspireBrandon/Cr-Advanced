@@ -143,8 +143,9 @@
                                 </v-card>
                             </v-flex>
                             <v-flex class="pa-0" md12 v-if="selectedView==1">
-                                <ProjectView :data="filteredData" :typeList="typeList" :statusList="statusList"
-                                    :accessType="userAccess" />
+                                <PlanogramDistribution :userAccess="userAccess" />
+                                <!-- <ProjectView :data="filteredData" :typeList="typeList" :statusList="statusList"
+                                    :accessType="userAccess" /> -->
                             </v-flex>
                             <v-flex md12 class="pa-0" v-if="selectedView==2">
                                 <StoreView :rowdata="storeData" :typeList="typeList" :statusList="statusList"
@@ -183,6 +184,7 @@
     // Components
     import TaskView from "./TaskView/Index.vue"
     import ProjectView from "./ProjectView/Index.vue"
+    import PlanogramDistribution from '../PlanogramImplementation/PlanogramOverView/StorePlanogramOverview'
     import StoreView from "./StoreView/StorePlanograms.vue"
     import SplashLoader from "@/components/Common/SplashLoader.vue"
     import ProjectShare from "./ProjectShare.vue"
@@ -199,7 +201,8 @@
             ProjectShare,
             NoticeBoard,
             NewTask,
-            AssignTask
+            AssignTask,
+            PlanogramDistribution
         },
         data() {
             return {

@@ -1,7 +1,7 @@
 <template>
     <div>
         <ag-grid-vue :gridOptions="gridOptions" @selection-changed="onSelectionChanged" :sideBar='false'
-            style="width: 100%;  height: calc(100vh - 220px);" :defaultColDef="defaultColDef" class="ag-theme-balham"
+            style="width: 100%;  height: calc(100vh - 335px);" :defaultColDef="defaultColDef" class="ag-theme-balham"
             :columnDefs="headers" :rowData="rowData" :enableSorting="true" :enableFilter="true"
             :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
             :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :gridReady="gridReady"
@@ -36,7 +36,7 @@
         request
     } from 'http';
     export default {
-        props: ["rowData", "selectedProject", "getRowData", "assign", "accessType"],
+        props: ["rowData", "selectedProject", "getRowData", "assign", "userAccess"],
         components: {
             AgGridVue,
             VariationOrderModal,
