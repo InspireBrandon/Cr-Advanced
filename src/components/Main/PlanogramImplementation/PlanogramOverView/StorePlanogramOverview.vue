@@ -19,20 +19,18 @@
                     @change="getStorePlanograms()" v-model="selectedProject" label="Project">
                 </v-autocomplete>
 
-                <v-autocomplete @change="updateProjectOwner" v-if="projectOwer != undefined && projectOwer != null" style="margin-left: 10px; margin-top: 8px; width: 300px" :items="systemUsers" v-model="projectOwer" label="Project Owner">
+                <v-autocomplete @change="updateProjectOwner" v-if="projectOwer != undefined && projectOwer != null"
+                    style="margin-left: 10px; margin-top: 8px; width: 300px" :items="systemUsers" v-model="projectOwer"
+                    label="Project Owner">
                 </v-autocomplete>
             </v-toolbar-items>
-            <v-btn @click="updateProjectOwner" color="blue-grey darken-2 ma-2"
-                v-if="selectedProject!=null&&selectedProject!='NaN'">
-                update project owner
-            </v-btn>
             <v-btn @click="sendMail" color="blue-grey darken-2 ma-2"
                 v-if="selectedProject!=null&&selectedProject!='NaN'">
                 Send Mail
             </v-btn>
         </v-toolbar>
-        <grid  :userAccess="userAccess" ref="grid" :getRowData="getStorePlanograms" :selectedProject="selectedProject" :rowData="rowData"
-            :assign="assignGroups" :Planogram_ID="Planogram_ID" />
+        <grid :userAccess="userAccess" ref="grid" :getRowData="getStorePlanograms" :selectedProject="selectedProject"
+            :rowData="rowData" :assign="assignGroups" :Planogram_ID="Planogram_ID" />
 
         <StorePlanograms ref="StorePlanograms" :getStoreData="getStorePlanograms" />
         <PlanogramDetailsSelector :PlanoName="title" ref="PlanogramDetailsSelector" />
@@ -122,52 +120,31 @@
             sendMail() {
                 let self = this
 
-                self.$refs.UserNotesModal.show(callback => {
+                self.$refs.UserNotesModal.show(modalData => {
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                     Axios.get(process.env.VUE_APP_API + `ProjectTX?projectID=${self.selectedProject}`).then(
-                    r => {
-                        console.log(r);
-                        let currentItem = r.data.projectTXList[0]
-                        let request = JSON.parse(JSON.stringify(currentItem));
+                        r => {
+                            console.log(r);
+                            let currentItem = r.data.projectTXList[0]
+                            let request = JSON.parse(JSON.stringify(currentItem));
 
-                        let projectTXGroupRequest = {
-                            projectID: request.project_ID
-                        }
-                        // Create New Project Group
-                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
-                            request.systemUserID = modalData.systemUserID;
-                            request.actionedByUserID = null;
-                            request.rollingUserID = null;
-                            request.notes = modalData.notes;
-                            request.projectTXGroup_ID = newGroup.id;
-                            request.type = 7;
-                            request.status = 43;
-                            // Create New Project Transaction
-                            self.createProjectTransaction(request, data => {})
-                        })
-                    })
-                })
-            },
-            updateProjectOwner() {
-                let self = this
-                self.$refs.SystemUserSelector.show(callback => {
-                    console.log(callback)
-                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
-                    Axios.get(process.env.VUE_APP_API + `Project?projectID=${self.selectedProject}`).then(r => {
-                        console.log(r);
-                        let request = r.data.projectList[0]
-                        request.SystemUserID = callback.systemUserID,
-                            Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
-                        Axios.put(process.env.VUE_APP_API + `Project`, request)
-                            .then(resp => {
-                                console.log(resp);
-
+                            let projectTXGroupRequest = {
+                                projectID: request.project_ID
+                            }
+                            // Create New Project Group
+                            self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
+                                request.systemUserID = modalData.systemUserID;
+                                request.actionedByUserID = null;
+                                request.rollingUserID = null;
+                                request.notes = modalData.notes;
+                                request.projectTXGroup_ID = newGroup.id;
+                                request.type = 7;
+                                request.status = 43;
+                                // Create New Project Transaction
+                                self.createProjectTransaction(request, data => {})
                             })
-
-                    })
+                        })
                 })
             },
             showStore(data) {
@@ -234,14 +211,11 @@
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', data)
                     .then(r => {
-                        console.log(r);
                         data.currentStatusText = "Implemented"
-
                         node.setData(data)
                     }).catch(e => {
                         console.log(e);
                         delete Axios.defaults.headers.common["TenantID"];
-                        callback(e)
                     })
             },
             Distribute(rowData) {
@@ -373,7 +347,6 @@
                 let planogramFit = false
                 let listItem = data.data
 
-
                 let node = data.node
                 self.$refs.PlanogramDetailsSelector.show(listItem, true, self.Planogram_ID, data => {
 
@@ -401,13 +374,6 @@
                             "StoreClusterFit": storeClusterFit,
                             "PlanogramFit": planogramFit,
                             "ModulesFit": moduleFit,
-                            // "Modules": data.modules,
-                            // "Height": data.height,
-                            // "Width": data.width,
-                            // "Displays": data.displays,
-                            // "Pallettes": data.pallettes,
-                            // "SupplierStands": data.supplierStands,
-                            // "Bins": data.bins,
                             "Fits": fits
                         }
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -433,6 +399,76 @@
                                 self.index = idx
                                 // self.getStorePlanograms()
 
+                                delete Axios.defaults.headers.common["TenantID"];
+                            }).catch(e => {
+                                delete Axios.defaults.headers.common["TenantID"];
+                            })
+                    })
+
+                })
+            },
+            replacePlanogram(data) {
+                let self = this;
+                let idx = data.rowIndex
+                let moduleFit = false
+                let heightFit = false
+                let storeClusterFit = false
+                let planogramFit = false
+                let listItem = data.data
+                let node = data.node
+
+                self.$refs.PlanogramDetailsSelector.show(listItem, true, self.Planogram_ID, data => {
+
+                    self.checkFits(listItem, data, fits => {
+                        if (listItem.modules < data.modules) {
+                            moduleFit = true
+                        }
+
+                        let Lheight = listItem.height * 0.9
+                        let Uheight = listItem.height * 1.1
+
+                        if ((parseFloat(data.height) < Lheight || Uheight < parseFloat(data.height))) {
+                            heightFit = true
+                        }
+
+                        if (listItem.cluster != data.clusterName) {
+                            storeClusterFit = true
+                        }
+
+                        let item = {
+                            "id": listItem.id,
+                            "store_ID": listItem.store_ID,
+                            "project_ID": self.selectedProject,
+                            "planogramDetail_ID": data.id,
+                            "planogramStoreStatus": 1,
+                            "HeightFit": heightFit,
+                            "StoreClusterFit": storeClusterFit,
+                            "PlanogramFit": planogramFit,
+                            "ModulesFit": moduleFit,
+                            "Fits": fits
+                        }
+
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                        Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
+                            .then(r => {
+                                listItem.id = r.data.store_Planogram.id
+                                listItem.fileName = data.fileName
+                                listItem.currentStatusText = "Distrubuted"
+                                listItem.heightFit = heightFit
+                                listItem.storeClusterFit = storeClusterFit
+                                listItem.project_ID = self.selectedProject
+                                listItem.planogramFit = planogramFit
+                                listItem.modulesFit = moduleFit
+                                listItem.fits = fits
+                                listItem.planogramStoreStatus = 2
+                                listItem.planogramDetail_ID = data.id
+                                listItem.detailHeight = data.height
+                                listItem.detailModules = data.modules
+                                listItem.systemFileID = data.systemFileID
+                                listItem.rangeID = data.rangeID
+                                node.setData(listItem)
+                                self.index = idx
                                 delete Axios.defaults.headers.common["TenantID"];
                             }).catch(e => {
                                 delete Axios.defaults.headers.common["TenantID"];
@@ -577,7 +613,7 @@
                     .then(r => {
                         self.systemUsers = [];
 
-                            r.data.forEach(el => {
+                        r.data.forEach(el => {
                             self.systemUsers.push({
                                 text: el.firstname + " " + el.lastname,
                                 value: el.systemUserID
@@ -640,6 +676,7 @@
                                 let tmp = r.data.projectList;
                                 self.projectsObject = tmp
                                 self.projects = [];
+                                self.projectOwer = null;
 
                                 tmp.forEach(el => {
                                     self.projects.push({
@@ -693,6 +730,39 @@
                     Axios.put(process.env.VUE_APP_API + "Project", self.currentProject)
                         .then(r => {
                             console.log(r.data);
+                        })
+                })
+            },
+            setView(pgID, pid, callback) {
+                let self = this;
+                self.selectedProjectGroup = pgID;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                self.$nextTick(() => {
+                    let projectGroupID = self.selectedProjectGroup
+                    Axios.get(process.env.VUE_APP_API +
+                            `Project?projectGroupID=${projectGroupID}`)
+                        .then(r => {
+                            delete Axios.defaults.headers.common["TenantID"];
+                            let tmp = r.data.projectList;
+                            self.projectsObject = tmp
+                            self.projects = [];
+                            self.projectOwer = null;
+
+                            tmp.forEach(el => {
+                                self.projects.push({
+                                    text: el.name,
+                                    value: el.id
+                                })
+                            })
+
+                            self.selectedProject = pid;
+
+                            self.getStorePlanograms();
+                        })
+                        .catch(e => {
+                            delete Axios.defaults.headers.common["TenantID"];
                         })
                 })
             }

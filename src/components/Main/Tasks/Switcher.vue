@@ -87,7 +87,7 @@
                                 </v-list>
                             </v-menu>
                         </div>
-                        <v-btn-toggle v-if="userAccess!=2" v-model="selectedView" @change="onViewChanged"
+                        <v-btn-toggle v-model="selectedView" @change="onViewChanged"
                             class="transparent" mandatory>
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
@@ -129,7 +129,8 @@
                                 :class="{ 'md10 sm6 xs6': showNotices, 'md12 sm12 xs12': !showNotices }"
                                 v-if="selectedView==0">
                                 <TaskView :accessType="userAccess" :data="filteredData" :typeList="typeList"
-                                    :statusList="statusList" :systemUserID="selectedUser" />
+                                    :statusList="statusList" :systemUserID="selectedUser"
+                                    :goToDistribution="goToDistribution" />
                             </v-flex>
                             <v-flex class="pa-0" v-if="selectedView==0 && showNotices"
                                 :class="{ 'md2 sm6 xs6': showNotices, 'md1 sm1 xs1': !showNotices }">
@@ -143,7 +144,7 @@
                                 </v-card>
                             </v-flex>
                             <v-flex class="pa-0" md12 v-if="selectedView==1">
-                                <PlanogramDistribution :userAccess="userAccess" />
+                                <PlanogramDistribution ref="PlanogramDistribution" :userAccess="userAccess" />
                                 <!-- <ProjectView :data="filteredData" :typeList="typeList" :statusList="statusList"
                                     :accessType="userAccess" /> -->
                             </v-flex>
@@ -206,6 +207,8 @@
         },
         data() {
             return {
+                selectedProjectGroup: null,
+                selectedProject: null,
                 viewState: 0,
                 show_subtasks: false,
                 filter_text: "",
@@ -829,6 +832,16 @@
                     callback(r.data.projectTX)
                 })
             },
+            goToDistribution(item) {
+                let self = this;
+                self.selectedProjectGroup = item.project_Group_ID;
+                self.selectedProject = item.project_ID;
+                self.selectedView = 1;
+
+                setTimeout(() => {
+                    self.$refs.PlanogramDistribution.setView(item.project_Group_ID, item.project_ID, () => {});
+                }, 1000);
+            }
         }
     }
 </script>

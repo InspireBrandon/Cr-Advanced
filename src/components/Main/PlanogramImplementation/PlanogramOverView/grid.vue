@@ -219,6 +219,7 @@
                 let systemUserID = encoded_details.USER_ID;
 
                 item.planogramStoreStatus = 1;
+                item.currentStatusText = "Assigned";
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
@@ -494,6 +495,7 @@
                 self.$refs.YesNoModal.show(text, val => {
                     if (val) {
                         self.remove(item, state, Status, data => {
+                            console.log(data)
                             node.setData(data)
                         })
                     }

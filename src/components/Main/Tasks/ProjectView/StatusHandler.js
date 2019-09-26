@@ -8,6 +8,25 @@ function StatusHandler() {
 
     const buttons = [
         new ButtonItem({
+            id: 'store_overview',
+            icon: 'store',
+            buttonColor: '',
+            iconColor: 'black',
+            tooltip: 'Store overview',
+            availableStatuses: [
+                PlanogramStoreStatus.Assigned,
+                PlanogramStoreStatus.Distrubuted,
+                PlanogramStoreStatus.ImplementationInProgress,
+                PlanogramStoreStatus.Implemented,
+                PlanogramStoreStatus.Recalled,
+                PlanogramStoreStatus.Unassigned,
+                PlanogramStoreStatus.Variation
+            ],
+            allowedUsers: [
+                UserTypes.SuperUser
+            ]
+        }),
+        new ButtonItem({
             id: 'view',
             icon: 'visibility',
             buttonColor: '',
@@ -26,27 +45,6 @@ function StatusHandler() {
                 UserTypes.Store
             ]
         }),
-        // new ButtonItem({
-        //     id: 'store_overview',
-        //     icon: 'store',
-        //     buttonColor: '',
-        //     iconColor: 'black',
-        //     tooltip: 'Store overview',
-        //     availableStatuses: [
-        //         PlanogramStoreStatus.Assigned,
-        //         PlanogramStoreStatus.Distrubuted,
-        //         PlanogramStoreStatus.ImplementationInProgress,
-        //         PlanogramStoreStatus.Implemented,
-        //         PlanogramStoreStatus.Recalled,
-        //         PlanogramStoreStatus.Unassigned,
-        //         PlanogramStoreStatus.Variation
-        //     ],
-        //     allowedUsers: [
-        //         UserTypes.SuperUser,
-        //         UserTypes.Buyer,
-        //         UserTypes.Supplier
-        //     ]
-        // }),
         new ButtonItem({
             id: 'assign',
             icon: 'assignment',
@@ -54,13 +52,22 @@ function StatusHandler() {
             iconColor: 'primary',
             tooltip: 'Assign planogram',
             availableStatuses: [
-                PlanogramStoreStatus.Assigned,
+                PlanogramStoreStatus.Unassigned
+            ],
+            allowedUsers: [
+                UserTypes.SuperUser
+            ]
+        }),
+        new ButtonItem({
+            id: 'replace_planogram',
+            icon: 'swap_horiz',
+            buttonColor: '',
+            iconColor: 'success',
+            tooltip: 'Replace',
+            availableStatuses: [
                 PlanogramStoreStatus.Distrubuted,
                 PlanogramStoreStatus.ImplementationInProgress,
                 PlanogramStoreStatus.Implemented,
-                PlanogramStoreStatus.Recalled,
-                PlanogramStoreStatus.Unassigned,
-                PlanogramStoreStatus.Variation
             ],
             allowedUsers: [
                 UserTypes.SuperUser
@@ -84,9 +91,11 @@ function StatusHandler() {
             icon: 'check',
             buttonColor: '',
             iconColor: '',
-            tooltip: 'Implemented',
+            tooltip: 'Implement',
             availableStatuses: [
-                PlanogramStoreStatus.Assigned
+                PlanogramStoreStatus.Assigned,
+                PlanogramStoreStatus.Distrubuted,
+                PlanogramStoreStatus.ImplementationInProgress
             ],
             allowedUsers: [
                 UserTypes.SuperUser,
@@ -165,13 +174,9 @@ function StatusHandler() {
             iconColor: 'error',
             tooltip: 'Remove Planogram From Store',
             availableStatuses: [
-                PlanogramStoreStatus.Assigned,
                 PlanogramStoreStatus.Distrubuted,
                 PlanogramStoreStatus.ImplementationInProgress,
                 PlanogramStoreStatus.Implemented,
-                PlanogramStoreStatus.Recalled,
-                PlanogramStoreStatus.Unassigned,
-                PlanogramStoreStatus.Variation
             ],
             allowedUsers: [
                 UserTypes.SuperUser
@@ -179,7 +184,7 @@ function StatusHandler() {
         }),
     ];
 
-    self.getButtons = function() {
+    self.getButtons = function () {
         return buttons;
     }
 }

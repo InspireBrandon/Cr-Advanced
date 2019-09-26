@@ -66,7 +66,7 @@
 
     export default {
         name: 'TaskView',
-        props: ['data', 'typeList', 'statusList', 'systemUserID', 'accessType'],
+        props: ['data', 'typeList', 'statusList', 'systemUserID', 'accessType', 'goToDistribution'],
         components: {
             UserSelector,
             AssignTask,
@@ -434,6 +434,10 @@
                         })
                     })
                 })
+            },
+            goToDistributionView(item) {
+                let self = this;
+                self.goToDistribution(item);
             },
             setParked(item) {
                 let self = this;
