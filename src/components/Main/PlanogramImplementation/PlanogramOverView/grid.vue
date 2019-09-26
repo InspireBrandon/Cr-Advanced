@@ -36,7 +36,7 @@
         request
     } from 'http';
     export default {
-        props: ["rowData", "selectedProject", "getRowData", "assign", "userAccess"],
+        props: ["rowData", "selectedProject", "getRowData", "assign", "userAccess", "isRupert"],
         components: {
             AgGridVue,
             VariationOrderModal,
@@ -48,6 +48,88 @@
             YesNoModal,
             Audit
         },
+        mounted() {
+            let self = this;
+            self.headers = [{
+                    "headerName": "Store",
+                    "checkboxSelection": self.userAccess == 0 || self.isRupert,
+                    "field": "storeName",
+                    "headerCheckboxSelection": true,
+                    "headerCheckboxSelectionFilteredOnly": true,
+                    "minWidth": 200,
+                }, {
+                    "headerName": "Planogram Name",
+                    "cellRendererFramework": "PlanogramName",
+
+                    "minWidth": 300,
+                    cellStyle: function (params) {
+                        if (params.data.planogramFit == true) {
+                            //mark police cells as red
+                            return {
+                                // color: 'red',
+                                backgroundColor: " rgb(240, 125, 125)"
+                            };
+                        } else {
+                            return {
+                                // backgroundColor: " #C8E6C9"
+                            };
+                        }
+                    }
+                }, {
+                    "headerName": "Status",
+                    "field": "currentStatusText",
+                    "minWidth": 100,
+                }, {
+                    "headerName": "Actions",
+                    "hide": false,
+                    "minWidth": 340,
+                    "cellRendererFramework": "Button"
+                },
+                {
+                    "headerName": "Best Fit",
+                    "cellRendererFramework": "Fits",
+                    "minWidth": 50
+                },
+                {
+                    "headerName": "Store Cluster",
+                    "field": "cluster",
+                    "minWidth": 75,
+                    cellClassRules: {
+                        'success-green': 'data.storeClusterFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                        'error-red': 'data.storeClusterFit == true && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                    }
+                }, {
+                    "headerName": "Category Cluster",
+                    "field": "categoryCluster",
+                    "minWidth": 75,
+                }, {
+                    "headerName": "Modules",
+                    "minWidth": 50,
+                    "editable": self.userAccess == 0 || self.isRupert,
+                    "field": "modules",
+                    cellClassRules: {
+                        'success-green': 'data.modulesFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                        'error-red': 'data.modulesFit == true && ( data.planogramStoreStatus!=5 && data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                    }
+
+                }, {
+                    "headerName": "Height",
+                    "minWidth": 50,
+                    // "cellRendererFramework": "height",
+                    "editable": self.userAccess == 0 || self.isRupert,
+                    "field": "height",
+                    cellClassRules: {
+                        'success-green': 'data.heightFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                        'error-red': 'data.heightFit == true && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                    }
+                }, {
+                    "headerName": "Audit",
+                    "minWidth": 50,
+                    "field": "audit",
+                    "cellRendererFramework": "Audit"
+                }
+            ]
+        },
         data() {
             return {
                 selectedItems: [],
@@ -58,85 +140,7 @@
                     //     "minWidth": 50,
                     //       "cellRendererFramework": "CheckBox"
                     // },
-                    {
-                        "headerName": "Store",
-                        "checkboxSelection": true,
-                        "field": "storeName",
-                        "headerCheckboxSelection": true,
-                        "headerCheckboxSelectionFilteredOnly": true,
-                        "minWidth": 200,
-                    }, {
-                        "headerName": "Planogram Name",
-                        "cellRendererFramework": "PlanogramName",
 
-                        "minWidth": 300,
-                        cellStyle: function (params) {
-                            if (params.data.planogramFit == true) {
-                                //mark police cells as red
-                                return {
-                                    // color: 'red',
-                                    backgroundColor: " rgb(240, 125, 125)"
-                                };
-                            } else {
-                                return {
-                                    // backgroundColor: " #C8E6C9"
-                                };
-                            }
-                        }
-                    }, {
-                        "headerName": "Status",
-                        "field": "currentStatusText",
-                        "minWidth": 100,
-                    }, {
-                        "headerName": "Actions",
-                        "editable": false,
-                        "hide": false,
-                        "minWidth": 340,
-                        "cellRendererFramework": "Button"
-                    },
-                    {
-                        "headerName": "Best Fit",
-                        "cellRendererFramework": "Fits",
-                        "minWidth": 50
-                    },
-                    {
-                        "headerName": "Store Cluster",
-                        "field": "cluster",
-                        "minWidth": 75,
-                        cellClassRules: {
-                            'success-green': 'data.storeClusterFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                            'error-red': 'data.storeClusterFit == true && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                        }
-                    }, {
-                        "headerName": "Category Cluster",
-                        "field": "categoryCluster",
-                        "minWidth": 75,
-                    }, {
-                        "headerName": "Modules",
-                        "minWidth": 50,
-                        "editable": true,
-                        "field": "modules",
-                        cellClassRules: {
-                            'success-green': 'data.modulesFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                            'error-red': 'data.modulesFit == true && ( data.planogramStoreStatus!=5 && data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                        }
-
-                    }, {
-                        "headerName": "Height",
-                        "minWidth": 50,
-                        // "cellRendererFramework": "height",
-                        "editable": true,
-                        "field": "height",
-                        cellClassRules: {
-                            'success-green': 'data.heightFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                            'error-red': 'data.heightFit == true && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                        }
-                    }, {
-                        "headerName": "Audit",
-                        "minWidth": 50,
-                        "field": "audit",
-                        "cellRendererFramework": "Audit"
-                    }
                 ],
                 defaultColDef: {
                     onCellValueChanged: this.UpdateLine
@@ -219,6 +223,7 @@
                 let systemUserID = encoded_details.USER_ID;
 
                 item.planogramStoreStatus = 1;
+                item.currentStatusText = "Assigned";
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
@@ -488,12 +493,13 @@
 
                 let text = "Do you want to park this store?";
 
-                if(!state)
+                if (!state)
                     text = "Do you want to continue distribution to this store?"
 
                 self.$refs.YesNoModal.show(text, val => {
                     if (val) {
                         self.remove(item, state, Status, data => {
+                            console.log(data)
                             node.setData(data)
                         })
                     }
@@ -508,7 +514,7 @@
                     listItem.planogramStoreStatus = 6
                     listItem.currentStatusText = "Parked"
                 } else {
-                    if(listItem.planogramDetail_ID == null || listItem.planogramDetail_ID == 0) {
+                    if (listItem.planogramDetail_ID == null || listItem.planogramDetail_ID == 0) {
                         listItem.currentStatusText = "Unassigned"
                         listItem.planogramStoreStatus = 0
                     } else {

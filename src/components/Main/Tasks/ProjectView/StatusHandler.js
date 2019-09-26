@@ -8,6 +8,26 @@ function StatusHandler() {
 
     const buttons = [
         new ButtonItem({
+            id: 'store_overview',
+            icon: 'store',
+            buttonColor: '',
+            iconColor: 'black',
+            tooltip: 'Store overview',
+            availableStatuses: [
+                PlanogramStoreStatus.Assigned,
+                PlanogramStoreStatus.Distrubuted,
+                PlanogramStoreStatus.ImplementationInProgress,
+                PlanogramStoreStatus.Implemented,
+                PlanogramStoreStatus.Recalled,
+                PlanogramStoreStatus.Unassigned,
+                PlanogramStoreStatus.Variation
+            ],
+            allowedUsers: [
+                UserTypes.SuperUser
+            ],
+            allowRupert: true
+        }),
+        new ButtonItem({
             id: 'view',
             icon: 'visibility',
             buttonColor: '',
@@ -24,29 +44,9 @@ function StatusHandler() {
                 UserTypes.Buyer,
                 UserTypes.Supplier,
                 UserTypes.Store
-            ]
+            ],
+            allowRupert: true
         }),
-        // new ButtonItem({
-        //     id: 'store_overview',
-        //     icon: 'store',
-        //     buttonColor: '',
-        //     iconColor: 'black',
-        //     tooltip: 'Store overview',
-        //     availableStatuses: [
-        //         PlanogramStoreStatus.Assigned,
-        //         PlanogramStoreStatus.Distrubuted,
-        //         PlanogramStoreStatus.ImplementationInProgress,
-        //         PlanogramStoreStatus.Implemented,
-        //         PlanogramStoreStatus.Recalled,
-        //         PlanogramStoreStatus.Unassigned,
-        //         PlanogramStoreStatus.Variation
-        //     ],
-        //     allowedUsers: [
-        //         UserTypes.SuperUser,
-        //         UserTypes.Buyer,
-        //         UserTypes.Supplier
-        //     ]
-        // }),
         new ButtonItem({
             id: 'assign',
             icon: 'assignment',
@@ -54,17 +54,28 @@ function StatusHandler() {
             iconColor: 'primary',
             tooltip: 'Assign planogram',
             availableStatuses: [
-                PlanogramStoreStatus.Assigned,
-                PlanogramStoreStatus.Distrubuted,
-                PlanogramStoreStatus.ImplementationInProgress,
-                PlanogramStoreStatus.Implemented,
-                PlanogramStoreStatus.Recalled,
-                PlanogramStoreStatus.Unassigned,
-                PlanogramStoreStatus.Variation
+                PlanogramStoreStatus.Unassigned
             ],
             allowedUsers: [
                 UserTypes.SuperUser
-            ]
+            ],
+            allowRupert: false
+        }),
+        new ButtonItem({
+            id: 'replace_planogram',
+            icon: 'swap_horiz',
+            buttonColor: '',
+            iconColor: 'success',
+            tooltip: 'Replace',
+            availableStatuses: [
+                PlanogramStoreStatus.Distrubuted,
+                PlanogramStoreStatus.ImplementationInProgress,
+                PlanogramStoreStatus.Implemented,
+            ],
+            allowedUsers: [
+                UserTypes.SuperUser
+            ],
+            allowRupert: false
         }),
         new ButtonItem({
             id: 'distribute',
@@ -77,21 +88,25 @@ function StatusHandler() {
             ],
             allowedUsers: [
                 UserTypes.SuperUser
-            ]
+            ],
+            allowRupert: true
         }),
         new ButtonItem({
             id: 'set_implemented',
             icon: 'check',
             buttonColor: '',
             iconColor: '',
-            tooltip: 'Implemented',
+            tooltip: 'Implement',
             availableStatuses: [
-                PlanogramStoreStatus.Assigned
+                PlanogramStoreStatus.Assigned,
+                PlanogramStoreStatus.Distrubuted,
+                PlanogramStoreStatus.ImplementationInProgress
             ],
             allowedUsers: [
                 UserTypes.SuperUser,
                 UserTypes.Store
-            ]
+            ],
+            allowRupert: true
         }),
         new ButtonItem({
             id: 'model_variation',
@@ -107,7 +122,8 @@ function StatusHandler() {
             ],
             allowedUsers: [
                 UserTypes.SuperUser
-            ]
+            ],
+            allowRupert: true
         }),
         new ButtonItem({
             id: 'store_variation',
@@ -124,7 +140,8 @@ function StatusHandler() {
             allowedUsers: [
                 UserTypes.SuperUser,
                 UserTypes.Store
-            ]
+            ],
+            allowRupert: true
         }),
         new ButtonItem({
             id: 'park',
@@ -143,7 +160,8 @@ function StatusHandler() {
             ],
             allowedUsers: [
                 UserTypes.SuperUser
-            ]
+            ],
+            allowRupert: true
         }),
         new ButtonItem({
             id: 'continue',
@@ -156,7 +174,8 @@ function StatusHandler() {
             ],
             allowedUsers: [
                 UserTypes.SuperUser
-            ]
+            ],
+            allowRupert: true
         }),
         new ButtonItem({
             id: 'remove_planogram_from_store',
@@ -165,21 +184,18 @@ function StatusHandler() {
             iconColor: 'error',
             tooltip: 'Remove Planogram From Store',
             availableStatuses: [
-                PlanogramStoreStatus.Assigned,
                 PlanogramStoreStatus.Distrubuted,
                 PlanogramStoreStatus.ImplementationInProgress,
                 PlanogramStoreStatus.Implemented,
-                PlanogramStoreStatus.Recalled,
-                PlanogramStoreStatus.Unassigned,
-                PlanogramStoreStatus.Variation
             ],
             allowedUsers: [
                 UserTypes.SuperUser
-            ]
+            ],
+            allowRupert: true
         }),
     ];
 
-    self.getButtons = function() {
+    self.getButtons = function () {
         return buttons;
     }
 }
@@ -193,6 +209,7 @@ function ButtonItem(data) {
     self.tooltip = data.tooltip;
     self.availableStatuses = data.availableStatuses;
     self.allowedUsers = data.allowedUsers;
+    self.allowRupert = data.allowRupert;
 }
 
 const UserTypes = {

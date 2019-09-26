@@ -180,6 +180,10 @@
                     app["demo"] = false;
                 }
                 break;
+                case "CLUSTERING": {
+                    app["demo"] = false;
+                }
+                break;
                 }
 
                 return app;
@@ -226,6 +230,10 @@
                     app["demo"] = true;
                 }
                 break;
+                case "CLUSTERING": {
+                    app["demo"] = true;
+                }
+                break;
                 }
 
                 return app;
@@ -260,6 +268,10 @@
                     app["demo"] = true;
                 }
                 break;
+                case "CLUSTERING": {
+                    app["demo"] = true;
+                }
+                break;
                 }
 
                 return app;
@@ -291,6 +303,10 @@
                 }
                 break;
                 case "FLOOR-PLANNING": {
+                    app["demo"] = true;
+                }
+                break;
+                case "CLUSTERING": {
                     app["demo"] = true;
                 }
                 break;

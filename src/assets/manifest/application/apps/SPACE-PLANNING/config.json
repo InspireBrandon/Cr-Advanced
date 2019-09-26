@@ -16,12 +16,8 @@
         "routeName": "plannogram_implementation",
         "title": "Planogram Implementation",
         "openInNewWindow": false
-    },{
-        "route": "/PlanogramDistribution/:ProjectID/:projectGroupID",
-        "routeName": "Planogram_distribution",
-        "title": "Planogram Distribution",
-        "openInNewWindow": false
-    }],
+    }
+],
     "ReportListRoute":{
         "route": "/SpacePlanningReportList",
         "routeName": "space_planning_report_list",

@@ -66,7 +66,7 @@
 
     export default {
         name: 'TaskView',
-        props: ['data', 'typeList', 'statusList', 'systemUserID', 'accessType'],
+        props: ['data', 'typeList', 'statusList', 'systemUserID', 'accessType', 'goToDistribution'],
         components: {
             UserSelector,
             AssignTask,
@@ -235,6 +235,11 @@
                 let self = this
                 self.notesDialog = true
                 self.currentNotes = notes
+            },
+            openNotesObj(obj) {
+                let self = this
+                self.notesDialog = true
+                self.currentNotes = obj.notes
             },
             createProjectTransactionGroup(request, callback) {
                 let self = this;
@@ -434,6 +439,10 @@
                         })
                     })
                 })
+            },
+            goToDistributionView(item) {
+                let self = this;
+                self.goToDistribution(item);
             },
             setParked(item) {
                 let self = this;
