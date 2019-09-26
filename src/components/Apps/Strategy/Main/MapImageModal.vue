@@ -10,9 +10,9 @@
             </v-toolbar>
             <v-toolbar dark flat>
                 <v-select style="margin-left: 10px; margin-top: 8px; width: 200px" dense :items="maps"
-                    v-model="selectedMap" hide-details>
+                    v-model="selectedMap" hide-details @change="getImages">
                 </v-select>
-                <v-btn color="primary"> new </v-btn>
+                <v-btn color="primary" @click="saveNew()"> Save new </v-btn>
                 <v-spacer> </v-spacer>
             </v-toolbar>
             <v-card-text>
@@ -46,7 +46,7 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" @click="submit">Save </v-btn>
+                <v-btn color="primary" @click="'submit'">Save </v-btn>
             </v-card-actions>
         </v-card>
         <input type="file" style="display: none;" ref="LegendfileInput" @change="onLegendImageChange">
@@ -63,9 +63,11 @@
                 name: null,
                 legendImageURL: 'https://www.okcballet.org/wp-content/uploads/2016/09/placeholder-image.png',
                 legendImgURL: '',
+                legendImg: null,
                 legendImageLinkAddress: '',
                 MapImageURL: 'https://www.okcballet.org/wp-content/uploads/2016/09/placeholder-image.png',
                 MapImgURL: '',
+                MapImg: null,
                 MapImageLinkAddress: '',
                 maps: [],
                 selectedMap: null,
@@ -79,14 +81,58 @@
 
                 Axios.get(process.env.VUE_APP_API + `MapImage`).then(r => {
                     console.log(r);
-                    self.maps=r.data
+                    self.maps = []
+                    r.data.forEach(e => {
+                        self.maps.push({
+                            text: e.name,
+                            value: e.id
+                        })
+                    })
                 })
                 self.callback = callback
             },
-            submit() {
+            saveNew() {
                 let self = this
+                let request = {
+                    name: self.name
+                }
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `MapImage`, request).then(r => {
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    console.log(r);
+                    Axios.post(process.env.VUE_APP_API + `MapImage?mapImageID=${r.data.id}&type=map`, self
+                            .MapImg)
+                        .then(
+                            mapres => {
+                                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                                Axios.post(process.env.VUE_APP_API +
+                                    `MapImage?mapImageID=${r.data.id}&type=legend`,
+                                    self.legendImg).then(legendRes => {
+
+                                })
+                            })
+
+                })
                 self.callback()
-                self.dialog = false
+            },
+            getImages() {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + `MapImage?mapImageID=${self.selectedMap}&type=map`)
+                    .then(r => {
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                        console.log(r);
+                        Axios.get(process.env.VUE_APP_API + `MapImage?mapImageID=${self.selectedMap}&type=legend`)
+                            .then(res => {
+                                console.log(res);
+                            })
+                    })
+
             },
             openFileDialog() {
                 let self = this;
@@ -97,6 +143,7 @@
                 let self = this;
                 const files = e.target.files;
                 let file = files[0];
+                self.MapImg = file;
                 self.blobToDataUrl(file, url => {
                     self.MapImgURL = url;
                 })
@@ -110,6 +157,7 @@
                 let self = this;
                 const files = e.target.files;
                 let file = files[0];
+                self.legendImg = file
                 self.blobToDataUrl(file, url => {
                     self.legendImgURL = url;
                 })
