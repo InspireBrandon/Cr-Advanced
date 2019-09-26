@@ -11,7 +11,7 @@
             <v-container grid-list-md>
                 <v-layout row wrap>
                     <v-flex md4>
-                        <v-checkbox label="heatmap" hide-details v-model="useHeatmap"> </v-checkbox>
+                        <v-checkbox label="Heatmap" hide-details v-model="useHeatmap"> </v-checkbox>
                         <v-text-field label="radius" type="number" v-if="useHeatmap" hide-details
                             v-model="heatMapRadius"></v-text-field>
                     </v-flex>
@@ -41,7 +41,6 @@
                         </v-card>
                     </v-flex>
                     <v-flex md4>
-                        <ImageSelector ref="ImageSelector" />
                     </v-flex>
                 </v-layout>
             </v-container>
@@ -90,7 +89,13 @@
             close() {
                 let self = this
 
-                let imageDetails = self.$refs.ImageSelector.returnData();
+                let imageDetails ={
+                    imageType: "none",
+                    imgURL: null,
+                    imageLinkAddress: null
+                } 
+                
+                
 
                 let item = {
                     heatMapRadius: self.heatMapRadius,

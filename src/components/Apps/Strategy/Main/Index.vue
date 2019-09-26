@@ -60,6 +60,7 @@
                     placeholder="Select cluster data" :items="dataFields" v-model="selectedDataField"> </v-autocomplete>
             </v-toolbar-items> -->
             <v-btn color="primary" @click="openMapSetup" v-if="selectedView == 1">Setup Map </v-btn>
+            <v-btn color="primary" @click="openMapImageModal" v-if="selectedView == 1">Setup Map Images</v-btn>
             <v-spacer></v-spacer>
             <v-btn-toggle v-model="selectedView" round class="transparent" mandatory>
                 <v-btn class="elevation-0" style="width: 100px" round color="primary">
@@ -83,12 +84,14 @@
         <CustomSelector ref="CustomSelector" />
         <!-- <ColorPicker ref="ColorPicker" /> -->
         <FileSelector ref="FileSelector" />
+        <MapImageModal ref="MapImageModal" />
     </v-card>
 </template>
 
 <script>
     import Axios from 'axios';
     import Grid from './Grid'
+    import MapImageModal from './MapImageModal'
     import Setup from './Setup'
     import CustomSetup from './CustomSetup'
     import Spinner from '@/components/Common/Spinner';
@@ -110,6 +113,7 @@
     export default {
         components: {
             Grid,
+            MapImageModal,
             Setup,
             CustomSetup,
             Spinner,
@@ -162,6 +166,12 @@
             self.getHinterlandStores();
         },
         methods: {
+            openMapImageModal() {
+                let self = this
+                self.$refs.MapImageModal.open(callback => {
+
+                })
+            },
             openMapSetup() {
                 let self = this
                 self.getMapSetupData()
@@ -521,7 +531,7 @@
 
                 setTimeout(() => {
                     self.headers = headers;
-                     self.getMapSetupData()
+                    self.getMapSetupData()
                     self.$refs.Spinner.hide();
                     self.$refs.Grid.setOrder();
                 }, 60);
@@ -639,7 +649,7 @@
                     self.currentConfig = setup;
                     self.selectedClusterType = setup.clusterType;
 
-                    if(self.selectedClusterType == 0) {
+                    if (self.selectedClusterType == 0) {
                         self.handleSetup(setup);
                     } else {
                         self.handleCustomSetup(setup);

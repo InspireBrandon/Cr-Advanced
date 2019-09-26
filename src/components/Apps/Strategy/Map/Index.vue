@@ -4,10 +4,34 @@
             <div id="thisone2" class="map" ref="thisone2">
             </div>
             <div class="sideBar">
-                <v-toolbar dark flat dense color="primary">Image </v-toolbar>
+                <v-toolbar dark flat dense color="primary">
+                    <v-toolbar-title> Image </v-toolbar-title>
+                    <v-spacer> </v-spacer>
+                    <v-autocomplete> </v-autocomplete>
+                </v-toolbar>
                 <v-card>
                     <v-img @click="openFileDialog" :src="imgURL == '' ? tmpImageURL : imgURL" aspect-ratio="1"
                         class="grey lighten-2" width="100%" max-height="200" style="cursor: pointer;"></v-img>
+                </v-card>
+
+                <v-card>
+                    <v-toolbar dark flat dense color="primary">
+                        <v-toolbar-title> Store Import Co-Ords </v-toolbar-title>
+                    </v-toolbar>
+                    <v-list dense>
+                        <v-list-tile>
+                            <v-list-tile-avatar>
+                                <v-btn icon @click="plotStore('item')">
+                                    <v-icon> room </v-icon>
+                                </v-btn>
+                            </v-list-tile-avatar>
+                            <v-list-tile-title>
+                                longmans shops
+                            </v-list-tile-title>
+                            <v-list-tile-action>long:28.36 Lat:27.36</v-list-tile-action>
+                        </v-list-tile>
+
+                    </v-list>
                 </v-card>
             </div>
         </div>
@@ -50,6 +74,11 @@
                 imgURL: '',
                 imageLinkAddress: '',
                 fileData: null,
+                heatData: null,
+                pieData: null,
+                canPlot: false,
+                currentPlotStore: null,
+                maxHeatLegend: 4000000
             }
         },
         mounted() {
@@ -58,7 +87,11 @@
             this.getHinterlandStores()
         },
         methods: {
-
+            plotStore(item) {
+                let self = this
+                self.canplot = true
+                self.currentPlotStore = item
+            },
             openFileDialog() {
                 let self = this;
                 self.$refs.fileInput.value = null
@@ -106,7 +139,15 @@
                             .then(r => {
 
                                 self.fileData = r.data
-
+                                self.drawMap(this.labels, {
+                                    useHeatmap: false,
+                                    usePiecharts: false,
+                                    imageDetails: {
+                                        imageType: "none",
+                                        imgURL: null,
+                                        imageLinkAddress: null
+                                    }
+                                }, null, null)
                             })
                     })
             },
@@ -134,10 +175,10 @@
                         })
                         pieArr = self.handelPiechartData(tmp.piechart, true)
                     }
-
-                    console.log(pieArr);
-
                     self.config = callback
+                    self.heatData = tmp
+                    self.pieData = pieArr
+
                     self.drawMap(this.labels, callback, tmp, pieArr)
                 })
             },
@@ -151,8 +192,6 @@
                         storeName: element.PlaceGroup.toUpperCase()
                     };
                     for (var store in data.data) {
-
-
                         data.data.forEach(el => {
                             if (el.displayname == element.PlaceGroup.toUpperCase()) {
                                 storeFound = true;
@@ -162,26 +201,6 @@
                                 tmpBasket["width"] = 20
                                 tmpBasket["height"] = 20
                                 tmpBasket["salesPercent"] = el.salesPercent
-                                // if (usePiechart) {
-                                //     tmpBasket["pieData"] = [{
-                                //             "category": "Category #1",
-                                //             "value": 1200
-                                //         },
-                                //         {
-                                //             "category": "Category #2",
-                                //             "value": 500
-                                //         },
-                                //         {
-                                //             "category": "Category #3",
-                                //             "value": 765
-                                //         },
-                                //         {
-                                //             "category": "Category #4",
-                                //             "value": 260
-                                //         }
-                                //     ]
-                                // }
-
                             }
                         })
                     }
@@ -193,6 +212,8 @@
                     final.push(tmpBasket);
                 })
                 final = removeDuplicates(final, 'storeName')
+                final.sort((a, b) => (a.sales < b.sales) ? 1 : -1)
+                self.maxHeatLegend = parseInt(final[0].sales)
                 return final
             },
             handelPiechartData(data, usePiechart) {
@@ -233,6 +254,7 @@
             },
             drawMap(labelState, config, setupdata, piechartArray) {
                 let self = this
+
                 let screeWidth = returnInnerWidth()
 
                 self.radius = parseInt(config.heatMapRadius)
@@ -277,9 +299,7 @@
 
                 let polygonTemplate = polygonSeries.mapPolygons.template;
 
-                // polygonTemplate.tooltipText = "{name}";
-                polygonTemplate.tooltipHTML =
-                    '<a style="background-color: #cccccc;" href="https://en.wikipedia.org/wiki/{category.urlEncode()}">{name}</a>'
+
                 var pattern_europe = new am4core.Pattern();
                 var image = new am4core.Image();
 
@@ -297,8 +317,11 @@
                 pattern_europe.width = image.width;
                 pattern_europe.height = image.height;
                 if (config.imageDetails.imageType != "none") {
+                    polygonTemplate.tooltipHTML =
+                        '<a style="background-color: #cccccc;" href="https://en.wikipedia.org/wiki/{category.urlEncode()}">{name}</a>'
                     if (config.imageDetails.imageType == "upload") {
                         image.href = config.imageDetails.imgURL
+
                     }
                     if (config.imageDetails.imageType == "link") {
                         image.href = config.imageDetails.imageLinkAddress
@@ -309,6 +332,8 @@
                 } else {
                     polygonTemplate.fill = chart.colors.getIndex(1);
                     polygonTemplate.strokeOpacity = 1;
+                    polygonTemplate.tooltipText = "{name}";
+
                 }
 
                 polygonTemplate.nonScalingStroke = true;
@@ -330,58 +355,29 @@
                         imageSeriesTemplate.propertyFields.longitude = "long";
                         imageSeriesTemplate.nonScaling = false
                         imageSeriesTemplate.fill = chart.colors.getIndex(1)
-                        chart.seriesContainer.events.on("hit", function (ev) {
-                            if (ev.preventDefault != undefined)
-                                ev.preventDefault();
-                            if (ev.stopPropagation != undefined)
-                                ev.stopPropagation();
-                            self.$refs.yesNo.show('Would you like to make a tag here?', goThrough => {
-                                if (goThrough) {
-                                    var mapMarker = imageSeriesTemplate.createChild(am4core
-                                        .Sprite);
-                                    mapMarker.path =
-                                        "M4 12 A12 12 0 0 1 28 12 C28 20, 16 32, 16 32 C16 32, 4 20 4 12 M11 12 A5 5 0 0 0 21 12 A5 5 0 0 0 11 12 Z";
-                                    mapMarker.width = 32;
-                                    mapMarker.height = 32;
-                                    mapMarker.scale = 0.7;
-                                    mapMarker.fill = am4core.color("#3F4B3B");
-                                    mapMarker.fillOpacity = 0.8;
-                                    mapMarker.horizontalCenter = "middle";
-                                    mapMarker.verticalCenter = "bottom";
-                                    var coords = chart.svgPointToGeo(ev.svgPoint);
-                                    var marker = imageSeries.mapImages.create();
 
-                                    marker.latitude = coords.latitude;
-                                    marker.longitude = coords.longitude;
-                                    marker.events.on("rightclick", function (dataItem, ev) {
-                                        if (dataItem.hidden)
-                                            marker.show(dataItem.index)
-                                        else
-                                            marker.hide(dataItem.index);
-                                        event.stopPropagation();
-                                    })
-                                }
-                            })
-                        });
 
                         var circle = imageSeriesTemplate.createChild(am4core.Circle);
                         circle.fillOpacity = 0.5;
-                        circle.tooltipText = heatmapItem + ":{storeName}: [bold]{sales}[/]";
+                        circle.tooltipText = heatmapItem + "{storeName}: [bold]{sales}[/]";
                         circle.radius = self.radius + idx
                         let label = imageSeriesTemplate.createChild(am4core.Label);
                         label.text = "{storeName}";
                         label.fill = am4core.color("#fff");
-
+                        label.fontSize = 5
                         label.nonScaling = false;
                         label.hidden = labelState
-                        console.log("chart.colors");
-                        console.log(chart.colors);
+                        console.log("label");
+                        console.log(label);
+
                         imageSeries.heatRules.push({
                             property: "fill",
                             target: circle,
                             min: chart.colors.getIndex(11).brighten(1),
                             max: chart.colors.getIndex(11).brighten(-1)
                         });
+                        console.log("chart.colors");
+                        console.log(chart.colors.getIndex(11).brighten(1));
                         // + (idx + 1)
                         let heatLegend = chart.createChild(am4maps.HeatLegend);
                         heatLegend.series = imageSeries;
@@ -389,11 +385,51 @@
                         heatLegend.width = am4core.percent(25);
                         heatLegend.marginRight = am4core.percent(4);
                         heatLegend.minValue = 0;
-                        heatLegend.maxValue = 40000000;
+
+
+                        heatLegend.maxValue = self.maxHeatLegend;
                         heatLegend.valign = "bottom";
                     })
                 }
-
+                chart.seriesContainer.events.on("hit", function (ev) {
+                    if (!self.canPlot) {
+                        return
+                    }
+                    if (ev.preventDefault != undefined)
+                        ev.preventDefault();
+                    if (ev.stopPropagation != undefined)
+                        ev.stopPropagation();
+                    self.$refs.yesNo.show('Would you like to make a tag here?', goThrough => {
+                        if (goThrough) {
+                            var mapMarker = imageSeriesTemplate.createChild(am4core
+                                .Sprite);
+                            mapMarker.path =
+                                "M4 12 A12 12 0 0 1 28 12 C28 20, 16 32, 16 32 C16 32, 4 20 4 12 M11 12 A5 5 0 0 0 21 12 A5 5 0 0 0 11 12 Z";
+                            mapMarker.width = 32;
+                            mapMarker.height = 32;
+                            mapMarker.scale = 0.7;
+                            mapMarker.fill = am4core.color("#3F4B3B");
+                            mapMarker.fillOpacity = 0.8;
+                            mapMarker.horizontalCenter = "middle";
+                            mapMarker.verticalCenter = "bottom";
+                            var coords = chart.svgPointToGeo(ev.svgPoint);
+                            var marker = imageSeries.mapImages.create();
+                            // //////////////////////
+                            // todo set Store plot data
+                            // self.currentPlotStore= click event data
+                            // //////////////////////
+                            marker.latitude = coords.latitude;
+                            marker.longitude = coords.longitude;
+                            marker.events.on("rightclick", function (dataItem, ev) {
+                                if (dataItem.hidden)
+                                    marker.show(dataItem.index)
+                                else
+                                    marker.hide(dataItem.index);
+                                event.stopPropagation();
+                            })
+                        }
+                    })
+                });
                 if (config.usePiecharts) {
                     let pieSeries = chart.series.push(new am4maps.MapImageSeries());
                     let pieTemplate = pieSeries.mapImages.template;
@@ -425,16 +461,14 @@
                     pieSeries.nonScalingStroke = true
                     pieSeries.name = "Pie Charts"
                     pieSeries.data = piechartArray
-
-
                 }
-                // if (self.lines) {
-                //     let graticuleSeries = chart.series.push(new am4maps.GraticuleSeries());
-                //     graticuleSeries.mapLines.template.line.strokeOpacity = 0.2;
-                //     graticuleSeries.longitudeStep = 2;
-                //     graticuleSeries.latitudeStep = 2
-                //     graticuleSeries.name = "lines"
-                // }
+                if (self.lines) {
+                    let graticuleSeries = chart.series.push(new am4maps.GraticuleSeries());
+                    graticuleSeries.mapLines.template.line.strokeOpacity = 0.2;
+                    graticuleSeries.longitudeStep = 2;
+                    graticuleSeries.latitudeStep = 2
+                    graticuleSeries.name = "lines"
+                }
                 let linkContainer = chart.createChild(am4core.Container);
                 linkContainer.isMeasured = false;
                 linkContainer.layout = "horizontal";
@@ -448,7 +482,7 @@
                 button.align = "right";
                 button.events.on("hit", function () {
                     self.labels = !self.labels
-                    self.drawMap(self.labels)
+                    self.drawMap(self.labels, self.config, self.heatData, self.pieData)
                 });
 
                 let equirectangular = linkContainer.createChild(am4core.Button);
@@ -460,7 +494,7 @@
                 equirectangular.events.on("hit", function () {
                     // toggle draw lines
                     self.lines = !self.lines
-                    self.drawMap(self.labels)
+                    self.drawMap(self.labels, self.config, self.heatData, self.pieData)
                 })
 
                 chart.legend = new am4maps.Legend();
@@ -558,7 +592,8 @@
             width: 1400px;
         }
     }
-     @media screen and (min-width:1920px) {
+
+    @media screen and (min-width:1920px) {
         .map {
             width: 1600px;
         }
