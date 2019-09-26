@@ -24,7 +24,8 @@ function StatusHandler() {
             ],
             allowedUsers: [
                 UserTypes.SuperUser
-            ]
+            ],
+            allowRupert: true
         }),
         new ButtonItem({
             id: 'view',
@@ -43,7 +44,8 @@ function StatusHandler() {
                 UserTypes.Buyer,
                 UserTypes.Supplier,
                 UserTypes.Store
-            ]
+            ],
+            allowRupert: true
         }),
         new ButtonItem({
             id: 'assign',
@@ -56,7 +58,8 @@ function StatusHandler() {
             ],
             allowedUsers: [
                 UserTypes.SuperUser
-            ]
+            ],
+            allowRupert: false
         }),
         new ButtonItem({
             id: 'replace_planogram',
@@ -71,7 +74,8 @@ function StatusHandler() {
             ],
             allowedUsers: [
                 UserTypes.SuperUser
-            ]
+            ],
+            allowRupert: false
         }),
         new ButtonItem({
             id: 'distribute',
@@ -84,7 +88,8 @@ function StatusHandler() {
             ],
             allowedUsers: [
                 UserTypes.SuperUser
-            ]
+            ],
+            allowRupert: true
         }),
         new ButtonItem({
             id: 'set_implemented',
@@ -100,7 +105,8 @@ function StatusHandler() {
             allowedUsers: [
                 UserTypes.SuperUser,
                 UserTypes.Store
-            ]
+            ],
+            allowRupert: true
         }),
         new ButtonItem({
             id: 'model_variation',
@@ -116,7 +122,8 @@ function StatusHandler() {
             ],
             allowedUsers: [
                 UserTypes.SuperUser
-            ]
+            ],
+            allowRupert: true
         }),
         new ButtonItem({
             id: 'store_variation',
@@ -133,7 +140,8 @@ function StatusHandler() {
             allowedUsers: [
                 UserTypes.SuperUser,
                 UserTypes.Store
-            ]
+            ],
+            allowRupert: true
         }),
         new ButtonItem({
             id: 'park',
@@ -152,7 +160,8 @@ function StatusHandler() {
             ],
             allowedUsers: [
                 UserTypes.SuperUser
-            ]
+            ],
+            allowRupert: true
         }),
         new ButtonItem({
             id: 'continue',
@@ -165,7 +174,8 @@ function StatusHandler() {
             ],
             allowedUsers: [
                 UserTypes.SuperUser
-            ]
+            ],
+            allowRupert: true
         }),
         new ButtonItem({
             id: 'remove_planogram_from_store',
@@ -180,7 +190,8 @@ function StatusHandler() {
             ],
             allowedUsers: [
                 UserTypes.SuperUser
-            ]
+            ],
+            allowRupert: true
         }),
     ];
 
@@ -198,7 +209,7 @@ function ButtonItem(data) {
     self.tooltip = data.tooltip;
     self.availableStatuses = data.availableStatuses;
     self.allowedUsers = data.allowedUsers;
-    self.removeRupert = data.removeRupert;
+    self.allowRupert = data.allowRupert;
 }
 
 const UserTypes = {

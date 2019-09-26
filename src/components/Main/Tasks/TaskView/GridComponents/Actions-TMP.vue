@@ -238,6 +238,7 @@
         case 21: {
             button_1.set('warning', 'visibility', cp.routeToImplementation, "View")
             button_2.set('primary', 'send', cp.goToDistribution, "Distribute")
+            button_3.set('error', 'close', cp.closeTask, "Close")
             // button_3.set('success', 'settings_backup_restore', cp.recall, "Recall")
             // button_4.set('error', 'local_parking', cp.setParked, "Park")
         }

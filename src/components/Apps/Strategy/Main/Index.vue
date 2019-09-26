@@ -7,7 +7,7 @@
                         File
                     </v-btn>
                     <v-list>
-                        <v-list-tile @click="newFile">
+                        <v-list-tile @click="customSetup">
                             <v-list-tile-title>New</v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile @click="saveFile">
@@ -18,7 +18,7 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
-                <v-menu dark offset-y style="margin-bottom: 10px;">
+                <!-- <v-menu dark offset-y style="margin-bottom: 10px;">
                     <v-btn slot="activator" flat>
                         Setup
                     </v-btn>
@@ -30,13 +30,15 @@
                             <v-list-tile-title>Custom Clusters</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
-                </v-menu>
+                </v-menu> -->
                 <v-btn slot="activator" flat @click="customQuery">
                     Custom
                 </v-btn>
             </v-toolbar-items>
             <v-spacer></v-spacer>
-            {{ currentToggle + ' - ' + title }}
+            <div v-if="title != ''">
+                {{ currentToggle + ' - ' + title }}
+            </div>
             <v-spacer></v-spacer>
             <v-toolbar-title>
                 <span>Main</span>
@@ -68,12 +70,13 @@
                 <v-btn class="elevation-0" style="width: 100px" round color="primary">
                     Map
                 </v-btn>
-                <v-btn class="elevation-0" style="width: 100px" round color="primary">
+                <!-- <v-btn class="elevation-0" style="width: 100px" round color="primary">
                     Model
-                </v-btn>
+                </v-btn> -->
             </v-btn-toggle>
         </v-toolbar>
-        <Grid v-show="selectedView == 0" :rowData="rowData" :headers="headers" ref="Grid" />
+        <Grid :showGrid="showGrid" :selectFile='openFile' :createFile="customSetup" v-show="selectedView == 0" :rowData="rowData"
+            :headers="headers" ref="Grid" />
         <Map v-if="selectedView == 1" :rowData="rowData" :setupData="setupMapData" ref="Map" />
         <ClusterModels :fileData="rowData" v-if="selectedView == 2" ref="ClusterModels" />
         <Setup ref="Setup" />
@@ -154,7 +157,8 @@
                 setupMapData: [],
                 selectedClusterType: 0,
                 currentConfig: null,
-                selectableFiles: []
+                selectableFiles: [],
+                showGrid: false
             }
         },
         mounted() {
@@ -270,7 +274,6 @@
                                     self.$refs.Spinner.hide();
                                 }
 
-                                self.firstLoad = false;
                                 self.unhandledReportData = r.data
                                 self.handleData(r.data, stores);
 
@@ -521,7 +524,7 @@
 
                 setTimeout(() => {
                     self.headers = headers;
-                     self.getMapSetupData()
+                    self.getMapSetupData()
                     self.$refs.Spinner.hide();
                     self.$refs.Grid.setOrder();
                 }, 60);
@@ -638,8 +641,9 @@
                 self.$refs.CustomSetup.show(self.headers, setup => {
                     self.currentConfig = setup;
                     self.selectedClusterType = setup.clusterType;
+                    self.showGrid = true;
 
-                    if(self.selectedClusterType == 0) {
+                    if (self.selectedClusterType == 0) {
                         self.handleSetup(setup);
                     } else {
                         self.handleCustomSetup(setup);
@@ -714,6 +718,7 @@
                 self.$refs.FileSelector.show(self.selectableFiles, file => {
                     let config = self.fileData.report.clusters[file];
                     self.currentConfig = config;
+                    self.showGrid = true;
                     self.selectedClusterType = file == 'Store Cluster' ? 0 : 1;
                     if (self.selectedClusterType == 0) {
                         self.handleSetup(config);
