@@ -36,7 +36,7 @@
         request
     } from 'http';
     export default {
-        props: ["rowData", "selectedProject", "getRowData", "assign", "userAccess"],
+        props: ["rowData", "selectedProject", "getRowData", "assign", "userAccess", "isRupert"],
         components: {
             AgGridVue,
             VariationOrderModal,
@@ -60,7 +60,7 @@
                     // },
                     {
                         "headerName": "Store",
-                        "checkboxSelection": true,
+                        "checkboxSelection": this.userAccess == 0 || this.isRupert,
                         "field": "storeName",
                         "headerCheckboxSelection": true,
                         "headerCheckboxSelectionFilteredOnly": true,
@@ -89,7 +89,6 @@
                         "minWidth": 100,
                     }, {
                         "headerName": "Actions",
-                        "editable": false,
                         "hide": false,
                         "minWidth": 340,
                         "cellRendererFramework": "Button"
@@ -114,7 +113,7 @@
                     }, {
                         "headerName": "Modules",
                         "minWidth": 50,
-                        "editable": true,
+                        "editable": this.userAccess == 0 || this.isRupert,
                         "field": "modules",
                         cellClassRules: {
                             'success-green': 'data.modulesFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
@@ -125,7 +124,7 @@
                         "headerName": "Height",
                         "minWidth": 50,
                         // "cellRendererFramework": "height",
-                        "editable": true,
+                        "editable": this.userAccess == 0 || this.isRupert,
                         "field": "height",
                         cellClassRules: {
                             'success-green': 'data.heightFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',

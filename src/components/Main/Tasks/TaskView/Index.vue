@@ -236,6 +236,11 @@
                 self.notesDialog = true
                 self.currentNotes = notes
             },
+            openNotesObj(obj) {
+                let self = this
+                self.notesDialog = true
+                self.currentNotes = obj.notes
+            },
             createProjectTransactionGroup(request, callback) {
                 let self = this;
 

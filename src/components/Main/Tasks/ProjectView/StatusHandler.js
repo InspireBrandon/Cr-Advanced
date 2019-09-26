@@ -198,6 +198,7 @@ function ButtonItem(data) {
     self.tooltip = data.tooltip;
     self.availableStatuses = data.availableStatuses;
     self.allowedUsers = data.allowedUsers;
+    self.removeRupert = data.removeRupert;
 }
 
 const UserTypes = {
