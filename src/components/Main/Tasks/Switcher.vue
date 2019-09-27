@@ -58,6 +58,7 @@
                             </v-btn>
                         </v-toolbar-items>
                         <v-btn v-if="userAccess == 0" color="primary" @click="startNewTask">Start new task</v-btn>
+                        <v-btn color="primary" @click="sendMail">Send Mail</v-btn>
                         <v-spacer></v-spacer>
                         <v-btn v-show="userAccess == 3" @click="$refs.guide.click()" dark outline>Help</v-btn>
                         <a style="display: none;" ref="guide" download
@@ -87,8 +88,7 @@
                                 </v-list>
                             </v-menu>
                         </div>
-                        <v-btn-toggle v-model="selectedView" @change="onViewChanged"
-                            class="transparent" mandatory>
+                        <v-btn-toggle v-model="selectedView" @change="onViewChanged" class="transparent" mandatory>
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
                                     <v-btn v-on="on" :value="0" flat>
@@ -170,6 +170,7 @@
         <ProjectShare ref="ProjectShare"></ProjectShare>
         <NewTask ref="NewTask"></NewTask>
         <AssignTask ref="AssignTask"></AssignTask>
+        <SendMailModal ref="SendMailModal"></SendMailModal>
     </v-container>
 </template>
 
@@ -192,6 +193,7 @@
     import NoticeBoard from '@/components/Main/NoticeBoard/Noticeboard.vue'
     import NewTask from './NewTask'
     import AssignTask from '@/components/Common/AssignTask'
+    import SendMailModal from './SendMailModal.vue'
 
     export default {
         components: {
@@ -203,7 +205,8 @@
             NoticeBoard,
             NewTask,
             AssignTask,
-            PlanogramDistribution
+            PlanogramDistribution,
+            SendMailModal
         },
         data() {
             return {
@@ -841,7 +844,53 @@
                 setTimeout(() => {
                     self.$refs.PlanogramDistribution.setView(item.project_Group_ID, item.project_ID, () => {});
                 }, 1000);
-            }
+            },
+            sendMail(item) {
+                let self = this;
+
+                self.$refs.SendMailModal.show(modalData => {
+                    let request = JSON.parse(JSON.stringify(item));
+                    let tmpUser = request.systemUserID;
+
+                    self.checkTaskTakeover(request, () => {
+                        request.systemUserID = tmpUser;
+
+                        let projectTXGroupRequest = {
+                            projectID: item.project_ID
+                        }
+
+                        request.status = 40;
+                        request.systemUserID = null;
+                        request.actionedByUserID = self.systemUserID;
+                        request.notes = self.findAndReplaceNote(request.notes);
+                        // Create New Process Assigned for complete group
+                        self.createProjectTransaction(request, processEndProjectTX => {
+                            // Create "New Group"
+                            self.createProjectTransactionGroup(projectTXGroupRequest,
+                                newGroupTX => {
+                                    // Create New Process Assigned for "New Group"
+                                    request.systemUserID = modalData.systemUserID;
+                                    request.actionedByUserID = null;
+                                    request.projectTXGroup_ID = newGroupTX.id;
+                                    request.notes = self.findAndReplaceNote(request.notes);
+                                    self.createProjectTransaction(request,
+                                        processStartProjectTX => {
+                                            // Create Requesting Approval process for "New Group"
+                                            request.status = 10;
+                                            request.notes = self.findAndReplaceNote(
+                                                modalData
+                                                .notes);
+                                            self.createProjectTransaction(request,
+                                                approvalTransaction => {
+                                                    self.$parent.$parent
+                                                        .getTaskViewData();
+                                                })
+                                        })
+                                })
+                        })
+                    })
+                })
+            },
         }
     }
 </script>
