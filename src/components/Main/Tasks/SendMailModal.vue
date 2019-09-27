@@ -8,15 +8,15 @@
                 <v-autocomplete return-object v-model="selectedUser" :items="users" label="Select a user">
                 </v-autocomplete>
 
-                <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 300px" :items="projectGroups"
-                    @change="getProjectsByProjectGroup()" v-model="selectedProjectGroup" label="Project Group">
+                <v-autocomplete :items="projectGroups" @change="getProjectsByProjectGroup()"
+                    v-model="selectedProjectGroup" label="Project Group">
                 </v-autocomplete>
 
-                <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 300px" :items="projects"
-                    @change="getStorePlanograms()" v-model="selectedProject" label="Project">
+                <v-autocomplete :items="projects" v-model="selectedProject"
+                    label="Project">
                 </v-autocomplete>
 
-                <v-textarea v-model="notes" label="notes"></v-textarea>
+                <v-textarea v-model="notes" label="Notes"></v-textarea>
             </v-card-text>
             <v-card-actions style="text-align: right;">
                 <v-spacer></v-spacer>
@@ -39,7 +39,6 @@
                 selectedProjectGroup: null,
                 projectGroups: [],
                 projects: [],
-                selectedProjectGroup: null,
                 selectedProject: null,
                 selectedUser: null,
                 notes: null
@@ -50,8 +49,7 @@
                 let self = this;
                 self.users = [];
 
-                self.getProjectsByProjectGroup();
-                self.getStorePlanograms();
+                self.getProjectGroups();
 
                 self.getUsers(() => {
                     self.afterRuturn = afterRuturn;
@@ -64,7 +62,9 @@
                 let self = this;
                 self.afterRuturn({
                     systemUserID: self.selectedUser.value,
-                    notes: self.notes
+                    notes: self.notes,
+                    project: self.selectedProject,
+                    projectGroup: self.selectedProjectGroup
                 });
                 self.dialog = false;
             },
@@ -88,6 +88,34 @@
 
                     })
             },
+            getProjectGroups() {
+                let self = this;
+
+                return new Promise((resolve, reject) => {
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    Axios.get(process.env.VUE_APP_API + `ProjectGroup`)
+                        .then(r => {
+                            delete Axios.defaults.headers.common["TenantID"];
+                            let tmp = r.data.projectGroupList;
+
+                            self.projectGroups = [];
+
+                            tmp.forEach(el => {
+                                self.projectGroups.push({
+                                    text: el.name,
+                                    value: el.id
+                                })
+                            })
+
+                            resolve(r);
+                        })
+                        .catch(e => {
+                            delete Axios.defaults.headers.common["TenantID"];
+                            reject(e);
+                        })
+                })
+            },
             getProjectsByProjectGroup() {
                 let self = this;
                 return new Promise((resolve, reject) => {
@@ -95,10 +123,9 @@
 
                     self.$nextTick(() => {
 
-
                         let projectGroupID = self.selectedProjectGroup
                         Axios.get(process.env.VUE_APP_API +
-                                `Project`)
+                                `Project?projectGroupID=${projectGroupID}`)
                             .then(r => {
                                 delete Axios.defaults.headers.common["TenantID"];
                                 let tmp = r.data.projectList;
@@ -122,47 +149,6 @@
                     })
                 })
             },
-            getStorePlanograms() {
-                let self = this
-
-                self.$nextTick(() => {
-                    self.currentStorePlanograms = [];
-
-                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
-                    Axios.get(process.env.VUE_APP_API + 'Store_Planogram')
-                        .then(r => {
-                            self.rowData = []
-
-                            self.projectsObject.forEach(element => {
-                                if (element.id == self.selectedProject) {
-                                    self.Planogram_ID = element.planogram_ID
-                                    self.projectOwer = element.systemUserID;
-                                    self.currentProject = element;
-                                }
-                            });
-
-                            self.currentStorePlanograms = []
-                            self.currentStorePlanograms = r.data.store_PlanogramList;
-                            self.currentStorePlanograms.forEach(e => {
-                                e.currentStatusText = self.StoreStatusList[e.planogramStoreStatus]
-                                    .text
-                            })
-                            self.rowData = self.currentStorePlanograms
-
-                            delete Axios.defaults.headers.common["TenantID"];
-
-                            self.projects.forEach(e => {
-                                if (e.value == self.selectedProject) {
-                                    self.title = e.text
-                                }
-                            })
-
-
-                        })
-                })
-            },
-
         }
     }
 </script>

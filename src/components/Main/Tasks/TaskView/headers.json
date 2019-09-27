@@ -32,6 +32,12 @@
         "hide": false
     },
     {
+        "headerName": "Custom Cluster",
+        "field": "customCluster",
+        "editable": false,
+        "hide": false
+    },
+    {
         "headerName": "Store",
         "field": "store",
         "editable": false,

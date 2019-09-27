@@ -806,7 +806,12 @@
                             project_Group_ID: data.projectGroup,
                             project_ID: data.project,
                             rangeFileID: data.rangeFile,
-                            systemFileID: data.spacePlanFile
+                            systemFileID: data.spacePlanFile,
+                            store_ID: data.store,
+                            storeCluster_ID: data.storeCluster,
+                            categoryCluster_ID: data.categoryCluster,
+                            customCluster_ID: data.customCluster,
+                            notes: data.notes
                         }
 
                         self.createProjectTransaction(txRequest, newItem => {
@@ -849,45 +854,29 @@
                 let self = this;
 
                 self.$refs.SendMailModal.show(modalData => {
-                    let request = JSON.parse(JSON.stringify(item));
-                    let tmpUser = request.systemUserID;
+                    let request = {
+                        systemUserID: null,
+                        notes: null,
+                        projectTXGroup_ID: null,
+                        type: null,
+                        status: null,
+                        project_ID: modalData.project,
+                        project_Group_ID: modalData.projectGroup
+                    };
 
-                    self.checkTaskTakeover(request, () => {
-                        request.systemUserID = tmpUser;
+                    let projectTXGroupRequest = {
+                        projectID: modalData.project
+                    }
 
-                        let projectTXGroupRequest = {
-                            projectID: item.project_ID
-                        }
-
-                        request.status = 40;
-                        request.systemUserID = null;
-                        request.actionedByUserID = self.systemUserID;
-                        request.notes = self.findAndReplaceNote(request.notes);
-                        // Create New Process Assigned for complete group
-                        self.createProjectTransaction(request, processEndProjectTX => {
-                            // Create "New Group"
-                            self.createProjectTransactionGroup(projectTXGroupRequest,
-                                newGroupTX => {
-                                    // Create New Process Assigned for "New Group"
-                                    request.systemUserID = modalData.systemUserID;
-                                    request.actionedByUserID = null;
-                                    request.projectTXGroup_ID = newGroupTX.id;
-                                    request.notes = self.findAndReplaceNote(request.notes);
-                                    self.createProjectTransaction(request,
-                                        processStartProjectTX => {
-                                            // Create Requesting Approval process for "New Group"
-                                            request.status = 10;
-                                            request.notes = self.findAndReplaceNote(
-                                                modalData
-                                                .notes);
-                                            self.createProjectTransaction(request,
-                                                approvalTransaction => {
-                                                    self.$parent.$parent
-                                                        .getTaskViewData();
-                                                })
-                                        })
-                                })
-                        })
+                    self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
+                        request.systemUserID = modalData.systemUserID;
+                        request.actionedByUserID = null;
+                        request.rollingUserID = null;
+                        request.notes = modalData.notes;
+                        request.projectTXGroup_ID = newGroup.id;
+                        request.type = 7;
+                        request.status = 43;
+                        self.createProjectTransaction(request, data => {})
                     })
                 })
             },
