@@ -96,6 +96,7 @@
                 let request = {
                     name: self.name
                 }
+
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.post(process.env.VUE_APP_API + `MapImage`, request).then(r => {

@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="dialog" persistent max-width="900">
+    <v-dialog v-model="dialog" persistent width="800">
         <v-card>
             <v-toolbar dark flat color="primary">
                 <v-toolbar-title>Start new task</v-toolbar-title>
@@ -39,10 +39,29 @@
                                 label="Space Plan File" hide-details>
                             </v-autocomplete>
                         </v-flex>
+                        <v-flex md3>
+                            <v-autocomplete v-model="selectedSpacePlanFile" :items="spacePlanFiles"
+                                label="Store Cluster" hide-details>
+                            </v-autocomplete>
+                        </v-flex>
+                        <v-flex md3>
+                            <v-autocomplete v-model="selectedSpacePlanFile" :items="spacePlanFiles"
+                                label="Category Cluster" hide-details>
+                            </v-autocomplete>
+                        </v-flex>
+                        <v-flex md3>
+                            <v-autocomplete v-model="selectedSpacePlanFile" :items="spacePlanFiles"
+                                label="Custom Cluster" hide-details>
+                            </v-autocomplete>
+                        </v-flex>
+                        <v-flex md12 class="mt-4">
+                            <v-textarea label="Notes" hide-details>
+                            </v-textarea>
+                        </v-flex>
                     </v-layout>
                 </v-container>
             </v-card-text>
-            <v-divider class="mx-2"></v-divider>
+            <v-divider class="mx-"></v-divider>
             <v-card-actions style="text-align: right;">
                 <v-spacer></v-spacer>
                 <v-btn color="secondary" @click.native="dialog = false">Cancel</v-btn>
@@ -89,6 +108,7 @@
             self.getProjectGroups();
             self.getRanges();
             self.getSpacePlans();
+            self.getStoreClusters();
         },
         methods: {
             show(afterReturn) {
@@ -203,6 +223,14 @@
 
                     })
             },
+            getStoreClusters() {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API + "Cluster/Store")
+                    .then(r => {
+                        console.log(r.data);
+                    })
+            }
         }
     }
 </script>
