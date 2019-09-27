@@ -1,7 +1,10 @@
 <template>
     <div>
         <div>
-            <ag-grid-vue :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 272px);"
+            <div style="width: 100%;  height: calc(100vh - 272px); text-align: center; font-size: 20px; padding-top: 10%;" v-show="!showGrid">
+                <div>Please <a href="#" @click.prevent="selectFile">select</a> or <a href="#" @click.prevent="createFile">create</a> a file to continue</div>
+            </div>
+            <ag-grid-vue v-show="showGrid" :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 272px);"
                 :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
                 :sideBar='true' :enableSorting="true" :enableFilter="true" :suppressRowClickSelection="true"
                 :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true" :enableColResize="true"
@@ -29,7 +32,7 @@
     import Axios from 'axios';
 
     export default {
-        props: ['rowData', 'headers'],
+        props: ['rowData', 'headers', 'selectFile', 'createFile', 'showGrid'],
         components: {
             AgGridVue,
             ProgressRenderer

@@ -3,7 +3,7 @@
         <v-tooltip bottom v-if="button.button_1.show">
             <template v-slot:activator="{ on }">
                 <v-btn :disabled="button.button_1.disabled"
-                    @click="button.button_1.click(params.data),button.button_1.disabled=true" flat icon small>
+                    @click="button.button_1.click(params.data); if(params.data.status != 43) { button.button_1.disabled=true }" flat icon small>
                     <v-icon :color="button.button_1.color" v-on="on">{{ button.button_1.icon }}</v-icon>
                 </v-btn>
             </template>
@@ -12,7 +12,7 @@
         <v-tooltip bottom v-if="button.button_2.show">
             <template v-slot:activator="{ on }">
                 <v-btn :disabled="button.button_2.disabled"
-                    @click="button.button_2.click(params.data),button.button_2.disabled=true" flat icon small>
+                    @click="button.button_2.click(params.data);" flat icon small>
                     <v-icon :color="button.button_2.color" v-on="on">{{ button.button_2.icon }}</v-icon>
                 </v-btn>
             </template>
@@ -238,6 +238,7 @@
         case 21: {
             button_1.set('warning', 'visibility', cp.routeToImplementation, "View")
             button_2.set('primary', 'send', cp.goToDistribution, "Distribute")
+            button_3.set('error', 'close', cp.closeTask, "Close")
             // button_3.set('success', 'settings_backup_restore', cp.recall, "Recall")
             // button_4.set('error', 'local_parking', cp.setParked, "Park")
         }
@@ -317,7 +318,8 @@
         }
         break;
         case 43: {
-            button_1.set('error', 'close', cp.closeTask, "Close")
+            button_1.set('info', 'visibility', cp.openNotesObj, "Read")
+            button_2.set('error', 'close', cp.closeTask, "Close")
         }
         break;
         case 44: {

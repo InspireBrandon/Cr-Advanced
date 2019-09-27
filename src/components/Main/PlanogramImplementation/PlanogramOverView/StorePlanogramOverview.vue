@@ -7,7 +7,7 @@
             <v-spacer></v-spacer>
         </v-toolbar>
         <v-toolbar dark flat>
-            <v-btn @click="assignGroups" color="blue-grey darken-2 ma-2">
+            <v-btn v-if="userAccess == 0 || isRupert" @click="assignGroups" color="blue-grey darken-2 ma-2">
                 group assign
             </v-btn>
             <v-toolbar-items>
@@ -19,7 +19,8 @@
                     @change="getStorePlanograms()" v-model="selectedProject" label="Project">
                 </v-autocomplete>
 
-                <v-autocomplete @change="updateProjectOwner" v-if="projectOwer != undefined && projectOwer != null"
+                <v-autocomplete :disabled="userAccess != 0" @change="updateProjectOwner"
+                    v-if="projectOwer != undefined && projectOwer != null"
                     style="margin-left: 10px; margin-top: 8px; width: 300px" :items="systemUsers" v-model="projectOwer"
                     label="Project Owner">
                 </v-autocomplete>
@@ -29,8 +30,8 @@
                 Send Mail
             </v-btn>
         </v-toolbar>
-        <grid :userAccess="userAccess" ref="grid" :getRowData="getStorePlanograms" :selectedProject="selectedProject"
-            :rowData="rowData" :assign="assignGroups" :Planogram_ID="Planogram_ID" />
+        <grid :isRupert="isRupert" :userAccess="userAccess" ref="grid" :getRowData="getStorePlanograms"
+            :selectedProject="selectedProject" :rowData="rowData" :assign="assignGroups" :Planogram_ID="Planogram_ID" />
 
         <StorePlanograms ref="StorePlanograms" :getStoreData="getStorePlanograms" />
         <PlanogramDetailsSelector :PlanoName="title" ref="PlanogramDetailsSelector" />
@@ -69,6 +70,7 @@
         },
         data() {
             return {
+                isRupert: false,
                 projectsObject: [],
                 Planogram_ID: null,
                 projects: [],
@@ -113,38 +115,43 @@
             }
         },
         mounted() {
+            let self = this;
             this.open()
             this.getSystemUsers();
+
+            let encoded_details = jwt.decode(sessionStorage.accessToken);
+            self.systemUserID = encoded_details.USER_ID;
+            self.isRupert = encoded_details.USER_ID == parseInt(process.env.VUE_APP_RUPERT);
         },
         methods: {
             sendMail() {
                 let self = this
 
                 self.$refs.UserNotesModal.show(modalData => {
-                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                    let request = {
+                        systemUserID: null,
+                        notes: null,
+                        projectTXGroup_ID: null,
+                        type: null,
+                        status: null,
+                        project_ID: self.selectedProject,
+                        project_Group_ID: self.selectedProjectGroup
+                    };
 
-                    Axios.get(process.env.VUE_APP_API + `ProjectTX?projectID=${self.selectedProject}`).then(
-                        r => {
-                            console.log(r);
-                            let currentItem = r.data.projectTXList[0]
-                            let request = JSON.parse(JSON.stringify(currentItem));
+                    let projectTXGroupRequest = {
+                        projectID: request.project_ID
+                    }
 
-                            let projectTXGroupRequest = {
-                                projectID: request.project_ID
-                            }
-                            // Create New Project Group
-                            self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
-                                request.systemUserID = modalData.systemUserID;
-                                request.actionedByUserID = null;
-                                request.rollingUserID = null;
-                                request.notes = modalData.notes;
-                                request.projectTXGroup_ID = newGroup.id;
-                                request.type = 7;
-                                request.status = 43;
-                                // Create New Project Transaction
-                                self.createProjectTransaction(request, data => {})
-                            })
-                        })
+                    self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
+                        request.systemUserID = modalData.systemUserID;
+                        request.actionedByUserID = null;
+                        request.rollingUserID = null;
+                        request.notes = modalData.notes;
+                        request.projectTXGroup_ID = newGroup.id;
+                        request.type = 7;
+                        request.status = 43;
+                        self.createProjectTransaction(request, data => {})
+                    })
                 })
             },
             showStore(data) {
