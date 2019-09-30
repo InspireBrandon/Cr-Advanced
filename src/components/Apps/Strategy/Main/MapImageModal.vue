@@ -102,7 +102,7 @@
                     self.selectedMap = null
                     self.name = null
                     self.MapImgURL = ''
-                    self.legendImgUR = ''
+                    self.legendImgURL = ''
                 }
                 self.dialog = true
             },
@@ -127,7 +127,7 @@
                                 Axios.post(process.env.VUE_APP_API +
                                     `MapImage?mapImageID=${self.selectedMap}&type=legend`,
                                     self.legendImg).then(legendRes => {
-
+                                    self.dialog = false
                                 })
                             })
                 })
@@ -152,6 +152,8 @@
                                 Axios.post(process.env.VUE_APP_API +
                                     `MapImage?mapImageID=${r.data.id}&type=legend`,
                                     self.legendImg).then(legendRes => {
+                                    self.dialog = false
+
 
                                 })
                             })
@@ -164,19 +166,6 @@
 
                 self.MapImgURL = process.env.VUE_APP_API + `MapImage?mapImageID=${self.selectedMap}&type=map`;
                 self.legendImgURL = process.env.VUE_APP_API + `MapImage?mapImageID=${self.selectedMap}&type=legend`;
-
-                // Axios.get(process.env.VUE_APP_API + `MapImage?mapImageID=${self.selectedMap}&type=map`)
-                //     .then(r => {
-                //         self.MapImgURL=r.data
-                //         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
-                //         console.log(r);
-                //         Axios.get(process.env.VUE_APP_API + `MapImage?mapImageID=${self.selectedMap}&type=legend`)
-                //             .then(res => {
-                //                 console.log(res);
-                //             })
-                //     })
-
             },
             openFileDialog() {
                 let self = this;

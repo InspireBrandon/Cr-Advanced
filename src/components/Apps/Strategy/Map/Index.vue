@@ -385,7 +385,7 @@
                     image.href = self.MapImgURL
                     pattern_europe.addElement(image.element);
                     polygonTemplate.fill = pattern_europe
-                    polygonTemplate.strokeOpacity = 1;
+                    polygonTemplate.strokeOpacity = 0;
                 } else {
                     polygonTemplate.fill = chart.colors.getIndex(1);
                     polygonTemplate.strokeOpacity = 1;
