@@ -420,11 +420,14 @@
                         circle.tooltipText = heatmapItem + "{storeName}: [bold]{sales}[/]";
                         circle.radius = self.radius + idx
                         let label = imageSeriesTemplate.createChild(am4core.Label);
-                        label.text = "{storeName}";
-                        label.fill = am4core.color("#fff");
+                        // label.text = "{storeName}";
+                        label.html =
+                        '<a style="background-color: black;color: white;" >{storeName}</a>'
+                        // label.fill = am4core.color("#fff");
                         label.fontSize = 5
                         label.nonScaling = false;
                         label.hidden = labelState
+                        
                         console.log("label");
                         console.log(label);
 
@@ -433,6 +436,12 @@
                             target: circle,
                             min: chart.colors.getIndex(11).brighten(1),
                             max: chart.colors.getIndex(11).brighten(-1)
+                        });
+                        imageSeries.heatRules.push({
+                            property: "radius",
+                            target: circle,
+                            min: 8,
+                            max: 15
                         });
                         console.log("chart.colors");
                         console.log(chart.colors.getIndex(11).brighten(1));
@@ -554,6 +563,7 @@
 
                 let equirectangular = linkContainer.createChild(am4core.Button);
                 equirectangular.label.text = "Toggle Line";
+                
                 equirectangular.padding(5, 5, 5, 5);
                 equirectangular.width = 100;
                 equirectangular.align = "left";
@@ -693,6 +703,7 @@
         .sideBar {
 
             width: calc(100vw - 1600px)
+            
         }
     }
 
