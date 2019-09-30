@@ -88,10 +88,12 @@
                 selectedmap: null,
                 MapImgURL: '',
                 legendImgURL: '',
-                plottableStores: []
-            }
-        },
-        mounted() {
+                plottableStores: [],
+                color: [am4core.color("rgb(255,99,71)"), am4core.color("rgb(255,255,0)"), am4core.color("rgb(0,204,0)"), am4core.color("rgb(255,128,0)"), am4core.color("rgb(204,0,204)")]
+            
+        }
+    },
+    mounted() {
             // this.openSetup()
             // this.drawMap(this.labels)
             this.getmaps()
@@ -262,8 +264,7 @@
                                 tmpBasket["sales"] = formatter.format(el.sales)
                                     .replace("$",
                                         "R");
-                                tmpBasket["width"] = 20
-                                tmpBasket["height"] = 20
+                             
                                 tmpBasket["salesPercent"] = el.salesPercent
                             }
                         })
@@ -307,12 +308,15 @@
                             if (finalStore.storeName == store.displayname) {
                                 finalStore.pieData.push({
                                     "category": el.config.selectedBasket.basket,
-                                    "value": store.sales
+                                    "value": store.sales,
+                                    "color": self.color[idx],
                                 })
                             }
                         })
                     })
                 })
+                console.log("final");
+                console.log(final);
 
                 return final
             },
@@ -484,6 +488,7 @@
                     })
                 });
                 if (config.usePiecharts) {
+
                     let pieSeries = chart.series.push(new am4maps.MapImageSeries());
                     let pieTemplate = pieSeries.mapImages.template;
                     pieTemplate.propertyFields.latitude = "lat";
@@ -506,12 +511,20 @@
                     let pieSeriesTemplate = pieChartTemplate.series.push(new am4charts.PieSeries);
                     pieSeriesTemplate.dataFields.category = "category";
                     pieSeriesTemplate.dataFields.value = "value";
+                    pieSeriesTemplate.slices.template.propertyFields.fill = "color";
+
+                    // pieSeriesTemplate.slices.template.fill = "color";
+                    // var colorSet = new am4core.ColorSet();
+                    // colorSet.list = ["#388E3C", "#FBC02D", "#0288d1", "#F44336", "#8E24AA"].map(function(color) {
+                    //   return new am4core.color(color);
+                    // });
+                    // pieSeries.colors = colorSet;
                     pieSeriesTemplate.slices.template.stroke = am4core.color("#fff");
                     pieSeriesTemplate.slices.template.strokeWidth = 1;
                     pieSeriesTemplate.slices.template.strokeOpacity = 1;
                     pieSeriesTemplate.labels.template.disabled = true;
 
-                    pieSeries.nonScalingStroke = true
+                    pieSeries.nonScalingStroke = false
                     pieSeries.name = "Pie Charts"
                     pieSeries.data = piechartArray
                 }
