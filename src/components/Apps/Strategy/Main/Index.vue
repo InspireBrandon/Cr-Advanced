@@ -34,6 +34,19 @@
                 <v-btn slot="activator" flat @click="customQuery">
                     Custom
                 </v-btn>
+                <v-menu dark offset-y style="margin-bottom: 10px;">
+                    <v-btn slot="activator" flat>
+                        Map
+                    </v-btn>
+                    <v-list>
+                        <v-list-tile @click="openMapImageModal(true)" >
+                            <v-list-tile-title>Add</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="openMapImageModal(false)" >
+                            <v-list-tile-title>Edit</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
             </v-toolbar-items>
             <v-spacer></v-spacer>
             <div v-if="title != ''">
@@ -170,9 +183,9 @@
             self.getHinterlandStores();
         },
         methods: {
-            openMapImageModal() {
+            openMapImageModal(type) {
                 let self = this
-                self.$refs.MapImageModal.open(callback => {
+                self.$refs.MapImageModal.open(type,callback => {
 
                 })
             },
