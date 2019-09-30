@@ -10,8 +10,8 @@
                     <v-autocomplete :items="maps" v-model="selectedmap" @change="onMapChange"> </v-autocomplete>
                 </v-toolbar>
                 <v-card>
-                    <v-img  :src="legendImgURL == '' ? tmpImageURL : legendImgURL"
-                        aspect-ratio="1" class="grey lighten-2" width="100%" max-height="200" style="cursor: pointer;">
+                    <v-img :src="legendImgURL == '' ? tmpImageURL : legendImgURL" aspect-ratio="1"
+                        class="grey lighten-2" width="100%" style="cursor: pointer;">
                     </v-img>
                 </v-card>
 
@@ -84,6 +84,7 @@
                 selectedmap: null,
                 MapImgURL: '',
                 legendImgURL: '',
+                plottableStores: []
             }
         },
         mounted() {
@@ -97,7 +98,7 @@
                 let self = this
                 self.$nextTick(() => {
                     console.log(self.selectedmap);
-                    
+
                     self.MapImgURL = process.env.VUE_APP_API +
                         `MapImage?mapImageID=${self.selectedmap}&type=map`;
                     self.legendImgURL = process.env.VUE_APP_API +
@@ -122,7 +123,7 @@
                         })
                     })
                     console.log(self.maps);
-                    
+
                 })
             },
             plotStore(item) {
@@ -605,11 +606,20 @@
         .map {
             width: 1000px;
         }
+
+        .sideBar {
+
+            width: calc(100vw - 1000px)
+        }
     }
 
     @media screen and (min-width:1336px) {
         .map {
             width: 1200px;
+        }
+         .sideBar {
+
+            width: calc(100vw - 1200px)
         }
     }
 
@@ -617,17 +627,29 @@
         .map {
             width: 1200px;
         }
+        .sideBar {
+
+            width: calc(100vw - 1200px)
+        }
     }
 
     @media screen and (min-width:1600px) {
         .map {
             width: 1400px;
         }
+        .sideBar {
+
+            width: calc(100vw - 1400px)
+        }
     }
 
     @media screen and (min-width:1920px) {
         .map {
             width: 1600px;
+        }
+        .sideBar {
+
+            width: calc(100vw - 1600px)
         }
     }
 </style>

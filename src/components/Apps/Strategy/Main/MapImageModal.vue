@@ -71,11 +71,14 @@
                 MapImageLinkAddress: '',
                 maps: [],
                 selectedMap: null,
+                isAdd:true
             }
         },
         methods: {
-            open(callback) {
+            open(type,callback) {
                 let self = this
+                self.isAdd=type
+               
                 self.dialog = true
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
