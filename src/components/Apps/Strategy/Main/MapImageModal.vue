@@ -12,7 +12,6 @@
                 <v-select style="margin-left: 10px; margin-top: 8px; width: 200px" dense :items="maps"
                     v-model="selectedMap" hide-details @change="getImages">
                 </v-select>
-                <v-btn color="primary" @click="saveNew()"> Save new </v-btn>
                 <v-spacer> </v-spacer>
             </v-toolbar>
             <v-card-text>
@@ -32,21 +31,22 @@
                             </v-text-field>
                         </v-flex>
                         <v-flex md4>
-                            <v-img @click="openLegendFileDialog"
-                                :src="legendImgURL == '' ? legendImageURL : legendImgURL" aspect-ratio="1"
-                                class="grey lighten-2" width="100%" max-height="200" style="cursor: pointer;"></v-img>
+                            <img @click="openLegendFileDialog" :src="legendImgURL == '' ? legendImageURL : legendImgURL"
+                                aspect-ratio="1" class="grey lighten-2" width="100%" max-height="200"
+                                style="cursor: pointer;">
                         </v-flex>
                         <v-flex md4>
-                            <v-img @click="openFileDialog" :src="MapImgURL == '' ? MapImageURL : MapImgURL"
+                            <img @click="openFileDialog" :src="MapImgURL == '' ? MapImageURL : MapImgURL"
                                 aspect-ratio="1" class="grey lighten-2" width="100%" max-height="200"
-                                style="cursor: pointer;"></v-img>
+                                style="cursor: pointer;">
                         </v-flex>
                     </v-layout>
                 </v-container>
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" @click="'submit'">Save </v-btn>
+                <v-btn color="primary" @click="saveNew()"> Save new </v-btn>
+                <v-btn color="primary" @click="save" v-if="selectedMap!=null">Save </v-btn>
             </v-card-actions>
         </v-card>
         <input type="file" style="display: none;" ref="LegendfileInput" @change="onLegendImageChange">
@@ -91,12 +91,37 @@
                 })
                 self.callback = callback
             },
+            save() {
+                let self = this
+                let request = {
+                    name: self.name,
+                    id: self.selectedMap
+                }
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.put(process.env.VUE_APP_API + `MapImage`, request).then(r => {
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    console.log(r);
+                    Axios.post(process.env.VUE_APP_API + `MapImage?mapImageID=${self.selectedMap}&type=map`, self
+                            .MapImg)
+                        .then(
+                            mapres => {
+                                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                                Axios.post(process.env.VUE_APP_API +
+                                    `MapImage?mapImageID=${self.selectedMap}&type=legend`,
+                                    self.legendImg).then(legendRes => {
+
+                                })
+                            })
+                })
+                self.callback()
+            },
             saveNew() {
                 let self = this
                 let request = {
                     name: self.name
                 }
-
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.post(process.env.VUE_APP_API + `MapImage`, request).then(r => {
@@ -108,14 +133,12 @@
                         .then(
                             mapres => {
                                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
                                 Axios.post(process.env.VUE_APP_API +
                                     `MapImage?mapImageID=${r.data.id}&type=legend`,
                                     self.legendImg).then(legendRes => {
 
                                 })
                             })
-
                 })
                 self.callback()
             },
@@ -123,16 +146,20 @@
                 let self = this
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.get(process.env.VUE_APP_API + `MapImage?mapImageID=${self.selectedMap}&type=map`)
-                    .then(r => {
-                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                self.MapImgURL = process.env.VUE_APP_API + `MapImage?mapImageID=${self.selectedMap}&type=map`;
+                self.legendImgURL = process.env.VUE_APP_API + `MapImage?mapImageID=${self.selectedMap}&type=legend`;
 
-                        console.log(r);
-                        Axios.get(process.env.VUE_APP_API + `MapImage?mapImageID=${self.selectedMap}&type=legend`)
-                            .then(res => {
-                                console.log(res);
-                            })
-                    })
+                // Axios.get(process.env.VUE_APP_API + `MapImage?mapImageID=${self.selectedMap}&type=map`)
+                //     .then(r => {
+                //         self.MapImgURL=r.data
+                //         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                //         console.log(r);
+                //         Axios.get(process.env.VUE_APP_API + `MapImage?mapImageID=${self.selectedMap}&type=legend`)
+                //             .then(res => {
+                //                 console.log(res);
+                //             })
+                //     })
 
             },
             openFileDialog() {
