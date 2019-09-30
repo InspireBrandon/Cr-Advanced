@@ -16,7 +16,7 @@
                         <v-list-tile>
                             <v-list-tile-title>Open</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile>
+                        <v-list-tile @click="saveFile">
                             <v-list-tile-title>Save</v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile @click="close">
@@ -47,8 +47,6 @@
             </v-toolbar-title>
         </v-toolbar>
         <v-toolbar dark flat>
-            <v-btn color="primary">Refresh</v-btn>
-            <v-btn color="primary">Setup</v-btn>
         </v-toolbar>
         <Grid :rowData="rowData" :headers="headers" ref="Grid" />
 
@@ -67,10 +65,45 @@
         data() {
             return {
                 rowData: [],
-                headers: []
+                headers: [],
+                runData: [],
+                fileData: []
             }
         },
+        created() {
+            let self = this;
+            self.getFile(data => {
+                if (data != null && data != false) {
+                    self.getFileData(data.id, fileData => {
+                        if (!Array.isArray(fileData.store)) {
+                            self.runData = [];
+
+                            let name = "ASDF";
+
+                            self.fileData = fileData.supplierImport;
+
+                            for (var prop in fileData.supplierImport) {
+                                self.runData.push({
+                                    prop: prop,
+                                    name: self.generateNameParams(fileData.supplierImport[name].config.selectedBasket, fileData.basket[name].config
+                                        .selectedPeriod)
+                                })
+                            }
+                        }
+                    })
+                }
+            })
+        },
         methods: {
+            generateNameParams(selectedBasket, selectedPeriod) {
+                let self = this;
+
+                if (selectedPeriod.periodic) {
+                    return `${selectedBasket.description} - ${selectedPeriod.monthsBetween} MMA (${selectedPeriod.dateFromString} TO ${selectedPeriod.dateToString})`;
+                } else {
+                    return `${selectedBasket.description} Average Monthly ${selectedPeriod.dateFromString} TO ${selectedPeriod.dateToString}`;
+                }
+            },
             close() {
                 let self = this
                 self.rowData = []
@@ -96,6 +129,93 @@
 
                     reader.readAsText(file);
                 })
+            },
+            getFile(callback) {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API +
+                        `SystemFile/JSON?db=CR-Devinspire&folder=CLUSTER REPORT&file=REPORT`)
+                    .then(r => {
+                        callback(r.data);
+                    })
+            },
+            saveFile() {
+                let self = this;
+
+                self.getFile(fileTransaction => {
+
+                    let name = "ASDF";
+
+                    let levelValues = [];
+
+                    if (fileTransaction == null || fileTransaction == false) {
+                        let tmp = {
+                            supplierImport: {}
+                        }
+
+                        tmp.supplierImport[name] = {
+                            data: self.rowData
+                        };
+
+                        self.appendAndSaveFile(tmp);
+                    } else {
+                        self.getFileData(fileTransaction.id, fileData => {
+                            let tmp = fileData;
+
+                            if (tmp == false) {
+                                tmp = {
+                                    supplierImport: {}
+                                }
+                            }
+
+                            if (tmp.supplierImport == undefined)
+                                tmp.supplierImport = {};
+
+                            if (Array.isArray(tmp.supplierImport))
+                                tmp.supplierImport = {};
+
+                            tmp.basket[name] = {
+                                data: self.rowData
+                            };
+
+                            self.appendAndSaveFile(tmp);
+                        })
+                    }
+                })
+            },
+            getFile(callback) {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API +
+                        `SystemFile/JSON?db=CR-Devinspire&folder=CLUSTER REPORT&file=REPORT`)
+                    .then(r => {
+                        callback(r.data);
+                    })
+            },
+            getFileData(id, callback) {
+                let self = this;
+                Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${id}`)
+                    .then(r => {
+                        callback(r.data);
+                    })
+            },
+            appendAndSaveFile(fileData) {
+                Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
+                        SystemFile: {
+                            SystemUser_ID: -1,
+                            Folder: "CLUSTER REPORT",
+                            Name: "REPORT",
+                            Extension: '.json'
+                        },
+                        Data: fileData
+                    })
+                    .then(r => {
+                        self.fileData = fileData.basket;
+                        alert("Successfully saved");
+                    })
+                    .catch(e => {
+                        alert("Failed to save");
+                    })
             },
         }
     }
