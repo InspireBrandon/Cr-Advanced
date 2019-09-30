@@ -9,9 +9,9 @@
                 </v-btn>
             </v-toolbar>
             <v-toolbar dark flat>
-                <v-select style="margin-left: 10px; margin-top: 8px; width: 200px" dense :items="maps"
+                <!-- <v-select style="margin-left: 10px; margin-top: 8px; width: 200px" dense :items="maps"
                     v-model="selectedMap" hide-details @change="getImages">
-                </v-select>
+                </v-select> -->
                 <v-spacer> </v-spacer>
             </v-toolbar>
             <v-card-text>
@@ -21,32 +21,33 @@
                             Name
                         </v-flex>
                         <v-flex md4>
-                            Legend
+                            Map
                         </v-flex>
                         <v-flex md4>
-                            Map
+                            Legend
                         </v-flex>
                         <v-flex md4>
                             <v-text-field v-model="name">
                             </v-text-field>
                         </v-flex>
                         <v-flex md4>
-                            <img @click="openLegendFileDialog" :src="legendImgURL == '' ? legendImageURL : legendImgURL"
+                            <img @click="openFileDialog" :src="MapImgURL == '' ? MapImageURL : MapImgURL"
                                 aspect-ratio="1" class="grey lighten-2" width="100%" max-height="200"
                                 style="cursor: pointer;">
                         </v-flex>
                         <v-flex md4>
-                            <img @click="openFileDialog" :src="MapImgURL == '' ? MapImageURL : MapImgURL"
+                            <img @click="openLegendFileDialog" :src="legendImgURL == '' ? legendImageURL : legendImgURL"
                                 aspect-ratio="1" class="grey lighten-2" width="100%" max-height="200"
                                 style="cursor: pointer;">
+
                         </v-flex>
                     </v-layout>
                 </v-container>
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" @click="saveNew()"> Save new </v-btn>
-                <v-btn color="primary" @click="save" v-if="selectedMap!=null">Save </v-btn>
+                <v-btn v-if="isAdd" color="primary" @click="saveNew()"> Save new </v-btn>
+                <v-btn color="primary" @click="save" v-if="!isAdd">Save </v-btn>
             </v-card-actions>
         </v-card>
         <input type="file" style="display: none;" ref="LegendfileInput" @change="onLegendImageChange">
@@ -71,15 +72,15 @@
                 MapImageLinkAddress: '',
                 maps: [],
                 selectedMap: null,
-                isAdd:true
+                isAdd: true
             }
         },
         methods: {
-            open(type,callback) {
+            open(type, item, callback) {
                 let self = this
-                self.isAdd=type
-               
-                self.dialog = true
+                self.isAdd = type
+                console.log(self.isAdd);
+
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.get(process.env.VUE_APP_API + `MapImage`).then(r => {
@@ -93,6 +94,17 @@
                     })
                 })
                 self.callback = callback
+                if (!self.isAdd) {
+                    self.selectedMap = item.id
+                    self.getImages()
+                    self.name = item.name
+                } else {
+                    self.selectedMap = null
+                    self.name = null
+                    self.MapImgURL = ''
+                    self.legendImgUR = ''
+                }
+                self.dialog = true
             },
             save() {
                 let self = this
@@ -106,7 +118,8 @@
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                     console.log(r);
-                    Axios.post(process.env.VUE_APP_API + `MapImage?mapImageID=${self.selectedMap}&type=map`, self
+                    Axios.post(process.env.VUE_APP_API + `MapImage?mapImageID=${self.selectedMap}&type=map`,
+                            self
                             .MapImg)
                         .then(
                             mapres => {

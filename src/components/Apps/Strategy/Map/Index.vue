@@ -7,7 +7,8 @@
                 <v-toolbar dark flat dense color="primary">
                     <v-toolbar-title> Image </v-toolbar-title>
                     <v-spacer> </v-spacer>
-                    <v-autocomplete :items="maps" v-model="selectedmap" @change="onMapChange"> </v-autocomplete>
+                    <v-btn @click="showSelector">maps</v-btn>
+                    <!-- <v-autocomplete :items="maps" v-model="selectedmap" @change="onMapChange"> </v-autocomplete> -->
                 </v-toolbar>
                 <v-card>
                     <v-img :src="legendImgURL == '' ? tmpImageURL : legendImgURL" aspect-ratio="1"
@@ -18,7 +19,7 @@
                 <v-card>
                     <v-toolbar dark flat dense color="primary">
                         <v-toolbar-title> Store Import Co-Ords </v-toolbar-title>
-                        <v-btn @click="showSelector">maps</v-btn>
+
                     </v-toolbar>
                     <v-list dense>
                         <v-list-tile>
@@ -101,8 +102,9 @@
             showSelector() {
                 let self = this;
 
-                self.$refs.MapImageSelector.show(() => {
-
+                self.$refs.MapImageSelector.show(callback => {
+                    self.selectedmap = callback.id
+                    self.onMapChange()
                 })
             },
             onMapChange() {
@@ -114,6 +116,19 @@
                         `MapImage?mapImageID=${self.selectedmap}&type=map`;
                     self.legendImgURL = process.env.VUE_APP_API +
                         `MapImage?mapImageID=${self.selectedmap}&type=legend`;
+                    if (self.config == null) {
+                        self.drawMap(this.labels, {
+                            useHeatmap: false,
+                            usePiecharts: false,
+                            imageDetails: {
+                                imageType: "none",
+                                imgURL: self.MapImgURL,
+                                imageLinkAddress: null
+                            }
+                        }, null, null)
+                    } else {
+                        self.drawMap(self.labels, self.config, self.heatData, self.pieData)
+                    }
                 })
             },
             getmaps() {
@@ -307,7 +322,6 @@
 
                 let screeWidth = returnInnerWidth()
 
-                self.radius = parseInt(config.heatMapRadius)
                 // todo sort rowdata by sales for heatmap legend
                 let formattedData = [];
                 let chart = am4core.create("thisone2", am4maps.MapChart);
@@ -379,13 +393,9 @@
                     polygonTemplate.tooltipText = "{name}";
 
                 }
-
                 polygonTemplate.nonScalingStroke = true;
-                // create capital markers
-
-
-
                 if (config.useHeatmap) {
+                    self.radius = parseInt(config.heatMapRadius)
                     setupdata.heatmap.forEach((heatmapItem, idx) => {
                         let imageSeries = chart.series.push(new am4maps.MapImageSeries());
                         // define template
@@ -628,7 +638,8 @@
         .map {
             width: 1200px;
         }
-         .sideBar {
+
+        .sideBar {
 
             width: calc(100vw - 1200px)
         }
@@ -638,6 +649,7 @@
         .map {
             width: 1200px;
         }
+
         .sideBar {
 
             width: calc(100vw - 1200px)
@@ -648,6 +660,7 @@
         .map {
             width: 1400px;
         }
+
         .sideBar {
 
             width: calc(100vw - 1400px)
@@ -658,6 +671,7 @@
         .map {
             width: 1600px;
         }
+
         .sideBar {
 
             width: calc(100vw - 1600px)
