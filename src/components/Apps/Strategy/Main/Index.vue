@@ -39,10 +39,10 @@
                         Map
                     </v-btn>
                     <v-list>
-                        <v-list-tile @click="openMapImageModal(true)" >
+                        <v-list-tile @click="openMapImageModal(true,null)" >
                             <v-list-tile-title>Add</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile @click="openMapImageModal(false)" >
+                        <v-list-tile @click="showSelector()" >
                             <v-list-tile-title>Edit</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
@@ -75,7 +75,7 @@
                     placeholder="Select cluster data" :items="dataFields" v-model="selectedDataField"> </v-autocomplete>
             </v-toolbar-items> -->
             <v-btn color="primary" @click="openMapSetup" v-if="selectedView == 1">Setup Map </v-btn>
-            <v-btn color="primary" @click="openMapImageModal" v-if="selectedView == 1">Setup Map Images</v-btn>
+            <!-- <v-btn color="primary" @click="openMapImageModal" v-if="selectedView == 1">Setup Map Images</v-btn> -->
             <v-spacer></v-spacer>
             <v-btn-toggle v-model="selectedView" round class="transparent" mandatory>
                 <v-btn class="elevation-0" style="width: 100px" round color="primary">
@@ -98,6 +98,8 @@
         <Spinner ref="Spinner" />
         <Prompt ref="Prompt" />
         <CustomSelector ref="CustomSelector" />
+        <MapImageSelector ref="MapImageSelector" />
+
         <!-- <ColorPicker ref="ColorPicker" /> -->
         <FileSelector ref="FileSelector" />
         <MapImageModal ref="MapImageModal" />
@@ -114,6 +116,8 @@
     import Map from '../Map/Index'
     import ClusterModels from '../ClusterModels/Index'
     import Prompt from '@/components/Common/Prompt'
+    import MapImageSelector from "@/components/Apps/Strategy/Map/MapImageSelector"
+
     import ColorPicker from '@/components/Common/ColorPicker'
     import CustomSelector from './CustomSelector'
     import FileSelector from './FileSelector';
@@ -138,7 +142,8 @@
             Prompt,
             ColorPicker,
             CustomSelector,
-            FileSelector
+            FileSelector,
+            MapImageSelector
         },
         data() {
             return {
@@ -183,9 +188,19 @@
             self.getHinterlandStores();
         },
         methods: {
-            openMapImageModal(type) {
+             showSelector() {
+                let self = this;
+                self.$refs.MapImageSelector.show(callback => {
+                    console.log(callback);
+                    
+                    self.openMapImageModal(false,callback)
+                    // self.selectedmap=callback.id
+                    // self.onMapChange()
+                })
+            },
+            openMapImageModal(type,item) {
                 let self = this
-                self.$refs.MapImageModal.open(type,callback => {
+                self.$refs.MapImageModal.open(type,item,callback => {
 
                 })
             },
