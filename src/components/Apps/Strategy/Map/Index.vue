@@ -4,21 +4,20 @@
             <div id="thisone2" class="map" ref="thisone2">
             </div>
             <div class="sideBar">
-                <v-card height="75%">
+                <v-card max-height="400px;">
                     <v-toolbar dark flat dense color="primary">
                         <v-toolbar-title> Image </v-toolbar-title>
                         <v-spacer> </v-spacer>
                         <v-btn @click="showSelector">maps</v-btn>
                         <!-- <v-autocomplete :items="maps" v-model="selectedmap" @change="onMapChange"> </v-autocomplete> -->
                     </v-toolbar>
-                    <v-img :src="legendImgURL == '' ? tmpImageURL : legendImgURL" aspect-ratio="1"
-                        class="grey lighten-2" width="100%" height="100%"></v-img>
+                    <img :src="legendImgURL == '' ? tmpImageURL : legendImgURL" :aspect-ratio="10/13"
+                        class="grey lighten-2 mt-0" width="200px" style="object-fit: fill;">
                 </v-card>
 
-                <v-card>
+                <!-- <v-card>
                     <v-toolbar dark flat dense color="primary">
                         <v-toolbar-title> Store Import Co-Ords </v-toolbar-title>
-
                     </v-toolbar>
                     <v-list dense>
                         <v-list-tile>
@@ -34,7 +33,7 @@
                         </v-list-tile>
 
                     </v-list>
-                </v-card>
+                </v-card> -->
             </div>
         </div>
         <input type="file" style="display: none;" ref="fileInput" @change="onImageChange">
@@ -587,8 +586,8 @@
         // }
 
         if (width > 1365) {
-            cw = 613.83;
-            offsetX = 2.52
+            cw = 488.35;
+            offsetX = 1.6
         }
 
         if (width > 1439) {
