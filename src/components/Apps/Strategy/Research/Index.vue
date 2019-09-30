@@ -70,7 +70,22 @@
         data() {
             return {
                 rowData: [],
-                headers: [],
+                headers: [{
+                    "headerName": "Retailer",
+                    "field": "Retailer",
+                },{
+                    "headerName": "Store",
+                    "field": "Store",
+                },{
+                    "headerName": "Sales",
+                    "field": "Sales",
+                },{
+                    "headerName": "X Coordinate",
+                    "field": "X",
+                },{
+                    "headerName": "Y Coordinate",
+                    "field": "Y",
+                }],
                 runData: [],
                 fileData: []
             }
@@ -129,7 +144,8 @@
 
                     reader.onload = function (e) {
                         let data = csvToDataObject(e.currentTarget.result);
-                        self.headers = convertToGridHeaders(data.headers);
+                        console.log(data);
+                        // self.headers = convertToGridHeaders(data.headers);
                         self.rowData = data.data;
                     }
 
@@ -160,16 +176,17 @@
                             for (var prop in self.fileData.supplierImport) {
                                 if (prop == name) {
                                     setTimeout(() => {
-                                        self.$refs.YesNoModal.show("This name already exists. Would you like to overwrite it?", value => {
-                                            if(value) {
-                                                canPass = true;
-                                            } else {
-                                                self.prompt();
-                                            }
-                                        })
+                                        self.$refs.YesNoModal.show(
+                                            "This name already exists. Would you like to overwrite it?",
+                                            value => {
+                                                if (value) {
+                                                    canPass = true;
+                                                } else {
+                                                    self.prompt();
+                                                }
+                                            })
                                     }, 60);
-                                }
-                                else {
+                                } else {
                                     canPass = true;
                                 }
                             }
