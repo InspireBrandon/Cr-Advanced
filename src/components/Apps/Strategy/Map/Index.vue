@@ -10,7 +10,7 @@
                     <v-autocomplete :items="maps" v-model="selectedmap" @change="onMapChange"> </v-autocomplete>
                 </v-toolbar>
                 <v-card>
-                    <v-img @click="openFileDialog" :src="legendImgURL == '' ? tmpImageURL : legendImgURL"
+                    <v-img  :src="legendImgURL == '' ? tmpImageURL : legendImgURL"
                         aspect-ratio="1" class="grey lighten-2" width="100%" max-height="200" style="cursor: pointer;">
                     </v-img>
                 </v-card>
@@ -96,13 +96,16 @@
             onMapChange() {
                 let self = this
                 self.$nextTick(() => {
+                    console.log(self.selectedmap);
+                    
                     self.MapImgURL = process.env.VUE_APP_API +
-                        `MapImage?mapImageID=${self.selectedMap}&type=map`;
+                        `MapImage?mapImageID=${self.selectedmap}&type=map`;
                     self.legendImgURL = process.env.VUE_APP_API +
-                        `MapImage?mapImageID=${self.selectedMap}&type=legend`;
+                        `MapImage?mapImageID=${self.selectedmap}&type=legend`;
                 })
             },
             getmaps() {
+                let self = this
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.get(process.env.VUE_APP_API + `MapImage`).then(r => {
