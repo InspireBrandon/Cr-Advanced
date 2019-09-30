@@ -11,8 +11,8 @@
                         <v-btn @click="showSelector">maps</v-btn>
                         <!-- <v-autocomplete :items="maps" v-model="selectedmap" @change="onMapChange"> </v-autocomplete> -->
                     </v-toolbar>
-                    <img :src="legendImgURL == '' ? tmpImageURL : legendImgURL" aspect-ratio="1"
-                        class="grey lighten-2" width="100%" height="100%">
+                    <v-img :src="legendImgURL == '' ? tmpImageURL : legendImgURL" aspect-ratio="1"
+                        class="grey lighten-2" width="100%" height="100%"></v-img>
                 </v-card>
 
                 <v-card>
