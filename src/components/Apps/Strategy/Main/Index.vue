@@ -36,7 +36,7 @@
                 </v-btn>
                 <v-menu dark offset-y style="margin-bottom: 10px;">
                     <v-btn slot="activator" flat>
-                        Map
+                        Map Image
                     </v-btn>
                     <v-list>
                         <v-list-tile @click="openMapImageModal(true,null)" >
@@ -82,7 +82,7 @@
                     Output
                 </v-btn>
                 <v-btn class="elevation-0" style="width: 100px" round color="primary">
-                    Map Image
+                    Map
                 </v-btn>
                 <!-- <v-btn class="elevation-0" style="width: 100px" round color="primary">
                     Model

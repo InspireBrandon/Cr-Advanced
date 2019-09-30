@@ -89,11 +89,13 @@
                 MapImgURL: '',
                 legendImgURL: '',
                 plottableStores: [],
-                color: [am4core.color("rgb(255,99,71)"), am4core.color("rgb(255,255,0)"), am4core.color("rgb(0,204,0)"), am4core.color("rgb(255,128,0)"), am4core.color("rgb(204,0,204)")]
-            
-        }
-    },
-    mounted() {
+                color: [am4core.color("rgb(255,99,71)"), am4core.color("rgb(255,255,0)"), am4core.color("rgb(0,204,0)"),
+                    am4core.color("rgb(255,128,0)"), am4core.color("rgb(204,0,204)")
+                ]
+
+            }
+        },
+        mounted() {
             // this.openSetup()
             // this.drawMap(this.labels)
             this.getmaps()
@@ -264,7 +266,7 @@
                                 tmpBasket["sales"] = formatter.format(el.sales)
                                     .replace("$",
                                         "R");
-                             
+
                                 tmpBasket["salesPercent"] = el.salesPercent
                             }
                         })
@@ -389,7 +391,7 @@
                     image.href = self.MapImgURL
                     pattern_europe.addElement(image.element);
                     polygonTemplate.fill = pattern_europe
-                    polygonTemplate.strokeOpacity = 0;
+                    polygonTemplate.strokeOpacity = 1;
                 } else {
                     polygonTemplate.fill = chart.colors.getIndex(1);
                     polygonTemplate.strokeOpacity = 1;
@@ -595,8 +597,8 @@
         // }
 
         if (width > 1365) {
-            cw = 737.05;
-            offsetX = 3.5
+            cw = 613.83;
+            offsetX = 2.52
         }
 
         if (width > 1439) {
@@ -612,6 +614,11 @@
         if (width > 1768) {
             cw = 841.05;
             offsetX = 2.22
+        }
+
+        if (width > 2559) {
+            cw = 966.53;
+            offsetX = 1.566        
         }
 
         return {
@@ -656,14 +663,14 @@
         }
     }
 
-    @media screen and (min-width:1336px) {
+    @media screen and (min-width:1366px) {
         .map {
-            width: 1200px;
+            width: 1100px;
         }
 
         .sideBar {
 
-            width: calc(100vw - 1200px)
+            width: calc(100vw - 1100px)
         }
     }
 
@@ -698,6 +705,17 @@
 
             width: calc(100vw - 1600px)
             
+        }
+    }
+
+    @media screen and (min-width:2560px) {
+        .map {
+            width: 2200px;
+        }
+
+        .sideBar {
+
+            width: calc(100vw - 2200px)
         }
     }
 </style>
