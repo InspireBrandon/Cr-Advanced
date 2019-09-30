@@ -82,7 +82,7 @@
                     Output
                 </v-btn>
                 <v-btn class="elevation-0" style="width: 100px" round color="primary">
-                    Map
+                    Map Image
                 </v-btn>
                 <!-- <v-btn class="elevation-0" style="width: 100px" round color="primary">
                     Model
