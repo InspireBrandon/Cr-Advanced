@@ -18,6 +18,7 @@
                 <v-card>
                     <v-toolbar dark flat dense color="primary">
                         <v-toolbar-title> Store Import Co-Ords </v-toolbar-title>
+                        <v-btn @click="showSelector">maps</v-btn>
                     </v-toolbar>
                     <v-list dense>
                         <v-list-tile>
@@ -37,9 +38,9 @@
             </div>
         </div>
         <input type="file" style="display: none;" ref="fileInput" @change="onImageChange">
-
         <YesNoModal ref="yesNo"></YesNoModal>
         <Mapsetup ref="Mapsetup" />
+        <MapImageSelector ref="MapImageSelector" />
     </div>
 </template>
 
@@ -52,6 +53,8 @@
     import am4geodata_worldLow from "@amcharts/amcharts4-geodata/southAfricaHigh";
     import Axios from 'axios'
 
+    import MapImageSelector from './MapImageSelector'
+
     // http://www.climbing.co.za/wp-content/uploads/2012/10/rsamap.png
     const formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -61,7 +64,8 @@
     export default {
         components: {
             YesNoModal,
-            Mapsetup
+            Mapsetup,
+            MapImageSelector
         },
         props: ["rowData", "setupData"],
         data() {
@@ -93,6 +97,13 @@
             this.getHinterlandStores()
         },
         methods: {
+            showSelector() {
+                let self = this;
+
+                self.$refs.MapImageSelector.show(() => {
+
+                })
+            },
             onMapChange() {
                 let self = this
                 self.$nextTick(() => {

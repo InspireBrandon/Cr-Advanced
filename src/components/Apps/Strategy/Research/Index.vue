@@ -16,7 +16,7 @@
                         <v-list-tile>
                             <v-list-tile-title>Open</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile @click="saveFile">
+                        <v-list-tile @click="prompt">
                             <v-list-tile-title>Save</v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile @click="close">
@@ -51,16 +51,21 @@
         <Grid :rowData="rowData" :headers="headers" ref="Grid" />
 
         <input @change="onFileChange" accept=".csv" ref="fileInput" style="display: none" type="file">
-
+        <Prompt ref="Prompt" />
+        <YesNoModal ref="YesNoModal" />
     </v-card>
 </template>
 
 <script>
     import Grid from './Grid'
+    import Prompt from '@/components/Common/Prompt'
+    import YesNoModal from '@/components/Common/YesNoModal'
 
     export default {
         components: {
-            Grid
+            Grid,
+            Prompt,
+            YesNoModal
         },
         data() {
             return {
@@ -85,7 +90,8 @@
                             for (var prop in fileData.supplierImport) {
                                 self.runData.push({
                                     prop: prop,
-                                    name: self.generateNameParams(fileData.supplierImport[name].config.selectedBasket, fileData.basket[name].config
+                                    name: self.generateNameParams(fileData.supplierImport[name]
+                                        .config.selectedBasket, fileData.basket[name].config
                                         .selectedPeriod)
                                 })
                             }
@@ -138,6 +144,42 @@
                     .then(r => {
                         callback(r.data);
                     })
+            },
+            prompt() {
+                let self = this;
+                let canPass = false;
+
+                self.$refs.Prompt.show("", "Name this import", "Name", name => {
+                    if (name == "") {
+                        setTimeout(() => {
+                            alert("Please enter a name")
+                            self.prompt();
+                        }, 60);
+                    } else {
+                        if (self.fileData.supplierImport != undefined && self.fileData.supplierImport != null) {
+                            for (var prop in self.fileData.supplierImport) {
+                                if (prop == name) {
+                                    setTimeout(() => {
+                                        self.$refs.YesNoModal.show("This name already exists. Would you like to overwrite it?", value => {
+                                            if(value) {
+                                                canPass = true;
+                                            } else {
+                                                self.prompt();
+                                            }
+                                        })
+                                    }, 60);
+                                }
+                                else {
+                                    canPass = true;
+                                }
+                            }
+                        }
+                    }
+
+                    if (canPass) {
+                        // saveFile
+                    }
+                })
             },
             saveFile() {
                 let self = this;
@@ -217,6 +259,22 @@
                         alert("Failed to save");
                     })
             },
+        }
+    }
+
+    function customImportItem(data) {
+        let self = this;
+        self.retailer = data.retailer;
+        self.storeName = data.storeName;
+        self.salesRetail = data.salesRetail;
+        self.hasCoordinates = (data.x != undefined && data.x != null) || (data.y != undefined && data.y != null)
+
+        if (self.hasCoordinates) {
+            self.x = data.x;
+            self.y = data.y;
+        } else {
+            self.x = null;
+            self.y = null;
         }
     }
 
