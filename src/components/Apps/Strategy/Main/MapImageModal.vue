@@ -46,7 +46,7 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn v-if="isAdd" color="primary" @click="saveNew()"> Save new </v-btn>
+                <v-btn v-if="isAdd" color="primary" @click="saveNew()">Save</v-btn>
                 <v-btn color="primary" @click="save" v-if="!isAdd">Save </v-btn>
             </v-card-actions>
         </v-card>
