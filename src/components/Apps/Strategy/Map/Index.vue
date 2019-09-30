@@ -7,11 +7,12 @@
                 <v-toolbar dark flat dense color="primary">
                     <v-toolbar-title> Image </v-toolbar-title>
                     <v-spacer> </v-spacer>
-                    <v-autocomplete> </v-autocomplete>
+                    <v-autocomplete :items="maps" v-model="selectedmap" @change="onMapChange"> </v-autocomplete>
                 </v-toolbar>
                 <v-card>
-                    <v-img @click="openFileDialog" :src="imgURL == '' ? tmpImageURL : imgURL" aspect-ratio="1"
-                        class="grey lighten-2" width="100%" max-height="200" style="cursor: pointer;"></v-img>
+                    <v-img @click="openFileDialog" :src="legendImgURL == '' ? tmpImageURL : legendImgURL"
+                        aspect-ratio="1" class="grey lighten-2" width="100%" max-height="200" style="cursor: pointer;">
+                    </v-img>
                 </v-card>
 
                 <v-card>
@@ -78,15 +79,49 @@
                 pieData: null,
                 canPlot: false,
                 currentPlotStore: null,
-                maxHeatLegend: 4000000
+                maxHeatLegend: 4000000,
+                maps: [],
+                selectedmap: null,
+                MapImgURL: '',
+                legendImgURL: '',
             }
         },
         mounted() {
             // this.openSetup()
             // this.drawMap(this.labels)
+            this.getmaps()
             this.getHinterlandStores()
         },
         methods: {
+            onMapChange() {
+                let self = this
+                self.$nextTick(() => {
+                    self.MapImgURL = process.env.VUE_APP_API +
+                        `MapImage?mapImageID=${self.selectedMap}&type=map`;
+                    self.legendImgURL = process.env.VUE_APP_API +
+                        `MapImage?mapImageID=${self.selectedMap}&type=legend`;
+                })
+            },
+            getmaps() {
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + `MapImage`).then(r => {
+                    console.log(r);
+                    self.maps = []
+                    self.maps.push({
+                        text: "None",
+                        value: null
+                    })
+                    r.data.forEach(e => {
+                        self.maps.push({
+                            text: e.name,
+                            value: e.id
+                        })
+                    })
+                    console.log(self.maps);
+                    
+                })
+            },
             plotStore(item) {
                 let self = this
                 self.canplot = true
@@ -316,16 +351,10 @@
                 // pattern_europe.y = -45
                 pattern_europe.width = image.width;
                 pattern_europe.height = image.height;
-                if (config.imageDetails.imageType != "none") {
+                if (self.selectedmap != null) {
                     polygonTemplate.tooltipHTML =
                         '<a style="background-color: #cccccc;" href="https://en.wikipedia.org/wiki/{category.urlEncode()}">{name}</a>'
-                    if (config.imageDetails.imageType == "upload") {
-                        image.href = config.imageDetails.imgURL
-
-                    }
-                    if (config.imageDetails.imageType == "link") {
-                        image.href = config.imageDetails.imageLinkAddress
-                    }
+                    image.href = self.MapImgURL
                     pattern_europe.addElement(image.element);
                     polygonTemplate.fill = pattern_europe
                     polygonTemplate.strokeOpacity = 1;
