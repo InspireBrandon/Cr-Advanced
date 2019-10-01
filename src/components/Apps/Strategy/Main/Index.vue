@@ -187,7 +187,7 @@
                 selectedClusterType: 0,
                 currentConfig: null,
                 selectableFiles: [],
-                showGrid: false
+                showGrid: true
             }
         },
         mounted() {
@@ -694,6 +694,24 @@
                     self.currentConfig = setup;
                     self.selectedClusterType = setup.clusterType;
                     self.showGrid = true;
+
+                    let columnDefs = self.headers;
+                    let containsStoreCluster = false;
+
+                    columnDefs.forEach(el => {
+                        if (el.headerName == "Store Cluster") {
+                            containsStoreCluster = true;
+                        }
+                    })
+
+                    if (!containsStoreCluster) {
+                        columnDefs.push({
+                            "headerName": "Store Cluster",
+                            "field": "cluster",
+                        })
+
+                        self.$refs.Grid.gridApi.setColumnDefs(columnDefs);
+                    }
 
                     if (self.selectedClusterType == 0) {
                         self.handleSetup(setup);

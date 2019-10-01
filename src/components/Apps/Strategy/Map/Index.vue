@@ -340,7 +340,6 @@
                         piechart: [],
                     }
 
-
                     if (callback.useHeatmap) {
                         callback.selectedHeatmapField.forEach(field => {
                             tmp.heatmap.push(self.fileData.basket[field])
