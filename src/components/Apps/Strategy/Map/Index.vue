@@ -599,7 +599,7 @@
                 // // console.log(self.SupplierData);
                 // console.log("self.SupplierCities");
                 // console.log(self.SupplierData);
-   
+
                 // for (var retailer in self.SupplierData) {
                 //     // console.log(retailer);
                 //     // self.SupplierData.forEach(retailer => {
@@ -808,6 +808,10 @@
             testKak(rowData) {
                 let self = this;
 
+                let alpharray = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q",
+                    "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF", "AG", "AH"
+                ];
+
                 let latBetween = 33;
                 let lowestLat = -34.87;
                 let highestLat = -22.14;
@@ -824,8 +828,17 @@
 
                 let lats = {};
 
+                let acrossArr = [];
+                let sideArr = [];
+
                 while (latCount <= highestLat) {
                     let allLatsBetween = [];
+
+                    acrossArr.push({
+                        latitude: latCount,
+                        longitude: highestLong,
+                        text: alpharray[latIDX]
+                    });
 
                     rowData.forEach(el => {
                         if (el.lat < latCount && (el.lat + latIncr) > latCount)
@@ -847,6 +860,12 @@
                 while (longCount <= highestLong) {
                     let allLongsBetween = [];
 
+                    sideArr.push({
+                        latitude: highestLat,
+                        longitude: longCount,
+                        text: (longIDX + 1)
+                    });
+
                     rowData.forEach(el => {
                         if (el.long < longCount && (el.long + longIncr) > longCount)
                             allLongsBetween.push(el);
@@ -859,13 +878,7 @@
                     longIDX++;
                 }
 
-                let alpharray = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q",
-                    "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
-                ];
-
                 let final = {};
-
-                // console.log(longs);
 
                 for (var long in longs) {
                     let longArr = longs[long];
@@ -897,7 +910,7 @@
                     }
                 }
 
-                console.table(finalFinal)
+                console.log(sideArr, acrossArr);
             }
         }
     }
