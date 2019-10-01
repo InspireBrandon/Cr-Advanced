@@ -90,7 +90,9 @@
                 plottableStores: [],
                 color: [am4core.color("rgb(255,99,71)"), am4core.color("rgb(255,255,0)"), am4core.color("rgb(0,204,0)"),
                     am4core.color("rgb(255,128,0)"), am4core.color("rgb(204,0,204)")
-                ]
+                ],
+                minorCities:[],
+                majorCities:[]
 
             }
         },
@@ -99,6 +101,7 @@
             // this.drawMap(this.labels)
             this.getmaps()
             this.getHinterlandStores()
+            this.getCities()
             this.testKak(this.rowData);
         },
         methods: {
@@ -149,8 +152,23 @@
                             value: e.id
                         })
                     })
-
                 })
+            },
+            getFile(callback) {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API +
+                        `SystemFile/JSON?db=CR-Devinspire&folder=CLUSTER REPORT&file=REPORT`)
+                    .then(r => {
+                        callback(r.data);
+                    })
+            },
+            getFileData(id, callback) {
+                let self = this;
+                Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${id}`)
+                    .then(r => {
+                        callback(r.data);
+                    })
             },
             plotStore(item) {
                 let self = this
@@ -177,6 +195,19 @@
                 }
                 a.readAsDataURL(blob);
             },
+             getCities() {
+                let self = this;
+                let cities = require('@/assets/CITIES/CITIES.json');
+                console.log(cities);
+                let major = cities.filter(e=>{
+                    return e.major
+                })
+                let minor = cities.filter(e=>{
+                    return !e.major
+                })
+                self.majorCities = major
+                self.minorCities = minor
+            },
             getHinterlandStores() {
                 let self = this;
 
@@ -196,6 +227,7 @@
                     let longLat = element.OfficeGPS.split(",");
                     element.long = parseFloat(longLat[1]);
                     element.lat = parseFloat(longLat[0]);
+                    element.imageURL = "https://img.icons8.com/cotton/2x/online-store.png";
                 })
 
                 self.stores = stores;
@@ -361,7 +393,7 @@
                 chart.projection = new am4maps.projections.Mercator();
                 let polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
 
-                polygonSeries.strokeOpacity = 0.9;
+                polygonSeries.strokeOpamajorCities = 0.9;
                 // polygonSeries.width=600
                 polygonSeries.useGeodata = true;
                 // polygonSeries.exclude = ["ZA-WC"];
@@ -391,17 +423,20 @@
                     image.href = self.MapImgURL
                     pattern_europe.addElement(image.element);
                     polygonTemplate.fill = pattern_europe
-                    polygonTemplate.strokeOpacity = 1;
+                    polygonTemplate.strokeOpamajorCities = 1;
                 } else {
                     polygonTemplate.fill = chart.colors.getIndex(1);
-                    polygonTemplate.strokeOpacity = 1;
+                    polygonTemplate.strokeOpamajorCities = 1;
                     polygonTemplate.tooltipText = "{name}";
 
                 }
                 polygonTemplate.nonScalingStroke = true;
+
+                // /////////////////////////////////////////////////////
+                // start store image series
                 let imageSeries = chart.series.push(new am4maps.MapImageSeries());
                 // define template
-                imageSeries.name = "stores"
+                imageSeries.name = "Stores"
                 imageSeries.data = self.stores
                 // imageSeries.dataFields.value = "sales";
 
@@ -412,19 +447,98 @@
                 imageSeriesTemplate.nonScaling = false
                 imageSeriesTemplate.fill = "black"
 
+                // 
+                let storeImage = imageSeriesTemplate.createChild(am4core.Image);
+                storeImage.propertyFields.href = "imageURL";
+                storeImage.width = 10;
+                storeImage.height = 10;
+                storeImage.horizontalCenter = "middle";
+                storeImage.verticalCenter = "bottom";
+                storeImage.tooltipText = "{PlaceGroup}: [bold]{sales}[/]"
+                // var circle = imageSeriesTemplate.createChild(am4core.Circle);
+                // circle.fillOpamajorCities = 0.5;
+                // circle.tooltipText = "{PlaceGroup}: [bold]{sales}[/]";
+                // circle.radius = 1
+                // let label = imageSeriesTemplate.createChild(am4core.Label);
+                // // label.text = "{PlaceGroup}";
+                // label.html =
+                //     '<a style="background-color: black;color: white;font-size:6px" >{PlaceGroup}</a>'
+                // // label.fill = am4core.color("#fff");
+                // label.fontSize = 5
+                // label.nonScaling = false;
+                // end store series
+                // /////////////////////////////////////////////////////
 
-                var circle = imageSeriesTemplate.createChild(am4core.Circle);
-                circle.fillOpacity = 0.5;
-                circle.tooltipText = "{PlaceGroup}: [bold]{sales}[/]";
-                circle.radius = 1
-                let label = imageSeriesTemplate.createChild(am4core.Label);
-                // label.text = "{PlaceGroup}";
-                label.html =
-                    '<a style="background-color: black;color: white;font-size:6px" >{PlaceGroup}</a>'
-                // label.fill = am4core.color("#fff");
-                label.fontSize = 5
-                label.nonScaling = false;
+                // /////////////////////////////////////////////////////
+                // start cities circle series
+                let majorCitiesImageSeries = chart.series.push(new am4maps.MapImageSeries());
+                // define template
+                majorCitiesImageSeries.name = "Major Cities"
+                console.log("self.majorCities");
+                console.log(self.majorCities);
+                
+                majorCitiesImageSeries.data = self.majorCities
+                // imageSeries.dataFields.value = "sales";
 
+                // if (type == 0) {
+                let majorCitiesImageSeriesTemplate = majorCitiesImageSeries.mapImages.template;
+                majorCitiesImageSeriesTemplate.propertyFields.latitude = "latitude";
+                majorCitiesImageSeriesTemplate.propertyFields.longitude = "longitude";
+                majorCitiesImageSeriesTemplate.nonScaling = false
+                majorCitiesImageSeriesTemplate.fill = "black"
+
+                // 
+                // let storeImage = imageSeriesTemplate.createChild(am4core.Image);
+                // storeImage.propertyFields.href = "imageURL";
+                // storeImage.width = 10;
+                // storeImage.height = 10;
+                // storeImage.horizontalCenter = "middle";
+                // storeImage.verticalCenter = "bottom";
+
+                var majorCitiesCircle = majorCitiesImageSeriesTemplate.createChild(am4core.Circle);
+                majorCitiesCircle.fillOpamajorCities = 0.5;
+                majorCitiesCircle.tooltipText = "{city}: [bold]{sales}[/]";
+                majorCitiesCircle.radius = 3
+                let majorCitiesLabel = majorCitiesImageSeriesTemplate.createChild(am4core.Label);
+                majorCitiesLabel.html =
+                    '<a style="background-color: black;color: white;font-size:6px" >{city}</a>'
+                majorCitiesLabel.fontSize = 5
+                majorCitiesLabel.nonScaling = false;
+                let minorCitiesImageSeries = chart.series.push(new am4maps.MapImageSeries());
+                // define template
+                minorCitiesImageSeries.name = "Minor Cities"
+                console.log("self.minorCities");
+                console.log(self.minorCities);
+                
+                minorCitiesImageSeries.data = self.minorCities
+                // imageSeries.dataFields.value = "sales";
+
+                // if (type == 0) {
+                let minorCitiesImageSeriesTemplate = minorCitiesImageSeries.mapImages.template;
+                minorCitiesImageSeriesTemplate.propertyFields.latitude = "latitude";
+                minorCitiesImageSeriesTemplate.propertyFields.longitude = "longitude";
+                minorCitiesImageSeriesTemplate.nonScaling = false
+                minorCitiesImageSeriesTemplate.fill = "black"
+
+                // 
+                // let storeImage = imageSeriesTemplate.createChild(am4core.Image);
+                // storeImage.propertyFields.href = "imageURL";
+                // storeImage.width = 10;
+                // storeImage.height = 10;
+                // storeImage.horizontalCenter = "middle";
+                // storeImage.verticalCenter = "bottom";
+
+                var minorCitiesCircle = minorCitiesImageSeriesTemplate.createChild(am4core.Circle);
+                minorCitiesCircle.fillOpaminorCities = 0.5;
+                minorCitiesCircle.tooltipText = "{city}: [bold]{sales}[/]";
+                minorCitiesCircle.radius = 1
+                let minorCitiesLabel = minorCitiesImageSeriesTemplate.createChild(am4core.Label);
+                minorCitiesLabel.html =
+                    '<a style="background-color: black;color: white;font-size:1px" >{city}</a>'
+                minorCitiesLabel.fontSize = 3
+                minorCitiesLabel.nonScaling = false;
+                //  end majorCities circle series
+                // /////////////////////////////////////////////////////
 
                 if (config.useHeatmap) {
                     self.radius = parseInt(config.heatMapRadius)
@@ -444,17 +558,17 @@
 
 
                         var circle = imageSeriesTemplate.createChild(am4core.Circle);
-                        circle.fillOpacity = 0.5;
+                        circle.fillOpamajorCities = 0.5;
                         circle.tooltipText = heatmapItem + "{storeName}: [bold]{sales}[/]";
                         circle.radius = self.radius + idx
-                        let label = imageSeriesTemplate.createChild(am4core.Label);
-                        // label.text = "{storeName}";
-                        label.html =
-                            '<a style="background-color: black;color: white;" >{storeName}</a>'
-                        // label.fill = am4core.color("#fff");
-                        label.fontSize = 5
-                        label.nonScaling = false;
-                        label.hidden = labelState
+                        // let label = imageSeriesTemplate.createChild(am4core.Label);
+                        // // label.text = "{storeName}";
+                        // label.html =
+                        //     '<a style="background-color: black;color: white;" >{storeName}</a>'
+                        // // label.fill = am4core.color("#fff");
+                        // label.fontSize = 5
+                        // label.nonScaling = false;
+                        // label.hidden = labelState
 
                         imageSeries.heatRules.push({
                             property: "fill",
@@ -501,7 +615,7 @@
                             mapMarker.height = 32;
                             mapMarker.scale = 0.7;
                             mapMarker.fill = am4core.color("#3F4B3B");
-                            mapMarker.fillOpacity = 0.8;
+                            mapMarker.fillOpamajorCities = 0.8;
                             mapMarker.horizontalCenter = "middle";
                             mapMarker.verticalCenter = "bottom";
                             var coords = chart.svgPointToGeo(ev.svgPoint);
@@ -556,7 +670,7 @@
                     // pieSeries.colors = colorSet;
                     pieSeriesTemplate.slices.template.stroke = am4core.color("#fff");
                     pieSeriesTemplate.slices.template.strokeWidth = 1;
-                    pieSeriesTemplate.slices.template.strokeOpacity = 1;
+                    pieSeriesTemplate.slices.template.strokeOpamajorCities = 1;
                     pieSeriesTemplate.labels.template.disabled = true;
 
                     pieSeries.nonScalingStroke = false
@@ -565,7 +679,7 @@
                 }
                 if (self.lines) {
                     let graticuleSeries = chart.series.push(new am4maps.GraticuleSeries());
-                    graticuleSeries.mapLines.template.line.strokeOpacity = 0.4;
+                    graticuleSeries.mapLines.template.line.strokeOpamajorCities = 0.4;
                     graticuleSeries.longitudeStep = 0.5;
                     graticuleSeries.latitudeStep = 0.5;
                     graticuleSeries.name = "lines"
@@ -659,28 +773,30 @@
                     longIDX++;
                 }
 
-                let alpharray = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+                let alpharray = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q",
+                    "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+                ];
 
                 let final = {};
 
                 console.log(longs);
 
-                for(var long in longs) {
+                for (var long in longs) {
                     let longArr = longs[long];
 
                     longArr.forEach(lon => {
-                        for(var lat in lats) {
+                        for (var lat in lats) {
                             let latArr = lats[lat];
 
                             latArr.forEach(latt => {
                                 let elName = alpharray[long] + lat;
                                 let arr = final[alpharray[long] + lat];
 
-                                if(arr == undefined) {
+                                if (arr == undefined) {
                                     final[elName] = [];
                                 }
 
-                                if(lon.storeName == latt.storeName) 
+                                if (lon.storeName == latt.storeName)
                                     final[elName].push(latt);
                             })
                         }
@@ -689,8 +805,8 @@
 
                 let finalFinal = {};
 
-                for(var prop in final) {
-                    if(final[prop].length > 0) {
+                for (var prop in final) {
+                    if (final[prop].length > 0) {
                         finalFinal[prop] = final[prop];
                     }
                 }
