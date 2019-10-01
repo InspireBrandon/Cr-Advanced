@@ -71,7 +71,7 @@
             return {
                 SupplierData: null,
                 labels: true,
-                lines: true,
+                lines: false,
                 radius: 20,
                 stores: [],
                 config: null,
@@ -131,8 +131,30 @@
                 let self = this;
 
                 self.$refs.MapImageSelector.show(callback => {
-                    self.selectedmap = callback.id
-                    self.onMapChange()
+                    console.log("callback");
+                    console.log(callback);
+                    if (callback.name == "Geogrid") {
+                        self.lines = true
+                        if (self.config == null) {
+                            self.drawMap(this.labels, {
+                                useHeatmap: false,
+                                usePiecharts: false,
+                                imageDetails: {
+                                    imageType: "none",
+                                    imgURL: '',
+                                    imageLinkAddress: null
+                                }
+                            }, null, null)
+                        } else {
+                            self.drawMap(self.labels, self.config, self.heatData, self.pieData)
+                        }
+                    } else {
+                        self.lines = false
+
+                        self.selectedmap = callback.id
+                        self.onMapChange()
+                    }
+
                 })
             },
             onMapChange() {
