@@ -81,7 +81,7 @@
                 fileData: null,
                 heatData: null,
                 pieData: null,
-                canPlot: false,
+                canPlot: true,
                 currentPlotStore: null,
                 maxHeatLegend: 4000000,
                 maps: [],
@@ -701,7 +701,7 @@
                     })
                 }
                 chart.seriesContainer.events.on("hit", function (ev) {
-                    // console.log(chart.svgPointToGeo(ev.svgPoint));
+                    console.log(chart.svgPointToGeo(ev.svgPoint));
 
                     if (!self.canPlot) {
                         return
@@ -818,7 +818,7 @@
                     var accrossCitiesCircle = accrossCitiesImageSeriesTemplate.createChild(am4core.Circle);
                     accrossCitiesCircle.fillOpaaccrossCities = 0.5;
                     accrossCitiesCircle.tooltipText = "{city}: [bold]{text}[/]";
-                    accrossCitiesCircle.radius = 1
+                    accrossCitiesCircle.radius = 0
                     let accrossCitiesLabel = accrossCitiesImageSeriesTemplate.createChild(am4core.Label);
                     accrossCitiesLabel.text ="{text}";
                     // accrossCitiesLabel.html =
@@ -877,18 +877,18 @@
                     "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF", "AG", "AH"
                 ];
 
-                let latBetween = 33;
+                let latBetween = 25.5;
                 let lowestLat = -34.87;
                 let highestLat = -22.14;
 
-                let longBetween = 26;
+                let longBetween = 33;
                 let lowestLong = 16.50;
                 let highestLong = 32.91;
 
                 let latIncr = (highestLat - lowestLat) / latBetween;
                 let longIncr = (highestLong - lowestLong) / longBetween;
 
-                let latCount = lowestLat;
+                let latCount = highestLat;
                 let latIDX = 0;
 
                 let lats = {};
@@ -896,13 +896,13 @@
                 let acrossArr = [];
                 let sideArr = [];
 
-                while (latCount <= highestLat) {
+                while (latCount >= lowestLat) {
                     let allLatsBetween = [];
 
                     acrossArr.push({
                         latitude: latCount,
-                        longitude: highestLong,
-                        text: alpharray[latIDX]
+                        longitude: 16.260933711249336,
+                        text: latIDX+1
                     });
 
                     rowData.forEach(el => {
@@ -913,7 +913,7 @@
                     if (allLatsBetween.length > 0)
                         lats[latIDX + 1] = allLatsBetween;
 
-                    latCount += latIncr;
+                    latCount -= latIncr;
                     latIDX++;
                 }
 
@@ -926,9 +926,9 @@
                     let allLongsBetween = [];
 
                     acrossArr.push({
-                        latitude: highestLat,
+                        latitude: -21.922142292657245,
                         longitude: longCount,
-                        text: (longIDX + 1)
+                        text: alpharray[longIDX]
                     });
 
                     rowData.forEach(el => {
