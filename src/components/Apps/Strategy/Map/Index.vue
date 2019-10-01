@@ -51,7 +51,7 @@
     import Mapsetup from "./setup.vue"
     import am4geodata_worldLow from "@amcharts/amcharts4-geodata/southAfricaHigh";
     import Axios from 'axios'
-
+    import jwt from 'jsonwebtoken'
     import MapImageSelector from './MapImageSelector'
 
     // http://www.climbing.co.za/wp-content/uploads/2012/10/rsamap.png
@@ -69,6 +69,7 @@
         props: ["rowData", "setupData"],
         data() {
             return {
+                SupplierData: null,
                 labels: true,
                 lines: true,
                 radius: 20,
@@ -91,8 +92,8 @@
                 color: [am4core.color("rgb(255,99,71)"), am4core.color("rgb(255,255,0)"), am4core.color("rgb(0,204,0)"),
                     am4core.color("rgb(255,128,0)"), am4core.color("rgb(204,0,204)")
                 ],
-                minorCities:[],
-                majorCities:[]
+                minorCities: [],
+                majorCities: []
 
             }
         },
@@ -103,6 +104,33 @@
             this.getHinterlandStores()
             this.getCities()
             this.testKak(this.rowData);
+            let self = this;
+            let encoded_details = jwt.decode(sessionStorage.accessToken);
+            self.SystemUser_ID = encoded_details.USER_ID;
+            self.getUserFile(callback => {
+                self.getFileData(callback.id, asd => {
+                    console.log("asd");
+                    console.log(asd);
+                    let supplierData = []
+                    let tmp = []
+                    // self.SupplierData = asd.supplierImport["PET CARE"].data
+                    asd.supplierImport["PET CARE"].data.forEach((e, idx) => {
+                        tmp.forEach(re => {
+                            if (re.) {
+                                tmp.push(e.retailer)
+                            }
+                        })
+
+                        console.log(tmp[e.retailer]);
+
+                    })
+
+                    console.log("supplierData");
+                    console.log(tmp);
+
+
+                })
+            })
         },
         methods: {
             showSelector() {
@@ -163,6 +191,16 @@
                         callback(r.data);
                     })
             },
+            getUserFile(callback) {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API +
+                        `SystemFile/JSON?db=CR-Devinspire&folder=SUPPLIER MARKET SHARE IMPORT/${self.SystemUser_ID}&file=REPORT`
+                    )
+                    .then(r => {
+                        callback(r.data);
+                    })
+            },
             getFileData(id, callback) {
                 let self = this;
                 Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${id}`)
@@ -195,14 +233,14 @@
                 }
                 a.readAsDataURL(blob);
             },
-             getCities() {
+            getCities() {
                 let self = this;
                 let cities = require('@/assets/CITIES/CITIES.json');
                 console.log(cities);
-                let major = cities.filter(e=>{
+                let major = cities.filter(e => {
                     return e.major
                 })
-                let minor = cities.filter(e=>{
+                let minor = cities.filter(e => {
                     return !e.major
                 })
                 self.majorCities = major
@@ -476,7 +514,7 @@
                 majorCitiesImageSeries.name = "Major Cities"
                 console.log("self.majorCities");
                 console.log(self.majorCities);
-                
+
                 majorCitiesImageSeries.data = self.majorCities
                 // imageSeries.dataFields.value = "sales";
 
@@ -509,7 +547,7 @@
                 minorCitiesImageSeries.name = "Minor Cities"
                 console.log("self.minorCities");
                 console.log(self.minorCities);
-                
+
                 minorCitiesImageSeries.data = self.minorCities
                 // imageSeries.dataFields.value = "sales";
 
@@ -539,6 +577,39 @@
                 minorCitiesLabel.nonScaling = false;
                 //  end majorCities circle series
                 // /////////////////////////////////////////////////////
+                let SupplierCitiesImageSeries = chart.series.push(new am4maps.MapImageSeries());
+                // define template
+                SupplierCitiesImageSeries.name = "Supplier import"
+                console.log("self.SupplierCities");
+                console.log(self.SupplierData);
+
+                SupplierCitiesImageSeries.data = self.SupplierData
+                // imageSeries.dataFields.value = "sales";
+
+                // if (type == 0) {
+                let SupplierCitiesImageSeriesTemplate = SupplierCitiesImageSeries.mapImages.template;
+                SupplierCitiesImageSeriesTemplate.propertyFields.latitude = "x";
+                SupplierCitiesImageSeriesTemplate.propertyFields.longitude = "y";
+                SupplierCitiesImageSeriesTemplate.nonScaling = false
+                SupplierCitiesImageSeriesTemplate.fill = "black"
+
+                // 
+                // let storeImage = imageSeriesTemplate.createChild(am4core.Image);
+                // storeImage.propertyFields.href = "imageURL";
+                // storeImage.width = 10;
+                // storeImage.height = 10;
+                // storeImage.horizontalCenter = "middle";
+                // storeImage.verticalCenter = "bottom";
+
+                var SupplierCitiesCircle = SupplierCitiesImageSeriesTemplate.createChild(am4core.Circle);
+                SupplierCitiesCircle.fillOpaSupplierCities = 0.5;
+                SupplierCitiesCircle.tooltipText = "{retailer}: [bold]{salesRetail}[/]{storeName}";
+                SupplierCitiesCircle.radius = 1
+                // let SupplierCitiesLabel = SupplierCitiesImageSeriesTemplate.createChild(am4core.Label);
+                // SupplierCitiesLabel.html =
+                //     '<a style="background-color: black;color: white;font-size:1px" >{city}</a>'
+                // SupplierCitiesLabel.fontSize = 3
+                // SupplierCitiesLabel.nonScaling = false;
 
                 if (config.useHeatmap) {
                     self.radius = parseInt(config.heatMapRadius)
