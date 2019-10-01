@@ -99,6 +99,7 @@
             // this.drawMap(this.labels)
             this.getmaps()
             this.getHinterlandStores()
+            this.testKak(this.rowData);
         },
         methods: {
             showSelector() {
@@ -112,7 +113,6 @@
             onMapChange() {
                 let self = this
                 self.$nextTick(() => {
-                    console.log(self.selectedmap);
 
                     self.MapImgURL = process.env.VUE_APP_API +
                         `MapImage?mapImageID=${self.selectedmap}&type=map`;
@@ -138,7 +138,6 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.get(process.env.VUE_APP_API + `MapImage`).then(r => {
-                    console.log(r);
                     self.maps = []
                     self.maps.push({
                         text: "None",
@@ -150,7 +149,6 @@
                             value: e.id
                         })
                     })
-                    console.log(self.maps);
 
                 })
             },
@@ -251,7 +249,6 @@
             },
             handelData(data, usePiechart) {
                 let self = this
-                console.log(data);
                 let final = [];
                 self.stores.forEach(element => {
                     let storeFound = false;
@@ -284,7 +281,6 @@
             },
             handelPiechartData(data, usePiechart) {
                 let self = this
-                console.log(data);
                 let final = [];
                 self.stores.forEach(element => {
                     let storeFound = false;
@@ -303,7 +299,6 @@
                 })
                 final = removeDuplicates(final, 'storeName')
                 data.forEach((el, idx) => {
-                    console.log(el);
                     final.forEach(finalStore => {
                         el.data.forEach(store => {
                             if (finalStore.storeName == store.displayname) {
@@ -316,8 +311,6 @@
                         })
                     })
                 })
-                console.log("final");
-                console.log(final);
 
                 return final
             },
@@ -329,6 +322,7 @@
                 // todo sort rowdata by sales for heatmap legend
                 let formattedData = [];
                 let chart = am4core.create("thisone2", am4maps.MapChart);
+
                 chart.name = "Map"
                 chart.projection = new am4maps.projections.Miller();
                 // chart.width=800
@@ -367,11 +361,8 @@
 
                 let polygonTemplate = polygonSeries.mapPolygons.template;
 
-
                 var pattern_europe = new am4core.Pattern();
                 var image = new am4core.Image();
-
-                ;
                 polygonTemplate.tooltipColorSource = "rgb(103,148,220)"
                 var height = this.$refs.thisone2.clientHeight
 
@@ -422,14 +413,11 @@
                         let label = imageSeriesTemplate.createChild(am4core.Label);
                         // label.text = "{storeName}";
                         label.html =
-                        '<a style="background-color: black;color: white;" >{storeName}</a>'
+                            '<a style="background-color: black;color: white;" >{storeName}</a>'
                         // label.fill = am4core.color("#fff");
                         label.fontSize = 5
                         label.nonScaling = false;
                         label.hidden = labelState
-                        
-                        console.log("label");
-                        console.log(label);
 
                         imageSeries.heatRules.push({
                             property: "fill",
@@ -443,8 +431,6 @@
                             min: 8,
                             max: 15
                         });
-                        console.log("chart.colors");
-                        console.log(chart.colors.getIndex(11).brighten(1));
                         // + (idx + 1)
                         let heatLegend = chart.createChild(am4maps.HeatLegend);
                         heatLegend.series = imageSeries;
@@ -459,6 +445,8 @@
                     })
                 }
                 chart.seriesContainer.events.on("hit", function (ev) {
+                    console.log(chart.svgPointToGeo(ev.svgPoint));
+
                     if (!self.canPlot) {
                         return
                     }
@@ -540,10 +528,12 @@
                 }
                 if (self.lines) {
                     let graticuleSeries = chart.series.push(new am4maps.GraticuleSeries());
-                    graticuleSeries.mapLines.template.line.strokeOpacity = 0.2;
-                    graticuleSeries.longitudeStep = 2;
-                    graticuleSeries.latitudeStep = 2
+                    graticuleSeries.mapLines.template.line.strokeOpacity = 0.4;
+                    graticuleSeries.longitudeStep = 0.5;
+                    graticuleSeries.latitudeStep = 0.5;
                     graticuleSeries.name = "lines"
+
+                    console.log("graticuleSeries", graticuleSeries);
                 }
                 let linkContainer = chart.createChild(am4core.Container);
                 linkContainer.isMeasured = false;
@@ -563,7 +553,7 @@
 
                 let equirectangular = linkContainer.createChild(am4core.Button);
                 equirectangular.label.text = "Toggle Line";
-                
+
                 equirectangular.padding(5, 5, 5, 5);
                 equirectangular.width = 100;
                 equirectangular.align = "left";
@@ -577,6 +567,98 @@
                 chart.legend = new am4maps.Legend();
                 chart.legend.position = "right";
                 chart.legend.align = "right";
+            },
+            testKak(rowData) {
+                let self = this;
+
+                let latBetween = 33;
+                let lowestLat = -34.87;
+                let highestLat = -22.14;
+
+                let longBetween = 26;
+                let lowestLong = 16.50;
+                let highestLong = 32.91;
+
+                let latIncr = (highestLat - lowestLat) / latBetween;
+                let longIncr = (highestLong - lowestLong) / longBetween;
+
+                let latCount = lowestLat;
+                let latIDX = 0;
+
+                let lats = {};
+
+                while (latCount <= highestLat) {
+                    let allLatsBetween = [];
+
+                    rowData.forEach(el => {
+                        if (el.lat < latCount && (el.lat + latIncr) > latCount)
+                            allLatsBetween.push(el);
+                    })
+
+                    if (allLatsBetween.length > 0)
+                        lats[latIDX + 1] = allLatsBetween;
+
+                    latCount += latIncr;
+                    latIDX++;
+                }
+
+                let longCount = lowestLong;
+                let longIDX = 0;
+
+                let longs = {};
+
+                while (longCount <= highestLong) {
+                    let allLongsBetween = [];
+
+                    rowData.forEach(el => {
+                        if (el.long < longCount && (el.long + longIncr) > longCount)
+                            allLongsBetween.push(el);
+                    })
+
+                    if (allLongsBetween.length > 0)
+                        longs[longIDX] = allLongsBetween;
+
+                    longCount += longIncr;
+                    longIDX++;
+                }
+
+                let alpharray = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+
+                let final = {};
+
+                console.log(longs);
+
+                for(var long in longs) {
+                    let longArr = longs[long];
+
+                    longArr.forEach(lon => {
+                        for(var lat in lats) {
+                            let latArr = lats[lat];
+
+                            latArr.forEach(latt => {
+                                let elName = alpharray[long] + lat;
+                                let arr = final[alpharray[long] + lat];
+
+                                if(arr == undefined) {
+                                    final[elName] = [];
+                                }
+
+                                if(lon.storeName == latt.storeName) 
+                                    final[elName].push(latt);
+                            })
+                        }
+                    });
+                }
+
+                let finalFinal = {};
+
+                for(var prop in final) {
+                    if(final[prop].length > 0) {
+                        finalFinal[prop] = final[prop];
+                    }
+                }
+
+                console.table(finalFinal)
             }
         }
     }
@@ -617,7 +699,7 @@
 
         if (width > 2559) {
             cw = 966.53;
-            offsetX = 1.566        
+            offsetX = 1.566
         }
 
         return {
@@ -703,7 +785,6 @@
         .sideBar {
 
             width: calc(100vw - 1600px)
-            
         }
     }
 

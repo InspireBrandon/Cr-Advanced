@@ -10,7 +10,7 @@
                         <v-list-tile @click="customSetup">
                             <v-list-tile-title>New</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile @click="saveFile">
+                        <v-list-tile :disabled="!showGrid" @click="saveFile">
                             <v-list-tile-title>Save</v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile @click="openFile">
@@ -18,8 +18,11 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
+                <v-btn :disabled="!showGrid" @click="customSetup" slot="activator" flat>
+                    Setup
+                </v-btn>
                 <!-- <v-menu dark offset-y style="margin-bottom: 10px;">
-                    <v-btn slot="activator" flat>
+                    <v-btn @click="customSetup" slot="activator" flat>
                         Setup
                     </v-btn>
                     <v-list>
@@ -31,18 +34,18 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu> -->
-                <v-btn slot="activator" flat @click="customQuery">
+                <!-- <v-btn slot="activator" flat @click="customQuery">
                     Custom
-                </v-btn>
+                </v-btn> -->
                 <v-menu dark offset-y style="margin-bottom: 10px;">
                     <v-btn slot="activator" flat>
                         Map Image
                     </v-btn>
                     <v-list>
-                        <v-list-tile @click="openMapImageModal(true,null)" >
+                        <v-list-tile @click="openMapImageModal(true,null)">
                             <v-list-tile-title>Add</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile @click="showSelector()" >
+                        <v-list-tile @click="showSelector()">
                             <v-list-tile-title>Edit</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
@@ -89,8 +92,8 @@
                 </v-btn> -->
             </v-btn-toggle>
         </v-toolbar>
-        <Grid :showGrid="showGrid" :selectFile='openFile' :createFile="customSetup" v-show="selectedView == 0" :rowData="rowData"
-            :headers="headers" ref="Grid" />
+        <Grid :showGrid="showGrid" :selectFile='openFile' :createFile="customSetup" v-show="selectedView == 0"
+            :rowData="rowData" :headers="headers" ref="Grid" />
         <Map v-if="selectedView == 1" :rowData="rowData" :setupData="setupMapData" ref="Map" />
         <ClusterModels :fileData="rowData" v-if="selectedView == 2" ref="ClusterModels" />
         <Setup ref="Setup" />
@@ -188,19 +191,19 @@
             self.getHinterlandStores();
         },
         methods: {
-             showSelector() {
+            showSelector() {
                 let self = this;
                 self.$refs.MapImageSelector.show(callback => {
                     console.log(callback);
-                    
-                    self.openMapImageModal(false,callback)
+
+                    self.openMapImageModal(false, callback)
                     // self.selectedmap=callback.id
                     // self.onMapChange()
                 })
             },
-            openMapImageModal(type,item) {
+            openMapImageModal(type, item) {
                 let self = this
-                self.$refs.MapImageModal.open(type,item,callback => {
+                self.$refs.MapImageModal.open(type, item, callback => {
 
                 })
             },

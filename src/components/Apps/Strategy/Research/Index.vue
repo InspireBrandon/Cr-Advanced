@@ -8,33 +8,16 @@
                     </v-btn>
                     <v-list>
                         <v-list-tile @click="openFileDialog">
-                            <v-list-tile-title>Import</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile>
                             <v-list-tile-title>New</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile>
+                        <v-list-tile @click="openFile">
                             <v-list-tile-title>Open</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile @click="prompt">
+                        <v-list-tile :disabled="rowData.length == 0" @click="prompt">
                             <v-list-tile-title>Save</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile @click="close">
-                            <v-list-tile-title>close</v-list-tile-title>
-                        </v-list-tile>
-                    </v-list>
-                </v-menu>
-                <v-menu dark offset-y style="margin-bottom: 10px;">
-                    <v-btn slot="activator" flat>Baskets</v-btn>
-                    <v-list>
-                        <v-list-tile>
-                            <v-list-tile-title>Add</v-list-tile-title>
-                        </v-list-tile>
-                        <!-- <v-list-tile @click="openLevels">
-                            <v-list-tile-title>Basket Levels</v-list-tile-title>
-                        </v-list-tile> -->
-                        <v-list-tile>
-                            <v-list-tile-title>Line items</v-list-tile-title>
+                        <v-list-tile :disabled="rowData.length == 0" @click="close">
+                            <v-list-tile-title>Close</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
                 </v-menu>
@@ -43,7 +26,7 @@
             <div></div>
             <v-spacer></v-spacer>
             <v-toolbar-title>
-                <span>Custom Analysis</span>
+                <span>Supplier Import</span>
             </v-toolbar-title>
         </v-toolbar>
         <v-toolbar dark flat>
@@ -53,38 +36,44 @@
         <input @change="onFileChange" accept=".csv" ref="fileInput" style="display: none" type="file">
         <Prompt ref="Prompt" />
         <YesNoModal ref="YesNoModal" />
+        <FileDataSelector ref="FileDataSelector" />
     </v-card>
 </template>
 
 <script>
+    import Axios from 'axios';
     import Grid from './Grid'
     import Prompt from '@/components/Common/Prompt'
     import YesNoModal from '@/components/Common/YesNoModal'
+    import FileDataSelector from './FileDataSelector'
 
     export default {
         components: {
             Grid,
             Prompt,
-            YesNoModal
+            YesNoModal,
+            FileDataSelector
         },
         data() {
             return {
                 rowData: [],
                 headers: [{
                     "headerName": "Retailer",
-                    "field": "Retailer",
-                },{
+                    "field": "retailer",
+                }, {
                     "headerName": "Store",
-                    "field": "Store",
-                },{
+                    "field": "storeName",
+                }, {
                     "headerName": "Sales",
-                    "field": "Sales",
-                },{
+                    "field": "salesRetail",
+                }, {
                     "headerName": "X Coordinate",
-                    "field": "X",
-                },{
+                    "field": "x",
+                    "editable": true
+                }, {
                     "headerName": "Y Coordinate",
-                    "field": "Y",
+                    "field": "y",
+                    "editable": true
                 }],
                 runData: [],
                 fileData: []
@@ -95,19 +84,16 @@
             self.getFile(data => {
                 if (data != null && data != false) {
                     self.getFileData(data.id, fileData => {
-                        if (!Array.isArray(fileData.store)) {
-                            self.runData = [];
+                        console.log("FILEDATA", fileData);
 
-                            let name = "ASDF";
+                        if (!Array.isArray(fileData.supplierImport)) {
+                            self.runData = [];
 
                             self.fileData = fileData.supplierImport;
 
                             for (var prop in fileData.supplierImport) {
                                 self.runData.push({
-                                    prop: prop,
-                                    name: self.generateNameParams(fileData.supplierImport[name]
-                                        .config.selectedBasket, fileData.basket[name].config
-                                        .selectedPeriod)
+                                    prop: prop
                                 })
                             }
                         }
@@ -145,8 +131,21 @@
                     reader.onload = function (e) {
                         let data = csvToDataObject(e.currentTarget.result);
                         console.log(data);
+
+                        let newArr = [];
+
+                        data.data.forEach(el => {
+                            newArr.push(new customImportItem({
+                                retailer: el.Retailer,
+                                storeName: el.Store,
+                                salesRetail: el.Sales,
+                                x: el.X,
+                                y: el.Y
+                            }))
+                        });
+
                         // self.headers = convertToGridHeaders(data.headers);
-                        self.rowData = data.data;
+                        self.rowData = newArr;
                     }
 
                     reader.readAsText(file);
@@ -172,38 +171,44 @@
                             self.prompt();
                         }, 60);
                     } else {
-                        if (self.fileData.supplierImport != undefined && self.fileData.supplierImport != null) {
-                            for (var prop in self.fileData.supplierImport) {
-                                if (prop == name) {
-                                    setTimeout(() => {
-                                        self.$refs.YesNoModal.show(
-                                            "This name already exists. Would you like to overwrite it?",
-                                            value => {
-                                                if (value) {
-                                                    canPass = true;
-                                                } else {
-                                                    self.prompt();
-                                                }
-                                            })
-                                    }, 60);
-                                } else {
-                                    canPass = true;
+                        if (self.fileData != undefined) {
+                            if (self.fileData.supplierImport != undefined && self.fileData.supplierImport !=
+                                null) {
+                                for (var prop in self.fileData.supplierImport) {
+                                    if (prop == name) {
+                                        setTimeout(() => {
+                                            self.$refs.YesNoModal.show(
+                                                "This name already exists. Would you like to overwrite it?",
+                                                value => {
+                                                    if (value) {
+                                                        canPass = true;
+                                                    } else {
+                                                        self.prompt();
+                                                    }
+                                                })
+                                        }, 60);
+                                    } else {
+                                        canPass = true;
+                                    }
                                 }
+                            } else {
+                                canPass = true;
                             }
+                        } else {
+                            canPass = true;
                         }
                     }
 
                     if (canPass) {
                         // saveFile
+                        self.saveFile(name)
                     }
                 })
             },
-            saveFile() {
+            saveFile(name) {
                 let self = this;
 
                 self.getFile(fileTransaction => {
-
-                    let name = "ASDF";
 
                     let levelValues = [];
 
@@ -233,7 +238,9 @@
                             if (Array.isArray(tmp.supplierImport))
                                 tmp.supplierImport = {};
 
-                            tmp.basket[name] = {
+
+
+                            tmp.supplierImport[name] = {
                                 data: self.rowData
                             };
 
@@ -276,6 +283,35 @@
                         alert("Failed to save");
                     })
             },
+            openFile() {
+                let self = this;
+
+                self.$refs.FileDataSelector.show(self.runData, fileData => {
+                    self.showingSaved = true;
+                    let reader = self.fileData[fileData.prop];
+                    // self.selectedBasket = reader.config.selectedBasket;
+                    // self.selectedPeriod = reader.config.selectedPeriod;
+
+                    // if (reader.config.turnoverGroups != undefined && reader.config.turnoverGroups != null) {
+                    //     let tg = reader.config.turnoverGroups;
+                    //     let tgv = reader.config.turnoverGroupUserValues;
+                    //     let updateUser = reader.config.updateUser;
+
+                    //     self.selectedLevel = tg.length - 1;
+                    //     self.updateUser = (updateUser == undefined || updateUser == null) ? false : updateUser;
+
+                    //     for (var i = 0; i < tg.length; i++) {
+                    //         self["level" + (i + 1)] = tg[i];
+                    //     }
+
+                    //     for (var i = 0; i < tgv.length; i++) {
+                    //         self["level" + (i + 1) + "Value"] = tgv[i];
+                    //     }
+                    // }
+
+                    self.rowData = reader.data;
+                });
+            }
         }
     }
 
