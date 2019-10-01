@@ -71,7 +71,7 @@
             return {
                 SupplierData: null,
                 labels: true,
-                lines: false,
+                lines: true,
                 radius: 20,
                 stores: [],
                 config: null,
@@ -92,8 +92,11 @@
                 color: [am4core.color("rgb(255,99,71)"), am4core.color("rgb(255,255,0)"), am4core.color("rgb(0,204,0)"),
                     am4core.color("rgb(255,128,0)"), am4core.color("rgb(204,0,204)")
                 ],
-                minorCities: [],
-                majorCities: []
+                accrossCities: [],
+                majorCities: [],
+                acrossArr: [],
+                sideArr: []
+
 
             }
         },
@@ -273,11 +276,11 @@
                 let major = cities.filter(e => {
                     return e.major
                 })
-                let minor = cities.filter(e => {
+                let accross = cities.filter(e => {
                     return !e.major
                 })
                 self.majorCities = major
-                self.minorCities = minor
+                self.accrossCities = accross
             },
             getHinterlandStores() {
                 let self = this;
@@ -575,21 +578,22 @@
                     '<a style="background-color: black;color: white;font-size:6px" >{city}</a>'
                 majorCitiesLabel.fontSize = 5
                 majorCitiesLabel.nonScaling = false;
-                let minorCitiesImageSeries = chart.series.push(new am4maps.MapImageSeries());
-                // define template
-                minorCitiesImageSeries.name = "Minor Cities"
-                // console.log("self.minorCities");
-                // console.log(self.minorCities);
 
-                minorCitiesImageSeries.data = self.minorCities
+                let accrossCitiesImageSeries = chart.series.push(new am4maps.MapImageSeries());
+                // define template
+                accrossCitiesImageSeries.name = "accross Cities"
+                // console.log("self.accrossCities");
+                // console.log(self.accrossCities);
+
+                accrossCitiesImageSeries.data = self.accrossCities
                 // imageSeries.dataFields.value = "sales";
 
                 // if (type == 0) {
-                let minorCitiesImageSeriesTemplate = minorCitiesImageSeries.mapImages.template;
-                minorCitiesImageSeriesTemplate.propertyFields.latitude = "latitude";
-                minorCitiesImageSeriesTemplate.propertyFields.longitude = "longitude";
-                minorCitiesImageSeriesTemplate.nonScaling = false
-                minorCitiesImageSeriesTemplate.fill = "black"
+                let accrossCitiesImageSeriesTemplate = accrossCitiesImageSeries.mapImages.template;
+                accrossCitiesImageSeriesTemplate.propertyFields.latitude = "latitude";
+                accrossCitiesImageSeriesTemplate.propertyFields.longitude = "longitude";
+                accrossCitiesImageSeriesTemplate.nonScaling = false
+                accrossCitiesImageSeriesTemplate.fill = "black"
 
                 // 
                 // let storeImage = imageSeriesTemplate.createChild(am4core.Image);
@@ -599,15 +603,15 @@
                 // storeImage.horizontalCenter = "middle";
                 // storeImage.verticalCenter = "bottom";
 
-                var minorCitiesCircle = minorCitiesImageSeriesTemplate.createChild(am4core.Circle);
-                minorCitiesCircle.fillOpaminorCities = 0.5;
-                minorCitiesCircle.tooltipText = "{city}: [bold]{sales}[/]";
-                minorCitiesCircle.radius = 1
-                let minorCitiesLabel = minorCitiesImageSeriesTemplate.createChild(am4core.Label);
-                minorCitiesLabel.html =
+                var accrossCitiesCircle = accrossCitiesImageSeriesTemplate.createChild(am4core.Circle);
+                accrossCitiesCircle.fillOpaaccrossCities = 0.5;
+                accrossCitiesCircle.tooltipText = "{city}: [bold]{sales}[/]";
+                accrossCitiesCircle.radius = 1
+                let accrossCitiesLabel = accrossCitiesImageSeriesTemplate.createChild(am4core.Label);
+                accrossCitiesLabel.html =
                     '<a style="background-color: black;color: white;font-size:1px" >{city}</a>'
-                minorCitiesLabel.fontSize = 3
-                minorCitiesLabel.nonScaling = false;
+                accrossCitiesLabel.fontSize = 3
+                accrossCitiesLabel.nonScaling = false;
                 //  end majorCities circle series
                 // /////////////////////////////////////////////////////
 
@@ -785,6 +789,52 @@
                     graticuleSeries.latitudeStep = 0.5;
                     graticuleSeries.name = "lines"
 
+
+                    let accrossCitiesImageSeries = chart.series.push(new am4maps.MapImageSeries());
+                    // define template
+                    // accrossCitiesImageSeries.name = "acrossArr Cities"
+                    // console.log("self.accrossCities");
+                    // console.log(self.accrossCities);
+                    console.log(self.acrossArr);
+                    
+                    accrossCitiesImageSeries.data = self.acrossArr
+                    // imageSeries.dataFields.value = "sales";
+
+                    // if (type == 0) {
+                    let accrossCitiesImageSeriesTemplate = accrossCitiesImageSeries.mapImages.template;
+                    accrossCitiesImageSeriesTemplate.propertyFields.latitude = "latitude";
+                    accrossCitiesImageSeriesTemplate.propertyFields.longitude = "longitude";
+                    accrossCitiesImageSeriesTemplate.nonScaling = false
+                    accrossCitiesImageSeriesTemplate.fill = "black"
+
+                    // 
+                    // let storeImage = imageSeriesTemplate.createChild(am4core.Image);
+                    // storeImage.propertyFields.href = "imageURL";
+                    // storeImage.width = 10;
+                    // storeImage.height = 10;
+                    // storeImage.horizontalCenter = "middle";
+                    // storeImage.verticalCenter = "bottom";
+
+                    var accrossCitiesCircle = accrossCitiesImageSeriesTemplate.createChild(am4core.Circle);
+                    accrossCitiesCircle.fillOpaaccrossCities = 0.5;
+                    accrossCitiesCircle.tooltipText = "{city}: [bold]{text}[/]";
+                    accrossCitiesCircle.radius = 1
+                    let accrossCitiesLabel = accrossCitiesImageSeriesTemplate.createChild(am4core.Label);
+                    accrossCitiesLabel.text ="{text}";
+                    // accrossCitiesLabel.html =
+                        '<a style="background-color: black;color: white;font-size:1px" >{text}</a>'
+                    accrossCitiesLabel.fontSize = 10
+                    accrossCitiesLabel.nonScaling = false;
+
+
+                    //let label = imageSeriesTemplate.createChild(am4core.Label);
+                        // // label.text = "{storeName}";
+                        // label.html =
+                        //     '<a style="background-color: black;color: white;" >{storeName}</a>'
+                        // // label.fill = am4core.color("#fff");
+                        // label.fontSize = 5
+                        // label.nonScaling = false;
+                        // label.hidden = labelState
                     // console.log("graticuleSeries", graticuleSeries);
                 }
                 let linkContainer = chart.createChild(am4core.Container);
@@ -875,7 +925,7 @@
                 while (longCount <= highestLong) {
                     let allLongsBetween = [];
 
-                    sideArr.push({
+                    acrossArr.push({
                         latitude: highestLat,
                         longitude: longCount,
                         text: (longIDX + 1)
@@ -926,6 +976,8 @@
                 }
                 console.log(finalFinal)
                 console.table(finalFinal)
+              
+                self.acrossArr = acrossArr;
             }
         }
     }
