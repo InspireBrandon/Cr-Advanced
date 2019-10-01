@@ -135,27 +135,42 @@
                 self.$refs.MapImageSelector.show(callback => {
                     // console.log("callback");
                     // console.log(callback);
-                    if (callback.name == "Geogrid") {
-                        self.lines = true
-                        if (self.config == null) {
-                            self.drawMap(this.labels, {
-                                useHeatmap: false,
-                                usePiecharts: false,
-                                imageDetails: {
-                                    imageType: "none",
-                                    imgURL: '',
-                                    imageLinkAddress: null
-                                }
-                            }, null, null)
-                        } else {
-                            self.drawMap(self.labels, self.config, self.heatData, self.pieData)
-                        }
-                    } else {
+                    if (callback.name == "None") {
                         self.lines = false
+                        self.drawMap(this.labels, {
+                            useHeatmap: false,
+                            usePiecharts: false,
+                            imageDetails: {
+                                imageType: "none",
+                                imgURL: '',
+                                imageLinkAddress: null
+                            }
+                        }, null, null)
+                    } else {
+                        if (callback.name == "Geogrid") {
+                            self.lines = true
+                            if (self.config == null) {
+                                self.drawMap(this.labels, {
+                                    useHeatmap: false,
+                                    usePiecharts: false,
+                                    imageDetails: {
+                                        imageType: "none",
+                                        imgURL: '',
+                                        imageLinkAddress: null
+                                    }
+                                }, null, null)
+                            } else {
+                                self.drawMap(self.labels, self.config, self.heatData, self.pieData)
+                            }
+                        } else {
+                            self.lines = false
 
-                        self.selectedmap = callback.id
-                        self.onMapChange()
+                            self.selectedmap = callback.id
+                            self.onMapChange()
+                        }
                     }
+
+
 
                 })
             },
@@ -449,7 +464,7 @@
                 chart.projection = new am4maps.projections.Mercator();
                 let polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
 
-                polygonSeries.strokeOpamajorCities = 0.9;
+                polygonSeries.strokeOpacity = 0.9;
                 // polygonSeries.width=600
                 polygonSeries.useGeodata = true;
                 // polygonSeries.exclude = ["ZA-WC"];
@@ -479,10 +494,10 @@
                     image.href = self.MapImgURL
                     pattern_europe.addElement(image.element);
                     polygonTemplate.fill = pattern_europe
-                    polygonTemplate.strokeOpamajorCities = 1;
+                    polygonTemplate.strokeOpacity = 1;
                 } else {
                     polygonTemplate.fill = chart.colors.getIndex(1);
-                    polygonTemplate.strokeOpamajorCities = 1;
+                    polygonTemplate.strokeOpacity = 1;
                     polygonTemplate.tooltipText = "{name}";
 
                 }
@@ -599,7 +614,7 @@
                 // // console.log(self.SupplierData);
                 // console.log("self.SupplierCities");
                 // console.log(self.SupplierData);
-   
+
                 // for (var retailer in self.SupplierData) {
                 //     // console.log(retailer);
                 //     // self.SupplierData.forEach(retailer => {
@@ -756,7 +771,7 @@
                     // pieSeries.colors = colorSet;
                     pieSeriesTemplate.slices.template.stroke = am4core.color("#fff");
                     pieSeriesTemplate.slices.template.strokeWidth = 1;
-                    pieSeriesTemplate.slices.template.strokeOpamajorCities = 1;
+                    pieSeriesTemplate.slices.template.strokeOpacity = 1;
                     pieSeriesTemplate.labels.template.disabled = true;
 
                     pieSeries.nonScalingStroke = false
@@ -765,7 +780,7 @@
                 }
                 if (self.lines) {
                     let graticuleSeries = chart.series.push(new am4maps.GraticuleSeries());
-                    graticuleSeries.mapLines.template.line.strokeOpamajorCities = 0.4;
+                    graticuleSeries.mapLines.template.line.strokeOpacity = 0.4;
                     graticuleSeries.longitudeStep = 0.5;
                     graticuleSeries.latitudeStep = 0.5;
                     graticuleSeries.name = "lines"
@@ -896,7 +911,7 @@
                         finalFinal[prop] = final[prop];
                     }
                 }
-
+                console.log(finalFinal)
                 console.table(finalFinal)
             }
         }
