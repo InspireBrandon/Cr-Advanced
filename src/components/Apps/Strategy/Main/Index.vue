@@ -50,6 +50,7 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
+                <!-- <v-btn flat dark @click="maintainCities">Cities</v-btn> -->
             </v-toolbar-items>
             <v-spacer></v-spacer>
             <div v-if="title != ''">
@@ -106,6 +107,7 @@
         <!-- <ColorPicker ref="ColorPicker" /> -->
         <FileSelector ref="FileSelector" />
         <MapImageModal ref="MapImageModal" />
+        <ImportCities ref="ImportCities" />
     </v-card>
 </template>
 
@@ -120,6 +122,7 @@
     import ClusterModels from '../ClusterModels/Index'
     import Prompt from '@/components/Common/Prompt'
     import MapImageSelector from "@/components/Apps/Strategy/Map/MapImageSelector"
+    import ImportCities from "./ImportCities"
 
     import ColorPicker from '@/components/Common/ColorPicker'
     import CustomSelector from './CustomSelector'
@@ -146,7 +149,8 @@
             ColorPicker,
             CustomSelector,
             FileSelector,
-            MapImageSelector
+            MapImageSelector,
+            ImportCities
         },
         data() {
             return {
@@ -191,6 +195,13 @@
             self.getHinterlandStores();
         },
         methods: {
+            maintainCities() {
+                let self = this;
+
+                self.$refs.ImportCities.show(data => {
+                    console.log(data);
+                })
+            },
             showSelector() {
                 let self = this;
                 self.$refs.MapImageSelector.show(callback => {

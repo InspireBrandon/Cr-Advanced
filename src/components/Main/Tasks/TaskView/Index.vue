@@ -442,7 +442,9 @@
             },
             goToDistributionView(item) {
                 let self = this;
-                self.goToDistribution(item);
+                self.setCanDistribute(item.systemFileID, ()=> {
+                    self.goToDistribution(item);
+                })
             },
             setParked(item) {
                 let self = this;
@@ -484,7 +486,6 @@
                             `SystemFile/SetDistribute?db=CR-DEVINSPIRE&systemFileID=${sp}&canDistribute=true`
                         )
                         .then(r => {
-                            console.log(r.data);
                             callback();
                         })
                 })
