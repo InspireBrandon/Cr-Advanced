@@ -10,14 +10,32 @@
             </v-toolbar>
             <v-container grid-list-md class="pa-2">
                 <v-layout row wrap style="height: 400px; overflow-x: auto;">
+                    <v-flex md4>
+                        <v-card style="cursor: pointer;" v-if="selected == geogridConfig" height="180"
+                            color="grey lighten-1" flat tile>
+                            <v-card-text>
+                                <h4 style="text-decoration: underline;">{{ geogridConfig.name }}</h4>
+                                <img style="width: 100%" src="https://www.conservationtech.com/PROJECTS/2010HAITI/GingerbreadSurvey/OSM-plan%20with%20GeoGrid.jpg" alt="no image found">
+                            </v-card-text>
+                        </v-card>
+                        <v-card style="cursor: pointer;" @click="selected = geogridConfig" v-else height="180"
+                            color="grey lighten-3" flat tile>
+                            <v-card-text>
+                                <h4 style="text-decoration: underline;">{{ geogridConfig.name }}</h4>
+                                <img style="width: 100%" src="https://www.conservationtech.com/PROJECTS/2010HAITI/GingerbreadSurvey/OSM-plan%20with%20GeoGrid.jpg" alt="no image found">
+                            </v-card-text>
+                        </v-card>
+                    </v-flex>
                     <v-flex md4 v-for="(map, idx) in maps" :key="idx">
-                        <v-card style="cursor: pointer;" v-if="map == selected" height="180" color="grey lighten-1" flat tile>
+                        <v-card style="cursor: pointer;" v-if="map == selected" height="180" color="grey lighten-1" flat
+                            tile>
                             <v-card-text>
                                 <h4 style="text-decoration: underline;">{{ map.name }}</h4>
                                 <img style="width: 100%" :src="imageSrc(map.id)" alt="no image found">
                             </v-card-text>
                         </v-card>
-                        <v-card style="cursor: pointer;" @click="selected = map" v-else height="180" color="grey lighten-3" flat tile>
+                        <v-card style="cursor: pointer;" @click="selected = map" v-else height="180"
+                            color="grey lighten-3" flat tile>
                             <v-card-text>
                                 <h4 style="text-decoration: underline;">{{ map.name }}</h4>
                                 <img style="width: 100%" :src="imageSrc(map.id)" alt="no image found">
@@ -43,7 +61,11 @@
                 dialog: false,
                 callback: null,
                 maps: [],
-                selected: null
+                selected: null,
+                geogridConfig: {
+                    id: -1,
+                    name: "Geogrid"
+                }
             }
         },
         methods: {
@@ -68,7 +90,9 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.get(process.env.VUE_APP_API + `MapImage`).then(r => {
-                    self.maps = r.data;
+                    r.data.forEach(element => {
+                        self.maps.push(element);
+                    });
                 })
             },
         }

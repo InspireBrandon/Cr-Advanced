@@ -46,6 +46,7 @@
     import Prompt from '@/components/Common/Prompt'
     import YesNoModal from '@/components/Common/YesNoModal'
     import FileDataSelector from './FileDataSelector'
+    import jwt from 'jsonwebtoken';
 
     export default {
         components: {
@@ -56,6 +57,7 @@
         },
         data() {
             return {
+                SystemUser_ID: -1,
                 rowData: [],
                 headers: [{
                     "headerName": "Retailer",
@@ -79,12 +81,14 @@
                 fileData: []
             }
         },
-        created() {
+        mounted() {
             let self = this;
+            let encoded_details = jwt.decode(sessionStorage.accessToken);
+            self.SystemUser_ID = encoded_details.USER_ID;
+
             self.getFile(data => {
                 if (data != null && data != false) {
                     self.getFileData(data.id, fileData => {
-                        console.log("FILEDATA", fileData);
 
                         if (!Array.isArray(fileData.supplierImport)) {
                             self.runData = [];
@@ -149,15 +153,6 @@
                     reader.readAsText(file);
                 })
             },
-            getFile(callback) {
-                let self = this;
-
-                Axios.get(process.env.VUE_APP_API +
-                        `SystemFile/JSON?db=CR-Devinspire&folder=CLUSTER REPORT&file=REPORT`)
-                    .then(r => {
-                        callback(r.data);
-                    })
-            },
             prompt() {
                 let self = this;
                 let canPass = false;
@@ -208,8 +203,6 @@
 
                 self.getFile(fileTransaction => {
 
-                    let levelValues = [];
-
                     if (fileTransaction == null || fileTransaction == false) {
                         let tmp = {
                             supplierImport: {}
@@ -236,13 +229,11 @@
                             if (Array.isArray(tmp.supplierImport))
                                 tmp.supplierImport = {};
 
-
-
                             tmp.supplierImport[name] = {
                                 data: self.rowData
                             };
 
-                            self.appendAndSaveFile(self.rowData);
+                            self.appendAndSaveFile(tmp);
                         })
                     }
                 })
@@ -251,7 +242,7 @@
                 let self = this;
 
                 Axios.get(process.env.VUE_APP_API +
-                        `SystemFile/JSON?db=CR-Devinspire&folder=CLUSTER REPORT&file=REPORT`)
+                        `SystemFile/JSON?db=CR-Devinspire&folder=SUPPLIER MARKET SHARE IMPORT/${self.SystemUser_ID}&file=REPORT`)
                     .then(r => {
                         callback(r.data);
                     })
@@ -264,10 +255,12 @@
                     })
             },
             appendAndSaveFile(fileData) {
+                let self = this;
+
                 Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
                         SystemFile: {
                             SystemUser_ID: -1,
-                            Folder: `SUPPLIER MARKET SHARE IMPORT/${localStorage.USER_ID}`,
+                            Folder: `SUPPLIER MARKET SHARE IMPORT/${self.SystemUser_ID}`,
                             Name: `REPORT`,
                             Extension: '.json'
                         },
@@ -323,8 +316,8 @@
         if (self.hasCoordinates) {
             let coordsSplit = data.coordinates.split(", ");
 
-            self.x = coordsSplit[0];
-            self.y = coordsSplit[1];
+            self.x = parseFloat(coordsSplit[0]);
+            self.y = parseFloat(coordsSplit[1]);
         } else {
             self.x = null;
             self.y = null;
