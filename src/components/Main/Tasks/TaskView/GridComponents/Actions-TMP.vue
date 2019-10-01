@@ -131,7 +131,7 @@
                 if (item.systemUserID == self.systemUserID) {
                     button_1.set('primary', 'send', cp.submitForApproval, "Send")
                     button_2.set('warning', 'visibility', cp.routeToView, "View")
-                    button_3.set('success', 'share', cp.goToDistribution, "Distribute")
+                    button_3.set('success', 'share', cp.goToDistributionView, "Distribute")
                 }
             }
             break;
@@ -182,11 +182,11 @@
 
             if (item.systemUserID == self.systemUserID && item.type == 3) {
                 button_1.set('primary', 'send', cp.submitForDistribution, "Send")
-                button_2.set('success', 'share', cp.goToDistribution, "Distribute")
+                button_2.set('success', 'share', cp.goToDistributionView, "Distribute")
             }
             if (item.systemUserID == self.systemUserID && item.type == 2) {
                 button_1.set('primary', 'send', cp.submitForDistribution, "Send")
-                button_2.set('success', 'share', cp.goToDistribution, "Distribute")
+                button_2.set('success', 'share', cp.goToDistributionView, "Distribute")
             }
         }
         break;
@@ -211,7 +211,7 @@
         // distribution
         case 19: {
             button_1.set('success', 'visibility', cp.setDistributionViewed, "View")
-            button_2.set('primary', 'send', cp.goToDistribution, "Distribute")
+            button_2.set('primary', 'send', cp.goToDistributionView, "Distribute")
             // button_2.set('error', 'local_parking', cp.setParked, "Park")
         }
         break;
@@ -237,7 +237,7 @@
         break;
         case 21: {
             button_1.set('warning', 'visibility', cp.routeToImplementation, "View")
-            button_2.set('primary', 'send', cp.goToDistribution, "Distribute")
+            button_2.set('primary', 'send', cp.goToDistributionView, "Distribute")
             button_3.set('error', 'close', cp.closeTask, "Close")
             // button_3.set('success', 'settings_backup_restore', cp.recall, "Recall")
             // button_4.set('error', 'local_parking', cp.setParked, "Park")

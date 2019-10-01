@@ -130,7 +130,6 @@
 
                     reader.onload = function (e) {
                         let data = csvToDataObject(e.currentTarget.result);
-                        console.log(data);
 
                         let newArr = [];
 
@@ -139,8 +138,7 @@
                                 retailer: el.Retailer,
                                 storeName: el.Store,
                                 salesRetail: el.Sales,
-                                x: el.X,
-                                y: el.Y
+                                coordinates: el.Coordinates
                             }))
                         });
 
@@ -244,7 +242,7 @@
                                 data: self.rowData
                             };
 
-                            self.appendAndSaveFile(tmp);
+                            self.appendAndSaveFile(self.rowData);
                         })
                     }
                 })
@@ -269,14 +267,14 @@
                 Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
                         SystemFile: {
                             SystemUser_ID: -1,
-                            Folder: "CLUSTER REPORT",
-                            Name: "REPORT",
+                            Folder: `SUPPLIER MARKET SHARE IMPORT/${localStorage.USER_ID}`,
+                            Name: `REPORT`,
                             Extension: '.json'
                         },
                         Data: fileData
                     })
                     .then(r => {
-                        self.fileData = fileData.basket;
+                        // self.fileData = fileData.basket;
                         alert("Successfully saved");
                     })
                     .catch(e => {
@@ -320,11 +318,13 @@
         self.retailer = data.retailer;
         self.storeName = data.storeName;
         self.salesRetail = data.salesRetail;
-        self.hasCoordinates = (data.x != undefined && data.x != null) || (data.y != undefined && data.y != null)
+        self.hasCoordinates = data.coordinates != undefined && data.coordinates != null && data.coordinates != "";
 
         if (self.hasCoordinates) {
-            self.x = data.x;
-            self.y = data.y;
+            let coordsSplit = data.coordinates.split(", ");
+
+            self.x = coordsSplit[0];
+            self.y = coordsSplit[1];
         } else {
             self.x = null;
             self.y = null;
@@ -348,7 +348,7 @@
         let lines = data.split('\n');
         let result = [];
 
-        let brokenHeaders = lines[0].split(',');
+        let brokenHeaders = lines[0].split(';');
         let headers = [];
 
         brokenHeaders.forEach(el => {
@@ -357,7 +357,7 @@
 
         for (let i = 1; i < lines.length; i++) {
             let obj = {};
-            let currentLine = lines[i].split(",");
+            let currentLine = lines[i].split(";");
 
             if (currentLine[0] != "") {
                 for (let j = 0; j < headers.length; j++) {
