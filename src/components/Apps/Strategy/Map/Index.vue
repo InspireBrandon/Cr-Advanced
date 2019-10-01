@@ -71,7 +71,7 @@
             return {
                 SupplierData: null,
                 labels: true,
-                lines: true,
+                lines: false,
                 radius: 20,
                 stores: [],
                 config: null,
@@ -107,38 +107,60 @@
             let self = this;
             let encoded_details = jwt.decode(sessionStorage.accessToken);
             self.SystemUser_ID = encoded_details.USER_ID;
-            self.getUserFile(callback => {
-                self.getFileData(callback.id, asd => {
-                    console.log("asd");
-                    console.log(asd);
-                    let supplierData = []
-                    let tmp = []
-                    // self.SupplierData = asd.supplierImport["PET CARE"].data
-                    asd.supplierImport["PET CARE"].data.forEach((e, idx) => {
-                        tmp.forEach(re => {
-                            if (re.) {
-                                tmp.push(e.retailer)
-                            }
-                        })
+            //     self.getUserFile(callback => {
+            //         self.getFileData(callback.id, asd => {
+            //             console.log("asd");
+            //             console.log(asd);
+            //             let supplierData = []
+            //             let tmp = []
+            //             // self.SupplierData = asd.supplierImport["PET CARE"].data
+            //             asd.supplierImport["PET CARE"].data.forEach((e, idx) => {
+            //                 tmp.forEach(re => {
+            //                     if (re.) {
+            //                         tmp.push(e.retailer)
+            //                     }
+            //                 })
 
-                        console.log(tmp[e.retailer]);
+            //                 console.log(tmp[e.retailer]);
 
-                    })
+            //             })
 
-                    console.log("supplierData");
-                    console.log(tmp);
+            //             console.log("supplierData");
+            //             console.log(tmp);
 
 
-                })
-            })
+            //         })
+            //     })
         },
         methods: {
             showSelector() {
                 let self = this;
 
                 self.$refs.MapImageSelector.show(callback => {
-                    self.selectedmap = callback.id
-                    self.onMapChange()
+                    console.log("callback");
+                    console.log(callback);
+                    if (callback.name == "Geogrid") {
+                        self.lines = true
+                        if (self.config == null) {
+                            self.drawMap(this.labels, {
+                                useHeatmap: false,
+                                usePiecharts: false,
+                                imageDetails: {
+                                    imageType: "none",
+                                    imgURL: '',
+                                    imageLinkAddress: null
+                                }
+                            }, null, null)
+                        } else {
+                            self.drawMap(self.labels, self.config, self.heatData, self.pieData)
+                        }
+                    } else {
+                        self.lines = false
+
+                        self.selectedmap = callback.id
+                        self.onMapChange()
+                    }
+
                 })
             },
             onMapChange() {
