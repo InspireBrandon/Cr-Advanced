@@ -7,10 +7,10 @@
                         File
                     </v-btn>
                     <v-list>
-                        <v-list-tile @click="newFile">
+                        <v-list-tile @click="customSetup">
                             <v-list-tile-title>New</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile @click="saveFile">
+                        <v-list-tile :disabled="!showGrid" @click="saveFile">
                             <v-list-tile-title>Save</v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile @click="openFile">
@@ -18,8 +18,11 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
-                <v-menu dark offset-y style="margin-bottom: 10px;">
-                    <v-btn slot="activator" flat>
+                <v-btn :disabled="!showGrid" @click="customSetup" slot="activator" flat>
+                    Setup
+                </v-btn>
+                <!-- <v-menu dark offset-y style="margin-bottom: 10px;">
+                    <v-btn @click="customSetup" slot="activator" flat>
                         Setup
                     </v-btn>
                     <v-list>
@@ -30,13 +33,29 @@
                             <v-list-tile-title>Custom Clusters</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
-                </v-menu>
-                <v-btn slot="activator" flat @click="customQuery">
+                </v-menu> -->
+                <!-- <v-btn slot="activator" flat @click="customQuery">
                     Custom
-                </v-btn>
+                </v-btn> -->
+                <v-menu dark offset-y style="margin-bottom: 10px;">
+                    <v-btn slot="activator" flat>
+                        Map Image
+                    </v-btn>
+                    <v-list>
+                        <v-list-tile @click="openMapImageModal(true,null)">
+                            <v-list-tile-title>Add</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="showSelector()">
+                            <v-list-tile-title>Edit</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
+                <!-- <v-btn flat dark @click="maintainCities">Cities</v-btn> -->
             </v-toolbar-items>
             <v-spacer></v-spacer>
-            {{ currentToggle + ' - ' + title }}
+            <div v-if="title != ''">
+                {{ currentToggle + ' - ' + title }}
+            </div>
             <v-spacer></v-spacer>
             <v-toolbar-title>
                 <span>Main</span>
@@ -60,6 +79,7 @@
                     placeholder="Select cluster data" :items="dataFields" v-model="selectedDataField"> </v-autocomplete>
             </v-toolbar-items> -->
             <v-btn color="primary" @click="openMapSetup" v-if="selectedView == 1">Setup Map </v-btn>
+            <!-- <v-btn color="primary" @click="openMapImageModal" v-if="selectedView == 1">Setup Map Images</v-btn> -->
             <v-spacer></v-spacer>
             <v-btn-toggle v-model="selectedView" round class="transparent" mandatory>
                 <v-btn class="elevation-0" style="width: 100px" round color="primary">
@@ -68,12 +88,13 @@
                 <v-btn class="elevation-0" style="width: 100px" round color="primary">
                     Map
                 </v-btn>
-                <v-btn class="elevation-0" style="width: 100px" round color="primary">
+                <!-- <v-btn class="elevation-0" style="width: 100px" round color="primary">
                     Model
-                </v-btn>
+                </v-btn> -->
             </v-btn-toggle>
         </v-toolbar>
-        <Grid v-show="selectedView == 0" :rowData="rowData" :headers="headers" ref="Grid" />
+        <Grid :showGrid="showGrid" :selectFile='openFile' :createFile="customSetup" v-show="selectedView == 0"
+            :rowData="rowData" :headers="headers" ref="Grid" />
         <Map v-if="selectedView == 1" :rowData="rowData" :setupData="setupMapData" ref="Map" />
         <ClusterModels :fileData="rowData" v-if="selectedView == 2" ref="ClusterModels" />
         <Setup ref="Setup" />
@@ -81,20 +102,28 @@
         <Spinner ref="Spinner" />
         <Prompt ref="Prompt" />
         <CustomSelector ref="CustomSelector" />
+        <MapImageSelector ref="MapImageSelector" />
+
         <!-- <ColorPicker ref="ColorPicker" /> -->
         <FileSelector ref="FileSelector" />
+        <MapImageModal ref="MapImageModal" />
+        <ImportCities ref="ImportCities" />
     </v-card>
 </template>
 
 <script>
     import Axios from 'axios';
     import Grid from './Grid'
+    import MapImageModal from './MapImageModal'
     import Setup from './Setup'
     import CustomSetup from './CustomSetup'
     import Spinner from '@/components/Common/Spinner';
     import Map from '../Map/Index'
     import ClusterModels from '../ClusterModels/Index'
     import Prompt from '@/components/Common/Prompt'
+    import MapImageSelector from "@/components/Apps/Strategy/Map/MapImageSelector"
+    import ImportCities from "./ImportCities"
+
     import ColorPicker from '@/components/Common/ColorPicker'
     import CustomSelector from './CustomSelector'
     import FileSelector from './FileSelector';
@@ -110,6 +139,7 @@
     export default {
         components: {
             Grid,
+            MapImageModal,
             Setup,
             CustomSetup,
             Spinner,
@@ -118,7 +148,9 @@
             Prompt,
             ColorPicker,
             CustomSelector,
-            FileSelector
+            FileSelector,
+            MapImageSelector,
+            ImportCities
         },
         data() {
             return {
@@ -154,7 +186,8 @@
                 setupMapData: [],
                 selectedClusterType: 0,
                 currentConfig: null,
-                selectableFiles: []
+                selectableFiles: [],
+                showGrid: false
             }
         },
         mounted() {
@@ -162,6 +195,29 @@
             self.getHinterlandStores();
         },
         methods: {
+            maintainCities() {
+                let self = this;
+
+                self.$refs.ImportCities.show(data => {
+                    console.log(data);
+                })
+            },
+            showSelector() {
+                let self = this;
+                self.$refs.MapImageSelector.show(callback => {
+                    console.log(callback);
+
+                    self.openMapImageModal(false, callback)
+                    // self.selectedmap=callback.id
+                    // self.onMapChange()
+                })
+            },
+            openMapImageModal(type, item) {
+                let self = this
+                self.$refs.MapImageModal.open(type, item, callback => {
+
+                })
+            },
             openMapSetup() {
                 let self = this
                 self.getMapSetupData()
@@ -270,7 +326,6 @@
                                     self.$refs.Spinner.hide();
                                 }
 
-                                self.firstLoad = false;
                                 self.unhandledReportData = r.data
                                 self.handleData(r.data, stores);
 
@@ -521,7 +576,7 @@
 
                 setTimeout(() => {
                     self.headers = headers;
-                     self.getMapSetupData()
+                    self.getMapSetupData()
                     self.$refs.Spinner.hide();
                     self.$refs.Grid.setOrder();
                 }, 60);
@@ -638,8 +693,9 @@
                 self.$refs.CustomSetup.show(self.headers, setup => {
                     self.currentConfig = setup;
                     self.selectedClusterType = setup.clusterType;
+                    self.showGrid = true;
 
-                    if(self.selectedClusterType == 0) {
+                    if (self.selectedClusterType == 0) {
                         self.handleSetup(setup);
                     } else {
                         self.handleCustomSetup(setup);
@@ -714,6 +770,7 @@
                 self.$refs.FileSelector.show(self.selectableFiles, file => {
                     let config = self.fileData.report.clusters[file];
                     self.currentConfig = config;
+                    self.showGrid = true;
                     self.selectedClusterType = file == 'Store Cluster' ? 0 : 1;
                     if (self.selectedClusterType == 0) {
                         self.handleSetup(config);

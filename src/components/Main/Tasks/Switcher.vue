@@ -58,6 +58,7 @@
                             </v-btn>
                         </v-toolbar-items>
                         <v-btn v-if="userAccess == 0" color="primary" @click="startNewTask">Start new task</v-btn>
+                        <v-btn color="primary" @click="sendMail">Send Mail</v-btn>
                         <v-spacer></v-spacer>
                         <v-btn v-show="userAccess == 3" @click="$refs.guide.click()" dark outline>Help</v-btn>
                         <a style="display: none;" ref="guide" download
@@ -87,8 +88,7 @@
                                 </v-list>
                             </v-menu>
                         </div>
-                        <v-btn-toggle v-model="selectedView" @change="onViewChanged"
-                            class="transparent" mandatory>
+                        <v-btn-toggle v-model="selectedView" @change="onViewChanged" class="transparent" mandatory>
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
                                     <v-btn v-on="on" :value="0" flat>
@@ -170,6 +170,7 @@
         <ProjectShare ref="ProjectShare"></ProjectShare>
         <NewTask ref="NewTask"></NewTask>
         <AssignTask ref="AssignTask"></AssignTask>
+        <SendMailModal ref="SendMailModal"></SendMailModal>
     </v-container>
 </template>
 
@@ -192,6 +193,7 @@
     import NoticeBoard from '@/components/Main/NoticeBoard/Noticeboard.vue'
     import NewTask from './NewTask'
     import AssignTask from '@/components/Common/AssignTask'
+    import SendMailModal from './SendMailModal.vue'
 
     export default {
         components: {
@@ -203,7 +205,8 @@
             NoticeBoard,
             NewTask,
             AssignTask,
-            PlanogramDistribution
+            PlanogramDistribution,
+            SendMailModal
         },
         data() {
             return {
@@ -803,7 +806,12 @@
                             project_Group_ID: data.projectGroup,
                             project_ID: data.project,
                             rangeFileID: data.rangeFile,
-                            systemFileID: data.spacePlanFile
+                            systemFileID: data.spacePlanFile,
+                            store_ID: data.store,
+                            storeCluster_ID: data.storeCluster,
+                            categoryCluster_ID: data.categoryCluster,
+                            customCluster_ID: data.customCluster,
+                            notes: data.notes
                         }
 
                         self.createProjectTransaction(txRequest, newItem => {
@@ -841,7 +849,37 @@
                 setTimeout(() => {
                     self.$refs.PlanogramDistribution.setView(item.project_Group_ID, item.project_ID, () => {});
                 }, 1000);
-            }
+            },
+            sendMail(item) {
+                let self = this;
+
+                self.$refs.SendMailModal.show(modalData => {
+                    let request = {
+                        systemUserID: null,
+                        notes: null,
+                        projectTXGroup_ID: null,
+                        type: null,
+                        status: null,
+                        project_ID: modalData.project,
+                        project_Group_ID: modalData.projectGroup
+                    };
+
+                    let projectTXGroupRequest = {
+                        projectID: modalData.project
+                    }
+
+                    self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
+                        request.systemUserID = modalData.systemUserID;
+                        request.actionedByUserID = null;
+                        request.rollingUserID = null;
+                        request.notes = modalData.notes;
+                        request.projectTXGroup_ID = newGroup.id;
+                        request.type = 7;
+                        request.status = 43;
+                        self.createProjectTransaction(request, data => {})
+                    })
+                })
+            },
         }
     }
 </script>

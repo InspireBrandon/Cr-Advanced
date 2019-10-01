@@ -55,7 +55,7 @@
                     new TabItem("Basket", "BasketAnalysis"),
                     new TabItem("Listing", "ListingClusters"),
                     new TabItem("Custom", "Custom"),
-                    new TabItem("Research", "Research")
+                    new TabItem("Import", "Research")
                 ]
             }
         },

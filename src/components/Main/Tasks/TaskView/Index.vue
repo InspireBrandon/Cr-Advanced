@@ -236,6 +236,11 @@
                 self.notesDialog = true
                 self.currentNotes = notes
             },
+            openNotesObj(obj) {
+                let self = this
+                self.notesDialog = true
+                self.currentNotes = obj.notes
+            },
             createProjectTransactionGroup(request, callback) {
                 let self = this;
 
@@ -437,7 +442,9 @@
             },
             goToDistributionView(item) {
                 let self = this;
-                self.goToDistribution(item);
+                self.setCanDistribute(item.systemFileID, ()=> {
+                    self.goToDistribution(item);
+                })
             },
             setParked(item) {
                 let self = this;
@@ -479,7 +486,6 @@
                             `SystemFile/SetDistribute?db=CR-DEVINSPIRE&systemFileID=${sp}&canDistribute=true`
                         )
                         .then(r => {
-                            console.log(r.data);
                             callback();
                         })
                 })

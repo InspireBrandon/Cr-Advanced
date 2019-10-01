@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="dialog" persistent max-width="900">
+    <v-dialog v-model="dialog" persistent width="900">
         <v-card>
             <v-toolbar dark flat color="primary">
                 <v-toolbar-title>Start new task</v-toolbar-title>
@@ -23,7 +23,8 @@
                                 label="Project Group" hide-details></v-autocomplete>
                         </v-flex>
                         <v-flex md6>
-                            <v-autocomplete v-model="selectedProject" :items="projects" label="Project" hide-details>
+                            <v-autocomplete :disabled="selectedProjectGroup == null" @change="onProjectOrStoreChange" v-model="selectedProject" :items="projects"
+                                label="Project" hide-details>
                             </v-autocomplete>
                         </v-flex>
                         <v-flex md12>
@@ -39,10 +40,37 @@
                                 label="Space Plan File" hide-details>
                             </v-autocomplete>
                         </v-flex>
+                        <v-flex md6>
+                            <v-autocomplete @change="onProjectOrStoreChange" v-model="selectedStore" :items="stores"
+                                label="Store" hide-details>
+                            </v-autocomplete>
+                        </v-flex>
+                        <v-flex md6></v-flex>
+                        <v-flex md3>
+                            <v-autocomplete v-model="selectedStoreCluster" :items="storeClusters" label="Store Cluster"
+                                hide-details>
+                            </v-autocomplete>
+                        </v-flex>
+                        <v-flex md3>
+                            <v-autocomplete :disabled="selectedProject == null || selectedStore == null"
+                                v-model="selectedCategoryCluster" :items="categoryClusters" label="Category Cluster"
+                                hide-details>
+                            </v-autocomplete>
+                        </v-flex>
+                        <v-flex md3>
+                            <v-autocomplete :disabled="selectedProject == null || selectedStore == null"
+                                v-model="selectedCustomCluster" :items="customClusters" label="Custom Cluster"
+                                hide-details>
+                            </v-autocomplete>
+                        </v-flex>
+                        <v-flex md12 class="mt-4">
+                            <v-textarea v-model="notes" label="Notes" hide-details>
+                            </v-textarea>
+                        </v-flex>
                     </v-layout>
                 </v-container>
             </v-card-text>
-            <v-divider class="mx-2"></v-divider>
+            <v-divider class="mx-"></v-divider>
             <v-card-actions style="text-align: right;">
                 <v-spacer></v-spacer>
                 <v-btn color="secondary" @click.native="dialog = false">Cancel</v-btn>
@@ -80,23 +108,44 @@
                 rangeFiles: [],
                 selectedRangeFile: null,
                 spacePlanFiles: [],
-                selectedSpacePlanFile: null
+                selectedSpacePlanFile: null,
+                storeClusters: [],
+                selectedStoreCluster: null,
+                categoryClusters: [],
+                selectedCategoryCluster: null,
+                customClusters: [],
+                selectedCustomCluster: null,
+                projectsComplete: null,
+                selectedPlanogramID: null,
+                stores: [],
+                selectedStore: null,
+                notes: ""
             }
         },
         created() {
             let self = this;
-            self.getSystemUsers();
-            self.getProjectGroups();
-            self.getRanges();
-            self.getSpacePlans();
         },
         methods: {
             show(afterReturn) {
                 let self = this;
+                self.getSystemUsers();
+                self.getProjectGroups();
+                self.getRanges();
+                self.getSpacePlans();
+                self.getStoreClusters();
+                self.getStores();
+
                 self.selectedTask = null;
                 self.selectedUser = null;
                 self.selectedProjectGroup = null;
                 self.selectedProject = null;
+                self.selectedRangeFile = null;
+                self.selectedSpacePlanFile = null;
+                self.selectedStore = null;
+                self.selectedStoreCluster = null;
+                self.selectedCategoryCluster = null;
+                self.selectedCustomCluster = null;
+                self.notes = null;
                 self.afterReturn = afterReturn;
                 self.dialog = true;
             },
@@ -110,7 +159,12 @@
                     projectGroup: self.selectedProjectGroup,
                     project: self.selectedProject,
                     rangeFile: self.selectedRangeFile,
-                    spacePlanFile: self.selectedSpacePlanFile
+                    spacePlanFile: self.selectedSpacePlanFile,
+                    store: self.selectedStore,
+                    storeCluster: self.selectedStoreCluster,
+                    categoryCluster: self.selectedCategoryCluster,
+                    customCluster: self.selectedCustomCluster,
+                    notes: self.notes
                 });
             },
             getSystemUsers() {
@@ -154,6 +208,8 @@
                     Axios.get(process.env.VUE_APP_API + `Project?projectGroupID=${self.selectedProjectGroup}`)
                         .then(r => {
                             delete Axios.defaults.headers.common["TenantID"];
+
+                            self.projectsComplete = r.data.projectList;
 
                             self.projects = [];
                             r.data.projectList.forEach(el => {
@@ -201,6 +257,114 @@
                     })
                     .catch(e => {
 
+                    })
+            },
+            getStoreClusters() {
+                let self = this;
+
+                self.storeClusters = [];
+
+                Axios.get(process.env.VUE_APP_API + "Cluster/Store")
+                    .then(r => {
+                        r.data.forEach(el => {
+                            self.storeClusters.push({
+                                text: el.displayname,
+                                value: el.id
+                            })
+                        })
+                    })
+            },
+            getStores() {
+                let self = this;
+
+                self.stores = [];
+
+                Axios.get(process.env.VUE_APP_API + `Store?db=CR-HINTERLAND-LIVE`)
+                    .then(r => {
+
+                        r.data.forEach(el => {
+                            self.stores.push({
+                                text: el.storeName,
+                                value: el.storeID
+                            })
+                        })
+                    })
+            },
+            onProjectOrStoreChange() {
+                let self = this;
+
+                self.$nextTick(() => {
+                    if (self.selectedProject != null && self.selectedStore != null) {
+                        let currentProject = self.projectsComplete.find(e => {
+                            return e.id == self.selectedProject;
+                        })
+
+                        self.selectedPlanogramID = currentProject.planogram_ID;
+                        self.getCategoryClusters();
+                        self.getCustomClusters();
+                    }
+                })
+            },
+            getCategoryClusters() {
+                let self = this;
+
+                self.categoryClusters = [];
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + `Clusters/CategoryCluster?planogramID=${self.selectedPlanogramID}`)
+                    .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        console.log(r.data);
+
+                        r.data.forEach(el => {
+                            self.categoryClusters.push({
+                                text: el.displayname,
+                                value: el.id
+                            })
+                        })
+                    })
+            },
+            getCategoryClusters() {
+                let self = this;
+
+                self.categoryClusters = [];
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API +
+                        `Clusters/CategoryCluster?planogramID=${self.selectedPlanogramID}&storeID=${self.selectedStore}`
+                    )
+                    .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+
+                        r.data.forEach(el => {
+                            self.categoryClusters.push({
+                                text: el.displayname,
+                                value: el.id
+                            })
+                        })
+                    })
+            },
+            getCustomClusters() {
+                let self = this;
+
+                self.customClusters = [];
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API +
+                        `Clusters/CustomCluster?planogramID=${self.selectedPlanogramID}&storeID=${self.selectedStore}`
+                    )
+                    .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+
+                        r.data.forEach(el => {
+                            self.customClusters.push({
+                                text: el.displayname,
+                                value: el.id
+                            })
+                        })
                     })
             },
         }
