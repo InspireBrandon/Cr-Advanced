@@ -184,6 +184,8 @@
                 let self = this;
 
                 let stores = require('@/assets/storeData/Hinterland.json');
+
+
                 self.prepareStoreResults(stores.Response);
             },
             prepareStoreResults(storeData) {
@@ -191,9 +193,17 @@
 
                 let stores = storeData.filter(e => {
                     return e.siteType == "SHOP";
+
+                })
+                stores.forEach(element => {
+                    let longLat = element.OfficeGPS.split(",");
+                    element.long = parseFloat(longLat[1]);
+                    element.lat = parseFloat(longLat[0]);
                 })
 
                 self.stores = stores;
+                console.log("stores");
+                console.log(self.stores);
 
 
                 self.getData(stores);
@@ -279,7 +289,7 @@
                     final.push(tmpBasket);
                 })
                 final = removeDuplicates(final, 'storeName')
-                final.sort((a, b) => (a.sales < b.sales) ? 1 : -1)
+                final.sort((a, b) => (a.salesPercent > b.salesPercent) ? 1 : -1)
                 self.maxHeatLegend = parseInt(final[0].sales)
                 return final
             },
@@ -399,6 +409,33 @@
 
                 }
                 polygonTemplate.nonScalingStroke = true;
+                let imageSeries = chart.series.push(new am4maps.MapImageSeries());
+                // define template
+                imageSeries.name = "stores"
+                imageSeries.data = self.stores
+                // imageSeries.dataFields.value = "sales";
+
+                // if (type == 0) {
+                let imageSeriesTemplate = imageSeries.mapImages.template;
+                imageSeriesTemplate.propertyFields.latitude = "lat";
+                imageSeriesTemplate.propertyFields.longitude = "long";
+                imageSeriesTemplate.nonScaling = false
+                imageSeriesTemplate.fill = "black"
+
+
+                var circle = imageSeriesTemplate.createChild(am4core.Circle);
+                circle.fillOpacity = 0.5;
+                circle.tooltipText = "{PlaceGroup}: [bold]{sales}[/]";
+                circle.radius = 1
+                let label = imageSeriesTemplate.createChild(am4core.Label);
+                // label.text = "{PlaceGroup}";
+                label.html =
+                    '<a style="background-color: black;color: white;font-size:6px" >{PlaceGroup}</a>'
+                // label.fill = am4core.color("#fff");
+                label.fontSize = 5
+                label.nonScaling = false;
+
+
                 if (config.useHeatmap) {
                     self.radius = parseInt(config.heatMapRadius)
                     setupdata.heatmap.forEach((heatmapItem, idx) => {
@@ -423,12 +460,12 @@
                         let label = imageSeriesTemplate.createChild(am4core.Label);
                         // label.text = "{storeName}";
                         label.html =
-                        '<a style="background-color: black;color: white;" >{storeName}</a>'
+                            '<a style="background-color: black;color: white;" >{storeName}</a>'
                         // label.fill = am4core.color("#fff");
                         label.fontSize = 5
                         label.nonScaling = false;
                         label.hidden = labelState
-                        
+
                         console.log("label");
                         console.log(label);
 
@@ -438,12 +475,12 @@
                             min: chart.colors.getIndex(11).brighten(1),
                             max: chart.colors.getIndex(11).brighten(-1)
                         });
-                        imageSeries.heatRules.push({
-                            property: "radius",
-                            target: circle,
-                            min: 8,
-                            max: 15
-                        });
+                        // imageSeries.heatRules.push({
+                        //     property: "radius",
+                        //     target: circle,
+                        //     min: 8,
+                        //     max: 15
+                        // });
                         console.log("chart.colors");
                         console.log(chart.colors.getIndex(11).brighten(1));
                         // + (idx + 1)
@@ -552,19 +589,19 @@
                 linkContainer.x = am4core.percent(0);
                 linkContainer.y = am4core.percent(0);
 
-                let button = linkContainer.createChild(am4core.Button);
-                button.label.text = "Toggle Labels";
-                button.padding(5, 5, 5, 5);
-                button.width = 100;
-                button.align = "right";
-                button.events.on("hit", function () {
-                    self.labels = !self.labels
-                    self.drawMap(self.labels, self.config, self.heatData, self.pieData)
-                });
+                // let button = linkContainer.createChild(am4core.Button);
+                // button.label.text = "Toggle Labels";
+                // button.padding(5, 5, 5, 5);
+                // button.width = 100;
+                // button.align = "right";
+                // button.events.on("hit", function () {
+                //     self.labels = !self.labels
+                //     self.drawMap(self.labels, self.config, self.heatData, self.pieData)
+                // });
 
                 let equirectangular = linkContainer.createChild(am4core.Button);
                 equirectangular.label.text = "Toggle Line";
-                
+
                 equirectangular.padding(5, 5, 5, 5);
                 equirectangular.width = 100;
                 equirectangular.align = "left";
@@ -618,7 +655,7 @@
 
         if (width > 2559) {
             cw = 966.53;
-            offsetX = 1.566        
+            offsetX = 1.566
         }
 
         return {
@@ -704,7 +741,6 @@
         .sideBar {
 
             width: calc(100vw - 1600px)
-            
         }
     }
 
