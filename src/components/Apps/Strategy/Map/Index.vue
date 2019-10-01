@@ -108,27 +108,21 @@
             let encoded_details = jwt.decode(sessionStorage.accessToken);
             self.SystemUser_ID = encoded_details.USER_ID;
             self.getUserFile(callback => {
-                self.getFileData(callback.id, asd => {
-                    console.log("asd");
-                    console.log(asd);
+                self.getFileData(callback.id, data => {
                     let supplierData = []
-                    let tmp = []
-                    // self.SupplierData = asd.supplierImport["PET CARE"].data
-                    asd.supplierImport["PET CARE"].data.forEach((e, idx) => {
-                        tmp.forEach(re => {
-                            if (re.) {
-                                tmp.push(e.retailer)
-                            }
-                        })
+                    let tmp = [];
+                    let arr = data.supplierImport["PET CARE"].data;
 
-                        console.log(tmp[e.retailer]);
+                    let distinctRetailers = removeDuplicates(arr, 'retailer');
+                    let distinctRetailerData = {};
 
-                    })
+                    distinctRetailers.forEach(retailer => {
+                        distinctRetailerData[retailer.retailer] = arr.filter(el => {
+                            return el.retailer == retailer.retailer;
+                        });
+                    });
 
-                    console.log("supplierData");
-                    console.log(tmp);
-
-
+                    console.log("distinctRetailerData", distinctRetailerData);
                 })
             })
         },
