@@ -79,12 +79,10 @@
             open(type, item, callback) {
                 let self = this
                 self.isAdd = type
-                console.log(self.isAdd);
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.get(process.env.VUE_APP_API + `MapImage`).then(r => {
-                    console.log(r);
                     self.maps = []
                     r.data.forEach(e => {
                         self.maps.push({
@@ -117,7 +115,6 @@
                 Axios.put(process.env.VUE_APP_API + `MapImage`, request).then(r => {
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                    console.log(r);
                     Axios.post(process.env.VUE_APP_API + `MapImage?mapImageID=${self.selectedMap}&type=map`,
                             self
                             .MapImg)

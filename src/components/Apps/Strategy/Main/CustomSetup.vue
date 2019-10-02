@@ -97,20 +97,26 @@
             }
         },
         methods: {
-            show(items, afterComplete) {
+            show(items, config, afterComplete) {
                 let self = this;
                 self.getPlanograms();
+                self.clusterType = null;
                 self.selectedPlanogram = null;
                 self.items = [];
                 self.useSystemValues = false;
                 self.selected = [];
+
+                if(config != null) {
+                    self.clusterType = config.clusterType;
+                    self.selected = config.selectedItems;
+                    self.selectedPlanogram = config.selectedPlanogram;
+                    self.useSystemValues = config.useSystemValues;
+                }
+
                 self.dialog = true;
 
                 items = JSON.parse(JSON.stringify(items))
-
                 items = items.splice(4, items.length - 1);
-
-                // self.items.push("Store Cluster");
 
                 items.forEach(el => {
                     self.items.push(el.headerName);

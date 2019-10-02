@@ -7,9 +7,9 @@
                         File
                     </v-btn>
                     <v-list>
-                        <v-list-tile @click="customSetup">
+                        <!-- <v-list-tile @click="customSetup">
                             <v-list-tile-title>New</v-list-tile-title>
-                        </v-list-tile>
+                        </v-list-tile> -->
                         <v-list-tile :disabled="!showGrid" @click="saveFile">
                             <v-list-tile-title>Save</v-list-tile-title>
                         </v-list-tile>
@@ -88,6 +88,9 @@
                 <v-btn class="elevation-0" style="width: 100px" round color="primary">
                     Map
                 </v-btn>
+                <v-btn class="elevation-0" style="width: 100px" round color="primary">
+                    Geogrid
+                </v-btn>
                 <!-- <v-btn class="elevation-0" style="width: 100px" round color="primary">
                     Model
                 </v-btn> -->
@@ -95,8 +98,9 @@
         </v-toolbar>
         <Grid :showGrid="showGrid" :selectFile='openFile' :createFile="customSetup" v-show="selectedView == 0"
             :rowData="rowData" :headers="headers" ref="Grid" />
-        <Map v-if="selectedView == 1" :rowData="rowData" :setupData="setupMapData" ref="Map" />
-        <ClusterModels :fileData="rowData" v-if="selectedView == 2" ref="ClusterModels" />
+        <Map :setGeogridData="onSetGeogridData" v-if="selectedView == 1" :rowData="rowData" :setupData="setupMapData" ref="Map" />
+        <Geogrid :geoGridData="geoGridData" v-if="selectedView == 2" ref="Geogrid" />
+        <!-- <ClusterModels :fileData="rowData" v-if="selectedView == 2" ref="ClusterModels" /> -->
         <Setup ref="Setup" />
         <CustomSetup ref="CustomSetup" />
         <Spinner ref="Spinner" />
@@ -123,6 +127,7 @@
     import Prompt from '@/components/Common/Prompt'
     import MapImageSelector from "@/components/Apps/Strategy/Map/MapImageSelector"
     import ImportCities from "./ImportCities"
+    import Geogrid from './Geogrid'
 
     import ColorPicker from '@/components/Common/ColorPicker'
     import CustomSelector from './CustomSelector'
@@ -150,7 +155,8 @@
             CustomSelector,
             FileSelector,
             MapImageSelector,
-            ImportCities
+            ImportCities,
+            Geogrid
         },
         data() {
             return {
@@ -187,7 +193,8 @@
                 selectedClusterType: 0,
                 currentConfig: null,
                 selectableFiles: [],
-                showGrid: true
+                showGrid: true,
+                geoGridData: {}
             }
         },
         mounted() {
@@ -195,6 +202,10 @@
             self.getHinterlandStores();
         },
         methods: {
+            onSetGeogridData(data) {
+                let self = this;
+                self.geoGridData = data;
+            },
             maintainCities() {
                 let self = this;
 
@@ -649,6 +660,47 @@
             handleSetup(data) {
                 let self = this;
 
+                let columnDefs = self.headers;
+                let containsCluster = false;
+
+                columnDefs.forEach(el => {
+                    if (el.headerName == "Cluster") {
+                        containsCluster = true;
+                    }
+                })
+
+                if (containsCluster) {
+                    self.headers.splice(self.headers.length - 1, 1);
+                }
+
+                let fields = self.getFieldsFromHeaders();
+
+                columnDefs.push({
+                    "headerName": "Cluster",
+                    valueFormatter: function (params) {
+                        let final = "";
+
+                        fields.forEach(el => {
+                            if (el == "userDefinedClusterValue") {
+                                final += self.useSystemValues ? params.data.level :
+                                    params.data.userDefinedCluster;
+                            } else {
+                                let userValue = params.data[el.replace("_value",
+                                    "")];
+                                let systemValue = params.data[el.replace("_value",
+                                    "").replace("user_", "system_")];
+                                final += self.useSystemValues ? systemValue :
+                                    userValue;
+                            }
+                        })
+
+                        return final;
+                    }
+                })
+
+                self.$refs.Grid.gridApi.setColumnDefs(columnDefs);
+                self.$refs.Grid.gridApi.redrawRows();
+
                 // Set title
                 self.title = "Store Cluster";
 
@@ -659,11 +711,11 @@
                 self.headers.forEach(h => {
                     let inSelected = false;
 
-                    data.selectedItems.forEach(si => {
-                        if (h.headerName == si) {
-                            inSelected = true;
-                        }
-                    })
+                    // data.selectedItems.forEach(si => {
+                    //     if (h.headerName == si) {
+                    //         inSelected = true;
+                    //     }
+                    // })
 
                     if (inSelected) {
                         show.push(h.field)
@@ -690,28 +742,10 @@
             customSetup() {
                 let self = this;
 
-                self.$refs.CustomSetup.show(self.headers, setup => {
+                self.$refs.CustomSetup.show(self.headers, self.currentConfig, setup => {
                     self.currentConfig = setup;
                     self.selectedClusterType = setup.clusterType;
                     self.showGrid = true;
-
-                    let columnDefs = self.headers;
-                    let containsStoreCluster = false;
-
-                    columnDefs.forEach(el => {
-                        if (el.headerName == "Store Cluster") {
-                            containsStoreCluster = true;
-                        }
-                    })
-
-                    if (!containsStoreCluster) {
-                        columnDefs.push({
-                            "headerName": "Store Cluster",
-                            "field": "cluster",
-                        })
-
-                        self.$refs.Grid.gridApi.setColumnDefs(columnDefs);
-                    }
 
                     if (self.selectedClusterType == 0) {
                         self.handleSetup(setup);
@@ -720,37 +754,92 @@
                     }
                 })
             },
+            getFieldsFromHeaders() {
+                let self = this;
+
+                let fields = []
+
+                self.currentConfig.selectedItems.forEach(si => {
+                    self.headers.forEach(el => {
+                        if (el.headerName == si)
+                            fields.push(el.field);
+                    })
+                })
+
+                return fields;
+            },
             handleCustomSetup(data) {
                 let self = this;
+
+                let columnDefs = self.headers;
+                let containsCluster = false;
+
+                columnDefs.forEach(el => {
+                    if (el.headerName == "Cluster") {
+                        containsCluster = true;
+                    }
+                })
+
+                if (containsCluster) {
+                    self.headers.splice(self.headers.length - 1, 1);
+                }
+
+                let fields = self.getFieldsFromHeaders();
+
+                columnDefs.push({
+                    "headerName": "Cluster",
+                    valueFormatter: function (params) {
+                        let final = "";
+
+                        fields.forEach(el => {
+                            if (el == "userDefinedClusterValue") {
+                                final += self.useSystemValues ? params.data.level :
+                                    params.data.userDefinedCluster;
+                            } else {
+                                let userValue = params.data[el.replace("_value",
+                                    "")];
+                                let systemValue = params.data[el.replace("_value",
+                                    "").replace("user_", "system_")];
+                                final += self.useSystemValues ? systemValue :
+                                    userValue;
+                            }
+                        })
+
+                        return final;
+                    }
+                })
+
+                self.$refs.Grid.gridApi.setColumnDefs(columnDefs);
+                self.$refs.Grid.gridApi.redrawRows();
 
                 // Set title
                 self.title = data.selectedPlanogram.text + " - Custom Cluster";
 
                 // handle headers
-                let hide = [];
-                let show = [];
+                // let hide = [];
+                // let show = [];
 
-                self.headers.forEach(h => {
-                    let inSelected = false;
+                // self.headers.forEach(h => {
+                //     let inSelected = false;
 
-                    data.selectedItems.forEach(si => {
-                        if (h.headerName == si) {
-                            inSelected = true;
-                        }
-                    })
+                //     data.selectedItems.forEach(si => {
+                //         if (h.headerName == si) {
+                //             inSelected = true;
+                //         }
+                //     })
 
-                    if (inSelected) {
-                        show.push(h.field)
-                    } else {
-                        if (h.field != 'storeName' && h.field != undefined && h.field != 'totalSales' && h
-                            .field != 'cumulativePercent') {
-                            hide.push(h.field)
-                        }
-                    }
-                })
+                //     if (inSelected) {
+                //         show.push(h.field)
+                //     } else {
+                //         if (h.field != 'storeName' && h.field != undefined && h.field != 'totalSales' && h
+                //             .field != 'cumulativePercent') {
+                //             hide.push(h.field)
+                //         }
+                //     }
+                // })
 
-                self.$refs.Grid.columnApi.setColumnsVisible(show, true);
-                self.$refs.Grid.columnApi.setColumnsVisible(hide, false);
+                // self.$refs.Grid.columnApi.setColumnsVisible(show, true);
+                // self.$refs.Grid.columnApi.setColumnsVisible(hide, false);
 
                 // handle system/user : set these incorrectly so that i can call change method
                 if (data.useSystemValues) {
