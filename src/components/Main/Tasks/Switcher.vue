@@ -886,10 +886,9 @@
 
 <style scoped>
     .scrollable {
-        height: calc(100vh - 209px);
-        overflow-x: auto;
+        height: calc(100vh - 222px);
+        overflow: auto;
     }
-
     table {
         border-collapse: collapse;
         width: 100%;
