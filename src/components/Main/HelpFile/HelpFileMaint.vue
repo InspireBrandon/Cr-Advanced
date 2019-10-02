@@ -1,11 +1,11 @@
 <template>
   <v-dialog fullscreen persistent v-model="dialog" width="90vw">
 
-    <v-card >
+    <v-card>
       <v-toolbar color="primary" dark>
-        <v-toolbar-title> Help File Maintenance - {{ component }}</v-toolbar-title>
+        <v-toolbar-title> Note</v-toolbar-title>
         <v-spacer></v-spacer>
-  <v-btn color="error" @click="dialog = false">Cancel</v-btn>
+        <v-btn color="error" @click="dialog = false">Cancel</v-btn>
       </v-toolbar>
       <v-card-text>
 
@@ -20,7 +20,7 @@
         <v-btn color="primary" @click="html = ''">Clear</v-btn>
         <v-spacer></v-spacer>
         <v-btn color="primary" @click="save">Save</v-btn>
-      
+
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -35,12 +35,14 @@
       return {
         html: "",
         dialog: false,
-        component: ""
+        component: "",
+        afterReturn: null
       }
     },
     methods: {
-      show(component) {
+      show(component, afterReturn) {
         let self = this;
+        self.afterReturn = afterReturn;
 
         self.component = component;
 
@@ -64,6 +66,9 @@
           })
           .then(r => {
             self.dialog = false;
+            if (self.afterReturn != undefined && self.afterReturn != null) {
+              self.afterReturn(self.html);
+            }
           })
       }
     }

@@ -154,8 +154,11 @@
               </v-list-tile>
             </v-list>
           </v-menu>
+          <v-btn v-if="rowData.length > 0" @click="showNote = !showNote" color="primary" small dark>Note</v-btn>
+          <!-- <v-btn @click="showNote = !showNote" color="primary" small dark>Note</v-btn> -->
           <v-menu offset-y>
-            <v-btn v-if="selectedItems.length > 0" :disabled="selectedItems.length == 0" slot="activator" color="primary" small dark>Set Indicator
+            <v-btn v-if="selectedItems.length > 0" :disabled="selectedItems.length == 0" slot="activator"
+              color="primary" small dark>Set Indicator
             </v-btn>
             <v-list dark>
               <v-list-tile @click="setIndicator('YES')">
@@ -178,13 +181,33 @@
           <!-- </v-flex> -->
           <!-- </v-layout> -->
         </v-toolbar>
-        <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%;  height: calc(100vh - 220px);"
-          :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
-          @selection-changed="onSelectionChanged" :rowData="rowData" :enableSorting="true" :enableFilter="true"
-          :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true"
-          :enableColResize="true" :floatingFilter="true" :onGridReady="onGridReady" :groupMultiAutoColumn="true"
-          :getContextMenuItems="getContextMenuItems">
-        </ag-grid-vue>
+        <v-container grid-list-md fluid class="ma-0 pa-0">
+          <v-layout row wrap>
+            <v-flex :class="{ 'md10': showNote, 'md12': !showNote }" class="pa-0">
+              <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%;  height: calc(100vh - 220px);"
+                :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
+                @selection-changed="onSelectionChanged" :rowData="rowData" :enableSorting="true" :enableFilter="true"
+                :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
+                :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :onGridReady="onGridReady"
+                :groupMultiAutoColumn="true" :getContextMenuItems="getContextMenuItems">
+              </ag-grid-vue>
+            </v-flex>
+            <v-flex v-show="showNote" class="pa-0" :class="{ 'md2': showNote, 'md0': !showNote }">
+              <v-card flat tile style="height: calc(100vh - 220px)">
+                <v-toolbar dark flat color="grey darken-3">
+                  <h2>Range Notes</h2>
+                  <v-spacer></v-spacer>
+                  <v-btn @click="openHelpFileMaint" fab small color="primary">
+                    <v-icon>edit</v-icon>
+                  </v-btn>
+                </v-toolbar>
+                <v-card-text style="height: calc(100vh - 290px); overflow: scroll;">
+                  <div v-html="note"></div>
+                </v-card-text>
+              </v-card>
+            </v-flex>
+          </v-layout>
+        </v-container>
         <v-toolbar dark dense class="pa-0">
           <div>
             <span>{{ rowData.length }} Rows</span>
@@ -228,6 +251,7 @@
     <LineGraphModal ref="LineGraphModal" />
     <StorePieGraph ref="StorePieGraph" />
     <CategorySelector ref="CategorySelector" />
+    <HelpFileMaint ref="HelpFileMaint" />
   </div>
 </template>
 
@@ -269,6 +293,7 @@
   import StorePieGraph from './StorePieGraph.vue'
   import GpGraph from './GpGraph.vue'
   import HighlightCluster from './HighlightCluster.vue'
+  import HelpFileMaint from '../../Main/HelpFile/HelpFileMaint'
 
   import {
     AgGridVue
@@ -308,10 +333,13 @@
       RangingReportModal,
       GraphConfigurationModal,
       HighlightCluster,
-      CategorySelector
+      CategorySelector,
+      HelpFileMaint
     },
     data() {
       return {
+        showNote: false,
+        note: "",
         filters: null,
         ShowGraph: false,
         isAdd: true,
@@ -449,6 +477,37 @@
       self.checkparams()
     },
     methods: {
+      openHelpFileMaint() {
+        let self = this;
+
+        let type = "PLANOGRAM"
+
+        if (self.fileData.useType == "CLUSTER")
+          type = "CLUSTER"
+
+        self.$refs.HelpFileMaint.show("RANGE - " + type + " - " + self.fileData.planogramID, html => {
+          self.note = html;
+        })
+      },
+      getHelpFile() {
+        let self = this;
+
+        let type = "PLANOGRAM"
+
+        if (self.fileData.useType == "CLUSTER")
+          type = "CLUSTER"
+
+        Axios.get(process.env.VUE_APP_API + "HelpFile?systemComponent=" + "RANGE - " + type + " - " + self.fileData.planogramID)
+          .then(r => {
+            if (r.data.success) {
+              self.note = r.data.helpFile.html;
+            } else {
+              self.note = "";
+            }
+
+            self.dialog = true;
+          })
+      },
       applyHighlight(indicator) {
         let self = this;
 
@@ -656,6 +715,8 @@
             self.fileData.tag = "CATEGORY";
             self.fileData.useType = "CATEGORY";
 
+            self.getHelpFile();
+
             Axios.get(process.env.VUE_APP_API +
                 `RangingAdvanced?planogramID=${category.id}&dateFromID=${dateRange.dateFrom}&dateToID=${dateRange.dateTo}&type=CATEGORY`
               )
@@ -719,6 +780,8 @@
             self.fileData.monthsBetween = dateRange.monthsBetween;
             self.fileData.tag = "";
             self.fileData.useType = "PLANOGRAM";
+
+            self.getHelpFile();
 
             Axios.get(process.env.VUE_APP_API +
                 `RangingAdvanced?planogramID=${planogram.planogram_ID}&dateFromID=${dateRange.dateFrom}&dateToID=${dateRange.dateTo}&type=PLANOGRAM`
@@ -798,6 +861,8 @@
               self.fileData.monthsBetween = r.data.monthsBetween;
               self.fileData.tag = r.data.tag;
               self.fileData.active_Shop_Code_ID = r.data.active_Shop_Code_ID;
+
+              self.getHelpFile();
 
               if (r.data.autoRangeConfig != undefined && r.data.autoRangeConfig != null) {
                 for (var prop in r.data.autoRangeConfig) {
