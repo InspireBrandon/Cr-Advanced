@@ -126,7 +126,7 @@
                 }, this);
 
                 console.log("sort function");
-                
+
                 let sortedData = data.sort(function (a, b) {
                     return b[key_value.value] - a[key_value.value];
                 })
@@ -137,7 +137,7 @@
 
                 function prepareParetoData() {
                     console.log("Pareto function");
-                    
+
                     let total = 0;
 
                     for (var i = 0; i < chart.data.length; i++) {
@@ -152,13 +152,14 @@
                     let sum = 0;
                     for (var i = 0; i < chart.data.length; i++) {
                         let value = chart.data[i][key_value.value];
+                        chart.data[i].color = getColors(data[i].store_Range_Indicator)
                         sum += value;
                         chart.data[i].pareto = sum / total * 100;
 
                     }
                 }
                 // Create axes
-                  console.log("after Pareto function");
+                console.log("after Pareto function");
                 let categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
                 categoryAxis.dataFields.category = key_value.altValue;
                 categoryAxis.renderer.grid.template.location = 0;
@@ -223,15 +224,26 @@
 
                 let paretoSeries = chart.series.push(new am4charts.LineSeries())
                 paretoSeries.dataFields.valueY = "pareto";
+                paretoSeries.dataFields.color = "color";
                 paretoSeries.dataFields.categoryX = key_value.altValue;
                 paretoSeries.dataFields.categoryz = key_value.key;
                 paretoSeries.dataFields.categoryzz = key_value.percent;
+                
+                
                 paretoSeries.yAxis = paretoValueAxis;
                 paretoSeries.tooltipText =
                     `{categoryzz}% of the items = {valueY.formatNumber('#.0')}%[/] of ${self.fact_name}`;
 
-                paretoSeries.bullets.push(new am4charts.CircleBullet());
+                let circleBullet = paretoSeries.bullets.push(new am4charts.CircleBullet());
+                circleBullet.circle.propertyFields.fill = "color";
+                circleBullet.circle.strokeWidth = 2;
 
+
+                // let bullet = paretoSeries.bullets.push(new am4charts.Bullet());
+                // bullet.circle.stroke = am4core.color("#fff");
+                // bullet.circle.strokeWidth = 2;
+                // paretoSeries.bullets.push(new am4charts.CircleBullet());
+                // paretoSeries.bullets.fill = am4core.color("#fff");
                 paretoSeries.strokeWidth = 2;
                 paretoSeries.stroke = new am4core.InterfaceColorSet().getFor("alternativeBackground");
                 paretoSeries.strokeOpacity = 0.5;
@@ -241,6 +253,20 @@
                 chart.cursor.behavior = "panX";
                 this.chart = chart
             }
+        }
+
+    }
+
+    function getColors(indicator) {
+        if (indicator == "YES") {
+            return am4core.color("rgb(128,255,0)")
+        }
+        if (indicator == "NO") {
+            return am4core.color("rgb(255,255,0)")
+        }
+
+        if (indicator == "SELECT" || indicator == "SELECTED") {
+            return am4core.color("rgb(0,128,255)")
         }
     }
 </script>
