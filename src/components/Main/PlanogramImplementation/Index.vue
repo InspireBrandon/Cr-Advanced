@@ -1104,8 +1104,6 @@
 
                 let request = JSON.parse(JSON.stringify(self.tmpRequest))
 
-                console.log(request);
-
                 let projectTXGroupRequest = {
                     projectID: request.project_ID
                 }

@@ -1,6 +1,6 @@
 <template>
     <div v-if="systemUserID != undefined && systemUserID != null" style="display: flex;">
-        <v-tooltip bottom v-if="button.button_1.show">
+        <v-tooltip right v-if="button.button_1.show">
             <template v-slot:activator="{ on }">
                 <v-btn :disabled="button.button_1.disabled"
                     @click="button.button_1.click(params.data); if(params.data.status != 43) { button.button_1.disabled=true }" flat icon small>
@@ -9,7 +9,7 @@
             </template>
             <span>{{ button.button_1.tooltip }}</span>
         </v-tooltip>
-        <v-tooltip bottom v-if="button.button_2.show">
+        <v-tooltip right v-if="button.button_2.show">
             <template v-slot:activator="{ on }">
                 <v-btn :disabled="button.button_2.disabled"
                     @click="button.button_2.click(params.data);" flat icon small>
@@ -18,7 +18,7 @@
             </template>
             <span>{{ button.button_2.tooltip }}</span>
         </v-tooltip>
-        <v-tooltip bottom v-if="button.button_3.show">
+        <v-tooltip right v-if="button.button_3.show">
             <template v-slot:activator="{ on }">
                 <v-btn :disabled="button.button_3.disabled"
                     @click="button.button_3.click(params.data),button.button_3.disabled=true" flat icon small>
@@ -27,7 +27,7 @@
             </template>
             <span>{{ button.button_3.tooltip }}</span>
         </v-tooltip>
-        <v-tooltip bottom v-if="button.button_4.show">
+        <v-tooltip right v-if="button.button_4.show">
             <template v-slot:activator="{ on }">
                 <v-btn :disabled="button.button_4.disabled"
                     @click="button.button_4.click(params.data),button.button_4.disabled=true" flat icon small>
@@ -221,17 +221,14 @@
                     button_1.set('warning', 'visibility', cp.routeToView, "View")
                 }
                 break;
-            case 2: {
-                button_1.set('warning', 'visibility', cp.routeToView, "View")
-                button_2.set('primary', 'check', cp.setApproved, "Approve")
-                button_3.set('error', 'close', cp.setDeclined, "Decline")
-            }
-            break;
-            case 3: {
-                button_1.set('warning', 'visibility', cp.routeToView, "View")
-            }break;
-            button_1.set('warning', 'visibility', cp.routeToView, "View")
-            break;
+                case 2: {
+                    button_1.set('warning', 'visibility', cp.routeToView, "View")
+                    button_2.set('primary', 'check', cp.setApproved, "Approve")
+                    button_3.set('error', 'close', cp.setDeclined, "Decline")
+                }break;
+                case 3: {
+                    button_1.set('warning', 'visibility', cp.routeToView, "View")
+                }break;
             }
         }
         break;

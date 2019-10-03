@@ -57,7 +57,7 @@
                                 <v-icon>home</v-icon>
                             </v-btn>
                         </v-toolbar-items>
-                        <v-btn v-if="userAccess == 0" color="primary" @click="startNewTask">Start new task</v-btn>
+                        <v-btn v-if="userAccess == 0 || userAccess == 1 || userAccess == 2 || userAccess == 3" color="primary" @click="startNewTask">Start new task</v-btn>
                         <v-btn color="primary" @click="sendMail">Send Mail</v-btn>
                         <v-spacer></v-spacer>
                         <v-btn v-show="userAccess == 3" @click="$refs.guide.click()" dark outline>Help</v-btn>
