@@ -79,8 +79,10 @@
                     placeholder="Select cluster data" :items="dataFields" v-model="selectedDataField"> </v-autocomplete>
             </v-toolbar-items> -->
             <v-btn color="primary" @click="openMapSetup" v-if="selectedView == 1">Setup Map </v-btn>
+            <v-btn color="primary" @click="openRetailerModal">import</v-btn>
             <!-- <v-btn color="primary" @click="openMapImageModal" v-if="selectedView == 1">Setup Map Images</v-btn> -->
             <v-spacer></v-spacer>
+
             <v-btn-toggle v-model="selectedView" round class="transparent" mandatory>
                 <v-btn class="elevation-0" style="width: 100px" round color="primary">
                     Output
@@ -98,7 +100,8 @@
         </v-toolbar>
         <Grid :showGrid="showGrid" :selectFile='openFile' :createFile="customSetup" v-show="selectedView == 0"
             :rowData="rowData" :headers="headers" ref="Grid" />
-        <Map :setGeogridData="onSetGeogridData" v-if="selectedView == 1" :rowData="rowData" :setupData="setupMapData" ref="Map" />
+        <Map :setGeogridData="onSetGeogridData" v-if="selectedView == 1" :rowData="rowData" :setupData="setupMapData"
+            ref="Map" />
         <Geogrid :geoGridData="geoGridData" v-if="selectedView == 2" ref="Geogrid" />
         <!-- <ClusterModels :fileData="rowData" v-if="selectedView == 2" ref="ClusterModels" /> -->
         <Setup ref="Setup" />
@@ -112,6 +115,7 @@
         <FileSelector ref="FileSelector" />
         <MapImageModal ref="MapImageModal" />
         <ImportCities ref="ImportCities" />
+        <RetailerImportModal ref="RetailerImportModal" />
     </v-card>
 </template>
 
@@ -119,6 +123,7 @@
     import Axios from 'axios';
     import Grid from './Grid'
     import MapImageModal from './MapImageModal'
+    import RetailerImportModal from './RetailerImportModal'
     import Setup from './Setup'
     import CustomSetup from './CustomSetup'
     import Spinner from '@/components/Common/Spinner';
@@ -144,6 +149,7 @@
     export default {
         components: {
             Grid,
+            RetailerImportModal,
             MapImageModal,
             Setup,
             CustomSetup,
@@ -202,6 +208,13 @@
             self.getHinterlandStores();
         },
         methods: {
+            openRetailerModal() {
+                let self = this
+                self.$refs.RetailerImportModal.open(callback => {
+
+                })
+
+            },
             onSetGeogridData(data) {
                 let self = this;
                 self.geoGridData = data;
