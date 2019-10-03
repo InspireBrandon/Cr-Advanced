@@ -19,7 +19,6 @@
                         </v-autocomplete>
                     </v-flex>
                     <v-flex v-if="form.accessType == 3" lg12 md12 sm12 xs12>
-                        {{form.storeID}}
                         <v-autocomplete :items="stores" v-model="form.storeID" label="Store"></v-autocomplete>
                     </v-flex>
                     <v-flex v-if="form.accessType == 4" lg12 md12 sm12 xs12>
