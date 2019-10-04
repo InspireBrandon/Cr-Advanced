@@ -1,57 +1,75 @@
 <template>
-    <v-dialog v-model="dialog" persistent fullscreen>
+    <v-dialog v-model="dialog" persistent width="800px">
         <v-card>
             <v-toolbar dark flat color="primary">
                 <v-toolbar-title>
                     Retailers
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
-                <v-btn icon @click="dialog=false">
+                <v-btn icon @click="close">
                     <v-icon>close</v-icon>
                 </v-btn>
-                <v-btn @click="update">
-                    Import Retailer Data
-                </v-btn>
             </v-toolbar>
-            <v-list dense hover>
-                <v-divider></v-divider>
-                <!-- :class="{ 'highlighted': selected == sp  }" 
-                    @click="selected = sp" -->
-                <v-list-tile avatar>
-                    <v-list-tile-avatar>
-                        <!-- <img :src="'data:image/png;base64,' + item.image" alt=""> -->
-                    </v-list-tile-avatar>
-                    <v-list-tile-content>
-                        <v-list-tile-title> Name</v-list-tile-title>
-
-                    </v-list-tile-content>
-                    <v-spacer></v-spacer>
-                    <v-list-tile-action>
-                        <v-flex>
-                            <v-btn color="primary">icon</v-btn>
-                        </v-flex>
-                    </v-list-tile-action>
-                    <!-- <v-list-tile-action> - h:{{sp.count}} w:{{sp.width}} modules:{{sp.modules}}</v-list-tile-action> -->
-                </v-list-tile>
-            </v-list>
-            <input @change="onFileChange" accept=".csv" ref="fileInput" style="display: none" type="file">
-
+            <v-toolbar dark flat>
+                <v-spacer></v-spacer>
+                <v-btn @click="addRetailer" color="grey darken-3">Add</v-btn>
+            </v-toolbar>
+            <v-card-text class="pa-2" style="height: 400px; overflow: auto;">
+                <v-list dense hover>
+                    <template v-for="(retailer, idx) in retailers">
+                        <v-list-tile avatar :key="idx">
+                            <v-list-tile-avatar tile>
+                                <v-img v-if="showImages" @click="openFileDialog(retailer.id)"
+                                    :src="retailerImage(retailer.id)" :lazy-src="retailerImage(retailer.id)"
+                                    aspect-ratio="1" contain></v-img>
+                            </v-list-tile-avatar>
+                            <v-list-tile-content>
+                                <v-list-tile-title> {{ retailer.name }}</v-list-tile-title>
+                            </v-list-tile-content>
+                            <v-spacer></v-spacer>
+                            <v-list-tile-action>
+                                <v-btn @click="modifyRetailerStores(retailer)" flat color="primary" icon>
+                                    <v-icon>edit</v-icon>
+                                </v-btn>
+                            </v-list-tile-action>
+                        </v-list-tile>
+                        <v-divider :key="idx + 'd'"></v-divider>
+                    </template>
+                </v-list>
+            </v-card-text>
+            <input type="file" style="display: none;" ref="IconInput" @change="onIconImageChange">
+            <RetailerStore ref="RetailerStore" />
+            <Prompt ref="Prompt" />
         </v-card>
     </v-dialog>
 
 </template>
 <script>
     import Axios from 'axios'
+    import RetailerStore from './RetailerStore/Index'
+    import Prompt from '@/components/Common/Prompt'
+
     export default {
         data() {
             return {
+                showImages: true,
                 dialog: false,
                 callback: null,
                 selected: null,
                 retailers: [],
+                currentRetailer: null
             }
         },
+        components: {
+            RetailerStore,
+            Prompt
+        },
         methods: {
+            retailerImage(retailerID) {
+                let self = this;
+
+                return process.env.VUE_APP_API + `Retailer/Image?retailerID=${retailerID}`
+            },
             update() {
                 let self = this
                 self.openFileDialog()
@@ -59,120 +77,73 @@
             getRetailers() {
                 let self = this
 
+                self.retailers = [];
+
+                Axios.get(process.env.VUE_APP_API + "Retailer")
+                    .then(r => {
+                        self.retailers = r.data.retailerList;
+                    })
+            },
+            modifyRetailerStores(retailer) {
+                let self = this;
+
+                self.$refs.RetailerStore.open(retailer, newRetailer => {
+
+                });
             },
             open(callback) {
                 let self = this
+                self.getRetailers();
                 self.callback = callback
                 self.dialog = true
+            },
+            addRetailer() {
+                let self = this;
+
+                self.$refs.Prompt.show("", "Retailer Name", "Name", name => {
+                    if (name == "") {
+                        alert("Please specify a name for the retailer.");
+                    } else {
+                        Axios.post(process.env.VUE_APP_API + "Retailer", {
+                                name: name
+                            })
+                            .then(r => {
+                                self.getRetailers();
+                            })
+                            .catch(e => {
+                                console.error(e);
+                            })
+                    }
+                })
             },
             close() {
                 let self = this
                 self.dialog = false
                 self.callback()
             },
-            openFileDialog() {
+            openFileDialog(retailerID) {
                 let self = this;
-                self.$refs.fileInput.value = null;
-                self.$refs.fileInput.click();
+                self.currentRetailer = retailerID;
+                self.$refs.IconInput.value = null
+                self.$refs.IconInput.click();
             },
-            onFileChange(e) {
+            onIconImageChange(e) {
+                let self = this;
+                const files = e.target.files;
+                let file = files[0];
+                self.uploadImage(file);
+            },
+            uploadImage(image) {
                 let self = this;
 
-                self.$nextTick(() => {
-                    const files = e.target.files;
-                    let file = files[0];
-                    let reader = new FileReader();
-
-                    reader.onload = function (e) {
-                        let data = csvToDataObject(e.currentTarget.result);
-
-                        let newArr = [];
-
-                        data.data.forEach(el => {
-                            newArr.push(new customImportItem({
-                                retailer: el.Retailer,
-                                storeName: el.Store,
-                                salesRetail: el.Sales,
-                                coordinates: el.Coordinates
-                            }))
-                        });
-                        let ImportList = {
-                            importList: newArr
-                        }
-                        // self.headers = convertToGridHeaders(data.headers);
-                        // self.rowData = newArr;
-                        Axios.post(process.env.VUE_APP_API +
-                                `Retailer/ProcessImport`, ImportList
-                            )
-                            .then(r => {
-                                callback(r.data);
-                            })
-                    }
-
-                    reader.readAsText(file);
-                })
-            },
-        }
-    }
-
-    function customImportItem(data) {
-        let self = this;
-        self.retailer = data.retailer;
-        self.storeName = data.storeName;
-        self.salesRetail = data.salesRetail;
-        self.hasCoordinates = data.coordinates != undefined && data.coordinates != null && data.coordinates != "";
-
-        if (self.hasCoordinates) {
-            let coordsSplit = data.coordinates.split(", ");
-
-            self.x = parseFloat(coordsSplit[0]);
-            self.y = parseFloat(coordsSplit[1]);
-        } else {
-            self.x = null;
-            self.y = null;
-        }
-    }
-
-    function convertToGridHeaders(headers) {
-        let tmp = [];
-
-        headers.forEach(el => {
-            tmp.push({
-                "headerName": el,
-                "field": el,
-            })
-        })
-
-        return tmp;
-    }
-
-    function csvToDataObject(data) {
-        let lines = data.split('\n');
-        let result = [];
-
-        let brokenHeaders = lines[0].split(';');
-        let headers = [];
-
-        brokenHeaders.forEach(el => {
-            headers.push(el.replace(/ /g, "").replace(/"/g, "").replace(/\r/g, ""));
-        })
-
-        for (let i = 1; i < lines.length; i++) {
-            let obj = {};
-            let currentLine = lines[i].split(";");
-
-            if (currentLine[0] != "") {
-                for (let j = 0; j < headers.length; j++) {
-                    obj[headers[j]] = currentLine[j].replace(/"/g, "").replace(/\r/g, "");
-                }
-
-                result.push(obj);
+                Axios.post(process.env.VUE_APP_API + `Retailer/Image?retailerID=${self.currentRetailer}`, image)
+                    .then(r => {
+                        self.showImages = false;
+                        setTimeout(() => {
+                            self.showImages = true;
+                        }, 60);
+                    })
             }
-
         }
-        return {
-            data: result,
-            headers: headers
-        };
     }
 </script>
