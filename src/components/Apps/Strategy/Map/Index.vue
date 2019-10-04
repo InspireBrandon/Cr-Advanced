@@ -50,6 +50,8 @@
 
 
                                     <v-checkbox label="Heatmaps" hide-details v-model="useHeatmap"> </v-checkbox>
+                                    <v-text-field label="radius" type="number" v-if="useHeatmap" hide-details
+                                        v-model="radius"></v-text-field>
                                     <v-autocomplete v-if="useHeatmap" multiple :items="heatmapItems"
                                         v-model="selectedHeatmapField" label="Heatmaps">
                                     </v-autocomplete>
@@ -63,7 +65,7 @@
                                 </v-card-text>
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
-                                    <v-btn color="primary"> draw Map</v-btn>
+                                    <v-btn color="primary" @click="submitSidebar"> draw Map</v-btn>
                                 </v-card-actions>
 
                             </v-card>
@@ -127,25 +129,6 @@
         data() {
             return {
                 // start sidebar setup
-                planograms: [{
-                    text: "yeet",
-                    value: 2
-                }, {
-                    text: "yeet",
-                    value: 3
-                }, {
-                    text: "yeet",
-                    value: 4
-                }, {
-                    text: "yeet",
-                    value: 5
-                }, {
-                    text: "yeet",
-                    value: 6
-                }, {
-                    text: "yeet",
-                    value: 7
-                }],
                 usePiecharts: false,
                 useHeatmap: false,
                 useSizeMap: false,
@@ -226,6 +209,62 @@
             self.piechartItems = tmp
         },
         methods: {
+            submitSidebar() {
+                let self = this
+
+                let tmp = {
+                    heatmap: [],
+                    piechart: [],
+                    sizeMap: []
+                }
+                let imageDetails = {
+                    imageType: "none",
+                    imgURL: self.MapImgURL,
+                    imageLinkAddress: null
+                }
+                let item = {
+                    heatMapRadius: self.radius,
+                    usePiecharts: self.usePiecharts,
+                    useHeatmap: self.useHeatmap,
+                    useSizeMap: self.useSizeMap,
+                    selectedPiechartItems: self.selectedPiechartItems,
+                    selectedHeatmapField: self.selectedHeatmapField,
+                    selectedSizeMapField: self.selectedSizeMapField,
+                    imageDetails: imageDetails,
+                    selectedRetailers: self.selectedRetailers
+                }
+                if (self.useSizeMap) {
+                    self.selectedSizeMapField.forEach(field => {
+                        tmp.sizeMap.push(self.fileData.basket[field])
+                    })
+                    tmp.sizeMap.forEach(field => {
+                        field.graphArr = self.handelData(field, false)
+                    })
+                }
+                if (self.useHeatmap) {
+                    self.selectedHeatmapField.forEach(field => {
+                        tmp.heatmap.push(self.fileData.basket[field])
+                    })
+                    tmp.heatmap.forEach(field => {
+                        field.graphArr = self.handelData(field, false)
+                    })
+                }
+                let pieArr = []
+                if (self.usePiecharts) {
+                    self.selectedPiechartItems.forEach(field => {
+                        tmp.piechart.push(self.fileData.basket[field])
+                    })
+                    pieArr = self.handelPiechartData(tmp.piechart, true)
+                }
+                self.config = item
+                self.heatData = tmp
+                self.pieData = pieArr
+                console.log("pieArr");
+                console.log(pieArr);
+
+
+                self.drawMap(this.labels, item, tmp, pieArr)
+            },
             showSelector() {
                 let self = this;
 
@@ -593,7 +632,7 @@
 
 
                 var majorCitiesCircle = majorCitiesImageSeriesTemplate.createChild(am4core.Circle);
-                majorCitiesCircle.fillOpamajorCities = 0.5;
+                majorCitiesCircle.fillOpacity = 0.5;
                 majorCitiesCircle.tooltipText = "{city}: [bold]{sales}[/]";
                 majorCitiesCircle.radius = 3
                 let majorCitiesLabel = majorCitiesImageSeriesTemplate.createChild(am4core.Label);
@@ -730,7 +769,7 @@
 
 
                     var circle = imageSeriesTemplate.createChild(am4core.Circle);
-                    circle.fillOpamajorCities = 0.5;
+                    circle.fillOpacity = 0.5;
                     circle.tooltipText = heatmapItem + "{storeName}: [bold]{sales}[/]";
                     circle.radius = self.radius + idx
 
@@ -740,12 +779,12 @@
                         min: chart.colors.getIndex(11).brighten(1),
                         max: chart.colors.getIndex(11).brighten(-1)
                     });
-                    imageSeries.heatRules.push({
-                        property: "radius",
-                        target: circle,
-                        min: 8,
-                        max: 15
-                    });
+                    // imageSeries.heatRules.push({
+                    //     property: "radius",
+                    //     target: circle,
+                    //     min: 8,
+                    //     max: 15
+                    // });
                     let heatLegend = chart.createChild(am4maps.HeatLegend);
                     heatLegend.series = imageSeries;
                     heatLegend.align = "right";
@@ -757,7 +796,58 @@
                 })
 
             },
-            drawPiecharts(chart) {
+            drawSizeMaps(chart, config, setupdata) {
+                // /////////////////////////////////////////////////////
+                //  start draw configured sizemap series
+                // /////////////////////////////////////////////////////
+                let self = this
+                console.log(setupdata);
+                
+                self.radius = parseInt(config.heatMapRadius)
+                setupdata.sizeMap.forEach((heatmapItem, idx) => {
+                    let imageSeries = chart.series.push(new am4maps.MapImageSeries());
+                    // define template
+                    imageSeries.name = heatmapItem.config.selectedBasket.basket
+                    imageSeries.data = heatmapItem.graphArr
+                    imageSeries.dataFields.value = "sales";
+
+                    // if (type == 0) {
+                    let imageSeriesTemplate = imageSeries.mapImages.template;
+                    imageSeriesTemplate.propertyFields.latitude = "lat";
+                    imageSeriesTemplate.propertyFields.longitude = "long";
+                    imageSeriesTemplate.nonScaling = false
+                    imageSeriesTemplate.fill = chart.colors.getIndex(11).brighten(1)
+
+
+                    var circle = imageSeriesTemplate.createChild(am4core.Circle);
+                    circle.fillOpacity = 0.5;
+                    circle.tooltipText = heatmapItem + "{storeName}: [bold]{sales}[/]";
+                    circle.radius = self.radius + idx
+
+                    // imageSeries.heatRules.push({
+                    //     property: "fill",
+                    //     target: circle,
+                    //     min: chart.colors.getIndex(11).brighten(1),
+                    //     max: chart.colors.getIndex(11).brighten(-1)
+                    // });
+                    imageSeries.heatRules.push({
+                        property: "radius",
+                        target: circle,
+                        min: 8,
+                        max: 15
+                    });
+                    // let heatLegend = chart.createChild(am4maps.HeatLegend);
+                    // heatLegend.series = imageSeries;
+                    // heatLegend.align = "right";
+                    // heatLegend.width = am4core.percent(25);
+                    // heatLegend.marginRight = am4core.percent(4);
+                    // heatLegend.minValue = 0;
+                    // heatLegend.maxValue = self.maxHeatLegend;
+                    // heatLegend.valign = "bottom";
+                })
+
+            },
+            drawPiecharts(chart, piechartArray) {
                 let self = this
                 // /////////////////////////////////////////////////////
                 // start Draw of configured piecharts
@@ -815,7 +905,7 @@
                 accrossCitiesImageSeriesTemplate.fill = "black"
 
                 var accrossCitiesCircle = accrossCitiesImageSeriesTemplate.createChild(am4core.Circle);
-                accrossCitiesCircle.fillOpaaccrossCities = 0.5;
+                accrossCitiesCircle.fillOpacity= 0.5;
                 accrossCitiesCircle.tooltipText = "{city}: [bold]{text}[/]";
                 accrossCitiesCircle.radius = 0
                 let accrossCitiesLabel = accrossCitiesImageSeriesTemplate.createChild(am4core.Label);
@@ -863,7 +953,10 @@
                     self.drawHeatMaps(chart, config, setupdata)
                 }
                 if (config.usePiecharts) {
-                    self.drawPiecharts(chart)
+                    self.drawPiecharts(chart, piechartArray)
+                }
+                if (config.useSizeMap) {
+                    self.drawSizeMaps(chart, config, setupdata)
                 }
                 if (self.lines) {
                     self.drawGridLines(chart)
@@ -889,7 +982,7 @@
                             mapMarker.height = 32;
                             mapMarker.scale = 0.7;
                             mapMarker.fill = am4core.color("#3F4B3B");
-                            mapMarker.fillOpamajorCities = 0.8;
+                            mapMarker.fillOpacity = 0.8;
                             mapMarker.horizontalCenter = "middle";
                             mapMarker.verticalCenter = "bottom";
                             var coords = chart.svgPointToGeo(ev.svgPoint);
