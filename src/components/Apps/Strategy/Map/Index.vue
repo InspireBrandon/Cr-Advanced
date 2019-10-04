@@ -62,6 +62,11 @@
                                     <v-autocomplete v-if="useSizeMap" multiple :items="heatmapItems"
                                         v-model="selectedSizeMapField" label="Size Map Items">
                                     </v-autocomplete>
+                                    <v-checkbox label="Use Retailer Map" hide-details v-model="useRetailerMap">
+                                    </v-checkbox>
+                                    <v-autocomplete v-if="useRetailerMap" multiple :items="selectedRetailers"
+                                        v-model="selectedRetailersFields" label="Size Map Items">
+                                    </v-autocomplete>
                                 </v-card-text>
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
@@ -132,10 +137,12 @@
                 usePiecharts: false,
                 useHeatmap: false,
                 useSizeMap: false,
+                useRetailerMap: false,
                 selectedPiechartItems: [],
                 selectedHeatmapField: [],
                 selectedSizeMapField: [],
                 selectedRetailers: [],
+                selectedRetailersFields: [],
                 piechartItems: [],
                 heatmapItems: [],
                 selectedPlanograms: null,
@@ -175,6 +182,7 @@
             this.getmaps()
             this.getHinterlandStores()
             this.getCities()
+            this.getRetailers()
             this.testKak(this.rowData);
             let self = this;
             let encoded_details = jwt.decode(sessionStorage.accessToken);
@@ -209,13 +217,31 @@
             self.piechartItems = tmp
         },
         methods: {
+            getRetailers() {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + `Retailer`).then(r => {
+                    console.log(r);
+                    self.selectedRetailers = []
+                    r.data.retailerList.forEach(e => {
+                        self.selectedRetailers.push({
+                            text: e.name,
+                            value: e.id
+                        })
+                    })
+
+                })
+
+            },
             submitSidebar() {
                 let self = this
 
                 let tmp = {
                     heatmap: [],
                     piechart: [],
-                    sizeMap: []
+                    sizeMap: [],
+                    retailerMap: [],
                 }
                 let imageDetails = {
                     imageType: "none",
@@ -227,11 +253,12 @@
                     usePiecharts: self.usePiecharts,
                     useHeatmap: self.useHeatmap,
                     useSizeMap: self.useSizeMap,
+                    useRetailerMap: self.useRetailerMap,
                     selectedPiechartItems: self.selectedPiechartItems,
                     selectedHeatmapField: self.selectedHeatmapField,
                     selectedSizeMapField: self.selectedSizeMapField,
                     imageDetails: imageDetails,
-                    selectedRetailers: self.selectedRetailers
+                    selectedRetailers: self.selectedRetailersFields
                 }
                 if (self.useSizeMap) {
                     self.selectedSizeMapField.forEach(field => {
@@ -256,14 +283,42 @@
                     })
                     pieArr = self.handelPiechartData(tmp.piechart, true)
                 }
+
+                if (self.useRetailerMap) {
+                    self.selectedRetailersFields.forEach(field => {
+                        tmp.retailerMap.push(field)
+
+                    })
+
+                }
                 self.config = item
                 self.heatData = tmp
                 self.pieData = pieArr
-                console.log("pieArr");
-                console.log(pieArr);
+                console.log(tmp);
+
+
 
 
                 self.drawMap(this.labels, item, tmp, pieArr)
+            },
+            buildGraphArr(field, callback) {
+                let self = this
+                console.log(field);
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + `RetailerStore?retailerID=${field}`).then(r => {
+                    console.log(r);
+
+                    let tmp = r.data.retailerStoreList
+                    tmp.forEach(e => {
+                        e.image = process.env.VUE_APP_API + `Retailer/Image?retailerID=${field}`
+                    })
+                    console.log("tmp");
+                    console.log(tmp);
+
+                    callback(tmp)
+                })
             },
             showSelector() {
                 let self = this;
@@ -591,6 +646,52 @@
                 polygonTemplate.nonScalingStroke = true;
 
             },
+            drawRetailerMap(chart, mapData) {
+                // /////////////////////////////////////////////////////
+                // start base retailer store image series
+                // /////////////////////////////////////////////////////
+                let self = this
+                console.log("[RETAILER MAP]starts draw");
+                console.log(mapData);
+                mapData.forEach(r => {
+                    self.buildGraphArr(r, callback => {
+
+                        console.log("callback");
+                        console.log(callback);
+                        let imageSeries = chart.series.push(new am4maps.MapImageSeries());
+                        // define template
+                        let seriesName = null
+                        self.selectedRetailers.forEach(e => {
+                            if (e.value == r) {
+                                seriesName = e.text
+                                console.log(e)
+                            }
+                        })
+                        self.selectedRetailers.where
+                        imageSeries.name = seriesName
+                        imageSeries.data = callback
+
+                        let imageSeriesTemplate = imageSeries.mapImages.template;
+                        imageSeriesTemplate.propertyFields.latitude = "xCoordinate";
+                        imageSeriesTemplate.propertyFields.longitude = "yCoordinate";
+                        imageSeriesTemplate.nonScaling = false
+                        imageSeriesTemplate.fill = "black"
+                        let storeImage = imageSeriesTemplate.createChild(am4core.Image);
+                        storeImage.propertyFields.href = "image";
+                        storeImage.width = 15;
+                        storeImage.height = 15;
+                        storeImage.horizontalCenter = "middle";
+                        storeImage.verticalCenter = "bottom";
+                        storeImage.propertyFields.tooltipText = "name"
+
+                    })
+
+                })
+
+
+
+
+            },
             drawImageSeries(chart) {
                 let self = this
                 // /////////////////////////////////////////////////////
@@ -613,7 +714,7 @@
                 storeImage.height = 15;
                 storeImage.horizontalCenter = "middle";
                 storeImage.verticalCenter = "bottom";
-                storeImage.tooltipText = "PlaceGroup"
+                storeImage.propertyFields.tooltipText = "PlaceGroup"
             },
             drawMajorCitiesImageSeries(chart) {
                 let self = this
@@ -802,7 +903,7 @@
                 // /////////////////////////////////////////////////////
                 let self = this
                 console.log(setupdata);
-                
+
                 self.radius = parseInt(config.heatMapRadius)
                 setupdata.sizeMap.forEach((heatmapItem, idx) => {
                     let imageSeries = chart.series.push(new am4maps.MapImageSeries());
@@ -905,7 +1006,7 @@
                 accrossCitiesImageSeriesTemplate.fill = "black"
 
                 var accrossCitiesCircle = accrossCitiesImageSeriesTemplate.createChild(am4core.Circle);
-                accrossCitiesCircle.fillOpacity= 0.5;
+                accrossCitiesCircle.fillOpacity = 0.5;
                 accrossCitiesCircle.tooltipText = "{city}: [bold]{text}[/]";
                 accrossCitiesCircle.radius = 0
                 let accrossCitiesLabel = accrossCitiesImageSeriesTemplate.createChild(am4core.Label);
@@ -960,6 +1061,9 @@
                 }
                 if (self.lines) {
                     self.drawGridLines(chart)
+                }
+                if (self.useRetailerMap) {
+                    self.drawRetailerMap(chart, setupdata.retailerMap)
                 }
                 // /////////////////////////////////////////////////////
                 // event for plotting stores mostly used for debug
