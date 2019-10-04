@@ -13,19 +13,23 @@
                 <v-btn @click="addRetailerStore" color="grey darken-3">Add</v-btn>
             </v-toolbar>
             <v-card-text class="pa-0" style="height: 600px; overflow: auto;">
-                <Grid :updateRetailerStore="updateRetailerStore" :rowData="retailerStores" ref="Grid" />
+                <Grid :deleteRetailerStore="deleteRetailerStore" :updateRetailerStore="updateRetailerStore"
+                    :rowData="retailerStores" ref="Grid" />
             </v-card-text>
         </v-card>
+        <YesNoModal ref="YesNoModal" />
     </v-dialog>
 
 </template>
 <script>
     import Axios from 'axios'
     import Grid from './Grid'
+    import YesNoModal from '@/components/Common/YesNoModal'
 
     export default {
         components: {
-            Grid
+            Grid,
+            YesNoModal
         },
         data() {
             return {
@@ -82,9 +86,21 @@
 
                 Axios.put(process.env.VUE_APP_API + "RetailerStore", item)
                     .then(r => {
-                        
+
                     })
             },
+            deleteRetailerStore(retailerStore) {
+                let self = this;
+
+                self.$refs.YesNoModal.show("Are you sure that you want to delete this retailer store?", value => {
+                    if (value) {
+                        Axios.delete(process.env.VUE_APP_API + "RetailerStore?retailerStoreID=" + retailerStore.id)
+                            .then(r => {
+                                self.retailerStores.splice(self.retailerStores.indexOf(retailerStore), 1);
+                            })
+                    }
+                })
+            }
         }
     }
 </script>
