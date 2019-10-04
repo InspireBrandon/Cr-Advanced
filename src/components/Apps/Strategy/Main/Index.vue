@@ -29,7 +29,7 @@
                         <v-list-tile @click="openRetailerModal">
                             <v-list-tile-title>Locations</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile>
+                        <v-list-tile @click="LinkRetailerStore">
                             <v-list-tile-title>Link Retailer Stores</v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile>
@@ -135,6 +135,7 @@
         <MapImageModal ref="MapImageModal" />
         <ImportCities ref="ImportCities" />
         <RetailerImportModal ref="RetailerImportModal" />
+        <LinkRetailerStore ref="LinkRetailerStore" />
     </v-card>
 </template>
 
@@ -152,6 +153,7 @@
     import MapImageSelector from "@/components/Apps/Strategy/Map/MapImageSelector"
     import ImportCities from "./ImportCities"
     import Geogrid from './Geogrid'
+    import LinkRetailerStore from './LinkRetailerStores/Index'
 
     import ColorPicker from '@/components/Common/ColorPicker'
     import CustomSelector from './CustomSelector'
@@ -181,7 +183,8 @@
             FileSelector,
             MapImageSelector,
             ImportCities,
-            Geogrid
+            Geogrid,
+            LinkRetailerStore
         },
         data() {
             return {
@@ -227,6 +230,13 @@
             self.getHinterlandStores();
         },
         methods: {
+            LinkRetailerStore() {
+                let self = this;
+
+                self.$refs.LinkRetailerStore.show(() => {
+
+                })
+            },
             openRetailerModal() {
                 let self = this
                 self.$refs.RetailerImportModal.open(callback => {
