@@ -2,9 +2,7 @@
     <v-dialog v-model="dialog" persistent width="800px">
         <v-card>
             <v-toolbar dark flat color="primary">
-                <v-toolbar-title>
-                    Retailers
-                </v-toolbar-title>
+                <v-toolbar-title>Locations</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-btn icon @click="close">
                     <v-icon>close</v-icon>
@@ -12,34 +10,49 @@
             </v-toolbar>
             <v-toolbar dark flat>
                 <v-spacer></v-spacer>
-                <v-btn @click="addRetailer" color="grey darken-3">Add</v-btn>
+                <!-- <v-btn @click="addRetailer" color="grey darken-3">Add</v-btn> -->
             </v-toolbar>
             <v-card-text class="pa-2" style="height: 400px; overflow: auto;">
-                <v-list dense hover>
-                    <template v-for="(retailer, idx) in retailers">
-                        <v-list-tile avatar :key="idx">
-                            <v-list-tile-avatar tile>
-                                <v-img v-if="showImages" @click="openFileDialog(retailer.id)"
-                                    :src="retailerImage(retailer.id)" :lazy-src="retailerImage(retailer.id)"
-                                    aspect-ratio="1" contain></v-img>
-                            </v-list-tile-avatar>
-                            <v-list-tile-content>
-                                <v-list-tile-title> {{ retailer.name }}</v-list-tile-title>
-                            </v-list-tile-content>
-                            <v-spacer></v-spacer>
-                            <v-list-tile-action>
-                                <v-btn @click="modifyRetailerStores(retailer)" flat color="primary" icon>
-                                    <v-icon>edit</v-icon>
-                                </v-btn>
-                            </v-list-tile-action>
-                        </v-list-tile>
-                        <v-divider :key="idx + 'd'"></v-divider>
-                    </template>
-                </v-list>
+                <div v-for="(rg, idx) in retailerGroups" :key="'rg-' + idx">
+                    <div style="display: flex;">
+                        <div class="headline">{{ rg.name }}</div>
+                        <v-btn icon small class="mt-0" @click="addRetailer(rg)">
+                            <v-icon>add</v-icon>
+                        </v-btn>
+                    </div>
+                    <v-list dense hover>
+                        <template v-for="(retailer, idx) in retailers" v-if="retailer.retailerGroupID == rg.id">
+                            <v-list-tile avatar :key="idx">
+                                <v-list-tile-avatar tile>
+                                    <v-img style="cursor: pointer;" v-if="showImages"
+                                        @click="openFileDialog(retailer.id)" :src="retailerImage(retailer.id)"
+                                        :lazy-src="retailerImage(retailer.id)" aspect-ratio="1" contain></v-img>
+                                </v-list-tile-avatar>
+                                <v-list-tile-content>
+                                    <v-list-tile-title> {{ retailer.name }}</v-list-tile-title>
+                                </v-list-tile-content>
+                                <v-spacer></v-spacer>
+                                <v-list-tile-action>
+                                    <div style="display: flex;">
+                                        <v-btn @click="modifyRetailerStores(retailer)" flat color="primary" icon>
+                                            <v-icon>edit</v-icon>
+                                        </v-btn>
+                                        <v-btn style="margin-left: 5px;" @click="deleteRetailer(retailer)" flat
+                                            color="error" icon>
+                                            <v-icon>delete</v-icon>
+                                        </v-btn>
+                                    </div>
+                                </v-list-tile-action>
+                            </v-list-tile>
+                            <v-divider :key="idx + 'd'"></v-divider>
+                        </template>
+                    </v-list>
+                </div>
             </v-card-text>
             <input type="file" style="display: none;" ref="IconInput" @change="onIconImageChange">
             <RetailerStore ref="RetailerStore" />
             <Prompt ref="Prompt" />
+            <YesNoModal ref="YesNoModal" />
         </v-card>
     </v-dialog>
 
@@ -48,6 +61,7 @@
     import Axios from 'axios'
     import RetailerStore from './RetailerStore/Index'
     import Prompt from '@/components/Common/Prompt'
+    import YesNoModal from '@/components/Common/YesNoModal'
 
     export default {
         data() {
@@ -57,12 +71,14 @@
                 callback: null,
                 selected: null,
                 retailers: [],
+                retailerGroups: [],
                 currentRetailer: null
             }
         },
         components: {
             RetailerStore,
-            Prompt
+            Prompt,
+            YesNoModal
         },
         methods: {
             retailerImage(retailerID) {
@@ -73,6 +89,16 @@
             update() {
                 let self = this
                 self.openFileDialog()
+            },
+            getRetailerGroups() {
+                let self = this;
+
+                self.retailerGroups = [];
+
+                Axios.get(process.env.VUE_APP_API + "RetailerGroup")
+                    .then(r => {
+                        self.retailerGroups = r.data.retailerGroupList;
+                    })
             },
             getRetailers() {
                 let self = this
@@ -93,11 +119,12 @@
             },
             open(callback) {
                 let self = this
+                self.getRetailerGroups();
                 self.getRetailers();
                 self.callback = callback
                 self.dialog = true
             },
-            addRetailer() {
+            addRetailer(rg) {
                 let self = this;
 
                 self.$refs.Prompt.show("", "Retailer Name", "Name", name => {
@@ -105,6 +132,7 @@
                         alert("Please specify a name for the retailer.");
                     } else {
                         Axios.post(process.env.VUE_APP_API + "Retailer", {
+                                retailerGroupID: rg.id,
                                 name: name
                             })
                             .then(r => {
@@ -143,6 +171,18 @@
                             self.showImages = true;
                         }, 60);
                     })
+            },
+            deleteRetailer(retailer) {
+                let self = this;
+
+                self.$refs.YesNoModal.show("Are you sure that you want to delete this retailer?", value => {
+                    if (value) {
+                        Axios.delete(process.env.VUE_APP_API + "Retailer?retailerID=" + retailer.id)
+                            .then(r => {
+                                self.retailers.splice(self.retailers.indexOf(retailer), 1);
+                            })
+                    }
+                })
             }
         }
     }

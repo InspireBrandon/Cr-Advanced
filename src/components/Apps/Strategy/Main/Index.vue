@@ -18,9 +18,28 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
-                <v-btn :disabled="!showGrid" @click="customSetup" slot="activator" flat>
-                    Setup
-                </v-btn>
+                <v-menu dark offset-y style="margin-bottom: 10px;">
+                    <v-btn slot="activator" flat>
+                        Setup
+                    </v-btn>
+                    <v-list>
+                        <v-list-tile @click="customSetup">
+                            <v-list-tile-title>Cluster</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="openRetailerModal">
+                            <v-list-tile-title>Locations</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile>
+                            <v-list-tile-title>Link Retailer Stores</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile>
+                            <v-list-tile-title>Link Supplier Stores</v-list-tile-title>
+                        </v-list-tile>
+                        <!-- <v-list-tile @click="openFile">
+                            <v-list-tile-title>Open</v-list-tile-title>
+                        </v-list-tile> -->
+                    </v-list>
+                </v-menu>
                 <!-- <v-menu dark offset-y style="margin-bottom: 10px;">
                     <v-btn @click="customSetup" slot="activator" flat>
                         Setup
@@ -78,8 +97,8 @@
                 <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 200px"
                     placeholder="Select cluster data" :items="dataFields" v-model="selectedDataField"> </v-autocomplete>
             </v-toolbar-items> -->
-            <v-btn color="primary" @click="openMapSetup" v-if="selectedView == 1">Setup Map </v-btn>
-            <v-btn color="primary" @click="openRetailerModal">import</v-btn>
+            <!-- <v-btn color="primary" @click="openMapSetup" v-if="selectedView == 1">Setup Map </v-btn> -->
+            <!-- <v-btn color="primary" @click="openRetailerModal">import</v-btn> -->
             <!-- <v-btn color="primary" @click="openMapImageModal" v-if="selectedView == 1">Setup Map Images</v-btn> -->
             <v-spacer></v-spacer>
 
