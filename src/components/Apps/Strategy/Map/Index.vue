@@ -768,7 +768,7 @@
                 accrossCitiesLabel.nonScaling = false;
 
             },
-            drawRetailerImport(chart) {
+            drawRetailerImport(chart, config) {
                 let self = this
                 // /////////////////////////////////////////////////////
                 //  start draw retailer import
@@ -830,7 +830,7 @@
                         let SupplierCitiesImageSeriesTemplate = SupplierCitiesImageSeries.mapImages.template;
                         SupplierCitiesImageSeriesTemplate.propertyFields.latitude = "x";
                         SupplierCitiesImageSeriesTemplate.propertyFields.longitude = "y";
-                        SupplierCitiesImageSeriesTemplate.nonScaling = false
+                        SupplierCitiesImageSeriesTemplate.nonScaling = true
                         SupplierCitiesImageSeriesTemplate.fill = "black"
 
                         var SupplierCitiesCircle = SupplierCitiesImageSeriesTemplate.createChild(am4core.Circle);
@@ -1044,11 +1044,11 @@
                 // //////////////////////////////////////////////////
 
                 self.drawPolygonseries(chart, screeWidth)
-                self.drawImageSeries(chart)
+                // self.drawImageSeries(chart)
                 self.drawMajorCitiesImageSeries(chart)
                 self.drawMinorCities(chart)
                 if (config.selectedRetailers != undefined && config.selectedRetailers.length > 0) {
-                    self.drawRetailerImport(chart)
+                    self.drawRetailerImport(chart, config)
                 }
                 if (config.useHeatmap) {
                     self.drawHeatMaps(chart, config, setupdata)

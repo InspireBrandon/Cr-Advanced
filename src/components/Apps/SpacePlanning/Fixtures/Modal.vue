@@ -87,7 +87,7 @@
                       label="Spread products:">
                     </v-select>
                   </v-flex>
-                
+
                   <v-flex lg8 md12 sm12 xs12>
                     <v-text-field type="number" label="Cost of Fixture" prefix="R" v-model="form.cost"></v-text-field>
                   </v-flex>
@@ -120,7 +120,7 @@
                     v-if="!form.rendering && (form.type == 2 && (form.fixtureType == 0 || form.fixtureType == 1))">
                     <v-text-field type="number" v-model="form.overhang" label="Overhang:" suffix="cm"></v-text-field>
                   </v-flex>
-                    <v-flex lg8 md12 sm12 xs12
+                  <v-flex lg8 md12 sm12 xs12
                     v-if="form.spreadProducts!='SFE'&&(!form.rendering && form.type == 2 && form.fixtureType != 2 || form.fixtureType==4&&form.type==3)">
                     <v-checkbox hide-details label="Squish" v-model="form.squish"></v-checkbox>
                   </v-flex>
@@ -306,6 +306,10 @@
           {
             text: 'Pegbar',
             value: 3
+          },
+          {
+            text: 'Share box',
+            value: 4
           }
         ],
         subTypes: [{
@@ -472,11 +476,11 @@
         this.form.pegHoleColor = {
           hex: fixture.color
         }
-        if(self.form.squish==true){
-            self.form.spreadProducts='L2R'
+        if (self.form.squish == true) {
+          self.form.spreadProducts = 'L2R'
         }
-        if(self.form.squish!=null&&self.form.spreadProducts!=null){
-         self.form.squish==false
+        if (self.form.squish != null && self.form.spreadProducts != null) {
+          self.form.squish == false
         }
         self.form.pegDiameter = self.form.pegRadius * 2;
 
@@ -599,14 +603,12 @@
       }
     }
   }
-
 </script>
 
 <style>
   .toolbar-title {
     text-align: center;
   }
-
 </style>
 
 
@@ -614,5 +616,4 @@
   .Modal {
     overflow-y: auto;
   }
-
 </style>

@@ -21,7 +21,7 @@
               <v-toolbar dense>
                 <v-toolbar-title class="toolbar-title">Properties</v-toolbar-title>
               </v-toolbar>
-              <v-container grid-list-md>
+              <v-container grid-list-md class="card-height">
                 <v-layout row wrap>
                   <v-flex lg8 md12 sm12 xs12>
                     <v-text-field disabled v-model="newData.name" label="Name:"></v-text-field>
@@ -95,6 +95,30 @@
                     <v-text-field type="number" label="Cost of Fixture" prefix="R" v-model="newData.cost">
                     </v-text-field>
                   </v-flex>
+                  <v-flex lg8 md12 sm12 xs12>
+                    <v-btn @click="addSegment" color="primary">Add segment</v-btn>
+                  </v-flex>
+                  <v-flex lg12 md12 sm12 xs12>
+                    <v-card color="grey darken-4" v-for="(segment, idx) in segments" :key="idx" class="mt-3 pa-1">
+                      <v-card-title class="pa-1">
+                        <div>Segment {{ idx + 1 }}</div>
+                        <v-spacer></v-spacer>
+                        <v-btn icon @click="removeSegment(segment)">
+                          <v-icon>close</v-icon>
+                        </v-btn>
+                      </v-card-title>
+                      <v-card-text class="pa-1">
+                        <v-layout row wrap>
+                          <v-flex md6>
+                            <v-text-field v-model="segment.height" label="Height:"></v-text-field>
+                          </v-flex>
+                          <v-flex md6>
+                            <v-text-field v-model="segment.width" label="Width:"></v-text-field>
+                          </v-flex>
+                        </v-layout>
+                      </v-card-text>
+                    </v-card>
+                  </v-flex>
                 </v-layout>
               </v-container>
             </v-card>
@@ -104,7 +128,7 @@
               <v-toolbar dense>
                 <v-toolbar-title class="toolbar-title">Dimensions</v-toolbar-title>
               </v-toolbar>
-              <v-container grid-list-md>
+              <v-container grid-list-md class="card-height">
                 <v-layout row wrap>
                   <v-flex lg8 md12>
                     <v-text-field type="number" v-model="newData.height" label="Height:" suffix="cm"></v-text-field>
@@ -168,7 +192,7 @@
               <v-toolbar dense>
                 <v-toolbar-title class="toolbar-title">Display</v-toolbar-title>
               </v-toolbar>
-              <v-container style="text-align: center;" grid-list-md>
+              <v-container style="text-align: center;" grid-list-md class="card-height">
                 <v-layout row wrap>
                   <v-expansion-panel v-model="generalPanel" inset expand>
                     <v-expansion-panel-content class="elevation-0">
@@ -400,7 +424,7 @@
           v =>
           v > 0 || "number value must be at least 1"
         ],
-
+        segments: [],
         generalPanel: [true],
         renderingPanel: [false],
         renderingPanel2: [false],
@@ -593,6 +617,16 @@
       EventBus.$off("MODAL_LOAD", this.open);
     },
     methods: {
+      addSegment() {
+        let self = this;
+
+        self.segments.push(new Segment(self.newData.height, self.newData.width, self.segments.length));
+      },
+      removeSegment(segment) {
+        let self = this;
+
+        self.segments.splice(self.segments.indexOf(segment), 1);
+      },
       handleTransparency() {
         let self = this
         self.$nextTick(() => {
@@ -1237,7 +1271,17 @@
       },
     }
   }
+
+  function Segment(totalHeight, width, segmentCount) {
+    let self = this;
+    self.height = totalHeight / (segmentCount + 2);
+    self.width = width;
+  }
 </script>
 
 <style scoped>
+  .card-height {
+    height: calc(100vh - 170px);
+    overflow: auto;
+  }
 </style>
