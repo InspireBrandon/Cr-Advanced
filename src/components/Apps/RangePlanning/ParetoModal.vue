@@ -262,7 +262,7 @@
             return am4core.color("rgb(128,255,0)")
         }
         if (indicator == "NO") {
-            return am4core.color("rgb(255,255,0)")
+            return am4core.color("rgb(255, 0 ,0)")
         }
 
         if (indicator == "SELECT" || indicator == "SELECTED") {

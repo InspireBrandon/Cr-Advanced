@@ -790,23 +790,23 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
     let dos_fac = 0; // getDaysOfSupplyFacings(clusters, clusterType, clusterID, volume_potential, product.depth)
 
     productSales.push(new RangeProduct(product, {
-      sales_retail: sales_retail.toFixed(2),
-      sales_cost: sales_cost.toFixed(2),
+      sales_retail: sales_retail.toFixed(0),
+      sales_cost: sales_cost.toFixed(0),
       sales_units: sales_units.toFixed(0),
-      sales_profit: sales_profit.toFixed(2),
-      stock_units: stock_units.toFixed(2),
-      stock_cost: stock_cost.toFixed(2),
-      number_distribution: number_distribution.toFixed(2),
-      weighted_distribution: weighted_distribution.toFixed(2),
-      sales_potential: sales_potential.toFixed(2),
-      volume_potential: volume_potential.toFixed(2),
-      profit_potential: profit_potential.toFixed(2),
+      sales_profit: sales_profit.toFixed(0),
+      stock_units: stock_units.toFixed(0),
+      stock_cost: stock_cost.toFixed(0),
+      number_distribution: number_distribution.toFixed(0),
+      weighted_distribution: weighted_distribution.toFixed(0),
+      sales_potential: sales_potential.toFixed(0),
+      volume_potential: volume_potential.toFixed(0),
+      profit_potential: profit_potential.toFixed(0),
       item_sales_rank: item_sales_rank,
       item_volume_rank: item_volume_rank,
       item_profit_rank: item_profit_rank,
       sales_potential_rank: sales_potential_rank,
       volume_potential_rank: volume_potential_rank,
-      dos_fac: dos_fac.toFixed(1)
+      dos_fac: dos_fac.toFixed(0)
     }, getProductIndicator(product.productID, storeSales, stores)))
   }
 
@@ -920,27 +920,27 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
     let dos_fac = (autoRangeData == undefined || autoRangeData == null) ? 0 : getDaysOfSupplyPerX(autoRangeData.dos_units, clusters, clusterType, clusterID, volume_potential)
 
     productSales.push(new RangeProduct(product, {
-      sales_retail: parseFloat(sales_retail.toFixed(2)),
-      sales_cost: sales_cost.toFixed(2),
+      sales_retail: parseFloat(sales_retail.toFixed(0)),
+      sales_cost: sales_cost.toFixed(0),
       sales_units: parseFloat(sales_units.toFixed(0)),
-      sales_profit: parseFloat(sales_profit.toFixed(2)),
-      stock_units: parseFloat(stock_units.toFixed(2)),
-      stock_cost: parseFloat(stock_cost.toFixed(2)),
-      number_distribution: number_distribution.toFixed(2),
-      weighted_distribution: weighted_distribution.toFixed(2),
-      sales_potential: parseFloat(sales_potential.toFixed(2)),
-      volume_potential: Math.round(parseFloat(volume_potential.toFixed(2))),
-      profit_potential: parseFloat(profit_potential.toFixed(2)),
-      cost_potential: parseFloat(cost_potential.toFixed(2)),
+      sales_profit: parseFloat(sales_profit.toFixed(0)),
+      stock_units: parseFloat(stock_units.toFixed(0)),
+      stock_cost: parseFloat(stock_cost.toFixed(0)),
+      number_distribution: number_distribution.toFixed(0),
+      weighted_distribution: weighted_distribution.toFixed(0),
+      sales_potential: parseFloat(sales_potential.toFixed(0)),
+      volume_potential: Math.round(parseFloat(volume_potential.toFixed(0))),
+      profit_potential: parseFloat(profit_potential.toFixed(0)),
+      cost_potential: parseFloat(cost_potential.toFixed(0)),
       item_sales_rank: item_sales_rank,
       item_volume_rank: item_volume_rank,
       item_profit_rank: item_profit_rank,
       sales_potential_rank: sales_potential_rank,
       volume_potential_rank: volume_potential_rank,
       profit_potential_rank: profit_potential_rank,
-      dos_fac: dos_fac.toFixed(1),
-      gross_profit: parseFloat(gross_profit.toFixed(2)),
-      markup: markup.toFixed(2),
+      dos_fac: dos_fac.toFixed(0),
+      gross_profit: parseFloat(gross_profit.toFixed(0)),
+      markup: markup.toFixed(0),
       sales_contribution: parseFloat(sales_contribution.toFixed(0)),
       units_contribution: parseFloat(units_contribution.toFixed(0)),
       profit_contribution: parseFloat(profit_contribution.toFixed(0))
@@ -1051,6 +1051,9 @@ function RangeProduct(productData, salesData, indicator) {
     self[prop] = productData[prop]
   }
 
+  // self.height = parseInt(productData.height);
+  // self.width = parseInt(productData.width);
+  // self.depth = parseInt(productData.depth);
   self.sales_Retail = salesData.sales_retail;
   self.sales_Cost = salesData.sales_cost;
   self.sales_Units = salesData.sales_units;

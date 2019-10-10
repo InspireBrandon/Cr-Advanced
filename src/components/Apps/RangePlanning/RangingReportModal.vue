@@ -70,6 +70,20 @@
                                 <td>{{ reportData.current.stock_on_hand_cost.selected_stores }}</td>
                                 <td>{{ reportData.current.stock_on_hand_cost.discontinued }}</td>
                             </tr>
+                            <tr>
+                                <td>Stock Turn</td>
+                                <td>{{ reportData.current.stock_on_hand_cost.total_category }}</td>
+                                <td>{{ reportData.current.stock_on_hand_cost.items_selected }}</td>
+                                <td>{{ reportData.current.stock_on_hand_cost.selected_stores }}</td>
+                                <td>{{ reportData.current.stock_on_hand_cost.discontinued }}</td>
+                            </tr>
+                            <tr>
+                                <td>Days Cover</td>
+                                <td>{{ reportData.current.stock_on_hand_cost.total_category }}</td>
+                                <td>{{ reportData.current.stock_on_hand_cost.items_selected }}</td>
+                                <td>{{ reportData.current.stock_on_hand_cost.selected_stores }}</td>
+                                <td>{{ reportData.current.stock_on_hand_cost.discontinued }}</td>
+                            </tr>
                         </tbody>
                     </table>
                     <v-divider class="my-2"></v-divider>
@@ -122,13 +136,6 @@
                         </tbody>
                     </table>
                 </v-card-text>
-
-                <!-- <v-divider></v-divider>
-
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="primary" flat @click="dialog = false">Print</v-btn>
-                </v-card-actions> -->
             </v-card>
         </v-dialog>
     </div>

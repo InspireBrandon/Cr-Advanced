@@ -5,7 +5,7 @@
             <v-spacer></v-spacer>
             <v-toolbar-title>Planogram Implementation</v-toolbar-title>
         </v-toolbar>
-        <v-container fluid grid-list-md>
+        <v-container fluid grid-list-md style="height: calc(100vh - 104px); overflow: auto;">
             <v-layout row wrap>
                 <v-flex xl7 lg7 md12 sm12 xs12>
                     <v-flex v-if="authorityType == 0 && routeProjectID == null" xl6 lg6 md6 sm12 xs12>

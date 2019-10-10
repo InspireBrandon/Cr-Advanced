@@ -41,7 +41,8 @@
                     "Brand",
                     "Manufacturer",
                     "Planogram",
-                    "Department"
+                    "Department",
+                    "Region"
                 ],
                 field: null,
                 categories: [],

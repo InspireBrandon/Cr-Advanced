@@ -112,6 +112,9 @@
                 <v-btn class="elevation-0" style="width: 100px" round color="primary">
                     Geogrid
                 </v-btn>
+                <v-btn class="elevation-0" style="width: 100px" round color="primary">
+                    Map 2
+                </v-btn>
                 <!-- <v-btn class="elevation-0" style="width: 100px" round color="primary">
                     Model
                 </v-btn> -->
@@ -123,6 +126,13 @@
             ref="Map" />
         <Geogrid :geoGridData="geoGridData" v-if="selectedView == 2" ref="Geogrid" />
         <!-- <ClusterModels :fileData="rowData" v-if="selectedView == 2" ref="ClusterModels" /> -->
+
+        <div v-if="selectedView == 3">
+            <iframe src='https://app.mapline.com/map/map_384ed598/DTAUTS5CP0cUKxF5Pz91Pz8jTD9mVV9hPz9FdT9SPz8UPz8UPz'
+                style='width:100%;height:700px;'></iframe>
+            <div style='font-size: 10px;'><a href='https://mapline.com' target='_blank'>Mapping by Mapline</a></div>
+        </div>
+
         <Setup ref="Setup" />
         <CustomSetup ref="CustomSetup" />
         <Spinner ref="Spinner" />

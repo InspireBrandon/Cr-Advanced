@@ -10,7 +10,8 @@
             </v-toolbar>
             <v-toolbar dark flat>
                 <v-spacer></v-spacer>
-                <v-btn @click="addRetailerStore" color="grey darken-3">Add</v-btn>
+                <v-btn @click="uploadMany" color="grey darken-3">Add Many</v-btn>
+                <v-btn @click="addRetailerStore" color="grey darken-3">Add Single</v-btn>
             </v-toolbar>
             <v-card-text class="pa-0" style="height: 600px; overflow: auto;">
                 <Grid :deleteRetailerStore="deleteRetailerStore" :updateRetailerStore="updateRetailerStore"
@@ -18,6 +19,7 @@
             </v-card-text>
         </v-card>
         <YesNoModal ref="YesNoModal" />
+        <CopyPasteModal ref="CopyPasteModal" />
     </v-dialog>
 
 </template>
@@ -25,11 +27,13 @@
     import Axios from 'axios'
     import Grid from './Grid'
     import YesNoModal from '@/components/Common/YesNoModal'
+    import CopyPasteModal from '../CopyPasteModal'
 
     export default {
         components: {
             Grid,
-            YesNoModal
+            YesNoModal,
+            CopyPasteModal
         },
         data() {
             return {
@@ -73,6 +77,13 @@
                     .then(r => {
                         self.retailerStores.unshift(r.data.retailerStore);
                     })
+            },
+            uploadMany() {
+                let self = this;
+                
+                self.$refs.CopyPasteModal.open(data => {
+                    console.log(data);
+                })
             },
             updateRetailerStore(e) {
                 let self = this;

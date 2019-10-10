@@ -497,7 +497,8 @@
         if (self.fileData.useType == "CLUSTER")
           type = "CLUSTER"
 
-        Axios.get(process.env.VUE_APP_API + "HelpFile?systemComponent=" + "RANGE - " + type + " - " + self.fileData.planogramID)
+        Axios.get(process.env.VUE_APP_API + "HelpFile?systemComponent=" + "RANGE - " + type + " - " + self.fileData
+            .planogramID)
           .then(r => {
             if (r.data.success) {
               self.note = r.data.helpFile.html;
@@ -1784,6 +1785,7 @@
     self.gross_profit = new RangeReportRow(data, type, 'gross_profit', 'percent');
     self.stock_on_hand_units = new RangeReportRow(data, type, 'stock_on_hand_units', 'number');
     self.stock_on_hand_cost = new RangeReportRow(data, type, 'stock_on_hand_cost', 'money');
+    self.stock_turn = new RangeReportRow(data, type, 'stock_turn', 'decimal');
   }
 
   function RangeReportRow(rowData, report_type, type, format) {
@@ -1899,6 +1901,19 @@
           self.discontinued += parseFloat(productData.stock_Cost.toFixed(2));
       }
       break;
+      // case 'stock_turn': {
+      //   self.stock_turn = parseFloat(productData.stock_Cost.toFixed(2));
+
+      //   if (productData.store_Range_Indicator == 'YES')
+      //     self.items_selected += parseFloat(productData.stock_Cost.toFixed(2));
+
+      //   if (productData.store_Range_Indicator == 'SELECT')
+      //     self.selected_stores += parseFloat(productData.stock_Cost.toFixed(2));
+
+      //   if (productData.store_Range_Indicator == 'NO')
+      //     self.discontinued += parseFloat(productData.stock_Cost.toFixed(2));
+      // }
+      // break;
       }
     })
 
@@ -1921,7 +1936,15 @@
       self.total_category = self.total_category.toFixed(2) + '%';
       self.items_selected = +self.items_selected.toFixed(2) + '%';
       self.selected_stores = +self.selected_stores.toFixed(2) + '%';
-      self.discontinued = +self.discontinued.toFixed(2) + '%';
+      self.discontinued = self.discontinued.toFixed(2) + '%';
+    }
+    break;
+    case 'decimal': {
+      self.total_category = self.total_category.toFixed(2) + '%';
+      self.items_selected = +self.items_selected.toFixed(2) + '%';
+      self.selected_stores = +self.selected_stores.toFixed(2) + '%';
+      self.discontinued = self.discontinued.toFixed(2) + '%';
+      // self.stock_turn = self.stock_turn.toFixed(2);
     }
     break;
     }
