@@ -19,6 +19,12 @@
                         <v-btn icon small class="mt-0" @click="addRetailer(rg)">
                             <v-icon>add</v-icon>
                         </v-btn>
+                        <v-btn icon small flat color="primary" class="mt-0" @click="editGroup(rg)">
+                            <v-icon>edit</v-icon>
+                        </v-btn>
+                        <v-btn icon small flat color="error" class="mt-0" @click="deleteGroup(rg)">
+                            <v-icon>delete</v-icon>
+                        </v-btn>
                     </div>
                     <v-list dense hover>
                         <template v-for="(retailer, idx) in retailers" v-if="retailer.retailerGroupID == rg.id">
@@ -167,6 +173,30 @@
                 let self = this
                 self.dialog = false
                 self.callback()
+            },
+            editGroup(group) {
+                let self = this
+                console.log(group);
+                self.$refs.Prompt.show("", "Location Group Name", "Name", name => {
+                    if (name == "") {
+                        alert("Please specify a name for the location group.");
+                    } else {
+                        group.name = name
+                        Axios.put(process.env.VUE_APP_API + "RetailerGroup", group)
+                            .then(r => {})
+                            .catch(e => {
+                                console.error(e);
+                            })
+                    }
+                })
+            },
+            deleteGroup(group) {
+                let self = this
+                Axios.delete(process.env.VUE_APP_API + `RetailerGroup?retailerGroupID=${group.id}`)
+                    .then(r => {
+                        self.getRetailerGroups();
+                        self.getRetailers();
+                    })
             },
             openFileDialog(retailerID) {
                 let self = this;
