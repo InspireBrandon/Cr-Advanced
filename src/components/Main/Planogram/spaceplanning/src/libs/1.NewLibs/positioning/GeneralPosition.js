@@ -553,6 +553,195 @@ class GeneralPosition {
       }
     }
     break;
+    case "SHAREBOX": {
+      // let squish = parent.GetSquishValue(parent.ID);
+
+      let x = merchOffset;
+      sortedArr.forEach((item, idx) => {
+        item.Position = idx + 1;
+        item.Group.setX(x);
+        item.LastPositionRelative = item.Group.position();
+        item.LastPositionAbsolute = item.Group.getAbsolutePosition();
+
+        if (item.Type == "PRODUCT") {
+          let actualWidth = item.Orientation_Width * item.Facings_X;
+          x += ((actualWidth - (item.Facings_X))) + 0.1;
+        } else {
+          let actualWidth = item.TotalWidth;
+          x += (actualWidth) + 0.1;
+        }
+
+      });
+
+      if (currentItem != null) {
+        let y = parent.Group.getHeight() - (currentItem.TotalHeight);
+        currentItem.Group.setY(y);
+
+        currentItem.LastPositionRelative = currentItem.Group.position();
+        currentItem.LastPositionAbsolute = currentItem.Group.getAbsolutePosition();
+      }
+
+      // switch (spreadType.toUpperCase()) {
+      //   case "L2R": {
+      //     let squish = parent.GetSquishValue(parent.ID);
+
+      //     let x = merchOffset;
+      //     sortedArr.forEach((item, idx) => {
+      //       item.Position = idx + 1;
+      //       item.Group.setX(x);
+      //       item.LastPositionRelative = item.Group.position();
+      //       item.LastPositionAbsolute = item.Group.getAbsolutePosition();
+
+      //       if (item.Type == "PRODUCT") {
+      //         let actualWidth = item.Orientation_Width * item.Facings_X;
+      //         x += ((actualWidth - (item.Facings_X * squish))) + 0.1;
+      //       } else {
+      //         let actualWidth = item.TotalWidth;
+      //         x += (actualWidth) + 0.1;
+      //       }
+
+      //     });
+
+      //     if (currentItem != null) {
+      //       let y = parent.Group.getHeight() - (currentItem.TotalHeight);
+      //       currentItem.Group.setY(y);
+
+      //       currentItem.LastPositionRelative = currentItem.Group.position();
+      //       currentItem.LastPositionAbsolute = currentItem.Group.getAbsolutePosition();
+      //     }
+      //   }
+      //   break;
+      // case "R2L": {
+      //   let x = parent.TotalWidth - merchOffset;
+      //   sortedArr.reverse();
+      //   sortedArr.forEach((item, idx) => {
+      //     x -= item.TotalWidth + 0.1;
+      //     item.Position = idx + 1;
+      //     item.Group.setX(x);
+      //     item.LastPositionRelative = item.Group.position();
+      //     item.LastPositionAbsolute = item.Group.getAbsolutePosition();
+      //   });
+
+      //   if (currentItem != null) {
+      //     let y = parent.Group.getHeight() - (currentItem.TotalHeight);
+      //     currentItem.Group.setY(y);
+
+      //     currentItem.LastPositionRelative = currentItem.Group.position();
+      //     currentItem.LastPositionAbsolute = currentItem.Group.getAbsolutePosition();
+      //   }
+      // }
+      // break;
+      // case "SE": {
+      //   let x = merchOffset;
+      //   let totalItemWidths = 0;
+      //   let totalItems = 0;
+      //   let parentWidth = parent.TotalWidth;
+      //   let spacing = 0;
+
+      //   if (sortedArr.length > 1) {
+      //     totalItems = sortedArr.length - 1;
+      //   } else {
+      //     totalItems = 1;
+      //   }
+
+      //   sortedArr.forEach((item) => {
+      //     totalItemWidths += item.TotalWidth;
+      //   });
+
+      //   spacing = (parentWidth - totalItemWidths) / totalItems;
+
+      //   // x = spacing;
+      //   sortedArr.forEach((item, idx) => {
+
+      //     item.Position = idx + 1;
+      //     item.Group.setX(x);
+      //     item.LastPositionRelative = item.Group.position();
+      //     item.LastPositionAbsolute = item.Group.getAbsolutePosition();
+
+      //     x += (item.TotalWidth) + spacing;
+      //   });
+
+      //   if (currentItem != null) {
+      //     let y = parent.Group.getHeight() - (currentItem.TotalHeight);
+      //     currentItem.Group.setY(y);
+
+      //     currentItem.LastPositionRelative = currentItem.Group.position();
+      //     currentItem.LastPositionAbsolute = currentItem.Group.getAbsolutePosition();
+      //   }
+
+      // }
+      // break;
+      // case "SFE": {
+      //   let x = merchOffset;
+      //   let spacing = 0;
+
+      //   spacing = parent.GetSpreadSpacing(parent.ID);
+      //   // squish = parent.GetSpreadSpacing(parent.ID);
+
+      //   parent.TotalChildren.sort((a, b) => a.Item.Group.getX() - b.Item.Group.getX())
+
+      //   parent.TotalChildren.forEach((item, idx) => {
+      //     let groupWidth = (item.Width * item.Count) + ((item.Count - 1) * (spacing));
+
+      //     item.Item.Position = idx + 1;
+
+      //     item.Item.Group.setX(x);
+      //     item.Item.LastPositionRelative = item.Item.Group.position();
+      //     item.Item.LastPositionAbsolute = item.Item.Group.getAbsolutePosition();
+
+      //     x = x + groupWidth + (spacing);
+      //   });
+
+      //   if (currentItem != null) {
+      //     let y = parent.Group.getHeight() - (currentItem.TotalHeight);
+      //     currentItem.Group.setY(y);
+
+      //     currentItem.LastPositionRelative = currentItem.Group.position();
+      //     currentItem.LastPositionAbsolute = currentItem.Group.getAbsolutePosition();
+      //   }
+      // }
+      // break;
+      // case "PWD": {
+      //   if (currentItem != null) {
+      //     let y = parent.Group.getHeight() - (currentItem.TotalHeight);
+      //     currentItem.Group.setY(y);
+
+      //     currentItem.LastPositionRelative = currentItem.Group.position();
+      //     currentItem.LastPositionAbsolute = currentItem.Group.getAbsolutePosition();
+      //   }
+      // }
+      // break;
+      // default: {
+      //   let squish = parent.GetSquishValue(parent.ID);
+
+      //   let x = merchOffset;
+      //   sortedArr.forEach((item, idx) => {
+      //     let actualWidth = item.Orientation_Width * item.Facings_X;
+      //     item.Position = idx + 1;
+      //     item.Group.setX(x);
+      //     item.LastPositionRelative = item.Group.position();
+      //     item.LastPositionAbsolute = item.Group.getAbsolutePosition();
+
+      //     if (item.Type == "PRODUCT") {
+      //       x += ((actualWidth - (item.Facings_X * squish))) + 0.1;
+      //     } else {
+      //       x += (actualWidth - (item.Facings_X * squish)) + 0.1;
+      //     }
+
+      //   });
+
+      //   if (currentItem != null) {
+      //     let y = parent.Group.getHeight() - (currentItem.TotalHeight);
+      //     currentItem.Group.setY(y);
+
+      //     currentItem.LastPositionRelative = currentItem.Group.position();
+      //     currentItem.LastPositionAbsolute = currentItem.Group.getAbsolutePosition();
+      //   }
+      // }
+      // break;
+      // }
+    }
+    break;
     case "PEG": {
       if (currentItem != null) {
         let y = parent.Group.getHeight() - (currentItem.TotalHeight);
@@ -1019,6 +1208,11 @@ class GeneralPosition {
         return retVal;
       }
       case "BASKET": {
+        retVal.y = productGroup.Group.getHeight() - ((yFacings + 1) * productGroup.Orientation_Height);
+        retVal.x = (xFacings * productGroup.Orientation_Width);
+        return retVal;
+      }
+      case "SHAREBOX": {
         retVal.y = productGroup.Group.getHeight() - ((yFacings + 1) * productGroup.Orientation_Height);
         retVal.x = (xFacings * productGroup.Orientation_Width);
         return retVal;

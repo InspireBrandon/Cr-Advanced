@@ -67,57 +67,51 @@ class StoreHelper {
     let self = this;
 
     switch (item.Type.toUpperCase()) {
-      case "PRODUCT":
-        {
-          // remove the product from active product list
-          VueStore.commit('removeActivePlanogramProduct', item);
-        }
-        break;
-      case "GONDOLA":
-        {
-          self.removeRecursive(VueStore, item.ID);
-        }
-        break;
-      case "PALETTE":
-        {
-          self.removeRecursive(VueStore, item.ID);
-        }
-        break;
-      case "BASE":
-        {
-          self.removeRecursive(VueStore, item.ID);
-        }
-        break;
-      case "SHELF":
-        {
-          self.removeRecursive(VueStore, item.ID);
-        }
-        break;
-      case "PEGBAR":
-        {
-          self.removeRecursive(VueStore, item.ID);
-        }
-        break;
-      case "PEGBOARD":
-        {
-          self.removeRecursive(VueStore, item.ID);
-        }
-        break;
-      case "BASKET":
-        {
-          self.removeRecursive(VueStore, item.ID);
-        }
-        break;
-      case "DIVIDER":
-        {
-          self.removeRecursive(VueStore, item.ID);
-        }
-        break;
-        case "TEXTHEADER":
-        {
-          self.removeRecursive(VueStore, item.ID);
-        }
-        break;
+      case "PRODUCT": {
+        // remove the product from active product list
+        VueStore.commit('removeActivePlanogramProduct', item);
+      }
+      break;
+    case "GONDOLA": {
+      self.removeRecursive(VueStore, item.ID);
+    }
+    break;
+    case "PALETTE": {
+      self.removeRecursive(VueStore, item.ID);
+    }
+    break;
+    case "BASE": {
+      self.removeRecursive(VueStore, item.ID);
+    }
+    break;
+    case "SHELF": {
+      self.removeRecursive(VueStore, item.ID);
+    }
+    break;
+    case "PEGBAR": {
+      self.removeRecursive(VueStore, item.ID);
+    }
+    break;
+    case "PEGBOARD": {
+      self.removeRecursive(VueStore, item.ID);
+    }
+    break;
+    case "BASKET": {
+      self.removeRecursive(VueStore, item.ID);
+    }
+    break;
+    case "SHAREBOX": {
+      self.removeRecursive(VueStore, item.ID);
+    }
+    break;
+    case "DIVIDER": {
+      self.removeRecursive(VueStore, item.ID);
+    }
+    break;
+    case "TEXTHEADER": {
+      self.removeRecursive(VueStore, item.ID);
+    }
+    break;
     }
 
     VueStore.commit('removePlanogramItem', item);

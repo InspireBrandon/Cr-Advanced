@@ -100,236 +100,346 @@ class PositioningBase {
 
       //#region Position each child ROOT group
       switch (fixture.Type.toUpperCase()) {
-        case "SHELF":
-          {
-            console.log("[POSITIONING] ALL CHILDREN IN " + fixture.Type.toUpperCase());
-            if (previousItem == null) {
-              if (element.constructor.name == "ProductGroup") {
-                x = groupX;
+        case "SHELF": {
+          console.log("[POSITIONING] ALL CHILDREN IN " + fixture.Type.toUpperCase());
+          if (previousItem == null) {
+            if (element.constructor.name == "ProductGroup") {
+              x = groupX;
+              y = fixture.ClientRect.getY()
+
+            } else if (element.constructor.name == "Basket") {
+              x = groupX;
+              y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
+
+            }
+
+            else if (element.constructor.name == "Sharebox") {
+              x = groupX;
+              y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
+
+            }
+          } else {
+
+            if (element.constructor.name == "ProductGroup") {
+
+              if (previousItem.constructor.name == "ProductGroup") {
+                x = (previousItem.Group.getX() + previousItem.TotalWidth);
                 y = fixture.ClientRect.getY()
 
-              } else if (element.constructor.name == "Basket") {
-                x = groupX;
+              } else if (previousItem.constructor.name == "Basket") {
+                x = (previousItem.Group.getX() + previousItem.Group.getWidth());
+                y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (previousItem.FixtureData.height * element.Ratio))
+
+              }
+
+              else if (previousItem.constructor.name == "Sharebox") {
+                x = (previousItem.Group.getX() + previousItem.Group.getWidth());
+                y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (previousItem.FixtureData.height * element.Ratio))
+
+              }
+
+            } else if (element.constructor.name == "Basket") {
+
+              if (previousItem.constructor.name == "ProductGroup") {
+                x = (previousItem.Group.getX() + previousItem.TotalWidth);
+                y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
+
+              } else if (previousItem.constructor.name == "Basket") {
+                x = (previousItem.Group.getX() + previousItem.Group.getWidth());
                 y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
 
               }
-            } else {
+            } else if (element.constructor.name == "Sharebox") {
 
-              if (element.constructor.name == "ProductGroup") {
+              if (previousItem.constructor.name == "ProductGroup") {
+                x = (previousItem.Group.getX() + previousItem.TotalWidth);
+                y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
 
-                if (previousItem.constructor.name == "ProductGroup") {
-                  x = (previousItem.Group.getX() + previousItem.TotalWidth);
-                  y = fixture.ClientRect.getY()
-
-                } else if (previousItem.constructor.name == "Basket") {
-                  x = (previousItem.Group.getX() + previousItem.Group.getWidth());
-                  y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (previousItem.FixtureData.height * element.Ratio))
-
-                }
-
-              } else if (element.constructor.name == "Basket") {
-
-                if (previousItem.constructor.name == "ProductGroup") {
-                  x = (previousItem.Group.getX() + previousItem.TotalWidth);
-                  y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
-
-                } else if (previousItem.constructor.name == "Basket") {
-                  x = (previousItem.Group.getX() + previousItem.Group.getWidth());
-                  y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
-
-                }
-              }
-            }
-
-            if (element.constructor.name == "ProductGroup") {
-              element.Group.position({
-                x: x,
-                y: y
-              });
-            } else if (element.constructor.name == "Basket") {
-              element.Group.position({
-                x: x,
-                y: y
-              });
-
-              element.ClientRect.destroy();
-              element.ClientRect = null;
-              element.AddClientRect();
-            }
-          }
-          break;
-        case "BASE":
-          {
-            console.log("[POSITIONING] ALL CHILDREN IN " + fixture.Type.toUpperCase());
-            if (previousItem == null) {
-              if (element.constructor.name == "ProductGroup") {
-                x = groupX;
-                y = fixture.ClientRect.getY()
-
-              } else if (element.constructor.name == "Basket") {
-                x = groupX;
+              } else if (previousItem.constructor.name == "Sharebox") {
+                x = (previousItem.Group.getX() + previousItem.Group.getWidth());
                 y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
 
               }
-            } else {
-
-              if (element.constructor.name == "ProductGroup") {
-
-                if (previousItem.constructor.name == "ProductGroup") {
-                  x = (previousItem.Group.getX() + previousItem.TotalWidth);
-                  y = fixture.ClientRect.getY()
-
-                } else if (previousItem.constructor.name == "Basket") {
-                  x = (previousItem.Group.getX() + previousItem.Group.getWidth());
-                  y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (previousItem.FixtureData.height * element.Ratio))
-
-                }
-
-              } else if (element.constructor.name == "Basket") {
-
-                if (previousItem.constructor.name == "ProductGroup") {
-                  x = (previousItem.Group.getX() + previousItem.TotalWidth);
-                  y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
-
-                } else if (previousItem.constructor.name == "Basket") {
-                  x = (previousItem.Group.getX() + previousItem.Group.getWidth());
-                  y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
-
-                }
-              }
-            }
-
-            if (element.constructor.name == "ProductGroup") {
-              element.Group.position({
-                x: x,
-                y: y
-              });
-            } else if (element.constructor.name == "Basket") {
-              element.Group.position({
-                x: x,
-                y: y
-              });
-
-              element.ClientRect.destroy();
-              element.ClientRect = null;
-              element.AddClientRect();
             }
           }
-          break;
-        case "PEGBAR":
-          {
-            console.log("[POSITIONING] ALL CHILDREN IN " + fixture.Type.toUpperCase());
 
-            if (previousItem == null) {
-              if (element.constructor.name == "ProductGroup") {
-                x = groupX;
-                y = fixture.ClientRect.getY()
+          if (element.constructor.name == "ProductGroup") {
+            element.Group.position({
+              x: x,
+              y: y
+            });
+          } else if (element.constructor.name == "Basket") {
+            element.Group.position({
+              x: x,
+              y: y
+            });
 
-              } else if (element.constructor.name == "Basket") {
-                x = groupX;
-                y = fixture.ClientRect.getY()
+            element.ClientRect.destroy();
+            element.ClientRect = null;
+            element.AddClientRect();
+          } else if (element.constructor.name == "Sharebox") {
+            element.Group.position({
+              x: x,
+              y: y
+            });
 
-              }
-            } else {
+            element.ClientRect.destroy();
+            element.ClientRect = null;
+            element.AddClientRect();
+          }
+        }
+        break;
+      case "BASE": {
+        console.log("[POSITIONING] ALL CHILDREN IN " + fixture.Type.toUpperCase());
+        if (previousItem == null) {
+          if (element.constructor.name == "ProductGroup") {
+            x = groupX;
+            y = fixture.ClientRect.getY()
 
-              if (element.constructor.name == "ProductGroup") {
+          } else if (element.constructor.name == "Basket") {
+            x = groupX;
+            y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
 
-                if (previousItem.constructor.name == "ProductGroup") {
-                  x = (previousItem.Group.getX() + previousItem.TotalWidth);
-                  y = fixture.ClientRect.getY()
+          } else if (element.constructor.name == "Sharebox") {
+            x = groupX;
+            y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
 
-                } else if (previousItem.constructor.name == "Basket") {
-                  x = (previousItem.Group.getX() + previousItem.Group.getWidth());
-                  y = fixture.ClientRect.getY()
+          }
+        } else {
 
-                }
+          if (element.constructor.name == "ProductGroup") {
 
-              } else if (element.constructor.name == "Basket") {
+            if (previousItem.constructor.name == "ProductGroup") {
+              x = (previousItem.Group.getX() + previousItem.TotalWidth);
+              y = fixture.ClientRect.getY()
 
-                if (previousItem.constructor.name == "ProductGroup") {
-                  x = (previousItem.Group.getX() + previousItem.TotalWidth);
-                  y = fixture.ClientRect.getY()
+            } else if (previousItem.constructor.name == "Basket") {
+              x = (previousItem.Group.getX() + previousItem.Group.getWidth());
+              y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (previousItem.FixtureData.height * element.Ratio))
 
-                } else if (previousItem.constructor.name == "Basket") {
-                  x = (previousItem.Group.getX() + previousItem.Group.getWidth());
-                  y = fixture.ClientRect.getY()
+            } else if (previousItem.constructor.name == "Sharebox") {
+              x = (previousItem.Group.getX() + previousItem.Group.getWidth());
+              y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (previousItem.FixtureData.height * element.Ratio))
 
-                }
-              }
             }
 
-            if (element.constructor.name == "ProductGroup") {
-              element.Group.position({
-                x: x,
-                y: y
-              });
-            } else if (element.constructor.name == "Basket") {
-              element.Group.position({
-                x: x,
-                y: y
-              });
+          } else if (element.constructor.name == "Basket") {
 
-              element.ClientRect.destroy();
-              element.ClientRect = null;
-              element.AddClientRect();
+            if (previousItem.constructor.name == "ProductGroup") {
+              x = (previousItem.Group.getX() + previousItem.TotalWidth);
+              y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
+
+            } else if (previousItem.constructor.name == "Basket") {
+              x = (previousItem.Group.getX() + previousItem.Group.getWidth());
+              y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
+
+            }
+          } else if (element.constructor.name == "Sharebox") {
+
+            if (previousItem.constructor.name == "ProductGroup") {
+              x = (previousItem.Group.getX() + previousItem.TotalWidth);
+              y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
+
+            } else if (previousItem.constructor.name == "Sharebox") {
+              x = (previousItem.Group.getX() + previousItem.Group.getWidth());
+              y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
+
             }
           }
-          break;
-        case "BASKET":
-          {
-            console.log("[POSITIONING] ALL CHILDREN IN " + fixture.Type.toUpperCase());
+        }
 
-            if (previousItem == null) {
-              if (element.constructor.name == "ProductGroup") {
-                x = groupX;
-                y = fixture.ClientRect.getY()
+        if (element.constructor.name == "ProductGroup") {
+          element.Group.position({
+            x: x,
+            y: y
+          });
+        } else if (element.constructor.name == "Basket") {
+          element.Group.position({
+            x: x,
+            y: y
+          });
 
-              } else if (element.constructor.name == "Basket") {
-                x = groupX;
-                y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
+          element.ClientRect.destroy();
+          element.ClientRect = null;
+          element.AddClientRect();
+        } else if (element.constructor.name == "Sharebox") {
+          element.Group.position({
+            x: x,
+            y: y
+          });
 
-              }
-            } else {
+          element.ClientRect.destroy();
+          element.ClientRect = null;
+          element.AddClientRect();
+        }
+      }
+      break;
+      case "PEGBAR": {
+        console.log("[POSITIONING] ALL CHILDREN IN " + fixture.Type.toUpperCase());
 
-              if (element.constructor.name == "ProductGroup") {
+        if (previousItem == null) {
+          if (element.constructor.name == "ProductGroup") {
+            x = groupX;
+            y = fixture.ClientRect.getY()
 
-                if (previousItem.constructor.name == "ProductGroup") {
-                  x = (previousItem.Group.getX() + previousItem.TotalWidth);
-                  y = fixture.ClientRect.getY()
+          } else if (element.constructor.name == "Basket") {
+            x = groupX;
+            y = fixture.ClientRect.getY()
 
-                } else if (previousItem.constructor.name == "Basket") {
-                  x = (previousItem.Group.getX() + previousItem.Group.getWidth());
-                  y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (previousItem.FixtureData.height * element.Ratio))
+          }
+        } else {
 
-                }
+          if (element.constructor.name == "ProductGroup") {
 
-              } else if (element.constructor.name == "Basket") {
+            if (previousItem.constructor.name == "ProductGroup") {
+              x = (previousItem.Group.getX() + previousItem.TotalWidth);
+              y = fixture.ClientRect.getY()
 
-                if (previousItem.constructor.name == "ProductGroup") {
-                  x = (previousItem.Group.getX() + previousItem.TotalWidth);
-                  y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
+            } else if (previousItem.constructor.name == "Basket") {
+              x = (previousItem.Group.getX() + previousItem.Group.getWidth());
+              y = fixture.ClientRect.getY()
 
-                } else if (previousItem.constructor.name == "Basket") {
-                  x = (previousItem.Group.getX() + previousItem.Group.getWidth());
-                  y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
-
-                }
-              }
             }
 
-            if (element.constructor.name == "ProductGroup") {
-              element.Group.position({
-                x: x,
-                y: y
-              });
-            } else if (element.constructor.name == "Basket") {
-              element.Group.position({
-                x: x,
-                y: y
-              });
+          } else if (element.constructor.name == "Basket") {
+
+            if (previousItem.constructor.name == "ProductGroup") {
+              x = (previousItem.Group.getX() + previousItem.TotalWidth);
+              y = fixture.ClientRect.getY()
+
+            } else if (previousItem.constructor.name == "Basket") {
+              x = (previousItem.Group.getX() + previousItem.Group.getWidth());
+              y = fixture.ClientRect.getY()
+
             }
           }
-          break;
+        }
+
+        if (element.constructor.name == "ProductGroup") {
+          element.Group.position({
+            x: x,
+            y: y
+          });
+        } else if (element.constructor.name == "Basket") {
+          element.Group.position({
+            x: x,
+            y: y
+          });
+
+          element.ClientRect.destroy();
+          element.ClientRect = null;
+          element.AddClientRect();
+        }
+      }
+      break;
+      case "BASKET": {
+        console.log("[POSITIONING] ALL CHILDREN IN " + fixture.Type.toUpperCase());
+
+        if (previousItem == null) {
+          if (element.constructor.name == "ProductGroup") {
+            x = groupX;
+            y = fixture.ClientRect.getY()
+
+          } else if (element.constructor.name == "Basket") {
+            x = groupX;
+            y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
+
+          }
+        } else {
+
+          if (element.constructor.name == "ProductGroup") {
+
+            if (previousItem.constructor.name == "ProductGroup") {
+              x = (previousItem.Group.getX() + previousItem.TotalWidth);
+              y = fixture.ClientRect.getY()
+
+            } else if (previousItem.constructor.name == "Basket") {
+              x = (previousItem.Group.getX() + previousItem.Group.getWidth());
+              y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (previousItem.FixtureData.height * element.Ratio))
+
+            }
+
+          } else if (element.constructor.name == "Basket") {
+
+            if (previousItem.constructor.name == "ProductGroup") {
+              x = (previousItem.Group.getX() + previousItem.TotalWidth);
+              y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
+
+            } else if (previousItem.constructor.name == "Basket") {
+              x = (previousItem.Group.getX() + previousItem.Group.getWidth());
+              y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
+
+            }
+          }
+        }
+
+        if (element.constructor.name == "ProductGroup") {
+          element.Group.position({
+            x: x,
+            y: y
+          });
+        } else if (element.constructor.name == "Basket") {
+          element.Group.position({
+            x: x,
+            y: y
+          });
+        }
+      }
+      break;
+      case "SHAREBOX": {
+        console.log("[POSITIONING] ALL CHILDREN IN " + fixture.Type.toUpperCase());
+
+        if (previousItem == null) {
+          if (element.constructor.name == "ProductGroup") {
+            x = groupX;
+            y = fixture.ClientRect.getY()
+
+          } else if (element.constructor.name == "Sharebox") {
+            x = groupX;
+            y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
+
+          }
+        } else {
+
+          if (element.constructor.name == "ProductGroup") {
+
+            if (previousItem.constructor.name == "ProductGroup") {
+              x = (previousItem.Group.getX() + previousItem.TotalWidth);
+              y = fixture.ClientRect.getY()
+
+            } else if (previousItem.constructor.name == "Basket") {
+              x = (previousItem.Group.getX() + previousItem.Group.getWidth());
+              y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (previousItem.FixtureData.height * element.Ratio))
+
+            }
+
+          } else if (element.constructor.name == "Sharebox") {
+
+            if (previousItem.constructor.name == "ProductGroup") {
+              x = (previousItem.Group.getX() + previousItem.TotalWidth);
+              y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
+
+            } else if (previousItem.constructor.name == "Sharebox") {
+              x = (previousItem.Group.getX() + previousItem.Group.getWidth());
+              y = fixture.ClientRect.getY() + (fixture.ClientRect.getHeight() - (element.FixtureData.height * element.Ratio))
+
+            }
+          }
+        }
+
+        if (element.constructor.name == "ProductGroup") {
+          element.Group.position({
+            x: x,
+            y: y
+          });
+        } else if (element.constructor.name == "Basket") {
+          element.Group.position({
+            x: x,
+            y: y
+          });
+        }
+      }
+      break;
       }
       //#endregion
 
@@ -380,26 +490,22 @@ class PositioningBase {
     });
 
     switch (fixture.Type.toUpperCase()) {
-      case "SHELF":
-        {
-          posArr.sort((a, b) => a.x - b.x);
-        }
-        break;
-      case "BASE":
-        {
-          posArr.sort((a, b) => a.x - b.x);
-        }
-        break;
-      case "PEGBAR":
-        {
-          posArr.sort((a, b) => a.x - b.x);
-        }
-        break;
-      case "PEGBOARD":
-        {
-          posArr.sort((a, b) => a.x - b.x && a.y - b.y);
-        }
-        break;
+      case "SHELF": {
+        posArr.sort((a, b) => a.x - b.x);
+      }
+      break;
+    case "BASE": {
+      posArr.sort((a, b) => a.x - b.x);
+    }
+    break;
+    case "PEGBAR": {
+      posArr.sort((a, b) => a.x - b.x);
+    }
+    break;
+    case "PEGBOARD": {
+      posArr.sort((a, b) => a.x - b.x && a.y - b.y);
+    }
+    break;
     }
 
     posArr.forEach((element, idx) => {
@@ -469,86 +575,92 @@ class PositioningBase {
     console.log("[PRODUCT POSITIONING] Positioning for : ", productGroup.FixtureType.toUpperCase());
 
     switch (productGroup.FixtureType.toUpperCase()) {
-      case "SHELF":
-        {
-          if (productGroup.FixtureID == null) {
-            return retVal;
-          } else {
-            retVal.y = fixtureItem.ClientRect.getHeight() - ((yCount + 1) * productGroup.Orientation_Height);
-            retVal.x = (xCount * productGroup.Orientation_Width);
-            return retVal;
-          }
-
+      case "SHELF": {
+        if (productGroup.FixtureID == null) {
+          return retVal;
+        } else {
+          retVal.y = fixtureItem.ClientRect.getHeight() - ((yCount + 1) * productGroup.Orientation_Height);
+          retVal.x = (xCount * productGroup.Orientation_Width);
+          return retVal;
         }
-        break;
-      case "BASE":
-        {
-          if (productGroup.FixtureID == null) {
-            return retVal;
+
+      }
+      break;
+    case "BASE": {
+      if (productGroup.FixtureID == null) {
+        return retVal;
+      } else {
+        retVal.y = fixtureItem.ClientRect.getHeight() - ((yCount + 1) * productGroup.Orientation_Height);
+        retVal.x = (xCount * productGroup.Orientation_Width);
+        return retVal;
+      }
+
+    }
+    break;
+    case "PEGBAR": {
+      if (productGroup.FixtureID == null) {
+        return retVal;
+      } else {
+        retVal.y = (fixtureItem.ClientRect.getHeight() / 2);
+        retVal.x = (xCount * productGroup.Orientation_Width);
+        return retVal;
+      }
+    }
+    break;
+    case "BASKET": {
+      if (productGroup.FixtureID == null) {
+        return retVal;
+      } else {
+        console.log("[BASKET PRODUCT POSITIONS]", fixtureItem)
+        retVal.y = fixtureItem.ClientRect.getHeight() - ((yCount + 1) * productGroup.Orientation_Height);
+        retVal.x = (xCount * productGroup.Orientation_Width);
+        return retVal;
+      }
+    }
+    break;
+    case "SHAREBOX": {
+      if (productGroup.FixtureID == null) {
+        return retVal;
+      } else {
+        console.log("[SHAREBOX PRODUCT POSITIONS]", fixtureItem)
+        retVal.y = fixtureItem.ClientRect.getHeight() - ((yCount + 1) * productGroup.Orientation_Height);
+        retVal.x = (xCount * productGroup.Orientation_Width);
+        return retVal;
+      }
+    }
+    break;
+    case "PEGBOARD": {
+      if (productGroup.FixtureID == null) {
+        return retVal;
+      } else {
+
+        if (productGroup.PegboardHoleAssigned == null) {
+          if (productGroup.PegboardHoleAssignedID == null) {
+            console.error("Cannot find peg assigned because id and peg is null for this product.");
           } else {
-            retVal.y = fixtureItem.ClientRect.getHeight() - ((yCount + 1) * productGroup.Orientation_Height);
-            retVal.x = (xCount * productGroup.Orientation_Width);
-            return retVal;
-          }
-
-        }
-        break;
-      case "PEGBAR":
-        {
-          if (productGroup.FixtureID == null) {
-            return retVal;
-          } else {
-            retVal.y = (fixtureItem.ClientRect.getHeight() / 2);
-            retVal.x = (xCount * productGroup.Orientation_Width);
-            return retVal;
-          }
-        }
-        break;
-      case "BASKET":
-        {
-          if (productGroup.FixtureID == null) {
-            return retVal;
-          } else {
-            console.log("[BASKET PRODUCT POSITIONS]", fixtureItem)
-            retVal.y = fixtureItem.ClientRect.getHeight() - ((yCount + 1) * productGroup.Orientation_Height);
-            retVal.x = (xCount * productGroup.Orientation_Width);
-            return retVal;
-          }
-        }
-        break;
-      case "PEGBOARD":
-        {
-          if (productGroup.FixtureID == null) {
-            return retVal;
-          } else {
-
-            if (productGroup.PegboardHoleAssigned == null) {
-              if (productGroup.PegboardHoleAssignedID == null) {
-                console.error("Cannot find peg assigned because id and peg is null for this product.");
-              } else {
-                productGroup.PegboardHoleAssigned = productGroup.Stage.find('#' + productGroup.PegboardHoleAssignedID);
-                console.log("TRYING TO FIND PEG HOLE", productGroup.PegboardHoleAssignedID, productGroup.Stage.find('#' + productGroup.PegboardHoleAssignedID))
-              }
-            }
-
-            let holePos = self.TransformMousePoint(stage);
-
-            // determine where the hole is and position the group to that
-            productGroup.Group.position({
-              // x: self.PegboardHoleAssigned.getAbsolutePosition().x - (self.Orientation_Width / 2),
-              // y: self.PegboardHoleAssigned.getAbsolutePosition().y
-
-              x: (holePos.x + (productGroup.PegboardHoleAssigned.getWidth() / 2)) - (productGroup.Orientation_Width / 2),
-              y: holePos.y + (productGroup.PegboardHoleAssigned.getHeight() / 2)
-            })
-
-            // return product position relative to the ProductGroup
-            retVal.y = (yCount * productGroup.Orientation_Height);
-            retVal.x = (xCount * productGroup.Orientation_Width);
-            return retVal;
+            productGroup.PegboardHoleAssigned = productGroup.Stage.find('#' + productGroup.PegboardHoleAssignedID);
+            console.log("TRYING TO FIND PEG HOLE", productGroup.PegboardHoleAssignedID, productGroup.Stage.find('#' + productGroup.PegboardHoleAssignedID))
           }
         }
-        break;
+
+        let holePos = self.TransformMousePoint(stage);
+
+        // determine where the hole is and position the group to that
+        productGroup.Group.position({
+          // x: self.PegboardHoleAssigned.getAbsolutePosition().x - (self.Orientation_Width / 2),
+          // y: self.PegboardHoleAssigned.getAbsolutePosition().y
+
+          x: (holePos.x + (productGroup.PegboardHoleAssigned.getWidth() / 2)) - (productGroup.Orientation_Width / 2),
+          y: holePos.y + (productGroup.PegboardHoleAssigned.getHeight() / 2)
+        })
+
+        // return product position relative to the ProductGroup
+        retVal.y = (yCount * productGroup.Orientation_Height);
+        retVal.x = (xCount * productGroup.Orientation_Width);
+        return retVal;
+      }
+    }
+    break;
     }
   }
 

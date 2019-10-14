@@ -10,7 +10,7 @@
             </v-toolbar>
             <v-toolbar dark flat>
                 <v-spacer></v-spacer>
-                <!-- <v-btn @click="addRetailer" color="grey darken-3">Add</v-btn> -->
+                <v-btn @click="addGroup" color="primary">Add Group</v-btn>
             </v-toolbar>
             <v-card-text class="pa-2" style="height: 400px; overflow: auto;">
                 <div v-for="(rg, idx) in retailerGroups" :key="'rg-' + idx">
@@ -127,9 +127,9 @@
             addRetailer(rg) {
                 let self = this;
 
-                self.$refs.Prompt.show("", "Retailer Name", "Name", name => {
+                self.$refs.Prompt.show("", "Location file Name", "Name", name => {
                     if (name == "") {
-                        alert("Please specify a name for the retailer.");
+                        alert("Please specify a name for the location.");
                     } else {
                         Axios.post(process.env.VUE_APP_API + "Retailer", {
                                 retailerGroupID: rg.id,
@@ -137,6 +137,25 @@
                             })
                             .then(r => {
                                 self.getRetailers();
+                            })
+                            .catch(e => {
+                                console.error(e);
+                            })
+                    }
+                })
+            },
+            addGroup() {
+                let self = this;
+
+                self.$refs.Prompt.show("", "Location Group Name", "Name", name => {
+                    if (name == "") {
+                        alert("Please specify a name for the location group.");
+                    } else {
+                        Axios.post(process.env.VUE_APP_API + "RetailerGroup", {
+                                name: name
+                            })
+                            .then(r => {
+                                self.getRetailerGroups();
                             })
                             .catch(e => {
                                 console.error(e);

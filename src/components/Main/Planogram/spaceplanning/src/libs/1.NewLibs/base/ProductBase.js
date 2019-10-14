@@ -95,6 +95,9 @@ class ProductBase extends ProductItemBase {
     let ctrl_position = new GeneralPositionHelper();
     let ctrl_store = new StoreHelper();
 
+    let parentItem = ctrl_store.getPlanogramItemById(self.VueStore, intersects.ID);
+    console.log("parentItem", parentItem);
+
     if (ctrl_store.getCloneItem(self.VueStore) == self.ID) {
       let ctrl_clone = new CloneBase("PRODUCT");
       ctrl_clone.Clone(self.VueStore, self.Stage, self, null, null, function () {
@@ -122,7 +125,6 @@ class ProductBase extends ProductItemBase {
     }
 
     if (intersects.ID != self.ParentID && intersects.ID != self.ID) {
-      let parentItem = ctrl_store.getPlanogramItemById(self.VueStore, intersects.ID);
       self.MoveToParentGroup(parentItem);
 
       // force re-position

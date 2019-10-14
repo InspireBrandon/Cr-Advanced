@@ -412,6 +412,11 @@
             strType = "PEGBAR";
           }
           break;
+          case 4: {
+            // sharebox
+            strType = "SHAREBOX";
+          }
+          break;
           }
         }
         break;

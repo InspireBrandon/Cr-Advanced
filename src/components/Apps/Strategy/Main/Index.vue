@@ -128,9 +128,7 @@
         <!-- <ClusterModels :fileData="rowData" v-if="selectedView == 2" ref="ClusterModels" /> -->
 
         <div v-if="selectedView == 3">
-            <iframe src='https://app.mapline.com/map/map_384ed598/DTAUTS5CP0cUKxF5Pz91Pz8jTD9mVV9hPz9FdT9SPz8UPz8UPz'
-                style='width:100%;height:700px;'></iframe>
-            <div style='font-size: 10px;'><a href='https://mapline.com' target='_blank'>Mapping by Mapline</a></div>
+            <iframe width="100%" style="height: calc(100vh - 223px)" src="https://app.powerbi.com/view?r=eyJrIjoiOGY0N2JkNzgtYzFhMC00NmIxLTg5NWEtZjRjZWJiMzEzYzhkIiwidCI6ImY2NzU3NzFmLWQ3ZWItNDgxNC04OTkzLWI5MDg2OTcwMTQ1ZSJ9" frameborder="0" allowFullScreen="true"></iframe>
         </div>
 
         <Setup ref="Setup" />

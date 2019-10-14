@@ -11,6 +11,7 @@ class PlanogramItemBase {
     this.ID = this.guid();
     this.VueStore = vueStore;
     this.Type = type;
+
     this.Data = data;
     this.Ratio = ratio;
 
@@ -114,6 +115,10 @@ class PlanogramItemBase {
       self.Config.SpreadType = "L2R";
     }
     break;
+    case "SHAREBOX": {
+      self.Config.SpreadType = "L2R";
+    }
+    break;
     }
   }
 
@@ -153,7 +158,7 @@ class PlanogramItemBase {
         y: dropPos.y,
         draggable: true
       })
-    } else if (self.Type.toUpperCase() == "BASKET" || self.Type.toUpperCase() == "DIVIDER" || self.Type.toUpperCase() == "PRODUCT" || self.Type.toUpperCase() == "LABELHOLDER") {
+    } else if (self.Type.toUpperCase() == "BASKET" || self.Type.toUpperCase() == "DIVIDER" || self.Type.toUpperCase() == "PRODUCT" || self.Type.toUpperCase() == "LABELHOLDER" || self.Type.toUpperCase() == "SHAREBOX") {
       self.Group = new Konva.Group({
         id: self.Type + '_master_group_' + self.ID,
         name: self.Type + '_master_group',
@@ -307,7 +312,7 @@ class PlanogramItemBase {
       }
       break;
       case "PRODUCT": {
-        typeArr = ["SHELF", "BASE", "BASKET", "PEGBAR", "PEGBOARD", "PALETTE", "LABELHOLDER"];
+        typeArr = ["SHELF", "BASE", "BASKET", "SHAREBOX", "PEGBAR", "PEGBOARD", "PALETTE", "LABELHOLDER"];
       }
       break;
       case "SHELF": {
@@ -342,7 +347,10 @@ class PlanogramItemBase {
         typeArr = ["SHELF", "BASE", "PEGBAR", "PEGBOARD", "BASKET"];
       }
       break;
-
+      case "SHAREBOX": {
+        typeArr = ["SHELF", "BASE", "BASKET"];
+      }
+      break;
       }
       if (self.Type == "GONDOLA" || self.Type == "TEXTHEADER") {
         self.PositionElement();
@@ -535,6 +543,11 @@ class PlanogramItemBase {
 
       basket.Group.draw();
     });
+
+    // let shareboxes = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "SHAREBOX", parentID);
+
+    // shareboxes.forEach(sharebox => {
+    // })
 
     //GONDOLAS
     let gondolas = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "GONDOLA", parentID);
@@ -873,6 +886,25 @@ class PlanogramItemBase {
       retVal = spacing;
     }
     break;
+    // case "SHAREBOX": {
+    //   let spreadType = parentItem.Data.spreadProducts;
+
+    //   console.log("WHAT", parentItem.Data);
+
+    //   if (spreadType.toUpperCase() != "SFE") {
+    //     return retVal;
+    //   }
+
+    //   if (totalItems == 1) {
+    //     spacing = 0;
+    //   } else {
+    //     spacing = (parentWidth - totalItemWidths) / (totalItems - 1);
+    //   }
+
+    //   self.SpacingEvenAmount = spacing;
+    //   retVal = spacing;
+    // }
+    break;
     case "PEGBAR": {
       let spreadType = parentItem.Data.spreadProducts;
 
@@ -948,6 +980,12 @@ class PlanogramItemBase {
     }
     break;
     case "BASKET": {
+      retVal = {
+        width: self.Data.width * self.Ratio,
+        height: self.Data.height * self.Ratio
+      }
+    }
+    case "SHAREBOX": {
       retVal = {
         width: self.Data.width * self.Ratio,
         height: self.Data.height * self.Ratio
@@ -1662,6 +1700,10 @@ class PlanogramItemBase {
       event.modal_load(EventBus, "FIXTURE", "BASKET", self, self.ID, self);
     }
     break;
+    case "SHAREBOX": {
+      event.modal_load(EventBus, "FIXTURE", "SHAREBOX", self, self.ID, self);
+    }
+    break;
     case "AREA": {
       event.modal_load(EventBus, "FIXTURE", "AREA", self, self.ID, self);
     }
@@ -1698,6 +1740,10 @@ class PlanogramItemBase {
       }
       break;
     case "BASKET": {
+      self.RemoveChildFromTotalChildrenArray(self.ID, self.ParentID);
+    }
+    break;
+    case "SHAREBOX": {
       self.RemoveChildFromTotalChildrenArray(self.ID, self.ParentID);
     }
     break;
@@ -1815,6 +1861,29 @@ class PlanogramItemBase {
     }
     break;
     case "BASKET": {
+      retVal = {
+        Type: self.Type.toUpperCase(),
+        RelativePosition: {
+          x: self.Group.getX(),
+          y: self.Group.getY(),
+        },
+        AbsolutePosition: {
+          x: self.Group.getAbsolutePosition().x,
+          y: self.Group.getAbsolutePosition().y
+        },
+        Data: {
+          Data: self.Data,
+          ID: self.ID,
+          ParentID: self.ParentID,
+          Config: self.Config,
+          TotalChildren: newTotalChildren
+        },
+        Position: self.Position,
+        Label: self.LabelText
+      }
+    }
+    break;
+    case "SHAREBOX": {
       retVal = {
         Type: self.Type.toUpperCase(),
         RelativePosition: {

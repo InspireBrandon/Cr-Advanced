@@ -140,10 +140,21 @@ class IntersectionTester {
 
       Promise.all(promiseArr)
         .then(results => {
+
+          console.log("YES", results)
+
           var basketIntrsct = results.find(x => x.Type == "BASKET");
           if (basketIntrsct != undefined && basketIntrsct.intersects == true) {
             hasIntersection = true;
             resolve(basketIntrsct);
+            return;
+          }
+
+          var shareboxIntrsct = results.find(x => x.Type == "SHAREBOX");
+
+          if (shareboxIntrsct != undefined && shareboxIntrsct.intersects == true) {
+            hasIntersection = true;
+            resolve(shareboxIntrsct);
             return;
           }
 
@@ -212,7 +223,7 @@ class IntersectionTester {
 
             console.log("BASKET/PRODUCT TEST INTRSCT", ItemType, TypeArr)
 
-            if (ItemType == "BASKET" || ItemType == "PRODUCT") {
+            if (ItemType == "BASKET" || ItemType == "PRODUCT" || ItemType == "SHAREBOX") {
               // console.log("BASKET TEST INTRSCT", ItemType)
               self.Internal_TestForIntersectionBelow(VueStore, dropPos, stage)
                 .then(finalTestResult => {
@@ -295,7 +306,7 @@ class IntersectionTester {
       }
 
       let children = ctrl_store.getAllPlanogramItems(VueStore, activeGondola.ID);
-      children = children.filter((el) => el.Type.toUpperCase() == "SHELF" || el.Type.toUpperCase() == "BASE");
+      children = children.filter((el) => el.Type.toUpperCase() == "SHELF" || el.Type.toUpperCase() == "BASE" || el.Type.toUpperCase() == "SHAREBOX");
 
       if (children.length == 0) {
         resolve(retVal);
@@ -366,7 +377,7 @@ class IntersectionTester {
 
     return new Promise((resolve) => {
       let promiseArr = [];
-      let types = ["GONDOLA", "SHELF", "BASE", "BASKET", "PEGBAR", "PEGBOARD", "DIVIDER", "AREA"];
+      let types = ["GONDOLA", "SHELF", "BASE", "BASKET", "PEGBAR", "PEGBOARD", "DIVIDER", "AREA", "SHAREBOX"];
 
       promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "GONDOLA", dropPos));
       promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "AREA", dropPos));
@@ -378,6 +389,7 @@ class IntersectionTester {
       promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "PEGBOARD", dropPos));
       promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "BASKET", dropPos));
       promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "DIVIDER", dropPos));
+      promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "SHAREBOX", dropPos));
 
       Promise.all(promiseArr)
         .then(results => {

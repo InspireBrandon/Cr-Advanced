@@ -94,16 +94,12 @@
         let self = this
         let stage = self.$parent.$parent.$parent;
         let event = new CustomEmitter();
-        console.log(stage.selectionData);
-
         if ((stage.selectionData.selectedGondola != undefined && stage.selectionData.selectedGondola != null) || (stage
           .selectionData.selectedProductGroup != undefined && stage.selectionData
           .selectedProductGroup)) {
           let event = new CustomEmitter();
           self.$refs.yesNoModal.show('Are you sure you want to delete this fixture?', value => {
             if (value) {
-
-
               if (stage.selectionData.selectedGondola != undefined && stage.selectionData.selectedGondola != null) {
                 let selectedFixture = stage.selectionData.selectedGondola;
 
@@ -121,8 +117,6 @@
             }
           })
         }
-
-
       },
       IncreaseInputControlX() {
         if (this.selectedControl == "FACING") {

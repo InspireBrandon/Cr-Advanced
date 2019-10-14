@@ -9,6 +9,7 @@ import BaseNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLib
 import PegboardNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PegboardBase.js";
 import PegBarNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PegBarBase.js";
 import BasketNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/BasketBase.js";
+import ShareboxNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/BasketBase.js";
 import AreaNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/AreaBase.js";
 import LabelHolderNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/LabelHolderBase.js";
 import ProductGroupNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/ProductBase.js";
@@ -46,12 +47,11 @@ class CloneBase {
 
     // find all elements within the object
     let childrenItemArr = ctrl_store.getAllPlanogramItems(VueStore, item.ID);
-    childrenItemArr.sort((a,b) => a.Group.getX() - b.Group.getX());
+    childrenItemArr.sort((a, b) => a.Group.getX() - b.Group.getX());
 
     switch (item.Type.toUpperCase()) {
-      case "GONDOLA":
-        {
-          self.CloneGondola(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item,)
+      case "GONDOLA": {
+        self.CloneGondola(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item, )
           .then(newItem => {
             childrenItemArr.forEach(childItem => {
               self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
@@ -61,139 +61,143 @@ class CloneBase {
               afterCloneCallBack();
             }
           })
-        }
-        break;
-        case "AREA":
-        {
-          self.CloneArea(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item,)
-          .then(newItem => {
-            childrenItemArr.forEach(childItem => {
-              self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
-            });
+      }
+      break;
+    case "AREA": {
+      self.CloneArea(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item, )
+        .then(newItem => {
+          childrenItemArr.forEach(childItem => {
+            self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
+          });
 
-            if (childrenItemArr.length == 0) {
-              afterCloneCallBack();
-            }
-          })
-        }
-        break;
-        case "LABELHOLDER":
-        {
-          self.CloneLabelHolder(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item,)
-          .then(newItem => {
-            childrenItemArr.forEach(childItem => {
-              self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
-            });
+          if (childrenItemArr.length == 0) {
+            afterCloneCallBack();
+          }
+        })
+    }
+    break;
+    case "LABELHOLDER": {
+      self.CloneLabelHolder(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item, )
+        .then(newItem => {
+          childrenItemArr.forEach(childItem => {
+            self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
+          });
 
-            if (childrenItemArr.length == 0) {
-              afterCloneCallBack();
-            }
-          })
-        }
-        break;
-        case "PALETTE":
-        {
-          self.ClonePalette(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item)
-          .then(newItem => {
-            childrenItemArr.forEach(childItem => {
-              self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
-            });
+          if (childrenItemArr.length == 0) {
+            afterCloneCallBack();
+          }
+        })
+    }
+    break;
+    case "PALETTE": {
+      self.ClonePalette(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item)
+        .then(newItem => {
+          childrenItemArr.forEach(childItem => {
+            self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
+          });
 
-            if (childrenItemArr.length == 0) {
-              afterCloneCallBack();
-            }
-          })
-        }
-        break;
-      case "SHELF":
-        {
-          // clone the shelf, then recursively call Clone with each child item
-          self.CloneShelf(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item)
-          .then(newItem => {
-            console.log("START")
-            childrenItemArr.forEach(childItem => {
-              self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
-            });
+          if (childrenItemArr.length == 0) {
+            afterCloneCallBack();
+          }
+        })
+    }
+    break;
+    case "SHELF": {
+      // clone the shelf, then recursively call Clone with each child item
+      self.CloneShelf(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item)
+        .then(newItem => {
+          console.log("START")
+          childrenItemArr.forEach(childItem => {
+            self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
+          });
 
-            // if (childrenItemArr.length == 0) {
-              console.log("CALL CB")
-              afterCloneCallBack();
-              console.log("DONE")
-            // }
-          })
-        }
-        break;
-      case "BASKET":
-        {
-          self.CloneBasket(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item)
-          .then(newItem => {
-            childrenItemArr.forEach(childItem => {
-              self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
-            });
+          // if (childrenItemArr.length == 0) {
+          console.log("CALL CB")
+          afterCloneCallBack();
+          console.log("DONE")
+          // }
+        })
+    }
+    break;
+    case "BASKET": {
+      self.CloneBasket(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item)
+        .then(newItem => {
+          childrenItemArr.forEach(childItem => {
+            self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
+          });
 
-            if (childrenItemArr.length == 0) {
-              afterCloneCallBack();
-            }
-          })
-        }
-        break;
-      case "BASE":
-        {
-          self.CloneBase(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item)
-          .then(newItem => {
-            childrenItemArr.forEach(childItem => {
-              self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
-            });
+          if (childrenItemArr.length == 0) {
+            afterCloneCallBack();
+          }
+        })
+    }
+    break;
+    case "SHAREBOX": {
+      self.CloneSharebox(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item)
+        .then(newItem => {
+          childrenItemArr.forEach(childItem => {
+            self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
+          });
 
-            if (childrenItemArr.length == 0) {
-              afterCloneCallBack();
-            }
-          })
-        }
-        break;
-      case "PEGBAR":
-        {
-          self.ClonePegbar(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item)
-          .then(newItem => {
-            childrenItemArr.forEach(childItem => {
-              self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
-            });
+          if (childrenItemArr.length == 0) {
+            afterCloneCallBack();
+          }
+        })
+    }
+    break;
+    case "BASE": {
+      self.CloneBase(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item)
+        .then(newItem => {
+          childrenItemArr.forEach(childItem => {
+            self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
+          });
 
-            if (childrenItemArr.length == 0) {
-              afterCloneCallBack();
-            }
-          })
+          if (childrenItemArr.length == 0) {
+            afterCloneCallBack();
+          }
+        })
+    }
+    break;
+    case "PEGBAR": {
+      self.ClonePegbar(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item)
+        .then(newItem => {
+          childrenItemArr.forEach(childItem => {
+            self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
+          });
 
-        }
-        break;
-      case "PEGBOARD":
-        {
-          self.ClonePegboard(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item)
-          .then(newItem => {
-            childrenItemArr.forEach(childItem => {
-              self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
-            });
+          if (childrenItemArr.length == 0) {
+            afterCloneCallBack();
+          }
+        })
 
-            if (childrenItemArr.length == 0) {
-              afterCloneCallBack();
-            }
-          })
-        }
-        break;
-      case "PRODUCT":
-        {
-          self.CloneProduct(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item)
-          .then(newItem => {
-            // childrenItemArr.forEach(childItem => {
-            //   self.Clone(VueStore, stage, childItem, item, newItem);
-            // });
+    }
+    break;
+    case "PEGBOARD": {
+      self.ClonePegboard(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item)
+        .then(newItem => {
+          childrenItemArr.forEach(childItem => {
+            self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
+          });
 
-            // if (childrenItemArr.length == 0) {
-            //   afterCloneCallBack();
-            // }
-          })
-        }
-        break;
+          if (childrenItemArr.length == 0) {
+            afterCloneCallBack();
+          }
+        })
+    }
+    break;
+    case "PRODUCT": {
+      self.CloneProduct(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item)
+        .then(newItem => {
+          // childrenItemArr.forEach(childItem => {
+          //   self.Clone(VueStore, stage, childItem, item, newItem);
+          // });
+
+          // if (childrenItemArr.length == 0) {
+          //   afterCloneCallBack();
+          // }
+        })
+    }
+    break;
 
     }
 
@@ -218,7 +222,7 @@ class CloneBase {
       //#region Set the same configs
       ctrl_item.Config = current_item.Config;
       //#endregion
-      
+
       ctrl_item.Initialise(dropPos, false);
       // start drag,
       // only start the drag on the root element being cloned
@@ -329,7 +333,7 @@ class CloneBase {
       //#region Set the same configs
       ctrl_item.Config = current_item.Config;
       //#endregion
-      
+
       ctrl_item.Initialise(dropPos, false);
       // start drag,
       // only start the drag on the root element being cloned
@@ -371,6 +375,43 @@ class CloneBase {
       // start drag,
       // only start the drag on the root element being cloned
       if (self.cloneRootType == "BASKET") {
+        ctrl_item.Group.startDrag();
+      }
+
+      if (current_item != null) {
+        ctrl_item.Group.setX(current_item.Group.getX());
+        ctrl_item.Group.setY(current_item.Group.getY());
+        ctrl_item.LastPositionRelative = ctrl_item.Group.position();
+        ctrl_item.LastPositionAbsolute = ctrl_item.Group.getAbsolutePosition();
+        ctrl_item.PositionElement();
+      }
+
+      resolve(ctrl_item);
+    });
+  }
+
+  CloneSharebox(stage, VueStore, MasterLayer, pixelRatio, parentID, data, dropPos, current_item, prev_original_item, prev_clone_item) {
+    let self = this;
+
+    return new Promise((resolve) => {
+      let ctrl_item = new ShareboxNew(
+        VueStore,
+        stage,
+        MasterLayer,
+        data,
+        pixelRatio,
+        "SHAREBOX",
+        prev_clone_item == null ? parentID : prev_clone_item.ID
+      );
+
+      //#region Set the same configs
+      ctrl_item.Config = current_item.Config;
+      //#endregion
+
+      ctrl_item.Initialise(dropPos, false);
+      // start drag,
+      // only start the drag on the root element being cloned
+      if (self.cloneRootType == "SHAREBOX") {
         ctrl_item.Group.startDrag();
       }
 

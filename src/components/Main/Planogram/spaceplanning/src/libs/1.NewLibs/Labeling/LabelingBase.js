@@ -18,7 +18,8 @@ class LabelingBase {
       el.Type.toUpperCase() == "BASE" ||
       el.Type.toUpperCase() == "PEGBAR" ||
       el.Type.toUpperCase() == "PEGBOARD" ||
-      el.Type.toUpperCase() == "BASKET"
+      el.Type.toUpperCase() == "BASKET" ||
+      el.Type.toUpperCase() == "SHAREBOX"
     )
 
     if (filteredArr.length == 0) {
@@ -56,7 +57,8 @@ class LabelingBase {
         el.Type.toUpperCase() == "PEGBOARD" ||
         el.Type.toUpperCase() == "PALETTE" ||
         el.Type.toUpperCase() == "BASKET" ||
-        el.Type.toUpperCase() == "LABELHOLDER"
+        el.Type.toUpperCase() == "LABELHOLDER" ||
+        el.Type.toUpperCase() == "SHAREBOX"
       )
 
       if (labelOrder.toUpperCase() == "T2B") {

@@ -47,32 +47,28 @@ class FixtureBase {
       self.FixtureConfig = data.Data.FixtureConfig;
 
       switch (data.Data.FixtureData.fixtureType) {
-        case 0:
-          {
-            self.Type = "Base";
-            self.ClientRectIntersection = null;
-            self.ClientRect = null;
-          }
-          break;
-        case 1:
-          {
-            self.Type = "Shelf";
-            self.ClientRectIntersection = null;
-            self.ClientRect = null;
-          }
-          break;
-        case 2:
-          {
-            self.Type = "Pegboard";
-          }
-          break;
-        case 3:
-          {
-            self.Type = "Pegbar";
-            self.ClientRectIntersection = null;
-            self.ClientRect = null;
-          }
-          break;
+        case 0: {
+          self.Type = "Base";
+          self.ClientRectIntersection = null;
+          self.ClientRect = null;
+        }
+        break;
+      case 1: {
+        self.Type = "Shelf";
+        self.ClientRectIntersection = null;
+        self.ClientRect = null;
+      }
+      break;
+      case 2: {
+        self.Type = "Pegboard";
+      }
+      break;
+      case 3: {
+        self.Type = "Pegbar";
+        self.ClientRectIntersection = null;
+        self.ClientRect = null;
+      }
+      break;
       }
 
       console.log("LOAD FROM FILE PGBAR", self.FixtureData, self.FixtureData.width, self.FixtureData.height);
@@ -128,46 +124,48 @@ class FixtureBase {
 
       gondolaEl.Fixtures.forEach((fixtureEl) => {
         switch (fixtureEl.Type.toUpperCase()) {
-          case "BASKET":
-            {
-              yArr.push({
-                fixture: fixtureEl,
-                y: fixtureEl.Group.getY()
-              })
-            }
-            break;
-          case "SHELF":
-            {
-              yArr.push({
-                fixture: fixtureEl,
-                y: fixtureEl.Group.getY()
-              })
-            }
-            break;
-          case "BASE":
-            {
-              yArr.push({
-                fixture: fixtureEl,
-                y: fixtureEl.Group.getY()
-              })
-            }
-            break;
-          case "PEGBOARD":
-            {
-              yArr.push({
-                fixture: fixtureEl,
-                y: fixtureEl.Group.getY() + fixtureEl.Group.getHeight()
-              })
-            }
-            break;
-          case "PEGBAR":
-            {
-              yArr.push({
-                fixture: fixtureEl,
-                y: fixtureEl.Group.getY() + fixtureEl.Group.getHeight()
-              })
-            }
-            break;
+          case "BASKET": {
+            yArr.push({
+              fixture: fixtureEl,
+              y: fixtureEl.Group.getY()
+            })
+          }
+          break;
+        case "SHAREBOX": {
+          yArr.push({
+            fixture: fixtureEl,
+            y: fixtureEl.Group.getY()
+          })
+        }
+        break;
+        case "SHELF": {
+          yArr.push({
+            fixture: fixtureEl,
+            y: fixtureEl.Group.getY()
+          })
+        }
+        break;
+        case "BASE": {
+          yArr.push({
+            fixture: fixtureEl,
+            y: fixtureEl.Group.getY()
+          })
+        }
+        break;
+        case "PEGBOARD": {
+          yArr.push({
+            fixture: fixtureEl,
+            y: fixtureEl.Group.getY() + fixtureEl.Group.getHeight()
+          })
+        }
+        break;
+        case "PEGBAR": {
+          yArr.push({
+            fixture: fixtureEl,
+            y: fixtureEl.Group.getY() + fixtureEl.Group.getHeight()
+          })
+        }
+        break;
         }
 
         if (order == "T2B") {
@@ -201,32 +199,30 @@ class FixtureBase {
     var strText = "";
 
     switch (self.Type.toUpperCase()) {
-      case "BASKET":
-        {
-          alert('we are here')
-          strText = "BASKET " + self.FixtureNumber;
-        }
-        break;
-      case "BASE":
-        {
-          strText = "BASE " + self.FixtureNumber;
-        }
-        break;
-      case "SHELF":
-        {
-          strText = "SHELF " + self.FixtureNumber;
-        }
-        break;
-      case "PEGBAR":
-        {
-          strText = "PEGBAR " + self.FixtureNumber;
-        }
-        break;
-      case "PEGBOARD":
-        {
-          strText = "PEGBOARD " + self.FixtureNumber;
-        }
-        break;
+      case "BASKET": {
+        strText = "BASKET " + self.FixtureNumber;
+      }
+      break;
+    case "SHAREBOX": {
+      strText = "SHAREBOX " + self.FixtureNumber;
+    }
+    break;
+    case "BASE": {
+      strText = "BASE " + self.FixtureNumber;
+    }
+    break;
+    case "SHELF": {
+      strText = "SHELF " + self.FixtureNumber;
+    }
+    break;
+    case "PEGBAR": {
+      strText = "PEGBAR " + self.FixtureNumber;
+    }
+    break;
+    case "PEGBOARD": {
+      strText = "PEGBOARD " + self.FixtureNumber;
+    }
+    break;
     }
 
     if (self.FixtureLabel != null) {
@@ -277,18 +273,20 @@ class FixtureBase {
       productGroup.DeleteProduct();
     }
 
-    switch(self.Type.toUpperCase()) {
+    switch (self.Type.toUpperCase()) {
       case "SHELF": {
         self.Group.destroy();
         self.ClientRect.destroy();
-      } break;
-      case "PEGBAR": {
-        self.Group.destroy();
-        self.ClientRect.destroy();
       }
-      case "PEGBOARD": {
+      break;
+    case "PEGBAR": {
+      self.Group.destroy();
+      self.ClientRect.destroy();
+    }
+    case "PEGBOARD": {
 
-      } break;
+    }
+    break;
     }
     self.Store_RemoveFixtureFromGondola(self);
 
@@ -308,27 +306,24 @@ class FixtureBase {
     var prevFixturePosition = self.Group.position();
     console.log("[Fixture] Delta x", deltaChangeX);
     switch (self.Type.toUpperCase()) {
-      case "SHELF":
-        {
-          self.ClientRectIntersection.x = gondolaItem.Group.getX();
-          self.ClientRect.setX(gondolaItem.Group.getX());
-        }
-        break;
-      case "BASE":
-        {
-          self.ClientRectIntersection.x = gondolaItem.Group.getX();
-          self.ClientRect.setX(gondolaItem.Group.getX());
-        }
-        break;
-      case "PEGBAR":
-        {
-          self.ClientRectIntersection.x = gondolaItem.Group.getX();
-          self.ClientRect.setX(gondolaItem.Group.getX());
-        }
-        break;
-        // case "PEGBOARD" : {
+      case "SHELF": {
+        self.ClientRectIntersection.x = gondolaItem.Group.getX();
+        self.ClientRect.setX(gondolaItem.Group.getX());
+      }
+      break;
+    case "BASE": {
+      self.ClientRectIntersection.x = gondolaItem.Group.getX();
+      self.ClientRect.setX(gondolaItem.Group.getX());
+    }
+    break;
+    case "PEGBAR": {
+      self.ClientRectIntersection.x = gondolaItem.Group.getX();
+      self.ClientRect.setX(gondolaItem.Group.getX());
+    }
+    break;
+    // case "PEGBOARD" : {
 
-        // } break;
+    // } break;
     }
     self.Group.setX(gondolaItem.Group.getX());
 
@@ -347,115 +342,112 @@ class FixtureBase {
     let retVal = null;
 
     switch (self.Type.toUpperCase()) {
-      case "SHELF":
-        {
-          retVal = {
-            RelativePosition: {
-              x: self.Group.getX(),
-              y: self.Group.getY(),
-            },
-            AbsolutePosition: {
-              x: self.Group.getAbsolutePosition().x,
-              y: self.Group.getAbsolutePosition().y
-            },
-            ClientRect: {
-              x: self.ClientRect.getX(),
-              y: self.ClientRect.getX(),
-              width: self.ClientRect.getWidth(),
-              height: self.ClientRect.getHeight()
-            },
-            Data: {
-              FixtureData: self.FixtureData,
-              ID: self.ID,
-              GondolaID: self.GondolaID,
-              FixtureConfig: self.FixtureConfig,
-              ProductGroupCount: self.ProductGroupArray.length,
-              FixtureNumber: self.FixtureNumber
-            }
+      case "SHELF": {
+        retVal = {
+          RelativePosition: {
+            x: self.Group.getX(),
+            y: self.Group.getY(),
+          },
+          AbsolutePosition: {
+            x: self.Group.getAbsolutePosition().x,
+            y: self.Group.getAbsolutePosition().y
+          },
+          ClientRect: {
+            x: self.ClientRect.getX(),
+            y: self.ClientRect.getX(),
+            width: self.ClientRect.getWidth(),
+            height: self.ClientRect.getHeight()
+          },
+          Data: {
+            FixtureData: self.FixtureData,
+            ID: self.ID,
+            GondolaID: self.GondolaID,
+            FixtureConfig: self.FixtureConfig,
+            ProductGroupCount: self.ProductGroupArray.length,
+            FixtureNumber: self.FixtureNumber
           }
         }
-        break;
-      case "BASE":
-        ; {
-          retVal = {
-            RelativePosition: {
-              x: self.Group.getX(),
-              y: self.Group.getY(),
-            },
-            AbsolutePosition: {
-              x: self.Group.getAbsolutePosition().x,
-              y: self.Group.getAbsolutePosition().y
-            },
-            ClientRect: {
-              x: self.ClientRect.getX(),
-              y: self.ClientRect.getX(),
-              width: self.ClientRect.getWidth(),
-              height: self.ClientRect.getHeight()
-            },
-            Data: {
-              FixtureData: self.FixtureData,
-              ID: self.ID,
-              GondolaID: self.GondolaID,
-              FixtureConfig: self.FixtureConfig,
-              ProductGroupCount: self.ProductGroupArray.length
-            }
+      }
+      break;
+    case "BASE":
+      ; {
+        retVal = {
+          RelativePosition: {
+            x: self.Group.getX(),
+            y: self.Group.getY(),
+          },
+          AbsolutePosition: {
+            x: self.Group.getAbsolutePosition().x,
+            y: self.Group.getAbsolutePosition().y
+          },
+          ClientRect: {
+            x: self.ClientRect.getX(),
+            y: self.ClientRect.getX(),
+            width: self.ClientRect.getWidth(),
+            height: self.ClientRect.getHeight()
+          },
+          Data: {
+            FixtureData: self.FixtureData,
+            ID: self.ID,
+            GondolaID: self.GondolaID,
+            FixtureConfig: self.FixtureConfig,
+            ProductGroupCount: self.ProductGroupArray.length
           }
         }
-        break;
-      case "PEGBOARD":
-        {
-          retVal = {
-            RelativePosition: {
-              x: self.Group.getX(),
-              y: self.Group.getY(),
-            },
-            AbsolutePosition: {
-              x: self.Group.getAbsolutePosition().x,
-              y: self.Group.getAbsolutePosition().y
-            },
-            // ClientRect: {
-            //   x: self.ClientRect.getX(),
-            //   y: self.ClientRect.getX(),
-            //   width: self.ClientRect.getWidth(),
-            //   height: self.ClientRect.getHeight()
-            // },
-            Data: {
-              FixtureData: self.FixtureData,
-              ID: self.ID,
-              GondolaID: self.GondolaID,
-              FixtureConfig: self.FixtureConfig,
-              ProductGroupCount: self.ProductGroupArray.length
-            }
-          }
+      }
+      break;
+    case "PEGBOARD": {
+      retVal = {
+        RelativePosition: {
+          x: self.Group.getX(),
+          y: self.Group.getY(),
+        },
+        AbsolutePosition: {
+          x: self.Group.getAbsolutePosition().x,
+          y: self.Group.getAbsolutePosition().y
+        },
+        // ClientRect: {
+        //   x: self.ClientRect.getX(),
+        //   y: self.ClientRect.getX(),
+        //   width: self.ClientRect.getWidth(),
+        //   height: self.ClientRect.getHeight()
+        // },
+        Data: {
+          FixtureData: self.FixtureData,
+          ID: self.ID,
+          GondolaID: self.GondolaID,
+          FixtureConfig: self.FixtureConfig,
+          ProductGroupCount: self.ProductGroupArray.length
         }
-        break;
-      case "PEGBAR":
-        {
-          retVal = {
-            RelativePosition: {
-              x: self.Group.getX(),
-              y: self.Group.getY(),
-            },
-            AbsolutePosition: {
-              x: self.Group.getAbsolutePosition().x,
-              y: self.Group.getAbsolutePosition().y
-            },
-            ClientRect: {
-              x: self.ClientRect.getX(),
-              y: self.ClientRect.getX(),
-              width: self.ClientRect.getWidth(),
-              height: self.ClientRect.getHeight()
-            },
-            Data: {
-              FixtureData: self.FixtureData,
-              ID: self.ID,
-              GondolaID: self.GondolaID,
-              FixtureConfig: self.FixtureConfig,
-              ProductGroupCount: self.ProductGroupArray.length
-            }
-          }
+      }
+    }
+    break;
+    case "PEGBAR": {
+      retVal = {
+        RelativePosition: {
+          x: self.Group.getX(),
+          y: self.Group.getY(),
+        },
+        AbsolutePosition: {
+          x: self.Group.getAbsolutePosition().x,
+          y: self.Group.getAbsolutePosition().y
+        },
+        ClientRect: {
+          x: self.ClientRect.getX(),
+          y: self.ClientRect.getX(),
+          width: self.ClientRect.getWidth(),
+          height: self.ClientRect.getHeight()
+        },
+        Data: {
+          FixtureData: self.FixtureData,
+          ID: self.ID,
+          GondolaID: self.GondolaID,
+          FixtureConfig: self.FixtureConfig,
+          ProductGroupCount: self.ProductGroupArray.length
         }
-        break;
+      }
+    }
+    break;
     }
 
     return JSON.stringify(retVal);

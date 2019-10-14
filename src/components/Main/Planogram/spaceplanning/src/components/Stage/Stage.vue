@@ -69,6 +69,7 @@
   import AreaNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/AreaBase.js";
   import LabelHolderNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/LabelHolderBase.js";
   import PegNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PegBase.js";
+  import ShareboxNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/ShareboxBase.js";
 
   //calculations
   import CalculationHandler from "@/components/Main/Planogram/spaceplanning/src/libs/CalculationLib/calculationHandler.js";
@@ -294,6 +295,11 @@
 
               if (e.keyCode === ctrlKey || e.keyCode === cmdKey || e.keyCode === vKey || e.keyCode === cKey) {
                 ctrl_store.setCtrlDown(self.$store, true);
+              }
+
+              if(e.keyCode == 46) {
+                alert("DELETE");
+                // ctrl_store.dele
               }
             }
           }
@@ -1207,6 +1213,26 @@
 
         ctrl_basket.Initialise(dropPos);
       },
+      addNewSharebox(fixtureID, data, dropPos) {
+        console.log("sharbox data", data);
+
+        let self = this;
+        let stage = self.$refs.stage.getStage();
+
+        let ctrl_sharebox = new ShareboxNew(
+          self.$store,
+          stage,
+          self.MasterLayer,
+          JSON.parse(JSON.stringify(data)),
+          self.$PixelToCmRatio,
+          "SHAREBOX",
+          fixtureID
+        );
+
+        // Set all json values
+
+        ctrl_sharebox.Initialise(dropPos);
+      },
       addNewPeg(fixtureID, data, dropPos) {
         let self = this;
         let stage = self.$refs.stage.getStage();
@@ -1543,10 +1569,12 @@
         let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
 
         console.log("SHELF ADD - STAGE", dropPos);
+        console.log("WHYYYYYYYY");
         ctrl_intersectionTester.TestIntersectsWithMany(stage, "PRODUCT", ["SHELF", "BASE", "PEGBAR", "PEGBOARD",
               "BASKET",
               "PALETTE",
-              "LABELHOLDER"
+              "LABELHOLDER",
+              "SHAREBOX"
             ], self.$store,
             dropPos)
           .then(result => {
@@ -1655,6 +1683,27 @@
               console.log("[LIBARY ADD] BASKET", result)
               if (result.intersects == true) {
                 self.addNewBasket(result.ID, data.data, result.ContainerPosition);
+              }
+            })
+
+        }
+        break;
+        case "SHAREBOX": {
+          data.data["Type"] = "SHAREBOX";
+
+          let ctrl_intersectionTester = new IntersectionTester();
+
+          let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
+
+          console.log("SHAREBOX ADD - STAGE", dropPos);
+          // ctrl_intersectionTester.TestIntersectsWithMany(stage, ["SHELF", "BASE", "PEGBAR", "BASKET"], dropPos)
+          ctrl_intersectionTester.TestIntersectsWithMany(stage, "SHAREBOX", ["SHELF", "BASE"],
+              self.$store,
+              dropPos)
+            .then(result => {
+              console.log("[LIBARY ADD] SHAREBOX", result)
+              if (result.intersects == true) {
+                self.addNewSharebox(result.ID, data.data, result.ContainerPosition);
               }
             })
 
