@@ -15,7 +15,14 @@
             <v-card-text class="pa-2" style="height: 400px; overflow: auto;">
                 <div v-for="(rg, idx) in retailerGroups" :key="'rg-' + idx">
                     <div style="display: flex;">
+                        <v-btn icon small class="mt-0" v-if="rg.hidden" @click="toggleHidden(rg)">
+                            <v-icon>visibility</v-icon>
+                        </v-btn>
+                        <v-btn icon small class="mt-0" v-if="!rg.hidden" @click="toggleHidden(rg)">
+                            <v-icon>visibility_off</v-icon>
+                        </v-btn>
                         <div class="headline">{{ rg.name }}</div>
+
                         <v-btn icon small class="mt-0" @click="addRetailer(rg)">
                             <v-icon>add</v-icon>
                         </v-btn>
@@ -28,7 +35,7 @@
                     </div>
                     <v-list dense hover>
                         <template v-for="(retailer, idx) in retailers" v-if="retailer.retailerGroupID == rg.id">
-                            <v-list-tile avatar :key="idx">
+                            <v-list-tile avatar :key="idx" v-if="!rg.hidden">
                                 <v-list-tile-avatar tile>
                                     <v-img style="cursor: pointer;" v-if="showImages"
                                         @click="openFileDialog(retailer.id)" :src="retailerImage(retailer.id)"
@@ -103,7 +110,11 @@
 
                 Axios.get(process.env.VUE_APP_API + "RetailerGroup")
                     .then(r => {
+                        r.data.retailerGroupList.forEach(element => {
+                            element.hidden = false
+                        });
                         self.retailerGroups = r.data.retailerGroupList;
+
                     })
             },
             getRetailers() {
@@ -168,6 +179,10 @@
                             })
                     }
                 })
+            },
+            toggleHidden(group) {
+                let self = this
+                group.hidden = !group.hidden
             },
             close() {
                 let self = this
