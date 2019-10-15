@@ -2,6 +2,7 @@
     <v-card>
         <v-card-text>
             <h1>MARLTON Market Share</h1>
+            <v-btn @click="getGeoGrid">get grid data</v-btn>
             <v-container fluid grid-list-md class="pa-0">
                 <v-layout row wrap>
                     <v-flex md11>
@@ -26,7 +27,8 @@
                                         <td style="width: 100px;">{{ item.retailerValue }}</td>
                                         <td style="width: 100px;">{{ item.supplierShare }}</td>
                                         <td style="width: 100px;">{{ item.supplierValue }}</td>
-                                        <td style="width: 100px;" :style="{ 'background': heatLegend[item.heat].color }">
+                                        <td style="width: 100px;"
+                                            :style="{ 'background': heatLegend[item.heat].color }">
                                         </td>
                                     </tr>
                                 </tbody>
@@ -49,6 +51,7 @@
 </template>
 
 <script>
+    import Axios from 'axios'
     export default {
         props: ["geoGridData"],
         data() {
@@ -101,6 +104,16 @@
                     color: "#f44336"
                 }]
             }
+        },
+        methods: {
+            getGeoGrid() {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + `SuplierLocationImportTX/GeoReport`).then(r => {
+                    console.log(r);
+                })
+            },
         },
         mounted() {
             let self = this;

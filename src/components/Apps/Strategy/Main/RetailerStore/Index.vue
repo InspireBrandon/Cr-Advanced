@@ -10,8 +10,8 @@
             </v-toolbar>
             <v-toolbar dark flat>
                 <v-spacer></v-spacer>
-                <v-btn @click="uploadMany" color="grey darken-3">Add Many</v-btn>
-                <v-btn @click="addRetailerStore" color="grey darken-3">Add Single</v-btn>
+                <v-btn @click="addRetailerStore" color="grey darken-3">Add Rows</v-btn>
+                <!-- <v-btn @click="addRetailerStore" color="grey darken-3">Add Single</v-btn> -->
             </v-toolbar>
             <v-card-text class="pa-0" style="height: 600px; overflow: auto;">
                 <Grid :deleteRetailerStore="deleteRetailerStore" :updateRetailerStore="updateRetailerStore"
@@ -19,6 +19,7 @@
             </v-card-text>
         </v-card>
         <YesNoModal ref="YesNoModal" />
+        <Prompt ref="Prompt" />
         <CopyPasteModal ref="CopyPasteModal" />
     </v-dialog>
 
@@ -26,12 +27,14 @@
 <script>
     import Axios from 'axios'
     import Grid from './Grid'
+    import Prompt from '@/components/Common/Prompt'
     import YesNoModal from '@/components/Common/YesNoModal'
     import CopyPasteModal from '../CopyPasteModal'
 
     export default {
         components: {
             Grid,
+            Prompt,
             YesNoModal,
             CopyPasteModal
         },
@@ -69,18 +72,18 @@
             },
             addRetailerStore() {
                 let self = this;
-
-                Axios.post(process.env.VUE_APP_API + "RetailerStore", {
-                        retailerID: self.retailerID,
-                        name: ''
-                    })
-                    .then(r => {
-                        self.retailerStores.unshift(r.data.retailerStore);
-                    })
+                self.$refs.Prompt.show("", "How Many Rows Would you like to add", "Rows", name => {
+                    Axios.post(process.env.VUE_APP_API +
+                            `RetailerStore/Many?Amount=${parseInt(name)}&RetailerID=${self.retailerID}`)
+                        .then(r => {
+                            console.log(r);
+                            self.getRetailerStores(self.retailerID);
+                        })
+                })
             },
             uploadMany() {
                 let self = this;
-                
+
                 self.$refs.CopyPasteModal.open(data => {
                     console.log(data);
                 })
@@ -105,7 +108,8 @@
 
                 self.$refs.YesNoModal.show("Are you sure that you want to delete this retailer store?", value => {
                     if (value) {
-                        Axios.delete(process.env.VUE_APP_API + "RetailerStore?retailerStoreID=" + retailerStore.id)
+                        Axios.delete(process.env.VUE_APP_API + "RetailerStore?retailerStoreID=" + retailerStore
+                                .id)
                             .then(r => {
                                 self.retailerStores.splice(self.retailerStores.indexOf(retailerStore), 1);
                             })
