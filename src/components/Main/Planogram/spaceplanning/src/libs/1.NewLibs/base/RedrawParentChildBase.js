@@ -13,6 +13,8 @@ class RedrawParentChildTree {
   RedrawParentDirectChildren(VueStore, parentID, force = false) {
     let self = this;
 
+    console.log("Redrawing parent direct children")
+
     let ctrl_store = new StoreHelper();
     let parentItem = ctrl_store.getPlanogramItemById(VueStore, parentID);
 
@@ -38,6 +40,8 @@ class RedrawParentChildTree {
 
   PositionDirectChildren(VueStore, parentID, force = false) {
     let self = this;
+
+    console.log("Position direct children")
 
     let ctrl_store = new StoreHelper();
     let parentItem = ctrl_store.getPlanogramItemById(VueStore, parentID);
@@ -66,6 +70,8 @@ class RedrawParentChildTree {
    */
   PositionAndRedrawDirectChildren(VueStore, parentID, force = false) {
     let self = this;
+
+    console.log("Position and redraw direct children")
 
     let ctrl_store = new StoreHelper();
     let parentItem = ctrl_store.getPlanogramItemById(VueStore, parentID);

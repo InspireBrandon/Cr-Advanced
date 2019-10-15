@@ -544,10 +544,11 @@ class PlanogramItemBase {
       basket.Group.draw();
     });
 
-    // let shareboxes = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "SHAREBOX", parentID);
+    let shareboxes = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "SHAREBOX", parentID);
 
-    // shareboxes.forEach(sharebox => {
-    // })
+    shareboxes.forEach(sharebox => {
+      sharebox.Group.draw();
+    })
 
     //GONDOLAS
     let gondolas = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "GONDOLA", parentID);
@@ -735,6 +736,14 @@ class PlanogramItemBase {
       retVal = squish;
     }
     break;
+    // case "SHAREBOX": {
+    //   if (totalItemWidths > parentWidth) {
+    //     squish = (totalItemWidths - parentWidth) / (totalItems);
+    //   }
+
+    //   retVal = squish;
+    // }
+    // break;
     case "PEGBAR": {
       if (totalItemWidths > parentWidth) {
         squish = (totalItemWidths - parentWidth) / (totalItems);
@@ -889,8 +898,6 @@ class PlanogramItemBase {
     // case "SHAREBOX": {
     //   let spreadType = parentItem.Data.spreadProducts;
 
-    //   console.log("WHAT", parentItem.Data);
-
     //   if (spreadType.toUpperCase() != "SFE") {
     //     return retVal;
     //   }
@@ -904,7 +911,7 @@ class PlanogramItemBase {
     //   self.SpacingEvenAmount = spacing;
     //   retVal = spacing;
     // }
-    break;
+    // break;
     case "PEGBAR": {
       let spreadType = parentItem.Data.spreadProducts;
 
@@ -1328,6 +1335,28 @@ class PlanogramItemBase {
           }
         }
         break;
+      case "SHAREBOX": {
+        if (existing == null) {
+          parentItem.TotalChildren.push({
+            ID: self.ID,
+            Type: self.Type,
+            Item: self,
+            Count: 1,
+            Width: self.TotalWidth
+          });
+
+        } else {
+          self.RemoveChildFromTotalChildrenArray(existing.ID, parentItem.ID);
+          parentItem.TotalChildren.push({
+            ID: self.ID,
+            Type: self.Type,
+            Item: self,
+            Count: 1,
+            Width: self.TotalWidth
+          });
+        }
+      }
+      break;
       case "BASKET": {
         if (existing == null) {
           parentItem.TotalChildren.push({

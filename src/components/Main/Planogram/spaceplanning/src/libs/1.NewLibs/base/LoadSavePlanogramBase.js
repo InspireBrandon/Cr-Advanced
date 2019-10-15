@@ -9,6 +9,7 @@ import PegboardNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.Ne
 import PegBarNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PegBarBase.js";
 import ProductGroupNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/ProductBase.js";
 import BasketNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/BasketBase.js";
+import ShareboxNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/ShareboxBase.js";
 import PegNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PegBase.js";
 import PlanogramNamer from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PlanogramNamer.js";
 import axios from 'axios';
@@ -871,6 +872,32 @@ class LoadSavePlanogramBase {
       ctrl_item.ApplyZIndexing();
     }
     break;
+    case "SHAREBOX": {
+      let ctrl_item = new ShareboxNew(
+        VueStore,
+        Stage,
+        MasterLayer,
+        CurrentItem.Data.Data,
+        PxlRatio,
+        "SHAREBOX",
+        ParentID
+      )
+
+      if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+        ctrl_item.Position = CurrentItem.Position;
+      }
+
+      // set json data values to the object
+      ctrl_item.ID = CurrentItem.Data.ID;
+      ctrl_item.Config = CurrentItem.Data.Config;
+      if (CurrentItem.Data.TotalChildren != null && CurrentItem.Data.TotalChildren != undefined && CurrentItem.Data.TotalChildren.length > 0) {
+        ctrl_item.TotalChildren = CurrentItem.Data.TotalChildren;
+      }
+
+      ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+      ctrl_item.ApplyZIndexing();
+    }
+    break;
     case "PEG": {
       let ctrl_item = new PegNew(
         VueStore,
@@ -1130,13 +1157,13 @@ function calculate(productItem, vuex, storeCount) {
 
   console.log(productData.ProductData);
 
-  calcData.Weekly_Sales_Retail = calculationHandler.Calculate_Weekly_Sales_Retail(vuex.state.usePotential ? sales_potential : sales_retail,);
+  calcData.Weekly_Sales_Retail = calculationHandler.Calculate_Weekly_Sales_Retail(vuex.state.usePotential ? sales_potential : sales_retail, );
 
-  if(vuex.state.usePotential) {
+  if (vuex.state.usePotential) {
     calcData.Weekly_Sales_Cost = calculationHandler.Calculate_Weekly_Sales_Cost(cost_potential);
   }
 
-  if(!vuex.state.usePotential) {
+  if (!vuex.state.usePotential) {
     calcData.Weekly_Sales_Cost = calculationHandler.Calculate_Weekly_Sales_Cost(sales_cost);
   }
 
