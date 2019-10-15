@@ -261,6 +261,17 @@ export const store = new Vuex.Store({
 
       return found;
     },
+    getPlanogramItemByParentID: (state) => (parentID) => {
+      var found = state.allPlanogramItems.filter(function (el) {
+        return el.ParentID == parentID;
+      })
+
+      if (found == null || found == undefined) {
+        console.warn("[STORE] Failed to get PlanogramItem By ParentID", id)
+      }
+
+      return found;
+    },
     getClusterData: (state) => {
       return {
         rangeID: state.rangeID,

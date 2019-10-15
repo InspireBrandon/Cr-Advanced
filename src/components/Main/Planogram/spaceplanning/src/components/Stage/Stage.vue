@@ -1569,7 +1569,6 @@
         let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
 
         console.log("SHELF ADD - STAGE", dropPos);
-        console.log("WHYYYYYYYY");
         ctrl_intersectionTester.TestIntersectsWithMany(stage, "PRODUCT", ["SHELF", "BASE", "PEGBAR", "PEGBOARD",
               "BASKET",
               "PALETTE",

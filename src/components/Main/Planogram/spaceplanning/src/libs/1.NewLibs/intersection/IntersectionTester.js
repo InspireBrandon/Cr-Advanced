@@ -141,8 +141,6 @@ class IntersectionTester {
       Promise.all(promiseArr)
         .then(results => {
 
-          console.log("YES", results)
-
           var basketIntrsct = results.find(x => x.Type == "BASKET");
           if (basketIntrsct != undefined && basketIntrsct.intersects == true) {
             hasIntersection = true;
@@ -216,12 +214,12 @@ class IntersectionTester {
 
           if (hasIntersection == false) {
 
-            // only do this test if you are a specific type [Basket, Product]
+            // only do this test if you are a specific type [Basket, Product, Sharebox]
             // let containsSpecifcItems = TypeArr.filter(function (el) {
             //   return el == "BASKET" || el == "PRODUCT";
             // });
 
-            console.log("BASKET/PRODUCT TEST INTRSCT", ItemType, TypeArr)
+            console.log("BASKET/PRODUCT/SHAREBOX TEST INTRSCT", ItemType, TypeArr)
 
             if (ItemType == "BASKET" || ItemType == "PRODUCT" || ItemType == "SHAREBOX") {
               // console.log("BASKET TEST INTRSCT", ItemType)
@@ -306,7 +304,7 @@ class IntersectionTester {
       }
 
       let children = ctrl_store.getAllPlanogramItems(VueStore, activeGondola.ID);
-      children = children.filter((el) => el.Type.toUpperCase() == "SHELF" || el.Type.toUpperCase() == "BASE" || el.Type.toUpperCase() == "SHAREBOX");
+      children = children.filter((el) => el.Type.toUpperCase() == "SHELF" || el.Type.toUpperCase() == "BASE" || el.type.toUpperCase() == "SHAREBOX");
 
       if (children.length == 0) {
         resolve(retVal);

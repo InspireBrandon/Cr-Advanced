@@ -14,14 +14,14 @@
             </v-toolbar>
             <v-card-text class="pa-2" style="height: 400px; overflow: auto;">
                 <div v-for="(rg, idx) in retailerGroups" :key="'rg-' + idx">
-                    <div style="display: flex;">
+                    <div style="display: flex; cursor: pointer;">
                         <v-btn icon small class="mt-0" v-if="rg.hidden" @click="toggleHidden(rg)">
                             <v-icon>visibility</v-icon>
                         </v-btn>
                         <v-btn icon small class="mt-0" v-if="!rg.hidden" @click="toggleHidden(rg)">
                             <v-icon>visibility_off</v-icon>
                         </v-btn>
-                        <div class="headline">{{ rg.name }}</div>
+                        <div class="headline" @click="toggleHidden(rg)">{{ rg.name }}</div>
 
                         <v-btn icon small class="mt-0" @click="addRetailer(rg)">
                             <v-icon>add</v-icon>
@@ -47,8 +47,12 @@
                                 <v-spacer></v-spacer>
                                 <v-list-tile-action>
                                     <div style="display: flex;">
-                                        <v-btn @click="modifyRetailerStores(retailer)" flat color="primary" icon>
+                                        <v-btn @click="modifyRetailer(retailer)" flat color="primary" icon>
                                             <v-icon>edit</v-icon>
+                                        </v-btn>
+                                        <v-btn style="margin-left: 5px;" @click="modifyRetailerStores(retailer)" flat
+                                            icon>
+                                            <v-icon>list</v-icon>
                                         </v-btn>
                                         <v-btn style="margin-left: 5px;" @click="deleteRetailer(retailer)" flat
                                             color="error" icon>
@@ -57,7 +61,7 @@
                                     </div>
                                 </v-list-tile-action>
                             </v-list-tile>
-                            <v-divider :key="idx + 'd'"></v-divider>
+                            <v-divider v-if="!rg.hidden" :key="idx + 'd'"></v-divider>
                         </template>
                     </v-list>
                 </div>
@@ -111,7 +115,7 @@
                 Axios.get(process.env.VUE_APP_API + "RetailerGroup")
                     .then(r => {
                         r.data.retailerGroupList.forEach(element => {
-                            element.hidden = false
+                            element.hidden = true
                         });
                         self.retailerGroups = r.data.retailerGroupList;
 
@@ -191,8 +195,8 @@
             },
             editGroup(group) {
                 let self = this
-                console.log(group);
-                self.$refs.Prompt.show("", "Location Group Name", "Name", name => {
+
+                self.$refs.Prompt.show(group.name, "Location Group Name", "Name", name => {
                     if (name == "") {
                         alert("Please specify a name for the location group.");
                     } else {
@@ -205,13 +209,33 @@
                     }
                 })
             },
+            modifyRetailer(retailer) {
+                let self = this;
+
+                self.$refs.Prompt.show(retailer.name, "Location Name", "Name", name => {
+                    if (name == "") {
+                        alert("Please specify a name for the location.");
+                    } else {
+                        retailer.name = name
+                        Axios.put(process.env.VUE_APP_API + "Retailer", retailer)
+                            .then(r => {})
+                            .catch(e => {
+                                console.error(e);
+                            })
+                    }
+                })
+            },
             deleteGroup(group) {
                 let self = this
-                Axios.delete(process.env.VUE_APP_API + `RetailerGroup?retailerGroupID=${group.id}`)
-                    .then(r => {
-                        self.getRetailerGroups();
-                        self.getRetailers();
-                    })
+
+                self.$refs.YesNoModal.show("Delete this location group?", value => {
+                    if (value) {
+                        Axios.delete(process.env.VUE_APP_API + "RetailerGroup?retailerGroupID=" + group.id)
+                            .then(r => {
+                                self.retailerGroups.splice(self.retailerGroups.indexOf(group), 1);
+                            })
+                    }
+                })
             },
             openFileDialog(retailerID) {
                 let self = this;
@@ -239,7 +263,7 @@
             deleteRetailer(retailer) {
                 let self = this;
 
-                self.$refs.YesNoModal.show("Are you sure that you want to delete this retailer?", value => {
+                self.$refs.YesNoModal.show("Delete this location?", value => {
                     if (value) {
                         Axios.delete(process.env.VUE_APP_API + "Retailer?retailerID=" + retailer.id)
                             .then(r => {

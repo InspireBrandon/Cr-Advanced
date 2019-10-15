@@ -81,7 +81,7 @@ class GeneralPosition {
             item.LastPositionRelative = item.Group.position();
             item.LastPositionAbsolute = item.Group.getAbsolutePosition();
 
-            if (item.Type == "PRODUCT") {
+            if (item.Type == "PRODUCT" || item.Type == "SHAREBOX") {
               let actualWidth = item.Orientation_Width * item.Facings_X;
               x += ((actualWidth - (item.Facings_X * squish))) + 0.1;
             } else {
@@ -554,14 +554,16 @@ class GeneralPosition {
     }
     break;
     case "SHAREBOX": {
+      console.log("WHAT IS GOING ON????????")
       // let squish = parent.GetSquishValue(parent.ID);
 
       let x = merchOffset;
       sortedArr.forEach((item, idx) => {
+
         item.Position = idx + 1;
         item.Group.setX(x);
-        item.LastPositionRelative = item.Group.position();
-        item.LastPositionAbsolute = item.Group.getAbsolutePosition();
+        // item.LastPositionRelative = item.Group.position();
+        // item.LastPositionAbsolute = item.Group.getAbsolutePosition();
 
         if (item.Type == "PRODUCT") {
           let actualWidth = item.Orientation_Width * item.Facings_X;
@@ -576,9 +578,15 @@ class GeneralPosition {
       if (currentItem != null) {
         let y = parent.Group.getHeight() - (currentItem.TotalHeight);
         currentItem.Group.setY(y);
+        currentItem.Group.setX(0);
 
         currentItem.LastPositionRelative = currentItem.Group.position();
         currentItem.LastPositionAbsolute = currentItem.Group.getAbsolutePosition();
+        // let y = parent.Group.getHeight() - (currentItem.TotalHeight);
+        // currentItem.Group.setY(y);
+
+        // currentItem.LastPositionRelative = currentItem.Group.position();
+        // currentItem.LastPositionAbsolute = currentItem.Group.getAbsolutePosition();
       }
 
       // switch (spreadType.toUpperCase()) {
@@ -1132,6 +1140,8 @@ class GeneralPosition {
 
     let ctrl_store = new StoreHelper();
     let parentItem = ctrl_store.getPlanogramItemById(productGroup.VueStore, productGroup.ParentID);
+    let children = ctrl_store.getPlanogramItemsByParentID(productGroup.VueStore, productGroup.ParentID);
+
     let nestingApplies = false;
     let nestingHeight = 0;
     if (productGroup.Data.nesting_Height != undefined && productGroup.Data.nesting_Height != null && productGroup.Data.nesting_Height != "" && yFacings > 0) {
@@ -1213,12 +1223,31 @@ class GeneralPosition {
         return retVal;
       }
       case "SHAREBOX": {
-        retVal.y = productGroup.Group.getHeight() - ((yFacings + 1) * productGroup.Orientation_Height);
-        retVal.x = (xFacings * productGroup.Orientation_Width);
+        // BRANDON - Commenting out for now
+        if(children.length > 1) {
+          let totalHeight = 0;
+
+          children.forEach(product => {
+            if(product.ID != productGroup.ID) {
+              totalHeight += product.Height;
+            }
+          });
+
+          retVal.y = (productGroup.Group.getHeight() - ((yFacings + 1) * productGroup.Orientation_Height)) - totalHeight;
+        }
+        else {
+          retVal.y = productGroup.Group.getHeight() - ((yFacings + 1) * productGroup.Orientation_Height);
+        }
+
+        productGroup.Group.setY(retVal.y);
+        retVal.x = 0; // (xFacings * productGroup.Orientation_Width);
+
         return retVal;
+        // retVal.y = productGroup.Group.getHeight() - ((yFacings + 1) * productGroup.Orientation_Height);
+        // retVal.x = (xFacings * productGroup.Orientation_Width);
+        // return retVal;
       }
       case "PEGBOARD": {
-
         retVal.y = productGroup.Group.getHeight() - ((yFacings + 1) * productGroup.Orientation_Height);
         retVal.x = (xFacings * productGroup.Orientation_Width);
         return retVal;

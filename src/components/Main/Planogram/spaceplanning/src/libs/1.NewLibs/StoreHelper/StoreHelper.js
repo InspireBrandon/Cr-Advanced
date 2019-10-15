@@ -43,6 +43,10 @@ class StoreHelper {
     return VueStore.getters.getPlanogramItemById(id);
   }
 
+  getPlanogramItemsByParentID(VueStore, parentID) {
+    return VueStore.getters.getPlanogramItemByParentID(parentID);
+  }
+
   addPlanogramItem(VueStore, item) {
     let self = this;
 
