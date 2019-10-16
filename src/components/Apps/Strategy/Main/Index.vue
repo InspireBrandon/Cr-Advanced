@@ -26,7 +26,7 @@
                         <v-list-tile @click="customSetup">
                             <v-list-tile-title>Cluster</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile @click="openRetailerModal">
+                        <!-- <v-list-tile @click="openRetailerModal">
                             <v-list-tile-title>Locations</v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile @click="LinkRetailerStore">
@@ -34,7 +34,7 @@
                         </v-list-tile>
                         <v-list-tile>
                             <v-list-tile-title>Link Supplier Stores</v-list-tile-title>
-                        </v-list-tile>
+                        </v-list-tile> -->
                         <!-- <v-list-tile @click="openFile">
                             <v-list-tile-title>Open</v-list-tile-title>
                         </v-list-tile> -->
@@ -56,7 +56,8 @@
                 <!-- <v-btn slot="activator" flat @click="customQuery">
                     Custom
                 </v-btn> -->
-                <v-menu dark offset-y style="margin-bottom: 10px;">
+                <!--  -->
+                <!-- <v-menu dark offset-y style="margin-bottom: 10px;">
                     <v-btn slot="activator" flat>
                         Map Image
                     </v-btn>
@@ -68,7 +69,8 @@
                             <v-list-tile-title>Edit</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
-                </v-menu>
+                </v-menu> -->
+                <!--  -->
                 <!-- <v-btn flat dark @click="maintainCities">Cities</v-btn> -->
             </v-toolbar-items>
             <v-spacer></v-spacer>
@@ -106,9 +108,9 @@
                 <v-btn class="elevation-0" style="width: 100px" round color="primary">
                     Output
                 </v-btn>
-                <v-btn class="elevation-0" style="width: 100px" round color="primary">
+                <!-- <v-btn class="elevation-0" style="width: 100px" round color="primary">
                     Map
-                </v-btn>
+                </v-btn> -->
                 <v-btn class="elevation-0" style="width: 100px" round color="primary">
                     Geogrid
                 </v-btn>
@@ -122,12 +124,11 @@
         </v-toolbar>
         <Grid :showGrid="showGrid" :selectFile='openFile' :createFile="customSetup" v-show="selectedView == 0"
             :rowData="rowData" :headers="headers" ref="Grid" />
-        <Map :setGeogridData="onSetGeogridData" v-if="selectedView == 1" :rowData="rowData" :setupData="setupMapData"
-            ref="Map" />
-        <Geogrid :geoGridData="geoGridData" v-if="selectedView == 2" ref="Geogrid" />
+        
+        <Geogrid :geoGridData="geoGridData" v-if="selectedView == 1" ref="Geogrid" />
         <!-- <ClusterModels :fileData="rowData" v-if="selectedView == 2" ref="ClusterModels" /> -->
 
-        <div v-if="selectedView == 3">
+        <div v-if="selectedView == 2">
             <iframe width="100%" style="height: calc(100vh - 223px)" src="https://app.powerbi.com/view?r=eyJrIjoiOGY0N2JkNzgtYzFhMC00NmIxLTg5NWEtZjRjZWJiMzEzYzhkIiwidCI6ImY2NzU3NzFmLWQ3ZWItNDgxNC04OTkzLWI5MDg2OTcwMTQ1ZSJ9" frameborder="0" allowFullScreen="true"></iframe>
         </div>
 

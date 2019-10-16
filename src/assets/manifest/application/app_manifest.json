@@ -33,5 +33,9 @@
     {
         "id": 9,
         "system_code": "TESTING"
+    },
+    {
+        "id": 10,
+        "system_code": "MAP"
     }
 ]
