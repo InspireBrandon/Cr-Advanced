@@ -1,104 +1,130 @@
 <template>
     <div width="100%">
+        <v-toolbar dark flat color="grey darken-2">
+            <v-toolbar-items>
+                <v-menu dark offset-y style="margin-bottom: 10px;">
+                    <v-btn slot="activator" flat>
+                        File
+                    </v-btn>
+                    <v-list>
+                        <!-- <v-list-tile @click="customSetup">
+                            <v-list-tile-title>New</v-list-tile-title>
+                        </v-list-tile> -->
+                        <v-list-tile>
+                            <v-list-tile-title>Save</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile>
+                            <v-list-tile-title>Open</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
+            </v-toolbar-items>
+            <v-spacer></v-spacer>
+            <v-toolbar-title>
+                Market Share
+            </v-toolbar-title>
+        </v-toolbar>
+        <v-toolbar dark flat>
+            <v-toolbar-items>
+                <v-select style="margin-left: 10px; margin-top: 8px; width: 200px" placeholder="Field" hide-details>
+                </v-select>
+
+                <v-select style="margin-left: 10px; margin-top: 8px; width: 200px" placeholder="Values" hide-details>
+                </v-select>
+            </v-toolbar-items>
+        </v-toolbar>
         <div oncontextmenu="return false;" class="mapContainer">
-            <div id="thisone2" class="map" ref="thisone2">
-            </div>
-            <div class="sideBar">
-                <v-card max-height="400px;" flat>
+            <v-layout row wrap>
+                <v-flex md9>
+                    <div id="thisone2" class="map" ref="thisone2">
+                    </div>
+                </v-flex>
+                <v-flex md3>
+                    <!-- <div class="sideBar"> -->
+                    <div>
+                        <v-card max-height="400px;" flat>
 
 
-                    <v-tabs class="elevation-4" centered dark fixed-tabs justify-content: center>
-                        <v-tabs-slider color="white"></v-tabs-slider>
+                            <v-tabs class="elevation-4" centered dark fixed-tabs justify-content: center>
+                                <v-tabs-slider color="white"></v-tabs-slider>
 
-                        <v-tab href="#tab-1" justify-content: center>
+                                <!-- <v-tab href="#tab-1" justify-content: center>
                             Map Image
-                        </v-tab>
-                        <v-tab href="#tab-2" justify-content: center>
-                            Setup Map
-                        </v-tab>
-
-                        <v-tab-item id="tab-1" class="elevation-2" justify-content: center>
+                        </v-tab> -->
+                                <v-tab href="#tab-1" justify-content: center>
+                                    Market Share
+                                </v-tab>
+                                <v-tab href="#tab-2" justify-content: center>
+                                    Setup Map
+                                </v-tab>
+                                <!-- <v-tab-item id="tab-1" class="elevation-2" justify-content: center>
                             <v-toolbar dark flat dense color="primary">
                                 <v-toolbar-title> Image </v-toolbar-title>
                                 <v-spacer> </v-spacer>
                                 <v-btn @click="showSelector">maps</v-btn>
-                                <!-- <v-autocomplete :items="maps" v-model="selectedmap" @change="onMapChange"> </v-autocomplete> -->
                             </v-toolbar>
                             <img v-show="legendImgURL != '' && selectedmap != null"
                                 :src="legendImgURL == '' ? tmpImageURL : legendImgURL" :aspect-ratio="10/13"
                                 class="grey lighten-2 mt-0" width="200px" style="object-fit: fill;">
-                        </v-tab-item>
-                        <v-tab-item id="tab-2" class="elevation-2" justify-content: center>
-                            <v-card height="calc(100vh - 273px)">
-                                <v-toolbar dark flat dense color="primary">
-                                    <v-toolbar-title> Setup </v-toolbar-title>
-                                    <v-spacer> </v-spacer>
-                                </v-toolbar>
-                                <v-card-text>
-                                    <!-- <v-checkbox label="Pie Charts" hide-details v-model="usePiecharts"> </v-checkbox>
-                                    <v-autocomplete v-if="usePiecharts" multiple :items="planograms"
-                                        v-model="selectedPlanograms" label="Planograms">
-                                    </v-autocomplete>
-                                    <v-divider></v-divider> -->
+                        </v-tab-item> -->
+                                <v-tab-item id="tab-1" class="elevation-2" justify-content: center>
+                                    <v-card height="calc(100vh - 273px)">
+                                        <v-toolbar dark flat dense color="primary">
+                                            <v-toolbar-title> Market Share </v-toolbar-title>
+                                            <v-spacer> </v-spacer>
+                                        </v-toolbar>
+                                    </v-card>
 
 
-                                    <v-checkbox label="Pie Charts" hide-details v-model="usePiecharts"> </v-checkbox>
-                                    <v-autocomplete v-if="usePiecharts" multiple :items="piechartItems"
-                                        v-model="selectedPiechartItems" label="Pie Charts Items">
-                                    </v-autocomplete>
-                                    <v-divider></v-divider>
+                                </v-tab-item>
+
+                                <v-tab-item id="tab-2" class="elevation-2" justify-content: center>
+                                    <v-card height="calc(100vh - 273px)">
+                                        <v-toolbar dark flat dense color="primary">
+                                            <v-toolbar-title> Setup </v-toolbar-title>
+                                            <v-spacer> </v-spacer>
+                                        </v-toolbar>
+                                        <v-card-text>
+                                            <v-checkbox label="Pie Charts" hide-details v-model="usePiecharts">
+                                            </v-checkbox>
+                                            <v-autocomplete v-if="usePiecharts" multiple :items="piechartItems"
+                                                v-model="selectedPiechartItems" label="Pie Charts Items">
+                                            </v-autocomplete>
+                                            <v-divider></v-divider>
 
 
-                                    <v-checkbox label="Heatmaps" hide-details v-model="useHeatmap"> </v-checkbox>
-                                    <v-text-field label="radius" type="number" v-if="useHeatmap" hide-details
-                                        v-model="radius"></v-text-field>
-                                    <v-autocomplete v-if="useHeatmap" multiple :items="heatmapItems"
-                                        v-model="selectedHeatmapField" label="Heatmaps">
-                                    </v-autocomplete>
-                                    <v-divider></v-divider>
+                                            <v-checkbox label="Heatmaps" hide-details v-model="useHeatmap">
+                                            </v-checkbox>
+                                            <v-text-field label="radius" type="number" v-if="useHeatmap" hide-details
+                                                v-model="radius"></v-text-field>
+                                            <v-autocomplete v-if="useHeatmap" multiple :items="heatmapItems"
+                                                v-model="selectedHeatmapField" label="Heatmaps">
+                                            </v-autocomplete>
+                                            <v-divider></v-divider>
 
 
-                                    <v-checkbox label="Use Size Map" hide-details v-model="useSizeMap"> </v-checkbox>
-                                    <v-autocomplete v-if="useSizeMap" multiple :items="heatmapItems"
-                                        v-model="selectedSizeMapField" label="Size Map Items">
-                                    </v-autocomplete>
-                                    <v-checkbox label="Use Retailer Map" hide-details v-model="useRetailerMap">
-                                    </v-checkbox>
-                                    <v-autocomplete v-if="useRetailerMap" multiple :items="selectedRetailers"
-                                        v-model="selectedRetailersFields" label="Size Map Items">
-                                    </v-autocomplete>
-                                </v-card-text>
-                                <v-card-actions>
-                                    <v-spacer></v-spacer>
-                                    <v-btn color="primary" @click="submitSidebar"> draw Map</v-btn>
-                                </v-card-actions>
-
-                            </v-card>
-                        </v-tab-item>
-                    </v-tabs>
-
-                </v-card>
-
-                <!-- <v-card>
-                    <v-toolbar dark flat dense color="primary">
-                        <v-toolbar-title> Store Import Co-Ords </v-toolbar-title>
-                    </v-toolbar>
-                    <v-list dense>
-                        <v-list-tile>
-                            <v-list-tile-avatar>
-                                <v-btn icon @click="plotStore('item')">
-                                    <v-icon> room </v-icon>
-                                </v-btn>
-                            </v-list-tile-avatar>
-                            <v-list-tile-title>
-                                longmans shops
-                            </v-list-tile-title>
-                            <v-list-tile-action>long:28.36 Lat:27.36</v-list-tile-action>
-                        </v-list-tile>
-
-                    </v-list>
-                </v-card> -->
-            </div>
+                                            <v-checkbox label="Use Size Map" hide-details v-model="useSizeMap">
+                                            </v-checkbox>
+                                            <v-autocomplete v-if="useSizeMap" multiple :items="heatmapItems"
+                                                v-model="selectedSizeMapField" label="Size Map Items">
+                                            </v-autocomplete>
+                                            <v-checkbox label="Use Retailer Map" hide-details v-model="useRetailerMap">
+                                            </v-checkbox>
+                                            <v-autocomplete v-if="useRetailerMap" multiple :items="selectedRetailers"
+                                                v-model="selectedRetailersFields" label="Size Map Items">
+                                            </v-autocomplete>
+                                        </v-card-text>
+                                        <v-card-actions>
+                                            <v-spacer></v-spacer>
+                                            <v-btn color="primary" @click="submitSidebar"> draw Map</v-btn>
+                                        </v-card-actions>
+                                    </v-card>
+                                </v-tab-item>
+                            </v-tabs>
+                        </v-card>
+                    </div>
+                </v-flex>
+            </v-layout>
         </div>
         <input type="file" style="display: none;" ref="fileInput" @change="onImageChange">
         <YesNoModal ref="yesNo"></YesNoModal>
@@ -159,7 +185,7 @@
                 fileData: null,
                 heatData: null,
                 pieData: null,
-                canPlot: true,
+                canPlot: false,
                 currentPlotStore: null,
                 maxHeatLegend: 4000000,
                 maps: [],
@@ -173,7 +199,8 @@
                 accrossCities: [],
                 majorCities: [],
                 acrossArr: [],
-                sideArr: []
+                sideArr: [],
+                geoGridData: []
             }
         },
         mounted() {
@@ -183,7 +210,8 @@
             this.getHinterlandStores()
             this.getCities()
             this.getRetailers()
-            this.testKak(this.rowData);
+            this.getGeoGrid()
+            // this.testKak(this.rowData);
             let self = this;
             let encoded_details = jwt.decode(sessionStorage.accessToken);
             self.SystemUser_ID = encoded_details.USER_ID;
@@ -217,6 +245,41 @@
             self.piechartItems = tmp
         },
         methods: {
+            DrawGeoGrid(chart, callback) {
+                let self = this
+                console.log("drawChart");
+                console.log(self.geoGridData);
+                self.geoGridData.forEach((e, idx) => {
+                    let arr = [e]
+
+                    let shapeSeries = chart.series.push(new am4maps.MapPolygonSeries());
+
+                    shapeSeries.data = [{
+                        "title": "Bermuda triangle",
+                        "geoPolygon": arr
+                    }]
+                    shapeSeries.visibleInLegend = false;
+                    shapeSeries.name = "block"
+                    let shapeTemplate = shapeSeries.mapPolygons.template;
+                    shapeTemplate.stroke = am4core.color("#e33");
+                    shapeTemplate.strokeWidth = 2;
+                    shapeTemplate.fill = shapeTemplate.stroke;
+                    shapeTemplate.fillOpacity = 0.2;
+                    shapeTemplate.nonScalingStroke = true;
+                    shapeTemplate.tooltipText = idx
+                })
+
+                callback()
+            },
+            getGeoGrid() {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + `SuplierLocationImportTX/GeoReport`).then(r => {
+                    console.log(r);
+                    self.geoGridData = r.data
+                })
+            },
             getRetailers() {
                 let self = this
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -501,8 +564,10 @@
                     .then(fd => {
                         Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fd.data.id}`)
                             .then(r => {
-
+                                console.log(r);
+                                
                                 self.fileData = r.data
+
                                 self.drawMap(this.labels, {
                                     useHeatmap: false,
                                     usePiecharts: false,
@@ -612,12 +677,14 @@
 
                 return final
             },
-            drawPolygonseries(chart, screeWidth) {
+            drawPolygonseries(chart,screeWidth) {
                 // //////////////////////////////////////////////////
                 // start image background overlay/color fill
                 // //////////////////////////////////////////////////
                 let self = this
                 let polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
+                console.log("in polyseries");
+                
                 polygonSeries.strokeOpacity = 0.9;
                 polygonSeries.useGeodata = true;
                 let polygonTemplate = polygonSeries.mapPolygons.template;
@@ -644,7 +711,6 @@
                     polygonTemplate.tooltipText = "{name}";
                 }
                 polygonTemplate.nonScalingStroke = true;
-
             },
             drawRetailerMap(chart, mapData) {
                 // /////////////////////////////////////////////////////
@@ -766,7 +832,6 @@
                     '<a style="background-color: black;color: white;font-size:1px" >{city}</a>'
                 accrossCitiesLabel.fontSize = 3
                 accrossCitiesLabel.nonScaling = false;
-
             },
             drawRetailerImport(chart, config) {
                 let self = this
@@ -1028,10 +1093,12 @@
                 var title = chart.titles.create();
                 title.text = "[bold font-size: 20]Store Sales Heatmap[/]";
                 title.textAlign = "middle";
-                self.rowData.forEach((element, idx) => {
-                    element["color"] = '#424242'
-                    formattedData.push(element);
-                });
+                // self.rowData.forEach((element, idx) => {
+                //     element["color"] = '#424242'
+                //     formattedData.push(element);
+                // });
+                console.log(am4geodata_worldLow);
+
                 let asd = am4geodata_worldLow
                 chart.geodata = asd;
                 if (chart.geodata.features[9].geometry.coordinates.length == 3) {
@@ -1042,9 +1109,11 @@
                 // //////////////////////////////////////////////////
                 // end draw of base chart 
                 // //////////////////////////////////////////////////
-
-                self.drawPolygonseries(chart, screeWidth)
+                console.log("drawPoly");
+                
+                self.drawPolygonseries(chart,screeWidth)
                 // self.drawImageSeries(chart)
+                 console.log("drawMAjor");
                 self.drawMajorCitiesImageSeries(chart)
                 self.drawMinorCities(chart)
                 if (config.selectedRetailers != undefined && config.selectedRetailers.length > 0) {
@@ -1059,10 +1128,11 @@
                 if (config.useSizeMap) {
                     self.drawSizeMaps(chart, config, setupdata)
                 }
-                self.drawGridLines(chart)
+                // self.drawGridLines(chart)
                 // if (self.lines) {
                 //     self.drawGridLines(chart)
                 // }
+
                 if (self.useRetailerMap) {
                     self.drawRetailerMap(chart, setupdata.retailerMap)
                 }
@@ -1073,7 +1143,7 @@
                     var coords = chart.svgPointToGeo(ev.svgPoint);
                     console.log("coords");
                     console.log(coords);
-                    
+
                     if (!self.canPlot) {
                         return
                     }
@@ -1130,6 +1200,19 @@
                 chart.legend.padding(5, 10, 15, 10);
                 chart.legend.position = "right";
                 chart.legend.valign = "top";
+                let legendLength = chart.legend.data.length
+                console.log(chart.legend.data.length);
+                self.DrawGeoGrid(chart, callback => {
+                    console.log("chart.valueLabels");
+                    console.log(chart.legend.data.length);
+                    // chart.legend.data.forEach((e,idx)=>{
+                    //     if(e.name=="block"){
+                    //         chart.legend.data.splice(idx, 1);
+                    //     }
+                    // })
+                    chart.legend.data.splice(legendLength, (chart.legend.data.length - legendLength));
+                    console.log(chart.legend);
+                })
             },
             testKak(rowData) {
                 let self = this;
@@ -1294,7 +1377,8 @@
 <style scoped>
     .map {
         height: calc(100vh - 225px);
-        width: 1600px;
+        /* width: 1600px; */
+        width: 100%;
         background-color: #cccccc;
         float: left;
     }
@@ -1309,7 +1393,7 @@
         width: 17%
     }
 
-    @media screen and (min-width:1280px) {
+    /* @media screen and (min-width:1280px) {
         .map {
             width: 1000px;
         }
@@ -1373,5 +1457,5 @@
 
             width: calc(100vw - 2200px)
         }
-    }
+    } */
 </style>

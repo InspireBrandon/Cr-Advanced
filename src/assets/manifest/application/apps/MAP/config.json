@@ -1,0 +1,13 @@
+
+{
+    "configName":"Map",
+    "report":false,
+    "routes": [
+        {
+            "route": "/map",
+            "routeName": "map",
+            "title": "map",
+            "openInNewWindow": false
+        }
+    ]
+}
