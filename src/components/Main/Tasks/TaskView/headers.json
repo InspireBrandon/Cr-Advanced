@@ -23,7 +23,8 @@
         "headerName": "Store Cluster",
         "field": "storeCluster",
         "editable": false,
-        "hide": false
+        "hide": false,
+        "valueFormatter": "function (params) {return formatter.format(params.value);}"
     },
     {
         "headerName": "Category Cluster",

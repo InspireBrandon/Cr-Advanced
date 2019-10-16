@@ -39,6 +39,11 @@
                     @click="params.context.componentParent.closeTask(params.data)">
                     <span>close</span>
                 </v-list-tile>
+                 <v-divider></v-divider>
+
+                <v-list-tile @click="params.context.componentParent.sendDiscontinue(params.data)">
+                    <span>Discontinue</span>
+                </v-list-tile>
 
             </v-list>
         </v-menu>
