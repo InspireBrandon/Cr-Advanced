@@ -1861,7 +1861,8 @@ class PlanogramItemBase {
             },
             TotalWidth: self.TotalWidth,
             TotalHeight: self.TotalHeight,
-            RandomColor: self.RandomColor
+            RandomColor: self.RandomColor,
+            StackIndex: self.StackIndex
           },
           Position: self.Position
         }

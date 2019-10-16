@@ -304,7 +304,7 @@ class IntersectionTester {
       }
 
       let children = ctrl_store.getAllPlanogramItems(VueStore, activeGondola.ID);
-      children = children.filter((el) => el.Type.toUpperCase() == "SHELF" || el.Type.toUpperCase() == "BASE" || el.type.toUpperCase() == "SHAREBOX");
+      children = children.filter((el) => el.Type.toUpperCase() == "SHELF" || el.Type.toUpperCase() == "BASE");
 
       if (children.length == 0) {
         resolve(retVal);

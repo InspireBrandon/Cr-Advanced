@@ -85,8 +85,9 @@
               <div slot="header">Details</div>
               <v-card>
                 <v-card-text>
-                   <div v-if="rangingData!=null" class="details">Range Name: {{rangingData.planogramName}} {{rangingData.tag}} {{ rangingData.monthsBetween }}MMA </div>
-                   <div v-if="rangingData==null" class="details"> No range found, Please select one</div>
+                  <div v-if="rangingData!=null" class="details">Range Name: {{rangingData.planogramName}}
+                    {{rangingData.tag}} {{ rangingData.monthsBetween }}MMA </div>
+                  <div v-if="rangingData==null" class="details"> No range found, Please select one</div>
                   <div v-if="rangingData.planogramID != null" class="details">Planogram Name: {{
                     rangingData.planogramName
                     }}</div>
@@ -849,7 +850,7 @@
             .then(r => {
               if (r.data) {
                 console.log(r.data);
-                
+
                 self.getCategoryCluster(r.data.planogramID)
                 self.rangingData.dateFromString = r.data.dateFromString;
                 self.rangingData.dateToString = r.data.dateToString;
@@ -1000,7 +1001,7 @@
                 self.updateLoader({
                   currentFile: 2,
                 })
-                
+
                 self.$store.commit("setRangeID", clusterData.rangeID);
                 self.$store.commit("setPlanogramName", r.data.planogramName);
                 self.setRangingClusterData(r.data.clusterData);
@@ -1521,7 +1522,21 @@
               self.$store.commit("setClusterType", self.selectedClusterType);
               self.$store.commit("setClusterID", self.selectedClusterOption);
 
+              let storeProducts = self.$store.state.activePlanogramProducts;
+
               self.products = self.rangingController.getSalesDataByStore(self.selectedClusterOption);
+
+              if (storeProducts.length > 0) {
+                storeProducts.forEach(storeProduct => {
+                  self.products.forEach(product => {
+                    if (storeProduct.Data.productID == product.productID) {
+                      for (var prop in product) {
+                        storeProduct.Data[prop] = product[prop];
+                      }
+                    }
+                  })
+                });
+              }
             }
           }
         })

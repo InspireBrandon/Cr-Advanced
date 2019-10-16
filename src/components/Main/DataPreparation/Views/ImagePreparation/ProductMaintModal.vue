@@ -1241,6 +1241,7 @@
         let productData;
 
         let ctrl_store = new StoreHelper();
+        
         let productStoreCopy = ctrl_store.getAllPlanogramItemsByType(
           self.$store,
           "PRODUCT"
@@ -1265,9 +1266,11 @@
           }
         });
 
+        console.log(productData.ProductData)
+
         calcData.DaysOfSupply = self.CalculationHandler.Calculate_Days_Of_Supply_Potential(
           productData.TotalFacings,
-          productData.ProductData.sales_Units
+          self.$store.state.usePotential ? productData.ProductData.volume_Potential : productData.ProductData.sales_Units
         );
 
         self.currentSalesPotential = productEventData.Data.sales_potential;

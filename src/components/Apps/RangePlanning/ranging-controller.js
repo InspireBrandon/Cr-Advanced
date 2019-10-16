@@ -207,7 +207,11 @@ class RangingController {
   }
 
   getSalesDataByStore(storeID) {
+    console.log("[RANGING CONTROLLER] GETTING SALES DATA BY STORE")
     let store = getStoreByID(storeID, this.storeSales);
+
+    console.log("[RANGING CONTROLLER] SELECTED STORE", store);
+
     let sales = getSalesDataByStore(store, this.allRangeProducts, this.storeSales);
     return sales;
   }

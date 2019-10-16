@@ -1016,6 +1016,7 @@ class LoadSavePlanogramBase {
 
       //#region Set the same configs
       ctrl_item.ID = CurrentItem.Data.ID;
+      ctrl_item.StackIndex = CurrentItem.Data.StackIndex;
       ctrl_item.Orientation_Width = CurrentItem.Data.Orientation.Width;
       ctrl_item.Orientation_Height = CurrentItem.Data.Orientation.Height;
       ctrl_item.Orientation_Depth = CurrentItem.Data.Orientation.Depth;
