@@ -159,7 +159,7 @@
                 fileData: null,
                 heatData: null,
                 pieData: null,
-                canPlot: false,
+                canPlot: true,
                 currentPlotStore: null,
                 maxHeatLegend: 4000000,
                 maps: [],
@@ -1059,9 +1059,10 @@
                 if (config.useSizeMap) {
                     self.drawSizeMaps(chart, config, setupdata)
                 }
-                if (self.lines) {
-                    self.drawGridLines(chart)
-                }
+                self.drawGridLines(chart)
+                // if (self.lines) {
+                //     self.drawGridLines(chart)
+                // }
                 if (self.useRetailerMap) {
                     self.drawRetailerMap(chart, setupdata.retailerMap)
                 }
@@ -1069,6 +1070,10 @@
                 // event for plotting stores mostly used for debug
                 // /////////////////////////////////////////////////////
                 chart.seriesContainer.events.on("hit", function (ev) {
+                    var coords = chart.svgPointToGeo(ev.svgPoint);
+                    console.log("coords");
+                    console.log(coords);
+                    
                     if (!self.canPlot) {
                         return
                     }
