@@ -55,6 +55,7 @@ class ProductItemBase extends PlanogramItemBase {
     this.image_used = null;
     this.LastFace = 'front';
     this.RandomColor = this.randomColor()
+    this.StackIndex = null;
 
     //#region Pegboard hole position
     this.PegboardHoleAssigned = null;
