@@ -8,31 +8,56 @@
                     </v-toolbar>
                     <v-card flat>
                         <v-card-text>
-                            <v-select :disabled="elementsDisabled" :items="tasks" v-model="task" label="Task">
-                            </v-select>
-                            <div v-if="task == 3">
-                                <v-checkbox v-model="useExisting" label="Modify existing?"></v-checkbox>
-                                <div v-if="useExisting">
-                                    <v-select :disabled="elementsDisabled" :items="systemFiles" v-model="systemFile"
-                                        label="Planogram">
-                                    </v-select>
-                                </div>
-                                <div v-else>
-                                    <v-select :items="storeClusters" v-model="storeCluster" label="Store Cluster">
-                                    </v-select>
-                                    <v-select disabled :items="categoryClusters" v-model="categoryCluster"
-                                        label="Category Cluster"></v-select>
-                                    <v-select :items="stores" v-model="store" @change="filterUsersByStore"
-                                        label="Store"></v-select>
-                                </div>
-                            </div>
-                            <v-select :disabled="elementsDisabled" :items="users" v-model="user" label="User">
-                            </v-select>
-                             <v-select v-if="task==2" :items="users" v-model="approvalUser" label="Approval User">
-                            </v-select>
-                            <v-autocomplete :disabled="elementsDisabled" v-if="task==2" :items="rangeData"
-                                v-model="selectedRange" label="Ranging file">
-                            </v-autocomplete>
+                            <v-container grid-list-md class="pa-0">
+                                <v-layout row wrap>
+                                    <v-flex sm4>
+                                        <v-select :disabled="elementsDisabled" :items="tasks" v-model="task"
+                                            label="Task">
+                                        </v-select>
+                                    </v-flex>
+                                    <v-flex sm8>
+                                        <v-checkbox v-if="task == 3" v-model="useExisting" label="Modify existing?">
+                                        </v-checkbox>
+                                    </v-flex>
+                                    <v-flex sm4>
+                                        <v-autocomplete :disabled="elementsDisabled" :items="users" v-model="user"
+                                            label="User">
+                                        </v-autocomplete>
+                                    </v-flex>
+                                    <v-flex sm4>
+                                        <v-autocomplete v-if="task==2" :items="approvalUsers" v-model="approvalUser"
+                                            label="Approval User">
+                                        </v-autocomplete>
+                                    </v-flex>
+                                    <v-flex sm4>
+                                    </v-flex>
+                                    <v-flex sm12>
+                                        <v-autocomplete :disabled="elementsDisabled" v-if="task==2" :items="rangeData"
+                                            v-model="selectedRange" label="Ranging file">
+                                        </v-autocomplete>
+                                        <v-autocomplete v-if="useExisting && task == 3" :disabled="elementsDisabled"
+                                            :items="systemFiles" v-model="systemFile" label="Planogram">
+                                        </v-autocomplete>
+                                    </v-flex>
+                                    <v-flex sm6>
+                                        <v-autocomplete v-if="task == 3" :items="stores" v-model="store"
+                                            @change="filterUsersByStore" label="Store"></v-autocomplete>
+                                    </v-flex>
+                                    <v-flex sm6></v-flex>
+                                    <v-flex sm4>
+                                        <v-autocomplete :disabled="store != null" v-if="task == 3" :items="storeClusters"
+                                            v-model="storeCluster" label="Store Cluster"></v-autocomplete>
+                                    </v-flex>
+                                    <v-flex sm4>
+                                        <v-autocomplete :disabled="store != null" v-if="task == 3" :items="customClusters"
+                                            v-model="customCluster" label="Custom Cluster"></v-autocomplete>
+                                    </v-flex>
+                                    <v-flex sm4>
+                                        <v-autocomplete :disabled="store != null" v-if="task == 3" :items="categoryClusters"
+                                            v-model="categoryCluster" label="Category Cluster"></v-autocomplete>
+                                    </v-flex>
+                                </v-layout>
+                            </v-container>
                             <v-textarea label="Notes" v-model="notes"></v-textarea>
                         </v-card-text>
                     </v-card>
@@ -57,12 +82,12 @@
         this.value = value;
     }
 
-    function TextValueArray(array, textProperty, valueProperty, insertNull) {
+    function TextValueArray(array, textProperty, valueProperty, insertNull, nullText) {
         let tmp = [];
 
         if (insertNull)
             tmp.push({
-                text: "",
+                text: nullText,
                 value: null
             })
 
@@ -105,8 +130,9 @@
                 selectedRange: null,
                 task: null,
                 users: [],
+                approvalUsers: [],
                 tmpUsers: [],
-                approvalUser:null,
+                approvalUser: null,
                 user: null,
                 notes: null,
                 systemFiles: [],
@@ -115,27 +141,39 @@
                 storeCluster: null,
                 categoryClusters: [],
                 categoryCluster: null,
+                customClusters: [],
+                customCluster: null,
                 stores: [],
                 store: null,
                 useExisting: true,
                 rangeData: [],
-                elementsDisabled: false
+                elementsDisabled: false,
+                planogramID: null
             }
         },
         created() {},
         methods: {
             filterUsersByStore() {
-                let self = this
-                let tmp = []
-                self.tmpUsers.forEach(e => {
-                    if (e.accessType.accessType==2) {
-                        if (e.accessType.storeID==self.store) {
-                            tmp.push(e)
-                        }
+                let self = this;
+
+                // let tmp = [];
+                // self.tmpUsers.forEach(e => {
+                //     if (e.accessType.accessType == 2) {
+                //         if (e.accessType.storeID == self.store) {
+                //             tmp.push(e)
+                //         }
+                //     }
+                // })
+
+                // self.users = tmp
+
+                self.$nextTick(() => {
+                    if (self.store != null) {
+                        self.storeCluster = null;
+                        self.customCluster = null;
+                        self.categoryCluster = null;
                     }
                 })
-                self.users=tmp
-
             },
             getRange(callback) {
                 let self = this;
@@ -175,6 +213,8 @@
                         })
                 })
 
+                self.getCustomClusters();
+                self.getCategoryClusters();
             },
             getSpacePlans() {
                 let self = this;
@@ -197,7 +237,8 @@
                 return new Promise((resolve, reject) => {
                     Axios.get(process.env.VUE_APP_API + "Cluster/Store")
                         .then(r => {
-                            self.storeClusters = new TextValueArray(r.data, 'displayname', 'id', false)
+                            self.storeClusters = new TextValueArray(r.data, 'displayname', 'id', true,
+                                "None")
                             resolve();
                         })
                         .catch(e => {
@@ -227,7 +268,8 @@
                 return new Promise((resolve, reject) => {
                     Axios.get(process.env.VUE_APP_API + "Store?db=CR-Devinspire")
                         .then(r => {
-                            self.stores = new TextValueArray(r.data, 'storeName', 'storeID', true)
+                            self.stores = new TextValueArray(r.data, 'storeName', 'storeID', true,
+                                "All Stores")
                             resolve();
                         })
                         .catch(e => {
@@ -262,16 +304,24 @@
                         .then(r => {
 
                             self.users = [];
+                            self.approvalUsers = [{
+                                text: "None",
+                                value: null
+                            }];
 
                             for (var i = 0; i < r.data.length; i++) {
                                 let item = r.data[i];
 
-                                self.users.push({
+                                let tmp = {
                                     text: item.firstname + " " + item.lastname,
                                     value: item.systemUserID,
+                                }
 
-                                });
+                                self.users.push(tmp);
+
+                                self.approvalUsers.push(tmp)
                             }
+
                             self.users.forEach(e => {
                                 self.getAccessType(e.value, accessType => {
                                     e.accessType = accessType
@@ -297,6 +347,9 @@
                 })
             },
             showWithData(data, afterRuturn) {
+
+                console.log(data);
+
                 let self = this;
                 self.user = null
                 self.task = data.type;
@@ -310,6 +363,10 @@
                 self.user = data.projectOwnerID
                 self.approvalUser = data.approvalUserID
                 self.notes = data.notes;
+                self.planogramID = data.planogram_ID;
+                self.storeCluster = data.storeCluster_ID;
+                self.customCluster = data.customCluster_ID;
+                self.categoryCluster = data.categoryCluster_ID;
 
                 self.getData(() => {
                     if (data.userID != null) {
@@ -324,6 +381,8 @@
                     }
                     self.dialog = true;
                 })
+
+
             },
             returnResult() {
                 let self = this;
@@ -337,11 +396,78 @@
                     useExisting: self.useExisting,
                     storeCluster: self.storeCluster,
                     categoryCluster: self.categoryCluster,
+                    customCluster: self.customCluster,
                     store: self.store,
-                    approvalUserID:self.approvalUser
+                    approvalUserID: self.approvalUser
                 });
 
                 self.dialog = false;
+            },
+            // getStoreClusters() {
+            //     let self = this;
+
+            //     self.storeClusters = [{
+            //         text: "None",
+            //         value: null
+            //     }];
+
+            //     Axios.get(process.env.VUE_APP_API + "Cluster/Store")
+            //         .then(r => {
+            //             r.data.forEach(el => {
+            //                 self.storeClusters.push({
+            //                     text: el.displayname,
+            //                     value: el.id
+            //                 })
+            //             })
+            //         })
+            // },
+            getCategoryClusters() {
+                let self = this;
+
+                self.categoryClusters = [{
+                    text: "None",
+                    value: null
+                }];
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API +
+                        `Clusters/CategoryCluster?planogramID=${self.planogramID}`
+                    )
+                    .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+
+                        r.data.forEach(el => {
+                            self.categoryClusters.push({
+                                text: el.displayname,
+                                value: el.id
+                            })
+                        })
+                    })
+            },
+            getCustomClusters() {
+                let self = this;
+
+                self.customClusters = [{
+                    text: "None",
+                    value: null
+                }];
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API +
+                        `Clusters/CustomCluster?planogramID=${self.planogramID}`
+                    )
+                    .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+
+                        r.data.forEach(el => {
+                            self.customClusters.push({
+                                text: el.displayname,
+                                value: el.id
+                            })
+                        })
+                    })
             },
         }
     }

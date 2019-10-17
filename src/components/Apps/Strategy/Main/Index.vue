@@ -7,14 +7,14 @@
                         File
                     </v-btn>
                     <v-list>
-                        <!-- <v-list-tile @click="customSetup">
-                            <v-list-tile-title>New</v-list-tile-title>
-                        </v-list-tile> -->
                         <v-list-tile :disabled="!showGrid" @click="saveFile">
                             <v-list-tile-title>Save</v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile @click="openFile">
                             <v-list-tile-title>Open</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="getHinterlandStores">
+                            <v-list-tile-title>Refresh</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
                 </v-menu>
@@ -26,52 +26,8 @@
                         <v-list-tile @click="customSetup">
                             <v-list-tile-title>Cluster</v-list-tile-title>
                         </v-list-tile>
-                        <!-- <v-list-tile @click="openRetailerModal">
-                            <v-list-tile-title>Locations</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="LinkRetailerStore">
-                            <v-list-tile-title>Link Retailer Stores</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile>
-                            <v-list-tile-title>Link Supplier Stores</v-list-tile-title>
-                        </v-list-tile> -->
-                        <!-- <v-list-tile @click="openFile">
-                            <v-list-tile-title>Open</v-list-tile-title>
-                        </v-list-tile> -->
                     </v-list>
                 </v-menu>
-                <!-- <v-menu dark offset-y style="margin-bottom: 10px;">
-                    <v-btn @click="customSetup" slot="activator" flat>
-                        Setup
-                    </v-btn>
-                    <v-list>
-                        <v-list-tile @click="setup">
-                            <v-list-tile-title>Store Cluster</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="customSetup">
-                            <v-list-tile-title>Custom Clusters</v-list-tile-title>
-                        </v-list-tile>
-                    </v-list>
-                </v-menu> -->
-                <!-- <v-btn slot="activator" flat @click="customQuery">
-                    Custom
-                </v-btn> -->
-                <!--  -->
-                <!-- <v-menu dark offset-y style="margin-bottom: 10px;">
-                    <v-btn slot="activator" flat>
-                        Map Image
-                    </v-btn>
-                    <v-list>
-                        <v-list-tile @click="openMapImageModal(true,null)">
-                            <v-list-tile-title>Add</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="showSelector()">
-                            <v-list-tile-title>Edit</v-list-tile-title>
-                        </v-list-tile>
-                    </v-list>
-                </v-menu> -->
-                <!--  -->
-                <!-- <v-btn flat dark @click="maintainCities">Cities</v-btn> -->
             </v-toolbar-items>
             <v-spacer></v-spacer>
             <div v-if="title != ''">
@@ -83,63 +39,21 @@
             </v-toolbar-title>
         </v-toolbar>
         <v-toolbar dark flat>
-            <v-btn color="primary" @click="setSystemUserHeaders">
-                {{ currentToggle }}
-            </v-btn>
-            <v-btn color="primary" @click="getHinterlandStores">Refresh</v-btn>
             <v-toolbar-items>
-                <!-- <v-select @change="changeFile" style="margin-left: 10px; margin-top: 8px; width: 300px"
-                    placeholder="Select File" dense :items="files" v-model="selectedFile" hide-details>
-                </v-select> -->
+                <v-autocomplete class="pt-0" return-object :items="planograms" v-model="selectedPlanogram"
+                    style="width: 300px; margin-top: 15px;" placeholder="Select a planogram" dense hide-details>
+                </v-autocomplete>
             </v-toolbar-items>
-            <!-- <v-toolbar-items v-if="selectedView == 1">
-                <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 200px"
-                    placeholder="Select cluster type" :items="clusters" v-model="selectedCluster"
-                    @change="onClusterChange"> </v-autocomplete>
-                <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 200px"
-                    placeholder="Select cluster data" :items="dataFields" v-model="selectedDataField"> </v-autocomplete>
-            </v-toolbar-items> -->
-            <!-- <v-btn color="primary" @click="openMapSetup" v-if="selectedView == 1">Setup Map </v-btn> -->
-            <!-- <v-btn color="primary" @click="openRetailerModal">import</v-btn> -->
-            <!-- <v-btn color="primary" @click="openMapImageModal" v-if="selectedView == 1">Setup Map Images</v-btn> -->
             <v-spacer></v-spacer>
-
-            <v-btn-toggle v-model="selectedView" round class="transparent" mandatory>
-                <v-btn class="elevation-0" style="width: 100px" round color="primary">
-                    Output
-                </v-btn>
-                <!-- <v-btn class="elevation-0" style="width: 100px" round color="primary">
-                    Map
-                </v-btn> -->
-                <v-btn class="elevation-0" style="width: 100px" round color="primary">
-                    Geogrid
-                </v-btn>
-                <v-btn class="elevation-0" style="width: 100px" round color="primary">
-                    Map 2
-                </v-btn>
-                <!-- <v-btn class="elevation-0" style="width: 100px" round color="primary">
-                    Model
-                </v-btn> -->
-            </v-btn-toggle>
         </v-toolbar>
         <Grid :showGrid="showGrid" :selectFile='openFile' :createFile="customSetup" v-show="selectedView == 0"
             :rowData="rowData" :headers="headers" ref="Grid" />
-        
-        <Geogrid :geoGridData="geoGridData" v-if="selectedView == 1" ref="Geogrid" />
-        <!-- <ClusterModels :fileData="rowData" v-if="selectedView == 2" ref="ClusterModels" /> -->
-
-        <div v-if="selectedView == 2">
-            <iframe width="100%" style="height: calc(100vh - 223px)" src="https://app.powerbi.com/view?r=eyJrIjoiOGY0N2JkNzgtYzFhMC00NmIxLTg5NWEtZjRjZWJiMzEzYzhkIiwidCI6ImY2NzU3NzFmLWQ3ZWItNDgxNC04OTkzLWI5MDg2OTcwMTQ1ZSJ9" frameborder="0" allowFullScreen="true"></iframe>
-        </div>
-
         <Setup ref="Setup" />
         <CustomSetup ref="CustomSetup" />
         <Spinner ref="Spinner" />
         <Prompt ref="Prompt" />
         <CustomSelector ref="CustomSelector" />
         <MapImageSelector ref="MapImageSelector" />
-
-        <!-- <ColorPicker ref="ColorPicker" /> -->
         <FileSelector ref="FileSelector" />
         <MapImageModal ref="MapImageModal" />
         <ImportCities ref="ImportCities" />
@@ -231,12 +145,15 @@
                 currentConfig: null,
                 selectableFiles: [],
                 showGrid: true,
-                geoGridData: {}
+                geoGridData: {},
+                planograms: [],
+                selectedPlanogram: null
             }
         },
         mounted() {
             let self = this;
             self.getHinterlandStores();
+            self.getPlanograms();
         },
         methods: {
             LinkRetailerStore() {
@@ -421,8 +338,6 @@
             handleData(data, storeData) {
                 let self = this;
 
-                console.log(data);
-
                 let final = [];
                 let headers = [];
 
@@ -439,72 +354,92 @@
                         let options = self.fileData.store[store].config.turnoverGroups;
 
                         headers.push({
-                            headerName: 'Sales %',
-                            cellRendererFramework: "ProgressRenderer",
-                            width: 500
-                        }, {
-                            "headerName": "Sales",
-                            "field": "totalSales",
-                            valueFormatter: function (params) {
-                                return formatter.format(params.value).replace("$", "R");
-                            }
-                        }, {
-                            "headerName": "Cumulative Sales %",
-                            "field": "cumulativePercent",
-                            valueFormatter: function (params) {
-                                return params.value.toFixed(1) + "%";
-                            }
-                        }, {
-                            "headerName": "Turnover Group",
-                            "field": self.currentToggle == "User" ? ("userDefinedClusterValue") : (
-                                "levelValue"),
-                            "valueFormatter": function (params) {
-                                let text = params.data[self.currentToggle == "User" ? (
-                                    "userDefinedCluster") : ("level")];
-                                let value = params.data[self.currentToggle == "User" ? (
-                                    "userDefinedClusterValue") : ("levelValue")];
-
-                                let inOptions = isInOptions(options, text);
-
-                                if (inOptions) {
-                                    return options[value];
-                                } else {
-                                    return text;
+                                headerName: 'Sales %',
+                                cellRendererFramework: "ProgressRenderer",
+                                width: 500
+                            }, {
+                                "headerName": "Sales",
+                                "field": "totalSales",
+                                valueFormatter: function (params) {
+                                    return formatter.format(params.value).replace("$", "R");
+                                }
+                            }, {
+                                "headerName": "Cumulative Sales %",
+                                "field": "cumulativePercent",
+                                valueFormatter: function (params) {
+                                    return params.value.toFixed(1) + "%";
                                 }
                             },
-                            cellStyle: function (params) {
-                                let text = params.data[self.currentToggle == "User" ? "userDefinedCluster" :
-                                    "level"];
-                                let value = params.data[self.currentToggle == "User" ?
-                                    "userDefinedClusterValue" : "levelValue"];
+                            // {
+                            //     "headerName": "Turnover Group",
+                            //     "field": self.currentToggle == "User" ? ("userDefinedClusterValue") : (
+                            //         "levelValue"),
+                            //     "valueFormatter": function (params) {
+                            //         let text = params.data[self.currentToggle == "User" ? (
+                            //             "userDefinedCluster") : ("level")];
+                            //         let value = params.data[self.currentToggle == "User" ? (
+                            //             "userDefinedClusterValue") : ("levelValue")];
 
-                                let inOptions = isInOptions(options, text);
+                            //         let inOptions = isInOptions(options, text);
 
-                                if (inOptions) {
-                                    if (value == 0) {
-                                        return {
-                                            backgroundColor: "#1976d2"
-                                        };
-                                    }
+                            //         if (inOptions) {
+                            //             return options[value];
+                            //         } else {
+                            //             return text;
+                            //         }
+                            //     },
+                            //     cellStyle: function (params) {
+                            //         let text = params.data[self.currentToggle == "User" ? "userDefinedCluster" :
+                            //             "level"];
+                            //         let value = params.data[self.currentToggle == "User" ?
+                            //             "userDefinedClusterValue" : "levelValue"];
 
-                                    if (value == 1) {
-                                        return {
-                                            backgroundColor: "#1976d2c2"
-                                        };
-                                    }
+                            //         let inOptions = isInOptions(options, text);
 
-                                    if (value == 2) {
-                                        return {
-                                            backgroundColor: "#1976d294"
-                                        };
-                                    }
-                                } else {
-                                    return {
-                                        backgroundColor: "#fff"
-                                    };
-                                }
-                            }
-                        })
+                            //         if (inOptions) {
+                            //             if (value == 0) {
+                            //                 return {
+                            //                     backgroundColor: "#1976d2"
+                            //                 };
+                            //             }
+
+                            //             if (value == 1) {
+                            //                 return {
+                            //                     backgroundColor: "#1976d2c2"
+                            //                 };
+                            //             }
+
+                            //             if (value == 2) {
+                            //                 return {
+                            //                     backgroundColor: "#1976d294"
+                            //                 };
+                            //             }
+                            //         } else {
+                            //             return {
+                            //                 backgroundColor: "#fff"
+                            //             };
+                            //         }
+                            //     }
+                            // }, 
+                            {
+                                headerName: 'System Clusters',
+                                children: [{
+                                    headerName: 'Store',
+                                    width: 130,
+                                }, {
+                                    headerName: 'Custom',
+                                    width: 130,
+                                }]
+                            }, {
+                                headerName: 'User Clusters',
+                                children: [{
+                                    headerName: 'Store',
+                                    width: 130,
+                                }, {
+                                    headerName: 'Custom',
+                                    width: 130,
+                                }]
+                            })
                     }
                 }
 
@@ -520,8 +455,6 @@
                         }
 
                         let options = self.fileData.basket[basket].config.turnoverGroups;
-
-                        console.log(options)
 
                         headers.push(self.addBasketHeader(basket, options));
                     }
@@ -994,6 +927,36 @@
                 }
 
                 self.$refs.Grid.gridApi.redrawRows();
+            },
+            getPlanograms() {
+                let self = this
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + `Planogram/Distinct`)
+                    .then(r => {
+                        let planograms = r.data.planogramList;
+                        self.planograms = [];
+                        planograms.forEach(element => {
+                            self.planograms.push({
+                                text: element.displayname,
+                                value: element.id
+                            })
+                        });
+                        self.selectedPlanogram = self.planograms[0].value
+
+                        self.getStoresWithClusters();
+
+                        delete Axios.defaults.headers.common["TenantID"];
+                    })
+            },
+            getStoresWithClusters() {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API + "StoreClustering?planogram_ID=" + self.selectedPlanogram)
+                    .then(r => {
+                        console.log(r.data);
+                    })
             }
         }
     }

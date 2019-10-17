@@ -388,6 +388,9 @@
                 let self = this;
 
                 let request = JSON.parse(JSON.stringify(currentItem))
+
+                request.notes = "" 
+
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
 
@@ -406,6 +409,7 @@
                     request.storeCluster_ID = taskDetails.storeCluster;
                     request.categoryCluster_ID = taskDetails.categoryCluster;
                     request.store_ID = taskDetails.store;
+                    request.customCluster_ID = taskDetails.customCluster;
                     request.notes = self.findAndReplaceNote(request.notes);
                     // Create first process assigned TX
                     self.createProjectTransaction(request, firstProcessAssigned => {
