@@ -563,7 +563,7 @@
                         Axios.post(process.env.VUE_APP_API +
                             `/Project?Project_ID=${params.project_ID}&Value=${true}`).then(
                             r => {
-                                
+
                                 self.closeTask(params)
                             })
                     }
@@ -1341,20 +1341,24 @@
             },
             sendDiscontinue(item) {
                 let self = this;
+                self.$refs.yesNoModal.show('Are you sure you want to Discontinue this Category?', value => {
+                    if (value) {
+                        let request = JSON.parse(JSON.stringify(item))
+                        let tmpUser = 1;
 
-                let request = JSON.parse(JSON.stringify(item))
-                let tmpUser = 1;
+                        self.checkTaskTakeover(request, () => {
+                            request.systemUserID = tmpUser;
+                            request.status = 45;
+                            request.notes = "[DISCONTINUE REQUESTED]"
+                            request.notes = self.findAndReplaceNote(request.notes);
 
-                self.checkTaskTakeover(request, () => {
-                    request.systemUserID = tmpUser;
-                    request.status = 45;
-                    request.notes = "[DISCONTINUE REQUESTED]"
-                    request.notes = self.findAndReplaceNote(request.notes);
-
-                    self.createProjectTransaction(request, newItem => {
-                        self.$parent.$parent.getTaskViewData();
-                    })
+                            self.createProjectTransaction(request, newItem => {
+                                self.$parent.$parent.getTaskViewData();
+                            })
+                        })
+                    }
                 })
+
             },
             sendMail(currentItem) {
                 let self = this;

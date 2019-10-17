@@ -207,7 +207,8 @@
                 let request = {
                     Name: name,
                     UserID: self.SystemUser_ID,
-                    ID: self.ImportID
+                    ID: self.ImportID,
+                    Type_ID: 1
                 }
                 console.log(request);
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -244,7 +245,7 @@
                     })
                 })
                 console.log(tmp);
-                
+
                 Axios.post(process.env.VUE_APP_API +
                         `SuplierLocationImportTX?groupID=${groupID}`, tmp
                     )

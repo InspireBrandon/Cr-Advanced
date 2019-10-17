@@ -252,6 +252,8 @@
     <StorePieGraph ref="StorePieGraph" />
     <CategorySelector ref="CategorySelector" />
     <HelpFileMaint ref="HelpFileMaint" />
+    <MapIndicatorModal ref="MapIndicatorModal" />
+
   </div>
 </template>
 
@@ -294,6 +296,7 @@
   import GpGraph from './GpGraph.vue'
   import HighlightCluster from './HighlightCluster.vue'
   import HelpFileMaint from '../../Main/HelpFile/HelpFileMaint'
+  import MapIndicatorModal from "./MapIndicatorModal"
 
   import {
     AgGridVue
@@ -311,6 +314,7 @@
     name: 'Ranging',
     components: {
       StorePieGraph,
+      MapIndicatorModal,
       LineGraphModal,
       GpGraph,
       ParetoModal,
