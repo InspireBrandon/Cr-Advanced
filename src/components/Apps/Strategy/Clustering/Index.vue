@@ -53,9 +53,9 @@
                     new TabItem("Main", "Main"),
                     new TabItem("Store", "StoreAnalysis"),
                     new TabItem("Basket", "BasketAnalysis"),
-                    new TabItem("Listing", "ListingClusters"),
-                    new TabItem("Custom", "Custom"),
-                    new TabItem("Import", "Research")
+                    new TabItem("Listing", "ListingClusters")
+                    // new TabItem("Custom", "Custom"),
+                    // new TabItem("Import", "Research")
                 ]
             }
         },

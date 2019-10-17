@@ -3,7 +3,7 @@
         <v-dialog v-model="dialog" width="1200" persistent>
             <v-card>
                 <v-toolbar dark flat color="primary">
-                    <v-toolbar-title>Custom Cluster Setup</v-toolbar-title>
+                    <v-toolbar-title>Cluster Setup</v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-btn icon @click.native="dialog = false">
                         <v-icon>close</v-icon>
@@ -23,9 +23,9 @@
                                     style="width: 300px" placeholder="Select a planogram" dense hide-details>
                                 </v-autocomplete>
                             </v-flex>
-                            <v-flex md12 v-if="clusterType != null">
+                            <!-- <v-flex md12 v-if="clusterType != null">
                                 <v-switch v-model="useSystemValues" hide-details label="Use system values"></v-switch>
-                            </v-flex>
+                            </v-flex> -->
                             <v-flex md4 class="mt-3" v-if="clusterType != null">
                                 <v-toolbar dark flat dense color="primary">
                                     <v-toolbar-title>Fields</v-toolbar-title>

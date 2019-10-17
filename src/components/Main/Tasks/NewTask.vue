@@ -23,8 +23,8 @@
                                 label="Project Group" hide-details></v-autocomplete>
                         </v-flex>
                         <v-flex md6>
-                            <v-autocomplete :disabled="selectedProjectGroup == null" @change="onProjectOrStoreChange" v-model="selectedProject" :items="projects"
-                                label="Project" hide-details>
+                            <v-autocomplete :disabled="selectedProjectGroup == null" @change="onProjectOrStoreChange"
+                                v-model="selectedProject" :items="projects" label="Project" hide-details>
                             </v-autocomplete>
                         </v-flex>
                         <v-flex md12>
@@ -47,19 +47,19 @@
                         </v-flex>
                         <v-flex md6></v-flex>
                         <v-flex md3>
-                            <v-autocomplete v-model="selectedStoreCluster" :items="storeClusters" label="Store Cluster"
+                            <v-autocomplete :disabled="selectedStore != null" v-model="selectedStoreCluster" :items="storeClusters" label="Store Cluster"
                                 hide-details>
                             </v-autocomplete>
                         </v-flex>
                         <v-flex md3>
-                            <v-autocomplete :disabled="selectedProject == null || selectedStore == null"
-                                v-model="selectedCategoryCluster" :items="categoryClusters" label="Category Cluster"
-                                hide-details>
-                            </v-autocomplete>
-                        </v-flex>
-                        <v-flex md3>
-                            <v-autocomplete :disabled="selectedProject == null || selectedStore == null"
+                            <v-autocomplete :disabled="selectedProject == null || selectedStore != null"
                                 v-model="selectedCustomCluster" :items="customClusters" label="Custom Cluster"
+                                hide-details>
+                            </v-autocomplete>
+                        </v-flex>
+                        <v-flex md3>
+                            <v-autocomplete :disabled="selectedProject == null || selectedStore != null"
+                                v-model="selectedCategoryCluster" :items="categoryClusters" label="Category Cluster"
                                 hide-details>
                             </v-autocomplete>
                         </v-flex>
@@ -111,9 +111,15 @@
                 selectedSpacePlanFile: null,
                 storeClusters: [],
                 selectedStoreCluster: null,
-                categoryClusters: [],
+                categoryClusters: [{
+                    text: "None",
+                    value: null
+                }],
                 selectedCategoryCluster: null,
-                customClusters: [],
+                customClusters: [{
+                    text: "None",
+                    value: null
+                }],
                 selectedCustomCluster: null,
                 projectsComplete: null,
                 selectedPlanogramID: null,
@@ -262,7 +268,10 @@
             getStoreClusters() {
                 let self = this;
 
-                self.storeClusters = [];
+                self.storeClusters = [{
+                    text: "None",
+                    value: null
+                }];
 
                 Axios.get(process.env.VUE_APP_API + "Cluster/Store")
                     .then(r => {
@@ -277,7 +286,10 @@
             getStores() {
                 let self = this;
 
-                self.stores = [];
+                self.stores = [{
+                    text: "All Stores",
+                    value: null
+                }];
 
                 Axios.get(process.env.VUE_APP_API + `Store?db=CR-HINTERLAND-LIVE`)
                     .then(r => {
@@ -294,7 +306,14 @@
                 let self = this;
 
                 self.$nextTick(() => {
-                    if (self.selectedProject != null && self.selectedStore != null) {
+                    if(self.selectedStore != null) {
+                        self.selectedStoreCluster = null;
+                        self.selectedCustomCluster = null;
+                        self.selectedCategoryCluster = null;
+                    }
+
+                    if (self.selectedProject != null) {
+
                         let currentProject = self.projectsComplete.find(e => {
                             return e.id == self.selectedProject;
                         })
@@ -308,27 +327,10 @@
             getCategoryClusters() {
                 let self = this;
 
-                self.categoryClusters = [];
-
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
-                Axios.get(process.env.VUE_APP_API + `Clusters/CategoryCluster?planogramID=${self.selectedPlanogramID}`)
-                    .then(r => {
-                        delete Axios.defaults.headers.common["TenantID"];
-                        console.log(r.data);
-
-                        r.data.forEach(el => {
-                            self.categoryClusters.push({
-                                text: el.displayname,
-                                value: el.id
-                            })
-                        })
-                    })
-            },
-            getCategoryClusters() {
-                let self = this;
-
-                self.categoryClusters = [];
+                self.categoryClusters = [{
+                    text: "None",
+                    value: null
+                }];
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
@@ -349,12 +351,15 @@
             getCustomClusters() {
                 let self = this;
 
-                self.customClusters = [];
+                self.customClusters = [{
+                    text: "None",
+                    value: null
+                }];
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.get(process.env.VUE_APP_API +
-                        `Clusters/CustomCluster?planogramID=${self.selectedPlanogramID}&storeID=${self.selectedStore}`
+                        `Clusters/CustomCluster?planogramID=${self.selectedPlanogramID}`
                     )
                     .then(r => {
                         delete Axios.defaults.headers.common["TenantID"];
