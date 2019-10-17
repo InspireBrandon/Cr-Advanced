@@ -32,6 +32,7 @@
         <SpacePlanSelector ref="SpacePlanSelector"></SpacePlanSelector>
         <RangeSelectorModal ref="RangeSelectorModal"></RangeSelectorModal>
         <UserNotesModal ref="UserNotesModal"></UserNotesModal>
+        <YesNoModal ref="yesNoModal"></YesNoModal>
         <NotesModal ref="NotesModal"></NotesModal>
     </v-container>
 </template>
@@ -50,6 +51,7 @@
     import Options from './GridComponents/Options.vue'
     import Notes from './GridComponents/Notes.vue'
     import Type from './GridComponents/Type.vue'
+    import YesNoModal from '@/components/Common/YesNoModal';
     import Status from './GridComponents/Status.vue'
 
     import UserSelector from '@/components/Common/UserSelector'
@@ -63,7 +65,6 @@
     import {
         AgGridVue
     } from "ag-grid-vue";
-
     export default {
         name: 'TaskView',
         props: ['data', 'typeList', 'statusList', 'systemUserID', 'accessType', 'goToDistribution'],
@@ -73,6 +74,8 @@
             SubtaskModal,
             SpacePlanSelector,
             RangeSelectorModal,
+            YesNoModal,
+
             UserNotesModal,
             NotesModal,
             AgGridVue,
@@ -85,7 +88,109 @@
         },
         data() {
             return {
-                columnDefs: [],
+                columnDefs: [{
+                        "headerName": "Project",
+                        "field": "planogram",
+                        "editable": false,
+                        "hide": false
+                    },
+                    {
+                        "headerName": "Type",
+                        "field": "type",
+                        "editable": false,
+                        "hide": false,
+                        "cellRendererFramework": "Type"
+                    },
+                    {
+                        "headerName": "Status",
+                        "field": "status",
+                        "editable": false,
+                        "hide": false,
+                        "cellRendererFramework": "Status"
+                    },
+                    {
+                        "headerName": "Intended Stores",
+                        "editable": false,
+                        "hide": false,
+                        "valueFormatter": function (params) {
+                            if (params.data.store != null || params.data.store != undefined) {
+                                return params.data.store
+                            } else {
+                                return (checkNull(params.data.storeCluster) + " " + checkNull(params.data
+                                    .categoryCluster) + " " + checkNull(params.data.customCluster))
+                            }
+                        }
+                    },
+                    // {
+                    //     "headerName": "Category Cluster",
+                    //     "field": "categoryCluster",
+                    //     "editable": false,
+                    //     "hide": false
+                    // },
+                    // {
+                    //     "headerName": "Custom Cluster",
+                    //     "field": "customCluster",
+                    //     "editable": false,
+                    //     "hide": false
+                    // },
+                    // {
+                    //     "headerName": "Store",
+                    //     "field": "store",
+                    //     "editable": false,
+                    //     "hide": false
+                    // },
+                    {
+                        "headerName": "Date",
+                        "field": "dateTimeString",
+                        "editable": false,
+                        "hide": false
+                    },
+                    {
+                        "headerName": "User Assigned",
+                        "field": "username",
+                        "editable": false,
+                        "hide": false
+                    },
+                    {
+                        "headerName": "Actioned By",
+                        "field": "actionedByUserName",
+                        "editable": false,
+                        "hide": false
+                    },
+                    {
+                        "headerName": "Actions",
+                        "field": "",
+                        "editable": false,
+                        "hide": false,
+                        "cellRendererFramework": "Actions",
+                        "width": 280
+                    },
+                    {
+                        "headerName": "Notes",
+                        "field": "",
+                        "editable": false,
+                        "hide": false,
+                        "cellRendererFramework": "Notes",
+                        "width": 90
+                    },
+                    {
+                        "headerName": "Files",
+                        "field": "",
+                        "editable": false,
+                        "hide": false,
+                        "cellRendererFramework": "Files",
+                        "width": 130
+                    },
+                    {
+                        "headerName": "",
+                        "field": "",
+                        "editable": false,
+                        "hide": false,
+                        "cellRendererFramework": "Options",
+                        "width": 80,
+                        "minWidth": 30
+                    }
+                ],
                 defaultColDef: {
                     onCellValueChanged: this.onCellValueChanged
                 },
@@ -169,7 +274,7 @@
         mounted() {
             let self = this
 
-            self.columnDefs = require('./headers.json');
+            // self.columnDefs = require('./headers.json');
 
             self.getUsers(() => {
 
@@ -450,8 +555,22 @@
 
                 // self.setDistributionViewed()
 
-                self.setCanDistribute(item.systemFileID, ()=> {
+                self.setCanDistribute(item.systemFileID, () => {
                     self.setDistributionInProgress(item);
+                })
+            },
+            setDiscontinued(params) {
+                let self = this
+                self.$refs.yesNoModal.show('Are you sure you want to discontinue this Category?', value => {
+                    if (value) {
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                        Axios.post(process.env.VUE_APP_API +
+                            `/Project?Project_ID=${params.project_ID}&Value=${true}`).then(
+                            r => {
+                                
+                                self.closeTask(params)
+                            })
+                    }
                 })
             },
             setParked(item) {
@@ -1224,6 +1343,23 @@
 
                 return newNote;
             },
+            sendDiscontinue(item) {
+                let self = this;
+
+                let request = JSON.parse(JSON.stringify(item))
+                let tmpUser = 1;
+
+                self.checkTaskTakeover(request, () => {
+                    request.systemUserID = tmpUser;
+                    request.status = 45;
+                    request.notes = "[DISCONTINUE REQUESTED]"
+                    request.notes = self.findAndReplaceNote(request.notes);
+
+                    self.createProjectTransaction(request, newItem => {
+                        self.$parent.$parent.getTaskViewData();
+                    })
+                })
+            },
             sendMail(currentItem) {
                 let self = this;
 
@@ -1250,6 +1386,14 @@
                     })
                 })
             }
+        }
+    }
+
+    function checkNull(prop) {
+        if (prop == null) {
+            return ""
+        } else {
+            return prop
         }
     }
 

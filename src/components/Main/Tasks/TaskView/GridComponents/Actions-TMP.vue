@@ -326,7 +326,7 @@
         }
         break;
         case 45: {
-            button_1.set('success', 'visibility', cp.setDistributionViewed, "View")
+            button_1.set('success', 'check', cp.setDiscontinued, "set Discontinued")
         }
 
         break;

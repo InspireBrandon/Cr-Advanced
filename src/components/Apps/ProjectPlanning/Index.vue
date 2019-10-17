@@ -80,13 +80,20 @@
                 <v-btn v-if="project!=null" outline dark @click.stop="deleteSelectedTX">
                     Delete
                 </v-btn>
+                <v-btn v-if="project!=null&&project.discontinued!=true" outline dark @click.stop="Discontinue">
+                    Discontinue
+                </v-btn>
+                <v-btn v-if="project!=null &&project.discontinued==true" outline dark @click.stop="Continue">
+                    Reinstate
+                </v-btn>
                 <v-spacer></v-spacer>
                 <v-btn flat icon v-if="project!=null" @click="openProjectTXAdd()">
                     <v-icon>add</v-icon>
                 </v-btn>
             </v-toolbar>
             <div style="overflow-x: auto; height: calc(100vh - 118px)">
-                <v-data-table v-if="project!=null" :headers="headers" :rows-per-page-items="[15,50,75,100]" :items="ProjectTXs" >
+                <v-data-table v-if="project!=null" :headers="headers" :rows-per-page-items="[15,50,75,100]"
+                    :items="ProjectTXs">
                     <template v-slot:items="props">
                         <td>
                             <v-checkbox hide-details v-model="selectedDelete" :value="props.item.id"></v-checkbox>
@@ -380,6 +387,28 @@
             }
         },
         methods: {
+            Continue() {
+                let self = this
+                self.$refs.yesNoModal.show('Are you sure you want to Reinstate this Category?', value => {
+                    if (value) {
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                        Axios.post(process.env.VUE_APP_API +
+                            `/Project?Project_ID=${self.project.id}&Value=${false}`).then(
+                            r => {})
+                    }
+                })
+            },
+            Discontinue() {
+                let self = this
+                self.$refs.yesNoModal.show('Are you sure you want to discontinue this Category?', value => {
+                    if (value) {
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                        Axios.post(process.env.VUE_APP_API +
+                            `/Project?Project_ID=${self.project.id}&Value=${true}`).then(
+                            r => {})
+                    }
+                })
+            },
             deleteSelectedTX() {
                 let self = this
                 self.$refs.yesNoModal.show('Delete selected project transactions?', value => {
@@ -493,12 +522,16 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.get(process.env.VUE_APP_API + 'ProjectGroup').then(r => {
+                    console.log(r);
+
                     r.data.projectGroupList.forEach(e => {
                         if (e.deleted == false) {
                             self.ProjectsGroups.push(e)
+
+
                         }
                     })
-
+                    console.log(self.ProjectsGroups);
                     delete Axios.defaults.headers.common["TenantID"];
                 })
 
@@ -724,6 +757,8 @@
                 }
 
                 self.project = item
+                console.log(self.project);
+                
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.get(process.env.VUE_APP_API + `ProjectTX?projectID=${item.id}`).then(r => {
 
