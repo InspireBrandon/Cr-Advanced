@@ -1,7 +1,6 @@
 <template>
   <div class="ranging">
     <v-toolbar dense dark color="grey darken-3">
-
       <v-toolbar-items v-if="!$route.path.includes('RangePlanningView')">
         <v-menu dark offset-y style="margin-bottom: 10px;">
           <v-btn slot="activator" flat>
@@ -37,9 +36,6 @@
             <v-list-tile @click="fitColumns">
               <v-list-tile-title>Fit Columns</v-list-tile-title>
             </v-list-tile>
-            <!-- <v-list-tile @click="saveRange">
-              <v-list-tile-title>Save</v-list-tile-title>
-            </v-list-tile> -->
           </v-list>
         </v-menu>
         <v-menu v-if="rowData.length > 0" dark offset-y style="margin-bottom: 10px;">
@@ -97,15 +93,11 @@
           </v-list>
         </v-menu>
       </v-toolbar-items>
-
       <v-spacer></v-spacer>
-
       <div v-if="rowData.length > 0">
         <span>{{ generateFileName() + fileData.tag + " (" + fileData.dateFromString + " TO " + fileData.dateToString + ")" }}</span>
       </div>
-
       <v-spacer></v-spacer>
-
       <v-toolbar-title>
         <span>Range Planning</span>
         <HelpFileViewer style="margin-left: 10px;" component="Ranging"></HelpFileViewer>
@@ -114,7 +106,6 @@
     <div fluid grid-list-lg>
       <v-layout row wrap>
         <v-toolbar dark>
-          <!-- <v-layout row wrap v-if="gotData"> -->
           <v-toolbar-items v-if="gotData">
             <v-select style="margin-left: 10px; margin-top: 8px; width: 200px" placeholder="Select cluster type"
               @change="onClusterTypeChange" dense :items="clusterTypes" v-model="selectedClusterType" hide-details>
@@ -141,7 +132,6 @@
           <v-spacer></v-spacer>
           <v-btn v-if="rowData.length>0" @click="openReport" color="primary" small dark>Report</v-btn>
           <v-btn v-if="rowData.length>0" @click="onChart1" color="primary" small dark>graphs</v-btn>
-          <!-- <v-btn @click="openParetoModal" color="primary" small dark>Pareto</v-btn> -->
           <v-menu v-if="rowData.length > 0" dark offset-y>
             <v-btn slot="activator" v-if="rowData.length>0" color="pink" small dark>Apply Highlight</v-btn>
             <v-list class="pa-0">
@@ -155,7 +145,6 @@
             </v-list>
           </v-menu>
           <v-btn v-if="rowData.length > 0" @click="showNote = !showNote" color="primary" small dark>Note</v-btn>
-          <!-- <v-btn @click="showNote = !showNote" color="primary" small dark>Note</v-btn> -->
           <v-menu offset-y>
             <v-btn v-if="selectedItems.length > 0" :disabled="selectedItems.length == 0" slot="activator"
               color="primary" small dark>Set Indicator
@@ -172,14 +161,6 @@
               </v-list-tile>
             </v-list>
           </v-menu>
-          <!-- <v-flex lg4 md4 style="margin-top: 15px;">
-             
-            </v-flex> -->
-          <!-- <v-flex lg2 md-and-down></v-flex> -->
-          <!-- <v-flex lg4 md2 style="text-align: right;"> -->
-
-          <!-- </v-flex> -->
-          <!-- </v-layout> -->
         </v-toolbar>
         <v-container grid-list-md fluid class="ma-0 pa-0">
           <v-layout row wrap>
@@ -240,7 +221,6 @@
     <Dialog ref="dialog"></Dialog>
     <YesNoModal ref="yesNo"></YesNoModal>
     <ProductMaintModal ref="productMaint"></ProductMaintModal>
-    <!-- <ProductListing ref="productListing"></ProductListing> -->
     <HighlightCluster ref="HighlightCluster"></HighlightCluster>
     <SizeLoader ref="SizeLoader" />
     <AutoRangeModal ref="AutoRangeModal" />
@@ -252,6 +232,7 @@
     <StorePieGraph ref="StorePieGraph" />
     <CategorySelector ref="CategorySelector" />
     <HelpFileMaint ref="HelpFileMaint" />
+    <SyncModalStatus ref="SyncModalStatus" />
   </div>
 </template>
 
@@ -294,6 +275,7 @@
   import GpGraph from './GpGraph.vue'
   import HighlightCluster from './HighlightCluster.vue'
   import HelpFileMaint from '../../Main/HelpFile/HelpFileMaint'
+  import SyncModalStatus from './SyncModalStatus'
 
   import {
     AgGridVue
@@ -334,7 +316,8 @@
       GraphConfigurationModal,
       HighlightCluster,
       CategorySelector,
-      HelpFileMaint
+      HelpFileMaint,
+      SyncModalStatus
     },
     data() {
       return {
@@ -933,8 +916,146 @@
                 self.$refs.SizeLoader.close()
                 self.gotData = true
               })
+
+              // TODO add check for update
+              self.promptForFileSync();
             })
         })
+      },
+      promptForFileSync() {
+        let self = this;
+
+        self.$refs.yesNo.show('Would you like to sync your data?', goThrough => {
+          if (goThrough) {
+            // Check if clusters have 0 stores
+            // Check if any indicators need to be mapped
+            // Map indicators
+            self.$refs.spinner.show();
+            self.sync_updatedIndicators();
+          }
+        })
+      },
+      sync_updatedIndicators() {
+        let self = this;
+
+        let outputObj = {
+          indicators: true,
+          indicatorMessage: "",
+          products: true,
+          productMessage: "",
+          activeShopCodes: true,
+          activeShopCodeMessage: "",
+          clusters: true,
+          clusterMessage: "",
+          currentLoading: "indicators"
+        };
+
+        self.$refs.SyncModalStatus.show();
+        self.$refs.SyncModalStatus.updateStatus(outputObj);
+
+        let updatedIndicators = self.rangingController.getImportCSV();
+
+        if (updatedIndicators.length <= 0) {
+          self.sync_updateProductDetails(outputObj);
+        } else {
+          Axios.put(process.env.VUE_APP_API + `Ranging/UpdateIndicators?db=CR-Hinterland-Live`, updatedIndicators)
+            .then(r => {
+              if (r.data) {
+                outputObj.indicatorMessage = "Success"
+              } else {
+                outputObj.indicators = false;
+                outputObj.indicatorMessage = "Failed to update indicators"
+              }
+
+              self.sync_updateProductDetails(outputObj);
+            })
+        }
+      },
+      sync_updateProductDetails(outputObj) {
+        let self = this;
+
+        outputObj.currentLoading = 'products';
+        self.$refs.SyncModalStatus.updateStatus(outputObj);
+
+        let updatedProducts = self.rangingController.getAllProducts();
+
+        updatedProducts.forEach(el => {
+          el["id"] = el.productID;
+        })
+
+        Axios.put(process.env.VUE_APP_API + "Product/UpdateProductList?db=CR-Hinterland-Live", updatedProducts)
+          .then(r => {
+            if (r.data) {
+              outputObj.productMessage = "Success"
+            } else {
+              outputObj.products = false;
+              outputObj.productMessage = "Failed to update product details"
+            }
+
+            self.sync_activeShopCodes(outputObj);
+          })
+          .catch(e => {
+            outputObj.products = false;
+            outputObj.productMessage = "Failed to update product details. " + e;
+          })
+        self.$refs.spinner.hide();
+      },
+      sync_activeShopCodes(outputObj) {
+        let self = this;
+
+        outputObj.currentLoading = 'activeShopCodes';
+        self.$refs.SyncModalStatus.updateStatus(outputObj);
+
+        let product_id_list = [];
+
+        self.rowData.forEach(product => {
+          product_id_list.push(product.productID)
+        })
+
+        Axios.post(process.env.VUE_APP_API + "Product/GetActiveShopCodes?db=CR-Hinterland-Live", {
+            productIDList: product_id_list
+          })
+          .then(r => {
+            let new_asc = r.data.productActiveShopCodeList
+
+            self.rowData.forEach((product, idx) => {
+              product.active_Shop_Code = new_asc[idx].active_Shop_Code;
+              product.active_Shop_Code_ID = new_asc[idx].active_Shop_Code_ID;
+            })
+
+            outputObj.activeShopCodeMessage = "Success"
+            self.sync_clusters(outputObj);
+          })
+          .catch(e => {
+            outputObj.activeShopCodes = false;
+            outputObj.activeShopCodeMessage = "Failed to get latest active shop codes. " + e;
+            self.sync_clusters(outputObj);
+          })
+      },
+      sync_clusters(outputObj) {
+        let self = this;
+
+        outputObj.currentLoading = 'clusters';
+        self.$refs.SyncModalStatus.updateStatus(outputObj);
+
+        Axios.get(process.env.VUE_APP_API + "Ranging/GetClusterData?planogramID=" + self.fileData.planogramID)
+          .then(r => {
+            let clusterData = r.data.clusterData;
+            self.rangingController.setClusterData(clusterData);
+            self.setRangingClusterData(clusterData);
+            outputObj.clusterMessage = "Success"
+            self.sync_complete(outputObj);
+          })
+          .catch(e => {
+            outputObj.clusters = false;
+            outputObj.clusterMessage = "Failed to get latest clusters. " + e;
+            self.sync_complete();
+          })
+      },
+      sync_complete(outputObj) {
+        let self = this;
+
+        self.$refs.SyncModalStatus.updateStatus(outputObj);
       },
       closeRange() {
         let self = this;

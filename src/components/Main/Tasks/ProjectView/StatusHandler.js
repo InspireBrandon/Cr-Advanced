@@ -165,7 +165,7 @@ function StatusHandler() {
         }),
         new ButtonItem({
             id: 'continue',
-            icon: 'play_arrow',
+            icon: 'stop',
             buttonColor: '',
             iconColor: 'black',
             tooltip: 'Continue',
