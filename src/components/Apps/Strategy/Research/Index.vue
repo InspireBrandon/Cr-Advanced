@@ -1,6 +1,9 @@
 <template>
     <v-card tile>
-        <v-toolbar flat dense dark color="grey darken-3">
+        <!-- <v-toolbar flat dense dark color="grey darken-3">
+            
+        </v-toolbar> -->
+        <v-toolbar dark flat>
             <v-toolbar-items>
                 <v-menu dark offset-y style="margin-bottom: 10px;">
                     <v-btn slot="activator" flat>
@@ -28,8 +31,6 @@
             <v-toolbar-title>
                 <span>Supplier Import</span>
             </v-toolbar-title>
-        </v-toolbar>
-        <v-toolbar dark flat>
         </v-toolbar>
         <Grid :rowData="rowData" :headers="headers" ref="Grid" />
 
@@ -65,7 +66,7 @@
                 rowData: [],
                 headers: [{
                     "headerName": "Retailer",
-                    "field": "retailer",
+                    "field": "retailerName",
                 }, {
                     "headerName": "Store",
                     "field": "storeName",
@@ -143,7 +144,7 @@
 
                         data.data.forEach(el => {
                             newArr.push(new customImportItem({
-                                retailer: el.Retailer,
+                                retailerName: el.retailerName,
                                 storeName: el.storeName,
                                 sales: el.sales,
                                 coordinates: el.Coordinates
@@ -237,7 +238,7 @@
                     //     val = parseFloat(number[0])
                     // }
                     tmp.push({
-                        Retailer: e.retailer,
+                        retailerName: e.retailerName,
                         StoreName: e.storeName,
                         Sales: e.sales,
                         XCoordinate: e.xCoordinate,
@@ -382,7 +383,7 @@
 
     function customImportItem(data) {
         let self = this;
-        self.retailer = data.retailer;
+        self.retailerName = data.retailerName;
         self.storeName = data.storeName;
         self.sales = data.sales;
         self.hasCoordinates = data.coordinates != undefined && data.coordinates != null && data.coordinates != "";

@@ -1,29 +1,6 @@
 <template>
     <div width="100%">
-        <v-toolbar dark flat color="grey darken-2">
-            <v-toolbar-items>
-                <v-menu dark offset-y style="margin-bottom: 10px;">
-                    <v-btn slot="activator" flat>
-                        File
-                    </v-btn>
-                    <v-list>
-                        <!-- <v-list-tile @click="customSetup">
-                            <v-list-tile-title>New</v-list-tile-title>
-                        </v-list-tile> -->
-                        <v-list-tile>
-                            <v-list-tile-title>Save</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile>
-                            <v-list-tile-title>Open</v-list-tile-title>
-                        </v-list-tile>
-                    </v-list>
-                </v-menu>
-            </v-toolbar-items>
-            <v-spacer></v-spacer>
-            <v-toolbar-title>
-                Market Share
-            </v-toolbar-title>
-        </v-toolbar>
+       
         <v-toolbar dark flat>
             <v-toolbar-items>
                 <v-select style="margin-left: 10px; margin-top: 8px; width: 200px" placeholder="Field" hide-details>
@@ -143,6 +120,7 @@
     import Axios from 'axios'
     import jwt from 'jsonwebtoken'
     import MapImageSelector from './MapImageSelector'
+    
 
     // http://www.climbing.co.za/wp-content/uploads/2012/10/rsamap.png
     const formatter = new Intl.NumberFormat('en-US', {

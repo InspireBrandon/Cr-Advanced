@@ -3,6 +3,7 @@
     <v-toolbar dense dark color="grey darken-3">
 
       <v-toolbar-items v-if="!$route.path.includes('RangePlanningView')">
+        <!-- <v-btn @click="openIndicatorModal"> </v-btn> -->
         <v-menu dark offset-y style="margin-bottom: 10px;">
           <v-btn slot="activator" flat>
             File
@@ -481,6 +482,12 @@
       self.checkparams()
     },
     methods: {
+      openIndicatorModal() {
+        let self = this
+        self.$refs.MapIndicatorModal.open(callback => {
+
+        })
+      },
       openHelpFileMaint() {
         let self = this;
 

@@ -103,7 +103,7 @@ import BasketAnalysis from '@/components/Apps/Strategy/BasketAnalysis/Index.vue'
 import ListingClusters from '@/components/Apps/Strategy/ListingClusters/Index.vue'
 import Clustering from '@/components/Apps/Strategy/Clustering/Index.vue'
 
-import map from '@/components/Apps/Strategy/Map/Index.vue'
+import map from '@/components/Apps/Strategy/Map/Switcher.vue'
 import map2 from '@/components/Apps/Strategy/Map/tesmap.vue'
 
 

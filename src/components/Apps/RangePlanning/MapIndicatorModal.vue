@@ -10,25 +10,36 @@
         <v-card>
             <table style="width: 100%;">
                 <thead>
-                    <th style="min-width: 130px;">Product</th>
+                    <th style="min-width: 130px;">Cluster Type</th>
+                    <th>Cluster Value</th>
+                    <th>Product</th>
                     <th>Cluster Indicator</th>
                     <th>System Indicator</th>
+                    <th></th>
                 </thead>
                 <tbody>
                     <tr v-for="(item, idx) in indicators" :key="idx">
-                        <td>{{ item.displayName }}</td>
+                        <td>{{ item.clusterType }}</td>
                         <td>
-                            <input v-model="item.useCluster" @change="handelClusterIndicator(item)"
-                                style="width: 100%; text-align: right;" type="checkbox">
+                            {{item.clusterValue}}
                         </td>
                         <td>
-                            <input v-model="item.useSystem" @change="handelClusterIndicator(item)"
-                                style="width: 100%; text-align: right;" type="checkbox">
+                            {{item.productDescription}}
+                        </td>
+                        <td v-if="item.useSystem" @click="item.useSystem=false">{{item.clusterIndicator}}</td>
+                        <td v-if="!item.useSystem" style="background:red;color:white;">{{item.clusterIndicator}}</td>
+                        <td v-if="item.useSystem" style="background:red;color:white;">{{item.systemIndicator}}</td>
+                        <td v-if="!item.useSystem" @click="item.useSystem=true">{{item.systemIndicator}}</td>
+                        <td class="ma-0;pa-0">
+                            <div class="ma-0">
+                                <v-btn fab small class="ma-0" icon flat color="red">
+                                    <v-icon class="ma-0">check </v-icon>
+                                </v-btn>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
             </table>
-
         </v-card>
     </v-dialog>
 </template>
@@ -38,16 +49,22 @@
             return {
                 dialog: false,
                 indicators: [{
+                    clusterType: "Product 1",
+                    useSystem: null,
+                    clusterIndicator: "awsd"
+                }, {
                     displayName: "Product 1",
-                    useCluster: false,
-                    useSystem: true,
+                    useSystem: null,
                 }],
-                callback:null,
+                callback: null,
 
             }
-        },methods:{
-            open(callback){
+        },
+        methods: {
+            open(callback) {
                 let self = this
+                self.dialog = true
+                self.callback = callback
             }
         }
     }
