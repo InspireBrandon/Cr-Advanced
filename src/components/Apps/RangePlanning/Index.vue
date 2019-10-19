@@ -3,6 +3,7 @@
     <v-toolbar dense dark color="grey darken-3">
       <v-toolbar-items v-if="!$route.path.includes('RangePlanningView')">
         <!-- <v-btn @click="openIndicatorModal"> </v-btn> -->
+        <v-btn @click="checkStoreClusterChange">asdasd</v-btn>
         <v-menu dark offset-y style="margin-bottom: 10px;">
           <v-btn slot="activator" flat>
             File
@@ -294,7 +295,7 @@
     name: 'Ranging',
     components: {
       StorePieGraph,
-      MapIndicatorModal,
+      // MapIndicatorModal,
       LineGraphModal,
       GpGraph,
       ParetoModal,
@@ -451,7 +452,9 @@
         tmpString: "",
         ais_Sales: 0,
         ais_SalesPotential: 0,
-        periodData: []
+        periodData: [],
+        tmpClusters: null,
+        currentClusterData: null
       }
     },
     created() {
@@ -784,7 +787,11 @@
                 self.rangingController = new RangingController(r.data);
 
                 self.rangingController.getSalesMonthlyTotals(() => {
+
                   self.setRangingClusterData(r.data.clusterData);
+                  self.currentClusterData = self.rangingController.getClusterData();
+
+
                   if (self.selectedClusterType != null && self.selectedClusterOption != null) {
                     self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType,
                       self
@@ -897,6 +904,9 @@
               self.canRefresh = true;
 
               self.rangingController = new RangingController(r.data);
+              self.setStoreClusterStuff();
+
+              console.log("[RANGING]", self.tmpClusters)
 
               self.rangingController.getSalesMonthlyTotals(() => {
 
@@ -925,38 +935,131 @@
                 self.gotData = true
               })
 
-              // TODO add check for update
               self.promptForFileSync();
             })
         })
+      },
+      checkStoreClusterChange() {
+        let self = this;
+        let descreps = [];
+
+        self.checkAllStoreClusters(descreps);
+        self.checkCategoryClusters(descreps);
+        self.checkCustomClusters(descreps);
+        self.checkDepartmentClusters(descreps);
+        self.checkRegionalClusters(descreps);
+        self.checkStoreClusters(descreps);
+
+        self.rangingController.getIndicatorsByCluster("store", 5);
+
+        return descreps;
+      },
+      checkAllStoreClusters() {
+        let self = this;
+
+        self.tmpClusters.allStoresClusters.forEach(tmpAsc => {
+          tmpAsc.clusterStores.forEach(tmpCs => {
+            // self.notifyClusterStores("All Stores", tmpAsc.clusterName, tmpCs.storeName);
+          })
+        })
+      },
+      checkCategoryClusters() {
+        let self = this;
+
+        self.tmpClusters.categoryClusters.forEach(tmpCc => {
+          tmpCc.clusterStores.forEach(tmpCs => {
+            // self.notifyClusterStores("Category Cluster", tmpCc.clusterName, tmpCs.storeName);
+          })
+        })
+      },
+      checkCustomClusters() {
+        let self = this;
+
+        self.tmpClusters.customClusters.forEach(tmpCc => {
+          tmpCc.clusterStores.forEach(tmpCs => {
+            // self.notifyClusterStores("Custom Cluster", tmpCc.clusterName, tmpCs.storeName);
+          })
+        })
+      },
+      checkDepartmentClusters() {
+        let self = this;
+
+        self.tmpClusters.departmentClusters.forEach(tmpDc => {
+          tmpDc.clusterStores.forEach(tmpCs => {
+            // self.notifyClusterStores("Custom Cluster", tmpDc.clusterName, tmpCs.storeName);
+          })
+        })
+      },
+      checkRegionalClusters() {
+        let self = this;
+
+        self.tmpClusters.regionalClusters.forEach(tmpRc => {
+          tmpRc.clusterStores.forEach(tmpCs => {
+            // self.notifyClusterStores("Regional Cluster", tmpRc.clusterName, tmpCs.storeName);
+          })
+        })
+      },
+      checkStoreClusters() {
+        let self = this;
+
+        self.tmpClusters.storeClusters.forEach(tmpSc => {
+          tmpSc.clusterStores.forEach(tmpCs => {
+            // self.notifyClusterStores("Store Cluster", tmpSc.clusterName, tmpCs.storeName);
+          })
+        })
+      },
+      notifyClusterStores(clusterType, cluster, store) {
+        // console.log(`Checking ${clusterType} - ${cluster} for store: ${store}`);
       },
       promptForFileSync() {
         let self = this;
 
         self.$refs.yesNo.show('Would you like to sync your data?', goThrough => {
           if (goThrough) {
-            // Check if clusters have 0 stores
-            // Check if any indicators need to be mapped
-            // Map indicators
-            self.$refs.spinner.show();
-            self.sync_updatedIndicators();
+            let outputObj = {
+              indicators: true,
+              indicatorMessage: "",
+              products: true,
+              productMessage: "",
+              activeShopCodes: true,
+              activeShopCodeMessage: "",
+              clusters: true,
+              clusterMessage: "",
+              storeClusterDescreps: true,
+              storeClusterDescrepMessage: "",
+              currentLoading: "indicators",
+              canContinue: false
+            };
+
+            self.sync_clusters(outputObj);
           }
         })
       },
-      sync_updatedIndicators() {
+      sync_clusters(outputObj) {
         let self = this;
 
-        let outputObj = {
-          indicators: true,
-          indicatorMessage: "",
-          products: true,
-          productMessage: "",
-          activeShopCodes: true,
-          activeShopCodeMessage: "",
-          clusters: true,
-          clusterMessage: "",
-          currentLoading: "indicators"
-        };
+        outputObj.currentLoading = 'clusters';
+        self.$refs.SyncModalStatus.updateStatus(outputObj);
+
+        Axios.get(process.env.VUE_APP_API + "Ranging/GetClusterData?planogramID=" + self.fileData.planogramID)
+          .then(r => {
+            let clusterData = r.data.clusterData;
+            self.rangingController.setClusterData(clusterData);
+            self.currentClusterData = self.rangingController.getClusterData();
+            self.setRangingClusterData(clusterData);
+            outputObj.clusterMessage = "Success"
+            self.checkStoreClusterChange();
+            // self.updatedIndicators(outputObj);
+          })
+          .catch(e => {
+            outputObj.clusters = false;
+            outputObj.clusterMessage = "Failed to get latest clusters. " + e;
+            self.checkStoreClusterChange();
+            // self.updatedIndicators(outputObj);
+          })
+      },
+      sync_updatedIndicators(outputObj) {
+        let self = this;
 
         self.$refs.SyncModalStatus.show();
         self.$refs.SyncModalStatus.updateStatus(outputObj);
@@ -1006,7 +1109,6 @@
             outputObj.products = false;
             outputObj.productMessage = "Failed to update product details. " + e;
           })
-        self.$refs.spinner.hide();
       },
       sync_activeShopCodes(outputObj) {
         let self = this;
@@ -1032,38 +1134,28 @@
             })
 
             outputObj.activeShopCodeMessage = "Success"
-            self.sync_clusters(outputObj);
+            self.sync_complete(outputObj);
           })
           .catch(e => {
             outputObj.activeShopCodes = false;
             outputObj.activeShopCodeMessage = "Failed to get latest active shop codes. " + e;
-            self.sync_clusters(outputObj);
-          })
-      },
-      sync_clusters(outputObj) {
-        let self = this;
-
-        outputObj.currentLoading = 'clusters';
-        self.$refs.SyncModalStatus.updateStatus(outputObj);
-
-        Axios.get(process.env.VUE_APP_API + "Ranging/GetClusterData?planogramID=" + self.fileData.planogramID)
-          .then(r => {
-            let clusterData = r.data.clusterData;
-            self.rangingController.setClusterData(clusterData);
-            self.setRangingClusterData(clusterData);
-            outputObj.clusterMessage = "Success"
             self.sync_complete(outputObj);
-          })
-          .catch(e => {
-            outputObj.clusters = false;
-            outputObj.clusterMessage = "Failed to get latest clusters. " + e;
-            self.sync_complete();
           })
       },
       sync_complete(outputObj) {
         let self = this;
-
+        outputObj.currentLoading = 'clustervariance'
         self.$refs.SyncModalStatus.updateStatus(outputObj);
+        let clusterDescrep = self.checkStoreClusterChange();
+
+        outputObj.storeClusterDescreps = true,
+          outputObj.storeClusterDescrepMessage = "Success",
+          self.$refs.SyncModalStatus.updateStatus(outputObj);
+
+        setTimeout(() => {
+          outputObj.canContinue = true;
+          self.$refs.SyncModalStatus.updateStatus(outputObj);
+        }, 1000);
       },
       closeRange() {
         let self = this;
@@ -1893,6 +1985,10 @@
         }
 
         self.gridApi[`exportDataAs${type}`](params);
+      },
+      setStoreClusterStuff() {
+        let self = this;
+        self.tmpClusters = self.rangingController.getClusterData();
       }
     }
   }

@@ -24,6 +24,11 @@ class RangingController {
     self.totalsData = null;
   }
 
+  getClusterData() {
+    let self = this;
+    return self.clusterData;
+  }
+
   getSalesMonthlyTotals(callback) {
     let self = this;
     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -123,6 +128,19 @@ class RangingController {
     });
 
     return finalArr
+  }
+  
+  getIndicatorsByCluster(clusterType, clusterID) {
+    let self = this;
+
+    let stores = getStoresByCluster(self.clusterData, clusterType, clusterID);
+    let retval = [];
+    
+    self.storeSales.forEach(ss => {
+
+      self.allRangeProducts.forEach(rp => {
+      })
+    })
   }
 
   getStoreCountByCluster(clusterType, clusterID) {
