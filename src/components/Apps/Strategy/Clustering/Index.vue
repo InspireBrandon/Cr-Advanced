@@ -30,6 +30,7 @@
     import StoreAnalysis from '../StoreAnalysis/Index'
     import Research from '../Research/Index'
     import Custom from '../Custom/Index'
+    import Brand from "../Brand/Index.vue"
 
     function TabItem(name, component) {
         this.name = name;
@@ -44,7 +45,8 @@
             StoreAnalysis,
             Map,
             Research,
-            Custom
+            Custom,
+            Brand
         },
         data() {
             return {
@@ -53,7 +55,8 @@
                     new TabItem("Main", "Main"),
                     new TabItem("Store", "StoreAnalysis"),
                     new TabItem("Basket", "BasketAnalysis"),
-                    new TabItem("Listing", "ListingClusters")
+                    new TabItem("Listing", "ListingClusters"),
+                    new TabItem("Brand", "Brand")
                     // new TabItem("Custom", "Custom"),
                     // new TabItem("Import", "Research")
                 ]

@@ -167,6 +167,7 @@
               self.spaceData = r.data.planogram_DetailsList
             }
             delete Axios.defaults.headers.common["TenantID"];
+            // self.spaceData = r.data.planogram_DetailsList
             callback();
           })
       },

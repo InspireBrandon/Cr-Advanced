@@ -295,7 +295,6 @@
     name: 'Ranging',
     components: {
       StorePieGraph,
-      // MapIndicatorModal,
       LineGraphModal,
       GpGraph,
       ParetoModal,
