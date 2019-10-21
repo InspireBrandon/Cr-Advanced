@@ -3,7 +3,7 @@
     <v-toolbar dense dark color="grey darken-3">
       <v-toolbar-items v-if="!$route.path.includes('RangePlanningView')">
         <!-- <v-btn @click="openIndicatorModal"> </v-btn> -->
-        <v-btn @click="checkStoreClusterChange">asdasd</v-btn>
+        <!-- <v-btn @click="checkStoreClusterChange">asdasd</v-btn> -->
         <v-menu dark offset-y style="margin-bottom: 10px;">
           <v-btn slot="activator" flat>
             File
@@ -950,61 +950,177 @@
         self.checkRegionalClusters(descreps);
         self.checkStoreClusters(descreps);
 
-        self.rangingController.getIndicatorsByCluster("store", 5);
+        // self.rangingController.getIndicatorsByCluster("store", 5);
+
+        console.log(descreps);
 
         return descreps;
       },
-      checkAllStoreClusters() {
+      checkAllStoreClusters(descreps) {
         let self = this;
 
         self.tmpClusters.allStoresClusters.forEach(tmpAsc => {
           tmpAsc.clusterStores.forEach(tmpCs => {
-            // self.notifyClusterStores("All Stores", tmpAsc.clusterName, tmpCs.storeName);
+            let current = self.currentClusterData.allStoresClusters.find(el => {
+              return el.clusterID === tmpAsc.clusterID;
+            })
+
+            let hasStore = false;
+
+            current.clusterStores.forEach(el => {
+              if (el.storeID === tmpCs.storeID) {
+                hasStore = true;
+              }
+            })
+
+            if (!hasStore) {
+              descreps.push({
+                storeID: tmpCs.storeID,
+                storeName: tmpCs.storeName,
+                clusterID: tmpSc.clusterID,
+                clusterName: tmpSc.clusterName
+              })
+            }
           })
         })
       },
-      checkCategoryClusters() {
+      checkCategoryClusters(descreps) {
         let self = this;
 
         self.tmpClusters.categoryClusters.forEach(tmpCc => {
           tmpCc.clusterStores.forEach(tmpCs => {
-            // self.notifyClusterStores("Category Cluster", tmpCc.clusterName, tmpCs.storeName);
+            let current = self.currentClusterData.categoryClusters.find(el => {
+              return el.clusterID === tmpCc.clusterID;
+            })
+
+            let hasStore = false;
+
+            current.clusterStores.forEach(el => {
+              if (el.storeID === tmpCs.storeID) {
+                hasStore = true;
+              }
+            })
+
+            if (!hasStore) {
+              descreps.push({
+                storeID: tmpCs.storeID,
+                storeName: tmpCs.storeName,
+                clusterID: tmpSc.clusterID,
+                clusterName: tmpSc.clusterName
+              })
+            }
           })
         })
       },
-      checkCustomClusters() {
+      checkCustomClusters(descreps) {
         let self = this;
 
         self.tmpClusters.customClusters.forEach(tmpCc => {
           tmpCc.clusterStores.forEach(tmpCs => {
-            // self.notifyClusterStores("Custom Cluster", tmpCc.clusterName, tmpCs.storeName);
+            let current = self.currentClusterData.customClusters.find(el => {
+              return el.clusterID === tmpCc.clusterID;
+            })
+
+            let hasStore = false;
+
+            current.clusterStores.forEach(el => {
+              if (el.storeID === tmpCs.storeID) {
+                hasStore = true;
+              }
+            })
+
+            if (!hasStore) {
+              descreps.push({
+                storeID: tmpCs.storeID,
+                storeName: tmpCs.storeName,
+                clusterID: tmpSc.clusterID,
+                clusterName: tmpSc.clusterName
+              })
+            }
           })
         })
       },
-      checkDepartmentClusters() {
+      checkDepartmentClusters(descreps) {
         let self = this;
 
         self.tmpClusters.departmentClusters.forEach(tmpDc => {
           tmpDc.clusterStores.forEach(tmpCs => {
-            // self.notifyClusterStores("Custom Cluster", tmpDc.clusterName, tmpCs.storeName);
+            let current = self.currentClusterData.departmentClusters.find(el => {
+              return el.clusterID === tmpDc.clusterID;
+            })
+
+            let hasStore = false;
+
+            current.clusterStores.forEach(el => {
+              if (el.storeID === tmpCs.storeID) {
+                hasStore = true;
+              }
+            })
+
+            if (!hasStore) {
+              descreps.push({
+                storeID: tmpCs.storeID,
+                storeName: tmpCs.storeName,
+                clusterID: tmpSc.clusterID,
+                clusterName: tmpSc.clusterName
+              })
+            }
           })
         })
       },
-      checkRegionalClusters() {
+      checkRegionalClusters(descreps) {
         let self = this;
 
         self.tmpClusters.regionalClusters.forEach(tmpRc => {
           tmpRc.clusterStores.forEach(tmpCs => {
-            // self.notifyClusterStores("Regional Cluster", tmpRc.clusterName, tmpCs.storeName);
+            let current = self.currentClusterData.regionalClusters.find(el => {
+              return el.clusterID === tmpRc.clusterID;
+            })
+
+            let hasStore = false;
+
+            current.clusterStores.forEach(el => {
+              if (el.storeID === tmpCs.storeID) {
+                hasStore = true;
+              }
+            })
+
+            if (!hasStore) {
+              descreps.push({
+                storeID: tmpCs.storeID,
+                storeName: tmpCs.storeName,
+                clusterID: tmpSc.clusterID,
+                clusterName: tmpSc.clusterName
+              })
+            }
           })
         })
       },
-      checkStoreClusters() {
+      checkStoreClusters(descreps) {
         let self = this;
 
         self.tmpClusters.storeClusters.forEach(tmpSc => {
           tmpSc.clusterStores.forEach(tmpCs => {
-            // self.notifyClusterStores("Store Cluster", tmpSc.clusterName, tmpCs.storeName);
+            let current = self.currentClusterData.storeClusters.find(el => {
+              return el.clusterID === tmpSc.clusterID;
+            })
+
+            let hasStore = false;
+
+            current.clusterStores.forEach(el => {
+              if (el.storeID === tmpCs.storeID) {
+                hasStore = true;
+              }
+            })
+
+            if (!hasStore) {
+              descreps.push({
+                storeID: tmpCs.storeID,
+                storeName: tmpCs.storeName,
+                clusterID: tmpSc.clusterID,
+                clusterName: tmpSc.clusterName
+              })
+            }
           })
         })
       },
