@@ -371,7 +371,6 @@
 
             if (gondola.Fixtures != null && gondola.Fixtures.length > 0) {
               gondola.Fixtures.forEach(fixture => {
-                console.log(fixture);
                 let fixtureObj = {
                   Type: "FIXTURE",
                   SubType: fixture.Type,
@@ -396,8 +395,6 @@
               });
             }
           });
-
-          console.log("OUTPUT FILE", output);
 
           switch (state.toUpperCase()) {
             case "NEW": {
@@ -527,12 +524,9 @@
 
         self.LoadingMsg = "Loading Gondolas";
 
-        console.log("LOAD UP GONDOLAS", gondolas);
-
         gondolas.sort((a, b) => a.Position - b.Position);
 
         gondolas.forEach((gondola, gondola_index) => {
-          console.log("LOAD UP GONDOLA", gondola, JSON.parse(gondola.Object));
           let data = JSON.parse(gondola.Object);
 
           let ctrl_gondola = new Gondola(
@@ -564,8 +558,6 @@
           g => g.Type === "FIXTURE"
         );
 
-        console.log("LOAD UP FIXTURES", fixtures);
-
         if (fixtures.length == 0) {
           this.FixtureLoading = false;
           this.ProductLoading = false;
@@ -574,7 +566,6 @@
         let fixturePromiseArr = [];
 
         fixtures.forEach(fixture => {
-          console.log("LOAD UP FIXTURE", fixture, JSON.parse(fixture.Object));
 
           let data = JSON.parse(fixture.Object);
 
@@ -680,8 +671,6 @@
           g => g.Type === "PRODUCTGROUP"
         );
 
-        console.log("LOAD UP PRODUCT GROUPS", productGroups);
-
         this.LoadingMsg = "Loading Products";
         if (productGroups.length == 0) {
           this.ProductLoading = false;
@@ -691,9 +680,7 @@
         productGroups.forEach((productGroupItem, productIdx) => {
           //   console.log("LOAD UP PRODUCT GROUPS", productGroupItem, JSON.parse(productGroupItem.Object));
           let data = JSON.parse(productGroupItem.Object);
-          console.log("LOAD PRODUCT TO FIXTURE (PRE)", data, fixtureID);
           if (data.Data.FixtureID == fixtureID) {
-            console.log("LOAD PRODUCT TO FIXTURE", data, fixtureID);
             let ctrl_product = new ProductGroup(
               self.$store,
               data.Data.ProductData,
@@ -907,8 +894,8 @@
 
         let height = stage.getHeight() - lastY;
 
-        console.log("[download parameters]", "R", ratio, "Last Y", lastY, "TTL H DWN", height, "stage H", stage
-          .getHeight())
+        // console.log("[download parameters]", "R", ratio, "Last Y", lastY, "TTL H DWN", height, "stage H", stage
+        //   .getHeight())
 
         var dataURL = this.$refs.stage.getStage().toDataURL({
           x: 0,
@@ -967,7 +954,7 @@
 
         // stage.find('Shape').strokeWidth(1 / stage.scale());
 
-        console.log(selectedValue);
+        // console.log(selectedValue);
         var dataURL = this.$refs.stage.getStage().toDataURL({
           x: selectedValue.Group.getX(),
           y: selectedValue.Group.getY(),
