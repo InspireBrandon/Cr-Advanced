@@ -1,0 +1,17 @@
+[{
+        "headerName": "Supplier Store",
+        "field": "storeName",
+        "editable": true
+    },
+    {
+        "headerName": "System Location",
+        "field": "name",
+        "editable": true
+    },
+    {
+        "headerName": "Actions",
+        "field": "",
+        "cellRendererFramework": "Button",
+        "pinned": "right"
+    }
+]

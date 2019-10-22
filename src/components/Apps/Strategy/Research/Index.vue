@@ -24,6 +24,16 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
+                <v-menu dark offset-y style="margin-bottom: 10px;">
+                    <v-btn slot="activator" flat>
+                        Setup
+                    </v-btn>
+                    <v-list>
+                        <v-list-tile>
+                            <v-list-tile-title @click="openRetailerSupplierStorDialog">Link Supplier Stores</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
             </v-toolbar-items>
             <v-spacer></v-spacer>
             <div></div>
@@ -34,6 +44,7 @@
         </v-toolbar>
         <Grid :rowData="rowData" :headers="headers" ref="Grid" />
 
+        <RetailerSupplierStoreDialog ref="RetailerSupplierStoreDialog"/>
         <input @change="onFileChange" accept=".csv" ref="fileInput" style="display: none" type="file">
         <Prompt ref="Prompt" />
         <YesNoModal ref="YesNoModal" />
@@ -50,6 +61,7 @@
     import FileDataSelector from './FileDataSelector'
     import ImportSelector from './ImportSelector'
     import jwt from 'jsonwebtoken';
+    import RetailerSupplierStoreDialog from './RetailerSupplierStore/RetailerSupplier';
 
     export default {
         components: {
@@ -57,7 +69,8 @@
             ImportSelector,
             Prompt,
             YesNoModal,
-            FileDataSelector
+            FileDataSelector,
+            RetailerSupplierStoreDialog
         },
         data() {
             return {
@@ -123,6 +136,11 @@
             close() {
                 let self = this
                 self.rowData = []
+            },
+            openRetailerSupplierStorDialog(){
+                let self = this;
+
+                self.$refs.RetailerSupplierStoreDialog.show();
             },
             openFileDialog() {
                 let self = this;

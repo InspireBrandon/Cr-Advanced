@@ -35,6 +35,8 @@ class StageWarehouseMiddleware {
                 }
               }
 
+              console.log(productData);
+
               productData["sales_Retail"] = warehouseProduct["sales_Retail"];
               productData["sales_Cost"] = warehouseProduct["sales_Cost"];
               productData["sales_Units"] = warehouseProduct["sales_Units"];
@@ -62,8 +64,6 @@ class StageWarehouseMiddleware {
               productData["autoRangeOneItem"] = warehouseProduct["autoRangeOneItem"];
               productData["alt_Store_Range_Indicator"] = warehouseProduct["alt_Store_Range_Indicator"];
               productData["alt_Store_Range_Indicator_ID"] = warehouseProduct["alt_Store_Range_Indicator_ID"];
-
-              console.log(productData, warehouseProduct)
 
               // currentPlanogramItem.Data.Data = warehouseProduct;
               // verify that product exists
