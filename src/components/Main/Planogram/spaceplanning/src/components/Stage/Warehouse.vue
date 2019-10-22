@@ -639,14 +639,11 @@
         let ctrl_store = new StoreHelper();
         let allProducts = self.products;
 
-        console.log("Starting");
-
         let storeProducts = self.$store.state.activePlanogramProducts;
-        // storeProducts = storeProducts.slice(0, productStoreCopy.length);
-        let storePlanogramItemProducts = ctrl_store.getAllPlanogramItemsByType(self.$store, "PRODUCT");
 
         allProducts.forEach(product => {
           storeProducts.forEach((storeProduct, idx) => {
+
             if (storeProduct.Data.barcode == product.barcode) {
 
               var needsDraw = false;
@@ -724,18 +721,13 @@
               storeProduct.Data.volume_potential = parseFloat(product.volume_potential);
               storeProduct.Data.sales_potential = parseFloat(product.sales_potential);
 
-              console.log("[storeProduct]", storeProduct.Data);
-
               if (needsDraw) {
-                console.log("Redrawing");
                 ctrl_store.setProductData(self.$store, storeProduct.Data, product.barcode);
                 storeProduct.ChangeDimensions(storeProduct);
               }
             }
           })
         })
-
-        console.log("Redrawing done");
       },
       dimensionChange(planoProduct, rangeProduct) {
         if (planoProduct.height == rangeProduct.height && planoProduct.width == rangeProduct.width && planoProduct
@@ -849,8 +841,6 @@
           axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fileID}`)
             .then(r => {
               if (r.data) {
-                console.log(r.data);
-
                 self.getCategoryCluster(r.data.planogramID)
                 self.rangingData.dateFromString = r.data.dateFromString;
                 self.rangingData.dateToString = r.data.dateToString;
@@ -1531,12 +1521,16 @@
                   self.products.forEach(product => {
                     if (storeProduct.Data.productID == product.productID) {
                       for (var prop in product) {
-                        storeProduct.Data[prop] = product[prop];
+                        if (prop != "useAlternateBarcode" && prop != "alternateBarcode" && prop != "alternatePackingType" && prop != "cost_potential") {
+                          storeProduct.Data[prop] = product[prop];
+                        }
                       }
                     }
                   })
                 });
               }
+
+              self.customEmitter.notify_cluster_change(EventBus);
             }
           }
         })

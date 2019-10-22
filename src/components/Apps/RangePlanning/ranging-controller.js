@@ -24,6 +24,11 @@ class RangingController {
     self.totalsData = null;
   }
 
+  getClusterData() {
+    let self = this;
+    return self.clusterData;
+  }
+
   getSalesMonthlyTotals(callback) {
     let self = this;
     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -54,8 +59,8 @@ class RangingController {
   setClusterData(clusterData) {
     this.clusterData = clusterData;
   }
-  
-  getClusterData(){
+
+  getClusterData() {
     return this.clusterData;
   }
 
@@ -71,21 +76,24 @@ class RangingController {
       for (let j = 0; j < store.salesData.length; j++) {
         let product = store.salesData[j];
 
-        if(product.store_Range_Indicator_ID == 0 && (product.updated != undefined && product.updated)) {
+        if (product.store_Range_Indicator_ID == 0 && (product.updated != undefined && product.updated)) {
 
-          switch(product.store_Range_Indicator) {
+          switch (product.store_Range_Indicator) {
             case 'YES': {
               product.store_Range_Indicator_ID = 2;
               product["updated"] = true;
-            }break;
-            case 'NO': {
-              product.store_Range_Indicator_ID = 1;
-              product["updated"] = true;
-            }break;
-            case 'SELECT': {
-              product.store_Range_Indicator_ID = 3;
-              product["updated"] = true;
-            }break;
+            }
+            break;
+          case 'NO': {
+            product.store_Range_Indicator_ID = 1;
+            product["updated"] = true;
+          }
+          break;
+          case 'SELECT': {
+            product.store_Range_Indicator_ID = 3;
+            product["updated"] = true;
+          }
+          break;
           }
         }
 
@@ -125,6 +133,51 @@ class RangingController {
     return finalArr
   }
 
+  getIndicatorsByCluster(clusterType, clusterID) {
+    let self = this;
+
+    let stores = getStoresByCluster(self.clusterData, clusterType, clusterID);
+    let retval = [];
+
+    self.allRangeProducts.forEach(rp => {
+
+      let currentProductIndicator = "";
+      let allSame = true;
+
+      self.storeSales.forEach(ss => {
+        if (storeInCluster(ss.storeID, stores)) {
+          ss.salesData.forEach(sdp => {
+            if(sdp.productID === rp.productID) {
+              if(currentProductIndicator === "") {
+                currentProductIndicator = sdp.store_Range_Indicator;
+              }
+              else {
+                if(sdp.store_Range_Indicator !== currentProductIndicator) {
+                  allSame = false;
+                }
+              }
+            }
+          })
+        }
+      })
+
+      if(allSame) {
+        retval.push({
+          productID: rp.productID,
+          indicator: currentProductIndicator
+        })
+      }
+      else {
+        retval.push({
+          productID: rp.productID,
+          indicator: "SELECTED"
+        })
+      }
+    })
+
+    return retval;
+  }
+
   getStoreCountByCluster(clusterType, clusterID) {
     return this.getStoresByCluster(clusterType, clusterID).length;
   }
@@ -147,6 +200,10 @@ class RangingController {
 
   getAllProducts() {
     return this.allRangeProducts;
+  }
+
+  getStoreSales() {
+    return this.storeSales;
   }
 
   getAllProductID() {
@@ -507,7 +564,7 @@ function getDaysOfSupplyPerX(dos_units, clusters, clusterType, clusterID, volume
   let clusterStores = getStoresByCluster(clusters, clusterType, clusterID);
   let storeCount = clusterStores.length;
 
-  let capacity = parseInt(dos_units);  ;
+  let capacity = parseInt(dos_units);;
 
   let other = volume_potential == 0 ? 0 : capacity / (volume_potential / storeCount) * 30;
 
@@ -917,7 +974,7 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
     if (weighted_distribution != 0 && sales_units != 0)
       (profit_potential = sales_profit / weighted_distribution * 100).toFixed(0);
 
-    if(weighted_distribution != 0 && sales_units != 0)
+    if (weighted_distribution != 0 && sales_units != 0)
       (cost_potential = sales_cost / weighted_distribution * 100).toFixed(0);
 
     // dos_fac = getDaysOfSupplyFacings(clusters, clusterType, clusterID, volume_potential, product.depth)
@@ -1063,8 +1120,8 @@ function RangeProduct(productData, salesData, indicator) {
   self.sales_Units = salesData.sales_units;
   self.sales_Profit = salesData.sales_profit;
   self.stock_Cost = salesData.stock_cost,
-  self.stock_Units = salesData.stock_units,
-  self.number_Distribution = salesData.number_distribution + " %";
+    self.stock_Units = salesData.stock_units,
+    self.number_Distribution = salesData.number_distribution + " %";
   self.weighted_Distribution = salesData.weighted_distribution + " %";
   self.sales_potential = salesData.sales_potential;
   self.volume_potential = salesData.volume_potential;

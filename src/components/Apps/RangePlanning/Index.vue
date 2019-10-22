@@ -3,6 +3,7 @@
     <v-toolbar dense dark color="grey darken-3">
       <v-toolbar-items v-if="!$route.path.includes('RangePlanningView')">
         <!-- <v-btn @click="openIndicatorModal"> </v-btn> -->
+        <!-- <v-btn @click="checkStoreClusterChange">asdasd</v-btn> -->
         <v-menu dark offset-y style="margin-bottom: 10px;">
           <v-btn slot="activator" flat>
             File
@@ -450,7 +451,9 @@
         tmpString: "",
         ais_Sales: 0,
         ais_SalesPotential: 0,
-        periodData: []
+        periodData: [],
+        tmpClusters: null,
+        currentClusterData: null
       }
     },
     created() {
@@ -783,7 +786,11 @@
                 self.rangingController = new RangingController(r.data);
 
                 self.rangingController.getSalesMonthlyTotals(() => {
+
                   self.setRangingClusterData(r.data.clusterData);
+                  self.currentClusterData = self.rangingController.getClusterData();
+
+
                   if (self.selectedClusterType != null && self.selectedClusterOption != null) {
                     self.rowData = self.rangingController.getSalesDataByCluster(self.selectedClusterType,
                       self
@@ -852,6 +859,7 @@
               self.fileData.monthsBetween = r.data.monthsBetween;
               self.fileData.tag = r.data.tag;
               self.fileData.active_Shop_Code_ID = r.data.active_Shop_Code_ID;
+              self.fileData.useType = (r.data.useType == undefined || r.data.useType == null) ? "PLANOGRAM" : "CATEGORY";
 
               self.getHelpFile();
 
@@ -896,6 +904,7 @@
               self.canRefresh = true;
 
               self.rangingController = new RangingController(r.data);
+              self.setStoreClusterStuff();
 
               self.rangingController.getSalesMonthlyTotals(() => {
 
@@ -924,38 +933,273 @@
                 self.gotData = true
               })
 
-              // TODO add check for update
               self.promptForFileSync();
             })
         })
+      },
+      checkStoreClusterChange() {
+        let self = this;
+        let descreps = [];
+
+        let storeSales = self.rangingController.getStoreSales();
+
+        self.checkAllStoreClusters(descreps);
+        self.checkCategoryClusters(descreps);
+        self.checkCustomClusters(descreps);
+        self.checkDepartmentClusters(descreps);
+        self.checkRegionalClusters(descreps);
+        self.checkStoreClusters(descreps);
+
+        descreps.forEach(descrep => {
+          let clusterData = self.tmpClusters[descrep.type + "Clusters"].find(el => {
+            return el.clusterID === descrep.clusterID;
+          })
+
+          let clusterIndicators = self.rangingController.getIndicatorsByCluster(descrep.type, descrep.clusterID);
+
+          clusterIndicators.forEach(ci => {
+            storeSales.forEach(ss => {
+              if (ss.storeID === descrep.storeID) {
+                let productRecord = ss.salesData.find(prel => {
+                  return prel.productID == ci.productID;
+                })
+
+                if(ci.indicator != "SELECTED") {
+                  productRecord.store_Range_Indicator = clusterIndicators.indicator
+                  productRecord.store_Range_Indicator_ID = clusterIndicators.indicator == "NO" ? 0 : 1;
+                  productRecord["updated"] = true;
+                }
+              }
+            })
+          })
+        })
+      },
+      checkAllStoreClusters(descreps) {
+        let self = this;
+
+        self.tmpClusters.allStoresClusters.forEach(tmpAsc => {
+          tmpAsc.clusterStores.forEach(tmpCs => {
+            let current = self.currentClusterData.allStoresClusters.find(el => {
+              return el.clusterID === tmpAsc.clusterID;
+            })
+
+            let hasStore = false;
+
+            current.clusterStores.forEach(el => {
+              if (el.storeID === tmpCs.storeID) {
+                hasStore = true;
+              }
+            })
+
+            if (!hasStore) {
+              descreps.push({
+                type: "allStores",
+                storeID: tmpCs.storeID,
+                storeName: tmpCs.storeName,
+                clusterID: tmpSc.clusterID,
+                clusterName: tmpSc.clusterName
+              })
+            }
+          })
+        })
+      },
+      checkCategoryClusters(descreps) {
+        let self = this;
+
+        self.tmpClusters.categoryClusters.forEach(tmpCc => {
+          tmpCc.clusterStores.forEach(tmpCs => {
+            let current = self.currentClusterData.categoryClusters.find(el => {
+              return el.clusterID === tmpCc.clusterID;
+            })
+
+            let hasStore = false;
+
+            current.clusterStores.forEach(el => {
+              if (el.storeID === tmpCs.storeID) {
+                hasStore = true;
+              }
+            })
+
+            if (!hasStore) {
+              descreps.push({
+                type: "category",
+                storeID: tmpCs.storeID,
+                storeName: tmpCs.storeName,
+                clusterID: tmpSc.clusterID,
+                clusterName: tmpSc.clusterName
+              })
+            }
+          })
+        })
+      },
+      checkCustomClusters(descreps) {
+        let self = this;
+
+        self.tmpClusters.customClusters.forEach(tmpCc => {
+          tmpCc.clusterStores.forEach(tmpCs => {
+            let current = self.currentClusterData.customClusters.find(el => {
+              return el.clusterID === tmpCc.clusterID;
+            })
+
+            let hasStore = false;
+
+            current.clusterStores.forEach(el => {
+              if (el.storeID === tmpCs.storeID) {
+                hasStore = true;
+              }
+            })
+
+            if (!hasStore) {
+              descreps.push({
+                type: "custom",
+                storeID: tmpCs.storeID,
+                storeName: tmpCs.storeName,
+                clusterID: tmpSc.clusterID,
+                clusterName: tmpSc.clusterName
+              })
+            }
+          })
+        })
+      },
+      checkDepartmentClusters(descreps) {
+        let self = this;
+
+        self.tmpClusters.departmentClusters.forEach(tmpDc => {
+          tmpDc.clusterStores.forEach(tmpCs => {
+            let current = self.currentClusterData.departmentClusters.find(el => {
+              return el.clusterID === tmpDc.clusterID;
+            })
+
+            let hasStore = false;
+
+            current.clusterStores.forEach(el => {
+              if (el.storeID === tmpCs.storeID) {
+                hasStore = true;
+              }
+            })
+
+            if (!hasStore) {
+              descreps.push({
+                type: "department",
+                storeID: tmpCs.storeID,
+                storeName: tmpCs.storeName,
+                clusterID: tmpSc.clusterID,
+                clusterName: tmpSc.clusterName
+              })
+            }
+          })
+        })
+      },
+      checkRegionalClusters(descreps) {
+        let self = this;
+
+        self.tmpClusters.regionalClusters.forEach(tmpRc => {
+          tmpRc.clusterStores.forEach(tmpCs => {
+            let current = self.currentClusterData.regionalClusters.find(el => {
+              return el.clusterID === tmpRc.clusterID;
+            })
+
+            let hasStore = false;
+
+            current.clusterStores.forEach(el => {
+              if (el.storeID === tmpCs.storeID) {
+                hasStore = true;
+              }
+            })
+
+            if (!hasStore) {
+              descreps.push({
+                type: "regional",
+                storeID: tmpCs.storeID,
+                storeName: tmpCs.storeName,
+                clusterID: tmpSc.clusterID,
+                clusterName: tmpSc.clusterName
+              })
+            }
+          })
+        })
+      },
+      checkStoreClusters(descreps) {
+        let self = this;
+
+        self.tmpClusters.storeClusters.forEach(tmpSc => {
+          tmpSc.clusterStores.forEach(tmpCs => {
+            let current = self.currentClusterData.storeClusters.find(el => {
+              return el.clusterID === tmpSc.clusterID;
+            })
+
+            let hasStore = false;
+
+            current.clusterStores.forEach(el => {
+              if (el.storeID === tmpCs.storeID) {
+                hasStore = true;
+              }
+            })
+
+            if (!hasStore) {
+              descreps.push({
+                type: "store",
+                storeID: tmpCs.storeID,
+                storeName: tmpCs.storeName,
+                clusterID: tmpSc.clusterID,
+                clusterName: tmpSc.clusterName
+              })
+            }
+          })
+        })
+      },
+      notifyClusterStores(clusterType, cluster, store) {
+        // console.log(`Checking ${clusterType} - ${cluster} for store: ${store}`);
       },
       promptForFileSync() {
         let self = this;
 
         self.$refs.yesNo.show('Would you like to sync your data?', goThrough => {
           if (goThrough) {
-            // Check if clusters have 0 stores
-            // Check if any indicators need to be mapped
-            // Map indicators
-            self.$refs.spinner.show();
-            self.sync_updatedIndicators();
+            let outputObj = {
+              indicators: true,
+              indicatorMessage: "",
+              products: true,
+              productMessage: "",
+              activeShopCodes: true,
+              activeShopCodeMessage: "",
+              clusters: true,
+              clusterMessage: "",
+              storeClusterDescreps: true,
+              storeClusterDescrepMessage: "",
+              currentLoading: "indicators",
+              canContinue: false
+            };
+
+            self.sync_clusters(outputObj);
           }
         })
       },
-      sync_updatedIndicators() {
+      sync_clusters(outputObj) {
         let self = this;
 
-        let outputObj = {
-          indicators: true,
-          indicatorMessage: "",
-          products: true,
-          productMessage: "",
-          activeShopCodes: true,
-          activeShopCodeMessage: "",
-          clusters: true,
-          clusterMessage: "",
-          currentLoading: "indicators"
-        };
+        outputObj.currentLoading = 'clusters';
+        self.$refs.SyncModalStatus.updateStatus(outputObj);
+
+        Axios.get(process.env.VUE_APP_API + "Ranging/GetClusterData?planogramID=" + self.fileData.planogramID)
+          .then(r => {
+            let clusterData = r.data.clusterData;
+            self.rangingController.setClusterData(clusterData);
+            self.currentClusterData = self.rangingController.getClusterData();
+            self.setRangingClusterData(clusterData);
+            outputObj.clusterMessage = "Success"
+            self.checkStoreClusterChange();
+            self.sync_updatedIndicators(outputObj);
+          })
+          .catch(e => {
+            outputObj.clusters = false;
+            outputObj.clusterMessage = "Failed to get latest clusters. " + e;
+            self.checkStoreClusterChange();
+            self.sync_updatedIndicators(outputObj);
+          })
+      },
+      sync_updatedIndicators(outputObj) {
+        let self = this;
 
         self.$refs.SyncModalStatus.show();
         self.$refs.SyncModalStatus.updateStatus(outputObj);
@@ -1005,7 +1249,6 @@
             outputObj.products = false;
             outputObj.productMessage = "Failed to update product details. " + e;
           })
-        self.$refs.spinner.hide();
       },
       sync_activeShopCodes(outputObj) {
         let self = this;
@@ -1031,38 +1274,30 @@
             })
 
             outputObj.activeShopCodeMessage = "Success"
-            self.sync_clusters(outputObj);
+            self.sync_complete(outputObj);
           })
           .catch(e => {
             outputObj.activeShopCodes = false;
             outputObj.activeShopCodeMessage = "Failed to get latest active shop codes. " + e;
-            self.sync_clusters(outputObj);
-          })
-      },
-      sync_clusters(outputObj) {
-        let self = this;
-
-        outputObj.currentLoading = 'clusters';
-        self.$refs.SyncModalStatus.updateStatus(outputObj);
-
-        Axios.get(process.env.VUE_APP_API + "Ranging/GetClusterData?planogramID=" + self.fileData.planogramID)
-          .then(r => {
-            let clusterData = r.data.clusterData;
-            self.rangingController.setClusterData(clusterData);
-            self.setRangingClusterData(clusterData);
-            outputObj.clusterMessage = "Success"
             self.sync_complete(outputObj);
-          })
-          .catch(e => {
-            outputObj.clusters = false;
-            outputObj.clusterMessage = "Failed to get latest clusters. " + e;
-            self.sync_complete();
           })
       },
       sync_complete(outputObj) {
         let self = this;
 
+        outputObj.canContinue = true;
+        outputObj.currentLoading = 'clustervariance'
         self.$refs.SyncModalStatus.updateStatus(outputObj);
+        let clusterDescrep = self.checkStoreClusterChange();
+
+        outputObj.storeClusterDescreps = true,
+          outputObj.storeClusterDescrepMessage = "Success",
+          self.$refs.SyncModalStatus.updateStatus(outputObj);
+
+        setTimeout(() => {
+          outputObj.canContinue = true;
+          self.$refs.SyncModalStatus.updateStatus(outputObj);
+        }, 1000);
       },
       closeRange() {
         let self = this;
@@ -1892,6 +2127,10 @@
         }
 
         self.gridApi[`exportDataAs${type}`](params);
+      },
+      setStoreClusterStuff() {
+        let self = this;
+        self.tmpClusters = self.rangingController.getClusterData();
       }
     }
   }

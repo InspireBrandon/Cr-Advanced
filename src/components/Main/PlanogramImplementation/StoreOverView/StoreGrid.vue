@@ -198,8 +198,6 @@
                         tmp.planogramStoreStatus = 0;
                         tmp.currentStatusText = "Unassigned"
 
-                        console.log(tmp)
-
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                         Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)

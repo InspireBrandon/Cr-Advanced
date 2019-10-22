@@ -175,8 +175,6 @@ export const store = new Vuex.Store({
       state.activePlanogramProducts.forEach(el => {
         if (el.Type == "PRODUCT") {
           if (el.Data.barcode == data.barcode) {
-            console.log(data.barcode)
-
 
             el.Data.height = data.data.height;
             el.Data.width = data.data.width;
