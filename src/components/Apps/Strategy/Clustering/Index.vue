@@ -31,6 +31,7 @@
     import Research from '../Research/Index'
     import Custom from '../Custom/Index'
     import Brand from "../Brand/Index.vue"
+    import Department from "../Department/Index.vue"
 
     function TabItem(name, component) {
         this.name = name;
@@ -40,6 +41,7 @@
     export default {
         components: {
             Main,
+            Department,
             BasketAnalysis,
             ListingClusters,
             StoreAnalysis,
@@ -56,7 +58,8 @@
                     new TabItem("Store", "StoreAnalysis"),
                     new TabItem("Basket", "BasketAnalysis"),
                     new TabItem("Listing", "ListingClusters"),
-                    new TabItem("Brand", "Brand")
+                    new TabItem("Category", "Brand"),
+                    new TabItem("Department", "Department"),
                     // new TabItem("Custom", "Custom"),
                     // new TabItem("Import", "Research")
                 ]

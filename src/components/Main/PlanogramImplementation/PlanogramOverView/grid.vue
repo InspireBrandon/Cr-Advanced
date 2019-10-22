@@ -2,7 +2,7 @@
     <div>
         <ag-grid-vue :gridOptions="gridOptions" @selection-changed="onSelectionChanged" :sideBar='false'
             style="width: 100%;  height: calc(100vh - 335px);" :defaultColDef="defaultColDef" class="ag-theme-balham"
-            :columnDefs="headers" :rowData="rowData" :enableSorting="true" :enableFilter="true"
+            :columnDefs="heads" :rowData="rowData" :enableSorting="true" :enableFilter="true"
             :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
             :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :gridReady="gridReady"
             :onGridReady="onGridReady" :groupMultiAutoColumn="true">
@@ -36,7 +36,7 @@
         request
     } from 'http';
     export default {
-        props: ["rowData", "selectedProject", "getRowData", "assign", "userAccess", "isRupert"],
+        props: ["rowData", "selectedProject", "getRowData", "assign", "userAccess", "isRupert","heads"],
         components: {
             AgGridVue,
             VariationOrderModal,
@@ -50,85 +50,7 @@
         },
         mounted() {
             let self = this;
-            self.headers = [{
-                    "headerName": "Store",
-                    "checkboxSelection": self.userAccess == 0 || self.isRupert,
-                    "field": "storeName",
-                    "headerCheckboxSelection": true,
-                    "headerCheckboxSelectionFilteredOnly": true,
-                    "minWidth": 200,
-                }, {
-                    "headerName": "Planogram Name",
-                    "cellRendererFramework": "PlanogramName",
-
-                    "minWidth": 300,
-                    cellStyle: function (params) {
-                        if (params.data.planogramFit == true) {
-                            //mark police cells as red
-                            return {
-                                // color: 'red',
-                                backgroundColor: " rgb(240, 125, 125)"
-                            };
-                        } else {
-                            return {
-                                // backgroundColor: " #C8E6C9"
-                            };
-                        }
-                    }
-                }, {
-                    "headerName": "Status",
-                    "field": "currentStatusText",
-                    "minWidth": 100,
-                }, {
-                    "headerName": "Actions",
-                    "hide": false,
-                    "minWidth": 340,
-                    "cellRendererFramework": "Button"
-                },
-                {
-                    "headerName": "Best Fit",
-                    "cellRendererFramework": "Fits",
-                    "minWidth": 50
-                },
-                {
-                    "headerName": "Store Cluster",
-                    "field": "cluster",
-                    "minWidth": 75,
-                    cellClassRules: {
-                        'success-green': 'data.storeClusterFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                        'error-red': 'data.storeClusterFit == true && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                    }
-                }, {
-                    "headerName": "Category Cluster",
-                    "field": "categoryCluster",
-                    "minWidth": 75,
-                }, {
-                    "headerName": "Modules",
-                    "minWidth": 50,
-                    "editable": self.userAccess == 0 || self.isRupert,
-                    "field": "modules",
-                    cellClassRules: {
-                        'success-green': 'data.modulesFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                        'error-red': 'data.modulesFit == true && ( data.planogramStoreStatus!=5 && data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                    }
-
-                }, {
-                    "headerName": "Height",
-                    "minWidth": 50,
-                    // "cellRendererFramework": "height",
-                    "editable": self.userAccess == 0 || self.isRupert,
-                    "field": "height",
-                    cellClassRules: {
-                        'success-green': 'data.heightFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                        'error-red': 'data.heightFit == true && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                    }
-                }, {
-                    "headerName": "Audit",
-                    "minWidth": 50,
-                    "field": "audit",
-                    "cellRendererFramework": "Audit"
-                }
-            ]
+            self.headers = self.heads 
         },
         data() {
             return {

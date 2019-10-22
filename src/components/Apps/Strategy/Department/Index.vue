@@ -25,7 +25,7 @@
             </v-toolbar-items>
             <v-spacer></v-spacer>
             <v-toolbar-title>
-                Catagory Cluster
+                Department Cluster
             </v-toolbar-title>
         </v-toolbar>
         <v-toolbar dark flat>

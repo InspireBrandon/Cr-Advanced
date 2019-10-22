@@ -9,7 +9,7 @@ class ListingClusterController {
     static GenerateClusterOutput(params) {
         let self = this;
         console.log(params);
-        
+
         // ////////////////////////////////////////////////////////////////////////////////////////////////////
         // PARAMS VARIABLES
         // ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,14 @@ function getStoreSales(stores, storeSales) {
 function getProductsWeighted(storeSalesData) {
     let uniqueProducts = removeDuplicates(storeSalesData.map(item => ({
         productName: item.productName,
-        product_ID: item.product_ID
+        product_ID: item.product_ID,
+        sales_Retail: item.sales_Retail,
+        size_Description: item.size_Description,
+        supplier: item.supplier,
+        manufacturer: item.manufacturer,
+        brand_Name: item.brand_Name,
+        subcategory: item.subcategory,
+        category: item.category
     })), "product_ID"); // get all unique products
 
     uniqueProducts.forEach(product => {
@@ -118,6 +125,9 @@ function getProductsWeighted(storeSalesData) {
 
 function getTotalStoreProductSales(stores, products, storeSalesData) {
     let tmpStoreData = [];
+    console.log("products");
+    console.log(products);
+
     let currentCumulative = 0;
 
     var totalCategorySales = storeSalesData.reduce((a, b) => {
@@ -146,7 +156,14 @@ function getTotalStoreProductSales(stores, products, storeSalesData) {
             totalProductSales: parseFloat(parseFloat(totalProductSales.toFixed(2))),
             cumulativProductSales: cumulativProductSales.toFixed(2),
             canHighlight: false,
-            highlightLevel: 0
+            highlightLevel: 0,
+            sales_Retail: product.sales_Retail,
+            size_Description: product.size_Description,
+            supplier: product.supplier,
+            manufacturer: product.manufacturer,
+            brand_Name: product.brand_Name,
+            subcategory: product.subcategory,
+            category: product.category
         }
 
         stores.forEach(store => {
@@ -274,7 +291,7 @@ function getMostCommonGroups(codeData, levels, group) {
     let currentCount = 0;
     let retval = [];
 
-    for(var i = 0; i < levels; i++) {
+    for (var i = 0; i < levels; i++) {
         let currentHighest = 0;
         let currentHighestString = "";
 
@@ -283,7 +300,7 @@ function getMostCommonGroups(codeData, levels, group) {
                 return fel["level" + group + "Code"] == el["level" + group + "Code"];
             }).length;
 
-            if(count > currentHighest) {
+            if (count > currentHighest) {
                 currentHighest = count;
                 currentHighestString = el["level" + group + "Code"];
             }
@@ -293,8 +310,8 @@ function getMostCommonGroups(codeData, levels, group) {
             return fel["level" + group + "Code"] != currentHighestString;
         });
 
-        if(currentHighest > 1) {
-            retval.push(currentHighestString);   
+        if (currentHighest > 1) {
+            retval.push(currentHighestString);
         }
     }
 
@@ -383,13 +400,12 @@ function generateClusterNew(tmpStoreData, clusterData) {
             let highest = commonGroups1[i];
             let lowest = commonGroups1[i + 1];
 
-            if(el.level1Code >= lowest && el.level1Code <= highest) {
+            if (el.level1Code >= lowest && el.level1Code <= highest) {
                 let closest = closestTo(el.level1Code, lowest, highest);
 
-                if(closest.highest > closest.lowest) {
+                if (closest.highest > closest.lowest) {
                     counter = i;
-                }
-                else {
+                } else {
                     counter = i + 1;
                 }
 
@@ -397,7 +413,7 @@ function generateClusterNew(tmpStoreData, clusterData) {
             }
         }
 
-        if(!assigned)
+        if (!assigned)
             counter = letters.length - 1;
 
         el.cluster = letters[counter];
@@ -414,13 +430,12 @@ function generateClusterNew(tmpStoreData, clusterData) {
             let highest = commonGroups2[i];
             let lowest = commonGroups2[i + 1];
 
-            if(el.level2Code >= lowest && el.level2Code <= highest) {
+            if (el.level2Code >= lowest && el.level2Code <= highest) {
                 let closest = closestTo(el.level2Code, lowest, highest);
 
-                if(closest.highest > closest.lowest) {
+                if (closest.highest > closest.lowest) {
                     counter = i + 1;
-                }
-                else {
+                } else {
                     counter = i + 2;
                 }
 
@@ -428,7 +443,7 @@ function generateClusterNew(tmpStoreData, clusterData) {
             }
         }
 
-        if(!assigned)
+        if (!assigned)
             counter = letters.length - 1;
 
         el.cluster = (counter == (letters.length - 1)) ? letters[counter] : counter;
@@ -445,13 +460,12 @@ function generateClusterNew(tmpStoreData, clusterData) {
             let highest = commonGroups3[i];
             let lowest = commonGroups3[i + 1];
 
-            if(el.level3Code >= lowest && el.level3Code <= highest) {
+            if (el.level3Code >= lowest && el.level3Code <= highest) {
                 let closest = closestTo(el.level3Code, lowest, highest);
 
-                if(closest.highest > closest.lowest) {
+                if (closest.highest > closest.lowest) {
                     counter = i;
-                }
-                else {
+                } else {
                     counter = i + 1;
                 }
 
@@ -459,7 +473,7 @@ function generateClusterNew(tmpStoreData, clusterData) {
             }
         }
 
-        if(!assigned)
+        if (!assigned)
             counter = letters.length - 1;
 
         el.cluster = (counter == (letters.length - 1)) ? letters[counter] : letters[counter].toLowerCase();
@@ -506,12 +520,12 @@ function closestTo(comparitor, lowest, highest) {
         highest: 0
     }
 
-    for(var i = 0; i < comparitor.length; i++) {
-        if(comparitor[i] == lowest[i]) {
+    for (var i = 0; i < comparitor.length; i++) {
+        if (comparitor[i] == lowest[i]) {
             counter.lowest++;
         }
 
-        if(comparitor[i] == highest[i]) {
+        if (comparitor[i] == highest[i]) {
             counter.highest++;
         }
     }

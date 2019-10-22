@@ -83,8 +83,10 @@
             getFiles(callback) {
                 let self = this
 
-                Axios.get(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire&folder=CLUSTERING - LISTING")
+                Axios.get(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire&folder=Category Cluster")
                     .then(r => {
+                        console.log(r);
+                        
                         self.getPlanograms(r.data, callback)
                     })
                     .catch(e => {
@@ -97,22 +99,26 @@
 
                 Axios.get(process.env.VUE_APP_API + `Planogram/Distinct`)
                     .then(r => {
+                        
                         let planograms = r.data.planogramList;
+                        console.log("files");
                         console.log(files);
-
+                        
                         files.forEach(file => {
                             file.name = self.findAndReplaceName(file.name, planograms)
                         });
 
                         self.items = files;
-
+                        
                         callback();
                         delete Axios.defaults.headers.common["TenantID"];
                     })
             },
             findAndReplaceName(name, planograms) {
                 let self = this;
-
+                console.log("planograms");
+                console.log(planograms);
+                
                 let nameSplit = name.split(/ (.+)/);
 
                 console.log(nameSplit)
