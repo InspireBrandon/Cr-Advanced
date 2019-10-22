@@ -202,6 +202,10 @@ class RangingController {
     return this.allRangeProducts;
   }
 
+  getStoreSales() {
+    return this.storeSales;
+  }
+
   getAllProductID() {
     let productIDArr = [];
 

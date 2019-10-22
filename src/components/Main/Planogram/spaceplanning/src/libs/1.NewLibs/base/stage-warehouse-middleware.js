@@ -25,6 +25,8 @@ class StageWarehouseMiddleware {
           // Check through warehouse to see if find the correct product
           warehouseProducts.forEach(warehouseProduct => {
 
+            console.log("PRODCUASDKIN", productData)
+
             if (warehouseProduct.barcode == productData.barcode) {
 
               for (var prop in productData) {
@@ -63,7 +65,7 @@ class StageWarehouseMiddleware {
               productData["alt_Store_Range_Indicator"] = warehouseProduct["alt_Store_Range_Indicator"];
               productData["alt_Store_Range_Indicator_ID"] = warehouseProduct["alt_Store_Range_Indicator_ID"];
 
-              console.log(productData, warehouseProduct)
+              console.log("plano kak", productData, warehouseProduct)
 
               // currentPlanogramItem.Data.Data = warehouseProduct;
               // verify that product exists

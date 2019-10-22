@@ -859,6 +859,7 @@
               self.fileData.monthsBetween = r.data.monthsBetween;
               self.fileData.tag = r.data.tag;
               self.fileData.active_Shop_Code_ID = r.data.active_Shop_Code_ID;
+              self.fileData.useType = (r.data.useType == undefined || r.data.useType == null) ? "PLANOGRAM" : "CATEGORY";
 
               self.getHelpFile();
 
@@ -905,8 +906,6 @@
               self.rangingController = new RangingController(r.data);
               self.setStoreClusterStuff();
 
-              console.log("[RANGING]", self.tmpClusters)
-
               self.rangingController.getSalesMonthlyTotals(() => {
 
                 self.setRangingClusterData(r.data.clusterData);
@@ -942,6 +941,8 @@
         let self = this;
         let descreps = [];
 
+        let storeSales = self.rangingController.getStoreSales();
+
         self.checkAllStoreClusters(descreps);
         self.checkCategoryClusters(descreps);
         self.checkCustomClusters(descreps);
@@ -949,11 +950,29 @@
         self.checkRegionalClusters(descreps);
         self.checkStoreClusters(descreps);
 
-        // self.rangingController.getIndicatorsByCluster("store", 5);
+        descreps.forEach(descrep => {
+          let clusterData = self.tmpClusters[descrep.type + "Clusters"].find(el => {
+            return el.clusterID === descrep.clusterID;
+          })
 
-        console.log(descreps);
+          let clusterIndicators = self.rangingController.getIndicatorsByCluster(descrep.type, descrep.clusterID);
 
-        return descreps;
+          clusterIndicators.forEach(ci => {
+            storeSales.forEach(ss => {
+              if (ss.storeID === descrep.storeID) {
+                let productRecord = ss.salesData.find(prel => {
+                  return prel.productID == ci.productID;
+                })
+
+                if(ci.indicator != "SELECTED") {
+                  productRecord.store_Range_Indicator = clusterIndicators.indicator
+                  productRecord.store_Range_Indicator_ID = clusterIndicators.indicator == "NO" ? 0 : 1;
+                  productRecord["updated"] = true;
+                }
+              }
+            })
+          })
+        })
       },
       checkAllStoreClusters(descreps) {
         let self = this;
@@ -974,6 +993,7 @@
 
             if (!hasStore) {
               descreps.push({
+                type: "allStores",
                 storeID: tmpCs.storeID,
                 storeName: tmpCs.storeName,
                 clusterID: tmpSc.clusterID,
@@ -1002,6 +1022,7 @@
 
             if (!hasStore) {
               descreps.push({
+                type: "category",
                 storeID: tmpCs.storeID,
                 storeName: tmpCs.storeName,
                 clusterID: tmpSc.clusterID,
@@ -1030,6 +1051,7 @@
 
             if (!hasStore) {
               descreps.push({
+                type: "custom",
                 storeID: tmpCs.storeID,
                 storeName: tmpCs.storeName,
                 clusterID: tmpSc.clusterID,
@@ -1058,6 +1080,7 @@
 
             if (!hasStore) {
               descreps.push({
+                type: "department",
                 storeID: tmpCs.storeID,
                 storeName: tmpCs.storeName,
                 clusterID: tmpSc.clusterID,
@@ -1086,6 +1109,7 @@
 
             if (!hasStore) {
               descreps.push({
+                type: "regional",
                 storeID: tmpCs.storeID,
                 storeName: tmpCs.storeName,
                 clusterID: tmpSc.clusterID,
@@ -1114,6 +1138,7 @@
 
             if (!hasStore) {
               descreps.push({
+                type: "store",
                 storeID: tmpCs.storeID,
                 storeName: tmpCs.storeName,
                 clusterID: tmpSc.clusterID,
@@ -1164,13 +1189,13 @@
             self.setRangingClusterData(clusterData);
             outputObj.clusterMessage = "Success"
             self.checkStoreClusterChange();
-            // self.updatedIndicators(outputObj);
+            self.sync_updatedIndicators(outputObj);
           })
           .catch(e => {
             outputObj.clusters = false;
             outputObj.clusterMessage = "Failed to get latest clusters. " + e;
             self.checkStoreClusterChange();
-            // self.updatedIndicators(outputObj);
+            self.sync_updatedIndicators(outputObj);
           })
       },
       sync_updatedIndicators(outputObj) {
@@ -1259,6 +1284,8 @@
       },
       sync_complete(outputObj) {
         let self = this;
+
+        outputObj.canContinue = true;
         outputObj.currentLoading = 'clustervariance'
         self.$refs.SyncModalStatus.updateStatus(outputObj);
         let clusterDescrep = self.checkStoreClusterChange();
