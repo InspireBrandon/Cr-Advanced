@@ -1,22 +1,43 @@
 <template>
     <v-card tile>
         <v-toolbar color="grey darken-3" dark dense flat>
-            <v-toolbar-title>
+            <v-toolbar-title v-if="selectedView==0">
                 Planogram Overview: <strong v-if="selectedProject!=null">{{title}}</strong>
             </v-toolbar-title>
+            <v-toolbar-title v-if="selectedView==1">
+                Store Overview: <strong v-if="selectedStore!=null">{{storeTitle}}</strong>
+            </v-toolbar-title>
             <v-spacer></v-spacer>
+            <v-btn-toggle round v-model="selectedView" class="transparent" mandatory>
+                <v-btn class="elevation-0" style="width: 100px" round @click="changeView(0)" color="primary">
+                    Planogram
+                </v-btn>
+                <v-btn class="elevation-0" style="width: 100px" round @click="changeView(1)" color="primary">
+                    Store
+                </v-btn>
+            </v-btn-toggle>
         </v-toolbar>
         <v-toolbar dark flat>
-            <v-btn v-if="userAccess == 0 || isRupert" @click="assignGroups" color="blue-grey darken-2 ma-2">
+
+            <v-btn v-if="(userAccess == 0 || isRupert )&&selectedView==0" @click="assignGroups"
+                color="blue-grey darken-2 ma-2">
                 group assign
             </v-btn>
+            <v-btn v-if="(userAccess == 0 || isRupert )&&selectedView==0" @click="groupRemove"
+                color="blue-grey darken-2 ma-2">
+                group Remove
+            </v-btn>
             <v-toolbar-items>
-                <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 300px" :items="projectGroups"
-                    @change="getProjectsByProjectGroup()" v-model="selectedProjectGroup" label="Project Group">
+                <v-autocomplete v-if="selectedView==1" style="margin-left: 10px; margin-top: 8px; width: 300px"
+                    :items="stores" @change="GetStoreData()" return-object v-model="selectedStore" label="Store">
+                </v-autocomplete>
+                <v-autocomplete v-if="selectedView==0" style="margin-left: 10px; margin-top: 8px; width: 300px"
+                    :items="projectGroups" @change="getProjectsByProjectGroup()" v-model="selectedProjectGroup"
+                    label="Project Group">
                 </v-autocomplete>
 
-                <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 300px" :items="projects"
-                    @change="getStorePlanograms()" v-model="selectedProject" label="Project">
+                <v-autocomplete v-if="selectedView==0" style="margin-left: 10px; margin-top: 8px; width: 300px"
+                    :items="projects" @change="getStorePlanograms()" v-model="selectedProject" label="Project">
                 </v-autocomplete>
 
                 <v-autocomplete :disabled="userAccess != 0" @change="updateProjectOwner"
@@ -31,7 +52,8 @@
             </v-btn>
         </v-toolbar>
         <grid :isRupert="isRupert" :userAccess="userAccess" ref="grid" :getRowData="getStorePlanograms"
-            :selectedProject="selectedProject" :rowData="rowData" :assign="assignGroups" :Planogram_ID="Planogram_ID" />
+            :selectedProject="selectedProject" :rowData="rowData" :assign="assignGroups" :Planogram_ID="Planogram_ID"
+            :heads="headers" />
 
         <StorePlanograms ref="StorePlanograms" :getStoreData="getStorePlanograms" />
         <PlanogramDetailsSelector :PlanoName="title" ref="PlanogramDetailsSelector" />
@@ -70,6 +92,8 @@
         },
         data() {
             return {
+                storeTitle: null,
+                selectedView: 0,
                 isRupert: false,
                 projectsObject: [],
                 Planogram_ID: null,
@@ -84,6 +108,8 @@
                 StoreClusters: [],
                 allStoreDialog: false,
                 selectedProject: null,
+                stores: [],
+                selectedStore: null,
                 StoreStatusList: [{
                         text: "Unassigned"
                     },
@@ -111,19 +137,241 @@
                 ],
                 currentStorePlanograms: [],
                 storeView: false,
-                currentProject: null
+                currentProject: null,
+                headers: [{
+                        "headerName": "Store",
+                        "checkboxSelection": self.userAccess == 0 || self.isRupert,
+                        "field": "storeName",
+                        "headerCheckboxSelection": true,
+                        "headerCheckboxSelectionFilteredOnly": true,
+                        "minWidth": 200,
+                    }, {
+                        "headerName": "Planogram Name",
+                        "cellRendererFramework": "PlanogramName",
+
+                        "minWidth": 300,
+                        cellStyle: function (params) {
+                            if (params.data.planogramFit == true) {
+                                //mark police cells as red
+                                return {
+                                    // color: 'red',
+                                    backgroundColor: " rgb(240, 125, 125)"
+                                };
+                            } else {
+                                return {
+                                    // backgroundColor: " #C8E6C9"
+                                };
+                            }
+                        }
+                    }, {
+                        "headerName": "Status",
+                        "field": "currentStatusText",
+                        "minWidth": 100,
+                    }, {
+                        "headerName": "Actions",
+                        "hide": false,
+                        "minWidth": 340,
+                        "cellRendererFramework": "Button"
+                    },
+                    {
+                        "headerName": "Best Fit",
+                        "cellRendererFramework": "Fits",
+                        "minWidth": 50
+                    },
+                    {
+                        "headerName": "Store Cluster",
+                        "field": "cluster",
+                        "minWidth": 75,
+                        cellClassRules: {
+                            'success-green': 'data.storeClusterFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                            'error-red': 'data.storeClusterFit == true && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                        }
+                    }, {
+                        "headerName": "Category Cluster",
+                        "field": "categoryCluster",
+                        "minWidth": 75,
+                    }, {
+                        "headerName": "Modules",
+                        "minWidth": 50,
+                        "editable": self.userAccess == 0 || self.isRupert,
+                        "field": "modules",
+                        cellClassRules: {
+                            'success-green': 'data.modulesFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                            'error-red': 'data.modulesFit == true && ( data.planogramStoreStatus!=5 && data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                        }
+
+                    }, {
+                        "headerName": "Height",
+                        "minWidth": 50,
+                        // "cellRendererFramework": "height",
+                        "editable": self.userAccess == 0 || self.isRupert,
+                        "field": "height",
+                        cellClassRules: {
+                            'success-green': 'data.heightFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                            'error-red': 'data.heightFit == true && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                        }
+                    }, {
+                        "headerName": "Audit",
+                        "minWidth": 50,
+                        "field": "audit",
+                        "cellRendererFramework": "Audit"
+                    }
+                ]
             }
         },
         mounted() {
             let self = this;
             this.open()
             this.getSystemUsers();
-
+            this.getStores()
             let encoded_details = jwt.decode(sessionStorage.accessToken);
             self.systemUserID = encoded_details.USER_ID;
             self.isRupert = encoded_details.USER_ID == parseInt(process.env.VUE_APP_RUPERT);
         },
         methods: {
+            getStores() {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API + "Store?db=CR-Devinspire")
+                    .then(r => {
+                        console.log(r);
+
+                        r.data.forEach(e => {
+                            self.stores.push({
+                                text: e.storeName,
+                                value: e.storeID
+                            })
+                        })
+                    })
+                    .catch(e => {})
+            },
+            GetStoreData() {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                console.log(self.selectedStore);
+                self.storeTitle = self.selectedStore.text
+
+                Axios.get(process.env.VUE_APP_API + `Store_Planogram?Store_ID=${self.selectedStore.value}`)
+                    .then(r => {
+                        console.log(r);
+
+                        self.rowData = []
+                        self.currentStorePlanograms = []
+                        self.currentStorePlanograms = r.data.store_PlanogramList;
+
+                        r.data.store_PlanogramList.forEach((e) => {
+                            e.GeneratedName = self.GenerateName(e)
+                            e.currentStatusText = self.StoreStatusList[e.planogramStoreStatus].text
+                        })
+
+                        self.rowData = self.currentStorePlanograms
+
+                        console.log(self.rowData);
+
+                    }).catch(e => {
+                        console.log(e);
+
+                    })
+            },
+            changeView(type) {
+                let self = this
+                self.selectedView = type;
+                self.headers = []
+                self.rowData = []
+                self.selectedStore = null
+                self.selectedProjectGroup = null
+                self.selectedProject = null
+                if (type == 0) {
+                    self.headers.push({
+                        "headerName": "Store",
+                        "checkboxSelection": self.userAccess == 0 || self.isRupert,
+                        "field": "storeName",
+                        "headerCheckboxSelection": true,
+                        "headerCheckboxSelectionFilteredOnly": true,
+                        "minWidth": 200,
+                    })
+                } else {
+                    self.headers.push({
+                        "headerName": "Project Group",
+                        "field": "groupName",
+                        "minWidth": 200,
+                    }, {
+                        "headerName": "Planogram",
+                        "field": "projectName",
+                        "minWidth": 200,
+                    })
+                }
+
+                self.headers.push({
+                    "headerName": "Planogram Name",
+                    "cellRendererFramework": "PlanogramName",
+
+                    "minWidth": 300,
+                    cellStyle: function (params) {
+                        if (params.data.planogramFit == true) {
+                            //mark police cells as red
+                            return {
+                                // color: 'red',
+                                backgroundColor: " rgb(240, 125, 125)"
+                            };
+                        } else {
+                            return {
+                                // backgroundColor: " #C8E6C9"
+                            };
+                        }
+                    }
+                }, {
+                    "headerName": "Status",
+                    "field": "currentStatusText",
+                    "minWidth": 100,
+                }, {
+                    "headerName": "Actions",
+                    "hide": false,
+                    "minWidth": 340,
+                    "cellRendererFramework": "Button"
+                }, {
+                    "headerName": "Best Fit",
+                    "cellRendererFramework": "Fits",
+                    "minWidth": 50
+                }, {
+                    "headerName": "Store Cluster",
+                    "field": "cluster",
+                    "minWidth": 75,
+                    cellClassRules: {
+                        'success-green': 'data.storeClusterFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                        'error-red': 'data.storeClusterFit == true && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                    }
+                }, {
+                    "headerName": "Category Cluster",
+                    "field": "categoryCluster",
+                    "minWidth": 75,
+                }, {
+                    "headerName": "Modules",
+                    "minWidth": 50,
+                    "editable": self.userAccess == 0 || self.isRupert,
+                    "field": "modules",
+                    cellClassRules: {
+                        'success-green': 'data.modulesFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                        'error-red': 'data.modulesFit == true && ( data.planogramStoreStatus!=5 && data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                    }
+
+                }, {
+                    "headerName": "Height",
+                    "minWidth": 50,
+                    // "cellRendererFramework": "height",
+                    "editable": self.userAccess == 0 || self.isRupert,
+                    "field": "height",
+                    cellClassRules: {
+                        'success-green': 'data.heightFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                        'error-red': 'data.heightFit == true && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                    }
+                }, {
+                    "headerName": "Audit",
+                    "minWidth": 50,
+                    "field": "audit",
+                    "cellRendererFramework": "Audit"
+                })
+            },
             sendMail() {
                 let self = this
 
@@ -277,6 +525,69 @@
                     }
                 })
 
+            },
+            groupRemove() {
+                let self = this
+                self.removeGroups(callback => {
+                    if (self.selectedView == 0) {
+                        self.getStorePlanograms()
+                    } else {
+                        self.GetStoreData()
+                    }
+                })
+
+            },
+            removeGroups(callback) {
+                let self = this
+                let deleteRows = self.$refs.grid.getSelectedRows()
+                if (deleteRows.length < 1) {
+                    alert("Please select at least one store")
+                    return
+                }
+                let count = 0
+
+                self.$refs.YesNoModal.show("Do you want to remove this Planogram?", data => {
+                    if (data) {
+                        deleteRows.forEach(rowstuff => {
+                            let listItem = rowstuff.data
+                            let node = rowstuff.node
+                            let moduleFit = false
+                            let heightFit = false
+                            let storeClusterFit = false
+                            let planogramFit = false
+
+
+                            let item = {
+                                "id": listItem.id,
+                                "store_ID": listItem.store_ID,
+                                "project_ID": self.selectedProject,
+                                "planogramDetail_ID": null,
+                                "planogramStoreStatus": 0,
+                                "HeightFit": heightFit,
+                                "StoreClusterFit": storeClusterFit,
+                                "PlanogramFit": planogramFit,
+                                "ModulesFit": moduleFit,
+                                "Modules": listItem.modules,
+                                "Height": listItem.height,
+                                "Width": listItem.width,
+                                "Displays": listItem.displays,
+                                "Pallettes": listItem.pallettes,
+                                "SupplierStands": listItem.supplierStands,
+                                "Bins": listItem.bins,
+                                "Fits": false
+                            }
+
+                            Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                            Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', item)
+                                .then(r => {
+                                    delete Axios.defaults.headers.common["TenantID"];
+                                }).catch(e => {
+                                    delete Axios.defaults.headers.common["TenantID"];
+                                })
+                        })
+                        callback()
+                    }
+                })
             },
             assignGroups() {
                 let self = this

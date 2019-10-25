@@ -199,7 +199,7 @@
             },
             openMapSetup() {
                 let self = this
-                self.getMapSetupData()
+                // self.getMapSetupData()
                 self.$refs.Map.openSetup()
             },
             customQuery() {
@@ -571,7 +571,7 @@
 
                 setTimeout(() => {
                     self.headers = headers;
-                    self.getMapSetupData()
+                    // self.getMapSetupData()
                     self.$refs.Spinner.hide();
                     self.$refs.Grid.setOrder();
                 }, 60);

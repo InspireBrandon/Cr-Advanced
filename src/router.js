@@ -21,6 +21,10 @@ import RangePlanningView from '@/components/Apps/RangePlanning/Index.vue'
 //import SpacePlanning from '@/components/Main/Planogram/spaceplanning/src/views/Main.vue'
 import Fixtures from '@/components/Apps/SpacePlanning/Fixtures/Index.vue'
 import Testing from '@/components/Main/Testing.vue'
+
+import TestingView from '@/components/Main/NewViewTesting/NewView.vue'
+import layout from '@/components/Main/NewViewTesting/layoutView.vue'
+
 import Graphs from '@/components/Main/Graphs/Graphs.vue'
 
 //Product maintainence
@@ -106,6 +110,9 @@ import Clustering from '@/components/Apps/Strategy/Clustering/Index.vue'
 import map from '@/components/Apps/Strategy/Map/Switcher.vue'
 import map2 from '@/components/Apps/Strategy/Map/tesmap.vue'
 
+import {
+  APPLICATION_ROUTE as RouteConfig
+} from "./components/Main/NewViewTesting/RoutesForTesting/routerConfig";
 
 Vue.use(Router)
 
@@ -137,6 +144,19 @@ export default new Router({
       component: FloorPlanning2D
     },
     {
+      path: '/TestingView',
+      name: RouteConfig.APPLICATION_NAME_1.NAME,
+      component: {
+        default: require('@/components/Main/NewViewTesting/NewView.vue').default,
+        headers: layout
+      }
+    },
+    {
+      path: "/menu-second",
+      name: RouteConfig.APPLICATION_NAME_2.NAME,
+      components: require('@/components/Main/NewViewTesting/NewView.vue')
+    },
+    {
       path: '/Menu',
       name: 'main',
       component: Main,
@@ -144,7 +164,7 @@ export default new Router({
           path: '/map',
           name: 'map',
           component: map
-        },{
+        }, {
           path: '/map2',
           name: 'map2',
           component: map2

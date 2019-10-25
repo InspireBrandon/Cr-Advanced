@@ -12,15 +12,16 @@
     </div>
 </template>
 <script>
+    import progressRenderer from "./progressRenderer";
     import {
         AgGridVue
     } from "ag-grid-vue";
-
     export default {
         components: {
             AgGridVue,
+            progressRenderer
         },
-        props: ["rowData", "stores","headers"],
+        props: ["rowData"],
         data() {
             return {
                 gridOptions: {
@@ -40,14 +41,31 @@
                 defaultColDef: {
 
                 },
-                
+                headers: [{
+                    headerName: 'Store Name',
+                    field: 'storeName'
+                }, {
+                    headerName: 'Formula 1',
+                    field: 'level1Code',
+                    hide: true
+                }, {
+                    headerName: 'Formula 2',
+                    field: 'level2Code',
+                    hide: true
+                }, {
+                    headerName: 'Formula 3',
+                    field: 'level3Code',
+                    hide: true
+                }, {
+                    headerName: 'Current Rank',
+                    field: 'currentRank'
+                }, {
+                    headerName: 'Cluster',
+                    field: 'cluster'
+                }]
             }
         },
-        mounted() {
-            //  this.setHeaders(this.stores)
-        },
         methods: {
-            
             autoSize() {
                 let self = this;
                 var allColumnIds = [];
