@@ -1044,6 +1044,7 @@ class LoadSavePlanogramBase {
       ctrl_item.Facings_X = CurrentItem.Data.Facings.x;
       ctrl_item.Facings_Y = CurrentItem.Data.Facings.y;
       ctrl_item.Facings_Z = CurrentItem.Data.Facings.z;
+      ctrl_item.Facings_Z_Max = CurrentItem.Data.Facings.z_Max;
 
       ctrl_item.RandomColor = CurrentItem.Data.RandomColor;
       ctrl_item.PegboardHoleAssigned = CurrentItem.Data.PegboardHoleAssigned;
@@ -1124,6 +1125,7 @@ function calculate(productItem, vuex, storeCount) {
     Facings_X: 0,
     Facings_Y: 0,
     Facings_Z: 0,
+    Facings_Z_Max: 0,
     TotalFacings: 0,
     XYFacings: 0
   };

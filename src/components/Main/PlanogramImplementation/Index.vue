@@ -44,12 +44,16 @@
                         v-if="(selectedPlanogram != null || routeProjectID != null) && !showLoader">
                         <v-toolbar color="primary" dark dense flat
                             v-if="selectedPlanogram != null || routeProjectID != null">
-                            <v-toolbar-title v-if="routeStatus!=null">
+                            <div v-if="routeStatus!=null">
+                                {{displayName}}
+                                <v-spacer></v-spacer>
                                 Status: {{status[routeStatus].text}}
-                            </v-toolbar-title>
-                            <v-toolbar-title v-else>
+                            </div>
+                            <div v-else>
+                                {{displayName}}
+                                <v-spacer></v-spacer>
                                 Status: {{status[timelineItems[0].status].text}}
-                            </v-toolbar-title>
+                            </div>
                         </v-toolbar>
                         <v-toolbar dark dense flat v-if="selectedPlanogram != null || routeProjectID != null">
                             <v-btn v-if="(projectsStatus.status==20||routeStatus==20)" flat outline @click="approve()"
@@ -76,16 +80,8 @@
                             <v-toolbar color="primary" dark flat dense>
                                 Planogram Image
                                 <v-spacer></v-spacer>
-                                {{displayName}}
-                                <v-spacer>
-                                </v-spacer>
-                                <v-tooltip bottom>
-                                    <v-btn flat outline slot="activator" @click="openReport">
-                                        <!-- <v-icon>save_alt</v-icon> -->
-                                        Open Report
-                                    </v-btn>
-                                    <span>Open Report</span>
-                                </v-tooltip>
+                                <v-btn flat outline @click="printImage">Print Image</v-btn>
+                                <v-btn flat outline @click="openReport">Open Report</v-btn>
                             </v-toolbar>
                             <v-card-text>
                                 <img style="max-height: 350px; max-width: 100%;" :src="image" @click="openImage">
@@ -1145,7 +1141,8 @@
                     request.project_Group_ID = p.projectGroupID
                     self.createProjectTransaction(request, processAssigned => {
                         self.$router.push(
-                            `/PlanogramDistribution/${request.project_ID}/${request.project_Group_ID}`)
+                            `/PlanogramDistribution/${request.project_ID}/${request.project_Group_ID}`
+                        )
                     })
                 })
             },
@@ -1387,6 +1384,23 @@
                     .catch(e => {
                         delete Axios.defaults.headers.common["TenantID"];
                     })
+            },
+            printImage() {
+                let self = this;
+
+                console.log(self.image)
+
+                let html = "<html><head><scri" + "pt>function step1(){\n" +
+                    "setTimeout('step2()', 10);}\n" +
+                    "function step2(){window.print();window.close()}\n" +
+                    "</scri" + "pt></head><body onload='step1()'>\n" +
+                    "<img style='width: 100%; max-height: 100vh;' src='" + self.image + "' /></body></html>"
+
+                var Pagelink = "about:blank";
+                var pwa = window.open(Pagelink, "_new");
+                pwa.document.open();
+                pwa.document.write(html);
+                pwa.document.close();
             }
         }
     }

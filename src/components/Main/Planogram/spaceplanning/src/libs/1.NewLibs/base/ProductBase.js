@@ -16,6 +16,7 @@ class ProductBase extends ProductItemBase {
     this.Indicator2 = null;
     this.ParentTreeRedraw = new ParentTreeRedraw();
     this.Rendering = null;
+    this.StackIndex = null;
   }
 
   Initialise(dropPos, positionElementRequired = true) {
@@ -91,8 +92,6 @@ class ProductBase extends ProductItemBase {
 
   PositionElement(intersects = null) {
     let self = this;
-
-    console.log("Positioning Product");
 
     let ctrl_position = new GeneralPositionHelper();
     let ctrl_store = new StoreHelper();

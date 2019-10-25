@@ -658,7 +658,7 @@
               storeProduct.Data.depth = parseFloat(product.depth);
 
               if (storeProduct.Data.tray_Barcode != product.tray_Barcode ||
-                storeProduct.Data.tray_Qty != parseInt(product.tray_Qty) ||
+                storeProduct.Data.tray_Qty != parseFloat(product.tray_Qty) ||
                 storeProduct.Data.tray_Height != parseFloat(product.tray_Height) ||
                 storeProduct.Data.tray_Width != parseFloat(product.tray_Width) ||
                 storeProduct.Data.tray_Depth != parseFloat(product.tray_Depth)) {
@@ -666,13 +666,13 @@
               }
 
               storeProduct.Data.tray_Barcode = product.tray_Barcode;
-              storeProduct.Data.tray_Qty = parseInt(product.tray_Qty);
+              storeProduct.Data.tray_Qty = parseFloat(product.tray_Qty);
               storeProduct.Data.tray_Height = parseFloat(product.tray_Height);
               storeProduct.Data.tray_Width = parseFloat(product.tray_Width);
               storeProduct.Data.tray_Depth = parseFloat(product.tray_Depth);
 
               if (storeProduct.Data.case_Barcode != product.case_Barcode ||
-                storeProduct.Data.case_Qty != parseInt(product.case_Qty) ||
+                storeProduct.Data.case_Qty != parseFloat(product.case_Qty) ||
                 storeProduct.Data.case_Height != parseFloat(product.case_Height) ||
                 storeProduct.Data.case_Width != parseFloat(product.case_Width) ||
                 storeProduct.Data.case_Depth != parseFloat(product.case_Depth)) {
@@ -680,13 +680,13 @@
               }
 
               storeProduct.Data.case_Barcode = product.case_Barcode;
-              storeProduct.Data.case_Qty = parseInt(product.case_Qty);
+              storeProduct.Data.case_Qty = parseFloat(product.case_Qty);
               storeProduct.Data.case_Height = parseFloat(product.case_Height);
               storeProduct.Data.case_Width = parseFloat(product.case_Width);
               storeProduct.Data.case_Depth = parseFloat(product.case_Depth);
 
               if (storeProduct.Data.shrink_Barcode != product.shrink_Barcode ||
-                storeProduct.Data.shrink_Qty != parseInt(product.shrink_Qty) ||
+                storeProduct.Data.shrink_Qty != parseFloat(product.shrink_Qty) ||
                 storeProduct.Data.shrink_Height != parseFloat(product.shrink_Height) ||
                 storeProduct.Data.shrink_Width != parseFloat(product.shrink_Width) ||
                 storeProduct.Data.shrink_Depth != parseFloat(product.shrink_Depth)) {
@@ -694,13 +694,13 @@
               }
 
               storeProduct.Data.shrink_Barcode = product.shrink_Barcode;
-              storeProduct.Data.shrink_Qty = parseInt(product.shrink_Qty);
+              storeProduct.Data.shrink_Qty = parseFloat(product.shrink_Qty);
               storeProduct.Data.shrink_Height = parseFloat(product.shrink_Height);
               storeProduct.Data.shrink_Width = parseFloat(product.shrink_Width);
               storeProduct.Data.shrink_Depth = parseFloat(product.shrink_Depth);
 
               if (storeProduct.Data.pallet_Barcode != product.pallet_Barcode ||
-                storeProduct.Data.pallet_Qty != parseInt(product.pallet_Qty) ||
+                storeProduct.Data.pallet_Qty != parseFloat(product.pallet_Qty) ||
                 storeProduct.Data.pallet_Height != parseFloat(product.pallet_Height) ||
                 storeProduct.Data.pallet_Width != parseFloat(product.pallet_Width) ||
                 storeProduct.Data.pallet_Depth != parseFloat(product.pallet_Depth)) {
@@ -708,12 +708,12 @@
               }
 
               storeProduct.Data.pallet_Barcode = product.pallet_Barcode;
-              storeProduct.Data.pallet_Qty = parseInt(product.pallet_Qty);
+              storeProduct.Data.pallet_Qty = parseFloat(product.pallet_Qty);
               storeProduct.Data.pallet_Height = parseFloat(product.pallet_Height);
               storeProduct.Data.pallet_Width = parseFloat(product.pallet_Width);
               storeProduct.Data.pallet_Depth = parseFloat(product.pallet_Depth);
 
-              if (storeProduct.Data.volume_potential != parseInt(product.volume_potential) || storeProduct.Data
+              if (storeProduct.Data.volume_potential != parseFloat(product.volume_potential) || storeProduct.Data
                 .sales_potential != parseFloat(product.sales_potential)) {
                 needsDraw = true;
               }

@@ -34,6 +34,7 @@
         <UserNotesModal ref="UserNotesModal"></UserNotesModal>
         <YesNoModal ref="yesNoModal"></YesNoModal>
         <NotesModal ref="NotesModal"></NotesModal>
+        <NewTask ref="NewTask"></NewTask>
     </v-container>
 </template>
 
@@ -61,6 +62,7 @@
     import RangeSelectorModal from '@/components/Common/RangeSelectorModal.vue'
     import UserNotesModal from '@/components/Common/UserNotesModal.vue'
     import NotesModal from '@/components/Common/NotesModal.vue'
+    import NewTask from '../NewTask'
 
     import {
         AgGridVue
@@ -75,7 +77,7 @@
             SpacePlanSelector,
             RangeSelectorModal,
             YesNoModal,
-
+            NewTask,
             UserNotesModal,
             NotesModal,
             AgGridVue,
@@ -389,7 +391,7 @@
 
                 let request = JSON.parse(JSON.stringify(currentItem))
 
-                request.notes = "" 
+                request.notes = ""
 
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
@@ -1187,27 +1189,46 @@
 
                 let newItem = JSON.parse(JSON.stringify(item))
 
-                self.$refs.SpacePlanSelector.show(spacePlanID => {
-                    self.$refs.RangeSelectorModal.show(rangePlanID => {
+                self.$refs.NewTask.show(data => {
+                    newItem.rangeFileID = data.rangeFile;
+                    newItem.systemFileID = data.spacePlanFile;
+                    newItem.store_ID = data.store;
+                    newItem.storeCluster_ID = data.storeCluster;
+                    newItem.categoryCluster_ID = data.categoryCluster;
+                    newItem.customCluster_ID = data.customCluster;
+                    newItem.status = 47;
 
-                        let self = this;
-                        let request = JSON.parse(JSON.stringify(item))
-
-                        let tmpUser = request.systemUserID;
-
-                        self.checkTaskTakeover(request, () => {
-                            request.systemUserID = tmpUser;
-                            request.status = 47;
-                            request.projectTXGroup_ID = item.projectTXGroup_ID
-                            request.systemFileID = spacePlanID;
-                            request.rangeFileID = rangePlanID;
-                            self.createProjectTransaction(request, newItem => {
-                                self.$parent.$parent.getTaskViewData();
-                            })
-                        })
+                    self.createProjectTransaction(newItem, data => {
+                        self.$parent.$parent.getTaskViewData();
                     })
                 })
             },
+            // setVariationComplete(item) {
+            //     let self = this;
+
+            //     let newItem = JSON.parse(JSON.stringify(item))
+
+            //     self.$refs.SpacePlanSelector.show(spacePlanID => {
+            //         self.$refs.RangeSelectorModal.show(rangePlanID => {
+
+            //             let self = this;
+            //             let request = JSON.parse(JSON.stringify(item))
+
+            //             let tmpUser = request.systemUserID;
+
+            //             self.checkTaskTakeover(request, () => {
+            //                 request.systemUserID = tmpUser;
+            //                 request.status = 47;
+            //                 request.projectTXGroup_ID = item.projectTXGroup_ID
+            //                 request.systemFileID = spacePlanID;
+            //                 request.rangeFileID = rangePlanID;
+            //                 self.createProjectTransaction(request, newItem => {
+            //                     self.$parent.$parent.getTaskViewData();
+            //                 })
+            //             })
+            //         })
+            //     })
+            // },
             setRecallInProgressandView(item) {
                 let self = this;
                 let request = JSON.parse(JSON.stringify(item))

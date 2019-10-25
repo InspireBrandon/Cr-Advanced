@@ -337,7 +337,8 @@
         break;
         case 47: {
             button_1.set('warning', 'visibility', cp.routeToView, "View")
-            button_2.set('primary', 'send', cp.sendVariation, "Send Variation")
+            button_2.set('primary', 'send', cp.submitForApproval, "Send Variation")
+            button_3.set('success', 'share', cp.goToDistributionView, "Distribute")
         }
         break;
         case 48: {
