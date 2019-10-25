@@ -39,6 +39,7 @@ class ProductItemBase extends PlanogramItemBase {
     this.Facings_X = 1;
     this.Facings_Y = 1;
     this.Facings_Z = 1;
+    this.Facings_Z_Max = -1;
     //#region Images
     this.ImageAvailable = {
       front: false,
@@ -55,7 +56,6 @@ class ProductItemBase extends PlanogramItemBase {
     this.image_used = null;
     this.LastFace = 'front';
     this.RandomColor = this.randomColor()
-    this.StackIndex = null;
 
     //#region Pegboard hole position
     this.PegboardHoleAssigned = null;
@@ -711,6 +711,8 @@ class ProductItemBase extends PlanogramItemBase {
 
   IncreaseFacingsY() {
     let self = this;
+
+    console.log("Increasing Facings");
 
     self.Facings_Y++;
     //TODO: Recreate products or draw them again

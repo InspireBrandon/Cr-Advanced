@@ -275,6 +275,7 @@ class PlanogramItemBase {
     });
 
     self.Group.on('dragmove touchmove', function (evt) {
+
       evt.cancelBubble = true;
       let ctrl_intrsct = new IntersectionTester();
       let ctrl_store = new StoreHelper();
@@ -312,7 +313,7 @@ class PlanogramItemBase {
       }
       break;
       case "PRODUCT": {
-        typeArr = ["SHELF", "BASE", "BASKET", "SHAREBOX", "PEGBAR", "PEGBOARD", "PALETTE", "LABELHOLDER"];
+        typeArr = ["SHELF", "BASE", "BASKET", "PEG", "SHAREBOX", "PEGBAR", "PEGBOARD", "PALETTE", "LABELHOLDER"];
       }
       break;
       case "SHELF": {
@@ -1290,15 +1291,19 @@ class PlanogramItemBase {
     let self = this;
     let ctrl_store = new StoreHelper();
     let parentItem = ctrl_store.getPlanogramItemById(self.VueStore, parentID);
+    let itemIDX = -1;
 
     if (parentItem != null) {
       for (var i = 0; i < parentItem.TotalChildren.length; i++) {
         if (parentItem.TotalChildren[i].ID === childID) {
           parentItem.TotalChildren.splice(i, 1);
+          itemIDX = i;
         }
       }
       // console.log("[FIXTURE TOTAL CHILDREN]", parentItem.Type, "REMOVED:", self.Type, "CHILDREN COUNT:", parentItem.TotalChildren);
     }
+
+    return itemIDX;
   }
 
   IncreaseParentChildrenCounter(positionElementRequired, parentID = null) {
@@ -1320,18 +1325,33 @@ class PlanogramItemBase {
               Type: self.Type,
               Item: self,
               Count: self.Facings_X,
-              Width: self.Orientation_Width
+              CountY: self.Facings_Y,
+              Width: self.Orientation_Width,
+              Height: self.Orientation_Height
             });
 
           } else {
-            self.RemoveChildFromTotalChildrenArray(existing.ID, parentItem.ID);
-            parentItem.TotalChildren.push({
+            let idx = self.RemoveChildFromTotalChildrenArray(existing.ID, parentItem.ID);
+
+            parentItem.TotalChildren.splice(idx, 0, {
               ID: self.ID,
               Type: self.Type,
               Item: self,
               Count: self.Facings_X,
-              Width: self.Orientation_Width
+              CountY: self.Facings_Y,
+              Width: self.Orientation_Width,
+              Height: self.Orientation_Height
             });
+
+            // parentItem.TotalChildren.push({
+            //   ID: self.ID,
+            //   Type: self.Type,
+            //   Item: self,
+            //   Count: self.Facings_X,
+            //   CountY: self.Facings_Y,
+            //   Width: self.Orientation_Width,
+            //   Height: self.Orientation_Height
+            // });
           }
         }
         break;
@@ -1671,16 +1691,23 @@ class PlanogramItemBase {
     let planogramSettings = ctrl_store.getPlanogramSettings(self.VueStore);
 
     let x = 0;
+    let midPoint = ((self.TotalWidth / 2) - (self.Text.getTextWidth() / 2)) * -1;
+
     let y = 0;
 
-    if (planogramSettings != null && planogramSettings != undefined) {
-      if (planogramSettings.LabelConfig.Position == "left") {
-        self.Text.setX(x);
-        self.Text.setY(y);
-      } else {
-        let tw = self.Text.getTextWidth() + self.Text.padding();
-        x = self.TotalWidth - tw;
-        self.Text.setX(x);
+    if (self.Type == "PEG") {
+      self.Text.setY(-15);
+      self.Text.setX(x - midPoint);
+    } else {
+      if (planogramSettings != null && planogramSettings != undefined) {
+        if (planogramSettings.LabelConfig.Position == "left") {
+          self.Text.setX(x);
+          self.Text.setY(y);
+        } else {
+          let tw = self.Text.getTextWidth() + self.Text.padding();
+          x = self.TotalWidth - tw;
+          self.Text.setX(x);
+        }
       }
     }
 
@@ -1831,7 +1858,8 @@ class PlanogramItemBase {
             Facings: {
               x: self.Facings_X,
               y: self.Facings_Y,
-              z: self.Facings_Z
+              z: self.Facings_Z,
+              z_Max: self.Facings_Z_Max
             },
             Orientation: {
               Rotation: self.Rotation,
@@ -1955,7 +1983,7 @@ class PlanogramItemBase {
           TotalChildren: newTotalChildren
         },
         Position: self.Position,
-        // Label: self.LabelText
+        Label: self.LabelText
       }
     }
     break;

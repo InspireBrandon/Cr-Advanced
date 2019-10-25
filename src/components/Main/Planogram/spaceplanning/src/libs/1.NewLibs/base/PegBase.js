@@ -1,5 +1,6 @@
 import Konva from 'konva';
 import GeneralPositionHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/positioning/GeneralPosition.js";
+import LabelHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/Labeling/LabelingBase.js";
 import StoreHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/StoreHelper/StoreHelper.js";
 import PlanogramItemBase from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PlanogramItemBase.js";
 import ParentTreeRedraw from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/RedrawParentChildBase.js";
@@ -46,6 +47,7 @@ class PegBase extends PlanogramItemBase {
         // TODO: add the extended method calls here
 
         self.AddPeg();
+        self.AddTextCosmetic();
 
         if (positionElementRequired == true) {
             self.PositionElement();
@@ -63,7 +65,7 @@ class PegBase extends PlanogramItemBase {
         let ctrl_store = new StoreHelper();
 
         if (ctrl_store.getCloneItem(self.VueStore) == self.ID) {
-            let ctrl_clone = new CloneBase("PEGBAR");
+            let ctrl_clone = new CloneBase("PEG");
             ctrl_clone.Clone(self.VueStore, self.Stage, self, null, null);
             ctrl_store.setCloneItem(self.VueStore, null);
             return;
@@ -90,15 +92,17 @@ class PegBase extends PlanogramItemBase {
             self.Group.setX(self.LastPositionRelative.x)
         }
 
-        self.PositionPegbar();
+        self.PositionPeg();
     }
 
-    PositionPegbar() {
+    PositionPeg() {
         let self = this;
 
+        console.log("POSITION")
+
         // adjust label values + fixture positions
-        // let ctrl_label = new LabelHelper();
-        // ctrl_label.SetNewLabelAndPositionNumbers(self.VueStore);
+        let ctrl_label = new LabelHelper();
+        ctrl_label.SetNewLabelAndPositionNumbers(self.VueStore);
 
         self.LastPositionRelative = self.Group.position();
         self.LastPositionAbsolute = self.Group.getAbsolutePosition();
@@ -126,27 +130,81 @@ class PegBase extends PlanogramItemBase {
         self.LoadImage(self.Area, self.Data.image);
 
         // call position element
-        self.PositionElement();
+        self.AddRenderings();
+        // self.PositionElement();
 
         // self.ApplyZIndexing();
     }
 
+    AddRenderings() {
+        let self = this;
+
+        self.RemoveRenderings();
+
+        if (self.Data.RenderingsItems == undefined || self.Data.RenderingsItems == null) {
+            return;
+        }
+
+        if (self.Data.RenderingsItems.LabelHolder != undefined || self.Data.RenderingsItems.LabelHolder != null) {
+            console.log("[PEG RENDERING] LABEL HOLDER", self.Data.RenderingsItems.LabelHolder);
+            // add shelf edge rendering
+            let w = self.Data.RenderingsItems.LabelHolder.width * self.Ratio;
+            let h = self.Data.RenderingsItems.LabelHolder.height * self.Ratio;
+            let offset = 0;
+
+            if (self.Data.RenderingsItems.LabelHolder.yOffset != undefined) {
+                offset = parseFloat(self.Data.RenderingsItems.LabelHolder.yOffset) * self.Ratio
+            }
+
+            let shelfLabelHolder = new Konva.Image({
+                x: 0,
+                y: 0 + offset,
+                width: w,
+                height: h,
+                color: 'transparent',
+                listening: false
+            })
+
+            self.LoadImage(shelfLabelHolder, self.Data.RenderingsItems.LabelHolder.image);
+
+            self.Renderings.push({
+                type: 'LABELHOLDER',
+                konva: shelfLabelHolder
+            });
+
+            self.Group.add(shelfLabelHolder);
+        }
+
+        self.Layer.draw();
+        // self.Group.draw();
+    }
+
+    RemoveRenderings() {
+        let self = this;
+
+        self.Renderings.forEach(element => {
+            element.konva.destroy();
+        });
+
+        self.Renderings = [];
+    }
+
     AddPeg() {
         let self = this;
-    
+
         self.Area = new Konva.Image({
-          x: 0,
-          y: 0,
-          width: self.Data.width * self.Ratio,
-          height: self.Data.height * self.Ratio,
-          fill: self.Data.color,
-          transformsEnabled: 'position'
+            x: 0,
+            y: 0,
+            width: self.Data.width * self.Ratio,
+            height: self.Data.height * self.Ratio,
+            fill: self.Data.color,
+            transformsEnabled: 'position'
         })
-    
+
         self.LoadImage(self.Area, self.Data.image);
-    
+
         self.Group.add(self.Area);
-      }
+    }
 }
 
 export default PegBase;

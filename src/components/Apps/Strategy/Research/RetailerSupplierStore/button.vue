@@ -60,7 +60,8 @@ export default {
       editForm: {
         id: 0,
         storeName: "",
-        name: ""
+        name: "",
+        location_ID: -1
       },
       location: null,
       Locations: [
@@ -86,14 +87,16 @@ export default {
       let self = this;
 
       self.$nextTick(() => {
-        self.editForm.ID = self.location.ID;
+        self.editForm.location_ID = self.location.id;
       });
     },
     openEdit(item) {
       let self = this;
+
+      console.log(item)
+
       self.EditDialog = true;
       self.editForm = item.data;
-      self.location = item.data;
       self.getLocations();
     },
     saveForm(item) {

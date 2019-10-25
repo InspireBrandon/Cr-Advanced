@@ -149,8 +149,13 @@
                     <v-text-field type="number" v-model="newData.overhang" label="Overhang:" suffix="cm"></v-text-field>
                   </v-flex>
                   <v-flex lg8 md12
-                    v-if="!newData.rendering && newData.fixtureType == 3 || newData.fixtureType==4&&newData.type==3">
+                    v-if="!newData.rendering && ((newData.fixtureType == 3 || newData.fixtureType == 0) && newData.type == 3)">
                     <v-text-field type="number" v-model="newData.productOffset" label="Product offset:" suffix="cm">
+                    </v-text-field>
+                  </v-flex>
+                  <v-flex lg8 md12
+                    v-if="!newData.rendering && (newData.fixtureType == 0 && newData.type == 3)">
+                    <v-text-field type="number" v-model="newData.productCascade" label="Product cascade:" suffix="cm">
                     </v-text-field>
                   </v-flex>
                   <v-flex lg8 md12 v-if="newData.fixtureType == 2 && !newData.rendering">
@@ -1112,6 +1117,7 @@
         self.newData.yHoleSpacing = returnFloat(self.newData.yHoleSpacing);
         self.newData.overhang = returnFloat(self.newData.overhang);
         self.newData.productOffset = returnFloat(self.newData.productOffset);
+        self.newData.productCascade = returnFloat(self.newData.productCascade);
         self.newData.squishAmount = returnFloat(self.newData.squishAmount);
         self.newData.facingOffsetX = returnFloat(self.newData.facingOffsetX);
         self.newData.facingOffsetY = returnFloat(self.newData.facingOffsetY);

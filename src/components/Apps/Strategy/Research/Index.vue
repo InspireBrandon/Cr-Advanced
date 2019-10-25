@@ -29,8 +29,8 @@
                         Setup
                     </v-btn>
                     <v-list>
-                        <v-list-tile>
-                            <v-list-tile-title @click="openRetailerSupplierStorDialog">Link Supplier Stores</v-list-tile-title>
+                        <v-list-tile @click="openRetailerSupplierStorDialog">
+                            <v-list-tile-title>Link Supplier Stores</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
                 </v-menu>
