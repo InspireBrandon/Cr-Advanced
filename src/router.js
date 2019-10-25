@@ -145,8 +145,8 @@ export default new Router({
     },
     {
       path: '/TestingView',
-      name: 'TestingView',
-      component: TestingView
+      name: RouteConfig.APPLICATION_NAME_1.NAME,
+      component: require('@/components/Main/NewViewTesting/NewView.vue').default,
     },
     {
       path: "/menu-second",
