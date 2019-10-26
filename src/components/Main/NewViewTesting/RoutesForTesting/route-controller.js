@@ -29,14 +29,6 @@ class RouteController {
     }
 }
 
-const accessTypes = {
-    SuperUser: 0,
-    Operations: 1,
-    Buyer: 2,
-    Supplier: 3,
-    Store: 4,
-}
-
 function GetAllRoutes() {
     let routes = [];
 
@@ -66,7 +58,6 @@ function GetAllRoutes() {
             id: "1.2",
             parentID: "1",
             title: "View",
-            route: "/PlanogramImplementation",
             allowedAccessLevels: [
                 accessTypes.Supplier,
                 accessTypes.Buyer
@@ -76,6 +67,14 @@ function GetAllRoutes() {
 
     // Ranging
     return routes;
+}
+
+const accessTypes = {
+    SuperUser: 0,
+    Operations: 1,
+    Buyer: 2,
+    Supplier: 3,
+    Store: 4,
 }
 
 export default RouteController;

@@ -2,8 +2,6 @@
   <div class="ranging">
     <v-toolbar dense dark color="grey darken-3">
       <v-toolbar-items v-if="!$route.path.includes('RangePlanningView')">
-        <!-- <v-btn @click="openIndicatorModal"> </v-btn> -->
-        <!-- <v-btn @click="checkStoreClusterChange">asdasd</v-btn> -->
         <v-menu dark offset-y style="margin-bottom: 10px;">
           <v-btn slot="activator" flat>
             File
@@ -235,6 +233,7 @@
     <CategorySelector ref="CategorySelector" />
     <HelpFileMaint ref="HelpFileMaint" />
     <SyncModalStatus ref="SyncModalStatus" />
+    <HandleDescrepancy ref="HandleDescrepancy" />
   </div>
 </template>
 
@@ -278,6 +277,7 @@
   import HighlightCluster from './HighlightCluster.vue'
   import HelpFileMaint from '../../Main/HelpFile/HelpFileMaint'
   import SyncModalStatus from './SyncModalStatus'
+  import HandleDescrepancy from './HandleDescrepancy'
 
   import {
     AgGridVue
@@ -319,7 +319,8 @@
       HighlightCluster,
       CategorySelector,
       HelpFileMaint,
-      SyncModalStatus
+      SyncModalStatus,
+      HandleDescrepancy
     },
     data() {
       return {
@@ -990,29 +991,39 @@
         self.checkRegionalClusters(descreps);
         self.checkStoreClusters(descreps);
 
-        descreps.forEach(descrep => {
-          let clusterData = self.tmpClusters[descrep.type + "Clusters"].find(el => {
-            return el.clusterID === descrep.clusterID;
-          })
+        // const unique = [...new Set(descreps.map(item => item.clusterName))];
 
-          let clusterIndicators = self.rangingController.getIndicatorsByCluster(descrep.type, descrep.clusterID);
+        self.$refs.HandleDescrepancy.show(descreps, fixed => {
 
-          clusterIndicators.forEach(ci => {
-            storeSales.forEach(ss => {
-              if (ss.storeID === descrep.storeID) {
-                let productRecord = ss.salesData.find(prel => {
-                  return prel.productID == ci.productID;
-                })
-
-                if (ci.indicator != "SELECTED") {
-                  productRecord.store_Range_Indicator = clusterIndicators.indicator
-                  productRecord.store_Range_Indicator_ID = clusterIndicators.indicator == "NO" ? 0 : 1;
-                  productRecord["updated"] = true;
-                }
-              }
-            })
-          })
         })
+
+        // alert(clusterIndicators);
+
+        // console.log(unique)
+
+        // descreps.forEach(descrep => {
+        //   let clusterData = self.tmpClusters[descrep.type + "Clusters"].find(el => {
+        //     return el.clusterID === descrep.clusterID;
+        //   })
+
+        //   let clusterIndicators = self.rangingController.getIndicatorsByCluster(descrep.type, descrep.clusterID);
+
+        //   clusterIndicators.forEach(ci => {
+        //     storeSales.forEach(ss => {
+        //       if (ss.storeID === descrep.storeID) {
+        //         let productRecord = ss.salesData.find(prel => {
+        //           return prel.productID == ci.productID;
+        //         })
+
+        //         if (ci.indicator != "SELECTED") {
+        //           productRecord.store_Range_Indicator = clusterIndicators.indicator
+        //           productRecord.store_Range_Indicator_ID = clusterIndicators.indicator == "NO" ? 0 : 1;
+        //           productRecord["updated"] = true;
+        //         }
+        //       }
+        //     })
+        //   })
+        // })
       },
       checkAllStoreClusters(descreps) {
         let self = this;
@@ -1229,13 +1240,13 @@
             self.setRangingClusterData(clusterData);
             outputObj.clusterMessage = "Success"
             self.checkStoreClusterChange();
-            self.sync_updatedIndicators(outputObj);
+            // self.sync_updatedIndicators(outputObj);
           })
           .catch(e => {
             outputObj.clusters = false;
             outputObj.clusterMessage = "Failed to get latest clusters. " + e;
             self.checkStoreClusterChange();
-            self.sync_updatedIndicators(outputObj);
+            // self.sync_updatedIndicators(outputObj);
           })
       },
       sync_updatedIndicators(outputObj) {
@@ -1328,7 +1339,7 @@
         outputObj.canContinue = true;
         outputObj.currentLoading = 'clustervariance'
         self.$refs.SyncModalStatus.updateStatus(outputObj);
-        let clusterDescrep = self.checkStoreClusterChange();
+        // let clusterDescrep = self.checkStoreClusterChange();
 
         outputObj.storeClusterDescreps = true,
           outputObj.storeClusterDescrepMessage = "Success",
@@ -1514,6 +1525,8 @@
       },
       setRangingClusterData(data) {
         let self = this;
+
+        console.log(data);
 
         data.allStoresClusters.forEach(element => {
           self.clusterOptions.allStores.push(new textValue(element));
@@ -2232,8 +2245,6 @@
         let self = this;
         Axios.get(process.env.VUE_APP_API + `Store?db=CR-Devinspire`).then(r => {
           r.data.forEach(store => {
-            console.log(store)
-
             self.clusterOptions.stores.push({
               text: store.storeName,
               value: store.storeID,
