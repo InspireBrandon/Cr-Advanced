@@ -23,7 +23,6 @@ import Fixtures from '@/components/Apps/SpacePlanning/Fixtures/Index.vue'
 import Testing from '@/components/Main/Testing.vue'
 
 import TestingView from '@/components/Main/NewViewTesting/NewView.vue'
-import layout from '@/components/Main/NewViewTesting/layoutView.vue'
 
 import Graphs from '@/components/Main/Graphs/Graphs.vue'
 
