@@ -10,38 +10,15 @@
         </v-btn>
       </v-toolbar>
       <v-flex md2 class="pa-0 ma-0">
-        <v-card>
-          <v-navigation-drawer permanent value="true">
-            <v-toolbar flat>
-              <v-list>
-                <v-list-tile>
-                  <v-list-tile-title class="title">CR Solutions</v-list-tile-title>
-                </v-list-tile>
-              </v-list>
-            </v-toolbar>
-            <v-divider></v-divider>
-            <v-card>
-              <v-treeview :items="planogramList" :open="open">
-                <template v-slot:prepend="{ item, open }">
-                  <div>
-                    <div v-if="item.route == null">
-                      <v-icon v-if="item.route == null">{{ open ? 'folder_open' : 'folder' }}</v-icon>
-                      {{item.title}}
-                    </div>
-                    <div v-else @click="goTo(item.route)" style="cursor: pointer;">
-                      <v-icon v-if="item.route == null">{{ open ? 'folder_open' : 'folder' }}</v-icon>
-                      {{item.title}}
-                    </div>
-                  </div>
-                  <!-- <v-icon
-              v-if="item.parentID"
-              v-text="`${item.parentID == 0 ? 'home_variant' : 'folder_network'}`"
-                  ></v-icon>-->
-                </template>
-              </v-treeview>
-            </v-card>
-          </v-navigation-drawer>
-        </v-card>
+        <v-navigation-drawer
+          permanent
+          value="true"
+          style="max-height: 850px"
+          class="overflow-y-auto"
+        >
+          <v-divider></v-divider>
+          <RecursiveItem parentID="0" />
+        </v-navigation-drawer>
       </v-flex>
       <v-flex md10 class="pa-0 ma-0">
         <router-view />
@@ -52,8 +29,12 @@
 
 <script>
 import RouteController from "@/components/Main/NewViewTesting/RoutesForTesting/route-controller";
+import RecursiveItem from "../NewViewTesting/RoutesForTesting/RecursiveItem";
 
 export default {
+  components: {
+    RecursiveItem
+  },
   data() {
     return {
       admins: [["Planograms"], ["Settings"], ["Settings"], ["Settings"]],
@@ -67,8 +48,6 @@ export default {
   created() {
     let self = this;
 
-    self.getRoutes();
-    self.getChildren();
   },
   mounted() {
     let self = this;
@@ -84,6 +63,7 @@ export default {
       });
 
       self.planogramList = rc.getRoutesByParentID("0");
+      console.log(rc.getRoutesByParentID("0"));
     },
     getChildren() {
       let self = this;

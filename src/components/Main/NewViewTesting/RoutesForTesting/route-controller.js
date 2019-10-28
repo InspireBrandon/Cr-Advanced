@@ -321,7 +321,7 @@ function GetAllRoutes() {
             id: "4",
             parentID: "0",
             title: "Data Import",
-            route: '/DataPreparation/DataImport',
+            route: '/DataImport',
             allowedAccessLevels: [
                 accessTypes.SuperUser,
                 accessTypes.Buyer,
@@ -367,18 +367,6 @@ function GetAllRoutes() {
         new RouteItem({
             id: "5.3",
             parentID: "5",
-            title: "Meetings And Workshops",
-            route: '/MeetingsAndWorkshops',
-            allowedAccessLevels: [
-                accessTypes.SuperUser,
-                accessTypes.Buyer,
-                accessTypes.Supplier,
-                accessTypes.Store
-            ],
-        }),
-        new RouteItem({
-            id: "6",
-            parentID: "0",
             title: "Meetings And Workshops",
             route: '/MeetingsAndWorkshops',
             allowedAccessLevels: [
@@ -450,7 +438,7 @@ function GetAllRoutes() {
         new RouteItem({
             id: "10",
             parentID: "0",
-            title: "Map",
+            title: "Mapping",
             route: '/map',
             allowedAccessLevels: [
                 accessTypes.SuperUser,
@@ -460,7 +448,6 @@ function GetAllRoutes() {
             ],
         }),
     );
-
     // Ranging
     return routes;
 }
