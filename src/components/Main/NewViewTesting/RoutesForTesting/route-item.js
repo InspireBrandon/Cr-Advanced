@@ -6,6 +6,7 @@ class RouteItem {
         self.title = data.title;
         self.route = data.route;
         self.allowedAccessLevels = data.allowedAccessLevels;
+        self.routeType = data.routeType;
     }
 }
 

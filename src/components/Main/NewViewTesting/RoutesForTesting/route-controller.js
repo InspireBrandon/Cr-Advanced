@@ -44,6 +44,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            RouteType: RouteType.Folder
         }),
         new RouteItem({
             id: "1.1",
@@ -471,5 +472,12 @@ const accessTypes = {
     Supplier: 3,
     Store: 4,
 }
+
+const RouteType = {
+    Folder: 0,
+    File: 1,
+    Software: 2
+}
+
 
 export default RouteController;
