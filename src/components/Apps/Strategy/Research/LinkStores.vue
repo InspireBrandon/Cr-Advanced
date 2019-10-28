@@ -1,9 +1,9 @@
 <template>
     <v-card style="height: calc(100vh - 272px)">
         <v-toolbar dark flat >
-            <v-tool-title>
+            <v-toolbar-title>
                 Store Links
-            </v-tool-title>
+            </v-toolbar-title>
         </v-toolbar>
 
     </v-card>

@@ -18,15 +18,25 @@
             </v-btn-toggle>
         </v-toolbar>
         <v-toolbar dark flat>
-
-            <v-btn v-if="(userAccess == 0 || isRupert )&&selectedView==0" @click="assignGroups"
-                color="blue-grey darken-2 ma-2">
-                group assign
-            </v-btn>
-            <v-btn v-if="(userAccess == 0 || isRupert )&&selectedView==0" @click="groupRemove"
-                color="blue-grey darken-2 ma-2">
-                group Remove
-            </v-btn>
+            <v-menu dark offset-y style="margin-bottom: 10px;" v-if="(userAccess == 0 || isRupert )&&selectedView==0">
+                <v-btn slot="activator" flat>
+                    Actions
+                </v-btn>
+                <v-list>
+                    <v-list-tile v-if="(userAccess == 0 || isRupert )&&selectedView==0" @click="assignGroups">
+                        <v-list-tile-title>group assign</v-list-tile-title>
+                    </v-list-tile>
+                    <v-list-tile v-if="(userAccess == 0 || isRupert )&&selectedView==0" @click="groupRemove">
+                        <v-list-tile-title>group Remove</v-list-tile-title>
+                    </v-list-tile>
+                    <v-list-tile v-if="(userAccess == 0 || isRupert )&&selectedView==0" @click="groupPark">
+                        <v-list-tile-title>Group Park</v-list-tile-title>
+                    </v-list-tile>
+                    <v-list-tile v-if="selectedProject!=null&&selectedProject!='NaN'" @click="sendMail">
+                        <v-list-tile-title>Send Mail</v-list-tile-title>
+                    </v-list-tile>
+                </v-list>
+            </v-menu>
             <v-toolbar-items>
                 <v-autocomplete v-if="selectedView==1" style="margin-left: 10px; margin-top: 8px; width: 300px"
                     :items="stores" @change="GetStoreData()" return-object v-model="selectedStore" label="Store">
@@ -46,10 +56,7 @@
                     label="Project Owner">
                 </v-autocomplete>
             </v-toolbar-items>
-            <v-btn @click="sendMail" color="blue-grey darken-2 ma-2"
-                v-if="selectedProject!=null&&selectedProject!='NaN'">
-                Send Mail
-            </v-btn>
+
         </v-toolbar>
         <grid :isRupert="isRupert" :userAccess="userAccess" ref="grid" :getRowData="getStorePlanograms"
             :selectedProject="selectedProject" :rowData="rowData" :assign="assignGroups" :Planogram_ID="Planogram_ID"
@@ -138,85 +145,7 @@
                 currentStorePlanograms: [],
                 storeView: false,
                 currentProject: null,
-                headers: [{
-                        "headerName": "Store",
-                        "checkboxSelection": self.userAccess == 0 || self.isRupert,
-                        "field": "storeName",
-                        "headerCheckboxSelection": true,
-                        "headerCheckboxSelectionFilteredOnly": true,
-                        "minWidth": 200,
-                    }, {
-                        "headerName": "Planogram Name",
-                        "cellRendererFramework": "PlanogramName",
-
-                        "minWidth": 300,
-                        cellStyle: function (params) {
-                            if (params.data.planogramFit == true) {
-                                //mark police cells as red
-                                return {
-                                    // color: 'red',
-                                    backgroundColor: " rgb(240, 125, 125)"
-                                };
-                            } else {
-                                return {
-                                    // backgroundColor: " #C8E6C9"
-                                };
-                            }
-                        }
-                    }, {
-                        "headerName": "Status",
-                        "field": "currentStatusText",
-                        "minWidth": 100,
-                    }, {
-                        "headerName": "Actions",
-                        "hide": false,
-                        "minWidth": 340,
-                        "cellRendererFramework": "Button"
-                    },
-                    {
-                        "headerName": "Best Fit",
-                        "cellRendererFramework": "Fits",
-                        "minWidth": 50
-                    },
-                    {
-                        "headerName": "Store Cluster",
-                        "field": "cluster",
-                        "minWidth": 75,
-                        cellClassRules: {
-                            'success-green': 'data.storeClusterFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                            'error-red': 'data.storeClusterFit == true && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                        }
-                    }, {
-                        "headerName": "Category Cluster",
-                        "field": "categoryCluster",
-                        "minWidth": 75,
-                    }, {
-                        "headerName": "Modules",
-                        "minWidth": 50,
-                        "editable": self.userAccess == 0 || self.isRupert,
-                        "field": "modules",
-                        cellClassRules: {
-                            'success-green': 'data.modulesFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                            'error-red': 'data.modulesFit == true && ( data.planogramStoreStatus!=5 && data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                        }
-
-                    }, {
-                        "headerName": "Height",
-                        "minWidth": 50,
-                        // "cellRendererFramework": "height",
-                        "editable": self.userAccess == 0 || self.isRupert,
-                        "field": "height",
-                        cellClassRules: {
-                            'success-green': 'data.heightFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                            'error-red': 'data.heightFit == true && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
-                        }
-                    }, {
-                        "headerName": "Audit",
-                        "minWidth": 50,
-                        "field": "audit",
-                        "cellRendererFramework": "Audit"
-                    }
-                ]
+                headers: []
             }
         },
         mounted() {
@@ -224,9 +153,94 @@
             this.open()
             this.getSystemUsers();
             this.getStores()
+            console.log("self.userAccess", self.userAccess);
+
             let encoded_details = jwt.decode(sessionStorage.accessToken);
             self.systemUserID = encoded_details.USER_ID;
             self.isRupert = encoded_details.USER_ID == parseInt(process.env.VUE_APP_RUPERT);
+            self.headers = [{
+                    "headerName": "Store",
+                    "checkboxSelection": self.userAccess == 0 || self.isRupert,
+                    "field": "storeName",
+                    "headerCheckboxSelection": true,
+                    "headerCheckboxSelectionFilteredOnly": true,
+                    "minWidth": 200,
+                }, {
+                    "headerName": "Planogram Name",
+                    "cellRendererFramework": "PlanogramName",
+
+                    "minWidth": 300,
+                    cellStyle: function (params) {
+                        if (params.data.planogramFit == true) {
+                            //mark police cells as red
+                            return {
+                                // color: 'red',
+                                backgroundColor: " rgb(240, 125, 125)"
+                            };
+                        } else {
+                            return {
+                                // backgroundColor: " #C8E6C9"
+                            };
+                        }
+                    }
+                }, {
+                    "headerName": "Status",
+                    "field": "currentStatusText",
+                    "minWidth": 100,
+                }, {
+                    "headerName": "Actions",
+                    "hide": false,
+                    "minWidth": 340,
+                    "cellRendererFramework": "Button"
+                },
+                {
+                    "headerName": "Best Fit",
+                    "cellRendererFramework": "Fits",
+                    "minWidth": 50
+                },
+                {
+                    "headerName": "Store Cluster",
+                    "field": "cluster",
+                    "minWidth": 75,
+                    cellClassRules: {
+                        'success-green': 'data.storeClusterFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                        'error-red': 'data.storeClusterFit == true && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                    }
+                }, {
+                    "headerName": "Custom Cluster",
+                    "field": "customCluster",
+                    "minWidth": 100,
+                }, {
+                    "headerName": "Category Cluster",
+                    "field": "categoryCluster",
+                    "minWidth": 75,
+                }, {
+                    "headerName": "Modules",
+                    "minWidth": 50,
+                    "editable": self.userAccess == 0 || self.isRupert,
+                    "field": "modules",
+                    cellClassRules: {
+                        'success-green': 'data.modulesFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                        'error-red': 'data.modulesFit == true && ( data.planogramStoreStatus!=5 && data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                    }
+
+                }, {
+                    "headerName": "Height",
+                    "minWidth": 50,
+                    // "cellRendererFramework": "height",
+                    "editable": self.userAccess == 0 || self.isRupert,
+                    "field": "height",
+                    cellClassRules: {
+                        'success-green': 'data.heightFit == false && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                        'error-red': 'data.heightFit == true && (data.planogramStoreStatus!=5 &&  data.planogramStoreStatus!=0 && data.planogramStoreStatus!=7 && data.planogramStoreStatus!=6)',
+                    }
+                }, {
+                    "headerName": "Audit",
+                    "minWidth": 50,
+                    "field": "audit",
+                    "cellRendererFramework": "Audit"
+                }
+            ]
         },
         methods: {
             getStores() {
@@ -333,6 +347,10 @@
                     "headerName": "Best Fit",
                     "cellRendererFramework": "Fits",
                     "minWidth": 50
+                }, {
+                    "headerName": "Custom Cluster",
+                    "field": "customCluster",
+                    "minWidth": 100,
                 }, {
                     "headerName": "Store Cluster",
                     "field": "cluster",
@@ -1031,6 +1049,67 @@
                         self.selectedProject = null
                     }
                 })
+            },
+            groupPark() {
+                let self = this
+                let data = self.$refs.grid.getSelectedRows()
+                if (data.length < 1) {
+                    alert("Please select at least one store")
+                    return
+                }
+                let text = "Do you want to park these stores?";
+
+                // if (!state)
+                //     text = "Do you want to continue distribution to this store?"
+
+                self.$refs.YesNoModal.show(text, val => {
+                    if (val) {
+                        data.forEach(item => {
+                            self.removeFromStore(item, true, 0)
+                        })
+                    }
+                })
+            },
+            removeFromStore(rowdata, state, Status) {
+                let self = this
+                let item = rowdata.data
+                let node = rowdata.node
+
+
+                self.remove(item, state, Status, data => {
+                    console.log(data)
+                    // node.setData(data)
+                })
+            },
+            remove(listItem, state, status, callback) {
+                let self = this;
+
+                console.log(listItem);
+
+                if (state == true) {
+                    listItem.planogramStoreStatus = 6
+                    listItem.currentStatusText = "Parked"
+                } else {
+                    if (listItem.planogramDetail_ID == null || listItem.planogramDetail_ID == 0) {
+                        listItem.currentStatusText = "Unassigned"
+                        listItem.planogramStoreStatus = 0
+                    } else {
+                        listItem.currentStatusText = "Assigned"
+                        listItem.planogramStoreStatus = 1
+                    }
+                }
+
+                listItem.project_ID = self.selectedProject
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.post(process.env.VUE_APP_API + 'Store_Planogram/Save', listItem)
+                    .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        callback(listItem)
+                    }).catch(e => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        callback(e)
+                    })
             },
             parkStoreDistribution(row) {
                 let self = this;

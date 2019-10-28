@@ -7,7 +7,7 @@
             :floatingFilter="true" :groupMultiAutoColumn="true" :onGridReady="onGridReady">
         </ag-grid-vue>
         <v-toolbar dark flat dense>
-            Rows: {{rowData.length}}
+            <!-- Rows: {{rowData.length}} -->
         </v-toolbar>
     </div>
 </template>
@@ -15,10 +15,14 @@
     import {
         AgGridVue
     } from "ag-grid-vue";
+     import progressRenderer from "./progressRenderer";
+     import DeptRenderer from "./DeptRenderer";
 
     export default {
         components: {
             AgGridVue,
+            progressRenderer,
+            DeptRenderer
         },
         props: ["rowData", "stores","headers"],
         data() {
@@ -67,7 +71,7 @@
             onGridReady(params) {
                 this.gridApi = params.api;
                 this.columnApi = params.columnApi;
-                this.gridApi.sizeColumnsToFit()
+                // this.gridApi.sizeColumnsToFit()
             },
         },
     }
