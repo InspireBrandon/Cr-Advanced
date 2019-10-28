@@ -1,14 +1,6 @@
 <template>
   <v-container fluid class="pa-0 ma-0" grid-list-md>
     <v-layout class="pa-0 ma-0" row wrap>
-      <v-toolbar dark>
-        <v-btn color="success">Start Implementing</v-btn>
-        <v-spacer></v-spacer>
-        <v-btn icon class="mr-2">
-          Print
-          <v-icon>print</v-icon>
-        </v-btn>
-      </v-toolbar>
       <v-flex md2 class="pa-0 ma-0">
         <v-navigation-drawer
           permanent

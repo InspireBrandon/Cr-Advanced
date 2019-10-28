@@ -5,32 +5,46 @@
         <div
           class="subheading mt-1 pa-1 font-weight-bold"
           v-if="item.parentID == '0' && item.route == null"
+          style="cursor: pointer;"
+          @click="item.showChildren = !item.showChildren"
         >
-          <v-icon v-if="item.route == null">{{ open ? 'folder_open' : 'folder' }}</v-icon>
+          <v-icon v-if="item.route == null">{{ item.showChildren ? 'folder_open' : 'folder' }}</v-icon>
           {{item.title}}
         </div>
         <div
           class="subheading mt-1 pa-1 font-weight-bold"
+          style="cursor: pointer;"
           v-if="item.parentID == '0' && item.route != null"
+          @click="goTo(item.route)"
         >
-          <v-icon>link</v-icon>
-          {{item.title}}
-        </div>
-        <div class="body-2 font-weight-regular" v-if="item.parentID != '0' && item.route == null">
-          <v-icon v-if="item.route == null">{{ open ? 'folder_open' : 'folder' }}</v-icon>
+          <v-icon>{{ item.showChildren ? 'folder_open' : 'folder' }}</v-icon>
           {{item.title}}
         </div>
         <div
-          v-if="item.parentID != '0' && item.route != null"
+          class="body-2 font-weight-regular"
           style="cursor: pointer;"
-          class="body-1 font-weight-regular"
-          @click="goTo(item.route)"
+          v-if="item.parentID != '0' && item.route == null"
+          @click="item.showChildren =  !item.showChildren"
         >
-          {{(idx + 1)}}.
+          <v-icon v-if="item.route == null">{{ item.showChildren ? 'folder_open' : 'folder' }}</v-icon>
           {{item.title}}
         </div>
+        <div>
+          <div
+            v-if="item.parentID != '0' && item.route != null"
+            style="cursor: pointer;"
+            class="body-1 font-weight-regular"
+            @click="goTo(item.route)"
+          >
+            <v-icon v-if="item.routeType == 0">folder</v-icon>
+            <v-icon v-if="item.routeType == 1">insert_drive_file</v-icon>
+            <v-icon v-if="item.routeType == 2">folder</v-icon>
+            {{(idx + 1)}}.
+            {{item.title}}
+          </div>
+        </div>
       </div>
-      <recursive-item style="margin-left: 15px;" :parentID="item.id"></recursive-item>
+      <recursive-item v-show="item.showChildren" style="margin-left: 15px;" :parentID="item.id"></recursive-item>
     </div>
   </div>
 </template>
@@ -40,7 +54,9 @@
 import RouteController from "@/components/Main/NewViewTesting/RoutesForTesting/route-controller";
 
 export default {
-  components: { RouteController },
+  components: {
+    RouteController
+  },
   props: ["parentID"],
   name: "recursive-item",
   data() {
@@ -57,6 +73,7 @@ export default {
     });
 
     self.items = rc.getRoutesByParentID(self.parentID);
+    console.log(self.items);
     // route controller to get all items by parent id
   },
   methods: {

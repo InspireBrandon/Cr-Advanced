@@ -38,13 +38,15 @@ function GetAllRoutes() {
             id: "1",
             parentID: "0",
             title: "Planogram",
+            showChildren: true,
+            // routeType: 0,
             allowedAccessLevels: [
                 accessTypes.SuperUser,
                 accessTypes.Buyer,
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
-            RouteType: RouteType.Folder
+            routeType: RouteType.Folder
         }),
         new RouteItem({
             id: "1.1",
@@ -53,7 +55,8 @@ function GetAllRoutes() {
             route: "/PlanogramImplementation",
             allowedAccessLevels: [
                 accessTypes.SuperUser
-            ]
+            ],
+            routeType: RouteType.File
         }),
         new RouteItem({
             id: "1.2",
@@ -62,7 +65,8 @@ function GetAllRoutes() {
             allowedAccessLevels: [
                 accessTypes.Supplier,
                 accessTypes.Buyer
-            ]
+            ],
+            routeType: RouteType.File
         }),
         new RouteItem({
             id: "1.3",
@@ -71,7 +75,8 @@ function GetAllRoutes() {
             route: "/SpacePlanning",
             allowedAccessLevels: [
                 accessTypes.SuperUser
-            ]
+            ],
+            routeType: RouteType.File
         }),
         new RouteItem({
             id: "1.4",
@@ -80,11 +85,13 @@ function GetAllRoutes() {
             route: "/Fixtures",
             allowedAccessLevels: [
                 accessTypes.SuperUser
-            ]
+            ],
+            routeType: RouteType.File
         }),
         new RouteItem({
             id: "2",
             parentID: "0",
+            showChildren: true,
             title: "Ranging",
             route: "/RangePlanning/:rangeFileID",
             allowedAccessLevels: [
@@ -93,10 +100,12 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.Folder
         }),
         new RouteItem({
             id: "3",
             parentID: "0",
+            showChildren: true,
             title: "Data Preparation",
             allowedAccessLevels: [
                 accessTypes.SuperUser,
@@ -104,6 +113,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.Folder
         }),
         new RouteItem({
             id: "3.1",
@@ -115,6 +125,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.Folder
         }),
         new RouteItem({
             id: "3.1.1",
@@ -127,6 +138,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.File
         }),
         new RouteItem({
             id: "3.1.2",
@@ -139,6 +151,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.File
         }),
         new RouteItem({
             id: "3.1.3",
@@ -151,6 +164,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.File
         }),
         new RouteItem({
             id: "3.1.4",
@@ -163,6 +177,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.File
         }),
         new RouteItem({
             id: "3.2",
@@ -174,6 +189,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.Folder
         }),
         new RouteItem({
             id: "3.2.1",
@@ -186,6 +202,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.File
         }),
         new RouteItem({
             id: "3.2.2",
@@ -198,6 +215,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.File
         }),
         new RouteItem({
             id: "3.3",
@@ -209,6 +227,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.Folder
         }),
         new RouteItem({
             id: "3.3.1",
@@ -221,6 +240,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.File
         }),
         new RouteItem({
             id: "3.3.2",
@@ -233,6 +253,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.File
         }),
         new RouteItem({
             id: "3.3.3",
@@ -245,6 +266,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.File
         }),
         new RouteItem({
             id: "3.3.4",
@@ -257,6 +279,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.File
         }),
         new RouteItem({
             id: "3.3.5",
@@ -269,6 +292,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.File
         }),
         new RouteItem({
             id: "3.3.6",
@@ -281,6 +305,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.File
         }),
         new RouteItem({
             id: "3.3.7",
@@ -293,6 +318,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.File
         }),
         new RouteItem({
             id: "3.4",
@@ -304,6 +330,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.Folder
         }),
         new RouteItem({
             id: "3.4.1",
@@ -316,9 +343,11 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.File
         }),
         new RouteItem({
             id: "4",
+            showChildren: true,
             parentID: "0",
             title: "Data Import",
             route: '/DataImport',
@@ -328,9 +357,11 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.Folder
         }),
         new RouteItem({
             id: "5",
+            showChildren: true,
             parentID: "0",
             title: "Project Planning",
             allowedAccessLevels: [
@@ -339,6 +370,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.Folder
         }),
         new RouteItem({
             id: "5.1",
@@ -351,6 +383,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.File
         }),
         new RouteItem({
             id: "5.2",
@@ -363,6 +396,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.File
         }),
         new RouteItem({
             id: "5.3",
@@ -375,9 +409,11 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.File
         }),
         new RouteItem({
-            id: "7",
+            id: "6",
+            showChildren: true,
             parentID: "0",
             title: "Tasks",
             route: '/Tasks',
@@ -387,10 +423,12 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.Folder
         }),
         new RouteItem({
-            id: "8",
+            id: "7",
             parentID: "0",
+            showChildren: true,
             title: "Floor Planning",
             allowedAccessLevels: [
                 accessTypes.SuperUser,
@@ -398,9 +436,10 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.Folder
         }),
         new RouteItem({
-            id: "8.1",
+            id: "7.1",
             parentID: "8",
             title: "Floor Planning",
             route: '/FloorPlanning',
@@ -410,9 +449,10 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.File
         }),
         new RouteItem({
-            id: "8.2",
+            id: "7.2",
             parentID: "8",
             title: "Floor Planning 2D",
             route: '/FloorPlanning2D',
@@ -422,10 +462,12 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.File
         }),
         new RouteItem({
-            id: "9",
+            id: "8",
             parentID: "0",
+            showChildren: true,
             title: "Clustering",
             route: '/Clustering',
             allowedAccessLevels: [
@@ -434,10 +476,12 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.Folder
         }),
         new RouteItem({
-            id: "10",
+            id: "9",
             parentID: "0",
+            showChildren: true,
             title: "Mapping",
             route: '/map',
             allowedAccessLevels: [
@@ -446,6 +490,7 @@ function GetAllRoutes() {
                 accessTypes.Supplier,
                 accessTypes.Store
             ],
+            routeType: RouteType.Folder
         }),
     );
     // Ranging
