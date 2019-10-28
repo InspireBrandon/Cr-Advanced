@@ -171,6 +171,301 @@ function GetAllRoutes() {
                 accessTypes.Store
             ],
         }),
+        new RouteItem({
+            id: "3.2",
+            parentID: "3",
+            title: "Market",
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "3.2.1",
+            parentID: "3.2",
+            title: "Store",
+            route: '/DataPreparation/Store',
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "3.2.2",
+            parentID: "3.2",
+            title: "Store Cluster",
+            route: '/DataPreparation/StoreCluster',
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "3.3",
+            parentID: "3",
+            title: "Fact",
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "3.3.1",
+            parentID: "3.3",
+            title: "Category Code",
+            route: '/DataPreparation/CategoryCode',
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "3.3.2",
+            parentID: "3.3",
+            title: "Planogram Maintenance",
+            route: '/DataPreparation/PlanogramMaintenance',
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "3.3.3",
+            parentID: "3.3",
+            title: "Supergroup A",
+            route: '/DataPreparation/Supergroup_A',
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "3.3.4",
+            parentID: "3.3",
+            title: "Supergroup B",
+            route: '/DataPreparation/Supergroup_B',
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "3.3.5",
+            parentID: "3.3",
+            title: "Segment",
+            route: '/DataPreparation/Segment',
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "3.3.6",
+            parentID: "3.3",
+            title: "Item Status",
+            route: '/DataPreparation/Item_Status',
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "3.3.7",
+            parentID: "3.3",
+            title: "Active Shop Code",
+            route: '/DataPreparation/Active_Shop_Code',
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "3.4",
+            parentID: "3",
+            title: "Period",
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "3.4.1",
+            parentID: "3.4",
+            title: "Period",
+            route: '/DataPreparation/Period',
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "4",
+            parentID: "0",
+            title: "Data Import",
+            route: '/DataPreparation/DataImport',
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "5",
+            parentID: "0",
+            title: "Project Planning",
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "5.1",
+            parentID: "5",
+            title: "Project PLanning Drawer",
+            route: '/Drawer',
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "5.2",
+            parentID: "5",
+            title: "Transaction Allocation",
+            route: '/Allocation/:ProjectID',
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "5.3",
+            parentID: "5",
+            title: "Meetings And Workshops",
+            route: '/MeetingsAndWorkshops',
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "6",
+            parentID: "0",
+            title: "Meetings And Workshops",
+            route: '/MeetingsAndWorkshops',
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "7",
+            parentID: "0",
+            title: "Tasks",
+            route: '/Tasks',
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "8",
+            parentID: "0",
+            title: "Floor Planning",
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "8.1",
+            parentID: "8",
+            title: "Floor Planning",
+            route: '/FloorPlanning',
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "8.2",
+            parentID: "8",
+            title: "Floor Planning 2D",
+            route: '/FloorPlanning2D',
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "9",
+            parentID: "0",
+            title: "Clustering",
+            route: '/Clustering',
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
+        new RouteItem({
+            id: "10",
+            parentID: "0",
+            title: "Map",
+            route: '/map',
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+        }),
     );
 
     // Ranging
