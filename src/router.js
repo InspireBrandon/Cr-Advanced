@@ -143,11 +143,6 @@ export default new Router({
       component: FloorPlanning2D
     },
     {
-      path: '/TestingView',
-      name: RouteConfig.APPLICATION_NAME_1.NAME,
-      component: require('@/components/Main/NewViewTesting/NewView.vue').default,
-    },
-    {
       path: "/menu-second",
       name: RouteConfig.APPLICATION_NAME_2.NAME,
       components: require('@/components/Main/NewViewTesting/NewView.vue')
@@ -157,6 +152,10 @@ export default new Router({
       name: 'main',
       component: Main,
       children: [{
+          path: '/TestingView',
+          name: RouteConfig.APPLICATION_NAME_1.NAME,
+          component: require('@/components/Main/NewViewTesting/NewView.vue').default,
+        }, {
           path: '/map',
           name: 'map',
           component: map
