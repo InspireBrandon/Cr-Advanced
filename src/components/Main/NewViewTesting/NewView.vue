@@ -8,7 +8,7 @@
       </v-flex>
       <v-flex md10 class="pa-0 ma-0">
         <v-card flat tile height="calc(100vh - 64px)">
-        <router-view />
+        <router-view :key="$route.fullPath" />
         </v-card>
       </v-flex>
     </v-layout>
