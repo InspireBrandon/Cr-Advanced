@@ -1,22 +1,11 @@
 <template>
-  <v-card>
-    <v-toolbar dark>
-      <v-btn color="success">Start Implementing</v-btn>
-      <v-spacer></v-spacer>
-      <v-btn icon class="mr-2">
-        Print
-        <v-icon>print</v-icon>
-      </v-btn>
+  <v-card tile>
+    <v-toolbar dark flat>
+      <v-toolbar-title>
+        <span class="title ml-3 mr-5">Chain&nbsp;<span class="font-weight-light">Research</span></span>
+      </v-toolbar-title>
     </v-toolbar>
     <v-navigation-drawer permanent value="true">
-      <v-toolbar flat>
-        <v-list>
-          <v-list-tile>
-            <v-list-tile-title class="title">CR Solutions</v-list-tile-title>
-          </v-list-tile>
-        </v-list>
-      </v-toolbar>
-      <v-divider></v-divider>
       <v-card>
         <v-treeview :items="planogramList" :open="open">
           <template v-slot:prepend="{ item, open }">

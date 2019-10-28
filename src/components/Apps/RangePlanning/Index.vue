@@ -978,7 +978,7 @@
             })
         })
       },
-      checkStoreClusterChange() {
+      checkStoreClusterChange(callback) {
         let self = this;
         let descreps = [];
 
@@ -993,63 +993,72 @@
 
         // const unique = [...new Set(descreps.map(item => item.clusterName))];
 
-        self.$refs.HandleDescrepancy.show(descreps, fixed => {
+        if (descreps.length > 0) {
+          self.$refs.HandleDescrepancy.show(descreps, fixed => {
+            fixed.forEach(descrep => {
 
-        })
+              if (descrep.newClusterIndicator) {
+                let clusterData = self.tmpClusters[descrep.type + "Clusters"].find(el => {
+                  return el.clusterID === descrep.clusterID;
+                })
 
-        // alert(clusterIndicators);
+                let clusterIndicators = self.rangingController.getIndicatorsByCluster(descrep.type, descrep
+                  .clusterID);
 
-        // console.log(unique)
+                clusterIndicators.forEach(ci => {
+                  storeSales.forEach(ss => {
+                    if (ss.storeID === descrep.storeID) {
+                      let productRecord = ss.salesData.find(prel => {
+                        return prel.productID == ci.productID;
+                      })
 
-        // descreps.forEach(descrep => {
-        //   let clusterData = self.tmpClusters[descrep.type + "Clusters"].find(el => {
-        //     return el.clusterID === descrep.clusterID;
-        //   })
+                      if (ci.indicator != "SELECTED") {
+                        productRecord.store_Range_Indicator = ci.indicator
+                        productRecord.store_Range_Indicator_ID = ci.indicator == "NO" ?
+                          0 :
+                          1;
+                        productRecord["updated"] = true;
+                      }
+                    }
+                  })
+                })
+              }
+            })
 
-        //   let clusterIndicators = self.rangingController.getIndicatorsByCluster(descrep.type, descrep.clusterID);
-
-        //   clusterIndicators.forEach(ci => {
-        //     storeSales.forEach(ss => {
-        //       if (ss.storeID === descrep.storeID) {
-        //         let productRecord = ss.salesData.find(prel => {
-        //           return prel.productID == ci.productID;
-        //         })
-
-        //         if (ci.indicator != "SELECTED") {
-        //           productRecord.store_Range_Indicator = clusterIndicators.indicator
-        //           productRecord.store_Range_Indicator_ID = clusterIndicators.indicator == "NO" ? 0 : 1;
-        //           productRecord["updated"] = true;
-        //         }
-        //       }
-        //     })
-        //   })
-        // })
+            callback();
+          })
+        } else {
+          callback();
+        }
       },
       checkAllStoreClusters(descreps) {
         let self = this;
 
         self.tmpClusters.allStoresClusters.forEach(tmpAsc => {
+
           tmpAsc.clusterStores.forEach(tmpCs => {
             let current = self.currentClusterData.allStoresClusters.find(el => {
               return el.clusterID === tmpAsc.clusterID;
             })
 
-            let hasStore = false;
+            if (current != undefined && current != null) {
+              let hasStore = false;
 
-            current.clusterStores.forEach(el => {
-              if (el.storeID === tmpCs.storeID) {
-                hasStore = true;
-              }
-            })
-
-            if (!hasStore) {
-              descreps.push({
-                type: "allStores",
-                storeID: tmpCs.storeID,
-                storeName: tmpCs.storeName,
-                clusterID: tmpSc.clusterID,
-                clusterName: tmpSc.clusterName
+              current.clusterStores.forEach(el => {
+                if (el.storeID === tmpCs.storeID) {
+                  hasStore = true;
+                }
               })
+
+              if (!hasStore) {
+                descreps.push({
+                  type: "allStores",
+                  storeID: tmpCs.storeID,
+                  storeName: tmpCs.storeName,
+                  clusterID: tmpSc.clusterID,
+                  clusterName: tmpSc.clusterName
+                })
+              }
             }
           })
         })
@@ -1063,22 +1072,24 @@
               return el.clusterID === tmpCc.clusterID;
             })
 
-            let hasStore = false;
+            if (current != undefined && current != null) {
+              let hasStore = false;
 
-            current.clusterStores.forEach(el => {
-              if (el.storeID === tmpCs.storeID) {
-                hasStore = true;
-              }
-            })
-
-            if (!hasStore) {
-              descreps.push({
-                type: "category",
-                storeID: tmpCs.storeID,
-                storeName: tmpCs.storeName,
-                clusterID: tmpSc.clusterID,
-                clusterName: tmpSc.clusterName
+              current.clusterStores.forEach(el => {
+                if (el.storeID === tmpCs.storeID) {
+                  hasStore = true;
+                }
               })
+
+              if (!hasStore) {
+                descreps.push({
+                  type: "category",
+                  storeID: tmpCs.storeID,
+                  storeName: tmpCs.storeName,
+                  clusterID: tmpSc.clusterID,
+                  clusterName: tmpSc.clusterName
+                })
+              }
             }
           })
         })
@@ -1092,22 +1103,24 @@
               return el.clusterID === tmpCc.clusterID;
             })
 
-            let hasStore = false;
+            if (current != undefined && current != null) {
+              let hasStore = false;
 
-            current.clusterStores.forEach(el => {
-              if (el.storeID === tmpCs.storeID) {
-                hasStore = true;
-              }
-            })
-
-            if (!hasStore) {
-              descreps.push({
-                type: "custom",
-                storeID: tmpCs.storeID,
-                storeName: tmpCs.storeName,
-                clusterID: tmpSc.clusterID,
-                clusterName: tmpSc.clusterName
+              current.clusterStores.forEach(el => {
+                if (el.storeID === tmpCs.storeID) {
+                  hasStore = true;
+                }
               })
+
+              if (!hasStore) {
+                descreps.push({
+                  type: "custom",
+                  storeID: tmpCs.storeID,
+                  storeName: tmpCs.storeName,
+                  clusterID: tmpSc.clusterID,
+                  clusterName: tmpSc.clusterName
+                })
+              }
             }
           })
         })
@@ -1121,22 +1134,24 @@
               return el.clusterID === tmpDc.clusterID;
             })
 
-            let hasStore = false;
+            if (current != undefined && current != null) {
+              let hasStore = false;
 
-            current.clusterStores.forEach(el => {
-              if (el.storeID === tmpCs.storeID) {
-                hasStore = true;
-              }
-            })
-
-            if (!hasStore) {
-              descreps.push({
-                type: "department",
-                storeID: tmpCs.storeID,
-                storeName: tmpCs.storeName,
-                clusterID: tmpSc.clusterID,
-                clusterName: tmpSc.clusterName
+              current.clusterStores.forEach(el => {
+                if (el.storeID === tmpCs.storeID) {
+                  hasStore = true;
+                }
               })
+
+              if (!hasStore) {
+                descreps.push({
+                  type: "department",
+                  storeID: tmpCs.storeID,
+                  storeName: tmpCs.storeName,
+                  clusterID: tmpSc.clusterID,
+                  clusterName: tmpSc.clusterName
+                })
+              }
             }
           })
         })
@@ -1150,22 +1165,24 @@
               return el.clusterID === tmpRc.clusterID;
             })
 
-            let hasStore = false;
+            if (current != undefined && current != null) {
+              let hasStore = false;
 
-            current.clusterStores.forEach(el => {
-              if (el.storeID === tmpCs.storeID) {
-                hasStore = true;
-              }
-            })
-
-            if (!hasStore) {
-              descreps.push({
-                type: "regional",
-                storeID: tmpCs.storeID,
-                storeName: tmpCs.storeName,
-                clusterID: tmpSc.clusterID,
-                clusterName: tmpSc.clusterName
+              current.clusterStores.forEach(el => {
+                if (el.storeID === tmpCs.storeID) {
+                  hasStore = true;
+                }
               })
+
+              if (!hasStore) {
+                descreps.push({
+                  type: "regional",
+                  storeID: tmpCs.storeID,
+                  storeName: tmpCs.storeName,
+                  clusterID: tmpSc.clusterID,
+                  clusterName: tmpSc.clusterName
+                })
+              }
             }
           })
         })
@@ -1179,22 +1196,24 @@
               return el.clusterID === tmpSc.clusterID;
             })
 
-            let hasStore = false;
+            if (current != undefined && current != null) {
+              let hasStore = false;
 
-            current.clusterStores.forEach(el => {
-              if (el.storeID === tmpCs.storeID) {
-                hasStore = true;
-              }
-            })
-
-            if (!hasStore) {
-              descreps.push({
-                type: "store",
-                storeID: tmpCs.storeID,
-                storeName: tmpCs.storeName,
-                clusterID: tmpSc.clusterID,
-                clusterName: tmpSc.clusterName
+              current.clusterStores.forEach(el => {
+                if (el.storeID === tmpCs.storeID) {
+                  hasStore = true;
+                }
               })
+
+              if (!hasStore) {
+                descreps.push({
+                  type: "store",
+                  storeID: tmpCs.storeID,
+                  storeName: tmpCs.storeName,
+                  clusterID: tmpSc.clusterID,
+                  clusterName: tmpSc.clusterName
+                })
+              }
             }
           })
         })
@@ -1229,6 +1248,7 @@
       sync_clusters(outputObj) {
         let self = this;
 
+        self.$refs.SyncModalStatus.show();
         outputObj.currentLoading = 'clusters';
         self.$refs.SyncModalStatus.updateStatus(outputObj);
 
@@ -1239,20 +1259,24 @@
             self.currentClusterData = self.rangingController.getClusterData();
             self.setRangingClusterData(clusterData);
             outputObj.clusterMessage = "Success"
-            self.checkStoreClusterChange();
-            // self.sync_updatedIndicators(outputObj);
+            self.checkStoreClusterChange(() => {
+              outputObj.indicatorMessage = "Success";
+              outputObj.currentLoading = 'indicators';
+              outputObj.indicators = true;
+              self.sync_updatedIndicators(outputObj);
+            });
           })
           .catch(e => {
+            alert(e);
             outputObj.clusters = false;
             outputObj.clusterMessage = "Failed to get latest clusters. " + e;
-            self.checkStoreClusterChange();
+            // self.checkStoreClusterChange();
             // self.sync_updatedIndicators(outputObj);
           })
       },
       sync_updatedIndicators(outputObj) {
         let self = this;
 
-        self.$refs.SyncModalStatus.show();
         self.$refs.SyncModalStatus.updateStatus(outputObj);
 
         let updatedIndicators = self.rangingController.getImportCSV();
@@ -1526,30 +1550,34 @@
       setRangingClusterData(data) {
         let self = this;
 
-        console.log(data);
-
         data.allStoresClusters.forEach(element => {
-          self.clusterOptions.allStores.push(new textValue(element));
+          if (element.clusterStores.length > 0)
+            self.clusterOptions.allStores.push(new textValue(element));
         });
 
         data.categoryClusters.forEach(element => {
-          self.clusterOptions.category.push(new textValue(element));
+          if (element.clusterStores.length > 0)
+            self.clusterOptions.category.push(new textValue(element));
         });
 
         data.customClusters.forEach(element => {
-          self.clusterOptions.custom.push(new textValue(element));
+          if (element.clusterStores.length > 0)
+            self.clusterOptions.custom.push(new textValue(element));
         });
 
         data.departmentClusters.forEach(element => {
-          self.clusterOptions.department.push(new textValue(element));
+          if (element.clusterStores.length > 0)
+            self.clusterOptions.department.push(new textValue(element));
         });
 
         data.regionalClusters.forEach(element => {
-          self.clusterOptions.regional.push(new textValue(element));
+          if (element.clusterStores.length > 0)
+            self.clusterOptions.regional.push(new textValue(element));
         });
 
         data.storeClusters.forEach(element => {
-          self.clusterOptions.store.push(new textValue(element));
+          if (element.clusterStores.length > 0)
+            self.clusterOptions.store.push(new textValue(element));
         });
       },
       onSelectionChanged(e) {

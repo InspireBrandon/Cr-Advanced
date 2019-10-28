@@ -11,7 +11,7 @@
                     <div v-for="(unique, idx1) in uniques" :key="idx1" class="mb-2">
                         <h3>{{ unique.name }}</h3>
                         <div>
-                            <v-checkbox @change="onMainChange(unique.name, idx1)" v-model="unique.storeSpecific" class="mt-0" hide-details label="Store Specific">
+                            <v-checkbox @change="onMainChange(unique.name, idx1)" v-model="unique.storeSpecific" class="mt-0" hide-details label="Show">
                             </v-checkbox>
                         </div>
                         <table v-if="unique.storeSpecific" class="mb-3">
@@ -73,6 +73,7 @@
                 self.dialog = true;
                 self.descreps = [];
                 self.uniques = [];
+                self.afterComplete = afterComplete;
 
                 descreps.forEach(descrep => {
                     descrep.newClusterIndicator = true;
@@ -92,6 +93,7 @@
             submit() {
                 let self = this;
                 self.dialog = false;
+                self.afterComplete(self.descreps);
             },
             onMainChange(changeForCluster, idx) {
                 let self = this;
@@ -115,8 +117,7 @@
             showHelpMessage() {
                 let self = this;
 
-                alert(
-                    "When updating a stores cluster the indicators of the original cluster will be affected. Using this tool you will be able to decide how you would like to handle the new indicator changes. In order to update the indicators, select yes. Otherwise select no.");
+                alert("Moving a Store from one cluster to another may affect the Range Indicators of that store. When a Store Moves from one Cluster to another select YES to Receive the indicators of the Cluster it is moving to, or NO if you would like to keep the Stores current Indicators. Please Note: The Store will move Clusters regardless of the decision Taken – and All Stores will have the Cluster Names as determined by the Clustering Module. When an Entire Cluster Moves (i.e. the Cluster is being renamed) – Selecting No will leave the Indicators as they currently are for each store, but they will receive the name of the NEW CLUSTER.");
             }
         }
     }
