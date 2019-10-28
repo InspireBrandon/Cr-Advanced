@@ -38,7 +38,6 @@ function GetAllRoutes() {
             id: "1",
             parentID: "0",
             title: "Planogram",
-            showChildren: true,
             // routeType: 0,
             allowedAccessLevels: [
                 accessTypes.SuperUser,
@@ -91,7 +90,6 @@ function GetAllRoutes() {
         new RouteItem({
             id: "2",
             parentID: "0",
-            showChildren: true,
             title: "Ranging",
             route: "/RangePlanning/:rangeFileID",
             allowedAccessLevels: [
@@ -105,7 +103,6 @@ function GetAllRoutes() {
         new RouteItem({
             id: "3",
             parentID: "0",
-            showChildren: true,
             title: "Data Preparation",
             allowedAccessLevels: [
                 accessTypes.SuperUser,
@@ -347,7 +344,6 @@ function GetAllRoutes() {
         }),
         new RouteItem({
             id: "4",
-            showChildren: true,
             parentID: "0",
             title: "Data Import",
             route: '/DataImport',
@@ -361,7 +357,6 @@ function GetAllRoutes() {
         }),
         new RouteItem({
             id: "5",
-            showChildren: true,
             parentID: "0",
             title: "Project Planning",
             allowedAccessLevels: [
@@ -375,7 +370,7 @@ function GetAllRoutes() {
         new RouteItem({
             id: "5.1",
             parentID: "5",
-            title: "Project PLanning Drawer",
+            title: "Project Planning Drawer",
             route: '/Drawer',
             allowedAccessLevels: [
                 accessTypes.SuperUser,
@@ -413,7 +408,6 @@ function GetAllRoutes() {
         }),
         new RouteItem({
             id: "6",
-            showChildren: true,
             parentID: "0",
             title: "Tasks",
             route: '/Tasks',
@@ -428,7 +422,6 @@ function GetAllRoutes() {
         new RouteItem({
             id: "7",
             parentID: "0",
-            showChildren: true,
             title: "Floor Planning",
             allowedAccessLevels: [
                 accessTypes.SuperUser,
@@ -440,7 +433,7 @@ function GetAllRoutes() {
         }),
         new RouteItem({
             id: "7.1",
-            parentID: "8",
+            parentID: "7",
             title: "Floor Planning",
             route: '/FloorPlanning',
             allowedAccessLevels: [
@@ -453,7 +446,7 @@ function GetAllRoutes() {
         }),
         new RouteItem({
             id: "7.2",
-            parentID: "8",
+            parentID: "7",
             title: "Floor Planning 2D",
             route: '/FloorPlanning2D',
             allowedAccessLevels: [
@@ -467,7 +460,6 @@ function GetAllRoutes() {
         new RouteItem({
             id: "8",
             parentID: "0",
-            showChildren: true,
             title: "Clustering",
             route: '/Clustering',
             allowedAccessLevels: [
@@ -481,7 +473,6 @@ function GetAllRoutes() {
         new RouteItem({
             id: "9",
             parentID: "0",
-            showChildren: true,
             title: "Mapping",
             route: '/map',
             allowedAccessLevels: [

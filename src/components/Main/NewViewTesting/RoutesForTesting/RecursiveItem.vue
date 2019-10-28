@@ -38,7 +38,7 @@
           >
             <v-icon v-if="item.routeType == 0">folder</v-icon>
             <v-icon v-if="item.routeType == 1">insert_drive_file</v-icon>
-            <v-icon v-if="item.routeType == 2">folder</v-icon>
+            <v-icon v-if="item.routeType == 2">stars</v-icon>
             {{(idx + 1)}}.
             {{item.title}}
           </div>
