@@ -29,14 +29,6 @@ class RouteController {
     }
 }
 
-const accessTypes = {
-    SuperUser: 0,
-    Operations: 1,
-    Buyer: 2,
-    Supplier: 3,
-    Store: 4,
-}
-
 function GetAllRoutes() {
     let routes = [];
 
@@ -457,6 +449,14 @@ function GetAllRoutes() {
     );
     // Ranging
     return routes;
+}
+
+const accessTypes = {
+    SuperUser: 0,
+    Operations: 1,
+    Buyer: 2,
+    Supplier: 3,
+    Store: 4,
 }
 
 export default RouteController;
