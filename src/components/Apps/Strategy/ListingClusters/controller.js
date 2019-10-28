@@ -202,7 +202,8 @@ function accumulateCodes(tmpStoreData, stores, clusterData) {
     let cumulativeStoreDataSecondAndThirdLevel = tmpStoreData.filter((e, idx) => {
         return parseFloat(e.cumulativProductSales) >= percentageOfCumulative && parseFloat(e.cumulativProductSales) <= percentageOfCumulativeThird;
     })
-
+    console.log("stores",stores);
+    console.log("cumulativeStoreData", cumulativeStoreData);
     stores.forEach(store => {
         let storeCodeData = {
             storeCode: "",

@@ -14,9 +14,9 @@
                         <v-list-tile @click="openFile">
                             <v-list-tile-title>Open</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile @click="saveFile">
+                        <!-- <v-list-tile @click="saveFile">
                             <v-list-tile-title>Save</v-list-tile-title>
-                        </v-list-tile>
+                        </v-list-tile> -->
                         <v-list-tile @click="closeFile">
                             <v-list-tile-title>Close</v-list-tile-title>
                         </v-list-tile>
@@ -29,7 +29,7 @@
             </v-toolbar-title>
         </v-toolbar>
         <v-toolbar dark flat>
-            <v-toolbar-items v-if="selectedPlanogram!=null">
+            <v-toolbar-items >
                 <v-select label="Primary Cluster" style="margin-left: 10px; margin-top: 8px; width: 150px"
                     placeholder="Item Percentage" @change="onPercentChange" dense :items="primaryClusters"
                     v-model="primaryCluster" hide-details></v-select>
@@ -45,9 +45,7 @@
                     style="margin-left: 10px; margin-top: 8px; width: 150px" dense :items="levels" v-model="level"
                     hide-details>
                 </v-select>
-                <v-select style="margin-left: 10px; margin-top: 8px; width: 200px" :items="category"
-                    v-model="selectedCategory" placeholder="Select category" hide-details @change="runQuery">
-                </v-select>
+                
             </v-toolbar-items>
             <v-spacer></v-spacer>
             <span v-if=" selectedPlanogram !=null">{{ selectedPlanogram.displayname }} </span>
@@ -220,7 +218,8 @@
                 selectedBrands: null,
                 selectedPlanogramName: null,
                 selectedPlanogram: null,
-                selectedPeriod: null
+                selectedPeriod: null,
+                ProjectGroups: null,
             }
 
         },
@@ -232,8 +231,8 @@
                     // TODO add loader
                     Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${file.id}`)
                         .then(r => {
-                            console.log("openFile");
-                            console.log(r);
+                            //console.log("openFile");
+                            //console.log(r);
 
                             self.salesData = r.data.salesData;
                             self.selectedPlanogram = r.data.config.planogramData;
@@ -271,7 +270,7 @@
                 Axios.get(process.env.VUE_APP_API +
                         `SystemFile/JSON?db=CR-Devinspire&folder=Category Cluster&file=REPORT`)
                     .then(r => {
-                        console.log(r);
+                        //console.log(r);
 
                         callback(r.data);
                     })
@@ -359,23 +358,21 @@
             openDataSelector() {
                 let self = this
                 self.$refs.DataSelector.show(data => {
-                    console.log(data);
+                    //console.log(data);
                 })
             },
             newFile() {
                 let self = this;
 
-                self.$refs.PlanogramSelector.show(false, planogram => {
-                    self.$refs.DateRangeSelector.show(dateRange => {
-                        console.log(dateRange);
-                        self.selectedPlanogram = planogram
-                        console.log(self.selectedPlanogram);
+                // self.$refs.DateRangeSelector.show(dateRange => {
+                //     //console.log(dateRange);
+                //     //console.log(self.selectedPlanogram);
 
-                        // self.selectedPlanogram = planogram.planogram_ID
-                        // self.selectedPlanogramName = planogram.displayname
-                        self.selectedPeriod = dateRange;
-                    })
-                })
+                //     // self.selectedPlanogram = planogram.planogram_ID
+                //     // self.selectedPlanogramName = planogram.displayname
+                //     self.selectedPeriod = dateRange;
+                self.runQuery()
+                // })
             },
             onPercentChange() {
                 let self = this;
@@ -393,7 +390,7 @@
                         self.storeRowData = lcData.storeData;
                         self.stores = lcData.stores;
                         self.rowData = lcData.productData;
-
+                        self.ProjectGroups = lcData.ProjectGroups
                         self.setHeaders()
                         self.$refs.Spinner.hide()
                     }
@@ -401,106 +398,110 @@
             },
             setHeaders() {
                 let self = this;
-                console.log("setting Headers");
-
+                //console.log("setting Headers");
+                
                 let tmp = [{
-                    headerName: 'Category',
-                    field: 'category'
-                }, {
-                    headerName: 'Subcategory',
-                    field: 'subcategory'
-                }, {
-                    headerName: 'Brand',
-                    field: 'brand_Name'
-                }, {
-                    headerName: 'Manufacturer',
-                    field: 'manufacturer'
-                }, {
-                    headerName: 'Supplier',
-                    field: 'supplier'
-                }, {
-                    headerName: 'Size Description',
-                    field: 'size_Description'
-                }, {
-                    headerName: 'Sales',
-                    field: 'sales_Retail'
-                }]
-                console.log("self.stores");
-                console.log(self.stores);
+                        headerName: 'Store Name',
+                        field: 'storeName'
+                    },
+                    {
+                        headerName: 'Total Sales',
+                        field: 'totalStoreSales'
+                    },{
+                    headerName: 'Cumulative Sales',
+                    cellRendererFramework: "progressRenderer"
+                },
+                {
+                    headerName: 'Stack bar',
+                    cellRendererFramework: "DeptRenderer",
+                    width:220
 
-                self.stores.forEach(store => {
-                    tmp.push({
-                        headerName: store.storeName,
+                },
+                ]
+                self.ProjectGroups.forEach((projectGroup,idx) => {
+                
+                    
+                
+                 tmp.push({
+                        headerName: projectGroup.projectGroup,
                         children: [{
+                            headerName: "Ratio",
+                            field: projectGroup.projectGroup + "_ratio",
+                            width: 100,},
+                            {
                             headerName: "In Store",
-                            field: store.storeName + "_inStore",
-                            width: 50,
-                            cellStyle: function (params) {
-                                if (params.data.canHighlight) {
-                                    if (params.data[store.storeName + "_inStore"]) {
-                                        if (params.data.highlightLevel == 1) {
-                                            return {
-                                                backgroundColor: "#5ef35e86"
-                                            };
-                                        }
+                            field: projectGroup.projectGroup + "_inStore",
+                            width: 100,
+                            
+                            // cellStyle: function (params) {
+                            //     if (params.data.canHighlight) {
+                            //         if (params.data[projectGroup.projectGroup + "_inStore"]) {
+                            //             if (params.data.highlightLevel == 1) {
+                            //                 return {
+                            //                     backgroundColor: "#5ef35e86"
+                            //                 };
+                            //             }
 
-                                        if (params.data.highlightLevel == 2) {
-                                            return {
-                                                backgroundColor: "#5ef35e40"
-                                            };
-                                        }
+                            //             if (params.data.highlightLevel == 2) {
+                            //                 return {
+                            //                     backgroundColor: "#5ef35e40"
+                            //                 };
+                            //             }
 
-                                        if (params.data.highlightLevel == 3) {
-                                            return {
-                                                backgroundColor: "#5ef35e17"
-                                            };
-                                        }
-                                    }
+                            //             if (params.data.highlightLevel == 3) {
+                            //                 return {
+                            //                     backgroundColor: "#5ef35e17"
+                            //                 };
+                            //             }
+                            //         }
 
-                                    if (!params.data[store.storeName + "_inStore"]) {
-                                        return {
-                                            backgroundColor: "#ff9e9e91"
-                                        };
-                                    }
-                                }
-                            }
+                            //         if (!params.data[projectGroup.projectGroup + "_inStore"]) {
+                            //             return {
+                            //                 backgroundColor: "#ff9e9e91"
+                            //             };
+                            //         }
+                            //     }
+                            // }
                         }]
                     })
                 })
-                console.log(tmp);
 
                 self.headers = tmp;
+                console.log(self.headers);
+                
+
             },
             runQuery() {
                 let self = this
-                self.$nextTick(() => {
-                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                    self.$refs.Spinner.show()
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                self.$refs.Spinner.show()
 
-                    Axios.get(process.env.VUE_APP_API +
-                            `Cluster/CategoryClustering?Planogram_ID=${self.selectedPlanogram.planogram_ID}&level=${self.selectedCategory}&PeriodFrom=${self.selectedPeriod.dateFrom}&PeriodTo=${self.selectedPeriod.dateTo}`
-                        )
-                        .then(r => {
-                            console.log(r)
-                            self.salesData = r.data
-                            // self.rowData=r.data
-                            let lcData = ListingClusterController.GenerateClusterOutput({
-                                storeSalesData: r.data,
-                                primaryCluster: self.primaryCluster,
-                                secondaryCluster: self.secondaryCluster,
-                                clusterLevels: self.level,
-                                clusterGroups: self.group
-                            })
-                            console.log(lcData);
-                            self.storeRowData = lcData.storeData;
-                            self.rowData = lcData.productData;
-                            self.stores = lcData.stores;
-                            self.setHeaders()
-                            self.$refs.Spinner.hide()
+                Axios.get(process.env.VUE_APP_API +
+                        // `Cluster/DepartmentClustering?PeriodFrom=${self.selectedPeriod.dateFrom}&PeriodTo=${self.selectedPeriod.dateTo}`
+                        `Cluster/DepartmentClustering?PeriodFrom=53&PeriodTo=58`
+                    )
+                    .then(r => {
 
-                            // self.productRowData = lcData.productData;
+                        console.log(r)
+                        self.salesData = r.data
+
+                        let lcData = ListingClusterController.GenerateClusterOutput({
+                            storeSalesData: r.data,
+                            primaryCluster: self.primaryCluster,
+                            secondaryCluster: self.secondaryCluster,
+                            clusterLevels: self.level,
+                            clusterGroups: self.group
                         })
-                })
+                        console.log(lcData);
+                        self.storeRowData = lcData.storeData;
+                        self.rowData = lcData.ProjectGroupData;
+                        self.stores = lcData.stores;
+                        self.ProjectGroups = lcData.ProjectGroups
+                        console.log(lcData);
+
+                        self.setHeaders()
+                        self.$refs.Spinner.hide()
+                    })
             },
         }
     }
