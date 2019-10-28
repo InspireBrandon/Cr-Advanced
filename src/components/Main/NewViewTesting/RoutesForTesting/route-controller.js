@@ -50,8 +50,37 @@ function GetAllRoutes() {
         new RouteItem({
             id: "1.1",
             parentID: "1",
-            title: "View",
-            route: "/PlanogramImplementation",
+            title: "Requesting Approval",
+            allowedAccessLevels: [
+                accessTypes.SuperUser
+            ],
+            routeType: RouteType.Folder
+        }),
+        new RouteItem({
+            id: "1.1.1",
+            parentID: "1.1",
+            title: "Garden Accessories",
+            route: `/TestingView/PlanogramImplementationNew/2/1069/12`,
+            allowedAccessLevels: [
+                accessTypes.SuperUser
+            ],
+            routeType: RouteType.File
+        }),
+        new RouteItem({
+            id: "1.1.2",
+            parentID: "1.1",
+            title: "Adhesives and Sealants",
+            route: `/TestingView/PlanogramImplementationNew/28/1155/12`,
+            allowedAccessLevels: [
+                accessTypes.SuperUser
+            ],
+            routeType: RouteType.File
+        }),
+        new RouteItem({
+            id: "1.1.3",
+            parentID: "1.1",
+            title: "Beverages Refrigerated",
+            route: `/TestingView/PlanogramImplementationNew/85/293/12`,
             allowedAccessLevels: [
                 accessTypes.SuperUser
             ],
@@ -75,7 +104,7 @@ function GetAllRoutes() {
             allowedAccessLevels: [
                 accessTypes.SuperUser
             ],
-            routeType: RouteType.File
+            routeType: RouteType.Software
         }),
         new RouteItem({
             id: "1.4",
@@ -85,7 +114,7 @@ function GetAllRoutes() {
             allowedAccessLevels: [
                 accessTypes.SuperUser
             ],
-            routeType: RouteType.File
+            routeType: RouteType.Software
         }),
         new RouteItem({
             id: "2",

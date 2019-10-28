@@ -1012,6 +1012,11 @@
                         return prel.productID == ci.productID;
                       })
 
+                      if(productRecord.barcode == "10082716") {
+                        console.log(productRecord);
+                        console.log(ci.indicator)
+                      }
+
                       if (ci.indicator != "SELECTED") {
                         productRecord.store_Range_Indicator = ci.indicator
                         productRecord.store_Range_Indicator_ID = ci.indicator == "NO" ?
@@ -1255,7 +1260,6 @@
         Axios.get(process.env.VUE_APP_API + "Ranging/GetClusterData?planogramID=" + self.fileData.planogramID)
           .then(r => {
             let clusterData = r.data.clusterData;
-            self.rangingController.setClusterData(clusterData);
             self.currentClusterData = self.rangingController.getClusterData();
             self.setRangingClusterData(clusterData);
             outputObj.clusterMessage = "Success"
@@ -1263,6 +1267,7 @@
               outputObj.indicatorMessage = "Success";
               outputObj.currentLoading = 'indicators';
               outputObj.indicators = true;
+              self.rangingController.setClusterData(clusterData);
               self.sync_updatedIndicators(outputObj);
             });
           })

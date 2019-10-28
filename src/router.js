@@ -143,15 +143,15 @@ export default new Router({
       component: FloorPlanning2D
     },
     {
-      path: '/Menu',
+      path: '/',
       name: 'main',
       component: Main,
       children: [{
-          path: '/TestingView',
+          path: 'TestingView',
           name: 'TestingView',
           component: require('@/components/Main/NewViewTesting/NewView.vue').default,
           children: [{
-            path: '/PlanogramImplementation',
+            path: 'PlanogramImplementationNew/:projectTransactionID/:planogramID/:status',
             name: 'PlanogramImplementation',
             component: PlanogramImplementation,
           }]

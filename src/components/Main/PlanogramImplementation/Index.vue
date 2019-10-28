@@ -1,6 +1,6 @@
 <template>
-    <v-card>
-        <v-toolbar dense dark>
+    <v-card flat tile>
+        <v-toolbar dense dark flat>
             <!-- <v-btn color="primary" flat outline dark @click="openStoreView()" v-if="(currentPlanogram != null && selectedProject != null)">Store View </v-btn> -->
             <v-spacer></v-spacer>
             <v-toolbar-title>Planogram Implementation</v-toolbar-title>
