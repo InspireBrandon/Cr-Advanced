@@ -19,12 +19,17 @@
                     </tbody>
                 </table>
             </v-card-text>
+
+
+
         </v-card>
     </div>
 </template>
 
 <script>
     import Axios from 'axios';
+
+    import RouteController from '@/components/Main/NewViewTesting/RoutesForTesting/route-controller'
 
     export default {
         data() {
@@ -35,8 +40,19 @@
         created() {
             let self = this;
             self.getFiles();
+            self.getRoutes();
         },
         methods: {
+            getRoutes() {
+                let self = this;
+
+                let rc = new RouteController({
+                    userType: 0
+                })
+
+                console.log(rc.getRoutesByParentID("0"))
+                console.log(rc.getRoutesByParentID("1"))
+            },
             getFiles() {
                 let self = this;
 

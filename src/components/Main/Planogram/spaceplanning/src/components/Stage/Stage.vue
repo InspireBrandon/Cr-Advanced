@@ -1024,7 +1024,7 @@
 
         let ctrl_positioning = new PositioningBase();
         let dropPos = ctrl_positioning.GetTransformedMousePoint(stage)
-        console.log("TEXT HEADER ADD - STAGE", dropPos, self.MasterLayer);
+        // console.log("TEXT HEADER ADD - STAGE", dropPos, self.MasterLayer);
 
         let ctrl_textHeader = new TextHeaderNew(self.$store, stage, self.MasterLayer, JSON.parse(JSON.stringify(data)),
           self.$PixelToCmRatio,
@@ -1120,7 +1120,7 @@
         });
       },
       addNewPoduct(parentId, data, dropPos) {
-        console.log("[ADD PRODUCT]", data);
+        // console.log("[ADD PRODUCT]", data);
         let self = this;
         let stage = self.$refs.stage.getStage();
 
@@ -1201,7 +1201,7 @@
         ctrl_basket.Initialise(dropPos);
       },
       addNewSharebox(fixtureID, data, dropPos) {
-        console.log("sharbox data", data);
+        // console.log("sharbox data", data);
 
         let self = this;
         let stage = self.$refs.stage.getStage();
@@ -1391,7 +1391,7 @@
         // self.selectionData.selectedProductGroup.Visual_Selected();
       },
       event_reload_data_modal_saved(data) {
-        console.log("GONDOLA SAVED EVENT STAGE", data);
+        // console.log("GONDOLA SAVED EVENT STAGE", data);
         let self = this;
         switch (data.type.toUpperCase()) {
           case "GONDOLA": {
@@ -1409,7 +1409,7 @@
         case "PRODUCT": {
           let ctrl_store = new StoreHelper();
           let changed_product = ctrl_store.getPlanogramItemById(this.$store, data.id);
-          console.log('Product Changed', changed_product)
+          // console.log('Product Changed', changed_product)
           changed_product.ChangeDimensions(data.object);
           let allProducts = self.$parent.$refs.warehouse.products;
 
@@ -1421,7 +1421,7 @@
                 }
               }
 
-              console.log("[Changed Range Product]", el)
+              // console.log("[Changed Range Product]", el)
             }
           })
         }
@@ -1558,6 +1558,7 @@
         console.log("SHELF ADD - STAGE", dropPos);
         ctrl_intersectionTester.TestIntersectsWithMany(stage, "PRODUCT", ["SHELF", "BASE", "PEGBAR", "PEGBOARD",
               "BASKET",
+              "PEG",
               "PALETTE",
               "LABELHOLDER",
               "SHAREBOX"

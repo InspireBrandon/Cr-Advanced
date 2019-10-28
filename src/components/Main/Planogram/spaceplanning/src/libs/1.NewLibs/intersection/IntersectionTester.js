@@ -113,6 +113,8 @@ class IntersectionTester {
   TestIntersectsWithMany(stage, ItemType, TypeArr, VueStore, dropPosPossibility) {
     let self = this;
 
+    console.log("BECAUSE INTERSECTION???")
+
     let dropPos = null;
 
     if (dropPosPossibility == null) {
@@ -145,6 +147,13 @@ class IntersectionTester {
           if (basketIntrsct != undefined && basketIntrsct.intersects == true) {
             hasIntersection = true;
             resolve(basketIntrsct);
+            return;
+          }
+
+          var pegIntrsct = results.find(x => x.Type == "PEG");
+          if(pegIntrsct != undefined && pegIntrsct.intersects == true) {
+            hasIntersection = true;
+            resolve(pegIntrsct);
             return;
           }
 
@@ -373,9 +382,11 @@ class IntersectionTester {
     let self = this;
     let dropPos = self.GetTransformedMousePoint(stage);
 
+    console.log("INTERSECTION")
+
     return new Promise((resolve) => {
       let promiseArr = [];
-      let types = ["GONDOLA", "SHELF", "BASE", "BASKET", "PEGBAR", "PEGBOARD", "DIVIDER", "AREA", "SHAREBOX"];
+      let types = ["GONDOLA", "SHELF", "BASE", "BASKET", "PEGBAR", "PEGBOARD", "DIVIDER", "AREA", "SHAREBOX", "PEG"];
 
       promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "GONDOLA", dropPos));
       promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "AREA", dropPos));
@@ -386,6 +397,7 @@ class IntersectionTester {
       promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "LABELHOLDER", dropPos));
       promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "PEGBOARD", dropPos));
       promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "BASKET", dropPos));
+      promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "PEG", dropPos));
       promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "DIVIDER", dropPos));
       promiseArr.push(self.TestIntersectsWithItem(stage, ItemType, "SHAREBOX", dropPos));
 

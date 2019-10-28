@@ -8,6 +8,7 @@ import ShelfNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLi
 import BaseNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/BaseShelf.js";
 import PegboardNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PegboardBase.js";
 import PegBarNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PegBarBase.js";
+import PegNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PegBase.js";
 import BasketNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/BasketBase.js";
 import ShareboxNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/BasketBase.js";
 import AreaNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/AreaBase.js";
@@ -160,6 +161,20 @@ class CloneBase {
     break;
     case "PEGBAR": {
       self.ClonePegbar(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item)
+        .then(newItem => {
+          childrenItemArr.forEach(childItem => {
+            self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
+          });
+
+          if (childrenItemArr.length == 0) {
+            afterCloneCallBack();
+          }
+        })
+
+    }
+    break;
+    case "PEG": {
+      self.ClonePeg(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item)
         .then(newItem => {
           childrenItemArr.forEach(childItem => {
             self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
@@ -449,6 +464,43 @@ class CloneBase {
       // start drag,
       // only start the drag on the root element being cloned
       if (self.cloneRootType == "PEGBAR") {
+        ctrl_item.Group.startDrag();
+      }
+
+      if (current_item != null) {
+        ctrl_item.Group.setX(current_item.Group.getX());
+        ctrl_item.Group.setY(current_item.Group.getY());
+        ctrl_item.LastPositionRelative = ctrl_item.Group.position();
+        ctrl_item.LastPositionAbsolute = ctrl_item.Group.getAbsolutePosition();
+        ctrl_item.PositionElement();
+      }
+
+      resolve(ctrl_item);
+    });
+  }
+
+  ClonePeg(stage, VueStore, MasterLayer, pixelRatio, parentID, data, dropPos, current_item, prev_original_item, prev_clone_item) {
+    let self = this;
+
+    return new Promise((resolve) => {
+      let ctrl_item = new PegNew(
+        VueStore,
+        stage,
+        MasterLayer,
+        data,
+        pixelRatio,
+        "PEG",
+        prev_clone_item == null ? parentID : prev_clone_item.ID
+      );
+
+      //#region Set the same configs
+      ctrl_item.Config = current_item.Config;
+      //#endregion
+
+      ctrl_item.Initialise(dropPos, false);
+      // start drag,
+      // only start the drag on the root element being cloned
+      if (self.cloneRootType == "PEG") {
         ctrl_item.Group.startDrag();
       }
 

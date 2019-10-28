@@ -217,20 +217,20 @@
                                     </v-list>
                                   </v-menu>
                                   <div class="subheading">Front</div>
-                                  <v-card style="text-align: center;" light @contextmenu="showImageMenu($event, 1)">
-                                    <img class="product-image" :src="image1" alt="" @click="openFile(1)">
+                                  <v-card style="text-align: center;" @click="openFile(1)" light @contextmenu="showImageMenu($event, 1)">
+                                    <img class="product-image" :src="image1" alt="" >
                                   </v-card>
                                 </v-flex>
                                 <v-flex md4 sm4>
                                   <div class="subheading">Side</div>
-                                  <v-card style="text-align: center;" light @contextmenu="showImageMenu($event, 2)">
-                                    <img class="product-image" :src="image2" alt="" @click="openFile(2)">
+                                  <v-card style="text-align: center;" light @click="openFile(2)" @contextmenu="showImageMenu($event, 2)">
+                                    <img class="product-image" :src="image2" alt="">
                                   </v-card>
                                 </v-flex>
                                 <v-flex md4 sm4>
                                   <div class="subheading">Top</div>
-                                  <v-card style="text-align: center;" light @contextmenu="showImageMenu($event, 3)">
-                                    <img class="product-image" :src="image3" alt="" @click="openFile(3)">
+                                  <v-card style="text-align: center;" light @click="openFile(3)" @contextmenu="showImageMenu($event, 3)">
+                                    <img class="product-image" :src="image3" alt="">
                                   </v-card>
                                 </v-flex>
                                 <v-flex md4 v-if="product_type == 0">

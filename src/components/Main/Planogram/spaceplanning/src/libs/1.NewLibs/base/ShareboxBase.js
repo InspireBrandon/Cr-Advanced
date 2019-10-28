@@ -350,7 +350,6 @@ class ShareboxBase extends PlanogramItemBase {
   }
 
   AdjustBarPosition() {
-
   }
 }
 
