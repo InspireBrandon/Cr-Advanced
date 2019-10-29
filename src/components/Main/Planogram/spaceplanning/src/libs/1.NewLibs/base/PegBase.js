@@ -80,6 +80,10 @@ class PegBase extends PlanogramItemBase {
                     prevParent.PositionElement();
                 }
 
+                console.log("PEG INTRSCT", intersects);
+                self.Group.setX(intersects.ContainerPosition.x)
+                self.Group.setY(0);
+                
                 ctrl_position.PositionToParent(self.VueStore, null, self.ParentID) // IMPORTANT!
 
                 self.ParentID = intersects.ID;
@@ -104,6 +108,8 @@ class PegBase extends PlanogramItemBase {
         let ctrl_label = new LabelHelper();
         ctrl_label.SetNewLabelAndPositionNumbers(self.VueStore);
 
+        self.Group.setY(0);
+        
         self.LastPositionRelative = self.Group.position();
         self.LastPositionAbsolute = self.Group.getAbsolutePosition();
 
