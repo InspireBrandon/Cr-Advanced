@@ -73,7 +73,6 @@ export default {
     });
 
     self.items = rc.getRoutesByParentID(self.parentID);
-    console.log(self.items);
     // route controller to get all items by parent id
   },
   methods: {
