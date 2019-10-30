@@ -143,28 +143,34 @@ export default new Router({
       component: FloorPlanning2D
     },
     {
-      path: '/TestingView',
-      name: RouteConfig.APPLICATION_NAME_1.NAME,
-      component: require('@/components/Main/NewViewTesting/NewView.vue').default,
-    },
-    {
-      path: "/menu-second",
-      name: RouteConfig.APPLICATION_NAME_2.NAME,
-      components: require('@/components/Main/NewViewTesting/NewView.vue')
-    },
-    {
-      path: '/Menu',
+      path: '/',
       name: 'main',
       component: Main,
       children: [{
+          path: 'TestingView',
+          name: 'TestingView',
+          component: require('@/components/Main/NewViewTesting/NewView.vue').default,
+          children: [{
+            path: '',
+            name: 'PlanogramImplementation',
+            component: Apps,
+          },{
+            path: 'PlanogramImplementationNew/:projectTransactionID/:planogramID/:status',
+            name: 'PlanogramImplementation',
+            component: PlanogramImplementation,
+          }]
+        },
+        {
           path: '/map',
           name: 'map',
           component: map
-        }, {
+        },
+        {
           path: '/map2',
           name: 'map2',
           component: map2
-        }, {
+        },
+        {
           path: '/ProductListing',
           name: 'ProductListing',
           component: ProductListing

@@ -549,8 +549,12 @@
       submit() {
         let self = this;
 
-        self.form.color = self.form.color.hex;
-        self.form.pegHoleColor = self.form.pegHoleColor.hex;
+        console.log(self.form.color);
+
+        self.form.color = self.form.color.hex == undefined ? '#fff' : self.form.color.hex;
+        self.form.pegHoleColor = self.form.pegHoleColor.hex == undefined ? "#000" : self.form.pegHoleColor.hex;
+
+        console.log(this.isAdd)
 
         if (this.isAdd) {
           axios.post(process.env.VUE_APP_API + "Fixture?db=CR-Devinspire", self.form)

@@ -158,6 +158,58 @@ class PlanogramItemBase {
         y: dropPos.y,
         draggable: true
       })
+    } else if (self.Type.toUpperCase() == "PEG") {
+      self.Group = new Konva.Group({
+        id: self.Type + '_master_group_' + self.ID,
+        name: self.Type + '_master_group',
+        x: dropPos.x,
+        y: dropPos.y,
+        draggable: true,
+        dragBoundFunc: function (pos) {
+          let dragPos = pos;
+          let stagePos = self.Stage.position();
+
+          let ctrl_store = new StoreHelper();
+          let gondola = ctrl_store.getPlanogramItemById(self.VueStore, self.ParentID);
+
+          // console.log("DRAGBOUND:", "STAGE", self.Stage.position(), "GONDOLA", gondola.Group.getAbsolutePosition(), "DRAG POS", pos, "NEW POS", dragPos);
+
+          let x = gondola.Group.getX() + gondola.Group.getWidth() - (self.Data.width * self.Ratio);
+          let y = this.getAbsolutePosition().y;
+
+          //#region Pop out of gondola
+          if (dragPos.y > (gondola.Group.getAbsolutePosition().y + (self.TotalHeight / 2))) {
+            y = dragPos.y;
+          }
+
+          if (dragPos.y < gondola.Group.getAbsolutePosition().y - (self.TotalHeight / 2)) {
+             y = dragPos.y;
+          }
+          //#endregion Pop out of gondola
+
+          // // TEST UPPER BOUND
+          // if (pos.x < gondola.Group.getAbsolutePosition().x) { // outside the top of the gondola
+          //   return {
+          //     x: gondola.Group.getAbsolutePosition().x,
+          //     y: y
+          //   }
+          // }
+
+          // // TEST LOWER BOUND
+          // let xLowerBound = gondola.Group.getAbsolutePosition().x + ((gondola.Group.getWidth() * self.Stage.scaleX()) - ((self.Data.width * self.Ratio) * self.Stage.scaleX()));
+          // if (pos.x > xLowerBound) {
+          //   return {
+          //     x: xLowerBound,
+          //     y: y
+          //   }
+          // }
+
+          return {
+            x: pos.x,
+            y: y
+          }
+        }
+      })
     } else if (self.Type.toUpperCase() == "BASKET" || self.Type.toUpperCase() == "DIVIDER" || self.Type.toUpperCase() == "PRODUCT" || self.Type.toUpperCase() == "LABELHOLDER" || self.Type.toUpperCase() == "SHAREBOX") {
       self.Group = new Konva.Group({
         id: self.Type + '_master_group_' + self.ID,
@@ -166,7 +218,8 @@ class PlanogramItemBase {
         y: dropPos.y,
         draggable: true
       })
-    } else {
+    } 
+    else {
       self.Group = new Konva.Group({
         id: self.Type + '_master_group_' + self.ID,
         name: self.Type + '_master_group',
@@ -223,7 +276,7 @@ class PlanogramItemBase {
             y: pos.y
           }
         }
-      })
+      }) 
     }
 
     if (self.ParentID == undefined || self.ParentID == null) {
@@ -1670,7 +1723,8 @@ class PlanogramItemBase {
       fontSize: 10,
       padding: 0.5,
       fill: 'black',
-      transformsEnabled: 'position'
+      transformsEnabled: 'position',
+      listening: false
     })
 
     self.SetTextLabelPosition();
