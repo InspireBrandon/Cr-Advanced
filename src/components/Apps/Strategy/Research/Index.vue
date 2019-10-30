@@ -409,8 +409,8 @@
         if (self.hasCoordinates) {
             let coordsSplit = data.coordinates.split(", ");
 
-            self.xCoordinate = parseFloat(coordsSplit[0]);
-            self.yCoordinate = parseFloat(coordsSplit[1]);
+            self.xCoordinate = parseFloat(coordsSplit[1]);
+            self.yCoordinate = parseFloat(coordsSplit[0]);
         } else {
             self.xCoordinate = null;
             self.yCoordinate = null;

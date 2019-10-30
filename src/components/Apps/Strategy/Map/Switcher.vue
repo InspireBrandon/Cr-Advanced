@@ -1,97 +1,132 @@
 <template>
     <div>
-        <v-toolbar color='grey darken-3' dense flat dark>
+        <v-toolbar color="grey darken-3" dense flat dark>
             <v-menu dark offset-y>
-                <v-btn slot="activator" flat>
-                    Setup
-                </v-btn>
+                <v-btn slot="activator" flat>Setup</v-btn>
                 <v-list>
-                    <v-list-tile @click="sharedDialog(1)">
+                    <v-list-tile @click="openRetailerModal()">
                         <v-list-tile-title>Locations</v-list-tile-title>
                     </v-list-tile>
-                    <v-list-tile @click="sharedDialog(2)">
+                    <v-list-tile @click="linkRetailerStore()">
                         <v-list-tile-title>Link Retailer Stores</v-list-tile-title>
                     </v-list-tile>
-                    <v-list-tile @click="getHinterlandStores">
-                        <v-list-tile-title>Link Supplier</v-list-tile-title>
+                    <v-list-tile @click="openRetailerSupplierStorDialog()">
+                        <v-list-tile-title>Link Supplier Stores</v-list-tile-title>
                     </v-list-tile>
                 </v-list>
             </v-menu>
             <v-menu dark offset-y>
-                <v-btn slot="activator" flat>
-                    Image
-                </v-btn>
+                <v-btn slot="activator" flat>Image</v-btn>
                 <v-list>
-                    <v-list-tile @click="saveFile">
+                    <v-list-tile @click="mapImageAdd()">
                         <v-list-tile-title>Add</v-list-tile-title>
                     </v-list-tile>
-                    <v-list-tile @click="openFile">
+                    <v-list-tile @click="showSelector()">
                         <v-list-tile-title>Manage</v-list-tile-title>
                     </v-list-tile>
                 </v-list>
             </v-menu>
+
+            <v-btn flat @click="importDialog = true">Import</v-btn>
+
             <v-spacer></v-spacer>
             <v-toolbar-title>Maps</v-toolbar-title>
         </v-toolbar>
-        <v-dialog v-model="dialog" >
+        <v-dialog v-model="importDialog">
             <v-card>
                 <v-toolbar dark color="primary">
-
-                    <v-toolbar-title>{{dialogHeader}}</v-toolbar-title>
+                    <!-- <v-toolbar-title>Supplier Import</v-toolbar-title> -->
                     <v-spacer></v-spacer>
-                    <v-btn icon dark @click="dialog = false">
+                    <v-btn icon dark @click="importDialog = false">
                         <v-icon>close</v-icon>
                     </v-btn>
                 </v-toolbar>
             </v-card>
-            <Research style="overflow: hidden; scroll:no" v-if='showItem == 1' ref="Research" />
-            <LinkStores v-if='showItem == 2' ref="LinkStores" />
+            <Research style="overflow: hidden; scroll:no" ref="Research" />
         </v-dialog>
+        <RetailerImportModal ref="RetailerImportModal" />
+        <LinkRetailerStore ref="LinkRetailerStore" />
         <MapComponent ref="MapComponent" />
+        <MapImageSelector ref="MapImageSelector" />
+        <RetailerSupplierStoreDialog ref="RetailerSupplierStoreDialog" />
+        <MapImageAdd ref="MapImageAdd" />
     </div>
-
 </template>
 <script>
-    import Research from '../Research/Index'
-    import LinkStores from "../Research/LinkStores" 
+    import Research from "../Research/Index";
+    import LinkStores from "../Research/LinkStores";
+    import RetailerImportModal from "../Main/RetailerImportModal";
+    import LinkRetailerStore from "../Main/LinkRetailerStores/Index";
+    import RetailerSupplierStoreDialog from "../Research/RetailerSupplierStore/RetailerSupplier";
+    import MapImageSelector from "./MapImageSelector";
+    import MapImageAdd from "../Main/MapImageModal"
 
-    import MapComponent from "./Index"
+    import MapComponent from "./Index";
     export default {
         components: {
             MapComponent,
             Research,
-            LinkStores
+            LinkStores,
+            RetailerImportModal,
+            LinkRetailerStore,
+            RetailerSupplierStoreDialog,
+            MapImageSelector,
+            MapImageAdd
         },
         data() {
             return {
-                dialog: false,
+                importDialog: false,
                 showItem: 0,
-                dialogHeader: ''
-            }
-
+                dialogHeader: ""
+            };
         },
         methods: {
-            sharedDialog(item) {
+            openRetailerModal() {
+                let self = this;
+                self.$refs.RetailerImportModal.open(callback => {});
+            },
+            mapImageSelector() {
+                let self = this;
+                self.$refs.MapImageSelector.show(callback => {});
+            },
+            mapImageAdd() {
+                let self = this;
+                self.$refs.MapImageAdd.open(true, null,callback => {});
+            },
+            openRetailerSupplierStorDialog() {
+                let self = this;
+
+                self.$refs.RetailerSupplierStoreDialog.show();
+            },
+
+            linkRetailerStore() {
+                let self = this;
+                self.$refs.LinkRetailerStore.show(() => {});
+            },
+            showSelector() {
+                let self = this;
+                self.$refs.MapImageSelector.show(callback => {
+                    console.log(callback);
+
+                    self.openMapImageModal(false, callback,anything=>{})
+                    // self.selectedmap=callback.id
+                    // self.onMapChange()
+                })
+            },
+            openMapImageModal(type, item) {
                 let self = this
-                if (item == 1) {
-                    self.showItem = 1;
-                    self.dialog = true;
-                    self.dialogHeader = 'Locations';
-                }
-                if (item == 2) {
-                    self.showItem = 2;
-                    self.dialog = true;
-                    self.dialogHeader = 'Link Retailer Stores';
-                }
-            }
+                self.$refs.MapImageAdd.open(type, item, callback => {
+                    
+                })
+            },
         }
-    }
+    };
 </script>
 
 
 
 
-        <!-- 
+<!-- 
         Old Code !!!!
         <v-toolbar  dense dark flat color="grey darken-2">
             <v-toolbar-title>
