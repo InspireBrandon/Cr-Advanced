@@ -8,6 +8,7 @@
 
                 <v-select style="margin-left: 10px; margin-top: 8px; width: 200px" placeholder="Values" hide-details>
                 </v-select>
+        
             </v-toolbar-items>
         </v-toolbar>
         <div oncontextmenu="return false;" class="mapContainer">
