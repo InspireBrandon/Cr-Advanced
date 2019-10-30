@@ -424,7 +424,8 @@ class GeneralPosition {
           });
 
           if (currentItem != null) {
-            let y = parent.Group.getHeight() - (currentItem.TotalHeight);
+            // let y = ;
+            let y = parent.Group.getHeight() - (currentItem.TotalHeight) + (parent.Data.productOffset == undefined ? 0 : parent.Data.productOffset) * -1;
             currentItem.Group.setY(y);
 
             currentItem.LastPositionRelative = currentItem.Group.position();
@@ -605,10 +606,10 @@ class GeneralPosition {
         let cascade = parent.Data.productCascade == undefined || parent.Data.productCascade == null ? 0 : parent.Data.productCascade;
 
         // Calculate Y
-        if(idx > 0) {
+        if (idx > 0) {
           y += cascade;
         }
-        
+
         productGroup.Group.setY(y);
       })
 
@@ -631,14 +632,21 @@ class GeneralPosition {
           let x = merchOffset;
           sortedArr.forEach((item, idx) => {
             item.Position = idx + 1;
-            item.Group.setX(x);
-            item.LastPositionRelative = item.Group.position();
-            item.LastPositionAbsolute = item.Group.getAbsolutePosition();
 
             if (item.Type == "PRODUCT") {
+              item.Group.setX(x);
+              item.LastPositionRelative = item.Group.position();
+              item.LastPositionAbsolute = item.Group.getAbsolutePosition();
               let actualWidth = item.Orientation_Width * item.Facings_X;
               x += ((actualWidth - (item.Facings_X * squish))) + 0.1;
+            } else if (item.Type == "PEG") {
+              // item.Group.setX(x);
+              item.LastPositionRelative = item.Group.position();
+              item.LastPositionAbsolute = item.Group.getAbsolutePosition();
             } else {
+              item.Group.setX(x);
+              item.LastPositionRelative = item.Group.position();
+              item.LastPositionAbsolute = item.Group.getAbsolutePosition();
               let actualWidth = item.TotalWidth;
               x += (actualWidth) + 0.1;
             }
@@ -783,9 +791,21 @@ class GeneralPosition {
           item.LastPositionAbsolute = item.Group.getAbsolutePosition();
 
           if (item.Type == "PRODUCT") {
+            item.Group.setX(x);
+            item.LastPositionRelative = item.Group.position();
+            item.LastPositionAbsolute = item.Group.getAbsolutePosition();
+            let actualWidth = item.Orientation_Width * item.Facings_X;
             x += ((actualWidth - (item.Facings_X * squish))) + 0.1;
+          } else if (item.Type == "PEG") {
+            // item.Group.setX(x);
+            item.LastPositionRelative = item.Group.position();
+            item.LastPositionAbsolute = item.Group.getAbsolutePosition();
           } else {
-            x += (actualWidth - (item.Facings_X * squish)) + 0.1;
+            item.Group.setX(x);
+            item.LastPositionRelative = item.Group.position();
+            item.LastPositionAbsolute = item.Group.getAbsolutePosition();
+            let actualWidth = item.TotalWidth;
+            x += (actualWidth) + 0.1;
           }
 
         });

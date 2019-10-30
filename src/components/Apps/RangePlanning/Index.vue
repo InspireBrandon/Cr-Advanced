@@ -1012,16 +1012,15 @@
                         return prel.productID == ci.productID;
                       })
 
-                      if(productRecord.barcode == "10082716") {
-                        console.log(productRecord);
-                        console.log(ci.indicator)
-                      }
-
                       if (ci.indicator != "SELECTED") {
                         productRecord.store_Range_Indicator = ci.indicator
                         productRecord.store_Range_Indicator_ID = ci.indicator == "NO" ?
                           0 :
                           1;
+                        productRecord["updated"] = true;
+                      } else {
+                        productRecord.store_Range_Indicator = "NO";
+                        productRecord.store_Range_Indicator_ID = 0;
                         productRecord["updated"] = true;
                       }
                     }
@@ -1061,7 +1060,9 @@
                   storeID: tmpCs.storeID,
                   storeName: tmpCs.storeName,
                   clusterID: tmpSc.clusterID,
-                  clusterName: tmpSc.clusterName
+                  clusterName: tmpSc.clusterName,
+                  oldClusterID: current.clusterID,
+                  oldClusterName: current.clusterName
                 })
               }
             }
@@ -1102,6 +1103,38 @@
       checkCustomClusters(descreps) {
         let self = this;
 
+        // remove duplicate clusters
+        let finalCC = [];
+        let finalCCOld = [];
+
+        self.currentClusterData.customClusters.forEach(tc => {
+          let canAdd = true;
+
+          finalCC.forEach(final => {
+            if (tc.clusterID == final.clusterID)
+              canAdd = false;
+          })
+
+          if (canAdd)
+            finalCC.push(tc);
+        })
+
+        self.currentClusterData.customClusters = finalCC;
+
+        self.tmpClusters.customClusters.forEach(tc => {
+          let canAdd = true;
+
+          finalCCOld.forEach(final => {
+            if (tc.clusterID == final.clusterID)
+              canAdd = false;
+          })
+
+          if (canAdd)
+            finalCCOld.push(tc);
+        })
+
+        self.tmpClusters.customClusters = finalCCOld;
+
         self.tmpClusters.customClusters.forEach(tmpCc => {
           tmpCc.clusterStores.forEach(tmpCs => {
             let current = self.currentClusterData.customClusters.find(el => {
@@ -1118,12 +1151,16 @@
               })
 
               if (!hasStore) {
+                let newCluster = self.getNewCluster("custom", tmpCs.storeID);
+
                 descreps.push({
                   type: "custom",
                   storeID: tmpCs.storeID,
                   storeName: tmpCs.storeName,
-                  clusterID: tmpSc.clusterID,
-                  clusterName: tmpSc.clusterName
+                  clusterID: tmpCc.clusterID,
+                  clusterName: tmpCc.clusterName,
+                  newClusterID: newCluster.clusterID,
+                  newClusterName: newCluster.clusterName
                 })
               }
             }
@@ -1211,17 +1248,37 @@
               })
 
               if (!hasStore) {
+                let newCluster = self.getNewCluster("store", tmpCs.storeID);
+
                 descreps.push({
                   type: "store",
                   storeID: tmpCs.storeID,
                   storeName: tmpCs.storeName,
                   clusterID: tmpSc.clusterID,
-                  clusterName: tmpSc.clusterName
+                  clusterName: tmpSc.clusterName,
+                  newClusterID: newCluster.clusterID,
+                  newClusterName: newCluster.clusterName,
                 })
               }
             }
           })
         })
+      },
+      getNewCluster(type, storeID) {
+        let self = this;
+
+        let cluster = null;
+
+        self.currentClusterData[type + "Clusters"].forEach(el => {
+          let storeFind = el.clusterStores.find(cs => {
+            return cs.storeID == storeID;
+          })
+
+          if (storeFind != undefined && storeFind != null)
+            cluster = el;
+        })
+
+        return cluster;
       },
       notifyClusterStores(clusterType, cluster, store) {
         // console.log(`Checking ${clusterType} - ${cluster} for store: ${store}`);
@@ -1260,6 +1317,7 @@
         Axios.get(process.env.VUE_APP_API + "Ranging/GetClusterData?planogramID=" + self.fileData.planogramID)
           .then(r => {
             let clusterData = r.data.clusterData;
+            self.rangingController.setClusterData(clusterData);
             self.currentClusterData = self.rangingController.getClusterData();
             self.setRangingClusterData(clusterData);
             outputObj.clusterMessage = "Success"
@@ -1267,7 +1325,6 @@
               outputObj.indicatorMessage = "Success";
               outputObj.currentLoading = 'indicators';
               outputObj.indicators = true;
-              self.rangingController.setClusterData(clusterData);
               self.sync_updatedIndicators(outputObj);
             });
           })

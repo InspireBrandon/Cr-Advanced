@@ -24,10 +24,8 @@
 
 <script>
 import Axios from "axios";
-// import Button from './button.vue';
-
 import { AgGridVue } from "ag-grid-vue";
-    import Button from './button.vue';
+import Button from "./button.vue";
 
 export default {
   props: ["rowData"],
@@ -39,22 +37,13 @@ export default {
     return {
       gridOptions: {
         rowHeight: 35,
-        pinnedTopRowData: [],
-        pinnedBottomRowData: [],
         context: {
           componentParent: this
         },
         afterFilterChanged: () =>
           console.log("gridOptions.api.inMemoryRowController.rowsAfterFilter")
       },
-      defaultColDef: {
-        onCellValueChanged: this.UpdateLine
-      },
-      gridOptions: {
-        context: {
-          componentParent: this
-        }
-      }
+      defaultColDef: {}
     };
   },
   beforeMount() {
@@ -66,8 +55,6 @@ export default {
       let self = this;
       self.gridApi = params.api;
       self.columnApi = params.columnApi;
-      self.gridApi.resetRowHeights();
-      self.gridApi.sizeColumnsToFit();
     }
   }
 };

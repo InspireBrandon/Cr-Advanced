@@ -151,6 +151,10 @@ export default new Router({
           name: 'TestingView',
           component: require('@/components/Main/NewViewTesting/NewView.vue').default,
           children: [{
+            path: '',
+            name: 'PlanogramImplementation',
+            component: Apps,
+          },{
             path: 'PlanogramImplementationNew/:projectTransactionID/:planogramID/:status',
             name: 'PlanogramImplementation',
             component: PlanogramImplementation,
