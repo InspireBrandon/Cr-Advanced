@@ -14,9 +14,9 @@
                         <v-list-tile @click="openFile">
                             <v-list-tile-title>Open</v-list-tile-title>
                         </v-list-tile>
-                        <!-- <v-list-tile @click="saveFile">
+                        <v-list-tile @click="saveFile" v-if="selectedProjectGroup!=null">
                             <v-list-tile-title>Save</v-list-tile-title>
-                        </v-list-tile> -->
+                        </v-list-tile>
                         <v-list-tile @click="closeFile">
                             <v-list-tile-title>Close</v-list-tile-title>
                         </v-list-tile>
@@ -29,10 +29,14 @@
             </v-toolbar-title>
         </v-toolbar>
         <v-toolbar dark flat>
-            <v-toolbar-items >
+            <v-toolbar-items>
+                <v-select label="Project Group" style="margin-left: 10px; margin-top: 8px;" dense
+                    :items="projectsGroupItems" v-model="selectedProjectGroup" return-object hide-details>
+                </v-select>
                 <v-select label="Primary Cluster" style="margin-left: 10px; margin-top: 8px; width: 150px"
                     placeholder="Item Percentage" @change="onPercentChange" dense :items="primaryClusters"
-                    v-model="primaryCluster" hide-details></v-select>
+                    v-model="primaryCluster" hide-details>
+                </v-select>
                 <v-select @change="onPercentChange" v-if="primaryCluster != 10" label="Secondary Cluster"
                     style="margin-left: 10px; margin-top: 8px; width: 150px" placeholder="Item Percentage" dense
                     :items="secondaryClusters" v-model="secondaryCluster" hide-details>
@@ -45,7 +49,9 @@
                     style="margin-left: 10px; margin-top: 8px; width: 150px" dense :items="levels" v-model="level"
                     hide-details>
                 </v-select>
-                
+
+
+
             </v-toolbar-items>
             <v-spacer></v-spacer>
             <span v-if=" selectedPlanogram !=null">{{ selectedPlanogram.displayname }} </span>
@@ -55,7 +61,7 @@
                     Store
                 </v-btn>
                 <v-btn class="elevation-0" style="width: 100px" round @click="changeView(1)" color="primary">
-                    Product
+                    Categories
                 </v-btn>
             </v-btn-toggle>
             <v-spacer></v-spacer>
@@ -87,7 +93,11 @@
 
     // import PlanogramSelector from '../ListingClusters/PlanogramSelector'
     import DataSelector from "./DataSelector"
-
+    const formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2
+    })
     export default {
         components: {
             FileSelector,
@@ -100,6 +110,8 @@
         },
         data() {
             return {
+                projectsGroupItems: [],
+                selectedProjectGroup: null,
                 storeRowData: [],
                 selectedView: 1,
                 headers: [],
@@ -223,7 +235,29 @@
             }
 
         },
+        mounted() {
+            this.getProjectGroups()
+        },
         methods: {
+
+            getProjectGroups() {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.get(process.env.VUE_APP_API + "ProjectGroup").then(r => {
+                    console.log(r);
+                    self.projectsGroupItems = [{
+                        text: "Group Overview",
+                        value: 0
+                    }]
+                    r.data.projectGroupList.forEach(group => {
+                        self.projectsGroupItems.push({
+                            text: group.name,
+                            value: group.id
+                        })
+                    })
+                })
+
+            },
             openFile() {
                 let self = this;
 
@@ -280,10 +314,10 @@
                 self.getFile(fileTransaction => {
                     if (fileTransaction == null || fileTransaction == false) {
                         let tmp = {
-                            CategoryClustering: {},
+                            DepartmentClustering: {},
                             salesData: self.salesData,
                             config: {
-                                planogramData: self.selectedPlanogram,
+                                selectedProjectGroup: self.selectedProjectGroup,
                                 periodData: self.selectedPeriod,
                                 setup: {
                                     primaryCluster: self.primaryCluster,
@@ -294,22 +328,22 @@
                             }
                         }
 
-                        tmp.CategoryClustering[self.selectedPlanogram.displayname] = self.storeRowData;
+                        tmp.DepartmentClustering[self.selectedProjectGroup.text] = self.storeRowData;
 
                         self.appendAndSaveFile(tmp);
                     } else {
                         self.getFileData(fileTransaction.id, fileData => {
                             let tmp = fileData;
 
-                            if (tmp.CategoryClustering == undefined) {
-                                tmp.CategoryClustering = {};
+                            if (tmp.DepartmentClustering == undefined) {
+                                tmp.DepartmentClustering = {};
                             }
 
-                            tmp.CategoryClustering[self.selectedPlanogram.displayname] = self
+                            tmp.DepartmentClustering[self.selectedProjectGroup.text] = self
                                 .storeRowData;
                             tmp.salesData = self.salesData,
                                 tmp.config = {
-                                    planogramData: self.selectedPlanogram,
+                                    selectedProjectGroup: self.selectedProjectGroup,
                                     periodData: self.selectedPeriod,
                                     setup: {
                                         primaryCluster: self.primaryCluster,
@@ -338,8 +372,8 @@
                 Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
                         SystemFile: {
                             SystemUser_ID: -1,
-                            Folder: "Category Cluster",
-                            Name: self.selectedPlanogram.planogram_ID,
+                            Folder: "Department Cluster",
+                            Name: self.selectedProjectGroup.text,
                             Extension: '.json'
                         },
                         Data: fileData
@@ -379,6 +413,21 @@
                 self.$nextTick(() => {
                     self.$refs.Spinner.show()
                     if (self.secondaryCluster != null) {
+
+                        //  let lcData = ListingClusterController.GenerateClusterOutput({
+                        //     storeSalesData: r.data,
+                        //     primaryCluster: self.primaryCluster,
+                        //     secondaryCluster: self.secondaryCluster,
+                        //     clusterLevels: self.level,
+                        //     clusterGroups: self.group
+                        // })
+
+                        // self.storeRowData = lcData.storeArrs;
+                        // self.rowData = lcData.ProjectGroupData;
+                        // self.stores = lcData.stores;
+                        // self.ProjectGroups = lcData.ProjectGroups
+
+
                         let lcData = ListingClusterController.GenerateClusterOutput({
                             storeSalesData: self.salesData,
                             primaryCluster: self.primaryCluster,
@@ -387,9 +436,9 @@
                             clusterGroups: self.group
                         });
 
-                        self.storeRowData = lcData.storeData;
+                        self.storeRowData = lcData.storeArrs;
+                        self.rowData = lcData.ProjectGroupData;
                         self.stores = lcData.stores;
-                        self.rowData = lcData.productData;
                         self.ProjectGroups = lcData.ProjectGroups
                         self.setHeaders()
                         self.$refs.Spinner.hide()
@@ -399,86 +448,147 @@
             setHeaders() {
                 let self = this;
                 //console.log("setting Headers");
-                
+
                 let tmp = [{
                         headerName: 'Store Name',
                         field: 'storeName'
                     },
                     {
                         headerName: 'Total Sales',
-                        field: 'totalStoreSales'
-                    },{
-                    headerName: 'Cumulative Sales',
-                    cellRendererFramework: "progressRenderer"
-                },
-                {
-                    headerName: 'Stack bar',
-                    cellRendererFramework: "DeptRenderer",
-                    width:220
+                        field: 'totalStoreSales',
+                        valueFormatter: function (params) {
+                            return formatter.format(params.value).replace("$", "R");
+                        }
+                    }, {
+                        headerName: 'Cumulative Sales',
+                        cellRendererFramework: "progressRenderer"
+                    },
+                    {
+                        headerName: 'Stack bar',
+                        cellRendererFramework: "DeptRenderer",
+                        width: 220
 
-                },
+                    }, {
+                        headerName: "Cumulative Sales",
+                        field: "cumulativStoreSales",
+                        cellStyle: function (params) {
+                            if (params.data.canHighlight) {
+                                if (params.data.highlightLevel == 1) {
+                                    return {
+                                        backgroundColor: "#9c9c9c"
+                                    };
+                                }
+
+                                if (params.data.highlightLevel == 2) {
+                                    return {
+                                        backgroundColor: "#b9b9b9"
+                                    };
+                                }
+
+                                if (params.data.highlightLevel == 3) {
+                                    return {
+                                        backgroundColor: "#e0e0e0"
+                                    };
+                                }
+                            }
+                        }
+                    }
                 ]
-                self.ProjectGroups.forEach((projectGroup,idx) => {
-                
-                    
-                
-                 tmp.push({
+                console.log("self.ProjectGroups", self.ProjectGroups);
+
+                self.ProjectGroups.forEach((projectGroup, idx) => {
+                    tmp.push({
                         headerName: projectGroup.projectGroup,
-                        children: [{
-                            headerName: "Ratio",
-                            field: projectGroup.projectGroup + "_ratio",
-                            width: 100,},
+                        children: [
+                            // {
+                            //         headerName: "_cumalitiveSales",
+                            //         // field: projectGroup.projectGroup + "_cumalitiveSales",
+                            //         width: 100,
+                            //          "valueFormatter": function (params) {
+
+                            //                 return ((parseFloat(params.data[projectGroup.projectGroup + "_cumalitiveSales"])) * 100).toFixed(2)
+                            //         },
+                            //     },
                             {
-                            headerName: "In Store",
-                            field: projectGroup.projectGroup + "_inStore",
-                            width: 100,
-                            
-                            // cellStyle: function (params) {
-                            //     if (params.data.canHighlight) {
-                            //         if (params.data[projectGroup.projectGroup + "_inStore"]) {
-                            //             if (params.data.highlightLevel == 1) {
-                            //                 return {
-                            //                     backgroundColor: "#5ef35e86"
-                            //                 };
-                            //             }
+                                headerName: "Ratio",
+                                width: 100,
+                                "valueFormatter": function (params) {
+                                    if (params.data[projectGroup.projectGroup + "_inStore"] ==
+                                        false) {
+                                        return 0
+                                    } else {
+                                        return ((parseFloat(params.data[projectGroup
+                                            .projectGroup + "_ratio"])) * 100).toFixed(2)
+                                    }
+                                },
+                                cellStyle: function (params) {
+                                    if (projectGroup.canHighlight) {
 
-                            //             if (params.data.highlightLevel == 2) {
-                            //                 return {
-                            //                     backgroundColor: "#5ef35e40"
-                            //                 };
-                            //             }
+                                        if (projectGroup.highlightLevel == 1) {
+                                            return {
+                                                backgroundColor: "#5ef35e86"
+                                            };
+                                        }
 
-                            //             if (params.data.highlightLevel == 3) {
-                            //                 return {
-                            //                     backgroundColor: "#5ef35e17"
-                            //                 };
-                            //             }
-                            //         }
+                                        if (projectGroup.highlightLevel == 2) {
+                                            return {
+                                                backgroundColor: "#5ef35e40"
+                                            };
+                                        }
 
-                            //         if (!params.data[projectGroup.projectGroup + "_inStore"]) {
-                            //             return {
-                            //                 backgroundColor: "#ff9e9e91"
-                            //             };
-                            //         }
-                            //     }
-                            // }
-                        }]
+                                        if (projectGroup.highlightLevel == 3) {
+                                            return {
+                                                backgroundColor: "#5ef35e17"
+                                            };
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                headerName: "In Store",
+                                field: projectGroup.projectGroup + "_inStore",
+                                width: 100,
+                                valueFormatter: function (params) {
+                                    return formatter.format(params.value).replace("$", "R");
+                                },
+                                cellStyle: function (params) {
+                                    if (projectGroup.canHighlight) {
+
+                                        if (projectGroup.highlightLevel == 1) {
+                                            return {
+                                                backgroundColor: "#5ef35e86"
+                                            };
+                                        }
+
+                                        if (projectGroup.highlightLevel == 2) {
+                                            return {
+                                                backgroundColor: "#5ef35e40"
+                                            };
+                                        }
+
+                                        if (projectGroup.highlightLevel == 3) {
+                                            return {
+                                                backgroundColor: "#5ef35e17"
+                                            };
+                                        }
+                                    }
+                                }
+                            }
+                        ]
                     })
                 })
-
                 self.headers = tmp;
-                console.log(self.headers);
-                
-
             },
             runQuery() {
                 let self = this
+
+
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 self.$refs.Spinner.show()
 
                 Axios.get(process.env.VUE_APP_API +
-                        // `Cluster/DepartmentClustering?PeriodFrom=${self.selectedPeriod.dateFrom}&PeriodTo=${self.selectedPeriod.dateTo}`
-                        `Cluster/DepartmentClustering?PeriodFrom=53&PeriodTo=58`
+                        // `Cluster/DepartmentClustering?PeriodFrom=${self.selectedPeriod.dateFrom}&PeriodTo=${self.selectedPeriod.dateTo}&ProjectGroupID=${self.selectedProjectGroup.value}`
+                        `Cluster/DepartmentClustering?PeriodFrom=53&PeriodTo=58&ProjectGroupID=${self.selectedProjectGroup.value}`
                     )
                     .then(r => {
 
@@ -492,17 +602,18 @@
                             clusterLevels: self.level,
                             clusterGroups: self.group
                         })
-                        console.log(lcData);
-                        self.storeRowData = lcData.storeData;
+
+                        self.storeRowData = lcData.storeArrs;
                         self.rowData = lcData.ProjectGroupData;
                         self.stores = lcData.stores;
                         self.ProjectGroups = lcData.ProjectGroups
-                        console.log(lcData);
+
 
                         self.setHeaders()
                         self.$refs.Spinner.hide()
                     })
-            },
-        }
+            }
+        },
+
     }
 </script>

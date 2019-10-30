@@ -38,9 +38,9 @@
                         self.params.context.componentParent.$parent.$parent.viewPlanogram(self.params.data);
                     }
                     break;
-                case 'store_overview': {
-                    self.params.context.componentParent.$parent.$parent.showStore(self.params.data);
-                }
+                // case 'store_overview': {
+                //     self.params.context.componentParent.$parent.$parent.showStore(self.params.data);
+                // }
                 break;
                 case 'assign': {
                     self.params.context.componentParent.$parent.$parent.assignPlanogramToStore(self.params);

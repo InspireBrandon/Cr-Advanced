@@ -7,26 +7,26 @@ function StatusHandler() {
     let self = this;
 
     const buttons = [
-        new ButtonItem({
-            id: 'store_overview',
-            icon: 'store',
-            buttonColor: '',
-            iconColor: 'black',
-            tooltip: 'Store overview',
-            availableStatuses: [
-                PlanogramStoreStatus.Assigned,
-                PlanogramStoreStatus.Distrubuted,
-                PlanogramStoreStatus.ImplementationInProgress,
-                PlanogramStoreStatus.Implemented,
-                PlanogramStoreStatus.Recalled,
-                PlanogramStoreStatus.Unassigned,
-                PlanogramStoreStatus.Variation
-            ],
-            allowedUsers: [
-                UserTypes.SuperUser
-            ],
-            allowRupert: true
-        }),
+        // new ButtonItem({
+        //     id: 'store_overview',
+        //     icon: 'store',
+        //     buttonColor: '',
+        //     iconColor: 'black',
+        //     tooltip: 'Store overview',
+        //     availableStatuses: [
+        //         PlanogramStoreStatus.Assigned,
+        //         PlanogramStoreStatus.Distrubuted,
+        //         PlanogramStoreStatus.ImplementationInProgress,
+        //         PlanogramStoreStatus.Implemented,
+        //         PlanogramStoreStatus.Recalled,
+        //         PlanogramStoreStatus.Unassigned,
+        //         PlanogramStoreStatus.Variation
+        //     ],
+        //     allowedUsers: [
+        //         UserTypes.SuperUser
+        //     ],
+        //     allowRupert: true
+        // }),
         new ButtonItem({
             id: 'view',
             icon: 'visibility',

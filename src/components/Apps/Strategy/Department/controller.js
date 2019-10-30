@@ -36,21 +36,67 @@ class ListingClusterController {
 
         let totalStoreProjectGroupSales = getTotalStoreProjectGroupSales(storeSales, ProjectGroups, storeSalesData, clusterData);
 
-        let storeClusterCodes = accumulateCodes(totalStoreProjectGroupSales, ProjectGroups, clusterData);
+        let storeClusterCodes = accumulateCodes(totalStoreProjectGroupSales, stores, clusterData, ProjectGroups);
         storeClusterCodes = addRank(storeClusterCodes);
-        let clusters = generateClusterNew(storeClusterCodes, clusterData);
+        let clusters = generateClusterNew(storeClusterCodes, clusterData, ProjectGroups);
+
+        let storeArrs = generateArrClusters(totalStoreProjectGroupSales, clusterData)
+        // storeArrs=totalStoreProjectGroupSales
+
+
 
         return {
             stores: storeClusterCodes,
             storeData: clusters,
             ProjectGroupData: totalStoreProjectGroupSales,
-            ProjectGroups: ProjectGroups
+            ProjectGroups: ProjectGroups,
+            storeArrs: storeArrs
         }
     }
 }
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
 // METHODS
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
+function generateArrClusters(projectSales, clusterData) {
+    let retval = []
+    console.log("clusterData.clusterGroups", clusterData.clusterGroups);
+
+    let tmp = JSON.parse(JSON.stringify(projectSales))
+    console.log(projectSales);
+
+    tmp.forEach(e => {
+        retval.push(e)
+        e.ratioARR.sort((a, b) => {
+            if (a.value > b.value) {
+                return -1;
+            }
+            if (a.value < b.value) {
+                return 1;
+            }
+            return 0;
+        })
+        e.clusterCode = ""
+        let count = 0
+
+        e.ratioARR.forEach(ratio => {
+            if (ratio.code != null && ratio.code != undefined && count < clusterData.clusterGroups) {
+                e.clusterCode += ratio.code
+                count++
+            }
+        })
+        // for (let index = 0; index < clusterData.clusterLevels; index++) {
+        //     const element = e.ratioARR[index];
+        //     e.ratioARR[index];
+        //     if(e){
+
+        //     }
+        //     e.clusterCode += element.code
+        // }
+    })
+    return retval
+
+}
+
 function getStoreSales(stores, storeSales) {
     let retval = [];
 
@@ -105,7 +151,6 @@ function getProjectGroupsWeighted(storeSalesData) {
         }).sales_Retail // reduce array to return only total sales
 
         totalSalesValue = parseFloat(parseFloat(totalSalesValue.toFixed(2)));
-
         ProjectGroup["totalSales"] = totalSalesValue;
     });
 
@@ -120,7 +165,7 @@ function getProjectGroupsWeighted(storeSalesData) {
     })
 }
 
-function getTotalStoreProjectGroupSales(stores, ProjectGroups, storeSalesData) {
+function getTotalStoreProjectGroupSales(stores, ProjectGroups, storeSalesData, clusterData) {
     let tmpStoreData = [];
     let currentCumulative = 0;
 
@@ -155,6 +200,20 @@ function getTotalStoreProjectGroupSales(stores, ProjectGroups, storeSalesData) {
             ratioARR: []
         }
 
+        ProjectGroups.sort((a, b) => {
+            if (a.totalSales > b.totalSales) {
+                return -1;
+            }
+            if (a.totalSales < b.totalSales) {
+                return 1;
+            }
+            return 0;
+        })
+        let letters = ["a", "b", "c", "d", "e"]
+        for (let index = 0; index < clusterData.clusterLevels; index++) {
+            ProjectGroups[index].code = letters[index]
+
+        }
         ProjectGroups.forEach(ProjectGroup => {
             var storeProjectGroupSale = storeSalesData.filter(sd => {
                 return sd.projectGroup_ID == ProjectGroup.projectGroup_ID && sd.store_ID == store.store_ID;
@@ -170,6 +229,7 @@ function getTotalStoreProjectGroupSales(stores, ProjectGroups, storeSalesData) {
                     tmpCode = "1";
                     tmpObj.projectTotal += parseFloat(storeProjectGroupSaleItem.sales_Retail)
                     inStore = storeProjectGroupSaleItem.sales_Retail
+
                 } else {
                     tmpCode = "0";
                 }
@@ -182,56 +242,80 @@ function getTotalStoreProjectGroupSales(stores, ProjectGroups, storeSalesData) {
 
         });
 
-
+        // ProjectGroup["cumalitiveProjectSales"] += ProjectGroup.sales_Retail
+        let lastAdded = 0
         ProjectGroups.forEach((ProjectGroup, idx) => {
             tmpObj[ProjectGroup.projectGroup + "_ratio"] = parseFloat(tmpObj[ProjectGroup.projectGroup + "_inStore"]) / parseFloat(tmpObj.projectTotal);
             if (tmpStoreData.length == 0) {
                 tmpObj.ratioARR.push({
                     value: parseFloat(tmpObj[ProjectGroup.projectGroup + "_inStore"]) / parseFloat(tmpObj.projectTotal),
                     color: '#' + (0x1000000 + (Math.random()) * 0xffffff).toString(16).substr(1, 6),
-                    name: ProjectGroup.projectGroup
+                    name: ProjectGroup.projectGroup,
+                    code: ProjectGroup.code
                 })
             } else {
                 tmpObj.ratioARR.push({
                     value: parseFloat(tmpObj[ProjectGroup.projectGroup + "_inStore"]) / parseFloat(tmpObj.projectTotal),
                     color: tmpStoreData[0].ratioARR[idx].color,
-                    name: ProjectGroup.projectGroup
+                    name: ProjectGroup.projectGroup,
+                    code: ProjectGroup.code,
                 })
             }
+            tmpObj[ProjectGroup.projectGroup + "_cumalitiveSales"] = lastAdded + parseFloat(tmpObj[ProjectGroup.projectGroup + "_ratio"])
+            lastAdded += tmpObj[ProjectGroup.projectGroup + "_ratio"]
 
         })
         tmpStoreData.push(tmpObj);
     });
+    console.log("tmpStoreData", tmpStoreData);
 
     return tmpStoreData;
 }
 
-function accumulateCodes(tmpStoreData, stores, clusterData) {
+function accumulateCodes(tmpStoreData, stores, clusterData, ProjectGroups) {
+    console.log("[START] accumulateCodes");
+    console.log(tmpStoreData);
+    console.log(stores);
+    console.log(ProjectGroups);
+    let storesTotalSales = 0
+    tmpStoreData.forEach(store => {
+        storesTotalSales += parseFloat(store.totalStoreSales)
+    })
+    console.log("storesTotalSales", storesTotalSales);
+
+    ProjectGroups.forEach((projectGroup, idx) => {
+        projectGroup.StoretotalPercentage = ((parseFloat(projectGroup.totalSales) / parseFloat(storesTotalSales)) * 100).toFixed(2)
+        if (idx == 0) {
+            projectGroup.cumulativeProjectPercentage = parseFloat(projectGroup.StoretotalPercentage)
+        } else {
+            projectGroup.cumulativeProjectPercentage = parseFloat(ProjectGroups[idx - 1].cumulativeProjectPercentage) + parseFloat(projectGroup.StoretotalPercentage)
+        }
+
+    })
     let storeClusterCodes = []
+    console.log(ProjectGroups);
 
     let percentageOfCumulative = (clusterData.primaryCluster / 10) * 100;
     let percentageOfCumulativeSecond = ((clusterData.primaryCluster + (clusterData.secondaryCluster / 2)) / 10) * 100;
     let percentageOfCumulativeThird = ((clusterData.primaryCluster + clusterData.secondaryCluster) / 10) * 100;
-    console.log("tmpStoreData", tmpStoreData);
 
-    let cumulativeStoreData = tmpStoreData.filter(e => {
-        return parseFloat(e.cumulativStoreSales) <= percentageOfCumulative;
+
+    let cumulativeStoreData = ProjectGroups.filter(e => {
+        return parseFloat(e.cumulativeProjectPercentage) <= percentageOfCumulative;
     })
 
-
-    let cumulativeStoreDataSecondLevel = tmpStoreData.filter((e, idx) => {
-        return parseFloat(e.cumulativStoreSales) >= percentageOfCumulative && parseFloat(e.cumulativStoreSales) <= percentageOfCumulativeSecond;
+    let cumulativeStoreDataSecondLevel = ProjectGroups.filter((e, idx) => {
+        return parseFloat(e.cumulativeProjectPercentage) >= percentageOfCumulative && parseFloat(e.cumulativeProjectPercentage) <= percentageOfCumulativeSecond;
     })
 
-    let cumulativeStoreDataThirdLevel = tmpStoreData.filter((e, idx) => {
-        return parseFloat(e.cumulativStoreSales) >= percentageOfCumulativeSecond && parseFloat(e.cumulativStoreSales) <= percentageOfCumulativeThird;
+    let cumulativeStoreDataThirdLevel = ProjectGroups.filter((e, idx) => {
+        return parseFloat(e.cumulativeProjectPercentage) >= percentageOfCumulativeSecond && parseFloat(e.cumulativeProjectPercentage) <= percentageOfCumulativeThird;
     })
 
-    let cumulativeStoreDataSecondAndThirdLevel = tmpStoreData.filter((e, idx) => {
-        return parseFloat(e.cumulativStoreSales) >= percentageOfCumulative && parseFloat(e.cumulativStoreSales) <= percentageOfCumulativeThird;
+    let cumulativeStoreDataSecondAndThirdLevel = ProjectGroups.filter((e, idx) => {
+        return parseFloat(e.cumulativeProjectPercentage) >= percentageOfCumulative && parseFloat(e.cumulativeProjectPercentage) <= percentageOfCumulativeThird;
     })
-    console.log("stores", stores);
-    console.log("cumulativeStoreData", cumulativeStoreData);
+
     stores.forEach(store => {
         let storeCodeData = {
             storeCode: "",
@@ -277,9 +361,11 @@ function accumulateCodes(tmpStoreData, stores, clusterData) {
             })
         }
 
+        
         storeClusterCodes.push(storeCodeData);
     })
-
+    console.log(storeClusterCodes);
+    console.log("ProjectGroups",ProjectGroups);
     return storeClusterCodes.sort((a, b) => {
         if (a.storeCode > b.storeCode) {
             return -1;
