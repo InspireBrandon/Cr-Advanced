@@ -9,7 +9,7 @@
           @click="item.showChildren = !item.showChildren"
         >
           <v-icon v-if="item.route == null">{{ item.showChildren ? 'folder_open' : 'folder' }}</v-icon>
-          {{item.title}}
+          {{item.title}} 
         </div>
         <div
           class="subheading mt-1 pa-1 font-weight-bold"

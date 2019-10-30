@@ -263,7 +263,7 @@
           }
           break;
           case 3: {
-            routeItem.parentID = "1.3";
+            routeItem.parentID = "PLANOGRAM_VIEW";
             // button_1.set('warning', 'visibility', cp.routeToView, "View")
             // button_2.set('error', 'check', cp.setPlanogramComplete, "Complete")
           }

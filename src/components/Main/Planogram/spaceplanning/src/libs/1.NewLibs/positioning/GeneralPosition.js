@@ -595,8 +595,13 @@ class GeneralPosition {
       let y = (productOffset * -1);
       let x = 0;
 
+      // parent.TotalChildren.reverse();
+
       parent.TotalChildren.forEach((item, idx) => {
         // Calculate X
+
+        console.log(item);
+
         let productGroup = ctrl_store.getPlanogramItemById(VueStore, item.ID);
         let productWidth = productGroup.TotalWidth;
         let midPoint = ((productWidth / 2) - (parent.TotalWidth / 2)) * -1;
