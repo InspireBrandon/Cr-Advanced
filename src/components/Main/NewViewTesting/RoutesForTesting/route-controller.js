@@ -57,15 +57,6 @@ function GetAllRoutes() {
             routeType: RouteType.Folder
         }),
         new RouteItem({
-            id: "1.2",
-            parentID: "1",
-            title: "Complete",
-            allowedAccessLevels: [
-                accessTypes.SuperUser
-            ],
-            routeType: RouteType.Folder
-        }),
-        new RouteItem({
             id: "1.1.1",
             parentID: "1.1",
             title: "Garden Accessories",
@@ -95,6 +86,33 @@ function GetAllRoutes() {
             ],
             routeType: RouteType.File
         }),
+        new RouteItem({
+            id: "1.2",
+            parentID: "1",
+            title: "Complete",
+            allowedAccessLevels: [
+                accessTypes.SuperUser
+            ],
+            routeType: RouteType.Folder
+        }),
+        new RouteItem({
+            id: "1.3",
+            parentID: "1",
+            title: "In progress",
+            allowedAccessLevels: [
+                accessTypes.SuperUser
+            ],
+            routeType: RouteType.Folder
+        }),
+        new RouteItem({
+            id: "1.4",
+            parentID: "1",
+            title: "RequestingApproval",
+            allowedAccessLevels: [
+                accessTypes.SuperUser
+            ],
+            routeType: RouteType.Folder
+        }),
         // new RouteItem({
         //     id: "1.2",
         //     parentID: "1",
@@ -105,26 +123,26 @@ function GetAllRoutes() {
         //     ],
         //     routeType: RouteType.File
         // }),
-        new RouteItem({
-            id: "1.3",
-            parentID: "1",
-            title: "Space Planning",
-            route: "/SpacePlanning",
-            allowedAccessLevels: [
-                accessTypes.SuperUser
-            ],
-            routeType: RouteType.Software
-        }),
-        new RouteItem({
-            id: "1.4",
-            parentID: "1",
-            title: "Default Fixtures",
-            route: "/Fixtures",
-            allowedAccessLevels: [
-                accessTypes.SuperUser
-            ],
-            routeType: RouteType.Software
-        }),
+        // new RouteItem({
+        //     id: "1.3",
+        //     parentID: "1",
+        //     title: "Space Planning",
+        //     route: "/SpacePlanning",
+        //     allowedAccessLevels: [
+        //         accessTypes.SuperUser
+        //     ],
+        //     routeType: RouteType.Software
+        // }),
+        // new RouteItem({
+        //     id: "1.4",
+        //     parentID: "1",
+        //     title: "Default Fixtures",
+        //     route: "/Fixtures",
+        //     allowedAccessLevels: [
+        //         accessTypes.SuperUser
+        //     ],
+        //     routeType: RouteType.Software
+        // }),
         new RouteItem({
             id: "2",
             parentID: "0",
@@ -540,5 +558,70 @@ const RouteType = {
     Software: 2
 }
 
+const SectionType = {
+    Event: 0,
+    DataPreparation: 1,
+    Ranging: 2,
+    Planogram: 3,
+    Promotion: 4,
+    Empty: 5,
+    Subtask: 6,
+    Mail: 7
+}
+
+const ProccessLevel = {
+    InProgress: 0,
+    Complete: 1,
+    Workshop: 2,
+    WorkshopEnded: 3,
+    Meeting: 4,
+    DataPreparationStart: 5,
+    RangingStart: 6,
+    PlanogramStart: 7,
+    MeetingSupplier: 8,
+    RequestingApproval: 9,
+    Declined: 10,
+    Approved: 11,
+    ImplementationPending: 12,
+    VariationRequest: 13,
+    Implemented: 14,
+    OnHold: 15,
+    WaitingFixtureRequirements: 16,
+    WaitingSupplier: 17,
+    AwaitingDistribution: 18,
+    ApprovalInProgress: 19,
+    DistributionInProgress: 20,
+    ReviewRange: 21,
+    ReviewPlanogram: 22,
+    ImplementationInProgress: 23,
+    Like: 24,
+    ImplementationComplete: 25,
+    DistributionComplete: 26,
+    WaitingProductInfoStart: 27,
+    WaitingProductInfoInProgress: 28,
+    WaitingProductInfoComplete: 29,
+    WaitingPlanogramInputStart: 30,
+    WaitingPlanogramInputInProgress: 31,
+    WaitingPlanogramInputComplete: 32,
+    WaitingFixtureInputStart: 33,
+    WaitingFixtureInputInProgress: 34,
+    WaitingFixtureInputComplete: 35,
+    WaitingCheckPlanogramStart: 36,
+    WaitingCheckPlanogramInProgress: 37,
+    WaitingCheckPlanogramComplete: 38,
+    AssignedTo: 39,
+    RequestNewVariant: 40,
+    TaskTakeover: 41,
+    Mail: 42,
+    DistributionViewed: 43,
+    Park: 44,
+    VariationInProgress: 45,
+    VariationComplete: 46,
+    VariationSent: 47,
+    Recalled: 48,
+    RecallViewed: 49,
+    RecallCompleted: 50,
+    RecallSent: 51
+}
 
 export default RouteController;
