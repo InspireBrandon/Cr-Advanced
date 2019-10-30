@@ -57,6 +57,15 @@ function GetAllRoutes() {
             routeType: RouteType.Folder
         }),
         new RouteItem({
+            id: "1.2",
+            parentID: "1",
+            title: "Complete",
+            allowedAccessLevels: [
+                accessTypes.SuperUser
+            ],
+            routeType: RouteType.Folder
+        }),
+        new RouteItem({
             id: "1.1.1",
             parentID: "1.1",
             title: "Garden Accessories",
@@ -86,16 +95,16 @@ function GetAllRoutes() {
             ],
             routeType: RouteType.File
         }),
-        new RouteItem({
-            id: "1.2",
-            parentID: "1",
-            title: "View",
-            allowedAccessLevels: [
-                accessTypes.Supplier,
-                accessTypes.Buyer
-            ],
-            routeType: RouteType.File
-        }),
+        // new RouteItem({
+        //     id: "1.2",
+        //     parentID: "1",
+        //     title: "View",
+        //     allowedAccessLevels: [
+        //         accessTypes.Supplier,
+        //         accessTypes.Buyer
+        //     ],
+        //     routeType: RouteType.File
+        // }),
         new RouteItem({
             id: "1.3",
             parentID: "1",

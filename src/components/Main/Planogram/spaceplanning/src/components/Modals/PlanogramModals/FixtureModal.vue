@@ -127,8 +127,6 @@
             <v-card class="elevation-5">
               <v-toolbar dense>
                 <v-toolbar-title class="toolbar-title">Dimensions</v-toolbar-title>
-                {{ newData.fixtureType }}
-                {{ newData.type }}
               </v-toolbar>
               <v-container grid-list-md class="card-height">
                 <v-layout row wrap>
@@ -151,7 +149,7 @@
                     <v-text-field type="number" v-model="newData.overhang" label="Overhang:" suffix="cm"></v-text-field>
                   </v-flex>
                   <v-flex lg8 md12
-                    v-if="!newData.rendering && ((newData.fixtureType == 3 || newData.fixtureType == 0 || newData.fixtureType == 1) && (newData.type == 2 || newData.type == 3))">
+                    v-if="!newData.rendering && ((newData.fixtureType == 4 || newData.fixtureType == 3 || newData.fixtureType == 0 || newData.fixtureType == 1) && (newData.type == 2 || newData.type == 3))">
                     <v-text-field type="number" v-model="newData.productOffset" label="Product offset:" suffix="cm">
                     </v-text-field>
                   </v-flex>
