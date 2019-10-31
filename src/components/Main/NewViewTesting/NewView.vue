@@ -105,7 +105,6 @@ export default {
       switch (item.status) {
         case 0:
           {
-            // button_1.set('secondary', 'assignment', cp.assign, "Assign")
           }
           break;
         case 1:
@@ -113,25 +112,14 @@ export default {
             switch (item.type) {
               case 1:
                 {
-                  // button_1.set('warning', 'visibility', cp.routeToView, "View")
-                  // button_2.set('error', 'check', cp.setComplete, "Complete")
                 }
                 break;
               case 2:
                 {
-                  // button_1.set('warning', 'visibility', cp.routeToView, "View")
-                  if (item.approvalUserID == null) {
-                    // button_2.set('error', 'check', cp.setComplete, "Complete")
-                  }
-                  if (item.approvalUserID != null) {
-                    // button_2.set('error', 'send', cp.sendToApprovalUser, "Send for Approval")
-                  }
                 }
                 break;
               case 3:
                 {
-                  // button_1.set('warning', 'visibility', cp.routeToView, "View")
-                  // button_2.set('error', 'check', cp.setPlanogramComplete, "Complete")
                 }
                 break;
             }
@@ -142,127 +130,101 @@ export default {
             switch (item.type) {
               case 1:
                 {
-                  if (item.actionedByUserID == self.systemUserID) {
-                    // button_1.set('error', 'close', cp.closeTask, "Close")
-                  }
-
-                  if (item.systemUserID == self.systemUserID) {
-                    // button_1.set('secondary', 'assignment', cp.assign, "Assign")
-                    // button_2.set('warning', 'visibility', cp.routeToView, "View")
-                  }
                 }
                 break;
               case 2:
                 {
-                  if (item.actionedByUserID == self.systemUserID) {
-                    // button_1.set('error', 'close', cp.closeTask, "Close")
-                  }
-
-                  if (item.systemUserID == self.systemUserID) {
-                    // button_1.set('secondary', 'assignment', cp.assign, "Assign")
-                    // button_2.set('warning', 'visibility', cp.routeToView, "View")
-                  }
                 }
                 break;
               case 3:
                 {
-                  if (item.actionedByUserID == self.systemUserID) {
-                    // button_2.set('error', 'close', cp.closeTask, "Close")
-                  }
-
-                  routeItem.parentID = "1.2";
-
-                  if (item.systemUserID == self.systemUserID) {
-                    // button_1.set('primary', 'send', cp.submitForApproval, "Send")
-                    // button_2.set('warning', 'visibility', cp.routeToView, "View")
-                    // button_3.set('success', 'share', cp.goToDistributionView, "Distribute")
-                  }
                 }
                 break;
             }
           }
           break;
-          case 3: {
-            routeItem.parentID = "PLANOGRAM_VIEW";
-            // button_1.set('warning', 'visibility', cp.routeToView, "View")
-            // button_2.set('error', 'check', cp.setPlanogramComplete, "Complete")
+        case 6:
+          {
           }
           break;
         case 7:
           {
-            // button_1.set('success', 'visibility', cp.setInProgressAndView, "View")
           }
           break;
         case 8:
           {
-            // button_1.set('success', 'visibility', cp.setInProgressAndView, "View")
           }
           break;
         case 10:
           {
-            // button_1.set('success', 'visibility', cp.setApprovalInProgress, "View")
           }
           break;
         case 11:
           {
-            if (item.actionedByUserID == self.systemUserID) {
-              // button_1.set('error', 'close', cp.closeTask, "Close")
-            }
-            if (item.systemUserID == self.systemUserID && item.type == 2) {
-              // button_1.set('success', 'visibility', cp.setInProgressAndView, "View")
-            }
           }
           break;
         case 12:
           {
-            if (item.actionedByUserID == self.systemUserID) {
-              // button_1.set('error', 'close', cp.closeTask, "Close")
-            }
-
-            if (item.systemUserID == self.systemUserID && item.type == 3) {
-              // button_1.set('primary', 'send', cp.submitForDistribution, "Send")
-              // button_2.set('success', 'share', cp.goToDistributionView, "Distribute")
-            }
-            if (item.systemUserID == self.systemUserID && item.type == 2) {
-              // button_1.set('primary', 'send', cp.submitForDistribution, "Send")
-              // button_2.set('success', 'share', cp.goToDistributionView, "Distribute")
-            }
           }
           break;
         case 13:
           {
-            // button_1.set('success', 'visibility', cp.setImplementationInProgress, "View")
-            routeItem.parentID = "AWAITING_IMPLEMENTATION_PLANOGRAM";
+            switch (item.type) {
+              case 1:
+                {
+                }
+                break;
+              case 2:
+                {
+                }
+                break;
+              case 3:
+                {
+                  routeItem.parentID = "AWAITING_IMPLEMENTATION_PLANOGRAM";
+                }
+                break;
+              case 6:
+                {
+                  routeItem.parentID = "AWAITING_IMPLEMENTATION_PLANOGRAM";
+                }
+                break;
+            }
           }
           break;
         case 14:
           {
-            // button_1.set('success', 'visibility', cp.setVariationInProgressandView, "View")
           }
           break;
         case 15:
           {
-            routeItem.parentID = "IMPLEMENTED_PLANOGRAM";
-            // button_1.set('success', 'visibility', cp.setVariationInProgressandView, "View")
+            switch (item.type) {
+              case 1:
+                {
+                }
+                break;
+              case 2:
+                {
+                }
+                break;
+              case 3:
+                {
+                  routeItem.parentID = "IMPLEMENTED_PLANOGRAM";
+                }
+                break;
+              case 6:
+                {
+                  routeItem.parentID = "IMPLEMENTED_PLANOGRAM";
+                }
+                break;
+            }
           }
           break;
         case 16:
           {
-            if (item.actionedByUserID == self.systemUserID) {
-              // button_1.set('error', 'close', cp.closeTask, "Close")
-            }
-
-            if (item.systemUserID == self.systemUserID) {
-              // button_1.set('error', 'close', cp.closeTask, "Close")
-            }
           }
           break;
-        // distribution
         case 19:
           {
-            // button_1.set('success', 'visibility', cp.setDistributionViewed, "View")
-            // button_2.set('primary', 'send', cp.goToDistributionView, "Distribute")
-            // button_2.set('error', 'local_parking', cp.setParked, "Park")
           }
           break;
         case 20:
@@ -270,19 +232,14 @@ export default {
             switch (item.type) {
               case 1:
                 {
-                  // button_1.set('warning', 'visibility', cp.routeToView, "View")
                 }
                 break;
               case 2:
                 {
-                  // button_1.set('warning', 'visibility', cp.routeToView, "View")
-                  // button_2.set('primary', 'check', cp.setApproved, "Approve")
-                  // button_3.set('error', 'close', cp.setDeclined, "Decline")
                 }
                 break;
               case 3:
                 {
-                  // button_1.set('warning', 'visibility', cp.routeToView, "View")
                 }
                 break;
             }
@@ -290,161 +247,150 @@ export default {
           break;
         case 21:
           {
-            // button_1.set('warning', 'visibility', cp.routeToImplementation, "View")
-            // button_2.set('primary', 'send', cp.goToDistributionView, "Distribute")
-            // button_3.set('error', 'close', cp.closeTask, "Close")
-            // button_3.set('success', 'settings_backup_restore', cp.recall, "Recall")
-            routeItem.parentID = "VIEW_PLANOGRAM";
-            // button_4.set('error', 'local_parking', cp.setParked, "Park")
+            switch (item.type) {
+              case 1:
+                {
+                }
+                break;
+              case 2:
+                {
+                }
+                break;
+              case 3:
+                {
+                  routeItem.parentID = "VIEW_PLANOGRAM";
+                }
+                break;
+              case 6:
+                {
+                  routeItem.parentID = "VIEW_PLANOGRAM";
+                }
+                break;
+            }
           }
           break;
         case 24:
           {
-            // button_1.set('warning', 'visibility', cp.routeToView, "View")
           }
           break;
         case 26:
           {
-            // button_1.set('primary', 'visibility', cp.routeToView, "View")
           }
           break;
         case 28:
           {
-            // if (item.rollingUserID != item.systemUserID)
-            // button_1.set('success', 'done', cp.setSubtaskInProgressAndView, "Received")
           }
           break;
         case 29:
           {
-            // if (item.rollingUserID != item.systemUserID)
-            // button_1.set('error', 'check', cp.completeSubtask, "Complete")
           }
           break;
         case 30:
           {
-            // button_1.set('error', 'close', cp.closeTask, "Close")
           }
           break;
         case 31:
           {
-            routeItem.parentID = "IMPLEMENTATION_IN_PROGRESS_PLANOGRAM";
-            // if (item.rollingUserID != self.systemUserID)
-            // button_1.set('success', 'done', cp.setSubtaskInProgressAndView, "Received")
+            switch (item.type) {
+              case 1:
+                {
+                }
+                break;
+              case 2:
+                {
+                }
+                break;
+              case 3:
+                {
+                  routeItem.parentID = "IMPLEMENTATION_IN_PROGRESS_PLANOGRAM";
+                }
+                break;
+              case 6:
+                {
+                  routeItem.parentID = "IMPLEMENTATION_IN_PROGRESS_PLANOGRAM";
+                }
+                break;
+            }
           }
           break;
         case 32:
           {
-            // if (item.rollingUserID != self.systemUserID)
-            // button_1.set('error', 'check', cp.completeSubtask, "Complete")
           }
           break;
         case 33:
           {
-            // button_1.set('error', 'close', cp.closeTask, "Close")
           }
           break;
         case 34:
           {
-            // if (item.rollingUserID != self.systemUserID)
-            // button_1.set('success', 'done', cp.setSubtaskInProgressAndView, "Received")
           }
           break;
         case 35:
           {
-            // if (item.rollingUserID != self.systemUserID)
-            // button_1.set('error', 'check', cp.completeSubtask, "Complete")
           }
           break;
         case 36:
           {
-            // button_1.set('error', 'close', cp.closeTask, "Close")
           }
           break;
         case 37:
           {
-            // if (item.rollingUserID != self.systemUserID)
-            // button_1.set('success', 'done', cp.setSubtaskInProgressAndView, "Received")
           }
           break;
         case 38:
           {
-            if (item.rollingUserID != self.systemUserID) {
-              // button_1.set('warning', 'visibility', cp.goToSubtaskView, "View")
-              // button_2.set('error', 'check', cp.completeSubtask, "Complete")
-            }
           }
           break;
         case 39:
           {
-            // button_1.set('error', 'close', cp.closeTask, "Close")
           }
           break;
         case 40:
           {
-            // button_1.set('error', 'close', cp.closeTask, "Close")
           }
           break;
         case 42:
           {
-            // button_1.set('error', 'close', cp.closeTask, "Close")
           }
           break;
         case 43:
           {
-            // button_1.set('info', 'visibility', cp.openNotesObj, "Read")
-            // button_2.set('error', 'close', cp.closeTask, "Close")
           }
           break;
         case 44:
           {
-            // button_1.set('success', 'visibility', cp.routeToView, "View") //implementation
-            // button_2.set('primary', 'send', cp.setDistributionInProgress, "Distribute")
-            // button_3.set('error', 'local_parking', cp.setParked, "Park")
           }
           break;
         case 45:
           {
-            // button_1.set('success', 'check', cp.setDiscontinued, "set Discontinued")
           }
 
           break;
         case 46:
           {
-            // button_1.set('warning', 'visibility', cp.routeToView, "View")
-            // button_2.set('success', 'check', cp.setVariationComplete, "Complete")
           }
           break;
         case 47:
           {
-            // button_1.set('warning', 'visibility', cp.routeToView, "View")
-            // button_2.set('primary', 'send', cp.submitForApproval, "Send Variation")
-            // button_3.set('success', 'share', cp.goToDistributionView, "Distribute")
           }
           break;
         case 48:
           {
-            // button_1.set('error', 'close', cp.closeTask, "Close")
           }
           break;
         case 49:
           {
-            // button_1.set('success', 'visibility', cp.setRecallInProgressandView, "View")
           }
           break;
         case 50:
           {
-            // button_1.set('warning', 'visibility', cp.routeToView, "View")
-            // button_2.set('success', 'check', cp.setRecalledComplete, "Complete")
           }
           break;
         case 51:
           {
-            // button_1.set('warning', 'visibility', cp.routeToView, "View")
-            // button_2.set('primary', 'send', cp.sendRecall, "Send")
           }
           break;
         case 52: {
-          // button_1.set('error', 'close', cp.closeTask, "Close")
         }
       }
 
