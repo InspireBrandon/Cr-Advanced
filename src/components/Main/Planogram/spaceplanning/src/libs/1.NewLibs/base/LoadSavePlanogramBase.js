@@ -1062,16 +1062,31 @@ class LoadSavePlanogramBase {
       ctrl_item.Group.setY(CurrentItem.RelativePosition.y);
     }
 
-    let itemArr = MasterData.filter((el) => el.Data.ParentID == CurrentItem.Data.ID);
-    itemArr.sort((a, b) => a.RelativePosition.x - b.RelativePosition.x);
+    if (CurrentItem.Type == "PEG") {
+      let itemArr = MasterData.filter((el) => el.Data.ParentID == CurrentItem.Data.ID);
+      itemArr.sort((a, b) => a.RelativePosition.y - b.RelativePosition.y);
+  
+      // check if there are children and call recursive
+      if (itemArr != undefined && itemArr != null) {
+        // get all children of the current item, call recursive function
+        if (itemArr.length > 0) {
+          itemArr.forEach(child => {
+            self.loadItemRecursive(MasterData, child, child.Data.ParentID, Stage, MasterLayer, PxlRatio, VueStore);
+          });
+        }
+      }
+    } else {
+      let itemArr = MasterData.filter((el) => el.Data.ParentID == CurrentItem.Data.ID);
+      itemArr.sort((a, b) => a.RelativePosition.x - b.RelativePosition.x);
 
-    // check if there are children and call recursive
-    if (itemArr != undefined && itemArr != null) {
-      // get all children of the current item, call recursive function
-      if (itemArr.length > 0) {
-        itemArr.forEach(child => {
-          self.loadItemRecursive(MasterData, child, child.Data.ParentID, Stage, MasterLayer, PxlRatio, VueStore);
-        });
+      // check if there are children and call recursive
+      if (itemArr != undefined && itemArr != null) {
+        // get all children of the current item, call recursive function
+        if (itemArr.length > 0) {
+          itemArr.forEach(child => {
+            self.loadItemRecursive(MasterData, child, child.Data.ParentID, Stage, MasterLayer, PxlRatio, VueStore);
+          });
+        }
       }
     }
   }

@@ -593,18 +593,15 @@ class GeneralPosition {
 
       let productOffset = parent.Data.productOffset == undefined || parent.Data.productOffset == null ? 0 : parent.Data.productOffset;
       let y = (productOffset * -1);
-      let x = 0;
 
       // parent.TotalChildren.reverse();
 
-      parent.TotalChildren.forEach((item, idx) => {
+      parent.TotalChildren.forEach((ting, idx) => {
         // Calculate X
 
-        console.log(item);
-
-        let productGroup = ctrl_store.getPlanogramItemById(VueStore, item.ID);
+        let productGroup = ctrl_store.getPlanogramItemById(VueStore, ting.ID);
         let productWidth = productGroup.TotalWidth;
-        let midPoint = ((productWidth / 2) - (parent.TotalWidth / 2)) * -1;
+        let midPoint = ((productWidth / 2) - (parent.TotalWidth / 2)) * -1 + merchOffset;
 
         productGroup.Group.setX(midPoint);
 
