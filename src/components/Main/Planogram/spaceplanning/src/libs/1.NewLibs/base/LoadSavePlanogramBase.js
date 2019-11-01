@@ -967,6 +967,8 @@ class LoadSavePlanogramBase {
     }
     break;
     case "SHELF": {
+      console.log("CHECKING SHELF")
+
       let ctrl_item = new ShelfNew(
         VueStore,
         Stage,
@@ -994,6 +996,8 @@ class LoadSavePlanogramBase {
     }
     break;
     case "BASE": {
+      console.log("LOAD RECURSIVE", CurrentItem)
+
       let ctrl_item = new BaseNew(
         VueStore,
         Stage,
@@ -1003,6 +1007,8 @@ class LoadSavePlanogramBase {
         "BASE",
         ParentID
       )
+
+      console.log("BASE", ctrl_item)
 
       if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
         ctrl_item.Position = CurrentItem.Position;

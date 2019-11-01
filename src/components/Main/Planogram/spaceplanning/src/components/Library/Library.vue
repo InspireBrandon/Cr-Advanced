@@ -262,7 +262,7 @@
               <template v-for="(item, index) in customFixtures">
                 <v-list-tile :key="index" @click="selectLibraryItem(item)"
                   :class="{ 'active-item':(selectedItem != null && item.id == selectedItem.data.id), 'inactive-item' : (selectedItem == null || item.id != selectedItem.data.id)}"
-                  draggable="true" @drag="dragMove" @dragstart="dragStart('LIBRARY', item)" @dragend="clearDrag">
+                  draggable="true" @drag="dragMove" @dragstart="dragCustomStart('LIBRARY', item)" @dragend="clearDrag">
                   <v-list-tile-content>
                     <v-list-tile-title>{{item.name}}</v-list-tile-title>
                     <v-list-tile-sub-title>
@@ -303,6 +303,21 @@
       self.getFixtures();
     },
     methods: {
+      dragCustomStart(where, item) {
+        let self = this;
+        if (where == "CHIP") {
+          if (self.selectedItem == null) {
+            alert("Please select a library item");
+          }
+        } else if (where == "LIBRARY") {
+          self.selectedItem = {
+            type: "CUSTOM",
+            data: item
+          };
+        }
+
+        window.library = self.selectedItem;
+      },
       dragStart(where, item) {
         let self = this;
         if (where == "CHIP") {
@@ -402,6 +417,7 @@
       selectLibraryItem(item) {
         let self = this;
         let strType = "";
+
         switch (item.type) {
           case 0: {
             // gondola
