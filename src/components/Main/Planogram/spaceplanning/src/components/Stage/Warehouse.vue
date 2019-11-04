@@ -11,6 +11,12 @@
           </v-tooltip>
           <v-tooltip bottom>
             <v-btn slot="activator" flat small>
+              <v-icon>assessment</v-icon>
+            </v-btn>
+            <span>Range</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <v-btn slot="activator" flat small>
               <v-icon>people</v-icon>
             </v-btn>
             <span>Strategy & Role</span>
@@ -21,17 +27,23 @@
             </v-btn>
             <span>Merchandise Rules & Constraints</span>
           </v-tooltip>
-          <v-tooltip bottom>
+          <!-- <v-tooltip bottom>
             <v-btn slot="activator" flat small>
               <v-icon>directions</v-icon>
             </v-btn>
             <span>CDT & Merch Flow</span>
-          </v-tooltip>
+          </v-tooltip> -->
           <v-tooltip bottom>
             <v-btn slot="activator" flat small>
               <v-icon>highlight</v-icon>
             </v-btn>
             <span>Life Of A Planogram</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <v-btn slot="activator" flat small>
+              <v-icon>star</v-icon>
+            </v-btn>
+            <span>Promotions</span>
           </v-tooltip>
         </v-btn-toggle>
         <v-spacer></v-spacer>
@@ -273,15 +285,181 @@
         <img src="static\img\tmp\strategy-real.PNG" style="height: calc(100vh - 85px);width: 100%;overflow-x: auto;"
           alt="">
       </v-layout>
-      <v-layout v-if="toggle == 2">
-        <img src="static\img\tmp\strategy.PNG" style="height: calc(100vh - 85px);width: 100%;overflow-x: auto;" alt="">
+      <v-layout v-if="toggle == 2" row wrap class="pa-3">
+        <v-flex xs12>
+          <h3>Category Characteristics</h3>
+        </v-flex>
+        <v-flex xs12>
+          <table style="width: 100%;">
+            <thead>
+              <th>Measure</th>
+              <th>Characteristic</th>
+            </thead>
+            <tbody>
+              <tr v-for="(item, idx) in categoryCharacteristics" :key="idx">
+                <td>{{ item.name }}</td>
+                <td>
+                  <select :style="{ background: getSelectBackground(item) }" v-model="item.value" style="width: 100%;">
+                    <option style="background: white;" value="H">H</option>
+                    <option style="background: white;" value="M">M</option>
+                    <option style="background: white;" value="L">L</option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </v-flex>
+        <v-flex xs12 class="mt-3">
+          <h3>User Category Role</h3>
+          <v-select light :items="categoryRoles" v-model="userCategoryRole" label="User Category Role" solo></v-select>
+        </v-flex>
+        <v-flex xs12>
+          <h3>System Category Role</h3>
+          <v-select light :items="categoryRoles" v-model="systemCategoryRole" label="System Category Role" solo>
+          </v-select>
+        </v-flex>
+        <v-flex xs12 style="display: flex;">
+          <h3>Note</h3>
+          <v-btn style="margin-top: -8px;" @click="openHelpFileMaint" fab small color="primary">
+            <v-icon>edit</v-icon>
+          </v-btn>
+        </v-flex>
+        <v-flex xs12>
+          <v-card light style="height: 280px; overflow-y: auto;">
+            <div v-html="note"></div>
+          </v-card>
+        </v-flex>
       </v-layout>
-      <v-layout v-if="toggle == 3">
+      <v-layout v-if="toggle == 3" row wrap class="pa-3">
+        <v-flex xs12>
+          <h3>Merchandise Principles</h3>
+        </v-flex>
+        <v-flex xs12>
+          <table style="width: 100%;">
+            <thead>
+              <th>Priority</th>
+              <th>Principle</th>
+              <th>Select</th>
+            </thead>
+            <tbody>
+              <tr v-for="(item, idx) in merchandisePrinciples" :key="idx">
+                <td style="width: 20px;">{{ idx + 1 }}</td>
+                <td style="width: 200px;">{{ item.name }}</td>
+                <td style="width: 50px;">
+                  <div v-if="item.type == 'select'">
+                    <select v-model="item.value" style="width: 100%;">
+                      <option style="background: white;" value="Yes">Yes</option>
+                      <option style="background: white;" value="No">No</option>
+                    </select>
+                  </div>
+                  <div v-if="item.type == 'number'">
+                    <input style="width: 100%;" type="number" v-model="item.value">
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </v-flex>
+      </v-layout>
+      <!-- <v-layout v-if="toggle == 4">
         <img src="static\img\tmp\cdt.PNG" style="height: calc(100vh - 85px);width: 100%;overflow-x: auto;" alt="">
+      </v-layout> -->
+      <v-layout v-if="toggle == 4" row wrap class="pa-3">
+        <v-flex xs12>
+          <h3>Life of a planogram</h3>
+        </v-flex>
+        <v-flex xs12 class="mt-3">
+          <h4>Days of supply</h4>
+          <v-text-field style="width: 150px;" hide-details solo light type="number"></v-text-field>
+        </v-flex>
+        <v-flex xs12 class="mt-3">
+          <h4>New items: 0</h4>
+        </v-flex>
+        <v-flex xs12>
+          <h4>Discontinued items: 0</h4>
+        </v-flex>
       </v-layout>
-      <v-layout v-if="toggle == 4">
-        <p>Life of A planogram</p>
-        <!-- <img src="static\img\tmp\cdt.PNG" style="height: calc(100vh - 85px);width: 100%;overflow-x: auto;" alt=""> -->
+      <v-layout v-if="toggle == 5" row wrap class="pa-3">
+        <v-container grid-list-xs class="ma-0 pa-0"
+          style="height: calc(100vh - 100px); overflow-y: auto; overflow-x: hidden;">
+          <v-layout row wrap>
+            <v-flex xs12>
+              <h2>Promotions</h2>
+            </v-flex>
+            <v-flex xs12>
+              <h3>Title</h3>
+              <v-text-field hide-details light solo></v-text-field>
+            </v-flex>
+            <v-flex xs12>
+              <h3>Type</h3>
+              <v-select light :items="promotionTypes" v-model="promotionType" solo>
+              </v-select>
+            </v-flex>
+            <v-flex xs12>
+              <h3>Store</h3>
+              <v-select hide-details light :items="clusterOptions.stores" v-model="promotionStore" solo>
+              </v-select>
+            </v-flex>
+            <v-flex xs4>
+              <h3>Store Cluster</h3>
+              <v-select light :items="clusterOptions.store" v-model="promotionStoreCluster" solo>
+              </v-select>
+            </v-flex>
+            <v-flex xs4>
+              <h3>Custom Cluster</h3>
+              <v-select light :items="clusterOptions.custom" v-model="promotionCustomCluster" solo>
+              </v-select>
+            </v-flex>
+            <v-flex xs4>
+              <h3>Category Cluster</h3>
+              <v-select light :items="clusterOptions.category" v-model="promotionCategoryCluster" solo>
+              </v-select>
+            </v-flex>
+            <v-flex xs6>
+              <h4>Pre Evaluation Start Date:</h4>
+              <v-text-field hide-details v-model="preEvaluationStartDate" type="date" light solo></v-text-field>
+            </v-flex>
+            <v-flex xs6>
+              <h4>Start Date:</h4>
+              <v-text-field hide-details v-model="startDate" type="date" light solo></v-text-field>
+            </v-flex>
+            <v-flex xs6>
+              <h4>Post Evaluation:</h4>
+              <v-text-field hide-details v-model="postEvaluationDate" type="date" light solo></v-text-field>
+            </v-flex>
+            <v-flex xs6>
+              <h4>End Date:</h4>
+              <v-text-field hide-details v-model="endDate" type="date" light solo></v-text-field>
+            </v-flex>
+            <v-flex xs12>
+              <h4>Total Promotion Days: {{ totalPromotionDays }}</h4>
+            </v-flex>
+            <v-flex xs8 class="mt-2">
+              <h4>Enter Barcodes:</h4>
+              <v-text-field hide-details solo light v-model="promoItemBarcode"></v-text-field>
+            </v-flex>
+            <v-flex xs4>
+              <v-btn color="primary" @click="addPromotionItem" style="margin-top: 33px">add</v-btn>
+            </v-flex>
+            <v-flex xs12>
+              <p>Number of items: {{ promoItems.length }}</p>
+            </v-flex>
+            <!-- <v-flex xs12 class="mt-3" style="height: 350px; overflow: auto;">
+              <table style="width: 100%;">
+                <thead>
+                  <th>Barcode</th>
+                  <th>Media</th>
+                </thead>
+                <tbody>
+                  <tr v-for="(item, idx) in promoItems" :key="idx">
+                    <td>{{ item }}</td>
+                    <td>SPRING PROMO PLANNED</td>
+                  </tr>
+                </tbody>
+              </table>
+            </v-flex> -->
+          </v-layout>
+        </v-container>
       </v-layout>
     </v-card>
     <RangeSelectorModal ref="rangeSelectorModal"></RangeSelectorModal>
@@ -295,6 +473,7 @@
     <SizeLoader ref="SizeLoader" />
     <!-- <SaveDetailsModal ref="SaveDetailsModal" /> -->
     <Prompt ref="Prompt" />
+    <HelpFileMaint ref="HelpFileMaint" />
   </div>
 </template>
 
@@ -317,6 +496,7 @@
   import PlanogramRetractionModal from "@/components/Main/Planogram/spaceplanning/src/components/Modals/PlanogramAproval/PlanogramRetractionModal.vue";
   import JoinPlanogram from "@/components/Main/Planogram/spaceplanning/src/components/Modals/JoinPlanogram/JoinPlanogram.vue";
   import Prompt from '@/components/Common/Prompt';
+  import HelpFileMaint from '../../../../../HelpFile/HelpFileMaint'
   // import SaveDetailsModal from "@/components/Main/Planogram/spaceplanning/src/components/Modals/SaveDetails/SaveDetailsModal";
 
 
@@ -342,7 +522,8 @@
       JoinPlanogram,
       SizeLoader,
       Prompt,
-      FixtureSelector
+      FixtureSelector,
+      HelpFileMaint
     },
     data() {
       let width = 0;
@@ -453,7 +634,201 @@
             };
           }
         },
-        details_panel: null
+        details_panel: null,
+        categoryCharacteristics: [{
+            name: 'Volume %',
+            value: 'M'
+          },
+          {
+            name: 'Sales %',
+            value: 'M'
+          },
+          {
+            name: 'Profit %',
+            value: 'M'
+          },
+          {
+            name: 'Margin %',
+            value: 'M'
+          },
+          {
+            name: 'Price',
+            value: 'M'
+          },
+          {
+            name: 'Promotional Frequency %',
+            value: 'M'
+          },
+          {
+            name: 'KVI %',
+            value: 'M'
+          },
+          {
+            name: 'KVI %',
+            value: 'M'
+          },
+          {
+            name: 'Price Sensitivity',
+            value: 'M'
+          },
+          {
+            name: 'Impulse Nature',
+            value: 'M'
+          },
+          {
+            name: 'Seasonal',
+            value: 'M'
+          },
+          {
+            name: 'Housebrand %',
+            value: 'M'
+          }
+        ],
+        categoryRoles: [
+          "Destination",
+          "Key Routine",
+          "Routine",
+          "Seasonal/Occasional",
+          "Convenience",
+        ],
+        systemCategoryRole: 'Destination',
+        userCategoryRole: 'Destination',
+        preEvaluationStartDate: null,
+        startDate: null,
+        endDate: null,
+        postEvaluationDate: null,
+        promoItemBarcode: '',
+        promoItems: [],
+        hml: ['H', "M", "L"],
+        merchandisePrinciples: [{
+            name: 'Top Shelf Level',
+            type: 'select',
+            value: 'Yes'
+          },
+          {
+            name: 'Gap between product and shelf above in cm',
+            type: 'number',
+            value: '0'
+          },
+          {
+            name: 'Minimum Facings Per Product',
+            type: 'number',
+            value: '0'
+          },
+          {
+            name: 'Minimum Facings = Shelf Edge Lable Width',
+            type: 'select',
+            value: 'Yes'
+          },
+          {
+            name: 'Small Packs above Large',
+            type: 'select',
+            value: 'Yes'
+          },
+          {
+            name: 'Merchandise by Horizontal Block',
+            type: 'select',
+            value: 'Yes'
+          },
+          {
+            name: 'Allow Strip Merchandising',
+            type: 'select',
+            value: 'Yes'
+          },
+          {
+            name: 'Allow Vertical Merchandising',
+            type: 'select',
+            value: 'Yes'
+          },
+          {
+            name: 'Group by Brand within Category',
+            type: 'select',
+            value: 'Yes'
+          },
+          {
+            name: 'Group by Brand within Sub-Category',
+            type: 'select',
+            value: 'Yes'
+          },
+          {
+            name: 'Group by Brand within Segment',
+            type: 'select',
+            value: 'Yes'
+          },
+          {
+            name: 'Allow Cross Merchandising',
+            type: 'select',
+            value: 'Yes'
+          },
+          {
+            name: 'House Brand Next to Brand Leader',
+            type: 'select',
+            value: 'Yes'
+          },
+          {
+            name: 'Normal Brand Flow = Premium Brand, House Brand, Brand Leader, Price Fighter',
+            type: 'select',
+            value: 'Yes'
+          },
+          {
+            name: 'Merchandise from Premium to Economy',
+            type: 'select',
+            value: 'Yes'
+          },
+          {
+            name: 'Balance Space to Sales',
+            type: 'select',
+            value: 'Yes'
+          },
+          {
+            name: 'Balance Space to Profit',
+            type: 'select',
+            value: 'Yes'
+          },
+          {
+            name: 'Balance Space to Volume',
+            type: 'select',
+            value: 'Yes'
+          },
+          {
+            name: 'Maximum Days of Supply',
+            type: 'number',
+            value: '0'
+          },
+          {
+            name: 'Maximise ROI',
+            type: 'select',
+            value: 'Yes'
+          },
+          {
+            name: 'Profit Generators to Eye Level',
+            type: 'select',
+            value: 'Yes'
+          },
+          {
+            name: 'Merchandise High Volume then High Value items for Hot Spots',
+            type: 'select',
+            value: 'Yes'
+          },
+          {
+            name: 'Minimum 1 Case of Product On Shelf',
+            type: 'select',
+            value: 'Yes'
+          }
+        ],
+        promotionTypes: [
+          'Print Media',
+          'Cross Merchandise',
+          'Radio',
+          'TV',
+          'In Store'
+        ],
+        promotionType: 'Print Media',
+        promotionStore: null,
+        promotionStoreCluster: null,
+        promotionCustomCluster: null,
+        promotionCategoryCluster: null,
+        note: ""
       };
     },
     created() {
@@ -470,6 +845,20 @@
       self.getFixtureType();
     },
     computed: {
+      totalPromotionDays() {
+        let self = this;
+
+        let start = new Date(self.startDate);
+        let end = new Date(self.endDate);
+
+        if (self.startDate != null && self.endDate != null) {
+          const oneDay = 24 * 60 * 60 * 1000;
+
+          return Math.round(Math.abs((end - start) / oneDay));
+        } else {
+          return 0;
+        }
+      },
       filteredItems() {
         let self = this;
         let tmp = [];
@@ -531,6 +920,60 @@
       }
     },
     methods: {
+      openHelpFileMaint() {
+        let self = this;
+
+        let type = "SPACE-PLANNING"
+
+        self.$refs.HelpFileMaint.show(type + " - " + self.spacePlanID, html => {
+          self.note = html;
+        })
+      },
+      getHelpFile() {
+        let self = this;
+
+        let type = "SPACE-PLANNING"
+
+        Axios.get(process.env.VUE_APP_API + "HelpFile?systemComponent=" + type + " - " + self.spacePlanID)
+          .then(r => {
+            if (r.data.success) {
+              self.note = r.data.helpFile.html;
+            } else {
+              self.note = "";
+            }
+
+            self.dialog = true;
+          })
+      },
+      addPromotionItem() {
+        let self = this;
+
+        let promoItems = self.promoItemBarcode.split(" ");
+
+        promoItems.forEach(element => {
+          self.promoItems.push(element);
+        });
+
+        self.promoItemBarcode = "";
+      },
+      getSelectBackground(item) {
+        let self = this;
+
+        switch (item.value) {
+          case "H": {
+            return "red";
+          }
+          break;
+        case "M": {
+          return "orange";
+        }
+        break;
+        case "L": {
+          return "yellow";
+        }
+        break;
+        }
+      },
       handleDefault(item) {
         // handle default flag and set comparii9torsd for dist process
         let self = this

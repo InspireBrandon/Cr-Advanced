@@ -55,7 +55,7 @@
         },
         data() {
             return {
-                dialog: true,
+                dialog: false,
                 afterReturn: null,
                 rowData: [],
                 barcode: '',
