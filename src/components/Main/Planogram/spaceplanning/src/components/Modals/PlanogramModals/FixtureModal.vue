@@ -140,7 +140,7 @@
                     <v-text-field type="number" v-model="newData.depth" label="Depth:" suffix="cm"></v-text-field>
                   </v-flex>
                   <v-flex lg8 md12 sm12 xs12
-                    v-if="(newData.fixtureType==1&&newData.type==2||newData.fixtureType==0&&newData.type==2 ||newData.fixtureType==1&&newData.type==3 ||newData.fixtureType==3&&newData.type==2 || newData.fixtureType==4&&newData.type==3)">
+                    v-if="(newData.fixtureType==1&&newData.type==2||newData.fixtureType==0&&newData.type==2 ||newData.fixtureType==1&&newData.type==3 ||newData.fixtureType==3&&newData.type==2 || newData.fixtureType==4&&newData.type==3 || newData.fixtureType==0&&newData.type==3)">
                     <v-text-field type="number" v-model="newData.merchandisingOffset" suffix="cm"
                       label="Merchandising Offset:"></v-text-field>
                   </v-flex>
@@ -149,7 +149,7 @@
                     <v-text-field type="number" v-model="newData.overhang" label="Overhang:" suffix="cm"></v-text-field>
                   </v-flex>
                   <v-flex lg8 md12
-                    v-if="!newData.rendering && ((newData.fixtureType == 3 || newData.fixtureType == 0) && newData.type == 3)">
+                    v-if="!newData.rendering && ((newData.fixtureType == 4 || newData.fixtureType == 3 || newData.fixtureType == 0 || newData.fixtureType == 1) && (newData.type == 2 || newData.type == 3))">
                     <v-text-field type="number" v-model="newData.productOffset" label="Product offset:" suffix="cm">
                     </v-text-field>
                   </v-flex>

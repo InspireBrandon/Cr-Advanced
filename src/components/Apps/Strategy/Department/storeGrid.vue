@@ -44,7 +44,8 @@
                 headers: [{
                     headerName: 'Store Name',
                     field: 'storeName'
-                }, {
+                }, 
+                {
                     headerName: 'Formula 1',
                     field: 'level1Code',
                     hide: true
@@ -56,10 +57,12 @@
                     headerName: 'Formula 3',
                     field: 'level3Code',
                     hide: true
-                }, {
-                    headerName: 'Current Rank',
-                    field: 'currentRank'
-                }, {
+                },
+                //  {
+                //     headerName: 'Current Rank',
+                //     field: 'currentRank'
+                // },
+                 {
                     headerName: 'Cluster',
                     field: 'cluster'
                 }]

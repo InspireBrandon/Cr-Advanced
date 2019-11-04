@@ -36,6 +36,14 @@
             <v-icon>extension</v-icon>
           </v-tab>
 
+          <v-tab href="#tab-custom">Custom
+            <v-icon>extension</v-icon>
+          </v-tab>
+
+          <v-tab href="#tab-planogram">Planograms
+            <v-icon>extension</v-icon>
+          </v-tab>
+
           <!-- GONDOLAS TAB -->
           <v-tab-item value="tab-gondola" class="list-item">
             <v-card flat>
@@ -252,6 +260,42 @@
               </template>
             </v-card>
           </v-tab-item>
+
+          <v-tab-item value="tab-custom" class="list-item">
+            <v-card flat>
+              <template v-for="(item, index) in customFixtures">
+                <v-list-tile :key="index" @click="selectLibraryItem(item)"
+                  :class="{ 'active-item':(selectedItem != null && item.id == selectedItem.data.id), 'inactive-item' : (selectedItem == null || item.id != selectedItem.data.id)}"
+                  draggable="true" @drag="dragMove" @dragstart="dragCustomStart('LIBRARY', item, 'CUSTOM')" @dragend="clearDrag">
+                  <v-list-tile-content>
+                    <v-list-tile-title>{{item.name}}</v-list-tile-title>
+                    <v-list-tile-sub-title>
+                      possible description :
+                      {{item.name}}
+                    </v-list-tile-sub-title>
+                  </v-list-tile-content>
+                </v-list-tile>
+              </template>
+            </v-card>
+          </v-tab-item>
+
+          <v-tab-item value="tab-planogram" class="list-item">
+            <v-card flat>
+              <template v-for="(item, index) in planograms">
+                <v-list-tile :key="index" @click="selectLibraryItem(item)"
+                  :class="{ 'active-item':(selectedItem != null && item.id == selectedItem.data.id), 'inactive-item' : (selectedItem == null || item.id != selectedItem.data.id)}"
+                  draggable="true" @drag="dragMove" @dragstart="dragCustomStart('LIBRARY', item, 'CUSTOM_PLANOGRAM')" @dragend="clearDrag">
+                  <v-list-tile-content>
+                    <v-list-tile-title>{{item.name}}</v-list-tile-title>
+                    <v-list-tile-sub-title>
+                      possible description :
+                      {{item.name}}
+                    </v-list-tile-sub-title>
+                  </v-list-tile-content>
+                </v-list-tile>
+              </template>
+            </v-card>
+          </v-tab-item>
         </v-tabs>
       </v-card>
     </v-menu>
@@ -272,13 +316,32 @@
       subfixtureDataArray: [],
       paletteDataArray: [],
       miscArray: [],
-      selectedItem: null
+      selectedItem: null,
+      customFixtures: [],
+      planograms: []
     }),
     mounted() {
       let self = this;
       self.getLibraryData();
+      self.getFixtures();
+      self.getPlanograms();
     },
     methods: {
+      dragCustomStart(where, item, type) {
+        let self = this;
+        if (where == "CHIP") {
+          if (self.selectedItem == null) {
+            alert("Please select a library item");
+          }
+        } else if (where == "LIBRARY") {
+          self.selectedItem = {
+            type: type,
+            data: item
+          };
+        }
+
+        window.library = self.selectedItem;
+      },
       dragStart(where, item) {
         let self = this;
         if (where == "CHIP") {
@@ -378,6 +441,7 @@
       selectLibraryItem(item) {
         let self = this;
         let strType = "";
+
         switch (item.type) {
           case 0: {
             // gondola
@@ -461,7 +525,33 @@
           type: strType,
           data: item
         };
-      }
+      },
+      getFixtures() {
+        let self = this;
+
+        self.spaceData = [];
+
+        axios.get(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire&folder=FIXTURES")
+          .then(r => {
+            self.customFixtures = r.data;
+          })
+          .catch(e => {
+            alert("Failed to get data...");
+          })
+      },
+      getPlanograms() {
+        let self = this;
+
+        self.spaceData = [];
+
+        axios.get(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire&folder=Space Planning")
+          .then(r => {
+            self.planograms = r.data;
+          })
+          .catch(e => {
+            alert("Failed to get data...");
+          })
+      },
     }
   };
 </script>

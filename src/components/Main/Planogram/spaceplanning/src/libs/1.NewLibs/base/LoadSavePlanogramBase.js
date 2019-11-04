@@ -513,6 +513,129 @@ class LoadSavePlanogramBase {
     })
   }
 
+  saveFixture(vuex, name, image, fixtureID, callback) {
+    let self = this;
+    let ctrl_store = new StoreHelper();
+    let allItems = ctrl_store.getAllPlanogramItems(vuex);
+
+    let output = {
+      name: name,
+      stage: null,
+      planogramData: [],
+      planogramSettings: vuex.getters.getPlanogramProperties,
+      image: image
+    }
+
+    allItems.forEach(item => {
+      // remove the line below to test that the positions are being saved and repopulated in the load
+      // item.PositionElement();
+      output.planogramData.push(item.ToObject());
+    });
+
+    output = JSON.parse(JSON.stringify(output));
+
+    let tmp = {
+      systemFile: {
+        systemUserID: 10,
+        folder: "FIXTURES",
+        name: name,
+        isFolder: true,
+        extension: "",
+        id: fixtureID
+      }
+    }
+
+    if (fixtureID == null) {
+      // Create Folder
+      axios.post(self.ServerAddress + "SystemFolder?db=CR-Devinspire", tmp)
+        .then(r => {
+          fixtureID = r.data.systemFileID;
+
+          // Upload data to folder
+          axios.post(self.ServerAddress + "SystemFile/JSON/Planogram?db=CR-Devinspire", {
+              file: "config",
+              systemFile: {
+                systemUserID: 10,
+                folder: "FIXTURES",
+                name: name,
+              },
+              data: output
+            })
+            .then(result => {
+              self.uploadFixtureImage(image, name, fixtureID, callback);
+            })
+        })
+    } else {
+      // Upload data to folder
+      axios.post(self.ServerAddress + "SystemFile/JSON/Planogram?db=CR-Devinspire", {
+          file: "config",
+          systemFile: {
+            systemUserID: 10,
+            folder: "FIXTURES",
+            name: name,
+          },
+          data: output
+        })
+        .then(result => {
+          self.uploadFixtureImage(image, name, fixtureID, callback);
+        })
+    }
+  }
+
+  uploadFixtureImage(image, name, fixtureID, callback) {
+    let self = this;
+
+    let xhrObj = new XMLHttpRequest();
+    let url = self.ServerAddress + `SystemFile/JSON/FixtureImage?db=CR-Devinspire&fileName=${name}`;
+
+    xhrObj.open("Post", url);
+
+    xhrObj.upload.onerror = function (e) {
+      alert("ERROR")
+      // hasError = true;
+    }
+
+    xhrObj.upload.onloadend = function (e) {
+      callback(fixtureID)
+    }
+
+    xhrObj.setRequestHeader("X-File-Name", "image.png");
+    xhrObj.setRequestHeader("Content-type", image.Type);
+
+    image.name = "image.png"
+    xhrObj.send(image);
+
+    // let startTime = new Date()
+
+    // xhrObj.upload.onprogress = function (pe) {
+    //   var currentFileSize = pe.loaded * 0.000001
+    //   var FileTotalSize = pe.total * 0.000001
+    //   var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+    //   var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
+
+    //   updateLoader({
+    //     text1: "uploading Planogram Image",
+    //     text2: "File Progresss",
+
+    //     currentFileSize: pe.loaded * 0.000001,
+    //     FileTotalSize: pe.total * 0.000001,
+    //     progress: ((currentFileSize / FileTotalSize) * 100) / 3,
+    //     currentFile: 2,
+    //     totalFiles: 3,
+    //     DownloadSpeed: DownloadSpeed
+    //   })
+    // }
+
+    // xhrObj.upload.onreadystatechange = function (oEvent) {
+
+    //   if (xhrObj.upload.readyState === 4) {
+    //     if (xhrObj.upload.status !== 200) {
+    //       alert("ERROR")
+    //     }
+    //   }
+    // };
+  }
+
   createDetailTX(clusterData, dimensionData, systemFileID, fixtureData, callback) {
 
     console.log("making detailTX");
@@ -581,6 +704,55 @@ class LoadSavePlanogramBase {
     // TODO: Make sure that we change the name to the correct standard.
     // return clusterData.planogramName + " " + clusterData.clusterName;
     return PlanogramNamer.generatePlanogramName(allPlanogramItems, clusterData);
+  }
+
+  loadFixture(fixtureID, VueStore, MasterLayer, Stage, pxlRatio, callback) {
+    let self = this;
+    let startTime = new Date()
+    self.resetStage(VueStore, MasterLayer, Stage);
+    let config = {
+      onDownloadProgress: progressEvent => {
+        var currentFileSize = progressEvent.loaded * 0.000001
+        var FileTotalSize = progressEvent.total * 0.000001
+        var TIME_TAKEN = new Date().getTime() - startTime.getTime()
+        var DownloadSpeed = currentFileSize / (TIME_TAKEN / 1000)
+
+        // do whatever you like with the percentage complete
+        // maybe dispatch an action that will update a progress bar or something
+        updateLoader({
+          text1: "Downloading Planogram",
+          text2: null,
+          currentFileSize: currentFileSize,
+          FileTotalSize: FileTotalSize,
+          currentFile: null,
+          totalFiles: null,
+          DownloadSpeed: DownloadSpeed,
+        })
+      }
+    }
+    axios.get(self.ServerAddress + `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${fixtureID}&file=config`)
+      .then(r => {
+
+        console.log(r.data);
+
+        let jsonData = r.data.jsonObject
+        self.startLoadingPlanogram(jsonData, Stage, pxlRatio, MasterLayer, VueStore, null, () => {
+          callback(r.data)
+        });
+
+        // afterGetSpacePlanFile(jsonData.clusterData, jsonData.dimensionData, jsonData.name, rangeProducts => {
+        //   if (rangeProducts == null) {
+        //   } else {
+        //     jsonData.planogramData = StageWarehouseMiddleware.verifyIntegrityOfWarehouseData(jsonData.planogramData, rangeProducts);
+        //     self.startLoadingPlanogram(jsonData, Stage, pxlRatio, MasterLayer, VueStore, hideLoader, () => {
+        //       callRedraw();
+        //     });
+        //   }
+        // });
+      })
+      .catch(e => {
+        alert("Failed to get data. " + e);
+      })
   }
 
   loadPlanogram(spacePlanID, VueStore, MasterLayer, Stage, pxlRatio, afterGetSpacePlanFile, hideLoader, updateLoader, callRedraw) {
@@ -694,7 +866,8 @@ class LoadSavePlanogramBase {
     // end
     Stage.draw();
 
-    hideLoader();
+    if (hideLoader != undefined && hideLoader != null)
+      hideLoader();
 
     if (callback != undefined && callback != null)
       callback();
@@ -794,6 +967,8 @@ class LoadSavePlanogramBase {
     }
     break;
     case "SHELF": {
+      console.log("CHECKING SHELF")
+
       let ctrl_item = new ShelfNew(
         VueStore,
         Stage,
@@ -821,6 +996,8 @@ class LoadSavePlanogramBase {
     }
     break;
     case "BASE": {
+      console.log("LOAD RECURSIVE", CurrentItem)
+
       let ctrl_item = new BaseNew(
         VueStore,
         Stage,
@@ -830,6 +1007,8 @@ class LoadSavePlanogramBase {
         "BASE",
         ParentID
       )
+
+      console.log("BASE", ctrl_item)
 
       if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
         ctrl_item.Position = CurrentItem.Position;
@@ -1062,16 +1241,31 @@ class LoadSavePlanogramBase {
       ctrl_item.Group.setY(CurrentItem.RelativePosition.y);
     }
 
-    let itemArr = MasterData.filter((el) => el.Data.ParentID == CurrentItem.Data.ID);
-    itemArr.sort((a, b) => a.RelativePosition.x - b.RelativePosition.x);
+    if (CurrentItem.Type == "PEG") {
+      let itemArr = MasterData.filter((el) => el.Data.ParentID == CurrentItem.Data.ID);
+      itemArr.sort((a, b) => a.RelativePosition.y - b.RelativePosition.y);
 
-    // check if there are children and call recursive
-    if (itemArr != undefined && itemArr != null) {
-      // get all children of the current item, call recursive function
-      if (itemArr.length > 0) {
-        itemArr.forEach(child => {
-          self.loadItemRecursive(MasterData, child, child.Data.ParentID, Stage, MasterLayer, PxlRatio, VueStore);
-        });
+      // check if there are children and call recursive
+      if (itemArr != undefined && itemArr != null) {
+        // get all children of the current item, call recursive function
+        if (itemArr.length > 0) {
+          itemArr.forEach(child => {
+            self.loadItemRecursive(MasterData, child, child.Data.ParentID, Stage, MasterLayer, PxlRatio, VueStore);
+          });
+        }
+      }
+    } else {
+      let itemArr = MasterData.filter((el) => el.Data.ParentID == CurrentItem.Data.ID);
+      itemArr.sort((a, b) => a.RelativePosition.x - b.RelativePosition.x);
+
+      // check if there are children and call recursive
+      if (itemArr != undefined && itemArr != null) {
+        // get all children of the current item, call recursive function
+        if (itemArr.length > 0) {
+          itemArr.forEach(child => {
+            self.loadItemRecursive(MasterData, child, child.Data.ParentID, Stage, MasterLayer, PxlRatio, VueStore);
+          });
+        }
       }
     }
   }

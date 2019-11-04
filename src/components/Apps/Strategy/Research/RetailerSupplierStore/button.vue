@@ -28,8 +28,6 @@
                   <v-autocomplete
                     return-object
                     @change="setLocationID"
-                    item-text="name"
-                    item-value="id"
                     v-model="location"
                     :items="Locations"
                     prepend-icon="search"
@@ -63,13 +61,13 @@ export default {
         name: "",
         location_ID: -1
       },
-      location: null,
-      Locations: [
-        {
-          id: "",
-          name: ""
-        }
-      ]
+      location: {
+        id: 0,
+        storeName: "",
+        name: "",
+        location_ID: -1
+      },
+      Locations: []
     };
   },
   components: {
@@ -79,35 +77,43 @@ export default {
     getLocations() {
       let self = this;
       Axios.get(process.env.VUE_APP_API + `RetailerStore`).then(r => {
-        self.Locations = r.data.retailerStoreList;
+        self.Locations = [];
         console.log(r.data);
+
+        r.data.retailerStoreList.forEach(item => {
+          self.Locations.push({
+            value: item.id,
+            text: item.name
+          });
+        });
       });
     },
     setLocationID() {
       let self = this;
 
       self.$nextTick(() => {
-        self.editForm.location_ID = self.location.id;
+        self.editForm.location_ID = self.location.value;
+        self.editForm.name = self.location.text;
       });
     },
     openEdit(item) {
       let self = this;
+      let tmp = item.data;
 
-      console.log(item)
-
-      self.EditDialog = true;
-      self.editForm = item.data;
+      self.editForm = tmp;
+      self.location = tmp.location_ID;
       self.getLocations();
+      self.EditDialog = true;
     },
     saveForm(item) {
       let self = this;
       let tmp = item.data;
       let node = item.node;
 
-      tmp = self.editForm;
-
       Axios.defaults.headers.common["TenantID"] =
         sessionStorage.currentDatabase;
+
+      tmp = self.editForm;
 
       Axios.put(
         process.env.VUE_APP_API + `SupplierRetailerStore`,

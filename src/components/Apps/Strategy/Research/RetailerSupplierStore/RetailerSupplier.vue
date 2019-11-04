@@ -5,7 +5,7 @@
         <v-dialog v-model="dialog" width="1500">
           <v-card>
             <v-toolbar flat dark color="blue darken-2" scroll-off-screen>
-              <v-toolbar-title>Configuration</v-toolbar-title>
+              <v-toolbar-title>Store Linking</v-toolbar-title>
               <v-spacer></v-spacer>
               <v-btn icon @click="dialog = false">
                 <v-icon>close</v-icon>

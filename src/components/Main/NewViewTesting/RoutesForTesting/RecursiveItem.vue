@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-for="(item, idx) in items" :key="idx">
+    <div v-for="(item, idx) in routeController.getRoutesByParentID(parentID)" :key="idx">
       <div>
         <div
           class="subheading mt-1 pa-1 font-weight-bold"
@@ -9,7 +9,7 @@
           @click="item.showChildren = !item.showChildren"
         >
           <v-icon v-if="item.route == null">{{ item.showChildren ? 'folder_open' : 'folder' }}</v-icon>
-          {{item.title}}
+          {{item.title}} 
         </div>
         <div
           class="subheading mt-1 pa-1 font-weight-bold"
@@ -27,7 +27,7 @@
           @click="item.showChildren =  !item.showChildren"
         >
           <v-icon v-if="item.route == null">{{ item.showChildren ? 'folder_open' : 'folder' }}</v-icon>
-          {{item.title}}
+          {{item.title}} {{counter(item)}}
         </div>
         <div>
           <div
@@ -39,25 +39,27 @@
             <v-icon v-if="item.routeType == 0">folder</v-icon>
             <v-icon v-if="item.routeType == 1">insert_drive_file</v-icon>
             <v-icon v-if="item.routeType == 2">stars</v-icon>
-            {{(idx + 1)}}.
             {{item.title}}
           </div>
         </div>
       </div>
-      <recursive-item v-show="item.showChildren" style="margin-left: 15px;" :parentID="item.id"></recursive-item>
+      <recursive-item
+        v-if="routeController != null"
+        :routeController="routeController"
+        v-show="item.showChildren"
+        style="margin-left: 15px;"
+        :parentID="item.id"
+      ></recursive-item>
     </div>
   </div>
 </template>
 
 
 <script>
-import RouteController from "@/components/Main/NewViewTesting/RoutesForTesting/route-controller";
+// import RouteController from "@/components/Main/NewViewTesting/RoutesForTesting/route-controller";
 
 export default {
-  components: {
-    RouteController
-  },
-  props: ["parentID"],
+  props: ["parentID", "routeController"],
   name: "recursive-item",
   data() {
     return {
@@ -67,14 +69,6 @@ export default {
   },
   created() {
     let self = this;
-
-    let rc = new RouteController({
-      userType: 0
-    });
-
-    self.items = rc.getRoutesByParentID(self.parentID);
-    console.log(self.items);
-    // route controller to get all items by parent id
   },
   methods: {
     goTo(route) {
@@ -84,8 +78,9 @@ export default {
       let self = this;
 
       var tmp = 0;
-
-      tmp = items.length;
+      if ((item.showChildrenCount = true)) {
+        tmp = `(${self.routeController.getRoutesByParentID(item.id).length})`;
+      }
       return tmp;
     }
   }
