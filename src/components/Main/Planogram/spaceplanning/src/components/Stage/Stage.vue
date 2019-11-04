@@ -1536,6 +1536,8 @@
         }
         //#endregion
 
+        console.log(data.type)
+
         switch (dragType.toUpperCase()) {
           case "WAREHOUSE": {
             self.addWarehouseProduct(stage, data, ev);
@@ -1544,6 +1546,8 @@
         case "LIBRARY": {
           if (data.type == "CUSTOM") {
             self.addCustomLibraryItem(stage, data, ev)
+          } else if(data.type == "CUSTOM_PLANOGRAM") {
+            self.addCustomPlanogram(stage, data, ev);
           } else {
             self.addLibraryItem(stage, data, ev);
           }
@@ -1835,6 +1839,23 @@
         let fileID = data.data.id;
 
         axios.get(process.env.VUE_APP_API + `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${fileID}&file=config`)
+          .then(r => {
+            let jsonData = r.data.jsonObject;
+            let planodata = jsonData.planogramData;
+            let stage = self.$refs.stage.getStage();
+            let cFixtureLoader = new CustomFixtureLoader(self.$store, stage, self.MasterLayer, self.$PixelToCmRatio);
+            cFixtureLoader.addCustomFixture(planodata);
+          })
+          .catch(e => {
+            alert("Failed to get data. " + e);
+          })
+      },
+      addCustomPlanogram(stage, data, ev) {
+        let self = this;
+
+        let fileID = data.data.id;
+
+        axios.get(process.env.VUE_APP_API + `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${fileID}&file=config_advanced`)
           .then(r => {
             let jsonData = r.data.jsonObject;
             let planodata = jsonData.planogramData;

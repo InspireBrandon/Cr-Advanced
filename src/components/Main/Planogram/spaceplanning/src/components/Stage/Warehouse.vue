@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card dark>
+    <v-card dark tile>
       <v-toolbar flat dense dark>
         <v-btn-toggle v-model="toggle" mandatory>
           <v-tooltip bottom>
