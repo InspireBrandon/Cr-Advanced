@@ -53,7 +53,7 @@ function GetAllRoutes() {
             ],
             routeType: RouteType.Folder,
             children: []
-        },{
+        }, {
             title: "AWAITING_IMPLEMENTATION",
             dispaly: "Ready to implement",
             allowedAccessLevels: [
@@ -64,7 +64,7 @@ function GetAllRoutes() {
             ],
             routeType: RouteType.Folder,
             children: []
-        },{
+        }, {
             title: "IMPLEMENTATION_IN_PROGRESS",
             dispaly: "In progress",
             allowedAccessLevels: [
@@ -75,7 +75,7 @@ function GetAllRoutes() {
             ],
             routeType: RouteType.Folder,
             children: []
-        },{
+        }, {
             title: "IMPLEMENTED",
             dispaly: "Implemented",
             allowedAccessLevels: [
@@ -117,6 +117,7 @@ function GetAllRoutes() {
 }
 
 function BuildRoutes(values, finalArr, parentString) {
+
     values.forEach(element => {
         let id = element.title;
 
@@ -136,6 +137,7 @@ function BuildRoutes(values, finalArr, parentString) {
             routeType: element.routeType
         }))
 
+        console.log(finalArr);
         if (element.children.length > 0) {
             BuildRoutes(element.children, finalArr, id);
         }

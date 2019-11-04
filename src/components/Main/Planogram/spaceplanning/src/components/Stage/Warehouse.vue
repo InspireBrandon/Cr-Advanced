@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card dark>
+    <v-card dark tile>
       <v-toolbar flat dense dark>
         <v-btn-toggle v-model="toggle" mandatory>
           <v-tooltip bottom>
@@ -43,6 +43,9 @@
             <v-list-tile @click="openFile">
               <v-list-tile-title>Open</v-list-tile-title>
             </v-list-tile>
+            <v-list-tile @click="openFixture">
+              <v-list-tile-title>Open Fixture</v-list-tile-title>
+            </v-list-tile>
             <v-list-tile @click="importRange">
               <v-list-tile-title>Select Range</v-list-tile-title>
             </v-list-tile>
@@ -51,6 +54,9 @@
             </v-list-tile>
             <v-list-tile @click="CheckExists()">
               <v-list-tile-title>Save New</v-list-tile-title>
+            </v-list-tile>
+            <v-list-tile @click="saveFixture">
+              <v-list-tile-title>Save As Fixture</v-list-tile-title>
             </v-list-tile>
             <v-list-tile @click="rangeToPlanogram">
               <v-list-tile-title>Range To Planogram</v-list-tile-title>
@@ -280,6 +286,7 @@
     </v-card>
     <RangeSelectorModal ref="rangeSelectorModal"></RangeSelectorModal>
     <SpacePlanSelector ref="spacePlanSelector"></SpacePlanSelector>
+    <FixtureSelector ref="FixtureSelector"></FixtureSelector>
     <Spinner ref="spinner"></Spinner>
     <YesNoModal ref="yesNoModal"></YesNoModal>
     <PlanogramAprovalModal ref="PlanogramAprovalModal"></PlanogramAprovalModal>
@@ -287,7 +294,7 @@
     <JoinPlanogram ref="JoinPlanogram"></JoinPlanogram>
     <SizeLoader ref="SizeLoader" />
     <!-- <SaveDetailsModal ref="SaveDetailsModal" /> -->
-
+    <Prompt ref="Prompt" />
   </div>
 </template>
 
@@ -300,6 +307,7 @@
   import RangeSelectorModal from '@/components/Common/RangeSelectorModal';
   import SizeLoader from '@/components/Common/SizeLoader';
   import SpacePlanSelector from '@/components/Common/SpacePlanSelector';
+  import FixtureSelector from '@/components/Common/FixtureSelector';
   import Spinner from '@/components/Common/Spinner';
   import RangingController from '@/components/Apps/RangePlanning/ranging-controller'
   import LoadSavePlanogramBase from '@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/LoadSavePlanogramBase'
@@ -308,6 +316,7 @@
   import PlanogramAprovalModal from "@/components/Main/Planogram/spaceplanning/src/components/Modals/PlanogramAproval/PlanogramAprovalModal.vue";
   import PlanogramRetractionModal from "@/components/Main/Planogram/spaceplanning/src/components/Modals/PlanogramAproval/PlanogramRetractionModal.vue";
   import JoinPlanogram from "@/components/Main/Planogram/spaceplanning/src/components/Modals/JoinPlanogram/JoinPlanogram.vue";
+  import Prompt from '@/components/Common/Prompt';
   // import SaveDetailsModal from "@/components/Main/Planogram/spaceplanning/src/components/Modals/SaveDetails/SaveDetailsModal";
 
 
@@ -331,7 +340,9 @@
       PlanogramAprovalModal,
       PlanogramRetractionModal,
       JoinPlanogram,
-      SizeLoader
+      SizeLoader,
+      Prompt,
+      FixtureSelector
     },
     data() {
       let width = 0;
@@ -344,7 +355,9 @@
         planogramDetailsID: null,
         toggle: 0,
         spacePlanID: null,
+        fixtureID: null,
         spacePlanName: null,
+        fixtureName: null,
         modules: 0,
         height: 0,
         width: 0,
@@ -713,7 +726,8 @@
               storeProduct.Data.pallet_Width = parseFloat(product.pallet_Width);
               storeProduct.Data.pallet_Depth = parseFloat(product.pallet_Depth);
 
-              if (storeProduct.Data.volume_potential != parseFloat(product.volume_potential) || storeProduct.Data
+              if (storeProduct.Data.volume_potential != parseFloat(product.volume_potential) || storeProduct
+                .Data
                 .sales_potential != parseFloat(product.sales_potential)) {
                 needsDraw = true;
               }
@@ -931,6 +945,7 @@
             // self.$refs.spinner.show();
             self.$refs.SizeLoader.show()
             self.spacePlanID = spacePlanID;
+            self.fixtureID = null;
 
             self.getFixtureDetails(self.spacePlanID);
 
@@ -939,6 +954,31 @@
               self.$refs.SizeLoader.close, self.updateLoader, () => {
                 self.rangeToPlanogram();
               });
+          }, 1000);
+        })
+      },
+      openFixture() {
+        let self = this;
+
+        self.$refs.FixtureSelector.show((fixtureID, item) => {
+
+          setTimeout(() => {
+            self.PlanogramObject = item
+
+            self.planogramHelper.setCreate(false);
+            let stage = self.$parent.$children[0].$children[2].getStage();
+            stage.destroyChildren(); // destroy first
+            self.$parent.$children[0].createNewLayer("LoadInit");
+            let masterLayer = self.$parent.$children[0].MasterLayer;
+
+            let pxlRatio = 3; // TODO: Figure out why this is 1 and not 3, perhaps a timing issue?
+
+            self.fixtureID = fixtureID;
+            self.spacePlanID = null;
+
+            self.planogramHelper.loadFixture(fixtureID, self.$store, masterLayer, stage, pxlRatio, data => {
+              self.fixtureName = data.jsonObject.name
+            });
           }, 1000);
         })
       },
@@ -1101,6 +1141,7 @@
         self.supplierStands = 0
         self.bins = 0
         self.spacePlanID = null;
+        self.fixtureID = null;
 
         self.fixture_types.forEach((el, idx) => {
           el.modules = 0;
@@ -1274,6 +1315,7 @@
         clusterData["categoryCluster"] = vscd.categoryCluster;
         let tmpSpacePlanID = self.spacePlanID
         self.spacePlanID = null
+        self.fixtureID = null
 
         self.saveRangeFile(vscd.rangeID, () => {
           self.$store.getters.getAllPlanogramActiveProducts.forEach(el => {
@@ -1301,6 +1343,26 @@
                 self.spacePlanID = data
               })
           }
+        })
+      },
+      saveFixture() {
+        let self = this;
+
+        self.$refs.Prompt.show(self.fixtureName, "Enter a name for the fixture", 'Name', fixtureName => {
+          let parent = self.$parent.$children[0].$children[2];
+          let stage = parent.getStage();
+
+          let b64 = parent.$parent.getImageBytes(2);
+          let image = parent.$parent.b64toBlob(b64, "image/png")
+
+          self.planogramHelper.setCreate(self.fixtureID == null);
+
+          self.planogramHelper.saveFixture(self.$store, fixtureName, image, self.fixtureID, systemFileID => {
+            console.log(systemFileID);
+            self.spacePlanID = null;
+            self.fixtureID = systemFileID;
+            self.fixtureName = fixtureName;
+          });
         })
       },
       saveRangeFile(rangeID, callback) {
@@ -1521,7 +1583,8 @@
                   self.products.forEach(product => {
                     if (storeProduct.Data.productID == product.productID) {
                       for (var prop in product) {
-                        if (prop != "useAlternateBarcode" && prop != "alternateBarcode" && prop != "alternatePackingType" && prop != "cost_potential") {
+                        if (prop != "useAlternateBarcode" && prop != "alternateBarcode" && prop !=
+                          "alternatePackingType" && prop != "cost_potential") {
                           storeProduct.Data[prop] = product[prop];
                         }
                       }

@@ -234,6 +234,7 @@
     <HelpFileMaint ref="HelpFileMaint" />
     <SyncModalStatus ref="SyncModalStatus" />
     <HandleDescrepancy ref="HandleDescrepancy" />
+    <CustomRange ref="CustomRange" />
   </div>
 </template>
 
@@ -278,6 +279,7 @@
   import HelpFileMaint from '../../Main/HelpFile/HelpFileMaint'
   import SyncModalStatus from './SyncModalStatus'
   import HandleDescrepancy from './HandleDescrepancy'
+  import CustomRange from './CustomRange/Index'
 
   import {
     AgGridVue
@@ -320,7 +322,8 @@
       CategorySelector,
       HelpFileMaint,
       SyncModalStatus,
-      HandleDescrepancy
+      HandleDescrepancy,
+      CustomRange
     },
     data() {
       return {

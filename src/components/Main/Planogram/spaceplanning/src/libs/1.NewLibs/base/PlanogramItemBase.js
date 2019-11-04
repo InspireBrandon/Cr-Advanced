@@ -1724,7 +1724,7 @@ class PlanogramItemBase {
       padding: 0.5,
       fill: 'black',
       transformsEnabled: 'position',
-      listening: false
+      // listening: false
     })
 
     self.SetTextLabelPosition();

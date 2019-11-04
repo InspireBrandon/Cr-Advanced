@@ -16,6 +16,15 @@
                         <v-list-tile @click="getHinterlandStores">
                             <v-list-tile-title>Refresh</v-list-tile-title>
                         </v-list-tile>
+                        <v-list-tile @click="openRetailerModal">
+                            <v-list-tile-title>openRetailerModal</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="LinkRetailerStore">
+                            <v-list-tile-title>LinkRetailerStore</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="LinkRetailerStore">
+                            <v-list-tile-title>LinkRetailerStore</v-list-tile-title>
+                        </v-list-tile>
                     </v-list>
                 </v-menu>
                 <v-menu dark offset-y style="margin-bottom: 10px;">

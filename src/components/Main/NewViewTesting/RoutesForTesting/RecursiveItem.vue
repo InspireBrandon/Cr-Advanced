@@ -9,7 +9,7 @@
           @click="item.showChildren = !item.showChildren"
         >
           <v-icon v-if="item.route == null">{{ item.showChildren ? 'folder_open' : 'folder' }}</v-icon>
-          {{item.title}}
+          {{item.title}} 
         </div>
         <div
           class="subheading mt-1 pa-1 font-weight-bold"
@@ -27,7 +27,7 @@
           @click="item.showChildren =  !item.showChildren"
         >
           <v-icon v-if="item.route == null">{{ item.showChildren ? 'folder_open' : 'folder' }}</v-icon>
-          {{item.title}}
+          {{item.title}} {{counter(item)}}
         </div>
         <div>
           <div
@@ -43,7 +43,13 @@
           </div>
         </div>
       </div>
-      <recursive-item v-if="routeController != null" :routeController="routeController" v-show="item.showChildren" style="margin-left: 15px;" :parentID="item.id"></recursive-item>
+      <recursive-item
+        v-if="routeController != null"
+        :routeController="routeController"
+        v-show="item.showChildren"
+        style="margin-left: 15px;"
+        :parentID="item.id"
+      ></recursive-item>
     </div>
   </div>
 </template>
@@ -53,7 +59,7 @@
 // import RouteController from "@/components/Main/NewViewTesting/RoutesForTesting/route-controller";
 
 export default {
-  props: ["parentID", 'routeController'],
+  props: ["parentID", "routeController"],
   name: "recursive-item",
   data() {
     return {
@@ -72,8 +78,9 @@ export default {
       let self = this;
 
       var tmp = 0;
-
-      tmp = items.length;
+      if ((item.showChildrenCount = true)) {
+        tmp = `(${self.routeController.getRoutesByParentID(item.id).length})`;
+      }
       return tmp;
     }
   }

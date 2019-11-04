@@ -42,6 +42,7 @@
   import IntersectionTester from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/intersection/IntersectionTester.js";
   import StoreHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/StoreHelper/StoreHelper.js";
   import LoadSavePlanogramBase from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/LoadSavePlanogramBase.js";
+  import CustomFixtureLoader from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/LoadCustomFixture.js";
   //#endregion Templates
 
   //#region Modals
@@ -217,6 +218,7 @@
       this.loadPlanogram();
     },
     created() {
+      this.planogramHelper = new LoadSavePlanogramBase(process.env.VUE_APP_API, true, null);
 
       this.$store.commit("resetStore");
       EventBus.$on(
@@ -297,7 +299,7 @@
                 ctrl_store.setCtrlDown(self.$store, true);
               }
 
-              if(e.keyCode == 46) {
+              if (e.keyCode == 46) {
                 alert("DELETE");
                 // ctrl_store.dele
               }
@@ -993,7 +995,7 @@
 
         let ctrl_positioning = new PositioningBase();
         let dropPos = ctrl_positioning.GetTransformedMousePoint(stage)
-        console.log("GONDOLA ADD - STAGE", dropPos, self.MasterLayer);
+        console.log("GONDOLA ADD - STAGE", dropPos, self.MasterLayer, data);
 
         let ctrl_gondola = new GondolaNew(self.$store, stage, self.MasterLayer, JSON.parse(JSON.stringify(data)), self
           .$PixelToCmRatio,
@@ -1118,6 +1120,10 @@
             element.TurnGroupsOff();
 
         });
+      },
+      addNewCustom(parentId, data, dropPos) {
+        let self = this;
+        let stage = self.$refs.stage.getStage();
       },
       addNewPoduct(parentId, data, dropPos) {
         // console.log("[ADD PRODUCT]", data);
@@ -1530,13 +1536,21 @@
         }
         //#endregion
 
+        console.log(data.type)
+
         switch (dragType.toUpperCase()) {
           case "WAREHOUSE": {
             self.addWarehouseProduct(stage, data, ev);
           }
           break;
         case "LIBRARY": {
-          self.addLibraryItem(stage, data, ev);
+          if (data.type == "CUSTOM") {
+            self.addCustomLibraryItem(stage, data, ev)
+          } else if(data.type == "CUSTOM_PLANOGRAM") {
+            self.addCustomPlanogram(stage, data, ev);
+          } else {
+            self.addLibraryItem(stage, data, ev);
+          }
         }
         break;
         }
@@ -1818,6 +1832,40 @@
         }
 
         stage.draw();
+      },
+      addCustomLibraryItem(stage, data, ev) {
+        let self = this;
+
+        let fileID = data.data.id;
+
+        axios.get(process.env.VUE_APP_API + `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${fileID}&file=config`)
+          .then(r => {
+            let jsonData = r.data.jsonObject;
+            let planodata = jsonData.planogramData;
+            let stage = self.$refs.stage.getStage();
+            let cFixtureLoader = new CustomFixtureLoader(self.$store, stage, self.MasterLayer, self.$PixelToCmRatio);
+            cFixtureLoader.addCustomFixture(planodata);
+          })
+          .catch(e => {
+            alert("Failed to get data. " + e);
+          })
+      },
+      addCustomPlanogram(stage, data, ev) {
+        let self = this;
+
+        let fileID = data.data.id;
+
+        axios.get(process.env.VUE_APP_API + `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${fileID}&file=config_advanced`)
+          .then(r => {
+            let jsonData = r.data.jsonObject;
+            let planodata = jsonData.planogramData;
+            let stage = self.$refs.stage.getStage();
+            let cFixtureLoader = new CustomFixtureLoader(self.$store, stage, self.MasterLayer, self.$PixelToCmRatio);
+            cFixtureLoader.addCustomFixture(planodata);
+          })
+          .catch(e => {
+            alert("Failed to get data. " + e);
+          })
       },
       //#endregion
 
