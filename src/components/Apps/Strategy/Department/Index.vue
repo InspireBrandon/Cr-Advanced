@@ -24,6 +24,9 @@
                 </v-menu>
             </v-toolbar-items>
             <v-spacer></v-spacer>
+            <div v-if="selectedProjectGroup != null && selectedPeriod!=null">{{ generateName() }}</div>
+            <v-spacer></v-spacer>
+
             <v-toolbar-title>
                 Department Cluster
             </v-toolbar-title>
@@ -31,7 +34,8 @@
         <v-toolbar dark flat>
             <v-toolbar-items>
                 <v-select label="Project Group" style="margin-left: 10px; margin-top: 8px;" dense
-                    :items="projectsGroupItems" v-model="selectedProjectGroup" return-object hide-details>
+                    :items="projectsGroupItems" v-model="selectedProjectGroup" @change="newFile" return-object
+                    hide-details>
                 </v-select>
                 <v-select label="Primary Cluster" style="margin-left: 10px; margin-top: 8px; width: 150px"
                     placeholder="Item Percentage" @change="onPercentChange" dense :items="primaryClusters"
@@ -269,7 +273,7 @@
                             //console.log(r);
 
                             self.salesData = r.data.salesData;
-                            self.selectedPlanogram = r.data.config.planogramData;
+                            self.selectedProjectGroup = r.data.config.selectedProjectGroup;
                             self.selectedPeriod = r.data.config.periodData;
 
                             self.primaryCluster = r.data.config.setup.primaryCluster;
@@ -285,7 +289,7 @@
                 let self = this;
                 self.selectedCategory = null;
                 self.salesData = null;
-                self.selectedPlanogram = null;
+                self.selectedProjectGroup = null;
                 self.selectedPeriod = null;
 
                 self.primaryCluster = 5;
@@ -373,7 +377,7 @@
                         SystemFile: {
                             SystemUser_ID: -1,
                             Folder: "Department Cluster",
-                            Name: self.selectedProjectGroup.text,
+                            Name: self.selectedProjectGroup.value,
                             Extension: '.json'
                         },
                         Data: fileData
@@ -391,22 +395,20 @@
             },
             openDataSelector() {
                 let self = this
-                self.$refs.DataSelector.show(data => {
-                    //console.log(data);
-                })
+                self.$refs.DataSelector.show(data => {})
             },
             newFile() {
                 let self = this;
+                self.$nextTick(() => {
+                    self.$refs.DateRangeSelector.show(dateRange => {
+                        //console.log(dateRange);
+                        //console.log(self.selectedPlanogram);
 
-                // self.$refs.DateRangeSelector.show(dateRange => {
-                //     //console.log(dateRange);
-                //     //console.log(self.selectedPlanogram);
 
-                //     // self.selectedPlanogram = planogram.planogram_ID
-                //     // self.selectedPlanogramName = planogram.displayname
-                //     self.selectedPeriod = dateRange;
-                self.runQuery()
-                // })
+                        self.selectedPeriod = dateRange;
+                        self.runQuery()
+                    })
+                })
             },
             onPercentChange() {
                 let self = this;
@@ -422,7 +424,7 @@
                         //     clusterGroups: self.group
                         // })
 
-                        // self.storeRowData = lcData.storeArrs;
+                        // self.storeRowData = lcData.storeData;
                         // self.rowData = lcData.ProjectGroupData;
                         // self.stores = lcData.stores;
                         // self.ProjectGroups = lcData.ProjectGroups
@@ -436,7 +438,7 @@
                             clusterGroups: self.group
                         });
 
-                        self.storeRowData = lcData.storeArrs;
+                        self.storeRowData = lcData.storeData;
                         self.rowData = lcData.ProjectGroupData;
                         self.stores = lcData.stores;
                         self.ProjectGroups = lcData.ProjectGroups
@@ -499,17 +501,7 @@
                 self.ProjectGroups.forEach((projectGroup, idx) => {
                     tmp.push({
                         headerName: projectGroup.projectGroup,
-                        children: [
-                            // {
-                            //         headerName: "_cumalitiveSales",
-                            //         // field: projectGroup.projectGroup + "_cumalitiveSales",
-                            //         width: 100,
-                            //          "valueFormatter": function (params) {
-
-                            //                 return ((parseFloat(params.data[projectGroup.projectGroup + "_cumalitiveSales"])) * 100).toFixed(2)
-                            //         },
-                            //     },
-                            {
+                        children: [{
                                 headerName: "Ratio",
                                 width: 100,
                                 "valueFormatter": function (params) {
@@ -579,6 +571,19 @@
                 })
                 self.headers = tmp;
             },
+            generateName() {
+                let self = this;
+
+                if (self.selectedPeriod != null) {
+                    if (self.selectedPeriod.periodic) {
+                        return `${self.selectedProjectGroup.text} - ${self.selectedPeriod.monthsBetween} MMA (${self.selectedPeriod.dateFromString} TO ${self.selectedPeriod.dateToString})`;
+                    } else {
+                        return `${self.selectedProjectGroup.text} Average Monthly ${self.selectedPeriod.dateFromString} TO ${self.selectedPeriod.dateToString}`;
+                    }
+                } else {
+                    return "";
+                }
+            },
             runQuery() {
                 let self = this
 
@@ -587,8 +592,8 @@
                 self.$refs.Spinner.show()
 
                 Axios.get(process.env.VUE_APP_API +
-                        // `Cluster/DepartmentClustering?PeriodFrom=${self.selectedPeriod.dateFrom}&PeriodTo=${self.selectedPeriod.dateTo}&ProjectGroupID=${self.selectedProjectGroup.value}`
-                        `Cluster/DepartmentClustering?PeriodFrom=53&PeriodTo=58&ProjectGroupID=${self.selectedProjectGroup.value}`
+                        `Cluster/DepartmentClustering?PeriodFrom=${self.selectedPeriod.dateFrom}&PeriodTo=${self.selectedPeriod.dateTo}&ProjectGroupID=${self.selectedProjectGroup.value}`
+                        // `Cluster/DepartmentClustering?PeriodFrom=53&PeriodTo=58&ProjectGroupID=${self.selectedProjectGroup.value}`
                     )
                     .then(r => {
 
@@ -603,7 +608,7 @@
                             clusterGroups: self.group
                         })
 
-                        self.storeRowData = lcData.storeArrs;
+                        self.storeRowData = lcData.storeData;
                         self.rowData = lcData.ProjectGroupData;
                         self.stores = lcData.stores;
                         self.ProjectGroups = lcData.ProjectGroups
@@ -614,6 +619,7 @@
                     })
             }
         },
+
 
     }
 </script>
