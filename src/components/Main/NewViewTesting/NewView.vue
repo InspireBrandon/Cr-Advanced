@@ -56,17 +56,46 @@ export default {
     });
 
     self.getTaskViewData();
+    self.getStoreData();
+    self.getAccessType();
   },
   methods: {
-    getTaskViewData(callback) {
+    getAccessType() {
+      let self = this;
+      let encoded_details = jwt.decode(sessionStorage.accessToken);
+      let systemUserID = encoded_details.USER_ID;
+
+      Axios.get(
+        process.env.VUE_APP_API +
+          `TenantLink_AccessType?systemUserID=26&tenantID=1`
+      ).then(r => {
+        console.log(r.data);
+
+        if (r.data.tenantLink_AccessTypeList.length > 0) {
+          let planoList = r.data.tenantLink_AccessTypeList[0];
+
+          planoList.supplierPlanogramList.forEach(element => {
+            self.getPlanograms(element.planogram_ID);
+          });
+        }
+      });
+    },
+    getPlanograms(planogram_ID) {
+      let self = this;
+
+      Axios.get(
+        process.env.VUE_APP_API + `Planogram?planogramID=${planogram_ID}`
+      ).then(r => {
+        console.log("planogram", r.data);
+        self.routeController.addRoute(self.processSharedRoutes(r.data[0]));
+      });
+    },
+    getTaskViewData() {
       let self = this;
       let encoded_details = jwt.decode(sessionStorage.accessToken);
       let systemUserID = encoded_details.USER_ID;
       self.$refs.SplashLoader.show();
-      let filterList = [];
       self.$nextTick(() => {
-        self.taskViewData = [];
-
         Axios.defaults.headers.common["TenantID"] =
           sessionStorage.currentDatabase;
 
@@ -86,6 +115,35 @@ export default {
           .catch(e => {
             self.$refs.SplashLoader.close();
             delete Axios.defaults.headers.common["TenantID"];
+          });
+      });
+    },
+    getStoreData() {
+      let self = this;
+      self.$refs.SplashLoader.show();
+      self.$nextTick(() => {
+        Axios.defaults.headers.common["TenantID"] =
+          sessionStorage.currentDatabase;
+
+        Axios.get(
+          process.env.VUE_APP_API + `Store_Planogram/Store?Store_ID=124526`
+        )
+          .then(r => {
+            console.log("StoreData", r.data);
+            let currentStorePlanograms = [];
+            currentStorePlanograms = r.data.queryResult;
+
+            r.data.queryResult.forEach(e => {
+              e.currentStatusText = self.routeController.addRoute(
+                self.processStoreRoute(e)
+              );
+            });
+
+            // self.storeData = currentStorePlanograms;
+            self.$refs.SplashLoader.close();
+          })
+          .catch(e => {
+            console.log(e);
           });
       });
     },
@@ -180,12 +238,12 @@ export default {
                 break;
               case 3:
                 {
-                  routeItem.parentID = "AWAITING_IMPLEMENTATION_PLANOGRAM";
+                  routeItem.parentID = "PLANOGRAM_AWAITING_IMPLEMENTATION";
                 }
                 break;
               case 6:
                 {
-                  routeItem.parentID = "AWAITING_IMPLEMENTATION_PLANOGRAM";
+                  routeItem.parentID = "PLANOGRAM_AWAITING_IMPLEMENTATION";
                 }
                 break;
             }
@@ -208,12 +266,12 @@ export default {
                 break;
               case 3:
                 {
-                  routeItem.parentID = "IMPLEMENTED_PLANOGRAM";
+                  routeItem.parentID = "PLANOGRAM_IMPLEMENTED";
                 }
                 break;
               case 6:
                 {
-                  routeItem.parentID = "IMPLEMENTED_PLANOGRAM";
+                  routeItem.parentID = "PLANOGRAM_IMPLEMENTED";
                 }
                 break;
             }
@@ -258,12 +316,12 @@ export default {
                 break;
               case 3:
                 {
-                  routeItem.parentID = "VIEW_PLANOGRAM";
+                  routeItem.parentID = "PLANOGRAM_VIEW";
                 }
                 break;
               case 6:
                 {
-                  routeItem.parentID = "VIEW_PLANOGRAM";
+                  routeItem.parentID = "PLANOGRAM_VIEW";
                 }
                 break;
             }
@@ -302,12 +360,12 @@ export default {
                 break;
               case 3:
                 {
-                  routeItem.parentID = "IMPLEMENTATION_IN_PROGRESS_PLANOGRAM";
+                  routeItem.parentID = "PLANOGRAM_IMPLEMENTATION_IN_PROGRESS";
                 }
                 break;
               case 6:
                 {
-                  routeItem.parentID = "IMPLEMENTATION_IN_PROGRESS_PLANOGRAM";
+                  routeItem.parentID = "PLANOGRAM_IMPLEMENTATION_IN_PROGRESS";
                 }
                 break;
             }
@@ -335,6 +393,26 @@ export default {
           break;
         case 37:
           {
+            switch (item.type) {
+              case 1:
+                {
+                }
+                break;
+              case 2:
+                {
+                }
+                break;
+              case 3:
+                {
+                  routeItem.parentID = "PLANOGRAM_AWAITING_IMPLEMENTATION";
+                }
+                break;
+              case 6:
+                {
+                  routeItem.parentID = "PLANOGRAM_AWAITING_IMPLEMENTATION";
+                }
+                break;
+            }
           }
           break;
         case 38:
@@ -393,6 +471,64 @@ export default {
         case 52: {
         }
       }
+
+      return routeItem;
+    },
+    processStoreRoute(item) {
+      let self = this;
+
+      let routeItem = new RouteItem({
+        showChildren: false,
+        id: item.uid,
+        parentID: "limbo",
+        title: item.storeCluster + " - " + item.projectName,
+        route: `/Tasks`,
+        allowedAccessLevels: [accessTypes.SuperUser],
+        routeType: RouteType.File
+      });
+
+      switch (item.planogramStoreStatus) {
+        case 0:
+          {
+          }
+          break;
+        case 1:
+          {
+          }
+          break;
+        case 2:
+          {
+            routeItem.parentID = "PLANOGRAM_AWAITING_IMPLEMENTATION";
+          }
+          break;
+        case 3:
+          {
+            routeItem.parentID = "PLANOGRAM_IMPLEMENTATION_IN_PROGRESS";
+          }
+          break;
+        case 4:
+          {
+            routeItem.parentID = "PLANOGRAM_IMPLEMENTED";
+          }
+          break;
+      }
+
+      return routeItem;
+    },
+    processSharedRoutes(item) {
+      let self = this;
+
+      let routeItem = new RouteItem({
+        showChildren: false,
+        id: item.id,
+        parentID: "limbo",
+        title: item.displayname,
+        route: `/Shared`,
+        allowedAccessLevels: [accessTypes.SuperUser],
+        routeType: RouteType.File
+      });
+
+      routeItem.parentID = "PLANOGRAM_SHARED";
 
       return routeItem;
     }
