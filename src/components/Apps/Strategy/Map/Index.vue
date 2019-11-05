@@ -288,19 +288,19 @@
           self.getFileData(callback.id, data => {
             let supplierData = [];
             let tmp = [];
-            let arr = data.supplierImport["MARLTONS"].data;
+            // let arr = data.supplierImport["MARLTONS"].data;
 
-            let distinctRetailers = removeDuplicates(arr, "retailer");
-            let distinctRetailerData = {};
+            // let distinctRetailers = removeDuplicates(arr, "retailer");
+            // let distinctRetailerData = {};
 
-            distinctRetailers.forEach(retailer => {
-              distinctRetailerData[retailer.retailer] = arr.filter(el => {
-                return el.retailer == retailer.retailer;
-              });
-            });
+            // distinctRetailers.forEach(retailer => {
+            //   distinctRetailerData[retailer.retailer] = arr.filter(el => {
+            //     return el.retailer == retailer.retailer;
+            //   });
+            // });
 
-            // console.log("distinctRetailerData", distinctRetailerData);
-            self.SupplierData = distinctRetailerData;
+            // // console.log("distinctRetailerData", distinctRetailerData);
+            // self.SupplierData = distinctRetailerData;
           });
         });
       });
