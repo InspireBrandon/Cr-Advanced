@@ -158,7 +158,11 @@ export default new Router({
             path: 'PlanogramImplementationNew/:projectTransactionID/:planogramID/:status',
             name: 'PlanogramImplementation',
             component: PlanogramImplementation,
-          }]
+          },{
+            path: '/RangePlanningView/:rangeFileID',
+            name: 'range_planning_view',
+            component: RangePlanningView,
+          },]
         },
         {
           path: '/map',

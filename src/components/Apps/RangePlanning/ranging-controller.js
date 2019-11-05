@@ -149,12 +149,11 @@ class RangingController {
       self.storeSales.forEach(ss => {
         if (storeInCluster(ss.storeID, stores)) {
           ss.salesData.forEach(sdp => {
-            if(sdp.productID === rp.productID) {
-              if(currentProductIndicator === "") {
+            if (sdp.productID === rp.productID) {
+              if (currentProductIndicator === "") {
                 currentProductIndicator = sdp.store_Range_Indicator;
-              }
-              else {
-                if(sdp.store_Range_Indicator !== currentProductIndicator) {
+              } else {
+                if (sdp.store_Range_Indicator !== currentProductIndicator) {
                   allSame = false;
                 }
               }
@@ -163,13 +162,12 @@ class RangingController {
         }
       })
 
-      if(allSame) {
+      if (allSame) {
         retval.push({
           productID: rp.productID,
           indicator: currentProductIndicator
         })
-      }
-      else {
+      } else {
         retval.push({
           productID: rp.productID,
           indicator: "SELECTED"
@@ -298,7 +296,7 @@ class RangingController {
         if (!headersCreated) {
           retval.headers.push({
             "headerName": "Product System ID",
-            "field": "product_System_ID"
+            "field": "product_System_ID",
           }, {
             "headerName": "Barcode",
             "field": "barcode"
@@ -312,7 +310,19 @@ class RangingController {
 
         retval.headers.push({
           "headerName": ss.storeName,
-          "field": ss.storeName
+          "field": ss.storeName,
+          "isIndicator": true,
+          "editable": true,
+          "cellEditor": "agRichSelectCellEditor",
+          "cellEditorParams": {
+            "values": ["YES", "NO"]
+          },
+          "cellStyle": {
+            "background-color": "#E3F2FD"
+          },
+          "filterParams": {
+            "newRowsAction": "keep"
+          }
         })
       }
     })
@@ -322,6 +332,7 @@ class RangingController {
         product_System_ID: arp.product_System_ID,
         barcode: arp.barcode,
         description: arp.description,
+        productID: arp.id
       }
 
       stores.forEach(store => {
@@ -331,6 +342,7 @@ class RangingController {
               this.allRangeProducts.forEach(arp2 => {
                 if (sd.productID == arp.productID) {
                   productIndicator[ss.storeName] = sd.store_Range_Indicator;
+                  productIndicator[ss.storeName + "ID"] = sd.storeID;
                 }
               })
             })

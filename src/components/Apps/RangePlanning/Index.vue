@@ -1682,10 +1682,23 @@
       onCellValueChanged(e) {
         let self = this;
         let field = e.colDef.field;
+        let isIndicator = e.colDef.isIndicator
 
         if (field != "store_Range_Indicator") {
-          if (e.oldValue != e.newValue) {
-            self.rangingController.setProductData(e.data.productID, field, e.newValue);
+          if (isIndicator != undefined && isIndicator != null && isIndicator) {
+            if (e.oldValue != e.newValue) {
+              let store = e.data[field + "ID"];
+              let stores = [{
+                storeID: store,
+                selected: e.newValue == "YES"
+              }]
+
+              self.rangingController.setStoreIndicatorByProductID(stores, e.data.productID);
+            }
+          } else {
+            if (e.oldValue != e.newValue) {
+              self.rangingController.setProductData(e.data.productID, field, e.newValue);
+            }
           }
         } else {
           if (e.oldValue != e.newValue) {
@@ -1999,6 +2012,8 @@
         case 'STORE': {
           let storelevel = self.rangingController.getStoreIndicators(self.selectedClusterType, self
             .selectedClusterOption);
+
+          console.log(storelevel);
 
           self.ais_Sales = 0;
           self.ais_SalesPotential = 0;

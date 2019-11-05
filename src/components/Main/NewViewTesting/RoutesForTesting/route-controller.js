@@ -16,6 +16,11 @@ class RouteController {
         })
     }
 
+    getAllRouteItems() {
+        let self = this;
+        return self.routes;
+    }
+
     addRoute(routeItem) {
         let self = this;
 
@@ -33,6 +38,19 @@ function GetAllRoutes() {
     let routes = [];
 
     const staticRoutes = [{
+            title: "TOOLS",
+            dispaly: "Tools",
+            route: '/TestingView',
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+            routeType: RouteType.Software,
+            children: []
+        },
+        {
             title: "PLANOGRAM",
             dispaly: "Planogram",
             allowedAccessLevels: [
@@ -139,7 +157,8 @@ function GetAllRoutes() {
                     children: []
                 }
             ]
-        }, {
+        },
+        {
             title: "CLUSTERING",
             dispaly: "Clustering",
             allowedAccessLevels: [
@@ -150,16 +169,116 @@ function GetAllRoutes() {
             ],
             routeType: RouteType.Folder,
             children: [{
-                title: "VIEW",
-                dispaly: "Clustering",
-                route: '/Clustering',
+                title: "STORE",
+                dispaly: "Store",
                 allowedAccessLevels: [
                     accessTypes.SuperUser,
                     accessTypes.Buyer,
                     accessTypes.Supplier,
                     accessTypes.Store
                 ],
-                routeType: RouteType.Software,
+                routeType: RouteType.File,
+                children: []
+            }, {
+                title: "CUSTOM",
+                dispaly: "Custom",
+                allowedAccessLevels: [
+                    accessTypes.SuperUser,
+                    accessTypes.Buyer,
+                    accessTypes.Supplier,
+                    accessTypes.Store
+                ],
+                routeType: RouteType.File,
+                children: []
+            },{
+                title: "BASKET",
+                dispaly: "Basket",
+                allowedAccessLevels: [
+                    accessTypes.SuperUser,
+                    accessTypes.Buyer,
+                    accessTypes.Supplier,
+                    accessTypes.Store
+                ],
+                routeType: RouteType.File,
+                children: []
+            },{
+                title: "CATEGORY",
+                dispaly: "Category",
+                allowedAccessLevels: [
+                    accessTypes.SuperUser,
+                    accessTypes.Buyer,
+                    accessTypes.Supplier,
+                    accessTypes.Store
+                ],
+                routeType: RouteType.File,
+                children: []
+            },{
+                title: "DEPARTMENT",
+                dispaly: "Department",
+                allowedAccessLevels: [
+                    accessTypes.SuperUser,
+                    accessTypes.Buyer,
+                    accessTypes.Supplier,
+                    accessTypes.Store
+                ],
+                routeType: RouteType.File,
+                children: []
+            }]
+        },
+        {
+            title: "FLOORPLANNING",
+            dispaly: "Floor Planning",
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+            routeType: RouteType.Folder,
+            children: [{
+                title: "DEPARTMENT",
+                dispaly: "Department",
+                allowedAccessLevels: [
+                    accessTypes.SuperUser,
+                    accessTypes.Buyer,
+                    accessTypes.Supplier,
+                    accessTypes.Store
+                ],
+                routeType: RouteType.Folder,
+                children: []
+            },{
+                title: "OUTPUT",
+                dispaly: "Outputs",
+                allowedAccessLevels: [
+                    accessTypes.SuperUser,
+                    accessTypes.Buyer,
+                    accessTypes.Supplier,
+                    accessTypes.Store
+                ],
+                routeType: RouteType.Folder,
+                children: []
+            }]
+        },
+        {
+            title: "PROMOTION",
+            dispaly: "Promotions",
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+            routeType: RouteType.Folder,
+            children: [{
+                title: "Department",
+                dispaly: "Department",
+                allowedAccessLevels: [
+                    accessTypes.SuperUser,
+                    accessTypes.Buyer,
+                    accessTypes.Supplier,
+                    accessTypes.Store
+                ],
+                routeType: RouteType.Folder,
                 children: []
             }]
         }
