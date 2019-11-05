@@ -83,9 +83,8 @@
             getFiles(callback) {
                 let self = this
 
-                Axios.get(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire&folder=Category Cluster")
+                Axios.get(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire&folder=Department Cluster")
                     .then(r => {
-                        console.log(r);
                         
                         self.getPlanograms(r.data, callback)
                     })
@@ -95,14 +94,16 @@
             },
             getPlanograms(files, callback) {
                 let self = this
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.get(process.env.VUE_APP_API + `Planogram/Distinct`)
+                 Axios.get(process.env.VUE_APP_API + "ProjectGroup")
                     .then(r => {
+                       
                         
-                        let planograms = r.data.planogramList;
-                        console.log("files");
-                        console.log(files);
+                        
+                        let planograms = r.data.projectGroupList;
+                        
+                       
                         
                         files.forEach(file => {
                             file.name = self.findAndReplaceName(file.name, planograms)
@@ -116,20 +117,17 @@
             },
             findAndReplaceName(name, planograms) {
                 let self = this;
-                console.log("planograms");
-                console.log(planograms);
+             
                 
                 let nameSplit = name.split(/ (.+)/);
 
-                console.log(nameSplit)
 
                 let planogram = planograms.find(e => {
                     return e.id == parseInt(nameSplit[0]);
                 })
 
-                console.log(planogram)
 
-                return name.replace(nameSplit[0], planogram.displayname);
+                return name.replace(nameSplit[0], planogram.name);
             }
         }
     }
