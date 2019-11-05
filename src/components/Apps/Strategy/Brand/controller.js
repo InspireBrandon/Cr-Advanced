@@ -8,18 +8,41 @@ class ListingClusterController {
 
     static GenerateClusterOutput(params) {
         let self = this;
-        console.log(params);
 
         // ////////////////////////////////////////////////////////////////////////////////////////////////////
         // PARAMS VARIABLES
         // ////////////////////////////////////////////////////////////////////////////////////////////////////
         let storeSalesData = params.storeSalesData; // all store sales data for category over 12 months
+        let tmpCategory = null;
+        switch (params.selectedCategory) {
+            case 0:
+                tmpCategory = "category"
+                break;
+            case 1:
+                tmpCategory = "subcategory"
+                break;
+            case 2:
+                tmpCategory = "brand_Name"
+                break;
+            case 3:
+                tmpCategory = "manufacturer"
+                break;
+            case 4:
+                tmpCategory = "supplier"
+                break;
+            case 5:
+                tmpCategory = "size_Description"
+                break;
 
+            default:
+                break;
+        }
         let clusterData = {
             primaryCluster: params.primaryCluster, // value used to determine the first level of the cluster
             secondaryCluster: params.secondaryCluster,
             clusterLevels: params.clusterLevels, // value used to determine the second level of the cluster
-            clusterGroups: params.clusterGroups // value used to determine amount of primary clusters
+            clusterGroups: params.clusterGroups,
+            selectedCategory: tmpCategory // value used to determine amount of primary clusters
         }
 
         // ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,26 +50,67 @@ class ListingClusterController {
         // ////////////////////////////////////////////////////////////////////////////////////////////////////
         let stores = removeDuplicates(storeSalesData.map(item => ({
             storeName: item.storeName,
-            store_ID: item.store_ID
+            store_ID: item.store_ID,
+            sqm_Shop: item.sqm_Shop
         })), "store_ID"); // get all unique stores
 
         let storeSales = getStoreSales(stores, storeSalesData); // get total store sales
-        let products = getProductsWeighted(storeSalesData); // get all unique products ordered by total weight in category
-        let totalStoreProductSales = getTotalStoreProductSales(storeSales, products, storeSalesData, clusterData);
-        let storeClusterCodes = accumulateCodes(totalStoreProductSales, stores, clusterData);
+
+        let ProjectGroups = getProjectGroupsWeighted(storeSalesData, clusterData); // get all unique ProjectGroups ordered by total weight in category
+
+        let totalStoreProjectGroupSales = getTotalStoreProjectGroupSales(storeSales, ProjectGroups, storeSalesData, clusterData);
+
+        let storeClusterCodes = accumulateCodes(totalStoreProjectGroupSales, stores, clusterData, ProjectGroups);
         storeClusterCodes = addRank(storeClusterCodes);
-        let clusters = generateClusterNew(storeClusterCodes, clusterData);
+        let clusters = generateClusterNew(storeClusterCodes, clusterData, totalStoreProjectGroupSales);
+
+        // let storeArrs = generateArrClusters(totalStoreProjectGroupSales, clusterData)
+        // storeArrs=totalStoreProjectGroupSales
+
+
 
         return {
             stores: storeClusterCodes,
             storeData: clusters,
-            productData: totalStoreProductSales
+            ProjectGroupData: totalStoreProjectGroupSales,
+            ProjectGroups: ProjectGroups,
+            // storeArrs: storeArrs
         }
     }
 }
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
 // METHODS
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
+function generateArrClusters(projectSales, clusterData) {
+    let retval = []
+
+    let tmp = JSON.parse(JSON.stringify(projectSales))
+
+    tmp.forEach(e => {
+        retval.push(e)
+        e.ratioARR.sort((a, b) => {
+            if (a.value > b.value) {
+                return -1;
+            }
+            if (a.value < b.value) {
+                return 1;
+            }
+            return 0;
+        })
+        e.clusterCode = ""
+        let count = 0
+
+        e.ratioARR.forEach(ratio => {
+            if (ratio.code != null && ratio.code != undefined && count < clusterData.clusterGroups) {
+                e.clusterCode += ratio.code
+                count++
+            }
+        })
+    })
+    return retval
+
+}
+
 function getStoreSales(stores, storeSales) {
     let retval = [];
 
@@ -54,6 +118,7 @@ function getStoreSales(stores, storeSales) {
         let tmp = {
             store_ID: store.store_ID,
             storeName: store.storeName,
+            sqm_Shop: store.sqm_Shop,
             sumSales: 0
         }
 
@@ -83,36 +148,37 @@ function getStoreSales(stores, storeSales) {
     })
 }
 
-function getProductsWeighted(storeSalesData) {
-    let uniqueProducts = removeDuplicates(storeSalesData.map(item => ({
-        productName: item.productName,
-        product_ID: item.product_ID,
+function getProjectGroupsWeighted(storeSalesData, clusterData) {
+    console.log("getProjectGroupsWeighted", storeSalesData);
+    console.log("clusterData.selectedCategory", clusterData.selectedCategory);
+
+    let uniqueProjectGroups = removeDuplicates(storeSalesData.map(item => ({
+        brand_Name: item.brand_Name,
+        category: item.category,
+        manufacturer: item.manufacturer,
         sales_Retail: item.sales_Retail,
         size_Description: item.size_Description,
-        supplier: item.supplier,
-        manufacturer: item.manufacturer,
-        brand_Name: item.brand_Name,
         subcategory: item.subcategory,
-        category: item.category
-    })), "product_ID"); // get all unique products
+        supplier: item.supplier,
+        product_ID: item.product_ID,
+    })), clusterData.selectedCategory); // get all unique ProjectGroups
 
-    uniqueProducts.forEach(product => {
-        let allProductSales = storeSalesData.filter(storeSale => {
-            return storeSale.product_ID == product.product_ID;
-        }); // get all product sales records
+    uniqueProjectGroups.forEach(ProjectGroup => {
+        let allProjectGroupSales = storeSalesData.filter(storeSale => {
+            return storeSale[clusterData.selectedCategory] == ProjectGroup[clusterData.selectedCategory];
+        }); // get all ProjectGroup sales records
 
-        let totalSalesValue = allProductSales.reduce((a, b) => {
+        let totalSalesValue = allProjectGroupSales.reduce((a, b) => {
             return {
                 sales_Retail: a.sales_Retail + b.sales_Retail
             }
         }).sales_Retail // reduce array to return only total sales
 
         totalSalesValue = parseFloat(parseFloat(totalSalesValue.toFixed(2)));
-
-        product["totalSales"] = totalSalesValue;
+        ProjectGroup["totalSales"] = totalSalesValue;
     });
 
-    return uniqueProducts.sort((a, b) => {
+    return uniqueProjectGroups.sort((a, b) => {
         if (a.totalSales > b.totalSales) {
             return -1;
         }
@@ -123,11 +189,15 @@ function getProductsWeighted(storeSalesData) {
     })
 }
 
-function getTotalStoreProductSales(stores, products, storeSalesData) {
-    let tmpStoreData = [];
-    console.log("products");
-    console.log(products);
+function getTotalStoreProjectGroupSales(stores, ProjectGroups, storeSalesData, clusterData) {
+    console.log("//////////////////////////////////////////////////////////////");
+    console.log('stores', stores);
+    console.log('ProjectGroups', ProjectGroups);
+    console.log('storeSalesData', storeSalesData);
+    console.log('clusterData', clusterData);
+    console.log("//////////////////////////////////////////////////////////////");
 
+    let tmpStoreData = [];
     let currentCumulative = 0;
 
     var totalCategorySales = storeSalesData.reduce((a, b) => {
@@ -136,96 +206,288 @@ function getTotalStoreProductSales(stores, products, storeSalesData) {
         }
     }).sales_Retail;
 
-    products.forEach(product => {
-        var productSales = storeSalesData.filter(sd => {
-            return sd.product_ID == product.product_ID;
+    stores.forEach(store => {
+        var StoreSales = storeSalesData.filter(sd => {
+            return sd.store_ID == store.store_ID;
         });
 
-        var totalProductSales = productSales.reduce((a, b) => {
+        var totalStoreSales = StoreSales.reduce((a, b) => {
             return {
                 sales_Retail: a.sales_Retail + b.sales_Retail
             }
         }).sales_Retail;
 
-        var cumulativProductSales = currentCumulative + ((totalProductSales / totalCategorySales) * 100);
-        currentCumulative = cumulativProductSales;
+        var cumulativStoreSales = currentCumulative + ((totalStoreSales / totalCategorySales) * 100);
+        currentCumulative = cumulativStoreSales;
 
         let tmpObj = {
-            product_ID: product.product_ID,
-            productName: product.productName,
-            totalProductSales: parseFloat(parseFloat(totalProductSales.toFixed(2))),
-            cumulativProductSales: cumulativProductSales.toFixed(2),
+            store_ID: store.store_ID,
+            sqm_Shop: store.sqm_Shop,
+            storeName: store.storeName,
+            totalStoreSales: parseFloat(parseFloat(totalStoreSales.toFixed(2))),
+            cumulativStoreSales: cumulativStoreSales.toFixed(2),
             canHighlight: false,
             highlightLevel: 0,
-            sales_Retail: product.sales_Retail,
-            size_Description: product.size_Description,
-            supplier: product.supplier,
-            manufacturer: product.manufacturer,
-            brand_Name: product.brand_Name,
-            subcategory: product.subcategory,
-            category: product.category
+            projectTotal: 0,
+            ratioARR: []
         }
 
-        stores.forEach(store => {
-            var storeProductSale = storeSalesData.filter(sd => {
-                return sd.product_ID == product.product_ID && sd.store_ID == store.store_ID;
+        ProjectGroups.sort((a, b) => {
+            if (a.totalSales > b.totalSales) {
+                return -1;
+            }
+            if (a.totalSales < b.totalSales) {
+                return 1;
+            }
+            return 0;
+        })
+
+        ProjectGroups.forEach(ProjectGroup => {
+            var storeProjectGroupSale = storeSalesData.filter(sd => {
+                return sd[clusterData.selectedCategory]  == ProjectGroup[clusterData.selectedCategory] && sd.store_ID == store.store_ID;
             });
 
             let tmpCode = "";
-            let inStore = false;
+            let inStore = 0;
 
-            if (storeProductSale.length > 0) {
-                let storeProductSaleItem = storeProductSale[0];
+            if (storeProjectGroupSale.length > 0) {
+                let storeProjectGroupSaleItem = storeProjectGroupSale[0];
 
-                if (storeProductSaleItem.sales_Retail > 0) {
+                if (storeProjectGroupSaleItem.sales_Retail > 0) {
                     tmpCode = "1";
-                    inStore = true;
+                    tmpObj.projectTotal += parseFloat(storeProjectGroupSaleItem.sales_Retail)
+                    inStore = storeProjectGroupSaleItem.sales_Retail
+
                 } else {
                     tmpCode = "0";
                 }
             } else {
                 tmpCode = "0";
             }
+            // parseFloat( storeProjectGroupSaleItem.sales_Retail)/parseFloat(ProjectGroup.totalSales);
+            tmpObj[ProjectGroup[clusterData.selectedCategory]] = tmpCode;
+            tmpObj[ProjectGroup[clusterData.selectedCategory] + "_inStore"] = inStore;
 
-            tmpObj[store.storeName] = tmpCode;
-            tmpObj[store.storeName + "_inStore"] = inStore;
         });
 
+
+
+
+        // ProjectGroup["cumalitiveProjectSales"] += ProjectGroup.sales_Retail
+        let lastAdded = 0
+        ProjectGroups.forEach((ProjectGroup, idx) => {
+            tmpObj[ProjectGroup[clusterData.selectedCategory] + "_ratio"] = parseFloat(tmpObj[ProjectGroup[clusterData.selectedCategory] + "_inStore"]) / parseFloat(tmpObj.projectTotal);
+            if (tmpStoreData.length == 0) {
+                tmpObj.ratioARR.push({
+                    value: (parseFloat(tmpObj[ProjectGroup[clusterData.selectedCategory] + "_inStore"]) / parseFloat(tmpObj.projectTotal)) * 100,
+                    color: '#' + (0x1000000 + (Math.random()) * 0xffffff).toString(16).substr(1, 6),
+                    name: ProjectGroup[clusterData.selectedCategory],
+                    code: ProjectGroup.code
+                })
+            } else {
+                tmpObj.ratioARR.push({
+                    value: (parseFloat(tmpObj[ProjectGroup[clusterData.selectedCategory] + "_inStore"]) / parseFloat(tmpObj.projectTotal)) * 100,
+                    color: tmpStoreData[0].ratioARR[idx].color,
+                    name: ProjectGroup[clusterData.selectedCategory],
+                    code: ProjectGroup.code,
+                })
+            }
+            tmpObj[ProjectGroup[clusterData.selectedCategory] + "_cumalitiveSales"] = lastAdded + parseFloat(tmpObj[ProjectGroup[clusterData.selectedCategory] + "_ratio"])
+            lastAdded += tmpObj[ProjectGroup[clusterData.selectedCategory] + "_ratio"]
+
+        })
         tmpStoreData.push(tmpObj);
     });
+    console.log("tmpStoreData after data", tmpStoreData);
 
     return tmpStoreData;
 }
 
-function accumulateCodes(tmpStoreData, stores, clusterData) {
+function accumulateCodes(tmpStoreData, stores, clusterData, ProjectGroups) {
+    console.log("---------------------------------------------------------------------");
+    console.log('tmpStoreData', tmpStoreData);
+    console.log('stores', stores);
+    console.log('clusterData', clusterData);
+
+    console.log("---------------------------------------------------------------------");
+
+    let storesTotalSales = 0
+    tmpStoreData.forEach(store => {
+        storesTotalSales += parseFloat(store.totalStoreSales)
+    })
+
+    ProjectGroups.forEach((projectGroup, idx) => {
+        projectGroup.StoretotalPercentage = ((parseFloat(projectGroup.totalSales) / parseFloat(storesTotalSales)) * 100).toFixed(2)
+        if (idx == 0) {
+            projectGroup.cumulativeProjectPercentage = parseFloat(projectGroup.StoretotalPercentage)
+        } else {
+            projectGroup.cumulativeProjectPercentage = parseFloat(ProjectGroups[idx - 1].cumulativeProjectPercentage) + parseFloat(projectGroup.StoretotalPercentage)
+        }
+
+    })
+    console.log('ProjectGroups', ProjectGroups);
+
     let storeClusterCodes = []
 
     let percentageOfCumulative = (clusterData.primaryCluster / 10) * 100;
     let percentageOfCumulativeSecond = ((clusterData.primaryCluster + (clusterData.secondaryCluster / 2)) / 10) * 100;
     let percentageOfCumulativeThird = ((clusterData.primaryCluster + clusterData.secondaryCluster) / 10) * 100;
 
-    let cumulativeStoreData = tmpStoreData.filter(e => {
-        return parseFloat(e.cumulativProductSales) <= percentageOfCumulative;
+
+    let cumulativeStoreData = ProjectGroups.filter(e => {
+        return parseFloat(e.cumulativeProjectPercentage) <= percentageOfCumulative;
+    })
+    console.log("cumulativeStoreData",cumulativeStoreData);
+    
+
+
+    let level1Lowest = 0
+    let level1Hightest = 0
+    cumulativeStoreData.forEach((project) => {
+        tmpStoreData.forEach((store, idx) => {
+            if (store.linetotal1 == undefined) {
+                store.linetotal1 = store[project[clusterData.selectedCategory] + "_inStore"]
+            } else {
+                store.linetotal1 += store[project[clusterData.selectedCategory] + "_inStore"]
+            }
+        })
+    })
+    cumulativeStoreData.forEach((project) => {
+        tmpStoreData.forEach((store, idx) => {
+            if (level1Hightest < store.linetotal1) {
+                level1Hightest = store.linetotal1
+            }
+            if (level1Lowest == 0) {
+                level1Lowest = level1Hightest
+            }
+            if (level1Lowest > store.linetotal1) {
+                level1Lowest = store.linetotal1
+            }
+            if (store.totallvl1Sales == undefined) {
+                store.totallvl1Sales = store[project[clusterData.selectedCategory] + "_inStore"]
+            } else {
+                store.totallvl1Sales += store[project[clusterData.selectedCategory] + "_inStore"]
+            }
+        })
+    })
+    let cumulativeStoreDataSecondLevel = ProjectGroups.filter((e, idx) => {
+        return parseFloat(e.cumulativeProjectPercentage) >= percentageOfCumulative && parseFloat(e.cumulativeProjectPercentage) <= percentageOfCumulativeSecond;
+    })
+    let level2Lowest = 0
+    let level2Hightest = 0
+
+
+    cumulativeStoreDataSecondLevel.forEach((project) => {
+        tmpStoreData.forEach((store, idx) => {
+            if (store.linetotal2 == undefined) {
+                store.linetotal2 = store[project[clusterData.selectedCategory] + "_inStore"]
+            } else {
+                store.linetotal2 += store[project[clusterData.selectedCategory] + "_inStore"]
+            }
+        })
+    })
+    cumulativeStoreDataSecondLevel.forEach((project) => {
+        tmpStoreData.forEach((store, idx) => {
+            if (level2Hightest < store.linetotal2) {
+                level2Hightest = store.linetotal2
+            }
+            if (level2Lowest == 0) {
+                level2Lowest = level2Hightest
+            }
+            if (level2Lowest > store.linetotal2) {
+                level2Lowest = store.linetotal2
+            }
+            if (store.totallvl2Sales == undefined) {
+                store.totallvl2Sales = store[project[clusterData.selectedCategory] + "_inStore"]
+            } else {
+                store.totallvl2Sales += store[project[clusterData.selectedCategory] + "_inStore"]
+            }
+        })
     })
 
-    let cumulativeStoreDataSecondLevel = tmpStoreData.filter((e, idx) => {
-        return parseFloat(e.cumulativProductSales) >= percentageOfCumulative && parseFloat(e.cumulativProductSales) <= percentageOfCumulativeSecond;
-    })
 
-    let cumulativeStoreDataThirdLevel = tmpStoreData.filter((e, idx) => {
-        return parseFloat(e.cumulativProductSales) >= percentageOfCumulativeSecond && parseFloat(e.cumulativProductSales) <= percentageOfCumulativeThird;
-    })
 
-    let cumulativeStoreDataSecondAndThirdLevel = tmpStoreData.filter((e, idx) => {
-        return parseFloat(e.cumulativProductSales) >= percentageOfCumulative && parseFloat(e.cumulativProductSales) <= percentageOfCumulativeThird;
+
+    let cumulativeStoreDataThirdLevel = ProjectGroups.filter((e, idx) => {
+        return parseFloat(e.cumulativeProjectPercentage) >= percentageOfCumulativeSecond && parseFloat(e.cumulativeProjectPercentage) <= percentageOfCumulativeThird;
     })
+    let level3Lowest = 0
+    let level3Hightest = 0
+    cumulativeStoreDataThirdLevel.forEach((project) => {
+        tmpStoreData.forEach((store, idx) => {
+            if (store.linetotal3 == undefined) {
+                store.linetotal3 = store[project[clusterData.selectedCategory] + "_inStore"]
+            } else {
+                store.linetotal3 += store[project[clusterData.selectedCategory] + "_inStore"]
+            }
+        })
+    })
+    cumulativeStoreDataThirdLevel.forEach((project) => {
+        tmpStoreData.forEach((store, idx) => {
+            if (level3Hightest < store.linetotal3) {
+                level3Hightest = store.linetotal3
+            }
+            if (level3Lowest == 0) {
+                level3Lowest = level3Hightest
+            }
+            if (level3Lowest > store.linetotal3) {
+                level3Lowest = store.linetotal3
+            }
+            if (store.totallvl3Sales == undefined) {
+                store.totallvl3Sales = store[project[clusterData.selectedCategory] + "_inStore"]
+            } else {
+                store.totallvl3Sales += store[project[clusterData.selectedCategory] + "_inStore"]
+            }
+        })
+    })
+    // cumulativeStoreDataThirdLevel.forEach(project => {
+    //     tmpStoreData.forEach((store, idx) => {
+    //         if (store.totallvl3Sales == undefined) {
+    //             store.totallvl3Sales = store[project[clusterData.selectedCategory]+ "_inStore"]
+
+    //         } else {
+    //             store.totallvl3Sales += store[project[clusterData.selectedCategory]+ "_inStore"]
+    //         }
+    //     })
+    // })
+    let cumulativeStoreDataSecondAndThirdLevel = ProjectGroups.filter((e, idx) => {
+        return parseFloat(e.cumulativeProjectPercentage) >= percentageOfCumulative && parseFloat(e.cumulativeProjectPercentage) <= percentageOfCumulativeThird;
+    })
+    cumulativeStoreDataSecondAndThirdLevel.forEach((project) => {
+        tmpStoreData.forEach((store, idx) => {
+            if (store.linetotal == undefined) {
+                store.linetotal = store[project[clusterData.selectedCategory] + "_inStore"]
+            } else {
+                store.linetotal += store[project[clusterData.selectedCategory] + "_inStore"]
+            }
+        })
+    })
+    // cumulativeStoreDataSecondAndThirdLevel.forEach((project) => {
+    //     tmpStoreData.forEach((store, idx) => {
+    //         if (level2Hightest < store.linetotal) {
+    //             level2Hightest = store.linetotal
+    //         }
+    //         if (level2Lowest == 0) {
+    //             level2Lowest = level2Hightest
+    //         }
+    //         if (level2Lowest > store.linetotal) {
+    //             level2Lowest = store.linetotal
+    //         }
+    //         if (store.totallvl2Sales == undefined) {
+    //             store.totallvl2Sales = store[project[clusterData.selectedCategory]+ "_inStore"]
+    //         } else {
+    //             store.totallvl2Sales += store[project[clusterData.selectedCategory]+ "_inStore"]
+    //         }
+    //     })
+    // })
+    // console.table(tmpStoreData);
 
     stores.forEach(store => {
         let storeCodeData = {
             storeCode: "",
-            level1Code: "",
-            level2Code: "",
-            level3Code: "",
+            level1Code: 5,
+            level2Code: 5,
+            level3Code: 5,
             store_ID: store.store_ID,
             storeName: store.storeName,
             currentRank: -1,
@@ -233,37 +495,105 @@ function accumulateCodes(tmpStoreData, stores, clusterData) {
         }
 
         cumulativeStoreData.forEach(tmpStoreItem => {
-            storeCodeData.storeCode += tmpStoreItem[store.storeName];
-            storeCodeData.level1Code += tmpStoreItem[store.storeName];
-            tmpStoreItem.canHighlight = true;
-            tmpStoreItem.highlightLevel = 1;
+            tmpStoreData.forEach(lineItem => {
+                if (lineItem.store_ID == store.store_ID) {
+                    let lowest = level1Lowest
+                    let highest = level1Hightest
+                    let comparitor = (highest - lowest) / clusterData.clusterLevels
+                    let code = 0
+                    for (let index = 0; index < clusterData.clusterLevels; index++) {
+                        if ((comparitor * index + lowest) < lineItem.totallvl1Sales) {
+                            code = clusterData.clusterLevels - (index + 1)
+                        }
+                    }
+                    storeCodeData.storeCode += code;
+                    storeCodeData.level1Code = code
+                    tmpStoreItem.canHighlight = true;
+                    tmpStoreItem.highlightLevel = 1;
+                }
+            })
         });
+
 
         if (clusterData.clusterGroups == 2) {
             cumulativeStoreDataSecondAndThirdLevel.forEach(tmpStoreItem => {
-                storeCodeData.storeCode += tmpStoreItem[store.storeName];
-                storeCodeData.level2Code += tmpStoreItem[store.storeName];
-                tmpStoreItem.highlightLevel = 2;
-                tmpStoreItem.canHighlight = true;
-            })
+                tmpStoreData.forEach(lineItem => {
+                    if (lineItem.store_ID == store.store_ID) {
+                        let lowest = level2Lowest
+                        let highest = level2Hightest
+                        let comparitor = (highest - lowest) / clusterData.clusterLevels
+                        let code = 0
+                        for (let index = 0; index < clusterData.clusterLevels; index++) {
+                            if ((comparitor * index + lowest) < lineItem.totallvl2Sales) {
+                                code = clusterData.clusterLevels - (index + 1)
+                            }
+                        }
+                        storeCodeData.storeCode += code;
+                        storeCodeData.level2Code = code
+                        tmpStoreItem.canHighlight = true;
+                        tmpStoreItem.highlightLevel = 2;
+                    }
+                })
+            });
+            // cumulativeStoreDataSecondAndThirdLevel.forEach(tmpStoreItem => {
+            //     storeCodeData.storeCode += code;
+            //     storeCodeData.level2Code += tmpStoreItem[store.projectGroup];
+            //     tmpStoreItem.highlightLevel = 2;
+            //     tmpStoreItem.canHighlight = true;
+            // })
         }
 
         if (clusterData.clusterGroups == 3) {
             cumulativeStoreDataSecondLevel.forEach(tmpStoreItem => {
-                storeCodeData.storeCode += tmpStoreItem[store.storeName];
-                storeCodeData.level2Code += tmpStoreItem[store.storeName];
-                tmpStoreItem.highlightLevel = 2;
-                tmpStoreItem.canHighlight = true;
-            })
+                tmpStoreData.forEach(lineItem => {
+                    if (lineItem.store_ID == store.store_ID) {
+                        let lowest = level2Lowest
+                        let highest = level2Hightest
+                        let comparitor = (highest - lowest) / clusterData.clusterLevels
+                        let code = 0
+                        for (let index = 0; index < clusterData.clusterLevels; index++) {
+                            if ((comparitor * index + lowest) < lineItem.totallvl2Sales) {
+                                code = clusterData.clusterLevels - (index + 1)
+                            }
+                        }
+                        storeCodeData.storeCode += code;
+                        storeCodeData.level2Code = code
+                        tmpStoreItem.canHighlight = true;
+                        tmpStoreItem.highlightLevel = 2;
+                    }
+                })
+            });
+            // cumulativeStoreDataSecondLevel.forEach(tmpStoreItem => {
+            //     storeCodeData.storeCode += code;
+            //     storeCodeData.level2Code += tmpStoreItem[store.projectGroup];
+            //     tmpStoreItem.highlightLevel = 2;
+            //     tmpStoreItem.canHighlight = true;
+            // })
 
             cumulativeStoreDataThirdLevel.forEach(tmpStoreItem => {
-                storeCodeData.storeCode += tmpStoreItem[store.storeName];
-                storeCodeData.level3Code += tmpStoreItem[store.storeName];
-                tmpStoreItem.highlightLevel = 3;
-                tmpStoreItem.canHighlight = true;
-            })
+                tmpStoreData.forEach(lineItem => {
+                    if (lineItem.store_ID == store.store_ID) {
+                        let lowest = level3Lowest
+                        let highest = level3Hightest
+                        let comparitor = (highest - lowest) / clusterData.clusterLevels
+                        let code = 0
+                        for (let index = 0; index < clusterData.clusterLevels; index++) {
+                            if ((comparitor * index + lowest) < lineItem.totallvl3Sales) {
+                                code = clusterData.clusterLevels - (index + 1)
+                            }
+                        }
+                        storeCodeData.storeCode += code;
+                        storeCodeData.level3Code = code
+                        tmpStoreItem.canHighlight = true;
+                        tmpStoreItem.highlightLevel = 3;
+                    }
+                })
+            });
+            // storeCodeData.storeCode += code;
+            // storeCodeData.level3Code += tmpStoreItem[store.projectGroup];
+            // tmpStoreItem.highlightLevel = 3;
+            // tmpStoreItem.canHighlight = true;
         }
-
         storeClusterCodes.push(storeCodeData);
     })
 
@@ -277,6 +607,8 @@ function accumulateCodes(tmpStoreData, stores, clusterData) {
         return 0;
     })
 }
+
+
 
 function addRank(tmpStoreData) {
     tmpStoreData.forEach((el, idx) => {
@@ -326,7 +658,9 @@ function getMostCommonGroups(codeData, levels, group) {
     });
 }
 
-function generateClusterNew(tmpStoreData, clusterData) {
+function generateClusterNew(tmpStoreData, clusterData, salesData) {
+    console.log("generateClusterNew", tmpStoreData);
+
     let clusterGroups = clusterData.clusterGroups;
     let clusterLevels = clusterData.clusterLevels;
 
@@ -390,33 +724,32 @@ function generateClusterNew(tmpStoreData, clusterData) {
     let highestFirst = tmpFirstLevel[0].level1Code;
     let commonGroups1 = getMostCommonGroups(tmpFirstLevel, clusterLevels, 1);
 
-    console.log("Common Group", commonGroups1)
 
     tmpFirstLevel.forEach((el, idx) => {
         let counter = 0;
         let assigned = false;
 
-        for (var i = 0; i < (commonGroups1.length - 1); i++) {
-            let highest = commonGroups1[i];
-            let lowest = commonGroups1[i + 1];
+        // for (var i = 0; i < (commonGroups1.length - 1); i++) {
+        //     let highest = commonGroups1[i];
+        //     let lowest = commonGroups1[i + 1];
 
-            if (el.level1Code >= lowest && el.level1Code <= highest) {
-                let closest = closestTo(el.level1Code, lowest, highest);
+        //     if (el.level1Code >= lowest && el.level1Code <= highest) {
+        //         let closest = closestTo(el.level1Code, lowest, highest);
 
-                if (closest.highest > closest.lowest) {
-                    counter = i;
-                } else {
-                    counter = i + 1;
-                }
+        //         if (closest.highest > closest.lowest) {
+        //             counter = i;
+        //         } else {
+        //             counter = i + 1;
+        //         }
 
-                assigned = true;
-            }
-        }
+        //         assigned = true;
+        //     }
+        // }
 
         if (!assigned)
             counter = letters.length - 1;
 
-        el.cluster = letters[counter];
+        el.cluster = letters[el.level1Code];
     })
 
     let highestSecond = tmpSecondLevel[0].level2Code;
@@ -426,57 +759,58 @@ function generateClusterNew(tmpStoreData, clusterData) {
         let counter = 0;
         let assigned = false;
 
-        for (var i = 0; i < (commonGroups2.length - 1); i++) {
-            let highest = commonGroups2[i];
-            let lowest = commonGroups2[i + 1];
+        // for (var i = 0; i < (commonGroups2.length - 1); i++) {
+        //     let highest = commonGroups2[i];
+        //     let lowest = commonGroups2[i + 1];
 
-            if (el.level2Code >= lowest && el.level2Code <= highest) {
-                let closest = closestTo(el.level2Code, lowest, highest);
+        //     if (el.level2Code >= lowest && el.level2Code <= highest) {
+        //         let closest = closestTo(el.level2Code, lowest, highest);
 
-                if (closest.highest > closest.lowest) {
-                    counter = i + 1;
-                } else {
-                    counter = i + 2;
-                }
+        //         if (closest.highest > closest.lowest) {
+        //             counter = i + 1;
+        //         } else {
+        //             counter = i + 2;
+        //         }
 
-                assigned = true;
-            }
-        }
+        //         assigned = true;
+        //     }
+        // }
 
-        if (!assigned)
-            counter = letters.length - 1;
+        // if (!assigned)
+        //     counter = letters.length - 1;
 
-        el.cluster = (counter == (letters.length - 1)) ? letters[counter] : counter;
+        el.cluster = el.level2Code + 1
     })
 
     let highestThird = tmpThirdLevel[0].level3Code;
     let commonGroups3 = getMostCommonGroups(tmpThirdLevel, clusterLevels, 3);
 
     tmpThirdLevel.forEach((el, idx) => {
-        let counter = 0;
-        let assigned = false;
+        //     let counter = 0;
+        //     let assigned = false;
 
-        for (var i = 0; i < (commonGroups3.length - 1); i++) {
-            let highest = commonGroups3[i];
-            let lowest = commonGroups3[i + 1];
+        //     for (var i = 0; i < (commonGroups3.length - 1); i++) {
+        //         let highest = commonGroups3[i];
+        //         let lowest = commonGroups3[i + 1];
 
-            if (el.level3Code >= lowest && el.level3Code <= highest) {
-                let closest = closestTo(el.level3Code, lowest, highest);
+        //         if (el.level3Code >= lowest && el.level3Code <= highest) {
+        //             let closest = closestTo(el.level3Code, lowest, highest);
 
-                if (closest.highest > closest.lowest) {
-                    counter = i;
-                } else {
-                    counter = i + 1;
-                }
+        //             if (closest.highest > closest.lowest) {
+        //                 counter = i;
+        //             } else {
+        //                 counter = i + 1;
+        //             }
 
-                assigned = true;
-            }
-        }
+        //             assigned = true;
+        //         }
+        //     }
 
-        if (!assigned)
-            counter = letters.length - 1;
+        //     if (!assigned)
+        //         counter = letters.length - 1;
 
-        el.cluster = (counter == (letters.length - 1)) ? letters[counter] : letters[counter].toLowerCase();
+        //     el.cluster = (counter == (letters.length - 1)) ? letters[counter] : letters[counter].toLowerCase();
+        el.cluster = letters[el.level3Code].toLowerCase();
     })
 
     tmp.forEach(el => {
@@ -502,13 +836,19 @@ function generateClusterNew(tmpStoreData, clusterData) {
             })
         }
     })
-
+    salesData.forEach(element => {
+        tmp.forEach(store => {
+            if (store.store_ID == element.store_ID) {
+                element.cluster = store.cluster
+            }
+        })
+    })
     return tmp.sort((a, b) => {
         if (a.storeCode > b.storeCode) {
-            return -1;
+            return 1;
         }
         if (a.storeCode < b.storeCode) {
-            return 1;
+            return -1;
         }
         return 0;
     });

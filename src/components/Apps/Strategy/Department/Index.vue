@@ -60,14 +60,14 @@
             <v-spacer></v-spacer>
             <span v-if=" selectedPlanogram !=null">{{ selectedPlanogram.displayname }} </span>
             <v-spacer></v-spacer>
-            <v-btn-toggle v-if="storeRowData.length > 0" round v-model="selectedView" class="transparent" mandatory>
+            <!-- <v-btn-toggle v-if="storeRowData.length > 0" round v-model="selectedView" class="transparent" mandatory>
                 <v-btn class="elevation-0" style="width: 100px" round @click="changeView(0)" color="primary">
                     Store
                 </v-btn>
                 <v-btn class="elevation-0" style="width: 100px" round @click="changeView(1)" color="primary">
                     Categories
                 </v-btn>
-            </v-btn-toggle>
+            </v-btn-toggle> -->
             <v-spacer></v-spacer>
         </v-toolbar>
         <PlanogramSelector ref="PlanogramSelector" />
@@ -401,8 +401,7 @@
                 let self = this;
                 self.$nextTick(() => {
                     self.$refs.DateRangeSelector.show(dateRange => {
-                        //console.log(dateRange);
-                        //console.log(self.selectedPlanogram);
+                       
 
 
                         self.selectedPeriod = dateRange;
@@ -447,6 +446,25 @@
                     }
                 })
             },
+            orderRowData(projectGroup) {
+                let self = this
+                console.log("orderRowData", projectGroup);
+
+                let tmp = self.rowData
+
+
+                self.rowData = tmp.sort((a, b) => {
+                    if (a[projectGroup.projectGroup + "_ratio"] > b[projectGroup.projectGroup + "_ratio"]) {
+                        return -1;
+                    }
+                    if (a[projectGroup.projectGroup + "_ratio"] < b[projectGroup.projectGroup + "_ratio"]) {
+                        return 1;
+                    }
+                    return 0;
+                })
+
+
+            },
             setHeaders() {
                 let self = this;
                 //console.log("setting Headers");
@@ -454,6 +472,10 @@
                 let tmp = [{
                         headerName: 'Store Name',
                         field: 'storeName'
+                    },
+                    {
+                        headerName: 'Cluster',
+                        field: 'cluster'
                     },
                     {
                         headerName: 'Total Sales',
@@ -470,6 +492,9 @@
                         cellRendererFramework: "DeptRenderer",
                         width: 220
 
+                    },{
+                        headerName: 'Area (m)',
+                        field: 'sqm_Shop'
                     }, {
                         headerName: "Cumulative Sales",
                         field: "cumulativStoreSales",
@@ -499,6 +524,9 @@
                 console.log("self.ProjectGroups", self.ProjectGroups);
 
                 self.ProjectGroups.forEach((projectGroup, idx) => {
+                    if (idx == 0) {
+                        self.orderRowData(projectGroup)
+                    }
                     tmp.push({
                         headerName: projectGroup.projectGroup,
                         children: [{
@@ -613,6 +641,7 @@
                         self.stores = lcData.stores;
                         self.ProjectGroups = lcData.ProjectGroups
 
+                        console.log(self.rowData);
 
                         self.setHeaders()
                         self.$refs.Spinner.hide()
