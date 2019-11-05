@@ -76,6 +76,7 @@ export default {
 
           planoList.supplierPlanogramList.forEach(element => {
             self.getPlanograms(element.planogram_ID);
+            self.getPlanograms2(element.planogram_ID);
           });
         }
       });
@@ -86,8 +87,22 @@ export default {
       Axios.get(
         process.env.VUE_APP_API + `Planogram?planogramID=${planogram_ID}`
       ).then(r => {
-        console.log("planogram", r.data);
-        self.routeController.addRoute(self.processSharedRoutes(r.data[0]));
+        self.routeController.addRoute(
+          self.processRangingSharedRoutes(r.data[0])
+        );
+      });
+    },
+    getPlanograms2(planogram_ID) {
+      let self = this;
+
+      Axios.get(
+        process.env.VUE_APP_API + `Planogram?planogramID=${planogram_ID}`
+      ).then(r => {
+        setTimeout(() => {
+          self.routeController.addRoute(
+            self.processPlanogramSharedRoutes(r.data[0])
+          );
+        }, 1000);
       });
     },
     getTaskViewData() {
@@ -515,8 +530,9 @@ export default {
 
       return routeItem;
     },
-    processSharedRoutes(item) {
+    processPlanogramSharedRoutes(item) {
       let self = this;
+      console.log("HIT1");
 
       let routeItem = new RouteItem({
         showChildren: false,
@@ -529,6 +545,24 @@ export default {
       });
 
       routeItem.parentID = "PLANOGRAM_SHARED";
+
+      return routeItem;
+    },
+    processRangingSharedRoutes(item) {
+      let self = this;
+      console.log("HIT2");
+
+      let routeItem = new RouteItem({
+        showChildren: false,
+        id: item.id,
+        parentID: "limbo",
+        title: item.displayname,
+        route: `/asdasdShared`,
+        allowedAccessLevels: [accessTypes.SuperUser],
+        routeType: RouteType.File
+      });
+
+        routeItem.parentID = "RANGING_SHARED";
 
       return routeItem;
     }
