@@ -22,6 +22,7 @@ class RangingController {
     self.monthsBetween = rangingData.monthsBetween;
     self.tag = rangingData.tag;
     self.totalsData = null;
+    self.categoryCharacteristics = rangingData.categoryCharacteristics
   }
 
   getClusterData() {
@@ -52,7 +53,8 @@ class RangingController {
       dateToString: this.dateToString,
       periodic: this.periodic,
       monthsBetween: this.monthsBetween,
-      tag: this.tag
+      tag: this.tag,
+      categoryCharacteristics: this.categoryCharacteristics
     }
   }
 

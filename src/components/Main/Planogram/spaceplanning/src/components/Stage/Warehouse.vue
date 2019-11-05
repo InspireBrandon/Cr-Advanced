@@ -373,10 +373,14 @@
           <v-text-field style="width: 150px;" hide-details solo light type="number"></v-text-field>
         </v-flex>
         <v-flex xs12 class="mt-3">
-          <h4>New items: 0</h4>
+          <h4>New items: 20</h4>
         </v-flex>
         <v-flex xs12>
-          <h4>Discontinued items: 0</h4>
+          <h4>Discontinued items: 5</h4>
+        </v-flex>
+        <v-flex xs12 style="display: flex;">
+          <div style="width: 80%; height: 20px; background: green;"></div>
+          <div style="width: 20%; height: 20px; background: red;"></div>
         </v-flex>
       </v-layout>
       <v-layout v-if="toggle == 5" row wrap class="pa-3">
@@ -664,10 +668,6 @@
             value: 'M'
           },
           {
-            name: 'KVI %',
-            value: 'M'
-          },
-          {
             name: 'Price Sensitivity',
             value: 'M'
           },
@@ -934,7 +934,7 @@
 
         let type = "SPACE-PLANNING"
 
-        Axios.get(process.env.VUE_APP_API + "HelpFile?systemComponent=" + type + " - " + self.spacePlanID)
+        axios.get(process.env.VUE_APP_API + "HelpFile?systemComponent=" + type + " - " + self.spacePlanID)
           .then(r => {
             if (r.data.success) {
               self.note = r.data.helpFile.html;
@@ -1390,6 +1390,8 @@
             self.spacePlanID = spacePlanID;
             self.fixtureID = null;
 
+            self.getHelpFile();
+
             self.getFixtureDetails(self.spacePlanID);
 
             self.planogramHelper.loadPlanogram(spacePlanID, self.$store, masterLayer, stage, pxlRatio, self
@@ -1497,6 +1499,22 @@
                   self.rangingData.planogramName = clusterData.planogramName;
                   self.rangingData.tag = clusterData.tag;
                   self.selectedFixtureType = clusterData.fixtureType;
+
+                  let rangingFileDetails = self.rangingController.getRangingFile();
+
+                  if(rangingFileDetails.categoryCharacteristics != undefined && rangingFileDetails.categoryCharacteristics != null) {
+                    self.categoryCharacteristics.forEach(cc => {
+                      for(var prop in rangingFileDetails.categoryCharacteristics) {
+
+                        if(cc.name == prop) {
+                          cc.value = rangingFileDetails.categoryCharacteristics[prop];
+                        }
+                      }
+                    });
+
+                    self.userCategoryRole = rangingFileDetails.categoryCharacteristics.userCategoryRole;
+                    self.systemCategoryRole = rangingFileDetails.categoryCharacteristics.systemCategoryRole;
+                  }
 
                   if (clusterData.storeID != null || clusterData.storeID != undefined) {
 
@@ -1817,6 +1835,17 @@
           })
 
           let rangingFileUpdated = self.rangingController.getRangingFile();
+
+          rangingFileUpdated.categoryCharacteristics = {}
+
+          self.categoryCharacteristics.forEach(el => {
+            rangingFileUpdated.categoryCharacteristics[el.name] = el.value;
+          })
+
+          rangingFileUpdated.categoryCharacteristics.userCategoryRole = self.userCategoryRole;
+          rangingFileUpdated.categoryCharacteristics.systemCategoryRole = self.systemCategoryRole;
+
+          console.log(rangingFileUpdated)
 
           axios.put(process.env.VUE_APP_API + "SystemFile/JSON/NoRename?db=CR-Devinspire&id=" + rangeID,
               rangingFileUpdated)

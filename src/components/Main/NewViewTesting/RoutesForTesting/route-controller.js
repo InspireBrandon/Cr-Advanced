@@ -33,18 +33,8 @@ function GetAllRoutes() {
     let routes = [];
 
     const staticRoutes = [{
-        title: "PLANOGRAM",
-        dispaly: "Planogram",
-        allowedAccessLevels: [
-            accessTypes.SuperUser,
-            accessTypes.Buyer,
-            accessTypes.Supplier,
-            accessTypes.Store
-        ],
-        routeType: RouteType.Folder,
-        children: [{
-            title: "VIEW",
-            dispaly: "Ready to view",
+            title: "PLANOGRAM",
+            dispaly: "Planogram",
             allowedAccessLevels: [
                 accessTypes.SuperUser,
                 accessTypes.Buyer,
@@ -52,10 +42,106 @@ function GetAllRoutes() {
                 accessTypes.Store
             ],
             routeType: RouteType.Folder,
-            children: []
+            children: [{
+                    title: "SHARED",
+                    dispaly: "Shared",
+                    allowedAccessLevels: [
+                        accessTypes.SuperUser,
+                        accessTypes.Buyer,
+                        accessTypes.Supplier,
+                        accessTypes.Store
+                    ],
+                    routeType: RouteType.Folder,
+                    children: []
+                },
+                {
+                    title: "VIEW",
+                    dispaly: "Ready to view",
+                    allowedAccessLevels: [
+                        accessTypes.SuperUser,
+                        accessTypes.Buyer,
+                        accessTypes.Supplier,
+                        accessTypes.Store
+                    ],
+                    routeType: RouteType.Folder,
+                    children: []
+                },
+                {
+                    title: "AWAITING_IMPLEMENTATION",
+                    dispaly: "Ready to implement",
+                    allowedAccessLevels: [
+                        accessTypes.SuperUser,
+                        accessTypes.Buyer,
+                        accessTypes.Supplier,
+                        accessTypes.Store
+                    ],
+                    routeType: RouteType.Folder,
+                    children: []
+                },
+                {
+                    title: "IMPLEMENTATION_IN_PROGRESS",
+                    dispaly: "In progress",
+                    allowedAccessLevels: [
+                        accessTypes.SuperUser,
+                        accessTypes.Buyer,
+                        accessTypes.Supplier,
+                        accessTypes.Store
+                    ],
+                    routeType: RouteType.Folder,
+                    children: []
+                },
+                {
+                    title: "IMPLEMENTED",
+                    dispaly: "Implemented",
+                    allowedAccessLevels: [
+                        accessTypes.SuperUser,
+                        accessTypes.Buyer,
+                        accessTypes.Supplier,
+                        accessTypes.Store
+                    ],
+                    routeType: RouteType.Folder,
+                    children: []
+                }
+            ]
+        },
+        {
+            title: "RANGING",
+            dispaly: "Range Analysis",
+            allowedAccessLevels: [
+                accessTypes.SuperUser,
+                accessTypes.Buyer,
+                accessTypes.Supplier,
+                accessTypes.Store
+            ],
+            routeType: RouteType.Folder,
+            children: [{
+                    title: "SHARED",
+                    dispaly: "Shared",
+                    allowedAccessLevels: [
+                        accessTypes.SuperUser,
+                        accessTypes.Buyer,
+                        accessTypes.Supplier,
+                        accessTypes.Store
+                    ],
+                    routeType: RouteType.Folder,
+                    children: []
+                },
+                {
+                    title: "VIEW",
+                    dispaly: "Ready to view",
+                    allowedAccessLevels: [
+                        accessTypes.SuperUser,
+                        accessTypes.Buyer,
+                        accessTypes.Supplier,
+                        accessTypes.Store
+                    ],
+                    routeType: RouteType.Folder,
+                    children: []
+                }
+            ]
         }, {
-            title: "AWAITING_IMPLEMENTATION",
-            dispaly: "Ready to implement",
+            title: "CLUSTERING",
+            dispaly: "Clustering",
             allowedAccessLevels: [
                 accessTypes.SuperUser,
                 accessTypes.Buyer,
@@ -63,53 +149,22 @@ function GetAllRoutes() {
                 accessTypes.Store
             ],
             routeType: RouteType.Folder,
-            children: []
-        }, {
-            title: "IMPLEMENTATION_IN_PROGRESS",
-            dispaly: "In progress",
-            allowedAccessLevels: [
-                accessTypes.SuperUser,
-                accessTypes.Buyer,
-                accessTypes.Supplier,
-                accessTypes.Store
-            ],
-            routeType: RouteType.Folder,
-            children: []
-        }, {
-            title: "IMPLEMENTED",
-            dispaly: "Implemented",
-            allowedAccessLevels: [
-                accessTypes.SuperUser,
-                accessTypes.Buyer,
-                accessTypes.Supplier,
-                accessTypes.Store
-            ],
-            routeType: RouteType.Folder,
-            children: []
-        }]
-    }, {
-        title: "RANGING",
-        dispaly: "Range Analysis",
-        allowedAccessLevels: [
-            accessTypes.SuperUser,
-            accessTypes.Buyer,
-            accessTypes.Supplier,
-            accessTypes.Store
-        ],
-        routeType: RouteType.Folder,
-        children: [{
-            title: "VIEW",
-            dispaly: "Ready to view",
-            allowedAccessLevels: [
-                accessTypes.SuperUser,
-                accessTypes.Buyer,
-                accessTypes.Supplier,
-                accessTypes.Store
-            ],
-            routeType: RouteType.Folder,
-            children: []
-        }]
-    }];
+            children: [{
+                title: "VIEW",
+                dispaly: "Clustering",
+                route: '/Clustering',
+                allowedAccessLevels: [
+                    accessTypes.SuperUser,
+                    accessTypes.Buyer,
+                    accessTypes.Supplier,
+                    accessTypes.Store
+                ],
+                routeType: RouteType.Software,
+                children: []
+            }]
+        }
+    ];
+
 
     BuildRoutes(staticRoutes, routes, "");
 
@@ -120,13 +175,15 @@ function BuildRoutes(values, finalArr, parentString) {
 
     values.forEach(element => {
         let id = element.title;
+        let tmp = id;
 
         if (parentString != "")
-            id += "_" + parentString
+            tmp = parentString + "_" + id;
 
         finalArr.push(new RouteItem({
-            id: id,
+            id: tmp,
             parentID: parentString == "" ? "0" : parentString,
+            route: element.route,
             title: element.dispaly,
             allowedAccessLevels: [
                 accessTypes.SuperUser,
@@ -138,8 +195,9 @@ function BuildRoutes(values, finalArr, parentString) {
         }))
 
         console.log(finalArr);
+
         if (element.children.length > 0) {
-            BuildRoutes(element.children, finalArr, id);
+            BuildRoutes(element.children, finalArr, tmp);
         }
     });
 }

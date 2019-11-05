@@ -1,7 +1,7 @@
 class RouteItem {
     constructor(data) {
         let self = this;
-        self.showChildren = data.showChildren;
+        self.showChildren = false;
         self.showChildrenCount = false;
         self.id = data.id;
         self.parentID = data.parentID;

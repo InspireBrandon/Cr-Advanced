@@ -286,25 +286,7 @@
         let encoded_details = jwt.decode(sessionStorage.accessToken);
         self.SystemUser_ID = encoded_details.USER_ID;
 
-        // self.getUserFile(callback => {
-        //   self.getFileData(callback.id, data => {
-        //     let supplierData = [];
-        //     let tmp = [];
-        //     let arr = data.supplierImport["MARLTONS"].data;
 
-        //     let distinctRetailers = removeDuplicates(arr, "retailer");
-        //     let distinctRetailerData = {};
-
-        //     distinctRetailers.forEach(retailer => {
-        //       distinctRetailerData[retailer.retailer] = arr.filter(el => {
-        //         return el.retailer == retailer.retailer;
-        //       });
-        //     });
-
-        //     // console.log("distinctRetailerData", distinctRetailerData);
-        //     self.SupplierData = distinctRetailerData;
-        //   });
-        // });
       });
 
     },
