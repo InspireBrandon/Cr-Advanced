@@ -52,14 +52,14 @@
             <v-spacer></v-spacer>
             <span v-if=" selectedPlanogram !=null">{{ selectedPlanogram.displayname }} </span>
             <v-spacer></v-spacer>
-            <v-btn-toggle v-if="storeRowData.length > 0" round v-model="selectedView" class="transparent" mandatory>
+            <!-- <v-btn-toggle v-if="storeRowData.length > 0" round v-model="selectedView" class="transparent" mandatory>
                 <v-btn class="elevation-0" style="width: 100px" round @click="changeView(0)" color="primary">
                     Store
                 </v-btn>
                 <v-btn class="elevation-0" style="width: 100px" round @click="changeView(1)" color="primary">
                     Product
                 </v-btn>
-            </v-btn-toggle>
+            </v-btn-toggle> -->
             <v-spacer></v-spacer>
         </v-toolbar>
         <PlanogramSelector ref="PlanogramSelector" />
@@ -75,8 +75,13 @@
     </div>
 </template>
 <script>
-    import Spinner from '@/components/Common/Spinner';
+    const formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2
+    })
 
+    import Spinner from '@/components/Common/Spinner';
     import BrandGrid from "./Grid"
     import Axios from 'axios'
     import DateRangeSelector from '@/components/Common/DateRangeSelector';
@@ -106,7 +111,7 @@
                 selectedView: 1,
                 headers: [],
                 stores: [],
-                primaryCluster: 5,
+                primaryCluster: 6,
                 primaryClusters: [{
                         text: "10%",
                         value: 1
@@ -220,7 +225,8 @@
                 selectedBrands: null,
                 selectedPlanogramName: null,
                 selectedPlanogram: null,
-                selectedPeriod: null
+                selectedPeriod: null,
+                ProjectGroups: []
             }
 
         },
@@ -366,16 +372,16 @@
                 let self = this;
 
                 self.$refs.PlanogramSelector.show(false, planogram => {
-                    self.$refs.DateRangeSelector.show(dateRange => {
-                        console.log(dateRange);
-                        self.selectedPlanogram = planogram
-                        console.log(self.selectedPlanogram);
+                    // self.$refs.DateRangeSelector.show(dateRange => {
+                    // console.log(dateRange);
+                    self.selectedPlanogram = planogram
+                    console.log(self.selectedPlanogram);
 
-                        // self.selectedPlanogram = planogram.planogram_ID
-                        // self.selectedPlanogramName = planogram.displayname
-                        self.selectedPeriod = dateRange;
-                    })
+                    // self.selectedPlanogram = planogram.planogram_ID
+                    // self.selectedPlanogramName = planogram.displayname
+                    // self.selectedPeriod = dateRange;
                 })
+                // })
             },
             onPercentChange() {
                 let self = this;
@@ -387,88 +393,197 @@
                             primaryCluster: self.primaryCluster,
                             secondaryCluster: self.secondaryCluster,
                             clusterLevels: self.level,
-                            clusterGroups: self.group
+                            clusterGroups: self.group,
+                            selectedCategory: self.selectedCategory
                         });
-
                         self.storeRowData = lcData.storeData;
+                        self.rowData = lcData.ProjectGroupData;
                         self.stores = lcData.stores;
-                        self.rowData = lcData.productData;
+                        self.ProjectGroups = lcData.ProjectGroups
 
                         self.setHeaders()
                         self.$refs.Spinner.hide()
                     }
                 })
             },
+            orderRowData(projectGroup) {
+                let self = this
+                console.log("orderRowData", projectGroup);
+
+
+
+
+            },
             setHeaders() {
                 let self = this;
-                console.log("setting Headers");
+                let tmpCategory = null
+                //console.log("setting Headers");
+                switch (self.selectedCategory) {
+                    case 0:
+                        tmpCategory = "category"
+                        break;
+                    case 1:
+                        tmpCategory = "subcategory"
+                        break;
+                    case 2:
+                        tmpCategory = "brand_Name"
+                        break;
+                    case 3:
+                        tmpCategory = "manufacturer"
+                        break;
+                    case 4:
+                        tmpCategory = "supplier"
+                        break;
+                    case 5:
+                        tmpCategory = "size_Description"
+                        break;
+
+                    default:
+                        break;
+                }
 
                 let tmp = [{
-                    headerName: 'Category',
-                    field: 'category'
-                }, {
-                    headerName: 'Subcategory',
-                    field: 'subcategory'
-                }, {
-                    headerName: 'Brand',
-                    field: 'brand_Name'
-                }, {
-                    headerName: 'Manufacturer',
-                    field: 'manufacturer'
-                }, {
-                    headerName: 'Supplier',
-                    field: 'supplier'
-                }, {
-                    headerName: 'Size Description',
-                    field: 'size_Description'
-                }, {
-                    headerName: 'Sales',
-                    field: 'sales_Retail'
-                }]
-                console.log("self.stores");
-                console.log(self.stores);
+                        headerName: 'Store Name',
+                        field: 'storeName'
+                    },
+                    {
+                        headerName: 'Cluster',
+                        field: 'cluster'
+                    },
+                    {
+                        headerName: 'Total Sales',
+                        field: 'totalStoreSales',
+                        valueFormatter: function (params) {
+                            return formatter.format(params.value).replace("$", "R");
+                        }
+                    }, {
+                        headerName: 'Cumulative Sales',
+                        cellRendererFramework: "progressRenderer"
+                    },
+                    {
+                        headerName: 'Stack bar',
+                        cellRendererFramework: "DeptRenderer",
+                        width: 220
 
-                self.stores.forEach(store => {
+                    },{
+                        headerName: 'Area (m)',
+                        field: 'sqm_Shop'
+                    }, {
+                        headerName: "Cumulative Sales",
+                        field: "cumulativStoreSales",
+                        cellStyle: function (params) {
+                            if (params.data.canHighlight) {
+                                if (params.data.highlightLevel == 1) {
+                                    return {
+                                        backgroundColor: "#9c9c9c"
+                                    };
+                                }
+
+                                if (params.data.highlightLevel == 2) {
+                                    return {
+                                        backgroundColor: "#b9b9b9"
+                                    };
+                                }
+
+                                if (params.data.highlightLevel == 3) {
+                                    return {
+                                        backgroundColor: "#e0e0e0"
+                                    };
+                                }
+                            }
+                        }
+                    }
+                ]
+                console.log("self.ProjectGroups", self.ProjectGroups);
+
+                self.ProjectGroups.forEach((projectGroup, idx) => {
+                    if (idx == 0) {
+                        let tmp = self.rowData
+                        self.rowData = tmp.sort((a, b) => {
+                            if (a[projectGroup[tmpCategory] + "_ratio"] > b[projectGroup[tmpCategory] +
+                                    "_ratio"]) {
+                                return -1;
+                            }
+                            if (a[projectGroup[tmpCategory] + "_ratio"] < b[projectGroup[tmpCategory] +
+                                    "_ratio"]) {
+                                return 1;
+                            }
+                            return 0;
+                        })
+                    }
                     tmp.push({
-                        headerName: store.storeName,
+                        headerName: projectGroup[tmpCategory],
                         children: [{
-                            headerName: "In Store",
-                            field: store.storeName + "_inStore",
-                            width: 50,
-                            cellStyle: function (params) {
-                                if (params.data.canHighlight) {
-                                    if (params.data[store.storeName + "_inStore"]) {
-                                        if (params.data.highlightLevel == 1) {
+                                headerName: "Ratio",
+                                width: 100,
+                                "valueFormatter": function (params) {
+                                    if (params.data[projectGroup[tmpCategory] +
+                                            "_inStore"] ==
+                                        false) {
+                                        return 0
+                                    } else {
+                                        return ((parseFloat(params.data[projectGroup[
+                                                tmpCategory] + "_ratio"])) * 100)
+                                            .toFixed(2)
+                                    }
+                                },
+                                cellStyle: function (params) {
+                                    if (projectGroup.canHighlight) {
+
+                                        if (projectGroup.highlightLevel == 1) {
                                             return {
                                                 backgroundColor: "#5ef35e86"
                                             };
                                         }
 
-                                        if (params.data.highlightLevel == 2) {
+                                        if (projectGroup.highlightLevel == 2) {
                                             return {
                                                 backgroundColor: "#5ef35e40"
                                             };
                                         }
 
-                                        if (params.data.highlightLevel == 3) {
+                                        if (projectGroup.highlightLevel == 3) {
                                             return {
                                                 backgroundColor: "#5ef35e17"
                                             };
                                         }
                                     }
+                                }
+                            },
+                            {
+                                headerName: "In Store",
+                                field: projectGroup[tmpCategory] + "_inStore",
+                                width: 100,
+                                valueFormatter: function (params) {
+                                    return formatter.format(params.value).replace("$",
+                                        "R");
+                                },
+                                cellStyle: function (params) {
+                                    if (projectGroup.canHighlight) {
 
-                                    if (!params.data[store.storeName + "_inStore"]) {
-                                        return {
-                                            backgroundColor: "#ff9e9e91"
-                                        };
+                                        if (projectGroup.highlightLevel == 1) {
+                                            return {
+                                                backgroundColor: "#5ef35e86"
+                                            };
+                                        }
+
+                                        if (projectGroup.highlightLevel == 2) {
+                                            return {
+                                                backgroundColor: "#5ef35e40"
+                                            };
+                                        }
+
+                                        if (projectGroup.highlightLevel == 3) {
+                                            return {
+                                                backgroundColor: "#5ef35e17"
+                                            };
+                                        }
                                     }
                                 }
                             }
-                        }]
+                        ]
                     })
                 })
-                console.log(tmp);
-
                 self.headers = tmp;
             },
             runQuery() {
@@ -478,7 +593,8 @@
                     self.$refs.Spinner.show()
 
                     Axios.get(process.env.VUE_APP_API +
-                            `Cluster/CategoryClustering?Planogram_ID=${self.selectedPlanogram.planogram_ID}&level=${self.selectedCategory}&PeriodFrom=${self.selectedPeriod.dateFrom}&PeriodTo=${self.selectedPeriod.dateTo}`
+                            // `Cluster/CategoryClustering?Planogram_ID=${self.selectedPlanogram.planogram_ID}&level=${self.selectedCategory}&PeriodFrom=${self.selectedPeriod.dateFrom}&PeriodTo=${self.selectedPeriod.dateTo}`
+                            `Cluster/CategoryClustering?Planogram_ID=${self.selectedPlanogram.planogram_ID}&level=${self.selectedCategory}&PeriodFrom=53&PeriodTo=58`
                         )
                         .then(r => {
                             console.log(r)
@@ -489,12 +605,20 @@
                                 primaryCluster: self.primaryCluster,
                                 secondaryCluster: self.secondaryCluster,
                                 clusterLevels: self.level,
-                                clusterGroups: self.group
+                                clusterGroups: self.group,
+                                selectedCategory: self.selectedCategory
                             })
                             console.log(lcData);
                             self.storeRowData = lcData.storeData;
-                            self.rowData = lcData.productData;
+                            self.rowData = lcData.ProjectGroupData;
                             self.stores = lcData.stores;
+                            self.ProjectGroups = lcData.ProjectGroups
+
+
+                            //      self.storeRowData = lcData.storeData;
+                            // self.rowData = lcData.ProjectGroupData;
+                            // self.stores = lcData.stores;
+                            self.ProjectGroups = lcData.ProjectGroups
                             self.setHeaders()
                             self.$refs.Spinner.hide()
 

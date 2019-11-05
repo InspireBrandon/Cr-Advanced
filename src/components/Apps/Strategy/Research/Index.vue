@@ -44,16 +44,19 @@
         </v-toolbar>
         <Grid :rowData="rowData" :headers="headers" ref="Grid" />
 
-        <RetailerSupplierStoreDialog ref="RetailerSupplierStoreDialog"/>
+        <RetailerSupplierStoreDialog ref="RetailerSupplierStoreDialog" />
         <input @change="onFileChange" accept=".csv" ref="fileInput" style="display: none" type="file">
         <Prompt ref="Prompt" />
         <YesNoModal ref="YesNoModal" />
         <FileDataSelector ref="FileDataSelector" />
         <ImportSelector ref="ImportSelector" />
+        <Spinner ref="Spinner" />
     </v-card>
 </template>
 
 <script>
+    import Spinner from '@/components/Common/Spinner';
+
     import Axios from 'axios';
     import Grid from './Grid'
     import Prompt from '@/components/Common/Prompt'
@@ -69,6 +72,7 @@
             ImportSelector,
             Prompt,
             YesNoModal,
+            Spinner,
             FileDataSelector,
             RetailerSupplierStoreDialog
         },
@@ -137,7 +141,7 @@
                 let self = this
                 self.rowData = []
             },
-            openRetailerSupplierStorDialog(){
+            openRetailerSupplierStorDialog() {
                 let self = this;
 
                 self.$refs.RetailerSupplierStoreDialog.show();
@@ -245,6 +249,7 @@
                 let self = this
                 let tmp = []
                 let val = null
+                self.$refs.Spinner.show()
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 self.rowData.forEach(e => {
                     // let number = e.sales.split("R")
@@ -270,7 +275,7 @@
                     )
                     .then(r => {
                         console.log(r);
-
+                        self.$refs.Spinner.hide()
                     })
 
             },

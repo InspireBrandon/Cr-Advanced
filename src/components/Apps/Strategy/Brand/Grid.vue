@@ -15,10 +15,16 @@
     import {
         AgGridVue
     } from "ag-grid-vue";
+     import DeptRenderer from "./DeptRenderer";
+     import progressRenderer from "./progressRenderer";
+
+
 
     export default {
         components: {
             AgGridVue,
+            DeptRenderer,
+            progressRenderer
         },
         props: ["rowData", "stores","headers"],
         data() {
@@ -67,7 +73,7 @@
             onGridReady(params) {
                 this.gridApi = params.api;
                 this.columnApi = params.columnApi;
-                this.gridApi.sizeColumnsToFit()
+                // this.gridApi.sizeColumnsToFit()
             },
         },
     }

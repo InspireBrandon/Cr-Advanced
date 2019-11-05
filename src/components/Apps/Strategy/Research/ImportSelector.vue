@@ -29,6 +29,8 @@
 
 <script>
     import Axios from 'axios'
+    import jwt from 'jsonwebtoken';
+
     export default {
         data() {
             return {
@@ -44,11 +46,19 @@
             },
             getData() {
                 let self = this
-                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.get(process.env.VUE_APP_API + `SuplierLocationImport`)
                     .then(r => {
-                        self.fileData=r.data
+                        self.fileData = []
+                        r.data.forEach(element => {
+                            if (element.userID == encoded_details.USER_ID) {
+                                self.fileData.push(element)
+                            }
+                        });
+
                         console.log(r);
 
                     })

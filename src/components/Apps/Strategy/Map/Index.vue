@@ -1,11 +1,11 @@
 <template>
   <div width="100%">
     <v-toolbar dark flat>
-      <v-toolbar-items>
+      <!-- <v-toolbar-items>
         <v-select style="margin-left: 10px; margin-top: 8px; width: 200px" placeholder="Field" hide-details></v-select>
 
         <v-select style="margin-left: 10px; margin-top: 8px; width: 200px" placeholder="Values" hide-details></v-select>
-      </v-toolbar-items>
+      </v-toolbar-items> -->
     </v-toolbar>
     <div oncontextmenu="return false;" class="mapContainer">
       <v-layout row wrap>
@@ -31,7 +31,7 @@
                     <v-spacer> </v-spacer>
                     <v-btn @click="showSelector">maps</v-btn>
                   </v-toolbar>
-                  <v-btn @click="getRectWidth">Test Rect</v-btn>
+                  <!-- <v-btn @click="getRectWidth">Test Rect</v-btn> -->
                   <img v-show="legendImgURL != '' && selectedmap != null"
                     :src="legendImgURL == '' ? tmpImageURL : legendImgURL" :aspect-ratio="10/13"
                     class="grey lighten-2 mt-0" width="200px" style="object-fit: fill;">
@@ -172,6 +172,7 @@
         MapImgURL: "",
         legendImgURL: "",
         plottableStores: [],
+        supplierImport: [],
         clusters: [{
           text: "store",
           value: "store"
@@ -275,6 +276,7 @@
     mounted() {
       // this.openSetup()
       // this.drawMap(this.labels)
+      this.getSupplierStores();
       this.getGeoGrid(() => {
         this.getmaps();
         this.getCities();
@@ -284,29 +286,27 @@
         let encoded_details = jwt.decode(sessionStorage.accessToken);
         self.SystemUser_ID = encoded_details.USER_ID;
 
-        self.getUserFile(callback => {
-          self.getFileData(callback.id, data => {
-            let supplierData = [];
-            let tmp = [];
-            // let arr = data.supplierImport["MARLTONS"].data;
 
-            // let distinctRetailers = removeDuplicates(arr, "retailer");
-            // let distinctRetailerData = {};
-
-            // distinctRetailers.forEach(retailer => {
-            //   distinctRetailerData[retailer.retailer] = arr.filter(el => {
-            //     return el.retailer == retailer.retailer;
-            //   });
-            // });
-
-            // // console.log("distinctRetailerData", distinctRetailerData);
-            // self.SupplierData = distinctRetailerData;
-          });
-        });
       });
 
     },
     methods: {
+      getSupplierStores() {
+        let self = this
+        Axios.defaults.headers.common["TenantID"] =
+          sessionStorage.currentDatabase;
+
+        let encoded_details = jwt.decode(sessionStorage.accessToken);
+
+        Axios.get(
+          process.env.VUE_APP_API +
+          `SuplierLocationImportTX/ByUser?userID=${encoded_details.USER_ID}`
+        ).then(r => {
+          console.log("[GETSUPPLIERSTORES]", r);
+
+          self.supplierImport = r.data
+        })
+      },
       getRectWidth() {
         let self = this
         console.log("rect");
@@ -316,9 +316,9 @@
         self.imageHeight = el.getBoundingClientRect().height
         self.imageWidth = el.getBoundingClientRect().width
 
-        console.log(self.imageHeight );
-          console.log(self.imageWidth );
-        
+        console.log(self.imageHeight);
+        console.log(self.imageWidth);
+
 
       },
       DrawGeoGrid(chart, callback) {
@@ -359,6 +359,8 @@
           labelTemplate.fontSize = 14;
           labelTemplate.interactionsEnabled = false;
           labelTemplate.nonScaling = true;
+
+
 
           // Set up label series to populate
           if (idx == 0) {
@@ -417,6 +419,8 @@
           process.env.VUE_APP_API +
           `SuplierLocationImportTX/GeoReport?userID=${encoded_details.USER_ID}`
         ).then(r => {
+          console.log("GEODATA", r.data);
+
           self.geoGridData = r.data;
 
           self.getHinterlandStores();
@@ -562,9 +566,9 @@
       },
       showSelector() {
         let self = this;
-       
-          self.getRectWidth()
-       
+
+        self.getRectWidth()
+
         self.$refs.MapImageSelector.show(callback => {
           // console.log("callback");
           // console.log(callback);
@@ -898,12 +902,12 @@
         var pattern_europe = new am4core.Pattern();
         var image = new am4core.Image();
         polygonTemplate.tooltipColorSource = "rgb(103,148,220)";
-        var height = this.$refs.thisone2.clientHeight;
+        // var height = this.$refs.thisone2.clientHeight;
         image.width = self.imageWidth;
         image.height = self.imageHeight;
-      
-        
-        pattern_europe.x = self.imageWidth/2.8
+
+
+        pattern_europe.x = self.imageWidth / 2.8
         // pattern_europe.y = -39;
         pattern_europe.width = image.width;
         pattern_europe.height = image.height;
@@ -1351,6 +1355,25 @@
         console.log("drawMAjor");
         self.drawMajorCitiesImageSeries(chart);
         self.drawMinorCities(chart);
+        // draw standard supplier import
+        let imageSeries = chart.series.push(new am4maps.MapImageSeries());
+        // define template
+        imageSeries.name = "Import stores";
+        imageSeries.data = self.supplierImport;
+        imageSeries.dataFields.value = "sales";
+
+        // if (type == 0) {
+        let imageSeriesTemplate = imageSeries.mapImages.template;
+        imageSeriesTemplate.propertyFields.latitude = "yCoordinate";
+        imageSeriesTemplate.propertyFields.longitude = "xCoordinate";
+        imageSeriesTemplate.nonScaling = false;
+        imageSeriesTemplate.fill = chart.colors.getIndex(9).brighten(1);
+
+        var circle = imageSeriesTemplate.createChild(am4core.Circle);
+        circle.fillOpacity = 0.5;
+        circle.tooltipText = "{storeName}: [bold]{sales}[/]";
+        circle.radius = 2;
+
         if (
           config.selectedRetailers != undefined &&
           config.selectedRetailers.length > 0

@@ -26,7 +26,8 @@ class ListingClusterController {
         // ////////////////////////////////////////////////////////////////////////////////////////////////////
         let stores = removeDuplicates(storeSalesData.map(item => ({
             storeName: item.storeName,
-            store_ID: item.store_ID
+            store_ID: item.store_ID,
+            sqm_Shop: item.sqm_Shop
         })), "store_ID"); // get all unique stores
 
         let storeSales = getStoreSales(stores, storeSalesData); // get total store sales
@@ -37,7 +38,7 @@ class ListingClusterController {
 
         let storeClusterCodes = accumulateCodes(totalStoreProjectGroupSales, stores, clusterData, ProjectGroups);
         storeClusterCodes = addRank(storeClusterCodes);
-        let clusters = generateClusterNew(storeClusterCodes, clusterData, ProjectGroups);
+        let clusters = generateClusterNew(storeClusterCodes, clusterData, totalStoreProjectGroupSales);
 
         // let storeArrs = generateArrClusters(totalStoreProjectGroupSales, clusterData)
         // storeArrs=totalStoreProjectGroupSales
@@ -93,6 +94,7 @@ function getStoreSales(stores, storeSales) {
         let tmp = {
             store_ID: store.store_ID,
             storeName: store.storeName,
+            sqm_Shop: store.sqm_Shop,
             sumSales: 0
         }
 
@@ -155,6 +157,8 @@ function getProjectGroupsWeighted(storeSalesData) {
 }
 
 function getTotalStoreProjectGroupSales(stores, ProjectGroups, storeSalesData, clusterData) {
+    console.log('getTotalStoreProjectGroupSales', stores);
+
     let tmpStoreData = [];
     let currentCumulative = 0;
 
@@ -180,6 +184,7 @@ function getTotalStoreProjectGroupSales(stores, ProjectGroups, storeSalesData, c
 
         let tmpObj = {
             store_ID: store.store_ID,
+            sqm_Shop: store.sqm_Shop,
             storeName: store.storeName,
             totalStoreSales: parseFloat(parseFloat(totalStoreSales.toFixed(2))),
             cumulativStoreSales: cumulativStoreSales.toFixed(2),
@@ -261,6 +266,7 @@ function getTotalStoreProjectGroupSales(stores, ProjectGroups, storeSalesData, c
 }
 
 function accumulateCodes(tmpStoreData, stores, clusterData, ProjectGroups) {
+    console.log('accumulateCodes', stores);
 
     let storesTotalSales = 0
     tmpStoreData.forEach(store => {
@@ -605,7 +611,9 @@ function getMostCommonGroups(codeData, levels, group) {
     });
 }
 
-function generateClusterNew(tmpStoreData, clusterData) {
+function generateClusterNew(tmpStoreData, clusterData, salesData) {
+    console.log("generateClusterNew", tmpStoreData);
+
     let clusterGroups = clusterData.clusterGroups;
     let clusterLevels = clusterData.clusterLevels;
 
@@ -724,38 +732,38 @@ function generateClusterNew(tmpStoreData, clusterData) {
         // if (!assigned)
         //     counter = letters.length - 1;
 
-        el.cluster = el.level2Code+1
+        el.cluster = el.level2Code + 1
     })
 
     let highestThird = tmpThirdLevel[0].level3Code;
     let commonGroups3 = getMostCommonGroups(tmpThirdLevel, clusterLevels, 3);
 
     tmpThirdLevel.forEach((el, idx) => {
-    //     let counter = 0;
-    //     let assigned = false;
+        //     let counter = 0;
+        //     let assigned = false;
 
-    //     for (var i = 0; i < (commonGroups3.length - 1); i++) {
-    //         let highest = commonGroups3[i];
-    //         let lowest = commonGroups3[i + 1];
+        //     for (var i = 0; i < (commonGroups3.length - 1); i++) {
+        //         let highest = commonGroups3[i];
+        //         let lowest = commonGroups3[i + 1];
 
-    //         if (el.level3Code >= lowest && el.level3Code <= highest) {
-    //             let closest = closestTo(el.level3Code, lowest, highest);
+        //         if (el.level3Code >= lowest && el.level3Code <= highest) {
+        //             let closest = closestTo(el.level3Code, lowest, highest);
 
-    //             if (closest.highest > closest.lowest) {
-    //                 counter = i;
-    //             } else {
-    //                 counter = i + 1;
-    //             }
+        //             if (closest.highest > closest.lowest) {
+        //                 counter = i;
+        //             } else {
+        //                 counter = i + 1;
+        //             }
 
-    //             assigned = true;
-    //         }
-    //     }
+        //             assigned = true;
+        //         }
+        //     }
 
-    //     if (!assigned)
-    //         counter = letters.length - 1;
+        //     if (!assigned)
+        //         counter = letters.length - 1;
 
-    //     el.cluster = (counter == (letters.length - 1)) ? letters[counter] : letters[counter].toLowerCase();
-    el.cluster = letters[el.level3Code].toLowerCase();
+        //     el.cluster = (counter == (letters.length - 1)) ? letters[counter] : letters[counter].toLowerCase();
+        el.cluster = letters[el.level3Code].toLowerCase();
     })
 
     tmp.forEach(el => {
@@ -781,7 +789,13 @@ function generateClusterNew(tmpStoreData, clusterData) {
             })
         }
     })
-
+    salesData.forEach(element => {
+        tmp.forEach(store => {
+            if (store.store_ID == element.store_ID) {
+                element.cluster = store.cluster
+            }
+        })
+    })
     return tmp.sort((a, b) => {
         if (a.storeCode > b.storeCode) {
             return 1;
