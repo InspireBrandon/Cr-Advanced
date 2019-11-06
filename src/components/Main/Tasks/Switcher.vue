@@ -57,7 +57,8 @@
                                 <v-icon>home</v-icon>
                             </v-btn>
                         </v-toolbar-items>
-                        <v-btn v-if="userAccess == 0 || userAccess == 1 || userAccess == 2 || userAccess == 3" color="primary" @click="startNewTask">Start new task</v-btn>
+                        <v-btn v-if="userAccess == 0 || userAccess == 1"
+                            color="primary" @click="startNewTask">Start new task</v-btn>
                         <v-btn color="primary" @click="sendMail">Send Mail</v-btn>
                         <v-spacer></v-spacer>
                         <v-btn v-show="userAccess == 3" @click="$refs.guide.click()" dark outline>Help</v-btn>
@@ -116,6 +117,15 @@
                             </v-tooltip>
                         </v-btn-toggle>
 
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-btn @click="showOutstandingTasks" icon v-on="on" flat>
+                                    <v-icon>access_time</v-icon>
+                                </v-btn>
+                            </template>
+                            <span>Outstanding tasks</span>
+                        </v-tooltip>
+
                         <v-btn v-show="selectedView==0" style="margin-left: 20px;" icon small color="secondary">
                             <v-icon @click="showNotices = !showNotices" v-if="showNotices">
                                 visibility_off</v-icon>
@@ -171,6 +181,7 @@
         <NewTask ref="NewTask"></NewTask>
         <AssignTask ref="AssignTask"></AssignTask>
         <SendMailModal ref="SendMailModal"></SendMailModal>
+        <OutstandingTasks ref="OutstandingTasks" />
     </v-container>
 </template>
 
@@ -194,6 +205,7 @@
     import NewTask from './NewTask'
     import AssignTask from '@/components/Common/AssignTask'
     import SendMailModal from './SendMailModal.vue'
+    import OutstandingTasks from './OutstandingTasks/Index'
 
     export default {
         components: {
@@ -206,7 +218,8 @@
             NewTask,
             AssignTask,
             PlanogramDistribution,
-            SendMailModal
+            SendMailModal,
+            OutstandingTasks
         },
         data() {
             return {
@@ -322,6 +335,10 @@
             }
         },
         methods: {
+            showOutstandingTasks() {
+                let self = this;
+                self.$refs.OutstandingTasks.show();
+            },
             change_view_state(viewState) {
                 let self = this;
                 self.viewState = viewState
@@ -889,6 +906,7 @@
         height: calc(100vh - 222px);
         overflow: auto;
     }
+
     table {
         border-collapse: collapse;
         width: 100%;
