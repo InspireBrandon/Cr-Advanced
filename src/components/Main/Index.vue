@@ -1,10 +1,10 @@
 <template>
     <div>
         <v-toolbar flat dark color="primary" app clipped-left>
-            <v-btn icon @click="$router.push('/Apps')">
+            <v-btn icon @click="$router.push('/Home')">
                 <v-icon>home</v-icon>
             </v-btn>
-            <v-btn v-if="$route.path.toUpperCase() !='/TASKS'" icon @click="$router.push('/tasks')">
+            <v-btn v-if="$route.path.toUpperCase() !='/TASKS'" icon @click="$router.push('/Tasks')">
                 <v-icon>inbox</v-icon>
             </v-btn>
 

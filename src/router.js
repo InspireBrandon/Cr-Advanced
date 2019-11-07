@@ -106,6 +106,11 @@ import BasketAnalysis from '@/components/Apps/Strategy/BasketAnalysis/Index.vue'
 import ListingClusters from '@/components/Apps/Strategy/ListingClusters/Index.vue'
 import Clustering from '@/components/Apps/Strategy/Clustering/Index.vue'
 
+// import PlanogramDistributionNew from '@/components/Main/PlanogramImplementation/PlanogramOverView/StorePlanogramOverview.vue'
+import PlanogramDistributionNew from '@/components/Main/PlanogramDistribution/PlanogramOverView/StorePlanogramOverview'
+
+import StorePlanogram from '@/components/Main/PlanogramStoreView/StoreView/StorePlanograms.vue'
+
 import map from '@/components/Apps/Strategy/Map/Switcher.vue'
 import map2 from '@/components/Apps/Strategy/Map/tesmap.vue'
 
@@ -147,7 +152,7 @@ export default new Router({
       name: 'main',
       component: Main,
       children: [{
-          path: 'TestingView',
+          path: 'Home',
           name: 'TestingView',
           component: require('@/components/Main/NewViewTesting/NewView.vue').default,
           children: [{
@@ -155,14 +160,22 @@ export default new Router({
             name: 'PlanogramImplementation',
             component: Apps,
           },{
-            path: 'PlanogramImplementationNew/:projectTransactionID/:planogramID/:status',
+            path: '/PlanogramImplementationNew/:projectTransactionID/:planogramID/:status',
             name: 'PlanogramImplementation',
             component: PlanogramImplementation,
           },{
             path: '/RangePlanningView/:rangeFileID',
             name: 'range_planning_view',
             component: RangePlanningView,
-          },]
+          }, {
+            path: '/PlanogramDistribution/:projectGroupID/:projectID',
+            name: 'range_planning_view',
+            component: PlanogramDistributionNew,
+          },{
+            path: '/StorePlanogram/:storeID',
+            name: 'range_planning_view',
+            component: StorePlanogram,
+          }]
         },
         {
           path: '/map',
@@ -212,10 +225,6 @@ export default new Router({
           path: '/Graphs',
           name: 'Graphs',
           component: Graphs
-        }, {
-          path: '/Home',
-          name: 'home',
-          component: Home
         }, {
           path: '/Apps',
           name: 'apps',

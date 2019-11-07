@@ -1005,8 +1005,9 @@
                   return el.clusterID === descrep.clusterID;
                 })
 
-                let clusterIndicators = self.rangingController.getIndicatorsByCluster(descrep.type, descrep
-                  .clusterID);
+                let clusterIndicators = self.rangingController.getIndicatorsByCluster(self.tmpClusters, descrep
+                  .type, descrep
+                  .newClusterID);
 
                 clusterIndicators.forEach(ci => {
                   storeSales.forEach(ss => {
@@ -1313,7 +1314,6 @@
       sync_clusters(outputObj) {
         let self = this;
 
-        self.$refs.SyncModalStatus.show();
         outputObj.currentLoading = 'clusters';
         self.$refs.SyncModalStatus.updateStatus(outputObj);
 
@@ -1342,6 +1342,7 @@
       sync_updatedIndicators(outputObj) {
         let self = this;
 
+        self.$refs.SyncModalStatus.show();
         self.$refs.SyncModalStatus.updateStatus(outputObj);
 
         let updatedIndicators = self.rangingController.getImportCSV();

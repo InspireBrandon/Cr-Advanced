@@ -1,88 +1,84 @@
 <template>
   <div>
     <div v-for="(item, idx) in routeController.getRoutesByParentID(parentID)" :key="idx">
-      <div>
-        <div
-          class="subheading mt-1 pa-1 font-weight-bold"
-          v-if="item.parentID == '0' && item.route == null"
-          style="cursor: pointer;"
-          @click="item.showChildren = !item.showChildren"
-        >
-          <v-icon v-if="item.route == null">{{ item.showChildren ? 'folder_open' : 'folder' }}</v-icon>
-          {{item.title}} 
-        </div>
-        <div
-          class="subheading mt-1 pa-1 font-weight-bold"
-          style="cursor: pointer;"
-          v-if="item.parentID == '0' && item.route != null"
-          @click="goTo(item.route)"
-        >
-          <v-icon>{{ item.showChildren ? 'folder_open' : 'folder' }}</v-icon>
-          {{item.title}}
-        </div>
-        <div
-          class="body-2 font-weight-regular"
-          style="cursor: pointer;"
-          v-if="item.parentID != '0' && item.route == null"
-          @click="item.showChildren =  !item.showChildren"
-        >
-          <v-icon v-if="item.route == null">{{ item.showChildren ? 'folder_open' : 'folder' }}</v-icon>
-          {{item.title}} {{counter(item)}}
-        </div>
-        <div>
-          <div
-            v-if="item.parentID != '0' && item.route != null"
-            style="cursor: pointer;"
-            class="body-1 font-weight-regular"
-            @click="goTo(item.route)"
-          >
-            <v-icon v-if="item.routeType == 0">folder</v-icon>
-            <v-icon v-if="item.routeType == 1">insert_drive_file</v-icon>
-            <v-icon v-if="item.routeType == 2">stars</v-icon>
-            {{item.title}}
-          </div>
-        </div>
+      <div v-if="item.allowedAccessLevels.includes(parseInt(accessType))">
+        <v-tooltip right>
+          <template v-slot:activator="{ on }">
+            <div v-on="on" class="overline font-weight-regular no-wrap" style="cursor: pointer;"
+              v-if="item.route == null" @click="item.showChildren =  !item.showChildren">
+              <v-icon v-if="item.route == null">{{ item.showChildren ? 'folder_open' : 'folder' }}</v-icon>
+              <span>{{item.title}}</span>
+              <span v-if="item.showChildrenCount">{{counter(item)}}</span>
+              <span>{{ item.extraDetails }}</span>
+            </div>
+          </template>
+          <span>{{ item.title }}</span>
+        </v-tooltip>
+        <v-tooltip right>
+          <template v-slot:activator="{ on }">
+            <div v-on="on" v-if="item.route != null" style="cursor: pointer;"
+              class="overline font-weight-regular no-wrap" @click="goTo(item.route)">
+              <v-icon v-if="item.routeType == 0">folder</v-icon>
+              <v-icon v-if="item.routeType == 1">insert_drive_file</v-icon>
+              <v-icon v-if="item.routeType == 2">build</v-icon>
+              <span>{{item.title}}</span>
+              <span v-if="item.showChildrenCount">{{counter(item)}}</span>
+              <span>{{ item.extraDetails }}</span>
+            </div>
+          </template>
+          <span>{{ item.title }}</span>
+        </v-tooltip>
       </div>
-      <recursive-item
-        v-if="routeController != null"
-        :routeController="routeController"
-        v-show="item.showChildren"
-        style="margin-left: 15px;"
-        :parentID="item.id"
-      ></recursive-item>
+      <recursive-item v-if="routeController != null" :routeController="routeController" v-show="item.showChildren"
+        style="margin-left: 20px;" :parentID="item.id"></recursive-item>
     </div>
   </div>
 </template>
 
 
 <script>
-// import RouteController from "@/components/Main/NewViewTesting/RoutesForTesting/route-controller";
+  // import RouteController from "@/components/Main/NewViewTesting/RoutesForTesting/route-controller";
 
-export default {
-  props: ["parentID", "routeController"],
-  name: "recursive-item",
-  data() {
-    return {
-      items: [],
-      open: [1, 2]
-    };
-  },
-  created() {
-    let self = this;
-  },
-  methods: {
-    goTo(route) {
-      this.$router.push(route);
+  export default {
+    props: ["parentID", "routeController"],
+    name: "recursive-item",
+    data() {
+      return {
+        items: [],
+        open: [1, 2],
+        accessType: -1
+      };
     },
-    counter(item) {
+    created() {
       let self = this;
+      setTimeout(() => {
+        self.accessType = sessionStorage.accessType;
+      }, 2000);
+    },
+    methods: {
+      goTo(route) {
+        this.$router.push(route);
+      },
+      counter(item) {
+        let self = this;
 
-      var tmp = 0;
-      if ((item.showChildrenCount = true)) {
-        tmp = `(${self.routeController.getRoutesByParentID(item.id).length})`;
+        var tmp = 0;
+        if ((item.showChildrenCount = true)) {
+          tmp = `(${self.routeController.getRoutesByParentID(item.id).length})`;
+        }
+        return tmp;
       }
-      return tmp;
     }
-  }
-};
+  };
 </script>
+
+<style>
+  .no-wrap {
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .overline {
+    font-size: 14px;
+  }
+</style>

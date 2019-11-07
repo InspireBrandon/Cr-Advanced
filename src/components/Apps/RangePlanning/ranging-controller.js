@@ -135,10 +135,13 @@ class RangingController {
     return finalArr
   }
 
-  getIndicatorsByCluster(clusterType, clusterID) {
+  getIndicatorsByCluster(clusterData, clusterType, clusterID) {
     let self = this;
 
-    let stores = getStoresByCluster(self.clusterData, clusterType, clusterID);
+    let stores = getStoresByCluster(clusterData, clusterType, clusterID);
+
+    console.log(stores);
+
     let retval = [];
 
     self.allRangeProducts.forEach(rp => {
