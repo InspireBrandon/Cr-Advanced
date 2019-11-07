@@ -1,6 +1,6 @@
 <template>
   <v-toolbar dense dark>
-    <v-btn icon @click="$router.push('/Apps')">
+    <v-btn icon @click="$router.push('/Home')">
       <v-icon>home</v-icon>
     </v-btn>
     <library ref="library"></library>

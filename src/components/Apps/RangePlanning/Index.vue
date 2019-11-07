@@ -1005,8 +1005,9 @@
                   return el.clusterID === descrep.clusterID;
                 })
 
-                let clusterIndicators = self.rangingController.getIndicatorsByCluster(descrep.type, descrep
-                  .clusterID);
+                let clusterIndicators = self.rangingController.getIndicatorsByCluster(self.tmpClusters, descrep
+                  .type, descrep
+                  .newClusterID);
 
                 clusterIndicators.forEach(ci => {
                   storeSales.forEach(ss => {
@@ -1313,7 +1314,6 @@
       sync_clusters(outputObj) {
         let self = this;
 
-        self.$refs.SyncModalStatus.show();
         outputObj.currentLoading = 'clusters';
         self.$refs.SyncModalStatus.updateStatus(outputObj);
 
@@ -1342,6 +1342,7 @@
       sync_updatedIndicators(outputObj) {
         let self = this;
 
+        self.$refs.SyncModalStatus.show();
         self.$refs.SyncModalStatus.updateStatus(outputObj);
 
         let updatedIndicators = self.rangingController.getImportCSV();
@@ -1682,10 +1683,23 @@
       onCellValueChanged(e) {
         let self = this;
         let field = e.colDef.field;
+        let isIndicator = e.colDef.isIndicator
 
         if (field != "store_Range_Indicator") {
-          if (e.oldValue != e.newValue) {
-            self.rangingController.setProductData(e.data.productID, field, e.newValue);
+          if (isIndicator != undefined && isIndicator != null && isIndicator) {
+            if (e.oldValue != e.newValue) {
+              let store = e.data[field + "ID"];
+              let stores = [{
+                storeID: store,
+                selected: e.newValue == "YES"
+              }]
+
+              self.rangingController.setStoreIndicatorByProductID(stores, e.data.productID);
+            }
+          } else {
+            if (e.oldValue != e.newValue) {
+              self.rangingController.setProductData(e.data.productID, field, e.newValue);
+            }
           }
         } else {
           if (e.oldValue != e.newValue) {
@@ -1999,6 +2013,8 @@
         case 'STORE': {
           let storelevel = self.rangingController.getStoreIndicators(self.selectedClusterType, self
             .selectedClusterOption);
+
+          console.log(storelevel);
 
           self.ais_Sales = 0;
           self.ais_SalesPotential = 0;
