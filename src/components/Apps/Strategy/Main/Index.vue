@@ -1,6 +1,27 @@
 <template>
     <v-card tile>
         <v-toolbar flat dense dark color="grey darken-3">
+           <v-btn-toggle round v-model="selectedView" class="transparent" mandatory>
+                    <v-btn class="elevation-0" style="width: 100px" round @click="changeView(0)" color="primary">
+                        Store
+                    </v-btn>
+                    <v-btn class="elevation-0" style="width: 100px" round @click="changeView(1)" color="primary">
+                        Custom
+                    </v-btn>
+                </v-btn-toggle>
+            <v-toolbar-items>
+               
+            </v-toolbar-items>
+            <v-spacer></v-spacer>
+            <div v-if="title != ''">
+                {{ currentToggle + ' - ' + title }}
+            </div>
+            <v-spacer></v-spacer>
+            <v-toolbar-title>
+                <span>Main</span>
+            </v-toolbar-title>
+        </v-toolbar>
+        <v-toolbar dark flat>
             <v-toolbar-items>
                 <v-menu dark offset-y style="margin-bottom: 10px;">
                     <v-btn slot="activator" flat>
@@ -16,7 +37,7 @@
                         <v-list-tile @click="getHinterlandStores">
                             <v-list-tile-title>Refresh</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile @click="openRetailerModal">
+                        <!-- <v-list-tile @click="openRetailerModal">
                             <v-list-tile-title>openRetailerModal</v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile @click="LinkRetailerStore">
@@ -24,7 +45,7 @@
                         </v-list-tile>
                         <v-list-tile @click="LinkRetailerStore">
                             <v-list-tile-title>LinkRetailerStore</v-list-tile-title>
-                        </v-list-tile>
+                        </v-list-tile> -->
                     </v-list>
                 </v-menu>
                 <v-menu dark offset-y style="margin-bottom: 10px;">
@@ -37,26 +58,15 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
-            </v-toolbar-items>
-            <v-spacer></v-spacer>
-            <div v-if="title != ''">
-                {{ currentToggle + ' - ' + title }}
-            </div>
-            <v-spacer></v-spacer>
-            <v-toolbar-title>
-                <span>Main</span>
-            </v-toolbar-title>
-        </v-toolbar>
-        <v-toolbar dark flat>
-            <v-toolbar-items>
-                <v-autocomplete class="pt-0" return-object :items="planograms" v-model="selectedPlanogram"
-                    style="width: 300px; margin-top: 15px;" placeholder="Select a planogram" dense hide-details>
+                <v-autocomplete class="pt-0" return-object :items="planograms" v-if="selectedView==1"
+                    v-model="selectedPlanogram" style="width: 300px; margin-top: 15px;" placeholder="Select a planogram"
+                    dense hide-details>
                 </v-autocomplete>
             </v-toolbar-items>
             <v-spacer></v-spacer>
         </v-toolbar>
-        <Grid :showGrid="showGrid" :selectFile='openFile' :createFile="customSetup" v-show="selectedView == 0"
-            :rowData="rowData" :headers="headers" ref="Grid" />
+        <Grid :showGrid="showGrid" :selectFile='openFile' :createFile="customSetup" :rowData="rowData"
+            :headers="headers" ref="Grid" />
         <Setup ref="Setup" />
         <CustomSetup ref="CustomSetup" />
         <Spinner ref="Spinner" />
@@ -139,6 +149,7 @@
                 dataFields: [],
                 selectedDataField: null,
                 headers: [],
+                clusterStores: [],
                 rowData: [],
                 stores: [],
                 unhandledReportData: null,
@@ -165,6 +176,45 @@
             self.getPlanograms();
         },
         methods: {
+            changeView(value) {
+                let self = this
+                self.selectedView = value
+                // if (value == 1) {
+                //     self.handleCustomSetup(self.currentConfig);
+                // }
+                // customCluster: element.customCluster,
+                //                         customCluster_ID: element.customCluster_ID,
+                //                         storeCluster: element.storeCluster,
+                //                         storeCluster_ID: element.storeCluster_ID,
+                if (self.selectedView == 0) {
+                    self.headers[4] = {
+                        headerName: 'Store System Clusters',
+                        editable: true,
+                        field: "storeCluster",
+
+                    }
+                    // self.headers[5] = {
+                    //     headerName: 'Store User Clusters',
+                    // }
+                } else {
+                    self.headers[4] = {
+                        headerName: 'Custom System Clusters',
+                        editable: true,
+                        field: "customCluster",
+
+                    }
+                    // self.headers[5] = {
+                    //     headerName: 'Custom User Clusters',
+                    // }
+                }
+                let tmp = self.headers
+                self.headers=[]
+                self.headers=tmp
+                console.log(self.headers);
+
+                self.$refs.Grid.gridApi.setColumnDefs(self.headers);
+                self.$refs.Grid.gridApi.redrawRows();
+            },
             LinkRetailerStore() {
                 let self = this;
 
@@ -430,28 +480,34 @@
                             //         }
                             //     }
                             // }, 
-                            {
-                                headerName: 'System Clusters',
-                                children: [{
-                                    headerName: 'Store',
-                                    width: 130,
-                                }, {
-                                    headerName: 'Custom',
-                                    width: 130,
-                                }]
-                            }, {
-                                headerName: 'User Clusters',
-                                children: [{
-                                    headerName: 'Store',
-                                    width: 130,
-                                }, {
-                                    headerName: 'Custom',
-                                    width: 130,
-                                }]
-                            })
+                        )
                     }
                 }
+                if (self.selectedView == 0) {
+                    headers.push({
+                        headerName: 'Store System Clusters',
+                        editable: true,
+                        field: "storeCluster",
 
+                    }, 
+                    // {
+                    //     headerName: 'Store User Clusters',
+
+                    // }
+                    )
+                } else {
+                    headers.push({
+                        headerName: 'Custom System Clusters',
+                        editable: true,
+                        field: "customCluster",
+
+                    }, 
+                    // {
+                    //     headerName: 'custom User Clusters',
+
+                    // }
+                    )
+                }
                 if (data.basket != undefined) {
                     for (var basket in data.basket) {
 
@@ -486,12 +542,28 @@
                         })
                     }
                 }
+                storeData.forEach(HintStore => {
+                    self.clusterStores.forEach(DBStore => {
+                        // console.log(HintStore.PlaceGroup.toUpperCase() == DBStore.store.toUpperCase());
 
+                        if (HintStore.PlaceGroup.toUpperCase() == DBStore.store.toUpperCase()) {
+                            HintStore.customCluster = DBStore.customCluster
+                            HintStore.customCluster_ID = DBStore.customCluster_ID
+                            HintStore.storeCluster = DBStore.storeCluster
+                            HintStore.storeCluster_ID = DBStore.storeCluster_ID
+                            HintStore.store_ID = DBStore.store_ID
+                        }
+                    })
+                });
                 storeData.forEach(element => {
                     let storeFound = false;
-
                     let tmpBasket = {
-                        storeName: element.PlaceGroup.toUpperCase()
+                        storeName: element.PlaceGroup.toUpperCase(),
+                        customCluster: element.customCluster,
+                        customCluster_ID: element.customCluster_ID,
+                        storeCluster: element.storeCluster,
+                        store_ID: element.store_ID,
+                        storeCluster_ID: element.storeCluster_ID,
                     };
 
                     if (data.store != undefined) {
@@ -577,6 +649,8 @@
 
                 self.headers = [];
                 self.rowData = final;
+                console.log("self.rowData", self.rowData);
+
 
                 setTimeout(() => {
                     self.headers = headers;
@@ -754,7 +828,8 @@
 
                 self.currentConfig.selectedItems.forEach(si => {
                     self.headers.forEach(el => {
-                        if (el.headerName == si)
+                        if (el.headerName == si && el.field != undefined)
+
                             fields.push(el.field);
                     })
                 })
@@ -778,6 +853,8 @@
                 }
 
                 let fields = self.getFieldsFromHeaders();
+
+                console.log("fields", fields);
 
                 columnDefs.push({
                     "headerName": "Cluster",
@@ -964,7 +1041,8 @@
 
                 Axios.get(process.env.VUE_APP_API + "StoreClustering?planogram_ID=" + self.selectedPlanogram)
                     .then(r => {
-                        console.log(r.data);
+                        self.clusterStores = r.data
+                        console.log("getStoresWithClusters", r.data);
                     })
             }
         }

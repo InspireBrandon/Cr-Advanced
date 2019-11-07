@@ -22,7 +22,7 @@
         {
             // sqm_Shop
             getToolTip(item,sqm){
-                return item.name+" "+":"+" "+ (item.value).toFixed(2)+"%"+" "+"Size : "+ ((item.value/100)*sqm).toFixed(0)
+                return item.name+" "+":"+" "+ (item.value).toFixed(2)+"%"
             }
             
         }

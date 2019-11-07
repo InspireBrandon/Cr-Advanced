@@ -1,8 +1,10 @@
 <template>
     <div>
         <div>
-            <div style="width: 100%;  height: calc(100vh - 272px); text-align: center; font-size: 20px; padding-top: 10%;" v-show="!showGrid">
-                <div>Please <a href="#" @click.prevent="selectFile">select</a> or <a href="#" @click.prevent="createFile">create</a> a file to continue</div>
+            <div style="width: 100%;  height: calc(100vh - 272px); text-align: center; font-size: 20px; padding-top: 10%;"
+                v-show="!showGrid">
+                <div>Please <a href="#" @click.prevent="selectFile">select</a> or <a href="#"
+                        @click.prevent="createFile">create</a> a file to continue</div>
             </div>
             <ag-grid-vue v-show="showGrid" :gridOptions="gridOptions" style="width: 100%;  height: calc(100vh - 272px);"
                 :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="headers" :rowData="rowData"
@@ -51,7 +53,7 @@
                     afterFilterChanged: () => console.log("gridOptions.api.inMemoryRowController.rowsAfterFilter"),
                 },
                 defaultColDef: {
-                    onCellValueChanged: this.UpdateLine
+                    onCellValueChanged: this.UpdateStoreCluster
                 }
             }
         },
@@ -59,6 +61,37 @@
             let self = this;
         },
         methods: {
+            UpdateStoreCluster(params) {
+                let self = this
+                let item = params.data;
+                let node = params.node;
+                switch (params.colDef.field) {
+                    case "customCluster": {
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                        Axios.post(process.env.VUE_APP_API +
+                                `Store/UpdateCustomCluster?planogram_ID=${self.selectedCategory}&cluster_Name=${item.customCluster}&store_ID=${item.store_ID}`
+                            )
+                            .then(r => {
+                                console.log("[FIELD UPDATED]");
+                                delete Axios.defaults.headers.common["TenantID"];
+                            })
+                    }
+                    break;
+                case "storeCluster": {
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                    Axios.post(process.env.VUE_APP_API +
+                            `Store/UpdateStoreCluster?cluster_Name=${item.storeCluster}&store_ID=${item.store_ID}`)
+                        .then(r => {
+                            console.log("[FIELD UPDATED]");
+
+                            delete Axios.defaults.headers.common["TenantID"];
+                        })
+                    break;
+                }
+
+                }
+
+            },
             onGridReady(params) {
                 let self = this;
                 self.gridApi = params.api;
@@ -66,7 +99,7 @@
             },
             setOrder() {
                 let self = this;
-                
+
                 var defaultSortModel = [{
                         colId: "userDefinedCluster",
                         sort: "asc"

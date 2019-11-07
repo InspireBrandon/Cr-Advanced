@@ -24,6 +24,8 @@
                 </v-menu>
             </v-toolbar-items>
             <v-spacer></v-spacer>
+            <span v-if=" selectedPlanogram !=null">{{ selectedPlanogram.displayname }} </span>
+            <v-spacer></v-spacer>
             <v-toolbar-title>
                 Catagory Cluster
             </v-toolbar-title>
@@ -49,9 +51,7 @@
                     v-model="selectedCategory" placeholder="Select category" hide-details @change="runQuery">
                 </v-select>
             </v-toolbar-items>
-            <v-spacer></v-spacer>
-            <span v-if=" selectedPlanogram !=null">{{ selectedPlanogram.displayname }} </span>
-            <v-spacer></v-spacer>
+           
             <!-- <v-btn-toggle v-if="storeRowData.length > 0" round v-model="selectedView" class="transparent" mandatory>
                 <v-btn class="elevation-0" style="width: 100px" round @click="changeView(0)" color="primary">
                     Store
@@ -289,6 +289,7 @@
                         let tmp = {
                             CategoryClustering: {},
                             salesData: self.salesData,
+                            selectedCategory:self.selectedCategory,
                             config: {
                                 planogramData: self.selectedPlanogram,
                                 periodData: self.selectedPeriod,
@@ -372,16 +373,15 @@
                 let self = this;
 
                 self.$refs.PlanogramSelector.show(false, planogram => {
-                    // self.$refs.DateRangeSelector.show(dateRange => {
-                    // console.log(dateRange);
+                    self.$refs.DateRangeSelector.show(dateRange => {
                     self.selectedPlanogram = planogram
                     console.log(self.selectedPlanogram);
 
                     // self.selectedPlanogram = planogram.planogram_ID
-                    // self.selectedPlanogramName = planogram.displayname
-                    // self.selectedPeriod = dateRange;
+                    self.selectedPlanogramName = planogram.displayname
+                    self.selectedPeriod = dateRange;
                 })
-                // })
+                })
             },
             onPercentChange() {
                 let self = this;
@@ -465,10 +465,12 @@
                         cellRendererFramework: "DeptRenderer",
                         width: 220
 
-                    },{
-                        headerName: 'Area (m)',
-                        field: 'sqm_Shop'
-                    }, {
+                    },
+                    // {
+                    //     headerName: 'Area (m)',
+                    //     field: 'sqm_Shop'
+                    // }, 
+                    {
                         headerName: "Cumulative Sales",
                         field: "cumulativStoreSales",
                         cellStyle: function (params) {
@@ -593,8 +595,8 @@
                     self.$refs.Spinner.show()
 
                     Axios.get(process.env.VUE_APP_API +
-                            // `Cluster/CategoryClustering?Planogram_ID=${self.selectedPlanogram.planogram_ID}&level=${self.selectedCategory}&PeriodFrom=${self.selectedPeriod.dateFrom}&PeriodTo=${self.selectedPeriod.dateTo}`
-                            `Cluster/CategoryClustering?Planogram_ID=${self.selectedPlanogram.planogram_ID}&level=${self.selectedCategory}&PeriodFrom=53&PeriodTo=58`
+                            `Cluster/CategoryClustering?Planogram_ID=${self.selectedPlanogram.planogram_ID}&level=${self.selectedCategory}&PeriodFrom=${self.selectedPeriod.dateFrom}&PeriodTo=${self.selectedPeriod.dateTo}`
+                            // `Cluster/CategoryClustering?Planogram_ID=${self.selectedPlanogram.planogram_ID}&level=${self.selectedCategory}&PeriodFrom=53&PeriodTo=58`
                         )
                         .then(r => {
                             console.log(r)
