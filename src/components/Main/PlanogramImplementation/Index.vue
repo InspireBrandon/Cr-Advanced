@@ -47,15 +47,16 @@
                             <div v-if="routeStatus!=null">
                                 {{displayName}}
                                 <v-spacer></v-spacer>
-                                Status: {{status[routeStatus].text}}
+                                <!-- Status: {{status[routeStatus].text}} -->
                             </div>
                             <div v-else>
                                 {{displayName}}
                                 <v-spacer></v-spacer>
-                                Status: {{status[timelineItems[0].status].text}}
+                                <!-- Status: {{status[timelineItems[0].status].text}} -->
                             </div>
                         </v-toolbar>
-                        <v-toolbar dark dense flat v-if="selectedPlanogram != null || routeProjectID != null">
+                        <v-toolbar dark dense flat v-if="projectsStatus == null"></v-toolbar>
+                        <v-toolbar dark dense flat v-if="selectedPlanogram != null || routeProjectID != null && projectsStatus != null">
                             <v-btn v-if="(projectsStatus.status==20||routeStatus==20)" flat outline @click="approve()"
                                 :disabled="Disableapprove">
                                 Approve</v-btn>

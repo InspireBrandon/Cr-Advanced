@@ -39,6 +39,7 @@ function GetAllRoutes() {
 
     const staticRoutes = [{
             title: "TOOLS",
+            group: "SOFTWARE",
             dispaly: "Tools",
             route: '/Home',
             allowedAccessLevels: [
@@ -53,6 +54,7 @@ function GetAllRoutes() {
         },
         {
             title: "TASKS",
+            group: "SOFTWARE",
             dispaly: "Tasks",
             route: '/Tasks',
             allowedAccessLevels: [
@@ -67,6 +69,7 @@ function GetAllRoutes() {
         },
         {
             title: "PLANOGRAM",
+            group: "FOLDER",
             dispaly: "Planogram",
             allowedAccessLevels: [
                 accessTypes.SuperUser,
@@ -76,7 +79,8 @@ function GetAllRoutes() {
             routeType: RouteType.Folder,
             showChildrenCount: false,
             children: [{
-                    title: "COMPLETE",
+                    title: "IN PROGRESS",
+                    group: "DYNAMIC_PLANOGRAM_TASK",
                     dispaly: "Complete",
                     allowedAccessLevels: [
                         accessTypes.SuperUser,
@@ -87,6 +91,7 @@ function GetAllRoutes() {
                     children: []
                 }, {
                     title: "REQUESTING APPROVAL",
+                    group: "DYNAMIC_PLANOGRAM_TASK",
                     dispaly: "Requesting approval",
                     allowedAccessLevels: [
                         accessTypes.SuperUser,
@@ -98,6 +103,7 @@ function GetAllRoutes() {
                 },
                 {
                     title: "APPROVAL IN PROGRESS",
+                    group: "DYNAMIC_PLANOGRAM_TASK",
                     dispaly: "Approval in progress",
                     allowedAccessLevels: [
                         accessTypes.SuperUser,
@@ -109,6 +115,7 @@ function GetAllRoutes() {
                 },
                 {
                     title: "APPROVED",
+                    group: "DYNAMIC_PLANOGRAM_TASK",
                     dispaly: "Approved",
                     allowedAccessLevels: [
                         accessTypes.SuperUser,
@@ -120,7 +127,8 @@ function GetAllRoutes() {
                 },
                 {
                     title: "AWAITING IMPLEMENTATION",
-                    dispaly: "Awaiting Implementation",
+                    group: "DYNAMIC_PLANOGRAM_STORE",
+                    dispaly: "Distributed",
                     allowedAccessLevels: [
                         accessTypes.SuperUser,
                         accessTypes.Buyer
@@ -131,6 +139,7 @@ function GetAllRoutes() {
                 },
                 {
                     title: "IMPLEMENTATION IN PROGRESS",
+                    group: "DYNAMIC_PLANOGRAM_STORE",
                     dispaly: "Implementation In Progress",
                     allowedAccessLevels: [
                         accessTypes.SuperUser,
@@ -142,6 +151,7 @@ function GetAllRoutes() {
                 },
                 {
                     title: "IMPLEMENTED",
+                    group: "DYNAMIC_PLANOGRAM_STORE",
                     dispaly: "Implemented",
                     allowedAccessLevels: [
                         accessTypes.SuperUser,
@@ -155,6 +165,7 @@ function GetAllRoutes() {
         },
         {
             title: "RANGING",
+            group: "FOLDER",
             dispaly: "Range Analysis",
             allowedAccessLevels: [
                 accessTypes.SuperUser
@@ -203,6 +214,7 @@ function GetAllRoutes() {
         },
         {
             title: "CLUSTERING",
+            group: "FOLDER",
             dispaly: "Clustering",
             allowedAccessLevels: [
                 accessTypes.SuperUser
@@ -273,6 +285,7 @@ function GetAllRoutes() {
         },
         {
             title: "FLOORPLANNING",
+            group: "FOLDER",
             dispaly: "Floor Planning",
             allowedAccessLevels: [
                 accessTypes.SuperUser
@@ -307,6 +320,7 @@ function GetAllRoutes() {
         },
         {
             title: "PROMOTION",
+            group: "FOLDER",
             dispaly: "Promotions",
             allowedAccessLevels: [
                 accessTypes.SuperUser
@@ -334,6 +348,7 @@ function BuildRoutes(values, finalArr, parentString) {
 
         finalArr.push(new RouteItem({
             id: tmp,
+            group: element.group,
             parentID: parentString == "" ? "0" : parentString,
             route: element.route,
             title: element.dispaly,

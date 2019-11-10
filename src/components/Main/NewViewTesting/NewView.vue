@@ -3,11 +3,12 @@
     <v-layout class="pa-0 ma-0" row wrap>
       <v-flex md2 class="pa-0 ma-0" style="z-index: 1;">
         <v-card style="border-right: 1px solid lightgrey" class="scroll pa-1" height="calc(100vh - 64px)" tile>
-          <v-text-field v-model="searchText" hide-details placeholder="Search..." append-icon="search" solo>
-          </v-text-field>
-          <RecursiveItem v-show="searchText.length == 0" v-if="routeController != null"
+          <!-- <v-text-field v-model="searchText" hide-details placeholder="Search..." append-icon="search" solo>
+          </v-text-field> -->
+          <NewRouter />
+          <!-- <RecursiveItem v-show="searchText.length == 0" v-if="routeController != null"
             :routeController="routeController" class="pa-0 ma-0 mt-2" parentID="0" />
-          <SearchItems v-show="searchText.length > 0" :filterItems="filteredItems" />
+          <SearchItems v-show="searchText.length > 0" :filterItems="filteredItems" /> -->
         </v-card>
       </v-flex>
       <v-flex md10 class="pa-0 ma-0">
@@ -26,6 +27,8 @@
   import SearchItems from './RoutesForTesting/SearchItems'
   import RouteItem from "./RoutesForTesting/route-item";
 
+  import NewRouter from './NEW/Index'
+
   import SplashLoader from "@/components/Common/SplashLoader.vue";
   import jwt from "jsonwebtoken";
   import Axios from "axios";
@@ -35,7 +38,8 @@
     components: {
       RecursiveItem,
       SplashLoader,
-      SearchItems
+      SearchItems,
+      NewRouter
     },
     data() {
       return {
@@ -46,7 +50,8 @@
         allRouteItems: [],
         statusList: [],
         typeList: [],
-        accessType: -1
+        accessType: -1,
+        projectGroups: []
       };
     },
     mounted() {
@@ -65,7 +70,8 @@
       // self.getTaskViewData();
       // self.getStoreData();
       self.getAccessType();
-      self.getStorePlanogramSimple();
+      self.getProjectGroups();
+      // self.getStorePlanogramSimple();
     },
     computed: {
       filteredItems() {
@@ -104,8 +110,8 @@
           }
 
           setTimeout(() => {
-            self.getTaskViewData();
-          }, 1000);
+            // self.getTaskViewData();
+          }, 60);
 
           self.$nextTick(() => {})
         });
@@ -289,7 +295,33 @@
         routeItem.parentID = "PLANOGRAM_SHARED";
 
         return routeItem;
-      }
+      },
+      getProjectGroups() {
+        let self = this;
+
+        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+        Axios.get(process.env.VUE_APP_API + `ProjectGroup`)
+          .then(r => {
+            self.projectGroups = r.data.projectGroupList.filter(e => {
+              return !e.deleted
+            })
+          })
+          .catch(e => {
+            console.log(e);
+          });
+      },
+      addDepartmentRoute() {
+        let self = this;
+
+        let departmentFolders = ["PLANOGRAM", "RANGING"];
+
+        departmentFolders.forEach(el => {
+          
+        })
+
+        self.routeController.addRoute(self.processSPRoute(el));
+      },
     }
   };
 

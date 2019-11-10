@@ -159,11 +159,15 @@ export default new Router({
             path: '',
             name: 'PlanogramImplementation',
             component: Apps,
-          },{
+          }, {
+            path: '/Tasks',
+            name: 'Tasks',
+            component: Tasks,
+          }, {
             path: '/PlanogramImplementationNew/:projectTransactionID/:planogramID/:status',
             name: 'PlanogramImplementation',
             component: PlanogramImplementation,
-          },{
+          }, {
             path: '/RangePlanningView/:rangeFileID',
             name: 'range_planning_view',
             component: RangePlanningView,
@@ -171,7 +175,7 @@ export default new Router({
             path: '/PlanogramDistribution/:projectGroupID/:projectID',
             name: 'range_planning_view',
             component: PlanogramDistributionNew,
-          },{
+          }, {
             path: '/StorePlanogram/:storeID',
             name: 'range_planning_view',
             component: StorePlanogram,
@@ -229,11 +233,13 @@ export default new Router({
           path: '/Apps',
           name: 'apps',
           component: Apps,
-        }, {
-          path: '/Tasks',
-          name: 'tasks',
-          component: Tasks
-        }, {
+        }, 
+        // {
+        //   path: '/Tasks',
+        //   name: 'tasks',
+        //   component: Tasks
+        // }, 
+        {
           path: '/Notifications',
           name: 'notifications',
           component: Notifications,
