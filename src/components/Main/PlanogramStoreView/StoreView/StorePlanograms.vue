@@ -73,7 +73,7 @@
                             e.currentStatusText = self.StoreStatusList[e.planogramStoreStatus].text
                         })
 
-                        self.rowData = r.data.store_PlanogramList
+                        self.rowData = r.data.queryResult
 
                         console.log(self.rowData);
 

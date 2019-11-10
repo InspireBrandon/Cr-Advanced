@@ -1,16 +1,16 @@
 <template>
     <v-card tile>
         <v-toolbar flat dense dark color="grey darken-3">
-           <v-btn-toggle round v-model="selectedView" class="transparent" mandatory>
-                    <v-btn class="elevation-0" style="width: 100px" round @click="changeView(0)" color="primary">
-                        Store
-                    </v-btn>
-                    <v-btn class="elevation-0" style="width: 100px" round @click="changeView(1)" color="primary">
-                        Custom
-                    </v-btn>
-                </v-btn-toggle>
+            <v-btn-toggle round v-model="selectedView" class="transparent" mandatory>
+                <v-btn class="elevation-0" style="width: 100px" round @click="changeView(0)" color="primary">
+                    Store
+                </v-btn>
+                <v-btn class="elevation-0" style="width: 100px" round @click="changeView(1)" color="primary">
+                    Custom
+                </v-btn>
+            </v-btn-toggle>
             <v-toolbar-items>
-               
+
             </v-toolbar-items>
             <v-spacer></v-spacer>
             <div v-if="title != ''">
@@ -167,7 +167,8 @@
                 showGrid: true,
                 geoGridData: {},
                 planograms: [],
-                selectedPlanogram: null
+                selectedPlanogram: null,
+                categoryClusters: []
             }
         },
         mounted() {
@@ -208,8 +209,8 @@
                     // }
                 }
                 let tmp = self.headers
-                self.headers=[]
-                self.headers=tmp
+                self.headers = []
+                self.headers = tmp
                 console.log(self.headers);
 
                 self.$refs.Grid.gridApi.setColumnDefs(self.headers);
@@ -403,7 +404,7 @@
                 let stores = [];
 
                 headers.push({
-                    "headerName": "Store",
+                    "headerName": "Store Name",
                     "field": "storeName",
                 })
 
@@ -411,101 +412,100 @@
                     for (var store in data.store) {
 
                         let options = self.fileData.store[store].config.turnoverGroups;
+                        console.log("options", options);
 
                         headers.push({
-                                headerName: 'Sales %',
-                                cellRendererFramework: "ProgressRenderer",
-                                width: 500
-                            }, {
-                                "headerName": "Sales",
-                                "field": "totalSales",
-                                valueFormatter: function (params) {
-                                    return formatter.format(params.value).replace("$", "R");
-                                }
-                            }, {
-                                "headerName": "Cumulative Sales %",
-                                "field": "cumulativePercent",
-                                valueFormatter: function (params) {
-                                    return params.value.toFixed(1) + "%";
+                            headerName: 'Sales %',
+                            cellRendererFramework: "ProgressRenderer",
+                            width: 500
+                        }, {
+                            "headerName": "Sales",
+                            "field": "totalSales",
+                            valueFormatter: function (params) {
+                                return formatter.format(params.value).replace("$", "R");
+                            }
+                        }, {
+                            "headerName": "Cumulative Sales %",
+                            "field": "cumulativePercent",
+                            valueFormatter: function (params) {
+                                return params.value.toFixed(1) + "%";
+                            }
+                        }, {
+                            "headerName": "Turnover Group",
+                            "field": self.currentToggle == "User" ? ("userDefinedClusterValue") : (
+                                "levelValue"),
+                            "valueFormatter": function (params) {
+                                let text = params.data[self.currentToggle == "User" ? (
+                                    "userDefinedCluster") : ("level")];
+                                let value = params.data[self.currentToggle == "User" ? (
+                                    "userDefinedClusterValue") : ("levelValue")];
+
+                                let inOptions = isInOptions(options, text);
+
+                                if (inOptions) {
+                                    return options[value];
+                                } else {
+                                    return text;
                                 }
                             },
-                            // {
-                            //     "headerName": "Turnover Group",
-                            //     "field": self.currentToggle == "User" ? ("userDefinedClusterValue") : (
-                            //         "levelValue"),
-                            //     "valueFormatter": function (params) {
-                            //         let text = params.data[self.currentToggle == "User" ? (
-                            //             "userDefinedCluster") : ("level")];
-                            //         let value = params.data[self.currentToggle == "User" ? (
-                            //             "userDefinedClusterValue") : ("levelValue")];
+                            cellStyle: function (params) {
+                                let text = params.data[self.currentToggle == "User" ? "userDefinedCluster" :
+                                    "level"];
+                                let value = params.data[self.currentToggle == "User" ?
+                                    "userDefinedClusterValue" : "levelValue"];
 
-                            //         let inOptions = isInOptions(options, text);
+                                let inOptions = isInOptions(options, text);
 
-                            //         if (inOptions) {
-                            //             return options[value];
-                            //         } else {
-                            //             return text;
-                            //         }
-                            //     },
-                            //     cellStyle: function (params) {
-                            //         let text = params.data[self.currentToggle == "User" ? "userDefinedCluster" :
-                            //             "level"];
-                            //         let value = params.data[self.currentToggle == "User" ?
-                            //             "userDefinedClusterValue" : "levelValue"];
+                                if (inOptions) {
+                                    if (value == 0) {
+                                        return {
+                                            backgroundColor: "#1976d2"
+                                        };
+                                    }
 
-                            //         let inOptions = isInOptions(options, text);
+                                    if (value == 1) {
+                                        return {
+                                            backgroundColor: "#1976d2c2"
+                                        };
+                                    }
 
-                            //         if (inOptions) {
-                            //             if (value == 0) {
-                            //                 return {
-                            //                     backgroundColor: "#1976d2"
-                            //                 };
-                            //             }
-
-                            //             if (value == 1) {
-                            //                 return {
-                            //                     backgroundColor: "#1976d2c2"
-                            //                 };
-                            //             }
-
-                            //             if (value == 2) {
-                            //                 return {
-                            //                     backgroundColor: "#1976d294"
-                            //                 };
-                            //             }
-                            //         } else {
-                            //             return {
-                            //                 backgroundColor: "#fff"
-                            //             };
-                            //         }
-                            //     }
-                            // }, 
-                        )
+                                    if (value == 2) {
+                                        return {
+                                            backgroundColor: "#1976d294"
+                                        };
+                                    }
+                                } else {
+                                    return {
+                                        backgroundColor: "#fff"
+                                    };
+                                }
+                            }
+                        }, )
                     }
                 }
                 if (self.selectedView == 0) {
                     headers.push({
-                        headerName: 'Store System Clusters',
-                        editable: true,
-                        field: "storeCluster",
+                            headerName: 'Store System Clusters',
+                            editable: true,
+                            field: "storeCluster",
 
-                    }, 
-                    // {
-                    //     headerName: 'Store User Clusters',
+                        },
+                        // {
+                        //     headerName: 'Store User Clusters',
 
-                    // }
+                        // }
                     )
                 } else {
                     headers.push({
-                        headerName: 'Custom System Clusters',
-                        editable: true,
-                        field: "customCluster",
+                            headerName: 'Custom System Clusters',
+                            editable: true,
+                            field: "customCluster",
 
-                    }, 
-                    // {
-                    //     headerName: 'custom User Clusters',
+                        },
+                        // {
+                        //     headerName: 'custom User Clusters',
 
-                    // }
+                        // }
                     )
                 }
                 if (data.basket != undefined) {
@@ -555,6 +555,8 @@
                         }
                     })
                 });
+                console.log("storeData", storeData);
+
                 storeData.forEach(element => {
                     let storeFound = false;
                     let tmpBasket = {
@@ -648,6 +650,15 @@
                 final = removeDuplicates(final, 'storeName')
 
                 self.headers = [];
+                final.sort((a, b) => {
+                    if (a.totalSales > b.totalSales) {
+                        return -1;
+                    }
+                    if (a.totalSales < b.totalSales) {
+                        return 1;
+                    }
+                    return 0;
+                });
                 self.rowData = final;
                 console.log("self.rowData", self.rowData);
 
@@ -813,13 +824,75 @@
                     self.currentConfig = setup;
                     self.selectedClusterType = setup.clusterType;
                     self.showGrid = true;
+                    console.log("setup", setup);
 
                     if (self.selectedClusterType == 0) {
                         self.handleSetup(setup);
                     } else {
-                        self.handleCustomSetup(setup);
+                        self.getCatgeoryReport(setup, category => {
+                            self.handleCustomSetup(setup, category);
+                        })
                     }
                 })
+            },
+            getCatgeoryReport(setup, callback) {
+                let self = this
+                console.log("self.selectedPlanogram", self.selectedPlanogram);
+
+                Axios.get(process.env.VUE_APP_API +
+                    `SystemFile/JSON?db={db}&folder=Category Cluster$&file=${self.selectedPlanogram}`).then(
+                    r => {
+                        console.log(r);
+
+                        let fileData = r.data
+                        let res = fileData.CategoryClustering[setup.selectedPlanogram.text]
+                        self.categoryClusters = res
+                        self.rowData.forEach(e => {
+                            self.categoryClusters.forEach(catStore => {
+                                if (catStore.store_ID == e.catStore) {
+                                    e.categoryCluster = catStore.cluster
+                                    methods
+                                }
+                            })
+                        })
+                        self.getDepartmentReport(setup, Deptback => {
+                            callback(res)
+                        })
+
+                    })
+            },
+            getProjectGroup(callback) {
+                let self = this
+                Axios.get(process.env.VUE_APP_API +
+                    `Cluster/ProjectGroup?planogram_ID=${self.selectedPlanogram}`).then(
+                    r => {
+                        callback(r.data)
+                    })
+            },
+            getDepartmentReport(setup, callback) {
+                let self = this
+                console.log("self.selectedPlanogram", self.selectedPlanogram);
+                // use method to get project group
+                self.getProjectGroup(projectGroup => {
+                    Axios.get(process.env.VUE_APP_API +
+                        `SystemFile/JSON?db={db}&folder=Department Cluster$&file=${projectGroup}`).then(
+                        r => {
+                            console.log(r);
+
+                            let fileData = r.data
+                            let res = fileData.departmentClustering[setup.selectedPlanogram.text]
+
+                            self.rowData.forEach(e => {
+                                res.forEach(catStore => {
+                                    if (catStore.store_ID == e.catStore) {
+                                        e.departmentC = catStore.cluster
+                                    }
+                                })
+                            })
+                            callback(res)
+                        })
+                })
+
             },
             getFieldsFromHeaders() {
                 let self = this;
@@ -836,8 +909,9 @@
 
                 return fields;
             },
-            handleCustomSetup(data) {
+            handleCustomSetup(data, category) {
                 let self = this;
+                console.log("handeling custom");
 
                 let columnDefs = self.headers;
                 let containsCluster = false;
@@ -851,27 +925,33 @@
                 if (containsCluster) {
                     self.headers.splice(self.headers.length - 1, 1);
                 }
-
+                columnDefs.push({
+                    "headerName": "Category Cluster",
+                    "field": "categoryCluster"
+                })
                 let fields = self.getFieldsFromHeaders();
-
+                categoryCluster
                 console.log("fields", fields);
-
                 columnDefs.push({
                     "headerName": "Cluster",
                     valueFormatter: function (params) {
                         let final = "";
 
                         fields.forEach(el => {
-                            if (el == "userDefinedClusterValue") {
-                                final += self.useSystemValues ? params.data.level :
-                                    params.data.userDefinedCluster;
-                            } else {
-                                let userValue = params.data[el.replace("_value",
-                                    "")];
-                                let systemValue = params.data[el.replace("_value",
-                                    "").replace("user_", "system_")];
-                                final += self.useSystemValues ? systemValue :
-                                    userValue;
+                            if (el == "storeCluster") {} else {
+                                if (el == "userDefinedClusterValue") {
+                                    console.log("userDefinedClusterValue", el);
+
+                                    final += self.useSystemValues ? params.data.level :
+                                        params.data.userDefinedCluster;
+                                } else {
+                                    let userValue = params.data[el.replace("_value",
+                                        "")];
+                                    let systemValue = params.data[el.replace("_value",
+                                        "").replace("user_", "system_")];
+                                    final += self.useSystemValues ? systemValue :
+                                        userValue;
+                                }
                             }
                         })
 
