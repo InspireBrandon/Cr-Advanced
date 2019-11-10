@@ -829,31 +829,70 @@
                     if (self.selectedClusterType == 0) {
                         self.handleSetup(setup);
                     } else {
-                        self.getCatgeoryReport(category => {
+                        self.getCatgeoryReport(setup, category => {
                             self.handleCustomSetup(setup, category);
                         })
                     }
                 })
             },
-            getCatgeoryReport(callback) {
+            getCatgeoryReport(setup, callback) {
                 let self = this
+                console.log("self.selectedPlanogram", self.selectedPlanogram);
 
                 Axios.get(process.env.VUE_APP_API +
-                    `SystemFile/JSON?db={db}&folder=${folder}&file=${self.selectedPlanogram.value}`).then(r => {
-                    console.log(r);
+                    `SystemFile/JSON?db={db}&folder=Category Cluster$&file=${self.selectedPlanogram}`).then(
+                    r => {
+                        console.log(r);
 
-                    let fileData = r.data
-                    let res = fileData.CategoryClustering[self.selectedPlanogram.text]
-                    self.categoryClusters = res
-                    self.rowData.forEach(e => {
-                        self.categoryClusters(catStore => {
-                            if (catStore.store_ID == e.catStore) {
-                                e.categoryCluster = catStore.cluster
-                            }
+                        let fileData = r.data
+                        let res = fileData.CategoryClustering[setup.selectedPlanogram.text]
+                        self.categoryClusters = res
+                        self.rowData.forEach(e => {
+                            self.categoryClusters.forEach(catStore => {
+                                if (catStore.store_ID == e.catStore) {
+                                    e.categoryCluster = catStore.cluster
+                                    methods
+                                }
+                            })
                         })
+                        self.getDepartmentReport(setup, Deptback => {
+                            callback(res)
+                        })
+
                     })
-                    callback(res)
+            },
+            getProjectGroup(callback) {
+                let self = this
+                Axios.get(process.env.VUE_APP_API +
+                    `Cluster/ProjectGroup?planogram_ID=${self.selectedPlanogram}`).then(
+                    r => {
+                        callback(r.data)
+                    })
+            },
+            getDepartmentReport(setup, callback) {
+                let self = this
+                console.log("self.selectedPlanogram", self.selectedPlanogram);
+                // use method to get project group
+                self.getProjectGroup(projectGroup => {
+                    Axios.get(process.env.VUE_APP_API +
+                        `SystemFile/JSON?db={db}&folder=Department Cluster$&file=${projectGroup}`).then(
+                        r => {
+                            console.log(r);
+
+                            let fileData = r.data
+                            let res = fileData.departmentClustering[setup.selectedPlanogram.text]
+
+                            self.rowData.forEach(e => {
+                                res.forEach(catStore => {
+                                    if (catStore.store_ID == e.catStore) {
+                                        e.departmentC = catStore.cluster
+                                    }
+                                })
+                            })
+                            callback(res)
+                        })
                 })
+
             },
             getFieldsFromHeaders() {
                 let self = this;
@@ -872,6 +911,7 @@
             },
             handleCustomSetup(data, category) {
                 let self = this;
+                console.log("handeling custom");
 
                 let columnDefs = self.headers;
                 let containsCluster = false;
