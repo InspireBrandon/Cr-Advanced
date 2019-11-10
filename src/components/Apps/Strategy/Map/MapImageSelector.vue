@@ -107,6 +107,7 @@
             },
             getmaps() {
                 let self = this
+                self.maps=[]
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.get(process.env.VUE_APP_API + `MapImage`).then(r => {

@@ -302,30 +302,26 @@
           process.env.VUE_APP_API +
           `SuplierLocationImportTX/ByUser?userID=${encoded_details.USER_ID}`
         ).then(r => {
-          console.log("[GETSUPPLIERSTORES]", r);
 
           self.supplierImport = r.data
         })
       },
       getRectWidth() {
         let self = this
-        console.log("rect");
         var el = document.querySelector(
           "#thisone2 > div > svg > g > g:nth-child(2) > g:nth-child(1) > g:nth-child(2) > g:nth-child(1) > g:nth-child(2) > g:nth-child(1) > g > g:nth-child(1) > g > g:nth-child(3) > g > g > path"
         )
         self.imageHeight = el.getBoundingClientRect().height
         self.imageWidth = el.getBoundingClientRect().width
 
-        console.log(self.imageHeight);
-        console.log(self.imageWidth);
+        
 
 
       },
       DrawGeoGrid(chart, callback) {
         let self = this;
 
-        console.log("drawChart");
-        console.log("GEO GRID DATA", self.geoGridData);
+      
 
         self.geoGridData.forEach((e, idx) => {
           let arr = [e.squareFormattedList];
@@ -419,7 +415,6 @@
           process.env.VUE_APP_API +
           `SuplierLocationImportTX/GeoReport?userID=${encoded_details.USER_ID}`
         ).then(r => {
-          console.log("GEODATA", r.data);
 
           self.geoGridData = r.data;
 
@@ -501,7 +496,6 @@
         self.config = item;
         self.heatData = tmp;
         self.pieData = pieArr;
-        console.log(tmp);
 
         self.drawMap(this.labels, item, tmp, pieArr);
       },
@@ -509,18 +503,14 @@
         let self = this
         let asd = []
         self.setupMapData = []
-        console.log("self.clusters", self.clusters);
-        console.log("self.fileData", self.fileData);
-
+      
         self.clusters.forEach((e, idx) => {
-          console.log(self.fileData[e.value]);
 
           asd.push(self.fileData[e.value])
           var names = Object.getOwnPropertyNames(asd[0]);
 
 
           let obj = asd[idx]
-          // console.log(obj);
           for (var item in obj) {
             let count = 0
 
@@ -543,7 +533,6 @@
       },
       buildGraphArr(field, callback) {
         let self = this;
-        console.log(field);
 
         Axios.defaults.headers.common["TenantID"] =
           sessionStorage.currentDatabase;
@@ -551,15 +540,12 @@
         Axios.get(
           process.env.VUE_APP_API + `RetailerStore?retailerID=${field}`
         ).then(r => {
-          console.log(r);
 
           let tmp = r.data.retailerStoreList;
           tmp.forEach(e => {
             e.image =
               process.env.VUE_APP_API + `Retailer/Image?retailerID=${field}`;
           });
-          console.log("tmp");
-          console.log(tmp);
 
           callback(tmp);
         });
@@ -570,9 +556,6 @@
         self.getRectWidth()
 
         self.$refs.MapImageSelector.show(callback => {
-          // console.log("callback");
-          // console.log(callback);
-
           if (callback.name == "None") {
             self.lines = false;
             self.selectedmap = null;
@@ -727,7 +710,6 @@
       getCities() {
         let self = this;
         let cities = require("@/assets/CITIES/CITIES.json");
-        // console.log(cities);
         let major = cities.filter(e => {
           return e.major;
         });
@@ -771,8 +753,6 @@
             process.env.VUE_APP_API +
             `SystemFile/JSON?db=CR-Devinspire&id=${fd.data.id}`
           ).then(r => {
-            console.log(r);
-
             self.fileData = r.data;
             self.getMapsetupMapData(callback => {
               self.drawMap(
@@ -894,23 +874,30 @@
         // //////////////////////////////////////////////////
         let self = this;
         let polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
-        console.log("in polyseries");
 
         polygonSeries.strokeOpacity = 0.9;
         polygonSeries.useGeodata = true;
         let polygonTemplate = polygonSeries.mapPolygons.template;
         var pattern_europe = new am4core.Pattern();
+
+
         var image = new am4core.Image();
         polygonTemplate.tooltipColorSource = "rgb(103,148,220)";
         // var height = this.$refs.thisone2.clientHeight;
         image.width = self.imageWidth;
         image.height = self.imageHeight;
+        var el = document.querySelector(
+          "#thisone2"
+        )
+        let containerHeight = el.getBoundingClientRect().height
+        let containerWidth = el.getBoundingClientRect().width
 
 
-        pattern_europe.x = self.imageWidth / 2.8
-        // pattern_europe.y = -39;
+        pattern_europe.x = (containerWidth - image.width) / 2
+        pattern_europe.y = containerHeight - image.height
         pattern_europe.width = image.width;
         pattern_europe.height = image.height;
+
         if (self.selectedmap != null) {
           polygonTemplate.tooltipHTML =
             '<a style="background-color: #cccccc;" href="https://en.wikipedia.org/wiki/{category.urlEncode()}">{name}</a>';
@@ -918,6 +905,7 @@
           pattern_europe.addElement(image.element);
           polygonTemplate.fill = pattern_europe;
           polygonTemplate.strokeOpacity = 1;
+
         } else {
           polygonTemplate.fill = chart.colors.getIndex(1);
           polygonTemplate.strokeOpacity = 1;
@@ -930,19 +918,14 @@
         // start base retailer store image series
         // /////////////////////////////////////////////////////
         let self = this;
-        console.log("[RETAILER MAP]starts draw");
-        console.log(mapData);
         mapData.forEach(r => {
           self.buildGraphArr(r, callback => {
-            console.log("callback");
-            console.log(callback);
             let imageSeries = chart.series.push(new am4maps.MapImageSeries());
             // define template
             let seriesName = null;
             self.selectedRetailers.forEach(e => {
               if (e.value == r) {
                 seriesName = e.text;
-                console.log(e);
               }
             });
             self.selectedRetailers.where;
@@ -1200,7 +1183,6 @@
         //  start draw configured sizemap series
         // /////////////////////////////////////////////////////
         let self = this;
-        console.log(setupMapData);
 
         self.radius = parseInt(config.heatMapRadius);
         setupMapData.sizeMap.forEach((heatmapItem, idx) => {
@@ -1336,7 +1318,6 @@
         //     element["color"] = '#424242'
         //     formattedData.push(element);
         // });
-        console.log(am4geodata_worldLow);
 
         let asd = am4geodata_worldLow;
         chart.geodata = asd;
@@ -1348,11 +1329,8 @@
         // //////////////////////////////////////////////////
         // end draw of base chart
         // //////////////////////////////////////////////////
-        console.log("drawPoly");
 
         self.drawPolygonseries(chart, screeWidth);
-        // self.drawImageSeries(chart)
-        console.log("drawMAjor");
         self.drawMajorCitiesImageSeries(chart);
         self.drawMinorCities(chart);
         // draw standard supplier import
@@ -1402,8 +1380,6 @@
         // /////////////////////////////////////////////////////
         chart.seriesContainer.events.on("hit", function (ev) {
           var coords = chart.svgPointToGeo(ev.svgPoint);
-          console.log("coords");
-          console.log(coords);
 
           if (!self.canPlot) {
             return;
@@ -1461,11 +1437,9 @@
         chart.legend.valign = "top";
         let legendLength = chart.legend.data.length;
 
-        console.log(chart.legend.data.length);
         if (config.drawGrid) {
           self.DrawGeoGrid(chart, callback => {
-            console.log("chart.valueLabels");
-            console.log(chart.legend.data.length);
+        
             // chart.legend.data.forEach((e,idx)=>{
             //     if(e.name=="block"){
             //         chart.legend.data.splice(idx, 1);
@@ -1476,7 +1450,6 @@
               legendLength,
               chart.legend.data.length - legendLength
             );
-            console.log(chart.legend);
           });
         }
 
