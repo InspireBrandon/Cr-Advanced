@@ -68,9 +68,10 @@
             buildTree() {
                 let self = this;
                 self.buildSoftwareButtons();
-                // self.buildRangePlanningTree();
+                self.buildRangePlanningTree();
                 self.buildModelPlanogramTree();
                 self.buildStorePlanogramTree();
+                self.buildFloorPlanningTree();
             },
             buildSoftwareButtons() {
                 let self = this;
@@ -188,20 +189,20 @@
                             self.getTasksByProjectGroup(department.id, tasks => {
                                 // Handle tasks in progress
                                 let inProgressTasks = tasks.filter(task => {
-                                    return task.type == 3 && (task.status == 1 || task
+                                    return task.type == 2 && (task.status == 1 || task
                                         .status == 2);
                                 })
 
                                 inProgressTasks.forEach(task => {
                                     let taskItem = new treeItem({
-                                        name: task.systemFileName,
+                                        name: task.rangeFileName,
                                         icon: 'folder',
                                         children: []
                                     })
 
                                     taskItem.click = function () {
                                         self.$router.push(
-                                            `/PlanogramImplementationNew/${task.planogram_ID}/${task.systemFileID}/${task.status}`
+                                            `/RangePlanningView/${task.rangeFileID}`
                                         );
                                     }
 
@@ -210,20 +211,20 @@
 
                                 // Handle tasks in progress
                                 let approvalInProgressTasks = tasks.filter(task => {
-                                    return task.type == 3 && (task.status == 10 || task
+                                    return task.type == 2 && (task.status == 10 || task
                                         .status == 20);
                                 })
 
                                 approvalInProgressTasks.forEach(task => {
                                     let taskItem = new treeItem({
-                                        name: task.systemFileName,
+                                        name: task.rangeFileName,
                                         icon: 'folder',
                                         children: []
                                     })
 
                                     taskItem.click = function () {
                                         self.$router.push(
-                                            `/PlanogramImplementationNew/${task.planogram_ID}/${task.systemFileID}/${task.status}`
+                                            `/RangePlanningView/${task.rangeFileID}`
                                         );
                                     }
 
@@ -232,19 +233,19 @@
 
                                 // Handle approved tasks
                                 let approvedTasks = tasks.filter(task => {
-                                    return task.type == 3 && (task.status == 12);
+                                    return task.type == 2 && (task.status == 12);
                                 })
 
                                 approvedTasks.forEach(task => {
                                     let taskItem = new treeItem({
-                                        name: task.systemFileName,
+                                        name: task.rangeFileName,
                                         icon: 'folder',
                                         children: []
                                     })
 
                                     taskItem.click = function () {
                                         self.$router.push(
-                                            `/PlanogramImplementationNew/${task.planogram_ID}/${task.systemFileID}/${task.status}`
+                                            `/RangePlanningView/${task.rangeFileID}`
                                         );
                                     }
 
@@ -536,71 +537,81 @@
                                         departmentTreeItem.showChildren = true;
                                     })
 
-                                self.getStorePlanograms(store.storeID, department.id, storePlanograms => {
-                                    // Handle tasks in progress
-                                    let pendingTasks = storePlanograms.filter(storePlanogram => {
-                                        return storePlanogram.planogramStoreStatus == 2;
-                                    })
+                                self.getStorePlanograms(store.storeID, department.id,
+                                    storePlanograms => {
+                                        // Handle tasks in progress
+                                        let pendingTasks = storePlanograms.filter(
+                                            storePlanogram => {
+                                                return storePlanogram
+                                                    .planogramStoreStatus == 2;
+                                            })
 
-                                    pendingTasks.forEach(task => {
-                                        let taskItem = new treeItem({
-                                            name: task.fileName,
-                                            icon: 'insert_drive_file',
-                                            children: []
+                                        pendingTasks.forEach(task => {
+                                            let taskItem = new treeItem({
+                                                name: task.fileName,
+                                                icon: 'insert_drive_file',
+                                                children: []
+                                            })
+
+                                            taskItem.click = function () {
+                                                self.$router.push(
+                                                    `/PlanogramImplementationNew/${task.planogramID}/${task.systemFileID}/13`
+                                                );
+                                            }
+
+                                            taskInProgress.children.push(taskItem);
                                         })
 
-                                        taskItem.click = function () {
-                                            self.$router.push(
-                                                `/PlanogramImplementationNew/${task.planogramID}/${task.systemFileID}/13`
-                                            );
-                                        }
+                                        // Handle tasks in progress
+                                        let InProgressTasks = storePlanograms.filter(
+                                            storePlanogram => {
+                                                return storePlanogram
+                                                    .planogramStoreStatus == 4;
+                                            })
 
-                                        taskInProgress.children.push(taskItem);
-                                    })
+                                        InProgressTasks.forEach(task => {
+                                            let taskItem = new treeItem({
+                                                name: task.fileName,
+                                                icon: 'folder',
+                                                children: []
+                                            })
 
-                                    // Handle tasks in progress
-                                    let InProgressTasks = storePlanograms.filter(storePlanogram => {
-                                        return storePlanogram.planogramStoreStatus == 4;
-                                    })
+                                            taskItem.click = function () {
+                                                self.$router.push(
+                                                    `/PlanogramImplementationNew/${task.planogramID}/${task.systemFileID}/24`
+                                                );
+                                            }
 
-                                    InProgressTasks.forEach(task => {
-                                        let taskItem = new treeItem({
-                                            name: task.fileName,
-                                            icon: 'folder',
-                                            children: []
+                                            taskApprovalInProgress.children.push(
+                                                taskItem);
                                         })
 
-                                        taskItem.click = function () {
-                                            self.$router.push(`/PlanogramImplementationNew/${task.planogramID}/${task.systemFileID}/24`);
-                                        }
+                                        // Handle implemented tasks
+                                        let implementedTasks = storePlanograms.filter(
+                                            storePlanogram => {
+                                                return storePlanogram
+                                                    .planogramStoreStatus == 4;
+                                            })
 
-                                        taskApprovalInProgress.children.push(taskItem);
-                                    })
+                                        implementedTasks.forEach(task => {
+                                            let taskItem = new treeItem({
+                                                name: task.fileName,
+                                                icon: 'folder',
+                                                children: []
+                                            })
 
-                                    // Handle implemented tasks
-                                    let implementedTasks = storePlanograms.filter(storePlanogram => {
-                                        return storePlanogram.planogramStoreStatus == 4;
-                                    })
+                                            taskItem.click = function () {
+                                                self.$router.push(
+                                                    `/PlanogramImplementationNew/${task.planogramID}/${task.systemFileID}/15`
+                                                );
+                                            }
 
-                                    implementedTasks.forEach(task => {
-                                        let taskItem = new treeItem({
-                                            name: task.fileName,
-                                            icon: 'folder',
-                                            children: []
+                                            taskApproved.children.push(taskItem);
                                         })
 
-                                        taskItem.click = function () {
-                                            self.$router.push(
-                                                `/PlanogramImplementationNew/${task.planogramID}/${task.systemFileID}/15`
-                                            );
-                                        }
-
-                                        taskApproved.children.push(taskItem);
+                                        departmentTreeItem.loading = false;
+                                        departmentTreeItem.showChildren = true;
                                     })
-
-                                    departmentTreeItem.loading = false;
-                                    departmentTreeItem.showChildren = true;
-                                })
                             }
                         }
 
@@ -611,6 +622,117 @@
                 })
 
                 self.treeItems.push(storePlanogramTreeItem);
+            },
+            buildFloorPlanningTree() {
+                let self = this;
+
+                let floorPlanningTreeItem = new treeItem({
+                    name: "Floor Planning",
+                    icon: "folder",
+                    children: []
+                })
+
+                floorPlanningTreeItem.click = function () {
+                    floorPlanningTreeItem.showChildren = !floorPlanningTreeItem.showChildren;
+                    floorPlanningTreeItem.icon = floorPlanningTreeItem.showChildren ? 'folder_open' : 'folder';
+                }
+
+                // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                // FLOOR PLANNING FOLDERS
+                // ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                // department clustering
+                let departmentClusteringTreeItem = new treeItem({
+                    name: "Department Clustering",
+                    icon: "folder",
+                    children: []
+                })
+
+                departmentClusteringTreeItem.click = function () {
+                    departmentClusteringTreeItem.showChildren = !departmentClusteringTreeItem.showChildren;
+                    departmentClusteringTreeItem.icon = departmentClusteringTreeItem.showChildren ? 'folder_open' :
+                        'folder';
+                }
+
+                // department floor plans
+                let departmentModelFloorPlanTreeItem = new treeItem({
+                    name: "Department Model Floor Plans",
+                    icon: "folder",
+                    children: []
+                })
+
+                departmentModelFloorPlanTreeItem.click = function () {
+                    departmentModelFloorPlanTreeItem.showChildren = !departmentModelFloorPlanTreeItem.showChildren;
+                    departmentModelFloorPlanTreeItem.icon = departmentModelFloorPlanTreeItem.showChildren ?
+                        'folder_open' : 'folder';
+                }
+
+                self.departments.forEach(department => {
+                    let departmentTreeItem = new treeItem({
+                        name: department.name,
+                        icon: "folder",
+                        children: []
+                    })
+
+                    departmentTreeItem.click = function () {
+                        departmentTreeItem.showChildren = !departmentTreeItem
+                            .showChildren;
+                        departmentTreeItem.icon = departmentTreeItem
+                            .showChildren ?
+                            'folder_open' : 'folder';
+                    }
+
+                    if (department.name == "Garden, Pool and Patio") {
+                        let departmentViewerTreeItem = new treeItem({
+                            name: "Garden – LTM2 – Merchandise Flow Diagram",
+                            icon: "insert_drive_file",
+                            children: [],
+                            click: function () {
+                                self.$router.push(
+                                    "/FloorPlanningViewer/Garden - LTM2 - Merchandise Flow Diagram.jpg"
+                                    )
+                            }
+                        })
+
+                        departmentTreeItem.children.push(departmentViewerTreeItem);
+                    }
+
+                    departmentModelFloorPlanTreeItem.children.push(departmentTreeItem)
+                })
+
+                // store floor plans
+                let storeFloorPlanTreeItem = new treeItem({
+                    name: "Store Floor Plans",
+                    icon: "folder",
+                    children: [
+                        new treeItem({
+                            name: "Delmas",
+                            icon: "insert_drive_file",
+                            children: [],
+                            click: function () {
+                                self.$router.push("/FloorPlanningViewer/Delmas - Floorplan.jpg")
+                            }
+                        }),
+                        new treeItem({
+                            name: "Klerksdorp",
+                            icon: "insert_drive_file",
+                            children: [],
+                            click: function () {
+                                self.$router.push("/FloorPlanningViewer/Klerksdorp Floorplan.jpg")
+                            }
+                        }),
+                    ]
+                })
+
+                storeFloorPlanTreeItem.click = function () {
+                    storeFloorPlanTreeItem.showChildren = !storeFloorPlanTreeItem.showChildren;
+                    storeFloorPlanTreeItem.icon = storeFloorPlanTreeItem.showChildren ?
+                        'folder_open' : 'folder';
+                }
+
+                floorPlanningTreeItem.children.push(departmentClusteringTreeItem, departmentModelFloorPlanTreeItem,
+                    storeFloorPlanTreeItem);
+                self.treeItems.push(floorPlanningTreeItem);
             },
             getTasksByProjectGroup(projectGroupID, callback) {
                 let self = this;

@@ -165,7 +165,7 @@
         <v-container grid-list-md fluid class="ma-0 pa-0">
           <v-layout row wrap>
             <v-flex :class="{ 'md10': showNote, 'md12': !showNote }" class="pa-0">
-              <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%;  height: calc(100vh - 220px);"
+              <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%;  height: calc(100vh - 212px);"
                 :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
                 @selection-changed="onSelectionChanged" :rowData="rowData" :enableSorting="true" :enableFilter="true"
                 :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
