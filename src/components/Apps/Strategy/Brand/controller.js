@@ -62,7 +62,9 @@ class ListingClusterController {
 
         let totalStoreProjectGroupSales = getTotalStoreProjectGroupSales(storeSales, ProjectGroups, storeSalesData, clusterData);
 
-        let storeClusterCodes = accumulateCodes(totalStoreProjectGroupSales, stores, clusterData, ProjectGroups);
+        let categoryLevels = generateCategoryLevels(ProjectGroups, totalStoreProjectGroupSales, clusterData);
+
+        let storeClusterCodes = accumulateCodes(categoryLevels, stores, clusterData, ProjectGroups);
         storeClusterCodes = addRank(storeClusterCodes);
         let clusters = generateClusterNew(storeClusterCodes, clusterData, totalStoreProjectGroupSales);
 
@@ -83,6 +85,64 @@ class ListingClusterController {
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
 // METHODS
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
+function generateCategoryLevels(projectGroups, totalStoreProjectGroupSales, clusterData) {
+    // Determine L/M/S
+    projectGroups.forEach(category => {
+        let highestValue = -1;
+        let lowestValue = -1;
+
+        totalStoreProjectGroupSales.forEach(storeSale => {
+            let selectedCategory = clusterData.selectedCategory;
+            let selectedValue = category[selectedCategory];
+            let value = storeSale[selectedValue + "_inStore"];
+
+            if(value > highestValue)
+                highestValue = value;
+
+            if(lowestValue == -1) {
+                lowestValue = value;
+            }
+            else {
+                if(value < lowestValue)   
+                    lowestValue = value;
+            }
+
+            console.log("selectedCategory", selectedCategory, selectedValue, highestValue, lowestValue);
+        })
+
+        let dividend = (highestValue) / 3;
+
+        totalStoreProjectGroupSales.forEach(storeSale => {
+            let selectedCategory = clusterData.selectedCategory;
+            let selectedValue = category[selectedCategory];
+            let value = storeSale[selectedValue + "_inStore"];
+
+            for(var i = 1; i < 4; i++) {
+                let highest = dividend * i;
+                let lowest = dividend * (i - 1);
+
+                if(value >= lowest && value <= highest) {
+                    let value = "S"
+                    
+                    if(i == 2) {
+                        value = "M"
+                    }
+
+                    if(i == 3) {
+                        value = "L"
+                    }
+
+                    storeSale[selectedValue + "_level"] = value;
+                }
+            }
+        })
+    })
+
+    console.log(totalStoreProjectGroupSales);
+
+    return totalStoreProjectGroupSales;
+}
+
 function generateArrClusters(projectSales, clusterData) {
     let retval = []
 
@@ -609,8 +669,6 @@ function accumulateCodes(tmpStoreData, stores, clusterData, ProjectGroups) {
         return 0;
     })
 }
-
-
 
 function addRank(tmpStoreData) {
     tmpStoreData.forEach((el, idx) => {
