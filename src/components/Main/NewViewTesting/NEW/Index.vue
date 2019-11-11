@@ -1,7 +1,7 @@
 <template>
     <div>
         <div>
-            <recursive :items="treeItems"></recursive>
+            <recursive :accessType="accessType" :items="treeItems"></recursive>
         </div>
     </div>
 </template>
@@ -11,6 +11,7 @@
     import Recursive from './Recursive'
 
     export default {
+        props: ['accessType', 'storeID'],
         components: {
             Recursive
         },
@@ -18,19 +19,22 @@
             return {
                 treeItems: [],
                 departments: [],
-                stores: [],
+                stores: []
             }
         },
         mounted() {
             let self = this;
-            self.getStores();
+            // self.getStores();
         },
         methods: {
             getStores() {
                 let self = this;
 
-                Axios.get(process.env.VUE_APP_API + "Store?db=CR-HINTERLAND-LIVE")
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + "Store_Planogram_Stores")
                     .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
                         self.stores = r.data;
                         self.getProjectGroups();
                     })
@@ -67,11 +71,52 @@
             },
             buildTree() {
                 let self = this;
-                self.buildSoftwareButtons();
-                self.buildRangePlanningTree();
-                self.buildModelPlanogramTree();
-                self.buildStorePlanogramTree();
-                self.buildFloorPlanningTree();
+
+                self.treeItems = [];
+
+                if (self.accessType == 0) {
+                    self.buildSoftwareButtons();
+                    self.buildRangePlanningTree();
+                    self.buildModelPlanogramTree();
+                    self.buildStorePlanogramTree();
+                    self.buildFloorPlanningTree();
+                    self.buildClusteringTree();
+                    self.buildSpacialMappingFolder();
+                    self.buildUploadTreeItems();
+                }
+
+                if (self.accessType == 1) {
+                    self.buildSoftwareButtons();
+                    self.buildRangePlanningTree();
+                    self.buildModelPlanogramTree();
+                    self.buildStorePlanogramTree();
+                    self.buildFloorPlanningTree();
+                    self.buildClusteringTree();
+                    self.buildSpacialMappingFolder();
+                    self.buildUploadTreeItems();
+                }
+
+                if (self.accessType == 2) {
+                    self.buildSoftwareButtons();
+                    self.buildRangePlanningTree();
+                    self.buildModelPlanogramTree();
+                    self.buildStorePlanogramTree();
+                    self.buildFloorPlanningTree();
+                    self.buildClusteringTree();
+                    self.buildSpacialMappingFolder();
+                    self.buildUploadTreeItems();
+                }
+
+                if (self.accessType == 3) {
+                    self.buildSoftwareButtons();
+                    self.buildRangePlanningTree();
+                    // self.buildModelPlanogramTree();
+                    self.buildStorePlanogramTree();
+                    self.buildFloorPlanningTree();
+                    self.buildClusteringTree();
+                    self.buildSpacialMappingFolder();
+                    self.buildUploadTreeItems();
+                }
             },
             buildSoftwareButtons() {
                 let self = this;
@@ -187,73 +232,87 @@
                             taskApproved.children = [];
 
                             self.getTasksByProjectGroup(department.id, tasks => {
-                                // Handle tasks in progress
-                                let inProgressTasks = tasks.filter(task => {
-                                    return task.type == 2 && (task.status == 1 || task
-                                        .status == 2);
-                                })
+                                self.getRangeFileByProjectGroup(department.id, rangeFiles => {
+                                    // go through all tasks and remove any range file in progress
 
-                                inProgressTasks.forEach(task => {
-                                    let taskItem = new treeItem({
-                                        name: task.rangeFileName,
-                                        icon: 'folder',
-                                        children: []
+                                    console.log(rangeFiles)
+
+                                    // Handle tasks in progress
+                                    let inProgressTasks = tasks.filter(task => {
+                                        return task.type == 2 && (task.status ==
+                                            1 || task
+                                            .status == 2);
                                     })
 
-                                    taskItem.click = function () {
-                                        self.$router.push(
-                                            `/RangePlanningView/${task.rangeFileID}`
-                                        );
-                                    }
+                                    inProgressTasks.forEach(task => {
+                                        let taskItem = new treeItem({
+                                            name: task.rangeFileName,
+                                            icon: 'folder',
+                                            children: []
+                                        })
 
-                                    taskInProgress.children.push(taskItem);
-                                })
+                                        taskItem.click = function () {
+                                            self.$router.push(
+                                                `/RangePlanningView/${task.rangeFileID}`
+                                            );
+                                        }
 
-                                // Handle tasks in progress
-                                let approvalInProgressTasks = tasks.filter(task => {
-                                    return task.type == 2 && (task.status == 10 || task
-                                        .status == 20);
-                                })
+                                        taskInProgress.children.push(taskItem);
 
-                                approvalInProgressTasks.forEach(task => {
-                                    let taskItem = new treeItem({
-                                        name: task.rangeFileName,
-                                        icon: 'folder',
-                                        children: []
+                                        rangeFiles.forEach(rangeFile => {
+                                            console.log(rangeFile);
+                                        })
                                     })
 
-                                    taskItem.click = function () {
-                                        self.$router.push(
-                                            `/RangePlanningView/${task.rangeFileID}`
-                                        );
-                                    }
-
-                                    taskApprovalInProgress.children.push(taskItem);
-                                })
-
-                                // Handle approved tasks
-                                let approvedTasks = tasks.filter(task => {
-                                    return task.type == 2 && (task.status == 12);
-                                })
-
-                                approvedTasks.forEach(task => {
-                                    let taskItem = new treeItem({
-                                        name: task.rangeFileName,
-                                        icon: 'folder',
-                                        children: []
+                                    // Handle tasks in progress
+                                    let approvalInProgressTasks = tasks.filter(task => {
+                                        return task.type == 2 && (task.status ==
+                                            10 || task
+                                            .status == 20);
                                     })
 
-                                    taskItem.click = function () {
-                                        self.$router.push(
-                                            `/RangePlanningView/${task.rangeFileID}`
-                                        );
-                                    }
+                                    approvalInProgressTasks.forEach(task => {
+                                        let taskItem = new treeItem({
+                                            name: task.rangeFileName,
+                                            icon: 'folder',
+                                            children: []
+                                        })
 
-                                    taskApproved.children.push(taskItem);
+                                        taskItem.click = function () {
+                                            self.$router.push(
+                                                `/RangePlanningView/${task.rangeFileID}`
+                                            );
+                                        }
+
+                                        taskApprovalInProgress.children.push(
+                                            taskItem);
+                                    })
+
+                                    // Handle approved tasks
+                                    let approvedTasks = tasks.filter(task => {
+                                        return task.type == 2 && (task.status ==
+                                        12);
+                                    })
+
+                                    approvedTasks.forEach(task => {
+                                        let taskItem = new treeItem({
+                                            name: task.rangeFileName,
+                                            icon: 'folder',
+                                            children: []
+                                        })
+
+                                        taskItem.click = function () {
+                                            self.$router.push(
+                                                `/RangePlanningView/${task.rangeFileID}`
+                                            );
+                                        }
+
+                                        taskApproved.children.push(taskItem);
+                                    })
+
+                                    departmentTreeItem.loading = false;
+                                    departmentTreeItem.showChildren = true;
                                 })
-
-                                departmentTreeItem.loading = false;
-                                departmentTreeItem.showChildren = true;
                             })
                         }
                     }
@@ -277,6 +336,8 @@
                     modelPlanogramTreeItem.showChildren = !modelPlanogramTreeItem.showChildren;
                     modelPlanogramTreeItem.icon = modelPlanogramTreeItem.showChildren ? 'folder_open' : 'folder';
                 }
+
+                // Get unique departments
 
                 self.departments.forEach(department => {
                     let departmentTreeItem = new treeItem({
@@ -396,7 +457,9 @@
 
                                 // Handle approved tasks
                                 let approvedTasks = tasks.filter(task => {
-                                    return task.type == 3 && (task.status == 12);
+                                    return task.type == 3 && (task.status == 12 || task
+                                        .status == 21 || task.status == 27 || task
+                                        .status == 44);
                                 })
 
                                 approvedTasks.forEach(task => {
@@ -441,6 +504,11 @@
                     storePlanogramTreeItem.icon = storePlanogramTreeItem.showChildren ? 'folder_open' : 'folder';
                 }
 
+                if (self.storeID != null)
+                    self.stores = self.stores.filter(e => {
+                        return e.storeID == self.storeID;
+                    })
+
                 self.stores.forEach(store => {
                     let storeFolder = new treeItem({
                         name: store.storeName,
@@ -449,174 +517,148 @@
                     })
 
                     storeFolder.click = function () {
-                        storeFolder.showChildren = !storeFolder.showChildren;
-                        storeFolder.icon = storeFolder.showChildren ? 'folder_open' :
-                            'folder';
-                    }
+                        if (storeFolder.showChildren) {
+                            storeFolder.showChildren = false;
+                            storeFolder.icon = 'folder';
+                        } else {
+                            storeFolder.loading = true;
+                            storeFolder.children = [];
 
-                    self.departments.forEach(department => {
-                        let departmentTreeItem = new treeItem({
-                            name: department.name,
-                            icon: 'folder',
-                            children: [],
-                            type: "department",
-                            value: department.id
-                        })
+                            self.getDepartmentsByStore(store.storeID, departments => {
+                                let uniqueDepartments = [];
 
-                        // ////////////////////////////////////////////////////////////////////////////////////////////////////
-                        // PENDING
-                        // ////////////////////////////////////////////////////////////////////////////////////////////////////
-                        let taskPending = new treeItem({
-                            name: "Implementation Pending",
-                            icon: 'folder',
-                            children: []
-                        })
+                                // get unique departments
+                                departments.forEach(department => {
+                                    let canAdd = true;
 
-                        taskPending.showChildrenCount = true;
-
-                        taskPending.click = function () {
-                            taskPending.showChildren = !taskPending.showChildren;
-                            taskPending.icon = taskPending.showChildren ? 'folder_open' :
-                                'folder';
-                        }
-                        // ////////////////////////////////////////////////////////////////////////////////////////////////////
-                        // IN PROGRESS
-                        // ////////////////////////////////////////////////////////////////////////////////////////////////////
-                        let taskInProgress = new treeItem({
-                            name: "Implementation In Progress",
-                            icon: 'folder',
-                            children: []
-                        })
-
-                        taskInProgress.showChildrenCount = true;
-
-                        taskInProgress.click = function () {
-                            taskInProgress.showChildren = !taskInProgress
-                                .showChildren;
-                            taskInProgress.icon = taskInProgress.showChildren ?
-                                'folder_open' :
-                                'folder';
-                        }
-                        // ////////////////////////////////////////////////////////////////////////////////////////////////////
-                        // IMPLEMENTED
-                        // ////////////////////////////////////////////////////////////////////////////////////////////////////
-                        let taskImplemented = new treeItem({
-                            name: "Implemented",
-                            icon: 'folder',
-                            children: []
-                        })
-
-                        taskImplemented.showChildrenCount = true;
-
-                        taskImplemented.click = function () {
-                            taskImplemented.showChildren = !taskImplemented.showChildren;
-                            taskImplemented.icon = taskImplemented.showChildren ? 'folder_open' :
-                                'folder';
-                        }
-
-                        // Add task folders to department folder
-                        departmentTreeItem.children.push(taskPending, taskInProgress, taskImplemented);
-
-                        // On click get all tasks by department and populate
-                        departmentTreeItem.click = function () {
-                            if (departmentTreeItem.showChildren) {
-                                departmentTreeItem.showChildren = false;
-                                departmentTreeItem.icon = "folder";
-                            } else {
-                                departmentTreeItem.loading = true;
-                                taskPending.children = [];
-                                taskInProgress.children = [];
-                                taskImplemented.children = [];
-
-                                // TODO: add get method for all store planogram stuff
-
-                                self.getStorePlanograms(store.storeID, department.id,
-                                    storePlanograms => {
-                                        console.log(department);
-                                        departmentTreeItem.loading = false;
-                                        departmentTreeItem.showChildren = true;
+                                    uniqueDepartments.forEach(ud => {
+                                        if (department.projectGroup == ud
+                                            .projectGroup)
+                                            canAdd = false;
                                     })
 
-                                self.getStorePlanograms(store.storeID, department.id,
-                                    storePlanograms => {
-                                        // Handle tasks in progress
-                                        let pendingTasks = storePlanograms.filter(
-                                            storePlanogram => {
-                                                return storePlanogram
-                                                    .planogramStoreStatus == 2;
-                                            })
+                                    if (canAdd)
+                                        uniqueDepartments.push(department);
+                                })
 
-                                        pendingTasks.forEach(task => {
+                                // Create folders for unique departments
+                                uniqueDepartments.forEach(ud => {
+                                    let departmentItem = new treeItem({
+                                        name: ud.projectGroup,
+                                        icon: 'folder',
+                                        children: [],
+                                    })
+
+                                    departmentItem.click = function () {
+                                        departmentItem.showChildren = !departmentItem
+                                            .showChildren;
+                                        departmentItem.icon = departmentItem
+                                            .showChildren ? 'folder_open' : 'folder';
+                                    }
+
+                                    // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                                    // PENDING
+                                    // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                                    let taskPending = new treeItem({
+                                        name: "Implementation Pending",
+                                        icon: 'folder',
+                                        children: []
+                                    })
+
+                                    taskPending.showChildrenCount = true;
+
+                                    taskPending.click = function () {
+                                        taskPending.showChildren = !taskPending
+                                            .showChildren;
+                                        taskPending.icon = taskPending.showChildren ?
+                                            'folder_open' :
+                                            'folder';
+                                    }
+                                    // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                                    // IN PROGRESS
+                                    // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                                    let taskInProgress = new treeItem({
+                                        name: "Implementation In Progress",
+                                        icon: 'folder',
+                                        children: []
+                                    })
+
+                                    taskInProgress.showChildrenCount = true;
+
+                                    taskInProgress.click = function () {
+                                        taskInProgress.showChildren = !taskInProgress
+                                            .showChildren;
+                                        taskInProgress.icon = taskInProgress
+                                            .showChildren ?
+                                            'folder_open' :
+                                            'folder';
+                                    }
+                                    // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                                    // IMPLEMENTED
+                                    // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                                    let taskImplemented = new treeItem({
+                                        name: "Implemented",
+                                        icon: 'folder',
+                                        children: []
+                                    })
+
+                                    taskImplemented.showChildrenCount = true;
+
+                                    taskImplemented.click = function () {
+                                        taskImplemented.showChildren = !taskImplemented
+                                            .showChildren;
+                                        taskImplemented.icon = taskImplemented
+                                            .showChildren ? 'folder_open' :
+                                            'folder';
+                                    }
+
+                                    departmentItem.children.push(taskPending,
+                                        taskInProgress, taskImplemented);
+
+                                    departments.forEach(department => {
+                                        if (department.projectGroup == ud
+                                            .projectGroup) {
                                             let taskItem = new treeItem({
-                                                name: task.fileName,
+                                                name: department.fileName,
                                                 icon: 'insert_drive_file',
-                                                children: []
+                                                children: [],
+                                                click: function () {
+                                                    self.$router.push(
+                                                        `/PlanogramImplementationNew/${department.planogramID}/${department.systemFileID}/13`
+                                                    );
+                                                }
                                             })
 
-                                            taskItem.click = function () {
-                                                self.$router.push(
-                                                    `/PlanogramImplementationNew/${task.planogramID}/${task.systemFileID}/13`
-                                                );
+                                            switch (department
+                                                .planogramStoreStatus) {
+                                                case 2: {
+                                                    taskPending.children.push(
+                                                        taskItem);
+                                                }
+                                                break;
+                                            case 3: {
+                                                taskInProgress.children.push(
+                                                    taskItem);
                                             }
-
-                                            taskInProgress.children.push(taskItem);
-                                        })
-
-                                        // Handle tasks in progress
-                                        let InProgressTasks = storePlanograms.filter(
-                                            storePlanogram => {
-                                                return storePlanogram
-                                                    .planogramStoreStatus == 4;
-                                            })
-
-                                        InProgressTasks.forEach(task => {
-                                            let taskItem = new treeItem({
-                                                name: task.fileName,
-                                                icon: 'folder',
-                                                children: []
-                                            })
-
-                                            taskItem.click = function () {
-                                                self.$router.push(
-                                                    `/PlanogramImplementationNew/${task.planogramID}/${task.systemFileID}/24`
-                                                );
+                                            break;
+                                            case 4: {
+                                                taskImplemented.children.push(
+                                                    taskItem);
                                             }
-
-                                            taskApprovalInProgress.children.push(
-                                                taskItem);
-                                        })
-
-                                        // Handle implemented tasks
-                                        let implementedTasks = storePlanograms.filter(
-                                            storePlanogram => {
-                                                return storePlanogram
-                                                    .planogramStoreStatus == 4;
-                                            })
-
-                                        implementedTasks.forEach(task => {
-                                            let taskItem = new treeItem({
-                                                name: task.fileName,
-                                                icon: 'folder',
-                                                children: []
-                                            })
-
-                                            taskItem.click = function () {
-                                                self.$router.push(
-                                                    `/PlanogramImplementationNew/${task.planogramID}/${task.systemFileID}/15`
-                                                );
+                                            break;
                                             }
-
-                                            taskApproved.children.push(taskItem);
-                                        })
-
-                                        departmentTreeItem.loading = false;
-                                        departmentTreeItem.showChildren = true;
+                                        }
                                     })
-                            }
-                        }
 
-                        storeFolder.children.push(departmentTreeItem);
-                    })
+                                    storeFolder.children.push(departmentItem);
+                                })
+
+                                storeFolder.icon = "folder_open";
+                                storeFolder.loading = false;
+                                storeFolder.showChildren = true;
+                            })
+                        }
+                    }
 
                     storePlanogramTreeItem.children.push(storeFolder);
                 })
@@ -674,6 +716,8 @@
                         children: []
                     })
 
+                    departmentTreeItem.showChildrenCount = true;
+
                     departmentTreeItem.click = function () {
                         departmentTreeItem.showChildren = !departmentTreeItem
                             .showChildren;
@@ -690,14 +734,14 @@
                             click: function () {
                                 self.$router.push(
                                     "/FloorPlanningViewer/Garden - LTM2 - Merchandise Flow Diagram.jpg"
-                                    )
+                                )
                             }
                         })
 
                         departmentTreeItem.children.push(departmentViewerTreeItem);
-                    }
 
-                    departmentModelFloorPlanTreeItem.children.push(departmentTreeItem)
+                        departmentModelFloorPlanTreeItem.children.push(departmentTreeItem)
+                    }
                 })
 
                 // store floor plans
@@ -734,6 +778,140 @@
                     storeFloorPlanTreeItem);
                 self.treeItems.push(floorPlanningTreeItem);
             },
+            buildClusteringTree() {
+                let self = this;
+
+                let clusteringTreeItem = new treeItem({
+                    name: "Clustering",
+                    icon: "folder",
+                    children: []
+                })
+
+                clusteringTreeItem.click = function () {
+                    clusteringTreeItem.showChildren = !clusteringTreeItem.showChildren;
+                    clusteringTreeItem.icon = clusteringTreeItem.showChildren ? 'folder_open' : 'folder';
+                }
+
+                // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                // STORE
+                // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                let storeTreeItem = new treeItem({
+                    name: "Store Clustering",
+                    icon: "folder",
+                    children: []
+                })
+
+                storeTreeItem.click = function () {
+                    storeTreeItem.showChildren = !storeTreeItem.showChildren;
+                    storeTreeItem.icon = storeTreeItem.showChildren ? 'folder_open' : 'folder';
+                }
+
+                // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                // CUSTOM
+                // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                let customTreeItem = new treeItem({
+                    name: "Custom Clustering",
+                    icon: "folder",
+                    children: []
+                })
+
+                customTreeItem.click = function () {
+                    customTreeItem.showChildren = !customTreeItem.showChildren;
+                    customTreeItem.icon = customTreeItem.showChildren ? 'folder_open' : 'folder';
+                }
+
+                // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                // BASKET
+                // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                let basketTreeItem = new treeItem({
+                    name: "Basket Clustering",
+                    icon: "folder",
+                    children: []
+                })
+
+                basketTreeItem.click = function () {
+                    basketTreeItem.showChildren = !basketTreeItem.showChildren;
+                    basketTreeItem.icon = basketTreeItem.showChildren ? 'folder_open' : 'folder';
+                }
+
+                // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                // LISTING
+                // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                let listingTreeItem = new treeItem({
+                    name: "Listing Clustering",
+                    icon: "folder",
+                    children: []
+                })
+
+                listingTreeItem.click = function () {
+                    listingTreeItem.showChildren = !listingTreeItem.showChildren;
+                    listingTreeItem.icon = listingTreeItem.showChildren ? 'folder_open' : 'folder';
+                }
+
+                // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                // CATEGORY
+                // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                let categoryTreeItem = new treeItem({
+                    name: "Category Clustering",
+                    icon: "folder",
+                    children: []
+                })
+
+                categoryTreeItem.click = function () {
+                    categoryTreeItem.showChildren = !categoryTreeItem.showChildren;
+                    categoryTreeItem.icon = categoryTreeItem.showChildren ? 'folder_open' : 'folder';
+                }
+
+                // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                // DEPARTMENT
+                // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                let departmentTreeItem = new treeItem({
+                    name: "Department Clustering",
+                    icon: "folder",
+                    children: []
+                })
+
+                departmentTreeItem.click = function () {
+                    departmentTreeItem.showChildren = !departmentTreeItem.showChildren;
+                    departmentTreeItem.icon = departmentTreeItem.showChildren ? 'folder_open' : 'folder';
+                }
+
+                clusteringTreeItem.children.push(storeTreeItem, customTreeItem, basketTreeItem, listingTreeItem,
+                    categoryTreeItem, departmentTreeItem);
+                self.treeItems.push(clusteringTreeItem);
+            },
+            buildSpacialMappingFolder() {
+                let self = this;
+
+                let spacialMappingTreeItem = new treeItem({
+                    name: "Spacial Mapping",
+                    icon: "folder",
+                    children: []
+                })
+
+                spacialMappingTreeItem.click = function () {
+                    spacialMappingTreeItem.showChildren = !spacialMappingTreeItem.showChildren;
+                    spacialMappingTreeItem.icon = spacialMappingTreeItem.showChildren ? 'folder_open' : 'folder';
+                }
+
+                self.treeItems.push(spacialMappingTreeItem);
+            },
+            buildUploadTreeItems() {
+                let self = this;
+
+                let uploadTreeItem = new treeItem({
+                    name: "My Folders",
+                    icon: "folder",
+                    children: []
+                })
+
+                uploadTreeItem.click = function () {
+                    uploadTreeItem.showChildren = !uploadTreeItem.showChildren;
+                    uploadTreeItem.icon = uploadTreeItem.showChildren ? 'folder_open' : 'folder';
+                }
+
+                self.treeItems.push(uploadTreeItem);
+            },
             getTasksByProjectGroup(projectGroupID, callback) {
                 let self = this;
 
@@ -742,6 +920,7 @@
                 Axios.get(process.env.VUE_APP_API +
                         `GetTasksByProjectGroup?projectGroupID=${projectGroupID}`)
                     .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
                         callback(r.data.projectTXList);
                     })
                     .catch(e => {
@@ -756,8 +935,36 @@
                 Axios.get(process.env.VUE_APP_API +
                         `Store_Planogram/StoreAndDepartment?storeID=${storeID}&projectGroupID=${projectGroupID}`)
                     .then(r => {
-                        console.log(r.data.queryResult)
+                        delete Axios.defaults.headers.common["TenantID"];
                         callback(r.data.queryResult);
+                    })
+                    .catch(e => {
+                        console.log(e);
+                    });
+            },
+            getDepartmentsByStore(storeID, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + `Store_Planogram_Store_Departments?storeID=${storeID}`)
+                    .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        callback(r.data);
+                    })
+                    .catch(e => {
+                        console.log(e);
+                    });
+            },
+            getRangeFileByProjectGroup(projectGroupID, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + `GetRangeFileByProjectGroup?projectGroupID=${projectGroupID}`)
+                    .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        callback(r.data);
                     })
                     .catch(e => {
                         console.log(e);

@@ -91,7 +91,7 @@ function getProductsWeighted(storeSalesData) {
         size_Description: item.size_Description,
         supplier: item.supplier,
         manufacturer: item.manufacturer,
-        brand_Name: item.brand_Name,
+        brand: item.brand,
         subcategory: item.subcategory,
         category: item.category
     })), "product_ID"); // get all unique products
@@ -161,7 +161,7 @@ function getTotalStoreProductSales(stores, products, storeSalesData) {
             size_Description: product.size_Description,
             supplier: product.supplier,
             manufacturer: product.manufacturer,
-            brand_Name: product.brand_Name,
+            brand: product.brand,
             subcategory: product.subcategory,
             category: product.category
         }

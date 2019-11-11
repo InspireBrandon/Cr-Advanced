@@ -465,7 +465,7 @@
         currentClusterData: null
       }
     },
-    created() {
+    mounted() {
       let self = this;
       self.gridOptions.context.componentParent = this;
       self.gridOptions.popupParent = document.body;
@@ -638,7 +638,10 @@
       },
       checkparams() {
         let self = this
+
         if (self.$route.params != null) {
+          self.$refs.spinner.show();
+
           Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${self.$route.params.rangeFileID}`)
             .then(r => {
               self.fileData.planogramName = r.data.planogramName;

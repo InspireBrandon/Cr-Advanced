@@ -101,9 +101,6 @@
                     .then(r => {
                         
                         let planograms = r.data.planogramList;
-                        console.log("files");
-                        console.log(files);
-                        
                         files.forEach(file => {
                             file.name = self.findAndReplaceName(file.name, planograms)
                         });
@@ -116,18 +113,12 @@
             },
             findAndReplaceName(name, planograms) {
                 let self = this;
-                console.log("planograms");
-                console.log(planograms);
                 
                 let nameSplit = name.split(/ (.+)/);
-
-                console.log(nameSplit)
 
                 let planogram = planograms.find(e => {
                     return e.id == parseInt(nameSplit[0]);
                 })
-
-                console.log(planogram)
 
                 return name.replace(nameSplit[0], planogram.displayname);
             }

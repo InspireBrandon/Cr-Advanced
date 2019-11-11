@@ -5,7 +5,7 @@
         <v-card style="border-right: 1px solid lightgrey" class="scroll pa-1" height="calc(100vh - 64px)" tile>
           <!-- <v-text-field v-model="searchText" hide-details placeholder="Search..." append-icon="search" solo>
           </v-text-field> -->
-          <NewRouter />
+          <NewRouter ref="NewRouter" :accessType="accessType" :storeID="storeID" />
           <!-- <RecursiveItem v-show="searchText.length == 0" v-if="routeController != null"
             :routeController="routeController" class="pa-0 ma-0 mt-2" parentID="0" />
           <SearchItems v-show="searchText.length > 0" :filterItems="filteredItems" /> -->
@@ -51,21 +51,12 @@
         statusList: [],
         typeList: [],
         accessType: -1,
-        projectGroups: []
+        projectGroups: [],
+        storeID: null
       };
     },
     mounted() {
       let self = this;
-
-      let statusHandler = new StatusHandler();
-      self.statusList = statusHandler.getStatus()
-      self.typeList = statusHandler.getTypeList()
-
-      self.routeController = new RouteController({
-        userType: 0
-      });
-
-      self.allRouteItems = self.routeController.getAllRouteItems();
 
       // self.getTaskViewData();
       // self.getStoreData();
@@ -96,18 +87,24 @@
           process.env.VUE_APP_API +
           `TenantLink_AccessType?systemUserID=${systemUserID}&tenantID=1`
         ).then(r => {
+          console.log(r.data);
+
           if (r.data.tenantLink_AccessTypeList != null && r.data.tenantLink_AccessTypeList.length > 0) {
             let accessType = r.data.tenantLink_AccessTypeList[0].accessType;
             let planoList = r.data.tenantLink_AccessTypeList[0].supplierPlanogramList;
+            let storeID = r.data.tenantLink_AccessTypeList[0].storeID;
 
             sessionStorage.accessType = accessType;
 
             self.accessType = accessType;
             self.planoList = planoList;
+            self.storeID = storeID;
           } else if (r.data.isDatabaseOwner) {
             sessionStorage.accessType = 0;
             self.accessType = 0;
           }
+
+          self.$refs.NewRouter.getStores();
 
           setTimeout(() => {
             // self.getTaskViewData();

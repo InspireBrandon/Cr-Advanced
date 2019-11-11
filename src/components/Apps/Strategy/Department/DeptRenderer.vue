@@ -5,7 +5,6 @@
                 <template v-slot:activator="{ on }">
                     <v-card flat tile :height="35" :color="item.color" :min-width="parseFloat( (item.value*2)+'%')"
                         v-on="on">
-
                     </v-card>
                 </template>
                 <span>{{getToolTip(item,params.data.sqm_Shop)}}</span>
@@ -22,7 +21,7 @@
         {
             // sqm_Shop
             getToolTip(item,sqm){
-                return item.name+" "+":"+" "+ (item.value).toFixed(2)+"%"+" "+"Size : "+ ((item.value/100)*sqm).toFixed(0)
+                return item.name+" "+":"+" "+ (item.value).toFixed(2)+"% of store turnover. \r\n" + " " + " Potential space: "+ ((item.value/100)*sqm).toFixed(0) + "(meters squared) of total store space"
             }
             
         }

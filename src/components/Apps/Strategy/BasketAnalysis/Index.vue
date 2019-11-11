@@ -379,9 +379,6 @@
                     self.rowData = reader.data;
                 });
             },
-            saveFile() {
-                let self = this;
-            },
             setupBaskets() {
                 let self = this;
                 self.$refs.BasketMaintenanceModal.open();
@@ -573,7 +570,7 @@
                     .catch(e => {
                         alert("Failed to save");
                     })
-            },
+            }
         }
     }
 </script>
