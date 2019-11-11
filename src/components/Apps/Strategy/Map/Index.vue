@@ -22,9 +22,9 @@
                 <!-- <v-tab href="#tab-1" justify-content: center>
                             Map Image
                 </v-tab>-->
-                <v-tab href="#tab-1" justify-content: center>Market Share</v-tab>
                 <v-tab href="#tab-2" justify-content: center>Setup Map</v-tab>
                 <v-tab href="#tab-3" justify-content: center>image</v-tab>
+                <v-tab href="#tab-1" justify-content: center>Market Share</v-tab>
                 <v-tab-item id="tab-3" class="elevation-2" justify-content: center>
                   <v-toolbar dark flat dense color="primary">
                     <v-toolbar-title> Image </v-toolbar-title>
@@ -37,20 +37,30 @@
                     class="grey lighten-2 mt-0" width="200px" style="object-fit: fill;">
                 </v-tab-item>
                 <v-tab-item id="tab-1" class="elevation-2" justify-content: center>
+                  <v-toolbar dark flat dense color="primary">
+                    <v-toolbar-title>Market Share</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-toolbar-items>
+                      <v-select style="margin-left: 10px;  width: 200px" placeholder="Select to see market share"
+                        v-model="selectedCategory" :items="categories" hide-details></v-select>
+                    </v-toolbar-items>
+                  </v-toolbar>
                   <v-card height="calc(100vh - 273px)" style="overflow:auto;">
-                    <v-toolbar dark flat dense color="primary">
-                      <v-toolbar-title>Market Share</v-toolbar-title>
-                      <v-spacer></v-spacer>
-                    </v-toolbar>
 
                     <v-card>
                       <v-list>
                         <v-list-tile v-for="(item, index) in AvailableData" :key="index">
                           <v-list-tile-title>
                             <v-layout>
-                              <span>{{checkAlphaNumber(item.blockNumber)}}</span>
+
+                              <span>{{checkAlphaNumber(item.blockNumber)}} </span>
                               <v-spacer></v-spacer>
-                              <span>{{item.squareTotalSalesPercentage}}%</span>
+
+                              <span>
+                                {{formatNumber(item.storeSummary.sales_Retail,item.squareTotalSales)}}
+                              </span>
+                              <!-- <v-spacer></v-spacer>
+                              <span>{{item.squareTotalSalesPercentage}}%</span> -->
                             </v-layout>
                           </v-list-tile-title>
                         </v-list-tile>
@@ -67,7 +77,10 @@
                     </v-toolbar>
                     <v-card-text>
                       <v-checkbox label="Draw Market Share Grid" hide-details v-model="drawGrid"></v-checkbox>
-                      <v-checkbox label="Pie Charts" hide-details v-model="usePiecharts"></v-checkbox>
+                      <v-divider></v-divider>
+                      <v-checkbox label="Draw import stores" hide-details v-model="useImportStores"></v-checkbox>
+                      <v-divider></v-divider>
+                      <!-- <v-checkbox label="Pie Charts" hide-details v-model="usePiecharts"></v-checkbox>
                       <v-autocomplete v-if="usePiecharts" multiple :items="piechartItems"
                         v-model="selectedPiechartItems" label="Pie Charts Items"></v-autocomplete>
                       <v-divider></v-divider>
@@ -81,7 +94,9 @@
 
                       <v-checkbox label="Use Size Map" hide-details v-model="useSizeMap"></v-checkbox>
                       <v-autocomplete v-if="useSizeMap" multiple :items="heatmapItems" v-model="selectedSizeMapField"
-                        label="Size Map Items"></v-autocomplete>
+                        label="Size Map Items"></v-autocomplete> -->
+                      <v-divider></v-divider>
+
                       <v-checkbox label="Use Retailer Map" hide-details v-model="useRetailerMap"></v-checkbox>
                       <v-autocomplete v-if="useRetailerMap" multiple :items="selectedRetailers"
                         v-model="selectedRetailersFields" label="Size Map Items"></v-autocomplete>
@@ -102,6 +117,8 @@
     <YesNoModal ref="yesNo"></YesNoModal>
     <Mapsetup ref="Mapsetup" />
     <MapImageSelector ref="MapImageSelector" />
+    <Spinner ref="Spinner" />
+
   </div>
 </template>
 
@@ -118,6 +135,8 @@
   import {
     relativeRadiusToValue
   } from "@amcharts/amcharts4/.internal/core/utils/Utils";
+  import Spinner from '@/components/Common/Spinner';
+
 
   // http://www.climbing.co.za/wp-content/uploads/2012/10/rsamap.png
   const formatter = new Intl.NumberFormat("en-US", {
@@ -128,6 +147,7 @@
   export default {
     components: {
       YesNoModal,
+      Spinner,
       Mapsetup,
       MapImageSelector
     },
@@ -164,6 +184,7 @@
         heatData: null,
         pieData: null,
         canPlot: false,
+        useImportStores: false,
         SystemUser_ID: null,
         currentPlotStore: null,
         maxHeatLegend: 4000000,
@@ -254,18 +275,29 @@
             rangeStart: 100,
             rangeEnd: 110
           }
-        ]
+        ],
+        selectedCategory: null,
+        categories: [{
+          text: "PET ACCESSORIES",
+          value: 33
+        }, {
+          text: "PET HEALTHCARE",
+          value: 34
+        }]
       };
+
     },
     computed: {
+
       AvailableData() {
         let self = this;
 
         let retVal = [];
 
         self.geoGridData.forEach((el, idx) => {
-          if (el.supplierRetailerStores.length > 0) {
+          if (el.retailerStores.length > 0) {
             el.blockNumber = idx;
+            el.storeSummary = self.MapStoreData(el)
             retVal.push(el);
           }
         });
@@ -274,15 +306,17 @@
       }
     },
     mounted() {
+      let self = this;
       // this.openSetup()
       // this.drawMap(this.labels)
+      self.$refs.Spinner.show()
       this.getSupplierStores();
       this.getGeoGrid(() => {
         this.getmaps();
         this.getCities();
         this.getRetailers();
         // this.testKak(this.rowData);
-        let self = this;
+
         let encoded_details = jwt.decode(sessionStorage.accessToken);
         self.SystemUser_ID = encoded_details.USER_ID;
 
@@ -291,6 +325,33 @@
 
     },
     methods: {
+      MapStoreData(el) {
+        let self = this;
+        let retVal = {
+          planogram: "",
+          sales_Retail: 0
+        };
+        if (el.retailerStores.length > 0) {
+          el.retailerStores.forEach(e => {
+            if (e.planogram_ID == self.selectedCategory) {
+              retVal.sales_Retail += e.sales_Retail
+              retVal.planogram = e.planogram
+            }
+          })
+        }
+        // retVal = el.retailerStores.map(item => ({
+        //   planogram: item.planogram,
+        //   planogram_ID: item.planogram_ID,
+        //   retailerStore: item.retailerStore,
+        //   sales_Retail: item.sales_Retail,
+        //   store: item.sales_Retail,
+        //   store_ID: item.store_ID,
+        //   xCoordinate: item.xCoordinate,
+        //   yCoordinate: item.yCoordinate,
+        // })), "planogram"
+
+        return retVal;
+      },
       getSupplierStores() {
         let self = this
         Axios.defaults.headers.common["TenantID"] =
@@ -314,14 +375,14 @@
         self.imageHeight = el.getBoundingClientRect().height
         self.imageWidth = el.getBoundingClientRect().width
 
-        
+
 
 
       },
       DrawGeoGrid(chart, callback) {
         let self = this;
 
-      
+
 
         self.geoGridData.forEach((e, idx) => {
           let arr = [e.squareFormattedList];
@@ -335,18 +396,20 @@
             title: "Bermuda triangle",
             geoPolygon: arr
           }];
-          shapeSeries.visibleInLegend = false;
+          shapeSeries.hiddenInLegend = true;
           shapeSeries.name = "block";
 
           let shapeTemplate = shapeSeries.mapPolygons.template;
           shapeTemplate.stroke = am4core.color("#e33");
           shapeTemplate.strokeWidth = 2;
           shapeTemplate.fill = shapeTemplate.stroke;
+          shapeTemplate.hiddenInLegend = true;
           shapeTemplate.fillOpacity = 0.2;
           shapeTemplate.nonScalingStroke = true;
           shapeTemplate.tooltipText = self.checkAlphaNumber(idx);
 
           var labelSeries = chart.series.push(new am4maps.MapImageSeries());
+          labelSeries.hiddenInLegend = true;
           var labelTemplate = labelSeries.mapImages.template.createChild(
             am4core.Label
           );
@@ -355,6 +418,7 @@
           labelTemplate.fontSize = 14;
           labelTemplate.interactionsEnabled = false;
           labelTemplate.nonScaling = true;
+          labelTemplate.hiddenInLegend = true;
 
 
 
@@ -363,26 +427,30 @@
             shapeSeries.events.on("inited", function () {
               shapeSeries.mapPolygons.each(function (polygon) {
                 var label = labelSeries.mapImages.create();
+
                 //var state = polygon.dataItem.dataContext.id.split("-").pop();
                 label.latitude = y + 0.25;
                 label.longitude = polygon.visualLongitude;
                 label.children.getIndex(0).text = idx + 1;
-
+                label.hiddenInLegend = true;
                 label = labelSeries.mapImages.create();
                 //var state = polygon.dataItem.dataContext.id.split("-").pop();
                 label.latitude = polygon.visualLatitude;
                 label.longitude = x - 0.25;
                 label.children.getIndex(0).text = "A";
+                label.hiddenInLegend = true;
               });
             });
           } else if (idx > 0 && idx < 10) {
             shapeSeries.events.on("inited", function () {
               shapeSeries.mapPolygons.each(function (polygon) {
                 var label = labelSeries.mapImages.create();
+                label.hiddenInLegend = true;
                 //var state = polygon.dataItem.dataContext.id.split("-").pop();
                 label.latitude = y + 0.25;
                 label.longitude = polygon.visualLongitude;
                 label.children.getIndex(0).text = idx + 1;
+                label.hiddenInLegend = true;
               });
             });
           } else if (idx % 10 === 0) {
@@ -393,10 +461,12 @@
             shapeSeries.events.on("inited", function () {
               shapeSeries.mapPolygons.each(function (polygon) {
                 var label = labelSeries.mapImages.create();
+                label.hiddenInLegend = true;
                 //var state = polygon.dataItem.dataContext.id.split("-").pop();
                 label.latitude = polygon.visualLatitude;
                 label.longitude = x - 0.25;
                 label.children.getIndex(0).text = found.text;
+                label.hiddenInLegend = true;
               });
             });
           }
@@ -415,6 +485,7 @@
           process.env.VUE_APP_API +
           `SuplierLocationImportTX/GeoReport?userID=${encoded_details.USER_ID}`
         ).then(r => {
+          console.log("getGeoGrid", r.data);
 
           self.geoGridData = r.data;
 
@@ -457,6 +528,7 @@
           useHeatmap: self.useHeatmap,
           useSizeMap: self.useSizeMap,
           useRetailerMap: self.useRetailerMap,
+          useImportStores: self.useImportStores,
           selectedPiechartItems: self.selectedPiechartItems,
           selectedHeatmapField: self.selectedHeatmapField,
           selectedSizeMapField: self.selectedSizeMapField,
@@ -503,7 +575,7 @@
         let self = this
         let asd = []
         self.setupMapData = []
-      
+
         self.clusters.forEach((e, idx) => {
 
           asd.push(self.fileData[e.value])
@@ -1303,6 +1375,7 @@
       },
       drawMap(labelState, config, setupMapData, piechartArray) {
         let self = this;
+        self.$refs.Spinner.show()
         // //////////////////////////////////////////////////
         // start draw of base chart
         // //////////////////////////////////////////////////
@@ -1334,23 +1407,23 @@
         self.drawMajorCitiesImageSeries(chart);
         self.drawMinorCities(chart);
         // draw standard supplier import
-        let imageSeries = chart.series.push(new am4maps.MapImageSeries());
-        // define template
-        imageSeries.name = "Import stores";
-        imageSeries.data = self.supplierImport;
-        imageSeries.dataFields.value = "sales";
+        if (config.useImportStores) {
+          // drawing imported stores
+          let imageSeries = chart.series.push(new am4maps.MapImageSeries());
+          imageSeries.name = "Import stores";
+          imageSeries.data = self.supplierImport;
+          imageSeries.dataFields.value = "sales";
+          let imageSeriesTemplate = imageSeries.mapImages.template;
+          imageSeriesTemplate.propertyFields.latitude = "yCoordinate";
+          imageSeriesTemplate.propertyFields.longitude = "xCoordinate";
+          imageSeriesTemplate.nonScaling = false;
+          imageSeriesTemplate.fill = chart.colors.getIndex(9).brighten(1);
+          var circle = imageSeriesTemplate.createChild(am4core.Circle);
+          circle.fillOpacity = 0.5;
+          circle.tooltipText = "{storeName}: [bold]{sales}[/]";
+          circle.radius = 2;
+        }
 
-        // if (type == 0) {
-        let imageSeriesTemplate = imageSeries.mapImages.template;
-        imageSeriesTemplate.propertyFields.latitude = "yCoordinate";
-        imageSeriesTemplate.propertyFields.longitude = "xCoordinate";
-        imageSeriesTemplate.nonScaling = false;
-        imageSeriesTemplate.fill = chart.colors.getIndex(9).brighten(1);
-
-        var circle = imageSeriesTemplate.createChild(am4core.Circle);
-        circle.fillOpacity = 0.5;
-        circle.tooltipText = "{storeName}: [bold]{sales}[/]";
-        circle.radius = 2;
 
         if (
           config.selectedRetailers != undefined &&
@@ -1439,20 +1512,19 @@
 
         if (config.drawGrid) {
           self.DrawGeoGrid(chart, callback => {
-        
-            // chart.legend.data.forEach((e,idx)=>{
-            //     if(e.name=="block"){
-            //         chart.legend.data.splice(idx, 1);
-            //     }
+            // chart.legend.data.forEach((e, idx) => {
+            //   if (e.name == undefined) {
+            //     chart.legend.data.splice(idx, 1);
+            //   }
             // })
 
-            chart.legend.data.splice(
-              legendLength,
-              chart.legend.data.length - legendLength
-            );
+            // chart.legend.data.splice(
+            //   legendLength,
+            //   chart.legend.data.length - legendLength
+            // );
           });
         }
-
+        self.$refs.Spinner.hide()
       },
       testKak(rowData) {
         let self = this;
@@ -1589,6 +1661,14 @@
         self.setGeogridData(finalFinal);
         self.acrossArr = acrossArr;
       },
+      formatNumber(storeSales, totalSales) {
+        let string = ""
+        if (storeSales > 0 && totalSales != 0) {
+          string = ((storeSales / totalSales) * 100).toFixed(2)
+          string += "%"
+        }
+        return string
+      },
       checkAlphaNumber(blockNumber) {
         let self = this;
 
@@ -1647,6 +1727,8 @@
       offsetX: offsetX
     };
   }
+
+
 
   function removeDuplicates(myArr, prop) {
     return myArr.filter((obj, pos, arr) => {
