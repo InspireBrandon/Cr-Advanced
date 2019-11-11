@@ -22,7 +22,7 @@ class ListingClusterController {
                 tmpCategory = "subcategory"
                 break;
             case 2:
-                tmpCategory = "brand_Name"
+                tmpCategory = "brand"
                 break;
             case 3:
                 tmpCategory = "manufacturer"
@@ -48,6 +48,8 @@ class ListingClusterController {
         // ////////////////////////////////////////////////////////////////////////////////////////////////////
         // CALCULATED VARIABLES
         // ////////////////////////////////////////////////////////////////////////////////////////////////////
+        console.log(storeSalesData)
+
         let stores = removeDuplicates(storeSalesData.map(item => ({
             storeName: item.storeName,
             store_ID: item.store_ID,
@@ -153,7 +155,7 @@ function getProjectGroupsWeighted(storeSalesData, clusterData) {
     console.log("clusterData.selectedCategory", clusterData.selectedCategory);
 
     let uniqueProjectGroups = removeDuplicates(storeSalesData.map(item => ({
-        brand_Name: item.brand_Name,
+        brand: item.brand,
         category: item.category,
         manufacturer: item.manufacturer,
         sales_Retail: item.sales_Retail,

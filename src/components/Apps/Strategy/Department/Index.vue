@@ -53,21 +53,10 @@
                     style="margin-left: 10px; margin-top: 8px; width: 150px" dense :items="levels" v-model="level"
                     hide-details>
                 </v-select>
-
-
-
             </v-toolbar-items>
             <v-spacer></v-spacer>
-            <span v-if=" selectedPlanogram !=null">{{ selectedPlanogram.displayname }} </span>
+            <span v-if="selectedPlanogram !=null">{{ generateName() }} </span>
             <v-spacer></v-spacer>
-            <!-- <v-btn-toggle v-if="storeRowData.length > 0" round v-model="selectedView" class="transparent" mandatory>
-                <v-btn class="elevation-0" style="width: 100px" round @click="changeView(0)" color="primary">
-                    Store
-                </v-btn>
-                <v-btn class="elevation-0" style="width: 100px" round @click="changeView(1)" color="primary">
-                    Categories
-                </v-btn>
-            </v-btn-toggle> -->
             <v-spacer></v-spacer>
         </v-toolbar>
         <PlanogramSelector ref="PlanogramSelector" />
@@ -84,7 +73,6 @@
 </template>
 <script>
     import Spinner from '@/components/Common/Spinner';
-
     import BrandGrid from "./Grid"
     import Axios from 'axios'
     import DateRangeSelector from '@/components/Common/DateRangeSelector';
@@ -92,11 +80,8 @@
     import ListingClusterController from './controller.js';
     import storeGrid from './storeGrid';
     import FileSelector from './FileSelector'
-
-
-
-    // import PlanogramSelector from '../ListingClusters/PlanogramSelector'
     import DataSelector from "./DataSelector"
+
     const formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
@@ -237,28 +222,47 @@
                 selectedPeriod: null,
                 ProjectGroups: null,
             }
-
         },
         mounted() {
             this.getProjectGroups()
         },
         methods: {
+            generateName() {
+                let self = this;
+                let name = "";
 
+                if (self.selectedProjectGroup.text != null) {
+                    if (self.selectedPeriod.periodic) {
+                        name =
+                            `${self.selectedProjectGroup.text} - ${self.selectedPeriod.monthsBetween} MMA`
+                    } else {
+                        name =
+                            `${self.selectedProjectGroup.text} Average Monthly ${self.selectedPeriod.dateFromString} TO ${self.selectedPeriod.dateToString}`
+                    }
+                }
+
+                return name;
+            },
             getProjectGroups() {
                 let self = this
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.get(process.env.VUE_APP_API + "ProjectGroup").then(r => {
-                    console.log(r);
                     self.projectsGroupItems = [{
                         text: "Group Overview",
                         value: 0
                     }]
+
                     r.data.projectGroupList.forEach(group => {
                         self.projectsGroupItems.push({
                             text: group.name,
                             value: group.id
                         })
                     })
+
+                    self.selectedProjectGroup = {
+                        text: "Group Overview",
+                        value: 0
+                    };
                 })
 
             },
@@ -318,17 +322,19 @@
                 self.getFile(fileTransaction => {
                     if (fileTransaction == null || fileTransaction == false) {
                         let tmp = {
-                            DepartmentClustering: {},
-                            salesData: self.salesData,
+                            departmentCluster: {}
+                        };
+
+                        tmp.departmentCluster[self.generateName()] = {
+                            data: self.salesData,
                             config: {
                                 selectedProjectGroup: self.selectedProjectGroup,
-                                periodData: self.selectedPeriod,
-                                setup: {
-                                    primaryCluster: self.primaryCluster,
-                                    secondaryCluster: self.secondaryCluster,
-                                    level: self.level,
-                                    group: self.group
-                                }
+                                periodData: self.selectedCategory,
+                                selectedPeriod: self.selectedPeriod,
+                                primaryCluster: self.primaryCluster,
+                                secondaryCluster: self.secondaryCluster,
+                                level: self.level,
+                                group: self.group
                             }
                         }
 
@@ -343,19 +349,18 @@
                                 tmp.DepartmentClustering = {};
                             }
 
-                            tmp.DepartmentClustering[self.selectedProjectGroup.text] = self
-                                .storeRowData;
-                            tmp.salesData = self.salesData,
-                                tmp.config = {
+                            tmp.categoryCluster[self.generateName()] = {
+                                data: self.salesData,
+                                config: {
                                     selectedProjectGroup: self.selectedProjectGroup,
-                                    periodData: self.selectedPeriod,
-                                    setup: {
-                                        primaryCluster: self.primaryCluster,
-                                        secondaryCluster: self.secondaryCluster,
-                                        level: self.level,
-                                        group: self.group
-                                    }
+                                    periodData: self.selectedCategory,
+                                    selectedPeriod: self.selectedPeriod,
+                                    primaryCluster: self.primaryCluster,
+                                    secondaryCluster: self.secondaryCluster,
+                                    level: self.level,
+                                    group: self.group
                                 }
+                            }
 
                             self.appendAndSaveFile(tmp);
                         })
@@ -401,7 +406,7 @@
                 let self = this;
                 self.$nextTick(() => {
                     self.$refs.DateRangeSelector.show(dateRange => {
-                       
+
 
 
                         self.selectedPeriod = dateRange;
@@ -414,20 +419,6 @@
                 self.$nextTick(() => {
                     self.$refs.Spinner.show()
                     if (self.secondaryCluster != null) {
-
-                        //  let lcData = ListingClusterController.GenerateClusterOutput({
-                        //     storeSalesData: r.data,
-                        //     primaryCluster: self.primaryCluster,
-                        //     secondaryCluster: self.secondaryCluster,
-                        //     clusterLevels: self.level,
-                        //     clusterGroups: self.group
-                        // })
-
-                        // self.storeRowData = lcData.storeData;
-                        // self.rowData = lcData.ProjectGroupData;
-                        // self.stores = lcData.stores;
-                        // self.ProjectGroups = lcData.ProjectGroups
-
 
                         let lcData = ListingClusterController.GenerateClusterOutput({
                             storeSalesData: self.salesData,
@@ -448,10 +439,7 @@
             },
             orderRowData(projectGroup) {
                 let self = this
-                console.log("orderRowData", projectGroup);
-
                 let tmp = self.rowData
-
 
                 self.rowData = tmp.sort((a, b) => {
                     if (a[projectGroup.projectGroup + "_ratio"] > b[projectGroup.projectGroup + "_ratio"]) {
@@ -467,15 +455,10 @@
             },
             setHeaders() {
                 let self = this;
-                //console.log("setting Headers");
 
                 let tmp = [{
                         headerName: 'Store Name',
                         field: 'storeName'
-                    },
-                    {
-                        headerName: 'Cluster',
-                        field: 'cluster'
                     },
                     {
                         headerName: 'Total Sales',
@@ -488,11 +471,14 @@
                         cellRendererFramework: "progressRenderer"
                     },
                     {
+                        headerName: 'Cluster',
+                        field: 'cluster'
+                    },
+                    {
                         headerName: 'Stack bar',
                         cellRendererFramework: "DeptRenderer",
                         width: 220
-
-                    },{
+                    }, {
                         headerName: 'Area (m)',
                         field: 'sqm_Shop'
                     }, {
@@ -521,7 +507,6 @@
                         }
                     }
                 ]
-                console.log("self.ProjectGroups", self.ProjectGroups);
 
                 self.ProjectGroups.forEach((projectGroup, idx) => {
                     if (idx == 0) {
@@ -599,19 +584,6 @@
                 })
                 self.headers = tmp;
             },
-            generateName() {
-                let self = this;
-
-                if (self.selectedPeriod != null) {
-                    if (self.selectedPeriod.periodic) {
-                        return `${self.selectedProjectGroup.text} - ${self.selectedPeriod.monthsBetween} MMA (${self.selectedPeriod.dateFromString} TO ${self.selectedPeriod.dateToString})`;
-                    } else {
-                        return `${self.selectedProjectGroup.text} Average Monthly ${self.selectedPeriod.dateFromString} TO ${self.selectedPeriod.dateToString}`;
-                    }
-                } else {
-                    return "";
-                }
-            },
             runQuery() {
                 let self = this
 
@@ -621,11 +593,8 @@
 
                 Axios.get(process.env.VUE_APP_API +
                         `Cluster/DepartmentClustering?PeriodFrom=${self.selectedPeriod.dateFrom}&PeriodTo=${self.selectedPeriod.dateTo}&ProjectGroupID=${self.selectedProjectGroup.value}`
-                        // `Cluster/DepartmentClustering?PeriodFrom=53&PeriodTo=58&ProjectGroupID=${self.selectedProjectGroup.value}`
                     )
                     .then(r => {
-
-                        console.log(r)
                         self.salesData = r.data
 
                         let lcData = ListingClusterController.GenerateClusterOutput({
@@ -640,8 +609,6 @@
                         self.rowData = lcData.ProjectGroupData;
                         self.stores = lcData.stores;
                         self.ProjectGroups = lcData.ProjectGroups
-
-                        console.log(self.rowData);
 
                         self.setHeaders()
                         self.$refs.Spinner.hide()

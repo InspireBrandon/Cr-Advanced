@@ -165,7 +165,7 @@
         <v-container grid-list-md fluid class="ma-0 pa-0">
           <v-layout row wrap>
             <v-flex :class="{ 'md10': showNote, 'md12': !showNote }" class="pa-0">
-              <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%;  height: calc(100vh - 220px);"
+              <ag-grid-vue :gridOptions="gridOptions" :sideBar='true' style="width: 100%;  height: calc(100vh - 212px);"
                 :defaultColDef="defaultColDef" class="ag-theme-balham" :columnDefs="columnDefs"
                 @selection-changed="onSelectionChanged" :rowData="rowData" :enableSorting="true" :enableFilter="true"
                 :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
@@ -465,7 +465,7 @@
         currentClusterData: null
       }
     },
-    created() {
+    mounted() {
       let self = this;
       self.gridOptions.context.componentParent = this;
       self.gridOptions.popupParent = document.body;
@@ -638,7 +638,10 @@
       },
       checkparams() {
         let self = this
+
         if (self.$route.params != null) {
+          self.$refs.spinner.show();
+
           Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${self.$route.params.rangeFileID}`)
             .then(r => {
               self.fileData.planogramName = r.data.planogramName;

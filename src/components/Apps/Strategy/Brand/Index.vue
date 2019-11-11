@@ -24,7 +24,7 @@
                 </v-menu>
             </v-toolbar-items>
             <v-spacer></v-spacer>
-            <span v-if=" selectedPlanogram !=null">{{ selectedPlanogram.displayname }} </span>
+            <span v-if=" selectedPlanogram !=null">{{ generateName() }} </span>
             <v-spacer></v-spacer>
             <v-toolbar-title>
                 Catagory Cluster
@@ -51,15 +51,6 @@
                     v-model="selectedCategory" placeholder="Select category" hide-details @change="runQuery">
                 </v-select>
             </v-toolbar-items>
-           
-            <!-- <v-btn-toggle v-if="storeRowData.length > 0" round v-model="selectedView" class="transparent" mandatory>
-                <v-btn class="elevation-0" style="width: 100px" round @click="changeView(0)" color="primary">
-                    Store
-                </v-btn>
-                <v-btn class="elevation-0" style="width: 100px" round @click="changeView(1)" color="primary">
-                    Product
-                </v-btn>
-            </v-btn-toggle> -->
             <v-spacer></v-spacer>
         </v-toolbar>
         <PlanogramSelector ref="PlanogramSelector" />
@@ -70,7 +61,7 @@
             :stores="stores" />
         <Spinner ref="Spinner" />
         <FileSelector ref="FileSelector" />
-
+        <FileDataSelector ref="FileDataSelector" />
 
     </div>
 </template>
@@ -85,15 +76,12 @@
     import BrandGrid from "./Grid"
     import Axios from 'axios'
     import DateRangeSelector from '@/components/Common/DateRangeSelector';
-    import PlanogramSelector from '@/components/Common/PlanogramSelector'
     import ListingClusterController from './controller.js';
     import storeGrid from './storeGrid';
     import FileSelector from './FileSelector'
-
-
-
-    // import PlanogramSelector from '../ListingClusters/PlanogramSelector'
+    import PlanogramSelector from '../ListingClusters/PlanogramSelector'
     import DataSelector from "./DataSelector"
+    import FileDataSelector from './FileDataSelector'
 
     export default {
         components: {
@@ -103,10 +91,13 @@
             DateRangeSelector,
             PlanogramSelector,
             storeGrid,
-            DataSelector
+            DataSelector,
+            FileDataSelector
         },
         data() {
             return {
+                fileData: null,
+                runData: [],
                 storeRowData: [],
                 selectedView: 1,
                 headers: [],
@@ -230,29 +221,105 @@
             }
 
         },
+        created() {
+            let self = this;
+
+            self.getFile(data => {
+                if (data != null && data != false) {
+                    self.getFileData(data.id, fileData => {
+                        self.runData = [];
+
+                        self.fileData = fileData.categoryCluster;
+
+                        for (var prop in fileData.categoryCluster) {
+                            self.runData.push({
+                                prop: prop,
+                                name: prop
+                            })
+                        }
+                    })
+                }
+            })
+        },
         methods: {
+            generateName() {
+                let self = this;
+                let name = "";
+
+                if (self.selectedCategory != null && self.selectedPlanogram != null) {
+                    let type = "";
+
+                    switch (self.selectedCategory) {
+                        case 0: {
+                            type = "CATEGORY";
+                        }
+                        break;
+                    case 1: {
+                        type = "SUB CATEGORY";
+                    }
+                    break;
+                    case 2: {
+                        type = "BRAND";
+                    }
+                    break;
+                    case 3: {
+                        type = "MANUFACTURER";
+                    }
+                    break;
+                    case 4: {
+                        type = "SUPPLIER";
+                    }
+                    break;
+                    case 5: {
+                        type = "SIZE DESCRIPTION";
+                    }
+                    break;
+                    }
+
+                    if (self.selectedPeriod.periodic) {
+                        name =
+                            `${self.selectedPlanogram.displayname} BY ${type} - ${self.selectedPeriod.monthsBetween} MMA`
+                    } else {
+                        name =
+                            `${self.selectedPlanogram.displayname} BY ${type} Average Monthly ${self.selectedPeriod.dateFromString} TO ${self.selectedPeriod.dateToString}`
+                    }
+                }
+
+                return name;
+            },
             openFile() {
                 let self = this;
 
-                self.$refs.FileSelector.show(file => {
-                    // TODO add loader
-                    Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${file.id}`)
-                        .then(r => {
-                            console.log("openFile");
-                            console.log(r);
+                self.$refs.FileDataSelector.show(self.runData, item => {
+                    let data = self.fileData[item.name];
 
-                            self.salesData = r.data.salesData;
-                            self.selectedPlanogram = r.data.config.planogramData;
-                            self.selectedPeriod = r.data.config.periodData;
+                    self.salesData = data.data;
+                    self.selectedPlanogram = data.config.selectedPlanogram;
+                    self.selectedCategory = data.config.selectedCategory;
+                    self.selectedPeriod = data.config.selectedPeriod;
+                    self.primaryCluster = data.config.primaryCluster;
+                    self.secondaryCluster = data.config.secondaryCluster;
+                    self.level = data.config.level;
+                    self.group = data.config.group;
 
-                            self.primaryCluster = r.data.config.setup.primaryCluster;
-                            self.secondaryCluster = r.data.config.setup.secondaryCluster;
-                            self.level = r.data.config.setup.level;
-                            self.group = r.data.config.setup.group;
-
-                            self.onPercentChange();
-                        })
+                    self.onPercentChange();
                 })
+
+                // self.$refs.FileSelector.show(file => {
+                //     Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${file.id}`)
+                //         .then(r => {
+                //             self.salesData = r.data.salesData;
+                //             self.selectedPlanogram = r.data.config.planogramData;
+                //             self.selectedPeriod = r.data.config.periodData;
+
+                //             self.primaryCluster = r.data.config.setup.primaryCluster;
+                //             self.secondaryCluster = r.data.config.setup.secondaryCluster;
+                //             self.level = r.data.config.setup.level;
+                //             self.group = r.data.config.setup.group;
+
+                //             self.onPercentChange();
+                //         })
+                // })
             },
             closeFile() {
                 let self = this;
@@ -277,8 +344,6 @@
                 Axios.get(process.env.VUE_APP_API +
                         `SystemFile/JSON?db=CR-Devinspire&folder=Category Cluster&file=REPORT`)
                     .then(r => {
-                        console.log(r);
-
                         callback(r.data);
                     })
             },
@@ -286,46 +351,60 @@
                 let self = this;
                 self.getFile(fileTransaction => {
                     if (fileTransaction == null || fileTransaction == false) {
+                        // let tmp = {
+                        //     CategoryClustering: {},
+                        //     salesData: self.salesData,
+                        //     selectedCategory: self.selectedCategory,
+                        //     config: {
+                        //         planogramData: self.selectedPlanogram,
+                        //         periodData: self.selectedPeriod,
+                        //         setup: {
+                        //             primaryCluster: self.primaryCluster,
+                        //             secondaryCluster: self.secondaryCluster,
+                        //             level: self.level,
+                        //             group: self.group
+                        //         }
+                        //     }
+                        // }
+
                         let tmp = {
-                            CategoryClustering: {},
-                            salesData: self.salesData,
-                            selectedCategory:self.selectedCategory,
+                            categoryCluster: {}
+                        };
+
+                        tmp.categoryCluster[self.generateName()] = {
+                            data: self.salesData,
                             config: {
-                                planogramData: self.selectedPlanogram,
-                                periodData: self.selectedPeriod,
-                                setup: {
-                                    primaryCluster: self.primaryCluster,
-                                    secondaryCluster: self.secondaryCluster,
-                                    level: self.level,
-                                    group: self.group
-                                }
+                                selectedPlanogram: self.selectedPlanogram,
+                                selectedCategory: self.selectedCategory,
+                                selectedPeriod: self.selectedPeriod,
+                                primaryCluster: self.primaryCluster,
+                                secondaryCluster: self.secondaryCluster,
+                                level: self.level,
+                                group: self.group
                             }
                         }
-
-                        tmp.CategoryClustering[self.selectedPlanogram.displayname] = self.storeRowData;
 
                         self.appendAndSaveFile(tmp);
                     } else {
                         self.getFileData(fileTransaction.id, fileData => {
                             let tmp = fileData;
 
-                            if (tmp.CategoryClustering == undefined) {
-                                tmp.CategoryClustering = {};
+                            if (tmp.categoryCluster == undefined) {
+                                tmp.categoryCluster = {};
                             }
 
-                            tmp.CategoryClustering[self.selectedPlanogram.displayname] = self
-                                .storeRowData;
-                            tmp.salesData = self.salesData,
-                                tmp.config = {
-                                    planogramData: self.selectedPlanogram,
-                                    periodData: self.selectedPeriod,
-                                    setup: {
-                                        primaryCluster: self.primaryCluster,
-                                        secondaryCluster: self.secondaryCluster,
-                                        level: self.level,
-                                        group: self.group
-                                    }
+                            tmp.categoryCluster[self.generateName()] = {
+                                data: self.salesData,
+                                config: {
+                                    selectedPlanogram: self.selectedPlanogram,
+                                    selectedCategory: self.selectedCategory,
+                                    selectedPeriod: self.selectedPeriod,
+                                    primaryCluster: self.primaryCluster,
+                                    secondaryCluster: self.secondaryCluster,
+                                    level: self.level,
+                                    group: self.group
                                 }
+                            }
 
                             self.appendAndSaveFile(tmp);
                         })
@@ -347,7 +426,7 @@
                         SystemFile: {
                             SystemUser_ID: -1,
                             Folder: "Category Cluster",
-                            Name: self.selectedPlanogram.planogram_ID,
+                            Name: "REPORT",
                             Extension: '.json'
                         },
                         Data: fileData
@@ -359,34 +438,22 @@
                         alert("Failed to save");
                     })
             },
-            changeView(type) {
-                let self = this
-                self.selectedView = type;
-            },
-            openDataSelector() {
-                let self = this
-                self.$refs.DataSelector.show(data => {
-                    console.log(data);
-                })
-            },
             newFile() {
                 let self = this;
 
-                self.$refs.PlanogramSelector.show(false, planogram => {
+                self.$refs.PlanogramSelector.show(planogram => {
                     self.$refs.DateRangeSelector.show(dateRange => {
-                    self.selectedPlanogram = planogram
-                    console.log(self.selectedPlanogram);
-
-                    // self.selectedPlanogram = planogram.planogram_ID
-                    self.selectedPlanogramName = planogram.displayname
-                    self.selectedPeriod = dateRange;
-                })
+                        self.selectedPlanogram = planogram;
+                        self.selectedPlanogramName = planogram.displayname
+                        self.selectedPeriod = dateRange;
+                    })
                 })
             },
             onPercentChange() {
                 let self = this;
                 self.$nextTick(() => {
                     self.$refs.Spinner.show()
+
                     if (self.secondaryCluster != null) {
                         let lcData = ListingClusterController.GenerateClusterOutput({
                             storeSalesData: self.salesData,
@@ -406,18 +473,9 @@
                     }
                 })
             },
-            orderRowData(projectGroup) {
-                let self = this
-                console.log("orderRowData", projectGroup);
-
-
-
-
-            },
             setHeaders() {
                 let self = this;
                 let tmpCategory = null
-                //console.log("setting Headers");
                 switch (self.selectedCategory) {
                     case 0:
                         tmpCategory = "category"
@@ -426,7 +484,7 @@
                         tmpCategory = "subcategory"
                         break;
                     case 2:
-                        tmpCategory = "brand_Name"
+                        tmpCategory = "brand"
                         break;
                     case 3:
                         tmpCategory = "manufacturer"
@@ -447,10 +505,6 @@
                         field: 'storeName'
                     },
                     {
-                        headerName: 'Cluster',
-                        field: 'cluster'
-                    },
-                    {
                         headerName: 'Total Sales',
                         field: 'totalStoreSales',
                         valueFormatter: function (params) {
@@ -461,15 +515,14 @@
                         cellRendererFramework: "progressRenderer"
                     },
                     {
+                        headerName: 'Cluster',
+                        field: 'cluster'
+                    },
+                    {
                         headerName: 'Stack bar',
                         cellRendererFramework: "DeptRenderer",
                         width: 220
-
                     },
-                    // {
-                    //     headerName: 'Area (m)',
-                    //     field: 'sqm_Shop'
-                    // }, 
                     {
                         headerName: "Cumulative Sales",
                         field: "cumulativStoreSales",
@@ -496,7 +549,6 @@
                         }
                     }
                 ]
-                console.log("self.ProjectGroups", self.ProjectGroups);
 
                 self.ProjectGroups.forEach((projectGroup, idx) => {
                     if (idx == 0) {
@@ -595,13 +647,10 @@
                     self.$refs.Spinner.show()
 
                     Axios.get(process.env.VUE_APP_API +
-                            `Cluster/CategoryClustering?Planogram_ID=${self.selectedPlanogram.planogram_ID}&level=${self.selectedCategory}&PeriodFrom=${self.selectedPeriod.dateFrom}&PeriodTo=${self.selectedPeriod.dateTo}`
-                            // `Cluster/CategoryClustering?Planogram_ID=${self.selectedPlanogram.planogram_ID}&level=${self.selectedCategory}&PeriodFrom=53&PeriodTo=58`
+                            `Cluster/CategoryClustering?Planogram_ID=${self.selectedPlanogram.id}&level=${self.selectedCategory}&PeriodFrom=${self.selectedPeriod.dateFrom}&PeriodTo=${self.selectedPeriod.dateTo}`
                         )
                         .then(r => {
-                            console.log(r)
                             self.salesData = r.data
-                            // self.rowData=r.data
                             let lcData = ListingClusterController.GenerateClusterOutput({
                                 storeSalesData: r.data,
                                 primaryCluster: self.primaryCluster,
@@ -610,21 +659,14 @@
                                 clusterGroups: self.group,
                                 selectedCategory: self.selectedCategory
                             })
-                            console.log(lcData);
+
                             self.storeRowData = lcData.storeData;
                             self.rowData = lcData.ProjectGroupData;
                             self.stores = lcData.stores;
                             self.ProjectGroups = lcData.ProjectGroups
-
-
-                            //      self.storeRowData = lcData.storeData;
-                            // self.rowData = lcData.ProjectGroupData;
-                            // self.stores = lcData.stores;
                             self.ProjectGroups = lcData.ProjectGroups
                             self.setHeaders()
                             self.$refs.Spinner.hide()
-
-                            // self.productRowData = lcData.productData;
                         })
                 })
             },
