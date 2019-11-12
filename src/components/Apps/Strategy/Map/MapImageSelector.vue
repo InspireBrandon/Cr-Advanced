@@ -26,7 +26,7 @@
                             </v-card-text>
                         </v-card>
                     </v-flex>
-                     <v-flex md4>
+                     <!-- <v-flex md4>
                         <v-card style="cursor: pointer;" v-if="selected == geogridConfig" height="180"
                             color="grey lighten-1" flat tile>
                             <v-card-text>
@@ -41,7 +41,7 @@
                                 <img style="width: 100%" src="https://www.conservationtech.com/PROJECTS/2010HAITI/GingerbreadSurvey/OSM-plan%20with%20GeoGrid.jpg" alt="no image found">
                             </v-card-text>
                         </v-card>
-                    </v-flex>
+                    </v-flex> -->
                     <v-flex md4 v-for="(map, idx) in maps" :key="idx">
                         <v-card style="cursor: pointer;" v-if="map == selected" height="180" color="grey lighten-1" flat
                             tile>
