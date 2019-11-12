@@ -1,37 +1,28 @@
 <template>
   <div width="100%">
     <v-toolbar dark flat>
-      <!-- <v-toolbar-items>
-        <v-select style="margin-left: 10px; margin-top: 8px; width: 200px" placeholder="Field" hide-details></v-select>
-
-        <v-select style="margin-left: 10px; margin-top: 8px; width: 200px" placeholder="Values" hide-details></v-select>
-      </v-toolbar-items> -->
     </v-toolbar>
     <div oncontextmenu="return false;" class="mapContainer">
-      <v-layout row wrap>
+      <v-layout  >
         <v-flex md9>
           <div id="thisone2" class="map" ref="thisone2"></div>
         </v-flex>
         <v-flex md3>
-          <!-- <div class="sideBar"> -->
           <div>
             <v-card max-height="400px;" flat>
-              <v-tabs class="elevation-4" centered dark fixed-tabs justify-content: center>
-                <v-tabs-slider color="white"></v-tabs-slider>
+              <v-tabs class="elevation-4"  dark>
+                <v-tabs-slider color="blue"></v-tabs-slider>
 
-                <!-- <v-tab href="#tab-1" justify-content: center>
-                            Map Image
-                </v-tab>-->
-                <v-tab href="#tab-2" justify-content: center>Setup Map</v-tab>
-                <v-tab href="#tab-3" justify-content: center>image</v-tab>
-                <v-tab href="#tab-1" justify-content: center>Market Share</v-tab>
+
+                <v-tab style="margin-left: 10px;" href="#tab-2">Setup Map</v-tab>
+                <v-tab href="#tab-3">image</v-tab>
+                <v-tab href="#tab-1">Market Share</v-tab>
                 <v-tab-item id="tab-3" class="elevation-2" justify-content: center>
                   <v-toolbar dark flat dense color="primary">
                     <v-toolbar-title> Image </v-toolbar-title>
                     <v-spacer> </v-spacer>
                     <v-btn @click="showSelector">maps</v-btn>
                   </v-toolbar>
-                  <!-- <v-btn @click="getRectWidth">Test Rect</v-btn> -->
                   <img v-show="legendImgURL != '' && selectedmap != null"
                     :src="legendImgURL == '' ? tmpImageURL : legendImgURL" :aspect-ratio="10/13"
                     class="grey lighten-2 mt-0" width="200px" style="object-fit: fill;">
@@ -67,7 +58,7 @@
                 </v-tab-item>
 
                 <v-tab-item id="tab-2" class="elevation-2" justify-content: center>
-                  <v-card height="calc(100vh - 273px)">
+                  <v-card  tile height="calc(100vh - 273px)">
                     <v-toolbar dark flat dense color="primary">
                       <v-toolbar-title>Setup</v-toolbar-title>
                       <v-spacer></v-spacer>
@@ -94,9 +85,9 @@
                         label="Size Map Items"></v-autocomplete> -->
                       <v-divider></v-divider>
 
-                      <v-checkbox label="Use Retailer Map" hide-details v-model="useRetailerMap"></v-checkbox>
+                      <v-checkbox label="Draw Retailer Stores" hide-details v-model="useRetailerMap"></v-checkbox>
                       <v-autocomplete v-if="useRetailerMap" multiple :items="selectedRetailers"
-                        v-model="selectedRetailersFields" label="Size Map Items"></v-autocomplete>
+                        v-model="selectedRetailersFields" label="Retailers"></v-autocomplete>
                     </v-card-text>
                     <v-card-actions>
                       <v-spacer></v-spacer>
@@ -112,7 +103,6 @@
     </div>
     <input type="file" style="display: none;" ref="fileInput" @change="onImageChange" />
     <YesNoModal ref="yesNo"></YesNoModal>
-    <Mapsetup ref="Mapsetup" />
     <MapImageSelector ref="MapImageSelector" />
     <Spinner ref="Spinner" />
 
@@ -124,14 +114,10 @@
   import * as am4charts from "@amcharts/amcharts4/charts";
   import * as am4maps from "@amcharts/amcharts4/maps";
   import YesNoModal from "@/components/Common/YesNoModal";
-  import Mapsetup from "./setup.vue";
   import am4geodata_worldLow from "@amcharts/amcharts4-geodata/southAfricaHigh";
   import Axios from "axios";
   import jwt from "jsonwebtoken";
   import MapImageSelector from "./MapImageSelector";
-  import {
-    relativeRadiusToValue
-  } from "@amcharts/amcharts4/.internal/core/utils/Utils";
   import Spinner from '@/components/Common/Spinner';
 
 
@@ -145,10 +131,8 @@
     components: {
       YesNoModal,
       Spinner,
-      Mapsetup,
       MapImageSelector
     },
-    props: ["rowData", "setGeogridData"],
     data() {
       return {
         // start sidebar setup
@@ -164,7 +148,6 @@
         setupMapData: [],
         piechartItems: [],
         heatmapItems: [],
-        selectedPlanograms: null,
         // end sidebar setup
         SupplierData: null,
         labels: true,
@@ -189,7 +172,6 @@
         selectedmap: null,
         MapImgURL: "",
         legendImgURL: "",
-        plottableStores: [],
         supplierImport: [],
         clusters: [{
           text: "store",
@@ -274,24 +256,15 @@
           }
         ],
         selectedCategory: null,
-        categories: [{
-          text: "PET ACCESSORIES",
-          value: 33
-        }, {
-          text: "PET HEALTHCARE",
-          value: 34
-        }],
+
         viewOnlyMode: false,
       };
 
     },
     computed: {
-
       AvailableData() {
         let self = this;
-
         let retVal = [];
-
         if (self.geoGridData != undefined && self.geoGridData != null) {
           self.geoGridData.forEach((el, idx) => {
             if (el.retailerStores.length > 0) {
@@ -301,20 +274,16 @@
             }
           });
         }
-
         return retVal;
       }
     },
     mounted() {
       let self = this;
-
       if (self.$route.params.params != null) {
         self.viewOnlyMode = true
       } else {
         self.viewOnlyMode = false
       }
-      // this.openSetup()
-      // this.drawMap(this.labels)
       self.$refs.Spinner.show()
       self.getSupplierStores();
       self.getGeoGrid(() => {
@@ -338,17 +307,6 @@
             // }
           })
         }
-        // retVal = el.retailerStores.map(item => ({
-        //   planogram: item.planogram,
-        //   planogram_ID: item.planogram_ID,
-        //   retailerStore: item.retailerStore,
-        //   sales_Retail: item.sales_Retail,
-        //   store: item.sales_Retail,
-        //   store_ID: item.store_ID,
-        //   xCoordinate: item.xCoordinate,
-        //   yCoordinate: item.yCoordinate,
-        // })), "planogram"
-
         return retVal;
       },
       getSupplierStores() {
@@ -373,10 +331,6 @@
         )
         self.imageHeight = el.getBoundingClientRect().height
         self.imageWidth = el.getBoundingClientRect().width
-
-
-
-
       },
       DrawGeoGrid(chart, callback) {
         let self = this;
@@ -730,7 +684,6 @@
       },
       getFile(callback) {
         let self = this;
-
         Axios.get(
           process.env.VUE_APP_API +
           `SystemFile/JSON?db=CR-Devinspire&folder=CLUSTER REPORT&file=REPORT`
@@ -740,7 +693,6 @@
       },
       getUserFile(callback) {
         let self = this;
-
         Axios.get(
           process.env.VUE_APP_API +
           `SystemFile/JSON?db=CR-Devinspire&folder=SUPPLIER MARKET SHARE IMPORT/${self.SystemUser_ID}&file=REPORT`
@@ -755,11 +707,6 @@
         ).then(r => {
           callback(r.data);
         });
-      },
-      plotStore(item) {
-        let self = this;
-        self.canplot = true;
-        self.currentPlotStore = item;
       },
       openFileDialog() {
         let self = this;
@@ -847,36 +794,7 @@
           });
         });
       },
-      openSetup() {
-        let self = this;
-        self.$refs.Mapsetup.open(self.setupMapData, callback => {
-          let tmp = {
-            heatmap: [],
-            piechart: []
-          };
 
-          if (callback.useHeatmap) {
-            callback.selectedHeatmapField.forEach(field => {
-              tmp.heatmap.push(self.fileData.basket[field]);
-            });
-            tmp.heatmap.forEach(field => {
-              field.graphArr = self.handelData(field, false);
-            });
-          }
-          let pieArr = [];
-          if (callback.usePiecharts) {
-            callback.selectedPiechartItems.forEach(field => {
-              tmp.piechart.push(self.fileData.basket[field]);
-            });
-            pieArr = self.handelPiechartData(tmp.piechart, true);
-          }
-          self.config = callback;
-          self.heatData = tmp;
-          self.pieData = pieArr;
-
-          self.drawMap(this.labels, callback, tmp, pieArr);
-        });
-      },
       handelData(data, usePiechart) {
         let self = this;
         let final = [];
@@ -1002,7 +920,6 @@
                 seriesName = e.text;
               }
             });
-            self.selectedRetailers.where;
             imageSeries.name = seriesName;
             imageSeries.data = callback;
 
@@ -1232,12 +1149,6 @@
             min: chart.colors.getIndex(11).brighten(1),
             max: chart.colors.getIndex(11).brighten(-1)
           });
-          // imageSeries.heatRules.push({
-          //     property: "radius",
-          //     target: circle,
-          //     min: 8,
-          //     max: 15
-          // });
           if (idx == 0) {
             let heatLegend = chart.createChild(am4maps.HeatLegend);
             heatLegend.series = imageSeries;
@@ -1290,14 +1201,7 @@
             min: 8,
             max: 15
           });
-          // let heatLegend = chart.createChild(am4maps.HeatLegend);
-          // heatLegend.series = imageSeries;
-          // heatLegend.align = "right";
-          // heatLegend.width = am4core.percent(25);
-          // heatLegend.marginRight = am4core.percent(4);
-          // heatLegend.minValue = 0;
-          // heatLegend.maxValue = self.maxHeatLegend;
-          // heatLegend.valign = "bottom";
+       
         });
       },
       drawPiecharts(chart, piechartArray) {
@@ -1340,48 +1244,13 @@
         pieSeries.name = "Pie Charts";
         pieSeries.data = piechartArray;
       },
-      drawGridLines(chart) {
-        let self = this;
-        // /////////////////////////////////////////////////////
-        // start Draw of Line grid
-        // /////////////////////////////////////////////////////
-        let graticuleSeries = chart.series.push(new am4maps.GraticuleSeries());
-        graticuleSeries.mapLines.template.line.strokeOpacity = 0.4;
-        graticuleSeries.longitudeStep = 0.5;
-        graticuleSeries.latitudeStep = 0.5;
-        graticuleSeries.name = "lines";
-        let accrossCitiesImageSeries = chart.series.push(
-          new am4maps.MapImageSeries()
-        );
-        accrossCitiesImageSeries.data = self.acrossArr;
-        let accrossCitiesImageSeriesTemplate =
-          accrossCitiesImageSeries.mapImages.template;
-        accrossCitiesImageSeriesTemplate.propertyFields.latitude = "latitude";
-        accrossCitiesImageSeriesTemplate.propertyFields.longitude = "longitude";
-        accrossCitiesImageSeriesTemplate.nonScaling = false;
-        accrossCitiesImageSeriesTemplate.fill = "black";
-
-        var accrossCitiesCircle = accrossCitiesImageSeriesTemplate.createChild(
-          am4core.Circle
-        );
-        accrossCitiesCircle.fillOpacity = 0.5;
-        accrossCitiesCircle.tooltipText = "{city}: [bold]{text}[/]";
-        accrossCitiesCircle.radius = 0;
-        let accrossCitiesLabel = accrossCitiesImageSeriesTemplate.createChild(
-          am4core.Label
-        );
-        accrossCitiesLabel.text = "{text}";
-        ('<a style="background-color: black;color: white;font-size:1px" >{text}</a>');
-        accrossCitiesLabel.fontSize = 10;
-        accrossCitiesLabel.nonScaling = false;
-      },
       drawMap(labelState, config, setupMapData, piechartArray) {
         let self = this;
         self.$refs.Spinner.show()
         // //////////////////////////////////////////////////
         // start draw of base chart
         // //////////////////////////////////////////////////
-        let screeWidth = returnInnerWidth();
+        let screeWidth = null
         let formattedData = [];
         let chart = am4core.create("thisone2", am4maps.MapChart);
         chart.name = "Map";
@@ -1389,10 +1258,7 @@
         var title = chart.titles.create();
         title.text = "[bold font-size: 20]Store Sales Heatmap[/]";
         title.textAlign = "middle";
-        // self.rowData.forEach((element, idx) => {
-        //     element["color"] = '#424242'
-        //     formattedData.push(element);
-        // });
+       
 
         let asd = am4geodata_worldLow;
         chart.geodata = asd;
@@ -1425,26 +1291,20 @@
           circle.tooltipText = "{storeName}: [bold]{sales}[/]";
           circle.radius = 2;
         }
-
-
         if (
           config.selectedRetailers != undefined &&
           config.selectedRetailers.length > 0
         ) {
           self.drawRetailerImport(chart, config);
         }
-        if (config.useHeatmap) {
-          self.drawHeatMaps(chart, config, setupMapData);
-        }
-        if (config.usePiecharts) {
-          self.drawPiecharts(chart, piechartArray);
-        }
-        if (config.useSizeMap) {
-          self.drawSizeMaps(chart, config, setupMapData);
-        }
-        // self.drawGridLines(chart)
-        // if (self.lines) {
-        //     self.drawGridLines(chart)
+        // if (config.useHeatmap) {
+        //   self.drawHeatMaps(chart, config, setupMapData);
+        // }
+        // if (config.usePiecharts) {
+        //   self.drawPiecharts(chart, piechartArray);
+        // }
+        // if (config.useSizeMap) {
+        //   self.drawSizeMaps(chart, config, setupMapData);
         // }
 
         if (self.useRetailerMap) {
@@ -1510,158 +1370,10 @@
         chart.legend.padding(5, 10, 15, 10);
         chart.legend.position = "right";
         chart.legend.valign = "top";
-        let legendLength = chart.legend.data.length;
-
         if (config.drawGrid) {
-          self.DrawGeoGrid(chart, callback => {
-            // chart.legend.data.forEach((e, idx) => {
-            //   if (e.name == undefined) {
-            //     chart.legend.data.splice(idx, 1);
-            //   }
-            // })
-
-            // chart.legend.data.splice(
-            //   legendLength,
-            //   chart.legend.data.length - legendLength
-            // );
-          });
+          self.DrawGeoGrid(chart, callback => {});
         }
         self.$refs.Spinner.hide()
-      },
-      testKak(rowData) {
-        let self = this;
-
-        let alpharray = [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E",
-          "F",
-          "G",
-          "H",
-          "I",
-          "J",
-          "K",
-          "L",
-          "M",
-          "N",
-          "O",
-          "P",
-          "Q",
-          "R",
-          "S",
-          "T",
-          "U",
-          "V",
-          "W",
-          "X",
-          "Y",
-          "Z",
-          "AA",
-          "AB",
-          "AC",
-          "AD",
-          "AE",
-          "AF",
-          "AG",
-          "AH"
-        ];
-
-        let latBetween = 25.5;
-        let lowestLat = -34.87;
-        let highestLat = -22.14;
-
-        let longBetween = 33;
-        let lowestLong = 16.5;
-        let highestLong = 32.91;
-
-        let latIncr = (highestLat - lowestLat) / latBetween;
-        let longIncr = (highestLong - lowestLong) / longBetween;
-
-        let latCount = highestLat;
-        let latIDX = 0;
-
-        let lats = {};
-
-        let acrossArr = [];
-        let sideArr = [];
-
-        while (latCount >= lowestLat) {
-          let allLatsBetween = [];
-
-          acrossArr.push({
-            latitude: latCount,
-            longitude: 16.260933711249336,
-            text: latIDX + 1
-          });
-
-          rowData.forEach(el => {
-            if (el.lat < latCount && el.lat + latIncr > latCount)
-              allLatsBetween.push(el);
-          });
-
-          if (allLatsBetween.length > 0) lats[latIDX + 1] = allLatsBetween;
-
-          latCount -= latIncr;
-          latIDX++;
-        }
-
-        let longCount = lowestLong;
-        let longIDX = 0;
-
-        let longs = {};
-
-        while (longCount <= highestLong) {
-          let allLongsBetween = [];
-
-          acrossArr.push({
-            latitude: -21.922142292657245,
-            longitude: longCount,
-            text: alpharray[longIDX]
-          });
-
-          rowData.forEach(el => {
-            if (el.long < longCount && el.long + longIncr > longCount)
-              allLongsBetween.push(el);
-          });
-
-          if (allLongsBetween.length > 0) longs[longIDX] = allLongsBetween;
-
-          longCount += longIncr;
-          longIDX++;
-        }
-
-        let final = {};
-
-        for (var long in longs) {
-          let longArr = longs[long];
-
-          longArr.forEach(lon => {
-            for (var lat in lats) {
-              let latArr = lats[lat];
-
-              latArr.forEach(latt => {
-                let elName = alpharray[long] + lat;
-                let arr = final[alpharray[long] + lat];
-
-                if (arr == undefined) {
-                  final[elName] = [];
-                }
-
-                if (lon.storeName == latt.storeName) final[elName].push(latt);
-              });
-            }
-          });
-        }
-        let finalFinal = {};
-        for (var prop in final) {
-          if (final[prop].length > 0) {
-            finalFinal[prop] = final[prop];
-          }
-        }
-        self.setGeogridData(finalFinal);
-        self.acrossArr = acrossArr;
       },
       formatNumber(storeSales, totalSales) {
         let string = ""
@@ -1688,52 +1400,6 @@
     }
   };
 
-  function returnInnerWidth() {
-    let width = screen.width;
-    let cw = 613;
-    let offsetX = 3.19;
-
-    // if (width > 1280) {
-    //     cw = 800;
-    //     offsetX = 800;
-    // }
-
-    // if (width > 1360) {
-    //     retval = 800;
-    // }
-
-    if (width > 1365) {
-      cw = 488.35;
-      offsetX = 1.6;
-    }
-
-    if (width > 1439) {
-      cw = 737.05;
-      offsetX = 3.1;
-    }
-
-    if (width > 1599) {
-      cw = 737.05;
-      offsetX = 2.4;
-    }
-
-    if (width > 1768) {
-      cw = 841.05;
-      offsetX = 2.22;
-    }
-
-    if (width > 2559) {
-      cw = 966.53;
-      offsetX = 1.566;
-    }
-
-    return {
-      width: cw,
-      offsetX: offsetX
-    };
-  }
-
-
 
   function removeDuplicates(myArr, prop) {
     return myArr.filter((obj, pos, arr) => {
@@ -1756,74 +1422,5 @@
     width: 100%;
   }
 
-  .sideBar {
-    float: right;
-    width: 17%;
-  }
-
-  /* @media screen and (min-width:1280px) {
-        .map {
-            width: 1000px;
-        }
-
-        .sideBar {
-
-            width: calc(100vw - 1000px)
-        }
-    }
-
-    @media screen and (min-width:1366px) {
-        .map {
-            width: 1100px;
-        }
-
-        .sideBar {
-
-            width: calc(100vw - 1100px)
-        }
-    }
-
-    @media screen and (min-width:1440px) {
-        .map {
-            width: 1200px;
-        }
-
-        .sideBar {
-
-            width: calc(100vw - 1200px)
-        }
-    }
-
-    @media screen and (min-width:1600px) {
-        .map {
-            width: 1400px;
-        }
-
-        .sideBar {
-
-            width: calc(100vw - 1400px)
-        }
-    }
-
-    @media screen and (min-width:1920px) {
-        .map {
-            width: 1600px;
-        }
-
-        .sideBar {
-
-            width: calc(100vw - 1600px)
-        }
-    }
-
-    @media screen and (min-width:2560px) {
-        .map {
-            width: 2200px;
-        }
-
-        .sideBar {
-
-            width: calc(100vw - 2200px)
-        }
-    } */
+ 
 </style>
