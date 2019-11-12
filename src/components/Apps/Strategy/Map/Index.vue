@@ -50,19 +50,16 @@
                     <v-card>
                       <v-list>
                         <v-list-tile v-for="(item, index) in AvailableData" :key="index">
-                          <v-list-tile-title>
                             <v-layout>
 
                               <span>{{checkAlphaNumber(item.blockNumber)}} </span>
                               <v-spacer></v-spacer>
-
                               <span>
                                 {{formatNumber(item.storeSummary.sales_Retail,item.squareTotalSales)}}
                               </span>
                               <!-- <v-spacer></v-spacer>
                               <span>{{item.squareTotalSalesPercentage}}%</span> -->
                             </v-layout>
-                          </v-list-tile-title>
                         </v-list-tile>
                       </v-list>
                     </v-card>
@@ -283,7 +280,8 @@
         }, {
           text: "PET HEALTHCARE",
           value: 34
-        }]
+        }],
+        viewOnlyMode:false,
       };
 
     },
@@ -309,8 +307,13 @@
     },
     mounted() {
       let self = this;
-      let encoded_details = jwt.decode(sessionStorage.accessToken);
-      self.SystemUser_ID = encoded_details.USER_ID;
+      console.log(self.$route.params);
+      
+      if(self.$route.params.params!=null){
+        self.viewOnlyMode = true
+      }else{
+         self.viewOnlyMode = false
+      }
       // this.openSetup()
       // this.drawMap(this.labels)
       self.$refs.Spinner.show()

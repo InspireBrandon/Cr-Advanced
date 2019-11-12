@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-toolbar color="grey darken-3" dense flat dark>
-            <v-menu dark offset-y>
+            <v-menu dark offset-y v-if="!viewOnlyMode">
                 <v-btn slot="activator" flat>Setup</v-btn>
                 <v-list>
                     <v-list-tile @click="openRetailerModal()">
@@ -15,7 +15,7 @@
                     </v-list-tile>
                 </v-list>
             </v-menu>
-            <v-menu dark offset-y>
+            <v-menu  v-if="!viewOnlyMode" dark offset-y>
                 <v-btn slot="activator" flat>Image</v-btn>
                 <v-list>
                     <v-list-tile @click="mapImageAdd()">
@@ -27,7 +27,7 @@
                 </v-list>
             </v-menu>
 
-            <v-btn flat @click="importDialog = true">Import</v-btn>
+            <v-btn v-if="!viewOnlyMode" flat @click="importDialog = true">Import</v-btn>
 
             <v-spacer></v-spacer>
             <v-toolbar-title>Maps</v-toolbar-title>
@@ -77,8 +77,17 @@
             return {
                 importDialog: false,
                 showItem: 0,
-                dialogHeader: ""
+                dialogHeader: "",
+                viewOnlyMode:false
             };
+        },
+        mounted() {
+            let self = this
+            if (self.$route.params.params != null) {
+                self.viewOnlyMode = true
+            } else {
+                self.viewOnlyMode = false
+            }
         },
         methods: {
             openRetailerModal() {
@@ -91,7 +100,7 @@
             },
             mapImageAdd() {
                 let self = this;
-                self.$refs.MapImageAdd.open(true, null,callback => {});
+                self.$refs.MapImageAdd.open(true, null, callback => {});
             },
             openRetailerSupplierStorDialog() {
                 let self = this;
@@ -108,7 +117,7 @@
                 self.$refs.MapImageSelector.show(callback => {
                     console.log(callback);
 
-                    self.openMapImageModal(false, callback,anything=>{})
+                    self.openMapImageModal(false, callback, anything => {})
                     // self.selectedmap=callback.id
                     // self.onMapChange()
                 })
@@ -116,7 +125,7 @@
             openMapImageModal(type, item) {
                 let self = this
                 self.$refs.MapImageAdd.open(type, item, callback => {
-                    
+
                 })
             },
         }
