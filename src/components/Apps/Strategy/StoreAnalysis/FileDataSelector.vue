@@ -49,6 +49,8 @@
             returnData() {
                 let self = this;
                 self.dialog = false;
+                console.log(self.selected);
+                
                 self.afterReturn(self.selected);
             }
         }

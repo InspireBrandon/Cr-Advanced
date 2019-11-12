@@ -106,6 +106,13 @@ import BasketAnalysis from '@/components/Apps/Strategy/BasketAnalysis/Index.vue'
 import ListingClusters from '@/components/Apps/Strategy/ListingClusters/Index.vue'
 import Clustering from '@/components/Apps/Strategy/Clustering/Index.vue'
 
+
+// clustering Views
+import BasketView from '@/components/Apps/Strategy/View/Basket/Index.vue'
+import StoreView from '@/components/Apps/Strategy/View/Store/Index.vue'
+import CategoryClusterView from '@/components/Apps/Strategy/View/CategortyCluster/Index.vue'
+
+
 // import PlanogramDistributionNew from '@/components/Main/PlanogramImplementation/PlanogramOverView/StorePlanogramOverview.vue'
 import PlanogramDistributionNew from '@/components/Main/PlanogramDistribution/PlanogramOverView/StorePlanogramOverview'
 
@@ -184,6 +191,23 @@ export default new Router({
             path: '/FloorPlanningViewer/:fileSrc',
             name: 'range_planning_view',
             component: FloorPlanningViewer,
+          },
+          {
+            path: '/BasketView/:fileID',
+            name: 'BasketView',
+            component: BasketView,
+          },{
+            path: '/StoreView/:fileID',
+            name: 'StoreView',
+            component: StoreView,
+          },{
+            path: '/CategoryClusterView/:fileID',
+            name: 'CategoryClusterView',
+            component: CategoryClusterView,
+          }, {
+            path: '/map/:params',
+            name: 'map',
+            component: map
           }]
         },
         {
