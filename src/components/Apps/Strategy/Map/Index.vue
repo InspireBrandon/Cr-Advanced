@@ -294,35 +294,32 @@
 
         let retVal = [];
 
-        self.geoGridData.forEach((el, idx) => {
-          if (el.retailerStores.length > 0) {
-            el.blockNumber = idx;
-            el.storeSummary = self.MapStoreData(el)
-            retVal.push(el);
-          }
-        });
+        if (self.geoGridData != undefined && self.geoGridData != null) {
+          self.geoGridData.forEach((el, idx) => {
+            if (el.retailerStores.length > 0) {
+              el.blockNumber = idx;
+              el.storeSummary = self.MapStoreData(el)
+              retVal.push(el);
+            }
+          });
+        }
 
         return retVal;
       }
     },
     mounted() {
       let self = this;
+      let encoded_details = jwt.decode(sessionStorage.accessToken);
+      self.SystemUser_ID = encoded_details.USER_ID;
       // this.openSetup()
       // this.drawMap(this.labels)
       self.$refs.Spinner.show()
-      this.getSupplierStores();
-      this.getGeoGrid(() => {
-        this.getmaps();
-        this.getCities();
-        this.getRetailers();
-        // this.testKak(this.rowData);
-
-        let encoded_details = jwt.decode(sessionStorage.accessToken);
-        self.SystemUser_ID = encoded_details.USER_ID;
-
-
+      self.getSupplierStores();
+      self.getGeoGrid(() => {
+        self.getmaps();
+        self.getCities();
+        self.getRetailers();
       });
-
     },
     methods: {
       MapStoreData(el) {
@@ -381,8 +378,6 @@
       },
       DrawGeoGrid(chart, callback) {
         let self = this;
-
-
 
         self.geoGridData.forEach((e, idx) => {
           let arr = [e.squareFormattedList];
@@ -482,8 +477,7 @@
         let encoded_details = jwt.decode(sessionStorage.accessToken);
 
         Axios.get(
-          process.env.VUE_APP_API +
-          `SuplierLocationImportTX/GeoReport?userID=${encoded_details.USER_ID}`
+          process.env.VUE_APP_API + `SuplierLocationImportTX/GeoReport?userID=${encoded_details.USER_ID}`
         ).then(r => {
           console.log("getGeoGrid", r.data);
 
@@ -517,11 +511,13 @@
           sizeMap: [],
           retailerMap: []
         };
+
         let imageDetails = {
           imageType: "none",
           imgURL: self.MapImgURL,
           imageLinkAddress: null
         };
+
         let item = {
           heatMapRadius: self.radius,
           usePiecharts: self.usePiecharts,
@@ -536,6 +532,7 @@
           drawGrid: self.drawGrid,
           selectedRetailers: self.selectedRetailersFields
         };
+
         if (self.useSizeMap) {
           self.selectedSizeMapField.forEach(field => {
             tmp.sizeMap.push(self.fileData.basket[field]);
@@ -544,6 +541,7 @@
             field.graphArr = self.handelData(field, false);
           });
         }
+
         if (self.useHeatmap) {
           self.selectedHeatmapField.forEach(field => {
             tmp.heatmap.push(self.fileData.basket[field]);
@@ -552,7 +550,9 @@
             field.graphArr = self.handelData(field, false);
           });
         }
+
         let pieArr = [];
+
         if (self.usePiecharts) {
           self.selectedPiechartItems.forEach(field => {
             tmp.piechart.push(self.fileData.basket[field]);

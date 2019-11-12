@@ -19,12 +19,13 @@
             return {
                 treeItems: [],
                 departments: [],
-                stores: []
+                stores: [],
+                baskets: [],
+
             }
         },
         mounted() {
             let self = this;
-            // self.getStores();
         },
         methods: {
             getStores() {
@@ -69,6 +70,24 @@
                         console.log(e);
                     });
             },
+            getFile(folder, file, callback) {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API +
+                        `SystemFile/JSON?db=CR-Devinspire&folder=CLUSTER REPORT&file=REPORT`)
+                    .then(r => {
+                        self.getFileData(r.data.id, fileData => {
+                            callback(fileData);
+                        })
+                    })
+            },
+            getFileData(id, callback) {
+                let self = this;
+                Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${id}`)
+                    .then(r => {
+                        callback(r.data);
+                    })
+            },
             buildTree() {
                 let self = this;
 
@@ -81,6 +100,7 @@
                     self.buildStorePlanogramTree();
                     self.buildFloorPlanningTree();
                     self.buildClusteringTree();
+                    self.buildPromotionalPlanningFolder();
                     self.buildSpatialMappingFolder();
                     self.buildUploadTreeItems();
                 }
@@ -92,6 +112,7 @@
                     self.buildStorePlanogramTree();
                     self.buildFloorPlanningTree();
                     self.buildClusteringTree();
+                    self.buildPromotionalPlanningFolder();
                     self.buildSpatialMappingFolder();
                     self.buildUploadTreeItems();
                 }
@@ -103,6 +124,7 @@
                     self.buildStorePlanogramTree();
                     self.buildFloorPlanningTree();
                     self.buildClusteringTree();
+                    self.buildPromotionalPlanningFolder();
                     self.buildSpatialMappingFolder();
                     self.buildUploadTreeItems();
                 }
@@ -114,6 +136,7 @@
                     self.buildStorePlanogramTree();
                     self.buildFloorPlanningTree();
                     self.buildClusteringTree();
+                    self.buildPromotionalPlanningFolder();
                     self.buildSpatialMappingFolder();
                     self.buildUploadTreeItems();
                 }
@@ -418,33 +441,33 @@
 
                             self.getTasksByProjectGroup(department.id, tasks => {
                                 self.getPlanogramFileByProjectGroup(department.id,
-                                planogramFiles => {
-                                    console.log(planogramFiles);
+                                    planogramFiles => {
+                                        console.log(planogramFiles);
 
-                                    // Handle tasks in progress
-                                    let inProgressTasks = tasks.filter(task => {
-                                        return task.type == 3 && (task.status ==
-                                            1 || task
-                                            .status == 2);
-                                    })
-
-                                    inProgressTasks.forEach(task => {
-                                        let taskItem = new treeItem({
-                                            name: task.systemFileName,
-                                            icon: 'insert_drive_file',
-                                            children: []
+                                        // Handle tasks in progress
+                                        let inProgressTasks = tasks.filter(task => {
+                                            return task.type == 3 && (task.status ==
+                                                1 || task
+                                                .status == 2);
                                         })
 
-                                        taskItem.click = function () {
-                                            self.$router.push(
-                                                `/PlanogramImplementationNew/${task.planogram_ID}/${task.systemFileID}/20`
-                                            );
-                                        }
+                                        inProgressTasks.forEach(task => {
+                                            let taskItem = new treeItem({
+                                                name: task.systemFileName,
+                                                icon: 'insert_drive_file',
+                                                children: []
+                                            })
 
-                                        taskInProgress.children.push(taskItem);
+                                            taskItem.click = function () {
+                                                self.$router.push(
+                                                    `/PlanogramImplementationNew/${task.planogram_ID}/${task.systemFileID}/20`
+                                                );
+                                            }
 
-                                        planogramFiles.forEach((planogramFile,
-                                            idx) => {
+                                            taskInProgress.children.push(taskItem);
+
+                                            planogramFiles.forEach((planogramFile,
+                                                idx) => {
                                                 if (planogramFile
                                                     .PlanogramFileID == task
                                                     .systemFileID) {
@@ -452,33 +475,33 @@
                                                         1);
                                                 }
                                             })
-                                    })
-
-                                    // Handle tasks in progress
-                                    let approvalInProgressTasks = tasks.filter(task => {
-                                        return task.type == 3 && (task.status ==
-                                            10 || task
-                                            .status == 20);
-                                    })
-
-                                    approvalInProgressTasks.forEach(task => {
-                                        let taskItem = new treeItem({
-                                            name: task.systemFileName,
-                                            icon: 'insert_drive_file',
-                                            children: []
                                         })
 
-                                        taskItem.click = function () {
-                                            self.$router.push(
-                                                `/PlanogramImplementationNew/${task.planogram_ID}/${task.systemFileID}/20`
-                                            );
-                                        }
+                                        // Handle tasks in progress
+                                        let approvalInProgressTasks = tasks.filter(task => {
+                                            return task.type == 3 && (task.status ==
+                                                10 || task
+                                                .status == 20);
+                                        })
 
-                                        taskApprovalInProgress.children.push(
-                                            taskItem);
+                                        approvalInProgressTasks.forEach(task => {
+                                            let taskItem = new treeItem({
+                                                name: task.systemFileName,
+                                                icon: 'insert_drive_file',
+                                                children: []
+                                            })
 
-                                        planogramFiles.forEach((planogramFile,
-                                            idx) => {
+                                            taskItem.click = function () {
+                                                self.$router.push(
+                                                    `/PlanogramImplementationNew/${task.planogram_ID}/${task.systemFileID}/20`
+                                                );
+                                            }
+
+                                            taskApprovalInProgress.children.push(
+                                                taskItem);
+
+                                            planogramFiles.forEach((planogramFile,
+                                                idx) => {
                                                 if (planogramFile
                                                     .PlanogramFileID == task
                                                     .systemFileID) {
@@ -486,36 +509,36 @@
                                                         1);
                                                 }
                                             })
-                                    })
-
-                                    // Handle approved tasks
-                                    let approvedTasks = tasks.filter(task => {
-                                        return task.type == 3 && (task.status ==
-                                            12 || task
-                                            .status == 21 || task.status ==
-                                            27 || task
-                                            .status == 44);
-                                    })
-
-                                    planogramFiles.forEach(task => {
-                                        let taskItem = new treeItem({
-                                            name: task.planogramFileName,
-                                            icon: 'insert_drive_file',
-                                            children: []
                                         })
 
-                                        taskItem.click = function () {
-                                            self.$router.push(
-                                                `/PlanogramImplementationNew/${task.planogram_ID}/${task.planogramFileID}/20`
-                                            );
-                                        }
+                                        // Handle approved tasks
+                                        let approvedTasks = tasks.filter(task => {
+                                            return task.type == 3 && (task.status ==
+                                                12 || task
+                                                .status == 21 || task.status ==
+                                                27 || task
+                                                .status == 44);
+                                        })
 
-                                        taskApproved.children.push(taskItem);
+                                        planogramFiles.forEach(task => {
+                                            let taskItem = new treeItem({
+                                                name: task.planogramFileName,
+                                                icon: 'insert_drive_file',
+                                                children: []
+                                            })
+
+                                            taskItem.click = function () {
+                                                self.$router.push(
+                                                    `/PlanogramImplementationNew/${task.planogram_ID}/${task.planogramFileID}/20`
+                                                );
+                                            }
+
+                                            taskApproved.children.push(taskItem);
+                                        })
+
+                                        departmentTreeItem.loading = false;
+                                        departmentTreeItem.showChildren = true;
                                     })
-
-                                    departmentTreeItem.loading = false;
-                                    departmentTreeItem.showChildren = true;
-                                })
                             })
                         }
                     }
@@ -825,95 +848,122 @@
 
                 clusteringTreeItem.click = function () {
                     clusteringTreeItem.showChildren = !clusteringTreeItem.showChildren;
-                    clusteringTreeItem.icon = clusteringTreeItem.showChildren ? 'folder_open' : 'folder';
+                    clusteringTreeItem.icon = clusteringTreeItem.showChildren ? 'folder_open' :
+                        'folder';
                 }
 
-                // ////////////////////////////////////////////////////////////////////////////////////////////////////
-                // STORE
-                // ////////////////////////////////////////////////////////////////////////////////////////////////////
-                let storeTreeItem = new treeItem({
-                    name: "Store Clustering",
-                    icon: "folder",
-                    children: []
-                })
+                self.getFile("CLUSTER REPORT", "REPORT", fileData => {
+                    self.baskets = [];
 
-                storeTreeItem.click = function () {
-                    storeTreeItem.showChildren = !storeTreeItem.showChildren;
-                    storeTreeItem.icon = storeTreeItem.showChildren ? 'folder_open' : 'folder';
-                }
+                    for (var basket in fileData.basket) {
+                        self.baskets.push(basket);
+                    }
 
-                // ////////////////////////////////////////////////////////////////////////////////////////////////////
-                // CUSTOM
-                // ////////////////////////////////////////////////////////////////////////////////////////////////////
-                let customTreeItem = new treeItem({
-                    name: "Custom Clustering",
-                    icon: "folder",
-                    children: []
-                })
+                    // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                    // STORE
+                    // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                    let storeTreeItem = new treeItem({
+                        name: "Store Clustering",
+                        icon: "folder",
+                        children: []
+                    })
 
-                customTreeItem.click = function () {
-                    customTreeItem.showChildren = !customTreeItem.showChildren;
-                    customTreeItem.icon = customTreeItem.showChildren ? 'folder_open' : 'folder';
-                }
+                    storeTreeItem.click = function () {
+                        storeTreeItem.showChildren = !storeTreeItem.showChildren;
+                        storeTreeItem.icon = storeTreeItem.showChildren ? 'folder_open' : 'folder';
+                    }
 
-                // ////////////////////////////////////////////////////////////////////////////////////////////////////
-                // BASKET
-                // ////////////////////////////////////////////////////////////////////////////////////////////////////
-                let basketTreeItem = new treeItem({
-                    name: "Basket Clustering",
-                    icon: "folder",
-                    children: []
-                })
+                    // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                    // CUSTOM
+                    // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                    let customTreeItem = new treeItem({
+                        name: "Custom Clustering",
+                        icon: "folder",
+                        children: []
+                    })
 
-                basketTreeItem.click = function () {
-                    basketTreeItem.showChildren = !basketTreeItem.showChildren;
-                    basketTreeItem.icon = basketTreeItem.showChildren ? 'folder_open' : 'folder';
-                }
+                    customTreeItem.click = function () {
+                        customTreeItem.showChildren = !customTreeItem.showChildren;
+                        customTreeItem.icon = customTreeItem.showChildren ? 'folder_open' : 'folder';
+                    }
 
-                // ////////////////////////////////////////////////////////////////////////////////////////////////////
-                // LISTING
-                // ////////////////////////////////////////////////////////////////////////////////////////////////////
-                let listingTreeItem = new treeItem({
-                    name: "Listing Clustering",
-                    icon: "folder",
-                    children: []
-                })
+                    // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                    // BASKET
+                    // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                    let basketTreeItem = new treeItem({
+                        name: "Basket Clustering",
+                        icon: "folder",
+                        children: []
+                    })
 
-                listingTreeItem.click = function () {
-                    listingTreeItem.showChildren = !listingTreeItem.showChildren;
-                    listingTreeItem.icon = listingTreeItem.showChildren ? 'folder_open' : 'folder';
-                }
+                    basketTreeItem.click = function () {
+                        basketTreeItem.showChildren = !basketTreeItem.showChildren;
+                        basketTreeItem.icon = basketTreeItem.showChildren ? 'folder_open' : 'folder';
+                    }
 
-                // ////////////////////////////////////////////////////////////////////////////////////////////////////
-                // CATEGORY
-                // ////////////////////////////////////////////////////////////////////////////////////////////////////
-                let categoryTreeItem = new treeItem({
-                    name: "Category Clustering",
-                    icon: "folder",
-                    children: []
-                })
+                    self.baskets.forEach(basket => {
+                        console.log(basket);
 
-                categoryTreeItem.click = function () {
-                    categoryTreeItem.showChildren = !categoryTreeItem.showChildren;
-                    categoryTreeItem.icon = categoryTreeItem.showChildren ? 'folder_open' : 'folder';
-                }
+                        let taskItem = new treeItem({
+                            name: basket,
+                            icon: "insert_drive_file",
+                            children: [],
+                            click: function () {
+                                alert("Going")
+                            }
+                        })
 
-                // ////////////////////////////////////////////////////////////////////////////////////////////////////
-                // DEPARTMENT
-                // ////////////////////////////////////////////////////////////////////////////////////////////////////
-                let departmentTreeItem = new treeItem({
-                    name: "Department Clustering",
-                    icon: "folder",
-                    children: []
-                })
+                        basketTreeItem.children.push(taskItem);
+                    })
 
-                departmentTreeItem.click = function () {
-                    departmentTreeItem.showChildren = !departmentTreeItem.showChildren;
-                    departmentTreeItem.icon = departmentTreeItem.showChildren ? 'folder_open' : 'folder';
-                }
+                    // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                    // LISTING
+                    // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                    let listingTreeItem = new treeItem({
+                        name: "Listing Clustering",
+                        icon: "folder",
+                        children: []
+                    })
 
-                clusteringTreeItem.children.push(storeTreeItem, customTreeItem, basketTreeItem, listingTreeItem,
-                    categoryTreeItem, departmentTreeItem);
+                    listingTreeItem.click = function () {
+                        listingTreeItem.showChildren = !listingTreeItem.showChildren;
+                        listingTreeItem.icon = listingTreeItem.showChildren ? 'folder_open' : 'folder';
+                    }
+
+                    // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                    // CATEGORY
+                    // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                    let categoryTreeItem = new treeItem({
+                        name: "Category Clustering",
+                        icon: "folder",
+                        children: []
+                    })
+
+                    categoryTreeItem.click = function () {
+                        categoryTreeItem.showChildren = !categoryTreeItem.showChildren;
+                        categoryTreeItem.icon = categoryTreeItem.showChildren ? 'folder_open' : 'folder';
+                    }
+
+                    // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                    // DEPARTMENT
+                    // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                    let departmentTreeItem = new treeItem({
+                        name: "Department Clustering",
+                        icon: "folder",
+                        children: []
+                    })
+
+                    departmentTreeItem.click = function () {
+                        departmentTreeItem.showChildren = !departmentTreeItem.showChildren;
+                        departmentTreeItem.icon = departmentTreeItem.showChildren ? 'folder_open' :
+                            'folder';
+                    }
+
+                    clusteringTreeItem.children.push(storeTreeItem, customTreeItem, basketTreeItem,
+                        listingTreeItem,
+                        categoryTreeItem, departmentTreeItem);
+                });
+
                 self.treeItems.push(clusteringTreeItem);
             },
             buildSpatialMappingFolder() {
@@ -936,7 +986,7 @@
                     children: [],
                     click: function () {
                         self.$router.push(
-                            "/FloorPlanningViewer/Garden - LTM2 - Merchandise Flow Diagram.jpg"
+                            "/Map"
                         )
                     }
                 })
@@ -947,13 +997,29 @@
                     children: [],
                     click: function () {
                         self.$router.push(
-                            "/FloorPlanningViewer/Garden - LTM2 - Merchandise Flow Diagram.jpg"
+                            "/Bi"
                         )
                     }
                 })
 
                 spacialMappingTreeItem.children.push(marketShareTreeItem, heatMapsTreeItem);
                 self.treeItems.push(spacialMappingTreeItem);
+            },
+            buildPromotionalPlanningFolder() {
+                let self = this;
+
+                let promotionalTreeItem = new treeItem({
+                    name: "Promotional Planning",
+                    icon: "folder",
+                    children: []
+                })
+
+                promotionalTreeItem.click = function () {
+                    promotionalTreeItem.showChildren = !promotionalTreeItem.showChildren;
+                    promotionalTreeItem.icon = promotionalTreeItem.showChildren ? 'folder_open' : 'folder';
+                }
+
+                self.treeItems.push(promotionalTreeItem);
             },
             buildUploadTreeItems() {
                 let self = this;
@@ -1042,7 +1108,7 @@
                     .catch(e => {
                         console.log(e);
                     });
-            },
+            }
         }
     }
 

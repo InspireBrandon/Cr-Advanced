@@ -114,6 +114,7 @@ import StorePlanogram from '@/components/Main/PlanogramStoreView/StoreView/Store
 import map from '@/components/Apps/Strategy/Map/Switcher.vue'
 import map2 from '@/components/Apps/Strategy/Map/tesmap.vue'
 import FloorPlanningViewer from '@/components/Main/FloorPlanningViewer/Index'
+import Bi from '@/components/Main/Bi'
 
 import {
   APPLICATION_ROUTE as RouteConfig
@@ -184,13 +185,21 @@ export default new Router({
             path: '/FloorPlanningViewer/:fileSrc',
             name: 'range_planning_view',
             component: FloorPlanningViewer,
+          }, {
+            path: '/Map',
+            name: 'range_planning_view',
+            component: map,
+          }, {
+            path: '/Bi',
+            name: 'range_planning_view',
+            component: Bi,
           }]
         },
-        {
-          path: '/map',
-          name: 'map',
-          component: map
-        },
+        // {
+        //   path: '/map',
+        //   name: 'map',
+        //   component: map
+        // },
         {
           path: '/map2',
           name: 'map2',

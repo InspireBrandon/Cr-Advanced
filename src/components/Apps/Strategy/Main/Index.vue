@@ -48,7 +48,7 @@
                         </v-list-tile> -->
                     </v-list>
                 </v-menu>
-                <v-menu dark offset-y style="margin-bottom: 10px;">
+                <!-- <v-menu dark offset-y style="margin-bottom: 10px;">
                     <v-btn slot="activator" flat>
                         Setup
                     </v-btn>
@@ -57,7 +57,7 @@
                             <v-list-tile-title>Cluster</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
-                </v-menu>
+                </v-menu> -->
                 <v-autocomplete class="pt-0" return-object :items="planograms" v-if="selectedView==1"
                     v-model="selectedPlanogram" style="width: 300px; margin-top: 15px;" placeholder="Select a planogram"
                     dense hide-details>
@@ -431,14 +431,11 @@
                                 return params.value.toFixed(1) + "%";
                             }
                         }, {
-                            "headerName": "Turnover Group",
-                            "field": self.currentToggle == "User" ? ("userDefinedClusterValue") : (
-                                "levelValue"),
+                            "headerName": "System Turnover Group",
+                            "field": "levelValue",
                             "valueFormatter": function (params) {
-                                let text = params.data[self.currentToggle == "User" ? (
-                                    "userDefinedCluster") : ("level")];
-                                let value = params.data[self.currentToggle == "User" ? (
-                                    "userDefinedClusterValue") : ("levelValue")];
+                                let text = params.data.level;
+                                let value = params.data.levelValue;
 
                                 let inOptions = isInOptions(options, text);
 
@@ -449,10 +446,53 @@
                                 }
                             },
                             cellStyle: function (params) {
-                                let text = params.data[self.currentToggle == "User" ? "userDefinedCluster" :
-                                    "level"];
-                                let value = params.data[self.currentToggle == "User" ?
-                                    "userDefinedClusterValue" : "levelValue"];
+                                let text = params.data.level;
+                                let value = params.data.levelValue;
+
+                                let inOptions = isInOptions(options, text);
+
+                                if (inOptions) {
+                                    if (value == 0) {
+                                        return {
+                                            backgroundColor: "#1976d2"
+                                        };
+                                    }
+
+                                    if (value == 1) {
+                                        return {
+                                            backgroundColor: "#1976d2c2"
+                                        };
+                                    }
+
+                                    if (value == 2) {
+                                        return {
+                                            backgroundColor: "#1976d294"
+                                        };
+                                    }
+                                } else {
+                                    return {
+                                        backgroundColor: "#fff"
+                                    };
+                                }
+                            }
+                        }, {
+                            "headerName": "User Turnover Group",
+                            "field": "userDefinedClusterValue",
+                            "valueFormatter": function (params) {
+                                let text = params.data.userDefinedCluster;
+                                let value = params.data.userDefinedClusterValue;
+
+                                let inOptions = isInOptions(options, text);
+
+                                if (inOptions) {
+                                    return options[value];
+                                } else {
+                                    return text;
+                                }
+                            },
+                            cellStyle: function (params) {
+                                let text = params.data.userDefinedCluster;
+                                let value = params.data.userDefinedClusterValue;
 
                                 let inOptions = isInOptions(options, text);
 
@@ -483,18 +523,38 @@
                         }, )
                     }
                 }
+
+                if (data.basket != undefined) {
+                    for (var basket in data.basket) {
+
+                        if (basket == "Premium Basket") {
+                            let hide = false;
+
+                            if (self.fileData.report != undefined || self.fileData.report != null) {
+                                if (self.selectedFile != undefined && self.selectedFile != null) {
+                                    hide = self.fileData.report[self.selectedFile]["basket_" + basket];
+                                }
+                            }
+
+                            let options = self.fileData.basket[basket].config.turnoverGroups;
+                            let pbh = self.addPremiumBasketHeader(basket, options);
+
+                            pbh.forEach(pb => {
+                                headers.push(pb);
+                            })
+                        }
+                    }
+                }
+
                 if (self.selectedView == 0) {
                     headers.push({
-                            headerName: 'Store System Clusters',
-                            editable: true,
-                            field: "storeCluster",
+                        headerName: 'System Store Clusters',
+                        editable: true,
+                        field: "storeCluster",
 
-                        },
-                        // {
-                        //     headerName: 'Store User Clusters',
-
-                        // }
-                    )
+                    }, {
+                        headerName: 'User Store Clusters'
+                    })
                 } else {
                     headers.push({
                             headerName: 'Custom System Clusters',
@@ -507,22 +567,6 @@
 
                         // }
                     )
-                }
-                if (data.basket != undefined) {
-                    for (var basket in data.basket) {
-
-                        let hide = false;
-
-                        if (self.fileData.report != undefined || self.fileData.report != null) {
-                            if (self.selectedFile != undefined && self.selectedFile != null) {
-                                hide = self.fileData.report[self.selectedFile]["basket_" + basket];
-                            }
-                        }
-
-                        let options = self.fileData.basket[basket].config.turnoverGroups;
-
-                        headers.push(self.addBasketHeader(basket, options));
-                    }
                 }
 
                 if (data.listing != undefined) {
@@ -542,6 +586,7 @@
                         })
                     }
                 }
+
                 storeData.forEach(HintStore => {
                     self.clusterStores.forEach(DBStore => {
                         // console.log(HintStore.PlaceGroup.toUpperCase() == DBStore.store.toUpperCase());
@@ -555,7 +600,6 @@
                         }
                     })
                 });
-                console.log("storeData", storeData);
 
                 storeData.forEach(element => {
                     let storeFound = false;
@@ -650,6 +694,7 @@
                 final = removeDuplicates(final, 'storeName')
 
                 self.headers = [];
+
                 final.sort((a, b) => {
                     if (a.totalSales > b.totalSales) {
                         return -1;
@@ -659,16 +704,109 @@
                     }
                     return 0;
                 });
-                self.rowData = final;
-                console.log("self.rowData", self.rowData);
 
+                self.rowData = final;
 
                 setTimeout(() => {
                     self.headers = headers;
-                    // self.getMapSetupData()
                     self.$refs.Spinner.hide();
                     self.$refs.Grid.setOrder();
                 }, 60);
+            },
+            addPremiumBasketHeader(basket, options) {
+                let self = this;
+
+                return [{
+                    "headerName": "System Premium Basket",
+                    "field": "system_basket_value_" + basket,
+                    "valueFormatter": function (params) {
+                        let text = params.data["system_basket_" + basket];
+                        let value = params.data["system_basket_value_" + basket];
+
+                        let inOptions = isInOptions(options, text);
+
+                        if (inOptions) {
+                            return options[value];
+                        } else {
+                            return text;
+                        }
+                    },
+                    "cellStyle": function (params) {
+                        let text = params.data["system_basket_" + basket];
+                        let value = params.data["system_basket_value_" + basket];
+
+                        let inOptions = isInOptions(options, text);
+
+                        if (inOptions) {
+                            if (value == 0) {
+                                return {
+                                    backgroundColor: "#9c9c9c"
+                                };
+                            }
+
+                            if (value == 1) {
+                                return {
+                                    backgroundColor: "#b9b9b9"
+                                };
+                            }
+
+                            if (value == 2) {
+                                return {
+                                    backgroundColor: "#e0e0e0"
+                                };
+                            }
+                        } else {
+                            return {
+                                backgroundColor: "#fff"
+                            };
+                        }
+                    }
+                },{
+                    "headerName": "User Premium Basket",
+                    "field": "user_basket_value_" + basket,
+                    "valueFormatter": function (params) {
+                        let text = params.data["use_basket_" + basket];
+                        let value = params.data["user_basket_value_" + basket];
+
+                        let inOptions = isInOptions(options, text);
+
+                        if (inOptions) {
+                            return options[value];
+                        } else {
+                            return text;
+                        }
+                    },
+                    "cellStyle": function (params) {
+                        let text = params.data["use_basket_" + basket];
+                        let value = params.data["user_basket_value_" + basket];
+
+                        let inOptions = isInOptions(options, text);
+
+                        if (inOptions) {
+                            if (value == 0) {
+                                return {
+                                    backgroundColor: "#9c9c9c"
+                                };
+                            }
+
+                            if (value == 1) {
+                                return {
+                                    backgroundColor: "#b9b9b9"
+                                };
+                            }
+
+                            if (value == 2) {
+                                return {
+                                    backgroundColor: "#e0e0e0"
+                                };
+                            }
+                        } else {
+                            return {
+                                backgroundColor: "#fff"
+                            };
+                        }
+                    }
+                }]
             },
             addBasketHeader(basket, options) {
                 let self = this;

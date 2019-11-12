@@ -32,13 +32,13 @@
         </v-toolbar>
         <v-toolbar dark flat>
             <v-toolbar-items v-if="selectedPlanogram!=null">
-                <v-select label="Primary Cluster" style="margin-left: 10px; margin-top: 8px; width: 150px"
+                <!-- <v-select label="Primary Cluster" style="margin-left: 10px; margin-top: 8px; width: 150px"
                     placeholder="Item Percentage" @change="onPercentChange" dense :items="primaryClusters"
                     v-model="primaryCluster" hide-details></v-select>
                 <v-select @change="onPercentChange" v-if="primaryCluster != 10" label="Secondary Cluster"
                     style="margin-left: 10px; margin-top: 8px; width: 150px" placeholder="Item Percentage" dense
                     :items="secondaryClusters" v-model="secondaryCluster" hide-details>
-                </v-select>
+                </v-select> -->
                 <v-select @change="onPercentChange" label="Groups"
                     style="margin-left: 10px; margin-top: 8px; width: 150px" dense :items="groups" v-model="group"
                     hide-details>
@@ -516,7 +516,7 @@
                     },
                     {
                         headerName: 'Cluster',
-                        field: 'cluster'
+                        field: 'levelText'
                     },
                     {
                         headerName: 'Stack bar',

@@ -63,8 +63,9 @@ class ListingClusterController {
         let totalStoreProjectGroupSales = getTotalStoreProjectGroupSales(storeSales, ProjectGroups, storeSalesData, clusterData);
 
         let categoryLevels = generateCategoryLevels(ProjectGroups, totalStoreProjectGroupSales, clusterData);
+        let clusterated = generateClustersAlt(ProjectGroups, categoryLevels, clusterData)
 
-        let storeClusterCodes = accumulateCodes(categoryLevels, stores, clusterData, ProjectGroups);
+        let storeClusterCodes = accumulateCodes(clusterated, stores, clusterData, ProjectGroups);
         storeClusterCodes = addRank(storeClusterCodes);
         let clusters = generateClusterNew(storeClusterCodes, clusterData, totalStoreProjectGroupSales);
 
@@ -86,6 +87,8 @@ class ListingClusterController {
 // METHODS
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
 function generateCategoryLevels(projectGroups, totalStoreProjectGroupSales, clusterData) {
+    let clusterLevels = clusterData.clusterLevels;
+
     // Determine L/M/S
     projectGroups.forEach(category => {
         let highestValue = -1;
@@ -96,50 +99,117 @@ function generateCategoryLevels(projectGroups, totalStoreProjectGroupSales, clus
             let selectedValue = category[selectedCategory];
             let value = storeSale[selectedValue + "_inStore"];
 
-            if(value > highestValue)
+            if (value > highestValue)
                 highestValue = value;
 
-            if(lowestValue == -1) {
+            if (lowestValue == -1) {
                 lowestValue = value;
-            }
-            else {
-                if(value < lowestValue)   
+            } else {
+                if (value < lowestValue)
                     lowestValue = value;
             }
-
-            console.log("selectedCategory", selectedCategory, selectedValue, highestValue, lowestValue);
         })
 
-        let dividend = (highestValue) / 3;
+        let dividend = (highestValue) / clusterLevels;
 
         totalStoreProjectGroupSales.forEach(storeSale => {
             let selectedCategory = clusterData.selectedCategory;
             let selectedValue = category[selectedCategory];
             let value = storeSale[selectedValue + "_inStore"];
 
-            for(var i = 1; i < 4; i++) {
+            for (var i = 1; i < (clusterLevels + 1); i++) {
                 let highest = dividend * i;
                 let lowest = dividend * (i - 1);
 
-                if(value >= lowest && value <= highest) {
-                    let value = "S"
-                    
-                    if(i == 2) {
-                        value = "M"
-                    }
+                if (value >= lowest && value <= highest) {
+                    storeSale[selectedValue + "_level"] = i;
+                }
 
-                    if(i == 3) {
-                        value = "L"
-                    }
-
-                    storeSale[selectedValue + "_level"] = value;
+                if (value == 0) {
+                    storeSale[selectedValue + "_level"] = 6;
                 }
             }
         })
     })
 
-    console.log(totalStoreProjectGroupSales);
+    return totalStoreProjectGroupSales;
+}
 
+function generateClustersAlt(projectGroups, totalStoreProjectGroupSales, clusterData) {
+    let clusterGroups = clusterData.clusterGroups;
+    let clusterLevels = clusterData.clusterLevels;
+
+    let lettersLevel3 = ["C", "B", "A", "", "", "X"];
+    let numbersLevel3 = ["3", "2", "1", "", "", "X"];
+
+    let lettersLevel4 = ["D", "C", "B", "A", "", "X"];
+    let numbersLevel4 = ["4", "3", "2", "1", "", "X"];
+
+    let lettersLevel5 = ["E", "D", "C", "B", "A", "X"];
+    let numbersLevel5 = ["5", "4", "3", "2", "1", "X"];
+
+    let lettersToUse;
+    let numbersToUse;
+
+    if (clusterLevels == 3) {
+        lettersToUse = lettersLevel3;
+        numbersToUse = numbersLevel3;
+    }
+
+    if (clusterLevels == 4) {
+        lettersToUse = lettersLevel4;
+        numbersToUse = numbersLevel4;
+    }
+
+    if (clusterLevels == 5) {
+        lettersToUse = lettersLevel5;
+        numbersToUse = numbersLevel5;
+    }
+
+    projectGroups.forEach((category, catIDX) => {
+        totalStoreProjectGroupSales.forEach(storeSale => {
+            let selectedCategory = clusterData.selectedCategory;
+            let selectedValue = category[selectedCategory];
+            let level = storeSale[selectedValue + "_level"];
+            let levelText = storeSale["levelText"];
+
+            if (levelText == undefined || levelText == null) {
+                if (level == 6) {
+                    storeSale["levelText"] = "X";
+                } else {
+                    if (catIDX == 0) {
+                        storeSale["levelText"] = lettersToUse[level - 1];
+                    }
+
+                    if (catIDX == 1) {
+                        storeSale["levelText"] = numbersToUse[level - 1];
+                    }
+
+                    if (catIDX == 2) {
+                        storeSale["levelText"] = lettersToUse[level - 1].toLowerCase();
+                    }
+                }
+            } else if (levelText.length < clusterGroups) {
+                if (level == 6) {
+                    storeSale["levelText"] += "X";
+                } else {
+                    if (catIDX == 0) {
+                        storeSale["levelText"] += lettersToUse[level - 1];
+                    }
+
+                    if (catIDX == 1) {
+                        storeSale["levelText"] += numbersToUse[level - 1];
+                    }
+
+                    if (catIDX == 2) {
+                        storeSale["levelText"] += lettersToUse[level - 1].toLowerCase();
+                    }
+                }
+            }
+        })
+    })
+
+    console.log("totalStoreProjectGroupSales", totalStoreProjectGroupSales);
     return totalStoreProjectGroupSales;
 }
 
@@ -211,9 +281,6 @@ function getStoreSales(stores, storeSales) {
 }
 
 function getProjectGroupsWeighted(storeSalesData, clusterData) {
-    console.log("getProjectGroupsWeighted", storeSalesData);
-    console.log("clusterData.selectedCategory", clusterData.selectedCategory);
-
     let uniqueProjectGroups = removeDuplicates(storeSalesData.map(item => ({
         brand: item.brand,
         category: item.category,
@@ -306,7 +373,7 @@ function getTotalStoreProjectGroupSales(stores, ProjectGroups, storeSalesData, c
 
         ProjectGroups.forEach(ProjectGroup => {
             var storeProjectGroupSale = storeSalesData.filter(sd => {
-                return sd[clusterData.selectedCategory]  == ProjectGroup[clusterData.selectedCategory] && sd.store_ID == store.store_ID;
+                return sd[clusterData.selectedCategory] == ProjectGroup[clusterData.selectedCategory] && sd.store_ID == store.store_ID;
             });
 
             let tmpCode = "";
@@ -399,8 +466,8 @@ function accumulateCodes(tmpStoreData, stores, clusterData, ProjectGroups) {
     let cumulativeStoreData = ProjectGroups.filter(e => {
         return parseFloat(e.cumulativeProjectPercentage) <= percentageOfCumulative;
     })
-    console.log("cumulativeStoreData",cumulativeStoreData);
-    
+    console.log("cumulativeStoreData", cumulativeStoreData);
+
 
 
     let level1Lowest = 0
@@ -719,8 +786,6 @@ function getMostCommonGroups(codeData, levels, group) {
 }
 
 function generateClusterNew(tmpStoreData, clusterData, salesData) {
-    console.log("generateClusterNew", tmpStoreData);
-
     let clusterGroups = clusterData.clusterGroups;
     let clusterLevels = clusterData.clusterLevels;
 
@@ -789,23 +854,6 @@ function generateClusterNew(tmpStoreData, clusterData, salesData) {
         let counter = 0;
         let assigned = false;
 
-        // for (var i = 0; i < (commonGroups1.length - 1); i++) {
-        //     let highest = commonGroups1[i];
-        //     let lowest = commonGroups1[i + 1];
-
-        //     if (el.level1Code >= lowest && el.level1Code <= highest) {
-        //         let closest = closestTo(el.level1Code, lowest, highest);
-
-        //         if (closest.highest > closest.lowest) {
-        //             counter = i;
-        //         } else {
-        //             counter = i + 1;
-        //         }
-
-        //         assigned = true;
-        //     }
-        // }
-
         if (!assigned)
             counter = letters.length - 1;
 
@@ -846,30 +894,6 @@ function generateClusterNew(tmpStoreData, clusterData, salesData) {
     let commonGroups3 = getMostCommonGroups(tmpThirdLevel, clusterLevels, 3);
 
     tmpThirdLevel.forEach((el, idx) => {
-        //     let counter = 0;
-        //     let assigned = false;
-
-        //     for (var i = 0; i < (commonGroups3.length - 1); i++) {
-        //         let highest = commonGroups3[i];
-        //         let lowest = commonGroups3[i + 1];
-
-        //         if (el.level3Code >= lowest && el.level3Code <= highest) {
-        //             let closest = closestTo(el.level3Code, lowest, highest);
-
-        //             if (closest.highest > closest.lowest) {
-        //                 counter = i;
-        //             } else {
-        //                 counter = i + 1;
-        //             }
-
-        //             assigned = true;
-        //         }
-        //     }
-
-        //     if (!assigned)
-        //         counter = letters.length - 1;
-
-        //     el.cluster = (counter == (letters.length - 1)) ? letters[counter] : letters[counter].toLowerCase();
         el.cluster = letters[el.level3Code].toLowerCase();
     })
 
@@ -896,6 +920,7 @@ function generateClusterNew(tmpStoreData, clusterData, salesData) {
             })
         }
     })
+
     salesData.forEach(element => {
         tmp.forEach(store => {
             if (store.store_ID == element.store_ID) {
@@ -903,6 +928,7 @@ function generateClusterNew(tmpStoreData, clusterData, salesData) {
             }
         })
     })
+
     return tmp.sort((a, b) => {
         if (a.storeCode > b.storeCode) {
             return 1;
