@@ -634,6 +634,11 @@
                                         }
                                     }
                                 }
+                            },
+                            {
+                                headerName: "Level",
+                                field: projectGroup[tmpCategory] + "_level",
+                                width: 100,
                             }
                         ]
                     })
