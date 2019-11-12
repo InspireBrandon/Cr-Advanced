@@ -41,8 +41,8 @@
                     <v-toolbar-title>Market Share</v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-toolbar-items>
-                      <v-select style="margin-left: 10px;  width: 200px" placeholder="Select to see market share"
-                        v-model="selectedCategory" :items="categories" hide-details></v-select>
+                      <!-- <v-select style="margin-left: 10px;  width: 200px" placeholder="Select to see market share"
+                        v-model="selectedCategory" :items="categories" hide-details></v-select> -->
                     </v-toolbar-items>
                   </v-toolbar>
                   <v-card height="calc(100vh - 273px)" style="overflow:auto;">
@@ -50,16 +50,16 @@
                     <v-card>
                       <v-list>
                         <v-list-tile v-for="(item, index) in AvailableData" :key="index">
-                            <v-layout>
+                          <v-layout>
 
-                              <span>{{checkAlphaNumber(item.blockNumber)}} </span>
-                              <v-spacer></v-spacer>
-                              <span>
-                                {{formatNumber(item.storeSummary.sales_Retail,item.squareTotalSales)}}
-                              </span>
-                              <!-- <v-spacer></v-spacer>
+                            <span>{{checkAlphaNumber(item.blockNumber)}} </span>
+                            <v-spacer></v-spacer>
+                            <span>
+                              {{formatNumber(item.storeSummary.sales_Retail,item.squareTotalSales)}}
+                            </span>
+                            <!-- <v-spacer></v-spacer>
                               <span>{{item.squareTotalSalesPercentage}}%</span> -->
-                            </v-layout>
+                          </v-layout>
                         </v-list-tile>
                       </v-list>
                     </v-card>
@@ -281,7 +281,7 @@
           text: "PET HEALTHCARE",
           value: 34
         }],
-        viewOnlyMode:false,
+        viewOnlyMode: false,
       };
 
     },
@@ -307,11 +307,11 @@
     },
     mounted() {
       let self = this;
-      
-      if(self.$route.params.params!=null){
+
+      if (self.$route.params.params != null) {
         self.viewOnlyMode = true
-      }else{
-         self.viewOnlyMode = false
+      } else {
+        self.viewOnlyMode = false
       }
       // this.openSetup()
       // this.drawMap(this.labels)
@@ -332,10 +332,10 @@
         };
         if (el.retailerStores.length > 0) {
           el.retailerStores.forEach(e => {
-            if (e.planogram_ID == self.selectedCategory) {
-              retVal.sales_Retail += e.sales_Retail
-              retVal.planogram = e.planogram
-            }
+            // if (e.planogram_ID == self.selectedCategory) {
+            retVal.sales_Retail += e.sales_Retail
+            retVal.planogram = e.planogram
+            // }
           })
         }
         // retVal = el.retailerStores.map(item => ({
@@ -1666,6 +1666,9 @@
       formatNumber(storeSales, totalSales) {
         let string = ""
         if (storeSales > 0 && totalSales != 0) {
+          console.log("storeSales", storeSales);
+          console.log("totalSales", totalSales);
+
           string = ((storeSales / totalSales) * 100).toFixed(2)
           string += "%"
         }
