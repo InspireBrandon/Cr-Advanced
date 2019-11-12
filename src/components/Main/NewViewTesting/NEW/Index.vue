@@ -1030,7 +1030,16 @@
                 let promotionalTreeItem = new treeItem({
                     name: "Promotional Planning",
                     icon: "folder",
-                    children: []
+                    children: [
+                        new treeItem({
+                            name: "Hook Line and Sinker Promo - 14 Sep to 2 Nov 2019",
+                            icon: "insert_drive_file",
+                            children: [],
+                            click() {
+                                self.$router.push("/PromotionViewer")
+                            }
+                        })
+                    ]
                 })
 
                 promotionalTreeItem.click = function () {

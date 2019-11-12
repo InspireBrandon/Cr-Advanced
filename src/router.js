@@ -121,6 +121,7 @@ import StorePlanogram from '@/components/Main/PlanogramStoreView/StoreView/Store
 import map from '@/components/Apps/Strategy/Map/Switcher.vue'
 import map2 from '@/components/Apps/Strategy/Map/tesmap.vue'
 import FloorPlanningViewer from '@/components/Main/FloorPlanningViewer/Index'
+import PromotionViewer from '@/components/Main/PromotionViewer'
 import Bi from '@/components/Main/Bi'
 
 import {
@@ -217,6 +218,10 @@ export default new Router({
             path: '/map/:params',
             name: 'map',
             component: map
+          }, {
+            path: '/PromotionViewer',
+            name: 'PromotionViewer',
+            component: PromotionViewer
           }]
         },
         // {
