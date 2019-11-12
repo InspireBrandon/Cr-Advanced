@@ -260,7 +260,7 @@
                                     let inProgressTasks = tasks.filter(task => {
                                         return task.type == 2 && (task.status ==
                                             1 || task
-                                            .status == 2);
+                                            .status == 2 || task.status == 7);
                                     })
 
                                     inProgressTasks.forEach(task => {
@@ -452,29 +452,35 @@
                                         })
 
                                         inProgressTasks.forEach(task => {
-                                            let taskItem = new treeItem({
-                                                name: task.systemFileName,
-                                                icon: 'insert_drive_file',
-                                                children: []
-                                            })
+                                            if (task.systemFileName != null) {
+                                                let taskItem = new treeItem({
+                                                    name: task.systemFileName ==
+                                                        null ? "" : task
+                                                        .systemFileName.split(
+                                                            "- XXX")[0],
+                                                    icon: 'insert_drive_file',
+                                                    children: []
+                                                })
 
-                                            taskItem.click = function () {
-                                                self.$router.push(
-                                                    `/PlanogramImplementationNew/${task.planogram_ID}/${task.systemFileID}/20`
-                                                );
-                                            }
-
-                                            taskInProgress.children.push(taskItem);
-
-                                            planogramFiles.forEach((planogramFile,
-                                                idx) => {
-                                                if (planogramFile
-                                                    .PlanogramFileID == task
-                                                    .systemFileID) {
-                                                    planogramFiles.splice(idx,
-                                                        1);
+                                                taskItem.click = function () {
+                                                    self.$router.push(
+                                                        `/PlanogramImplementationNew/${task.planogram_ID}/${task.systemFileID}/20`
+                                                    );
                                                 }
-                                            })
+
+                                                taskInProgress.children.push(taskItem);
+
+                                                planogramFiles.forEach((planogramFile,
+                                                    idx) => {
+                                                    if (planogramFile
+                                                        .PlanogramFileID == task
+                                                        .systemFileID) {
+                                                        planogramFiles.splice(
+                                                            idx,
+                                                            1);
+                                                    }
+                                                })
+                                            }
                                         })
 
                                         // Handle tasks in progress
@@ -485,30 +491,36 @@
                                         })
 
                                         approvalInProgressTasks.forEach(task => {
-                                            let taskItem = new treeItem({
-                                                name: task.systemFileName,
-                                                icon: 'insert_drive_file',
-                                                children: []
-                                            })
+                                            if (task.systemFileName != null) {
+                                                let taskItem = new treeItem({
+                                                    name: task.systemFileName ==
+                                                        null ? "" : task
+                                                        .systemFileName.split(
+                                                            "- XXX")[0],
+                                                    icon: 'insert_drive_file',
+                                                    children: []
+                                                })
 
-                                            taskItem.click = function () {
-                                                self.$router.push(
-                                                    `/PlanogramImplementationNew/${task.planogram_ID}/${task.systemFileID}/20`
-                                                );
-                                            }
-
-                                            taskApprovalInProgress.children.push(
-                                                taskItem);
-
-                                            planogramFiles.forEach((planogramFile,
-                                                idx) => {
-                                                if (planogramFile
-                                                    .PlanogramFileID == task
-                                                    .systemFileID) {
-                                                    planogramFiles.splice(idx,
-                                                        1);
+                                                taskItem.click = function () {
+                                                    self.$router.push(
+                                                        `/PlanogramImplementationNew/${task.planogram_ID}/${task.systemFileID}/20`
+                                                    );
                                                 }
-                                            })
+
+                                                taskApprovalInProgress.children.push(
+                                                    taskItem);
+
+                                                planogramFiles.forEach((planogramFile,
+                                                    idx) => {
+                                                    if (planogramFile
+                                                        .PlanogramFileID == task
+                                                        .systemFileID) {
+                                                        planogramFiles.splice(
+                                                            idx,
+                                                            1);
+                                                    }
+                                                })
+                                            }
                                         })
 
                                         // Handle approved tasks
@@ -522,7 +534,10 @@
 
                                         planogramFiles.forEach(task => {
                                             let taskItem = new treeItem({
-                                                name: task.planogramFileName,
+                                                name: task.planogramFileName ==
+                                                    null ? "" : task
+                                                    .planogramFileName.split(
+                                                        "- XXX")[0],
                                                 icon: 'insert_drive_file',
                                                 children: []
                                             })
@@ -955,7 +970,8 @@
                                 icon: "insert_drive_file",
                                 children: [],
                                 click() {
-                                    self.$router.push("/CategoryClusterView/" + categoryCluster);
+                                    self.$router.push("/CategoryClusterView/" +
+                                        categoryCluster);
                                 }
                             })
 
