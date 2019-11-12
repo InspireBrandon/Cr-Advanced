@@ -307,7 +307,6 @@
     },
     mounted() {
       let self = this;
-      console.log(self.$route.params);
       
       if(self.$route.params.params!=null){
         self.viewOnlyMode = true

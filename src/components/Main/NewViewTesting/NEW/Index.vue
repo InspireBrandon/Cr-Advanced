@@ -74,7 +74,7 @@
                 let self = this;
 
                 Axios.get(process.env.VUE_APP_API +
-                        `SystemFile/JSON?db=CR-Devinspire&folder=CLUSTER REPORT&file=REPORT`)
+                        `SystemFile/JSON?db=CR-Devinspire&folder=${folder}&file=REPORT`)
                     .then(r => {
                         self.getFileData(r.data.id, fileData => {
                             callback(fileData);
@@ -902,14 +902,12 @@
                     }
 
                     self.baskets.forEach(basket => {
-                        console.log(basket);
-
                         let taskItem = new treeItem({
                             name: basket,
                             icon: "insert_drive_file",
                             children: [],
                             click: function () {
-                                alert("Going")
+                                self.$router.push("/BasketView/" + basket);
                             }
                         })
 
@@ -943,6 +941,27 @@
                         categoryTreeItem.showChildren = !categoryTreeItem.showChildren;
                         categoryTreeItem.icon = categoryTreeItem.showChildren ? 'folder_open' : 'folder';
                     }
+
+                    self.getFile("Category Cluster", "REPORT", ccfileData => {
+                        let categoryClusters = [];
+
+                        for (var prop in ccfileData.categoryCluster) {
+                            categoryClusters.push(prop)
+                        }
+
+                        categoryClusters.forEach(categoryCluster => {
+                            let taskItem = new treeItem({
+                                name: categoryCluster,
+                                icon: "insert_drive_file",
+                                children: [],
+                                click() {
+                                    self.$router.push("/CategoryClusterView/" + categoryCluster);
+                                }
+                            })
+
+                            categoryTreeItem.children.push(taskItem);
+                        })
+                    })
 
                     // ////////////////////////////////////////////////////////////////////////////////////////////////////
                     // DEPARTMENT
