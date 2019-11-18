@@ -2,11 +2,11 @@
     <div>
         <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear>
         <v-container v-if="!showLoader" fluid grid-list-md style="height: calc(100vh - 65px); overflow-x: auto;">
-            <v-layout row wrap justify-center>
+            <!-- <v-layout row wrap justify-center>
                 <v-flex lg3 md4 sm6 xs12 v-for="(appConfigDetail, index) in appConfigDetail" :key="index">
                     <app-block :appConfigDetail="appConfigDetail"></app-block>
                 </v-flex>
-            </v-layout>
+            </v-layout> -->
             <!-- <v-layout row wrap>
                 <v-flex lg12 md12 sm12 xs12 v-if="!hasDatabases">
                     <v-card>
@@ -17,6 +17,7 @@
                     </v-card>
                 </v-flex>
             </v-layout> -->
+            <PlanogramNoteViewer/>
         </v-container>
     </div>
 </template>
@@ -27,11 +28,13 @@
 
     import ApplicationDetailsHelper from '@/libs/system/application/application-details-helper.js';
     import app_block from '@/components/Main/Apps/app_block.vue';
+    import PlanogramNoteViewer from '@/components/Common/PlanogramNoteViewer.vue';
 
     export default {
         name: 'apps',
         components: {
-            'app-block': app_block
+            'app-block': app_block,
+            PlanogramNoteViewer
         },
         data() {
             return {

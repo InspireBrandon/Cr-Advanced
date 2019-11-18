@@ -1,7 +1,16 @@
 <template>
     <div>
         <div>
-            <recursive :accessType="accessType" :items="treeItems"></recursive>
+            <recursive :onContextMenu="onContextMenu" :accessType="accessType" :items="treeItems"></recursive>
+            <v-menu v-model="showMenu" :position-x="x" :position-y="y" absolute offset-y>
+                <v-list dense class="pa-0">
+                    <v-list-tile class="pa-0" @click="addNote">
+                        <v-list-tile-title class="pa-0">Add note</v-list-tile-title>
+                    </v-list-tile>
+                    <v-divider></v-divider>
+                </v-list>
+            </v-menu>
+            <PlanogramNoteModal ref="PlanogramNoteModal" />
         </div>
     </div>
 </template>
@@ -9,11 +18,20 @@
 <script>
     import Axios from "axios";
     import Recursive from './Recursive'
+    import PlanogramNoteModal from '@/components/Common/PlanogramNoteModal'
+    import jwt from "jsonwebtoken";
+
+    import SoftwareTreeItem from './Sections/SoftwareTreeItem'
+    let softwareTreeItem;
+
+    import MappingTreeItem from './Sections/MappingTreeItem'
+    let mappingTreeItem;
 
     export default {
         props: ['accessType', 'storeID'],
         components: {
-            Recursive
+            Recursive,
+            PlanogramNoteModal
         },
         data() {
             return {
@@ -21,11 +39,22 @@
                 departments: [],
                 stores: [],
                 baskets: [],
-
+                showMenu: false,
+                x: 0,
+                y: 0,
+                selectedItem: null
             }
         },
         mounted() {
             let self = this;
+
+            softwareTreeItem = new SoftwareTreeItem({
+                vueCtx: self
+            })
+
+            mappingTreeItem = new MappingTreeItem({
+                vueCtx: self
+            })
         },
         methods: {
             getStores() {
@@ -94,14 +123,16 @@
                 self.treeItems = [];
 
                 if (self.accessType == 0) {
-                    self.buildSoftwareButtons();
+                    softwareTreeItem.build(self.treeItems);
+                    // self.buildSoftwareButtons();
                     self.buildRangePlanningTree();
                     self.buildModelPlanogramTree();
                     self.buildStorePlanogramTree();
                     self.buildFloorPlanningTree();
                     self.buildClusteringTree();
                     self.buildPromotionalPlanningFolder();
-                    self.buildSpatialMappingFolder();
+                    // self.buildSpatialMappingFolder();
+                    mappingTreeItem.build(self.treeItems);
                     self.buildUploadTreeItems();
                 }
 
@@ -267,7 +298,9 @@
                                         let taskItem = new treeItem({
                                             name: task.rangeFileName,
                                             icon: 'insert_drive_file',
-                                            children: []
+                                            children: [],
+                                            type: 'PlanogramID',
+                                            value: task.planogram_ID
                                         })
 
                                         taskItem.click = function () {
@@ -297,7 +330,9 @@
                                         let taskItem = new treeItem({
                                             name: task.rangeFileName,
                                             icon: 'insert_drive_file',
-                                            children: []
+                                            children: [],
+                                            type: 'PlanogramID',
+                                            value: task.planogram_ID
                                         })
 
                                         taskItem.click = function () {
@@ -327,7 +362,9 @@
                                         let taskItem = new treeItem({
                                             name: task.rangeFileName,
                                             icon: 'insert_drive_file',
-                                            children: []
+                                            children: [],
+                                            type: 'PlanogramID',
+                                            value: task.planogram_ID
                                         })
 
                                         taskItem.click = function () {
@@ -1152,6 +1189,42 @@
                     .catch(e => {
                         console.log(e);
                     });
+            },
+            onContextMenu(e, item) {
+                let self = this;
+                self.selectedItem = item;
+                self.showMenu = false
+                self.x = e.clientX
+                self.y = e.clientY
+                self.$nextTick(() => {
+                    self.showMenu = true
+                })
+            },
+            addNote() {
+                let self = this;
+
+                self.$refs.PlanogramNoteModal.show(html => {
+                    // Save html
+                    let encoded_details = jwt.decode(sessionStorage.accessToken);
+                    let systemUserID = encoded_details.USER_ID;
+
+                    let request = {
+                        planogramID: 28,
+                        userID: systemUserID,
+                        noteType: 1,
+                        html: html
+                    }
+
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    Axios.post(process.env.VUE_APP_API + `PlanogramNoteTX`, request)
+                        .then(r => {
+                            delete Axios.defaults.headers.common["TenantID"];
+                        })
+                        .catch(e => {
+                            console.log(e);
+                        });
+                })
             }
         }
     }
@@ -1167,5 +1240,8 @@
         self.type = data.type;
         self.value = data.value;
         self.loading = false;
+        self.allowSelect = false;
+        self.showIcon = true;
+        self.showImage = false;
     }
 </script>

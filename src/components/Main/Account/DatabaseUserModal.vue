@@ -47,10 +47,14 @@
                                             <v-list dense>
                                                 <v-list-tile @click="setAccessType(props)">Set access type</v-list-tile>
                                                 <v-divider></v-divider>
+                                                <v-list-tile @click="setSubscriptionLevel(props)">Set subscription level
+                                                </v-list-tile>
+                                                <v-divider></v-divider>
                                                 <v-list-tile @click="openFeatureAccessModal(props.item.systemUserID)">
                                                     Feature access</v-list-tile>
                                                 <v-divider></v-divider>
-                                                <v-list-tile @click="revoke_access(props.item)">Revoke access</v-list-tile>
+                                                <v-list-tile @click="revoke_access(props.item)">Revoke access
+                                                </v-list-tile>
                                             </v-list>
                                         </v-menu>
                                     </td>
@@ -63,6 +67,7 @@
         </v-card>
         <DatabaseFeatureAccessModal ref="DatabaseFeatureAccessModal"></DatabaseFeatureAccessModal>
         <AccessTypeModal ref="AccessTypeModal"></AccessTypeModal>
+        <SubscriptionLevelModal ref="SubscriptionLevelModal"></SubscriptionLevelModal>
     </v-dialog>
 </template>
 <script>
@@ -71,6 +76,7 @@
 
     import DatabaseFeatureAccessModal from './DatabaseFeatureAccessModal';
     import AccessTypeModal from './AccessTypeModal';
+    import SubscriptionLevelModal from './SubscriptionLevelModal';
 
     export default {
         data() {
@@ -100,7 +106,7 @@
                         text: '',
                         align: 'center',
                         sortable: false
-                    },{
+                    }, {
                         text: 'First name',
                         align: 'left',
                         sortable: false,
@@ -158,7 +164,8 @@
         },
         components: {
             DatabaseFeatureAccessModal,
-            AccessTypeModal
+            AccessTypeModal,
+            SubscriptionLevelModal
         },
         methods: {
             getUsers() {
@@ -205,8 +212,6 @@
                         });
 
                         self.showLoader = false;
-                        console.log(self.databaseUsers);
-
                     })
             },
             getAccessType(systemUserID, tenantID, accessType) {
@@ -215,8 +220,6 @@
                 Axios.get(process.env.VUE_APP_API +
                         `TenantLink_AccessType?systemUserID=${systemUserID}&tenantID=${tenantID}`)
                     .then(r => {
-                        console.log(r);
-
                         if (r.data.tenantLink_AccessTypeList.length > 0) {
                             accessType(r.data.tenantLink_AccessTypeList[0].accessType)
                         } else {
@@ -297,14 +300,28 @@
             revoke_access(item) {
                 let self = this;
 
-                Axios.delete(process.env.VUE_APP_API + `TenantAccess/User?systemUserID=${item.systemUserID}&tenantID=${sessionStorage.currentDatabase}`)
+                Axios.delete(process.env.VUE_APP_API +
+                        `TenantAccess/User?systemUserID=${item.systemUserID}&tenantID=${sessionStorage.currentDatabase}`
+                        )
                     .then(r => {
-                        if(r.data)
+                        if (r.data)
                             self.databaseUsers.splice(self.databaseUsers.indexOf(item), 1);
                     })
                     .catch(e => {
 
                     })
+            },
+            setSubscriptionLevel(props) {
+                let self = this;
+
+                self.$refs.SubscriptionLevelModal.show(props.item.subscriptionLevel, subscriptionLevel => {
+                    props.item.subscriptionLevel = subscriptionLevel;
+
+                    Axios.put(process.env.VUE_APP_API + `SystemUser`, props.item)
+                        .then(r => {
+                            console.log(r.data);
+                        })
+                })
             }
         }
     }

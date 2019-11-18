@@ -1,12 +1,12 @@
 <template>
     <v-card>
         <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear>
-        <v-container grid-list-md v-if="!showLoader">
+        <v-container class="pa-0" fluid grid-list-md v-if="!showLoader">
             <v-layout row wrap>
                 <v-flex lg12 md12 sm12 xs12>
                     <v-container grid-list-md>
                         <v-layout row wrap>
-                            <v-flex lg12 md12 sm12 xs12>
+                            <!-- <v-flex lg12 md12 sm12 xs12>
                                 <v-card flat>
                                     <v-card-title primary-title>
                                         <v-layout row wrap>
@@ -35,9 +35,49 @@
                                         <v-btn color="grey darken-1" @click="$router.go(-1)">cancel</v-btn>
                                     </v-card-actions>
                                 </v-card>
+                            </v-flex> -->
+                            <v-flex xs12>
+                                <v-card flat>
+                                    <h1>System Settings</h1>
+                                    <v-tabs class="elevation-4" dark>
+                                        <v-tabs-slider color="white"></v-tabs-slider>
+                                        <v-tab href="#tab-1" justify-content: center fixed-tabs>Structure</v-tab>
+                                        <v-tab href="#tab-2" justify-content: center fixed-tabs>Help Files</v-tab>
+
+                                        <v-tab-item id="tab-1" class="elevation-2" justify-content: center>
+                                            <v-toolbar dense dark color="primary">
+                                                <v-toolbar-title>Chain Research Structure</v-toolbar-title>
+                                            </v-toolbar>
+                                            <v-toolbar dense dark color="grey darken-4">
+                                                <v-spacer></v-spacer>
+                                                <v-btn color="primary">Import structure</v-btn>
+                                            </v-toolbar>
+                                            <v-card>
+                                                <v-card-text class="pa-2 pb-4">
+                                                    <v-layout row wrap>
+                                                        <v-flex xs6 sm3>
+                                                            <!-- <StructureMaint name="Stores" server /> -->
+                                                        </v-flex>
+                                                        <v-flex xs6 sm3>
+                                                            <StructureMaint server="SystemDepartment" name="Department" />
+                                                        </v-flex>
+                                                        <v-flex xs6 sm3>
+                                                            <StructureMaint server="SystemCategory" name="Category" />
+                                                        </v-flex>
+                                                        <v-flex xs6 sm3>
+                                                            <StructureMaint server="SystemBrand" name="Brand" />
+                                                        </v-flex>
+                                                    </v-layout>
+                                                </v-card-text>
+                                            </v-card>
+                                        </v-tab-item>
+                                        <v-tab-item id="tab-2" class="elevation-2" justify-content: center>
+                                            <HelpFile class="mb-2"></HelpFile>
+                                        </v-tab-item>
+                                    </v-tabs>
+                                </v-card>
                             </v-flex>
                         </v-layout>
-                        <HelpFile></HelpFile>
                     </v-container>
                 </v-flex>
             </v-layout>
@@ -48,14 +88,17 @@
 <script>
     import Axios from 'axios';
     import jwt from 'jsonwebtoken';
-    import {   
+    import {
         EventBus
     } from '@/libs/events/event-bus.js';
     import HelpFile from '@/components/Main/HelpFile/Index.vue'
 
+    import StructureMaint from './StructureMaint'
+
     export default {
         components: {
-            HelpFile
+            HelpFile,
+            StructureMaint
         },
         data() {
             return {

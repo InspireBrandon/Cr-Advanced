@@ -12,7 +12,7 @@
 
         <v-card light class="elevation-0" style="height: calc(100vh - 170px); overflow-x: auto;">
           <v-card-text>
-            <wysiwyg v-model="html" />
+            <wysiwyg height="400px" v-model="html" />
           </v-card-text>
         </v-card>
       </v-card-text>

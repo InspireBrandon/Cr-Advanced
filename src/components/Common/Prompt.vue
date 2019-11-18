@@ -3,7 +3,9 @@
     <v-layout row justify-center>
       <v-dialog v-model="dialog" persistent max-width="400">
         <v-card >
-          <v-card-title style="text-align: center; display: block;" class="headline">{{ title }}</v-card-title>
+          <v-toolbar flat dark dense color="primary">
+            <v-toolbar-title>{{ title }}</v-toolbar-title>
+          </v-toolbar>
           <v-card-text style="text-align: center;">
             <v-form @submit.prevent="returnText">
               <v-text-field autofocus ref="textField" v-model="text" :label="label" required></v-text-field>
