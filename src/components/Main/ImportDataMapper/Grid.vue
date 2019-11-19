@@ -34,7 +34,7 @@
                     headerName: "Import Value",
                     field: "importValue",
                 }, {
-                    headerName: "Linked To",
+                    headerName: "System Value",
                     field: "linkedTo",
                     cellRendererFramework: "Linker",
                 }],

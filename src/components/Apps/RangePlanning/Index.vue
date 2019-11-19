@@ -1,34 +1,34 @@
 <template>
   <div class="ranging">
     <v-toolbar dense dark color="grey darken-3">
-      <v-toolbar-items v-if="!$route.path.includes('RangePlanningView')">
+      <v-toolbar-items>
         <v-menu dark offset-y style="margin-bottom: 10px;">
           <v-btn slot="activator" flat>
             File
           </v-btn>
           <v-list>
-            <v-list-tile @click="newRange">
+            <v-list-tile @click="newRange" v-if="!$route.path.includes('RangePlanningView')">
               <v-list-tile-title>New</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile @click="newCustom">
+            <v-list-tile @click="newCustom" v-if="!$route.path.includes('RangePlanningView')">
               <v-list-tile-title>New Custom</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile @click="openRange">
+            <v-list-tile @click="openRange" v-if="!$route.path.includes('RangePlanningView')">
               <v-list-tile-title>Open</v-list-tile-title>
             </v-list-tile>
             <v-list-tile :disabled="fileData.planogramName == ''" @click="promptForTag">
               <v-list-tile-title>Save</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile :disabled="fileData.planogramName == ''" @click="refreshRange">
+            <v-list-tile :disabled="fileData.planogramName == ''" @click="refreshRange" v-if="!$route.path.includes('RangePlanningView')">
               <v-list-tile-title>Refresh Range</v-list-tile-title>
             </v-list-tile>
-            <v-divider></v-divider>
-            <v-list-tile :disabled="fileData.planogramID == ''" @click="closeRange">
+            <v-divider v-if="!$route.path.includes('RangePlanningView')"></v-divider>
+            <v-list-tile :disabled="fileData.planogramID == ''" @click="closeRange" v-if="!$route.path.includes('RangePlanningView')">
               <v-list-tile-title>Close</v-list-tile-title>
             </v-list-tile>
           </v-list>
         </v-menu>
-        <v-menu v-if="rowData.length > 0" dark offset-y style="margin-bottom: 10px;">
+        <v-menu v-if="rowData.length > 0 && !$route.path.includes('RangePlanningView')" dark offset-y style="margin-bottom: 10px;">
           <v-btn slot="activator" flat>
             Options
           </v-btn>
@@ -38,7 +38,7 @@
             </v-list-tile>
           </v-list>
         </v-menu>
-        <v-menu v-if="rowData.length > 0" dark offset-y style="margin-bottom: 10px;">
+        <v-menu v-if="rowData.length > 0 && !$route.path.includes('RangePlanningView')" dark offset-y style="margin-bottom: 10px;">
           <v-btn slot="activator" flat>
             Database
           </v-btn>
@@ -57,7 +57,7 @@
             </v-list-tile>
           </v-list>
         </v-menu>
-        <v-menu v-if="rowData.length > 0" dark offset-y style="margin-bottom: 10px;">
+        <v-menu v-if="rowData.length > 0 && !$route.path.includes('RangePlanningView')" dark offset-y style="margin-bottom: 10px;">
           <v-btn slot="activator" flat>
             View
           </v-btn>
@@ -70,7 +70,7 @@
             </v-list-tile>
           </v-list>
         </v-menu>
-        <v-menu v-if="rowData.length > 0" dark offset-y style="margin-bottom: 10px;">
+        <v-menu v-if="rowData.length > 0 && !$route.path.includes('RangePlanningView')" dark offset-y style="margin-bottom: 10px;">
           <v-btn slot="activator" flat>Highlight</v-btn>
           <v-list>
             <v-list-tile :disabled="selectedClusterOption == null" @click="openAutoRangeModal">
@@ -81,7 +81,7 @@
             </v-list-tile>
           </v-list>
         </v-menu>
-        <v-menu v-if="rowData.length > 0" dark offset-y style="margin-bottom: 10px;">
+        <v-menu v-if="rowData.length > 0 && !$route.path.includes('RangePlanningView')" dark offset-y style="margin-bottom: 10px;">
           <v-btn slot="activator" flat>Export</v-btn>
           <v-list>
             <v-list-tile @click="exportData('Excel')">
@@ -118,7 +118,7 @@
 
             <span style="margin-left: 30px; margin-top: 30px; " v-show="storesInCluster > -1">{{ storesInCluster }}
               Stores </span>
-            <span v-show="getItemsToAudit() > 0"
+            <span v-show="getItemsToAudit() > 0 && !$route.path.includes('RangePlanningView')"
               style="font-weight: bold; color: red;margin-left: 10px; margin-top: 30px;"> - {{ getItemsToAudit() }}
               product(s) need auditing</span>
 
@@ -133,7 +133,7 @@
           <v-btn v-if="rowData.length>0" @click="openReport" color="primary" small dark>Report</v-btn>
           <v-btn v-if="rowData.length>0" @click="onChart1" color="primary" small dark>graphs</v-btn>
           <v-menu v-if="rowData.length > 0" dark offset-y>
-            <v-btn slot="activator" v-if="rowData.length>0" color="pink" small dark>Apply Highlight</v-btn>
+            <v-btn slot="activator" v-if="rowData.length>0 && !$route.path.includes('RangePlanningView')" color="pink" small dark>Apply Highlight</v-btn>
             <v-list class="pa-0">
               <v-list-tile :disabled="selectedClusterOption == null" @click="applyHighlight('YES')">
                 <v-list-tile-title>YES</v-list-tile-title>
@@ -144,7 +144,7 @@
               </v-list-tile>
             </v-list>
           </v-menu>
-          <v-btn v-if="rowData.length > 0" @click="showNote = !showNote" color="primary" small dark>Note</v-btn>
+          <v-btn v-if="rowData.length > 0 && !$route.path.includes('RangePlanningView')" @click="showNote = !showNote" color="primary" small dark>Note</v-btn>
           <v-menu offset-y>
             <v-btn v-if="selectedItems.length > 0" :disabled="selectedItems.length == 0" slot="activator"
               color="primary" small dark>Set Indicator
@@ -639,8 +639,8 @@
       checkparams() {
         let self = this
 
-        if (self.$route.params != null) {
-          // self.$refs.spinner.show();
+        if (self.$route.params.rangeFileID != null && self.$route.params.rangeFileID != ":rangeFileID") {
+          self.$refs.spinner.show();
 
           Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${self.$route.params.rangeFileID}`)
             .then(r => {
@@ -686,6 +686,8 @@
                 self.$refs.spinner.hide();
                 self.gotData = true
               })
+
+              self.promptForFileSync();
             })
 
         }
@@ -779,6 +781,8 @@
                   self.$refs.spinner.hide();
                   self.gotData = true
                 })
+
+                self.promptForFileSync();
               })
           })
         })
@@ -854,6 +858,8 @@
                   self.$refs.spinner.hide();
                   self.gotData = true
                 })
+
+                self.promptForFileSync();
               })
           })
         })
@@ -1503,6 +1509,8 @@
                 self.$refs.spinner.hide();
                 self.gotData = true
               })
+
+              self.promptForFileSync();
             })
         })
       },
@@ -1512,14 +1520,14 @@
           try {
             self.columnDefs = require('./headers.json');
 
-            if (self.columnDefs[self.columnDefs.length - 1].headerName != "Options") {
-              self.columnDefs.push({
-                headerName: 'Options',
-                field: 'barcode',
-                cellRendererFramework: 'optionsComponent',
-                pinned: 'right'
-              })
-            }
+            // if (self.columnDefs[self.columnDefs.length - 1].headerName != "Options") {
+            //   self.columnDefs.push({
+            //     headerName: 'Options',
+            //     field: 'barcode',
+            //     cellRendererFramework: 'optionsComponent',
+            //     pinned: 'right'
+            //   })
+            // }
 
             self.columnDefs[4] = {
               "headerName": "Description",
