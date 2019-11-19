@@ -501,7 +501,7 @@
 
                                                 taskItem.click = function () {
                                                     self.$router.push(
-                                                        `/PlanogramImplementationNew/${task.planogram_ID}/${task.systemFileID}/20`
+                                                        `/PlanogramImplementationNew/${task.project_ID}/${task.systemFileID}/20`
                                                     );
                                                 }
 
@@ -540,7 +540,7 @@
 
                                                 taskItem.click = function () {
                                                     self.$router.push(
-                                                        `/PlanogramImplementationNew/${task.planogram_ID}/${task.systemFileID}/20`
+                                                        `/PlanogramImplementationNew/${task.project_ID}/${task.systemFileID}/20`
                                                     );
                                                 }
 
@@ -581,7 +581,7 @@
 
                                             taskItem.click = function () {
                                                 self.$router.push(
-                                                    `/PlanogramImplementationNew/${task.planogram_ID}/${task.planogramFileID}/20`
+                                                    `/PlanogramImplementationNew/${task.project_ID}/${task.planogramFileID}/20`
                                                 );
                                             }
 
@@ -735,7 +735,7 @@
                                                 children: [],
                                                 click: function () {
                                                     self.$router.push(
-                                                        `/PlanogramImplementationNew/${department.planogramID}/${department.systemFileID}/13`
+                                                        `/PlanogramImplementationNew/${department.project_ID}/${department.systemFileID}/13`
                                                     );
                                                 }
                                             })
