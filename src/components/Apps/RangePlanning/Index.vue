@@ -687,7 +687,7 @@
                 self.gotData = true
               })
 
-              self.promptForFileSync();
+              // self.promptForFileSync();
             })
 
         }
