@@ -232,11 +232,14 @@
             self.initialise();
             if (self.$route.params.projectTransactionID != undefined) {
                 self.routeProjectID = self.$route.params.projectTransactionID;
+                console.log("routeProjectID",self.routeProjectID);
+                
                 self.selectedProject = self.routeProjectID;
                 self.routePlanogramID = self.$route.params.planogramID
                 self.routeStatus = self.$route.params.status
                 self.onRouteEnter(function () {
                     self.selectPlanogram(self.routePlanogramID);
+                   
                 })
             } else {
                 self.initialise();
@@ -344,7 +347,9 @@
                             self.displayName = r.data.jsonObject.name
                             self.planogramObj = r.data.jsonObject
                             self.$refs.SizeLoader.close()
-
+                            console.log("self.selectedProject",self.selectedProject);
+                            
+                            self.getProjectTransactionsByProjectID(self.selectedProject)
                             if (r.data.fromFolder == false) {
                                 self.image = r.data.jsonObject.image
 
@@ -780,6 +785,9 @@
             },
             getProjectTransactionsByProjectID(projectID) {
                 let self = this;
+                console.log("getProjectTransactionsByProjectID");
+                
+                
                 self.projectID = projectID
                 return new Promise((resolve, reject) => {
 
@@ -787,6 +795,8 @@
 
                     Axios.get(process.env.VUE_APP_API + `ProjectTX?projectID=${projectID}`)
                         .then(r => {
+                            console.log(r);
+                            
                             delete Axios.defaults.headers.common["TenantID"];
 
                             self.timelineItems = [];

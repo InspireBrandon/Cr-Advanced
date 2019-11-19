@@ -34,7 +34,16 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
+                <v-select style="margin-left: 10px; margin-top: 8px; width: 200px" label="Type"
+                    v-model="selectedImportType" :items="ImportTypes">
+
+                </v-select>
+                <v-select style="margin-left: 10px; margin-top: 8px; width: 200px" label="Import level"
+                    v-model="selectedImportLevel" return-object :items="ImportLevels">
+
+                </v-select>
             </v-toolbar-items>
+
             <v-spacer></v-spacer>
             <div></div>
             <v-spacer></v-spacer>
@@ -50,6 +59,7 @@
         <YesNoModal ref="YesNoModal" />
         <FileDataSelector ref="FileDataSelector" />
         <ImportSelector ref="ImportSelector" />
+        <DateRangeSelector ref="DateRangeSelector" />
         <Spinner ref="Spinner" />
     </v-card>
 </template>
@@ -59,6 +69,7 @@
 
     import Axios from 'axios';
     import Grid from './Grid'
+    import DateRangeSelector from '@/components/Common/DateRangeSelector';
     import Prompt from '@/components/Common/Prompt'
     import YesNoModal from '@/components/Common/YesNoModal'
     import FileDataSelector from './FileDataSelector'
@@ -74,17 +85,38 @@
             YesNoModal,
             Spinner,
             FileDataSelector,
-            RetailerSupplierStoreDialog
+            RetailerSupplierStoreDialog,
+            DateRangeSelector
         },
         data() {
             return {
+                selectedImportType: true,
+                ImportTypes: [{
+                    text: "Sales In",
+                    value: true
+                }, {
+                    text: "Sales Out",
+                    value: false
+                }],
                 selectedImport: null,
+                ImportLevels: [{
+                    text: "Store",
+                    value: 0
+                }, {
+                    text: "Department",
+                    value: 1
+                }, {
+                    text: "Category",
+                    value: 2
+                }, {
+                    text: "Brand",
+                    value: 3
+                }],
+                subscriptionLevel: null,
+                selectedImportLevel: null,
                 SystemUser_ID: -1,
                 rowData: [],
-                headers: [{
-                    "headerName": "Retailer",
-                    "field": "retailerName",
-                }, {
+                HeadersStatic: [{
                     "headerName": "Store",
                     "field": "storeName",
                 }, {
@@ -99,6 +131,34 @@
                     "field": "yCoordinate",
                     "editable": true
                 }],
+                headers: [{
+                    "headerName": "Store",
+                    "field": "storeName",
+                }, {
+                    "headerName": "sales",
+                    "field": "sales",
+                }, {
+                    "headerName": "X Coordinate",
+                    "field": "xCoordinate",
+                    "editable": true
+                }, {
+                    "headerName": "Y Coordinate",
+                    "field": "yCoordinate",
+                    "editable": true
+                }, {
+                    "headerName": "brand",
+                    "field": "brand",
+                    "editable": true
+                }, {
+                    "headerName": "category",
+                    "field": "category",
+                    "editable": true
+                }, {
+                    "headerName": "department",
+                    "field": "department",
+                    "editable": true
+                }, ],
+                hasDatabases: false,
                 runData: [],
                 fileData: []
             }
@@ -107,6 +167,22 @@
             let self = this;
             let encoded_details = jwt.decode(sessionStorage.accessToken);
             self.SystemUser_ID = encoded_details.USER_ID;
+            Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+            Axios.get(process.env.VUE_APP_API + `SystemUser/${self.SystemUser_ID}`).then(r => {
+                console.log("SystemUser", r);
+                Axios.get(process.env.VUE_APP_API + `TenantAccess?systemUserID=${self.SystemUser_ID}`)
+                    .then(r => {
+                        if (r.data.length > 0) {
+                            self.subscriptionLevel = 3
+                            self.hasDatabases = true;
+                        }
+                        self.subscriptionLevel = r.data.subscriptionLevel
+                        self.createSubscriptionLevels()
+
+                    })
+
+            })
 
             self.getFile(data => {
                 if (data != null && data != false) {
@@ -128,6 +204,33 @@
             })
         },
         methods: {
+            createSubscriptionLevels() {
+                let self = this
+                if (!self.hasDatabases) {
+                    let tmp = self.ImportLevels
+                    self.ImportLevels = []
+                    tmp.forEach(e => {
+                        if (e.value <= self.subscriptionLevel) {
+                            self.ImportLevels.push(e)
+                        }
+                    })
+                } else {
+                    self.ImportLevels = [{
+                        text: "Store",
+                        value: 0
+                    }, {
+                        text: "Department",
+                        value: 1
+                    }, {
+                        text: "Category",
+                        value: 2
+                    }, {
+                        text: "Brand",
+                        value: 3
+                    }]
+
+                }
+            },
             generateNameParams(selectedBasket, selectedPeriod) {
                 let self = this;
 
@@ -148,6 +251,11 @@
             },
             openFileDialog() {
                 let self = this;
+                if (self.selectedImportLevel == null) {
+                    alert("Please Select an import Level")
+                    return
+                }
+                
                 self.$refs.fileInput.value = null;
                 self.$refs.fileInput.click();
             },
@@ -161,19 +269,88 @@
 
                     reader.onload = function (e) {
                         let data = csvToDataObject(e.currentTarget.result);
-
+                        let tmpHeaders = []
+                        tmpHeaders = self.HeadersStatic
                         let newArr = [];
+                        switch (self.selectedImportLevel.value) {
+                            case 0:
+                                data.data.forEach(el => {
+                                    newArr.push(new customImportItem({
+                                        storeName: el.storeName,
+                                        sales: el.sales,
+                                        coordinates: el.Coordinates
+                                    }))
+                                });
 
-                        data.data.forEach(el => {
-                            newArr.push(new customImportItem({
-                                retailerName: el.retailerName,
-                                storeName: el.storeName,
-                                sales: el.sales,
-                                coordinates: el.Coordinates
-                            }))
-                        });
+
+                                break;
+                            case 1:
+                                data.data.forEach(el => {
+                                    newArr.push(new customImportItem({
+                                        storeName: el.storeName,
+                                        department: el.department,
+                                        sales: el.sales,
+                                        coordinates: el.Coordinates
+                                    }))
+                                });
+                                tmpHeaders.push({
+                                    "headerName": "category",
+                                    "field": "category",
+                                    "editable": true
+                                }, )
+                                break;
+                            case 2:
+                                data.data.forEach(el => {
+                                    newArr.push(new customImportItem({
+                                        storeName: el.storeName,
+                                        category: el.category,
+                                        department: el.department,
+                                        sales: el.sales,
+                                        coordinates: el.Coordinates
+                                    }))
+                                });
+                                tmpHeaders.push({
+                                    "headerName": "category",
+                                    "field": "category",
+                                    "editable": true
+                                }, {
+                                    "headerName": "department",
+                                    "field": "department",
+                                    "editable": true
+                                })
+                                break;
+                            case 3:
+                                data.data.forEach(el => {
+                                    newArr.push(new customImportItem({
+                                        storeName: el.storeName,
+                                        brand: el.brand,
+                                        category: el.category,
+                                        department: el.department,
+                                        sales: el.sales,
+                                        coordinates: el.Coordinates
+                                    }))
+                                });
+                                tmpHeaders.push({
+                                    "headerName": "brand",
+                                    "field": "brand",
+                                    "editable": true
+                                }, {
+                                    "headerName": "category",
+                                    "field": "category",
+                                    "editable": true
+                                }, {
+                                    "headerName": "department",
+                                    "field": "department",
+                                    "editable": true
+                                })
+                                break;
+
+                            default:
+                                break;
+                        }
 
                         // self.headers = convertToGridHeaders(data.headers);
+                        self.headers = tmpHeaders
                         self.rowData = newArr;
                     }
 
@@ -227,23 +404,28 @@
             },
             saveImportToDB(name) {
                 let self = this
-                let request = {
-                    Name: name,
-                    UserID: self.SystemUser_ID,
-                    ID: self.ImportID,
-                    Type_ID: 1
-                }
-                console.log(request);
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                self.$refs.DateRangeSelector.show(dateRange => {
+                    console.log("[DATERANGE]", dateRange);
 
-                Axios.post(process.env.VUE_APP_API + `SuplierLocationImport`, request)
-                    .then(r => {
-                        console.log(r);
+                    let request = {
+                        Name: name,
+                        UserID: self.SystemUser_ID,
+                        ID: self.ImportID,
+                        salesIn: self.selectedImportType,
+                        Type_ID: 1,
+                        PeriodTo: dateRange.dateTo,
+                        PeriodFrom: dateRange.dateFrom,
+                    }
+                    console.log(request);
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                        self.saveImportTXes(r.data.id)
-                    })
+                    Axios.post(process.env.VUE_APP_API + `SuplierLocationImport`, request)
+                        .then(r => {
+                            console.log("[SuplierLocationImport]", r);
 
-
+                            self.saveImportTXes(r.data.id)
+                        })
+                })
             },
             saveImportTXes(groupID) {
                 let self = this
@@ -264,6 +446,9 @@
                         retailerName: e.retailerName,
                         StoreName: e.storeName,
                         Sales: e.sales,
+                        brand: e.brand,
+                        category: e.category,
+                        department: e.department,
                         XCoordinate: e.xCoordinate,
                         YCoordinate: e.yCoordinate
                     })
@@ -361,7 +546,7 @@
             openFile() {
                 let self = this;
                 self.$refs.ImportSelector.show(callback => {
-                    console.log(callback);
+                    console.log("{ImportSelector}", callback);
                     self.selectedImport = callback
 
                     Axios.get(process.env.VUE_APP_API + `SuplierLocationImportTX/GetAll?groupID=${callback.id}`)
@@ -409,6 +594,9 @@
         self.retailerName = data.retailerName;
         self.storeName = data.storeName;
         self.sales = data.sales;
+        self.brand = data.brand
+        self.category = data.category
+        self.department = data.department
         self.hasCoordinates = data.coordinates != undefined && data.coordinates != null && data.coordinates != "";
 
         if (self.hasCoordinates) {
