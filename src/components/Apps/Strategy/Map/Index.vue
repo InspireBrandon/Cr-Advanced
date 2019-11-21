@@ -2,7 +2,7 @@
   <div width="100%">
     <v-toolbar dark flat>
       <span v-if="chart!=null">
-        {{chart.zoomLevel}}
+        {{lastCLicked}}
       </span>
     </v-toolbar>
     <div oncontextmenu="return false;" class="mapContainer">
@@ -127,6 +127,7 @@
     },
     data() {
       return {
+        lastCLicked: null,
         // start sidebar setup
         useRetailerMap: false,
         selectedRetailers: [],
@@ -247,13 +248,13 @@
         let self = this;
         let retVal = [];
         if (self.geoGridData != undefined && self.geoGridData != null) {
-          self.geoGridData.forEach((el, idx) => {
-            if (el.retailerStores.length > 0) {
-              el.blockNumber = idx;
-              el.storeSummary = self.MapStoreData(el)
-              retVal.push(el);
-            }
-          });
+          // self.geoGridData.forEach((el, idx) => {
+          //   if (el.retailerStores.length > 0) {
+          //     el.blockNumber = idx;
+          //     el.storeSummary = self.MapStoreData(el)
+          //     retVal.push(el);
+          //   }
+          // });
         }
         return retVal;
       }
@@ -327,29 +328,53 @@
         let self = this;
 
         self.geoGridData.forEach((e, idx) => {
-          let arr = [e.squareFormattedList];
+          let arr = [e.geoPolygon];
 
-          let x = e.squareFormattedList[0].longitude;
-          let y = e.squareFormattedList[0].latitude;
+          // let x = e.squareFormattedList[0].longitude;
+          // let y = e.squareFormattedList[0].latitude;
+          let x = e.geoPolygon[0].longitude;
+          let y = e.geoPolygon[0].latitude;
+
+          // let shapeSeries = chart.series.push(new am4maps.MapPolygonSeries());
+
+          // shapeSeries.data = [{
+          //   "title": "Bermuda triangle",
+          //   "geoPolygon": arr
+          // }];
+
+          // let shapeTemplate = shapeSeries.mapPolygons.template;
+          // shapeTemplate.stroke = am4core.color("#e33");
+          // shapeTemplate.strokeWidth = 2;
+          // shapeTemplate.fill = shapeTemplate.stroke;
+          // shapeTemplate.fillOpacity = 0.2;
+          // shapeTemplate.nonScalingStroke = true;
 
           let shapeSeries = chart.series.push(new am4maps.MapPolygonSeries());
-
-          shapeSeries.data = [{
-            title: "Bermuda triangle",
-            geoPolygon: arr
-          }];
-          shapeSeries.hiddenInLegend = true;
-          shapeSeries.name = "block";
-
           let shapeTemplate = shapeSeries.mapPolygons.template;
           shapeTemplate.stroke = am4core.color("#e33");
           shapeTemplate.strokeWidth = 2;
-          shapeTemplate.fill = shapeTemplate.stroke;
-          shapeTemplate.hiddenInLegend = true;
+          shapeTemplate.propertyFields.stores = e.stores.length
+          // shapeTemplate.fill = shapeTemplate.stroke;
+          shapeTemplate.propertyFields.latitude = "longitude";
+          shapeTemplate.propertyFields.longitude = "latitude";
+
+
+
           shapeTemplate.fillOpacity = 0.2;
           shapeTemplate.nonScalingStroke = true;
-          shapeTemplate.tooltipText = self.checkAlphaNumber(idx);
+          shapeSeries.data = [{
+            title: idx,
+            geoPolygon: arr
+          }];
 
+          shapeSeries.name = "block";
+          shapeTemplate.tooltipText = self.checkAlphaNumber(idx) + " stores:" + e.stores.length;
+          // shapeSeries.heatRules.push({
+          //   property: "fill",
+          //   target: polygonSeries.mapPolygons.template,
+          //   min: chart.colors.getIndex(1).brighten(1),
+          //   max: chart.colors.getIndex(1).brighten(-0.3)
+          // });
           var labelSeries = chart.series.push(new am4maps.MapImageSeries());
           labelSeries.hiddenInLegend = true;
           var labelTemplate = labelSeries.mapImages.template.createChild(
@@ -1008,42 +1033,44 @@
         // /////////////////////////////////////////////////////
         // event for plotting stores mostly used for debug
         // /////////////////////////////////////////////////////
-        // chart.seriesContainer.events.on("hit", function (ev) {
-        //   var coords = chart.svgPointToGeo(ev.svgPoint);
+        chart.seriesContainer.events.on("hit", function (ev) {
+          var coords = chart.svgPointToGeo(ev.svgPoint);
+          self.lastCLicked = coords
+          console.log(coords);
 
-        //   if (!self.canPlot) {
-        //     return;
-        //   }
-        //   if (ev.preventDefault != undefined) ev.preventDefault();
-        //   if (ev.stopPropagation != undefined) ev.stopPropagation();
-        //   self.$refs.yesNo.show(
-        //     "Would you like to make a tag here?",
-        //     goThrough => {
-        //       if (goThrough) {
-        //         var mapMarker = imageSeriesTemplate.createChild(am4core.Sprite);
-        //         mapMarker.path =
-        //           "M4 12 A12 12 0 0 1 28 12 C28 20, 16 32, 16 32 C16 32, 4 20 4 12 M11 12 A5 5 0 0 0 21 12 A5 5 0 0 0 11 12 Z";
-        //         mapMarker.width = 32;
-        //         mapMarker.height = 32;
-        //         mapMarker.scale = 0.7;
-        //         mapMarker.fill = am4core.color("#3F4B3B");
-        //         mapMarker.fillOpacity = 0.8;
-        //         mapMarker.horizontalCenter = "middle";
-        //         mapMarker.verticalCenter = "bottom";
-        //         var coords = chart.svgPointToGeo(ev.svgPoint);
-        //         var marker = imageSeries.mapImages.create();
+          if (!self.canPlot) {
+            return;
+          }
+          if (ev.preventDefault != undefined) ev.preventDefault();
+          if (ev.stopPropagation != undefined) ev.stopPropagation();
+          self.$refs.yesNo.show(
+            "Would you like to make a tag here?",
+            goThrough => {
+              if (goThrough) {
+                var mapMarker = imageSeriesTemplate.createChild(am4core.Sprite);
+                mapMarker.path =
+                  "M4 12 A12 12 0 0 1 28 12 C28 20, 16 32, 16 32 C16 32, 4 20 4 12 M11 12 A5 5 0 0 0 21 12 A5 5 0 0 0 11 12 Z";
+                mapMarker.width = 32;
+                mapMarker.height = 32;
+                mapMarker.scale = 0.7;
+                mapMarker.fill = am4core.color("#3F4B3B");
+                mapMarker.fillOpacity = 0.8;
+                mapMarker.horizontalCenter = "middle";
+                mapMarker.verticalCenter = "bottom";
+                var coords = chart.svgPointToGeo(ev.svgPoint);
+                var marker = imageSeries.mapImages.create();
 
-        //         marker.latitude = coords.latitude;
-        //         marker.longitude = coords.longitude;
-        //         marker.events.on("rightclick", function (dataItem, ev) {
-        //           if (dataItem.hidden) marker.show(dataItem.index);
-        //           else marker.hide(dataItem.index);
-        //           event.stopPropagation();
-        //         });
-        //       }
-        //     }
-        //   );
-        // });
+                marker.latitude = coords.latitude;
+                marker.longitude = coords.longitude;
+                marker.events.on("rightclick", function (dataItem, ev) {
+                  if (dataItem.hidden) marker.show(dataItem.index);
+                  else marker.hide(dataItem.index);
+                  event.stopPropagation();
+                });
+              }
+            }
+          );
+        });
 
         if (config.drawGrid) {
           self.DrawGeoGrid(chart, callback => {});
