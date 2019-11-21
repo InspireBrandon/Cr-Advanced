@@ -39,9 +39,21 @@
 
                 </v-select>
                 <v-select style="margin-left: 10px; margin-top: 8px; width: 200px" label="Import level"
-                    v-model="selectedImportLevel" return-object :items="ImportLevels">
-
+                    v-model="selectedImportLevel" @change="handleSpecificHeaders" return-object :items="ImportLevels">
                 </v-select>
+                <v-checkbox @change="handleSpecificHeaders" v-if="selectedImportLevel!=null"
+                    style="margin-left: 10px; margin-top: 14px;" label="Specific" v-model="isSpecific">
+                </v-checkbox>
+                <v-text-field style="margin-left: 15px; margin-top: 8px; width: 200px" v-model="specificName"
+                    v-if="isSpecific" label="Specific Name">
+
+                </v-text-field>
+                <!-- <v-btn @click="gengrid">
+                    gen
+                </v-btn>
+                 <v-btn @click="linkGrid">
+                    Link
+                </v-btn> -->
             </v-toolbar-items>
 
             <v-spacer></v-spacer>
@@ -90,6 +102,8 @@
         },
         data() {
             return {
+                specificName: null,
+                isSpecific: false,
                 selectedImportType: true,
                 ImportTypes: [{
                     text: "Sales In",
@@ -131,33 +145,7 @@
                     "field": "yCoordinate",
                     "editable": true
                 }],
-                headers: [{
-                    "headerName": "Store",
-                    "field": "storeName",
-                }, {
-                    "headerName": "sales",
-                    "field": "sales",
-                }, {
-                    "headerName": "X Coordinate",
-                    "field": "xCoordinate",
-                    "editable": true
-                }, {
-                    "headerName": "Y Coordinate",
-                    "field": "yCoordinate",
-                    "editable": true
-                }, {
-                    "headerName": "brand",
-                    "field": "brand",
-                    "editable": true
-                }, {
-                    "headerName": "category",
-                    "field": "category",
-                    "editable": true
-                }, {
-                    "headerName": "department",
-                    "field": "department",
-                    "editable": true
-                }, ],
+                headers: [],
                 hasDatabases: false,
                 runData: [],
                 fileData: []
@@ -204,6 +192,83 @@
             })
         },
         methods: {
+            handleSpecificHeaders() {
+                let self = this
+                self.headers = []
+                self.$nextTick(() => {
+                    if (self.isSpecific) {
+                        self.headers = self.HeadersStatic
+                    } else {
+                        let tmpHeaders = []
+                        tmpHeaders = self.HeadersStatic
+                        let newHead = JSON.parse(JSON.stringify(tmpHeaders))
+                        switch (self.selectedImportLevel.value) {
+                            case 0:
+
+                                break;
+                            case 1:
+
+                                newHead.push({
+                                    "headerName": "department",
+                                    "field": "department",
+                                    "editable": true
+                                })
+                                break;
+                            case 2:
+
+                                newHead.push({
+                                    "headerName": "category",
+                                    "field": "category",
+                                    "editable": true
+                                }, {
+                                    "headerName": "department",
+                                    "field": "department",
+                                    "editable": true
+                                })
+                                break;
+                            case 3:
+
+                                newHead.push({
+                                    "headerName": "brand",
+                                    "field": "brand",
+                                    "editable": true
+                                }, {
+                                    "headerName": "category",
+                                    "field": "category",
+                                    "editable": true
+                                }, {
+                                    "headerName": "department",
+                                    "field": "department",
+                                    "editable": true
+                                })
+                                break;
+
+                            default:
+                                break;
+                        }
+                        self.headers = newHead
+                    }
+                })
+            },
+            gengrid() {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + `SuplierLocationImportTX/GenerateGrid`)
+                    .then(r => {
+                        console.log(r);
+                    })
+            },
+            linkGrid() {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + `SuplierLocationImportTX/LinkCurrentStoresToGrid`)
+                    .then(r => {
+                        console.log(r);
+                    })
+            },
+
             createSubscriptionLevels() {
                 let self = this
                 if (!self.hasDatabases) {
@@ -255,7 +320,7 @@
                     alert("Please Select an import Level")
                     return
                 }
-                
+
                 self.$refs.fileInput.value = null;
                 self.$refs.fileInput.click();
             },
@@ -269,91 +334,70 @@
 
                     reader.onload = function (e) {
                         let data = csvToDataObject(e.currentTarget.result);
-                        let tmpHeaders = []
-                        tmpHeaders = self.HeadersStatic
+
                         let newArr = [];
-                        switch (self.selectedImportLevel.value) {
-                            case 0:
-                                data.data.forEach(el => {
-                                    newArr.push(new customImportItem({
-                                        storeName: el.storeName,
-                                        sales: el.sales,
-                                        coordinates: el.Coordinates
-                                    }))
-                                });
+                        if (self.isSpecific) {
+                            data.data.forEach(el => {
+                                newArr.push(new customImportItem({
+                                    storeName: el.storeName,
+                                    sales: el.sales,
+                                    coordinates: el.Coordinates
+                                }))
+                            });
+                        } else {
+
+                            switch (self.selectedImportLevel.value) {
+                                case 0:
+                                    data.data.forEach(el => {
+                                        newArr.push(new customImportItem({
+                                            storeName: el.storeName,
+                                            sales: el.sales,
+                                            coordinates: el.Coordinates
+                                        }))
+                                    });
 
 
-                                break;
-                            case 1:
-                                data.data.forEach(el => {
-                                    newArr.push(new customImportItem({
-                                        storeName: el.storeName,
-                                        department: el.department,
-                                        sales: el.sales,
-                                        coordinates: el.Coordinates
-                                    }))
-                                });
-                                tmpHeaders.push({
-                                    "headerName": "category",
-                                    "field": "category",
-                                    "editable": true
-                                }, )
-                                break;
-                            case 2:
-                                data.data.forEach(el => {
-                                    newArr.push(new customImportItem({
-                                        storeName: el.storeName,
-                                        category: el.category,
-                                        department: el.department,
-                                        sales: el.sales,
-                                        coordinates: el.Coordinates
-                                    }))
-                                });
-                                tmpHeaders.push({
-                                    "headerName": "category",
-                                    "field": "category",
-                                    "editable": true
-                                }, {
-                                    "headerName": "department",
-                                    "field": "department",
-                                    "editable": true
-                                })
-                                break;
-                            case 3:
-                                data.data.forEach(el => {
-                                    newArr.push(new customImportItem({
-                                        storeName: el.storeName,
-                                        brand: el.brand,
-                                        category: el.category,
-                                        department: el.department,
-                                        sales: el.sales,
-                                        coordinates: el.Coordinates
-                                    }))
-                                });
-                                tmpHeaders.push({
-                                    "headerName": "brand",
-                                    "field": "brand",
-                                    "editable": true
-                                }, {
-                                    "headerName": "category",
-                                    "field": "category",
-                                    "editable": true
-                                }, {
-                                    "headerName": "department",
-                                    "field": "department",
-                                    "editable": true
-                                })
-                                break;
+                                    break;
+                                case 1:
+                                    data.data.forEach(el => {
+                                        newArr.push(new customImportItem({
+                                            storeName: el.storeName,
+                                            department: el.department,
+                                            sales: el.sales,
+                                            coordinates: el.Coordinates
+                                        }))
+                                    });
 
-                            default:
-                                break;
+                                case 2:
+                                    data.data.forEach(el => {
+                                        newArr.push(new customImportItem({
+                                            storeName: el.storeName,
+                                            category: el.category,
+                                            department: el.department,
+                                            sales: el.sales,
+                                            coordinates: el.Coordinates
+                                        }))
+                                    });
+
+                                case 3:
+                                    data.data.forEach(el => {
+                                        newArr.push(new customImportItem({
+                                            storeName: el.storeName,
+                                            brand: el.brand,
+                                            category: el.category,
+                                            department: el.department,
+                                            sales: el.sales,
+                                            coordinates: el.Coordinates
+                                        }))
+                                    });
+
+                                default:
+                                    break;
+                            }
                         }
-
                         // self.headers = convertToGridHeaders(data.headers);
-                        self.headers = tmpHeaders
                         self.rowData = newArr;
                     }
-
                     reader.readAsText(file);
                 })
             },
@@ -415,6 +459,9 @@
                         Type_ID: 1,
                         PeriodTo: dateRange.dateTo,
                         PeriodFrom: dateRange.dateFrom,
+                        IsSpecific: self.isSpecific,
+                        Import_Level:self.selectedImportLevel.value
+
                     }
                     console.log(request);
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -442,16 +489,31 @@
                     // } else {
                     //     val = parseFloat(number[0])
                     // }
-                    tmp.push({
-                        retailerName: e.retailerName,
-                        StoreName: e.storeName,
-                        Sales: e.sales,
-                        brand: e.brand,
-                        category: e.category,
-                        department: e.department,
-                        XCoordinate: e.xCoordinate,
-                        YCoordinate: e.yCoordinate
-                    })
+                    if (self.isSpecific) {
+                        let item = {
+                            retailerName: e.retailerName,
+                            StoreName: e.storeName,
+                            Sales: e.sales,
+                            brand: e.brand,
+                            category: e.category,
+                            department: e.department,
+                            XCoordinate: e.xCoordinate,
+                            YCoordinate: e.yCoordinate
+                        }
+                        item[self.selectedImportLevel.text.toLowerCase()]=self.specificName
+                        tmp.push(item)
+                    } else {
+                        tmp.push({
+                            retailerName: e.retailerName,
+                            StoreName: e.storeName,
+                            Sales: e.sales,
+                            brand: e.brand,
+                            category: e.category,
+                            department: e.department,
+                            XCoordinate: e.xCoordinate,
+                            YCoordinate: e.yCoordinate
+                        })
+                    }
                 })
                 console.log(tmp);
 
@@ -468,43 +530,6 @@
             saveFile(name) {
                 let self = this;
                 self.saveImportToDB(name)
-                // self.getFile(fileTransaction => {
-
-                //     if (fileTransaction == null || fileTransaction == false) {
-                //         let tmp = {
-                //             supplierImport: {}
-                //         }
-
-                //         tmp.supplierImport[name] = {
-                //             data: self.rowData
-                //         };
-                //         self.saveImportToDB(name)
-                //         self.appendAndSaveFile(tmp);
-                //     } else {
-                //         self.getFileData(fileTransaction.id, fileData => {
-                //             let tmp = fileData;
-
-                //             if (tmp == false) {
-                //                 tmp = {
-                //                     supplierImport: {}
-                //                 }
-                //             }
-
-                //             if (tmp.supplierImport == undefined)
-                //                 tmp.supplierImport = {};
-
-                //             if (Array.isArray(tmp.supplierImport))
-                //                 tmp.supplierImport = {};
-
-                //             tmp.supplierImport[name] = {
-                //                 data: self.rowData
-                //             };
-                //             self.saveImportToDB(name)
-                //             self.appendAndSaveFile(tmp);
-
-                //         })
-                //     }
-                // })
             },
             getFile(callback) {
                 let self = this;

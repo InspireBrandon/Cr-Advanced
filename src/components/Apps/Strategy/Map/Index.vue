@@ -2,7 +2,7 @@
   <div width="100%">
     <v-toolbar dark flat>
       <span v-if="chart!=null">
-        {{chart.zoomLevel}}
+        {{lastCLicked}}
       </span>
     </v-toolbar>
     <div oncontextmenu="return false;" class="mapContainer">
@@ -123,6 +123,7 @@
     },
     data() {
       return {
+        lastCLicked: null,
         // start sidebar setup
         useRetailerMap: false,
         selectedRetailers: [],
@@ -243,13 +244,13 @@
         let self = this;
         let retVal = [];
         if (self.geoGridData != undefined && self.geoGridData != null) {
-          self.geoGridData.forEach((el, idx) => {
-            if (el.retailerStores.length > 0) {
-              el.blockNumber = idx;
-              el.storeSummary = self.MapStoreData(el)
-              retVal.push(el);
-            }
-          });
+          // self.geoGridData.forEach((el, idx) => {
+          //   if (el.retailerStores.length > 0) {
+          //     el.blockNumber = idx;
+          //     el.storeSummary = self.MapStoreData(el)
+          //     retVal.push(el);
+          //   }
+          // });
         }
         return retVal;
       }
@@ -314,29 +315,53 @@
         let self = this;
 
         self.geoGridData.forEach((e, idx) => {
-          let arr = [e.squareFormattedList];
+          let arr = [e.geoPolygon];
 
-          let x = e.squareFormattedList[0].longitude;
-          let y = e.squareFormattedList[0].latitude;
+          // let x = e.squareFormattedList[0].longitude;
+          // let y = e.squareFormattedList[0].latitude;
+          let x = e.geoPolygon[0].longitude;
+          let y = e.geoPolygon[0].latitude;
+
+          // let shapeSeries = chart.series.push(new am4maps.MapPolygonSeries());
+
+          // shapeSeries.data = [{
+          //   "title": "Bermuda triangle",
+          //   "geoPolygon": arr
+          // }];
+
+          // let shapeTemplate = shapeSeries.mapPolygons.template;
+          // shapeTemplate.stroke = am4core.color("#e33");
+          // shapeTemplate.strokeWidth = 2;
+          // shapeTemplate.fill = shapeTemplate.stroke;
+          // shapeTemplate.fillOpacity = 0.2;
+          // shapeTemplate.nonScalingStroke = true;
 
           let shapeSeries = chart.series.push(new am4maps.MapPolygonSeries());
-
-          shapeSeries.data = [{
-            title: "Bermuda triangle",
-            geoPolygon: arr
-          }];
-          shapeSeries.hiddenInLegend = true;
-          shapeSeries.name = "block";
-
           let shapeTemplate = shapeSeries.mapPolygons.template;
           shapeTemplate.stroke = am4core.color("#e33");
           shapeTemplate.strokeWidth = 2;
-          shapeTemplate.fill = shapeTemplate.stroke;
-          shapeTemplate.hiddenInLegend = true;
+          shapeTemplate.propertyFields.stores = e.stores.length
+          // shapeTemplate.fill = shapeTemplate.stroke;
+          shapeTemplate.propertyFields.latitude = "longitude";
+          shapeTemplate.propertyFields.longitude = "latitude";
+
+
+
           shapeTemplate.fillOpacity = 0.2;
           shapeTemplate.nonScalingStroke = true;
-          shapeTemplate.tooltipText = self.checkAlphaNumber(idx);
+          shapeSeries.data = [{
+            title: idx,
+            geoPolygon: arr
+          }];
 
+          shapeSeries.name = "block";
+          shapeTemplate.tooltipText = self.checkAlphaNumber(idx) + " stores:" + e.stores.length;
+          // shapeSeries.heatRules.push({
+          //   property: "fill",
+          //   target: polygonSeries.mapPolygons.template,
+          //   min: chart.colors.getIndex(1).brighten(1),
+          //   max: chart.colors.getIndex(1).brighten(-0.3)
+          // });
           var labelSeries = chart.series.push(new am4maps.MapImageSeries());
           labelSeries.hiddenInLegend = true;
           var labelTemplate = labelSeries.mapImages.template.createChild(
@@ -700,392 +725,394 @@
         console.log(mapData);
         console.log("/////////////////////////////////////////////////////");
         mapData.forEach(r => {
-              self.buildGraphArr(r, callback => {
-                  let imageSeries = chart.series.push(new am4maps.MapImageSeries());
-                  // define template
-                  let seriesName = null;
-                  self.selectedRetailers.forEach(e => {
-                    if (e.value == r) {
-                      seriesName = e.text;
-                    }
-                  });
-                  self.seriesDataRef.push({
-                    name: seriesName,
-                    data: callback
-                  })
-                  imageSeries.name = seriesName;
-                  // imageSeries.data = callback;
-
-                  let imageSeriesTemplate = imageSeries.mapImages.template;
-                  imageSeriesTemplate.propertyFields.latitude = "xCoordinate";
-                  imageSeriesTemplate.propertyFields.longitude = "yCoordinate";
-                  imageSeriesTemplate.propertyFields.tooltipText = "name";
-                  // imageSeriesTemplate.nonScaling = true;
-                  // imageSeriesTemplate.nonScalingStroke=true
-                  imageSeriesTemplate.fill = "black";
-                  let storeImage = imageSeriesTemplate.createChild(am4core.Image);
-                  storeImage.propertyFields.href = "image";
-                  storeImage.width = 50;
-                  storeImage.height = 50;
-                  storeImage.horizontalCenter = "middle";
-                  storeImage.verticalCenter = "bottom";
-                  // storeImage.propertyFields.tooltipText = "name";
-                  // storeImage.nonScalingStroke=false
-                  storeImage.nonScaling = true;
-
-                  // let storeScalingImage = imageSeriesTemplate.createChild(am4core.Image);
-                  // storeScalingImage.propertyFields.href = "image";
-                  // storeScalingImage.width = 100;
-                  // storeScalingImage.height = 100;
-                  // storeScalingImage.horizontalCenter = "middle";
-                  // storeScalingImage.verticalCenter = "bottom";
-                  // // storeImage.propertyFields.tooltipText = "name";
-                  // // storeImage.nonScalingStroke=false
-                  // storeScalingImage.nonScaling = false;
-                  // chart.events.on("zoomlevelchanged", setZoomimage());
-
-                  // function setZoomimage() {
-                  //   if (chart.zoomLevel < 2) {
-                  //     storeImage.hide();
-                  //     storeScalingImage.show();
-
-                  //   } else {
-                  //     storeScalingImage.hide();
-                  //     storeImage.show();
-                  //   }}
-                  });
-              });
-          },
-          drawImageSeries(chart) {
-            let self = this;
-            // /////////////////////////////////////////////////////
-            // start base hinterland store image series
-            // /////////////////////////////////////////////////////
-
+          self.buildGraphArr(r, callback => {
             let imageSeries = chart.series.push(new am4maps.MapImageSeries());
             // define template
-            imageSeries.name = "Hinterland Stores";
-            imageSeries.data = self.stores;
+            let seriesName = null;
+            self.selectedRetailers.forEach(e => {
+              if (e.value == r) {
+                seriesName = e.text;
+              }
+            });
+            self.seriesDataRef.push({
+              name: seriesName,
+              data: callback
+            })
+            imageSeries.name = seriesName;
+            // imageSeries.data = callback;
 
             let imageSeriesTemplate = imageSeries.mapImages.template;
-            imageSeriesTemplate.propertyFields.latitude = "lat";
-            imageSeriesTemplate.propertyFields.longitude = "long";
-            imageSeriesTemplate.nonScaling = false;
+            imageSeriesTemplate.propertyFields.latitude = "xCoordinate";
+            imageSeriesTemplate.propertyFields.longitude = "yCoordinate";
+            imageSeriesTemplate.propertyFields.tooltipText = "name";
+            // imageSeriesTemplate.nonScaling = true;
+            // imageSeriesTemplate.nonScalingStroke=true
             imageSeriesTemplate.fill = "black";
             let storeImage = imageSeriesTemplate.createChild(am4core.Image);
-            storeImage.propertyFields.href = "imageURL";
+            storeImage.propertyFields.href = "image";
+            storeImage.width = 50;
+            storeImage.height = 50;
+            storeImage.horizontalCenter = "middle";
+            storeImage.verticalCenter = "bottom";
+            // storeImage.propertyFields.tooltipText = "name";
+            // storeImage.nonScalingStroke=false
+            storeImage.nonScaling = true;
+
+            // let storeScalingImage = imageSeriesTemplate.createChild(am4core.Image);
+            // storeScalingImage.propertyFields.href = "image";
+            // storeScalingImage.width = 100;
+            // storeScalingImage.height = 100;
+            // storeScalingImage.horizontalCenter = "middle";
+            // storeScalingImage.verticalCenter = "bottom";
+            // // storeImage.propertyFields.tooltipText = "name";
+            // // storeImage.nonScalingStroke=false
+            // storeScalingImage.nonScaling = false;
+            // chart.events.on("zoomlevelchanged", setZoomimage());
+
+            // function setZoomimage() {
+            //   if (chart.zoomLevel < 2) {
+            //     storeImage.hide();
+            //     storeScalingImage.show();
+
+            //   } else {
+            //     storeScalingImage.hide();
+            //     storeImage.show();
+            //   }}
+          });
+        });
+      },
+      drawImageSeries(chart) {
+        let self = this;
+        // /////////////////////////////////////////////////////
+        // start base hinterland store image series
+        // /////////////////////////////////////////////////////
+
+        let imageSeries = chart.series.push(new am4maps.MapImageSeries());
+        // define template
+        imageSeries.name = "Hinterland Stores";
+        imageSeries.data = self.stores;
+
+        let imageSeriesTemplate = imageSeries.mapImages.template;
+        imageSeriesTemplate.propertyFields.latitude = "lat";
+        imageSeriesTemplate.propertyFields.longitude = "long";
+        imageSeriesTemplate.nonScaling = false;
+        imageSeriesTemplate.fill = "black";
+        let storeImage = imageSeriesTemplate.createChild(am4core.Image);
+        storeImage.propertyFields.href = "imageURL";
+        storeImage.width = 15;
+        storeImage.height = 15;
+        storeImage.horizontalCenter = "middle";
+        storeImage.verticalCenter = "bottom";
+        storeImage.propertyFields.tooltipText = "PlaceGroup";
+      },
+      drawMajorCitiesImageSeries(chart) {
+        let self = this;
+        // /////////////////////////////////////////////////////
+        // start major/minor cities circle series
+        // /////////////////////////////////////////////////////
+        let majorCitiesImageSeries = chart.series.push(
+          new am4maps.MapImageSeries()
+        );
+        majorCitiesImageSeries.name = "Major Cities";
+        // majorCitiesImageSeries.data = self.majorCities;
+
+        let majorCitiesImageSeriesTemplate =
+          majorCitiesImageSeries.mapImages.template;
+        majorCitiesImageSeriesTemplate.propertyFields.latitude = "latitude";
+        majorCitiesImageSeriesTemplate.propertyFields.longitude = "longitude";
+        majorCitiesImageSeriesTemplate.nonScaling = false;
+        majorCitiesImageSeriesTemplate.fill = "black";
+
+        var majorCitiesCircle = majorCitiesImageSeriesTemplate.createChild(
+          am4core.Circle
+        );
+        majorCitiesCircle.fillOpacity = 0.5;
+        majorCitiesCircle.tooltipText = "{city}: [bold]{sales}[/]";
+        majorCitiesCircle.radius = 3;
+        let majorCitiesLabel = majorCitiesImageSeriesTemplate.createChild(
+          am4core.Label
+        );
+        majorCitiesLabel.html =
+          '<a style="background-color: black;color: white;font-size:6px" >{city}</a>';
+        majorCitiesLabel.fontSize = 5;
+        majorCitiesLabel.nonScaling = false;
+      },
+      drawMinorCities(chart) {
+        let self = this;
+        // /////////////////////////////////////////////////////
+        //  start minor cities drawing
+        // /////////////////////////////////////////////////////
+
+        let accrossCitiesImageSeries = chart.series.push(
+          new am4maps.MapImageSeries()
+        );
+        accrossCitiesImageSeries.name = "Minor Cities";
+        // accrossCitiesImageSeries.data = self.accrossCities;
+        let accrossCitiesImageSeriesTemplate =
+          accrossCitiesImageSeries.mapImages.template;
+        accrossCitiesImageSeriesTemplate.propertyFields.latitude = "latitude";
+        accrossCitiesImageSeriesTemplate.propertyFields.longitude = "longitude";
+        accrossCitiesImageSeriesTemplate.nonScaling = false;
+        accrossCitiesImageSeriesTemplate.fill = "black";
+
+        var accrossCitiesCircle = accrossCitiesImageSeriesTemplate.createChild(
+          am4core.Circle
+        );
+        accrossCitiesCircle.fillOpaaccrossCities = 0.5;
+        accrossCitiesCircle.tooltipText = "{city}: [bold]{sales}[/]";
+        accrossCitiesCircle.radius = 3;
+        let accrossCitiesLabel = accrossCitiesImageSeriesTemplate.createChild(
+          am4core.Label
+        );
+        accrossCitiesLabel.html =
+          '<a style="background-color: black;color: white;font-size:1px" >{city}</a>';
+        accrossCitiesLabel.fontSize = 3;
+        accrossCitiesLabel.nonScaling = false;
+      },
+      drawRetailerImport(chart, config) {
+        let self = this;
+        // /////////////////////////////////////////////////////
+        //  start draw retailer import
+        // /////////////////////////////////////////////////////
+        for (var retailer in self.SupplierData) {
+          let currentHasImages = [
+            "Absolute Vet",
+            "Bkb Co-Ops",
+            "Build It",
+            "Builders Warehouse",
+            "Chamberlain",
+            "Choppies",
+            "Coastal",
+            "Co-Ops",
+            "Crazy Plastics",
+            "Dis-Chem",
+            "Est Africa",
+            "Family Pets",
+            "Game",
+            "Gwk Co-Ops",
+            "Hinterland",
+            "Makro",
+            "Mica",
+            "Ntk Agric",
+            "OK Foods",
+            "Overberg Agri Co-Ops",
+            "Pet And Pool",
+            "Pets World",
+            "Pick n Pay",
+            "Shoprite Checkers",
+            "Spar",
+            "The Queen",
+            "Tuinroete Afgri",
+            "Vetsmart",
+            "West Pack"
+          ];
+
+          let hasImage = false;
+          let inArray = false;
+
+          currentHasImages.forEach(img => {
+            if (retailer.includes(img)) hasImage = true;
+          });
+
+          config.selectedRetailers.forEach(el => {
+            if (retailer == el) inArray = true;
+          });
+
+          if (hasImage && inArray) {
+            self.SupplierData[retailer].forEach(el => {
+              if (retailer.includes("Hinterland")) {
+                el.image = "Hinterland.png";
+              } else {
+                el.image = el.retailer + ".png";
+              }
+            });
+
+            let SupplierCitiesImageSeries = chart.series.push(
+              new am4maps.MapImageSeries()
+            );
+
+            SupplierCitiesImageSeries.name = retailer;
+            SupplierCitiesImageSeries.data = self.SupplierData[retailer];
+
+            let SupplierCitiesImageSeriesTemplate =
+              SupplierCitiesImageSeries.mapImages.template;
+            SupplierCitiesImageSeriesTemplate.propertyFields.latitude = "x";
+            SupplierCitiesImageSeriesTemplate.propertyFields.longitude = "y";
+            SupplierCitiesImageSeriesTemplate.nonScaling = true;
+            SupplierCitiesImageSeriesTemplate.fill = "black";
+
+            var SupplierCitiesCircle = SupplierCitiesImageSeriesTemplate.createChild(
+              am4core.Circle
+            );
+            SupplierCitiesCircle.fillOpaSupplierCities = 0.5;
+            SupplierCitiesCircle.tooltipText =
+              "{retailer}: [bold]{sales}[/]{storeName}";
+            SupplierCitiesCircle.radius = 0;
+
+            let storeImage = SupplierCitiesImageSeriesTemplate.createChild(
+              am4core.Image
+            );
+            storeImage.propertyFields.href = "image";
             storeImage.width = 15;
             storeImage.height = 15;
             storeImage.horizontalCenter = "middle";
             storeImage.verticalCenter = "bottom";
-            storeImage.propertyFields.tooltipText = "PlaceGroup";
-          },
-          drawMajorCitiesImageSeries(chart) {
-            let self = this;
-            // /////////////////////////////////////////////////////
-            // start major/minor cities circle series
-            // /////////////////////////////////////////////////////
-            let majorCitiesImageSeries = chart.series.push(
-              new am4maps.MapImageSeries()
-            );
-            majorCitiesImageSeries.name = "Major Cities";
-            // majorCitiesImageSeries.data = self.majorCities;
+            storeImage.tooltipText = "{storeName}: [bold]{sales}[/]";
+          }
+        }
+      },
 
-            let majorCitiesImageSeriesTemplate =
-              majorCitiesImageSeries.mapImages.template;
-            majorCitiesImageSeriesTemplate.propertyFields.latitude = "latitude";
-            majorCitiesImageSeriesTemplate.propertyFields.longitude = "longitude";
-            majorCitiesImageSeriesTemplate.nonScaling = false;
-            majorCitiesImageSeriesTemplate.fill = "black";
+      drawMap(config, setupMapData) {
+        let self = this;
+        self.$refs.Spinner.show()
+        // //////////////////////////////////////////////////
+        // start draw of base chart
+        // //////////////////////////////////////////////////
 
-            var majorCitiesCircle = majorCitiesImageSeriesTemplate.createChild(
-              am4core.Circle
-            );
-            majorCitiesCircle.fillOpacity = 0.5;
-            majorCitiesCircle.tooltipText = "{city}: [bold]{sales}[/]";
-            majorCitiesCircle.radius = 3;
-            let majorCitiesLabel = majorCitiesImageSeriesTemplate.createChild(
-              am4core.Label
-            );
-            majorCitiesLabel.html =
-              '<a style="background-color: black;color: white;font-size:6px" >{city}</a>';
-            majorCitiesLabel.fontSize = 5;
-            majorCitiesLabel.nonScaling = false;
-          },
-          drawMinorCities(chart) {
-            let self = this;
-            // /////////////////////////////////////////////////////
-            //  start minor cities drawing
-            // /////////////////////////////////////////////////////
+        let formattedData = [];
+        let chart = am4core.create("thisone2", am4maps.MapChart);
+        chart.name = "Map";
+        chart.projection = new am4maps.projections.Miller();
+        var title = chart.titles.create();
+        title.text = "[bold font-size: 20]Store Sales Heatmap[/]";
+        title.textAlign = "middle";
 
-            let accrossCitiesImageSeries = chart.series.push(
-              new am4maps.MapImageSeries()
-            );
-            accrossCitiesImageSeries.name = "Minor Cities";
-            // accrossCitiesImageSeries.data = self.accrossCities;
-            let accrossCitiesImageSeriesTemplate =
-              accrossCitiesImageSeries.mapImages.template;
-            accrossCitiesImageSeriesTemplate.propertyFields.latitude = "latitude";
-            accrossCitiesImageSeriesTemplate.propertyFields.longitude = "longitude";
-            accrossCitiesImageSeriesTemplate.nonScaling = false;
-            accrossCitiesImageSeriesTemplate.fill = "black";
+        let asd = am4geodata_worldLow;
+        chart.geodata = asd;
+        if (chart.geodata.features[9].geometry.coordinates.length == 3) {
+          chart.geodata.features[9].geometry.coordinates.splice(2, 1);
+          chart.geodata.features[9].geometry.coordinates.splice(0, 1);
+        }
+        chart.projection = new am4maps.projections.Mercator();
+        // //////////////////////////////////////////////////
+        // end draw of base chart
+        // //////////////////////////////////////////////////
 
-            var accrossCitiesCircle = accrossCitiesImageSeriesTemplate.createChild(
-              am4core.Circle
-            );
-            accrossCitiesCircle.fillOpaaccrossCities = 0.5;
-            accrossCitiesCircle.tooltipText = "{city}: [bold]{sales}[/]";
-            accrossCitiesCircle.radius = 3;
-            let accrossCitiesLabel = accrossCitiesImageSeriesTemplate.createChild(
-              am4core.Label
-            );
-            accrossCitiesLabel.html =
-              '<a style="background-color: black;color: white;font-size:1px" >{city}</a>';
-            accrossCitiesLabel.fontSize = 3;
-            accrossCitiesLabel.nonScaling = false;
-          },
-          drawRetailerImport(chart, config) {
-            let self = this;
-            // /////////////////////////////////////////////////////
-            //  start draw retailer import
-            // /////////////////////////////////////////////////////
-            for (var retailer in self.SupplierData) {
-              let currentHasImages = [
-                "Absolute Vet",
-                "Bkb Co-Ops",
-                "Build It",
-                "Builders Warehouse",
-                "Chamberlain",
-                "Choppies",
-                "Coastal",
-                "Co-Ops",
-                "Crazy Plastics",
-                "Dis-Chem",
-                "Est Africa",
-                "Family Pets",
-                "Game",
-                "Gwk Co-Ops",
-                "Hinterland",
-                "Makro",
-                "Mica",
-                "Ntk Agric",
-                "OK Foods",
-                "Overberg Agri Co-Ops",
-                "Pet And Pool",
-                "Pets World",
-                "Pick n Pay",
-                "Shoprite Checkers",
-                "Spar",
-                "The Queen",
-                "Tuinroete Afgri",
-                "Vetsmart",
-                "West Pack"
-              ];
+        self.drawPolygonseries(chart);
+        self.drawMajorCitiesImageSeries(chart);
+        self.drawMinorCities(chart);
+        // draw standard supplier import
+        if (config.useImportStores) {
+          // drawing imported stores
+          let imageSeries = chart.series.push(new am4maps.MapImageSeries());
+          imageSeries.name = "Import stores";
+          imageSeries.data = self.supplierImport;
+          imageSeries.dataFields.value = "sales";
+          let imageSeriesTemplate = imageSeries.mapImages.template;
+          imageSeriesTemplate.propertyFields.latitude = "yCoordinate";
+          imageSeriesTemplate.propertyFields.longitude = "xCoordinate";
+          imageSeriesTemplate.nonScaling = false;
+          imageSeriesTemplate.fill = chart.colors.getIndex(9).brighten(1);
+          var circle = imageSeriesTemplate.createChild(am4core.Circle);
+          circle.fillOpacity = 0.5;
+          circle.tooltipText = "{storeName}: [bold]{sales}[/]";
+          circle.radius = 2;
+        }
+        if (
+          config.selectedRetailers != undefined &&
+          config.selectedRetailers.length > 0
+        ) {
+          self.drawRetailerImport(chart, config);
+        }
+        if (self.useRetailerMap) {
+          self.drawRetailerMap(chart, self.setupMapData.retailerMap);
+        }
+        // /////////////////////////////////////////////////////
+        // event for plotting stores mostly used for debug
+        // /////////////////////////////////////////////////////
+        chart.seriesContainer.events.on("hit", function (ev) {
+          var coords = chart.svgPointToGeo(ev.svgPoint);
+          self.lastCLicked = coords
+          console.log(coords);
 
-              let hasImage = false;
-              let inArray = false;
+          if (!self.canPlot) {
+            return;
+          }
+          if (ev.preventDefault != undefined) ev.preventDefault();
+          if (ev.stopPropagation != undefined) ev.stopPropagation();
+          self.$refs.yesNo.show(
+            "Would you like to make a tag here?",
+            goThrough => {
+              if (goThrough) {
+                var mapMarker = imageSeriesTemplate.createChild(am4core.Sprite);
+                mapMarker.path =
+                  "M4 12 A12 12 0 0 1 28 12 C28 20, 16 32, 16 32 C16 32, 4 20 4 12 M11 12 A5 5 0 0 0 21 12 A5 5 0 0 0 11 12 Z";
+                mapMarker.width = 32;
+                mapMarker.height = 32;
+                mapMarker.scale = 0.7;
+                mapMarker.fill = am4core.color("#3F4B3B");
+                mapMarker.fillOpacity = 0.8;
+                mapMarker.horizontalCenter = "middle";
+                mapMarker.verticalCenter = "bottom";
+                var coords = chart.svgPointToGeo(ev.svgPoint);
+                var marker = imageSeries.mapImages.create();
 
-              currentHasImages.forEach(img => {
-                if (retailer.includes(img)) hasImage = true;
-              });
-
-              config.selectedRetailers.forEach(el => {
-                if (retailer == el) inArray = true;
-              });
-
-              if (hasImage && inArray) {
-                self.SupplierData[retailer].forEach(el => {
-                  if (retailer.includes("Hinterland")) {
-                    el.image = "Hinterland.png";
-                  } else {
-                    el.image = el.retailer + ".png";
-                  }
+                marker.latitude = coords.latitude;
+                marker.longitude = coords.longitude;
+                marker.events.on("rightclick", function (dataItem, ev) {
+                  if (dataItem.hidden) marker.show(dataItem.index);
+                  else marker.hide(dataItem.index);
+                  event.stopPropagation();
                 });
-
-                let SupplierCitiesImageSeries = chart.series.push(
-                  new am4maps.MapImageSeries()
-                );
-
-                SupplierCitiesImageSeries.name = retailer;
-                SupplierCitiesImageSeries.data = self.SupplierData[retailer];
-
-                let SupplierCitiesImageSeriesTemplate =
-                  SupplierCitiesImageSeries.mapImages.template;
-                SupplierCitiesImageSeriesTemplate.propertyFields.latitude = "x";
-                SupplierCitiesImageSeriesTemplate.propertyFields.longitude = "y";
-                SupplierCitiesImageSeriesTemplate.nonScaling = true;
-                SupplierCitiesImageSeriesTemplate.fill = "black";
-
-                var SupplierCitiesCircle = SupplierCitiesImageSeriesTemplate.createChild(
-                  am4core.Circle
-                );
-                SupplierCitiesCircle.fillOpaSupplierCities = 0.5;
-                SupplierCitiesCircle.tooltipText =
-                  "{retailer}: [bold]{sales}[/]{storeName}";
-                SupplierCitiesCircle.radius = 0;
-
-                let storeImage = SupplierCitiesImageSeriesTemplate.createChild(
-                  am4core.Image
-                );
-                storeImage.propertyFields.href = "image";
-                storeImage.width = 15;
-                storeImage.height = 15;
-                storeImage.horizontalCenter = "middle";
-                storeImage.verticalCenter = "bottom";
-                storeImage.tooltipText = "{storeName}: [bold]{sales}[/]";
               }
             }
-          },
+          );
+        });
 
-          drawMap(config, setupMapData) {
-            let self = this;
-            self.$refs.Spinner.show()
-            // //////////////////////////////////////////////////
-            // start draw of base chart
-            // //////////////////////////////////////////////////
+        if (config.drawGrid) {
+          self.DrawGeoGrid(chart, callback => {});
+        }
+        console.log("chart", chart);
 
-            let formattedData = [];
-            let chart = am4core.create("thisone2", am4maps.MapChart);
-            chart.name = "Map";
-            chart.projection = new am4maps.projections.Miller();
-            var title = chart.titles.create();
-            title.text = "[bold font-size: 20]Store Sales Heatmap[/]";
-            title.textAlign = "middle";
+        self.chart = chart
+        self.$refs.Spinner.hide()
+      },
+      setChartData() {
+        let self = this
+        console.log("here");
+        console.log("chart Series", self.chart.series);
+        console.log("[DATA_REF]", self.seriesDataRef);
 
-            let asd = am4geodata_worldLow;
-            chart.geodata = asd;
-            if (chart.geodata.features[9].geometry.coordinates.length == 3) {
-              chart.geodata.features[9].geometry.coordinates.splice(2, 1);
-              chart.geodata.features[9].geometry.coordinates.splice(0, 1);
+        self.chart.series.values.forEach(element => {
+          self.seriesDataRef.forEach(ref => {
+            if (element.name == ref.name) {
+              console.log(element.name + "||" + ref.name);
+
+              element.data = ref.data
             }
-            chart.projection = new am4maps.projections.Mercator();
-            // //////////////////////////////////////////////////
-            // end draw of base chart
-            // //////////////////////////////////////////////////
+          })
 
-            self.drawPolygonseries(chart);
-            self.drawMajorCitiesImageSeries(chart);
-            self.drawMinorCities(chart);
-            // draw standard supplier import
-            if (config.useImportStores) {
-              // drawing imported stores
-              let imageSeries = chart.series.push(new am4maps.MapImageSeries());
-              imageSeries.name = "Import stores";
-              imageSeries.data = self.supplierImport;
-              imageSeries.dataFields.value = "sales";
-              let imageSeriesTemplate = imageSeries.mapImages.template;
-              imageSeriesTemplate.propertyFields.latitude = "yCoordinate";
-              imageSeriesTemplate.propertyFields.longitude = "xCoordinate";
-              imageSeriesTemplate.nonScaling = false;
-              imageSeriesTemplate.fill = chart.colors.getIndex(9).brighten(1);
-              var circle = imageSeriesTemplate.createChild(am4core.Circle);
-              circle.fillOpacity = 0.5;
-              circle.tooltipText = "{storeName}: [bold]{sales}[/]";
-              circle.radius = 2;
-            }
-            if (
-              config.selectedRetailers != undefined &&
-              config.selectedRetailers.length > 0
-            ) {
-              self.drawRetailerImport(chart, config);
-            }
-            if (self.useRetailerMap) {
-              self.drawRetailerMap(chart, self.setupMapData.retailerMap);
-            }
-            // /////////////////////////////////////////////////////
-            // event for plotting stores mostly used for debug
-            // /////////////////////////////////////////////////////
-            // chart.seriesContainer.events.on("hit", function (ev) {
-            //   var coords = chart.svgPointToGeo(ev.svgPoint);
-
-            //   if (!self.canPlot) {
-            //     return;
-            //   }
-            //   if (ev.preventDefault != undefined) ev.preventDefault();
-            //   if (ev.stopPropagation != undefined) ev.stopPropagation();
-            //   self.$refs.yesNo.show(
-            //     "Would you like to make a tag here?",
-            //     goThrough => {
-            //       if (goThrough) {
-            //         var mapMarker = imageSeriesTemplate.createChild(am4core.Sprite);
-            //         mapMarker.path =
-            //           "M4 12 A12 12 0 0 1 28 12 C28 20, 16 32, 16 32 C16 32, 4 20 4 12 M11 12 A5 5 0 0 0 21 12 A5 5 0 0 0 11 12 Z";
-            //         mapMarker.width = 32;
-            //         mapMarker.height = 32;
-            //         mapMarker.scale = 0.7;
-            //         mapMarker.fill = am4core.color("#3F4B3B");
-            //         mapMarker.fillOpacity = 0.8;
-            //         mapMarker.horizontalCenter = "middle";
-            //         mapMarker.verticalCenter = "bottom";
-            //         var coords = chart.svgPointToGeo(ev.svgPoint);
-            //         var marker = imageSeries.mapImages.create();
-
-            //         marker.latitude = coords.latitude;
-            //         marker.longitude = coords.longitude;
-            //         marker.events.on("rightclick", function (dataItem, ev) {
-            //           if (dataItem.hidden) marker.show(dataItem.index);
-            //           else marker.hide(dataItem.index);
-            //           event.stopPropagation();
-            //         });
-            //       }
-            //     }
-            //   );
-            // });
-
-            if (config.drawGrid) {
-              self.DrawGeoGrid(chart, callback => {});
-            }
-            console.log("chart", chart);
-
-            self.chart = chart
-            self.$refs.Spinner.hide()
-          },
-          setChartData() {
-            let self = this
-            console.log("here");
-            console.log("chart Series", self.chart.series);
-            console.log("[DATA_REF]", self.seriesDataRef);
-
-            self.chart.series.values.forEach(element => {
-              self.seriesDataRef.forEach(ref => {
-                if (element.name == ref.name) {
-                  console.log(element.name + "||" + ref.name);
-
-                  element.data = ref.data
-                }
-              })
-
-            });
-          },
-          formatNumber(storeSales, totalSales) {
-            let string = ""
-            if (storeSales > 0 && totalSales != 0) {
+        });
+      },
+      formatNumber(storeSales, totalSales) {
+        let string = ""
+        if (storeSales > 0 && totalSales != 0) {
 
 
-              string = ((storeSales / totalSales) * 100).toFixed(2)
-              string += "%"
-            }
-            return string
-          },
-          checkAlphaNumber(blockNumber) {
-            let self = this;
+          string = ((storeSales / totalSales) * 100).toFixed(2)
+          string += "%"
+        }
+        return string
+      },
+      checkAlphaNumber(blockNumber) {
+        let self = this;
 
-            var found = self.alpharray.find(el => {
-              return el.rangeStart <= blockNumber && el.rangeEnd > blockNumber;
-            });
+        var found = self.alpharray.find(el => {
+          return el.rangeStart <= blockNumber && el.rangeEnd > blockNumber;
+        });
 
-            let number = blockNumber - found.rangeStart + 1;
+        let number = blockNumber - found.rangeStart + 1;
 
-            return found.text + number;
-          }
+        return found.text + number;
       }
-    };
-
-    function removeDuplicates(myArr, prop) {
-      return myArr.filter((obj, pos, arr) => {
-        return arr.map(mapObj => mapObj[prop]).indexOf(obj[prop]) === pos;
-      });
     }
+  };
+
+  function removeDuplicates(myArr, prop) {
+    return myArr.filter((obj, pos, arr) => {
+      return arr.map(mapObj => mapObj[prop]).indexOf(obj[prop]) === pos;
+    });
+  }
 </script>
 
 <style scoped>
