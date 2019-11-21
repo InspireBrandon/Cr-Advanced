@@ -1,5 +1,14 @@
 import TreeItem from './TreeItem'
 import Axios from "axios";
+import {
+    EventBus
+} from '@/libs/events/event-bus.js';
+
+let event_data = {
+    retailers: []
+}
+
+let mappingTreeItem = null;
 
 class MappingTreeItem {
     constructor(data) {
@@ -10,13 +19,15 @@ class MappingTreeItem {
     build(treeItems) {
         let self = this;
 
-        let mappingTreeItem = buildMappingFolder();
+        mappingTreeItem = buildMappingFolder();
 
-        mappingTreeItem.children.push(
-            buildLocationsFolder()
-        )
+        let mapItems = buildLocationsFolder(self.vueCtx)
+
+        mappingTreeItem.children.push(mapItems)
 
         treeItems.push(mappingTreeItem);
+
+        EventBus.$on("MAPPING_LOADED", redrawMap(event_data));
     }
 }
 
@@ -28,7 +39,7 @@ function buildMappingFolder() {
         icon: "folder"
     })
 
-    mappingTreeItem.click = function() {
+    mappingTreeItem.click = function () {
         mappingTreeItem.showChildren = !mappingTreeItem.showChildren;
         mappingTreeItem.icon = mappingTreeItem.showChildren ? 'folder_open' : 'folder';
     }
@@ -36,7 +47,7 @@ function buildMappingFolder() {
     return mappingTreeItem;
 }
 
-function buildLocationsFolder() {
+function buildLocationsFolder(vueCtx) {
     let self = this;
 
     let locationTreeItem = new TreeItem({
@@ -44,18 +55,17 @@ function buildLocationsFolder() {
         icon: "folder"
     })
 
-    locationTreeItem.click = function() {
-        if(locationTreeItem.showChildren) {
+    locationTreeItem.click = function () {
+        if (locationTreeItem.showChildren) {
             locationTreeItem.showChildren = false;
             locationTreeItem.icon = 'folder';
-        }
-        else {
+        } else {
             // empty out parent array
             locationTreeItem.children = [];
             locationTreeItem.loading = true;
 
             getLocationGroups(locationGroups => {
-                locationTreeItem.children = buildLocationGroupFolders(locationGroups);
+                locationTreeItem.children = buildLocationGroupFolders(locationGroups, vueCtx);
                 locationTreeItem.icon = 'folder_open';
                 locationTreeItem.loading = false;
                 locationTreeItem.showChildren = true;
@@ -66,7 +76,7 @@ function buildLocationsFolder() {
     return locationTreeItem;
 }
 
-function buildLocationGroupFolders(locationGroups) {
+function buildLocationGroupFolders(locationGroups, vueCtx) {
     let locationGroupItems = [];
 
     locationGroups.forEach(locationGroup => {
@@ -76,18 +86,17 @@ function buildLocationGroupFolders(locationGroups) {
             allowSelect: true
         })
 
-        locationGroupTreeItem.click = function() {
-            if(locationGroupTreeItem.showChildren) {
+        locationGroupTreeItem.click = function () {
+            if (locationGroupTreeItem.showChildren) {
                 locationGroupTreeItem.showChildren = false;
                 locationGroupTreeItem.icon = 'folder';
-            }
-            else {
+            } else {
                 // empty out parent array
                 locationGroupTreeItem.children = [];
                 locationGroupTreeItem.loading = true;
 
                 getLocationsByGroupID(locationGroup.id, locations => {
-                    locationGroupTreeItem.children = buildLocationFolders(locations);
+                    locationGroupTreeItem.children = buildLocationFolders(locations, vueCtx);
                     locationGroupTreeItem.icon = 'folder_open';
                     locationGroupTreeItem.loading = false;
                     locationGroupTreeItem.showChildren = true;
@@ -95,19 +104,18 @@ function buildLocationGroupFolders(locationGroups) {
             }
         }
 
-        locationGroupTreeItem.onSelect = function() {
-            if(locationGroupTreeItem.showChildren) {
+        locationGroupTreeItem.onSelect = function () {
+            if (locationGroupTreeItem.showChildren) {
                 locationGroupTreeItem.children.forEach(child => {
                     child.selected = locationGroupTreeItem.selected;
                 })
-            }
-            else {
+            } else {
                 // empty out parent array
                 locationGroupTreeItem.children = [];
                 locationGroupTreeItem.loading = true;
 
                 getLocationsByGroupID(locationGroup.id, locations => {
-                    locationGroupTreeItem.children = buildLocationFolders(locations);
+                    locationGroupTreeItem.children = buildLocationFolders(locations, vueCtx);
                     locationGroupTreeItem.icon = 'folder_open';
                     locationGroupTreeItem.loading = false;
                     locationGroupTreeItem.showChildren = true;
@@ -121,7 +129,7 @@ function buildLocationGroupFolders(locationGroups) {
     return locationGroupItems;
 }
 
-function buildLocationFolders(locations, parentItem) {
+function buildLocationFolders(locations, vueCtx) {
     let locationItems = [];
 
     locations.forEach(location => {
@@ -131,15 +139,22 @@ function buildLocationFolders(locations, parentItem) {
             allowSelect: true,
             showImage: true,
             showIcon: false,
-            imageSrc: retailerImage(location.id)
+            imageSrc: retailerImage(location.id),
+            value: location.id
         })
 
-        locationTreeItem.click = function() {
-            // Trigger event bus to redraw map
+        locationTreeItem.click = function () {
             locationTreeItem.selected = !locationTreeItem.selected;
+
+            let config = getMapConfig(vueCtx, () => {
+                // Trigger event bus to redraw map
+                checkMapping(vueCtx, {
+                    retailers: []
+                })
+            });
         }
 
-        locationTreeItem.onSelect = function() {
+        locationTreeItem.onSelect = function () {
             // Trigger event bus to redraw map
         }
 
@@ -153,6 +168,39 @@ function retailerImage(retailerID) {
     return process.env.VUE_APP_API + `Retailer/Image?retailerID=${retailerID}`
 }
 
+function checkMapping(vueCtx, ) {
+    if (vueCtx.$route.name == "map") {
+        redrawMap()
+    } else {
+        vueCtx.$router.push("/map")
+    }
+}
+
+function redrawMap() {
+    EventBus.$emit('MAPPING_REDRAW', event_data);
+}
+
+function getMapConfig(vueCtx, callback) {
+    vueCtx.$nextTick(() => {
+        let locations = mappingTreeItem.children[0];
+        let tmpRetailers = []
+
+        let groups = locations.children;
+
+        groups.forEach(group => {
+            group.children.forEach(retailer => {
+                if (retailer.selected) {
+                    tmpRetailers.push(retailer.value)
+                }
+            })
+        })
+
+        event_data.retailers = tmpRetailers;
+
+        callback();
+    })
+}
+
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
 // SERVICE CALLS
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -160,18 +208,18 @@ function getLocationGroups(callback) {
     let self = this;
 
     Axios.get(process.env.VUE_APP_API + "RetailerGroup")
-    .then(r => {
-        callback(r.data.retailerGroupList)
-    })
+        .then(r => {
+            callback(r.data.retailerGroupList)
+        })
 }
 
 function getLocationsByGroupID(retailerGroupID, callback) {
     let self = this;
 
     Axios.get(process.env.VUE_APP_API + `Retailer?retailerGroupID=${retailerGroupID}`)
-    .then(r => {
-        callback(r.data.retailerList)
-    })
+        .then(r => {
+            callback(r.data.retailerList)
+        })
 }
 
 export default MappingTreeItem;

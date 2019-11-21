@@ -123,7 +123,13 @@ import map2 from '@/components/Apps/Strategy/Map/tesmap.vue'
 import FloorPlanningViewer from '@/components/Main/FloorPlanningViewer/Index'
 import PromotionViewer from '@/components/Main/PromotionViewer'
 import Bi from '@/components/Main/Bi'
-import ImportDataMapper  from '@/components/Main/ImportDataMapper/Index'
+
+// Data mapping
+import ImportDataMapper from '@/components/Main/ImportDataMapper/Index'
+import ImportStoreMapper from '@/components/Main/ImportDataMapper/Sections/Store/Index'
+import ImportDepartmentMapper from '@/components/Main/ImportDataMapper/Sections/Department/Index'
+import ImportCategoryMapper from '@/components/Main/ImportDataMapper/Sections/Category/Index'
+import ImportBrandMapper from '@/components/Main/ImportDataMapper/Sections/Brand/Index'
 
 import {
   APPLICATION_ROUTE as RouteConfig
@@ -167,67 +173,85 @@ export default new Router({
           name: 'TestingView',
           component: require('@/components/Main/NewViewTesting/NewView.vue').default,
           children: [{
-            path: '',
-            name: 'PlanogramImplementation',
-            component: Apps,
-          }, {
-            path: '/Tasks',
-            name: 'Tasks',
-            component: Tasks,
-          }, {
-            path: '/PlanogramImplementationNew/:projectTransactionID/:planogramID/:status',
-            name: 'PlanogramImplementation',
-            component: PlanogramImplementation,
-          }, {
-            path: '/RangePlanningView/:rangeFileID',
-            name: 'range_planning_view',
-            component: RangePlanningView,
-          }, {
-            path: '/PlanogramDistribution/:projectGroupID/:projectID',
-            name: 'range_planning_view',
-            component: PlanogramDistributionNew,
-          }, {
-            path: '/StorePlanogram/:storeID',
-            name: 'range_planning_view',
-            component: StorePlanogram,
-          }, {
-            path: '/FloorPlanningViewer/:fileSrc',
-            name: 'range_planning_view',
-            component: FloorPlanningViewer,
-          }, {
-            path: '/Map',
-            name: 'range_planning_view',
-            component: map,
-          }, {
-            path: '/Bi',
-            name: 'range_planning_view',
-            component: Bi,
-          },
-          {
-            path: '/BasketView/:fileID',
-            name: 'BasketView',
-            component: BasketView,
-          },{
-            path: '/StoreView/:fileID',
-            name: 'StoreView',
-            component: StoreView,
-          },{
-            path: '/CategoryClusterView/:fileID',
-            name: 'CategoryClusterView',
-            component: CategoryClusterView,
-          }, {
-            path: '/map/:params',
-            name: 'map',
-            component: map
-          }, {
-            path: '/PromotionViewer',
-            name: 'PromotionViewer',
-            component: PromotionViewer
-          }, {
-            path: '/ImportDataMapper',
-            name: 'PromotionViewer',
-            component: ImportDataMapper
-          }],
+              path: '',
+              name: 'PlanogramImplementation',
+              component: Apps,
+            }, {
+              path: '/Tasks',
+              name: 'Tasks',
+              component: Tasks,
+            }, {
+              path: '/PlanogramImplementationNew/:projectTransactionID/:planogramID/:status',
+              name: 'PlanogramImplementation',
+              component: PlanogramImplementation,
+            }, {
+              path: '/RangePlanningView/:rangeFileID',
+              name: 'range_planning_view',
+              component: RangePlanningView,
+            }, {
+              path: '/PlanogramDistribution/:projectGroupID/:projectID',
+              name: 'range_planning_view',
+              component: PlanogramDistributionNew,
+            }, {
+              path: '/StorePlanogram/:storeID',
+              name: 'range_planning_view',
+              component: StorePlanogram,
+            }, {
+              path: '/FloorPlanningViewer/:fileSrc',
+              name: 'range_planning_view',
+              component: FloorPlanningViewer,
+            }, {
+              path: '/Map',
+              name: 'map',
+              component: map,
+            }, {
+              path: '/Bi',
+              name: 'range_planning_view',
+              component: Bi,
+            },
+            {
+              path: '/BasketView/:fileID',
+              name: 'BasketView',
+              component: BasketView,
+            }, {
+              path: '/StoreView/:fileID',
+              name: 'StoreView',
+              component: StoreView,
+            }, {
+              path: '/CategoryClusterView/:fileID',
+              name: 'CategoryClusterView',
+              component: CategoryClusterView,
+            }, {
+              path: '/map/:params',
+              name: 'map',
+              component: map
+            }, {
+              path: '/PromotionViewer',
+              name: 'PromotionViewer',
+              component: PromotionViewer
+            }, {
+              path: '/ImportDataMapper',
+              name: 'PromotionViewer',
+              component: ImportDataMapper,
+              children: [{
+                path: 'Store',
+                name: 'PromotionViewer',
+                component: ImportStoreMapper,
+              },{
+                path: 'Department',
+                name: 'PromotionViewer',
+                component: ImportDepartmentMapper,
+              }, {
+                path: 'Category',
+                name: 'PromotionViewer',
+                component: ImportCategoryMapper,
+              },{
+                path: 'Brand',
+                name: 'PromotionViewer',
+                component: ImportBrandMapper,
+              }]
+            }
+          ],
         },
         // {
         //   path: '/map',
@@ -281,7 +305,7 @@ export default new Router({
           path: '/Apps',
           name: 'apps',
           component: Apps,
-        }, 
+        },
         // {
         //   path: '/Tasks',
         //   name: 'tasks',

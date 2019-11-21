@@ -15,6 +15,7 @@ class TreeItem {
         self.showIcon = (data.showIcon == undefined || data.showIcon == null) ? true : data.showIcon;        
         self.showImage = (data.showImage == undefined || data.showImage == null) ? false : data.showImage;        
         self.imageSrc = (data.imageSrc == undefined || data.imageSrc == null) ? "" : data.imageSrc;        
+        self.value = data.value;
     }
 } 
 

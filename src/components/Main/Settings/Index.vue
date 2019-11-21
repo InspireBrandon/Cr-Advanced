@@ -1,10 +1,10 @@
 <template>
-    <v-card>
+    <v-card tile flat>
         <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear>
         <v-container class="pa-0" fluid grid-list-md v-if="!showLoader">
             <v-layout row wrap>
                 <v-flex lg12 md12 sm12 xs12>
-                    <v-container grid-list-md>
+                    <v-container class="pa-0" fluid grid-list-md>
                         <v-layout row wrap>
                             <!-- <v-flex lg12 md12 sm12 xs12>
                                 <v-card flat>
@@ -37,26 +37,24 @@
                                 </v-card>
                             </v-flex> -->
                             <v-flex xs12>
-                                <v-card flat>
-                                    <h1>System Settings</h1>
-                                    <v-tabs class="elevation-4" dark>
+                                <v-card flat tile>
+                                    <v-tabs dark color="grey darken-4">
                                         <v-tabs-slider color="white"></v-tabs-slider>
                                         <v-tab href="#tab-1" justify-content: center fixed-tabs>Structure</v-tab>
                                         <v-tab href="#tab-2" justify-content: center fixed-tabs>Help Files</v-tab>
 
-                                        <v-tab-item id="tab-1" class="elevation-2" justify-content: center>
-                                            <v-toolbar dense dark color="primary">
+                                        <v-tab-item id="tab-1" justify-content: center>
+                                            <v-toolbar dense dark color="grey darken-3">
                                                 <v-toolbar-title>Chain Research Structure</v-toolbar-title>
-                                            </v-toolbar>
-                                            <v-toolbar dense dark color="grey darken-4">
                                                 <v-spacer></v-spacer>
                                                 <v-btn color="primary">Import structure</v-btn>
                                             </v-toolbar>
-                                            <v-card>
+                                            <v-card flat>
                                                 <v-card-text class="pa-2 pb-4">
-                                                    <v-layout row wrap>
+                                                    <StructureTree />
+                                                    <!-- <v-layout row wrap>
                                                         <v-flex xs6 sm3>
-                                                            <!-- <StructureMaint name="Stores" server /> -->
+                                                            <StructureMaint name="Stores" server />
                                                         </v-flex>
                                                         <v-flex xs6 sm3>
                                                             <StructureMaint server="SystemDepartment" name="Department" />
@@ -67,7 +65,7 @@
                                                         <v-flex xs6 sm3>
                                                             <StructureMaint server="SystemBrand" name="Brand" />
                                                         </v-flex>
-                                                    </v-layout>
+                                                    </v-layout> -->
                                                 </v-card-text>
                                             </v-card>
                                         </v-tab-item>
@@ -94,11 +92,13 @@
     import HelpFile from '@/components/Main/HelpFile/Index.vue'
 
     import StructureMaint from './StructureMaint'
+    import StructureTree from './StructureTree'
 
     export default {
         components: {
             HelpFile,
-            StructureMaint
+            StructureMaint,
+            StructureTree
         },
         data() {
             return {

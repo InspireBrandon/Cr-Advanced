@@ -150,7 +150,7 @@
 
                 if (self.accessType == 2) {
                     self.buildSoftwareButtons();
-                    self.buildRangePlanningTree();
+                    // self.buildRangePlanningTree();
                     self.buildModelPlanogramTree();
                     self.buildStorePlanogramTree();
                     self.buildFloorPlanningTree();
@@ -162,7 +162,7 @@
 
                 if (self.accessType == 3) {
                     self.buildSoftwareButtons();
-                    self.buildRangePlanningTree();
+                    // self.buildRangePlanningTree();
                     // self.buildModelPlanogramTree();
                     self.buildStorePlanogramTree();
                     self.buildFloorPlanningTree();
@@ -378,6 +378,7 @@
 
                                     departmentTreeItem.loading = false;
                                     departmentTreeItem.showChildren = true;
+                                    departmentTreeItem.icon = "folder_open";
                                 })
                             })
                         }

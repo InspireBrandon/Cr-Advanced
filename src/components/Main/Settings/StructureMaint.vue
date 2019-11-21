@@ -15,7 +15,7 @@
                 </v-btn>
             </v-toolbar>
             <v-progress-linear v-if="loading" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear>
-            <v-card-text style="height: calc(100vh - 400px); overflow-y: scroll;" class="pa-0">
+            <v-card-text style="height: calc(100vh - 275px); overflow-y: scroll;" class="pa-0">
                 <div style="cursor: pointer;" @dblclick="modify" @click="selected = item" v-for="(item, idx) in items"
                     :key="idx" :class="{ 'selected_item': selected == item  }">
                     <div style="padding: 3px;">{{ item.name }}</div>
