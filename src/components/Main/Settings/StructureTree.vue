@@ -1,28 +1,53 @@
 <template>
-    <div style="max-height: 500px; overflow-y: auto; width: 450px;">
-        <div v-for="(department, idx) in treeItems" :key="'d' + idx">
-            <v-card @click="department.onClick" style="width: 350px;" flat color="black" dark class="mb-1">
-                <v-card-title class="pa-1">
-                    <div>{{ department.name }}</div>
-                    <v-spacer></v-spacer>
-                    <div v-if="department.showOptions">
-                        <v-btn icon class="ma-0 pa-0">
+    <div style="width: 440px;">
+        <div>
+            <v-btn style="margin-left: -2px;" color="primary">Add department</v-btn>
+        </div>
+        <div style="max-height: calc(100vh - 230px); overflow-y: auto;">
+            <div v-for="(department, idx) in treeItems" :key="'d' + idx">
+                <v-card @mouseover="department.showOptions = true" @mouseleave="department.showOptions = false"
+                    style="width: 350px; cursor: pointer;" flat color="black" dark class="mb-1">
+                    <v-card-title class="pa-1">
+                        <div style="height: 30px; padding-top: 4px;">{{ department.name }}</div>
+                        <v-spacer></v-spacer>
+                        <div v-if="department.showOptions">
                             <v-icon color="white">add</v-icon>
-                        </v-btn>
-                        <v-btn icon class="ma-0 pa-0">
                             <v-icon color="white">delete</v-icon>
-                        </v-btn>
-                    </div>
-                </v-card-title>
-            </v-card>
-            <div v-for="(category, idx) in department.children" :key="'c' + idx">
-                <v-card @click="category.onClick" style="width: 350px;" flat color="blue" dark class="mb-1 ml-4">
-                    <v-card-text class="pa-1">{{ category.name }}</v-card-text>
+                        </div>
+                        <v-icon v-if="!department.showChildren" class="ml-3" @click.prevent="department.onClick"
+                            color="white">keyboard_arrow_down</v-icon>
+                        <v-icon v-if="department.showChildren" class="ml-3" @click.prevent="department.onClick"
+                            color="white">keyboard_arrow_up</v-icon>
+                    </v-card-title>
                 </v-card>
-                <div class="ml-4" v-for="(brand, idx) in category.children" :key="'b' + idx">
-                    <v-card style="width: 350px;" flat color="grey darken-1" dark class="mb-1 ml-4">
-                        <v-card-text class="pa-1">{{ brand.name }}</v-card-text>
+                <div v-for="(category, idx) in department.children" :key="'c' + idx">
+                    <v-card @mouseover="category.showOptions = true" @mouseleave="category.showOptions = false"
+                        style="width: 350px; cursor: pointer;" flat color="blue" dark class="mb-1 ml-4">
+                        <v-card-title class="pa-1">
+                            <div style="height: 30px; padding-top: 4px;">{{ category.name }}</div>
+                            <v-spacer></v-spacer>
+                            <div v-if="category.showOptions">
+                                <v-icon @click.prevent="doShiz" color="white">add</v-icon>
+                                <v-icon color="white">delete</v-icon>
+                            </div>
+                            <v-icon v-if="!category.showChildren" class="ml-3" @click="category.onClick" color="white">
+                                keyboard_arrow_down</v-icon>
+                            <v-icon v-if="category.showChildren" class="ml-3" @click="category.onClick" color="white">
+                                keyboard_arrow_up</v-icon>
+                        </v-card-title>
                     </v-card>
+                    <div class="ml-4" v-for="(brand, idx) in category.children" :key="'b' + idx">
+                        <v-card @mouseover="brand.showOptions = true" @mouseleave="brand.showOptions = false"
+                            style="width: 350px; cursor: pointer;" flat color="grey darken-1" dark class="mb-1 ml-4">
+                            <v-card-title class="pa-1">
+                                <div style="height: 30px; padding-top: 4px;">{{ brand.name }}</div>
+                                <v-spacer></v-spacer>
+                                <div v-if="brand.showOptions">
+                                    <v-icon color="white">delete</v-icon>
+                                </div>
+                            </v-card-title>
+                        </v-card>
+                    </div>
                 </div>
             </div>
         </div>
@@ -133,6 +158,9 @@
                 })
 
                 return retval;
+            },
+            doShiz() {
+
             }
         }
     }
