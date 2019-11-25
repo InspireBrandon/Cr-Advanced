@@ -15,7 +15,7 @@
                     </v-list-tile>
                 </v-list>
             </v-menu>
-            <v-menu  v-if="!viewOnlyMode" dark offset-y>
+            <v-menu v-if="!viewOnlyMode" dark offset-y>
                 <v-btn slot="activator" flat>Image</v-btn>
                 <v-list>
                     <v-list-tile @click="mapImageAdd()">
@@ -27,23 +27,13 @@
                 </v-list>
             </v-menu>
 
-            <v-btn v-if="!viewOnlyMode" flat @click="importDialog = true">Import</v-btn>
+            <v-btn v-if="!viewOnlyMode" flat @click="openImport">Import</v-btn>
 
             <v-spacer></v-spacer>
             <v-toolbar-title>Maps</v-toolbar-title>
         </v-toolbar>
-        <v-dialog v-model="importDialog">
-            <v-card>
-                <v-toolbar dark color="primary">
-                    <!-- <v-toolbar-title>Supplier Import</v-toolbar-title> -->
-                    <v-spacer></v-spacer>
-                    <v-btn icon dark @click="importDialog = false">
-                        <v-icon>close</v-icon>
-                    </v-btn>
-                </v-toolbar>
-            </v-card>
-            <Research style="overflow: hidden; scroll:no" ref="Research" />
-        </v-dialog>
+      
+                <Research ref="Research" />
         <RetailerImportModal ref="RetailerImportModal" />
         <LinkRetailerStore ref="LinkRetailerStore" />
         <MapComponent ref="MapComponent" />
@@ -78,7 +68,7 @@
                 importDialog: false,
                 showItem: 0,
                 dialogHeader: "",
-                viewOnlyMode:false
+                viewOnlyMode: false
             };
         },
         mounted() {
@@ -90,6 +80,10 @@
             }
         },
         methods: {
+            openImport(){
+                let self = this 
+                self.$refs.Research.open()
+            },
             openRetailerModal() {
                 let self = this;
                 self.$refs.RetailerImportModal.open(callback => {});

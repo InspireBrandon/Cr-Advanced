@@ -1,79 +1,57 @@
 <template>
-    <v-card tile>
-        <!-- <v-toolbar flat dense dark color="grey darken-3">
-            
-        </v-toolbar> -->
-        <v-toolbar dark flat>
-            <v-toolbar-items>
-                <v-menu dark offset-y style="margin-bottom: 10px;">
-                    <v-btn slot="activator" flat>
-                        File
-                    </v-btn>
-                    <v-list>
-                        <v-list-tile @click="openFileDialog">
-                            <v-list-tile-title>New</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="openFile">
-                            <v-list-tile-title>Open</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile :disabled="rowData.length == 0" @click="prompt">
-                            <v-list-tile-title>Save</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile :disabled="rowData.length == 0" @click="close">
-                            <v-list-tile-title>Close</v-list-tile-title>
-                        </v-list-tile>
-                    </v-list>
-                </v-menu>
-                <v-menu dark offset-y style="margin-bottom: 10px;">
-                    <v-btn slot="activator" flat>
-                        Setup
-                    </v-btn>
-                    <v-list>
-                        <v-list-tile @click="openRetailerSupplierStorDialog">
-                            <v-list-tile-title>Link Supplier Stores</v-list-tile-title>
-                        </v-list-tile>
-                    </v-list>
-                </v-menu>
-                <v-select style="margin-left: 10px; margin-top: 8px; width: 200px" label="Type"
-                    v-model="selectedImportType" :items="ImportTypes">
+    <v-dialog v-model="importDialog" fullscreen>
 
-                </v-select>
-                <v-select style="margin-left: 10px; margin-top: 8px; width: 200px" label="Import level"
-                    v-model="selectedImportLevel" @change="handleSpecificHeaders" return-object :items="ImportLevels">
-                </v-select>
-                <v-checkbox @change="handleSpecificHeaders" v-if="selectedImportLevel!=null"
-                    style="margin-left: 10px; margin-top: 14px;" label="Specific" v-model="isSpecific">
-                </v-checkbox>
-                <v-text-field style="margin-left: 15px; margin-top: 8px; width: 200px" v-model="specificName"
-                    v-if="isSpecific" label="Specific Name">
-
-                </v-text-field>
-                <!-- <v-btn @click="gengrid">
-                    gen
+        <v-card style="overflow:hidden">
+            <v-toolbar dark color="primary">
+                <!-- <v-toolbar-title>Supplier Import</v-toolbar-title> -->
+                <v-spacer></v-spacer>
+                <v-btn icon dark @click="importDialog = false">
+                    <v-icon>close</v-icon>
                 </v-btn>
-                 <v-btn @click="linkGrid">
-                    Link
-                </v-btn> -->
-            </v-toolbar-items>
+            </v-toolbar>
+            <v-toolbar dark flat>
+                <v-toolbar-items>
+                    <v-menu dark offset-y style="margin-bottom: 10px;">
+                        <v-btn slot="activator" flat>
+                            File
+                        </v-btn>
+                        <v-list>
+                            <v-list-tile @click="openImportModal">
+                                <v-list-tile-title>import</v-list-tile-title>
+                            </v-list-tile>
 
-            <v-spacer></v-spacer>
-            <div></div>
-            <v-spacer></v-spacer>
-            <v-toolbar-title>
-                <span>Supplier Import</span>
-            </v-toolbar-title>
-        </v-toolbar>
-        <Grid :rowData="rowData" :headers="headers" ref="Grid" />
+                            <v-list-tile @click="openFile">
+                                <v-list-tile-title>Open</v-list-tile-title>
+                            </v-list-tile>
+                            <v-list-tile :disabled="rowData.length == 0" @click="prompt">
+                                <v-list-tile-title>Save</v-list-tile-title>
+                            </v-list-tile>
+                            <v-list-tile :disabled="rowData.length == 0" @click="close">
+                                <v-list-tile-title>Close</v-list-tile-title>
+                            </v-list-tile>
+                        </v-list>
+                    </v-menu>
+                </v-toolbar-items>
+                <v-spacer></v-spacer>
+                <div></div>
+                <v-spacer></v-spacer>
+                <v-toolbar-title>
+                    <span>Supplier Import</span>
+                </v-toolbar-title>
+            </v-toolbar>
+            <Grid :rowData="rowData" :headers="headers" ref="Grid" />
 
-        <RetailerSupplierStoreDialog ref="RetailerSupplierStoreDialog" />
-        <input @change="onFileChange" accept=".csv" ref="fileInput" style="display: none" type="file">
-        <Prompt ref="Prompt" />
-        <YesNoModal ref="YesNoModal" />
-        <FileDataSelector ref="FileDataSelector" />
-        <ImportSelector ref="ImportSelector" />
-        <DateRangeSelector ref="DateRangeSelector" />
-        <Spinner ref="Spinner" />
-    </v-card>
+            <RetailerSupplierStoreDialog ref="RetailerSupplierStoreDialog" />
+            <!-- <input @change="onFileChange" accept=".csv" ref="fileInput" style="display: none" type="file"> -->
+            <Prompt ref="Prompt" />
+            <YesNoModal ref="YesNoModal" />
+            <FileDataSelector ref="FileDataSelector" />
+            <ImportSelector ref="ImportSelector" />
+            <DateRangeSelector ref="DateRangeSelector" />
+            <Spinner ref="Spinner" />
+            <ImportModal ref="ImportModal" />
+        </v-card>
+    </v-dialog>
 </template>
 
 <script>
@@ -88,12 +66,14 @@
     import ImportSelector from './ImportSelector'
     import jwt from 'jsonwebtoken';
     import RetailerSupplierStoreDialog from './RetailerSupplierStore/RetailerSupplier';
+    import ImportModal from "./ImportModal"
 
     export default {
         components: {
             Grid,
             ImportSelector,
             Prompt,
+            ImportModal,
             YesNoModal,
             Spinner,
             FileDataSelector,
@@ -102,14 +82,17 @@
         },
         data() {
             return {
+                importDialog: false,
+                dateFrom: null,
+                dateTo: null,
                 specificName: null,
-                isSpecific: false,
+                isSpecific: true,
                 selectedImportType: true,
                 ImportTypes: [{
-                    text: "Sales In",
+                    text: "sales In",
                     value: true
                 }, {
-                    text: "Sales Out",
+                    text: "sales Out",
                     value: false
                 }],
                 selectedImport: null,
@@ -133,19 +116,65 @@
                 HeadersStatic: [{
                     "headerName": "Store",
                     "field": "storeName",
+                    cellStyle: function (params) {
+                        if (params.data.InvalidProperty == "storeName" || params.data.storeName == "") {
+                            return {
+                                backgroundColor: "#ff9e9e91"
+                            };
+                        }
+                    }
                 }, {
                     "headerName": "sales",
                     "field": "sales",
+                    cellStyle: function (params) {
+                        if (params.data.InvalidProperty == "sales" || params.data.sales == "") {
+                            return {
+                                backgroundColor: "#ff9e9e91"
+                            };
+                        }
+                    }
                 }, {
                     "headerName": "X Coordinate",
                     "field": "xCoordinate",
-                    "editable": true
+                    "editable": true,
+
                 }, {
                     "headerName": "Y Coordinate",
                     "field": "yCoordinate",
-                    "editable": true
+                    "editable": true,
+
                 }],
-                headers: [],
+                headers: [{
+                    "headerName": "Store",
+                    "field": "storeName",
+                    cellStyle: function (params) {
+                        if (params.data.InvalidProperty == "storeName" || params.data.storeName == "") {
+                            return {
+                                backgroundColor: "#ff9e9e91"
+                            };
+                        }
+                    }
+                }, {
+                    "headerName": "sales",
+                    "field": "sales",
+                    cellStyle: function (params) {
+                        if (params.data.InvalidProperty == "sales" || params.data.sales == "") {
+                            return {
+                                backgroundColor: "#ff9e9e91"
+                            };
+                        }
+                    }
+                }, {
+                    "headerName": "X Coordinate",
+                    "field": "xCoordinate",
+                    "editable": true,
+
+                }, {
+                    "headerName": "Y Coordinate",
+                    "field": "yCoordinate",
+                    "editable": true,
+
+                }],
                 hasDatabases: false,
                 runData: [],
                 fileData: []
@@ -167,87 +196,24 @@
                         }
                         self.subscriptionLevel = r.data.subscriptionLevel
                         self.createSubscriptionLevels()
-
                     })
-
-            })
-
-            self.getFile(data => {
-                if (data != null && data != false) {
-                    self.getFileData(data.id, fileData => {
-
-                        if (!Array.isArray(fileData.supplierImport)) {
-                            self.runData = [];
-
-                            self.fileData = fileData.supplierImport;
-
-                            for (var prop in fileData.supplierImport) {
-                                self.runData.push({
-                                    prop: prop
-                                })
-                            }
-                        }
-                    })
-                }
             })
         },
         methods: {
-            handleSpecificHeaders() {
+            open() {
                 let self = this
-                self.headers = []
-                self.$nextTick(() => {
-                    if (self.isSpecific) {
-                        self.headers = self.HeadersStatic
-                    } else {
-                        let tmpHeaders = []
-                        tmpHeaders = self.HeadersStatic
-                        let newHead = JSON.parse(JSON.stringify(tmpHeaders))
-                        switch (self.selectedImportLevel.value) {
-                            case 0:
-
-                                break;
-                            case 1:
-
-                                newHead.push({
-                                    "headerName": "department",
-                                    "field": "department",
-                                    "editable": true
-                                })
-                                break;
-                            case 2:
-
-                                newHead.push({
-                                    "headerName": "category",
-                                    "field": "category",
-                                    "editable": true
-                                }, {
-                                    "headerName": "department",
-                                    "field": "department",
-                                    "editable": true
-                                })
-                                break;
-                            case 3:
-
-                                newHead.push({
-                                    "headerName": "brand",
-                                    "field": "brand",
-                                    "editable": true
-                                }, {
-                                    "headerName": "category",
-                                    "field": "category",
-                                    "editable": true
-                                }, {
-                                    "headerName": "department",
-                                    "field": "department",
-                                    "editable": true
-                                })
-                                break;
-
-                            default:
-                                break;
-                        }
-                        self.headers = newHead
-                    }
+                self.importDialog = true
+            },
+            openImportModal() {
+                let self = this
+                self.$refs.ImportModal.open(self.hasDatabases, self.subscriptionLevel, callback => {
+                    console.log("[MODAL CALLBACK]", callback)
+                    self.onFileChange(callback.fileData)
+                    self.dateFrom = callback.dateFrom
+                    self.dateTo = callback.dateTo
+                    self.selectedImportLevel = callback.importLevel
+                    self.selectedImportType = callback.importType
+                    self.specificName = callback.selectedField
                 })
             },
             gengrid() {
@@ -324,155 +290,213 @@
                 self.$refs.fileInput.value = null;
                 self.$refs.fileInput.click();
             },
-            onFileChange(e) {
+            checkValid(isSpecific, Level, item) {
+                let self = this
+                let validity = {
+                    isValid: true,
+                    InvalidProperty: null,
+                }
+
+
+                if (isSpecific) {
+                    if (item.storeName == null || item.storeName == undefined || item.storeName == "") {
+                        validity.isValid = false;
+                        validity.InvalidProperty = "storeName"
+                    }
+
+                    if (item.sales == null || item.sales == undefined || item.sales == "") {
+                        validity.isValid = false;
+                        validity.InvalidProperty = "sales"
+                    }
+                } else {
+                    switch (Level) {
+                        case 0:
+
+                            break;
+                            if (item.storeName == null || item.storeName == undefined || item.storeName == "") {
+                                validity.isValid = false;
+                                validity.InvalidProperty = "storeName"
+
+                            }
+                            if (item.sales == null || item.sales == undefined || item.sales == "") {
+                                validity.isValid = false;
+                                validity.InvalidProperty = "sales"
+                            }
+
+                            case 1:
+                                if (item.storeName == null || item.storeName == undefined || item.storeName == "") {
+                                    validity.isValid = false;
+                                    validity.InvalidProperty = "storeName"
+                                }
+                                if (item.sales == null || item.sales == undefined || item.sales == "") {
+                                    validity.isValid = false;
+                                    validity.InvalidProperty = "sales"
+                                }
+
+                                if (item.department == null || item.department == undefined || item.department == "") {
+                                    validity.isValid = false;
+                                    validity.InvalidProperty = "department"
+                                }
+                                break;
+                            case 2:
+                                if (item.storeName == null || item.storeName == undefined || item.storeName == "") {
+                                    validity.isValid = false;
+                                    validity.InvalidProperty = "storeName"
+                                }
+                                if (item.sales == null || item.sales == undefined || item.sales == "") {
+                                    validity.isValid = false;
+                                    validity.InvalidProperty = "sales"
+                                }
+
+
+                                if (item.department == null || item.department == undefined || item.department == "") {
+                                    validity.isValid = false;
+                                    validity.InvalidProperty = "department"
+                                }
+                                break;
+                            case 3:
+                                if (item.storeName == null || item.storeName == undefined || item.storeName == "") {
+                                    validity.isValid = false;
+                                    validity.InvalidProperty = "storeName"
+                                }
+                                if (item.sales == null || item.sales == undefined || item.sales == "") {
+                                    validity.isValid = false;
+                                    validity.InvalidProperty = "sales"
+                                }
+
+                                if (item.department == null || item.department == undefined || item.department == "") {
+                                    validity.isValid = false;
+                                    validity.InvalidProperty = "department"
+                                }
+
+                                if (item.brand == null || item.brand == undefined || item.brand == "") {
+                                    validity.isValid = false;
+                                    validity.InvalidProperty = "brand"
+                                }
+                                break;
+
+                            default:
+                                break;
+                    }
+                }
+                return validity
+            },
+            onFileChange(data) {
                 let self = this;
+                let newArr = [];
+                if (self.isSpecific) {
+                    data.data.forEach(el => {
+                        let validity = self.checkValid(true, null, el)
+                        newArr.push(new customImportItem({
+                            isValid: validity.isValid,
+                            InvalidProperty: validity.InvalidProperty,
+                            storeName: el.storeName,
+                            sales: el.sales,
+                            coordinates: el.Coordinates
 
-                self.$nextTick(() => {
-                    const files = e.target.files;
-                    let file = files[0];
-                    let reader = new FileReader();
+                        }))
+                    });
+                } else {
 
-                    reader.onload = function (e) {
-                        let data = csvToDataObject(e.currentTarget.result);
-
-                        let newArr = [];
-                        if (self.isSpecific) {
+                    switch (self.selectedImportLevel.value) {
+                        case 0:
+                            let validity = self.checkValid(false, 0, el)
                             data.data.forEach(el => {
                                 newArr.push(new customImportItem({
+                                    isValid: validity.isValid,
+                                    InvalidProperty: validity.InvalidProperty,
                                     storeName: el.storeName,
                                     sales: el.sales,
                                     coordinates: el.Coordinates
                                 }))
                             });
-                        } else {
-
-                            switch (self.selectedImportLevel.value) {
-                                case 0:
-                                    data.data.forEach(el => {
-                                        newArr.push(new customImportItem({
-                                            storeName: el.storeName,
-                                            sales: el.sales,
-                                            coordinates: el.Coordinates
-                                        }))
-                                    });
 
 
-                                    break;
-                                case 1:
-                                    data.data.forEach(el => {
-                                        newArr.push(new customImportItem({
-                                            storeName: el.storeName,
-                                            department: el.department,
-                                            sales: el.sales,
-                                            coordinates: el.Coordinates
-                                        }))
-                                    });
+                            break;
+                        case 1:
+                            data.data.forEach(el => {
+                                let validity = self.checkValid(false, 1, el)
+                                newArr.push(new customImportItem({
+                                    isValid: validity.isValid,
+                                    InvalidProperty: validity.InvalidProperty,
+                                    storeName: el.storeName,
+                                    department: el.department,
+                                    sales: el.sales,
+                                    coordinates: el.Coordinates
+                                }))
+                            });
 
-                                case 2:
-                                    data.data.forEach(el => {
-                                        newArr.push(new customImportItem({
-                                            storeName: el.storeName,
-                                            category: el.category,
-                                            department: el.department,
-                                            sales: el.sales,
-                                            coordinates: el.Coordinates
-                                        }))
-                                    });
+                        case 2:
+                            data.data.forEach(el => {
+                                let validity = self.checkValid(false, 2, el)
+                                newArr.push(new customImportItem({
+                                    isValid: validity.isValid,
+                                    InvalidProperty: validity.InvalidProperty,
+                                    storeName: el.storeName,
+                                    category: el.category,
+                                    department: el.department,
+                                    sales: el.sales,
+                                    coordinates: el.Coordinates
+                                }))
+                            });
 
-                                case 3:
-                                    data.data.forEach(el => {
-                                        newArr.push(new customImportItem({
-                                            storeName: el.storeName,
-                                            brand: el.brand,
-                                            category: el.category,
-                                            department: el.department,
-                                            sales: el.sales,
-                                            coordinates: el.Coordinates
-                                        }))
-                                    });
+                        case 3:
+                            data.data.forEach(el => {
+                                let validity = self.checkValid(false, 3, el)
+                                newArr.push(new customImportItem({
+                                    isValid: validity.isValid,
+                                    InvalidProperty: validity.InvalidProperty,
+                                    storeName: el.storeName,
+                                    brand: el.brand,
+                                    category: el.category,
+                                    department: el.department,
+                                    sales: el.sales,
+                                    coordinates: el.Coordinates
+                                }))
+                            });
 
-                                default:
-                                    break;
-                            }
-                        }
-                        // self.headers = convertToGridHeaders(data.headers);
-                        self.rowData = newArr;
+                        default:
+                            break;
                     }
-                    reader.readAsText(file);
-                })
+                }
+                // self.headers = convertToGridHeaders(data.headers);
+                self.rowData = newArr;
+                console.log("rowData", self.rowData);
+
+
             },
             prompt() {
                 let self = this;
                 let canPass = false;
+                let name = self.specificName + " " + self.dateFrom.text + " to " + self.dateTo.text
+                console.log("Name", name);
 
-                self.$refs.Prompt.show("", "Name this import", "Name", name => {
-                    if (name == "") {
-                        setTimeout(() => {
-                            alert("Please enter a name")
-                            self.prompt();
-                        }, 60);
-                    } else {
-                        if (self.fileData != undefined) {
-                            if (self.fileData.supplierImport != undefined && self.fileData.supplierImport !=
-                                null) {
-                                for (var prop in self.fileData.supplierImport) {
-                                    if (prop == name) {
-                                        setTimeout(() => {
-                                            self.$refs.YesNoModal.show(
-                                                "This name already exists. Would you like to overwrite it?",
-                                                value => {
-                                                    if (value) {
-                                                        canPass = true;
-                                                    } else {
-                                                        self.prompt();
-                                                    }
-                                                })
-                                        }, 60);
-                                    } else {
-                                        canPass = true;
-                                    }
-                                }
-                            } else {
-                                canPass = true;
-                            }
-                        } else {
-                            canPass = true;
-                        }
-                    }
-
-                    if (canPass) {
-                        // saveFile
-                        self.saveFile(name)
-                    }
-                })
+                self.saveFile(name)
             },
             saveImportToDB(name) {
                 let self = this
-                self.$refs.DateRangeSelector.show(dateRange => {
-                    console.log("[DATERANGE]", dateRange);
 
-                    let request = {
-                        Name: name,
-                        UserID: self.SystemUser_ID,
-                        ID: self.ImportID,
-                        salesIn: self.selectedImportType,
-                        Type_ID: 1,
-                        PeriodTo: dateRange.dateTo,
-                        PeriodFrom: dateRange.dateFrom,
-                        IsSpecific: self.isSpecific,
-                        Import_Level:self.selectedImportLevel.value
+                let request = {
+                    Name: name,
+                    UserID: self.SystemUser_ID,
+                    ID: self.ImportID,
+                    salesIn: self.selectedImportType,
+                    Type_ID: 1,
+                    PeriodTo: self.dateTo.value,
+                    PeriodFrom: self.dateFrom.value,
+                    IsSpecific: self.isSpecific,
+                    Import_Level: self.selectedImportLevel.value
 
-                    }
-                    console.log(request);
-                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                }
+                console.log(request);
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                    Axios.post(process.env.VUE_APP_API + `SuplierLocationImport`, request)
-                        .then(r => {
-                            console.log("[SuplierLocationImport]", r);
+                Axios.post(process.env.VUE_APP_API + `SuplierLocationImport`, request)
+                    .then(r => {
+                        console.log("[SuplierLocationImport]", r);
 
-                            self.saveImportTXes(r.data.id)
-                        })
-                })
+                        self.saveImportTXes(r.data.id)
+                    })
             },
             saveImportTXes(groupID) {
                 let self = this
@@ -491,27 +515,29 @@
                     // }
                     if (self.isSpecific) {
                         let item = {
+                            isValid: e.isValid,
                             retailerName: e.retailerName,
-                            StoreName: e.storeName,
-                            Sales: e.sales,
+                            storeName: e.storeName,
+                            sales: e.sales,
                             brand: e.brand,
                             category: e.category,
                             department: e.department,
-                            XCoordinate: e.xCoordinate,
-                            YCoordinate: e.yCoordinate
+                            xCoordinate: e.xCoordinate,
+                            yCoordinate: e.yCoordinate
                         }
-                        item[self.selectedImportLevel.text.toLowerCase()]=self.specificName
+                        item[self.selectedImportLevel.text.toLowerCase()] = self.specificName
                         tmp.push(item)
                     } else {
                         tmp.push({
+                            isValid: e.isValid,
                             retailerName: e.retailerName,
-                            StoreName: e.storeName,
-                            Sales: e.sales,
+                            storeName: e.storeName,
+                            sales: e.sales,
                             brand: e.brand,
                             category: e.category,
                             department: e.department,
-                            XCoordinate: e.xCoordinate,
-                            YCoordinate: e.yCoordinate
+                            xCoordinate: e.xCoordinate,
+                            yCoordinate: e.yCoordinate
                         })
                     }
                 })
@@ -574,7 +600,8 @@
                     console.log("{ImportSelector}", callback);
                     self.selectedImport = callback
 
-                    Axios.get(process.env.VUE_APP_API + `SuplierLocationImportTX/GetAll?groupID=${callback.id}`)
+                    Axios.get(process.env.VUE_APP_API +
+                            `SuplierLocationImportTX/GetAll?groupID=${callback.id}`)
                         .then(r => {
                             console.log(r);
                             self.rowData = r.data
@@ -616,13 +643,16 @@
 
     function customImportItem(data) {
         let self = this;
+        self.isValid = data.isValid;
+        self.InvalidProperty = data.InvalidProperty
         self.retailerName = data.retailerName;
         self.storeName = data.storeName;
         self.sales = data.sales;
         self.brand = data.brand
         self.category = data.category
         self.department = data.department
-        self.hasCoordinates = data.coordinates != undefined && data.coordinates != null && data.coordinates != "";
+        self.hasCoordinates = data.coordinates != undefined && data.coordinates != null && data.coordinates !=
+            "";
 
         if (self.hasCoordinates) {
             let coordsSplit = data.coordinates.split(", ");
