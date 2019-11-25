@@ -38,8 +38,6 @@ class LoadSavePlanogramBase {
     let allItems = ctrl_store.getAllPlanogramItems(vuex);
     let allProducts = ctrl_store.getAllPlanogramItemsByType(vuex, "PRODUCT");
 
-    console.log(allProducts, allItems);
-
     let output = {
       name: "",
       stage: null,
@@ -63,6 +61,32 @@ class LoadSavePlanogramBase {
           pdi.Data["CalcData"] = calcData;
         }
       })
+    })
+
+    console.log("products", allProducts);
+
+    // add planogram detail products
+
+    let planogramProducts = [];
+
+    allProducts.forEach(ap => {
+      let canAdd = true;
+
+      planogramProducts.forEach(pp => {
+        if(ap.Data.id == pp.Product_ID) 
+          canAdd = false;
+      })
+
+      if(canAdd) {
+        planogramProducts.push({
+          planogram_Detail_ID: -1,
+          product_ID: ap.Data.id,
+          facings_X: ap.Facings_X,
+          facings_t: ap.Facings_Y,
+          facings_z: ap.Facings_Z,
+
+        })
+      }
     })
 
     let planogramName = "";
@@ -637,6 +661,7 @@ class LoadSavePlanogramBase {
   }
 
   createDetailTX(clusterData, dimensionData, systemFileID, fixtureData, callback) {
+    let self = this;
 
     console.log("making detailTX");
     let defaultItem = null
@@ -696,6 +721,18 @@ class LoadSavePlanogramBase {
         console.log(systemFileID);
 
         callback(r)
+        delete axios.defaults.headers.common["TenantID"];
+      })
+
+      // self.createPlanogram_Detail_Product(systemFileID, products);
+  }
+
+  createPlanogram_Detail_Product(systemFileID, products) {
+    axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+    axios.post(process.env.VUE_APP_API + `Planogram_Detail_Product?${systemFileID}`, products).then(
+      r => {
+        console.log(r.data);
         delete axios.defaults.headers.common["TenantID"];
       })
   }

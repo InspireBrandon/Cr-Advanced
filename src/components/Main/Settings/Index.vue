@@ -47,7 +47,7 @@
                                             <v-toolbar dense dark color="grey darken-3">
                                                 <v-toolbar-title>Chain Research Structure</v-toolbar-title>
                                                 <v-spacer></v-spacer>
-                                                <v-btn color="primary">Import structure</v-btn>
+                                                <v-btn color="primary" @click="importStructure">Import structure</v-btn>
                                             </v-toolbar>
                                             <v-card flat>
                                                 <v-card-text class="pa-2 pb-4">
@@ -185,6 +185,15 @@
                     .then(() => {
                         self.loading = false;
                         EventBus.$emit('background-picture-changed', self.$refs.backgroundImage.src);
+                    })
+            },
+            importStructure() {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API + `SystemStructure/Import`)
+                    .then(r => {
+                        alert("Import done. Page will now reload");
+                        window.location.reload();
                     })
             }
         }
