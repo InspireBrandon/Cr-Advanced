@@ -63,28 +63,39 @@ class LoadSavePlanogramBase {
       })
     })
 
-    console.log("products", allProducts);
-
     // add planogram detail products
 
     let planogramProducts = [];
 
-    allProducts.forEach(ap => {
+    let onlyProducts = output.planogramData.filter(e => {
+      return e.Type == "PRODUCT";
+    })
+
+    onlyProducts.forEach(ap => {
       let canAdd = true;
 
       planogramProducts.forEach(pp => {
-        if(ap.Data.id == pp.Product_ID) 
+        if (ap.Data.Data.productID == pp.product_ID)
           canAdd = false;
       })
 
-      if(canAdd) {
+      if (canAdd) {
+        // TODO add calcs here
+
         planogramProducts.push({
           planogram_Detail_ID: -1,
-          product_ID: ap.Data.id,
-          facings_X: ap.Facings_X,
-          facings_t: ap.Facings_Y,
-          facings_z: ap.Facings_Z,
-
+          product_ID: ap.Data.Data.productID,
+          facings_X: ap.Data.Facings.x,
+          facings_Y: ap.Data.Facings.y,
+          facings_Z: ap.Data.Facings.z,
+          weekly_Sales: ap.Data.CalcData.Weekly_Sales_Retail,
+          weekly_Sales_Potential: 0,
+          weekly_Profit: ap.Data.CalcData.Weekly_Profit,
+          weekly_Profit_Potential: 0,
+          weekly_Units: ap.Data.CalcData.Weekly_Sales_Units,
+          weekly_Units_Potential: 0,
+          weekly_Cost: ap.Data.CalcData.Weekly_Sales_Cost,
+          weekly_Cost_Potential: 0,
         })
       }
     })
@@ -149,7 +160,7 @@ class LoadSavePlanogramBase {
         alert("folder created")
       }
 
-      self.createDetailTX(clusterData, dimensionData, resultSpace, fixtureData, () => {})
+      self.createDetailTX(clusterData, dimensionData, resultSpace, fixtureData, planogramProducts, () => {})
 
       output.image = null
       let startTime = new Date()
@@ -276,8 +287,6 @@ class LoadSavePlanogramBase {
 
           xhrObj.setRequestHeader("X-File-Name", "image.png");
           xhrObj.setRequestHeader("Content-type", image.Type);
-          console.log("image");
-          console.log(image);
 
           image.name = "image.png"
           xhrObj.send(image);
@@ -317,6 +326,41 @@ class LoadSavePlanogramBase {
           pdi.Data["CalcData"] = calcData;
         }
       })
+    })
+
+    let planogramProducts = [];
+
+    let onlyProducts = output.planogramData.filter(e => {
+      return e.Type == "PRODUCT";
+    })
+
+    onlyProducts.forEach(ap => {
+      let canAdd = true;
+
+      planogramProducts.forEach(pp => {
+        if (ap.Data.Data.productID == pp.product_ID)
+          canAdd = false;
+      })
+
+      if (canAdd) {
+        // TODO add calcs here
+
+        planogramProducts.push({
+          planogram_Detail_ID: -1,
+          product_ID: ap.Data.Data.productID,
+          facings_X: ap.Data.Facings.x,
+          facings_Y: ap.Data.Facings.y,
+          facings_Z: ap.Data.Facings.z,
+          weekly_Sales: ap.Data.CalcData.Weekly_Sales_Retail,
+          weekly_Sales_Potential: 0,
+          weekly_Profit: ap.Data.CalcData.Weekly_Profit,
+          weekly_Profit_Potential: 0,
+          weekly_Units: ap.Data.CalcData.Weekly_Sales_Units,
+          weekly_Units_Potential: 0,
+          weekly_Cost: ap.Data.CalcData.Weekly_Sales_Cost,
+          weekly_Cost_Potential: 0,
+        })
+      }
     })
 
     let planogramName = "";
@@ -377,7 +421,7 @@ class LoadSavePlanogramBase {
     axios.post(self.ServerAddress + "SystemFolder?db=CR-Devinspire", tmp, config).then(resp => {
       let resultSpace = resp.data.systemFileID
 
-      self.createDetailTX(clusterData, dimensionData, resultSpace, fixtureData, () => {})
+      self.createDetailTX(clusterData, dimensionData, resultSpace, fixtureData, planogramProducts, () => {})
 
       output.image = null
       let startTime = new Date()
@@ -519,21 +563,16 @@ class LoadSavePlanogramBase {
 
           xhrObj.setRequestHeader("X-File-Name", "image.png");
           xhrObj.setRequestHeader("Content-type", image.Type);
-          console.log("image");
-          console.log(image);
 
           image.name = "image.png"
           xhrObj.send(image);
         })
 
-        createDetailTX(clusterData, dimensionData, fixtureData, resultSpace, () => {
+        createDetailTX(clusterData, dimensionData, fixtureData, resultSpace, planogramProducts, () => {
           callback(resultSpace);
         })
 
-      }).catch(e => {
-        console.log(e)
-        console.error("Failed to save planogram file");
-      })
+      }).catch(e => {})
     })
   }
 
@@ -660,26 +699,19 @@ class LoadSavePlanogramBase {
     // };
   }
 
-  createDetailTX(clusterData, dimensionData, systemFileID, fixtureData, callback) {
+  createDetailTX(clusterData, dimensionData, systemFileID, fixtureData, products, callback) {
     let self = this;
 
-    console.log("making detailTX");
     let defaultItem = null
     let totalModules = 0;
-
-    console.log(fixtureData)
 
     fixtureData.forEach(item => {
       if (item.isDefault == true) {
         defaultItem = item
       }
 
-      console.log(item)
-
       totalModules += parseInt(item.modules);
     })
-
-    console.log('[TOTAL MODULES]', totalModules)
 
     let sendRequst = {
       "systemFileID": systemFileID,
@@ -717,22 +749,20 @@ class LoadSavePlanogramBase {
 
     axios.post(process.env.VUE_APP_API + 'Planogram_Details/Save', request).then(
       r => {
-        console.log(r.data);
-        console.log(systemFileID);
+        let planogramDetailID = r.data.planogram_Details.id;
+
+        self.createPlanogram_Detail_Product(planogramDetailID, products)
 
         callback(r)
         delete axios.defaults.headers.common["TenantID"];
       })
-
-      // self.createPlanogram_Detail_Product(systemFileID, products);
   }
 
-  createPlanogram_Detail_Product(systemFileID, products) {
+  createPlanogram_Detail_Product(planogramDetailID, products) {
     axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-    axios.post(process.env.VUE_APP_API + `Planogram_Detail_Product?${systemFileID}`, products).then(
+    axios.post(process.env.VUE_APP_API + `Planogram_Detail_Product?planogramDetailID=${planogramDetailID}`, products).then(
       r => {
-        console.log(r.data);
         delete axios.defaults.headers.common["TenantID"];
       })
   }
@@ -769,8 +799,6 @@ class LoadSavePlanogramBase {
     }
     axios.get(self.ServerAddress + `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${fixtureID}&file=config`)
       .then(r => {
-
-        console.log(r.data);
 
         let jsonData = r.data.jsonObject
         self.startLoadingPlanogram(jsonData, Stage, pxlRatio, MasterLayer, VueStore, null, () => {
@@ -865,15 +893,12 @@ class LoadSavePlanogramBase {
 
   startLoadingPlanogram(fileData, Stage, PxlRatio, MasterLayer, VueStore, hideLoader, callback) {
 
-    console.log("START LOADING", Stage, MasterLayer);
-
     let self = this;
     let MasterData = fileData.planogramData;
 
     // Set Plangram settings
     if (fileData.planogramSettings != undefined && fileData.planogramSettings != null) {
       VueStore.commit("setPlanogramProperties", fileData.planogramSettings);
-      console.log('[LOAD PLANGRAM SETTINGS]', fileData.planogramSettings);
     }
 
     // Init Gondolas
@@ -1004,7 +1029,6 @@ class LoadSavePlanogramBase {
     }
     break;
     case "SHELF": {
-      console.log("CHECKING SHELF")
 
       let ctrl_item = new ShelfNew(
         VueStore,
@@ -1033,7 +1057,6 @@ class LoadSavePlanogramBase {
     }
     break;
     case "BASE": {
-      console.log("LOAD RECURSIVE", CurrentItem)
 
       let ctrl_item = new BaseNew(
         VueStore,
@@ -1045,7 +1068,6 @@ class LoadSavePlanogramBase {
         ParentID
       )
 
-      console.log("BASE", ctrl_item)
 
       if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
         ctrl_item.Position = CurrentItem.Position;
@@ -1371,10 +1393,6 @@ function calculate(productItem, vuex, storeCount) {
     }
   });
 
-  console.log(productData);
-
-  console.log("VUEX", vuex.state.usePotential)
-
   var sales_retail = productData.ProductData.sales_Retail,
     sales_potential = productData.ProductData.sales_potential,
     sales_cost = productData.ProductData.sales_Cost,
@@ -1388,8 +1406,6 @@ function calculate(productItem, vuex, storeCount) {
     total_facings,
     vuex.state.usePotential ? volume_potential : sales_units
   );
-
-  console.log(productData.ProductData);
 
   calcData.Weekly_Sales_Retail = calculationHandler.Calculate_Weekly_Sales_Retail(vuex.state.usePotential ? sales_potential : sales_retail, );
 
