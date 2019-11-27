@@ -119,7 +119,7 @@ import PlanogramDistributionNew from '@/components/Main/PlanogramDistribution/Pl
 
 import StorePlanogram from '@/components/Main/PlanogramStoreView/StoreView/StorePlanograms.vue'
 
-import map from '@/components/Apps/Strategy/Map/Switcher.vue'
+import map from '@/components/Apps/Strategy/Map/Index.vue'
 import map2 from '@/components/Apps/Strategy/Map/tesmap.vue'
 import FloorPlanningViewer from '@/components/Main/FloorPlanningViewer/Index'
 import PromotionViewer from '@/components/Main/PromotionViewer'

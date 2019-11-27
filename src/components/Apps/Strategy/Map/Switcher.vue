@@ -1,15 +1,15 @@
 <template>
     <div>
-
-
-        <Research ref="Research" />
-
+     
     </div>
 </template>
 <script>
+    
+
+    import MapComponent from "./Index";
     export default {
         components: {
-            
+         
         },
         data() {
             return {
@@ -20,15 +20,14 @@
             };
         },
         mounted() {
-            let self = this
-            if (self.$route.params.params != null) {
-                self.viewOnlyMode = true
-            } else {
-                self.viewOnlyMode = false
-            }
+           
         },
         methods: {
-
+         
         }
     };
 </script>
+
+
+
+

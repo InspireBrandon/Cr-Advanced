@@ -520,7 +520,7 @@ function checkMapping(vueCtx, ) {
     if (vueCtx.$route.name == "map") {
         redrawMap()
     } else {
-        vueCtx.$router.push("/map")
+        vueCtx.$router.push("/map/:params")
     }
 }
 

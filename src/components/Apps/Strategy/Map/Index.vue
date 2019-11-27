@@ -37,13 +37,19 @@
         {{lastCLicked}}
       </span>
       <v-btn @click="log"></v-btn> -->
+      <v-spacer></v-spacer>
+
+      <v-btn @click="toggleSidbar" icon>
+        <v-icon v-if="!openSideBar">visibility</v-icon>
+        <v-icon v-if="openSideBar">visibility_off</v-icon>
+      </v-btn>
     </v-toolbar>
     <div oncontextmenu="return false;" class="mapContainer">
       <v-layout>
-        <v-flex md9>
+        <v-flex :md9="openSideBar" :md12="!openSideBar">
           <div id="thisone2" class="map" ref="thisone2"></div>
         </v-flex>
-        <v-flex md3>
+        <v-flex md3 v-if="openSideBar">
           <div>
             <v-card max-height="400px;" flat>
               <v-tabs class="elevation-4" dark>
@@ -70,7 +76,6 @@
                     </v-toolbar-items>
                   </v-toolbar>
                   <v-card height="calc(100vh - 273px)" style="overflow:auto;">
-
                     <v-card>
                       <v-list>
                         <div v-for="(item, index) in AvailableData" :key="index">
@@ -96,7 +101,6 @@
     <Spinner ref="Spinner" />
     <RetailerImportModal ref="RetailerImportModal" />
     <LinkRetailerStore ref="LinkRetailerStore" />
-    <MapComponent ref="MapComponent" />
     <MapImageSelector ref="MapImageSelector" />
     <RetailerSupplierStoreDialog ref="RetailerSupplierStoreDialog" />
     <MapImageAdd ref="MapImageAdd" />
@@ -113,6 +117,8 @@
   import jwt from "jsonwebtoken";
   import Spinner from '@/components/Common/Spinner';
   import LinkStores from "../Research/LinkStores";
+  import Research from "../Research/Index";
+
   import RetailerImportModal from "../Main/RetailerImportModal";
   import LinkRetailerStore from "../Main/LinkRetailerStores/Index";
   import RetailerSupplierStoreDialog from "../Research/RetailerSupplierStore/RetailerSupplier";
@@ -147,6 +153,7 @@
     },
     data() {
       return {
+        openSideBar: false,
         // static Series Data holders
         retailerData: [],
 
@@ -290,6 +297,8 @@
     mounted() {
       let self = this;
       self.$refs.Spinner.show()
+      console.log(self.$route);
+
       if (self.$route.params.params != null) {
         self.viewOnlyMode = true
       } else {
@@ -313,6 +322,10 @@
       });
     },
     methods: {
+      toggleSidbar() {
+        let self = this
+        self.openSideBar = !self.openSideBar
+      },
       openImport() {
         let self = this
         self.$refs.Research.open()
@@ -1092,6 +1105,7 @@
         // //////////////////////////////////////////////////
         // start draw of base chart
         // //////////////////////////////////////////////////
+        self.openSideBar=false
         self.$refs.Spinner.show()
         // if (self.chart != null) {
         //   self.chart.dispose()
@@ -1177,7 +1191,7 @@
 
 <style scoped>
   .map {
-    height: calc(100vh - 225px);
+    height: calc(100vh - 177px);
     /* width: 1600px; */
     width: 100%;
     background-color: #cccccc;
