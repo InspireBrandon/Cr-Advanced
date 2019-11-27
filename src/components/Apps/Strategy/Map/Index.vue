@@ -304,8 +304,6 @@
         EventBus.$emit('MAPPING_LOADED');
       });
 
-
-
       EventBus.$off('MAPPING_REDRAW')
       EventBus.$on('MAPPING_REDRAW', data => {
         self.viewOnlyMode = true
@@ -381,6 +379,8 @@
       },
       handleEventData(data, callback) {
         let self = this
+        self.$refs.Spinner.show()
+
         self.$nextTick(() => {
           console.log("[EVENT DATA]", data);
           self.setChartData(data, chartCB => {
@@ -888,7 +888,7 @@
         let imageSeriesTemplate = imageSeries.mapImages.template;
         imageSeriesTemplate.propertyFields.latitude = "xCoordinate";
         imageSeriesTemplate.propertyFields.longitude = "yCoordinate";
-        imageSeriesTemplate.nonScaling = false;
+        imageSeriesTemplate.nonScaling = true;
         imageSeriesTemplate.fill = "black";
 
         // var retailCircle = imageSeriesTemplate.createChild(
@@ -899,8 +899,8 @@
 
         let storeImage = imageSeriesTemplate.createChild(am4core.Image);
         storeImage.propertyFields.href = "image"
-        storeImage.width = 50;
-        storeImage.height = 50;
+        storeImage.width = 40;
+        storeImage.height = 40;
         storeImage.horizontalCenter = "middle";
         storeImage.verticalCenter = "bottom";
         storeImage.propertyFields.tooltipText = "name";
@@ -1101,7 +1101,7 @@
         chart.name = "Map";
         chart.projection = new am4maps.projections.Miller();
         var title = chart.titles.create();
-        title.text = "[bold font-size: 20]Store Sales Heatmap[/]";
+        // title.text = "[bold font-size: 20]Store Sales Heatmap[/]";
         title.textAlign = "middle";
 
         let asd = am4geodata_worldLow;
@@ -1122,7 +1122,7 @@
         self.drawMajorCitiesImageSeries(chart);
         self.drawMinorCities(chart);
         self.drawRetailerMap(chart);
-        self.DrawGeoGrid(chart, callback => {});
+        // self.DrawGeoGrid(chart, callback => {});
         self.chart = chart
         self.$refs.Spinner.hide()
       },
