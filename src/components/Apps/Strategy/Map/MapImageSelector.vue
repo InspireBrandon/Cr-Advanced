@@ -99,6 +99,8 @@
             close() {
                 let self = this;
                 self.dialog = false;
+                console.log("selectedmap",self.selected);
+                
                 self.callback(self.selected);
             },
             imageSrc(imgID) {

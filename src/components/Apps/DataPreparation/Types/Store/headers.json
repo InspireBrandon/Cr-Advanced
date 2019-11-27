@@ -3,6 +3,22 @@
         "field": "displayname"
     },
     {
+        "headerName": "Store Manager",
+        "field": "store_Manager"
+    },
+    {
+        "headerName": "Fax No.",
+        "field": "store_Fax"
+    },
+    {
+        "headerName": "Tel No.",
+        "field": "store_Phone"
+    },
+    {
+        "headerName": "Store Email",
+        "field": "store_Email"
+    },
+    {
         "headerName": "",
         "field": "",
         "cellRendererFramework": "Button",

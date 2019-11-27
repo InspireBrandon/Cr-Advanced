@@ -80,7 +80,7 @@
         data() {
             return {
                 fileData: null,
-                Filename: "None selected",
+                Filename: "Please select a file",
                 dialog: false,
                 dateFrom: null,
                 dateTo: null,
@@ -196,7 +196,7 @@
                 let self = this
                 self.fileData = null
                 self.selectedImportLevel = null
-                self.Filename = "None selected"
+                self.Filename = "Please select a file"
                 self.selectedSubscriptionField = null
                 self.dateFrom = null
                 self.dateTo = null

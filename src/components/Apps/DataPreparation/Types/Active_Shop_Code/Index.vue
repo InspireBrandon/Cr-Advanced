@@ -8,8 +8,10 @@
     import SimpleList from '@/components/Apps/DataPreparation/Common/SimpleList.vue'
 
     export default {
+
         components: {
             SimpleList
-        }
+        },
+      
     }
 </script>
