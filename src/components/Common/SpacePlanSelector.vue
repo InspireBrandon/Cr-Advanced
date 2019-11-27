@@ -18,13 +18,18 @@
         <v-card-text style="display: block;">
           <v-list class="pa-0" dense hover v-for="(sp, idx) in filteredSpacePlans" :key="idx">
             <v-divider v-if="!sp.archived"></v-divider>
-            <v-list-tile :class="{ 'highlighted': selectedSpacePlan == sp  }" avatar @click="selectedSpacePlan = sp" v-if="!sp.archived">
+            <v-list-tile :class="{ 'highlighted': selectedSpacePlan == sp  }" avatar @click="selectedSpacePlan = sp"
+              v-if="!sp.archived">
               <v-list-tile-content>
                 <v-list-tile-title v-text="sp.name"></v-list-tile-title>
               </v-list-tile-content>
               <v-list-tile-action>
-                <v-checkbox la label="Can Distribute" @change="setCanDistribute(sp)" v-model="sp.canDistribute"
-                  hide-details color="primary"></v-checkbox>
+                <div>
+                  <v-checkbox label="Complete" @change="setComplete(sp)" v-model="sp.complete" hide-details
+                    color="primary"></v-checkbox>
+                  <v-checkbox label="Can Distribute" @change="setCanDistribute(sp)" v-model="sp.canDistribute"
+                    hide-details color="primary"></v-checkbox>
+                </div>
               </v-list-tile-action>
             </v-list-tile>
           </v-list>
@@ -180,6 +185,17 @@
         self.$nextTick(() => {
           Axios.post(process.env.VUE_APP_API +
               `SystemFile/SetDistribute?db=CR-DEVINSPIRE&systemFileID=${sp.id}&canDistribute=${sp.canDistribute}`)
+            .then(r => {
+              console.log(r.data);
+            })
+        })
+      },
+      setComplete(sp) {
+        let self = this;
+
+        self.$nextTick(() => {
+          Axios.post(process.env.VUE_APP_API +
+              `SystemFile/SetComplete?db=CR-DEVINSPIRE&systemFileID=${sp.id}&complete=${sp.complete}`)
             .then(r => {
               console.log(r.data);
             })

@@ -132,6 +132,9 @@ import ImportDepartmentMapper from '@/components/Main/ImportDataMapper/Sections/
 import ImportCategoryMapper from '@/components/Main/ImportDataMapper/Sections/Category/Index'
 import ImportBrandMapper from '@/components/Main/ImportDataMapper/Sections/Brand/Index'
 
+// REPORTS
+import CrossPlanogramAnalysis from '@/components/Main/Reports/ClickView/CrossPlanogramAnalysis/Index'
+
 import {
   APPLICATION_ROUTE as RouteConfig
 } from "./components/Main/NewViewTesting/RoutesForTesting/routerConfig";
@@ -227,6 +230,10 @@ export default new Router({
               name: 'map',
               component: map
             }, {
+              path: '/CrossPlanogramAnalysis',
+              name: 'CrossPlanogramAnalysis',
+              component: CrossPlanogramAnalysis,
+            }, {
               path: '/PromotionViewer',
               name: 'PromotionViewer',
               component: PromotionViewer
@@ -238,7 +245,7 @@ export default new Router({
                 path: 'Store',
                 name: 'PromotionViewer',
                 component: ImportStoreMapper,
-              },{
+              }, {
                 path: 'Department',
                 name: 'PromotionViewer',
                 component: ImportDepartmentMapper,
@@ -246,7 +253,7 @@ export default new Router({
                 path: 'Category',
                 name: 'PromotionViewer',
                 component: ImportCategoryMapper,
-              },{
+              }, {
                 path: 'Brand',
                 name: 'PromotionViewer',
                 component: ImportBrandMapper,

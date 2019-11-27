@@ -63,28 +63,41 @@ class LoadSavePlanogramBase {
       })
     })
 
-    console.log("products", allProducts);
-
     // add planogram detail products
 
     let planogramProducts = [];
 
-    allProducts.forEach(ap => {
+    let onlyProducts = output.planogramData.filter(e => {
+      return e.Type == "PRODUCT";
+    })
+
+    onlyProducts.forEach(ap => {
       let canAdd = true;
 
       planogramProducts.forEach(pp => {
-        if(ap.Data.id == pp.Product_ID) 
+        if (ap.Data.Data.productID == pp.product_ID)
           canAdd = false;
       })
 
-      if(canAdd) {
+      if (canAdd) {
+        let calcData = calculateAdvanced(ap, vuex, storeCount);
+
         planogramProducts.push({
           planogram_Detail_ID: -1,
-          product_ID: ap.Data.id,
-          facings_X: ap.Facings_X,
-          facings_t: ap.Facings_Y,
-          facings_z: ap.Facings_Z,
-
+          product_ID: ap.Data.Data.productID,
+          facings_X: calcData.XFacings,
+          facings_Y: calcData.YFacings,
+          facings_Z: calcData.ZFacings,
+          weekly_Sales: calcData.Weekly_Sales,
+          weekly_Sales_Potential: calcData.Weekly_Sales_Potential,
+          weekly_Profit: calcData.Weekly_Profit,
+          weekly_Profit_Potential: calcData.Weekly_Profit_Potential,
+          weekly_Units: calcData.Weekly_Units,
+          weekly_Units_Potential: calcData.Weekly_Units_Potential,
+          weekly_Cost: calcData.Weekly_Cost,
+          weekly_Cost_Potential: calcData.Weekly_Cost_Potential,
+          dos: calcData.DaysOfSupply,
+          dos_Potential: calcData.DaysOfSupplyPotential
         })
       }
     })
@@ -149,7 +162,7 @@ class LoadSavePlanogramBase {
         alert("folder created")
       }
 
-      self.createDetailTX(clusterData, dimensionData, resultSpace, fixtureData, () => {})
+      self.createDetailTX(clusterData, dimensionData, resultSpace, fixtureData, planogramProducts, () => {})
 
       output.image = null
       let startTime = new Date()
@@ -276,8 +289,6 @@ class LoadSavePlanogramBase {
 
           xhrObj.setRequestHeader("X-File-Name", "image.png");
           xhrObj.setRequestHeader("Content-type", image.Type);
-          console.log("image");
-          console.log(image);
 
           image.name = "image.png"
           xhrObj.send(image);
@@ -317,6 +328,43 @@ class LoadSavePlanogramBase {
           pdi.Data["CalcData"] = calcData;
         }
       })
+    })
+
+    let planogramProducts = [];
+
+    let onlyProducts = output.planogramData.filter(e => {
+      return e.Type == "PRODUCT";
+    })
+
+    onlyProducts.forEach(ap => {
+      let canAdd = true;
+
+      planogramProducts.forEach(pp => {
+        if (ap.Data.Data.productID == pp.product_ID)
+          canAdd = false;
+      })
+
+      if (canAdd) {
+        let calcData = calculateAdvanced(ap, vuex, storeCount);
+
+        planogramProducts.push({
+          planogram_Detail_ID: -1,
+          product_ID: ap.Data.Data.productID,
+          facings_X: calcData.XFacings,
+          facings_Y: calcData.YFacings,
+          facings_Z: calcData.ZFacings,
+          weekly_Sales: calcData.Weekly_Sales,
+          weekly_Sales_Potential: calcData.Weekly_Sales_Potential,
+          weekly_Profit: calcData.Weekly_Profit,
+          weekly_Profit_Potential: calcData.Weekly_Profit_Potential,
+          weekly_Units: calcData.Weekly_Units,
+          weekly_Units_Potential: calcData.Weekly_Units_Potential,
+          weekly_Cost: calcData.Weekly_Cost,
+          weekly_Cost_Potential: calcData.Weekly_Cost_Potential,
+          dos: calcData.DaysOfSupply,
+          dos_Potential: calcData.DaysOfSupplyPotential
+        })
+      }
     })
 
     let planogramName = "";
@@ -377,7 +425,7 @@ class LoadSavePlanogramBase {
     axios.post(self.ServerAddress + "SystemFolder?db=CR-Devinspire", tmp, config).then(resp => {
       let resultSpace = resp.data.systemFileID
 
-      self.createDetailTX(clusterData, dimensionData, resultSpace, fixtureData, () => {})
+      self.createDetailTX(clusterData, dimensionData, resultSpace, fixtureData, planogramProducts, () => {})
 
       output.image = null
       let startTime = new Date()
@@ -519,21 +567,16 @@ class LoadSavePlanogramBase {
 
           xhrObj.setRequestHeader("X-File-Name", "image.png");
           xhrObj.setRequestHeader("Content-type", image.Type);
-          console.log("image");
-          console.log(image);
 
           image.name = "image.png"
           xhrObj.send(image);
         })
 
-        createDetailTX(clusterData, dimensionData, fixtureData, resultSpace, () => {
+        createDetailTX(clusterData, dimensionData, fixtureData, resultSpace, planogramProducts, () => {
           callback(resultSpace);
         })
 
-      }).catch(e => {
-        console.log(e)
-        console.error("Failed to save planogram file");
-      })
+      }).catch(e => {})
     })
   }
 
@@ -660,26 +703,19 @@ class LoadSavePlanogramBase {
     // };
   }
 
-  createDetailTX(clusterData, dimensionData, systemFileID, fixtureData, callback) {
+  createDetailTX(clusterData, dimensionData, systemFileID, fixtureData, products, callback) {
     let self = this;
 
-    console.log("making detailTX");
     let defaultItem = null
     let totalModules = 0;
-
-    console.log(fixtureData)
 
     fixtureData.forEach(item => {
       if (item.isDefault == true) {
         defaultItem = item
       }
 
-      console.log(item)
-
       totalModules += parseInt(item.modules);
     })
-
-    console.log('[TOTAL MODULES]', totalModules)
 
     let sendRequst = {
       "systemFileID": systemFileID,
@@ -717,22 +753,20 @@ class LoadSavePlanogramBase {
 
     axios.post(process.env.VUE_APP_API + 'Planogram_Details/Save', request).then(
       r => {
-        console.log(r.data);
-        console.log(systemFileID);
+        let planogramDetailID = r.data.planogram_Details.id;
+
+        self.createPlanogram_Detail_Product(planogramDetailID, products)
 
         callback(r)
         delete axios.defaults.headers.common["TenantID"];
       })
-
-      // self.createPlanogram_Detail_Product(systemFileID, products);
   }
 
-  createPlanogram_Detail_Product(systemFileID, products) {
+  createPlanogram_Detail_Product(planogramDetailID, products) {
     axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-    axios.post(process.env.VUE_APP_API + `Planogram_Detail_Product?${systemFileID}`, products).then(
+    axios.post(process.env.VUE_APP_API + `Planogram_Detail_Product?planogramDetailID=${planogramDetailID}`, products).then(
       r => {
-        console.log(r.data);
         delete axios.defaults.headers.common["TenantID"];
       })
   }
@@ -769,8 +803,6 @@ class LoadSavePlanogramBase {
     }
     axios.get(self.ServerAddress + `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${fixtureID}&file=config`)
       .then(r => {
-
-        console.log(r.data);
 
         let jsonData = r.data.jsonObject
         self.startLoadingPlanogram(jsonData, Stage, pxlRatio, MasterLayer, VueStore, null, () => {
@@ -865,15 +897,12 @@ class LoadSavePlanogramBase {
 
   startLoadingPlanogram(fileData, Stage, PxlRatio, MasterLayer, VueStore, hideLoader, callback) {
 
-    console.log("START LOADING", Stage, MasterLayer);
-
     let self = this;
     let MasterData = fileData.planogramData;
 
     // Set Plangram settings
     if (fileData.planogramSettings != undefined && fileData.planogramSettings != null) {
       VueStore.commit("setPlanogramProperties", fileData.planogramSettings);
-      console.log('[LOAD PLANGRAM SETTINGS]', fileData.planogramSettings);
     }
 
     // Init Gondolas
@@ -1004,7 +1033,6 @@ class LoadSavePlanogramBase {
     }
     break;
     case "SHELF": {
-      console.log("CHECKING SHELF")
 
       let ctrl_item = new ShelfNew(
         VueStore,
@@ -1033,7 +1061,6 @@ class LoadSavePlanogramBase {
     }
     break;
     case "BASE": {
-      console.log("LOAD RECURSIVE", CurrentItem)
 
       let ctrl_item = new BaseNew(
         VueStore,
@@ -1045,7 +1072,6 @@ class LoadSavePlanogramBase {
         ParentID
       )
 
-      console.log("BASE", ctrl_item)
 
       if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
         ctrl_item.Position = CurrentItem.Position;
@@ -1371,10 +1397,6 @@ function calculate(productItem, vuex, storeCount) {
     }
   });
 
-  console.log(productData);
-
-  console.log("VUEX", vuex.state.usePotential)
-
   var sales_retail = productData.ProductData.sales_Retail,
     sales_potential = productData.ProductData.sales_potential,
     sales_cost = productData.ProductData.sales_Cost,
@@ -1388,8 +1410,6 @@ function calculate(productItem, vuex, storeCount) {
     total_facings,
     vuex.state.usePotential ? volume_potential : sales_units
   );
-
-  console.log(productData.ProductData);
 
   calcData.Weekly_Sales_Retail = calculationHandler.Calculate_Weekly_Sales_Retail(vuex.state.usePotential ? sales_potential : sales_retail, );
 
@@ -1405,6 +1425,118 @@ function calculate(productItem, vuex, storeCount) {
 
   calcData.Weekly_Profit = calculationHandler.Calculate_Weekly_Profit(vuex.state.usePotential ? sales_potential : sales_retail,
     sales_cost);
+
+  calcData.XFacings = productData.Facings_X;
+  calcData.Capacity = productData.TotalFacings;
+  calcData.ForwardCapacity = productData.XYFacings;
+
+  return calcData;
+}
+
+function calculateAdvanced(productItem, vuex, storeCount) {
+  let self = this;
+  let calculationHandler = new CalculationHandler(0, storeCount);
+
+  var calcData = {
+    XFacings: 0,
+    YFacings: 0,
+    ZFacings: 0,
+    Capacity: null,
+    ForwardCapacity: null,
+    DaysOfSupply: null,
+    DaysOfSupplyPotential: null,
+    Weekly_Sales: null,
+    Weekly_Sales_Potential: null,
+    Weekly_Cost: null,
+    Weekly_Cost_Potential: null,
+    Weekly_Units: null,
+    Weekly_Units_Potential: null,
+    Weekly_Profit: null,
+    Weekly_Profit_Potential: null
+  }
+
+  let productEventData = productItem;
+
+  let productID = productEventData.Data.Data.productID;
+
+  let productData;
+
+  let ctrl_store = new StoreHelper();
+  let productStoreCopy = ctrl_store.getAllPlanogramItemsByType(vuex, "PRODUCT");
+
+  productStoreCopy = productStoreCopy.slice(0, productStoreCopy.length);
+
+  productData = {
+    ProductData: productEventData.Data,
+    Facings_X: 0,
+    Facings_Y: 0,
+    Facings_Z: 0,
+    Facings_Z_Max: 0,
+    TotalFacings: 0,
+    XYFacings: 0
+  };
+
+  let productPlacementCount = 0
+
+  productStoreCopy.forEach((element, index) => {
+    if (element.Data.productID == productID) {
+      productPlacementCount++;
+    }
+  })
+
+  let totalLinearProduct = 0;
+  let totalProduct = 0;
+
+  productStoreCopy.forEach((element, index) => {
+    if (element.Data.productID == productID) {
+      console.log("checking for caps", element);
+
+      productData.Facings_X += element.Facings_X;
+      productData.Facings_Y += element.Facings_Y + (element.Caps_Enabled ? element.Caps_Count : 0) / productPlacementCount;
+      productData.Facings_Z += element.Facings_Z / productPlacementCount;
+      productData.TotalFacings += element.TotalFacings;
+      productData.XYFacings += element.Facings_X + element.Facings_Y;
+
+      totalLinearProduct += (element.Facings_X * (element.Facings_Y + + (element.Caps_Enabled ? element.Caps_Count : 0)));
+      totalProduct += element.TotalFacings;
+    }
+  });
+
+  productData.Facings_Y = (totalLinearProduct / productData.Facings_X);
+  productData.Facings_Z = (totalProduct / totalLinearProduct);
+
+  var sales_retail = productData.ProductData.Data.sales_Retail,
+    sales_potential = productData.ProductData.Data.sales_potential,
+    sales_cost = productData.ProductData.Data.sales_Cost,
+    sales_units = productData.ProductData.Data.sales_Units,
+    volume_potential = productData.ProductData.Data.volume_potential,
+    cost_potential = productData.ProductData.Data.cost_potential,
+    weighted_distribution = productData.ProductData.Data.weighted_Distribution,
+    total_facings = productData.TotalFacings;
+
+  calcData.XFacings = parseFloat(productData.Facings_X).toFixed(3).toString();
+  calcData.YFacings = parseFloat(productData.Facings_Y).toFixed(3).toString();
+  calcData.ZFacings = parseFloat(productData.Facings_Z).toFixed(3).toString();
+
+  // Days Of Supply
+  calcData.DaysOfSupply = calculationHandler.Calculate_Days_Of_Supply_Potential(total_facings, sales_units);
+  calcData.DaysOfSupplyPotential = calculationHandler.Calculate_Days_Of_Supply_Potential(total_facings, storeCount == 1 ? sales_units : volume_potential);
+
+  // SALES
+  calcData.Weekly_Sales = calculationHandler.Calculate_Weekly_Sales_Retail(sales_retail);
+  calcData.Weekly_Sales_Potential = calculationHandler.Calculate_Weekly_Sales_Retail(storeCount == 1 ? sales_retail : sales_potential);
+
+  // COST
+  calcData.Weekly_Cost = calculationHandler.Calculate_Weekly_Sales_Cost(sales_cost);
+  calcData.Weekly_Cost_Potential = calculationHandler.Calculate_Weekly_Sales_Cost(storeCount == 1 ? sales_cost : cost_potential);
+
+  // UNITS
+  calcData.Weekly_Units = calculationHandler.Calculate_Weekly_Sales_Units(sales_units);
+  calcData.Weekly_Units_Potential = calculationHandler.Calculate_Weekly_Sales_Units(storeCount == 1 ? sales_units : volume_potential);
+
+  // PROFIT
+  calcData.Weekly_Profit = calculationHandler.Calculate_Weekly_Profit(sales_retail, sales_cost);
+  calcData.Weekly_Profit_Potential = calculationHandler.Calculate_Weekly_Profit(storeCount == 1 ? sales_retail : sales_potential, storeCount == 1 ? sales_cost : cost_potential);
 
   calcData.XFacings = productData.Facings_X;
   calcData.Capacity = productData.TotalFacings;
