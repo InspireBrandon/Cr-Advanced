@@ -133,6 +133,7 @@
                     self.buildPromotionalPlanningFolder();
                     // self.buildSpatialMappingFolder();
                     mappingTreeItem.build(self.treeItems);
+                    self.buildReportTreeItems();
                     self.buildUploadTreeItems();
                 }
 
@@ -1102,6 +1103,34 @@
                 }
 
                 self.treeItems.push(promotionalTreeItem);
+            },
+            buildReportTreeItems() {
+                let self = this;
+
+                let reportTreeItem = new treeItem({
+                    name: "Reports",
+                    icon: "folder",
+                    children: []
+                })
+
+                reportTreeItem.click = function () {
+                    reportTreeItem.showChildren = !reportTreeItem.showChildren;
+                    reportTreeItem.icon = reportTreeItem.showChildren ? 'folder_open' : 'folder';
+                }
+
+                let cpaTreeItem = new treeItem({
+                    name: "Cross Planogram Analysis",
+                    icon: "insert_drive_file",
+                    children: []
+                })
+
+                cpaTreeItem.click = function() {
+                    self.$router.push("/CrossPlanogramAnalysis");
+                }
+
+                reportTreeItem.children.push(cpaTreeItem);
+
+                self.treeItems.push(reportTreeItem);
             },
             buildUploadTreeItems() {
                 let self = this;
