@@ -1,6 +1,7 @@
 <template>
     <div>
         <div>
+            <!-- <recursive :accessType="accessType" :items="treeItems"></recursive> -->
             <recursive :onContextMenu="onContextMenu" :accessType="accessType" :items="treeItems"></recursive>
             <v-menu v-model="showMenu" :position-x="x" :position-y="y" absolute offset-y>
                 <v-list dense class="pa-0">
@@ -26,6 +27,9 @@
 
     import MappingTreeItem from './Sections/MappingTreeItem'
     let mappingTreeItem;
+
+    import FolderTreeItem from './Sections/FolderTreeItem/FolderTreeItem.js'
+    let folderTreeItem;
 
     export default {
         props: ['accessType', 'storeID'],
@@ -53,6 +57,10 @@
             })
 
             mappingTreeItem = new MappingTreeItem({
+                vueCtx: self
+            })
+
+            folderTreeItem = new FolderTreeItem({
                 vueCtx: self
             })
         },
@@ -134,7 +142,8 @@
                     // self.buildSpatialMappingFolder();
                     mappingTreeItem.build(self.treeItems);
                     self.buildReportTreeItems();
-                    self.buildUploadTreeItems();
+                    // self.buildUploadTreeItems();
+                    folderTreeItem.build(self.treeItems);
                 }
 
                 if (self.accessType == 1) {

@@ -131,6 +131,9 @@ import ImportDepartmentMapper from '@/components/Main/ImportDataMapper/Sections/
 import ImportCategoryMapper from '@/components/Main/ImportDataMapper/Sections/Category/Index'
 import ImportBrandMapper from '@/components/Main/ImportDataMapper/Sections/Brand/Index'
 
+// Observations
+import ObservationsAndInsights from '@/components/Main/ObservationsAndInsights/Index'
+
 // REPORTS
 import CrossPlanogramAnalysis from '@/components/Main/Reports/ClickView/CrossPlanogramAnalysis/Index'
 
@@ -232,6 +235,10 @@ export default new Router({
               path: '/CrossPlanogramAnalysis',
               name: 'CrossPlanogramAnalysis',
               component: CrossPlanogramAnalysis,
+            },{
+              path: '/ObservationsAndInsights',
+              name: 'ObservationsAndInsights',
+              component: ObservationsAndInsights,
             }, {
               path: '/PromotionViewer',
               name: 'PromotionViewer',

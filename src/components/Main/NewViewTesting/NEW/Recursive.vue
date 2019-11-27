@@ -11,6 +11,7 @@
                 <v-icon @click="item.click" :size="12" v-if="!item.loading && item.showIcon">{{ item.icon }}</v-icon>
                 <span @click="item.click" class="ml-1">{{item.name}}</span>
                 <span @click="item.click" class="ml-1" v-if="item.showChildrenCount">({{ item.children.length }})</span>
+                <v-icon v-for="action in item.actions" :key="action.name" class="ml-1" size="12">{{ action.icon }}</v-icon>
             </div>
             <recursive v-if="item.showChildren" style="margin-left: 15px;" :onContextMenu="onContextMenu" :items="item.children"></recursive>
         </div>

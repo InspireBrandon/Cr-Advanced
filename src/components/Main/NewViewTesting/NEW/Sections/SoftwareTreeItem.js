@@ -25,7 +25,15 @@ class SoftwareTreeItem {
             }
         })
 
-        treeItems.push(appItem, taskItem);
+        let observationsItemItem = new TreeItem({
+            name: "Observations & Insights",
+            icon: "build",
+            click: function() {
+                self.vueCtx.$router.push("/ObservationsAndInsights")
+            }
+        })
+
+        treeItems.push(appItem, taskItem, observationsItemItem);
     }
 }
 
