@@ -1,0 +1,23 @@
+[{
+        "headerName": "Name",
+        "field": "displayname"
+    },
+    {
+        "headerName": "Address",
+        "field": "physical_Address"
+    },
+    {
+        "headerName": "City",
+        "field": "city"
+    },
+    {
+        "headerName": "Province",
+        "field": "province"
+    },
+    {
+        "headerName": "",
+        "field": "",
+        "cellRendererFramework": "Button",
+        "pinned": "right"
+    }
+]

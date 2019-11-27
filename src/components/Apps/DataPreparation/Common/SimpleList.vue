@@ -32,13 +32,13 @@
 
     export default {
         name: 'common-import-list',
-        props: ['name', 'headerName', 'hasCode'],
+        props: ['name', 'headerName', 'hasCode', 'passedHeaders'],
         components: {
             SimpleMaint,
             AgGridVue,
             Button
         },
-        data: () => {
+        data ()  {
             let self = this;
 
             return {
@@ -68,7 +68,14 @@
         computed: {},
         beforeMount() {
             let self = this;
-            self.columnDefs = require('./headers.json');
+            console.log("passedHeaders",self.passedHeaders);
+            
+            if (self.passedHeaders == null) {
+                self.columnDefs = require('./headers.json');
+            } else {
+                self.columnDefs = self.passedHeaders
+            }
+
         },
         mounted() {
             let self = this;
@@ -103,6 +110,8 @@
 
                 Axios.get(process.env.VUE_APP_API + `Retailer/${self.name}`)
                     .then(r => {
+                        console.log(r.data);
+
                         self.rowData = r.data;
                         delete Axios.defaults.headers.common["TenantID"];
                     })

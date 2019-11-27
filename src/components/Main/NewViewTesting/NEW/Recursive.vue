@@ -2,6 +2,7 @@
     <div>
         <div v-for="(item, idx) in items" :key="idx">
             <div @contextmenu.prevent="onContextMenu($event, item)" class="route-item">
+                 
                 <input v-model="item.selected" @change="onSelect(item)" style="margin-top: 3px; margin-right: 5px;" type="checkbox" v-if="item.allowSelect" />
                 <div @click="item.click" v-if="item.showImage" style="width: 20px; text-align: center;">
                     <img style="max-width: 20px; max-height: 15px;" :src="item.imageSrc" :lazy-src="item.imageSrc" aspect-ratio="1" contain>
@@ -10,6 +11,7 @@
                 </v-progress-circular>
                 <v-icon @click="item.click" :size="12" v-if="!item.loading && item.showIcon">{{ item.icon }}</v-icon>
                 <span @click="item.click" class="ml-1">{{item.name}}</span>
+                <input v-model="item.Comparison"  @change="onComparisonSelect(item)" style="margin-top: 3px; margin-left: 5px;" type="checkbox" v-if="item.allowComparison" />
                 <span @click="item.click" class="ml-1" v-if="item.showChildrenCount">({{ item.children.length }})</span>
                 <v-icon v-for="action in item.actions" :key="action.name" class="ml-1" size="12">{{ action.icon }}</v-icon>
             </div>
@@ -27,6 +29,12 @@
                 let self = this;
                 self.$nextTick(() => {
                     item.onSelect();
+                })
+            },
+             onComparisonSelect(item) {
+                let self = this;
+                self.$nextTick(() => {
+                    item.onComparisonSelect();
                 })
             }
         }

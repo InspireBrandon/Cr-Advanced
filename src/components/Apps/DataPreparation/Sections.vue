@@ -17,6 +17,19 @@
                                 </v-list-tile-action>
                             </v-list-tile>
                         </v-list-group>
+                         <v-list-group prepend-icon="shopping_cart">
+                            <template v-slot:activator>
+                                <v-list-tile>
+                                    <v-list-tile-title>Item Fields</v-list-tile-title>
+                                </v-list-tile>
+                            </template>
+                            <v-list-tile v-for="(item, i) in item_fields" :key="i" @click="openDataImport(item.route)">
+                                <v-list-tile-title v-text="item.name"></v-list-tile-title>
+                                <v-list-tile-action>
+
+                                </v-list-tile-action>
+                            </v-list-tile>
+                        </v-list-group>
                         <v-list-group prepend-icon="work">
                             <template v-slot:activator>
                                 <v-list-tile>
@@ -77,10 +90,10 @@
         name: 'DataImport',
         data: () => {
             return {
-                product: [
-                    new navItem({
-                        name: 'Brand',
-                        route: 'Brand'
+                item_fields:[
+ new navItem({
+                        name: 'Segment',
+                        route: 'Segment'
                     }),
                     new navItem({
                         name: 'Manufacturer',
@@ -94,6 +107,33 @@
                         name: 'Department',
                         route: 'Department'
                     }),
+                      new navItem({
+                        name: 'Brand',
+                        route: 'Brand'
+                    }),
+                ],
+                product: [
+                    new navItem({
+                        name: 'Product Catalogue',
+                        route: 'ProductCatalogue'
+                    }),
+                     new navItem({
+                        name: 'Category Code',
+                        route: 'CategoryCode'
+                    }),
+                     new navItem({
+                        name: 'Supergroup_A',
+                        route: 'Supergroup_A'
+                    }),
+                    new navItem({
+                        name: 'Supergroup_B',
+                        route: 'Supergroup_B'
+                    }),
+                     
+                    new navItem({
+                        name: 'Item Status',
+                        route: 'Item_Status'
+                    }),
                 ],
                 market: [
                     new navItem({
@@ -104,44 +144,24 @@
                         name: 'Store Cluster',
                         route: 'StoreCluster'
                     }),
-                ],
-                fact: [
-                    new navItem({
-                        name: 'Category Code',
-                        route: 'CategoryCode'
-                    }),
-                    new navItem({
-                        name: 'Planogram Maintenance',
-                        route: 'PlanogramMaintenance'
-                    }),
-                    new navItem({
-                        name: 'Supergroup_A',
-                        route: 'Supergroup_A'
-                    }),
-                    new navItem({
-                        name: 'Supergroup_B',
-                        route: 'Supergroup_B'
-                    }),
-                    new navItem({
-                        name: 'Segment',
-                        route: 'Segment'
-                    }),
-                    new navItem({
-                        name: 'Item_Status',
-                        route: 'Item_Status'
-                    }),
-                    new navItem({
-                        name: 'Active_Shop_Code',
-                        route: 'Active_Shop_Code'
-                    }),
                     new navItem({
                         name: 'Retail_Chain',
                         route: 'Retail_Chain'
                     }),
+                     new navItem({
+                        name: 'Active_Shop_Code',
+                        route: 'Active_Shop_Code'
+                    }),
                     new navItem({
-                        name: 'Product Catalogue',
-                        route: 'ProductCatalogue'
-                    })
+                         name: 'Geographic_Location',
+                        route: 'Geographic_Location'
+                    }),
+                ],
+                fact: [
+                    new navItem({
+                        name: 'Planogram Maintenance',
+                        route: 'PlanogramMaintenance'
+                    }),
                 ],
                 period: [
                     new navItem({

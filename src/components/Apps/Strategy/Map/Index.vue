@@ -41,23 +41,17 @@
 
                     <v-card>
                       <v-list>
-                        <v-list-tile v-for="(item, index) in AvailableData" :key="index">
-                          <v-layout>
-                            <span>{{checkAlphaNumber(item.blockNumber)}} </span>
-                            <v-spacer></v-spacer>
-                            <span>
-                              {{formatNumber(item.storeSummary.sales_Retail,item.squareTotalSales)}}
-                            </span>
-                            <!-- <v-spacer></v-spacer>
-                              <span>{{item.squareTotalSalesPercentage}}%</span> -->
-                          </v-layout>
-                        </v-list-tile>
+                        <div v-for="(item, index) in AvailableData" :key="index">
+                          <v-list-tile>
+                            <v-list-tile-title>{{checkAlphaNumber(item.blockNumber)}}:
+                              {{formatNumber(item.regionValues)}} </v-list-tile-title>
+                          </v-list-tile>
+                          <v-divider></v-divider>
+                        </div>
                       </v-list>
                     </v-card>
                   </v-card>
                 </v-tab-item>
-
-               
               </v-tabs>
             </v-card>
           </div>
@@ -226,13 +220,18 @@
         let self = this;
         let retVal = [];
         if (self.geoGridData != undefined && self.geoGridData != null) {
-          // self.geoGridData.forEach((el, idx) => {
-          //   if (el.retailerStores.length > 0) {
-          //     el.blockNumber = idx;
-          //     el.storeSummary = self.MapStoreData(el)
-          //     retVal.push(el);
-          //   }
-          // });
+          if (self.geoGridData.length > 0) {
+            self.geoGridData.forEach((el, idx) => {
+              if (el.regionValues != null && el.regionValues != undefined) {
+                if (el.regionValues.length > 0) {
+                  el.blockNumber = idx;
+                  retVal.push(el);
+                }
+              }
+
+            });
+          }
+
         }
         return retVal;
       }
@@ -251,52 +250,79 @@
         self.getmaps();
         self.getCities();
         self.getRetailers();
-
         EventBus.$emit('MAPPING_LOADED');
-
-
       });
-      EventBus.$on('MAPPING_REDRAW', data => {
-        console.log("MAPPING_REDRAW", data);
-        self.setChartData(data, callback => {
-          console.log("[DATA SET]");
-          self.chart.invalidateData();
 
-          if (self.config == null) {
-            self.drawMap({
-                imageDetails: {
-                  imageType: "none",
-                  imgURL: self.MapImgURL,
-                  imageLinkAddress: null
-                }
-              },
-              null,
-              null
-            );
-          } else {
-            self.drawMap(self.config, self.heatData);
-          }
-        });
+
+
+      EventBus.$off('MAPPING_REDRAW')
+      EventBus.$on('MAPPING_REDRAW', data => {
+        self.handleEventData(data, callback => {
+
+        })
       });
     },
     methods: {
-      log() {
+      getMarketShare(data, ) {
         let self = this
-        console.log(self.chart);
+        console.log("getMarketShare", data);
+
+        if (data.length == 0) {
+
+        } else {
+          Axios.defaults.headers.common["TenantID"] =
+            sessionStorage.currentDatabase;
+
+          let encoded_details = jwt.decode(sessionStorage.accessToken);
+
+          Axios.post(
+            process.env.VUE_APP_API + `SuplierLocationImportTX/MArketShare`, data
+          ).then(r => {
+            self.geoGridData = r.data
+            console.log("getMarketShare", r.data)
+
+          })
+        }
 
       },
+      handleEventData(data, callback) {
+        let self = this
+        self.$nextTick(() => {
+          console.log("[EVENT DATA]", data);
+          self.setChartData(data, chartCB => {
+            self.getRectWidth()
+            self.selectedmap = data.mapImages[0]
+            self.onMapChange(imagecb => {
+              if (self.config == null) {
+                self.drawMap({
+                  imageDetails: {
+                    imageType: "none",
+                    imgURL: self.MapImgURL,
+                    imageLinkAddress: null
+                  }
+                });
+              } else {
+                self.drawMap(self.config, self.heatData);
+              }
+            })
 
+            self.getMarketShare(data.MarketShare)
+            callback()
+          });
+        })
+
+      },
       MapStoreData(el) {
         let self = this;
-        let retVal = {
-          planogram: "",
-          sales_Retail: 0
-        };
-        if (el.retailerStores.length > 0) {
-          el.retailerStores.forEach(e => {
+        let retVal = []
+        if (el.regionValues.length > 0) {
+          el.regionValues.forEach(e => {
             // if (e.planogram_ID == self.selectedCategory) {
-            retVal.sales_Retail += e.sales_Retail
-            retVal.planogram = e.planogram
+            retVal.push({
+              name: e.header_Name,
+              sales: e.sales
+            })
+
             // }
           })
         }
@@ -320,20 +346,15 @@
       getRectWidth() {
         let self = this
         self.lastCLicked = self.chart.zoomGeoPoint
-
-        // self.chart.zoomLevel = 1
-
-        // self.chart.zoomStep = 2
         self.chart.goHome(0);
-
-        // self.chart.zoomGeoPoint.latitude = -28.686843852813457
-        // self.chart.zoomGeoPoint.longitude = 24.674649674206332
-
         var el = document.querySelector(
           "#thisone2 > div > svg > g > g:nth-child(2) > g:nth-child(1) > g:nth-child(2) > g:nth-child(1) > g:nth-child(2) > g:nth-child(1) > g > g:nth-child(1) > g > g:nth-child(3) > g > g > path"
         )
         self.imageHeight = el.getBoundingClientRect().height
         self.imageWidth = el.getBoundingClientRect().width
+        console.log(self.imageHeight);
+        console.log(self.imageWidth);
+
       },
       DrawGeoGrid(chart, callback) {
         let self = this;
@@ -363,8 +384,17 @@
           let shapeSeries = chart.series.push(new am4maps.MapPolygonSeries());
           let shapeTemplate = shapeSeries.mapPolygons.template;
           shapeTemplate.stroke = am4core.color("#e33");
+          // if (e.regionValues == null) {
+          //   shapeTemplate.stroke = am4core.color("#e33");
+          // } else {
+          //   if (e.regionValues.length == 0) {
+          //     shapeTemplate.stroke = am4core.color("#e33");
+          //   } else {
+          //     shapeTemplate.stroke = am4core.color("#00ff00");
+          //   }
+          // }
+
           shapeTemplate.strokeWidth = 2;
-          shapeTemplate.propertyFields.stores = e.stores.length
           // shapeTemplate.fill = shapeTemplate.stroke;
           shapeTemplate.propertyFields.latitude = "longitude";
           shapeTemplate.propertyFields.longitude = "latitude";
@@ -379,7 +409,12 @@
           }];
 
           shapeSeries.name = "block";
-          shapeTemplate.tooltipText = self.checkAlphaNumber(idx) + " stores:" + e.stores.length;
+          if (e.regionValues != null) {
+            shapeTemplate.tooltipText = self.checkAlphaNumber(idx) + " stores:" + e.regionValues.length;
+          } else {
+            shapeTemplate.tooltipText = self.checkAlphaNumber(idx);
+          }
+
           // shapeSeries.heatRules.push({
           //   property: "fill",
           //   target: polygonSeries.mapPolygons.template,
@@ -462,8 +497,6 @@
         Axios.get(
           process.env.VUE_APP_API + `SuplierLocationImportTX/GeoReport?userID=${encoded_details.USER_ID}`
         ).then(r => {
-          console.log("getGeoGrid", r.data)
-
           self.geoGridData = r.data;
 
           self.getHinterlandStores();
@@ -542,8 +575,6 @@
       buildGraphArr(fields, callback) {
         let self = this;
         let tmp = []
-        console.log("fields", fields);
-
         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
         Axios.post(process.env.VUE_APP_API + `RetailerStore/Multiple`, fields).then(r => {
           // tmp = r.data.retailerStoreList
@@ -579,29 +610,21 @@
           }
         });
       },
-      onMapChange() {
+      onMapChange(callback) {
         let self = this;
         self.$nextTick(() => {
-          self.MapImgURL =
-            process.env.VUE_APP_API +
-            `MapImage?mapImageID=${self.selectedmap}&type=map`;
-          self.legendImgURL =
-            process.env.VUE_APP_API +
-            `MapImage?mapImageID=${self.selectedmap}&type=legend`;
-
-          if (self.config == null) {
-            self.drawMap({
-                imageDetails: {
-                  imageType: "none",
-                  imgURL: self.MapImgURL,
-                  imageLinkAddress: null
-                }
-              },
-              null,
-              null
-            );
+          console.log(self.selectedmap);
+          if (self.selectedmap == undefined) {
+            self.selectedmap = null
+              callback()
           } else {
-            self.drawMap(self.config, self.heatData);
+            self.MapImgURL =
+              process.env.VUE_APP_API +
+              `MapImage?mapImageID=${self.selectedmap}&type=map`;
+            self.legendImgURL =
+              process.env.VUE_APP_API +
+              `MapImage?mapImageID=${self.selectedmap}&type=legend`;
+              callback()
           }
         });
       },
@@ -767,7 +790,6 @@
         let imageSeries = chart.series.push(new am4maps.MapImageSeries());
         imageSeries.name = "retailerMap";
         imageSeries.data = chart.data.retailerData
-        console.log("retailerMap", imageSeries.data);
 
         let imageSeriesTemplate = imageSeries.mapImages.template;
         imageSeriesTemplate.propertyFields.latitude = "xCoordinate";
@@ -775,11 +797,11 @@
         imageSeriesTemplate.nonScaling = false;
         imageSeriesTemplate.fill = "black";
 
-        var retailCircle = imageSeriesTemplate.createChild(
-          am4core.Circle
-        );
-        retailCircle.fillOpacity = 0.5;
-        retailCircle.radius = 3;
+        // var retailCircle = imageSeriesTemplate.createChild(
+        //   am4core.Circle
+        // );
+        // retailCircle.fillOpacity = 0.5;
+        // retailCircle.radius = 3;
 
         let storeImage = imageSeriesTemplate.createChild(am4core.Image);
         storeImage.propertyFields.href = "image"
@@ -976,13 +998,10 @@
         // //////////////////////////////////////////////////
         // start draw of base chart
         // //////////////////////////////////////////////////
-        if (self.chart != null) {
-          console.log("[DISPOSED]");
-
-          self.chart.dispose()
-          console.log(self.chart);
-
-        }
+        self.$refs.Spinner.show()
+        // if (self.chart != null) {
+        //   self.chart.dispose()
+        // }
         let formattedData = [];
         let chart = am4core.create("thisone2", am4maps.MapChart);
         chart.name = "Map";
@@ -1008,99 +1027,37 @@
         self.drawPolygonseries(chart);
         self.drawMajorCitiesImageSeries(chart);
         self.drawMinorCities(chart);
-        // draw standard supplier import
-        if (config.useImportStores) {
-          // drawing imported stores
-          let imageSeries = chart.series.push(new am4maps.MapImageSeries());
-          imageSeries.name = "Import stores";
-          imageSeries.data = self.supplierImport;
-          imageSeries.dataFields.value = "sales";
-          let imageSeriesTemplate = imageSeries.mapImages.template;
-          imageSeriesTemplate.propertyFields.latitude = "yCoordinate";
-          imageSeriesTemplate.propertyFields.longitude = "xCoordinate";
-          imageSeriesTemplate.nonScaling = false;
-          imageSeriesTemplate.fill = chart.colors.getIndex(9).brighten(1);
-          var circle = imageSeriesTemplate.createChild(am4core.Circle);
-          circle.fillOpacity = 0.5;
-          circle.tooltipText = "{storeName}: [bold]{sales}[/]";
-          circle.radius = 2;
-        }
-        if (
-          config.selectedRetailers != undefined &&
-          config.selectedRetailers.length > 0
-        ) {
-          // self.drawRetailerImport(chart, config);
-        }
-        // if (self.useRetailerMap) {
         self.drawRetailerMap(chart);
-        // }
-        // /////////////////////////////////////////////////////
-        // event for plotting stores mostly used for debug
-        // /////////////////////////////////////////////////////
-        chart.seriesContainer.events.on("hit", function (ev) {
-          var coords = chart.svgPointToGeo(ev.svgPoint);
-          self.lastCLicked = coords
-          console.log(coords);
-
-          if (!self.canPlot) {
-            return;
-          }
-          if (ev.preventDefault != undefined) ev.preventDefault();
-          if (ev.stopPropagation != undefined) ev.stopPropagation();
-          self.$refs.yesNo.show(
-            "Would you like to make a tag here?",
-            goThrough => {
-              if (goThrough) {
-                var mapMarker = imageSeriesTemplate.createChild(am4core.Sprite);
-                mapMarker.path =
-                  "M4 12 A12 12 0 0 1 28 12 C28 20, 16 32, 16 32 C16 32, 4 20 4 12 M11 12 A5 5 0 0 0 21 12 A5 5 0 0 0 11 12 Z";
-                mapMarker.width = 32;
-                mapMarker.height = 32;
-                mapMarker.scale = 0.7;
-                mapMarker.fill = am4core.color("#3F4B3B");
-                mapMarker.fillOpacity = 0.8;
-                mapMarker.horizontalCenter = "middle";
-                mapMarker.verticalCenter = "bottom";
-                var coords = chart.svgPointToGeo(ev.svgPoint);
-                var marker = imageSeries.mapImages.create();
-
-                marker.latitude = coords.latitude;
-                marker.longitude = coords.longitude;
-                marker.events.on("rightclick", function (dataItem, ev) {
-                  if (dataItem.hidden) marker.show(dataItem.index);
-                  else marker.hide(dataItem.index);
-                  event.stopPropagation();
-                });
-              }
-            }
-          );
-        });
-
-        // if (config.drawGrid) {
         self.DrawGeoGrid(chart, callback => {});
-        // }
-        console.log("chart", chart);
         self.chart = chart
-
         self.$refs.Spinner.hide()
       },
       setChartData(eventData, callback) {
         let self = this
-
-        self.buildGraphArr(eventData.retailers, retailerCallback => {
-          self.retailerData = retailerCallback
-          console.log(self.retailerData);
+        if (eventData.retailers.length > 0) {
+          self.buildGraphArr(eventData.retailers, retailerCallback => {
+            self.retailerData = retailerCallback
+            callback()
+          })
+        } else {
           callback()
-        })
-      },
-      formatNumber(storeSales, totalSales) {
-        let string = ""
-        if (storeSales > 0 && totalSales != 0) {
-
-
-          string = ((storeSales / totalSales) * 100).toFixed(2)
-          string += "%"
         }
+
+      },
+      formatNumber(regionValues) {
+        // log
+        let string = ""
+        let percentage = 0
+        if (regionValues.length == 1) {
+          percentage = (regionValues[0].sales / regionValues[0].otherSales) * 100
+        }
+        string = percentage.toFixed(2)
+        // if (storeSales > 0 && totalSales != 0) {
+
+
+        //   string = ((storeSales / totalSales) * 100).toFixed(2)
+        string += "%"
+        // }
         return string
       },
       checkAlphaNumber(blockNumber) {
