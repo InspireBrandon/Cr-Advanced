@@ -31,11 +31,14 @@
     import FolderTreeItem from './Sections/FolderTreeItem/FolderTreeItem.js'
     let folderTreeItem;
 
+    import UserFiles from '../../UserFiles/Index'
+
     export default {
         props: ['accessType', 'storeID'],
         components: {
             Recursive,
-            PlanogramNoteModal
+            PlanogramNoteModal,
+            UserFiles
         },
         data() {
             return {
@@ -143,7 +146,7 @@
                     mappingTreeItem.build(self.treeItems);
                     self.buildReportTreeItems();
                     // self.buildUploadTreeItems();
-                    folderTreeItem.build(self.treeItems);
+                    // folderTreeItem.build(self.treeItems);
                 }
 
                 if (self.accessType == 1) {

@@ -363,15 +363,17 @@ function buildImageFolders(locations, vueCtx) {
         imageItem.click = function () {
             imageItem.selected = !imageItem.selected;
 
-            let config = getMapConfig(vueCtx, () => {
-                // Trigger event bus to redraw map
-                checkMapping(vueCtx, {
-                    retailers: [],
-                    mapImages: [],
-                    marketShareItems: [],
+            vueCtx.$nextTick(() => {
+                let config = getMapConfig(vueCtx, () => {
+                    // Trigger event bus to redraw map
+                    checkMapping(vueCtx, {
+                        retailers: [],
+                        mapImages: [],
+                        marketShareItems: [],
 
-                })
-            });
+                    })
+                });
+            })
         }
 
         imageItem.onSelect = function () {
