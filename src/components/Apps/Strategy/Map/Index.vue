@@ -257,11 +257,9 @@
 
       EventBus.$off('MAPPING_REDRAW')
       EventBus.$on('MAPPING_REDRAW', data => {
-        if (data.retailers.length > 0 || data.mapImages.length > 0 || data.MarketShare.length > 0) {
-          self.handleEventData(data, callback => {
+        self.handleEventData(data, callback => {
 
-          })
-        }
+        })
       });
     },
     methods: {
@@ -289,12 +287,12 @@
       },
       handleEventData(data, callback) {
         let self = this
-        console.log("[EVENT DATA]", data);
-        self.setChartData(data, chartCB => {
-          if (data.mapImages.length > 0) {
+        self.$nextTick(() => {
+          console.log("[EVENT DATA]", data);
+          self.setChartData(data, chartCB => {
             self.getRectWidth()
             self.selectedmap = data.mapImages[0]
-            self.onMapChange()
+            self.onMapChange(imagecb => {
               if (self.config == null) {
                 self.drawMap({
                   imageDetails: {
@@ -306,13 +304,13 @@
               } else {
                 self.drawMap(self.config, self.heatData);
               }
+            })
 
-          } else {
-            self.selectedmap = null
-          }
-          self.getMarketShare(data.MarketShare)
-          callback()
-        });
+            self.getMarketShare(data.MarketShare)
+            callback()
+          });
+        })
+
       },
       MapStoreData(el) {
         let self = this;
@@ -612,15 +610,22 @@
           }
         });
       },
-      onMapChange() {
+      onMapChange(callback) {
         let self = this;
         self.$nextTick(() => {
-          self.MapImgURL =
-            process.env.VUE_APP_API +
-            `MapImage?mapImageID=${self.selectedmap}&type=map`;
-          self.legendImgURL =
-            process.env.VUE_APP_API +
-            `MapImage?mapImageID=${self.selectedmap}&type=legend`;
+          console.log(self.selectedmap);
+          if (self.selectedmap == undefined) {
+            self.selectedmap = null
+              callback()
+          } else {
+            self.MapImgURL =
+              process.env.VUE_APP_API +
+              `MapImage?mapImageID=${self.selectedmap}&type=map`;
+            self.legendImgURL =
+              process.env.VUE_APP_API +
+              `MapImage?mapImageID=${self.selectedmap}&type=legend`;
+              callback()
+          }
         });
       },
       getmaps() {
