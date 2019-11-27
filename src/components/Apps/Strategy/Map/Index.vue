@@ -1,5 +1,37 @@
 <template>
   <div width="100%">
+    <v-toolbar color="grey darken-3" dense flat dark>
+      <v-menu dark offset-y v-if="!viewOnlyMode">
+        <v-btn slot="activator" flat>Setup</v-btn>
+        <v-list>
+          <v-list-tile @click="openRetailerModal()">
+            <v-list-tile-title>Locations</v-list-tile-title>
+          </v-list-tile>
+          <v-list-tile @click="linkRetailerStore()">
+            <v-list-tile-title>Link Retailer Stores</v-list-tile-title>
+          </v-list-tile>
+          <v-list-tile @click="openRetailerSupplierStorDialog()">
+            <v-list-tile-title>Link Supplier Stores</v-list-tile-title>
+          </v-list-tile>
+        </v-list>
+      </v-menu>
+      <v-menu v-if="!viewOnlyMode" dark offset-y>
+        <v-btn slot="activator" flat>Image</v-btn>
+        <v-list>
+          <v-list-tile @click="mapImageAdd()">
+            <v-list-tile-title>Add</v-list-tile-title>
+          </v-list-tile>
+          <v-list-tile @click="showSelector()">
+            <v-list-tile-title>Manage</v-list-tile-title>
+          </v-list-tile>
+        </v-list>
+      </v-menu>
+
+      <v-btn v-if="!viewOnlyMode" flat @click="openImport">Import</v-btn>
+
+      <v-spacer></v-spacer>
+      <v-toolbar-title>Maps</v-toolbar-title>
+    </v-toolbar>
     <v-toolbar dark flat>
       <!-- <span v-if="chart!=null">
         {{lastCLicked}}
@@ -62,7 +94,12 @@
     <YesNoModal ref="yesNo"></YesNoModal>
     <MapImageSelector ref="MapImageSelector" />
     <Spinner ref="Spinner" />
-
+    <RetailerImportModal ref="RetailerImportModal" />
+    <LinkRetailerStore ref="LinkRetailerStore" />
+    <MapComponent ref="MapComponent" />
+    <MapImageSelector ref="MapImageSelector" />
+    <RetailerSupplierStoreDialog ref="RetailerSupplierStoreDialog" />
+    <MapImageAdd ref="MapImageAdd" />
   </div>
 </template>
 
@@ -74,8 +111,15 @@
   import am4geodata_worldLow from "@amcharts/amcharts4-geodata/southAfricaHigh";
   import Axios from "axios";
   import jwt from "jsonwebtoken";
-  import MapImageSelector from "./MapImageSelector";
   import Spinner from '@/components/Common/Spinner';
+  import LinkStores from "../Research/LinkStores";
+  import RetailerImportModal from "../Main/RetailerImportModal";
+  import LinkRetailerStore from "../Main/LinkRetailerStores/Index";
+  import RetailerSupplierStoreDialog from "../Research/RetailerSupplierStore/RetailerSupplier";
+  import MapImageSelector from "./MapImageSelector";
+  import MapImageAdd from "../Main/MapImageModal"
+
+  import MapComponent from "./Index";
 
   import {
     EventBus
@@ -92,7 +136,14 @@
     components: {
       YesNoModal,
       Spinner,
-      MapImageSelector
+      MapImageSelector,
+      MapComponent,
+      LinkStores,
+      RetailerImportModal,
+      LinkRetailerStore,
+      RetailerSupplierStoreDialog,
+      MapImageSelector,
+      MapImageAdd
     },
     data() {
       return {
@@ -257,12 +308,55 @@
 
       EventBus.$off('MAPPING_REDRAW')
       EventBus.$on('MAPPING_REDRAW', data => {
+        self.viewOnlyMode = true
         self.handleEventData(data, callback => {
 
         })
       });
     },
     methods: {
+      openImport() {
+        let self = this
+        self.$refs.Research.open()
+      },
+      openRetailerModal() {
+        let self = this;
+        self.$refs.RetailerImportModal.open(callback => {});
+      },
+      mapImageSelector() {
+        let self = this;
+        self.$refs.MapImageSelector.show(callback => {});
+      },
+      mapImageAdd() {
+        let self = this;
+        self.$refs.MapImageAdd.open(true, null, callback => {});
+      },
+      openRetailerSupplierStorDialog() {
+        let self = this;
+
+        self.$refs.RetailerSupplierStoreDialog.show();
+      },
+
+      linkRetailerStore() {
+        let self = this;
+        self.$refs.LinkRetailerStore.show(() => {});
+      },
+      showSelector() {
+        let self = this;
+        self.$refs.MapImageSelector.show(callback => {
+          console.log(callback);
+
+          self.openMapImageModal(false, callback, anything => {})
+          // self.selectedmap=callback.id
+          // self.onMapChange()
+        })
+      },
+      openMapImageModal(type, item) {
+        let self = this
+        self.$refs.MapImageAdd.open(type, item, callback => {
+
+        })
+      },
       getMarketShare(data, ) {
         let self = this
         console.log("getMarketShare", data);
@@ -616,7 +710,7 @@
           console.log(self.selectedmap);
           if (self.selectedmap == undefined) {
             self.selectedmap = null
-              callback()
+            callback()
           } else {
             self.MapImgURL =
               process.env.VUE_APP_API +
@@ -624,7 +718,7 @@
             self.legendImgURL =
               process.env.VUE_APP_API +
               `MapImage?mapImageID=${self.selectedmap}&type=legend`;
-              callback()
+            callback()
           }
         });
       },
