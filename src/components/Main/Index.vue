@@ -11,6 +11,9 @@
             <!-- <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon> -->
             <span class="title ml-3 mr-5">Chain&nbsp;<span class="font-weight-light">Research</span></span>
             <v-spacer></v-spacer>
+            <v-btn class="mr-3" icon @click="createNote">
+                <v-icon>note_add</v-icon>
+            </v-btn>
             <v-badge color="red" overlap>
                 <!-- <template v-slot:badge>
                     <span>3</span>
@@ -137,6 +140,7 @@
                 Close
             </v-btn>
         </v-snackbar>
+        <PlanogramNoteModal ref="PlanogramNoteModal" />
     </div>
 </template>
 
@@ -147,12 +151,16 @@
         EventBus
     } from '@/libs/events/event-bus.js';
 
+    import PlanogramNoteModal from '@/components/Common/PlanogramNoteModal';
 
     export default {
+        components: {
+            PlanogramNoteModal
+        },
         name: 'main-page',
         data() {
             return {
-                Loaded:false,
+                Loaded: false,
                 snackbarText: "",
                 snackbar: false,
                 sheet: false,
@@ -287,7 +295,7 @@
                         if (r.data.length > 0) {
                             self.databases = r.data;
                             sessionStorage.currentDatabase = r.data[0].tenantID;
-                            self.Loaded=true
+                            self.Loaded = true
                         }
                     })
             },
@@ -299,6 +307,18 @@
                 self.sheet = false;
                 self.snackbarText = "You've entered " + database.databaseName;
                 self.snackbar = true;
+            },
+            createNote() {
+                let self = this;
+
+                self.$refs.PlanogramNoteModal.show(data => {
+                    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    Axios.post(process.env.VUE_APP_API + "PlanogramNoteTX", data)
+                        .then(r => {
+                            delete Axios.defaults.headers.common["TenantID"];
+                        })
+                })
             }
         }
     }

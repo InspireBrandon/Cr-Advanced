@@ -13,6 +13,7 @@
             </v-menu>
             <PlanogramNoteModal ref="PlanogramNoteModal" />
         </div>
+        <UserFiles />
     </div>
 </template>
 
@@ -1245,17 +1246,10 @@
             addNote() {
                 let self = this;
 
-                self.$refs.PlanogramNoteModal.show(html => {
+                self.$refs.PlanogramNoteModal.show(request => {
                     // Save html
                     let encoded_details = jwt.decode(sessionStorage.accessToken);
                     let systemUserID = encoded_details.USER_ID;
-
-                    let request = {
-                        planogramID: 28,
-                        userID: systemUserID,
-                        noteType: 1,
-                        html: html
-                    }
 
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
