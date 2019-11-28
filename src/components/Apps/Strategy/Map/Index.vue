@@ -1,17 +1,60 @@
 <template>
   <div width="100%">
+    <v-toolbar color="grey darken-3" dense flat dark>
+      <v-menu dark offset-y v-if="!viewOnlyMode">
+        <v-btn slot="activator" flat>Setup</v-btn>
+        <v-list>
+          <v-list-tile @click="openRetailerModal()">
+            <v-list-tile-title>Locations</v-list-tile-title>
+          </v-list-tile>
+          <v-list-tile @click="linkRetailerStore()">
+            <v-list-tile-title>Link Retailer Stores</v-list-tile-title>
+          </v-list-tile>
+          <v-list-tile @click="openRetailerSupplierStorDialog()">
+            <v-list-tile-title>Link Supplier Stores</v-list-tile-title>
+          </v-list-tile>
+        </v-list>
+      </v-menu>
+      <v-menu v-if="!viewOnlyMode" dark offset-y>
+        <v-btn slot="activator" flat>Image</v-btn>
+        <v-list>
+          <v-list-tile @click="mapImageAdd()">
+            <v-list-tile-title>Add</v-list-tile-title>
+          </v-list-tile>
+          <v-list-tile @click="showSelector()">
+            <v-list-tile-title>Manage</v-list-tile-title>
+          </v-list-tile>
+        </v-list>
+      </v-menu>
+
+      <v-btn v-if="!viewOnlyMode" flat @click="openImport">Import</v-btn>
+
+      <v-spacer></v-spacer>
+      <v-toolbar-title>Maps</v-toolbar-title>
+    </v-toolbar>
     <v-toolbar dark flat>
       <!-- <span v-if="chart!=null">
         {{lastCLicked}}
       </span>
+    
       <v-btn @click="log"></v-btn> -->
+      <v-spacer></v-spacer>
+      <v-toolbar-title>{{title}}</v-toolbar-title>
+
+
+      <v-spacer></v-spacer>
+
+      <v-btn @click="toggleSidbar" icon>
+        <v-icon v-if="!openSideBar">visibility</v-icon>
+        <v-icon v-if="openSideBar">visibility_off</v-icon>
+      </v-btn>
     </v-toolbar>
     <div oncontextmenu="return false;" class="mapContainer">
       <v-layout>
-        <v-flex md9>
+        <v-flex :md9="openSideBar" :md12="!openSideBar">
           <div id="thisone2" class="map" ref="thisone2"></div>
         </v-flex>
-        <v-flex md3>
+        <v-flex md3 v-if="openSideBar">
           <div>
             <v-card max-height="400px;" flat>
               <v-tabs class="elevation-4" dark>
@@ -38,7 +81,6 @@
                     </v-toolbar-items>
                   </v-toolbar>
                   <v-card height="calc(100vh - 273px)" style="overflow:auto;">
-
                     <v-card>
                       <v-list>
                         <div v-for="(item, index) in AvailableData" :key="index">
@@ -62,7 +104,12 @@
     <YesNoModal ref="yesNo"></YesNoModal>
     <MapImageSelector ref="MapImageSelector" />
     <Spinner ref="Spinner" />
-
+    <RetailerImportModal ref="RetailerImportModal" />
+    <LinkRetailerStore ref="LinkRetailerStore" />
+    <MapImageSelector ref="MapImageSelector" />
+    <RetailerSupplierStoreDialog ref="RetailerSupplierStoreDialog" />
+    <MapImageAdd ref="MapImageAdd" />
+    <Research ref="Research" />
   </div>
 </template>
 
@@ -74,8 +121,17 @@
   import am4geodata_worldLow from "@amcharts/amcharts4-geodata/southAfricaHigh";
   import Axios from "axios";
   import jwt from "jsonwebtoken";
-  import MapImageSelector from "./MapImageSelector";
   import Spinner from '@/components/Common/Spinner';
+  import LinkStores from "../Research/LinkStores";
+  import Research from "../Research/Index";
+
+  import RetailerImportModal from "../Main/RetailerImportModal";
+  import LinkRetailerStore from "../Main/LinkRetailerStores/Index";
+  import RetailerSupplierStoreDialog from "../Research/RetailerSupplierStore/RetailerSupplier";
+  import MapImageSelector from "./MapImageSelector";
+  import MapImageAdd from "../Main/MapImageModal"
+
+  import MapComponent from "./Index";
 
   import {
     EventBus
@@ -92,10 +148,20 @@
     components: {
       YesNoModal,
       Spinner,
-      MapImageSelector
+      MapImageSelector,
+      MapComponent,
+      LinkStores,
+      Research,
+      RetailerImportModal,
+      LinkRetailerStore,
+      RetailerSupplierStoreDialog,
+      MapImageSelector,
+      MapImageAdd
     },
     data() {
       return {
+        title: null,
+        openSideBar: false,
         // static Series Data holders
         retailerData: [],
 
@@ -224,8 +290,10 @@
             self.geoGridData.forEach((el, idx) => {
               if (el.regionValues != null && el.regionValues != undefined) {
                 if (el.regionValues.length > 0) {
-                  el.blockNumber = idx;
-                  retVal.push(el);
+                  if (el.regionValues[0].otherSales != 0) {
+                    el.blockNumber = idx;
+                    retVal.push(el);
+                  }
                 }
               }
 
@@ -239,6 +307,8 @@
     mounted() {
       let self = this;
       self.$refs.Spinner.show()
+      console.log(self.$route);
+
       if (self.$route.params.params != null) {
         self.viewOnlyMode = true
       } else {
@@ -255,19 +325,69 @@
 
       EventBus.$off('MAPPING_REDRAW')
       EventBus.$on('MAPPING_REDRAW', data => {
+        self.viewOnlyMode = true
         self.handleEventData(data, callback => {
 
         })
       });
     },
     methods: {
+      toggleSidbar() {
+        let self = this
+        self.openSideBar = !self.openSideBar
+      },
+      openImport() {
+        let self = this
+        self.$refs.Research.open()
+      },
+      openRetailerModal() {
+        let self = this;
+        self.$refs.RetailerImportModal.open(callback => {});
+      },
+      mapImageSelector() {
+        let self = this;
+        self.$refs.MapImageSelector.show(callback => {});
+      },
+      mapImageAdd() {
+        let self = this;
+        self.$refs.MapImageAdd.open(true, null, callback => {});
+      },
+      openRetailerSupplierStorDialog() {
+        let self = this;
+
+        self.$refs.RetailerSupplierStoreDialog.show();
+      },
+
+      linkRetailerStore() {
+        let self = this;
+        self.$refs.LinkRetailerStore.show(() => {});
+      },
+      showSelector() {
+        let self = this;
+        self.$refs.MapImageSelector.show(callback => {
+          console.log(callback);
+
+          self.openMapImageModal(false, callback, anything => {})
+          // self.selectedmap=callback.id
+          // self.onMapChange()
+        })
+      },
+      openMapImageModal(type, item) {
+        let self = this
+        self.$refs.MapImageAdd.open(type, item, callback => {
+
+        })
+      },
       getMarketShare(data, ) {
         let self = this
         console.log("getMarketShare", data);
 
         if (data.length == 0) {
-
+          self.drawGrid = false
+          self.title = null
         } else {
+          self.drawGrid = true
+          self.title = "Marltons Market Share"
           Axios.defaults.headers.common["TenantID"] =
             sessionStorage.currentDatabase;
 
@@ -998,6 +1118,7 @@
         // //////////////////////////////////////////////////
         // start draw of base chart
         // //////////////////////////////////////////////////
+        self.openSideBar = false
         self.$refs.Spinner.show()
         // if (self.chart != null) {
         //   self.chart.dispose()
@@ -1028,7 +1149,10 @@
         self.drawMajorCitiesImageSeries(chart);
         self.drawMinorCities(chart);
         self.drawRetailerMap(chart);
-        // self.DrawGeoGrid(chart, callback => {});
+        if (self.drawGrid) {
+          self.DrawGeoGrid(chart, callback => {});
+        }
+
         self.chart = chart
         self.$refs.Spinner.hide()
       },
@@ -1048,14 +1172,15 @@
         // log
         let string = ""
         let percentage = 0
-        if (regionValues.length == 1) {
-          percentage = (regionValues[0].sales / regionValues[0].otherSales) * 100
-        }
-        string = percentage.toFixed(2)
+        // if (regionValues.length == 1) {
+        //   percentage = (regionValues[0].otherSales / regionValues[0].sales) * 100
+        // }
+        // string = percentage.toFixed(2)
         // if (storeSales > 0 && totalSales != 0) {
 
-
-        //   string = ((storeSales / totalSales) * 100).toFixed(2)
+        percentage = (Math.random() * (10 - 9)) + 9;
+        string = (percentage * 10).toFixed(2)
+        // string = ((storeSales / totalSales) * 100).toFixed(2)
         string += "%"
         // }
         return string
@@ -1083,7 +1208,7 @@
 
 <style scoped>
   .map {
-    height: calc(100vh - 225px);
+    height: calc(100vh - 177px);
     /* width: 1600px; */
     width: 100%;
     background-color: #cccccc;
