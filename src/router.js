@@ -112,6 +112,10 @@ import Clustering from '@/components/Apps/Strategy/Clustering/Index.vue'
 import BasketView from '@/components/Apps/Strategy/View/Basket/Index.vue'
 import StoreView from '@/components/Apps/Strategy/View/Store/Index.vue'
 import CategoryClusterView from '@/components/Apps/Strategy/View/CategortyCluster/Index.vue'
+import DepartmentView from '@/components/Apps/Strategy/View/Department/Index.vue'
+
+import ListingView from '@/components/Apps/Strategy/View/Listing/Index.vue'
+
 
 
 // import PlanogramDistributionNew from '@/components/Main/PlanogramImplementation/PlanogramOverView/StorePlanogramOverview.vue'
@@ -224,11 +228,21 @@ export default new Router({
               path: '/StoreView/:fileID',
               name: 'StoreView',
               component: StoreView,
-            }, {
+            },  {
+              path: '/ListingView/:fileID',
+              name: 'ListingView',
+              component: ListingView,
+            },
+            {
               path: '/CategoryClusterView/:fileID',
               name: 'CategoryClusterView',
               component: CategoryClusterView,
-            }, {
+            },  {
+              path: '/DepartmentView/:fileID',
+              name: 'DepartmentView',
+              component: DepartmentView,
+            }, 
+            {
               path: '/map/:params',
               name: 'map',
               component: map

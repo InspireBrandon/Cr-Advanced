@@ -25,6 +25,7 @@ class MappingTreeItem {
         let self = this;
 
         mappingTreeItem = buildMappingFolder();
+
         // locations
         let mapItems = buildLocationsFolder(self.vueCtx)
         mappingTreeItem.children.push(mapItems)
@@ -38,11 +39,55 @@ class MappingTreeItem {
 
 
 
+        let BiItems = buildBIFolder(self.vueCtx)
+        mappingTreeItem.children.push(BiItems)
+
+
 
         treeItems.push(mappingTreeItem);
 
         EventBus.$on("MAPPING_LOADED", redrawMap(event_data));
     }
+}
+
+function buildBIFolder(vueCtx) {
+    let self = this;
+
+    let MarketShareTreeItem = new TreeItem({
+        name: "Heatmaps",
+        icon: "folder",
+    })
+
+    MarketShareTreeItem.click = function () {
+        if (MarketShareTreeItem.showChildren) {
+            MarketShareTreeItem.showChildren = false;
+            MarketShareTreeItem.icon = 'folder';
+        } else {
+            // empty out parent array
+            MarketShareTreeItem.children = [];
+            MarketShareTreeItem.loading = true;
+
+            MarketShareTreeItem.icon = 'folder_open';
+            MarketShareTreeItem.loading = false;
+            MarketShareTreeItem.showChildren = true;
+            MarketShareTreeItem.children = [new TreeItem({
+                name: "Store Sales HinterLand",
+                icon: "insert_drive_file",
+                click: function () {
+                    vueCtx.$router.push("/bi")
+                }
+            }), new TreeItem({
+                name: "Brand Sales Marltons",
+                icon: "insert_drive_file",
+                click: function () {
+                    vueCtx.$router.push("/bi")
+                }
+            })]
+
+
+        }
+    }
+    return MarketShareTreeItem
 }
 
 function buildMarketShareFolder(vueCtx) {
@@ -563,6 +608,9 @@ function getMapConfig(vueCtx, callback) {
         })
 
         event_data.mapImages = tmpimages
+
+
+
         let marketShareItems = mappingTreeItem.children[2];
 
         let tmpMarketShareITems = []

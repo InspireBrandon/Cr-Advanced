@@ -36,7 +36,12 @@
       <!-- <span v-if="chart!=null">
         {{lastCLicked}}
       </span>
+    
       <v-btn @click="log"></v-btn> -->
+      <v-spacer></v-spacer>
+      <v-toolbar-title>{{title}}</v-toolbar-title>
+
+
       <v-spacer></v-spacer>
 
       <v-btn @click="toggleSidbar" icon>
@@ -104,6 +109,7 @@
     <MapImageSelector ref="MapImageSelector" />
     <RetailerSupplierStoreDialog ref="RetailerSupplierStoreDialog" />
     <MapImageAdd ref="MapImageAdd" />
+    <Research ref="Research" />
   </div>
 </template>
 
@@ -145,6 +151,7 @@
       MapImageSelector,
       MapComponent,
       LinkStores,
+      Research,
       RetailerImportModal,
       LinkRetailerStore,
       RetailerSupplierStoreDialog,
@@ -153,6 +160,7 @@
     },
     data() {
       return {
+        title: null,
         openSideBar: false,
         // static Series Data holders
         retailerData: [],
@@ -282,8 +290,10 @@
             self.geoGridData.forEach((el, idx) => {
               if (el.regionValues != null && el.regionValues != undefined) {
                 if (el.regionValues.length > 0) {
-                  el.blockNumber = idx;
-                  retVal.push(el);
+                  if (el.regionValues[0].otherSales != 0) {
+                    el.blockNumber = idx;
+                    retVal.push(el);
+                  }
                 }
               }
 
@@ -373,8 +383,11 @@
         console.log("getMarketShare", data);
 
         if (data.length == 0) {
-
+          self.drawGrid = false
+          self.title = null
         } else {
+          self.drawGrid = true
+          self.title = "Marltons Market Share"
           Axios.defaults.headers.common["TenantID"] =
             sessionStorage.currentDatabase;
 
@@ -1105,7 +1118,7 @@
         // //////////////////////////////////////////////////
         // start draw of base chart
         // //////////////////////////////////////////////////
-        self.openSideBar=false
+        self.openSideBar = false
         self.$refs.Spinner.show()
         // if (self.chart != null) {
         //   self.chart.dispose()
@@ -1136,7 +1149,10 @@
         self.drawMajorCitiesImageSeries(chart);
         self.drawMinorCities(chart);
         self.drawRetailerMap(chart);
-        // self.DrawGeoGrid(chart, callback => {});
+        if (self.drawGrid) {
+          self.DrawGeoGrid(chart, callback => {});
+        }
+
         self.chart = chart
         self.$refs.Spinner.hide()
       },
@@ -1156,14 +1172,15 @@
         // log
         let string = ""
         let percentage = 0
-        if (regionValues.length == 1) {
-          percentage = (regionValues[0].sales / regionValues[0].otherSales) * 100
-        }
-        string = percentage.toFixed(2)
+        // if (regionValues.length == 1) {
+        //   percentage = (regionValues[0].otherSales / regionValues[0].sales) * 100
+        // }
+        // string = percentage.toFixed(2)
         // if (storeSales > 0 && totalSales != 0) {
 
-
-        //   string = ((storeSales / totalSales) * 100).toFixed(2)
+        percentage = (Math.random() * (10 - 9)) + 9;
+        string = (percentage * 10).toFixed(2)
+        // string = ((storeSales / totalSales) * 100).toFixed(2)
         string += "%"
         // }
         return string

@@ -920,14 +920,21 @@
 
                 self.getFile("CLUSTER REPORT", "REPORT", fileData => {
                     self.baskets = [];
+                    console.log("fileData", fileData);
 
                     for (var basket in fileData.basket) {
                         self.baskets.push(basket);
                     }
 
+
+
                     // ////////////////////////////////////////////////////////////////////////////////////////////////////
                     // STORE
                     // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                    self.stores=[]
+                     for (var store in fileData.store) {
+                        self.stores.push(store);
+                    }
                     let storeTreeItem = new treeItem({
                         name: "Store Clustering",
                         icon: "folder",
@@ -938,6 +945,18 @@
                         storeTreeItem.showChildren = !storeTreeItem.showChildren;
                         storeTreeItem.icon = storeTreeItem.showChildren ? 'folder_open' : 'folder';
                     }
+                     self.stores.forEach(store => {
+                        let taskItem = new treeItem({
+                            name: store,
+                            icon: "insert_drive_file",
+                            children: [],
+                            click: function () {
+                                self.$router.push("/StoreView/" + store);
+                            }
+                        })
+
+                        storeTreeItem.children.push(taskItem);
+                    })
 
                     // ////////////////////////////////////////////////////////////////////////////////////////////////////
                     // CUSTOM
@@ -983,6 +1002,10 @@
                     // ////////////////////////////////////////////////////////////////////////////////////////////////////
                     // LISTING
                     // ////////////////////////////////////////////////////////////////////////////////////////////////////
+                    self.listings = []
+                    for (var listing in fileData.listing) {
+                        self.listings.push(listing);
+                    }
                     let listingTreeItem = new treeItem({
                         name: "Listing Clustering",
                         icon: "folder",
@@ -993,6 +1016,19 @@
                         listingTreeItem.showChildren = !listingTreeItem.showChildren;
                         listingTreeItem.icon = listingTreeItem.showChildren ? 'folder_open' : 'folder';
                     }
+
+                    self.listings.forEach(listing => {
+                        let taskItem = new treeItem({
+                            name: listing,
+                            icon: "insert_drive_file",
+                            children: [],
+                            click: function () {
+                                self.$router.push("/ListingView/" + listing);
+                            }
+                        })
+
+                        listingTreeItem.children.push(taskItem);
+                    })
 
                     // ////////////////////////////////////////////////////////////////////////////////////////////////////
                     // CATEGORY
@@ -1044,6 +1080,27 @@
                         departmentTreeItem.icon = departmentTreeItem.showChildren ? 'folder_open' :
                             'folder';
                     }
+                    //   self.getFile("Department Cluster", "REPORT", ccfileData => {
+                    //     let departmentClusters = [];
+            
+                    //     for (var prop in ccfileData.categoryCluster) {
+                    //         departmentClusters.push(prop)
+                    //     }
+
+                    //     categoryClusters.forEach(categoryCluster => {
+                    //         let taskItem = new treeItem({
+                    //             name: categoryCluster,
+                    //             icon: "insert_drive_file",
+                    //             children: [],
+                    //             click() {
+                    //                 self.$router.push("/CategoryClusterView/" +
+                    //                     categoryCluster);
+                    //             }
+                    //         })
+
+                    //         categoryTreeItem.children.push(taskItem);
+                    //     })
+                    // })
 
                     clusteringTreeItem.children.push(storeTreeItem, customTreeItem, basketTreeItem,
                         listingTreeItem,
@@ -1136,7 +1193,7 @@
                     children: []
                 })
 
-                cpaTreeItem.click = function() {
+                cpaTreeItem.click = function () {
                     self.$router.push("/CrossPlanogramAnalysis");
                 }
 
