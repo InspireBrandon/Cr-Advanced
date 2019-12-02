@@ -23,6 +23,10 @@
     import PlanogramNoteModal from '@/components/Common/PlanogramNoteModal'
     import jwt from "jsonwebtoken";
 
+    import {
+        EventBus
+    } from '@/libs/events/event-bus.js';
+
     import SoftwareTreeItem from './Sections/SoftwareTreeItem'
     let softwareTreeItem;
 
@@ -61,7 +65,8 @@
             })
 
             mappingTreeItem = new MappingTreeItem({
-                vueCtx: self
+                vueCtx: self,
+                eventBus: EventBus
             })
 
             folderTreeItem = new FolderTreeItem({
@@ -932,8 +937,8 @@
                     // ////////////////////////////////////////////////////////////////////////////////////////////////////
                     // STORE
                     // ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    self.stores=[]
-                     for (var store in fileData.store) {
+                    self.stores = []
+                    for (var store in fileData.store) {
                         self.stores.push(store);
                     }
                     let storeTreeItem = new treeItem({
@@ -946,7 +951,7 @@
                         storeTreeItem.showChildren = !storeTreeItem.showChildren;
                         storeTreeItem.icon = storeTreeItem.showChildren ? 'folder_open' : 'folder';
                     }
-                     self.stores.forEach(store => {
+                    self.stores.forEach(store => {
                         let taskItem = new treeItem({
                             name: store,
                             icon: "insert_drive_file",
@@ -1083,7 +1088,7 @@
                     }
                     //   self.getFile("Department Cluster", "REPORT", ccfileData => {
                     //     let departmentClusters = [];
-            
+
                     //     for (var prop in ccfileData.categoryCluster) {
                     //         departmentClusters.push(prop)
                     //     }

@@ -13,6 +13,10 @@
             </v-toolbar-items>
             <v-btn @click="filter" color="primary">Filter</v-btn>
             <v-spacer></v-spacer>
+            <v-toolbar-items>
+                <v-text-field v-model.lazy="searchText" prepend-icon="search" style="width: 600px"
+                    placeholder="Search..."></v-text-field>
+            </v-toolbar-items>
         </v-toolbar>
         <Grid ref="Grid" :rowData="rowData" />
     </v-card>
@@ -31,12 +35,19 @@
             return {
                 rowData: [],
                 projectGroups: [],
-                selectedProjectGroup: null
+                selectedProjectGroup: null,
+                searchText: ''
             }
         },
         mounted() {
             let self = this;
             self.getProjectGroups();
+        },
+        watch: {
+            searchText: function (value) {
+                let self = this;
+                self.$refs.Grid.gridApi.setQuickFilter(value)
+            }
         },
         methods: {
             getProjectGroups() {
@@ -68,6 +79,13 @@
                             self.$refs.Grid.autoSizeAll();
                         }, 100);
                     })
+            },
+            filterChange() {
+                let self = this;
+
+                self.$nextTick(() => {
+                    self.$refs.Grid.gridApi.setQuickFilter(self.searchText)
+                })
             }
         }
     }
