@@ -24,7 +24,7 @@ class MappingTreeItem {
     build(treeItems) {
         let self = this;
 
-        mappingTreeItem = buildMappingFolder();
+        mappingTreeItem = buildMappingFolder(self.vueCtx);
 
         // locations
         let mapItems = buildLocationsFolder(self.vueCtx)
@@ -324,7 +324,9 @@ function buildMarketShareFinalItems(locations, vueCtx) {
 
         imageItem.click = function () {
             imageItem.selected = !imageItem.selected;
-
+                
+            
+              
             let config = getMapConfig(vueCtx, () => {
                 // Trigger event bus to redraw map
                 checkMapping(vueCtx, {
@@ -346,7 +348,7 @@ function buildMarketShareFinalItems(locations, vueCtx) {
     return ImageItems;
 }
 
-function buildMappingFolder() {
+function buildMappingFolder(vueCtx) {
     let self = this;
 
     let mappingTreeItem = new TreeItem({
@@ -357,6 +359,8 @@ function buildMappingFolder() {
     mappingTreeItem.click = function () {
         mappingTreeItem.showChildren = !mappingTreeItem.showChildren;
         mappingTreeItem.icon = mappingTreeItem.showChildren ? 'folder_open' : 'folder';
+        if (mappingTreeItem.showChildren)
+            checkMapping(vueCtx)
     }
 
     return mappingTreeItem;
@@ -407,7 +411,17 @@ function buildImageFolders(locations, vueCtx) {
 
         imageItem.click = function () {
             imageItem.selected = !imageItem.selected;
-
+            console.log("deselecting loops");
+            let images = mappingTreeItem.children[1];
+                let tmpimages = []
+                let tmpimagesgroups = images.children;
+                tmpimagesgroups.forEach(item => {
+        
+                    if (item.value!=imageItem.value) {
+        
+                        item.selected=false
+                    }
+                })
             vueCtx.$nextTick(() => {
                 let config = getMapConfig(vueCtx, () => {
                     // Trigger event bus to redraw map

@@ -44,60 +44,70 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn @click="toggleSidbar" icon>
-        <v-icon v-if="!openSideBar">visibility</v-icon>
-        <v-icon v-if="openSideBar">visibility_off</v-icon>
-      </v-btn>
+
+      <v-menu v-model="openSideBar" :close-on-click="false" :close-on-content-click="false" left offset-y>
+        <template v-slot:activator="{ on }">
+          <v-btn v-on="on" @click="toggleSidbar" slot="activator" icon>
+            <v-icon v-if="!openSideBar">visibility</v-icon>
+            <v-icon v-if="openSideBar">visibility_off</v-icon>
+          </v-btn>
+        </template>
+
+        <v-card max-height="400px;" width="400px" flat>
+          <v-tabs class="elevation-4" dark>
+            <v-tabs-slider color="blue"></v-tabs-slider>
+            <v-tab href="#tab-3">image</v-tab>
+            <v-tab href="#tab-1">Market Share</v-tab>
+            <v-tab-item id="tab-3" class="elevation-2" justify-content: center>
+              <v-toolbar dark flat dense color="primary">
+                <v-toolbar-title> Image </v-toolbar-title>
+                <v-spacer> </v-spacer>
+              </v-toolbar>
+              <img v-show="legendImgURL != '' && selectedmap != null"
+                :src="legendImgURL == '' ? tmpImageURL : legendImgURL" :aspect-ratio="10/13" class="grey lighten-2 mt-0"
+                width="200px" style="object-fit: fill;">
+            </v-tab-item>
+            <v-tab-item id="tab-1" class="elevation-2" justify-content: center>
+              <v-toolbar dark flat dense color="primary">
+                <v-toolbar-title>Market Share</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-toolbar-items>
+                  <!-- <v-select style="margin-left: 10px;  width: 200px" placeholder="Select to see market share"
+                        v-model="selectedCategory" :items="categories" hide-details></v-select> -->
+                </v-toolbar-items>
+              </v-toolbar>
+              <v-card height="calc(100vh - 273px)" style="overflow:auto;">
+                <v-card>
+                  <v-list>
+                    <div v-for="(item, index) in AvailableData" :key="index">
+                      <v-list-tile>
+                        <v-list-tile-title>{{checkAlphaNumber(item.blockNumber)}}:
+                          {{formatNumber(item.regionValues)}} </v-list-tile-title>
+                      </v-list-tile>
+                      <v-divider></v-divider>
+                    </div>
+                  </v-list>
+                </v-card>
+              </v-card>
+            </v-tab-item>
+          </v-tabs>
+        </v-card>
+
+      </v-menu>
     </v-toolbar>
     <div oncontextmenu="return false;" class="mapContainer">
       <v-layout>
-        <v-flex :md9="openSideBar" :md12="!openSideBar">
+
+        <!-- <v-flex :md9="openSideBar" :md12="!openSideBar"> -->
+        <v-flex md12>
+
           <div id="thisone2" class="map" ref="thisone2"></div>
         </v-flex>
-        <v-flex md3 v-if="openSideBar">
+        <!-- <v-flex md3 v-if="openSideBar">
           <div>
-            <v-card max-height="400px;" flat>
-              <v-tabs class="elevation-4" dark>
-                <v-tabs-slider color="blue"></v-tabs-slider>
-                <v-tab href="#tab-3">image</v-tab>
-                <v-tab href="#tab-1">Market Share</v-tab>
-                <v-tab-item id="tab-3" class="elevation-2" justify-content: center>
-                  <v-toolbar dark flat dense color="primary">
-                    <v-toolbar-title> Image </v-toolbar-title>
-                    <v-spacer> </v-spacer>
-                    <v-btn @click="showSelector">maps</v-btn>
-                  </v-toolbar>
-                  <img v-show="legendImgURL != '' && selectedmap != null"
-                    :src="legendImgURL == '' ? tmpImageURL : legendImgURL" :aspect-ratio="10/13"
-                    class="grey lighten-2 mt-0" width="200px" style="object-fit: fill;">
-                </v-tab-item>
-                <v-tab-item id="tab-1" class="elevation-2" justify-content: center>
-                  <v-toolbar dark flat dense color="primary">
-                    <v-toolbar-title>Market Share</v-toolbar-title>
-                    <v-spacer></v-spacer>
-                    <v-toolbar-items>
-                      <!-- <v-select style="margin-left: 10px;  width: 200px" placeholder="Select to see market share"
-                        v-model="selectedCategory" :items="categories" hide-details></v-select> -->
-                    </v-toolbar-items>
-                  </v-toolbar>
-                  <v-card height="calc(100vh - 273px)" style="overflow:auto;">
-                    <v-card>
-                      <v-list>
-                        <div v-for="(item, index) in AvailableData" :key="index">
-                          <v-list-tile>
-                            <v-list-tile-title>{{checkAlphaNumber(item.blockNumber)}}:
-                              {{formatNumber(item.regionValues)}} </v-list-tile-title>
-                          </v-list-tile>
-                          <v-divider></v-divider>
-                        </div>
-                      </v-list>
-                    </v-card>
-                  </v-card>
-                </v-tab-item>
-              </v-tabs>
-            </v-card>
+            
           </div>
-        </v-flex>
+        </v-flex> -->
       </v-layout>
     </div>
     <input type="file" style="display: none;" ref="fileInput" @change="onImageChange" />
@@ -326,9 +336,7 @@
       EventBus.$off('MAPPING_REDRAW')
       EventBus.$on('MAPPING_REDRAW', data => {
         self.viewOnlyMode = true
-        self.handleEventData(data, callback => {
-
-        })
+        self.handleEventData(data, )
       });
     },
     methods: {
@@ -380,7 +388,6 @@
       },
       getMarketShare(data, ) {
         let self = this
-        console.log("getMarketShare", data);
 
         if (data.length == 0) {
           self.drawGrid = false
@@ -397,13 +404,12 @@
             process.env.VUE_APP_API + `SuplierLocationImportTX/MArketShare`, data
           ).then(r => {
             self.geoGridData = r.data
-            console.log("getMarketShare", r.data)
 
           })
         }
 
       },
-      handleEventData(data, callback) {
+      handleEventData(data) {
         let self = this
         self.$refs.Spinner.show()
 
@@ -425,9 +431,7 @@
                 self.drawMap(self.config, self.heatData);
               }
             })
-
             self.getMarketShare(data.MarketShare)
-            callback()
           });
         })
 
@@ -527,13 +531,14 @@
             title: idx,
             geoPolygon: arr
           }];
+          shapeTemplate.tooltipText = self.checkAlphaNumber(idx);
 
           shapeSeries.name = "block";
-          if (e.regionValues != null) {
-            shapeTemplate.tooltipText = self.checkAlphaNumber(idx) + " stores:" + e.regionValues.length;
-          } else {
-            shapeTemplate.tooltipText = self.checkAlphaNumber(idx);
-          }
+          // if (e.regionValues != null) {
+          //   shapeTemplate.tooltipText = self.checkAlphaNumber(idx) + " stores:" + e.regionValues.length;
+          // } else {
+          //   shapeTemplate.tooltipText = self.checkAlphaNumber(idx);
+          // }
 
           // shapeSeries.heatRules.push({
           //   property: "fill",
@@ -695,16 +700,20 @@
       buildGraphArr(fields, callback) {
         let self = this;
         let tmp = []
-        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-        Axios.post(process.env.VUE_APP_API + `RetailerStore/Multiple`, fields).then(r => {
-          // tmp = r.data.retailerStoreList
-          self.setFieldImages(r.data.retailerStoreList, formattedData => {
-            tmp = formattedData
-            callback(tmp)
+        if (fields > 0) {
+
+          Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+          Axios.post(process.env.VUE_APP_API + `RetailerStore/Multiple`, fields).then(r => {
+            // tmp = r.data.retailerStoreList
+            self.setFieldImages(r.data.retailerStoreList, formattedData => {
+              tmp = formattedData
+              callback(tmp)
+            })
+
           })
-
-        })
-
+        } else {
+          callback(tmp)
+        }
       },
       showSelector() {
         let self = this;
@@ -1158,14 +1167,11 @@
       },
       setChartData(eventData, callback) {
         let self = this
-        if (eventData.retailers.length > 0) {
-          self.buildGraphArr(eventData.retailers, retailerCallback => {
-            self.retailerData = retailerCallback
-            callback()
-          })
-        } else {
+        self.buildGraphArr(eventData.retailers, retailerCallback => {
+          self.retailerData = retailerCallback
           callback()
-        }
+        })
+
 
       },
       formatNumber(regionValues) {
