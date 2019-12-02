@@ -1,4 +1,5 @@
 import TreeItem from './TreeItem'
+
 import moment from 'moment'
 import Axios from "axios";
 import {
@@ -7,7 +8,14 @@ import {
 import jwt from "jsonwebtoken";
 
 
+
 let event_data = {
+    retailers: [],
+    mapImages: [],
+    MarketShare: [],
+}
+let retailerGroup_state = []
+let state_data = {
     retailers: [],
     mapImages: [],
     MarketShare: [],
@@ -96,7 +104,7 @@ function buildMarketShareFolder(vueCtx) {
     let MarketShareTreeItem = new TreeItem({
         name: "Market Share",
         icon: "folder",
-        allowComparison: true,
+        // allowComparison: true,
     })
 
     MarketShareTreeItem.click = function () {
@@ -108,149 +116,187 @@ function buildMarketShareFolder(vueCtx) {
             MarketShareTreeItem.children = [];
             MarketShareTreeItem.loading = true;
 
-            GetMarketSharePeriodHeaders(locationGroups => {
-                MarketShareTreeItem.children = buildMarkeetShareSubFolders(locationGroups, vueCtx);
-                MarketShareTreeItem.icon = 'folder_open';
-                MarketShareTreeItem.loading = false;
-                MarketShareTreeItem.showChildren = true;
+            let supplierItem = new TreeItem({
+                name: "Brand Sales Marltons",
+                icon: "folder",
+                click: function () {
+                    if (supplierItem.showChildren) {
+                        supplierItem.showChildren = false;
+                        supplierItem.icon = 'folder';
+                    } else {
+                        // empty out parent array
+                        supplierItem.children = [];
+                        supplierItem.loading = true;
+                       
+                        GetMarketSharePeriodHeaders(locationGroups => {
+                            console.log("[STARTS BUILD MARLTONS BRAND SALES]",locationGroups);
+                            GetMarketShareInnerHeaders(locationGroups[0].periodTo, locations => {
+                                supplierItem.children = buildMarketShareItems(locations, vueCtx);
+                                supplierItem.icon = 'folder_open';
+                                supplierItem.loading = false;
+                                supplierItem.showChildren = true;
+                            })
+                            
+                        })
+                    }
+                }
             })
+            let retailerItem = new TreeItem({
+                name: "Store Sales HinterLand",
+                icon: "folder",
+                loading: false,
+                // to do insert children + clickevents
+                click: function () {
+
+                    if (retailerItem.showChildren) {
+                        retailerItem.showChildren = false;
+                        retailerItem.icon = 'folder';
+                    } else {
+                        // empty out parent array
+                        retailerItem.children = [];
+                        retailerItem.loading = true;
+                        
+                        GetMarketSharePeriodHeaders(locationGroups => {
+                            console.log("GetMarketSharePeriodHeaders [AFTER CALLBACK]" );
+                            
+                            retailerItem.children = buildRetailerFolders(locationGroups, vueCtx);
+                            retailerItem.icon = 'folder_open';
+                            retailerItem.loading = false;
+                            retailerItem.showChildren = true;
+                        })
+                    }
+                }
+            })
+
+            MarketShareTreeItem.children = [
+                retailerItem, supplierItem
+            ];
+            MarketShareTreeItem.icon = 'folder_open';
+            MarketShareTreeItem.loading = false;
+            MarketShareTreeItem.showChildren = true;
+
         }
     }
-    MarketShareTreeItem.onComparisonSelect = function () {
-        // todo : set children as comparison = true
-    }
+
 
     return MarketShareTreeItem;
 }
 
-function buildMarkeetShareSubFolders(locationGroups, vueCtx) {
-    let locationGroupItems = [];
-    // let todayTreeItem = new TreeItem({
-    //     name: "recent",
-    //     icon: "folder"
-    // })
-    let todayTreeItem = new TreeItem({
-        name: moment(locationGroups[0].period_To_Date).format('YYYY-MM'),
-        icon: "folder",
-        allowSelect: false
-    })
+function buildRetailerFolders(PeriodHeaders, vueCtx) {
+    console.log("buildRetailerFolders", PeriodHeaders);
 
-    todayTreeItem.click = function () {
-        if (todayTreeItem.showChildren) {
-            todayTreeItem.showChildren = false;
-            todayTreeItem.icon = 'folder';
-        } else {
-            // empty out parent array
-            todayTreeItem.children = [];
-            todayTreeItem.loading = true;
-
-            GetMarketShareInnerHeaders(locationGroups[0].periodTo, locations => {
-                todayTreeItem.children = buildMarketShareItems([locations[0]], vueCtx);
-                todayTreeItem.icon = 'folder_open';
-                todayTreeItem.loading = false;
-                todayTreeItem.showChildren = true;
-            })
-        }
-    }
-
-    todayTreeItem.onSelect = function () {
-        if (todayTreeItem.showChildren) {
-            todayTreeItem.children.forEach(child => {
-                child.selected = todayTreeItem.selected;
-            })
-        } else {
-            // empty out parent array
-            todayTreeItem.children = [];
-            todayTreeItem.loading = true;
-
-            GetMarketShareInnerHeaders(locationGroups[0].periodTo, locations => {
-                todayTreeItem.children = buildMarketShareItems([locations[0]], vueCtx);
-                todayTreeItem.icon = 'folder_open';
-                todayTreeItem.loading = false;
-                todayTreeItem.showChildren = true;
-            })
-        }
-    }
-
-
-    let oldertreeItem = new TreeItem({
-        name: "Older",
+    let retailerGroupItems = []
+    let retailerTreeItem = new TreeItem({
+        name: moment(PeriodHeaders[0].period_To_Date).format('YYYY-MM'),
         icon: "folder"
     })
 
-    oldertreeItem.click = function () {
-        if (oldertreeItem.showChildren) {
-            oldertreeItem.showChildren = false;
-            oldertreeItem.icon = 'folder';
+    retailerTreeItem.click = function () {
+        if (retailerTreeItem.showChildren) {
+            retailerTreeItem.showChildren = false;
+            retailerTreeItem.icon = 'folder';
         } else {
             // empty out parent array
-            oldertreeItem.children = [];
-            oldertreeItem.loading = true;
+            retailerTreeItem.children = [];
+            retailerTreeItem.loading = true;
 
-            GetMarketSharePeriodHeaders(locationGroups => {
-                oldertreeItem.children = buildMarketShareGroupFolders(locationGroups, vueCtx);
-                oldertreeItem.icon = 'folder_open';
-                oldertreeItem.loading = false;
-                oldertreeItem.showChildren = true;
-            })
+            // GetMarketSharePeriodHeaders(locationGroups => {
+            //     retailerTreeItem.children = buildMarketShareGroupFolders(locationGroups, vueCtx);
+            //     retailerTreeItem.icon = 'folder_open';
+            //     retailerTreeItem.loading = false;
+            //     retailerTreeItem.showChildren = true;
+            // })
         }
     }
-    locationGroupItems.push(todayTreeItem)
-    locationGroupItems.push(oldertreeItem)
-    return locationGroupItems
+    retailerGroupItems.push(retailerTreeItem)
+    console.log(retailerGroupItems);
 
+    return retailerGroupItems
+
+}
+
+function buildMarkeetShareSubFolders(locationGroups, vueCtx) {
+    let locationGroupItems = [];
+    GetMarketShareInnerHeaders(locationGroups[0].periodTo, locations => {
+        // var todayTreeItem = buildMarketShareItems([locations[0]], vueCtx);
+        let oldertreeItem = new TreeItem({
+            name: "Older",
+            icon: "folder"
+        })
+
+        oldertreeItem.click = function () {
+            if (oldertreeItem.showChildren) {
+                oldertreeItem.showChildren = false;
+                oldertreeItem.icon = 'folder';
+            } else {
+                // empty out parent array
+                oldertreeItem.children = [];
+                oldertreeItem.loading = true;
+
+                GetMarketSharePeriodHeaders(locationGroups => {
+                    oldertreeItem.children = buildMarketShareGroupFolders(locationGroups, vueCtx);
+                    oldertreeItem.icon = 'folder_open';
+                    oldertreeItem.loading = false;
+                    oldertreeItem.showChildren = true;
+                })
+            }
+        }
+        // locationGroupItems.push(todayTreeItem)
+        locationGroupItems.push(oldertreeItem)
+        return locationGroupItems
+
+    })
 }
 
 function buildMarketShareGroupFolders(MarketShareGroups, vueCtx) {
     let locationGroupItems = [];
+    console.log("MarketShareGroups", MarketShareGroups);
 
     MarketShareGroups.forEach((MarketShareGroup, idx) => {
-        if (idx > 0) {
-            let MarketShareGroupTreeItem = new TreeItem({
-                name: moment(MarketShareGroup.period_To_Date).format('YYYY-MM'),
-                icon: "folder",
-                allowSelect: false
-            })
+        let MarketShareGroupTreeItem = new TreeItem({
+            name: moment(MarketShareGroup.period_To_Date).format('YYYY-MM'),
+            icon: "folder",
+            allowSelect: false
+        })
 
-            MarketShareGroupTreeItem.click = function () {
-                if (MarketShareGroupTreeItem.showChildren) {
-                    MarketShareGroupTreeItem.showChildren = false;
-                    MarketShareGroupTreeItem.icon = 'folder';
-                } else {
-                    // empty out parent array
-                    MarketShareGroupTreeItem.children = [];
-                    MarketShareGroupTreeItem.loading = true;
+        MarketShareGroupTreeItem.click = function () {
+            if (MarketShareGroupTreeItem.showChildren) {
+                MarketShareGroupTreeItem.showChildren = false;
+                MarketShareGroupTreeItem.icon = 'folder';
+            } else {
+                // empty out parent array
+                MarketShareGroupTreeItem.children = [];
+                MarketShareGroupTreeItem.loading = true;
 
-                    GetMarketShareInnerHeaders(MarketShareGroup.periodTo, locations => {
-                        MarketShareGroupTreeItem.children = buildMarketShareItems(locations, vueCtx);
-                        MarketShareGroupTreeItem.icon = 'folder_open';
-                        MarketShareGroupTreeItem.loading = false;
-                        MarketShareGroupTreeItem.showChildren = true;
-                    })
-                }
+                GetMarketShareInnerHeaders(MarketShareGroup.periodTo, locations => {
+                    MarketShareGroupTreeItem.children = buildMarketShareItems(locations, vueCtx);
+                    MarketShareGroupTreeItem.icon = 'folder_open';
+                    MarketShareGroupTreeItem.loading = false;
+                    MarketShareGroupTreeItem.showChildren = true;
+                })
             }
-
-            MarketShareGroupTreeItem.onSelect = function () {
-                if (MarketShareGroupTreeItem.showChildren) {
-                    MarketShareGroupTreeItem.children.forEach(child => {
-                        child.selected = MarketShareGroupTreeItem.selected;
-                    })
-                } else {
-                    // empty out parent array
-                    MarketShareGroupTreeItem.children = [];
-                    MarketShareGroupTreeItem.loading = true;
-
-                    GetMarketShareInnerHeaders(MarketShareGroup.periodTo, locations => {
-                        MarketShareGroupTreeItem.children = buildMarketShareItems(locations, vueCtx);
-                        MarketShareGroupTreeItem.icon = 'folder_open';
-                        MarketShareGroupTreeItem.loading = false;
-                        MarketShareGroupTreeItem.showChildren = true;
-                    })
-                }
-            }
-
-            locationGroupItems.push(MarketShareGroupTreeItem);
         }
+
+        MarketShareGroupTreeItem.onSelect = function () {
+            if (MarketShareGroupTreeItem.showChildren) {
+                MarketShareGroupTreeItem.children.forEach(child => {
+                    child.selected = MarketShareGroupTreeItem.selected;
+                })
+            } else {
+                // empty out parent array
+                MarketShareGroupTreeItem.children = [];
+                MarketShareGroupTreeItem.loading = true;
+
+                GetMarketShareInnerHeaders(MarketShareGroup.periodTo, locations => {
+                    MarketShareGroupTreeItem.children = buildMarketShareItems(locations, vueCtx);
+                    MarketShareGroupTreeItem.icon = 'folder_open';
+                    MarketShareGroupTreeItem.loading = false;
+                    MarketShareGroupTreeItem.showChildren = true;
+                })
+            }
+        }
+
+        locationGroupItems.push(MarketShareGroupTreeItem);
 
     })
 
@@ -324,9 +370,17 @@ function buildMarketShareFinalItems(locations, vueCtx) {
 
         imageItem.click = function () {
             imageItem.selected = !imageItem.selected;
-                
-            
-              
+            if(imageItem.selected){
+                state_data.MarketShare.push(imageItem.value)
+            }else{
+                state_data.MarketShare.forEach((state,idx)=>{
+                    if(state.id==imageItem.value.id){
+                        state_data.MarketShare.splice(idx,1)
+                    }
+                })
+            }
+
+
             let config = getMapConfig(vueCtx, () => {
                 // Trigger event bus to redraw map
                 checkMapping(vueCtx, {
@@ -384,6 +438,7 @@ function buildLocationsFolder(vueCtx) {
             locationTreeItem.loading = true;
 
             getLocationGroups(locationGroups => {
+
                 locationTreeItem.children = buildLocationGroupFolders(locationGroups, vueCtx);
                 locationTreeItem.icon = 'folder_open';
                 locationTreeItem.loading = false;
@@ -408,20 +463,32 @@ function buildImageFolders(locations, vueCtx) {
             imageSrc: MapImage(location.id),
             value: location.id
         })
-
+        state_data.mapImages.forEach(state => {
+            if (state == imageItem.value) {
+                imageItem.selected = true
+            }
+        })
         imageItem.click = function () {
             imageItem.selected = !imageItem.selected;
-            console.log("deselecting loops");
-            let images = mappingTreeItem.children[1];
-                let tmpimages = []
-                let tmpimagesgroups = images.children;
-                tmpimagesgroups.forEach(item => {
-        
-                    if (item.value!=imageItem.value) {
-        
-                        item.selected=false
+            if (imageItem.selected) {
+                state_data.mapImages = [imageItem.value]
+            } else {
+                state_data.mapImages.forEach((state, idx) => {
+                    if (state == imageItem.value) {
+                        state_data.mapImages.splice(idx, 1)
                     }
                 })
+            }
+            let images = mappingTreeItem.children[1];
+            let tmpimages = []
+            let tmpimagesgroups = images.children;
+            tmpimagesgroups.forEach(item => {
+
+                if (item.value != imageItem.value) {
+
+                    item.selected = false
+                }
+            })
             vueCtx.$nextTick(() => {
                 let config = getMapConfig(vueCtx, () => {
                     // Trigger event bus to redraw map
@@ -436,7 +503,37 @@ function buildImageFolders(locations, vueCtx) {
         }
 
         imageItem.onSelect = function () {
-            // Trigger event bus to redraw map
+            if (imageItem.selected) {
+                state_data.mapImages = [imageItem.value]
+                // state_data.mapImages.push(imageItem.value)
+            } else {
+                state_data.mapImages.forEach((state, idx) => {
+                    if (state == imageItem.value) {
+                        state_data.mapImages.splice(idx, 1)
+                    }
+                })
+            }
+            let images = mappingTreeItem.children[1];
+            let tmpimages = []
+            let tmpimagesgroups = images.children;
+            tmpimagesgroups.forEach(item => {
+
+                if (item.value != imageItem.value) {
+
+                    item.selected = false
+                }
+            })
+            vueCtx.$nextTick(() => {
+                let config = getMapConfig(vueCtx, () => {
+                    // Trigger event bus to redraw map
+                    checkMapping(vueCtx, {
+                        retailers: [],
+                        mapImages: [],
+                        marketShareItems: [],
+
+                    })
+                });
+            })
 
         }
 
@@ -450,7 +547,7 @@ function buildImageFolder(vueCtx) {
     let self = this;
 
     let imageTreeItem = new TreeItem({
-        name: "Images",
+        name: "Maps",
         icon: "folder"
     })
 
@@ -477,14 +574,22 @@ function buildImageFolder(vueCtx) {
 
 function buildLocationGroupFolders(locationGroups, vueCtx) {
     let locationGroupItems = [];
+    console.log("buildLocationGroupFolders", retailerGroup_state);
+
 
     locationGroups.forEach(locationGroup => {
         let locationGroupTreeItem = new TreeItem({
             name: locationGroup.name,
             icon: "folder",
-            allowSelect: true
+            allowSelect: true,
+            disabled: false,
+            value: locationGroup.id
         })
-
+        retailerGroup_state.forEach(groupstate => {
+            if (groupstate == locationGroupTreeItem.value) {
+                locationGroupTreeItem.selected = true
+            }
+        })
         locationGroupTreeItem.click = function () {
             if (locationGroupTreeItem.showChildren) {
                 locationGroupTreeItem.showChildren = false;
@@ -504,22 +609,84 @@ function buildLocationGroupFolders(locationGroups, vueCtx) {
         }
 
         locationGroupTreeItem.onSelect = function () {
+            if (locationGroupTreeItem.selected) {
+                retailerGroup_state.push(locationGroupTreeItem.value)
+            } else {
+                retailerGroup_state.forEach((groupstate, idx) => {
+                    if (groupstate == locationGroupTreeItem.value) {
+                        retailerGroup_state.splice(idx, 1)
+                    }
+                })
+            }
+            locationGroupTreeItem.disabled = true
             if (locationGroupTreeItem.showChildren) {
                 locationGroupTreeItem.children.forEach(child => {
                     child.selected = locationGroupTreeItem.selected;
+                    if (locationGroupTreeItem.selected) {
+
+                        state_data.retailers.push(child.value)
+                    } else {
+
+                        state_data.retailers.forEach((state, idx) => {
+                            if (child.value == state) {
+                                state_data.retailers.splice(idx, 1)
+                            }
+                        })
+                    }
+
                 })
+                let config = getMapConfig(vueCtx, () => {
+                    // Trigger event bus to redraw map
+                    checkMapping(vueCtx, {
+                        retailers: [],
+                        mapImages: [],
+                        marketShareItems: [],
+
+                    })
+                });
             } else {
                 // empty out parent array
                 locationGroupTreeItem.children = [];
                 locationGroupTreeItem.loading = true;
 
                 getLocationsByGroupID(locationGroup.id, locations => {
+
                     locationGroupTreeItem.children = buildLocationFolders(locations, vueCtx);
                     locationGroupTreeItem.icon = 'folder_open';
                     locationGroupTreeItem.loading = false;
                     locationGroupTreeItem.showChildren = true;
+                    if (locationGroupTreeItem.selected) {
+                        locationGroupTreeItem.children.forEach(item => {
+                            item.selected = true
+                            state_data.retailers.push(item.value)
+                        })
+                        let config = getMapConfig(vueCtx, () => {
+                            // Trigger event bus to redraw map
+                            checkMapping(vueCtx, {
+                                retailers: [],
+                                mapImages: [],
+                                marketShareItems: [],
+
+                            })
+                        });
+                    } else {
+                        locationGroupTreeItem.children.forEach(item => {
+                            item.selected = false
+                            state_data.retailers.forEach((state, idx) => {
+                                if (state == item.value) {
+                                    state_data.retailers.splice(idx, 1)
+                                }
+                            })
+
+
+                        })
+
+                    }
+
                 })
+
             }
+            locationGroupTreeItem.disabled = false
         }
 
         locationGroupItems.push(locationGroupTreeItem);
@@ -530,8 +697,10 @@ function buildLocationGroupFolders(locationGroups, vueCtx) {
 
 function buildLocationFolders(locations, vueCtx) {
     let locationItems = [];
+    console.log("buildLocationFolders", locations);
 
     locations.forEach(location => {
+
         let locationTreeItem = new TreeItem({
             name: location.name,
             icon: "flag",
@@ -542,8 +711,24 @@ function buildLocationFolders(locations, vueCtx) {
             value: location.id
         })
 
+        state_data.retailers.forEach(state => {
+
+            if (locationTreeItem.value == state) {
+                locationTreeItem.selected = true
+            }
+        })
         locationTreeItem.click = function () {
+            locationTreeItem.disabled = true
             locationTreeItem.selected = !locationTreeItem.selected;
+            if (locationTreeItem.selected) {
+                state_data.retailers.push(locationTreeItem.value)
+            } else {
+                state_data.retailers.forEach((location, idx) => {
+                    if (location == locationTreeItem.value) {
+                        state_data.retailers.splice(idx, 1)
+                    }
+                })
+            }
 
             let config = getMapConfig(vueCtx, () => {
                 // Trigger event bus to redraw map
@@ -554,10 +739,31 @@ function buildLocationFolders(locations, vueCtx) {
 
                 })
             });
+            locationTreeItem.disabled = false
         }
 
         locationTreeItem.onSelect = function () {
-            // Trigger event bus to redraw map
+            locationTreeItem.disabled = true
+            if (locationTreeItem.selected) {
+                state_data.retailers.push(locationTreeItem.value)
+            } else {
+                state_data.retailers.forEach((location, idx) => {
+                    if (location == locationTreeItem.value) {
+                        state_data.retailers.splice(idx, 1)
+                    }
+                })
+            }
+
+            let config = getMapConfig(vueCtx, () => {
+                // Trigger event bus to redraw map
+                checkMapping(vueCtx, {
+                    retailers: [],
+                    mapImages: [],
+                    marketShareItems: [],
+
+                })
+            });
+            locationTreeItem.disabled = false
         }
 
         locationItems.push(locationTreeItem);
@@ -576,7 +782,9 @@ function MapImage(MapID) {
 }
 
 function checkMapping(vueCtx, ) {
-    if (vueCtx.$route.name == "map") {
+    console.log(vueCtx.$route.name);
+
+    if (vueCtx.$route.name == "/map/:params") {
         redrawMap()
     } else {
         vueCtx.$router.push("/map/:params")
@@ -584,78 +792,15 @@ function checkMapping(vueCtx, ) {
 }
 
 function redrawMap() {
+    console.log('MAPPING_REDRAW');
+
     EventBus.$emit('MAPPING_REDRAW', event_data);
 }
 
 function getMapConfig(vueCtx, callback) {
     vueCtx.$nextTick(() => {
-        let locations = mappingTreeItem.children[0];
 
-
-        let tmpRetailers = []
-
-        let groups = locations.children;
-
-        groups.forEach(group => {
-            group.children.forEach(retailer => {
-                if (retailer.selected) {
-
-                    tmpRetailers.push(retailer.value)
-                }
-            })
-        })
-
-        event_data.retailers = tmpRetailers;
-
-        let images = mappingTreeItem.children[1];
-        let tmpimages = []
-
-        let tmpimagesgroups = images.children;
-
-
-        tmpimagesgroups.forEach(image => {
-
-            if (image.selected) {
-
-                tmpimages.push(image.value)
-            }
-        })
-
-        event_data.mapImages = tmpimages
-
-
-
-        let marketShareItems = mappingTreeItem.children[2];
-
-        let tmpMarketShareITems = []
-
-        let tmpShares = marketShareItems.children;
-
-
-        tmpShares.forEach((item, idx) => {
-            item.children.forEach((categoryFolders) => {
-
-                categoryFolders.children.forEach((child) => {
-                    if (idx == 0) {
-                        if (child.selected) {
-                            child.value.Comparison = marketShareItems.Comparison
-                            tmpMarketShareITems.push(child.value)
-                        }
-                    } else {
-                        child.children.forEach(olderItem => {
-
-                            if (olderItem.selected) {
-                                olderItem.value.Comparison = marketShareItems.Comparison
-                                tmpMarketShareITems.push(olderItem.value)
-                            }
-                        })
-                    }
-                })
-            })
-        })
-
-
-        event_data.MarketShare = tmpMarketShareITems
+        event_data = state_data
         callback();
     })
 }
@@ -693,12 +838,14 @@ function getMaps(callback) {
 
 function GetMarketSharePeriodHeaders(callback) {
     let self = this
+    console.log("GetMarketSharePeriodHeaders [STARTS]");
 
     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
     let encoded_details = jwt.decode(sessionStorage.accessToken);
     let systemUserID = encoded_details.USER_ID;
     Axios.get(process.env.VUE_APP_API + `SuplierLocationImportTX/PeriodHeaders?userID=` + systemUserID).then(r => {
-
+        console.log("GetMarketSharePeriodHeaders", r.data);
+       
         callback(r.data)
     })
 }
@@ -710,6 +857,7 @@ function GetMarketShareInnerHeaders(periodTo, callback) {
     let encoded_details = jwt.decode(sessionStorage.accessToken);
     let systemUserID = encoded_details.USER_ID;
     Axios.get(process.env.VUE_APP_API + `SuplierLocationImportTX/Levels?userID=${systemUserID}&periodTo=${periodTo}`).then(r => {
+        console.log("GetMarketShareInnerHeaders", r.data);
 
         callback(r.data)
     })

@@ -56,17 +56,8 @@
         <v-card max-height="400px;" width="400px" flat>
           <v-tabs class="elevation-4" dark>
             <v-tabs-slider color="blue"></v-tabs-slider>
+            <v-tab href="#tab-1" >Market Share</v-tab>
             <v-tab href="#tab-3">image</v-tab>
-            <v-tab href="#tab-1">Market Share</v-tab>
-            <v-tab-item id="tab-3" class="elevation-2" justify-content: center>
-              <v-toolbar dark flat dense color="primary">
-                <v-toolbar-title> Image </v-toolbar-title>
-                <v-spacer> </v-spacer>
-              </v-toolbar>
-              <img v-show="legendImgURL != '' && selectedmap != null"
-                :src="legendImgURL == '' ? tmpImageURL : legendImgURL" :aspect-ratio="10/13" class="grey lighten-2 mt-0"
-                width="200px" style="object-fit: fill;">
-            </v-tab-item>
             <v-tab-item id="tab-1" class="elevation-2" justify-content: center>
               <v-toolbar dark flat dense color="primary">
                 <v-toolbar-title>Market Share</v-toolbar-title>
@@ -89,6 +80,15 @@
                   </v-list>
                 </v-card>
               </v-card>
+            </v-tab-item>
+            <v-tab-item id="tab-3" class="elevation-2" justify-content: center>
+              <v-toolbar dark flat dense color="primary">
+                <v-toolbar-title> Image </v-toolbar-title>
+                <v-spacer> </v-spacer>
+              </v-toolbar>
+              <img v-show="legendImgURL != '' && selectedmap != null"
+                :src="legendImgURL == '' ? tmpImageURL : legendImgURL" :aspect-ratio="10/13" class="grey lighten-2 mt-0"
+                width="200px" style="object-fit: fill;">
             </v-tab-item>
           </v-tabs>
         </v-card>
@@ -287,7 +287,10 @@
         ],
         selectedCategory: null,
         viewOnlyMode: false,
-        seriesDataRef: []
+        seriesDataRef: [],
+        containerHeight: 0,
+        containerWidth: 0,
+        focusMarketShare: false
       };
 
     },
@@ -324,7 +327,6 @@
       } else {
         self.viewOnlyMode = false
       }
-      self.$refs.Spinner.show()
       self.getSupplierStores();
       self.getGeoGrid(() => {
         self.getmaps();
@@ -335,8 +337,14 @@
 
       EventBus.$off('MAPPING_REDRAW')
       EventBus.$on('MAPPING_REDRAW', data => {
+        self.$refs.Spinner.show()
         self.viewOnlyMode = true
         self.handleEventData(data, )
+        if (data.MarketShare.length > 0) {
+          self.focusMarketShare = true
+        } else {
+          self.focusMarketShare = false
+        }
       });
     },
     methods: {
@@ -471,11 +479,22 @@
         let self = this
         self.lastCLicked = self.chart.zoomGeoPoint
         self.chart.goHome(0);
+        var elMain = document.querySelector(
+          "#thisone2"
+        )
+        if (elMain != null) {
+          self.containerHeight = elMain.getBoundingClientRect().height
+          self.containerWidth = elMain.getBoundingClientRect().width
+        }
+
         var el = document.querySelector(
           "#thisone2 > div > svg > g > g:nth-child(2) > g:nth-child(1) > g:nth-child(2) > g:nth-child(1) > g:nth-child(2) > g:nth-child(1) > g > g:nth-child(1) > g > g:nth-child(3) > g > g > path"
         )
-        self.imageHeight = el.getBoundingClientRect().height
-        self.imageWidth = el.getBoundingClientRect().width
+
+        if (el != null) {
+          self.imageHeight = el.getBoundingClientRect().height
+          self.imageWidth = el.getBoundingClientRect().width
+        }
         console.log(self.imageHeight);
         console.log(self.imageWidth);
 
@@ -700,11 +719,15 @@
       buildGraphArr(fields, callback) {
         let self = this;
         let tmp = []
+        console.log("fields", fields);
+
         if (fields > 0) {
 
           Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
           Axios.post(process.env.VUE_APP_API + `RetailerStore/Multiple`, fields).then(r => {
             // tmp = r.data.retailerStoreList
+            console.log("buildGraphArr", r);
+
             self.setFieldImages(r.data.retailerStoreList, formattedData => {
               tmp = formattedData
               callback(tmp)
@@ -884,15 +907,11 @@
         // var height = this.$refs.thisone2.clientHeight;
         image.width = self.imageWidth;
         image.height = self.imageHeight;
-        var el = document.querySelector(
-          "#thisone2"
-        )
-        let containerHeight = el.getBoundingClientRect().height
-        let containerWidth = el.getBoundingClientRect().width
 
 
-        pattern_europe.x = (containerWidth - image.width) / 2
-        pattern_europe.y = containerHeight - image.height
+
+        pattern_europe.x = (self.containerWidth - image.width) / 2
+        pattern_europe.y = self.containerHeight - image.height
         pattern_europe.width = image.width;
         pattern_europe.height = image.height;
 
@@ -1129,9 +1148,9 @@
         // //////////////////////////////////////////////////
         self.openSideBar = false
         self.$refs.Spinner.show()
-        // if (self.chart != null) {
-        //   self.chart.dispose()
-        // }
+        if (self.chart != null) {
+          self.chart.dispose()
+        }
         let formattedData = [];
         let chart = am4core.create("thisone2", am4maps.MapChart);
         chart.name = "Map";
@@ -1169,6 +1188,8 @@
         let self = this
         self.buildGraphArr(eventData.retailers, retailerCallback => {
           self.retailerData = retailerCallback
+          console.log("retailerCallback", retailerCallback);
+
           callback()
         })
 
