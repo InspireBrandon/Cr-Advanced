@@ -10,6 +10,9 @@ import {
 import "../node_modules/vue-wysiwyg/dist/vueWysiwyg.css";
 
 import wysiwyg from "vue-wysiwyg";
+
+import VueHTMLEditor from 'vue-html-editor'
+
 import 'vue-croppa/dist/vue-croppa.css'
 import VueKonva from 'vue-konva'
 
@@ -23,6 +26,7 @@ LicenseManager.setLicenseKey("Evaluation_License-_Not_For_Production_Valid_Until
 import 'ag-grid-enterprise/chartsModule';
 
 Vue.use(VueKonva)
+Vue.use(VueHTMLEditor)
 
 Vue.use(Croppa);
 Vue.use(wysiwyg, {});

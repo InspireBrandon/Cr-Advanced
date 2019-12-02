@@ -8,11 +8,16 @@
         </v-toolbar>
         <v-toolbar dense dark color="grey darken-4">
             <v-toolbar-items>
-                <v-select @change="onTypeChange" v-if="options" v-model="selectedOption" :items="options" style="width: 300px;"
-                    label="Observation Type">
+                <v-select @change="optionChange" v-if="options" v-model="selectedOption" :items="options"
+                    style="width: 300px;" label="Observation Type">
                 </v-select>
-                <v-autocomplete @change="onCategoryChange" v-if="selectedOption == 1" item-text="name" item-value="id" class="ml-2"
-                    v-model="selectedProject" return-object :items="projects" style="width: 300px;" label="Category">
+                <v-autocomplete @change="onCategoryChange" v-if="selectedOption == 0" item-text="name" item-value="id"
+                    class="ml-2" v-model="selectedTopLineTopic" return-object :items="topLineTopics"
+                    style="width: 300px;" label="Observation Topic">
+                </v-autocomplete>
+                <v-autocomplete @change="onCategoryChange" v-if="selectedOption == 1" item-text="name" item-value="id"
+                    class="ml-2" v-model="selectedProject" return-object :items="projects" style="width: 300px;"
+                    label="Category">
                 </v-autocomplete>
             </v-toolbar-items>
             <v-spacer></v-spacer>
@@ -48,13 +53,15 @@
                 ],
                 selectedOption: 0,
                 projects: [],
-                selectedProject: null
+                selectedProject: null,
+                topLineTopics: [],
+                selectedTopLineTopic: null
             }
         },
         mounted() {
             let self = this;
-            self.$refs.PlanogramNoteViewer.getTransactions(0, 0);
             self.getProjects();
+            self.getObservationTopics();
         },
         methods: {
             getProjects() {
@@ -68,6 +75,17 @@
                         self.projects = r.data.projectList;
                     })
             },
+            getObservationTopics() {
+                let self = this
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + "TopLineType")
+                    .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        self.topLineTopics = r.data;
+                    })
+            },
             addNote() {
                 let self = this;
 
@@ -77,30 +95,26 @@
                     Axios.post(process.env.VUE_APP_API + "PlanogramNoteTX", data)
                         .then(r => {
                             delete Axios.defaults.headers.common["TenantID"];
-                            if(self.selectedOption == 0) {
-                                self.$refs.PlanogramNoteViewer.getTransactions(self.selectedOption, 0);
-                            }
-                            else {
-                                self.$refs.PlanogramNoteViewer.getTransactions(self.selectedOption, self.selectedProject.planogram_ID);
-                            }
+                            self.onCategoryChange();
                         })
-                })
-            },
-            onTypeChange() {
-                let self = this;
-
-                self.$nextTick(() => {
-                    if (self.selectedOption == 0) {
-                        self.$refs.PlanogramNoteViewer.getTransactions(self.selectedOption, 0);
-                    }
                 })
             },
             onCategoryChange() {
                 let self = this;
 
                 self.$nextTick(() => {
-                    self.$refs.PlanogramNoteViewer.getTransactions(self.selectedOption, self.selectedProject.planogram_ID);
+                    if (self.selectedOption == 0) {
+                        self.$refs.PlanogramNoteViewer.getTransactions(self.selectedOption, self
+                            .selectedTopLineTopic.id);
+                    } else {
+                        self.$refs.PlanogramNoteViewer.getTransactions(self.selectedOption, self.selectedProject
+                            .planogram_ID);
+                    }
                 })
+            },
+            optionChange() {
+                let self = this;
+                self.onCategoryChange();
             }
         }
     }
