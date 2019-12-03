@@ -1410,6 +1410,29 @@
                         })
                     })
                 })
+            },
+            forward(currentItem) {
+                let self = this;
+
+                self.$refs.userSelector.show(user => {
+
+                    let projectTXGroupRequest = {
+                        projectID: currentItem.project_ID
+                    }
+
+                    self.createProjectTransactionGroup(projectTXGroupRequest, newProjectTX => {
+                        currentItem.systemUserID = user.systemUserID;
+                        currentItem.projectTXGroup_ID = newProjectTX.id;
+
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                        Axios.put(process.env.VUE_APP_API + 'ProjectTX?update=false', currentItem).then(
+                            res => {
+                                delete Axios.defaults.headers.common["TenantID"];
+                                self.$parent.$parent.getTaskViewData();
+                            })
+                    })
+                })
             }
         }
     }
