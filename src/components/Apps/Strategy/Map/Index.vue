@@ -57,7 +57,7 @@
           <v-tabs class="elevation-4" dark>
             <v-tabs-slider color="blue"></v-tabs-slider>
             <v-tab href="#tab-1">Market Share</v-tab>
-            <v-tab href="#tab-3">image</v-tab>
+            <v-tab href="#tab-3">Legend</v-tab>
             <v-tab-item id="tab-1" class="elevation-2" justify-content: center>
               <v-toolbar dark flat dense color="primary">
                 <v-toolbar-title>Market Share</v-toolbar-title>
@@ -83,7 +83,7 @@
             </v-tab-item>
             <v-tab-item id="tab-3" class="elevation-2" justify-content: center>
               <v-toolbar dark flat dense color="primary">
-                <v-toolbar-title> Image </v-toolbar-title>
+                <v-toolbar-title> Legend </v-toolbar-title>
                 <v-spacer> </v-spacer>
               </v-toolbar>
               <img v-show="legendImgURL != '' && selectedmap != null"
@@ -119,6 +119,7 @@
     <RetailerSupplierStoreDialog ref="RetailerSupplierStoreDialog" />
     <MapImageAdd ref="MapImageAdd" />
     <Research ref="Research" />
+    <squareModal ref="squareModal" />
   </div>
 </template>
 
@@ -139,7 +140,10 @@
   import RetailerSupplierStoreDialog from "../Research/RetailerSupplierStore/RetailerSupplier";
   import MapImageSelector from "./MapImageSelector";
   import MapImageAdd from "../Main/MapImageModal"
+  import squareModal from "./squareModal";
 
+
+  
   import MapComponent from "./Index";
 
   import {
@@ -159,6 +163,7 @@
       Spinner,
       MapImageSelector,
       MapComponent,
+      squareModal,
       LinkStores,
       Research,
       RetailerImportModal,
@@ -289,7 +294,8 @@
         seriesDataRef: [],
         containerHeight: 0,
         containerWidth: 0,
-        focusMarketShare: false
+        focusMarketShare: false,
+        event_data:null,
       };
 
     },
@@ -335,11 +341,11 @@
 
       EventBus.$off('MAPPING_REDRAW')
       EventBus.$on('MAPPING_REDRAW', data => {
-
+        self.event_data = data
         self.$refs.Spinner.show()
         self.viewOnlyMode = true
         self.handleEventData(data, )
-      
+
       });
     },
     methods: {
@@ -380,15 +386,14 @@
       },
       openMapImageModal(type, item) {
         let self = this
-        self.$refs.MapImageAdd.open(type, item, callback => {
-        })
+        self.$refs.MapImageAdd.open(type, item, callback => {})
       },
       getMarketShare(data, stores) {
         let self = this
-        
+
         if (data.length != 0 && stores.length != 0) {
-        
-       
+
+
           self.$refs.Spinner.show()
           self.drawGrid = true
           self.title = "Marltons Market Share Hinterland"
@@ -403,8 +408,8 @@
             console.log("getMarketShare", r.data);
 
             self.geoGridData = r.data
-              self.openSideBar=true
-        self.$refs.Spinner.Hide()
+            self.openSideBar = true
+            self.$refs.Spinner.Hide()
 
           })
         } else {
@@ -494,6 +499,12 @@
         console.log(self.imageWidth);
 
       },
+      openSquareModal(square){
+        let self = this 
+        console.log(square);
+        self.$refs.squareModal.open(square, self.event_data.MarketShare[0])
+        
+      },
       DrawGeoGrid(chart, callback) {
         let self = this;
 
@@ -546,7 +557,9 @@
             geoPolygon: arr
           }];
           shapeTemplate.tooltipText = self.checkAlphaNumber(idx);
-
+          shapeTemplate.events.on('hit',function(){
+            self.openSquareModal(e)
+          })
           shapeSeries.name = "block";
           // if (e.regionValues != null) {
           //   shapeTemplate.tooltipText = self.checkAlphaNumber(idx) + " stores:" + e.regionValues.length;
@@ -560,68 +573,68 @@
           //   min: chart.colors.getIndex(1).brighten(1),
           //   max: chart.colors.getIndex(1).brighten(-0.3)
           // });
-            var labelSeries = chart.series.push(new am4maps.MapImageSeries());
-            labelSeries.hiddenInLegend = true;
-            var labelTemplate = labelSeries.mapImages.template.createChild(
-              am4core.Label
-            );
-            labelTemplate.horizontalCenter = "middle";
-            labelTemplate.verticalCenter = "middle";
-            labelTemplate.fontSize = 14;
-            labelTemplate.interactionsEnabled = false;
-            labelTemplate.nonScaling = true;
-            labelTemplate.hiddenInLegend = true;
+          var labelSeries = chart.series.push(new am4maps.MapImageSeries());
+          labelSeries.hiddenInLegend = true;
+          var labelTemplate = labelSeries.mapImages.template.createChild(
+            am4core.Label
+          );
+          labelTemplate.horizontalCenter = "middle";
+          labelTemplate.verticalCenter = "middle";
+          labelTemplate.fontSize = 14;
+          labelTemplate.interactionsEnabled = false;
+          labelTemplate.nonScaling = true;
+          labelTemplate.hiddenInLegend = true;
 
 
 
-            // Set up label series to populate
-            if (idx == 0) {
-              shapeSeries.events.on("inited", function () {
-                shapeSeries.mapPolygons.each(function (polygon) {
-                  var label = labelSeries.mapImages.create();
+          // Set up label series to populate
+          if (idx == 0) {
+            shapeSeries.events.on("inited", function () {
+              shapeSeries.mapPolygons.each(function (polygon) {
+                var label = labelSeries.mapImages.create();
 
-                  //var state = polygon.dataItem.dataContext.id.split("-").pop();
-                  label.latitude = y + 0.25;
-                  label.longitude = polygon.visualLongitude;
-                  label.children.getIndex(0).text = idx + 1;
-                  label.hiddenInLegend = true;
-                  label = labelSeries.mapImages.create();
-                  //var state = polygon.dataItem.dataContext.id.split("-").pop();
-                  label.latitude = polygon.visualLatitude;
-                  label.longitude = x - 0.25;
-                  label.children.getIndex(0).text = "A";
-                  label.hiddenInLegend = true;
-                });
+                //var state = polygon.dataItem.dataContext.id.split("-").pop();
+                label.latitude = y + 0.25;
+                label.longitude = polygon.visualLongitude;
+                label.children.getIndex(0).text = idx + 1;
+                label.hiddenInLegend = true;
+                label = labelSeries.mapImages.create();
+                //var state = polygon.dataItem.dataContext.id.split("-").pop();
+                label.latitude = polygon.visualLatitude;
+                label.longitude = x - 0.25;
+                label.children.getIndex(0).text = "A";
+                label.hiddenInLegend = true;
               });
-            } else if (idx > 0 && idx < 10) {
-              shapeSeries.events.on("inited", function () {
-                shapeSeries.mapPolygons.each(function (polygon) {
-                  var label = labelSeries.mapImages.create();
-                  label.hiddenInLegend = true;
-                  //var state = polygon.dataItem.dataContext.id.split("-").pop();
-                  label.latitude = y + 0.25;
-                  label.longitude = polygon.visualLongitude;
-                  label.children.getIndex(0).text = idx + 1;
-                  label.hiddenInLegend = true;
-                });
+            });
+          } else if (idx > 0 && idx < 10) {
+            shapeSeries.events.on("inited", function () {
+              shapeSeries.mapPolygons.each(function (polygon) {
+                var label = labelSeries.mapImages.create();
+                label.hiddenInLegend = true;
+                //var state = polygon.dataItem.dataContext.id.split("-").pop();
+                label.latitude = y + 0.25;
+                label.longitude = polygon.visualLongitude;
+                label.children.getIndex(0).text = idx + 1;
+                label.hiddenInLegend = true;
               });
-            } else if (idx % 10 === 0) {
-              var found = self.alpharray.find(el => {
-                return el.rangeStart == idx;
-              });
+            });
+          } else if (idx % 10 === 0) {
+            var found = self.alpharray.find(el => {
+              return el.rangeStart == idx;
+            });
 
-              shapeSeries.events.on("inited", function () {
-                shapeSeries.mapPolygons.each(function (polygon) {
-                  var label = labelSeries.mapImages.create();
-                  label.hiddenInLegend = true;
-                  //var state = polygon.dataItem.dataContext.id.split("-").pop();
-                  label.latitude = polygon.visualLatitude;
-                  label.longitude = x - 0.25;
-                  label.children.getIndex(0).text = found.text;
-                  label.hiddenInLegend = true;
-                });
+            shapeSeries.events.on("inited", function () {
+              shapeSeries.mapPolygons.each(function (polygon) {
+                var label = labelSeries.mapImages.create();
+                label.hiddenInLegend = true;
+                //var state = polygon.dataItem.dataContext.id.split("-").pop();
+                label.latitude = polygon.visualLatitude;
+                label.longitude = x - 0.25;
+                label.children.getIndex(0).text = found.text;
+                label.hiddenInLegend = true;
               });
-            }
+            });
+          }
         });
 
         callback();
@@ -1081,9 +1094,13 @@
         self.drawPolygonseries(chart);
         self.drawMajorCitiesImageSeries(chart);
         self.drawMinorCities(chart);
-        self.drawRetailerMap(chart);
+
         if (self.drawGrid) {
-          self.DrawGeoGrid(chart, callback => {});
+          self.DrawGeoGrid(chart, callback => {
+
+            self.drawRetailerMap(chart);
+
+          });
         }
 
         self.chart = chart
@@ -1103,15 +1120,20 @@
         let string = ""
         let percentage = 0
         if (regionValues.length == 1) {
-          percentage = (regionValues[0].sales / regionValues[0].otherSales) * 100
+          percentage = (regionValues[0].otherSales / regionValues[0].sales) * 100
         }
         string = percentage.toFixed(2)
+
+     let salesstring =    formatter.format(regionValues[0].otherSales).replace("$", "R");
         // if (storeSales > 0 && totalSales != 0) {
 
         // percentage = (Math.random() * (10 - 9)) + 9;
         // string = (percentage * 10).toFixed(2)
         // string = ((storeSales / totalSales) * 100).toFixed(2)
         string += "%"
+
+        string+="  Sales: "+salesstring
+
         // }
         return string
       },
