@@ -119,7 +119,7 @@ function buildMarketShareFolder(vueCtx) {
             MarketShareTreeItem.loading = true;
 
             let supplierItem = new TreeItem({
-                name: "Supplier",
+                name: "Market",
                 icon: "folder",
                 click: function () {
 
@@ -190,7 +190,7 @@ function buildRetailerFolders(PeriodHeaders, vueCtx) {
 
     let retailerGroupItems = []
     let retailerTreeItem = new TreeItem({
-        name: "HinterLand",
+        name: "Hinterland",
         icon: "insert_drive_file",
         allowSelect: true,
         value: 2

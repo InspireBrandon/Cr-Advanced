@@ -339,11 +339,7 @@
         self.$refs.Spinner.show()
         self.viewOnlyMode = true
         self.handleEventData(data, )
-        if (data.MarketShare.length > 0) {
-          self.focusMarketShare = true
-        } else {
-          self.focusMarketShare = false
-        }
+      
       });
     },
     methods: {
@@ -389,10 +385,13 @@
       },
       getMarketShare(data, stores) {
         let self = this
-
+        
         if (data.length != 0 && stores.length != 0) {
+        
+       
+          self.$refs.Spinner.show()
           self.drawGrid = true
-          self.title = "Marltons Market Share"
+          self.title = "Marltons Market Share Hinterland"
           Axios.defaults.headers.common["TenantID"] =
             sessionStorage.currentDatabase;
 
@@ -404,6 +403,8 @@
             console.log("getMarketShare", r.data);
 
             self.geoGridData = r.data
+              self.openSideBar=true
+        self.$refs.Spinner.Hide()
 
           })
         } else {
@@ -559,68 +560,68 @@
           //   min: chart.colors.getIndex(1).brighten(1),
           //   max: chart.colors.getIndex(1).brighten(-0.3)
           // });
-          //   var labelSeries = chart.series.push(new am4maps.MapImageSeries());
-          //   labelSeries.hiddenInLegend = true;
-          //   var labelTemplate = labelSeries.mapImages.template.createChild(
-          //     am4core.Label
-          //   );
-          //   labelTemplate.horizontalCenter = "middle";
-          //   labelTemplate.verticalCenter = "middle";
-          //   labelTemplate.fontSize = 14;
-          //   labelTemplate.interactionsEnabled = false;
-          //   labelTemplate.nonScaling = true;
-          //   labelTemplate.hiddenInLegend = true;
+            var labelSeries = chart.series.push(new am4maps.MapImageSeries());
+            labelSeries.hiddenInLegend = true;
+            var labelTemplate = labelSeries.mapImages.template.createChild(
+              am4core.Label
+            );
+            labelTemplate.horizontalCenter = "middle";
+            labelTemplate.verticalCenter = "middle";
+            labelTemplate.fontSize = 14;
+            labelTemplate.interactionsEnabled = false;
+            labelTemplate.nonScaling = true;
+            labelTemplate.hiddenInLegend = true;
 
 
 
-          //   // Set up label series to populate
-          //   if (idx == 0) {
-          //     shapeSeries.events.on("inited", function () {
-          //       shapeSeries.mapPolygons.each(function (polygon) {
-          //         var label = labelSeries.mapImages.create();
+            // Set up label series to populate
+            if (idx == 0) {
+              shapeSeries.events.on("inited", function () {
+                shapeSeries.mapPolygons.each(function (polygon) {
+                  var label = labelSeries.mapImages.create();
 
-          //         //var state = polygon.dataItem.dataContext.id.split("-").pop();
-          //         label.latitude = y + 0.25;
-          //         label.longitude = polygon.visualLongitude;
-          //         label.children.getIndex(0).text = idx + 1;
-          //         label.hiddenInLegend = true;
-          //         label = labelSeries.mapImages.create();
-          //         //var state = polygon.dataItem.dataContext.id.split("-").pop();
-          //         label.latitude = polygon.visualLatitude;
-          //         label.longitude = x - 0.25;
-          //         label.children.getIndex(0).text = "A";
-          //         label.hiddenInLegend = true;
-          //       });
-          //     });
-          //   } else if (idx > 0 && idx < 10) {
-          //     shapeSeries.events.on("inited", function () {
-          //       shapeSeries.mapPolygons.each(function (polygon) {
-          //         var label = labelSeries.mapImages.create();
-          //         label.hiddenInLegend = true;
-          //         //var state = polygon.dataItem.dataContext.id.split("-").pop();
-          //         label.latitude = y + 0.25;
-          //         label.longitude = polygon.visualLongitude;
-          //         label.children.getIndex(0).text = idx + 1;
-          //         label.hiddenInLegend = true;
-          //       });
-          //     });
-          //   } else if (idx % 10 === 0) {
-          //     var found = self.alpharray.find(el => {
-          //       return el.rangeStart == idx;
-          //     });
+                  //var state = polygon.dataItem.dataContext.id.split("-").pop();
+                  label.latitude = y + 0.25;
+                  label.longitude = polygon.visualLongitude;
+                  label.children.getIndex(0).text = idx + 1;
+                  label.hiddenInLegend = true;
+                  label = labelSeries.mapImages.create();
+                  //var state = polygon.dataItem.dataContext.id.split("-").pop();
+                  label.latitude = polygon.visualLatitude;
+                  label.longitude = x - 0.25;
+                  label.children.getIndex(0).text = "A";
+                  label.hiddenInLegend = true;
+                });
+              });
+            } else if (idx > 0 && idx < 10) {
+              shapeSeries.events.on("inited", function () {
+                shapeSeries.mapPolygons.each(function (polygon) {
+                  var label = labelSeries.mapImages.create();
+                  label.hiddenInLegend = true;
+                  //var state = polygon.dataItem.dataContext.id.split("-").pop();
+                  label.latitude = y + 0.25;
+                  label.longitude = polygon.visualLongitude;
+                  label.children.getIndex(0).text = idx + 1;
+                  label.hiddenInLegend = true;
+                });
+              });
+            } else if (idx % 10 === 0) {
+              var found = self.alpharray.find(el => {
+                return el.rangeStart == idx;
+              });
 
-          //     shapeSeries.events.on("inited", function () {
-          //       shapeSeries.mapPolygons.each(function (polygon) {
-          //         var label = labelSeries.mapImages.create();
-          //         label.hiddenInLegend = true;
-          //         //var state = polygon.dataItem.dataContext.id.split("-").pop();
-          //         label.latitude = polygon.visualLatitude;
-          //         label.longitude = x - 0.25;
-          //         label.children.getIndex(0).text = found.text;
-          //         label.hiddenInLegend = true;
-          //       });
-          //     });
-          //   }
+              shapeSeries.events.on("inited", function () {
+                shapeSeries.mapPolygons.each(function (polygon) {
+                  var label = labelSeries.mapImages.create();
+                  label.hiddenInLegend = true;
+                  //var state = polygon.dataItem.dataContext.id.split("-").pop();
+                  label.latitude = polygon.visualLatitude;
+                  label.longitude = x - 0.25;
+                  label.children.getIndex(0).text = found.text;
+                  label.hiddenInLegend = true;
+                });
+              });
+            }
         });
 
         callback();
@@ -950,8 +951,8 @@
 
         let storeImage = imageSeriesTemplate.createChild(am4core.Image);
         storeImage.propertyFields.href = "image"
-        storeImage.width = 40;
-        storeImage.height = 40;
+        storeImage.width = 25;
+        storeImage.height = 25;
         storeImage.horizontalCenter = "middle";
         storeImage.verticalCenter = "bottom";
         storeImage.propertyFields.tooltipText = "name";
