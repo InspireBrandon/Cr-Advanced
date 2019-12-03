@@ -711,7 +711,7 @@
         let tmp = []
         console.log("fields", fields);
 
-        if (fields > 0) {
+        if (fields.length > 0) {
 
           Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
           Axios.post(process.env.VUE_APP_API + `RetailerStore/Multiple`, fields).then(r => {

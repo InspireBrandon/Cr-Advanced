@@ -97,7 +97,7 @@ function generateCategoryLevels(projectGroups, totalStoreProjectGroupSales, clus
         totalStoreProjectGroupSales.forEach(storeSale => {
             let selectedCategory = clusterData.selectedCategory;
             let selectedValue = category[selectedCategory];
-            let value = storeSale[selectedValue + "_inStore"];
+            let value = storeSale[selectedValue + "_ratio"];
 
             if (value > highestValue)
                 highestValue = value;
@@ -115,7 +115,7 @@ function generateCategoryLevels(projectGroups, totalStoreProjectGroupSales, clus
         totalStoreProjectGroupSales.forEach(storeSale => {
             let selectedCategory = clusterData.selectedCategory;
             let selectedValue = category[selectedCategory];
-            let value = storeSale[selectedValue + "_inStore"];
+            let value = storeSale[selectedValue + "_ratio"];
 
             for (var i = 1; i < (clusterLevels + 1); i++) {
                 let highest = dividend * i;
@@ -172,6 +172,8 @@ function generateClustersAlt(projectGroups, totalStoreProjectGroupSales, cluster
             let selectedValue = category[selectedCategory];
             let level = storeSale[selectedValue + "_level"];
             let levelText = storeSale["levelText"];
+
+            console.log(storeSale)
 
             if (levelText == undefined || levelText == null) {
                 if (level == 6) {
@@ -399,9 +401,6 @@ function getTotalStoreProjectGroupSales(stores, ProjectGroups, storeSalesData, c
 
         });
 
-
-
-
         // ProjectGroup["cumalitiveProjectSales"] += ProjectGroup.sales_Retail
         let lastAdded = 0
         ProjectGroups.forEach((ProjectGroup, idx) => {
@@ -427,6 +426,7 @@ function getTotalStoreProjectGroupSales(stores, ProjectGroups, storeSalesData, c
         })
         tmpStoreData.push(tmpObj);
     });
+    
     console.log("tmpStoreData after data", tmpStoreData);
 
     return tmpStoreData;

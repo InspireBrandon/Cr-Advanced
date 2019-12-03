@@ -524,7 +524,7 @@
                         width: 220
                     },
                     {
-                        headerName: "Cumulative Sales",
+                        headerName: "% Store",
                         field: "cumulativStoreSales",
                         cellStyle: function (params) {
                             if (params.data.canHighlight) {
@@ -569,6 +569,7 @@
                         headerName: projectGroup[tmpCategory],
                         children: [{
                                 headerName: "Ratio",
+                                field: projectGroup[tmpCategory] + "_ratio",
                                 width: 100,
                                 "valueFormatter": function (params) {
                                     if (params.data[projectGroup[tmpCategory] +
