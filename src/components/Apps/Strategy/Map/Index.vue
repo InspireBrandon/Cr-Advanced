@@ -56,7 +56,7 @@
         <v-card max-height="400px;" width="400px" flat>
           <v-tabs class="elevation-4" dark>
             <v-tabs-slider color="blue"></v-tabs-slider>
-            <v-tab href="#tab-1" >Market Share</v-tab>
+            <v-tab href="#tab-1">Market Share</v-tab>
             <v-tab href="#tab-3">image</v-tab>
             <v-tab-item id="tab-1" class="elevation-2" justify-content: center>
               <v-toolbar dark flat dense color="primary">
@@ -337,6 +337,7 @@
 
       EventBus.$off('MAPPING_REDRAW')
       EventBus.$on('MAPPING_REDRAW', data => {
+
         self.$refs.Spinner.show()
         self.viewOnlyMode = true
         self.handleEventData(data, )
@@ -394,13 +395,10 @@
 
         })
       },
-      getMarketShare(data, ) {
+      getMarketShare(data, stores) {
         let self = this
 
-        if (data.length == 0) {
-          self.drawGrid = false
-          self.title = null
-        } else {
+        if (data.length != 0 && stores.length != 0) {
           self.drawGrid = true
           self.title = "Marltons Market Share"
           Axios.defaults.headers.common["TenantID"] =
@@ -411,9 +409,15 @@
           Axios.post(
             process.env.VUE_APP_API + `SuplierLocationImportTX/MArketShare`, data
           ).then(r => {
+            console.log("getMarketShare", r.data);
+
             self.geoGridData = r.data
 
           })
+        } else {
+          self.drawGrid = false
+          self.title = null
+
         }
 
       },
@@ -439,7 +443,7 @@
                 self.drawMap(self.config, self.heatData);
               }
             })
-            self.getMarketShare(data.MarketShare)
+            self.getMarketShare(data.MarketShare, data.Store)
           });
         })
 
@@ -716,12 +720,15 @@
         callback(items)
 
       },
-      buildGraphArr(fields, callback) {
+      buildGraphArr(fields, store, callback) {
         let self = this;
         let tmp = []
         console.log("fields", fields);
 
-        if (fields > 0) {
+        if (store.length > 0) {
+          fields.push(store[0])
+        }
+        if (fields.length > 0) {
 
           Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
           Axios.post(process.env.VUE_APP_API + `RetailerStore/Multiple`, fields).then(r => {
@@ -1186,7 +1193,7 @@
       },
       setChartData(eventData, callback) {
         let self = this
-        self.buildGraphArr(eventData.retailers, retailerCallback => {
+        self.buildGraphArr(eventData.retailers, eventData.Store, retailerCallback => {
           self.retailerData = retailerCallback
           console.log("retailerCallback", retailerCallback);
 
@@ -1199,14 +1206,14 @@
         // log
         let string = ""
         let percentage = 0
-        // if (regionValues.length == 1) {
-        //   percentage = (regionValues[0].otherSales / regionValues[0].sales) * 100
-        // }
-        // string = percentage.toFixed(2)
+        if (regionValues.length == 1) {
+          percentage = (regionValues[0].sales / regionValues[0].otherSales) * 100
+        }
+        string = percentage.toFixed(2)
         // if (storeSales > 0 && totalSales != 0) {
 
-        percentage = (Math.random() * (10 - 9)) + 9;
-        string = (percentage * 10).toFixed(2)
+        // percentage = (Math.random() * (10 - 9)) + 9;
+        // string = (percentage * 10).toFixed(2)
         // string = ((storeSales / totalSales) * 100).toFixed(2)
         string += "%"
         // }
