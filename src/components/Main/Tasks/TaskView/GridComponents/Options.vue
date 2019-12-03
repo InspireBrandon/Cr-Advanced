@@ -18,7 +18,14 @@
 
                 <v-divider></v-divider>
 
-                <v-list-tile v-if="params.data.systemFileName != null" @click="params.context.componentParent.assign(params.data)">
+                <v-list-tile @click="params.context.componentParent.forward(params.data)">
+                    <span>Forward</span>
+                </v-list-tile>
+
+                <v-divider></v-divider>
+
+                <v-list-tile v-if="params.data.systemFileName != null"
+                    @click="params.context.componentParent.assign(params.data)">
                     <span>Variation</span>
                 </v-list-tile>
 
@@ -35,11 +42,12 @@
                 </v-list-tile>
                 <v-divider></v-divider>
 
-                <v-list-tile v-if="( params.data.status == 2||params.data.status == 2)&&params.data.actionedByUserID==null"
+                <v-list-tile
+                    v-if="( params.data.status == 2||params.data.status == 2)&&params.data.actionedByUserID==null"
                     @click="params.context.componentParent.closeTask(params.data)">
                     <span>close</span>
                 </v-list-tile>
-                 <v-divider></v-divider>
+                <v-divider></v-divider>
 
                 <v-list-tile @click="params.context.componentParent.sendDiscontinue(params.data)">
                     <span>Discontinue</span>

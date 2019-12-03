@@ -112,7 +112,6 @@
     </div>
     <input type="file" style="display: none;" ref="fileInput" @change="onImageChange" />
     <YesNoModal ref="yesNo"></YesNoModal>
-    <MapImageSelector ref="MapImageSelector" />
     <Spinner ref="Spinner" />
     <RetailerImportModal ref="RetailerImportModal" />
     <LinkRetailerStore ref="LinkRetailerStore" />
@@ -317,7 +316,6 @@
     mounted() {
       let self = this;
       self.$refs.Spinner.show()
-      console.log(self.$route);
 
       if (self.$route.params.params != null) {
         self.viewOnlyMode = true
@@ -336,7 +334,7 @@
       EventBus.$off('MAPPING_REDRAW')
       EventBus.$on('MAPPING_REDRAW', data => {
         self.viewOnlyMode = true
-        self.handleEventData(data, )
+        self.handleEventData(data)
       });
     },
     methods: {
@@ -365,7 +363,6 @@
 
         self.$refs.RetailerSupplierStoreDialog.show();
       },
-
       linkRetailerStore() {
         let self = this;
         self.$refs.LinkRetailerStore.show(() => {});
@@ -373,20 +370,15 @@
       showSelector() {
         let self = this;
         self.$refs.MapImageSelector.show(callback => {
-          console.log(callback);
-
           self.openMapImageModal(false, callback, anything => {})
-          // self.selectedmap=callback.id
-          // self.onMapChange()
         })
       },
       openMapImageModal(type, item) {
         let self = this
         self.$refs.MapImageAdd.open(type, item, callback => {
-
         })
       },
-      getMarketShare(data, ) {
+      getMarketShare(data) {
         let self = this
 
         if (data.length == 0) {
@@ -414,7 +406,6 @@
         self.$refs.Spinner.show()
 
         self.$nextTick(() => {
-          console.log("[EVENT DATA]", data);
           self.setChartData(data, chartCB => {
             self.getRectWidth()
             self.selectedmap = data.mapImages[0]
@@ -434,7 +425,6 @@
             self.getMarketShare(data.MarketShare)
           });
         })
-
       },
       MapStoreData(el) {
         let self = this;
@@ -1029,99 +1019,6 @@
         accrossCitiesLabel.fontSize = 3;
         accrossCitiesLabel.nonScaling = false;
       },
-      // drawRetailerImport(chart, config) {
-      //   let self = this;
-      //   // /////////////////////////////////////////////////////
-      //   //  start draw retailer import
-      //   // /////////////////////////////////////////////////////
-      //   for (var retailer in self.SupplierData) {
-      //     let currentHasImages = [
-      //       "Absolute Vet",
-      //       "Bkb Co-Ops",
-      //       "Build It",
-      //       "Builders Warehouse",
-      //       "Chamberlain",
-      //       "Choppies",
-      //       "Coastal",
-      //       "Co-Ops",
-      //       "Crazy Plastics",
-      //       "Dis-Chem",
-      //       "Est Africa",
-      //       "Family Pets",
-      //       "Game",
-      //       "Gwk Co-Ops",
-      //       "Hinterland",
-      //       "Makro",
-      //       "Mica",
-      //       "Ntk Agric",
-      //       "OK Foods",
-      //       "Overberg Agri Co-Ops",
-      //       "Pet And Pool",
-      //       "Pets World",
-      //       "Pick n Pay",
-      //       "Shoprite Checkers",
-      //       "Spar",
-      //       "The Queen",
-      //       "Tuinroete Afgri",
-      //       "Vetsmart",
-      //       "West Pack"
-      //     ];
-
-      //     let hasImage = false;
-      //     let inArray = false;
-
-      //     currentHasImages.forEach(img => {
-      //       if (retailer.includes(img)) hasImage = true;
-      //     });
-
-      //     config.selectedRetailers.forEach(el => {
-      //       if (retailer == el) inArray = true;
-      //     });
-
-      //     if (hasImage && inArray) {
-      //       self.SupplierData[retailer].forEach(el => {
-      //         if (retailer.includes("Hinterland")) {
-      //           el.image = "Hinterland.png";
-      //         } else {
-      //           el.image = el.retailer + ".png";
-      //         }
-      //       });
-
-      //       let SupplierCitiesImageSeries = chart.series.push(
-      //         new am4maps.MapImageSeries()
-      //       );
-
-      //       SupplierCitiesImageSeries.name = retailer;
-      //       SupplierCitiesImageSeries.data = self.SupplierData[retailer];
-
-      //       let SupplierCitiesImageSeriesTemplate =
-      //         SupplierCitiesImageSeries.mapImages.template;
-      //       SupplierCitiesImageSeriesTemplate.propertyFields.latitude = "x";
-      //       SupplierCitiesImageSeriesTemplate.propertyFields.longitude = "y";
-      //       SupplierCitiesImageSeriesTemplate.nonScaling = true;
-      //       SupplierCitiesImageSeriesTemplate.fill = "black";
-
-      //       var SupplierCitiesCircle = SupplierCitiesImageSeriesTemplate.createChild(
-      //         am4core.Circle
-      //       );
-      //       SupplierCitiesCircle.fillOpaSupplierCities = 0.5;
-      //       SupplierCitiesCircle.tooltipText =
-      //         "{retailer}: [bold]{sales}[/]{storeName}";
-      //       SupplierCitiesCircle.radius = 0;
-
-      //       let storeImage = SupplierCitiesImageSeriesTemplate.createChild(
-      //         am4core.Image
-      //       );
-      //       storeImage.propertyFields.href = "image";
-      //       storeImage.width = 15;
-      //       storeImage.height = 15;
-      //       storeImage.horizontalCenter = "middle";
-      //       storeImage.verticalCenter = "bottom";
-      //       storeImage.tooltipText = "{storeName}: [bold]{sales}[/]";
-      //     }
-      //   }
-      // },
-
       drawMap(config, setupMapData) {
         let self = this;
         // //////////////////////////////////////////////////
@@ -1171,8 +1068,6 @@
           self.retailerData = retailerCallback
           callback()
         })
-
-
       },
       formatNumber(regionValues) {
         // log
@@ -1204,12 +1099,6 @@
       }
     }
   };
-
-  function removeDuplicates(myArr, prop) {
-    return myArr.filter((obj, pos, arr) => {
-      return arr.map(mapObj => mapObj[prop]).indexOf(obj[prop]) === pos;
-    });
-  }
 </script>
 
 <style scoped>

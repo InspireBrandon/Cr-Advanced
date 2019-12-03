@@ -3,10 +3,14 @@
     <v-layout row justify-center>
       <v-dialog v-model="dialog" persistent max-width="400">
         <v-card>
-          <v-card-title class="headline">Select users to share with</v-card-title>
-          <v-card style="height: 400px; overflow: auto;">
+          <v-card-title flat class="headline">Select users to share with</v-card-title>
+          <div class="px-2">
+            <v-text-field prepend-icon="search" placeholder="Search..." v-model="searchText"></v-text-field>
+          </div>
+          <v-card style="height: 300px; overflow: auto;">
             <v-list>
-              <v-list-tile :class="{ 'selected-user': selectedUser == user }" @click="selectUser(user)" v-for="(user, idx) in userList" :key="idx">
+              <v-list-tile :class="{ 'selected-user': selectedUser == user }" @click="selectUser(user)"
+                v-for="(user, idx) in filteredItems" :key="idx">
                 <v-list-tile-content>
                   <v-list-tile-title>{{user.firstname + ' ' + user.lastname}}</v-list-tile-title>
                   <!-- <v-list-tile-sub-title>Notify when receiving invites</v-list-tile-sub-title> -->
@@ -35,11 +39,27 @@
         userList: [],
         dialog: false,
         afterRuturn: null,
-        selectedUser: null
+        selectedUser: null,
+        searchText: ""
       }
     },
     created() {
       this.getUsers();
+    },
+    computed: {
+      filteredItems() {
+        let self = this;
+
+        if(self.searchText == "") {
+          return self.userList;
+        }
+        else {
+          return self.userList.filter(el => {
+            let userName = el.firstname + ' ' + el.lastname;
+            return userName.toUpperCase().indexOf(self.searchText.toUpperCase()) > -1;
+          })
+        }
+      }
     },
     methods: {
       show(afterRuturn) {
