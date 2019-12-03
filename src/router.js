@@ -244,7 +244,7 @@ export default new Router({
             }, 
             {
               path: '/map/:params',
-              name: 'map',
+              name: '/map/:params',
               component: map
             }, {
               path: '/CrossPlanogramAnalysis',

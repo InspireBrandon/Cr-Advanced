@@ -19,6 +19,7 @@ class TreeItem {
         self.actions = [];
         self.allowComparison=data.allowComparison
         self.Comparison = data.Comparison
+        self.disabled = data.disabled
     }
 } 
 
