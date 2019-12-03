@@ -158,9 +158,6 @@
                 self.level = data.config.level;
                 self.group = data.config.group;
                 self.onPercentChange();
-
-
-
             },
 
             setHeaders() {

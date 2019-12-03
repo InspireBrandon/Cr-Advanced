@@ -113,10 +113,8 @@ import BasketView from '@/components/Apps/Strategy/View/Basket/Index.vue'
 import StoreView from '@/components/Apps/Strategy/View/Store/Index.vue'
 import CategoryClusterView from '@/components/Apps/Strategy/View/CategortyCluster/Index.vue'
 import DepartmentView from '@/components/Apps/Strategy/View/Department/Index.vue'
-
 import ListingView from '@/components/Apps/Strategy/View/Listing/Index.vue'
-
-
+import CustomView from '@/components/Apps/Strategy/View/Custom/Index.vue'
 
 // import PlanogramDistributionNew from '@/components/Main/PlanogramImplementation/PlanogramOverView/StorePlanogramOverview.vue'
 import PlanogramDistributionNew from '@/components/Main/PlanogramDistribution/PlanogramOverView/StorePlanogramOverview'
@@ -237,6 +235,10 @@ export default new Router({
               path: '/CategoryClusterView/:fileID',
               name: 'CategoryClusterView',
               component: CategoryClusterView,
+            }, {
+              path: '/CustomView/:fileID',
+              name: 'CustomView',
+              component: CustomView,
             },  {
               path: '/DepartmentView/:fileID',
               name: 'DepartmentView',

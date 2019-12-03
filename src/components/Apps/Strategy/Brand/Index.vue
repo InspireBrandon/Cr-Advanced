@@ -62,7 +62,6 @@
         <Spinner ref="Spinner" />
         <FileSelector ref="FileSelector" />
         <FileDataSelector ref="FileDataSelector" />
-
     </div>
 </template>
 <script>

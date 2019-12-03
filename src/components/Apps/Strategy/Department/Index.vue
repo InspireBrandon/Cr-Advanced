@@ -67,8 +67,7 @@
             :stores="stores" />
         <Spinner ref="Spinner" />
         <FileSelector ref="FileSelector" />
-
-
+        <FileDataSelector ref="FileDataSelector" />
     </div>
 </template>
 <script>
@@ -81,6 +80,7 @@
     import storeGrid from './storeGrid';
     import FileSelector from './FileSelector'
     import DataSelector from "./DataSelector"
+    import FileDataSelector from './FileDataSelector'
 
     const formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -95,7 +95,8 @@
             DateRangeSelector,
             PlanogramSelector,
             storeGrid,
-            DataSelector
+            DataSelector,
+            FileDataSelector
         },
         data() {
             return {
@@ -224,7 +225,26 @@
             }
         },
         mounted() {
-            this.getProjectGroups()
+            let self = this;
+
+            self.getProjectGroups()
+
+            self.getFile(data => {
+                if (data != null && data != false) {
+                    self.getFileData(data.id, fileData => {
+                        self.runData = [];
+
+                        self.fileData = fileData.departmentCluster;
+
+                        for (var prop in fileData.departmentCluster) {
+                            self.runData.push({
+                                prop: prop,
+                                name: prop
+                            })
+                        }
+                    })
+                }
+            })
         },
         methods: {
             generateName() {
@@ -269,29 +289,43 @@
             openFile() {
                 let self = this;
 
-                self.$refs.FileSelector.show(file => {
-                    // TODO add loader
-                    Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${file.id}`)
-                        .then(r => {
-                            //console.log("openFile");
-                            //console.log(r);
+                // self.$refs.FileSelector.show(file => {
+                //     // TODO add loader
+                //     Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${file.id}`)
+                //         .then(r => {
+                //             self.salesData = r.data.salesData;
+                //             self.selectedProjectGroup = r.data.config.selectedProjectGroup;
+                //             self.selectedPeriod = r.data.config.periodData;
 
-                            self.salesData = r.data.salesData;
-                            self.selectedProjectGroup = r.data.config.selectedProjectGroup;
-                            self.selectedPeriod = r.data.config.periodData;
+                //             self.primaryCluster = r.data.config.setup.primaryCluster;
+                //             self.secondaryCluster = r.data.config.setup.secondaryCluster;
+                //             self.level = r.data.config.setup.level;
+                //             self.group = r.data.config.setup.group;
 
-                            self.primaryCluster = r.data.config.setup.primaryCluster;
-                            self.secondaryCluster = r.data.config.setup.secondaryCluster;
-                            self.level = r.data.config.setup.level;
-                            self.group = r.data.config.setup.group;
+                //             self.onPercentChange();
+                //         })
+                // })
 
-                            self.onPercentChange();
-                        })
+                self.$refs.FileDataSelector.show(self.runData, item => {
+                    let data = self.fileData[item.name];
+
+                    self.salesData = data.data;
+                    self.selectedProjectGroup = data.config.selectedProjectGroup;
+                    self.selectedPlanogram = data.config.selectedPlanogram;
+                    self.selectedCategory = data.config.selectedCategory;
+                    self.selectedPeriod = data.config.selectedPeriod;
+                    self.primaryCluster = data.config.primaryCluster;
+                    self.secondaryCluster = data.config.secondaryCluster;
+                    self.level = data.config.level;
+                    self.group = data.config.group;
+
+                    self.onPercentChange();
                 })
             },
             closeFile() {
                 let self = this;
                 self.selectedCategory = null;
+                self.selectedProjectGroup = nulll
                 self.salesData = null;
                 self.selectedProjectGroup = null;
                 self.selectedPeriod = null;
@@ -310,10 +344,8 @@
                 let self = this;
 
                 Axios.get(process.env.VUE_APP_API +
-                        `SystemFile/JSON?db=CR-Devinspire&folder=Category Cluster&file=REPORT`)
+                        `SystemFile/JSON?db=CR-Devinspire&folder=Department Cluster&file=REPORT`)
                     .then(r => {
-                        //console.log(r);
-
                         callback(r.data);
                     })
             },
@@ -321,6 +353,7 @@
                 let self = this;
                 self.getFile(fileTransaction => {
                     if (fileTransaction == null || fileTransaction == false) {
+
                         let tmp = {
                             departmentCluster: {}
                         };
@@ -328,8 +361,9 @@
                         tmp.departmentCluster[self.generateName()] = {
                             data: self.salesData,
                             config: {
+                                selectedPlanogram: self.selectedPlanogram,
+                                selectedCategory: self.selectedCategory,
                                 selectedProjectGroup: self.selectedProjectGroup,
-                                periodData: self.selectedCategory,
                                 selectedPeriod: self.selectedPeriod,
                                 primaryCluster: self.primaryCluster,
                                 secondaryCluster: self.secondaryCluster,
@@ -338,22 +372,20 @@
                             }
                         }
 
-                        tmp.DepartmentClustering[self.selectedProjectGroup.text] = self.storeRowData;
-
                         self.appendAndSaveFile(tmp);
                     } else {
                         self.getFileData(fileTransaction.id, fileData => {
                             let tmp = fileData;
 
-                            if (tmp.DepartmentClustering == undefined) {
-                                tmp.DepartmentClustering = {};
+                            if (tmp.departmentCluster == undefined) {
+                                tmp.departmentCluster = {};
                             }
 
-                            tmp.categoryCluster[self.generateName()] = {
+                            tmp.departmentCluster[self.generateName()] = {
                                 data: self.salesData,
                                 config: {
-                                    selectedProjectGroup: self.selectedProjectGroup,
-                                    periodData: self.selectedCategory,
+                                    selectedPlanogram: self.selectedPlanogram,
+                                    selectedCategory: self.selectedCategory,
                                     selectedPeriod: self.selectedPeriod,
                                     primaryCluster: self.primaryCluster,
                                     secondaryCluster: self.secondaryCluster,
@@ -382,7 +414,7 @@
                         SystemFile: {
                             SystemUser_ID: -1,
                             Folder: "Department Cluster",
-                            Name: self.selectedProjectGroup.value,
+                            Name: "REPORT",
                             Extension: '.json'
                         },
                         Data: fileData

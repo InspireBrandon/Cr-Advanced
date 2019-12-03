@@ -755,6 +755,9 @@
                                                 icon: 'insert_drive_file',
                                                 children: [],
                                                 click: function () {
+                                                    console.log(
+                                                        department);
+
                                                     self.$router.push(
                                                         `/PlanogramImplementationNew/${department.project_ID}/${department.systemFileID}/13`
                                                     );
@@ -933,15 +936,15 @@
                         self.baskets.push(basket);
                     }
 
-
-
                     // ////////////////////////////////////////////////////////////////////////////////////////////////////
                     // STORE
                     // ////////////////////////////////////////////////////////////////////////////////////////////////////
                     self.stores = []
+
                     for (var store in fileData.store) {
                         self.stores.push(store);
                     }
+
                     let storeTreeItem = new treeItem({
                         name: "Store Clustering",
                         icon: "folder",
@@ -979,6 +982,15 @@
                         customTreeItem.icon = customTreeItem.showChildren ? 'folder_open' : 'folder';
                     }
 
+                    customTreeItem.children.push(new treeItem({
+                        name: "View",
+                        icon: "insert_drive_file",
+                        children: [],
+                        click: function () {
+                            self.$router.push("/CustomView/SHOP");
+                        }
+                    }))
+
                     // ////////////////////////////////////////////////////////////////////////////////////////////////////
                     // BASKET
                     // ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1010,6 +1022,7 @@
                     // LISTING
                     // ////////////////////////////////////////////////////////////////////////////////////////////////////
                     self.listings = []
+
                     for (var listing in fileData.listing) {
                         self.listings.push(listing);
                     }
@@ -1036,6 +1049,15 @@
 
                         listingTreeItem.children.push(taskItem);
                     })
+
+                    listingTreeItem.children.push(new treeItem({
+                        name: "ADHESIVES AND SEALANTS - 6 MMA",
+                        icon: "insert_drive_file",
+                        children: [],
+                        click: function () {
+                            self.$router.push("/ListingView/28");
+                        }
+                    }))
 
                     // ////////////////////////////////////////////////////////////////////////////////////////////////////
                     // CATEGORY
@@ -1087,6 +1109,16 @@
                         departmentTreeItem.icon = departmentTreeItem.showChildren ? 'folder_open' :
                             'folder';
                     }
+
+                    departmentTreeItem.children.push(new treeItem({
+                        name: "DIY - Paint and Allied",
+                        icon: "insert_drive_file",
+                        children: [],
+                        click: function () {
+                            self.$router.push("/DepartmentView/28");
+                        }
+                    }))
+
                     //   self.getFile("Department Cluster", "REPORT", ccfileData => {
                     //     let departmentClusters = [];
 
