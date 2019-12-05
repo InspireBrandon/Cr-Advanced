@@ -7,7 +7,7 @@
             <v-spacer></v-spacer>
             <v-btn color="primary" @click="openConfigEditor">Edit Config </v-btn>
         </v-toolbar>
-        <v-container grid-list-md>
+        <v-container grid-list-md style="height: calc(100vh - 158px)">
             <v-layout row wrap>
                 <v-flex md3>
                     <v-autocomplete :items="applications" v-model="selectedApplication" label="applications"
@@ -38,7 +38,8 @@
                         <v-container grid-list-md v-if="selectedApplicationObject!=null">
                             <v-layout row wrap>
                                 <v-flex md3>
-                                    <v-text-field readonly v-model="selectedApplicationObject.name" hide-details label="Name">
+                                    <v-text-field readonly v-model="selectedApplicationObject.name" hide-details
+                                        label="Name">
 
                                     </v-text-field>
                                 </v-flex>
@@ -55,8 +56,8 @@
                                     </v-text-field>
                                 </v-flex>
                                 <v-flex md3>
-                                    <v-text-field readonly v-model="selectedApplicationObject.applicationID" hide-details
-                                        label="ApplicationID">
+                                    <v-text-field readonly v-model="selectedApplicationObject.applicationID"
+                                        hide-details label="ApplicationID">
 
                                     </v-text-field>
                                 </v-flex>
@@ -80,6 +81,10 @@
                     <v-card elevation=1>
                         <v-container grid-list-md v-if="selectedApplication!=null">
                             <v-layout row wrap v-for="(item,idx) in workspaces" :key="idx">
+                                <v-flex md1>
+                                    <v-checkbox @change="updateDefault(item)" v-model="item.isDefault" label="Default">
+                                    </v-checkbox>
+                                </v-flex>
                                 <v-flex md3>
                                     <v-text-field readonly v-model="item.name" hide-details label="Name">
                                     </v-text-field>
@@ -96,7 +101,7 @@
                                         <v-icon>edit</v-icon>
                                     </v-btn>
                                 </v-flex>
-                                <v-flex md3>
+                                <v-flex md2>
                                 </v-flex>
                             </v-layout>
                         </v-container>
@@ -105,7 +110,7 @@
             </v-layout>
         </v-container>
         <!-- create workspace dialog -->
-        <v-dialog v-model="workspaceDialog" persistent width="800px">
+        <v-dialog v-model="workspaceDialog" persistent width="900px">
             <v-card elevation=1>
                 <v-toolbar flat dense color="primary" dark>
                     <v-toolbar-title>
@@ -118,11 +123,15 @@
                 </v-toolbar>
                 <v-container grid-list-md>
                     <v-layout row wrap>
-                        <v-flex md6>
+                        <v-flex md2>
+                            <v-checkbox v-model="createWorkspaceObject.isDefault" label="Default">
+                            </v-checkbox>
+                        </v-flex>
+                        <v-flex md5>
                             <v-text-field v-model="createWorkspaceObject.name" hide-details label="Name">
                             </v-text-field>
                         </v-flex>
-                        <v-flex md6>
+                        <v-flex md5>
                             <v-text-field hide-details v-model="createWorkspaceObject.workspaceID" label="WorkspaceID">
                             </v-text-field>
                         </v-flex>
@@ -136,7 +145,7 @@
             </v-card>
         </v-dialog>
         <!-- create application dialog -->
-        <v-dialog v-model="applicationDialog" persistent width="800px">
+        <v-dialog v-model="applicationDialog" persistent width="900px">
             <v-card elevation=1>
                 <v-toolbar flat dense color="primary" dark>
                     <v-toolbar-title>
@@ -216,6 +225,7 @@
                     power_BI_Application_ID: null,
                     workspaceID: null,
                     name: null,
+                    isDefault: false
                 }
 
             }
@@ -246,12 +256,17 @@
                             value: element.id
                         })
                     });
+                    if (self.selectedApplication != null) {
+                        let tmp = self.applicationsArray.filter(item => {
+                            return item.id == self.selectedApplication;
+                        })
+                        self.selectedApplicationObject = tmp[0]
+                    }
                 })
             },
             updateApplication(item) {
                 let self = this
-                for (var prop in self.applicationModalObject)
-                {
+                for (var prop in self.applicationModalObject) {
                     self.applicationModalObject[prop] = item[prop]
                 }
                 self.applicationDialog = true
@@ -262,6 +277,23 @@
                     self.createWorkspaceObject[prop] = item[prop]
                 }
                 self.workspaceDialog = true
+            },
+            updateDefault(item) {
+                let self = this
+                self.checkValid(item, isvalid => {
+                    if (isvalid) {
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                        item.power_BI_Application_ID = self.selectedApplication
+                        Axios.post(process.env.VUE_APP_API + `Power_BI/CreateWorkspace`, item).then(r => {
+                            self.getWorkspaces()
+                            // self.applications = r.data
+                            self.workspaceDialog = false
+                        })
+                    } else {
+                        alert("Please ensure all fields are filled in")
+                    }
+                })
+
             },
             getWorkspaces() {
                 let self = this
@@ -306,6 +338,7 @@
                         Axios.post(process.env.VUE_APP_API + `Power_BI/CreateApplication`, self
                             .applicationModalObject).then(r => {
                             self.applicationDialog = false
+
                             self.getApplications()
                         })
                     } else {
