@@ -12,6 +12,7 @@
                 </v-list>
             </v-menu>
             <PlanogramNoteModal ref="PlanogramNoteModal" />
+            <SystemFiles ref="SystemFiles" />
         </div>
         <UserFiles />
     </div>
@@ -38,13 +39,15 @@
     let folderTreeItem;
 
     import UserFiles from '../../UserFiles/Index'
+    import SystemFiles from '../../SystemFiles/Index'
 
     export default {
         props: ['accessType', 'storeID'],
         components: {
             Recursive,
             PlanogramNoteModal,
-            UserFiles
+            UserFiles,
+            SystemFiles
         },
         data() {
             return {
@@ -151,7 +154,7 @@
                     self.buildPromotionalPlanningFolder();
                     // self.buildSpatialMappingFolder();
                     mappingTreeItem.build(self.treeItems);
-                    self.buildReportTreeItems();
+                    // self.buildReportTreeItems();
                     // self.buildUploadTreeItems();
                     // folderTreeItem.build(self.treeItems);
                 }
