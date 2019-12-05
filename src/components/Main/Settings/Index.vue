@@ -42,6 +42,7 @@
                                         <v-tabs-slider color="white"></v-tabs-slider>
                                         <v-tab href="#tab-1" justify-content: center fixed-tabs>Structure</v-tab>
                                         <v-tab href="#tab-2" justify-content: center fixed-tabs>Help Files</v-tab>
+                                        <v-tab href="#tab-3" justify-content: center fixed-tabs>Power BI</v-tab>
 
                                         <v-tab-item id="tab-1" justify-content: center>
                                             <v-toolbar dense dark color="grey darken-3">
@@ -72,6 +73,9 @@
                                         <v-tab-item id="tab-2" class="elevation-2" justify-content: center>
                                             <HelpFile class="mb-2"></HelpFile>
                                         </v-tab-item>
+                                          <v-tab-item id="tab-3" class="elevation-2" justify-content: center>
+                                            <PowerBIMaint class="mb-2"></PowerBIMaint>
+                                        </v-tab-item>
                                     </v-tabs>
                                 </v-card>
                             </v-flex>
@@ -93,12 +97,16 @@
 
     import StructureMaint from './StructureMaint'
     import StructureTree from './StructureTree'
+    import PowerBIMaint from './PowerBIMaint'
+    
+
 
     export default {
         components: {
             HelpFile,
             StructureMaint,
-            StructureTree
+            StructureTree,
+            PowerBIMaint
         },
         data() {
             return {
