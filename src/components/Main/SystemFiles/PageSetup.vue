@@ -71,6 +71,8 @@
                 self.afterReturn = afterReturn;
                 self.dialog = true;
 
+                self.getPage()
+
                 self.getBIReports(() => {
                     self.loading = false;
                 })
@@ -85,32 +87,16 @@
                     bi_ReportID: self.selectedReport
                 })
             },
-            getPage(callback) {
+            getPage() {
                 let self = this;
 
-                Axios.get(process.env.VUE_APP_API + "PowerBI/GetReports")
+                Axios.get(process.env.VUE_APP_API + "SystemPage?systemFolderFileID=" + self.systemFolderFileID)
                     .then(r => {
-                        r.data.value.forEach(report => {
-                            self.reports.push({
-                                text: report.name,
-                                value: report.id
-                            })
-                        });
-                        callback();
-                    })
-            },
-            getPageSections() {
-                let self = this;
-
-                Axios.get(process.env.VUE_APP_API + "PowerBI/GetReports")
-                    .then(r => {
-                        r.data.value.forEach(report => {
-                            self.reports.push({
-                                text: report.name,
-                                value: report.id
-                            })
-                        });
-                        callback();
+                        if(r.data.systemPage != null) {
+                            if(r.data.systemPage.systemPageSectionList.length > 0) {
+                                self.selectedReport = r.data.systemPage.systemPageSectionList[0].bI_ReportID;
+                            }
+                        }
                     })
             }
         }

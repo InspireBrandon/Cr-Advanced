@@ -97,7 +97,7 @@ import ProductListing from '@/components/Apps/RangePlanning/ProductListing/Index
 
 // Floor Planning
 import FloorPlanning from '@/components/Main/FloorPlanning/index.vue'
-import FloorPlanning2D from '@/components/Main/FloorPlanning2D/views/main.vue'
+import FloorPlanning2D from '@/components/Main/FloorPlanning2D/Index.vue'
 
 import Fixture_Type from '@/components/Main/Fixture_Type/Fixture_Type.vue'
 import FileStatus from '@/components/Main/FileStatus'
@@ -214,7 +214,7 @@ export default new Router({
               name: 'map',
               component: map,
             }, {
-              path: '/Bi',
+              path: '/Bi/:folderFileID',
               name: 'range_planning_view',
               component: Bi,
             },

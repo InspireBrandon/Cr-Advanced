@@ -4,6 +4,7 @@ import App from './App.vue'
 import router from './router'
 import "../node_modules/ag-grid-community/dist/styles/ag-grid.css";
 import "../node_modules/ag-grid-community/dist/styles/ag-theme-balham.css";
+
 import {
   store
 } from './store'
@@ -24,6 +25,9 @@ import {
 LicenseManager.setLicenseKey("Evaluation_License-_Not_For_Production_Valid_Until_27_August_2019__MTU2Njg2MDQwMDAwMA==5ba3300c9715d7ce8777c4ff77198109");
 
 import 'ag-grid-enterprise/chartsModule';
+
+import FloorPlanningSettings from './components/Main/FloorPlanning2D/views/Settings'
+Vue.component('floor-planning-settings', FloorPlanningSettings)
 
 Vue.use(VueKonva)
 Vue.use(VueHTMLEditor)

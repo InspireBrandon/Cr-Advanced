@@ -13,14 +13,14 @@
                             v-model="item.name" class="ml-1" style="border: 1px solid lightgrey" type="text">
                     </v-form>
                 </div>
-                <div @contextmenu.prevent="onContextMenuFile($event, item)" class="route-item" v-if="item.type == 1">
+                <div @click="$router.push(`/Bi/${item.id}`)" @contextmenu.prevent="onContextMenuFile($event, item)" class="route-item" v-if="item.type == 1">
                     <v-progress-circular :size="12" v-if="item.loading" :width="2" indeterminate color="primary">
                     </v-progress-circular>
                     <v-icon size="12">bar_chart</v-icon>
                     <span class="ml-1" v-if="!item.showEdit">{{item.name}}</span>
                     <v-form @submit.prevent="submitFolderRename">
                         <input :ref="'edit' + item.id" v-if="item.showEdit" @blur="submitFolderRename"
-                            v-model="item.fileName" class="ml-1" style="border: 1px solid lightgrey" type="text">
+                            v-model="item.name" class="ml-1" style="border: 1px solid lightgrey" type="text">
                     </v-form>
                 </div>
                 <UserFiles :systemUserID="systemUserID" v-if="item.showChildren" style="margin-left: 15px;"
@@ -125,14 +125,21 @@
             setupPage() {
                 let self = this;
 
-                self.$refs.PageSetup.show(self.selectedItem.id, request => {
-                    self.savePage(request)
+                self.$refs.PageSetup.show(self.selectedItem.id, data => {
+                    self.savePage(data)
                 })
             },
-            savePage(request) {
+            savePage(data) {
                 let self = this;
 
-                Axios.post(process.env.VUE_APP_API + "")
+                let request = {
+                    systemFolderFileID: data.systemFolderFileID,
+                    systemPageSectionList: [{
+                        bi_ReportID: data.bi_ReportID
+                    }]
+                }
+
+                Axios.post(process.env.VUE_APP_API + "SystemPage", request)
                     .then(r => {
                     })
             },

@@ -2,12 +2,10 @@
     <div>
         <v-toolbar dark flat dense>
             <v-toolbar-items>
-                <v-select style="width: 300px;" label="Reports" @change="choseReport" :items="reports"
-                    v-model="selectedReport"></v-select>
                 <v-select style="width: 300px;" class="ml-3" label="Page" @change="chooseActivePage" :items="pages"
                     v-model="selectedPage"></v-select>
-                <v-select style="width: 300px;" class="ml-3" label="Store Numbers" multiple @change="applyReportFilters"
-                    :items="storeNumbers" v-model="selectedStoreNumbers"></v-select>
+                <!-- <v-select style="width: 300px;" class="ml-3" label="Store Numbers" multiple @change="applyReportFilters"
+                    :items="storeNumbers" v-model="selectedStoreNumbers"></v-select> -->
             </v-toolbar-items>
             <v-btn color="primary" @click="printReport">Print</v-btn>
             <!-- <v-btn color="primary" @click="switchMode">{{ currentMode == "edit" ? "View" : "Edit" }}</v-btn> -->
@@ -27,7 +25,7 @@
     export default {
         components: {
             Spinner
-        },  
+        },
         data() {
             return {
                 report: null,
@@ -37,7 +35,7 @@
                 selectedReport: null,
                 pages: [],
                 selectedPage: null,
-                currentMode: "view"
+                currentMode: "view",
             }
         },
         mounted() {
@@ -45,20 +43,39 @@
 
             self.$refs.Spinner.show();
 
-            self.getReports(() => {
+            self.getPage(() => {
                 self.getReportEmbedConfig();
-            });
+            })
+
+            // self.getReports(() => {
+            // });
         },
         methods: {
             switchMode() {
                 let self = this;
 
-                if(self.currentMode == "edit") 
+                if (self.currentMode == "edit")
                     self.currentMode = "view"
-                else 
+                else
                     self.currentMode = "edit"
 
                 self.report.switchMode(self.currentMode)
+            },
+            getPage(callback) {
+                let self = this;
+
+                let folderFileID = self.$route.params.folderFileID
+
+                Axios.get(process.env.VUE_APP_API + "SystemPage?systemFolderFileID=" + folderFileID)
+                    .then(r => {
+                        if (r.data.systemPage != null) {
+                            if (r.data.systemPage.systemPageSectionList.length > 0) {
+                                self.selectedReport = r.data.systemPage.systemPageSectionList[0].bI_ReportID;
+                            }
+                        }
+
+                        callback();
+                    })
             },
             getActivePages() {
                 let self = this;
