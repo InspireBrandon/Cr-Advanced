@@ -110,6 +110,7 @@ function buildMarketShareFolder(vueCtx) {
     })
 
     MarketShareTreeItem.click = function () {
+        checkMapping(vueCtx)
         if (MarketShareTreeItem.showChildren) {
             MarketShareTreeItem.showChildren = false;
             MarketShareTreeItem.icon = 'folder';
@@ -425,8 +426,7 @@ function buildMappingFolder(vueCtx) {
     mappingTreeItem.click = function () {
         mappingTreeItem.showChildren = !mappingTreeItem.showChildren;
         mappingTreeItem.icon = mappingTreeItem.showChildren ? 'folder_open' : 'folder';
-        if (mappingTreeItem.showChildren)
-            checkMapping(vueCtx)
+     
     }
 
     return mappingTreeItem;
@@ -441,14 +441,16 @@ function buildLocationsFolder(vueCtx) {
     })
 
     locationTreeItem.click = function () {
+        checkMapping(vueCtx)
         if (locationTreeItem.showChildren) {
             locationTreeItem.showChildren = false;
             locationTreeItem.icon = 'folder';
         } else {
             // empty out parent array
+           
             locationTreeItem.children = [];
             locationTreeItem.loading = true;
-
+           
             getLocationGroups(locationGroups => {
 
                 locationTreeItem.children = buildLocationGroupFolders(locationGroups, vueCtx);
@@ -481,6 +483,7 @@ function buildImageFolders(locations, vueCtx) {
             }
         })
         imageItem.click = function () {
+            
             imageItem.selected = !imageItem.selected;
             if (imageItem.selected) {
                 state_data.mapImages = [imageItem.value]
@@ -564,6 +567,7 @@ function buildImageFolder(vueCtx) {
     })
 
     imageTreeItem.click = function () {
+        checkMapping(vueCtx)
         if (imageTreeItem.showChildren) {
             imageTreeItem.showChildren = false;
             imageTreeItem.icon = 'folder';
@@ -790,8 +794,8 @@ function MapImage(MapID) {
         `MapImage?mapImageID=${MapID}&type=map`
 }
 
-function checkMapping(vueCtx, ) {
-
+function checkMapping(vueCtx) {
+    
     if (vueCtx.$route.name == "/map/:params") {
         redrawMap()
     } else {

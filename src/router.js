@@ -126,6 +126,8 @@ import map2 from '@/components/Apps/Strategy/Map/tesmap.vue'
 import FloorPlanningViewer from '@/components/Main/FloorPlanningViewer/Index'
 import PromotionViewer from '@/components/Main/PromotionViewer'
 import Bi from '@/components/Main/Bi'
+// Dashboard Designer 
+import DashboardDesigner from '@/components/Main/DashboardDesigner/Index'
 
 // Data mapping
 import ImportDataMapper from '@/components/Main/ImportDataMapper/Index'
@@ -226,7 +228,7 @@ export default new Router({
               path: '/StoreView/:fileID',
               name: 'StoreView',
               component: StoreView,
-            },  {
+            }, {
               path: '/ListingView/:fileID',
               name: 'ListingView',
               component: ListingView,
@@ -239,11 +241,11 @@ export default new Router({
               path: '/CustomView/:fileID',
               name: 'CustomView',
               component: CustomView,
-            },  {
+            }, {
               path: '/DepartmentView/:fileID',
               name: 'DepartmentView',
               component: DepartmentView,
-            }, 
+            },
             {
               path: '/map/:params',
               name: '/map/:params',
@@ -252,7 +254,7 @@ export default new Router({
               path: '/CrossPlanogramAnalysis',
               name: 'CrossPlanogramAnalysis',
               component: CrossPlanogramAnalysis,
-            },{
+            }, {
               path: '/ObservationsAndInsights',
               name: 'ObservationsAndInsights',
               component: ObservationsAndInsights,
@@ -284,11 +286,11 @@ export default new Router({
             }
           ],
         },
-        // {
-        //   path: '/map',
-        //   name: 'map',
-        //   component: map
-        // },
+        {
+          path: '/DashboardDesigner',
+          name: 'DashboardDesigner',
+          component: DashboardDesigner
+        },
         {
           path: '/map2',
           name: 'map2',
