@@ -8,7 +8,7 @@
             <SystemFiles :systemUserID="systemUserID" :items="folderFiles" />
             <div v-if="showAddFolder">
                 <v-form @submit.prevent="submitFolderFile">
-                    <v-icon size="12">{{ currentType == 'folder' ? 'folder' : 'insert_drive_file' }}</v-icon>
+                    <v-icon size="12">{{ currentType == 'folder' ? 'folder' : 'bar_chart' }}</v-icon>
                     <input @blur="showAddFolder = false" ref="folderName" v-model="folderName" class="ml-1"
                         style="border: 1px solid lightgrey" type="text">
                 </v-form>
@@ -142,6 +142,7 @@
 
         self.children = [];
         self.showChildren = false;
+        self.showAddFolder = false;
         self.showEdit = false;
     }
 </script>

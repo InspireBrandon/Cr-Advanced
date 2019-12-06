@@ -16,7 +16,7 @@
                 <div @contextmenu.prevent="onContextMenuFile($event, item)" class="route-item" v-if="item.type == 1">
                     <v-progress-circular :size="12" v-if="item.loading" :width="2" indeterminate color="primary">
                     </v-progress-circular>
-                    <v-icon size="12">insert_drive_file</v-icon>
+                    <v-icon size="12">bar_chart</v-icon>
                     <span class="ml-1" v-if="!item.showEdit">{{item.name}}</span>
                     <v-form @submit.prevent="submitFolderRename">
                         <input :ref="'edit' + item.id" v-if="item.showEdit" @blur="submitFolderRename"
@@ -25,10 +25,9 @@
                 </div>
                 <UserFiles :systemUserID="systemUserID" v-if="item.showChildren" style="margin-left: 15px;"
                     :onContextMenu="onContextMenu" :items="item.children"></UserFiles>
-                    {{ item.showAddFolder }}
                 <div v-if="item.showAddFolder" style="margin-left: 15px;">
                     <v-form @submit.prevent="submitFolderFile">
-                        <v-icon size="12">{{ currentType == 'folder' ? 'folder' : 'insert_drive_file' }}</v-icon>
+                        <v-icon size="12">{{ currentType == 'folder' ? 'folder' : 'bar_chart' }}</v-icon>
                         <input @blur="item.showAddFolder = false" :ref="'folderName' + item.id" v-model="folderName" class="ml-1"
                             style="border: 1px solid lightgrey" type="text">
                     </v-form>
@@ -70,16 +69,19 @@
             </v-menu>
         </div>
         <YesNoModal style="position: absolute" ref="YesNoModal" />
+        <PageSetup style="position: absolute" ref="PageSetup" />
     </div>
 </template>
 
 <script>
     import Axios from 'axios';
     import YesNoModal from '@/components/Common/YesNoModal'
+    import PageSetup from './PageSetup'
 
     export default {
         components: {
             YesNoModal,
+            PageSetup
         },
         data() {
             return {
@@ -115,12 +117,24 @@
                 self.showFileMenu = false
                 self.x = e.clientX
                 self.y = e.clientY
+
                 self.$nextTick(() => {
                     self.showFileMenu = true
                 })
             },
             setupPage() {
                 let self = this;
+
+                self.$refs.PageSetup.show(self.selectedItem.id, request => {
+                    self.savePage(request)
+                })
+            },
+            savePage(request) {
+                let self = this;
+
+                Axios.post(process.env.VUE_APP_API + "")
+                    .then(r => {
+                    })
             },
             getFolderFileByParentID(parentID, callback) {
                 let self = this;
@@ -131,7 +145,11 @@
                         let tmp = [];
 
                         r.data.systemFolderFileList.forEach(ff => {
-                            tmp.push(new treeItem(ff))
+                            let ti = new treeItem(ff)
+
+                            tmp.push(ti)
+
+                            console.log(ti)
                         });
 
                         callback(tmp);
@@ -217,14 +235,14 @@
                 let type = self.currentType == 'folder' ? 0 : 1;
 
                 let request = {
-                    parentID: null,
+                    parentID: self.selectedItem.id,
                     name: self.folderName,
                     type: type
                 }
 
                 self.createFolderFile(request, newFolderFile => {
-                    self.folderFiles.push(new treeItem(newFolderFile));
-                    self.showAddFolder = false;
+                    self.selectedItem.children.push(new treeItem(newFolderFile));
+                    self.selectedItem.showAddFolder = false;
                 })
             },
             createFolderFile(request, callback) {
@@ -246,10 +264,6 @@
             },
             submitFolderRename() {
                 let self = this;
-
-                if (self.selectedItem.type == 1) {
-                    self.selectedItem.name = self.selectedItem.fileName + "." + self.selectedItem.extension;
-                }
 
                 self.modifyFolderFile(() => {
                     self.selectedItem.showEdit = false;
