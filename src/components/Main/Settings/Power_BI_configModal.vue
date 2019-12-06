@@ -16,18 +16,15 @@
             <v-container grid-list-md>
                 <v-layout row wrap>
                     <v-flex md6>
-                        <v-text-field v-model="config.apiUrl" label="apiUrl">
-
+                        <v-text-field v-model="config.apiUrl" label="Api Url">
                         </v-text-field>
                     </v-flex>
                     <v-flex md6>
-                        <v-text-field v-model="config.authorityUrl" label="authorityUrl">
-
+                        <v-text-field v-model="config.authorityUrl" label="Authority Url">
                         </v-text-field>
                     </v-flex>
                     <v-flex md6>
-                        <v-text-field v-model="config.resourceURL" label="resourceURL">
-
+                        <v-text-field v-model="config.resourceURL" label="Resource URL">
                         </v-text-field>
                     </v-flex>
                 </v-layout>
@@ -77,6 +74,7 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.post(process.env.VUE_APP_API + `Power_BI/updateConfig`, self.config).then(r => {
                     console.log("updateConfig", r);
+                    self.dialog=false;
                 })
             }
         }

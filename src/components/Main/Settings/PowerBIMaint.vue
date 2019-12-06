@@ -49,7 +49,7 @@
                                     </v-text-field>
                                 </v-flex>
                                 <v-flex md3>
-                                    <v-text-field readonly v-model="selectedApplicationObject.password" hide-details
+                                    <v-text-field readonly v-model="selectedApplicationObject.password" type="password" hide-details
                                         label="Password">
 
                                     </v-text-field>
@@ -166,7 +166,7 @@
                             </v-text-field>
                         </v-flex>
                         <v-flex md6>
-                            <v-text-field hide-details v-model="applicationModalObject.password" label="Password">
+                            <v-text-field hide-details v-model="applicationModalObject.password" type="password"  label="Password">
                             </v-text-field>
                         </v-flex>
                         <v-flex md6>
