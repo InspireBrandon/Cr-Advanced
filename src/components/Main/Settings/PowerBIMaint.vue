@@ -10,9 +10,8 @@
         <v-container grid-list-md style="height: calc(100vh - 158px)">
             <v-layout row wrap>
                 <v-flex md3>
-                    <v-autocomplete :items="applications" v-model="selectedApplication" label="applications"
+                    <v-autocomplete :items="applications" v-model="selectedApplication" label="Applications"
                         @change="onApplicationChange">
-
                     </v-autocomplete>
                 </v-flex>
                 <v-flex md9>
@@ -57,7 +56,7 @@
                                 </v-flex>
                                 <v-flex md3>
                                     <v-text-field readonly v-model="selectedApplicationObject.applicationID"
-                                        hide-details label="ApplicationID">
+                                        hide-details label="Application ID">
 
                                     </v-text-field>
                                 </v-flex>
@@ -71,7 +70,7 @@
                 <v-flex md12>
                     <v-toolbar flat dense color="primary" dark>
                         <v-toolbar-title>
-                            WorkSpaces
+                            Workspaces
                         </v-toolbar-title>
                         <v-spacer></v-spacer>
                         <v-btn v-if="selectedApplication!=null" @click="openWorkspaceCreate" icon dark color="green">
@@ -90,7 +89,7 @@
                                     </v-text-field>
                                 </v-flex>
                                 <v-flex md3>
-                                    <v-text-field readonly hide-details v-model="item.workspaceID" label="WorkspaceID">
+                                    <v-text-field readonly hide-details v-model="item.workspaceID" label="Workspace ID">
                                     </v-text-field>
                                 </v-flex>
                                 <v-flex md3>
@@ -132,7 +131,7 @@
                             </v-text-field>
                         </v-flex>
                         <v-flex md5>
-                            <v-text-field hide-details v-model="createWorkspaceObject.workspaceID" label="WorkspaceID">
+                            <v-text-field hide-details v-model="createWorkspaceObject.workspaceID" label="Workspace ID">
                             </v-text-field>
                         </v-flex>
                     </v-layout>
@@ -160,23 +159,19 @@
                     <v-layout row wrap>
                         <v-flex md6>
                             <v-text-field v-model="applicationModalObject.name" hide-details label="Name">
-
                             </v-text-field>
                         </v-flex>
                         <v-flex md6>
                             <v-text-field hide-details v-model="applicationModalObject.username" label="Username">
-
                             </v-text-field>
                         </v-flex>
                         <v-flex md6>
                             <v-text-field hide-details v-model="applicationModalObject.password" label="Password">
-
                             </v-text-field>
                         </v-flex>
                         <v-flex md6>
                             <v-text-field hide-details v-model="applicationModalObject.applicationID"
-                                label="ApplicationID">
-
+                                label="Application ID">
                             </v-text-field>
                         </v-flex>
                     </v-layout>
@@ -188,10 +183,8 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <!-- c -->
         <YesNoModal ref="yesNoModal"></YesNoModal>
         <configModal ref="configModal" />
-
     </div>
 </template>
 <script>
@@ -249,6 +242,7 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 self.applications = []
                 Axios.get(process.env.VUE_APP_API + `Power_BI/GetApplications`).then(r => {
+                 
                     self.applicationsArray = r.data
                     r.data.forEach(element => {
                         self.applications.push({
@@ -261,6 +255,9 @@
                             return item.id == self.selectedApplication;
                         })
                         self.selectedApplicationObject = tmp[0]
+                    }else{
+                           self.selectedApplication=r.data[0].id
+                           self.onApplicationChange()
                     }
                 })
             },
