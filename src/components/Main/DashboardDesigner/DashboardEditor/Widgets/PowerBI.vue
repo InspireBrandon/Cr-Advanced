@@ -1,5 +1,8 @@
 <template>
     <div>
+        <v-btn icon v-if="editing" @click="openCustomFilterModal">
+            <v-icon>filter</v-icon>
+        </v-btn>
         <!-- <v-toolbar dark flat dense>
             <v-toolbar-items>
                 <v-select style="width: 300px;" label="Reports" @change="choseReport" :items="reports"
@@ -12,8 +15,10 @@
             <v-btn color="primary" @click="printReport">Print</v-btn> -->
         <!-- <v-btn color="primary" @click="switchMode">{{ currentMode == "edit" ? "View" : "Edit" }}</v-btn> -->
         <!-- </v-toolbar> -->
-        <div ref="reportContainer" id="reportContainer" style="width: 100%; height: 100%;"></div>
+        <div ref="reportContainer" id="reportContainer" class="desktop-view"
+            style="width: 100%; height: 100%;border-style: none"></div>
         <Spinner ref="Spinner" />
+        <CustomFilterModal ref="CustomFilterModal" />
     </div>
 </template>
 
@@ -23,10 +28,15 @@
     import * as models from 'powerbi-models';
 
     import Spinner from '@/components/Common/Spinner';
+    import CustomFilterModal from "../CustomFilterModal"
+    import {
+        setTimeout
+    } from 'timers';
     export default {
-        props: ["config"],
+        props: ["config", "editing"],
         components: {
-            Spinner
+            Spinner,
+            CustomFilterModal
         },
         data() {
             return {
@@ -56,6 +66,10 @@
 
         },
         methods: {
+            openCustomFilterModal() {
+                let self = this
+                self.$refs.CustomFilterModal.open(callback => {})
+            },
             switchMode() {
                 let self = this;
 
@@ -147,17 +161,62 @@
                 self.report.on('loaded', function (event) {
                     self.getFilters();
                     self.getActivePages();
-
                     self.$refs.Spinner.hide();
-                })
 
+                })
+                self.$refs.Spinner.hide();
                 self.getFilters();
+
             },
+            getvisuals(visualCallback) {
+                let self = this
+                let res = []
+                // Get a reference to the embedded report HTML element
+                var embedContainer = self.$refs.reportContainer
+
+                // Get a reference to the embedded report.
+                let report = powerbi.get(embedContainer);
+
+                // Retrieve the page collection and get the visuals for the first page.
+                report.getPages()
+                    .then(function (pages) {
+
+                        // Retrieve active page.
+                        var activePage = pages.find(function (page) {
+                            return page.isActive
+                        });
+
+                        activePage.getVisuals()
+                            .then(function (visuals) {
+
+                                visuals.forEach((visual, idx) => {
+                                    visual.exportData(models.ExportDataType.Underlying)
+                                        .then(function (data) {
+                                            let object = csvToDataObject(data.data)
+                                            res.push(object)
+                                            if (idx + 1 == visuals.length) {
+                                                visualCallback(res)
+                                            }
+                                        })
+                                })
+                            })
+                            .catch(function (errors) {
+                                console.log(errors);
+                            });
+                    })
+                    .catch(function (errors) {
+                        console.log(errors);
+                    });
+            },
+
             getFilters() {
                 let self = this;
 
                 self.report.getFilters()
-                    .then(filters => {})
+                    .then(filters => {
+
+
+                    })
             },
             applyReportFilters() {
                 let self = this;
@@ -210,4 +269,53 @@
             }
         }
     }
+
+    function csvToDataObject(data) {
+        console.log(data);
+
+        let lines = data.split('\n');
+        let result = [];
+
+        let brokenHeaders = lines[0].split(',');
+        let headers = [];
+
+        brokenHeaders.forEach(el => {
+            headers.push(el.replace(/ /g, "_").replace(/"/g, "").replace(/\r/g, ""));
+        })
+
+        for (let i = 1; i < lines.length; i++) {
+            let obj = {};
+            let currentLine = lines[i].split(",");
+
+            if (currentLine[0] != "") {
+                for (let j = 0; j < headers.length; j++) {
+                    obj[headers[j]] = currentLine[j].replace(/"/g, "").replace(/\r/g, "");
+                }
+
+                result.push(obj);
+            }
+
+        }
+        return {
+            data: result,
+            headers: headers
+        };
+    }
 </script>
+<style>
+    #reportContainer {
+        background-color: white;
+        padding: 0px;
+        clear: both;
+    }
+
+    .desktop-view iframe,
+    .mobile-view iframe {
+        border: none;
+    }
+</style>
+<style>
+    .iframe {
+        border-width: 0px !important;
+    }
+</style>

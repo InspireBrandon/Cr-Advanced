@@ -1,10 +1,10 @@
 <template>
-  <component :is="loadWidget" :config="ReportData.config" :id="id" ref="ReportComponent"></component>
+  <component :is="loadWidget" :config="ReportData" :id="id" :editing="editing" ref="ReportComponent"></component>
 </template>
 
 <script>
 export default {
-  props: ["ReportData", "id"],
+  props: ["ReportData", "id","editing"],
   data() {
     return {};
   },
@@ -14,7 +14,7 @@ export default {
     setTimeout(() => {
       //   let height = self.$refs.ReportComponent.$el.clientHeight;
       //   self.ReportData.ReportLayout.h = height;
-      self.$parent.$parent.autoSize();
+      self.$parent.autoSize();
     }, 50);
   },
   computed: {

@@ -6,45 +6,69 @@
             </v-toolbar-title>
         </v-toolbar>
         <v-toolbar dark dense flat color="grey darken-3">
-            <v-btn color="primary" @click="openEditModal">
-                add tile
-            </v-btn>
-            <v-btn color="primary" @click="saveDashboard()">
-                save dashboard
-            </v-btn>
+            <v-toolbar-items>
+                <v-menu dark offset-y style="margin-bottom: 10px;">
+                    <v-btn slot="activator" color="grey darken-3">
+                        File
+                    </v-btn>
+                    <v-list>
+                        <v-list-tile @click="openDashboard()">
+                            <v-list-tile-title>Open</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="saveDashboard()">
+                            <v-list-tile-title>Save Dashboard</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="close()">
+                            <v-list-tile-title>Close</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
+                <v-menu dark offset-y style="margin-bottom: 10px;">
+                    <v-btn slot="activator" color="grey darken-3">
+                        Actions
+                    </v-btn>
+                    <v-list>
+                        <v-list-tile @click="openEditModal()">
+                            <v-list-tile-title>Add tile</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="toggleEditing()">
+                            <v-list-tile-title>toggle editing</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
+            </v-toolbar-items>
         </v-toolbar>
 
-        <v-card width="100%" height="100%" class="report-main " @dragover.prevent @drop="dragFinish($event)"
-            @dblclick="addWidget('Graph')">
+        <v-card width="100%" style="height: calc(100vh - 161px);" class="report-main scroll" @dblclick="openEditModal">
+            <v-card v-if="ReportItems.length==0">
+                <span>Double click or click actions to add Dashboard Tiles</span>
+            </v-card>
             <grid-layout style="width:100%;height:100%" :layout.sync="Layout" :col-num="12" :row-height="30"
                 :auto-size="true" :is-draggable="true" :is-resizable="true" :is-mirrored="false"
                 :vertical-compact="true" :margin="[5, 5]" :use-css-transforms="true">
+
                 <grid-item class="grid-item" v-for="(item, idx) in ReportItems" :x="item.ReportLayout.x"
                     :y="item.ReportLayout.y" :w="item.ReportLayout.w" :h="item.ReportLayout.h" :i="item.ReportLayout.i"
                     :key="item.ReportLayout.i">
-                    <v-flex no-gutters class="fill-height" align="center" justify="center">
-                        <v-card class="fill-height" height="100%" width="100%">
-                            <v-toolbar dense>
-                                {{item.Name}}
-                                <v-spacer></v-spacer>
-                                <v-btn icon color="red">
-                                    <v-icon>mdi-delete</v-icon>
-                                </v-btn>
-                            </v-toolbar>
-                            <ReportLoader :ReportData="item" :key="idx" :id="idx"
-                                style="height: calc(100% - 48px) !important;" />
-                        </v-card>
+                    <v-flex class="fill-height">
+                        <ReportLoader :ReportData="item" :key="idx" :id="idx" :editing="editing"
+                            :class="{ 'editing': editing==true ,'Not_editing': editing==false }" />
+                        <v-btn color="error" dark flat v-if="editing" @click="removeitem(item,idx)">
+                            <v-icon >
+                                delete
+                            </v-icon>
+                        </v-btn>
+                        
                     </v-flex>
                 </grid-item>
             </grid-layout>
         </v-card>
-
-
-
         <!-- <ReportCreate ref="ReportCreate"/> -->
-
         <ComponentEditorModal ref="ComponentEditorModal" />
         <PowerBIConfigModal ref="PowerBIConfigModal" />
+        <dashboardSelector ref="dashboardSelector" />
+        <Prompt ref="Prompt" />
+
         <!-- <v-flex  v-for="(item,idx) in components" :key="idx">
                     <component v-bind:is="item.name" @click.native="openEditModal(item,idx)" :props="item"></component>
 
@@ -53,6 +77,7 @@
 
 </template>
 <script>
+    import Axios from 'axios'
     // components
     import ComponentEditorModal from "./ComponentEditorModal"
     import PowerBIConfigModal from "./PowerBIConfigModal"
@@ -62,6 +87,9 @@
     // dashboard editor
     import VueGridLayout from 'vue-grid-layout';
     import ReportLoader from "./DashboardEditor/report-loader";
+    import dashboardSelector from "./DashboardSelector"
+    import Prompt from '@/components/Common/Prompt'
+
 
 
     export default {
@@ -70,11 +98,13 @@
             GridLayout: VueGridLayout.GridLayout,
             GridItem: VueGridLayout.GridItem,
             ReportLoader,
-            PowerBIConfigModal
-
+            PowerBIConfigModal,
+            dashboardSelector,
+            Prompt,
         },
         data() {
             return {
+                editing: true,
                 rows: 2,
                 columns: 2,
                 components: [],
@@ -100,21 +130,48 @@
 
             }
         },
-        mounted() {
-            this.generateGrid()
-        },
         methods: {
-            generateGrid() {
+            close(){
                 let self = this
-                for (let index = 0; index < 12; index++) {
-                    let item = new editComponentConfig({
-                        type: 1,
-                        name: "EditComponents",
-                        height: '250px',
-                        width: '250px'
-                    })
-                    self.components.push(item)
-                }
+                self.Layout=[]
+                self.ReportItems=[]
+            },
+            toggleEditing() {
+                let self = this
+                self.editing = !self.editing
+            },
+            removeitem(item, index) {
+                let self = this
+                self.ReportItems.splice(index, index + 1)
+            },
+            dragStart(which, ev) {
+                let self = this;
+                console.log("dragStart", which, ev);
+
+                self.draggedItem = which;
+            },
+            openDashboard() {
+                let self = this
+                self.$refs.dashboardSelector.show(dashboard => {
+                    console.log(dashboard);
+                    self.ReportItems = []
+                    Axios.get(process.env.VUE_APP_API + `Dashboard/Widgets?Dashboard_ID=${dashboard.id}`).then(
+                        r => {
+                            r.data.forEach(widget => {
+                                let item = {
+                                    ReportLayout: JSON.parse(widget.report_Layout),
+                                    key: widget.widget_Key,
+                                    text: widget.text,
+                                    value: widget.value,
+                                    id: widget.id
+                                }
+                                console.log("item", item);
+                                self.ReportItems.push(item)
+                                self.Layout.push(item.ReportLayout)
+                            })
+
+                        })
+                })
             },
             dragFinish(ev) {
                 let self = this;
@@ -150,28 +207,37 @@
             },
             saveDashboard() {
                 let self = this;
+                self.$refs.Prompt.show(null, "Enter a Name for the Dashboard", "Dashboard Name", name => {
+                    if (name != null) {
+                        let retVal = [];
+                        console.log("self.ReportItems", self.ReportItems);
 
-                let retVal = [];
+                        self.ReportItems.forEach(element => {
+                            var objToPush = {
+                                text: element.text,
+                                value: element.value,
+                                report_Layout: JSON.stringify(element.ReportLayout),
+                                widget_Key: element.key
+                            }
+                            retVal.push(objToPush);
+                        });
 
-                self.ReportItems.forEach(element => {
-                    var objToPush = Object.assign({}, element);
+                        let request = {
+                            ID: null,
+                            Name: name,
+                            Widgets: retVal
+                        };
 
-                    objToPush.ReportLayout = JSON.stringify(element.ReportLayout);
+                        console.log("request", request);
+                        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                    retVal.push(objToPush);
-                });
+                        Axios.post(process.env.VUE_APP_API + "Dashboard/CreateDashboard", request)
+                            .then(r => {
+                                console.log(r);
 
-                let request = {
-                    ID: null,
-                    Name: "",
-                    Widgets: retVal
-                };
-
-                console.log("request", self.ReportItems);
-
-                // self.post("Tenant/ReportDashboard", request).then(r => {
-                //   self.$router.push("/Reports");
-                // });
+                            });
+                    }
+                })
             },
             guid() {
                 function s4() {
@@ -212,17 +278,17 @@
                     h: 10,
                     i: self.guid()
                 };
-                if(config==null){
-                    config={
-                        text:null,
-                        value:null,
+                if (config == null) {
+                    config = {
+                        text: null,
+                        value: null,
                     }
                 }
                 self.ReportItems.push({
                     ReportLayout: item,
                     key: key,
                     text: config.text,
-                    value:config.value
+                    value: config.value
                 });
                 self.Layout.push(item);
             },
@@ -258,20 +324,17 @@
         /* box-shadow: 0px -1px 20px #888; */
     }
 
-    .grid-item {
-        border: 1px dotted;
-        background: lightgrey;
+    .editing {
+        height: calc(100% - 48px);
+        border: 2px dotted;
+
     }
 
-    .job-card-slider {
-        height: 100%;
-        align-items: flex-end;
-        display: flex;
-        width: calc(100% - 52px);
-        overflow: hidden;
-        scroll-behavior: smooth;
-        padding: 5px;
+    .Not_editing {
+        height: calc(100%);
+        border: 0px dotted;
     }
+
 
     .slider-button {
         height: 100%;
@@ -279,6 +342,11 @@
         display: flex;
         background: lightgrey;
     }
+
+    /* .scroll {
+        overflow-y: scroll;
+        overflow-x: auto;
+    } */
 </style>
 
 <style lang="css">
@@ -290,15 +358,11 @@
             margin-bottom: 10px;
         }
     }
-</style>
 
-<style scoped>
-    .scroll {
-        top: 50px;
-        position: absolute;
-        background: #6aa5d1;
-        height: calc(100vh - 240px);
-        overflow-y: scroll;
-        overflow-x: auto;
+    .grid-item {
+        /* background-color: grey; */
+        /* border: -1px dotted; */
+        /* box-shadow: 0px -1px 20px #888; */
+
     }
 </style>
