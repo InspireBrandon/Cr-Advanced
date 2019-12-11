@@ -33,8 +33,8 @@
                     <v-text-field v-if="!newData.rendering" v-model="newData.label" label="Label:"></v-text-field>
                   </v-flex>
                   <v-flex v-if="newData.type == 0 && !newData.rendering" lg8 md12 sm12 xs12>
-                    <v-select disabled placeholder="please select" :items="fixtureLabelOrders" v-model="newData.fixtureLabelOrder"
-                      label="Label order:">
+                    <v-select disabled placeholder="please select" :items="fixtureLabelOrders"
+                      v-model="newData.fixtureLabelOrder" label="Label order:">
                     </v-select>
                   </v-flex>
                   <v-flex v-if="newData.type == 0 && !newData.rendering" lg12 md12>
@@ -46,22 +46,24 @@
                     </v-radio-group>
                   </v-flex>
                   <v-flex lg8 md12 sm12 xs12>
-                    <v-select disabled placeholder="please select" v-if="newData.rendering" :items="types" v-model="newData.type"
-                      label="Type:">
+                    <v-select disabled placeholder="please select" v-if="newData.rendering" :items="types"
+                      v-model="newData.type" label="Type:">
                     </v-select>
                     <v-select disabled placeholder="please select" v-if="newData.type == 2" :items="fixtureTypes"
                       v-model="newData.fixtureType" label="Type:">
                     </v-select>
-                    <v-select disabled placeholder="please select" v-if="newData.type == 3" :items="subTypes" v-model="newData.fixtureType"
-                      label="Subtype:">
+                    <v-select disabled placeholder="please select" v-if="newData.type == 3" :items="subTypes"
+                      v-model="newData.fixtureType" label="Subtype:">
                     </v-select>
-                    <v-select disabled placeholder="please select" v-if="newData.type == 2 && newData.fixtureType == 1 && newData.rendering"
+                    <v-select disabled placeholder="please select"
+                      v-if="newData.type == 2 && newData.fixtureType == 1 && newData.rendering"
                       :items="renderingTypeShelf" v-model="newData.renderingType" label="Subtype:">
                     </v-select>
                   </v-flex>
                   <v-flex lg8 md12 sm12 xs12 v-if="!newData.rendering">
-                    <v-select placeholder="please select" v-if="(newData.fixtureType == 2 || newData.fixtureType == 3) && newData.type == 2"
-                      :items="pegs" v-model="newData.defaultPeg" label="Default peg:">
+                    <v-select placeholder="please select"
+                      v-if="(newData.fixtureType == 2 || newData.fixtureType == 3) && newData.type == 2" :items="pegs"
+                      v-model="newData.defaultPeg" label="Default peg:">
                     </v-select>
                   </v-flex>
                   <v-flex lg8 md12 sm12 xs12 v-if="!newData.rendering">
@@ -70,7 +72,8 @@
                     </v-select>
                   </v-flex>
                   <v-flex lg8 md12 sm12 xs12>
-                    <v-text-field type="number" label="Cost of Fixture" prefix="R" v-model="newData.cost"></v-text-field>
+                    <v-text-field type="number" label="Cost of Fixture" prefix="R" v-model="newData.cost">
+                    </v-text-field>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -92,17 +95,25 @@
                   <v-flex lg8 md12 v-if="!newData.rendering">
                     <v-text-field type="number" v-model="newData.depth" label="Depth:" suffix="cm"></v-text-field>
                   </v-flex>
-                  <v-flex lg8 md12 v-if="!newData.rendering && (newData.type == 2 && (newData.fixtureType == 0 || newData.fixtureType == 1))">
+                  <v-flex lg8 md12
+                    v-if="!newData.rendering && (newData.type == 2 && (newData.fixtureType == 0 || newData.fixtureType == 1))">
                     <v-text-field type="number" v-model="newData.overhang" label="Overhang:" suffix="cm"></v-text-field>
                   </v-flex>
                   <v-flex lg8 md12 v-if="!newData.rendering && newData.fixtureType == 3">
-                    <v-text-field type="number" v-model="newData.productOffset" label="Product offset:" suffix="cm"></v-text-field>
+                    <v-text-field type="number" v-model="newData.productOffset" label="Product offset:" suffix="cm">
+                    </v-text-field>
                   </v-flex>
                   <v-flex lg8 md12 v-if="newData.fixtureType == 2 && !newData.rendering">
-                    <v-text-field type="number" v-model="newData.xHoleSpacing" label="X hole spacing:" suffix="cm"></v-text-field>
+                    <v-text-field type="number" v-model="newData.xHoleSpacing" label="X hole spacing:" suffix="cm">
+                    </v-text-field>
                   </v-flex>
                   <v-flex lg8 md12 v-if="newData.fixtureType == 2 && !newData.rendering">
-                    <v-text-field type="number" v-model="newData.yHoleSpacing" label="Y hole spacing:" suffix="cm"></v-text-field>
+                    <v-text-field type="number" v-model="newData.yHoleSpacing" label="Y hole spacing:" suffix="cm">
+                    </v-text-field>
+                  </v-flex>
+                  <v-flex lg8 md12 v-if="!newData.rendering||newData.type == 2">
+                    <v-select v-model="newData.floorplanShape" :items="floorplanShapes" label="Floorplan Shape:"
+                      ></v-select>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -120,15 +131,18 @@
                       <div slot="header">General</div>
                       <v-flex lg12 md12 sm12 xs12>
                         <h3>Image</h3>
-                        <v-card class="elevation-5" @click="openFileExplorer" style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
+                        <v-card class="elevation-5" @click="openFileExplorer"
+                          style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
                           <img ref="changeImage" style="max-height: 150px; max-width: 150px;" src="" alt="">
                         </v-card>
                         <input ref="fileInput" style="display: none" @change="imageChange" type="file">
                       </v-flex>
                       <v-flex lg12 md12 sm12 xs12>
-                        <div v-show="newData.type == 2 && (newData.fixtureType == 0 || newData.fixtureType == 1) && !newData.rendering">
+                        <div
+                          v-show="newData.type == 2 && (newData.fixtureType == 0 || newData.fixtureType == 1) && !newData.rendering">
                           <h3>Bar image</h3>
-                          <v-card class="elevation-5" @click="openFileExplorerBar" style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
+                          <v-card class="elevation-5" @click="openFileExplorerBar"
+                            style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
                             <img ref="changeImageBar" style="max-height: 150px; max-width: 150px;" src="" alt="">
                           </v-card>
                           <input ref="fileInputBar" style="display: none" @change="imageChangeBar" type="file">
@@ -141,7 +155,8 @@
                         </div>
                       </v-flex>
                       <v-flex lg8 md12 sm12 xs12>
-                        <v-checkbox hide-details label="Transparent" v-model="newData.transparent" @change="handleTransparency"></v-checkbox>
+                        <v-checkbox hide-details label="Transparent" v-model="newData.transparent"
+                          @change="handleTransparency"></v-checkbox>
                       </v-flex>
                       <v-flex lg12 md12 sm12 xs12>
                         <div v-if="newData.type == 2 && newData.fixtureType == 2 && !newData.rendering">
@@ -160,7 +175,8 @@
                         <v-select placeholder="Render Image" :items="renderingselect" v-model="newData.renderImage"
                           label="Rendering:" @change="changeImageSelect">
                         </v-select>
-                        <v-card class="elevation-5" @click="openFileExplorerRender" style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
+                        <v-card class="elevation-5" @click="openFileExplorerRender"
+                          style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
                           <img ref="changeRenderImage" style="max-height: 150px; max-width: 150px;" src="" alt="">
                         </v-card>
                         <input ref="fileInputRender" style="display: none" @change="imageChangeRender" type="file">
@@ -168,13 +184,16 @@
 
                         <v-layout>
                           <v-flex>
-                            <v-text-field type="number" v-model="viewRender.height" label="Height:" suffix="cm" :rules=numberRules></v-text-field>
+                            <v-text-field type="number" v-model="viewRender.height" label="Height:" suffix="cm"
+                              :rules=numberRules></v-text-field>
                           </v-flex>
                           <v-flex>
-                            <v-text-field type="number" v-model="viewRender.width" label="Width:" suffix="cm" :rules=numberRules></v-text-field>
+                            <v-text-field type="number" v-model="viewRender.width" label="Width:" suffix="cm"
+                              :rules=numberRules></v-text-field>
                           </v-flex>
                           <v-flex>
-                            <v-text-field type="number" v-model="viewRender.yOffset" label="Y Offeset:" suffix="cm"></v-text-field>
+                            <v-text-field type="number" v-model="viewRender.yOffset" label="Y Offeset:" suffix="cm">
+                            </v-text-field>
                           </v-flex>
                         </v-layout>
                       </v-flex>
@@ -227,6 +246,13 @@
           depth: 1,
           yOffset: 0
         },
+        floorplanShapes: [{
+            text: "Square"
+          },
+          {
+            text: "Circle"
+          }
+        ],
         renderImageDimensions: {},
         renderingselect: [{
           text: 'None',
@@ -347,9 +373,9 @@
           if (self.newData.transparent == true) {
             self.newData.color = "transparent"
           } else {
-           self.newData.color = {
-            hex: "black"
-          }
+            self.newData.color = {
+              hex: "black"
+            }
           }
         })
       },
@@ -466,7 +492,8 @@
             }
             if (self.newData.RenderingsItems.Front.image != undefined && self.newData.RenderingsItems.Front.image !=
               null)
-              self.$refs.changeRenderImage.src = 'data:image/png;base64,' + self.newData.RenderingsItems.Front.image;
+              self.$refs.changeRenderImage.src = 'data:image/png;base64,' + self.newData.RenderingsItems.Front
+              .image;
 
 
             else

@@ -795,7 +795,7 @@ function MapImage(MapID) {
 }
 
 function checkMapping(vueCtx) {
-    
+    console.log(vueCtx.$route.name);
     if (vueCtx.$route.name == "/map/:params") {
         redrawMap()
     } else {
