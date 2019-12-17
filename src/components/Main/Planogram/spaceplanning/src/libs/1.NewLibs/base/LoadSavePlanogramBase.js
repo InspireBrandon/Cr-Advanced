@@ -1397,6 +1397,8 @@ class LoadSavePlanogramBase {
 
 function generateFloorPlanArr(planodata) {
   let self = this
+  console.log("planodata", planodata);
+
   let floorArr = []
   let baseItem = {
     id: null,
@@ -1418,6 +1420,7 @@ function generateFloorPlanArr(planodata) {
         height: item.Data.Data.depth,
         width: item.Data.Data.width,
         depth: item.Data.Data.height,
+        shape: item.Data.Data.floorplanShape,
         name: item.Data.Data.name,
         children: getChildren(planodata, item.Data.ID)
       })
@@ -1439,6 +1442,7 @@ function getChildren(planodata, parentID) {
       height: fixture.Data.Data.depth,
       width: fixture.Data.Data.width,
       name: fixture.Data.Data.name,
+      shape: fixture.Data.Data.floorplanShape,
       depth: fixture.Data.Data.height,
       children: getChildren(planodata, fixture.Data.ID)
     })
