@@ -15,22 +15,22 @@
                     :disabled="selectedProjectGroup == null" @change="onProjectOrStoreChange" v-model="selectedProject"
                     :items="projects" label="Project" hide-details>
                 </v-autocomplete>
-                <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 200px" v-model="selectedStore"
+                <v-autocomplete  style="margin-left: 10px; margin-top: 8px; width: 200px" v-model="selectedStore"
                     :items="stores" label="stores" @change="onProjectOrStoreChange">
 
                 </v-autocomplete>
 
                 <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 200px"
-                    :disabled="selectedStore != null" v-model="selectedStoreCluster" :items="storeClusters"
+                    :disabled="selectedStore != null" @change="getDistributedPlanograms" v-model="selectedStoreCluster" :items="storeClusters"
                     label="Store Cluster" hide-details return-object>
                 </v-autocomplete>
 
-                <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 200px"
+                <v-autocomplete @change="getDistributedPlanograms" style="margin-left: 10px; margin-top: 8px; width: 200px"
                     :disabled="selectedProject == null || selectedStore != null" v-model="selectedCustomCluster"
                     :items="customClusters" label="Custom Cluster" hide-details return-object>
                 </v-autocomplete>
 
-                <v-autocomplete style="margin-left: 10px; margin-top: 8px; width: 200px"
+                <v-autocomplete @change="getDistributedPlanograms" style="margin-left: 10px; margin-top: 8px; width: 200px"
                     :disabled="selectedProject == null || selectedStore != null" v-model="selectedCategoryCluster"
                     :items="categoryClusters" label="Category Cluster" hide-details return-object>
                 </v-autocomplete>

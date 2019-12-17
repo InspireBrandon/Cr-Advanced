@@ -38,7 +38,7 @@ export default {
           route: "/TestingView"
         },
         {
-          name: "tmpFloorplanfilteringTest",
+          name: "floorplan filter",
           route: "/tmpFloorplanfilteringTest"
         }
       ]
