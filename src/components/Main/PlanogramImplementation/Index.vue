@@ -646,7 +646,6 @@
                             .then(r => {
                                 delete Axios.defaults.headers.common["TenantID"];
                                 self.projects = r.data.projectList;
-                                console.log(self.projects);
 
                                 self.projectsSelect = [];
 
@@ -814,7 +813,8 @@
 
                                 if (element.deleted != true) {
                                     if (!hasIn) {
-                                        if (element.status == self.routeStatus) {
+
+                                        if (element.status == self.routeStatus && element.systemFileID == self.$route.params.planogramID) {
                                             self.tmpRequest = element;
                                             hasIn = true;
                                         }
@@ -1108,6 +1108,8 @@
                 self.Disableapprove = true
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
+
+                console.log(self.tmpRequest)
 
                 let request = JSON.parse(JSON.stringify(self.tmpRequest))
 

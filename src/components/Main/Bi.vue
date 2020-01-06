@@ -10,7 +10,7 @@
             <v-btn color="primary" @click="printReport">Print</v-btn>
             <!-- <v-btn color="primary" @click="switchMode">{{ currentMode == "edit" ? "View" : "Edit" }}</v-btn> -->
         </v-toolbar>
-        <div ref="reportContainer" id="reportContainer" style="width: 100%; height: calc(100vh - 128px);"></div>
+        <div ref="reportContainer" id="reportContainer" style="width: 100%; height: calc(100vh - 110px);"></div>
         <Spinner ref="Spinner" />
     </div>
 </template>

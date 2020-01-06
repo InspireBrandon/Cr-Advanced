@@ -26,9 +26,6 @@ LicenseManager.setLicenseKey("Evaluation_License-_Not_For_Production_Valid_Until
 
 import 'ag-grid-enterprise/chartsModule';
 
-import FloorPlanningSettings from './components/Main/FloorPlanning2D/views/Settings'
-Vue.component('floor-planning-settings', FloorPlanningSettings)
-
 Vue.use(VueKonva)
 Vue.use(VueHTMLEditor)
 

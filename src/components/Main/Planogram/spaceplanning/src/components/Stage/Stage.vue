@@ -174,6 +174,7 @@
       //#endregion
 
       var scaleBy = 1.05;
+
       stage.addEventListener('wheel', (e) => {
         //e.preventDefault();
         // var stage = self.$refs.stage.getStage();
@@ -1893,6 +1894,7 @@
     }
   };
 </script>
+
 <style scoped>
   .canvasOperations {
     width: calc(100% - 10px);
