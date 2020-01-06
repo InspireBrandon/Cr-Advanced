@@ -1,12 +1,44 @@
 <template>
     <div>
-        <v-toolbar dense dark color="primary"></v-toolbar>
+        <v-toolbar dark color="primary">
+            <v-btn icon @click="$router.push('/Home')">
+                <v-icon>home</v-icon>
+            </v-btn>
+            <span class="title ml-3 mr-5">Chain&nbsp;<span class="font-weight-light">Research</span></span>
+        </v-toolbar>
         <v-toolbar dense dark>
-            <!-- <v-btn @click="addRect">add rect</v-btn>
+            <v-toolbar-items>
+                <v-menu dark offset-y style="margin-bottom: 10px;">
+                    <v-btn slot="activator" flat>
+                        File
+                    </v-btn>
+                    <v-list dense class="px-2">
+                        <v-list-tile>
+                            <v-list-tile-title>New</v-list-tile-title>
+                        </v-list-tile>
+                        <v-divider></v-divider>
+                        <v-list-tile>
+                            <v-list-tile-title>Open</v-list-tile-title>
+                        </v-list-tile>
+                        <v-divider></v-divider>
+                        <v-list-tile>
+                            <v-list-tile-title>Save</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile>
+                            <v-list-tile-title>Save As</v-list-tile-title>
+                        </v-list-tile>
+                        <v-divider></v-divider>
+                        <v-list-tile>
+                            <v-list-tile-title>Close</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
+            </v-toolbar-items>
+            <v-btn @click="addRect">add rect</v-btn>
             <v-btn @click="addCircle">add circle</v-btn>
             <v-btn @click="selectImage">add image</v-btn>
             <v-btn @click="addLabel">add label</v-btn>
-            <v-btn @click="duplicate">duplicate</v-btn> -->
+            <v-btn @click="duplicate">duplicate</v-btn>
             <v-spacer></v-spacer>
             <v-btn-toggle v-model="mode" mandatory @change="toggleMode">
                 <v-btn :value="0" flat>
@@ -16,13 +48,16 @@
                     <v-icon>brush</v-icon>
                 </v-btn>
             </v-btn-toggle>
+            <v-toolbar-title>Floor Planning</v-toolbar-title>
         </v-toolbar>
         <v-container grid-list-xs class="ma-0 pa-0" fluid>
             <div style="display: flex;">
                 <div class="toolbar grey darken-4">
                     <v-layout row wrap class="pt-3">
                         <v-flex sm12 class="pa-1" v-for="(tool, idx) in tools" :key="idx">
-                            <v-card :color="selectedTool == tool ? '#111111' : '#212121'" class="selected-tool mb-1 pa-1" dark flat style="text-align: center; cursor: pointer;" @click="selectedTool = tool">
+                            <v-card :color="selectedTool == tool ? '#111111' : '#212121'"
+                                class="selected-tool mb-1 pa-1" dark flat style="text-align: center; cursor: pointer;"
+                                @click="selectedTool = tool">
                                 <v-icon :size="25">{{ tool }}</v-icon>
                             </v-card>
                             <v-divider dark></v-divider>
@@ -30,6 +65,9 @@
                     </v-layout>
                 </div>
                 <v-layout row wrap>
+                    <!-- <v-flex sm12 class="pa-0">
+                        <Settings class="fill-height" />
+                    </v-flex> -->
                     <v-flex sm10 class="pa-0">
                         <v-card tile flat id="stage_container" class="fill-height" :style="{ 'cursor': currentCursor }">
                             <div id="container"></div>
@@ -48,10 +86,6 @@
                                 </v-text-field>
                                 <v-text-field type="number" label="Width" v-model="properties.width" hide-details>
                                 </v-text-field>
-                                <!-- <v-text-field @change="propChange('fill')" type="color" label="Color"
-                                v-model="properties.fill" hide-details>
-                            </v-text-field> -->
-                                <!-- <v-slider discrete thumb-label v-model="value" step="10" ticks="always"></v-slider> -->
                             </v-card-text>
                             <v-toolbar v-if="mode == 1" dark dense flat color="grey darken-3">
                                 <v-toolbar-title>
@@ -83,7 +117,7 @@
                                     </v-list>
                                 </v-menu>
                             </v-toolbar>
-                            <v-card-text class="pa-0 pt-2" style="height: 59%; overflow-y: scroll;">
+                            <v-card-text class="pa-0 pt-2" style="height: 57%; overflow-y: scroll;">
                                 <div v-for="(layer, idx) in layers" :key="idx">
                                     <div style="display: flex;" class="pa-2"
                                         @click="layer.attrs.showChildren = !layer.attrs.showChildren">
@@ -142,6 +176,8 @@
     import Line from './libs/drawing/shape/line'
     import StageImage from './libs/drawing/shape/image'
 
+    import Settings from './Settings'
+
     const meterPixelRatio = 3779.5275590551;
 
     var height = 0;
@@ -155,9 +191,11 @@
     }
 
     export default {
+        components: {
+            Settings
+        },
         data() {
             return {
-                selectedTool: null,
                 ctrlDown: false,
                 stage: null,
                 layer: null,
@@ -177,8 +215,27 @@
                     snapOption: 15,
                     snappingAngles: []
                 },
-                tools: ['view_carousel', 'fiber_manual_record', 'show_chart', 'image', 'local_offer', 'arrow_upward'],
-                currentCursor: 'crosshair'
+                tools: ['open_with', 'view_carousel', 'fiber_manual_record', 'show_chart', 'image', 'local_offer',
+                    'arrow_upward'
+                ],
+                selectedTool: 'open_with',
+                // currentCursor: 'default'
+            }
+        },
+        computed: {
+            currentCursor() {
+                let self = this;
+
+                switch (self.mode) {
+                    case modes.draw: {
+                        return 'crosshair';
+                    }
+                    break;
+                case modes.move: {
+                    return 'default';
+                }
+                break;
+                }
             }
         },
         methods: {
