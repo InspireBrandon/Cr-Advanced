@@ -26,18 +26,11 @@
           </v-list-tile>
         </v-list>
       </v-menu>
-
       <v-btn v-if="!viewOnlyMode" flat @click="openImport">Import</v-btn>
-
       <v-spacer></v-spacer>
       <v-toolbar-title>Maps</v-toolbar-title>
     </v-toolbar>
     <v-toolbar dark flat>
-      <!-- <span v-if="chart!=null">
-        {{lastCLicked}}
-      </span>
-    
-      <v-btn @click="log"></v-btn> -->
       <v-spacer></v-spacer>
       <v-toolbar-title>{{title}}</v-toolbar-title>
 
@@ -62,10 +55,6 @@
               <v-toolbar dark flat dense color="primary">
                 <v-toolbar-title>Market Share</v-toolbar-title>
                 <v-spacer></v-spacer>
-                <v-toolbar-items>
-                  <!-- <v-select style="margin-left: 10px;  width: 200px" placeholder="Select to see market share"
-                        v-model="selectedCategory" :items="categories" hide-details></v-select> -->
-                </v-toolbar-items>
               </v-toolbar>
               <v-card height="calc(100vh - 273px)" style="overflow:auto;">
                 <v-card>
@@ -98,19 +87,12 @@
     <div oncontextmenu="return false;" class="mapContainer">
       <v-layout>
 
-        <!-- <v-flex :md9="openSideBar" :md12="!openSideBar"> -->
         <v-flex md12>
 
           <div id="thisone2" class="map" ref="thisone2"></div>
         </v-flex>
-        <!-- <v-flex md3 v-if="openSideBar">
-          <div>
-            
-          </div>
-        </v-flex> -->
       </v-layout>
     </div>
-    <input type="file" style="display: none;" ref="fileInput" @change="onImageChange" />
     <YesNoModal ref="yesNo"></YesNoModal>
     <Spinner ref="Spinner" />
     <RetailerImportModal ref="RetailerImportModal" />
@@ -143,7 +125,7 @@
   import squareModal from "./squareModal";
 
 
-  
+
   import MapComponent from "./Index";
 
   import {
@@ -151,7 +133,6 @@
   } from '@/libs/events/event-bus.js';
 
 
-  // http://www.climbing.co.za/wp-content/uploads/2012/10/rsamap.png
   const formatter = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
@@ -176,20 +157,12 @@
       return {
         title: null,
         openSideBar: false,
-        // static Series Data holders
         retailerData: [],
-
-        lastCLicked: null,
         // start sidebar setup
         useRetailerMap: false,
         selectedRetailers: [],
         selectedRetailersFields: [],
-        setupMapData: [],
         // end sidebar setup
-        SupplierData: null,
-        labels: true,
-        lines: false,
-        radius: 20,
         stores: [],
         imageHeight: null,
         imageWidth: null,
@@ -198,39 +171,13 @@
         imgURL: "",
         imageLinkAddress: "",
         fileData: null,
-        canPlot: false,
-        useImportStores: false,
-        SystemUser_ID: null,
         maps: [],
         selectedmap: null,
         MapImgURL: "",
         legendImgURL: "",
-        supplierImport: [],
-        clusters: [{
-          text: "store",
-          value: "store"
-        }, {
-          text: "basket",
-          value: "basket"
-        }, {
-          text: "listing",
-          value: "listing"
-        }, {
-          text: "custom",
-          value: "custom"
-        }, ],
-        color: [
-          am4core.color("rgb(255,99,71)"),
-          am4core.color("rgb(255,255,0)"),
-          am4core.color("rgb(0,204,0)"),
-          am4core.color("rgb(255,128,0)"),
-          am4core.color("rgb(204,0,204)")
-        ],
         chart: null,
         accrossCities: [],
         majorCities: [],
-        acrossArr: [],
-        sideArr: [],
         geoGridData: [],
         drawGrid: false,
         alpharray: [{
@@ -289,13 +236,10 @@
             rangeEnd: 110
           }
         ],
-        selectedCategory: null,
         viewOnlyMode: false,
-        seriesDataRef: [],
         containerHeight: 0,
         containerWidth: 0,
-        focusMarketShare: false,
-        event_data:null,
+        event_data: null,
       };
 
     },
@@ -314,10 +258,8 @@
                   }
                 }
               }
-
             });
           }
-
         }
         return retVal;
       }
@@ -325,15 +267,13 @@
     mounted() {
       let self = this;
       self.$refs.Spinner.show()
-
       if (self.$route.params.params != null) {
         self.viewOnlyMode = true
       } else {
         self.viewOnlyMode = false
       }
-      self.getSupplierStores();
+
       self.getGeoGrid(() => {
-        self.getmaps();
         self.getCities();
         self.getRetailers();
         EventBus.$emit('MAPPING_LOADED');
@@ -371,7 +311,6 @@
       },
       openRetailerSupplierStorDialog() {
         let self = this;
-
         self.$refs.RetailerSupplierStoreDialog.show();
       },
       linkRetailerStore() {
@@ -405,7 +344,6 @@
           Axios.post(
             process.env.VUE_APP_API + `SuplierLocationImportTX/MArketShare`, data
           ).then(r => {
-            console.log("getMarketShare", r.data);
 
             self.geoGridData = r.data
             self.openSideBar = true
@@ -444,40 +382,8 @@
           });
         })
       },
-      MapStoreData(el) {
-        let self = this;
-        let retVal = []
-        if (el.regionValues.length > 0) {
-          el.regionValues.forEach(e => {
-            // if (e.planogram_ID == self.selectedCategory) {
-            retVal.push({
-              name: e.header_Name,
-              sales: e.sales
-            })
-
-            // }
-          })
-        }
-        return retVal;
-      },
-      getSupplierStores() {
-        let self = this
-        Axios.defaults.headers.common["TenantID"] =
-          sessionStorage.currentDatabase;
-
-        let encoded_details = jwt.decode(sessionStorage.accessToken);
-
-        Axios.get(
-          process.env.VUE_APP_API +
-          `SuplierLocationImportTX/ByUser?userID=${encoded_details.USER_ID}`
-        ).then(r => {
-
-          self.supplierImport = r.data
-        })
-      },
       getRectWidth() {
         let self = this
-        self.lastCLicked = self.chart.zoomGeoPoint
         self.chart.goHome(0);
         var elMain = document.querySelector(
           "#thisone2"
@@ -495,15 +401,13 @@
           self.imageHeight = el.getBoundingClientRect().height
           self.imageWidth = el.getBoundingClientRect().width
         }
-        console.log(self.imageHeight);
-        console.log(self.imageWidth);
+
 
       },
-      openSquareModal(square){
-        let self = this 
-        console.log(square);
+      openSquareModal(square) {
+        let self = this
         self.$refs.squareModal.open(square, self.event_data.MarketShare[0])
-        
+
       },
       DrawGeoGrid(chart, callback) {
         let self = this;
@@ -557,38 +461,28 @@
             geoPolygon: arr
           }];
           shapeTemplate.tooltipText = self.checkAlphaNumber(idx);
-          shapeTemplate.events.on('hit',function(){
+          shapeTemplate.events.on('hit', function () {
             self.openSquareModal(e)
           })
           shapeSeries.name = "block";
-          // if (e.regionValues != null) {
-          //   shapeTemplate.tooltipText = self.checkAlphaNumber(idx) + " stores:" + e.regionValues.length;
-          // } else {
-          //   shapeTemplate.tooltipText = self.checkAlphaNumber(idx);
-          // }
-
-          // shapeSeries.heatRules.push({
-          //   property: "fill",
-          //   target: polygonSeries.mapPolygons.template,
-          //   min: chart.colors.getIndex(1).brighten(1),
-          //   max: chart.colors.getIndex(1).brighten(-0.3)
-          // });
-          var labelSeries = chart.series.push(new am4maps.MapImageSeries());
-          labelSeries.hiddenInLegend = true;
-          var labelTemplate = labelSeries.mapImages.template.createChild(
-            am4core.Label
-          );
-          labelTemplate.horizontalCenter = "middle";
-          labelTemplate.verticalCenter = "middle";
-          labelTemplate.fontSize = 14;
-          labelTemplate.interactionsEnabled = false;
-          labelTemplate.nonScaling = true;
-          labelTemplate.hiddenInLegend = true;
 
 
 
           // Set up label series to populate
           if (idx == 0) {
+            var labelSeries = chart.series.push(new am4maps.MapImageSeries());
+            labelSeries.hiddenInLegend = true;
+            var labelTemplate = labelSeries.mapImages.template.createChild(
+              am4core.Label
+            );
+            labelTemplate.horizontalCenter = "middle";
+            labelTemplate.verticalCenter = "middle";
+            labelTemplate.fontSize = 14;
+            labelTemplate.interactionsEnabled = false;
+            labelTemplate.nonScaling = true;
+            labelTemplate.hiddenInLegend = true;
+
+
             shapeSeries.events.on("inited", function () {
               shapeSeries.mapPolygons.each(function (polygon) {
                 var label = labelSeries.mapImages.create();
@@ -607,6 +501,20 @@
               });
             });
           } else if (idx > 0 && idx < 10) {
+
+            var labelSeries = chart.series.push(new am4maps.MapImageSeries());
+            labelSeries.hiddenInLegend = true;
+            var labelTemplate = labelSeries.mapImages.template.createChild(
+              am4core.Label
+            );
+            labelTemplate.horizontalCenter = "middle";
+            labelTemplate.verticalCenter = "middle";
+            labelTemplate.fontSize = 14;
+            labelTemplate.interactionsEnabled = false;
+            labelTemplate.nonScaling = true;
+            labelTemplate.hiddenInLegend = true;
+
+
             shapeSeries.events.on("inited", function () {
               shapeSeries.mapPolygons.each(function (polygon) {
                 var label = labelSeries.mapImages.create();
@@ -619,6 +527,19 @@
               });
             });
           } else if (idx % 10 === 0) {
+            var labelSeries = chart.series.push(new am4maps.MapImageSeries());
+            labelSeries.hiddenInLegend = true;
+            var labelTemplate = labelSeries.mapImages.template.createChild(
+              am4core.Label
+            );
+            labelTemplate.horizontalCenter = "middle";
+            labelTemplate.verticalCenter = "middle";
+            labelTemplate.fontSize = 14;
+            labelTemplate.interactionsEnabled = false;
+            labelTemplate.nonScaling = true;
+            labelTemplate.hiddenInLegend = true;
+
+
             var found = self.alpharray.find(el => {
               return el.rangeStart == idx;
             });
@@ -645,12 +566,10 @@
           sessionStorage.currentDatabase;
 
         let encoded_details = jwt.decode(sessionStorage.accessToken);
-
         Axios.get(
           process.env.VUE_APP_API + `SuplierLocationImportTX/GeoReport?userID=${encoded_details.USER_ID}`
         ).then(r => {
           self.geoGridData = r.data;
-
           self.getHinterlandStores();
           callback()
         });
@@ -670,52 +589,6 @@
           });
         });
       },
-      submitSidebar() {
-        let self = this;
-
-        let tmp = {
-          retailerMap: []
-        };
-
-        let imageDetails = {
-          imageType: "none",
-          imgURL: self.MapImgURL,
-          imageLinkAddress: null
-        };
-
-        let item = {
-          useRetailerMap: self.useRetailerMap,
-          useImportStores: self.useImportStores,
-          imageDetails: imageDetails,
-          drawGrid: self.drawGrid,
-          selectedRetailers: self.selectedRetailersFields
-        };
-
-        if (self.useRetailerMap) {
-          self.selectedRetailersFields.forEach(field => {
-            tmp.retailerMap.push(field);
-          });
-        }
-        self.config = item;
-        self.setupMapData = tmp
-        self.drawMap(item, tmp);
-      },
-      GetField(field, callback) {
-        let self = this
-        let tmp = []
-        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-        Axios.get(
-          process.env.VUE_APP_API + `RetailerStore?retailerID=${field}`
-        ).then(r => {
-          r.data.retailerStoreList.forEach(e => {
-            e.image = process.env.VUE_APP_API + `Retailer/Image?retailerID=${field}`;
-            tmp.push(e)
-
-          });
-          callback(tmp);
-        })
-
-      },
       setFieldImages(items, callback) {
         let self = this
         items.forEach((e, idx) => {
@@ -727,17 +600,13 @@
       buildGraphArr(fields, store, callback) {
         let self = this;
         let tmp = []
-        console.log("fields", fields);
 
         if (store.length > 0) {
           fields.push(store[0])
         }
         if (fields.length > 0) {
-
           Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
           Axios.post(process.env.VUE_APP_API + `RetailerStore/Multiple`, fields).then(r => {
-            // tmp = r.data.retailerStoreList
-            console.log("buildGraphArr", r);
 
             self.setFieldImages(r.data.retailerStoreList, formattedData => {
               tmp = formattedData
@@ -754,7 +623,6 @@
         self.getRectWidth()
         self.$refs.MapImageSelector.show(callback => {
           if (callback.name == "None") {
-            self.lines = false;
             self.selectedmap = null;
             self.drawMap({
                 imageDetails: {
@@ -767,7 +635,6 @@
               null
             );
           } else {
-            self.lines = false;
             self.selectedmap = callback.id;
             self.onMapChange();
           }
@@ -776,7 +643,6 @@
       onMapChange(callback) {
         let self = this;
         self.$nextTick(() => {
-          console.log(self.selectedmap);
           if (self.selectedmap == undefined) {
             self.selectedmap = null
             callback()
@@ -791,45 +657,6 @@
           }
         });
       },
-      getmaps() {
-        let self = this;
-        Axios.defaults.headers.common["TenantID"] =
-          sessionStorage.currentDatabase;
-
-        Axios.get(process.env.VUE_APP_API + `MapImage`).then(r => {
-          self.maps = [];
-          self.maps.push({
-            text: "None",
-            value: null
-          });
-          r.data.forEach(e => {
-            self.maps.push({
-              text: e.name,
-              value: e.id
-            });
-          });
-        });
-      },
-      openFileDialog() {
-        let self = this;
-        self.$refs.fileInput.value = null;
-        self.$refs.fileInput.click();
-      },
-      onImageChange(e) {
-        let self = this;
-        const files = e.target.files;
-        let file = files[0];
-        self.blobToDataUrl(file, url => {
-          self.imgURL = url;
-        });
-      },
-      blobToDataUrl(blob, callback) {
-        var a = new FileReader();
-        a.onload = function () {
-          callback(a.result);
-        };
-        a.readAsDataURL(blob);
-      },
       getCities() {
         let self = this;
         let cities = require("@/assets/CITIES/CITIES.json");
@@ -839,14 +666,6 @@
         let accross = cities.filter(e => {
           return !e.major;
         });
-        self.seriesDataRef.push({
-          name: "Major Cities",
-          data: major
-        })
-        self.seriesDataRef.push({
-          name: "Minor Cities",
-          data: accross
-        })
         self.majorCities = major;
         self.accrossCities = accross;
       },
@@ -859,7 +678,6 @@
       },
       prepareStoreResults(storeData) {
         let self = this;
-
         let stores = storeData.filter(e => {
           return e.siteType == "SHOP";
         });
@@ -915,11 +733,8 @@
 
         var image = new am4core.Image();
         polygonTemplate.tooltipColorSource = "rgb(103,148,220)";
-        // var height = this.$refs.thisone2.clientHeight;
         image.width = self.imageWidth;
         image.height = self.imageHeight;
-
-
 
         pattern_europe.x = (self.containerWidth - image.width) / 2
         pattern_europe.y = self.containerHeight - image.height
@@ -933,7 +748,6 @@
           pattern_europe.addElement(image.element);
           polygonTemplate.fill = pattern_europe;
           polygonTemplate.strokeOpacity = 1;
-
         } else {
           polygonTemplate.fill = chart.colors.getIndex(1);
           polygonTemplate.strokeOpacity = 1;
@@ -955,12 +769,6 @@
         imageSeriesTemplate.propertyFields.longitude = "yCoordinate";
         imageSeriesTemplate.nonScaling = true;
         imageSeriesTemplate.fill = "black";
-
-        // var retailCircle = imageSeriesTemplate.createChild(
-        //   am4core.Circle
-        // );
-        // retailCircle.fillOpacity = 0.5;
-        // retailCircle.radius = 3;
 
         let storeImage = imageSeriesTemplate.createChild(am4core.Image);
         storeImage.propertyFields.href = "image"
@@ -1069,13 +877,13 @@
         if (self.chart != null) {
           self.chart.dispose()
         }
-        let formattedData = [];
         let chart = am4core.create("thisone2", am4maps.MapChart);
         chart.name = "Map";
         chart.projection = new am4maps.projections.Miller();
         var title = chart.titles.create();
-        // title.text = "[bold font-size: 20]Store Sales Heatmap[/]";
         title.textAlign = "middle";
+        chart.zoomDuration=0.5;
+        chart.updateOnReleaseOnly=true
 
         let asd = am4geodata_worldLow;
         chart.geodata = asd;
@@ -1097,26 +905,27 @@
 
         if (self.drawGrid) {
           self.DrawGeoGrid(chart, callback => {
-
             self.drawRetailerMap(chart);
-
+            console.log("[CHART SERIES]", chart.series);
           });
+        } else {
+          self.drawRetailerMap(chart);
         }
 
         self.chart = chart
+
+
         self.$refs.Spinner.hide()
       },
       setChartData(eventData, callback) {
         let self = this
         self.buildGraphArr(eventData.retailers, eventData.Store, retailerCallback => {
           self.retailerData = retailerCallback
-          console.log("retailerCallback", retailerCallback);
 
           callback()
         })
       },
       formatNumber(regionValues) {
-        // log
         let string = ""
         let percentage = 0
         if (regionValues.length == 1) {
@@ -1124,17 +933,10 @@
         }
         string = percentage.toFixed(2)
 
-     let salesstring =    formatter.format(regionValues[0].otherSales).replace("$", "R");
-        // if (storeSales > 0 && totalSales != 0) {
-
-        // percentage = (Math.random() * (10 - 9)) + 9;
-        // string = (percentage * 10).toFixed(2)
-        // string = ((storeSales / totalSales) * 100).toFixed(2)
+        let salesstring = formatter.format(regionValues[0].otherSales).replace("$", "R");
         string += "%"
 
-        string+="  Sales: "+salesstring
-
-        // }
+        string += "  Sales: " + salesstring
         return string
       },
       checkAlphaNumber(blockNumber) {

@@ -129,6 +129,9 @@ import Bi from '@/components/Main/Bi'
 // Dashboard Designer 
 import DashboardDesigner from '@/components/Main/DashboardDesigner/Index'
 
+// temp filter test
+import tmpFloorplanfilteringTest from '@/components/Main/tmpFloorplanfilteringTest'
+
 // Data mapping
 import ImportDataMapper from '@/components/Main/ImportDataMapper/Index'
 import ImportStoreMapper from '@/components/Main/ImportDataMapper/Sections/Store/Index'
@@ -174,6 +177,11 @@ export default new Router({
       path: '/FloorPlanning2D',
       name: 'floor_planning_2d',
       component: FloorPlanning2D
+    },
+    {
+      path: '/tmpFloorplanfilteringTest',
+      name: 'tmpFloorplanfilteringTest',
+      component: tmpFloorplanfilteringTest
     },
     {
       path: '/',
