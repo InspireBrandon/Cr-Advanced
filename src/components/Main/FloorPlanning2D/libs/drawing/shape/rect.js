@@ -12,17 +12,40 @@ class Rect extends Shape {
 
     create() {
         let self = this;
+        let rectGroup = new Konva.Group({
+            visible: true,
+            showEditName: true,
+            selected: true,
+            showChildren: true,
+            draggable: true,
+            name:"rect-group",
+            width:50,
+            height:50
+
+        })
 
         self.shape = new Konva.Rect({
             height: 50,
             width: 50,
             fill: "#1976d2",
-            draggable: true,
+            // draggable: true,
             visible: 'inherit',
-            enabledAnchors: self.enabledAnchors
+            enabledAnchors: self.enabledAnchors,
+            name: "rect"
+        });
+        let line = new Konva.Rect({
+
+            name: "front-Line",
+            height: 5,
+            width: 50,
+            fill: "red",
+            // draggable: true,
+            visible: true,
         });
 
-        self.parent.add(self.shape);
+        rectGroup.add(self.shape)
+        rectGroup.add(line)
+        self.parent.add(rectGroup);
         self.parent.draw();
     }
 }

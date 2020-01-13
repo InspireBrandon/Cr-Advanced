@@ -100,11 +100,13 @@
                             <v-toolbar dark dense flat color="grey darken-3">
                                 <v-toolbar-title>
                                     <div>Layers</div>
+                                    <div v-if="selectedLayer!=null">
+                                    </div>
                                 </v-toolbar-title>
                                 <v-spacer></v-spacer>
                                 <v-menu offset-y>
                                     <template v-slot:activator="{ on }">
-                                        <v-btn v-on="on" small color="primary">add</v-btn>
+                                        <v-btn v-on="on" small @click="log" color="primary">add</v-btn>
                                     </template>
                                     <v-list dense class="pa-0">
                                         <v-list-tile tile @click="addLayer">
@@ -118,7 +120,7 @@
                                 </v-menu>
                             </v-toolbar>
                             <v-card-text class="pa-0 pt-2" style="height: 57%; overflow-y: scroll;">
-                                <div v-for="(layer, idx) in layers" :key="idx">
+                                <!-- <div v-for="(layer, idx) in layers" :key="idx">
                                     <div style="display: flex;" class="pa-2"
                                         @click="layer.attrs.showChildren = !layer.attrs.showChildren">
                                         <input @change="selectLayer(layer)" v-model="layer.attrs.selected"
@@ -157,7 +159,11 @@
                                             <v-divider></v-divider>
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
+                                <RecursiveLayer :showChild="true" :layers="layers" :selectLayer="selectLayer"
+                                    :setLayerVisible="setLayerVisible" :deleteLayer="deleteLayer" :endDrag="endDrag"
+                                    :startDrag="startDrag" :selectedLayer="selectedLayer" />
+
                             </v-card-text>
                         </v-card>
                     </v-flex>
@@ -177,6 +183,7 @@
     import StageImage from './libs/drawing/shape/image'
 
     import Settings from './Settings'
+    import RecursiveLayer from "./RecursiveLayer.vue"
 
     const meterPixelRatio = 3779.5275590551;
 
@@ -192,10 +199,17 @@
 
     export default {
         components: {
-            Settings
+            Settings,
+            RecursiveLayer
         },
         data() {
             return {
+                snapableItems: ['.wall', '.rect-group', '.circle'],
+                dragItem: null,
+                dragParent: null,
+                dragidx: null,
+                panX: 0,
+                panY: 0,
                 ctrlDown: false,
                 stage: null,
                 layer: null,
@@ -239,6 +253,31 @@
             }
         },
         methods: {
+            endDrag(item, parent) {
+                let self = this
+                if (self.dragItem != null) {
+
+                    item.children.push(self.dragItem)
+
+                    self.selectLayer(item, parent)
+                    self.dragParent.splice(self.dragidx, 1)
+                    self.dragItem = null
+                    self.dragParent = null
+                    self.dragidx = null
+                }
+
+            },
+            startDrag(item, idx, layers) {
+                let self = this
+                self.dragItem = item
+                self.dragParent = layers
+                self.dragidx = idx
+            },
+            log() {
+                let self = this
+                console.log("log", self.stage);
+
+            },
             updateSnappingAngles() {
                 let self = this;
 
@@ -339,21 +378,21 @@
                     visible: true,
                     showEditName: true,
                     selected: true,
-                    showChildren: false
+                    showChildren: false,
+                    drawType: "Layer"
                 })
 
                 self.layers.forEach(el => {
                     el.attrs.selected = false;
                 })
 
-                self.selectLayer(layer)
-
                 self.layers.unshift(layer);
                 self.stage.add(layer);
+                self.selectLayer(layer, self.layers)
 
-                setTimeout(() => {
-                    self.$refs["editLayer0"][0].focus();
-                }, 250);
+                // setTimeout(() => {
+                //     // self.$refs["editLayer"][0].focus();
+                // }, 250);
             },
             addGroup() {
                 let self = this;
@@ -362,28 +401,29 @@
                     name: "Group 1",
                     visible: true,
                     showEditName: true,
-                    selected: true
+                    selected: true,
+                    showChildren: true
+
                 })
 
                 self.selectedLayer.add(group);
-                self.selectLayer.draw();
+                self.selectedLayer.draw();
             },
-            selectLayer(layer) {
+            selectLayer(layer, parent) {
                 let self = this;
 
                 self.$nextTick(() => {
-                    self.layers.forEach(el => {
-                        el.attrs.selected = false;
+                    if (parent != undefined) {
+                        parent.forEach(el => {
+                            el.attrs.selected = false;
 
-                        el.children.forEach(child => {
-                            child.draggable(false);
+                            el.children.forEach(child => {
+                                child.draggable(false);
+                            })
                         })
-                    })
-
+                    }
                     layer.attrs.selected = true;
-
                     self.selectedLayer = layer;
-
                     layer.children.forEach(child => {
                         child.draggable(true);
                     })
@@ -391,13 +431,16 @@
             },
             addStageEvents() {
                 let self = this;
-
                 let firstPosition = null;
                 let lastPosition = null;
                 let isPaint = false;
                 var wall;
 
                 self.stage.on('click tap', function (e) {
+                    if (e.target.attrs.name == "front-Line" || e.target.attrs.name == "rect") {
+                        e.target = e.target.parent
+                        self.selectedItem = e.target
+                    }
                     if (self.mode == modes.move) {
                         if (e.target === self.stage) {
                             self.stage.find('Transformer').destroy()
@@ -409,33 +452,102 @@
 
                         if (e.target.attrs.draggable) {
                             self.selectedItem = e.target;
-
                             self.properties.name = self.selectedItem.attrs.name;
                             self.properties.height = self.selectedItem.attrs.height;
                             self.properties.width = self.selectedItem.attrs.width;
                             self.properties.color = self.selectedItem.attrs.fill;
 
                             var tr = new Konva.Transformer({
-                                enabledAnchors: self.selectedItem.attrs.enabledAnchors
+                                enabledAnchors: self.selectedItem.attrs.enabledAnchors,
+                                boundBoxFunc: function (oldBoundBox, newBoundBox) {
+                                    if (self.ctrlDown) {
+                                        return oldBoundBox;
+                                    }
+                                    return newBoundBox;
+                                }
                             });
-
                             self.selectedLayer.add(tr);
 
                             tr.attachTo(e.target);
                             self.selectedLayer.draw();
+                            tr.on('transform', function (z) {
+                                if (self.ctrlDown) {
+                                    // tr.stopTransform();
+
+                                    let transform = self.stage.getAbsoluteTransform().copy();
+                                    // to detect relative position we need to invert transform
+                                    transform.invert();
+                                    // now we find relative point
+                                    let pos = self.stage.getPointerPosition();
+                                    let dropPos = transform.point(pos);
+
+
+                                    lastPosition = dropPos;
+                                    if (z.currentTarget.movingResizer == "middle-left") {
+                                        // tr.stopTransform();
+                                        const right = {
+                                            x: self.selectedItem.width(),
+                                            y: self.selectedItem.height() / 2
+                                        };
+                                        const current = rotatePoint(right, Konva.getAngle(self
+                                            .selectedItem.rotation()));
+                                        var deltaX = lastPosition.x - (self.selectedItem.attrs.x +
+                                            current.x);
+                                        var deltaY = lastPosition.y - (self.selectedItem.attrs.y +
+                                            current.y);
+
+                                        let hyp = Math.hypot(deltaY, deltaX)
+                                        var rad = Math.atan2(deltaY, deltaX);
+
+                                        var deg = rad * (180 / Math.PI);
+
+
+                                        rotateAroundCenter(self.selectedItem, (180 + deg))
+                                    }
+                                    if (z.currentTarget.movingResizer == "middle-right") {
+                                        var deltaX = lastPosition.x - e.target.attrs.x;
+                                        var deltaY = lastPosition.y - e.target.attrs.y;
+
+                                        let hyp = Math.hypot(deltaY, deltaX)
+                                        var rad = Math.atan2(deltaY, deltaX);
+
+                                        var deg = rad * (180 / Math.PI);
+                                        self.selectedItem.rotation(deg);
+                                    }
+
+                                }
+
+                            });
 
                             tr.on('transformend', function () {
-                                self.selectedItem.setAttrs({
-                                    height: self.selectedItem.height() * self.selectedItem
-                                        .scaleY().toFixed(2),
-                                    width: self.selectedItem.width() * self.selectedItem
-                                        .scaleX().toFixed(2),
-                                    scaleX: 1,
-                                    scaleY: 1
-                                });
+                              
+                                if (self.selectedItem.attrs.name == "rect-group") {
+                                    self.selectedItem.children.forEach(item => {
+                                        item.setAttrs({
+                                            height: item.height() * item
+                                                .scaleY().toFixed(2),
+                                            width: item.width() * item
+                                                .scaleX().toFixed(2),
+                                            scaleX: 1,
+                                            scaleY: 1
+                                        });
 
-                                self.properties.height = self.selectedItem.height().toFixed(2);
-                                self.properties.width = self.selectedItem.width().toFixed(2);
+                                        self.properties.height = item.height().toFixed(2);
+                                        self.properties.width = item.width().toFixed(2)
+                                    });
+                                } else {
+                                    self.selectedItem.setAttrs({
+                                        height: self.selectedItem.height() * self.selectedItem
+                                            .scaleY().toFixed(2),
+                                        width: self.selectedItem.width() * self.selectedItem
+                                            .scaleX().toFixed(2),
+                                        scaleX: 1,
+                                        scaleY: 1
+                                    });
+
+                                    self.properties.height = self.selectedItem.height().toFixed(2);
+                                    self.properties.width = self.selectedItem.width().toFixed(2);
+                                }
                             });
                         }
                     }
@@ -444,19 +556,25 @@
                 self.stage.on('contentMousedown', function () {
                     if (self.mode == modes.draw) {
                         isPaint = true;
-
-                        var pos = self.stage.getPointerPosition();
+                        let transform = self.stage.getAbsoluteTransform().copy();
+                        // to detect relative position we need to invert transform
+                        transform.invert();
+                        // now we find relative point
+                        let pos = self.stage.getPointerPosition();
+                        let dropPos = transform.point(pos);
 
                         if (firstPosition == null) {
-                            firstPosition = pos;
-                            lastPosition = pos;
+                            firstPosition = dropPos;
+                            lastPosition = dropPos;
                         } else {
-                            lastPosition = pos;
+                            lastPosition = dropPos;
                         }
 
                         wall = new Line(self.selectedLayer, {
                             x: firstPosition.x,
-                            y: firstPosition.y
+                            y: firstPosition.y,
+                            name: 'wall',
+                            drawType: 'wall'
                         })
 
                         // wall = new Line.Rect({
@@ -470,7 +588,22 @@
                         // });
 
                         // self.selectedLayer.add(wall);
+                    } else {
+                        let transform = self.stage.getAbsoluteTransform().copy();
+                        // to detect relative position we need to invert transform
+                        transform.invert();
+                        // now we find relative point
+                        let pos = self.stage.getPointerPosition();
+                        let dropPos = transform.point(pos);
+
+                        if (firstPosition == null) {
+                            firstPosition = dropPos;
+                            lastPosition = dropPos;
+                        } else {
+                            lastPosition = dropPos;
+                        }
                     }
+
                 })
 
                 self.stage.on('contentMouseup', function () {
@@ -492,17 +625,38 @@
                         firstPosition = null;
                         lastPosition = null;
                     }
-                });
 
+                });
+                self.stage.on('dragstart', (e) => {
+                    if (self.mode == modes.draw) {
+                        self.stage.stopDrag()
+                    } else {
+
+                    }
+                })
+                self.stage.on('dragend', (e) => {
+                    if (self.mode == modes.draw) {
+                        self.stage.stopDrag()
+                    } else {
+                        // clear all previous lines on the screen
+                        self.stage.find('.guid-line').destroy();
+                        self.stage.batchDraw();
+
+                    }
+                })
                 self.stage.on('contentMousemove', function () {
                     if (self.mode == modes.draw) {
                         if (firstPosition == null) {
                             return;
                         }
+                        let transform = self.stage.getAbsoluteTransform().copy();
+                        // to detect relative position we need to invert transform
+                        transform.invert();
+                        // now we find relative point
+                        let pos = self.stage.getPointerPosition();
+                        let dropPos = transform.point(pos);
 
-                        var pos = self.stage.getPointerPosition();
-
-                        lastPosition = pos;
+                        lastPosition = dropPos;
 
                         var deltaX = lastPosition.x - firstPosition.x;
                         var deltaY = lastPosition.y - firstPosition.y;
@@ -537,8 +691,76 @@
 
                         self.selectedLayer.draw();
                     }
+
+                });
+                self.stage.on('dragmove', function (e) {
+                    // clear all previous lines on the screen
+                    self.stage.find('.guid-line').destroy();
+
+                    // find possible snapping lines
+                    var lineGuideStops = getLineGuideStops(e.target, self.stage, self.snapableItems);
+
+                    // find snapping points of current object
+                    var itemBounds = getObjectSnappingEdges(e.target, self.stage);
+
+                    // now find where can we snap current object
+                    var guides = getGuides(lineGuideStops, itemBounds, self.stage);
+
+                    // do nothing of no snapping
+                    if (!guides.length) {
+                        return;
+                    }
+
+                    drawGuides(guides, self.stage, self.selectedLayer);
+
+                    // now force object position
+                    guides.forEach(lg => {
+                        switch (lg.snap) {
+                            case 'start': {
+                                switch (lg.orientation) {
+                                    case 'V': {
+                                        e.target.x(lg.lineGuide + lg.offset);
+                                        break;
+                                    }
+                                    case 'H': {
+                                        e.target.y(lg.lineGuide + lg.offset);
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                            case 'center': {
+                                switch (lg.orientation) {
+                                    case 'V': {
+                                        e.target.x(lg.lineGuide + lg.offset);
+                                        break;
+                                    }
+                                    case 'H': {
+                                        e.target.y(lg.lineGuide + lg.offset);
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                            case 'end': {
+                                switch (lg.orientation) {
+                                    case 'V': {
+                                        e.target.x(lg.lineGuide + lg.offset);
+                                        break;
+                                    }
+                                    case 'H': {
+                                        e.target.y(lg.lineGuide + lg.offset);
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    });
                 });
 
+
+                var scaleBy = 1.05;
                 self.stage.addEventListener('wheel', (e) => {
                     var oldScale = self.stage.scaleX();
 
@@ -647,7 +869,6 @@
                 let self = this;
 
                 self.$nextTick(() => {
-                    console.log(propName)
                     self.selectedItem.attrs[propName] = self.properties[propName];
                     self.selectedLayer.draw();
                 })
@@ -662,7 +883,10 @@
             },
             duplicate() {
                 let self = this;
-                self.selectedItem
+                // console.log("{Duplicate}", self.selectedItem);
+                // let newItem = JSON.parse(JSON.stringify(self.selectedItem))
+                self.selectedLayer.add(self.selectedItem)
+                // self.stage.batchDraw();
             }
         },
         mounted() {
@@ -676,24 +900,270 @@
             self.stage = new Konva.Stage({
                 container: "container",
                 width: width,
-                height: height
+                height: height,
+                draggable: true
             })
+            var gridLayer = new Konva.Layer();
+            var padding = 10;
+
+            for (var i = 0; i < width / padding; i++) {
+                gridLayer.add(new Konva.Line({
+                    points: [Math.round(i * padding) + 0.5, 0, Math.round(i * padding) + 0.5, height],
+                    stroke: '#ddd',
+                    strokeWidth: 1,
+                }));
+            }
+            gridLayer.add(new Konva.Line({
+                points: [0, 0, 10, 10]
+            }));
+            for (var j = 0; j < height / padding; j++) {
+                gridLayer.add(new Konva.Line({
+                    points: [0, Math.round(j * padding), width, Math.round(j * padding)],
+                    stroke: '#ddd',
+                    strokeWidth: 0.5,
+                }));
+            }
+            self.stage.add(gridLayer);
 
             let startLayer = new Konva.Layer({
                 name: 'Background',
                 visible: true,
-                selected: true
+                selected: true,
+                showChildren: true,
+                drawType: "Layer"
             });
 
             self.selectedLayer = startLayer
             self.layers.unshift(startLayer);
-
+            // let bg_rect = new Konva.Rect({
+            //     x: 0,
+            //     y: 0,
+            //     width: self.stage.width(),
+            //     height: self.stage.height(),
+            //     fill: 'white'
+            // })
+            // startLayer.add(bg_rect);
             self.stage.add(startLayer);
+
 
             self.addStageEvents();
             self.addEvents();
             self.updateSnappingAngles();
         }
+    }
+
+    function getLineGuideStops(skipShape, stage, snapableItems) {
+        let self = this
+
+        // we can snap to stage borders and the center of the stage
+        let scale = stage.scaleX();
+        var vertical = [];
+        var horizontal = [];
+
+        // and we snap over edges and center of each object on the canvas
+        snapableItems.forEach(element => {
+            stage.find(element).forEach(guideItem => {
+
+                if (guideItem === skipShape) {
+                    return;
+                }
+
+                var box = guideItem.getClientRect();
+                box.x = box.x / scale;
+                box.y = box.y / scale;
+                box.width = box.width / scale;
+                box.height = box.height / scale;
+                // and we can snap to all edges of shapes
+                vertical.push([box.x, (box.x + box.width), (box.x +
+                    box.width / 2)]);
+                horizontal.push([box.y, (box.y + box.height), (box.y *
+                    +box.height / 2)]);
+            });
+        });
+
+        return {
+            vertical: vertical.flat(),
+            horizontal: horizontal.flat()
+        };
+    }
+
+    function getObjectSnappingEdges(node, stage) {
+        let self = this
+        let scale = stage.scaleX();
+        var box = node.getClientRect();
+        box.x = box.x / scale;
+        box.y = box.y / scale;
+        box.width = box.width / scale;
+        box.height = box.height / scale;
+        return {
+            vertical: [{
+                    guide: Math.round(box.x),
+                    offset: Math.round(node.x() - box.x),
+                    snap: 'start'
+                },
+                {
+                    guide: Math.round(box.x + box.width / 2),
+                    offset: Math.round(node.x() - box.x - box.width / 2),
+                    snap: 'center'
+                },
+                {
+                    guide: Math.round(box.x + box.width),
+                    offset: Math.round(node.x() - box.x - box.width),
+                    snap: 'end'
+                }
+            ],
+            horizontal: [{
+                    guide: Math.round(box.y),
+                    offset: Math.round(node.y() - box.y),
+                    snap: 'start'
+                },
+                {
+                    guide: Math.round(box.y + box.height / 2),
+                    offset: Math.round(node.y() - box.y - box.height / 2),
+                    snap: 'center'
+                },
+                {
+                    guide: Math.round(box.y + box.height),
+                    offset: Math.round(node.y() - box.y - box.height),
+                    snap: 'end'
+                }
+            ]
+        };
+    }
+
+    function getGuides(lineGuideStops, itemBounds, stage) {
+        let self = this
+        var GUIDELINE_OFFSET = 5;
+        var resultV = [];
+        var resultH = [];
+
+        lineGuideStops.vertical.forEach(lineGuide => {
+            itemBounds.vertical.forEach(itemBound => {
+                var diff = Math.abs(lineGuide - itemBound.guide);
+                // if the distance between guild line and object snap point is close we can consider this for snapping
+                if (diff < GUIDELINE_OFFSET) {
+                    resultV.push({
+                        lineGuide: lineGuide,
+                        diff: diff,
+                        snap: itemBound.snap,
+                        offset: itemBound.offset
+                    });
+                }
+            });
+        });
+
+        lineGuideStops.horizontal.forEach(lineGuide => {
+            itemBounds.horizontal.forEach(itemBound => {
+                var diff = Math.abs(lineGuide - itemBound.guide);
+                if (diff < GUIDELINE_OFFSET) {
+                    resultH.push({
+                        lineGuide: lineGuide,
+                        diff: diff,
+                        snap: itemBound.snap,
+                        offset: itemBound.offset
+                    });
+                }
+            });
+        });
+
+        var guides = [];
+
+        // find closest snap
+        var minV = resultV.sort((a, b) => a.diff - b.diff)[0];
+        var minH = resultH.sort((a, b) => a.diff - b.diff)[0];
+        if (minV) {
+            guides.push({
+                lineGuide: minV.lineGuide,
+                offset: minV.offset,
+                orientation: 'V',
+                snap: minV.snap
+            });
+        }
+        if (minH) {
+            guides.push({
+                lineGuide: minH.lineGuide,
+                offset: minH.offset,
+                orientation: 'H',
+                snap: minH.snap
+            });
+        }
+        return guides;
+    }
+
+    function drawGuides(guides, stage, selectedLayer) {
+        let self = this
+        let scaleX = stage.scaleX()
+        let scaleY = stage.scaleY()
+        let xOffset = stage.x() / scaleX;
+        let yOffset = stage.y() / scaleY;
+
+        let y_V1 = 0;
+        let y_V2 = stage.height();
+        let x_V = 0; // change according to rect
+
+        let y_H = 0; // change according to rect
+        let x_H1 = 0;
+        let x_H2 = stage.width();
+
+
+        guides.forEach(lg => {
+            if (lg.orientation === 'H') {
+                y_H = lg.lineGuide -
+                    yOffset; //(lg.lineGuide * scaleY); //- ((lg.lineGuide * scaleY) - lg.lineGuide);
+
+                var line = new Konva.Line({
+                    points: [x_H1, y_H, x_H2, y_H],
+                    stroke: 'rgb(0, 161, 255)',
+                    strokeWidth: 1,
+                    name: 'guid-line',
+                    dash: [4, 6]
+                });
+                selectedLayer.add(line);
+                stage.batchDraw();
+            } else if (lg.orientation === 'V') {
+                x_V = lg.lineGuide - xOffset; // * scaleX;// - ((lg.lineGuide * scaleX) - lg.lineGuide);
+                var line = new Konva.Line({
+                    points: [x_V, y_V1, x_V, y_V2],
+                    stroke: 'rgb(0, 161, 255)',
+                    strokeWidth: 1,
+                    name: 'guid-line',
+                    dash: [4, 6]
+                });
+                selectedLayer.add(line);
+                stage.batchDraw();
+            }
+        });
+
+
+    }
+
+    const rotatePoint = ({
+        x,
+        y
+    }, rad) => {
+        const rcos = Math.cos(rad);
+        const rsin = Math.sin(rad);
+        return {
+            x: x * rcos - y * rsin,
+            y: y * rcos + x * rsin
+        };
+    };
+
+    // will work for shapes with top-left origin, like rectangle
+    function rotateAroundCenter(node, rotation) {
+        //current rotation origin (0, 0) relative to desired origin - center (node.width()/2, node.height()/2)
+        const right = {
+            x: -node.width(),
+            y: -node.height() / 2
+        };
+        const current = rotatePoint(right, Konva.getAngle(node.rotation()));
+        const rotated = rotatePoint(right, Konva.getAngle(rotation));
+        const dx = rotated.x - current.x,
+            dy = rotated.y - current.y;
+
+        node.rotation(rotation);
+        node.x(node.x() + dx);
+        node.y(node.y() + dy);
     }
 
     function blobToDataUrl(blob, callback) {

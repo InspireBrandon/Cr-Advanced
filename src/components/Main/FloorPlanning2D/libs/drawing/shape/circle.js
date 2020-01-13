@@ -12,7 +12,8 @@ class Circle extends Shape {
             fill: "#1976d2",
             draggable: true,
             visible: 'inherit',
-            enabledAnchors: self.enabledAnchors
+            enabledAnchors: self.enabledAnchors,
+            name:"circle"
         });
 
         parent.add(self.shape);

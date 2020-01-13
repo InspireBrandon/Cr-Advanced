@@ -11,6 +11,8 @@ class Line extends Shape {
         self.shape = new Konva.Rect({
             x: config.x,
             y: config.y,
+            name: config.name,
+            drawType: config.drawType,
             height: 10,
             width: 0,
             fill: "#1976d2",
