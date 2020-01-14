@@ -39,6 +39,7 @@
             <v-btn @click="selectImage">add image</v-btn>
             <v-btn @click="addLabel">add label</v-btn>
             <v-btn @click="duplicate">duplicate</v-btn>
+            {{selectedLayerTreeItem}}
             <v-spacer></v-spacer>
             <v-btn-toggle v-model="mode" mandatory @change="toggleMode">
                 <v-btn :value="0" flat>
@@ -160,9 +161,10 @@
                                         </div>
                                     </div>
                                 </div> -->
-                                <RecursiveLayer :showChild="true" :layers="layers" :selectLayer="selectLayer"
-                                    :setLayerVisible="setLayerVisible" :deleteLayer="deleteLayer" :endDrag="endDrag"
-                                    :startDrag="startDrag" :selectedLayer="selectedLayer" />
+                                <RecursiveLayer :editLayerName="editLayerName" :showChild="true" :layers="layerTree"
+                                    :selectLayer="selectLayer" :setLayerVisible="setLayerVisible"
+                                    :deleteLayer="deleteLayer" :endDrag="endDrag" :startDrag="startDrag"
+                                    :selectedLayerTree="selectedLayerTree" :selectedLayer="selectedLayer" />
 
                             </v-card-text>
                         </v-card>
@@ -177,6 +179,7 @@
 <script>
     import Konva from 'konva'
 
+    import treeItem from './libs/tree/TreeItem'
     import Rect from './libs/drawing/shape/rect'
     import Circle from './libs/drawing/shape/circle'
     import Line from './libs/drawing/shape/line'
@@ -204,6 +207,7 @@
         },
         data() {
             return {
+                selectedLayerTreeItem: null,
                 snapableItems: ['.wall', '.rect-group', '.circle'],
                 dragItem: null,
                 dragParent: null,
@@ -213,6 +217,7 @@
                 ctrlDown: false,
                 stage: null,
                 layer: null,
+                layerTree: [],
                 layers: [],
                 properties: {
                     name: "",
@@ -222,6 +227,7 @@
                 },
                 selectedItem: null,
                 selectedLayer: null,
+                selectedLayerTree: null,
                 mode: modes.move,
                 brush: {
                     size: 10,
@@ -297,6 +303,17 @@
             addRect() {
                 let self = this;
                 let rect = new Rect(self.selectedLayer);
+
+                self.selectedLayerTree.children.push(new treeItem({
+                    KonvaID: rect.shape.parent._id,
+                    visible: true,
+                    showEditName: true,
+                    selected: true,
+                    showChildren: true,
+                    draggable: true,
+                    name: "rect-group",
+                    children: [],
+                }))
             },
             addCircle() {
                 let self = this;
@@ -370,11 +387,26 @@
                 self.selectedLayer.add(textNode);
                 self.selectedLayer.draw();
             },
+            editLayerName(layer, name) {
+                let self = this
+
+                let tmpItems = self.stage.find(".EnterName")
+
+
+                tmpItems.forEach(item => {
+                    if (layer.KonvaID = item._id) {
+                        item.setAttrs({
+                            name: name
+                        })
+                        item.attrs.name = name
+                    }
+                })
+            },
             addLayer() {
                 let self = this;
 
                 let layer = new Konva.Layer({
-                    name: "",
+                    name: "EnterName",
                     visible: true,
                     showEditName: true,
                     selected: true,
@@ -385,6 +417,18 @@
                 self.layers.forEach(el => {
                     el.attrs.selected = false;
                 })
+
+                self.layerTree.push(new treeItem({
+                    KonvaID: layer._id,
+                    children: [],
+                    name: layer.name(),
+                    showEditName: true,
+                    visible: layer.visible,
+                    selected: layer.selected,
+                    showChildren: layer.showChildren,
+                    drawType: "Layer"
+                }))
+
 
                 self.layers.unshift(layer);
                 self.stage.add(layer);
@@ -413,18 +457,25 @@
                 let self = this;
 
                 self.$nextTick(() => {
+                    self.selectedLayerTree = layer
+                    let tmpItems = self.stage.find("." + layer.name)
+                    tmpItems.forEach(item => {
+                        if (item._id == layer.KonvaID) {
+                            self.selectedLayer = item;
+                        }
+                    })
                     if (parent != undefined) {
                         parent.forEach(el => {
-                            el.attrs.selected = false;
+                            el.selected = false;
 
-                            el.children.forEach(child => {
-                                child.draggable(false);
-                            })
+                            // el.children.forEach(child => {
+                            //     child.draggable(false);
+                            // })
                         })
                     }
-                    layer.attrs.selected = true;
-                    self.selectedLayer = layer;
-                    layer.children.forEach(child => {
+                    layer.selected = !layer.selected;
+
+                    self.selectedLayer.children.forEach(child => {
                         child.draggable(true);
                     })
                 })
@@ -435,11 +486,13 @@
                 let lastPosition = null;
                 let isPaint = false;
                 var wall;
+                var rect
 
                 self.stage.on('click tap', function (e) {
                     if (e.target.attrs.name == "front-Line" || e.target.attrs.name == "rect") {
                         e.target = e.target.parent
                         self.selectedItem = e.target
+
                     }
                     if (self.mode == modes.move) {
                         if (e.target === self.stage) {
@@ -520,21 +573,38 @@
                             });
 
                             tr.on('transformend', function () {
-                              
+                                console.log("in here", self.selectedItem);
                                 if (self.selectedItem.attrs.name == "rect-group") {
                                     self.selectedItem.children.forEach(item => {
-                                        item.setAttrs({
-                                            height: item.height() * item
-                                                .scaleY().toFixed(2),
-                                            width: item.width() * item
-                                                .scaleX().toFixed(2),
-                                            scaleX: 1,
-                                            scaleY: 1
-                                        });
+                                        if (item.attrs.name == "front-Line") {
+                                            console.log("in child");
+                                            item.setAttrs({
+                                                height: 5,
+                                                width: item.width() * item
+                                                    .scaleX().toFixed(2),
+                                                scaleX: 1,
+                                                scaleY: 1
+                                            });
 
-                                        self.properties.height = item.height().toFixed(2);
-                                        self.properties.width = item.width().toFixed(2)
+                                            self.properties.height = item.height().toFixed(2);
+                                            self.properties.width = item.width().toFixed(2)
+
+
+                                        } else {
+                                            item.setAttrs({
+                                                height: item.height() * item
+                                                    .scaleY().toFixed(2),
+                                                width: item.width() * item
+                                                    .scaleX().toFixed(2),
+                                                scaleX: 1,
+                                                scaleY: 1
+                                            });
+
+                                            self.properties.height = item.height().toFixed(2);
+                                            self.properties.width = item.width().toFixed(2)
+                                        }
                                     });
+                                    console.log("after transform apply here", self.selectedItem);
                                 } else {
                                     self.selectedItem.setAttrs({
                                         height: self.selectedItem.height() * self.selectedItem
@@ -555,7 +625,6 @@
 
                 self.stage.on('contentMousedown', function () {
                     if (self.mode == modes.draw) {
-                        isPaint = true;
                         let transform = self.stage.getAbsoluteTransform().copy();
                         // to detect relative position we need to invert transform
                         transform.invert();
@@ -569,14 +638,48 @@
                         } else {
                             lastPosition = dropPos;
                         }
+                        isPaint = true;
+                        switch (self.selectedTool) {
+                            case "show_chart":
+                                wall = new Line(self.selectedLayer, {
+                                    x: firstPosition.x,
+                                    y: firstPosition.y,
+                                    name: 'wall',
+                                    drawType: 'wall'
+                                })
 
-                        wall = new Line(self.selectedLayer, {
-                            x: firstPosition.x,
-                            y: firstPosition.y,
-                            name: 'wall',
-                            drawType: 'wall'
-                        })
+                                self.selectedLayerTree.children.push(new treeItem({
+                                    KonvaID: wall.shape._id,
+                                    name: 'wall',
+                                    drawType: 'wall',
+                                    children: [],
+                                }))
+                                break;
 
+                            case "view_carousel":
+
+                                rect = new Rect(self.selectedLayer, {
+                                    x: firstPosition.x,
+                                    y: firstPosition.y,
+                                });
+
+                                self.selectedLayerTree.children.push(new treeItem({
+
+                                    KonvaID: rect.shape.parent._id,
+                                    visible: true,
+                                    showEditName: true,
+                                    selected: true,
+                                    showChildren: true,
+                                    draggable: true,
+                                    name: "rect-group",
+                                    children: [],
+                                }))
+                                break;
+
+                            default:
+                                break;
+                        }
+                        console.log("[self.selectedTool]", self.selectedTool);
                         // wall = new Line.Rect({
                         //     x: firstPosition.x,
                         //     y: firstPosition.y,
@@ -596,12 +699,12 @@
                         let pos = self.stage.getPointerPosition();
                         let dropPos = transform.point(pos);
 
-                        if (firstPosition == null) {
-                            firstPosition = dropPos;
-                            lastPosition = dropPos;
-                        } else {
-                            lastPosition = dropPos;
-                        }
+                        // if (firstPosition == null) {
+                        //     firstPosition = dropPos;
+                        //     lastPosition = dropPos;
+                        // } else {
+                        //     lastPosition = dropPos;
+                        // }
                     }
 
                 })
@@ -619,35 +722,28 @@
                         var rad = Math.atan2(deltaY, deltaX);
 
                         var deg = rad * (180 / Math.PI);
+                        switch (self.selectedTool) {
+                            case "show_chart":
+                                wall.shape.width(hyp);
+                                break;
+                            case "view_carousel":
+                                rect.shape.width(hyp);
+                                break;
+                            default:
+                                break;
+                        }
 
-                        wall.shape.width(hyp);
 
                         firstPosition = null;
                         lastPosition = null;
                     }
 
                 });
-                self.stage.on('dragstart', (e) => {
-                    if (self.mode == modes.draw) {
-                        self.stage.stopDrag()
-                    } else {
 
-                    }
-                })
-                self.stage.on('dragend', (e) => {
-                    if (self.mode == modes.draw) {
-                        self.stage.stopDrag()
-                    } else {
-                        // clear all previous lines on the screen
-                        self.stage.find('.guid-line').destroy();
-                        self.stage.batchDraw();
-
-                    }
-                })
                 self.stage.on('contentMousemove', function () {
                     if (self.mode == modes.draw) {
                         if (firstPosition == null) {
-                            return;
+                            return
                         }
                         let transform = self.stage.getAbsoluteTransform().copy();
                         // to detect relative position we need to invert transform
@@ -665,33 +761,63 @@
                         var rad = Math.atan2(deltaY, deltaX);
 
                         var deg = rad * (180 / Math.PI);
+                        switch (self.selectedTool) {
+                            case "show_chart":
+                                wall.shape.width(hyp);
+                                if (!self.ctrlDown) {
+                                    wall.shape.rotation(deg);
+                                } else {
+                                    let updateDegrees = false;
+                                    let snappedAngle = 0;
+                                    let tolerance = self.brush.snapOption * 0.45;
 
-                        wall.shape.width(hyp);
+                                    self.brush.snappingAngles.forEach(sa => {
+                                        let lowerBounds = sa - tolerance
+                                        let upperBounds = sa + tolerance
 
-                        if (!self.ctrlDown) {
-                            wall.shape.rotation(deg);
-                        } else {
-                            let updateDegrees = false;
-                            let snappedAngle = 0;
-                            let tolerance = self.brush.snapOption * 0.45;
+                                        if (deg >= lowerBounds && deg <= upperBounds) {
+                                            updateDegrees = true;
+                                            snappedAngle = sa;
+                                        }
+                                    })
 
-                            self.brush.snappingAngles.forEach(sa => {
-                                let lowerBounds = sa - tolerance
-                                let upperBounds = sa + tolerance
-
-                                if (deg >= lowerBounds && deg <= upperBounds) {
-                                    updateDegrees = true;
-                                    snappedAngle = sa;
+                                    if (updateDegrees)
+                                        wall.shape.rotation(snappedAngle);
                                 }
-                            })
+                                break;
 
-                            if (updateDegrees)
-                                wall.shape.rotation(snappedAngle);
+                            case "view_carousel":
+                                rect.shape.width(hyp);
+                                rect.line.width(hyp);
+                                if (!self.ctrlDown) {
+                                    rect.line.rotation(deg);
+                                    rect.shape.rotation(deg);
+                                } else {
+                                    let updateDegrees = false;
+                                    let snappedAngle = 0;
+                                    let tolerance = self.brush.snapOption * 0.45;
+
+                                    self.brush.snappingAngles.forEach(sa => {
+                                        let lowerBounds = sa - tolerance
+                                        let upperBounds = sa + tolerance
+
+                                        if (deg >= lowerBounds && deg <= upperBounds) {
+                                            updateDegrees = true;
+                                            snappedAngle = sa;
+                                        }
+                                    })
+
+                                    if (updateDegrees)
+                                        rect.shape.rotation(snappedAngle);
+                                    rect.line.rotation(snappedAngle);
+                                }
+                                break;
+
+                            default:
+                                break;
                         }
-
                         self.selectedLayer.draw();
                     }
-
                 });
                 self.stage.on('dragmove', function (e) {
                     // clear all previous lines on the screen
@@ -758,7 +884,23 @@
                         }
                     });
                 });
+                self.stage.on('dragstart', (e) => {
+                    if (self.mode == modes.draw) {
+                        self.stage.stopDrag()
+                    } else {
 
+                    }
+                })
+                self.stage.on('dragend', (e) => {
+                    if (self.mode == modes.draw) {
+                        self.stage.stopDrag()
+                    } else {
+                        // clear all previous lines on the screen
+                        self.stage.find('.guid-line').destroy();
+                        self.stage.batchDraw();
+
+                    }
+                })
 
                 var scaleBy = 1.05;
                 self.stage.addEventListener('wheel', (e) => {
@@ -807,8 +949,11 @@
                     switch (key) {
                         case "Delete": {
                             if (self.selectedItem != null) {
+
+                                deleteTreeItem(self.layerTree, self.selectedItem._id)
                                 self.selectedItem.destroy()
                                 self.stage.find('Transformer').destroy()
+
                                 self.selectedLayer.draw();
                             }
                         }
@@ -832,12 +977,16 @@
             setLayerVisible(layer) {
                 let self = this;
 
-                if (layer.attrs.visible)
-                    layer.hide();
-                else
-                    layer.show();
-
-                layer.draw()
+                let tmpItems = self.stage.find("." + layer.name)
+                tmpItems.forEach(item => {
+                    if (layer.KonvaID = item._id) {
+                        if (item.attrs.visible)
+                            item.hide();
+                        else
+                            item.show();
+                        item.draw()
+                    }
+                })
             },
             toggleMode() {
                 let self = this;
@@ -862,6 +1011,7 @@
             deleteLayer(layer) {
                 let self = this;
                 self.layers.splice(self.layers.indexOf(layer), 1);
+                self.layerTree
                 layer.destroy();
                 layer.draw();
             },
@@ -883,8 +1033,9 @@
             },
             duplicate() {
                 let self = this;
-                // console.log("{Duplicate}", self.selectedItem);
+
                 // let newItem = JSON.parse(JSON.stringify(self.selectedItem))
+
                 self.selectedLayer.add(self.selectedItem)
                 // self.stage.batchDraw();
             }
@@ -932,7 +1083,17 @@
                 showChildren: true,
                 drawType: "Layer"
             });
-
+            let tmplayertree = new treeItem({
+                KonvaID: startLayer._id,
+                children: [],
+                name: 'Background',
+                visible: true,
+                selected: true,
+                showChildren: true,
+                drawType: "Layer"
+            })
+            self.layerTree.push(tmplayertree)
+            self.selectedLayerTree = tmplayertree
             self.selectedLayer = startLayer
             self.layers.unshift(startLayer);
             // let bg_rect = new Konva.Rect({
@@ -1148,6 +1309,25 @@
             y: y * rcos + x * rsin
         };
     };
+
+
+
+    function deleteTreeItem(subMenuItems, id) {
+        if (subMenuItems) {
+            subMenuItems.forEach((item, idx) => {
+
+                if (item.KonvaID == id) {
+                    subMenuItems.splice(idx, 1)
+                }
+                if (item.children.length > 0) {
+                    deleteTreeItem(item.children, id)
+                }
+            })
+        }
+
+    }
+
+
 
     // will work for shapes with top-left origin, like rectangle
     function rotateAroundCenter(node, rotation) {

@@ -2,15 +2,20 @@ import Konva from 'konva'
 import Shape from './shape'
 
 class Rect extends Shape {
-    constructor(parent) {
+    constructor(parent,config) {
         super(parent);
-
+        if(config==null||config==undefined){
+           config={
+               x:0,
+               y:0
+           }
+        }
         let self = this;
 
-        self.create()
+        self.create(config)
     }
 
-    create() {
+    create(config) {
         let self = this;
         let rectGroup = new Konva.Group({
             visible: true,
@@ -25,6 +30,8 @@ class Rect extends Shape {
         })
 
         self.shape = new Konva.Rect({
+            x: config.x,
+            y: config.y,
             height: 50,
             width: 50,
             fill: "#1976d2",
@@ -33,8 +40,9 @@ class Rect extends Shape {
             enabledAnchors: self.enabledAnchors,
             name: "rect"
         });
-        let line = new Konva.Rect({
-
+        self.line = new Konva.Rect({
+            x: config.x,
+            y: config.y,
             name: "front-Line",
             height: 5,
             width: 50,
@@ -44,8 +52,10 @@ class Rect extends Shape {
         });
 
         rectGroup.add(self.shape)
-        rectGroup.add(line)
+        rectGroup.add(self.line)
         self.parent.add(rectGroup);
+        console.log("[rectGroup]",rectGroup);
+        
         self.parent.draw();
     }
 }

@@ -52,7 +52,7 @@
         methods: {
             getProjectGroups() {
                 let self = this;
-
+    
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 self.projectGroups = [];
