@@ -824,6 +824,8 @@
                 r.data["dateTo"] = dateRange.dateTo;
                 self.rangingController = new RangingController(r.data);
 
+                console.log(r.data.clusterData);
+
                 self.rangingController.getSalesMonthlyTotals(() => {
 
                   self.setRangingClusterData(r.data.clusterData);
@@ -1627,30 +1629,42 @@
       setRangingClusterData(data) {
         let self = this;
 
+        self.clusterOptions.allStores = [];
+
         data.allStoresClusters.forEach(element => {
           if (element.clusterStores.length > 0)
             self.clusterOptions.allStores.push(new textValue(element));
         });
+
+        self.clusterOptions.category = [];
 
         data.categoryClusters.forEach(element => {
           if (element.clusterStores.length > 0)
             self.clusterOptions.category.push(new textValue(element));
         });
 
+        self.clusterOptions.custom = [];
+
         data.customClusters.forEach(element => {
           if (element.clusterStores.length > 0)
             self.clusterOptions.custom.push(new textValue(element));
         });
 
+        self.clusterOptions.department = [];
+
         data.departmentClusters.forEach(element => {
           if (element.clusterStores.length > 0)
             self.clusterOptions.department.push(new textValue(element));
         });
+        
+        self.clusterOptions.regional = [];
 
         data.regionalClusters.forEach(element => {
           if (element.clusterStores.length > 0)
             self.clusterOptions.regional.push(new textValue(element));
         });
+
+        self.clusterOptions.store = [];
 
         data.storeClusters.forEach(element => {
           if (element.clusterStores.length > 0)
@@ -2348,6 +2362,8 @@
         Axios.get(process.env.VUE_APP_API + "Ranging/GetClusterData?planogramID=" + self.fileData.planogramID)
           .then(r => {
             let clusterData = r.data.clusterData;
+
+            console.log(r.data.clusterData)
 
             self.rangingController.setClusterData(clusterData);
             self.setRangingClusterData(clusterData);
