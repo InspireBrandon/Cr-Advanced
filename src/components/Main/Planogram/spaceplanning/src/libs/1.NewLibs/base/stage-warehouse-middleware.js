@@ -74,7 +74,12 @@ class StageWarehouseMiddleware {
           })
 
           if (!itemExists) {
-            productData.store_Range_Indicator = 'NO';
+
+            if (productData.isHybridProduct) {
+              productData.store_Range_Indicator = 'YES';
+            } else {
+              productData.store_Range_Indicator = 'NO';
+            }
           }
         }
       }

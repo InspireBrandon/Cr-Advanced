@@ -172,7 +172,7 @@
             :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" solo hide-details></v-select>
         </v-flex>
         <v-flex xs2 v-if="rangingData.planogramID != null && gotData" md6 style="padding: 2px;">
-          <v-checkbox label="Use Potential" v-model="$store.state.usePotential"></v-checkbox>
+          <v-checkbox hide-details label="Use Potential" v-model="$store.state.usePotential"></v-checkbox>
         </v-flex>
         <v-flex xs10 v-if="rangingData.planogramID != null && gotData" md6 style="padding: 2px;">
           <h4>Active Items Selected</h4>
@@ -180,6 +180,13 @@
             <div>Sales: R{{ ais_Sales }}</div>
             <div>Sales Potential: R{{ ais_SalesPotential }}</div>
           </div>
+        </v-flex>
+        <v-flex xs2 v-if="rangingData.planogramID != null && gotData" md6 style="padding: 2px;">
+          <v-select light dense solo hide-details :items="HybridRanges" v-model="selectedHybridRange"
+            @change="onHybridChange"></v-select>
+        </v-flex>
+        <v-flex xs2 v-if="rangingData.planogramID != null && gotData" md6 style="padding: 2px;">
+          <v-btn small color="primary" @click="addHybridRange">add range</v-btn>
         </v-flex>
         <v-flex xs12 v-if="rangingData.planogramID != null">
           <div>
@@ -200,83 +207,97 @@
                   </v-btn>
                 </v-btn-toggle>
               </v-flex>
-              <v-flex md12 v-if="view_type == 0">
-                <v-list dark dense three-line
-                  :class="{ 'details_closed': details_panel != 0, 'details_open': details_panel == 0 }"
-                  class="scroll-y">
-                  <template v-for="(item, index) in filteredItems">
-                    <div :key="index">
-                      <v-divider></v-divider>
-                      <v-subheader :key="item.barcode">
-                        <b>
-                          <u>BARCODE: {{ item.barcode }}</u>
-                        </b>
-                      </v-subheader>
-                      <v-list-tile :key="index">
-                        <v-img v-if="warehouse_data.imagesOn" style="width:50px !important; height:50px !important"
-                          :src="warehouseCtrl.getProductImageURL(item.barcode)" draggable="true" @drag="dragProduct"
-                          @dragstart="dragProductStart($event, item)" @dragend="clearDrag" contain></v-img>
+              <v-expansion-panel expand v-model="products_panel">
+                <v-expansion-panel-content>
+                  <div slot="header">
+                    Products
+                  </div>
+                  <v-card>
+                    <v-flex md12 v-if="view_type == 0">
+                      <v-list dark dense two-line
+                        :class="{ 'details_closed': details_panel != 0, 'details_open': details_panel == 0 }"
+                        class="scroll-y">
+                        <template v-for="(item, index) in filteredItems">
+                          <div :key="index">
+                            <v-divider></v-divider>
+                            <v-subheader :key="item.barcode">
+                              <b>
+                                <u>BARCODE: {{ item.barcode }}</u>
+                              </b>
+                            </v-subheader>
+                            <v-list-tile :key="index">
+                              <v-img v-if="warehouse_data.imagesOn"
+                                style="width:50px !important; height:50px !important"
+                                :src="warehouseCtrl.getProductImageURL(item.barcode)" draggable="true"
+                                @drag="dragProduct" @dragstart="dragProductStart($event, item)" @dragend="clearDrag"
+                                contain></v-img>
 
-                        <v-img v-else style="width:50px !important; height:50px !important"
-                          src="/static/img/image-placeholder.png" draggable="true" @drag="dragProduct"
-                          @dragstart="dragProductStart($event, item)" @dragend="clearDrag" contain></v-img>
+                              <v-img v-else style="width:50px !important; height:50px !important"
+                                src="/static/img/image-placeholder.png" draggable="true" @drag="dragProduct"
+                                @dragstart="dragProductStart($event, item)" @dragend="clearDrag" contain></v-img>
 
-                        <v-list-tile-content class="ml-2" style="width: 100%">
-                          <v-list-tile-title>{{item.description}}</v-list-tile-title>
-                          <v-list-tile-sub-title>
-                            Width: {{ numberify(item.width) }} Height: {{ numberify(item.height) }} Depth:
-                            {{ numberify(item.depth) }}
-                          </v-list-tile-sub-title>
-                        </v-list-tile-content>
-                        <v-list-tile-action>
-                          <v-menu absolute left dark>
-                            <v-btn slot="activator" small fab flat dark>
-                              <v-icon v-if="item.store_Range_Indicator == 'YES'" color="green">done</v-icon>
-                              <v-icon v-if="item.store_Range_Indicator == 'NO'" color="red">close</v-icon>
-                              <v-icon
-                                v-if="item.store_Range_Indicator == 'SELECTED' || item.store_Range_Indicator == 'SELECT'"
-                                color="blue">group_work</v-icon>
-                            </v-btn>
-                            <v-list>
-                              <v-list-tile @click="setProductIndicator('YES', item)">
-                                YES
-                              </v-list-tile>
-                              <v-list-tile @click="setProductIndicator('NO', item)">
-                                NO
-                              </v-list-tile>
-                              <v-list-tile @click="setProductIndicator('SELECTED', item)">
-                                SELECTED
-                              </v-list-tile>
-                              <v-list-tile @click="setProductIndicator('SELECT', item)">
-                                SELECT
-                              </v-list-tile>
-                            </v-list>
-                          </v-menu>
-                        </v-list-tile-action>
-                      </v-list-tile>
-                    </div>
-                  </template>
-                </v-list>
-              </v-flex>
-              <v-flex md12 v-if="view_type == 1">
-                <v-layout row wrap :class="{ 'details_closed': details_panel != 0, 'details_open': details_panel == 0 }"
-                  class="scroll-y">
-                  <v-flex md4 v-for="(item, index) in filteredItems" :key="index">
-                    <v-card>
-                      <v-card-text style="text-align: center;">
-                        <h4>{{ item.barcode }}</h4>
-                        <v-img v-if="warehouse_data.imagesOn"
-                          style="width:50px !important; height:50px !important; margin: 0 auto;"
-                          :src="warehouseCtrl.getProductImageURL(item.barcode)" draggable="true" @drag="dragProduct"
-                          @dragstart="dragProductStart($event, item)" @dragend="clearDrag" contain></v-img>
-                        <v-img v-else style="width:50px !important; height:50px !important; margin: 0 auto;"
-                          src="/static/img/image-placeholder.png" draggable="true" @drag="dragProduct"
-                          @dragstart="dragProductStart($event, item)" @dragend="clearDrag" contain></v-img>
-                      </v-card-text>
-                    </v-card>
-                  </v-flex>
-                </v-layout>
-              </v-flex>
+                              <v-list-tile-content class="ml-2" style="width: 100%">
+                                <v-list-tile-title>{{item.description}}</v-list-tile-title>
+                                <v-list-tile-sub-title>
+                                  Width: {{ numberify(item.width) }} Height: {{ numberify(item.height) }} Depth:
+                                  {{ numberify(item.depth) }}
+                                </v-list-tile-sub-title>
+                              </v-list-tile-content>
+                              <v-list-tile-action>
+                                <v-menu absolute left dark>
+                                  <v-btn slot="activator" small fab flat dark>
+                                    <v-icon v-if="item.store_Range_Indicator == 'YES'" color="green">done</v-icon>
+                                    <v-icon v-if="item.store_Range_Indicator == 'NO'" color="red">close</v-icon>
+                                    <v-icon
+                                      v-if="item.store_Range_Indicator == 'SELECTED' || item.store_Range_Indicator == 'SELECT'"
+                                      color="blue">group_work</v-icon>
+                                  </v-btn>
+                                  <v-list>
+                                    <v-list-tile @click="setProductIndicator('YES', item)">
+                                      YES
+                                    </v-list-tile>
+                                    <v-list-tile @click="setProductIndicator('NO', item)">
+                                      NO
+                                    </v-list-tile>
+                                    <v-list-tile @click="setProductIndicator('SELECTED', item)">
+                                      SELECTED
+                                    </v-list-tile>
+                                    <v-list-tile @click="setProductIndicator('SELECT', item)">
+                                      SELECT
+                                    </v-list-tile>
+                                  </v-list>
+                                </v-menu>
+                              </v-list-tile-action>
+                            </v-list-tile>
+                          </div>
+                        </template>
+                      </v-list>
+                    </v-flex>
+                    <v-flex md12 v-if="view_type == 1">
+                      <v-layout row wrap
+                        :class="{ 'details_closed': details_panel != 0, 'details_open': details_panel == 0 }"
+                        class="scroll-y">
+                        <v-flex md4 v-for="(item, index) in filteredItems" :key="index">
+                          <v-card>
+                            <v-card-text style="text-align: center;">
+                              <h4>{{ item.barcode }}</h4>
+                              <v-img v-if="warehouse_data.imagesOn"
+                                style="width:50px !important; height:50px !important; margin: 0 auto;"
+                                :src="warehouseCtrl.getProductImageURL(item.barcode)" draggable="true"
+                                @drag="dragProduct" @dragstart="dragProductStart($event, item)" @dragend="clearDrag"
+                                contain></v-img>
+                              <v-img v-else style="width:50px !important; height:50px !important; margin: 0 auto;"
+                                src="/static/img/image-placeholder.png" draggable="true" @drag="dragProduct"
+                                @dragstart="dragProductStart($event, item)" @dragend="clearDrag" contain></v-img>
+                            </v-card-text>
+                          </v-card>
+                        </v-flex>
+                      </v-layout>
+                    </v-flex>
+                  </v-card>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+
             </v-layout>
           </div>
         </v-flex>
@@ -533,6 +554,9 @@
       let width = 0;
       width = window.innerWidth * 0.4;
       return {
+        HybridRanges: [],
+        selectedHybridRange: null,
+        lastHybridLoaded: null,
         ais_Sales: 0,
         ais_SalesPotential: 0,
         storeCount: 1,
@@ -572,6 +596,7 @@
         selectedFixtureType: null,
         gotData: false,
         products: [],
+        hybridProducts: [],
         PlanogramObject: {
           status: null,
         },
@@ -639,6 +664,7 @@
           }
         },
         details_panel: null,
+        products_panel: [true],
         categoryCharacteristics: [{
             name: 'Volume %',
             value: 'M'
@@ -863,37 +889,76 @@
         let self = this;
         let tmp = [];
         let final = [];
-
-
-        self.products.forEach(el => {
-          if (el.height == undefined || el.height == null || parseFloat(el.height) <= 0)
-            el.height = 10
-
-          if (el.width == undefined || el.width == null || parseFloat(el.width) <= 0)
-            el.width = 10
-
-          if (el.depth == undefined || el.depth == null || parseFloat(el.depth) <= 0)
-            el.depth = 10
-        })
-
-        if (self.searchText == "") {
-          tmp = self.products;
-        } else {
-          self.products.forEach(product => {
-            if (inIndex(product.description, self.searchText) || inIndex(product.barcode, self.searchText))
-              tmp.push(product);
-          })
+        if (self.HybridRanges.length == 0) {
+          return
         }
+        // todo add switch on selected hybrid
+        if (self.selectedHybridRange == self.HybridRanges[0].value) {
 
-        if (tmp.length > 0) {
-          for (var i = 0; i < tmp.length; i++) {
-            let element = tmp[i];
-            if (!self.productInStore(element.productID)) {
-              final.push(element)
+
+          self.products.forEach(el => {
+            if (el.height == undefined || el.height == null || parseFloat(el.height) <= 0)
+              el.height = 10
+
+            if (el.width == undefined || el.width == null || parseFloat(el.width) <= 0)
+              el.width = 10
+
+            if (el.depth == undefined || el.depth == null || parseFloat(el.depth) <= 0)
+              el.depth = 10
+          })
+
+          if (self.searchText == "") {
+            tmp = self.products;
+          } else {
+            self.products.forEach(product => {
+              if (inIndex(product.description, self.searchText) || inIndex(product.barcode, self.searchText))
+                tmp.push(product);
+            })
+          }
+
+          if (tmp.length > 0) {
+            for (var i = 0; i < tmp.length; i++) {
+              let element = tmp[i];
+              if (!self.productInStore(element.productID)) {
+                final.push(element)
+              }
+            }
+          }
+        } else {
+
+          console.log("hybridProducts", self.hybridProducts);
+
+          self.hybridProducts.forEach(el => {
+            if (el.height == undefined || el.height == null || parseFloat(el.height) <= 0)
+              el.height = 10
+
+            if (el.width == undefined || el.width == null || parseFloat(el.width) <= 0)
+              el.width = 10
+
+            if (el.depth == undefined || el.depth == null || parseFloat(el.depth) <= 0)
+              el.depth = 10
+          })
+
+          if (self.searchText == "") {
+            tmp = self.hybridProducts;
+          } else {
+            self.hybridProducts.forEach(product => {
+
+              if ((inIndex(product.description, self.searchText) || inIndex(product.barcode, self.searchText)) &&
+                product.store_Range_Indicator == "yes")
+                tmp.push(product);
+            })
+          }
+
+          if (tmp.length > 0) {
+            for (var i = 0; i < tmp.length; i++) {
+              let element = tmp[i];
+              if (!self.productInStore(element.productID) && element.store_Range_Indicator == "YES") {
+                final.push(element)
+              }
             }
           }
         }
-
         return final;
       }
     },
@@ -920,6 +985,78 @@
       }
     },
     methods: {
+      onHybridChange() {
+        let self = this
+        self.$nextTick(() => {
+          if (self.selectedHybridRange != self.HybridRanges[0].value && self.selectedHybridRange != self
+            .lastHybridLoaded) {
+            self.$refs.spinner.show()
+            self.lastHybridLoaded = self.selectedHybridRange
+            axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${self.selectedHybridRange}`)
+              .then(r => {
+                console.log("[addHybridRange]", r.data);
+
+                //todo add into self.hybridproducts after going through range controller
+
+                self.rangingController = new RangingController(r.data);
+
+                self.rangingController.getSalesMonthlyTotals(() => {
+                  if (self.selectedClusterType != null && self.selectedClusterOption != null) {
+                    self.hybridProducts = self.rangingController.getSalesDataByCluster(self
+                      .selectedClusterType,
+                      self.selectedClusterOption);
+
+                    self.hybridProducts.forEach(el => {
+                      if (el.store_Range_Indicator == "YES") {
+                        self.ais_Sales = (parseFloat(self.ais_Sales) + ((parseFloat(el.sales_Retail) /
+                          4) / self.storeCount)).toFixed(2);
+                        self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + ((parseFloat(el
+                          .sales_potential) / 4)) / self.storeCount).toFixed(2);
+                      }
+                    })
+                  }
+                  self.$refs.spinner.hide()
+                })
+              })
+          }
+        })
+      },
+      addHybridRange() {
+        let self = this
+        let vscd = self.$store.getters.getClusterData;
+
+        self.rangingData.rangeID
+        self.$refs.rangeSelectorModal.show(fileID => {
+          self.$refs.spinner.show()
+          axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fileID}`)
+            .then(r => {
+              self.rangingController = new RangingController(r.data);
+
+              self.rangingController.getSalesMonthlyTotals(() => {
+                if (self.selectedClusterType != null && self.selectedClusterOption != null) {
+                  self.hybridProducts = self.rangingController.getSalesDataByCluster(self.selectedClusterType,
+                    self.selectedClusterOption);
+
+                  self.hybridProducts.forEach(el => {
+                    if (el.store_Range_Indicator == "YES") {
+                      self.ais_Sales = (parseFloat(self.ais_Sales) + ((parseFloat(el.sales_Retail) /
+                        4) / self.storeCount)).toFixed(2);
+                      self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + ((parseFloat(el
+                        .sales_potential) / 4)) / self.storeCount).toFixed(2);
+                    }
+                  })
+                }
+              })
+              self.HybridRanges.push({
+                text: r.data.planogramName,
+                value: fileID
+              })
+              self.$refs.spinner.hide()
+            })
+
+        })
+
+      },
       openHelpFileMaint() {
         let self = this;
 
@@ -1398,7 +1535,18 @@
               .setClusterAndDimensionData,
               self.$refs.SizeLoader.close, self.updateLoader, () => {
                 self.rangeToPlanogram();
+                if (self.HybridRanges.length == 0) {
+                  self.HybridRanges = []
+                  let vscd = self.$store.getters.getClusterData;
+                  self.HybridRanges.push({
+                    text: self.rangingData.planogramName + " (PRIMARY)",
+                    value: vscd.rangeID
+                  })
+                }
+                self.selectedHybridRange = self.HybridRanges[0].value
               });
+            //initialising hybrid range selector
+
           }, 1000);
         })
       },
@@ -1427,11 +1575,11 @@
           }, 1000);
         })
       },
-      setClusterAndDimensionData(clusterData, dimension, spacePlanName, updatePlanoDataCallback) {
+      setClusterAndDimensionData(clusterData, hybridRanges, dimension, spacePlanName, updatePlanoDataCallback) {
         let self = this;
 
         self.spacePlanName = spacePlanName == undefined ? "" : spacePlanName;
-
+        self.HybridRanges = hybridRanges
         self.modules = dimension == undefined || dimension.modules == undefined ? 0 : dimension.modules;
         self.height = dimension == undefined || dimension.height == undefined ? 0 : dimension.height;
         self.width = dimension == undefined || dimension.width == undefined ? 0 : dimension.width;
@@ -1502,11 +1650,12 @@
 
                   let rangingFileDetails = self.rangingController.getRangingFile();
 
-                  if(rangingFileDetails.categoryCharacteristics != undefined && rangingFileDetails.categoryCharacteristics != null) {
+                  if (rangingFileDetails.categoryCharacteristics != undefined && rangingFileDetails
+                    .categoryCharacteristics != null) {
                     self.categoryCharacteristics.forEach(cc => {
-                      for(var prop in rangingFileDetails.categoryCharacteristics) {
+                      for (var prop in rangingFileDetails.categoryCharacteristics) {
 
-                        if(cc.name == prop) {
+                        if (cc.name == prop) {
                           cc.value = rangingFileDetails.categoryCharacteristics[prop];
                         }
                       }
@@ -1714,7 +1863,7 @@
                 bins: self.bins,
                 FixtureType: self.selectedFixtureType
               }, self.spacePlanID, self.generateName(self.fixture_types), true, image, self.updateLoader, self
-              .$refs.SizeLoader.close, self.fixture_types, self.storeCount, data => {
+              .$refs.SizeLoader.close, self.fixture_types, self.storeCount, self.HybridRanges, data => {
                 self.spacePlanID = data
               })
           } else {
@@ -1733,7 +1882,7 @@
                   }, self.spacePlanID, self.generateName(self.fixture_types), value, image, self.updateLoader,
                   self
                   .$refs
-                  .SizeLoader.close, self.fixture_types, self.storeCount, callback => {
+                  .SizeLoader.close, self.fixture_types, self.storeCount, self.HybridRanges, callback => {
                     self.spacePlanID = callback
                   })
               } else {
@@ -1748,7 +1897,7 @@
                     FixtureType: self.selectedFixtureType,
                     bins: self.bins
                   }, self.spacePlanID, self.spacePlanName, value, image, self.updateLoader, self.$refs
-                  .SizeLoader.close, self.fixture_types, self.storeCount, callback => {
+                  .SizeLoader.close, self.fixture_types, self.storeCount, self.HybridRanges, callback => {
                     self.spacePlanID = callback
                   })
               }
@@ -1800,7 +1949,7 @@
               self
               .$refs
               .SizeLoader
-              .close, self.fixture_types, self.storeCount, data => {
+              .close, self.fixture_types, self.storeCount, self.HybridRanges, data => {
                 self.spacePlanID = data
               })
           }
@@ -1953,6 +2102,8 @@
         return retVal;
       },
       dragProductStart(ev, data) {
+        console.log("dragProductStart", data);
+        data.isHybridProduct = true
         window.warehouseDragData = data;
       },
       dragProduct(ev) {
@@ -1987,6 +2138,7 @@
         let self = this;
 
         self.$nextTick(() => {
+
           if (self.selectedClusterOption != null) {
             if (self.selectedClusterType != "stores") {
               self.storeCount = self.rangingController.getStoreCountByCluster(self.selectedClusterType, self
@@ -2066,6 +2218,18 @@
               }
 
               self.customEmitter.notify_cluster_change(EventBus);
+
+            }
+            if (self.HybridRanges.length == 0) {
+              console.log("nohybrids");
+
+              self.HybridRanges = []
+              let vscd = self.$store.getters.getClusterData;
+              self.HybridRanges.push({
+                text: self.rangingData.planogramName + " (PRIMARY)",
+                value: vscd.rangeID
+              })
+              self.selectedHybridRange = self.HybridRanges[0].value
             }
           }
         })
@@ -2226,7 +2390,7 @@
   }
 
   .details_closed {
-    max-height: calc(100vh - 295px)
+    max-height: calc(100vh - 407px)
   }
 
   table {
