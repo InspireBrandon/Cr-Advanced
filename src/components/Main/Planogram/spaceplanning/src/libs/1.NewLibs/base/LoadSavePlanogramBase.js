@@ -32,7 +32,7 @@ class LoadSavePlanogramBase {
     this.Create = create;
   }
 
-  save(vuex, stage, clusterData, dimensionData, spacePlanID, spacePlanName, updateName, image, updateLoader, close, fixtureData, storeCount, callback) {
+  save(vuex, stage, clusterData, dimensionData, spacePlanID, spacePlanName, updateName, image, updateLoader, close, fixtureData ,storeCount,hybridRanges, callback) {
     let self = this;
     let ctrl_store = new StoreHelper();
     let allItems = ctrl_store.getAllPlanogramItems(vuex);
@@ -45,7 +45,8 @@ class LoadSavePlanogramBase {
       planogramSettings: vuex.getters.getPlanogramProperties,
       clusterData: clusterData,
       dimensionData: dimensionData,
-      image: image
+      image: image,
+      hybridRanges:hybridRanges
     }
 
     allItems.forEach(item => {
@@ -317,7 +318,7 @@ class LoadSavePlanogramBase {
     })
   }
 
-  saveNew(vuex, stage, clusterData, dimensionData, spacePlanID, spacePlanName, updateName, image, updateLoader, close, fixtureData, storeCount, callback) {
+  saveNew(vuex, stage, clusterData, dimensionData, spacePlanID, spacePlanName, updateName, image, updateLoader, close, fixtureData, storeCount,hybridRanges, callback) {
     let self = this;
     let ctrl_store = new StoreHelper();
     let allItems = ctrl_store.getAllPlanogramItems(vuex);
@@ -330,7 +331,8 @@ class LoadSavePlanogramBase {
       planogramSettings: vuex.getters.getPlanogramProperties,
       clusterData: clusterData,
       dimensionData: dimensionData,
-      image: image
+      image: image,
+      hybridRanges:hybridRanges
     }
 
     allItems.forEach(item => {
@@ -895,8 +897,9 @@ class LoadSavePlanogramBase {
       .then(r => {
 
         let jsonData = r.data.jsonObject
-
-        afterGetSpacePlanFile(jsonData.clusterData, jsonData.dimensionData, jsonData.name, rangeProducts => {
+        console.log("loadPlanogram",jsonData);
+        
+        afterGetSpacePlanFile(jsonData.clusterData,jsonData.hybridRanges, jsonData.dimensionData, jsonData.name, rangeProducts => {
           if (rangeProducts == null) {
             self.startLoadingPlanogram(jsonData, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
           } else {

@@ -6,6 +6,9 @@
                     v-model="selectedPage"></v-select>
                 <!-- <v-select style="width: 300px;" class="ml-3" label="Store Numbers" multiple @change="applyReportFilters"
                     :items="storeNumbers" v-model="selectedStoreNumbers"></v-select> -->
+                <!-- <v-btn @click="applyReportFilters">
+                    name
+                </v-btn> -->
             </v-toolbar-items>
             <v-btn color="primary" @click="printReport">Print</v-btn>
             <!-- <v-btn color="primary" @click="switchMode">{{ currentMode == "edit" ? "View" : "Edit" }}</v-btn> -->
@@ -16,6 +19,7 @@
 </template>
 
 <script>
+    import jwt from 'jsonwebtoken';
     import Axios from 'axios';
     import * as pbi from 'powerbi-client';
     import * as models from 'powerbi-models';
@@ -28,6 +32,11 @@
         },
         data() {
             return {
+                userAccess: null,
+                userAccessTypeID: null,
+                systemUserID: null,
+
+                planogramAccess: [],
                 report: null,
                 storeNumbers: [1, 2, 3, 4, 5, 6, 7],
                 selectedStoreNumbers: [],
@@ -42,10 +51,13 @@
             let self = this;
 
             self.$refs.Spinner.show();
+            self.checkAccessType(access => {
+                self.getPage(() => {
+                    self.getReportEmbedConfig();
 
-            self.getPage(() => {
-                self.getReportEmbedConfig();
+                })
             })
+
 
             // self.getReports(() => {
             // });
@@ -77,7 +89,7 @@
                         callback();
                     })
             },
-            getActivePages() {
+            getActivePages(callback) {
                 let self = this;
 
                 self.pages = [];
@@ -93,6 +105,8 @@
 
                         if (self.pages.length > 0)
                             self.selectedPage = self.pages[0].value;
+                        callback(self.selectedPage)
+
                     });
             },
             getReports(callback) {
@@ -138,6 +152,7 @@
                 //     filterType: models.FilterType.Basic,
                 //     requiresSingleSelect: true // Limits selection of values to one.
                 // }
+                console.log("[generateReport]", reportEmbedConfig);
 
                 var config = {
                     type: 'report',
@@ -157,7 +172,9 @@
 
                 self.report.on('loaded', function (event) {
                     self.getFilters();
-                    self.getActivePages();
+                    self.getActivePages(() => {
+                        self.applyReportFilters()
+                    });
 
                     self.$refs.Spinner.hide();
                 })
@@ -170,27 +187,93 @@
                 self.report.getFilters()
                     .then(filters => {})
             },
-            applyReportFilters() {
+            checkAccessType(callback) {
                 let self = this;
 
-                self.$nextTick(() => {
-                    if (self.selectedStoreNumbers.length == 0) {
-                        self.report.removeFilters();
-                    } else {
-                        const basicFilter = {
-                            $schema: "http://powerbi.com/product/schema#basic",
-                            target: {
-                                table: "Store",
-                                column: "StoreNumber"
-                            },
-                            operator: "In",
-                            values: self.selectedStoreNumbers,
-                            filterType: models.FilterType.Basic,
-                            requiresSingleSelect: true // Limits selection of values to one.
-                        }
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+                self.systemUserID = systemUserID;
 
-                        self.report.setFilters([basicFilter])
+                Axios.get(process.env.VUE_APP_API +
+                        `TenantLink_AccessType?systemUserID=${systemUserID}&tenantID=${sessionStorage.currentDatabase}`)
+                    .then(r => {
+                        console.log("[CHECK ACCESS]", r.data);
+
+                        if (r.data.isDatabaseOwner == true) {
+                            self.userAccess = 0
+                        } else {
+                            console.log("[tenenant]");
+                            console.log(r.data);
+
+                            self.userAccess = r.data.tenantLink_AccessTypeList[0].accessType
+                            self.userAccessTypeID = r.data.tenantLink_AccessTypeList[0].tenantLink_AccessTypeID
+                            self.planogramAccess = []
+                            r.data.tenantLink_AccessTypeList[0].supplierPlanogramList.forEach(planogram => {
+                                self.planogramAccess.push(planogram.planogram_ID)
+                            })
+                            if (self.userAccess == 3) {
+                                self.selectedStore = r.data.tenantLink_AccessTypeList[0].storeID
+                                self.store_ID = r.data.tenantLink_AccessTypeList[0].storeID
+                            }
+                        }
+                        callback();
+                    })
+            },
+            applyReportFilters() {
+                let self = this;
+                // let visuals = self.report.page(self.selectedPage).getVisuals()
+                //     .then(data => {
+                //         console.log("[DATYA]",data);
+                        
+                //         data.forEach((item, idx) => {
+                //             item.exportData(models.ExportDataType.Summarized , 100)
+                //                 .then(function (data) {
+                //                     console.log("[VISUALS]" + idx, data);
+                //                 })
+                //         })
+                //     })
+                // console.log("[export]", visuals);
+
+
+                // self.report.exportData(models.ExportDataType.Summarized, 100)
+                //     .then(function (data) {
+                //         console.log("[exportData]",data);
+                //     })
+                self.$nextTick(() => {
+                    let supplierFilter
+                    let supplierFilter2
+                    // apply filter
+
+                    console.log("[supplierFilter]", self.planogramAccess);
+
+                    supplierFilter = {
+                        $schema: "http://powerbi.com/product/schema#basic",
+                        target: {
+                            table: "BI_Topline",
+                            column: "Planogram_ID"
+                        },
+                        operator: "In",
+                        values: self.planogramAccess,
+                        filterType: models.FilterType.Basic,
+                        requiresSingleSelect: false // Limits selection of values to one.
+                    }
+
+                    supplierFilter2 = {
+                        $schema: "http://powerbi.com/product/schema#basic",
+                        target: {
+                            table: "BI_Category",
+                            column: "Planogram_ID"
+                        },
+                        operator: "In",
+                        values: self.planogramAccess,
+                        filterType: models.FilterType.Basic,
+                        requiresSingleSelect: false // Limits selection of values to one.
+                    }
+
+                    if (self.planogramAccess.length > 0) {
+                        self.report.setFilters([supplierFilter,supplierFilter2])
                             .catch(errors => {
+
                                 // Handle error
                             });
                     }
@@ -208,7 +291,10 @@
 
                 self.$nextTick(() => {
                     let page = self.report.page(self.selectedPage);
+                    console.log("[page]", page);
+
                     page.setActive();
+                    self.applyReportFilters()
                 })
             },
             printReport() {
