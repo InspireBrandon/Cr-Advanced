@@ -471,7 +471,7 @@
                             tr.attachTo(e.target);
                             self.selectedLayer.draw();
                             tr.on('transform', function (z) {
-                                if (self.ctrlDown) {
+                                // if (self.ctrlDown) {
                                     // tr.stopTransform();
 
                                     let transform = self.stage.getAbsoluteTransform().copy();
@@ -481,8 +481,8 @@
                                     let pos = self.stage.getPointerPosition();
                                     let dropPos = transform.point(pos);
 
-
                                     lastPosition = dropPos;
+
                                     if (z.currentTarget.movingResizer == "middle-left") {
                                         // tr.stopTransform();
                                         const right = {
@@ -501,9 +501,9 @@
 
                                         var deg = rad * (180 / Math.PI);
 
-
-                                        rotateAroundCenter(self.selectedItem, (180 + deg))
+                                        rotateAroundCenter(self.selectedItem, (180 + deg), pos)
                                     }
+
                                     if (z.currentTarget.movingResizer == "middle-right") {
                                         var deltaX = lastPosition.x - e.target.attrs.x;
                                         var deltaY = lastPosition.y - e.target.attrs.y;
@@ -513,10 +513,9 @@
 
                                         var deg = rad * (180 / Math.PI);
                                         self.selectedItem.rotation(deg);
+                                        self.selectedItem.width(hyp);
                                     }
-
-                                }
-
+                                // }
                             });
 
                             tr.on('transformend', function () {
@@ -627,6 +626,7 @@
                     }
 
                 });
+
                 self.stage.on('dragstart', (e) => {
                     if (self.mode == modes.draw) {
                         self.stage.stopDrag()
@@ -634,6 +634,7 @@
 
                     }
                 })
+
                 self.stage.on('dragend', (e) => {
                     if (self.mode == modes.draw) {
                         self.stage.stopDrag()
@@ -644,6 +645,7 @@
 
                     }
                 })
+
                 self.stage.on('contentMousemove', function () {
                     if (self.mode == modes.draw) {
                         if (firstPosition == null) {
@@ -693,6 +695,7 @@
                     }
 
                 });
+
                 self.stage.on('dragmove', function (e) {
                     // clear all previous lines on the screen
                     self.stage.find('.guid-line').destroy();
@@ -759,8 +762,8 @@
                     });
                 });
 
-
                 var scaleBy = 1.05;
+
                 self.stage.addEventListener('wheel', (e) => {
                     var oldScale = self.stage.scaleX();
 
@@ -1150,7 +1153,7 @@
     };
 
     // will work for shapes with top-left origin, like rectangle
-    function rotateAroundCenter(node, rotation) {
+    function rotateAroundCenter(node, rotation, hyp) {
         //current rotation origin (0, 0) relative to desired origin - center (node.width()/2, node.height()/2)
         const right = {
             x: -node.width(),
@@ -1162,6 +1165,7 @@
             dy = rotated.y - current.y;
 
         node.rotation(rotation);
+        node.width(hyp);
         node.x(node.x() + dx);
         node.y(node.y() + dy);
     }
