@@ -149,7 +149,8 @@
 
         Axios.get(process.env.VUE_APP_API + "/Planogram_Details")
           .then(r => {
-
+            console.log("Planogram_Details",r);
+            
             self.spaceData = []
             if (self.doCheck == true) {
               r.data.planogram_DetailsList.forEach(element => {

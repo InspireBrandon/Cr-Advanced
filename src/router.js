@@ -94,6 +94,9 @@ import HelpFileView from '@/components/Main/HelpFile/Index.vue'
 import Tasks from '@/components/Main/Tasks/Switcher.vue';
 
 import ProductListing from '@/components/Apps/RangePlanning/ProductListing/Index.vue';
+// floor plan Planogram Designer
+import FloorplanDesigner from '@/components/Main/Floorplan_planogramDesinger/FloorplanDesigner.vue'
+
 
 // Floor Planning
 import FloorPlanning from '@/components/Main/FloorPlanning/index.vue'
@@ -173,6 +176,12 @@ export default new Router({
       name: 'floor_planning',
       component: FloorPlanning
     },
+    {
+      path: '/FloorplanDesigner/:ID',
+      name: 'floor_plan_designer',
+      component: FloorplanDesigner
+    },
+    
     {
       path: '/FloorPlanning2D',
       name: 'floor_planning_2d',

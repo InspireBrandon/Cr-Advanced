@@ -4,6 +4,11 @@
             <v-toolbar-items>
                 <v-select style="width: 300px;" class="ml-3" label="Page" @change="chooseActivePage" :items="pages"
                     v-model="selectedPage"></v-select>
+
+                <v-autocomplete :items="planograms" v-model="selectedPlanograms" class="ml-3"
+                    placeholder="Planogram Filter" multiple style="width: 300px;margin-left:8px;" @change="applyFilter"
+                    hide-details>
+                </v-autocomplete>
                 <!-- <v-select style="width: 300px;" class="ml-3" label="Store Numbers" multiple @change="applyReportFilters"
                     :items="storeNumbers" v-model="selectedStoreNumbers"></v-select> -->
                 <!-- <v-btn @click="applyReportFilters">
@@ -11,6 +16,7 @@
                 </v-btn> -->
             </v-toolbar-items>
             <v-btn color="primary" @click="printReport">Print</v-btn>
+
             <!-- <v-btn color="primary" @click="switchMode">{{ currentMode == "edit" ? "View" : "Edit" }}</v-btn> -->
         </v-toolbar>
         <div ref="reportContainer" id="reportContainer" style="width: 100%; height: calc(100vh - 110px);"></div>
@@ -32,6 +38,8 @@
         },
         data() {
             return {
+                planograms: [],
+                selectedPlanograms: [],
                 userAccess: null,
                 userAccessTypeID: null,
                 systemUserID: null,
@@ -51,7 +59,9 @@
             let self = this;
 
             self.$refs.Spinner.show();
+
             self.checkAccessType(access => {
+                self.getPlanograms()
                 self.getPage(() => {
                     self.getReportEmbedConfig();
 
@@ -63,6 +73,85 @@
             // });
         },
         methods: {
+
+            getPlanograms() {
+                let self = this;
+
+                return new Promise((resolve, reject) => {
+                    Axios.get(process.env.VUE_APP_API + 'Planogram')
+                        .then(r => {
+                            console.log(r);
+
+
+                            r.data.planogramList.forEach(e => {
+                                if (self.userAccess == 2) {
+                                    self.planogramAccess.forEach(planogram => {
+                                        if (planogram == e.id) {
+                                            self.planograms.push({
+                                                text: e.displayname,
+                                                value: e.id
+                                            })
+                                        }
+                                    })
+                                } else {
+                                    self.planograms.push({
+                                        text: e.displayname,
+                                        value: e.id
+                                    })
+                                }
+
+                            })
+                            if (self.userAccess == 2) {
+                                self.selectedPlanograms = self.planogramAccess
+                            }
+                            resolve();
+                        })
+                        .catch(e => {
+                            reject();
+                        })
+                })
+            },
+            applyFilter() {
+                let self = this
+                self.report.removeFilters();
+                // self.planogramAccess.forEach(item => {
+                //     self.selectedPlanograms.push(item)
+                // })
+                let supplierFilter = {
+                    $schema: "http://powerbi.com/product/schema#basic",
+                    target: {
+                        table: "BI_Topline",
+                        column: "Planogram_ID"
+                    },
+                    operator: "In",
+                    values: self.selectedPlanograms,
+                    filterType: models.FilterType.Basic,
+                    requiresSingleSelect: false // Limits selection of values to one.
+                }
+
+                let supplierFilter2 = {
+                    $schema: "http://powerbi.com/product/schema#basic",
+                    target: {
+                        table: "BI_Category",
+                        column: "Planogram_ID"
+                    },
+                    operator: "In",
+                    values: self.selectedPlanograms,
+                    filterType: models.FilterType.Basic,
+                    requiresSingleSelect: false // Limits selection of values to one.
+                }
+
+
+                if (self.selectedPlanograms.length > 0) {
+                    self.report.setFilters([supplierFilter, supplierFilter2])
+                        .catch(errors => {
+
+                            // Handle error
+                        });
+                } else {
+                    self.applyReportFilters()
+                }
+            },
             switchMode() {
                 let self = this;
 
@@ -221,24 +310,6 @@
             },
             applyReportFilters() {
                 let self = this;
-                // let visuals = self.report.page(self.selectedPage).getVisuals()
-                //     .then(data => {
-                //         console.log("[DATYA]",data);
-                        
-                //         data.forEach((item, idx) => {
-                //             item.exportData(models.ExportDataType.Summarized , 100)
-                //                 .then(function (data) {
-                //                     console.log("[VISUALS]" + idx, data);
-                //                 })
-                //         })
-                //     })
-                // console.log("[export]", visuals);
-
-
-                // self.report.exportData(models.ExportDataType.Summarized, 100)
-                //     .then(function (data) {
-                //         console.log("[exportData]",data);
-                //     })
                 self.$nextTick(() => {
                     let supplierFilter
                     let supplierFilter2
@@ -271,7 +342,7 @@
                     }
 
                     if (self.planogramAccess.length > 0) {
-                        self.report.setFilters([supplierFilter,supplierFilter2])
+                        self.report.setFilters([supplierFilter, supplierFilter2])
                             .catch(errors => {
 
                                 // Handle error

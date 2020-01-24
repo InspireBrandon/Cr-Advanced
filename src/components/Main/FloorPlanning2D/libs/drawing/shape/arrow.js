@@ -1,7 +1,7 @@
 import Konva from 'konva'
 import Shape from './shape'
 
-class Circle extends Shape {
+class Arrow extends Shape {
     constructor(parent, config, ratio) {
         super(parent);
         if (config == null || config == undefined) {
@@ -14,15 +14,17 @@ class Circle extends Shape {
 
         let self = this;
 
-        self.shape = new Konva.Circle({
-            x: config.x,
-            y: config.y,
-            radius: 25 * ratio,
+        self.shape = new Konva.Arrow({
+            points:[config.x, config.y],
+            pointerLength: 20,
+            pointerWidth: 20,
+            stroke:"black",
+            strokeWidth:4,
             fill: "#1976d2",
             draggable: true,
             visible: 'inherit',
             enabledAnchors: self.enabledAnchors,
-            name: "circle"
+            name: "arrow"
         });
 
         parent.add(self.shape);
@@ -30,4 +32,4 @@ class Circle extends Shape {
     }
 }
 
-export default Circle;
+export default Arrow;

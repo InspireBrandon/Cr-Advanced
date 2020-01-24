@@ -9,6 +9,7 @@ class TreeItem {
         self.showChildren=data.showChildren;
         self.visible=data.visible;
         self.drawType=data.drawType;
+        self.locked=data.locked;
     }
 } 
 
