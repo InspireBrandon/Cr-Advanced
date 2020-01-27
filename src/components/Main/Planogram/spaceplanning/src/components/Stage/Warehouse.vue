@@ -900,46 +900,19 @@
         let self = this;
         let tmp = [];
         let final = [];
-        if (self.HybridRanges.length == 0) {
-          return
-        }
-        // todo add switch on selected hybrid
-        if (self.selectedHybridRange == self.HybridRanges[0].value) {
-          self.products.forEach(el => {
-            if (el.height == undefined || el.height == null || parseFloat(el.height) <= 0)
-              el.height = 10
+        if (self.HybridRanges != null && self.HybridRanges != undefined) {
 
-            if (el.width == undefined || el.width == null || parseFloat(el.width) <= 0)
-              el.width = 10
-
-            if (el.depth == undefined || el.depth == null || parseFloat(el.depth) <= 0)
-              el.depth = 10
-          })
-
-          if (self.searchText == "") {
-            tmp = self.products;
-          } else {
-            self.products.forEach(product => {
-              if (inIndex(product.description, self.searchText) || inIndex(product.barcode, self.searchText))
-                tmp.push(product);
-            })
+          if (self.HybridRanges.length == 0) {
+            return
           }
 
-          if (tmp.length > 0) {
-            for (var i = 0; i < tmp.length; i++) {
-              let element = tmp[i];
-              if (!self.productInStore(element.productID)) {
-                final.push(element)
-              }
-            }
+
+          // todo add switch on selected hybrid
+          if (self.HybridRanges != null && self.hybridRanges != undefined) {
+
           }
-        } else {
-
-
-          if (self.selectedHybridRange == "Promotion items") {
-            console.log("promoItems", self.promoItems);
-
-            self.promoItems.forEach(el => {
+          if (self.selectedHybridRange == self.HybridRanges[0].value) {
+            self.products.forEach(el => {
               if (el.height == undefined || el.height == null || parseFloat(el.height) <= 0)
                 el.height = 10
 
@@ -951,11 +924,10 @@
             })
 
             if (self.searchText == "") {
-              tmp = self.promoItems;
+              tmp = self.products;
             } else {
-              self.promoItems.forEach(product => {
-
-                if ((inIndex(product.description, self.searchText) || inIndex(product.barcode, self.searchText)))
+              self.products.forEach(product => {
+                if (inIndex(product.description, self.searchText) || inIndex(product.barcode, self.searchText))
                   tmp.push(product);
               })
             }
@@ -969,38 +941,75 @@
               }
             }
           } else {
-            self.hybridProducts.forEach(el => {
-              if (el.height == undefined || el.height == null || parseFloat(el.height) <= 0)
-                el.height = 10
 
-              if (el.width == undefined || el.width == null || parseFloat(el.width) <= 0)
-                el.width = 10
 
-              if (el.depth == undefined || el.depth == null || parseFloat(el.depth) <= 0)
-                el.depth = 10
-            })
+            if (self.selectedHybridRange == "Promotion items") {
+              console.log("promoItems", self.promoItems);
 
-            if (self.searchText == "") {
-              tmp = self.hybridProducts;
-            } else {
-              self.hybridProducts.forEach(product => {
+              self.promoItems.forEach(el => {
+                if (el.height == undefined || el.height == null || parseFloat(el.height) <= 0)
+                  el.height = 10
 
-                if ((inIndex(product.description, self.searchText) || inIndex(product.barcode, self.searchText)) &&
-                  product.store_Range_Indicator == "yes")
-                  tmp.push(product);
+                if (el.width == undefined || el.width == null || parseFloat(el.width) <= 0)
+                  el.width = 10
+
+                if (el.depth == undefined || el.depth == null || parseFloat(el.depth) <= 0)
+                  el.depth = 10
               })
-            }
 
-            if (tmp.length > 0) {
-              for (var i = 0; i < tmp.length; i++) {
-                let element = tmp[i];
-                if (!self.productInStore(element.productID) && element.store_Range_Indicator == "YES") {
-                  final.push(element)
+              if (self.searchText == "") {
+                tmp = self.promoItems;
+              } else {
+                self.promoItems.forEach(product => {
+
+                  if ((inIndex(product.description, self.searchText) || inIndex(product.barcode, self.searchText)))
+                    tmp.push(product);
+                })
+              }
+
+              if (tmp.length > 0) {
+                for (var i = 0; i < tmp.length; i++) {
+                  let element = tmp[i];
+                  if (!self.productInStore(element.productID)) {
+                    final.push(element)
+                  }
+                }
+              }
+            } else {
+              self.hybridProducts.forEach(el => {
+                if (el.height == undefined || el.height == null || parseFloat(el.height) <= 0)
+                  el.height = 10
+
+                if (el.width == undefined || el.width == null || parseFloat(el.width) <= 0)
+                  el.width = 10
+
+                if (el.depth == undefined || el.depth == null || parseFloat(el.depth) <= 0)
+                  el.depth = 10
+              })
+
+              if (self.searchText == "") {
+                tmp = self.hybridProducts;
+              } else {
+                self.hybridProducts.forEach(product => {
+
+                  if ((inIndex(product.description, self.searchText) || inIndex(product.barcode, self
+                    .searchText)) &&
+                    product.store_Range_Indicator == "yes")
+                    tmp.push(product);
+                })
+              }
+
+              if (tmp.length > 0) {
+                for (var i = 0; i < tmp.length; i++) {
+                  let element = tmp[i];
+                  if (!self.productInStore(element.productID) && element.store_Range_Indicator == "YES") {
+                    final.push(element)
+                  }
                 }
               }
             }
-          }
 
+          }
         }
         return final;
       }
@@ -1626,15 +1635,17 @@
               .setClusterAndDimensionData,
               self.$refs.SizeLoader.close, self.updateLoader, () => {
                 self.rangeToPlanogram();
-                if (self.HybridRanges.length == 0) {
+
+                // if (self.HybridRanges.length == 0) {
                   self.HybridRanges = []
                   let vscd = self.$store.getters.getClusterData;
                   self.HybridRanges.push({
                     text: self.rangingData.planogramName + " (PRIMARY)",
                     value: vscd.rangeID
                   })
-                }
+                // }
                 self.selectedHybridRange = self.HybridRanges[0].value
+
               });
             //initialising hybrid range selector
 
@@ -2325,17 +2336,20 @@
               self.customEmitter.notify_cluster_change(EventBus);
 
             }
-            if (self.HybridRanges.length == 0) {
-              console.log("nohybrids");
+            if (self.HybridRanges != null && self.HybridRanges != undefined) {
+              if (self.HybridRanges.length == 0) {
+                console.log("nohybrids");
 
-              self.HybridRanges = []
-              let vscd = self.$store.getters.getClusterData;
-              self.HybridRanges.push({
-                text: self.rangingData.planogramName + " (PRIMARY)",
-                value: vscd.rangeID
-              })
-              self.selectedHybridRange = self.HybridRanges[0].value
+                self.HybridRanges = []
+                let vscd = self.$store.getters.getClusterData;
+                self.HybridRanges.push({
+                  text: self.rangingData.planogramName + " (PRIMARY)",
+                  value: vscd.rangeID
+                })
+                self.selectedHybridRange = self.HybridRanges[0].value
+              }
             }
+
           }
         })
       },
@@ -2467,19 +2481,22 @@
             planogramName += " - " + e.code + "(" + e.modules + " x " + e.height + "M)"
           }
         })
-        if (self.HybridRanges.length > 1) {
-          planogramName += " - Mixed"
+        if (self.HybridRanges != null && self.HybridRanges != undefined) {
+          if (self.HybridRanges.length > 1) {
+            planogramName += " - Mixed"
 
-          let addpromo = false
-          self.HybridRanges.forEach(range => {
-            if (range.value == "Promotion items") {
-              addpromo = true
+            let addpromo = false
+            self.HybridRanges.forEach(range => {
+              if (range.value == "Promotion items") {
+                addpromo = true
+              }
+            })
+            if (addpromo) {
+              planogramName += " - Promotion"
             }
-          })
-          if (addpromo) {
-            planogramName += " - Promotion"
           }
         }
+
 
         return planogramName
       },
