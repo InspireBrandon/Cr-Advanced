@@ -271,15 +271,38 @@
           value: null
         })
 
+        self.categoryCodes.forEach(element => {
+          let canAdd = true;
+
+          tmp.forEach(el => {
+            if (el.value == element.departmentID) {
+              canAdd = false
+            }
+          })
+
+          if (canAdd) {
+            // console.log(element);
+
+            tmp.push({
+              text: element.department,
+              value: element.departmentID
+            })
+          }
+        });
+
         for (let index = 0; index < self.categoryCodes.length; index++) {
           const element = self.categoryCodes[index];
-          tmp.push({
-            text: element.department,
-            value: element.departmentID
-          })
         }
 
-        return tmp;
+        return tmp.sort((a, b) => {
+            if ( a.text < b.text ){
+              return -1;
+            }
+            if ( a.text > b.text ){
+              return 1;
+            }
+            return 0;
+        });
       },
       subdepartments() {
         let self = this;
@@ -663,7 +686,7 @@
       openEdit(product) {
         let self = this
         console.log(product);
-        
+
         this.$refs.productMaint.show({
           isAdd: false,
           formData: product.data,
@@ -678,7 +701,7 @@
             Axios.put(process.env.VUE_APP_API + "Product?db=CR-Hinterland-Live", product.data)
               .then(r => {
                 console.log(r);
-                
+
                 if (r.data) {
                   self.$refs.productMaint.hide();
                   product.node.setData(r.data);
