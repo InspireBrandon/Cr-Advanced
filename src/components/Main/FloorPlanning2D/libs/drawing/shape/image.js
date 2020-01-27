@@ -8,6 +8,7 @@ class Image extends Shape {
         super(parent);
 
         let self = this;
+
         self.create();
     }
 
