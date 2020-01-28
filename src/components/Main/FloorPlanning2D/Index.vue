@@ -1,5 +1,16 @@
 <template>
     <div>
+        <v-menu v-model="showMenu" :position-x="x" :position-y="y" absolute offset-y>
+            <v-list dense class="pa-0">
+                <v-list-tile class="pa-0" @click.prevent="moveSelectedBack">
+                    <v-list-tile-title class="pa-0">Send Back</v-list-tile-title>
+                </v-list-tile>
+                <v-divider></v-divider>
+                <v-list-tile class="pa-0" @click.prevent="moveSelectedForward">
+                    <v-list-tile-title class="pa-0">MoveForward</v-list-tile-title>
+                </v-list-tile>
+            </v-list>
+        </v-menu>
         <v-toolbar dark color="primary">
             <v-btn icon @click="$router.push('/Home')">
                 <v-icon>home</v-icon>
@@ -52,7 +63,7 @@
             <v-btn icon flat small @click="duplicate('DOWN')">
                 <v-icon>arrow_drop_down</v-icon>
             </v-btn>
-            {{selectedItem}}
+            {{ctrlDown}}
             <v-spacer></v-spacer>
             <v-toolbar-title>Floor Planning</v-toolbar-title>
         </v-toolbar>
@@ -80,7 +91,7 @@
                 <v-layout row wrap>
                     <v-flex sm10 class="pa-0">
                         <v-card tile flat id="stage_container" class="fill-height" :style="{ 'cursor': currentCursor }">
-                            <div id="container"></div>
+                            <div id="container" oncontextmenu="return false;"></div>
                         </v-card>
                     </v-flex>
                     <v-flex sm2 class="pa-0">
@@ -92,12 +103,16 @@
                             </v-toolbar>
                             <v-card-text v-if="selectedTool == 'open_with'" class="pt-0"
                                 style="height: 30%; overflow-y: scroll;">
-                                <v-text-field label="Name" v-model="properties.name" hide-details> </v-text-field>
-                                <v-text-field type="number" label="Height" v-model="properties.height" hide-details>
+                                <v-text-field v-if="properties.name!=null" label="Name" v-model="properties.name"
+                                    hide-details> </v-text-field>
+                                <v-text-field v-if="properties.height!=null" type="number" label="Height"
+                                    v-model="properties.height" hide-details>
                                 </v-text-field>
-                                <v-text-field type="number" label="Width" v-model="properties.width" hide-details>
+                                <v-text-field v-if="properties.width!=null" type="number" label="Width"
+                                    v-model="properties.width" hide-details>
                                 </v-text-field>
-                                <v-text-field type="number" label="Radius" v-model="properties.radius" hide-details>
+                                <v-text-field v-if="properties.radius!=null" type="number" label="Radius"
+                                    v-model="properties.radius" hide-details>
                                 </v-text-field>
                             </v-card-text>
                             <v-toolbar v-if="selectedTool != 'open_with'" dark dense flat color="grey darken-3">
@@ -134,7 +149,7 @@
                                 </v-menu>
                             </v-toolbar>
                             <v-card-text class="pa-0 pt-0" style="height: 57%; overflow-y: scroll;">
-                                <RecursiveLayer :selectedLayerTreeItem="selectedLayerTreeItem"
+                                <RecursiveLayer ref="RecursiveLayer" :selectedLayerTreeItem="selectedLayerTreeItem"
                                     :editLayerName="editLayerName" :showChild="true" :layers="layerTree"
                                     :selectLayer="selectLayer" :setLayerVisible="setLayerVisible"
                                     :deleteLayer="deleteLayer" :endDrag="endDrag" :swapIndex="swapIndex"
@@ -149,6 +164,12 @@
             <input @change="onFileChange" type="file" style="display: none;" ref="fileInput">
             <PlanogramDetailsSelector ref="PlanogramDetailsSelector" />
         </v-container>
+        <v-snackbar v-model="snackbar" color="primary" :timeout="3000">
+            {{ snackbarText }}
+            <v-btn dark flat @click="snackbar = false">
+                Close
+            </v-btn>
+        </v-snackbar>
     </div>
 </template>
 
@@ -158,15 +179,17 @@
     import treeItem from './libs/tree/TreeItem'
     import Rect from './libs/drawing/shape/rect'
     import Circle from './libs/drawing/shape/circle'
+    import Label from './libs/drawing/shape/label'
     import Line from './libs/drawing/shape/line'
     import Arrow from './libs/drawing/shape/arrow'
     import StageImage from './libs/drawing/shape/image'
+
+
     import DuplicationHelper from './libs/drawing/Functions/duplication-Helper'
     import SnappingHandler from './libs/drawing/Functions/snapping-handler'
 
+
     import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector';
-
-
 
     import Settings from './Settings'
     import RecursiveLayer from "./RecursiveLayer.vue"
@@ -179,8 +202,6 @@
 
     const scaleBy = 1.05;
 
-
-
     export default {
         components: {
             Settings,
@@ -189,6 +210,13 @@
         },
         data() {
             return {
+                snackbar: false,
+                snackbarText: "",
+                x: 0,
+                y: 0,
+                showMenu: false,
+                lastdeletedItem: [],
+                lastDeletedTree: [],
                 meterRatio: 50,
                 duplicationSequence: {
                     up: 1,
@@ -268,6 +296,52 @@
             }
         },
         methods: {
+            getItemFromArr(arr, id, prop, callback) {
+                let self = this
+                arr.forEach((item, idx) => {
+                    if (item[prop] == id) {
+                        callback({
+                            item: item,
+                            idx: idx
+                        })
+                    }
+                })
+            },
+            moveSelectedBack() {
+                let self = this
+
+                if (self.selectedLayer.children.length > 1) {
+                    self.getItemFromArr(self.selectedLayer.children, self.selectedItem._id, "_id", konvaCallback => {
+                        self.getItemFromArr(self.selectedLayerTree.children, self.selectedItem._id, "KonvaID",
+                            treeCallback => {
+                                arraymove(self.selectedLayer.children, konvaCallback.idx, konvaCallback
+                                    .idx - 1)
+                                arraymove(self.selectedLayerTree.children, treeCallback.idx, treeCallback
+                                    .idx - 1)
+                                self.selectedLayer.draw()
+                            })
+                    })
+                }
+            },
+            moveSelectedForward() {
+                let self = this
+
+                if (self.selectedLayer.children.length > 1) {
+
+                    self.getItemFromArr(self.selectedLayer.children, self.selectedItem._id, "_id", konvaCallback => {
+
+                        self.getItemFromArr(self.selectedLayerTree.children, self.selectedItem._id, "KonvaID",
+                            treeCallback => {
+
+                                arraymove(self.selectedLayer.children, konvaCallback.idx, konvaCallback
+                                    .idx + 1, self.selectedLayer.children.length + 1)
+                                arraymove(self.selectedLayerTree.children, treeCallback.idx, treeCallback
+                                    .idx + 1, self.selectedLayerTree.children.length)
+                                self.selectedLayer.draw()
+                            })
+                    })
+                }
+            },
             resetDuplication() {
                 let self = this
 
@@ -309,6 +383,41 @@
                         self.selectedLayer.children.forEach(child => {
                             child.draggable(false);
                         })
+                    }
+                    switch (self.selectedTool) {
+
+                        case "open_with":
+                            self.snackbarText = "Click and drag items to move them"
+                            self.snackbar = true
+                            break;
+                        case "view_carousel":
+                            self.snackbarText = "Click on stage to add a Gondola"
+                            self.snackbar = true
+                            break;
+                        case "fiber_manual_record":
+                            self.snackbarText = "Click and drag on the stage to add Circle"
+                            self.snackbar = true
+                            break;
+                        case "show_chart":
+                            self.snackbarText = "Click and drag on the stage to add a wall"
+                            self.snackbar = true
+                            break;
+                        case "image":
+                            self.snackbarText = "Click on the stage to add an image"
+                            self.snackbar = true
+                            break;
+                        case "local_offer":
+                            self.snackbarText = "Click and drag on the stage to add a label"
+                            self.snackbar = true
+                            break;
+                        case "arrow_upward":
+                            self.snackbarText = "Click and drag on the stage to add an arrow"
+                            self.snackbar = true
+                            break;
+
+
+                        default:
+                            break;
                     }
                 })
             },
@@ -535,12 +644,15 @@
                     showChildren: layer.showChildren,
                     drawType: "Layer"
                 })
+
                 self.layerTree.push(layertreeitem)
+
 
 
                 self.layers.unshift(layer);
                 self.stage.add(layer);
                 self.selectLayer(layertreeitem, self.layerTree)
+                self.$refs.RecursiveLayer.focusRename(layer._id)
             },
             addGroup() {
                 let self = this;
@@ -628,6 +740,18 @@
                 }
 
             },
+            onContextMenu(e, item) {
+                let self = this;
+
+                // self.selectedItem = item;
+                self.showMenu = false
+                self.x = e.evt.clientX
+                self.y = e.evt.clientY
+                self.$nextTick(() => {
+                    self.stage.find('Transformer').destroy()
+                    self.showMenu = true
+                })
+            },
             addStageEvents() {
                 let self = this;
                 let firstPosition = null;
@@ -640,14 +764,14 @@
                 var arrow
                 var arrowStartY
                 var arrowStartX
+                var textNode
 
                 self.stage.on('click tap', function (e) {
-                    console.log("click tap", e);
-
                     self.stage.find('Transformer').destroy()
                     self.resetDuplication()
                     if (e.target.attrs.name == "front-Line" || e.target.attrs.name == "rect") {
                         e.target = e.target.parent
+
                         self.findLayerItem(self.layerTree, e.target.parent._id, callback => {
                             self.selectedLayerTreeItem = callback
                         })
@@ -671,16 +795,15 @@
                             self.properties.width = self.selectedItem.attrs.width;
                             self.properties.color = self.selectedItem.attrs.fill;
                             self.properties.radius = self.selectedItem.attrs.radius;
-
                             var tr = new Konva.Transformer({
                                 enabledAnchors: self.selectedItem.attrs.enabledAnchors,
 
-                                boundBoxFunc: function (oldBoundBox, newBoundBox) {
-                                    if (self.ctrlDown) {
-                                        return oldBoundBox;
-                                    }
-                                    return newBoundBox;
-                                }
+                                // boundBoxFunc: function (oldBoundBox, newBoundBox) {
+                                //     if (self.ctrlDown) {
+                                //         return oldBoundBox;
+                                //     }
+                                //     return newBoundBox;
+                                // }
                             });
                             tr.rotateEnabled(false);
 
@@ -740,6 +863,15 @@
                             tr.on('transformend', function () {
                                 self.stage.find('.guid-line').destroy();
                                 if (self.selectedItem.attrs.name == "rect-group") {
+                                    // self.selectedItem.setAttrs({
+                                    //     height: self.selectedItem.height() * self.selectedItem
+                                    //         .scaleX().toFixed(2),
+                                    //     width: self.selectedItem.width() * self.selectedItem
+                                    //         .scaleX().toFixed(2),
+                                    //     scaleX: 1,
+                                    //     scaleY: 1,
+
+                                    // });
                                     self.selectedItem.children.forEach(item => {
                                         if (item.attrs.name == "front-Line") {
                                             item.setAttrs({
@@ -749,11 +881,6 @@
                                                 scaleX: 1,
                                                 scaleY: 1
                                             });
-
-                                            self.properties.height = item.height().toFixed(2);
-                                            self.properties.width = item.width().toFixed(2)
-
-
                                         } else {
                                             item.setAttrs({
                                                 height: item.height() * item
@@ -763,14 +890,12 @@
                                                 scaleX: 1,
                                                 scaleY: 1
                                             });
-
                                             self.properties.height = item.height().toFixed(2);
                                             self.properties.width = item.width().toFixed(2)
                                         }
                                     });
                                 } else {
 
-                                    console.log(self.selectedItem);
                                     if (self.selectedItem.attrs.drawType == "label") {
 
                                     } else {
@@ -795,7 +920,17 @@
                     }
                 });
 
+                self.stage.on('contextmenu', function (ev) {
+                    // self.stage.find('Transformer').destroy()
+                    self.onContextMenu(ev)
+
+                })
+
                 self.stage.on('contentMousedown', function () {
+                    if (self.selectedLayer.attrs.visible == false) {
+                        alert("cannot draw on invisible layer")
+                        return
+                    }
                     let transform = self.stage.getAbsoluteTransform().copy();
                     // to detect relative position we need to invert transform
                     transform.invert();
@@ -894,19 +1029,14 @@
                             break;
                         case "local_offer":
 
-
-                            var textNode = new Konva.Text({
-                                text: 'Some text here',
-                                drawType: "label",
+                            textNode = new Label(self.selectedLayer, {
                                 x: firstPosition.x,
                                 y: firstPosition.y,
-                                fontSize: 20,
-                                draggable: true,
-                                width: 200
                             });
 
+
                             self.selectedLayerTree.children.push(new treeItem({
-                                KonvaID: textNode._id,
+                                KonvaID: textNode.shape._id,
                                 visible: true,
                                 showEditName: true,
                                 selected: true,
@@ -915,14 +1045,14 @@
                                 name: "Label",
                                 children: [],
                             }))
-                            textNode.on('dblclick dbltap', () => {
+                            textNode.shape.on('dblclick dbltap', () => {
 
                                 // create textarea over canvas with absolute position
                                 // first we need to find position for textarea
                                 // how to find it?
                                 self.stage.find('Transformer').destroy()
                                 // at first lets find position of text node relative to the stage:
-                                var textPosition = textNode.getAbsolutePosition();
+                                var textPosition = textNode.shape.getAbsolutePosition();
 
                                 // then lets find position of stage container on the page:
                                 var stageBox = self.stage.getContainer().getBoundingClientRect();
@@ -936,15 +1066,15 @@
                                 // create textarea and style it
                                 var textarea = document.createElement('textarea');
                                 document.body.appendChild(textarea);
-                                textNode.hide();
+                                textNode.shape.hide();
                                 self.selectedLayer.draw();
-                                textarea.value = textNode.text();
+                                textarea.value = textNode.shape.text();
                                 textarea.style.fontFamily = 'Arial';
                                 textarea.style.fontSize = '18';
                                 textarea.style.position = 'absolute';
                                 textarea.style.top = areaPosition.y + 'px';
                                 textarea.style.left = areaPosition.x + 'px';
-                                textarea.style.width = textNode.width() * self.Ratio;
+                                textarea.style.width = textNode.shape.width() * self.Ratio;
 
                                 textarea.focus();
 
@@ -952,40 +1082,32 @@
                                     // hide on enter
                                     if (e.keyCode === 13) {
                                         let StringText = textarea.value;
-                                        textNode.text(StringText);
-                                        textNode.show();
+                                        textNode.shape.text(StringText);
+                                        textNode.shape.show();
                                         self.selectedLayer.draw();
                                         document.body.removeChild(textarea);
                                     }
                                 });
                                 textarea.addEventListener('blur', function (e) {
-                                    // hide on enter
+                                    // hide on blur
                                     let StringText = textarea.value;
-                                    textNode.text(StringText);
-                                    textNode.show();
+                                    textNode.shape.text(StringText);
+                                    textNode.shape.show();
                                     self.selectedLayer.draw();
                                     document.body.removeChild(textarea);
                                 });
                             });
-                            self.selectedLayer.add(textNode);
-                            self.selectedLayer.draw();
+
                             break;
 
 
                         default:
                             break;
                     }
-
-
-
                 })
 
                 self.stage.on('contentMouseup', function (e) {
-                    console.log("contentMouseup", e);
-
                     isPaint = false;
-
-
                     var pos = self.stage.getPointerPosition();
 
                     var deltaX = lastPosition.x - firstPosition.x;
@@ -1009,6 +1131,9 @@
                         case "arrow_upward":
                             // arrow.shape.width(hyp);
                             break;
+                        case "local_offer":
+                            textNode.shape.width(hyp);
+                            break;
 
                         default:
                             break;
@@ -1023,7 +1148,6 @@
                 });
 
                 self.stage.on('contentMousemove', function (e) {
-
                     if (firstPosition == null) {
                         return
                     }
@@ -1047,11 +1171,12 @@
 
                     switch (self.selectedTool) {
                         case "show_chart":
-
+                          
                             wall.shape.width(hyp);
                             if (!self.ctrlDown) {
                                 wall.shape.rotation(deg);
                             } else {
+                                self.handleSnapping(wall.shape)
                                 let updateDegrees = false;
                                 let snappedAngle = 0;
                                 let tolerance = self.brush.snapOption * 0.45;
@@ -1069,7 +1194,7 @@
                                 if (updateDegrees)
                                     wall.shape.rotation(snappedAngle);
                             }
-                            self.handleSnapping(wall.shape)
+
                             break;
 
                         case "view_carousel":
@@ -1080,6 +1205,8 @@
                                 rect.line.rotation(deg);
                                 rect.shape.rotation(deg);
                             } else {
+                                self.handleSnapping(rect.shape)
+                                self.handleSnapping(rect.line)
                                 let updateDegrees = false;
                                 let snappedAngle = 0;
                                 let tolerance = self.brush.snapOption * 0.45;
@@ -1098,8 +1225,7 @@
                                     rect.shape.rotation(snappedAngle);
                                     rect.line.rotation(snappedAngle);
                                 }
-                                self.handleSnapping(rect.shape)
-                                self.handleSnapping(rect.line)
+                                
                             }
                             break;
 
@@ -1142,6 +1268,30 @@
                         case "fiber_manual_record":
                             circle.shape.width(hyp);
                             self.handleSnapping(circle.shape)
+                            break;
+                        case "local_offer":
+                            textNode.shape.width(hyp);
+
+                            if (!self.ctrlDown) {
+                                textNode.shape.rotation(deg);
+                            } else {
+                                let updateDegrees = false;
+                                let snappedAngle = 0;
+                                let tolerance = self.brush.snapOption * 0.45;
+
+                                self.brush.snappingAngles.forEach(sa => {
+                                    let lowerBounds = sa - tolerance
+                                    let upperBounds = sa + tolerance
+
+                                    if (deg >= lowerBounds && deg <= upperBounds) {
+                                        updateDegrees = true;
+                                        snappedAngle = sa;
+                                    }
+                                })
+
+                                if (updateDegrees)
+                                    textNode.shape.rotation(snappedAngle);
+                            }
                             break;
 
                         default:
@@ -1291,20 +1441,42 @@
                     const key = event.key;
 
                     switch (key) {
-                        case "Delete": {
+                        case "Delete":
                             if (self.selectedItem != null) {
-
-                                deleteTreeItem(self.layerTree, self.selectedItem._id)
-                                self.selectedItem.destroy()
+                                let tmpItem = null
+                                self.lastdeletedItem.unshift(self.selectedItem)
+                                deleteTreeItem(self.layerTree, self.selectedItem._id, self)
+                                self.selectedItem.parent.children.forEach((element, idx) => {
+                                    if (element._id == self.selectedItem._id) {
+                                        tmpItem = self.selectedItem.parent.children.splice(idx, 1)
+                                    }
+                                })
                                 self.stage.find('Transformer').destroy()
-
+                                if (self.lastdeletedItem.length > 50) {
+                                    self.lastdeletedItem.splice(50, 1)
+                                }
+                                if (self.lastDeletedTree.length > 50) {
+                                    self.lastDeletedTree.splice(50, 1)
+                                }
                                 self.selectedLayer.draw();
+                                self.selectedItem = null;
                             }
-                        }
-                        break;
-                    case "Control": {
-                        self.ctrlDown = true;
-                    }
+                            break;
+                        case "Control":
+                            self.ctrlDown = true;
+                            break;
+                        case "z":
+                            if (self.ctrlDown && self.lastdeletedItem.length > 0) {
+                                self.$nextTick(() => {
+                                    let item = self.lastdeletedItem.splice(0, 1)[0]
+                                    self.selectedLayer.children.push(item)
+                                    self.selectedLayerTree.children.push(self.lastDeletedTree.splice(0,
+                                        1)[0])
+
+                                    self.selectedLayer.draw()
+                                })
+                            }
+                            break;
                     }
                 });
 
@@ -1552,15 +1724,17 @@
 
 
 
-    function deleteTreeItem(subMenuItems, id) {
+    function deleteTreeItem(subMenuItems, id, self) {
+
         if (subMenuItems) {
             subMenuItems.forEach((item, idx) => {
 
                 if (item.KonvaID == id) {
-                    subMenuItems.splice(idx, 1)
+                    let tmp = subMenuItems.splice(idx, 1)
+                    self.lastDeletedTree.unshift(tmp[0])
                 }
                 if (item.children.length > 0) {
-                    deleteTreeItem(item.children, id)
+                    deleteTreeItem(item.children, id, self)
                 }
             })
         }
@@ -1586,6 +1760,20 @@
         node.x(node.x() + dx);
         node.y(node.y() + dy);
         // 
+    }
+
+    function arraymove(arr, fromIndex, toIndex, comparitor) {
+
+        if (fromIndex != toIndex && fromIndex > -1 && toIndex > -1 && toIndex < arr.length + 1) {
+            console.log("inside");
+            console.log("fromIndex:", fromIndex);
+            console.log("toIndex:", toIndex);
+
+            var element = arr[fromIndex];
+            arr.splice(fromIndex, 1);
+            arr.splice(toIndex, 0, element);
+        }
+
     }
 
     function blobToDataUrl(blob, callback) {

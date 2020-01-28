@@ -12,8 +12,8 @@
                 <div style="width: 80%">
                     <div v-if="!layer.showEditName">{{ layer.name }}</div>
                     <v-form @submit.prevent="editname(layer)">
-                        <input :ref="'editLayer' + idx" v-model="layer.name" v-if="layer.showEditName" class="mb-1"
-                            style="border: 1px solid lightgrey" type="text">
+                        <input @blur="editname(layer)" :ref="'editLayer' + layer.KonvaID" v-model="layer.name" v-if="layer.showEditName"
+                            class="mb-1" style="border: 1px solid lightgrey" type="text">
                     </v-form>
                 </div>
                 <v-icon :size="22" @click="togglevisible(layer)" color="grey darken-2">
@@ -39,20 +39,21 @@
             </div>
             <v-divider></v-divider>
             <div @dragover.prevent draggable="true" @drop="endgroupDrag(layer,layers,idx)"
-                v-on:dragstart="dragStart(layer,idx,layers)"
-                v-if="(layer.drawType!='Layer'&&layer.drawType!='group')">
+                v-on:dragstart="dragStart(layer,idx,layers)" v-if="(layer.drawType!='Layer'&&layer.drawType!='group')">
                 <div class="pa-1 grey lighten-3" style="display: flex;">
                     <div :class="{ 'highlighted': selectedLayerTreeItem == layer  }">{{ layer.name }}
                     </div>
                 </div>
                 <v-divider></v-divider>
             </div>
-            <RecursiveLayer :selectedLayerTreeItem="selectedLayerTreeItem" :toggleLock="toggleLock"
-                v-show="layer.visible" style="margin-left: 15px;" :selectedLayer="selectedLayer"
+            <RecursiveLayer :ref="'Recursive'+layer.KonvaID" :selectedLayerTreeItem="selectedLayerTreeItem"
+                :toggleLock="toggleLock" v-show="layer.visible" style="margin-left: 15px;"
+                :selectedLayer="selectedLayer"
                 v-if="((layer.children.length!=0||layer.drawType=='group')&&dragging==false&&layer.collapsed!=true)"
                 :layers="layer.children" :selectLayer="selectLayer" :selectedLayerTree="selectedLayerTree"
                 :setLayerVisible="setLayerVisible" :deleteLayer="deleteLayer" :showChild="layer.selected"
-                :endDrag="endDrag" :startDrag="startDrag" :swapIndex="swapIndex" :editLayerName="editLayerName" />
+                :endDrag="endDrag" :startDrag="startDrag" :swapIndex="swapIndex" :editLayerName="editLayerName"
+                />
         </div>
     </div>
 </template>
@@ -60,7 +61,7 @@
     export default {
         props: ["layers", "selectLayer", "setLayerVisible", "deleteLayer", "showChild", "startDrag", "endDrag",
             "selectedLayer", "editLayerName", "selectedLayerTree", "selectedLayerTreeItem", "toggleLock",
-            "swapIndex"
+            "swapIndex", 
         ],
         name: "RecursiveLayer",
         data() {
@@ -69,6 +70,19 @@
             }
         },
         methods: {
+            focusRename(id) {
+                let self = this
+                self.$nextTick(() => {
+                    let asd = self.$refs["editLayer" + id][0]
+                    if (asd != null) {
+                        asd.focus();
+                    } else {
+                        self.layers.forEach(element => {
+                            self.$refs['Recursive' + element.KonvaID].focusRename(id)
+                        })
+                    }
+                })
+            },
             togglekids() {
                 this.dragging = false
             },
