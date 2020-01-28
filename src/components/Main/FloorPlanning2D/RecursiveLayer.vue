@@ -1,14 +1,16 @@
 <template>
     <div>
         <div v-for="(layer, idx) in layers" :key="idx">
-            <div v-on:dragstart="dragStart(layer,idx,layers)" @dragend="togglekids" @drop="endlayer(layer,layers)" @dragover.prevent
-                draggable="true" :class="{ 'highlighted': selectedLayerTree == layer  }"
+            <div v-on:dragstart="dragStart(layer,idx,layers)" @dragend="togglekids" @drop="endlayer(layer,layers)"
+                @dragover.prevent draggable="true" :class="{ 'highlighted': selectedLayerTree == layer  }"
                 v-if="layer.drawType=='Layer'||layer.drawType=='group'" style="display: flex;" class="pa-2"
                 @click="layer.showChildren = !layer.showChildren">
+                <v-icon :size="22" @click="toggleCollapsed(layer)" color="grey darken-2">
+                    {{ layer.collapsed ? 'arrow_drop_down' : 'arrow_drop_up' }}</v-icon>
                 <input @change="selectLayer(layer,layers)" v-model="layer.selected"
                     style="margin-top: 4px; margin-right: 10px;" type="checkbox">
                 <div style="width: 80%">
-                    <div v-if="!layer.showEditName">{{ layer.name }}-{{layer.children.length}}</div>
+                    <div v-if="!layer.showEditName">{{ layer.name }}</div>
                     <v-form @submit.prevent="editname(layer)">
                         <input :ref="'editLayer' + idx" v-model="layer.name" v-if="layer.showEditName" class="mb-1"
                             style="border: 1px solid lightgrey" type="text">
@@ -16,6 +18,8 @@
                 </div>
                 <v-icon :size="22" @click="togglevisible(layer)" color="grey darken-2">
                     {{ layer.visible ? 'visibility' : 'visibility_off' }}</v-icon>
+
+
                 <v-icon v-if="layer.drawType=='group'" :size="22" @click="togglelocked(layer)" color="grey darken-2">
                     {{ layer.locked ? 'lock_open' : 'lock' }}</v-icon>
                 <v-menu offset-y offset-x>
@@ -36,7 +40,7 @@
             <v-divider></v-divider>
             <div @dragover.prevent draggable="true" @drop="endgroupDrag(layer,layers,idx)"
                 v-on:dragstart="dragStart(layer,idx,layers)"
-                v-if="showChild&&(layer.drawType!='Layer'&&layer.drawType!='group')">
+                v-if="(layer.drawType!='Layer'&&layer.drawType!='group')">
                 <div class="pa-1 grey lighten-3" style="display: flex;">
                     <div :class="{ 'highlighted': selectedLayerTreeItem == layer  }">{{ layer.name }}
                     </div>
@@ -45,10 +49,10 @@
             </div>
             <RecursiveLayer :selectedLayerTreeItem="selectedLayerTreeItem" :toggleLock="toggleLock"
                 v-show="layer.visible" style="margin-left: 15px;" :selectedLayer="selectedLayer"
-                v-if="(layer.selected&&layer.children.length!=0||layer.drawType=='group')&&dragging==false" :layers="layer.children"
-                :selectLayer="selectLayer" :selectedLayerTree="selectedLayerTree" :setLayerVisible="setLayerVisible"
-                :deleteLayer="deleteLayer" :showChild="layer.selected" :endDrag="endDrag" :startDrag="startDrag"
-                :swapIndex="swapIndex" :editLayerName="editLayerName" />
+                v-if="((layer.children.length!=0||layer.drawType=='group')&&dragging==false&&layer.collapsed!=true)"
+                :layers="layer.children" :selectLayer="selectLayer" :selectedLayerTree="selectedLayerTree"
+                :setLayerVisible="setLayerVisible" :deleteLayer="deleteLayer" :showChild="layer.selected"
+                :endDrag="endDrag" :startDrag="startDrag" :swapIndex="swapIndex" :editLayerName="editLayerName" />
         </div>
     </div>
 </template>
@@ -64,14 +68,14 @@
                 dragging: false
             }
         },
-        methods: { 
-            togglekids(){
-                this.dragging=false
+        methods: {
+            togglekids() {
+                this.dragging = false
             },
-            endlayer(layer,layers) {
+            endlayer(layer, layers) {
                 let self = this
                 self.dragging = false
-                self.endDrag(layer,layers)
+                self.endDrag(layer, layers)
             },
             dragStart(layer, idx, layers) {
                 let self = this
@@ -80,7 +84,7 @@
             },
             endgroupDrag(layer, layers, idx) {
                 let self = this
-                self.dragging= false
+                self.dragging = false
                 console.log("endgroupDrag");
 
                 if (layer.drawType == "group") {
@@ -108,6 +112,10 @@
                 layer.locked = !layer.locked
                 self.toggleLock(layer)
 
+            },
+            toggleCollapsed(layer) {
+                let self = this
+                layer.collapsed = !layer.collapsed
             }
         }
 

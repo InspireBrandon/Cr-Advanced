@@ -37,6 +37,8 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
+                <v-text-field label="block to meter ratio" v-model="meterRatio" style="width:200px">
+                </v-text-field>
             </v-toolbar-items>
             <v-btn icon flat small @click="duplicate('RIGHT')">
                 <v-icon>arrow_right</v-icon>
@@ -50,6 +52,7 @@
             <v-btn icon flat small @click="duplicate('DOWN')">
                 <v-icon>arrow_drop_down</v-icon>
             </v-btn>
+            {{selectedItem}}
             <v-spacer></v-spacer>
             <v-toolbar-title>Floor Planning</v-toolbar-title>
         </v-toolbar>
@@ -58,12 +61,18 @@
                 <div class="toolbar grey darken-4">
                     <v-layout row wrap class="pt-3">
                         <v-flex sm12 class="pa-1" v-for="(tool, idx) in tools" :key="idx">
-                            <v-card :color="selectedTool == tool ? ' #111111;' : '#212121'"
-                                class="selected-tool mb-1 pa-1" dark flat style="text-align: center; cursor: pointer;"
-                                @click="onToolChange(tool)">
-                                <v-icon :color="selectedTool == tool ? 'primary' : 'white'" :size="25">{{ tool }}
-                                </v-icon>
-                            </v-card>
+                            <v-tooltip right>
+                                <template v-slot:activator="{ on }">
+                                    <v-card v-on="on" :color="selectedTool == tool ? ' #111111;' : '#212121'"
+                                        class="selected-tool mb-1 pa-1" dark flat
+                                        style="text-align: center; cursor: pointer;" @click="onToolChange(tool.name)">
+                                        <v-icon :color="selectedTool == tool.name ? 'primary' : 'white'" :size="25">
+                                            {{ tool.name }}
+                                        </v-icon>
+                                    </v-card>
+                                </template>
+                                <span>{{ tool.tooltip }}</span>
+                            </v-tooltip>
                             <v-divider dark></v-divider>
                         </v-flex>
                     </v-layout>
@@ -87,6 +96,8 @@
                                 <v-text-field type="number" label="Height" v-model="properties.height" hide-details>
                                 </v-text-field>
                                 <v-text-field type="number" label="Width" v-model="properties.width" hide-details>
+                                </v-text-field>
+                                <v-text-field type="number" label="Radius" v-model="properties.radius" hide-details>
                                 </v-text-field>
                             </v-card-text>
                             <v-toolbar v-if="selectedTool != 'open_with'" dark dense flat color="grey darken-3">
@@ -178,6 +189,7 @@
         },
         data() {
             return {
+                meterRatio: 50,
                 duplicationSequence: {
                     up: 1,
                     down: 1,
@@ -201,6 +213,7 @@
                 layers: [],
                 properties: {
                     name: "",
+                    radius: null,
                     height: null,
                     width: null,
                     fill: null
@@ -215,8 +228,30 @@
                     snapOption: 15,
                     snappingAngles: []
                 },
-                tools: ['open_with', 'view_carousel', 'fiber_manual_record', 'show_chart', 'image', 'local_offer',
-                    'arrow_upward'
+                tools: [{
+                        name: 'open_with',
+                        tooltip: "move & selection"
+                    }, {
+                        name: 'view_carousel',
+                        tooltip: "Draw Gondola"
+                    }, {
+                        name: 'fiber_manual_record',
+                        tooltip: "Draw circle"
+                    }, {
+                        name: 'show_chart',
+                        tooltip: "Draw wall"
+                    },
+                    {
+                        name: 'image',
+                        tooltip: "Draw Image"
+                    }, {
+                        name: 'local_offer',
+                        tooltip: "Add label"
+                    },
+                    {
+                        name: 'arrow_upward',
+                        tooltip: "Draw Arrow"
+                    }
                 ],
                 selectedTool: 'open_with',
                 // currentCursor: 'default'
@@ -235,7 +270,6 @@
         methods: {
             resetDuplication() {
                 let self = this
-                console.log("resetDuplication", self.selectedItem);
 
                 self.duplicationSequence.up = 1
                 self.duplicationSequence.down = 1
@@ -248,7 +282,6 @@
                 self.findKonvaItem([self.stage], layer.KonvaID, KonvaEndcallback => {
                     KonvaEndcallback.draggable(true)
                     KonvaEndcallback.children.forEach(child => {
-                        console.log("toggleLock", child);
 
                         child.draggable(layer.locked)
                     })
@@ -257,7 +290,6 @@
             openSpaceDesigner() {
                 let self = this
                 self.$refs.PlanogramDetailsSelector.show(null, false, null, spacePlanID => {
-                    console.log(spacePlanID);
                     self.$router.push("/FloorplanDesigner/" + spacePlanID.id)
 
 
@@ -410,7 +442,6 @@
                     image.shape.image(imageObj);
                     self.selectedLayer.draw();
                     self.findKonvaItem(self.stage.children, image.shape._id, callback => {
-                        console.log(callback);
                         var tr = new Konva.Transformer({
                             boundBoxFunc: function (oldBoundBox, newBoundBox) {
                                 if (self.ctrlDown) {
@@ -453,7 +484,9 @@
                     y: 80,
                     fontSize: 20,
                     draggable: true,
-                    width: 200
+                    width: 200,
+                    resizeToFitX: true,
+                    resizeToFitY: true
                 });
 
                 self.selectedLayer.add(textNode);
@@ -480,7 +513,7 @@
                 let layer = new Konva.Layer({
                     name: "",
                     visible: true,
-                    showEditName: false,
+                    showEditName: true,
                     selected: true,
                     showChildren: false,
                     drawType: "Layer"
@@ -496,7 +529,7 @@
                     KonvaID: layer._id,
                     children: [],
                     name: "Layer",
-                    showEditName: false,
+                    showEditName: true,
                     visible: layer.visible,
                     selected: layer.selected,
                     showChildren: layer.showChildren,
@@ -535,7 +568,7 @@
                 })
 
                 self.selectedLayerTree.children.push(layertreeitem)
-                self.selectedLayer.add(group);
+                // self.selectedLayer.add(group);
                 self.selectedLayer.draw();
             },
             selectLayer(layer, parent) {
@@ -570,7 +603,6 @@
             },
             duplicateDrag(e) {
                 let self = this
-                console.log(e.target);
                 let duplicationHelper = new DuplicationHelper();
 
                 switch (e.target.attrs.name) {
@@ -610,6 +642,8 @@
                 var arrowStartX
 
                 self.stage.on('click tap', function (e) {
+                    console.log("click tap", e);
+
                     self.stage.find('Transformer').destroy()
                     self.resetDuplication()
                     if (e.target.attrs.name == "front-Line" || e.target.attrs.name == "rect") {
@@ -623,6 +657,7 @@
                         if (e.target === self.stage) {
                             self.stage.find('Transformer').destroy()
                             self.selectedLayer.draw();
+                            self.selectedItem = null
                             return;
                         }
                         self.stage.find('Transformer').destroy();
@@ -635,6 +670,7 @@
                             self.properties.height = self.selectedItem.attrs.height;
                             self.properties.width = self.selectedItem.attrs.width;
                             self.properties.color = self.selectedItem.attrs.fill;
+                            self.properties.radius = self.selectedItem.attrs.radius;
 
                             var tr = new Konva.Transformer({
                                 enabledAnchors: self.selectedItem.attrs.enabledAnchors,
@@ -651,11 +687,10 @@
                             self.selectedLayer.add(tr);
 
                             tr.attachTo(e.target);
-                            console.log("e.target", e.target);
 
                             self.selectedLayer.draw();
                             tr.on('transform', function (z) {
-                                self.handleSnapping(e)
+                                self.handleSnapping(e.target)
                                 let transform = self.stage.getAbsoluteTransform().copy();
                                 // to detect relative position we need to invert transform
                                 transform.invert();
@@ -677,10 +712,9 @@
                                             current.x);
                                         var deltaY = lastPosition.y - (self.selectedItem.attrs.y +
                                             current.y);
-                                      
+
                                         let hyp = Math.hypot(deltaX, deltaY);
-                                        console.log("hyp: "+hyp);
-                                        
+
                                         // self.selectedItem.width(hyp);
 
                                         var rad = Math.atan2(deltaY, deltaX);
@@ -689,7 +723,6 @@
                                     }
 
                                     if (z.currentTarget.movingResizer == "middle-right") {
-                                        console.log("middle-right");
                                         var deltaX = lastPosition.x - e.target.attrs.x;
                                         var deltaY = lastPosition.y - e.target.attrs.y;
 
@@ -736,18 +769,27 @@
                                         }
                                     });
                                 } else {
-                                    self.selectedItem.setAttrs({
-                                        height: self.selectedItem.height() * self.selectedItem
-                                            .scaleY().toFixed(2),
-                                        width: self.selectedItem.width() * self.selectedItem
-                                            .scaleX().toFixed(2),
-                                        scaleX: 1,
-                                        scaleY: 1
-                                    });
+
+                                    console.log(self.selectedItem);
+                                    if (self.selectedItem.attrs.drawType == "label") {
+
+                                    } else {
+                                        self.selectedItem.setAttrs({
+                                            height: self.selectedItem.height() * self
+                                                .selectedItem
+                                                .scaleY().toFixed(2),
+                                            width: self.selectedItem.width() * self.selectedItem
+                                                .scaleX().toFixed(2),
+                                            scaleX: 1,
+                                            scaleY: 1
+                                        });
+                                    }
+
 
                                     self.properties.height = self.selectedItem.height().toFixed(2);
                                     self.properties.width = self.selectedItem.width().toFixed(2);
                                 }
+                                self.stage.batchDraw();
                             });
                         }
                     }
@@ -855,6 +897,7 @@
 
                             var textNode = new Konva.Text({
                                 text: 'Some text here',
+                                drawType: "label",
                                 x: firstPosition.x,
                                 y: firstPosition.y,
                                 fontSize: 20,
@@ -915,6 +958,14 @@
                                         document.body.removeChild(textarea);
                                     }
                                 });
+                                textarea.addEventListener('blur', function (e) {
+                                    // hide on enter
+                                    let StringText = textarea.value;
+                                    textNode.text(StringText);
+                                    textNode.show();
+                                    self.selectedLayer.draw();
+                                    document.body.removeChild(textarea);
+                                });
                             });
                             self.selectedLayer.add(textNode);
                             self.selectedLayer.draw();
@@ -929,9 +980,11 @@
 
                 })
 
-                self.stage.on('contentMouseup', function () {
+                self.stage.on('contentMouseup', function (e) {
+                    console.log("contentMouseup", e);
 
                     isPaint = false;
+
 
                     var pos = self.stage.getPointerPosition();
 
@@ -947,7 +1000,7 @@
                             wall.shape.width(hyp);
                             break;
                         case "view_carousel":
-                            rect.shape.width(hyp);
+                            // rect.shape.width(hyp);
                             break;
 
                         case "fiber_manual_record":
@@ -960,12 +1013,16 @@
                         default:
                             break;
                     }
+
                     firstPosition = null;
                     lastPosition = null;
-
+                    self.stage.find('.guid-line').destroy();
+                    let guides = self.stage.find('.guid-line')
+                    self.resetDuplication()
+                    self.stage.batchDraw()
                 });
 
-                self.stage.on('contentMousemove', function () {
+                self.stage.on('contentMousemove', function (e) {
 
                     if (firstPosition == null) {
                         return
@@ -986,8 +1043,11 @@
                     var rad = Math.atan2(deltaY, deltaX);
 
                     var deg = rad * (180 / Math.PI);
+
+
                     switch (self.selectedTool) {
                         case "show_chart":
+
                             wall.shape.width(hyp);
                             if (!self.ctrlDown) {
                                 wall.shape.rotation(deg);
@@ -1009,11 +1069,13 @@
                                 if (updateDegrees)
                                     wall.shape.rotation(snappedAngle);
                             }
+                            self.handleSnapping(wall.shape)
                             break;
 
                         case "view_carousel":
-                            rect.shape.width(hyp);
-                            rect.line.width(hyp);
+                            // rect.shape.width(hyp);
+                            // rect.line.width(hyp);
+
                             if (!self.ctrlDown) {
                                 rect.line.rotation(deg);
                                 rect.shape.rotation(deg);
@@ -1036,7 +1098,8 @@
                                     rect.shape.rotation(snappedAngle);
                                     rect.line.rotation(snappedAngle);
                                 }
-
+                                self.handleSnapping(rect.shape)
+                                self.handleSnapping(rect.line)
                             }
                             break;
 
@@ -1078,26 +1141,7 @@
 
                         case "fiber_manual_record":
                             circle.shape.width(hyp);
-                            if (!self.ctrlDown) {
-                                circle.shape.rotation(deg);
-                            } else {
-                                let updateDegrees = false;
-                                let snappedAngle = 0;
-                                let tolerance = self.brush.snapOption * 0.45;
-
-                                self.brush.snappingAngles.forEach(sa => {
-                                    let lowerBounds = sa - tolerance
-                                    let upperBounds = sa + tolerance
-
-                                    if (deg >= lowerBounds && deg <= upperBounds) {
-                                        updateDegrees = true;
-                                        snappedAngle = sa;
-                                    }
-                                })
-
-                                if (updateDegrees)
-                                    circle.shape.rotation(snappedAngle);
-                            }
+                            self.handleSnapping(circle.shape)
                             break;
 
                         default:
@@ -1111,7 +1155,7 @@
                 });
 
                 self.stage.on('dragmove', function (e) {
-                    self.handleSnapping(e)
+                    self.handleSnapping(e.target)
 
                 });
                 self.stage.on('dragstart', (e) => {
@@ -1129,6 +1173,8 @@
                 self.stage.on('dragend', (e) => {
                     if (self.selectedTool != "open_with") {
                         self.stage.stopDrag()
+
+
                     } else {
                         // clear all previous lines on the screen
                         self.stage.find('.guid-line').destroy();
@@ -1177,11 +1223,11 @@
                 self.stage.find('.guid-line').destroy();
 
                 // find possible snapping lines
-                var lineGuideStops = snappingHandler.getLineGuideStops(e.target, self.stage, self
+                var lineGuideStops = snappingHandler.getLineGuideStops(e, self.stage, self
                     .snapableItems);
 
                 // find snapping points of current object
-                var itemBounds = snappingHandler.getObjectSnappingEdges(e.target, self.stage);
+                var itemBounds = snappingHandler.getObjectSnappingEdges(e, self.stage);
 
                 // now find where can we snap current object
                 var guides = snappingHandler.getGuides(lineGuideStops, itemBounds, self.stage);
@@ -1199,37 +1245,37 @@
                         case 'start': {
                             switch (lg.orientation) {
                                 case 'V': {
-                                    e.target.x(lg.lineGuide + lg.offset);
+                                    e.x(lg.lineGuide + lg.offset);
                                     break;
                                 }
                                 case 'H': {
-                                    e.target.y(lg.lineGuide + lg.offset);
+                                    e.y(lg.lineGuide + lg.offset);
                                     break;
                                 }
                             }
                             break;
                         }
-                        case 'center': {
-                            switch (lg.orientation) {
-                                case 'V': {
-                                    e.target.x(lg.lineGuide + lg.offset);
-                                    break;
-                                }
-                                case 'H': {
-                                    e.target.y(lg.lineGuide + lg.offset);
-                                    break;
-                                }
-                            }
-                            break;
-                        }
+                        // case 'center': {
+                        //     switch (lg.orientation) {
+                        //         case 'V': {
+                        //             e.x(lg.lineGuide + lg.offset);
+                        //             break;
+                        //         }
+                        //         case 'H': {
+                        //             e.y(lg.lineGuide + lg.offset);
+                        //             break;
+                        //         }
+                        //     }
+                        //     break;
+                        // }
                         case 'end': {
                             switch (lg.orientation) {
                                 case 'V': {
-                                    e.target.x(lg.lineGuide + lg.offset);
+                                    e.x(lg.lineGuide + lg.offset);
                                     break;
                                 }
                                 case 'H': {
-                                    e.target.y(lg.lineGuide + lg.offset);
+                                    e.y(lg.lineGuide + lg.offset);
                                     break;
                                 }
                             }
@@ -1432,7 +1478,7 @@
                 draggable: true
             })
             var gridLayer = new Konva.Layer();
-            var padding = 10;
+            var padding = self.meterRatio;
 
             for (var i = 0; i < width / padding; i++) {
                 gridLayer.add(new Konva.Line({
@@ -1534,9 +1580,9 @@
         const rotated = rotatePoint(right, Konva.getAngle(rotation));
         const dx = rotated.x - current.x,
             dy = rotated.y - current.y;
-//  node.width(hyp);
+        //  node.width(hyp);
         node.rotation(rotation);
-       
+
         node.x(node.x() + dx);
         node.y(node.y() + dy);
         // 
