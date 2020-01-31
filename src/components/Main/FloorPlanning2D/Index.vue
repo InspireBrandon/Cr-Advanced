@@ -63,7 +63,8 @@
             <v-btn icon flat small @click="duplicate('DOWN')">
                 <v-icon>arrow_drop_down</v-icon>
             </v-btn>
-            {{ctrlDown}}
+            {{firstPosition}}
+            <!-- <div v-if="selectedItem!=null">{{selectedItem.attrs.x}}||{{selectedItem.attrs.y}}</div> -->
             <v-spacer></v-spacer>
             <v-toolbar-title>Floor Planning</v-toolbar-title>
         </v-toolbar>
@@ -186,6 +187,8 @@
 
 
     import DuplicationHelper from './libs/drawing/Functions/duplication-Helper'
+    import DragHandler from './libs/drawing/Functions/Drag-Handler'
+
     import SnappingHandler from './libs/drawing/Functions/snapping-handler'
 
 
@@ -210,6 +213,23 @@
         },
         data() {
             return {
+                wall: null,
+                rect: null,
+                circle: null,
+                image: null,
+                arrow: null,
+                arrowStartY: null,
+                arrowStartX: null,
+                textNode: null,
+                firstPosition: {
+                    x: 0,
+                    y: 0
+                },
+                lastPosition: {
+                    x: 0,
+                    y: 0
+                },
+                multiSelectGroup: null,
                 snackbar: false,
                 snackbarText: "",
                 x: 0,
@@ -217,7 +237,7 @@
                 showMenu: false,
                 lastdeletedItem: [],
                 lastDeletedTree: [],
-                meterRatio: 50,
+                meterRatio: 25,
                 duplicationSequence: {
                     up: 1,
                     down: 1,
@@ -282,7 +302,6 @@
                     }
                 ],
                 selectedTool: 'open_with',
-                // currentCursor: 'default'
             }
         },
         computed: {
@@ -559,7 +578,9 @@
                                 return newBoundBox;
                             }
                         });
-                        tr.rotateEnabled(false);
+
+
+                        tr.rotateEnabled(true);
 
                         self.selectedLayer.add(tr);
 
@@ -752,24 +773,66 @@
                     self.showMenu = true
                 })
             },
+            handleMultiSelect(item) {
+                let self = this
+                console.log(self.multiSelectGroup);
+
+                console.log("handleMultiSelect", item);
+
+                if (self.multiSelectGroup == null || self.multiSelectGroup == undefined) {
+                    let multigroup = new Konva.Group({
+                        name: "MultiSelectGroup",
+                        visible: true,
+                        showEditName: false,
+                        selected: true,
+                        showChildren: true,
+                        draggable: true,
+                        locked: true,
+                        drawType: "MultiSelectGroup",
+                    })
+
+                    self.multiSelectGroup = multigroup
+                    self.selectedLayer.add(multigroup)
+                }
+                var pos = item.getAbsolutePosition(); // get abs position
+                if (item.tmpParent != null && item.tmpParent != undefined) {
+                    item.draggable(true)
+                    console.log("beforeMove", item);
+
+                    item.moveTo(item.tmpParent)
+                    item.position({
+                        x: pos.x,
+                        y: pos.y
+                    });
+                    item.tmpParent = null
+                    console.log("AfterMove", item);
+                    if (self.multiSelectGroup.children.length == 0) {
+                        self.multiSelectGroup.destroy()
+                        self.multiSelectGroup = null
+                    }
+                } else {
+                    item.draggable(false)
+                    item.tmpParent = item.parent
+                    item.moveTo(self.multiSelectGroup)
+                    item.position({
+                        x: pos.x,
+                        y: pos.y
+                    });
+                    console.log(item);
+                }
+
+                self.selectedLayer.draw()
+
+            },
             addStageEvents() {
                 let self = this;
-                let firstPosition = null;
-                let lastPosition = null;
                 let isPaint = false;
-                var wall;
-                var rect;
-                var circle;
-                var image
-                var arrow
-                var arrowStartY
-                var arrowStartX
-                var textNode
 
+                let dragHandler = new DragHandler(this)
                 self.stage.on('click tap', function (e) {
                     self.stage.find('Transformer').destroy()
                     self.resetDuplication()
-                    if (e.target.attrs.name == "front-Line" || e.target.attrs.name == "rect") {
+                    if (e.target.attrs.name == "front-Line" || e.target.attrs.name == "Gondola-Rect") {
                         e.target = e.target.parent
 
                         self.findLayerItem(self.layerTree, e.target.parent._id, callback => {
@@ -784,17 +847,29 @@
                             self.selectedItem = null
                             return;
                         }
+                        if (self.ctrlDown) {
+                            self.handleMultiSelect(e.target)
+                        }
                         self.stage.find('Transformer').destroy();
                         if (e.target.attrs.draggable) {
                             self.selectedItem = e.target;
                             self.findLayerItem(self.layerTree, e.target._id, callback => {
                                 self.selectedLayerTreeItem = callback
                             })
-                            self.properties.name = self.selectedItem.attrs.name;
-                            self.properties.height = self.selectedItem.attrs.height;
-                            self.properties.width = self.selectedItem.attrs.width;
-                            self.properties.color = self.selectedItem.attrs.fill;
-                            self.properties.radius = self.selectedItem.attrs.radius;
+                            if (self.selectedItem.attrs.name == "rect-group") {
+                                self.properties.name = self.selectedItem.children[0].attrs.name;
+                                self.properties.height = self.selectedItem.children[0].attrs.height;
+                                self.properties.width = self.selectedItem.children[0].attrs.width;
+                                self.properties.color = self.selectedItem.children[0].attrs.fill;
+                                self.properties.radius = self.selectedItem.children[0].attrs.radius;
+                            } else {
+                                self.properties.name = self.selectedItem.attrs.name;
+                                self.properties.height = self.selectedItem.attrs.height;
+                                self.properties.width = self.selectedItem.attrs.width;
+                                self.properties.color = self.selectedItem.attrs.fill;
+                                self.properties.radius = self.selectedItem.attrs.radius;
+                            }
+
                             var tr = new Konva.Transformer({
                                 enabledAnchors: self.selectedItem.attrs.enabledAnchors,
 
@@ -805,14 +880,23 @@
                                 //     return newBoundBox;
                                 // }
                             });
-                            tr.rotateEnabled(false);
+                            console.log(self.selectedItem.attrs.name);
+
+                            if (self.selectedItem.attrs.name == "rect-group" || self.selectedItem.attrs.name ==
+                                "image") {
+                                tr.rotateEnabled(true);
+                            } else {
+                                tr.rotateEnabled(false);
+                            }
 
                             self.selectedLayer.add(tr);
 
                             tr.attachTo(e.target);
 
                             self.selectedLayer.draw();
+
                             tr.on('transform', function (z) {
+                                console.log("rotation", "transform");
                                 self.handleSnapping(e.target)
                                 let transform = self.stage.getAbsoluteTransform().copy();
                                 // to detect relative position we need to invert transform
@@ -821,7 +905,7 @@
                                 let pos = self.stage.getPointerPosition();
                                 let dropPos = transform.point(pos);
 
-                                lastPosition = dropPos;
+                                self.lastPosition = dropPos;
                                 if (self.ctrlDown) {
                                     if (z.currentTarget.movingResizer == "middle-left") {
                                         const right = {
@@ -831,9 +915,9 @@
 
                                         const current = rotatePoint(right, Konva.getAngle(self
                                             .selectedItem.rotation()));
-                                        var deltaX = lastPosition.x - (self.selectedItem.attrs.x +
+                                        var deltaX = self.lastPosition.x - (self.selectedItem.attrs.x +
                                             current.x);
-                                        var deltaY = lastPosition.y - (self.selectedItem.attrs.y +
+                                        var deltaY = self.lastPosition.y - (self.selectedItem.attrs.y +
                                             current.y);
 
                                         let hyp = Math.hypot(deltaX, deltaY);
@@ -846,8 +930,8 @@
                                     }
 
                                     if (z.currentTarget.movingResizer == "middle-right") {
-                                        var deltaX = lastPosition.x - e.target.attrs.x;
-                                        var deltaY = lastPosition.y - e.target.attrs.y;
+                                        var deltaX = self.lastPosition.x - e.target.attrs.x;
+                                        var deltaY = self.lastPosition.y - e.target.attrs.y;
 
                                         let hyp = Math.hypot(deltaY, deltaX)
                                         var rad = Math.atan2(deltaY, deltaX);
@@ -863,15 +947,7 @@
                             tr.on('transformend', function () {
                                 self.stage.find('.guid-line').destroy();
                                 if (self.selectedItem.attrs.name == "rect-group") {
-                                    // self.selectedItem.setAttrs({
-                                    //     height: self.selectedItem.height() * self.selectedItem
-                                    //         .scaleX().toFixed(2),
-                                    //     width: self.selectedItem.width() * self.selectedItem
-                                    //         .scaleX().toFixed(2),
-                                    //     scaleX: 1,
-                                    //     scaleY: 1,
 
-                                    // });
                                     self.selectedItem.children.forEach(item => {
                                         if (item.attrs.name == "front-Line") {
                                             item.setAttrs({
@@ -879,7 +955,8 @@
                                                 width: item.width() * item
                                                     .scaleX().toFixed(2),
                                                 scaleX: 1,
-                                                scaleY: 1
+                                                scaleY: 1,
+                                                rotation: item.rotation()
                                             });
                                         } else {
                                             item.setAttrs({
@@ -888,7 +965,8 @@
                                                 width: item.width() * item
                                                     .scaleX().toFixed(2),
                                                 scaleX: 1,
-                                                scaleY: 1
+                                                scaleY: 1,
+
                                             });
                                             self.properties.height = item.height().toFixed(2);
                                             self.properties.width = item.width().toFixed(2)
@@ -927,381 +1005,39 @@
                 })
 
                 self.stage.on('contentMousedown', function () {
-                    if (self.selectedLayer.attrs.visible == false) {
-                        alert("cannot draw on invisible layer")
-                        return
-                    }
-                    let transform = self.stage.getAbsoluteTransform().copy();
-                    // to detect relative position we need to invert transform
-                    transform.invert();
-                    // now we find relative point
-                    let pos = self.stage.getPointerPosition();
-                    let dropPos = transform.point(pos);
+                    console.log("firstPosition2" + self.firstPosition)
 
-                    if (firstPosition == null) {
-                        firstPosition = dropPos;
-                        lastPosition = dropPos;
-                    } else {
-                        lastPosition = dropPos;
-                    }
-                    isPaint = true;
-
-                    switch (self.selectedTool) {
-
-                        case "show_chart":
-                            wall = new Line(self.selectedLayer, {
-                                x: firstPosition.x,
-                                y: firstPosition.y,
-                                name: 'wall',
-                                drawType: 'wall'
-                            })
-
-                            self.selectedLayerTree.children.push(new treeItem({
-                                KonvaID: wall.shape._id,
-                                name: 'wall',
-                                drawType: 'wall',
-                                children: [],
-                            }))
-                            break;
-
-                        case "arrow_upward":
-                            arrow = new Arrow(self.selectedLayer, {
-                                x: firstPosition.x,
-                                y: firstPosition.y,
-                            });
-                            arrowStartY = firstPosition.y
-                            arrowStartX = firstPosition.x
-
-                            self.selectedLayerTree.children.push(new treeItem({
-                                KonvaID: arrow.shape._id,
-                                visible: true,
-                                showEditName: true,
-                                selected: true,
-                                showChildren: true,
-                                draggable: true,
-                                name: "arrow",
-                                children: [],
-                            }))
-                            break;
-                        case "view_carousel":
-
-                            rect = new Rect(self.selectedLayer, {
-                                x: firstPosition.x,
-                                y: firstPosition.y,
-                            });
-
-                            self.selectedLayerTree.children.push(new treeItem({
-                                KonvaID: rect.shape.parent._id,
-                                visible: true,
-                                showEditName: true,
-                                selected: true,
-                                showChildren: true,
-                                draggable: true,
-                                name: "rect-group",
-                                children: [],
-                            }))
-                            break;
-
-
-                        case "fiber_manual_record":
-                            circle = new Circle(self.selectedLayer, {
-                                x: firstPosition.x,
-                                y: firstPosition.y,
-                            });
-
-                            self.selectedLayerTree.children.push(new treeItem({
-                                KonvaID: circle.shape._id,
-                                visible: true,
-                                showEditName: true,
-                                selected: true,
-                                showChildren: true,
-                                draggable: true,
-                                name: "Circle",
-                                children: [],
-                            }))
-                            break;
-
-
-                        case "image":
-                            self.selectImage()
-
-
-                            break;
-                        case "local_offer":
-
-                            textNode = new Label(self.selectedLayer, {
-                                x: firstPosition.x,
-                                y: firstPosition.y,
-                            });
-
-
-                            self.selectedLayerTree.children.push(new treeItem({
-                                KonvaID: textNode.shape._id,
-                                visible: true,
-                                showEditName: true,
-                                selected: true,
-                                showChildren: true,
-                                draggable: true,
-                                name: "Label",
-                                children: [],
-                            }))
-                            textNode.shape.on('dblclick dbltap', () => {
-
-                                // create textarea over canvas with absolute position
-                                // first we need to find position for textarea
-                                // how to find it?
-                                self.stage.find('Transformer').destroy()
-                                // at first lets find position of text node relative to the stage:
-                                var textPosition = textNode.shape.getAbsolutePosition();
-
-                                // then lets find position of stage container on the page:
-                                var stageBox = self.stage.getContainer().getBoundingClientRect();
-
-                                // so position of textarea will be the sum of positions above:
-                                var areaPosition = {
-                                    x: stageBox.left + textPosition.x,
-                                    y: stageBox.top + textPosition.y
-                                };
-
-                                // create textarea and style it
-                                var textarea = document.createElement('textarea');
-                                document.body.appendChild(textarea);
-                                textNode.shape.hide();
-                                self.selectedLayer.draw();
-                                textarea.value = textNode.shape.text();
-                                textarea.style.fontFamily = 'Arial';
-                                textarea.style.fontSize = '18';
-                                textarea.style.position = 'absolute';
-                                textarea.style.top = areaPosition.y + 'px';
-                                textarea.style.left = areaPosition.x + 'px';
-                                textarea.style.width = textNode.shape.width() * self.Ratio;
-
-                                textarea.focus();
-
-                                textarea.addEventListener('keydown', function (e) {
-                                    // hide on enter
-                                    if (e.keyCode === 13) {
-                                        let StringText = textarea.value;
-                                        textNode.shape.text(StringText);
-                                        textNode.shape.show();
-                                        self.selectedLayer.draw();
-                                        document.body.removeChild(textarea);
-                                    }
-                                });
-                                textarea.addEventListener('blur', function (e) {
-                                    // hide on blur
-                                    let StringText = textarea.value;
-                                    textNode.shape.text(StringText);
-                                    textNode.shape.show();
-                                    self.selectedLayer.draw();
-                                    document.body.removeChild(textarea);
-                                });
-                            });
-
-                            break;
-
-
-                        default:
-                            break;
-                    }
+                    dragHandler.handleContentMousedown(self.selectedLayer, self.stage, self.firstPosition,
+                        self.lastPosition, self.selectedTool, self.selectedLayerTree, self.selectImage,
+                        isPaint,
+                        self.wall, self.rect, self.circle, self.image, self.arrow, self.arrowStartY, self
+                        .arrowStartX, self.textNode,  callback => {
+                            console.log("contentMousedown", callback);
+                            self.wall=callback.wall
+                        })
                 })
 
                 self.stage.on('contentMouseup', function (e) {
-                    isPaint = false;
-                    var pos = self.stage.getPointerPosition();
-
-                    var deltaX = lastPosition.x - firstPosition.x;
-                    var deltaY = lastPosition.y - firstPosition.y;
-
-                    let hyp = Math.hypot(deltaY, deltaX)
-                    var rad = Math.atan2(deltaY, deltaX);
-
-                    var deg = rad * (180 / Math.PI);
-                    switch (self.selectedTool) {
-                        case "show_chart":
-                            wall.shape.width(hyp);
-                            break;
-                        case "view_carousel":
-                            // rect.shape.width(hyp);
-                            break;
-
-                        case "fiber_manual_record":
-                            circle.shape.width(hyp);
-                            break;
-                        case "arrow_upward":
-                            // arrow.shape.width(hyp);
-                            break;
-                        case "local_offer":
-                            textNode.shape.width(hyp);
-                            break;
-
-                        default:
-                            break;
+                    if (self.firstPosition.x == 0) {
+                        return
                     }
-
-                    firstPosition = null;
-                    lastPosition = null;
-                    self.stage.find('.guid-line').destroy();
-                    let guides = self.stage.find('.guid-line')
-                    self.resetDuplication()
-                    self.stage.batchDraw()
+                    dragHandler.handleContentMouseUp(self.selectedLayer, self.stage, self.firstPosition,
+                        self.lastPosition, self.selectedTool, self.selectedLayerTree, self.selectImage,
+                        isPaint,
+                        self.wall, self.rect, self.circle, self.image, self.arrow, self.arrowStartY, self
+                        .arrowStartX, self.textNode, self.resetDuplication)
                 });
 
                 self.stage.on('contentMousemove', function (e) {
-                    if (firstPosition == null) {
+
+                    if (self.firstPosition.x == 0) {
                         return
                     }
-                    let transform = self.stage.getAbsoluteTransform().copy();
-                    // to detect relative position we need to invert transform
-                    transform.invert();
-                    // now we find relative point
-                    let pos = self.stage.getPointerPosition();
-                    let dropPos = transform.point(pos);
-
-                    lastPosition = dropPos;
-
-                    var deltaX = lastPosition.x - firstPosition.x;
-                    var deltaY = lastPosition.y - firstPosition.y;
-
-                    let hyp = Math.hypot(deltaY, deltaX)
-                    var rad = Math.atan2(deltaY, deltaX);
-
-                    var deg = rad * (180 / Math.PI);
-
-
-                    switch (self.selectedTool) {
-                        case "show_chart":
-                          
-                            wall.shape.width(hyp);
-                            if (!self.ctrlDown) {
-                                wall.shape.rotation(deg);
-                            } else {
-                                self.handleSnapping(wall.shape)
-                                let updateDegrees = false;
-                                let snappedAngle = 0;
-                                let tolerance = self.brush.snapOption * 0.45;
-
-                                self.brush.snappingAngles.forEach(sa => {
-                                    let lowerBounds = sa - tolerance
-                                    let upperBounds = sa + tolerance
-
-                                    if (deg >= lowerBounds && deg <= upperBounds) {
-                                        updateDegrees = true;
-                                        snappedAngle = sa;
-                                    }
-                                })
-
-                                if (updateDegrees)
-                                    wall.shape.rotation(snappedAngle);
-                            }
-
-                            break;
-
-                        case "view_carousel":
-                            // rect.shape.width(hyp);
-                            // rect.line.width(hyp);
-
-                            if (!self.ctrlDown) {
-                                rect.line.rotation(deg);
-                                rect.shape.rotation(deg);
-                            } else {
-                                self.handleSnapping(rect.shape)
-                                self.handleSnapping(rect.line)
-                                let updateDegrees = false;
-                                let snappedAngle = 0;
-                                let tolerance = self.brush.snapOption * 0.45;
-
-                                self.brush.snappingAngles.forEach(sa => {
-                                    let lowerBounds = sa - tolerance
-                                    let upperBounds = sa + tolerance
-
-                                    if (deg >= lowerBounds && deg <= upperBounds) {
-                                        updateDegrees = true;
-                                        snappedAngle = sa;
-                                    }
-                                })
-
-                                if (updateDegrees) {
-                                    rect.shape.rotation(snappedAngle);
-                                    rect.line.rotation(snappedAngle);
-                                }
-                                
-                            }
-                            break;
-
-
-                        case "arrow_upward":
-
-                            var deltaXArrow = lastPosition.x - firstPosition.x;
-                            var deltaYArrow = lastPosition.y - firstPosition.y;
-
-
-                            var radArrow = Math.atan2(deltaYArrow, deltaXArrow);
-
-                            var degArrow = radArrow * (180 / Math.PI);
-                            if (!self.ctrlDown) {
-                                arrow.shape.points([arrowStartX, arrowStartY, lastPosition.x, lastPosition.y])
-                            } else {
-
-                                let updateDegrees = false;
-                                let snappedAngle = 0;
-                                let tolerance = self.brush.snapOption * 0.45;
-
-                                self.brush.snappingAngles.forEach(sa => {
-                                    let lowerBounds = sa - tolerance
-                                    let upperBounds = sa + tolerance
-
-                                    if (deg >= lowerBounds && deg <= upperBounds) {
-                                        updateDegrees = true;
-                                        snappedAngle = sa;
-                                    }
-                                })
-
-                                if (updateDegrees) {
-                                    arrow.shape.rotation(degArrow);
-                                }
-
-                                arrow.shape.points([arrowStartX, arrowStartY, lastPosition.x, lastPosition.y])
-                            }
-                            break;
-
-                        case "fiber_manual_record":
-                            circle.shape.width(hyp);
-                            self.handleSnapping(circle.shape)
-                            break;
-                        case "local_offer":
-                            textNode.shape.width(hyp);
-
-                            if (!self.ctrlDown) {
-                                textNode.shape.rotation(deg);
-                            } else {
-                                let updateDegrees = false;
-                                let snappedAngle = 0;
-                                let tolerance = self.brush.snapOption * 0.45;
-
-                                self.brush.snappingAngles.forEach(sa => {
-                                    let lowerBounds = sa - tolerance
-                                    let upperBounds = sa + tolerance
-
-                                    if (deg >= lowerBounds && deg <= upperBounds) {
-                                        updateDegrees = true;
-                                        snappedAngle = sa;
-                                    }
-                                })
-
-                                if (updateDegrees)
-                                    textNode.shape.rotation(snappedAngle);
-                            }
-                            break;
-
-                        default:
-                            break;
-                    }
-                    if (self.selectedLayer.attrs.drawType == 'group') {
-                        self.groupLayer.draw();
-                    } else {
-                        self.selectedLayer.draw();
-                    }
+                    dragHandler.handleContentMousemove(self.selectedLayer, self.stage, self.firstPosition,
+                        self.lastPosition, self.selectedTool, self.selectedLayerTree, self.selectImage,
+                        isPaint,
+                        self.wall, self.rect, self.circle, self.image, self.arrow, self.arrowStartY, self
+                        .arrowStartX, self.textNode, self.ctrlDown, self.handleSnapping, self.brush)
                 });
 
                 self.stage.on('dragmove', function (e) {
@@ -1309,12 +1045,12 @@
 
                 });
                 self.stage.on('dragstart', (e) => {
-                    if (self.ctrlDown) {
+                    if (self.ctrlDown && self.selectedTool == "open_with") {
                         self.duplicateDrag(e)
+
                     }
                     if (self.selectedTool != "open_with") {
                         self.stage.stopDrag()
-
                     } else {
 
                     }
@@ -1328,8 +1064,36 @@
                     } else {
                         // clear all previous lines on the screen
                         self.stage.find('.guid-line').destroy();
-                        self.stage.batchDraw();
 
+                        self.stage.batchDraw();
+                        if (e.target.attrs.name == "MultiSelectGroup") {
+                            e.target.children.forEach(item => {
+                                var pos = item.getAbsolutePosition(); // get abs position
+                                item.draggable(true)
+                                item.moveTo(item.tmpParent)
+                                item.position({
+                                    x: pos.x,
+                                    y: pos.y
+                                });
+                                item.tmpParent = null
+                                if (self.multiSelectGroup.children.length == 0) {
+                                    self.multiSelectGroup.destroy()
+                                    self.multiSelectGroup = null
+                                }
+                            })
+                        }
+                        // var posabs = e.target.getAbsolutePosition();
+                        // e.target.position({
+                        //     x: posabs.x,
+                        //     y: posabs.y
+                        // });
+                        // e.target.setAttrs({
+                        //     x: posabs.x,
+                        //     y: posabs.y
+                        // })
+
+                        self.stage.batchDraw()
+                        console.log("dragend", e);
                     }
                 })
 
@@ -1376,8 +1140,10 @@
                 var lineGuideStops = snappingHandler.getLineGuideStops(e, self.stage, self
                     .snapableItems);
 
+
                 // find snapping points of current object
                 var itemBounds = snappingHandler.getObjectSnappingEdges(e, self.stage);
+
 
                 // now find where can we snap current object
                 var guides = snappingHandler.getGuides(lineGuideStops, itemBounds, self.stage);
@@ -1388,48 +1154,49 @@
                 }
 
                 snappingHandler.drawGuides(guides, self.stage, self.selectedLayer);
-
                 // now force object position
                 guides.forEach(lg => {
-                    switch (lg.snap) {
-                        case 'start': {
-                            switch (lg.orientation) {
-                                case 'V': {
-                                    e.x(lg.lineGuide + lg.offset);
-                                    break;
+                    if (e.attrs.name != "front-Line" && e.attrs.name != "Gondola-Rect") {
+                        switch (lg.snap) {
+                            case 'start': {
+                                switch (lg.orientation) {
+                                    case 'V': {
+                                        e.x(lg.lineGuide + lg.offset);
+                                        break;
+                                    }
+                                    case 'H': {
+                                        e.y(lg.lineGuide + lg.offset);
+                                        break;
+                                    }
                                 }
-                                case 'H': {
-                                    e.y(lg.lineGuide + lg.offset);
-                                    break;
-                                }
+                                break;
                             }
-                            break;
-                        }
-                        // case 'center': {
-                        //     switch (lg.orientation) {
-                        //         case 'V': {
-                        //             e.x(lg.lineGuide + lg.offset);
-                        //             break;
-                        //         }
-                        //         case 'H': {
-                        //             e.y(lg.lineGuide + lg.offset);
-                        //             break;
-                        //         }
-                        //     }
-                        //     break;
-                        // }
-                        case 'end': {
-                            switch (lg.orientation) {
-                                case 'V': {
-                                    e.x(lg.lineGuide + lg.offset);
-                                    break;
+                            // case 'center': {
+                            //     switch (lg.orientation) {
+                            //         case 'V': {
+                            //             e.x(lg.lineGuide + lg.offset);
+                            //             break;
+                            //         }
+                            //         case 'H': {
+                            //             e.y(lg.lineGuide + lg.offset);
+                            //             break;
+                            //         }
+                            //     }
+                            //     break;
+                            // }
+                            case 'end': {
+                                switch (lg.orientation) {
+                                    case 'V': {
+                                        e.x(lg.lineGuide + lg.offset);
+                                        break;
+                                    }
+                                    case 'H': {
+                                        e.y(lg.lineGuide + lg.offset);
+                                        break;
+                                    }
                                 }
-                                case 'H': {
-                                    e.y(lg.lineGuide + lg.offset);
-                                    break;
-                                }
+                                break;
                             }
-                            break;
                         }
                     }
                 });

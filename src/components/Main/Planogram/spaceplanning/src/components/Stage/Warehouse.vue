@@ -905,12 +905,7 @@
           if (self.HybridRanges.length == 0) {
             return
           }
-
-
-          // todo add switch on selected hybrid
-          if (self.HybridRanges != null && self.hybridRanges != undefined) {
-
-          }
+          // standard range start
           if (self.selectedHybridRange == self.HybridRanges[0].value) {
             self.products.forEach(el => {
               if (el.height == undefined || el.height == null || parseFloat(el.height) <= 0)
@@ -940,11 +935,12 @@
                 }
               }
             }
-          } else {
-
-
+          }
+          // standard range end
+          else {
+            // promotion range start
             if (self.selectedHybridRange == "Promotion items") {
-              console.log("promoItems", self.promoItems);
+              console.log("inPromoItemsFilter", self.promoItems);
 
               self.promoItems.forEach(el => {
                 if (el.height == undefined || el.height == null || parseFloat(el.height) <= 0)
@@ -970,12 +966,14 @@
               if (tmp.length > 0) {
                 for (var i = 0; i < tmp.length; i++) {
                   let element = tmp[i];
-                  if (!self.productInStore(element.productID)) {
-                    final.push(element)
-                  }
+                  final.push(element)
                 }
               }
+              console.log("inPromoItemsend", final);
+
+              // promotion range end
             } else {
+              // Hybrid range start
               self.hybridProducts.forEach(el => {
                 if (el.height == undefined || el.height == null || parseFloat(el.height) <= 0)
                   el.height = 10
@@ -993,7 +991,7 @@
                 self.hybridProducts.forEach(product => {
 
                   if ((inIndex(product.description, self.searchText) || inIndex(product.barcode, self
-                    .searchText)) &&
+                      .searchText)) &&
                     product.store_Range_Indicator == "yes")
                     tmp.push(product);
                 })
@@ -1007,6 +1005,7 @@
                   }
                 }
               }
+              // Hybrid range end
             }
 
           }
@@ -1053,6 +1052,8 @@
                   item.store_Range_Indicator = "YES"
                   self.promoItems.push(item)
                 })
+                console.log(self.promoItems);
+
                 self.$refs.spinner.hide()
               })
           } else {
@@ -1105,6 +1106,7 @@
       addHybridRange() {
         let self = this
         let vscd = self.$store.getters.getClusterData;
+        console.log("vscd", vscd);
 
         self.rangingData.rangeID
         self.$refs.rangeSelectorModal.show(fileID => {
@@ -1112,22 +1114,36 @@
           axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fileID}`)
             .then(r => {
               self.rangingController = new RangingController(r.data);
+              if (vscd.storeID != null || vscd.storeID != undefined) {
 
-              self.rangingController.getSalesMonthlyTotals(() => {
-                if (self.selectedClusterType != null && self.selectedClusterOption != null) {
-                  self.hybridProducts = self.rangingController.getSalesDataByCluster(self.selectedClusterType,
-                    self.selectedClusterOption);
+                self.getStores()
+                self.selectedClusterType = "stores"
+                // self.clusterOptions[stores]=clusterData.storeID
 
-                  self.hybridProducts.forEach(el => {
-                    if (el.store_Range_Indicator == "YES") {
-                      self.ais_Sales = (parseFloat(self.ais_Sales) + ((parseFloat(el.sales_Retail) /
-                        4) / self.storeCount)).toFixed(2);
-                      self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + ((parseFloat(el
-                        .sales_potential) / 4)) / self.storeCount).toFixed(2);
-                    }
-                  })
-                }
-              })
+                self.selectedClusterOption = vscd.storeID
+
+                self.onClusterOptionChange()
+              }
+              if (vscd.clusterType != null && vscd.storeID == null || vscd
+                .vscd !=
+                undefined && vscd.storeID == undefined) {
+                self.rangingController.getSalesMonthlyTotals(() => {
+                  if (self.selectedClusterType != null && self.selectedClusterOption != null) {
+                    self.hybridProducts = self.rangingController.getSalesDataByCluster(self
+                      .selectedClusterType,
+                      self.selectedClusterOption);
+
+                    self.hybridProducts.forEach(el => {
+                      if (el.store_Range_Indicator == "YES") {
+                        self.ais_Sales = (parseFloat(self.ais_Sales) + ((parseFloat(el.sales_Retail) /
+                          4) / self.storeCount)).toFixed(2);
+                        self.ais_SalesPotential = (parseFloat(self.ais_SalesPotential) + ((parseFloat(el
+                          .sales_potential) / 4)) / self.storeCount).toFixed(2);
+                      }
+                    })
+                  }
+                })
+              }
               self.HybridRanges.push({
                 text: r.data.planogramName,
                 value: fileID
@@ -1636,14 +1652,14 @@
               self.$refs.SizeLoader.close, self.updateLoader, () => {
                 self.rangeToPlanogram();
 
-                // if (self.HybridRanges.length == 0) {
+                if (self.HybridRanges.length == 0) {
                   self.HybridRanges = []
                   let vscd = self.$store.getters.getClusterData;
                   self.HybridRanges.push({
                     text: self.rangingData.planogramName + " (PRIMARY)",
                     value: vscd.rangeID
                   })
-                // }
+                }
                 self.selectedHybridRange = self.HybridRanges[0].value
 
               });
@@ -1682,7 +1698,11 @@
         let self = this;
 
         self.spacePlanName = spacePlanName == undefined ? "" : spacePlanName;
-        self.HybridRanges = hybridRanges
+        console.log("setClusterAndDimensionData", hybridRanges);
+
+        if (hybridRanges != null && hybridRanges != undefined) {
+          self.HybridRanges = hybridRanges
+        }
         if (promoItemRefs == null || promoItemRefs == undefined) {
           self.promoItemRefs = []
         } else {

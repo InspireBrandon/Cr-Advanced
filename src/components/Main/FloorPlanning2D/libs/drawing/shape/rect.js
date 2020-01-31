@@ -17,7 +17,6 @@ class Rect extends Shape {
             name = "rect-group"
         }
         let self = this;
-        console.log("[rect] name", name);
 
         self.create(config, ratio, name)
     }
@@ -35,7 +34,7 @@ class Rect extends Shape {
             // draggable: true,
             visible: 'inherit',
             enabledAnchors: self.enabledAnchors,
-            name: "rect",
+            name: "Gondola-Rect",
             strokeWidth: 1,
             stroke: 'black',
         });
@@ -61,8 +60,6 @@ class Rect extends Shape {
             showChildren: true,
             draggable: true,
             name: name.toString(),
-            width: 50 * ratio,
-            height: 50 * ratio,
         })
 
         rectGroup.add(self.shape)

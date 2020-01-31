@@ -126,15 +126,13 @@ class DuplicationHelper {
     }
     DuplicateRectGroup(SelectedItem, Layer, LayerTree, direction, duplicationSequence) {
         let rect
-        console.log("SelectedItem", SelectedItem);
+        console.log("SelectedItem", SelectedItem.attrs);
 
         switch (direction) {
             case "UP":
-                console.log("DuplicateRectGroup", SelectedItem.attrs.xref);
-
                 rect = new Rect(Layer, {
                     x: (SelectedItem.attrs.xref +SelectedItem.attrs.x),
-                    y: (SelectedItem.attrs.yref+SelectedItem.attrs.y) - (SelectedItem.attrs
+                    y: (SelectedItem.attrs.yref+SelectedItem.attrs.y) - (SelectedItem.children[0].attrs
                         .height * duplicationSequence.up),
                 });
                 break;
@@ -183,7 +181,7 @@ class DuplicationHelper {
             width: SelectedItem.width() * SelectedItem
                 .scaleX().toFixed(2),
             scaleX: 1,
-            scaleY: 1
+            scaleY: 1,
         })
         rect.shape.parent.children.forEach(item => {
             SelectedItem.children.forEach(dupItem => {
@@ -201,7 +199,9 @@ class DuplicationHelper {
             })
 
         })
-
+        rect.shape.parent.rotation(SelectedItem.rotation())
+        console.log("Dupl8ication",rect);
+        
         Layer.draw()
     }
     DuplicateRectGroupDrag(SelectedItem, Layer, LayerTree) {
@@ -226,7 +226,8 @@ class DuplicationHelper {
             width: SelectedItem.width() * SelectedItem
                 .scaleX().toFixed(2),
             scaleX: 1,
-            scaleY: 1
+            scaleY: 1,
+            draggable:true,
         })
         rect.shape.parent.children.forEach(item => {
             SelectedItem.children.forEach(dupItem => {
@@ -238,7 +239,6 @@ class DuplicationHelper {
                             .scaleX().toFixed(2),
                         scaleX: 1,
                         scaleY: 1,
-                        rotation: dupItem.rotation()
                     })
                 }
             })
@@ -267,7 +267,8 @@ class DuplicationHelper {
             radius: SelectedItem.radius() * SelectedItem
                 .scaleY().toFixed(2),
             scaleX: 1,
-            scaleY: 1
+            scaleY: 1,
+            draggable:true,
         })
         Layer.draw()
     }
@@ -293,8 +294,9 @@ class DuplicationHelper {
             height: SelectedItem.height() * SelectedItem
                 .scaleY().toFixed(2),
             scaleX: 1,
-            scaleY: 1,
-            rotation: SelectedItem.rotation()
+            scaleY: 1, 
+            draggable:true,
+            rotation:SelectedItem.rotation()
         })
         Layer.draw()
     }

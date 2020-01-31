@@ -78,25 +78,25 @@
                 let self = this;
 
                 return new Promise((resolve, reject) => {
-                    Axios.get(process.env.VUE_APP_API + 'Planogram')
+                    Axios.get(process.env.VUE_APP_API + 'TopLinePlanos')
                         .then(r => {
                             console.log(r);
 
 
-                            r.data.planogramList.forEach(e => {
+                            r.data.forEach(e => {
                                 if (self.userAccess == 2) {
                                     self.planogramAccess.forEach(planogram => {
-                                        if (planogram == e.id) {
+                                        if (planogram == e.value) {
                                             self.planograms.push({
-                                                text: e.displayname,
-                                                value: e.id
+                                                text: e.text,
+                                                value: e.value
                                             })
                                         }
                                     })
                                 } else {
                                     self.planograms.push({
-                                        text: e.displayname,
-                                        value: e.id
+                                        text: e.text,
+                                        value: e.value
                                     })
                                 }
 
@@ -169,6 +169,8 @@
 
                 Axios.get(process.env.VUE_APP_API + "SystemPage?systemFolderFileID=" + folderFileID)
                     .then(r => {
+                        console.log("getPage", r);
+
                         if (r.data.systemPage != null) {
                             if (r.data.systemPage.systemPageSectionList.length > 0) {
                                 self.selectedReport = r.data.systemPage.systemPageSectionList[0].bI_ReportID;

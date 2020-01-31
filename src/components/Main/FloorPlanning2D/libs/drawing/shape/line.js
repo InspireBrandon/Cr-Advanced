@@ -16,7 +16,7 @@ class Line extends Shape {
             height: 10,
             width: 0,
             fill: "#1976d2",
-            draggable: false,
+            draggable: true,
             visible: 'inherit',
             enabledAnchors: self.enabledAnchors
         });

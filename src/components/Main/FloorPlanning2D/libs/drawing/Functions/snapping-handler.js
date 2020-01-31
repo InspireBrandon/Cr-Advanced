@@ -13,9 +13,7 @@ class snappinghandler {
         // and we snap over edges and center of each object on the canvas
         snapableItems.forEach(element => {
             stage.find(element).forEach(guideItem => {
-               
-                
-                if (guideItem === skipShape||guideItem.attrs.visible==false) {
+                if (guideItem === skipShape||guideItem.attrs.visible==false||guideItem.parent==skipShape) {
                     return;
                 }
 
@@ -109,6 +107,7 @@ class snappinghandler {
             itemBounds.horizontal.forEach(itemBound => {
                 var diff = Math.abs(lineGuide - itemBound.guide);
                 if (diff < GUIDELINE_OFFSET) {
+
                     resultH.push({
                         lineGuide: lineGuide,
                         diff: diff,
@@ -185,12 +184,7 @@ class snappinghandler {
                 stage.batchDraw();
             }
         });
-
-
     }
-
-
-
 }
 
 export default snappinghandler

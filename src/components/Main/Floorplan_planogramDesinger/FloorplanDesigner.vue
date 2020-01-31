@@ -146,7 +146,7 @@
             addStageEvents() {
                 let self = this
                 self.stage.on('click tap', function (e) {
-                    if (e.target.attrs.name == "front-Line" || e.target.attrs.name == "rect") {
+                    if (e.target.attrs.name == "front-Line" || e.target.attrs.name == "Gondola-Rect") {
                         e.target = e.target.parent
                         self.selectedItem = e.target
                         self.findDrop(e.target, callback => {
