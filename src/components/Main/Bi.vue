@@ -80,30 +80,32 @@
                 return new Promise((resolve, reject) => {
                     Axios.get(process.env.VUE_APP_API + 'TopLinePlanos')
                         .then(r => {
-                            console.log(r);
+                            console.log(self.userAccess);
 
 
                             r.data.forEach(e => {
-                                if (self.userAccess == 2) {
-                                    self.planogramAccess.forEach(planogram => {
-                                        if (planogram == e.value) {
-                                            self.planograms.push({
-                                                text: e.text,
-                                                value: e.value
-                                            })
-                                        }
-                                    })
-                                } else {
-                                    self.planograms.push({
-                                        text: e.text,
-                                        value: e.value
-                                    })
+                                if (e.text != "AAA TEST PROJECT") {
+                                    if (self.userAccess == 2) {
+                                        self.planogramAccess.forEach(planogram => {
+                                            if (planogram == e.value) {
+                                                self.planograms.push({
+                                                    text: e.text,
+                                                    value: e.value
+                                                })
+                                            }
+                                        })
+                                    } else {
+                                        self.planograms.push({
+                                            text: e.text,
+                                            value: e.value
+                                        })
+                                    }
                                 }
-
                             })
                             if (self.userAccess == 2) {
                                 self.selectedPlanograms = self.planogramAccess
                             }
+
                             resolve();
                         })
                         .catch(e => {
