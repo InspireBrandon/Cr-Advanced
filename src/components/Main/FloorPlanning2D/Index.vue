@@ -63,8 +63,10 @@
             <v-btn icon flat small @click="duplicate('DOWN')">
                 <v-icon>arrow_drop_down</v-icon>
             </v-btn>
-            {{firstPosition}}
-            <!-- <div v-if="selectedItem!=null">{{selectedItem.attrs.x}}||{{selectedItem.attrs.y}}</div> -->
+            <v-btn @click="resetStageScale">
+                reset zoom
+            </v-btn>
+            <div v-if="selectedItem!=null">{{selectedItem.attrs.name}}</div>
             <v-spacer></v-spacer>
             <v-toolbar-title>Floor Planning</v-toolbar-title>
         </v-toolbar>
@@ -92,7 +94,7 @@
                 <v-layout row wrap>
                     <v-flex sm10 class="pa-0">
                         <v-card tile flat id="stage_container" class="fill-height" :style="{ 'cursor': currentCursor }">
-                            <div id="container" oncontextmenu="return false;"></div>
+                            <div ref="container" id="container" oncontextmenu="return false;"></div>
                         </v-card>
                     </v-flex>
                     <v-flex sm2 class="pa-0">
@@ -104,16 +106,16 @@
                             </v-toolbar>
                             <v-card-text v-if="selectedTool == 'open_with'" class="pt-0"
                                 style="height: 30%; overflow-y: scroll;">
-                                <v-text-field v-if="properties.name!=null" label="Name" v-model="properties.name"
-                                    hide-details> </v-text-field>
-                                <v-text-field v-if="properties.height!=null" type="number" label="Height"
-                                    v-model="properties.height" hide-details>
+                                <v-text-field @change="applyProperties" v-if="properties.name!=null" label="Name"
+                                    v-model="properties.name" hide-details> </v-text-field>
+                                <v-text-field v-if="properties.height!=null" @change="applyProperties" type="number"
+                                    label="Height" v-model="properties.height" hide-details>
                                 </v-text-field>
-                                <v-text-field v-if="properties.width!=null" type="number" label="Width"
-                                    v-model="properties.width" hide-details>
+                                <v-text-field v-if="properties.width!=null" @change="applyProperties" type="number"
+                                    label="Width" v-model="properties.width" hide-details>
                                 </v-text-field>
-                                <v-text-field v-if="properties.radius!=null" type="number" label="Radius"
-                                    v-model="properties.radius" hide-details>
+                                <v-text-field v-if="properties.radius!=null" @change="applyProperties" type="number"
+                                    label="Radius" v-model="properties.radius" hide-details>
                                 </v-text-field>
                             </v-card-text>
                             <v-toolbar v-if="selectedTool != 'open_with'" dark dense flat color="grey darken-3">
@@ -123,7 +125,15 @@
                             </v-toolbar>
                             <v-card-text v-if="selectedTool != 'open_with'" class="pt-3"
                                 style="height: 30%; overflow-y: scroll;">
-                                <v-text-field label="Size" v-model="brush.size" hide-details></v-text-field>
+                                <v-text-field v-if="selectedTool=='view_carousel'||selectedTool=='show_chart'"
+                                    label="Height" v-model="brush.height" hide-details>
+                                </v-text-field>
+                                <v-text-field v-if="selectedTool=='view_carousel'" label="Width" v-model="brush.width"
+                                    hide-details>
+                                </v-text-field>
+                                <v-text-field v-if="selectedTool=='fiber_manual_record'" label="Radius"
+                                    v-model="brush.radius" hide-details>
+                                </v-text-field>
                                 <v-text-field type="color" label="Color" v-model="brush.color" hide-details>
                                 </v-text-field>
                             </v-card-text>
@@ -150,11 +160,11 @@
                                 </v-menu>
                             </v-toolbar>
                             <v-card-text class="pa-0 pt-0" style="height: 57%; overflow-y: scroll;">
-                                <RecursiveLayer ref="RecursiveLayer" :selectedLayerTreeItem="selectedLayerTreeItem"
-                                    :editLayerName="editLayerName" :showChild="true" :layers="layerTree"
-                                    :selectLayer="selectLayer" :setLayerVisible="setLayerVisible"
-                                    :deleteLayer="deleteLayer" :endDrag="endDrag" :swapIndex="swapIndex"
-                                    :startDrag="startDrag" :selectedLayerTree="selectedLayerTree"
+                                <RecursiveLayer ref="RecursiveLayer" :selectItemFromSidePanel="selectItemFromSidePanel"
+                                    :selectedLayerTreeItem="selectedLayerTreeItem" :editLayerName="editLayerName"
+                                    :showChild="true" :layers="layerTree" :selectLayer="selectLayer"
+                                    :setLayerVisible="setLayerVisible" :deleteLayer="deleteLayer" :endDrag="endDrag"
+                                    :swapIndex="swapIndex" :startDrag="startDrag" :selectedLayerTree="selectedLayerTree"
                                     :selectedLayer="selectedLayer" :toggleLock="toggleLock" />
 
                             </v-card-text>
@@ -188,16 +198,21 @@
 
     import DuplicationHelper from './libs/drawing/Functions/duplication-Helper'
     import DragHandler from './libs/drawing/Functions/Drag-Handler'
+    import ClickTapHelper from './libs/drawing/Functions/ClickTap-helper'
+    import TransFormerHelper from './libs/drawing/Functions/TransFormer-Helper'
+    import MultiSelectHelper from './libs/drawing/Functions/MultiSelect-helper'
 
     import SnappingHandler from './libs/drawing/Functions/snapping-handler'
-
 
     import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector';
 
     import Settings from './Settings'
     import RecursiveLayer from "./RecursiveLayer.vue"
     // import config from 'config';
-
+    let dragHandler = new DragHandler(this)
+    let clickTapHelper = new ClickTapHelper()
+    let transFormerHelper = new TransFormerHelper()
+    let multiSelectHelper = new MultiSelectHelper()
     const meterPixelRatio = 3779.5275590551;
 
     var height = 0;
@@ -222,6 +237,10 @@
                 arrowStartX: null,
                 textNode: null,
                 firstPosition: {
+                    x: 0,
+                    y: 0
+                },
+                imagePos: {
                     x: 0,
                     y: 0
                 },
@@ -269,10 +288,11 @@
                 selectedItem: null,
                 selectedLayer: null,
                 selectedLayerTree: null,
-
                 brush: {
-                    size: 10,
-                    color: "#000",
+                    height: 10,
+                    width: 10,
+                    radius: 10,
+                    color: "#1976d2",
                     snapOption: 15,
                     snappingAngles: []
                 },
@@ -315,6 +335,139 @@
             }
         },
         methods: {
+            applyProperties() {
+                let self = this
+
+                if (self.selectedItem.attrs.name != "rect-group") {
+                    for (var prop in self.properties) {
+                        if (self.properties[prop] != null && prop != "name") {
+                            self.selectedItem.attrs[prop] = parseFloat(self.properties[prop])
+                        }
+                    }
+                } else {
+                    self.selectedItem.children.forEach(item => {
+                        for (var prop in self.properties) {
+                            if (self.properties[prop] != null && prop != "name" && prop != "height") {
+                                item.attrs[prop] = parseFloat(self.properties[prop])
+                            }
+                            if (item.attrs.name == "front-Line") {
+                                item.attrs.height = 5
+
+                            } else {
+                                item.attrs.height = parseFloat(self.properties["height"])
+
+                            }
+                        }
+
+                    })
+                }
+                self.stage.batchDraw()
+            },
+            applyBrushProperties(tool) {
+                let self = this
+                switch (tool) {
+                    case "view_carousel": {
+                        self.brush.height = 50
+                        self.brush.width = 50
+                    }
+
+                    break;
+                case "fiber_manual_record": {
+                    self.brush.radius = 50
+
+                }
+
+                break;
+                case "show_chart": {
+                    self.brush.height = 10
+                }
+                break;
+
+                default:
+                    break;
+                }
+            },
+            resetStageScale() {
+                let self = this
+                self.stage.scale({
+                    x: 1,
+                    y: 1
+                });
+                var newPos = {
+                    x: 0,
+                    y: 0
+                };
+                self.stage.position(newPos);
+                self.stage.batchDraw()
+            },
+            selectItemFromSidePanel(item) {
+                let self = this
+                self.findKonvaItem(self.stage.children, item.KonvaID, e => {
+                    clickTapHelper.destroyTransformer(self.stage, cb => {
+                        clickTapHelper.setSelectedItem(e, self.findLayerItem, self
+                            .selectedLayerTreeItem, self.selectedItem)
+                    })
+                    self.resetDuplication()
+
+                    if (self.selectedTool == "open_with") {
+                        clickTapHelper.handleSelection(e, self.stage, self.selectedLayer, self.selectedItem,
+                            self.selectedLayerTreeItem, self.ctrlDown, self.handleMultiSelect, self
+                            .selectedTool)
+
+                        if (e.attrs.draggable && e != self.stage) {
+                            self.selectedItem = e;
+                            self.findLayerItem(self.layerTree, e._id, callback => {
+                                self.selectedLayerTreeItem = callback
+                            })
+                            if (self.selectedItem.attrs.name == "rect-group") {
+                                self.properties.name = self.selectedItem.children[0].attrs.name;
+                                self.properties.height = self.selectedItem.children[0].attrs.height;
+                                self.properties.width = self.selectedItem.children[0].attrs.width;
+                                self.properties.color = self.selectedItem.children[0].attrs.fill;
+                                self.properties.radius = self.selectedItem.children[0].attrs.radius;
+                            } else {
+                                self.properties.name = self.selectedItem.attrs.name;
+                                self.properties.height = self.selectedItem.attrs.height;
+                                self.properties.width = self.selectedItem.attrs.width;
+                                self.properties.color = self.selectedItem.attrs.fill;
+                                self.properties.radius = self.selectedItem.attrs.radius;
+                            }
+
+                            var tr = new Konva.Transformer({
+                                enabledAnchors: self.selectedItem.attrs.enabledAnchors,
+                            });
+
+                            if (self.selectedItem.attrs.name == "rect-group" || self.selectedItem.attrs.name ==
+                                "image") {
+                                tr.rotateEnabled(true);
+                            } else {
+                                tr.rotateEnabled(false);
+                            }
+
+                            self.selectedLayer.add(tr);
+
+                            tr.attachTo(e);
+
+                            self.selectedLayer.draw();
+
+                            tr.on('transform', function (z) {
+                                transFormerHelper.handleTransform(e, z, self.handleSnapping, self.stage,
+                                    self.lastPosition, self.ctrlDown, self.selectedItem,
+                                    rotateAroundCenter)
+
+
+                            });
+
+                            tr.on('transformend', function () {
+                                transFormerHelper.handleTransformEnd(self.selectedItem, self.properties)
+
+                                self.stage.batchDraw();
+                            });
+                        }
+                    }
+
+                })
+            },
             getItemFromArr(arr, id, prop, callback) {
                 let self = this
                 arr.forEach((item, idx) => {
@@ -328,7 +481,6 @@
             },
             moveSelectedBack() {
                 let self = this
-
                 if (self.selectedLayer.children.length > 1) {
                     self.getItemFromArr(self.selectedLayer.children, self.selectedItem._id, "_id", konvaCallback => {
                         self.getItemFromArr(self.selectedLayerTree.children, self.selectedItem._id, "KonvaID",
@@ -344,14 +496,10 @@
             },
             moveSelectedForward() {
                 let self = this
-
                 if (self.selectedLayer.children.length > 1) {
-
                     self.getItemFromArr(self.selectedLayer.children, self.selectedItem._id, "_id", konvaCallback => {
-
                         self.getItemFromArr(self.selectedLayerTree.children, self.selectedItem._id, "KonvaID",
                             treeCallback => {
-
                                 arraymove(self.selectedLayer.children, konvaCallback.idx, konvaCallback
                                     .idx + 1, self.selectedLayer.children.length + 1)
                                 arraymove(self.selectedLayerTree.children, treeCallback.idx, treeCallback
@@ -363,7 +511,6 @@
             },
             resetDuplication() {
                 let self = this
-
                 self.duplicationSequence.up = 1
                 self.duplicationSequence.down = 1
                 self.duplicationSequence.right = 1
@@ -375,7 +522,6 @@
                 self.findKonvaItem([self.stage], layer.KonvaID, KonvaEndcallback => {
                     KonvaEndcallback.draggable(true)
                     KonvaEndcallback.children.forEach(child => {
-
                         child.draggable(layer.locked)
                     })
                 })
@@ -384,15 +530,14 @@
                 let self = this
                 self.$refs.PlanogramDetailsSelector.show(null, false, null, spacePlanID => {
                     self.$router.push("/FloorplanDesigner/" + spacePlanID.id)
-
-
                 })
             },
             onToolChange(tool) {
                 let self = this
                 self.$nextTick(() => {
-                    self.selectedTool = tool
 
+                    self.selectedTool = tool
+                    self.applyBrushProperties(tool)
                     if (self.selectedTool == "open_with") {
                         self.selectedLayer.children.forEach(child => {
                             child.draggable(true);
@@ -404,7 +549,6 @@
                         })
                     }
                     switch (self.selectedTool) {
-
                         case "open_with":
                             self.snackbarText = "Click and drag items to move them"
                             self.snackbar = true
@@ -433,8 +577,6 @@
                             self.snackbarText = "Click and drag on the stage to add an arrow"
                             self.snackbar = true
                             break;
-
-
                         default:
                             break;
                     }
@@ -464,7 +606,6 @@
             },
             endDrag(item, parent) {
                 let self = this
-
                 if (self.dragItem != null && item != null && self.dragItem != item) {
                     item.children.push(self.dragItem)
                     self.selectLayer(item, parent)
@@ -491,24 +632,17 @@
             },
             startDrag(item, idx, layers) {
                 let self = this
-
                 self.dragItem = item
-
                 self.dragStartIndex = idx
                 var Konvaitem
                 self.findKonvaItem([self.stage], item.KonvaID, Konvaitemcallback => {
                     Konvaitem = Konvaitemcallback
-
                     self.findKonvaItem([self.stage], Konvaitem.parent._id, KonvaLayerDragStart => {
                         self.KonvaLayerDragStart = KonvaLayerDragStart
-
-                        // self.KonvaDragItem=
                         self.dragParent = layers
                         self.dragidx = idx
                     })
-
                 })
-
             },
             log() {
                 let self = this
@@ -530,28 +664,9 @@
                     }
                 })
             },
-            addRect() {
-                let self = this;
-                let rect = new Rect(self.selectedLayer);
-
-                self.selectedLayerTree.children.push(new treeItem({
-                    KonvaID: rect.shape.parent._id,
-                    visible: true,
-                    showEditName: true,
-                    selected: true,
-                    showChildren: true,
-                    draggable: true,
-                    name: "rect-group",
-                    children: [],
-                }))
-            },
-            addCircle() {
-                let self = this;
-                let circle = new Circle(self.selectedLayer);
-            },
             addImage(dataUrl) {
                 let self = this;
-                let image = new StageImage(self.selectedLayer);
+                let image = new StageImage(self.selectedLayer, self.imagePos);
 
                 self.selectedLayerTree.children.push(new treeItem({
                     KonvaID: image.shape._id,
@@ -569,26 +684,14 @@
                 imageObj.onload = function () {
                     image.shape.image(imageObj);
                     self.selectedLayer.draw();
-                    self.findKonvaItem(self.stage.children, image.shape._id, callback => {
-                        var tr = new Konva.Transformer({
-                            boundBoxFunc: function (oldBoundBox, newBoundBox) {
-                                if (self.ctrlDown) {
-                                    return oldBoundBox;
-                                }
-                                return newBoundBox;
-                            }
-                        });
+                    self.onToolChange("open_with")
+                    self.imagePos.x = 0
+                    self.imagePos.y = 0
 
-
-                        tr.rotateEnabled(true);
-
-                        self.selectedLayer.add(tr);
-
-                        tr.attachTo(callback);
-                    })
+                    // self.selectedTool = ''
+                    image.shape.draggable(true)
                 }
                 imageObj.src = dataUrl;
-                self.selectedTool = 'open_with'
             },
             selectImage() {
                 let self = this;
@@ -604,23 +707,6 @@
                 blobToDataUrl(file, dataUrl => {
                     self.addImage(dataUrl)
                 })
-            },
-            addLabel() {
-                let self = this;
-
-                var textNode = new Konva.Text({
-                    text: 'Some text here',
-                    x: 50,
-                    y: 80,
-                    fontSize: 20,
-                    draggable: true,
-                    width: 200,
-                    resizeToFitX: true,
-                    resizeToFitY: true
-                });
-
-                self.selectedLayer.add(textNode);
-                self.selectedLayer.draw();
             },
             editLayerName(layer, name) {
                 let self = this
@@ -775,87 +861,47 @@
             },
             handleMultiSelect(item) {
                 let self = this
-                console.log(self.multiSelectGroup);
-
-                console.log("handleMultiSelect", item);
-
-                if (self.multiSelectGroup == null || self.multiSelectGroup == undefined) {
-                    let multigroup = new Konva.Group({
-                        name: "MultiSelectGroup",
-                        visible: true,
-                        showEditName: false,
-                        selected: true,
-                        showChildren: true,
-                        draggable: true,
-                        locked: true,
-                        drawType: "MultiSelectGroup",
-                    })
-
-                    self.multiSelectGroup = multigroup
-                    self.selectedLayer.add(multigroup)
-                }
-                var pos = item.getAbsolutePosition(); // get abs position
-                if (item.tmpParent != null && item.tmpParent != undefined) {
-                    item.draggable(true)
-                    console.log("beforeMove", item);
-
-                    item.moveTo(item.tmpParent)
-                    item.position({
-                        x: pos.x,
-                        y: pos.y
-                    });
-                    item.tmpParent = null
-                    console.log("AfterMove", item);
-                    if (self.multiSelectGroup.children.length == 0) {
-                        self.multiSelectGroup.destroy()
-                        self.multiSelectGroup = null
-                    }
-                } else {
-                    item.draggable(false)
-                    item.tmpParent = item.parent
-                    item.moveTo(self.multiSelectGroup)
-                    item.position({
-                        x: pos.x,
-                        y: pos.y
-                    });
-                    console.log(item);
-                }
-
-                self.selectedLayer.draw()
-
+                let multiSelectHelper = new MultiSelectHelper()
+                multiSelectHelper.handleMultiselect(self.multiSelectGroup, self.selectedLayer, item, callback => {
+                    self.multiSelectGroup = callback
+                    self.selectedLayer.draw()
+                })
             },
             addStageEvents() {
                 let self = this;
                 let isPaint = false;
-
-                let dragHandler = new DragHandler(this)
                 self.stage.on('click tap', function (e) {
-                    self.stage.find('Transformer').destroy()
-                    self.resetDuplication()
-                    if (e.target.attrs.name == "front-Line" || e.target.attrs.name == "Gondola-Rect") {
-                        e.target = e.target.parent
-
-                        self.findLayerItem(self.layerTree, e.target.parent._id, callback => {
-                            self.selectedLayerTreeItem = callback
-                        })
-                        self.selectedItem = e.target
+                    if (e.target != self.stage) {
+                        if (e.target.parent.attrs.name == "rect-group") {
+                            e.target = e.target.parent
+                        }
                     }
-                    if (self.selectedTool == "open_with") {
-                        if (e.target === self.stage) {
-                            self.stage.find('Transformer').destroy()
-                            self.selectedLayer.draw();
+                    clickTapHelper.destroyTransformer(self.stage, cb => {
+                        clickTapHelper.setSelectedItem(e.target, self.findLayerItem, self
+                            .selectedLayerTreeItem, self.selectedItem)
+                        if (e.target == self.stage) {
                             self.selectedItem = null
-                            return;
+                            self.selectedLayerTreeItem = null
+                            for (var prop in self.properties) {
+                                self.properties[prop] = null
+                            }
                         }
-                        if (self.ctrlDown) {
-                            self.handleMultiSelect(e.target)
-                        }
-                        self.stage.find('Transformer').destroy();
-                        if (e.target.attrs.draggable) {
+                    })
+                    self.resetDuplication()
+
+                    if (self.selectedTool == "open_with") {
+                        clickTapHelper.handleSelection(e.target, self.stage, self.selectedLayer, self
+                            .selectedItem,
+                            self.selectedLayerTreeItem, self.ctrlDown, self.handleMultiSelect, self
+                            .selectedTool)
+
+
+                        if (e.target.attrs.draggable && e.target != self.stage) {
                             self.selectedItem = e.target;
                             self.findLayerItem(self.layerTree, e.target._id, callback => {
                                 self.selectedLayerTreeItem = callback
                             })
+
                             if (self.selectedItem.attrs.name == "rect-group") {
                                 self.properties.name = self.selectedItem.children[0].attrs.name;
                                 self.properties.height = self.selectedItem.children[0].attrs.height;
@@ -872,15 +918,7 @@
 
                             var tr = new Konva.Transformer({
                                 enabledAnchors: self.selectedItem.attrs.enabledAnchors,
-
-                                // boundBoxFunc: function (oldBoundBox, newBoundBox) {
-                                //     if (self.ctrlDown) {
-                                //         return oldBoundBox;
-                                //     }
-                                //     return newBoundBox;
-                                // }
                             });
-                            console.log(self.selectedItem.attrs.name);
 
                             if (self.selectedItem.attrs.name == "rect-group" || self.selectedItem.attrs.name ==
                                 "image") {
@@ -896,105 +934,35 @@
                             self.selectedLayer.draw();
 
                             tr.on('transform', function (z) {
-                                console.log("rotation", "transform");
-                                self.handleSnapping(e.target)
-                                let transform = self.stage.getAbsoluteTransform().copy();
-                                // to detect relative position we need to invert transform
-                                transform.invert();
-                                // now we find relative point
-                                let pos = self.stage.getPointerPosition();
-                                let dropPos = transform.point(pos);
+                                transFormerHelper.handleTransform(e.target, z, self.handleSnapping, self
+                                    .stage,
+                                    self.lastPosition, self.ctrlDown, self.selectedItem,
+                                    rotateAroundCenter)
 
-                                self.lastPosition = dropPos;
-                                if (self.ctrlDown) {
-                                    if (z.currentTarget.movingResizer == "middle-left") {
-                                        const right = {
-                                            x: self.selectedItem.width(),
-                                            y: self.selectedItem.height() / 2
-                                        };
-
-                                        const current = rotatePoint(right, Konva.getAngle(self
-                                            .selectedItem.rotation()));
-                                        var deltaX = self.lastPosition.x - (self.selectedItem.attrs.x +
-                                            current.x);
-                                        var deltaY = self.lastPosition.y - (self.selectedItem.attrs.y +
-                                            current.y);
-
-                                        let hyp = Math.hypot(deltaX, deltaY);
-
-                                        // self.selectedItem.width(hyp);
-
-                                        var rad = Math.atan2(deltaY, deltaX);
-                                        var deg = rad * (180 / Math.PI);
-                                        rotateAroundCenter(self.selectedItem, (180 + deg), hyp)
-                                    }
-
-                                    if (z.currentTarget.movingResizer == "middle-right") {
-                                        var deltaX = self.lastPosition.x - e.target.attrs.x;
-                                        var deltaY = self.lastPosition.y - e.target.attrs.y;
-
-                                        let hyp = Math.hypot(deltaY, deltaX)
-                                        var rad = Math.atan2(deltaY, deltaX);
-
-                                        var deg = rad * (180 / Math.PI);
-                                        self.selectedItem.rotation(deg);
-                                        self.selectedItem.width(hyp);
-                                    }
-                                }
-
+                             
                             });
 
                             tr.on('transformend', function () {
-                                self.stage.find('.guid-line').destroy();
-                                if (self.selectedItem.attrs.name == "rect-group") {
-
-                                    self.selectedItem.children.forEach(item => {
-                                        if (item.attrs.name == "front-Line") {
-                                            item.setAttrs({
-                                                height: 5,
-                                                width: item.width() * item
-                                                    .scaleX().toFixed(2),
-                                                scaleX: 1,
-                                                scaleY: 1,
-                                                rotation: item.rotation()
-                                            });
-                                        } else {
-                                            item.setAttrs({
-                                                height: item.height() * item
-                                                    .scaleY().toFixed(2),
-                                                width: item.width() * item
-                                                    .scaleX().toFixed(2),
-                                                scaleX: 1,
-                                                scaleY: 1,
-
-                                            });
-                                            self.properties.height = item.height().toFixed(2);
-                                            self.properties.width = item.width().toFixed(2)
-                                        }
-                                    });
-                                } else {
-
-                                    if (self.selectedItem.attrs.drawType == "label") {
-
-                                    } else {
-                                        self.selectedItem.setAttrs({
-                                            height: self.selectedItem.height() * self
-                                                .selectedItem
-                                                .scaleY().toFixed(2),
-                                            width: self.selectedItem.width() * self.selectedItem
-                                                .scaleX().toFixed(2),
-                                            scaleX: 1,
-                                            scaleY: 1
-                                        });
-                                    }
-
-
-                                    self.properties.height = self.selectedItem.height().toFixed(2);
-                                    self.properties.width = self.selectedItem.width().toFixed(2);
-                                }
+                                transFormerHelper.handleTransformEnd(self.selectedItem, self.properties)
                                 self.stage.batchDraw();
+
+                               
                             });
                         }
+                    }
+                    if (self.selectedTool == "image") {
+                        let transform = self.stage.getAbsoluteTransform().copy();
+                        // to detect relative position we need to invert transform
+                        transform.invert();
+                        // now we find relative point
+                        let pos = self.stage.getPointerPosition();
+                        let dropPos = transform.point(pos);
+                        self.imagePos.x = dropPos.x
+                        self.imagePos.y = dropPos.y
+                        setTimeout(() => {
+                            self.selectImage()
+
+                        }, 200);
                     }
                 });
 
@@ -1005,15 +973,19 @@
                 })
 
                 self.stage.on('contentMousedown', function () {
-                    console.log("firstPosition2" + self.firstPosition)
 
                     dragHandler.handleContentMousedown(self.selectedLayer, self.stage, self.firstPosition,
                         self.lastPosition, self.selectedTool, self.selectedLayerTree, self.selectImage,
                         isPaint,
                         self.wall, self.rect, self.circle, self.image, self.arrow, self.arrowStartY, self
-                        .arrowStartX, self.textNode,  callback => {
-                            console.log("contentMousedown", callback);
-                            self.wall=callback.wall
+                        .arrowStartX, self.textNode, self.brush, self, callback => {
+                            self.wall = callback.wall
+                            self.rect = callback.rect
+                            self.circle = callback.circle
+                            self.textNode = callback.textNode
+                            self.arrow = callback.arrow
+                            self.arrowStartY = self.firstPosition.y
+                            self.arrowStartX = self.firstPosition.x
                         })
                 })
 
@@ -1025,7 +997,21 @@
                         self.lastPosition, self.selectedTool, self.selectedLayerTree, self.selectImage,
                         isPaint,
                         self.wall, self.rect, self.circle, self.image, self.arrow, self.arrowStartY, self
-                        .arrowStartX, self.textNode, self.resetDuplication)
+                        .arrowStartX, self.textNode, self.resetDuplication, callback => {
+                            self.lastPosition = {
+                                x: 0,
+                                y: 0
+                            }
+                            self.firstPosition = {
+                                x: 0,
+                                y: 0
+                            }
+                            self.arrowStartY = 0
+                            self.arrowStartX = 0
+                            if (self.selectedTool != "open_with") {
+                                self.onToolChange("open_with")
+                            }
+                        })
                 });
 
                 self.stage.on('contentMousemove', function (e) {
@@ -1042,12 +1028,10 @@
 
                 self.stage.on('dragmove', function (e) {
                     self.handleSnapping(e.target)
-
                 });
                 self.stage.on('dragstart', (e) => {
                     if (self.ctrlDown && self.selectedTool == "open_with") {
                         self.duplicateDrag(e)
-
                     }
                     if (self.selectedTool != "open_with") {
                         self.stage.stopDrag()
@@ -1059,54 +1043,27 @@
                 self.stage.on('dragend', (e) => {
                     if (self.selectedTool != "open_with") {
                         self.stage.stopDrag()
-
-
                     } else {
                         // clear all previous lines on the screen
                         self.stage.find('.guid-line').destroy();
-
                         self.stage.batchDraw();
                         if (e.target.attrs.name == "MultiSelectGroup") {
-                            e.target.children.forEach(item => {
-                                var pos = item.getAbsolutePosition(); // get abs position
-                                item.draggable(true)
-                                item.moveTo(item.tmpParent)
-                                item.position({
-                                    x: pos.x,
-                                    y: pos.y
-                                });
-                                item.tmpParent = null
-                                if (self.multiSelectGroup.children.length == 0) {
+                            multiSelectHelper.clearMultiselect(e, self.multiSelectGroup, self.stage,
+                                callback => {
                                     self.multiSelectGroup.destroy()
                                     self.multiSelectGroup = null
-                                }
-                            })
+                                    self.stage.batchDraw()
+                                })
                         }
-                        // var posabs = e.target.getAbsolutePosition();
-                        // e.target.position({
-                        //     x: posabs.x,
-                        //     y: posabs.y
-                        // });
-                        // e.target.setAttrs({
-                        //     x: posabs.x,
-                        //     y: posabs.y
-                        // })
-
-                        self.stage.batchDraw()
-                        console.log("dragend", e);
                     }
                 })
-
                 var scaleBy = 1.05;
-
                 self.stage.addEventListener('wheel', (e) => {
                     var oldScale = self.stage.scaleX();
-
                     var mousePointTo = {
                         x: self.stage.getPointerPosition().x / oldScale - self.stage.x() / oldScale,
                         y: self.stage.getPointerPosition().y / oldScale - self.stage.y() / oldScale,
                     };
-
                     var newScale = (e.deltaY * -1) > 0 ? oldScale * scaleBy : oldScale / scaleBy;
                     self.stage.scale({
                         x: newScale,
@@ -1117,9 +1074,16 @@
                         x: -(mousePointTo.x - self.stage.getPointerPosition().x / newScale) * newScale,
                         y: -(mousePointTo.y - self.stage.getPointerPosition().y / newScale) * newScale
                     };
-
-                    self.stage.position(newPos);
-                    self.stage.batchDraw();
+                    if (self.stage.scaleX() < 1 || self.stage.scaleY() < 1) {
+                        self.stage.position({
+                            x: 0,
+                            y: 0
+                        })
+                        self.stage.batchDraw();
+                    } else {
+                        self.stage.position(newPos);
+                        self.stage.batchDraw();
+                    }
                 });
             },
             findparentLayer(item) {
@@ -1135,24 +1099,17 @@
                 let snappingHandler = new SnappingHandler()
                 // clear all previous lines on the screen
                 self.stage.find('.guid-line').destroy();
-
                 // find possible snapping lines
                 var lineGuideStops = snappingHandler.getLineGuideStops(e, self.stage, self
                     .snapableItems);
-
-
                 // find snapping points of current object
                 var itemBounds = snappingHandler.getObjectSnappingEdges(e, self.stage);
-
-
                 // now find where can we snap current object
                 var guides = snappingHandler.getGuides(lineGuideStops, itemBounds, self.stage);
-
                 // do nothing of no snapping
                 if (!guides.length) {
                     return;
                 }
-
                 snappingHandler.drawGuides(guides, self.stage, self.selectedLayer);
                 // now force object position
                 guides.forEach(lg => {
@@ -1171,19 +1128,6 @@
                                 }
                                 break;
                             }
-                            // case 'center': {
-                            //     switch (lg.orientation) {
-                            //         case 'V': {
-                            //             e.x(lg.lineGuide + lg.offset);
-                            //             break;
-                            //         }
-                            //         case 'H': {
-                            //             e.y(lg.lineGuide + lg.offset);
-                            //             break;
-                            //         }
-                            //     }
-                            //     break;
-                            // }
                             case 'end': {
                                 switch (lg.orientation) {
                                     case 'V': {
@@ -1203,10 +1147,8 @@
             },
             addEvents() {
                 let self = this;
-
                 document.addEventListener('keydown', function (event) {
                     const key = event.key;
-
                     switch (key) {
                         case "Delete":
                             if (self.selectedItem != null) {
@@ -1227,6 +1169,9 @@
                                 }
                                 self.selectedLayer.draw();
                                 self.selectedItem = null;
+                                for (var prop in self.properties) {
+                                    self.properties[prop] = null
+                                }
                             }
                             break;
                         case "Control":
@@ -1246,10 +1191,8 @@
                             break;
                     }
                 });
-
                 document.addEventListener('keyup', function (event) {
                     const key = event.key;
-
                     switch (key) {
                         case "Control": {
                             self.ctrlDown = false;
@@ -1257,7 +1200,6 @@
                     }
                 });
             },
-
             setLayerVisible(layer) {
                 let self = this;
                 let tmpItems = self.stage.find("." + layer.name)
@@ -1272,15 +1214,6 @@
                     }
                     self.stage.batchDraw()
                 })
-                // tmpItems.forEach(item => {
-                //     if (layer.KonvaID = item._id) {
-                //         if (item.attrs.visible)
-                //             item.hide();
-                //         else
-                //             item.show();
-                //         item.draw()
-                //     }
-                // })
             },
             deleteLayer(layer, parent, idx) {
                 let self = this;
@@ -1293,14 +1226,6 @@
                     }
                 })
             },
-            getShapeMeters(shape) {
-                let self = this;
-
-                return {
-                    height: (shape.attrs.height / meterPixelRatio).toFixed(2),
-                    width: (shape.attrs.width / meterPixelRatio).toFixed(2),
-                }
-            },
             duplicate(direction) {
                 let self = this;
 
@@ -1309,7 +1234,6 @@
                 if (self.selectedItem == null) {
                     return;
                 }
-
                 switch (self.selectedItem.attrs.name) {
                     case "rect-group":
                         duplicationHelper.DuplicateRectGroup(self.selectedItem, self.selectedLayer, self
@@ -1325,7 +1249,6 @@
                     case "wall":
                         duplicationHelper.DuplicateWall(self.selectedItem, self.selectedLayer, self
                             .selectedLayerTree, direction, self.duplicationSequence)
-
                         break;
 
                     default:
@@ -1344,13 +1267,9 @@
                     case "RIGHT":
                         ++self.duplicationSequence.right
                         break;
-
-
                     default:
                         break;
                 }
-                // self.selectedLayer.add(newItem)
-                // self.stage.batchDraw();
             },
             findLayerItem(subMenuItems, id, callback) {
                 let self = this
@@ -1414,7 +1333,15 @@
                 container: "container",
                 width: width,
                 height: height,
-                draggable: true
+                draggable: true,
+                dragBoundFunc: function (pos) {
+                    var newY = pos.y > 0 ? 0 : pos.y;
+                    var newX = pos.x > 0 ? 0 : pos.x;
+                    return {
+                        x: newX,
+                        y: newY
+                    };
+                }
             })
             var gridLayer = new Konva.Layer();
             var padding = self.meterRatio;
@@ -1458,24 +1385,12 @@
             self.selectedLayerTree = tmplayertree
             self.selectedLayer = startLayer
             self.layers.unshift(startLayer);
-            // let bg_rect = new Konva.Rect({
-            //     x: 0,
-            //     y: 0,
-            //     width: self.stage.width(),
-            //     height: self.stage.height(),
-            //     fill: 'white'
-            // })
-            // startLayer.add(bg_rect);
             self.stage.add(startLayer);
-
-
             self.addStageEvents();
             self.addEvents();
             self.updateSnappingAngles();
         }
     }
-
-
 
     const rotatePoint = ({
         x,
@@ -1489,10 +1404,7 @@
         };
     };
 
-
-
     function deleteTreeItem(subMenuItems, id, self) {
-
         if (subMenuItems) {
             subMenuItems.forEach((item, idx) => {
 
@@ -1505,11 +1417,7 @@
                 }
             })
         }
-
     }
-
-
-
     // will work for shapes with top-left origin, like rectangle
     function rotateAroundCenter(node, rotation, hyp) {
         //current rotation origin (0, 0) relative to desired origin - center (node.width()/2, node.height()/2)
@@ -1532,9 +1440,7 @@
     function arraymove(arr, fromIndex, toIndex, comparitor) {
 
         if (fromIndex != toIndex && fromIndex > -1 && toIndex > -1 && toIndex < arr.length + 1) {
-            console.log("inside");
-            console.log("fromIndex:", fromIndex);
-            console.log("toIndex:", toIndex);
+
 
             var element = arr[fromIndex];
             arr.splice(fromIndex, 1);

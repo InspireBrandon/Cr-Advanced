@@ -7,37 +7,43 @@ import treeItem from '@/components/Main/FloorPlanning2D/libs/tree/TreeItem'
 
 
 class DuplicationHelper {
-    constructor() {}
+    constructor() {
+
+    }
     DuplicateWall(SelectedItem, Layer, LayerTree, direction, duplicationSequence) {
         let rect
+        let brush = {
+            height: SelectedItem.attrs.height,
+            color: SelectedItem.attrs.fill,
+        }
         switch (direction) {
             case "UP":
                 rect = new Line(Layer, {
                     x: SelectedItem.attrs.x,
                     y: SelectedItem.attrs.y - (SelectedItem.attrs
                         .height * duplicationSequence.up),
-                });
+                }, brush);
                 break;
             case "RIGHT":
                 rect = new Line(Layer, {
                     x: SelectedItem.attrs.x + (SelectedItem.attrs
                         .width * duplicationSequence.right),
                     y: SelectedItem.attrs.y,
-                });
+                }, brush);
                 break;
             case "LEFT":
                 rect = new Line(Layer, {
                     x: SelectedItem.attrs.x - (SelectedItem.attrs
                         .width * duplicationSequence.left),
                     y: SelectedItem.attrs.y,
-                });
+                }, brush);
                 break;
             case "DOWN":
                 rect = new Line(Layer, {
                     x: SelectedItem.attrs.x,
                     y: SelectedItem.attrs.y + (SelectedItem.attrs
                         .height * duplicationSequence.down),
-                });
+                }, brush);
                 break;
 
             default:
@@ -68,35 +74,38 @@ class DuplicationHelper {
     }
     DuplicateCircle(SelectedItem, Layer, LayerTree, direction, duplicationSequence) {
         let circle
-
+        let brush = {
+            height: SelectedItem.attrs.radius,
+            color: SelectedItem.attrs.fill,
+        }
         switch (direction) {
             case "UP":
                 circle = new Circle(Layer, {
                     x: SelectedItem.attrs.x,
                     y: SelectedItem.attrs.y - ((SelectedItem.attrs
                         .radius * 2) * duplicationSequence.up),
-                });
+                }, null, brush);
                 break;
             case "RIGHT":
                 circle = new Circle(Layer, {
                     x: SelectedItem.attrs.x + ((SelectedItem.attrs
                         .radius * 2) * duplicationSequence.right),
                     y: SelectedItem.attrs.y,
-                });
+                }, null, brush);
                 break;
             case "LEFT":
                 circle = new Circle(Layer, {
                     x: SelectedItem.attrs.x - ((SelectedItem.attrs
                         .radius * 2) * duplicationSequence.left),
                     y: SelectedItem.attrs.y,
-                });
+                }, null, brush);
                 break;
             case "DOWN":
                 circle = new Circle(Layer, {
                     x: SelectedItem.attrs.x,
                     y: SelectedItem.attrs.y + ((SelectedItem.attrs
                         .radius * 2) * duplicationSequence.down),
-                });
+                }, null, brush);
                 break;
 
             default:
@@ -126,38 +135,45 @@ class DuplicationHelper {
     }
     DuplicateRectGroup(SelectedItem, Layer, LayerTree, direction, duplicationSequence) {
         let rect
-        console.log("SelectedItem", SelectedItem.attrs);
+        let brush = {
+            height: SelectedItem.children[0].attrs.height,
+            width: SelectedItem.children[0].attrs.width,
+            color: SelectedItem.children[0].attrs.fill,
+        }
+        console.log("SelectedItem", SelectedItem);
 
         switch (direction) {
             case "UP":
                 rect = new Rect(Layer, {
-                    x: (SelectedItem.attrs.xref +SelectedItem.attrs.x),
-                    y: (SelectedItem.attrs.yref+SelectedItem.attrs.y) - (SelectedItem.children[0].attrs
+                    x: SelectedItem.children[0].attrs.x,
+                    y: SelectedItem.children[0].attrs.y - (SelectedItem.children[0].attrs
                         .height * duplicationSequence.up),
-                });
+                }, null, null, brush);
+                // console.log("[NEW RECT]", rect);
+
                 break;
             case "RIGHT":
                 rect = new Rect(Layer, {
-                    x: (SelectedItem.attrs.xref +SelectedItem.attrs.x) + (SelectedItem.children[0].attrs
+                    x: (SelectedItem.children[0].attrs.x) + (SelectedItem.children[0].attrs
                         .width * duplicationSequence.right),
-                    y: (SelectedItem.attrs.yref+SelectedItem.attrs.y),
-                });
+                    y: (SelectedItem.children[0].attrs.y),
+                }, null, null, brush);
 
                 break;
             case "LEFT":
                 rect = new Rect(Layer, {
-                    x: (SelectedItem.attrs.xref +SelectedItem.attrs.x) - (SelectedItem.children[0].attrs
+                    x: (SelectedItem.children[0].attrs.x) - (SelectedItem.children[0].attrs
                         .width * duplicationSequence.left),
-                    y: (SelectedItem.attrs.yref+SelectedItem.attrs.y),
-                });
+                    y: (SelectedItem.children[0].attrs.y),
+                }, null, null, brush);
 
                 break;
             case "DOWN":
                 rect = new Rect(Layer, {
-                    x: (SelectedItem.attrs.xref +SelectedItem.attrs.x),
-                    y: (SelectedItem.attrs.yref+SelectedItem.attrs.y) + (SelectedItem.children[0].attrs
+                    x: (SelectedItem.children[0].attrs.x),
+                    y: (SelectedItem.children[0].attrs.y) + (SelectedItem.children[0].attrs
                         .height * duplicationSequence.down),
-                });
+                }, null, null, brush);
                 break;
 
             default:
@@ -193,22 +209,29 @@ class DuplicationHelper {
                             .scaleX().toFixed(2),
                         scaleX: 1,
                         scaleY: 1,
-                        rotation: dupItem.rotation()
+                        // rotation: dupItem.rotation()
                     })
                 }
             })
 
         })
+        rect.shape.parent.setAttrs({
+            x: SelectedItem.attrs.x,
+            y: SelectedItem.attrs.y,
+        })
         rect.shape.parent.rotation(SelectedItem.rotation())
-        console.log("Dupl8ication",rect);
-        
         Layer.draw()
     }
     DuplicateRectGroupDrag(SelectedItem, Layer, LayerTree) {
+        let brush = {
+            height: SelectedItem.children[0].attrs.height,
+            width: SelectedItem.children[0].attrs.width,
+            color: SelectedItem.children[0].attrs.fill,
+        }
         let rect = new Rect(Layer, {
-            x: (SelectedItem.attrs.xref +SelectedItem.attrs.x),
-            y: (SelectedItem.attrs.yref+SelectedItem.attrs.y),
-        });
+            x: (SelectedItem.children[0].attrs.x),
+            y: (SelectedItem.children[0].attrs.y),
+        }, null, null, brush);
         LayerTree.children.push(new treeItem({
             KonvaID: rect.shape.parent._id,
             visible: true,
@@ -227,7 +250,6 @@ class DuplicationHelper {
                 .scaleX().toFixed(2),
             scaleX: 1,
             scaleY: 1,
-            draggable:true,
         })
         rect.shape.parent.children.forEach(item => {
             SelectedItem.children.forEach(dupItem => {
@@ -239,19 +261,29 @@ class DuplicationHelper {
                             .scaleX().toFixed(2),
                         scaleX: 1,
                         scaleY: 1,
+                        // rotation: dupItem.rotation()
                     })
                 }
             })
 
         })
+        rect.shape.parent.setAttrs({
+            x: SelectedItem.attrs.x,
+            y: SelectedItem.attrs.y,
+        })
+        rect.shape.parent.rotation(SelectedItem.rotation())
 
         Layer.draw()
     }
     DuplicateCircleDrag(SelectedItem, Layer, LayerTree) {
+        let brush = {
+            radius: SelectedItem.attrs.radius,
+            color: SelectedItem.attrs.fill,
+        }
         let circle = new Circle(Layer, {
             x: SelectedItem.attrs.x,
             y: SelectedItem.attrs.y,
-        });
+        }, null, brush);
 
         LayerTree.children.push(new treeItem({
             KonvaID: circle.shape._id,
@@ -268,16 +300,19 @@ class DuplicationHelper {
                 .scaleY().toFixed(2),
             scaleX: 1,
             scaleY: 1,
-            draggable:true,
+            draggable: true,
         })
         Layer.draw()
     }
     DuplicateWallDrag(SelectedItem, Layer, LayerTree) {
-
+        let brush = {
+            height: SelectedItem.attrs.height,
+            color: SelectedItem.attrs.fill,
+        }
         let rect = new Line(Layer, {
             x: SelectedItem.attrs.x,
             y: SelectedItem.attrs.y,
-        });
+        }, brush);
         LayerTree.children.push(new treeItem({
             KonvaID: rect.shape._id,
             visible: true,
@@ -294,9 +329,9 @@ class DuplicationHelper {
             height: SelectedItem.height() * SelectedItem
                 .scaleY().toFixed(2),
             scaleX: 1,
-            scaleY: 1, 
-            draggable:true,
-            rotation:SelectedItem.rotation()
+            scaleY: 1,
+            draggable: true,
+            rotation: SelectedItem.rotation()
         })
         Layer.draw()
     }

@@ -2,8 +2,9 @@ import Konva from 'konva'
 import Shape from './shape'
 
 class Rect extends Shape {
-    constructor(parent, config, ratio, name) {
+    constructor(parent, config, ratio, name, brush) {
         super(parent);
+
         if (config == null || config == undefined) {
             config = {
                 x: 0,
@@ -18,19 +19,20 @@ class Rect extends Shape {
         }
         let self = this;
 
-        self.create(config, ratio, name)
+        self.create(config, ratio, name,brush)
     }
 
-    create(config, ratio, name) {
+    create(config, ratio, name, brush) {
         let self = this;
-        
+
 
         self.shape = new Konva.Rect({
             x: config.x,
             y: config.y,
-            height: 50 * ratio,
-            width: 50 * ratio,
-            fill: "#1976d2",
+            height: parseFloat(brush.height),
+            width: parseFloat(brush.width),
+            fill: brush.color,
+            // fill: "#1976d2",
             // draggable: true,
             visible: 'inherit',
             enabledAnchors: self.enabledAnchors,
@@ -43,7 +45,7 @@ class Rect extends Shape {
             y: config.y,
             name: "front-Line",
             height: 5 * ratio,
-            width: 50 * ratio,
+            width: parseFloat(brush.width),
             fill: "red",
             // draggable: true,
             visible: true,
@@ -52,8 +54,7 @@ class Rect extends Shape {
         });
 
         let rectGroup = new Konva.Group({
-            xref:config.x,
-            yref:config.y,
+            
             visible: true,
             showEditName: true,
             selected: true,

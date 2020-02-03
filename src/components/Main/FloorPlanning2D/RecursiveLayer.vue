@@ -12,8 +12,8 @@
                 <div style="width: 80%">
                     <div v-if="!layer.showEditName">{{ layer.name }}</div>
                     <v-form @submit.prevent="editname(layer)">
-                        <input @blur="editname(layer)" :ref="'editLayer' + layer.KonvaID" v-model="layer.name" v-if="layer.showEditName"
-                            class="mb-1" style="border: 1px solid lightgrey" type="text">
+                        <input @blur="editname(layer)" :ref="'editLayer' + layer.KonvaID" v-model="layer.name"
+                            v-if="layer.showEditName" class="mb-1" style="border: 1px solid lightgrey" type="text">
                     </v-form>
                 </div>
                 <v-icon :size="22" @click="togglevisible(layer)" color="grey darken-2">
@@ -38,8 +38,9 @@
                 </v-menu>
             </div>
             <v-divider></v-divider>
-            <div @dragover.prevent draggable="true" @drop="endgroupDrag(layer,layers,idx)"
-                v-on:dragstart="dragStart(layer,idx,layers)" v-if="(layer.drawType!='Layer'&&layer.drawType!='group')">
+            <div @click="selectItemFromSidePanel(layer)" @dragover.prevent draggable="true"
+                @drop="endgroupDrag(layer,layers,idx)" v-on:dragstart="dragStart(layer,idx,layers)"
+                v-if="(layer.drawType!='Layer'&&layer.drawType!='group')">
                 <div class="pa-1 grey lighten-3" style="display: flex;">
                     <div :class="{ 'highlighted': selectedLayerTreeItem == layer  }">{{ layer.name }}
                     </div>
@@ -53,7 +54,7 @@
                 :layers="layer.children" :selectLayer="selectLayer" :selectedLayerTree="selectedLayerTree"
                 :setLayerVisible="setLayerVisible" :deleteLayer="deleteLayer" :showChild="layer.selected"
                 :endDrag="endDrag" :startDrag="startDrag" :swapIndex="swapIndex" :editLayerName="editLayerName"
-                />
+                :selectItemFromSidePanel="selectItemFromSidePanel" />
         </div>
     </div>
 </template>
@@ -61,7 +62,7 @@
     export default {
         props: ["layers", "selectLayer", "setLayerVisible", "deleteLayer", "showChild", "startDrag", "endDrag",
             "selectedLayer", "editLayerName", "selectedLayerTree", "selectedLayerTreeItem", "toggleLock",
-            "swapIndex", 
+            "swapIndex", "selectItemFromSidePanel"
         ],
         name: "RecursiveLayer",
         data() {
@@ -99,7 +100,6 @@
             endgroupDrag(layer, layers, idx) {
                 let self = this
                 self.dragging = false
-                console.log("endgroupDrag");
 
                 if (layer.drawType == "group") {
                     self.endDrag(layer, layers)

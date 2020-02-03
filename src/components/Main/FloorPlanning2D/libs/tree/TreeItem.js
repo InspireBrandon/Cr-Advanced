@@ -10,6 +10,9 @@ class TreeItem {
         self.visible=data.visible;
         self.drawType=data.drawType;
         self.locked=data.locked;
+        self.width = data.width
+        self.height = data.height
+        self.radius = data.radius
         if(data.collapsed==null||data.collapsed==undefined){
             self.collapsed=false;
         }else{
