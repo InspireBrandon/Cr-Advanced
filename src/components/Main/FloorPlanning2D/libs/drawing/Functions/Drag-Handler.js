@@ -13,7 +13,7 @@ import Arrow from '@/components/Main/FloorPlanning2D/libs/drawing/shape/arrow'
 
 class DragHandler {
     constructor() {}
-    handleContentMousedown(SelectedLayer, stage, firstPosition, lastPosition, selectedTool, SelectedLayerTree, selectImage, isPaint, wall, rect, circle, image, arrow, arrowStartY, arrowStartX, textNode, brush, vueCtx, callback) {
+    handleContentMousedown(SelectedLayer, stage, firstPosition, lastPosition, selectedTool, SelectedLayerTree, selectImage, isPaint, wall, rect, circle, image, arrow, arrowStartY, arrowStartX, textNode, brush, vueCtx, dotted, callback) {
 
         if (SelectedLayer.attrs.visible == false) {
             alert("cannot draw on invisible layer")
@@ -195,6 +195,24 @@ class DragHandler {
             });
         }
         break;
+        case "zoom_out_map": {
+            dotted = new Line(SelectedLayer, {
+                x: firstPosition.x,
+                y: firstPosition.y,
+                name: 'wall',
+                drawType: 'wall'
+            }, {
+                height: 2,
+                color: "#1976d2"
+            })
+            dotted.shape.setAttrs({
+                stroke: 'black',
+                strokeWidth: 10,
+                dash: [10, 10],
+                name:"dotted"
+            })
+        }
+        break;
         default:
             break;
 
@@ -207,6 +225,7 @@ class DragHandler {
             arrow: arrow,
             arrowStartX: arrowStartX,
             arrowStartY: arrowStartX,
+            dotted: dotted,
         })
 
     }
@@ -256,7 +275,7 @@ class DragHandler {
         callback()
     }
 
-    handleContentMousemove(SelectedLayer, stage, firstPosition, lastPosition, selectedTool, SelectedLayerTree, selectImage, isPaint, wall, rect, circle, image, arrow, arrowStartY, arrowStartX, textNode, ctrlDown, handleSnapping, brush) {
+    handleContentMousemove(SelectedLayer, stage, firstPosition, lastPosition, selectedTool, SelectedLayerTree, selectImage, isPaint, wall, rect, circle, image, arrow, arrowStartY, arrowStartX, textNode, ctrlDown, handleSnapping, brush, transformProperties, dotted) {
         let transform = stage.getAbsoluteTransform().copy();
         // to detect relative position we need to invert transform
         transform.invert();
@@ -279,6 +298,8 @@ class DragHandler {
             case "show_chart":
 
                 wall.shape.width(hyp);
+                transformProperties.width = wall.shape.width()
+                transformProperties.height = wall.shape.height()
                 if (!ctrlDown) {
                     wall.shape.rotation(deg);
                 } else {
@@ -306,7 +327,8 @@ class DragHandler {
             case "view_carousel":
                 // rect.shape.width(hyp);
                 // rect.line.width(hyp);
-
+                transformProperties.width = rect.shape.width()
+                transformProperties.height = rect.shape.height()
                 if (!ctrlDown) {
                     rect.line.rotation(deg);
                     rect.shape.rotation(deg);
@@ -374,6 +396,7 @@ class DragHandler {
 
             case "fiber_manual_record":
                 circle.shape.width(hyp);
+                transformProperties.radius = circle.shape.width()
                 handleSnapping(circle.shape)
                 break;
             case "local_offer":
@@ -400,7 +423,29 @@ class DragHandler {
                         textNode.shape.rotation(snappedAngle);
                 }
                 break;
+            case "zoom_out_map": {
+                dotted.shape.width(hyp);
 
+
+                handleSnapping(dotted.shape)
+                let updateDegrees = false;
+                let snappedAngle = 0;
+                let tolerance = brush.snapOption * 0.45;
+                let snapping = [-180, -90, 0, 90]
+                snapping.forEach(sa => {
+                    let lowerBounds = sa - tolerance
+                    let upperBounds = sa + tolerance
+
+                    if (deg >= lowerBounds && deg <= upperBounds) {
+                        updateDegrees = true;
+                        snappedAngle = sa;
+                    }
+                })
+
+                if (updateDegrees)
+                    dotted.shape.rotation(snappedAngle);
+
+            }
             default:
                 break;
         }

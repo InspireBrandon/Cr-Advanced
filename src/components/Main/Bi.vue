@@ -16,6 +16,8 @@
                 </v-btn> -->
             </v-toolbar-items>
             <v-btn color="primary" @click="printReport">Print</v-btn>
+            <v-btn color="primary" v-if="userAccess==0" @click="RefreshTables">refresh</v-btn>
+            <v-btn color="primary" v-if="userAccess==0" @click="CleanTables">Clean</v-btn>
 
             <!-- <v-btn color="primary" @click="switchMode">{{ currentMode == "edit" ? "View" : "Edit" }}</v-btn> -->
         </v-toolbar>
@@ -73,7 +75,22 @@
             // });
         },
         methods: {
+            RefreshTables() {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                let UpdateAll = false
+                if (self.selectedPlanograms.length == 0) {
+                    UpdateAll = true
+                }
+                Axios.post(process.env.VUE_APP_API +
+                    `PowerBI/UpdateTables?UpdateAll=${UpdateAll}`,self.selectedPlanograms).then(r => {
+                    console.log(r);
 
+                })
+            },
+            CleanTables() {
+                let self = this
+            },
             getPlanograms() {
                 let self = this;
 

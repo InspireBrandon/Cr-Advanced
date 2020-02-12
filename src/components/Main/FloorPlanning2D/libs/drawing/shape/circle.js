@@ -11,8 +11,14 @@ class Circle extends Shape {
         if (ratio == null || ratio == undefined) {
             ratio = 1
         }
-
+        if (brush == null || brush == undefined) {
+            brush = {
+                radius:10,
+                color:"#1976d2"
+            }
+        }
         let self = this;
+        console.log("Bursh", brush.radius);
 
         self.shape = new Konva.Circle({
             x: config.x,

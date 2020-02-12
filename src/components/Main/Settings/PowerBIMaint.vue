@@ -5,6 +5,7 @@
                 Power BI
             </v-toolbar-title>
             <v-spacer></v-spacer>
+            <!-- <v-btn color="primary" @click="updateTables">update tables </v-btn> -->
             <v-btn color="primary" @click="openConfigEditor">Edit Config </v-btn>
         </v-toolbar>
         <v-container grid-list-md style="height: calc(100vh - 158px)">
@@ -49,8 +50,8 @@
                                     </v-text-field>
                                 </v-flex>
                                 <v-flex md3>
-                                    <v-text-field readonly v-model="selectedApplicationObject.password" type="password" hide-details
-                                        label="Password">
+                                    <v-text-field readonly v-model="selectedApplicationObject.password" type="password"
+                                        hide-details label="Password">
 
                                     </v-text-field>
                                 </v-flex>
@@ -166,7 +167,8 @@
                             </v-text-field>
                         </v-flex>
                         <v-flex md6>
-                            <v-text-field hide-details v-model="applicationModalObject.password" type="password"  label="Password">
+                            <v-text-field hide-details v-model="applicationModalObject.password" type="password"
+                                label="Password">
                             </v-text-field>
                         </v-flex>
                         <v-flex md6>
@@ -185,17 +187,20 @@
         </v-dialog>
         <YesNoModal ref="yesNoModal"></YesNoModal>
         <configModal ref="configModal" />
+        <TableUpdateModal ref="TableUpdateModal" />
     </div>
 </template>
 <script>
     import Axios from 'axios'
     import YesNoModal from '@/components/Common/YesNoModal'
     import configModal from './Power_BI_configModal'
+    import TableUpdateModal from "./TableUpdateModal"
 
     export default {
         components: {
             YesNoModal,
-            configModal
+            configModal,
+            TableUpdateModal
         },
         data() {
             return {
@@ -227,6 +232,10 @@
             this.getApplications()
         },
         methods: {
+            updateTables() {
+                let self = this
+                self.$refs.TableUpdateModal.open()
+            },
             onApplicationChange() {
                 let self = this
                 self.$nextTick(() => {
@@ -242,7 +251,7 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 self.applications = []
                 Axios.get(process.env.VUE_APP_API + `Power_BI/GetApplications`).then(r => {
-                 
+
                     self.applicationsArray = r.data
                     r.data.forEach(element => {
                         self.applications.push({
@@ -255,9 +264,9 @@
                             return item.id == self.selectedApplication;
                         })
                         self.selectedApplicationObject = tmp[0]
-                    }else{
-                           self.selectedApplication=r.data[0].id
-                           self.onApplicationChange()
+                    } else {
+                        self.selectedApplication = r.data[0].id
+                        self.onApplicationChange()
                     }
                 })
             },

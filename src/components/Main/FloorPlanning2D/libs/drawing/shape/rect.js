@@ -1,8 +1,9 @@
 import Konva from 'konva'
 import Shape from './shape'
+import StageImage from "./image"
 
 class Rect extends Shape {
-    constructor(parent, config, ratio, name, brush) {
+    constructor(parent, config, ratio, name, brush, dataUrl) {
         super(parent);
 
         if (config == null || config == undefined) {
@@ -17,12 +18,23 @@ class Rect extends Shape {
         if (name == null || name == undefined) {
             name = "rect-group"
         }
+        if (brush == undefined || brush == null) {
+            brush = {
+                color: "#1976d2",
+                height: 5,
+                width: 5
+
+            }
+        }
+        if (dataUrl == null || dataUrl == undefined) {
+            dataUrl = ""
+        }
         let self = this;
 
-        self.create(config, ratio, name,brush)
+        self.create(config, ratio, name, brush, dataUrl)
     }
 
-    create(config, ratio, name, brush) {
+    create(config, ratio, name, brush, dataUrl) {
         let self = this;
 
 
@@ -44,17 +56,16 @@ class Rect extends Shape {
             x: config.x,
             y: config.y,
             name: "front-Line",
-            height: 5 * ratio,
+            height: 5,
             width: parseFloat(brush.width),
-            fill: "red",
+            // fill: "red",
             // draggable: true,
             visible: true,
-            strokeWidth: 1,
-            stroke: 'black',
+            // strokeWidth: 1,
+            // stroke: 'black',
         });
 
         let rectGroup = new Konva.Group({
-            
             visible: true,
             showEditName: true,
             selected: true,
@@ -62,11 +73,30 @@ class Rect extends Shape {
             draggable: true,
             name: name.toString(),
         })
-
         rectGroup.add(self.shape)
         rectGroup.add(self.line)
-        self.parent.add(rectGroup);
+        if (dataUrl != "") {
+            self.image = new Konva.Image({
+                name: "Gondola-Rect",
+                visible: 'inherit',
+                x: config.x,
+                y: config.y,
+                height: parseFloat(brush.height),
+                width: parseFloat(brush.width),
+                draggable: false
+            })
 
+            var imageObj = new Image();
+
+            imageObj.onload = function () {
+                self.image.image(imageObj);
+                self.parent.draw();
+                self.image.draggable(false)
+            }
+            imageObj.src = dataUrl;
+            rectGroup.add(self.image)
+        }
+        self.parent.add(rectGroup);
         self.parent.draw();
     }
 }

@@ -18,8 +18,8 @@ class Image extends Shape {
             visible: 'inherit',
             x: config.x,
             y: config.y,
-            width:200,
-            height:200,
+            // width:200,
+            // height:200,
             draggable: true
         })
 

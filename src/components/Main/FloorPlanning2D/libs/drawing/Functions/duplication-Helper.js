@@ -141,39 +141,44 @@ class DuplicationHelper {
             color: SelectedItem.children[0].attrs.fill,
         }
         console.log("SelectedItem", SelectedItem);
+        let dataurl
+        if (SelectedItem.children.length == 3) {
+            dataurl = SelectedItem.children[2].attrs.image.src
+        }
+        console.log("[SELETCED PAREENT]", SelectedItem.parent);
 
         switch (direction) {
             case "UP":
-                rect = new Rect(Layer, {
+                rect = new Rect(SelectedItem.parent, {
                     x: SelectedItem.children[0].attrs.x,
                     y: SelectedItem.children[0].attrs.y - (SelectedItem.children[0].attrs
                         .height * duplicationSequence.up),
-                }, null, null, brush);
+                }, null, null, brush, dataurl);
                 // console.log("[NEW RECT]", rect);
 
                 break;
             case "RIGHT":
-                rect = new Rect(Layer, {
+                rect = new Rect(SelectedItem.parent, {
                     x: (SelectedItem.children[0].attrs.x) + (SelectedItem.children[0].attrs
                         .width * duplicationSequence.right),
                     y: (SelectedItem.children[0].attrs.y),
-                }, null, null, brush);
+                }, null, null, brush, dataurl);
 
                 break;
             case "LEFT":
-                rect = new Rect(Layer, {
+                rect = new Rect(SelectedItem.parent, {
                     x: (SelectedItem.children[0].attrs.x) - (SelectedItem.children[0].attrs
                         .width * duplicationSequence.left),
                     y: (SelectedItem.children[0].attrs.y),
-                }, null, null, brush);
+                }, null, null, brush, dataurl);
 
                 break;
             case "DOWN":
-                rect = new Rect(Layer, {
+                rect = new Rect(SelectedItem.parent, {
                     x: (SelectedItem.children[0].attrs.x),
                     y: (SelectedItem.children[0].attrs.y) + (SelectedItem.children[0].attrs
                         .height * duplicationSequence.down),
-                }, null, null, brush);
+                }, null, null, brush, dataurl);
                 break;
 
             default:
@@ -190,7 +195,9 @@ class DuplicationHelper {
             name: "rect-group",
             children: [],
         }))
-
+        if (SelectedItem.length == 3) {
+            rect.shape.parent.attrs.DropID = SelectedItem.attrs.DropID
+        }
         rect.shape.setAttrs({
             height: SelectedItem.height() * SelectedItem
                 .scaleY().toFixed(2),
@@ -215,9 +222,15 @@ class DuplicationHelper {
             })
 
         })
+        console.log(SelectedItem.attrs);
+        console.log(rect.shape.parent.attrs);
         rect.shape.parent.setAttrs({
             x: SelectedItem.attrs.x,
             y: SelectedItem.attrs.y,
+            scaleX: SelectedItem.attrs.scaleX,
+            scaleY: SelectedItem.attrs.scaleY,
+            rotation: SelectedItem.rotation()
+
         })
         rect.shape.parent.rotation(SelectedItem.rotation())
         Layer.draw()
@@ -228,10 +241,16 @@ class DuplicationHelper {
             width: SelectedItem.children[0].attrs.width,
             color: SelectedItem.children[0].attrs.fill,
         }
-        let rect = new Rect(Layer, {
-            x: (SelectedItem.children[0].attrs.x),
-            y: (SelectedItem.children[0].attrs.y),
-        }, null, null, brush);
+        let dataurl
+        if (SelectedItem.children.length == 3) {
+            dataurl = SelectedItem.children[2].attrs.image.src
+        }
+        let rect = new Rect(SelectedItem.parent, {
+            x: SelectedItem.children[0].attrs.x,
+            y: SelectedItem.children[0].attrs.y,
+        }, null, null, brush, dataurl);
+
+
         LayerTree.children.push(new treeItem({
             KonvaID: rect.shape.parent._id,
             visible: true,
@@ -242,7 +261,9 @@ class DuplicationHelper {
             name: "rect-group",
             children: [],
         }))
-
+        if (SelectedItem.length == 3) {
+            rect.shape.parent.attrs.DropID = SelectedItem.attrs.DropID
+        }
         rect.shape.setAttrs({
             height: SelectedItem.height() * SelectedItem
                 .scaleY().toFixed(2),
@@ -267,12 +288,17 @@ class DuplicationHelper {
             })
 
         })
+        console.log(SelectedItem.attrs);
+        console.log(rect.shape.parent.attrs);
         rect.shape.parent.setAttrs({
             x: SelectedItem.attrs.x,
             y: SelectedItem.attrs.y,
+            scaleX: SelectedItem.attrs.scaleX,
+            scaleY: SelectedItem.attrs.scaleY,
+            rotation: SelectedItem.rotation()
+
         })
         rect.shape.parent.rotation(SelectedItem.rotation())
-
         Layer.draw()
     }
     DuplicateCircleDrag(SelectedItem, Layer, LayerTree) {
@@ -334,6 +360,42 @@ class DuplicationHelper {
             rotation: SelectedItem.rotation()
         })
         Layer.draw()
+    }
+
+    DuplicateImageDrag(SelectedItem, Layer, LayerTree) {
+        console.log("SelectedItem", SelectedItem);
+
+        let image = new StageImage(Layer, {
+            x: SelectedItem.attrs.x,
+            y: SelectedItem.attrs.y
+        });
+        image.shape.setAttrs({
+            height: SelectedItem.attrs.height,
+            width: SelectedItem.attrs.width,
+            rotation: SelectedItem.rotation()
+        })
+        LayerTree.children.push(new treeItem({
+            KonvaID: image.shape._id,
+            visible: true,
+            showEditName: true,
+            selected: true,
+            showChildren: true,
+            draggable: true,
+            name: "Image",
+            children: [],
+        }))
+
+        var imageObj = new Image();
+
+        imageObj.onload = function () {
+            image.shape.image(imageObj);
+            Layer.draw();
+            // self.onToolChange("open_with")
+            // self.selectedTool = ''
+            image.shape.draggable(true)
+        }
+        imageObj.src = SelectedItem.attrs.image.src;
+
     }
 
 }

@@ -3,7 +3,7 @@ import Konva from 'konva'
 class TransFormerHelper {
     constructor() {}
 
-    handleTransform(e, z, handleSnapping, stage, lastPosition, ctrlDown, selectedItem, rotateAroundCenter) {
+    handleTransform(e, z, handleSnapping, stage, lastPosition, ctrlDown, selectedItem, rotateAroundCenter, transformProperties, propertiesLabel, propertiesLabelVertical) {
         handleSnapping(e)
         let transform = stage.getAbsoluteTransform().copy();
         // to detect relative position we need to invert transform
@@ -15,6 +15,40 @@ class TransFormerHelper {
         lastPosition.x = dropPos.x
         lastPosition.y = dropPos.y;
 
+        if (e.attrs.name != "rect-group") {
+            transformProperties.height = e.height()
+            transformProperties.width = e.width()
+            // propertiesLabel.setAttrs({
+            //     x: e.attrs.x + (transformProperties.width / 2),
+            //     y: e.attrs.y
+            // })
+            // propertiesLabelVertical.setAttrs({
+            //     x: e.attrs.x,
+            //     y: e.attrs.y + (transformProperties.height / 2),
+            //     rotation: 270
+            // })
+        } else {
+            transformProperties.height = e.children[0].height()
+            transformProperties.width = e.children[0].width()
+            // propertiesLabel.setAttrs({
+            //     x: e.children[0].attrs.x + (transformProperties.width / 2),
+            //     y: e.children[0].attrs.y
+            // })
+            // propertiesLabelVertical.setAttrs({
+            //     x: e.children[0].attrs.x,
+            //     y: e.children[0].attrs.y + (transformProperties.height / 2),
+            //     rotation: 270
+            // })
+        }
+
+
+        // propertiesLabel.text((transformProperties.width * e.scaleX()).toFixed())
+        // propertiesLabelVertical.text((transformProperties.height * e.scaleY()).toFixed())
+        stage.batchDraw()
+
+
+
+        // transformProperties.radius = e.target.radius
         if (ctrlDown) {
             if (z.currentTarget.movingResizer == "middle-left") {
                 const right = {
@@ -46,6 +80,7 @@ class TransFormerHelper {
 
                 var deg = rad * (180 / Math.PI);
                 selectedItem.rotation(deg);
+
                 selectedItem.width(hyp);
             }
         }
@@ -53,9 +88,10 @@ class TransFormerHelper {
     handleTransformEnd(selectedItem, properties) {
         if (selectedItem.attrs.name == "rect-group") {
             selectedItem.children.forEach(item => {
+                console.log(item.attrs.name + "--x: " + item.attrs.x + "Y:" + item.attrs.y + item.attrs.image);
                 if (item.attrs.name == "front-Line") {
                     item.setAttrs({
-                        height: 5,
+                        height: 0,
                         width: item.width() * item
                             .scaleX().toFixed(2),
                         scaleX: 1,
@@ -63,6 +99,9 @@ class TransFormerHelper {
                         rotation: item.rotation()
                     });
                 } else {
+                    console.log(item);
+
+
                     item.setAttrs({
                         height: item.height() * item
                             .scaleY().toFixed(2),
@@ -72,6 +111,12 @@ class TransFormerHelper {
                         scaleY: 1,
 
                     });
+                    if (item.attrs.image != undefined) {
+                        item.setAttrs({
+                            x: selectedItem.children[0].attrs.x,
+                            y: selectedItem.children[0].attrs.y
+                        })
+                    }
                     properties.height = item.height().toFixed(2);
                     properties.width = item.width().toFixed(2)
                 }

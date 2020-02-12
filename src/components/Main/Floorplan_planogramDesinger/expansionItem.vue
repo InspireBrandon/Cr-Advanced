@@ -17,6 +17,11 @@
                                     </v-icon>
                                 </v-btn>
                             </v-flex>
+                            <v-flex md12>
+                                <v-text-field v-if="Drop.shape=='Square'" @change="changeRotation(Drop,rotation)"
+                                    type="number" label="Rotation" v-model="rotation" hide-details>
+                                </v-text-field>
+                            </v-flex>
                             <v-flex md6>
                                 <h4 style="text-decoration: underline;"> Top</h4>
                                 <v-card width="100" height="100" @click="openFileDialog('Top')">
@@ -60,7 +65,7 @@
 <script>
     import axios from "axios"
     export default {
-        props: ["Drop", "reDraw", "selectedFixtures"],
+        props: ["Drop", "reDraw", "selectedFixtures", "changeRotation"],
         data() {
             return {
                 tmpImageURL: 'https://www.okcballet.org/wp-content/uploads/2016/09/placeholder-image.png',
@@ -77,13 +82,21 @@
                     BackImg: null,
                     Back: null,
                 },
+                rotation: 0,
 
             }
         },
         mounted() {
             this.getImages()
+            this.checkDrop()
         },
         methods: {
+            checkDrop() {
+                let self = this
+                if (self.Drop.shape == null || self.Drop.shape == undefined) {
+                    self.Drop.shape = "Square"
+                }
+            },
             changeDrop() {
                 let self = this
                 self.$nextTick(() => {

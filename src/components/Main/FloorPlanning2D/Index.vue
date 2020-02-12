@@ -28,11 +28,11 @@
                             <v-list-tile-title>New</v-list-tile-title>
                         </v-list-tile>
                         <v-divider></v-divider>
-                        <v-list-tile>
+                        <v-list-tile @click="open">
                             <v-list-tile-title>Open</v-list-tile-title>
                         </v-list-tile>
                         <v-divider></v-divider>
-                        <v-list-tile>
+                        <v-list-tile @click="saveFloorplan">
                             <v-list-tile-title>Save</v-list-tile-title>
                         </v-list-tile>
                         <v-list-tile>
@@ -48,8 +48,8 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
-                <v-text-field label="block to meter ratio" v-model="meterRatio" style="width:200px">
-                </v-text-field>
+                <!-- <v-text-field label="block to meter ratio" v-model="meterRatio" style="width:200px">
+                </v-text-field> -->
             </v-toolbar-items>
             <v-btn icon flat small @click="duplicate('RIGHT')">
                 <v-icon>arrow_right</v-icon>
@@ -66,7 +66,8 @@
             <v-btn @click="resetStageScale">
                 reset zoom
             </v-btn>
-            <div v-if="selectedItem!=null">{{selectedItem.attrs.name}}</div>
+            <PlanogramLibrary />
+            <!-- <div v-if="selectedItem!=null">{{selectedItem.attrs.name}}-{{properties.fill}}</div> -->
             <v-spacer></v-spacer>
             <v-toolbar-title>Floor Planning</v-toolbar-title>
         </v-toolbar>
@@ -94,7 +95,9 @@
                 <v-layout row wrap>
                     <v-flex sm10 class="pa-0">
                         <v-card tile flat id="stage_container" class="fill-height" :style="{ 'cursor': currentCursor }">
-                            <div ref="container" id="container" oncontextmenu="return false;"></div>
+                            <div ref="container" @dragover="acceptDrag" @drop="dropDragItem" id="container"
+                                oncontextmenu="return false;">
+                            </div>
                         </v-card>
                     </v-flex>
                     <v-flex sm2 class="pa-0">
@@ -116,6 +119,9 @@
                                 </v-text-field>
                                 <v-text-field v-if="properties.radius!=null" @change="applyProperties" type="number"
                                     label="Radius" v-model="properties.radius" hide-details>
+                                </v-text-field>
+                                <v-text-field type="color" label="Color" v-model="properties.fill"
+                                    @change="applyProperties($event)">
                                 </v-text-field>
                             </v-card-text>
                             <v-toolbar v-if="selectedTool != 'open_with'" dark dense flat color="grey darken-3">
@@ -160,7 +166,16 @@
                                 </v-menu>
                             </v-toolbar>
                             <v-card-text class="pa-0 pt-0" style="height: 57%; overflow-y: scroll;">
-                                <RecursiveLayer ref="RecursiveLayer" :selectItemFromSidePanel="selectItemFromSidePanel"
+                                <div @dragover.prevent draggable="true" @drop="MoveLayerTopTop($event)">
+                                    <div class="pa-1 grey lighten-3" style="display: flex;">
+                                        <div>
+                                            Drag layer here to move to top.
+                                        </div>
+                                    </div>
+                                    <v-divider></v-divider>
+                                </div>
+                                <RecursiveLayer v-if="layerTree.length>0" ref="RecursiveLayer"
+                                    :selectItemFromSidePanel="selectItemFromSidePanel"
                                     :selectedLayerTreeItem="selectedLayerTreeItem" :editLayerName="editLayerName"
                                     :showChild="true" :layers="layerTree" :selectLayer="selectLayer"
                                     :setLayerVisible="setLayerVisible" :deleteLayer="deleteLayer" :endDrag="endDrag"
@@ -174,6 +189,10 @@
             </div>
             <input @change="onFileChange" type="file" style="display: none;" ref="fileInput">
             <PlanogramDetailsSelector ref="PlanogramDetailsSelector" />
+            <floorPlanSelector ref="floorPlanSelector" />
+            <Prompt ref="Prompt" />
+            <Spinner ref="spinner"></Spinner>
+
         </v-container>
         <v-snackbar v-model="snackbar" color="primary" :timeout="3000">
             {{ snackbarText }}
@@ -205,9 +224,19 @@
     import SnappingHandler from './libs/drawing/Functions/snapping-handler'
 
     import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector';
+    import Prompt from '@/components/Common/Prompt';
+    import Spinner from '@/components/Common/Spinner';
+
+
 
     import Settings from './Settings'
     import RecursiveLayer from "./RecursiveLayer.vue"
+    import PlanogramLibrary from "./PlanogramLibrary.vue"
+    import floorPlanSelector from "./floorPlanSelector.vue"
+
+
+    import axios from 'axios'
+
     // import config from 'config';
     let dragHandler = new DragHandler(this)
     let clickTapHelper = new ClickTapHelper()
@@ -224,10 +253,17 @@
         components: {
             Settings,
             RecursiveLayer,
-            PlanogramDetailsSelector
+            PlanogramDetailsSelector,
+            PlanogramLibrary,
+            floorPlanSelector,
+            Prompt,
+            Spinner,
+
         },
+        // 1 block = 1 meter
         data() {
             return {
+                dotted: null,
                 wall: null,
                 rect: null,
                 circle: null,
@@ -257,6 +293,7 @@
                 lastdeletedItem: [],
                 lastDeletedTree: [],
                 meterRatio: 25,
+                // 1 block = 1 meter
                 duplicationSequence: {
                     up: 1,
                     down: 1,
@@ -283,7 +320,7 @@
                     radius: null,
                     height: null,
                     width: null,
-                    fill: null
+                    fill: "#1976d2",
                 },
                 selectedItem: null,
                 selectedLayer: null,
@@ -319,9 +356,24 @@
                     {
                         name: 'arrow_upward',
                         tooltip: "Draw Arrow"
+                    },
+                    {
+                        name: 'zoom_out_map',
+                        tooltip: "Use this to scale images"
                     }
                 ],
                 selectedTool: 'open_with',
+                transformProperties: {
+                    radius: 0,
+                    height: 0,
+                    width: 0
+                },
+                propertiesLabelHorizontal: null,
+                propertiesLabelVertical: null,
+                Floorplan_ID: null,
+                LabelText: "",
+                saveArr: [],
+                imageIDArr: [],
             }
         },
         computed: {
@@ -335,31 +387,620 @@
             }
         },
         methods: {
-            applyProperties() {
+            DrawFixture(item, parentArr, parentLayerTree, callback) {
+                let self = this
+                switch (item.name) {
+                    case "wall": {
+                        let wall = new Line(parentArr, {
+                            x: item.x,
+                            y: item.y,
+                            name: 'wall',
+                            drawType: 'wall'
+                        })
+                        wall.shape.setAttrs({
+                            width: item.width,
+                            height: item.height,
+                            rotation: item.rotation,
+                            draggable: false
+
+                        })
+                        let treeitem = new treeItem({
+                            KonvaID: wall.shape._id,
+                            name: 'wall',
+                            drawType: 'wall',
+                            children: [],
+                            width: null
+                        })
+                        parentLayerTree.children.push(treeitem)
+                        self.stage.batchDraw()
+
+                    }
+                    break;
+                case "circle": {
+                    let circle = new Circle(parentArr, {
+                        x: item.x,
+                        y: item.y,
+                    });
+                    circle.shape.setAttrs({
+                        radius: item.radius,
+                        draggable: false
+                    })
+                    parentLayerTree.children.push(new treeItem({
+                        KonvaID: circle.shape._id,
+                        visible: true,
+                        showEditName: false,
+                        selected: false,
+                        showChildren: true,
+                        draggable: true,
+                        name: "Circle",
+                        children: [],
+                    }))
+                    self.stage.batchDraw()
+
+                }
+                break;
+
+                case "rect-group": {
+                    let rect = new Rect(parentArr, {
+                        x: item.x,
+                        y: item.y,
+                    }, null, null, null, self.imageSrc(item.fixture_ID,
+                        "Top"));
+
+                    parentLayerTree.children.push(new treeItem({
+                        KonvaID: rect.shape.parent._id,
+                        visible: true,
+                        showEditName: false,
+                        selected: false,
+                        showChildren: true,
+                        draggable: true,
+                        name: "rect-group",
+                        children: [],
+                    }))
+                    rect.shape.parent.draggable = false
+                    item.children.forEach(element => {
+                        if (element.name == "front-line") {
+                            rect.line.setAttrs({
+                                width: element.width,
+                                draggable: false
+                            })
+                        } else {
+                            rect.shape.setAttrs({
+                                width: element.width,
+                                height: element.height,
+                                draggable: false
+                            })
+                            rect.image.setAttrs({
+                                width: element.width,
+                                height: element.height,
+                                draggable: false
+                            })
+                        }
+                    })
+
+                }
+                break;
+
+                case "image": {
+                    let image = new StageImage(parentArr, {
+                        x: item.x,
+                        y: item.y
+                    });
+
+                    parentLayerTree.children.push(new treeItem({
+                        KonvaID: image.shape._id,
+                        visible: true,
+                        showEditName: false,
+                        selected: false,
+                        showChildren: true,
+                        draggable: false,
+                        name: "Image",
+                        children: [],
+                    }))
+                    image.shape.setAttrs({
+                        width: item.width,
+                        height: item.height
+                    })
+                    image.shape.attrs.refFile = self.imageFloorplanFixtureSrc(item.id);
+                    var imageObj = new Image();
+
+                    imageObj.onload = function () {
+                        image.shape.image(imageObj);
+                        self.stage.batchDraw();
+                        // self.selectedTool = ''
+                        image.shape.draggable(true)
+                    }
+                    imageObj.src = self.imageFloorplanFixtureSrc(item.id);
+                }
+                break;
+
+                case "arrow": {
+                    let arrow = new Arrow(parentArr, {
+                        x: item.x,
+                        y: item.y,
+                    });
+
+
+                    parentLayerTree.children.push(new treeItem({
+                        KonvaID: arrow.shape._id,
+                        visible: true,
+                        showEditName: false,
+                        selected: false,
+                        showChildren: true,
+                        draggable: true,
+                        name: "arrow",
+                        children: [],
+                    }))
+                    arrow.shape.points([item.x, item.y, item.arrowEndX, item.arrowEndY])
+                }
+                default:
+                    break;
+                }
+                callback()
+            },
+            drawSavedItems(menuItems, parentArr, parentLayerTree, callback) {
+                let self = this
+                menuItems.forEach(item => {
+                    switch (item.type) {
+                        case 0: {
+                            let layer = new Konva.Layer({
+                                name: item.name,
+                                visible: true,
+                                showEditName: false,
+                                selected: false,
+                                showChildren: false,
+                                drawType: "Layer",
+                                type: "Layer"
+                            })
+                            let layertreeitem = new treeItem({
+                                KonvaID: layer._id,
+                                children: [],
+                                name: item.name,
+                                showEditName: false,
+                                visible: layer.visible,
+                                selected: layer.selected,
+                                showChildren: layer.showChildren,
+                                drawType: "Layer"
+                            })
+                            parentLayerTree.push(layertreeitem)
+                            parentArr.add(layer);
+                            // drawLayer
+                            if (item.children.length > 0) {
+                                self.drawSavedItems(item.children, layer, layertreeitem, callback => {
+
+                                })
+                            }
+                        }
+                        break;
+                    case 1: {
+                        let self = this;
+                        let group = new Konva.Group({
+                            name: item.name,
+                            visible: true,
+                            showEditName: false,
+                            selected: false,
+                            showChildren: true,
+                            draggable: true,
+                            locked: false,
+                            drawType: "group",
+                            type: "group",
+                        })
+                        let layertreeitem = new treeItem({
+                            KonvaID: group._id,
+                            children: [],
+                            name: item.name,
+                            showEditName: false,
+                            visible: group.visible,
+                            selected: group.selected,
+                            showChildren: group.showChildren,
+                            drawType: "group",
+                            locked: true,
+                        })
+                        parentArr.add(group)
+                        parentLayerTree.children.push(layertreeitem)
+                        if (item.children.length > 0) {
+                            self.drawSavedItems(item.children, group, layertreeitem, callback => {
+
+                            })
+                        }
+                        // drawGroup
+                    }
+                    break;
+                    case 2: {
+                        // drawFixture
+                        self.DrawFixture(item, parentArr, parentLayerTree, cb => {
+                            self.stage.batchDraw()
+                        })
+
+                    }
+                    break;
+
+                    default:
+                        break;
+                    }
+                    callback()
+
+                });
+
+
+            },
+            open() {
+                let self = this
+                self.$refs.floorPlanSelector.show(callback => {
+                    console.log("floorPlanSelector", callback);
+
+                    axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                    axios.get(process.env.VUE_APP_API + `GetFloorPlanItems?Header_ID=${callback}`).then(r => {
+                        console.log(r);
+                        self.stage.children.forEach((child, idx) => {
+                            if (child.attrs.name != "grid") {
+                                self.stage.children.splice(idx, 1)
+                            }
+                        })
+                        self.layerTree = []
+                        self.drawSavedItems(r.data, self.stage, self.layerTree,
+                            cb => {
+                                self.selectLayer(self.layerTree[0], self.layerTree)
+                            })
+                    })
+                })
+            },
+            CheckType(item) {
+
+                switch (item.attrs.type) {
+                    case "Layer":
+                        return 0
+                        break;
+                    case "group":
+                        return 1
+                        break;
+                    case "planogramGroup":
+                        return 1
+                        break;
+                    case "PlanogramFixture":
+                        return 2
+                        break;
+                    default: {
+                        return 2
+                    }
+                    break;
+                }
+
+            },
+            FormatItems(menuItems, parentArr, Floorplan_Fixture_ID, Floorplan_ID, callback) {
+                let self = this
+
+                menuItems.forEach((item, idx) => {
+                    if (item.attrs.name != "grid") {
+                        let reqObj = {
+                            type: self.CheckType(item),
+                            x: item.attrs.x,
+                            y: item.attrs.y,
+                            width: item.attrs.width,
+                            height: item.attrs.height,
+                            depth: item.attrs.depth,
+                            rotation: item.attrs.rotation,
+                            radius: item.attrs.radius,
+                            name: item.attrs.name,
+                            Floorplan_ID: Floorplan_ID,
+                            Fixture_ID: item.attrs.DropID,
+                            color: item.attrs.fill,
+                            children: []
+                        }
+                        if (item.attrs.name == "arrow") {
+                            console.log(item);
+                            reqObj.x = item.attrs.points[0]
+                            reqObj.y = item.attrs.points[1]
+                            reqObj.arrowEndX = item.attrs.points[2]
+                            reqObj.arrowEndY = item.attrs.points[3]
+
+                        }
+                        if (item.attrs.name == "image") {
+                            self.imageIDArr.push(item)
+                        }
+                        parentArr.push(reqObj)
+                        if (item.children.length > 0) {
+                            self.FormatItems(item.children, reqObj.children, item.attrs.DropID, Floorplan_ID,
+                                recCall => {})
+                        }
+                        if (idx + 1 == menuItems.length) {
+                            callback()
+                        }
+                    }
+                })
+            },
+            handleImageSaving() {
+                let self = this
+                if (self.imageIDArr.length > 0) {
+                    axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                    axios.get(process.env.VUE_APP_API + `Floorplan?Floorplan_ID=${self.Floorplan_ID}`).then(r => {
+                        r.data.forEach(saveditem => {
+                            self.imageIDArr.forEach(item => {
+                                if (saveditem.x == item.attrs.x && saveditem.y == item.attrs
+                                    .y) {
+                                    axios.post(process.env.VUE_APP_API +
+                                        `Floorplan/Image?ImageID=${saveditem.id}`, item
+                                        .attrs.refFile).then(
+                                        resp => {})
+                                }
+                            })
+                        })
+                    })
+                }
+                self.$refs.spinner.hide()
+
+            },
+            saveFloorplan() {
+                let self = this
+                console.log('saving', self.stage);
+                self.saveArr = []
+                self.$refs.Prompt.show("", " Save FloorPlan", "Please enter floorplan name", Name => {
+                    self.$refs.spinner.show()
+                    axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                    let req = {
+                        id: self.Floorplan_ID,
+                        name: Name
+                    }
+                    axios.post(process.env.VUE_APP_API + `saveFloorHeader`, req).then(r => {
+                        self.Floorplan_ID = r.data.id
+                        self.imageIDArr = []
+                        self.FormatItems(self.stage.children, self.saveArr, 0, self.Floorplan_ID,
+                            callback => {
+                                console.log("FormatItems", self.saveArr);
+                                axios.post(process.env.VUE_APP_API +
+                                    `saveFloorHeader?header_ID=${self.Floorplan_ID}`, self
+                                    .saveArr).then(
+                                    resp => {
+                                        console.log(self.imageIDArr);
+                                        self.handleImageSaving()
+                                    })
+
+                            })
+                    })
+                })
+            },
+            imageSrc(imgID, type) {
+                let self = this;
+                return process.env.VUE_APP_API + `FloorplanFixture?mapImageID=${imgID}&type=${type}`
+            },
+            imageFloorplanFixtureSrc(ImageID) {
+                let self = this
+                return process.env.VUE_APP_API + `Floorplan?ImageID=${ImageID}`
+
+            },
+            addShape(parent, item, idx, dropPos, callback) {
+                let self = this
+
+
+                let shape = JSON.parse(item.attributes)
+                console.log("x:" + shape.x + " y:" + shape.y);
+                switch (shape.name) {
+                    case "rect-group": {
+                        let rect = new Rect(self.selectedLayer, {
+                            x: 0,
+                            y: 0,
+                        }, null, null, null, self.imageSrc(item.floorplan_Fixture_ID,
+                            "Top"));
+
+                        rect.shape.parent.saveID = item.id
+                        rect.shape.parent.guid = item.guid
+                        rect.shape.parent.attrs = shape
+                        rect.shape.parent.attrs.type = "PlanogramFixture"
+                        rect.shape.parent.setAttrs({
+                            x: dropPos.x + (shape.x / 4),
+                            y: dropPos.y + (shape.y / 4)
+                        })
+                        self.selectedLayerTree.children.push(new treeItem({
+                            KonvaID: rect.shape.parent._id,
+                            visible: true,
+                            showEditName: true,
+                            selected: true,
+                            showChildren: true,
+                            draggable: true,
+                            name: "rect-group",
+                            children: [],
+                        }))
+                        item.children.forEach((child, idx) => {
+                            let childAttrs = JSON.parse(child.attributes)
+                            switch (childAttrs.name) {
+                                case "Gondola-Rect": {
+                                    if (idx == 0) {
+                                        rect.shape.attrs = childAttrs
+                                        rect.shape.saveID = child.id
+                                        rect.shape.guid = child.guid
+                                        rect.shape.setAttrs({
+                                            width: childAttrs.width / 4,
+                                            height: childAttrs.height / 4
+                                        })
+                                    } else {
+                                        rect.image.setAttrs({
+                                            width: childAttrs.width / 4,
+                                            height: childAttrs.height / 4
+                                        })
+                                        rect.image.saveID = child.id
+                                        rect.image.guid = child.guid
+                                    }
+                                }
+                                break;
+                            case "front-Line": {
+                                rect.line.attrs = childAttrs
+                                rect.line.setAttrs({
+                                    width: childAttrs.width / 4,
+                                })
+                                rect.line.saveID = child.id
+                                rect.line.guid = child.guid
+                            }
+                            break;
+                            default:
+                                break;
+                            }
+                        })
+                        rect.shape.parent.moveTo(parent)
+                        rect.shape.parent.draggable(false)
+                    }
+                    break;
+                case "circle": {
+                    let circle = new Circle(self.selectedLayer, {
+                        x: shape.x / 4,
+                        y: shape.y / 4,
+                    }, null, {
+                        radius: shape.radius / 4,
+                        color: "#1976d2"
+                    });
+                    circle.shape.attrs = shape
+                    circle.shape.setAttrs({
+                        x: dropPos.x + (shape.x / 4),
+                        y: dropPos.y + (shape.y / 4),
+                        radius: shape.radius / 4
+                    })
+                    circle.shape.saveID = item.id
+                    circle.shape.guid = item.guid
+                    circle.shape.attrs.type = "PlanogramFixture"
+                    circle.shape.draggable(false)
+
+
+                    self.selectedLayerTree.children.push(new treeItem({
+                        KonvaID: circle.shape._id,
+                        visible: true,
+                        showEditName: true,
+                        selected: true,
+                        showChildren: true,
+                        draggable: true,
+                        name: "Circle",
+                        children: [],
+                    }))
+                    circle.shape.moveTo(parent)
+                    self.selectedLayer.draw()
+                }
+                break;
+                default:
+                    break;
+                }
+                callback()
+            },
+            drawSaved(cb) {
+                let self = this
+                self.getSavedData(cb.id, data => {
+                    let transform = self.stage.getAbsoluteTransform().copy();
+                    // to detect relative position we need to invert transform
+                    transform.invert();
+                    // now we find relative point
+                    let pos = self.stage.getPointerPosition();
+                    console.log("pos", pos);
+
+                    let dropPos = transform.point(pos);
+                    console.log("dropPos", dropPos);
+
+                    let group = new Konva.Group({
+                        name: cb.planogram_Name,
+                        type: "planogramGroup",
+                        x: 0,
+                        y: 0,
+                        visible: true,
+                        showEditName: false,
+                        selected: true,
+                        showChildren: true,
+                        draggable: true,
+                        locked: true,
+                        drawType: "group",
+                        isPlanogram: true,
+                    })
+
+                    let layertreeitem = new treeItem({
+                        KonvaID: group._id,
+                        children: [],
+                        name: cb.planogram_Name,
+                        showEditName: false,
+                        visible: group.visible,
+                        selected: group.selected,
+                        showChildren: group.showChildren,
+                        drawType: "group",
+                        locked: true,
+                    })
+                    let tmplayer = self.selectedLayer
+                    let tmplayertreeitem = self.selectedLayerTree
+                    self.selectedLayerTree.children.push(layertreeitem)
+                    self.selectedLayer.add(group);
+                    self.selectedLayerTree = layertreeitem
+                    self.selectedLayer.draw();
+                    data.forEach((item, idx) => {
+                        self.addShape(group, item, idx, dropPos, callback => {
+
+                        })
+
+                    })
+                    self.selectedLayer = tmplayer
+                    self.selectedLayerTree = tmplayertreeitem
+                    self.stage.batchDraw()
+
+                })
+            },
+            getSavedData(header, callback) {
+                let self = this
+                axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                axios.get(process.env.VUE_APP_API +
+                    `FloorplanItems/Exisitng?headerID=${header}`).then(r => {
+                    callback(r.data)
+                })
+            },
+            acceptDrag(ev) {
+                ev.preventDefault();
+            },
+            dropDragItem(ev) {
+                ev.preventDefault();
+                let self = this
+                self.drawSaved(window.libraryDrag)
+
+            },
+            MoveLayerTopTop(event) {
+                let self = this
+                // if(self.dragStartIndex<1){
+                //     return
+                // }
+                let tmptreeItem = self.layerTree.splice(self.dragStartIndex, 1)
+                self.layerTree.unshift(tmptreeItem[0]);
+                // self.layerTree.splice(0, 0, tmpt0reeItem);
+            },
+            applyProperties(event) {
+                let self = this
+                self.makeChanges(callback => {
+                    self.stage.batchDraw()
+                })
+            },
+            makeChanges(callback) {
                 let self = this
 
                 if (self.selectedItem.attrs.name != "rect-group") {
                     for (var prop in self.properties) {
-                        if (self.properties[prop] != null && prop != "name") {
+                        if (self.properties[prop] != null && prop != "name" && prop != "fill") {
                             self.selectedItem.attrs[prop] = parseFloat(self.properties[prop])
                         }
+                        self.selectedItem.attrs["fill"] = self.properties["fill"]
                     }
+                    callback()
+                    self.stage.batchDraw()
                 } else {
                     self.selectedItem.children.forEach(item => {
                         for (var prop in self.properties) {
-                            if (self.properties[prop] != null && prop != "name" && prop != "height") {
+                            if (self.properties[prop] != null && prop != "name" && prop !=
+                                "height" && prop !=
+                                "fill") {
                                 item.attrs[prop] = parseFloat(self.properties[prop])
                             }
                             if (item.attrs.name == "front-Line") {
-                                item.attrs.height = 5
+                                item.attrs.height = 0
 
                             } else {
                                 item.attrs.height = parseFloat(self.properties["height"])
-
+                                item.attrs["fill"] = self.properties["fill"]
                             }
                         }
 
                     })
+                    callback()
+                    self.stage.batchDraw()
                 }
                 self.stage.batchDraw()
             },
@@ -370,19 +1011,15 @@
                         self.brush.height = 50
                         self.brush.width = 50
                     }
-
                     break;
                 case "fiber_manual_record": {
                     self.brush.radius = 50
-
                 }
-
                 break;
                 case "show_chart": {
                     self.brush.height = 10
                 }
                 break;
-
                 default:
                     break;
                 }
@@ -419,48 +1056,55 @@
                             self.findLayerItem(self.layerTree, e._id, callback => {
                                 self.selectedLayerTreeItem = callback
                             })
+                            console.log("self.selectedItem", self.selectedItem);
+
                             if (self.selectedItem.attrs.name == "rect-group") {
                                 self.properties.name = self.selectedItem.children[0].attrs.name;
                                 self.properties.height = self.selectedItem.children[0].attrs.height;
                                 self.properties.width = self.selectedItem.children[0].attrs.width;
-                                self.properties.color = self.selectedItem.children[0].attrs.fill;
+                                self.properties.fill = self.selectedItem.children[0].attrs.fill;
                                 self.properties.radius = self.selectedItem.children[0].attrs.radius;
                             } else {
                                 self.properties.name = self.selectedItem.attrs.name;
                                 self.properties.height = self.selectedItem.attrs.height;
                                 self.properties.width = self.selectedItem.attrs.width;
-                                self.properties.color = self.selectedItem.attrs.fill;
+                                self.properties.fill = self.selectedItem.attrs.fill;
                                 self.properties.radius = self.selectedItem.attrs.radius;
                             }
 
-                            var tr = new Konva.Transformer({
-                                enabledAnchors: self.selectedItem.attrs.enabledAnchors,
-                            });
+                            var tr
+                            if (self.selectedItem.attrs.name == "image") {
+                                tr = new Konva.Transformer({
+                                    enabledAnchors: ['top-left', 'top-right', 'bottom-left',
+                                        'bottom-right'
+                                    ],
+                                });
+                            } else {
+                                tr = new Konva.Transformer({
+                                    enabledAnchors: self.selectedItem.attrs.enabledAnchors,
+                                });
+                            }
 
                             if (self.selectedItem.attrs.name == "rect-group" || self.selectedItem.attrs.name ==
                                 "image") {
                                 tr.rotateEnabled(true);
+
                             } else {
                                 tr.rotateEnabled(false);
                             }
 
                             self.selectedLayer.add(tr);
-
                             tr.attachTo(e);
-
                             self.selectedLayer.draw();
 
                             tr.on('transform', function (z) {
                                 transFormerHelper.handleTransform(e, z, self.handleSnapping, self.stage,
                                     self.lastPosition, self.ctrlDown, self.selectedItem,
-                                    rotateAroundCenter)
-
-
+                                    rotateAroundCenter, self.transformProperties)
                             });
 
                             tr.on('transformend', function () {
                                 transFormerHelper.handleTransformEnd(self.selectedItem, self.properties)
-
                                 self.stage.batchDraw();
                             });
                         }
@@ -577,6 +1221,11 @@
                             self.snackbarText = "Click and drag on the stage to add an arrow"
                             self.snackbar = true
                             break;
+                        case "zoom_out_map":
+                            self.snackbarText = "Drag a line then select an image to scale it"
+                            self.snackbar = true
+
+                            break;
                         default:
                             break;
                     }
@@ -647,6 +1296,8 @@
             log() {
                 let self = this
                 console.log("log", self.stage);
+                console.log("logTree", self.layerTree);
+
             },
             updateSnappingAngles() {
                 let self = this;
@@ -664,7 +1315,7 @@
                     }
                 })
             },
-            addImage(dataUrl) {
+            addImage(dataUrl, file) {
                 let self = this;
                 let image = new StageImage(self.selectedLayer, self.imagePos);
 
@@ -678,6 +1329,8 @@
                     name: "Image",
                     children: [],
                 }))
+                image.shape.attrs.refFile = file
+                console.log("addimage", image.shape.attrs.refFile);
 
                 var imageObj = new Image();
 
@@ -690,8 +1343,13 @@
 
                     // self.selectedTool = ''
                     image.shape.draggable(true)
+                    image.shape.attrs.width = image.shape.attrs.image.width
+                    image.shape.attrs.height = image.shape.attrs.image.height
                 }
                 imageObj.src = dataUrl;
+
+                console.log("ADDIMAGE", image);
+
             },
             selectImage() {
                 let self = this;
@@ -705,23 +1363,25 @@
                 let file = files[0];
 
                 blobToDataUrl(file, dataUrl => {
-                    self.addImage(dataUrl)
+                    self.addImage(dataUrl, file)
                 })
             },
             editLayerName(layer, name) {
                 let self = this
 
-                let tmpItems = self.stage.find(".EnterName")
-
-
-                tmpItems.forEach(item => {
-                    if (layer.KonvaID = item._id) {
-                        item.setAttrs({
-                            name: name
-                        })
-                        item.attrs.name = name
-                    }
+                // let tmpItems = self.stage.find(".EnterName")
+                self.findKonvaItem([self.stage], layer.KonvaID, callback => {
+                    callback.attrs.name = name
                 })
+
+                // tmpItems.forEach(item => {
+                //     if (layer.KonvaID == item._id) {
+                //         item.setAttrs({
+                //             name: name
+                //         })
+                //         item.attrs.name = name
+                //     }
+                // })
             },
             addLayer() {
                 let self = this;
@@ -732,7 +1392,8 @@
                     showEditName: true,
                     selected: true,
                     showChildren: false,
-                    drawType: "Layer"
+                    drawType: "Layer",
+                    type: "Layer"
                 })
 
                 layer.attrs.name = "Enter Name" + layer._id
@@ -772,6 +1433,7 @@
                     draggable: true,
                     locked: true,
                     drawType: "group",
+                    type: "group",
                 })
 
                 let layertreeitem = new treeItem({
@@ -813,9 +1475,10 @@
                             })
                         }
                         layer.selected = true;
+                        console.log("select layer", self.selectedLayer);
 
                         self.selectedLayer.children.forEach(child => {
-                            child.draggable(true);
+                            child.draggable(true)
                         })
                     })
                 })
@@ -842,15 +1505,46 @@
 
                         break;
 
+                    case "image":
+                        duplicationHelper.DuplicateImageDrag(e.target, self.selectedLayer, self
+                            .selectedLayerTree)
+                        break;
+
                     default:
                         break;
                 }
 
             },
+            scaleSelected() {
+                let self = this
+                if (self.selectedItem == null) {
+                    return
+                }
+                if (self.selectedItem.attrs.name != 'image') {
+                    return
+                }
+                let rotation = self.dotted.shape.attrs.rotation
+                if (rotation == 90 || rotation == -90) {
+                    let dottedHeightratio = self.dotted.shape.attrs.width / self.selectedItem.attrs.height
+                    self.selectedItem.setAttrs({
+                        height: self.dotted.shape.attrs.width,
+                        width: self.selectedItem.attrs.width * dottedHeightratio
+                    })
+                } else {
+                    let dottedHeightratio = self.dotted.shape.attrs.width / self.selectedItem.attrs.width
+                    self.selectedItem.setAttrs({
+                        height: self.selectedItem.attrs.height * dottedHeightratio,
+                        width: self.dotted.shape.attrs.width
+                    })
+                }
+                console.log(self.dotted);
+                self.dotted.shape.destroy()
+                self.dotted = null
+                self.stage.batchDraw()
+
+            },
             onContextMenu(e, item) {
                 let self = this;
-
-                // self.selectedItem = item;
                 self.showMenu = false
                 self.x = e.evt.clientX
                 self.y = e.evt.clientY
@@ -861,6 +1555,9 @@
             },
             handleMultiSelect(item) {
                 let self = this
+                if (!item.attrs.draggable) {
+                    return
+                }
                 let multiSelectHelper = new MultiSelectHelper()
                 multiSelectHelper.handleMultiselect(self.multiSelectGroup, self.selectedLayer, item, callback => {
                     self.multiSelectGroup = callback
@@ -871,11 +1568,24 @@
                 let self = this;
                 let isPaint = false;
                 self.stage.on('click tap', function (e) {
+                    self.stage.find('Transformer').destroy()
+
                     if (e.target != self.stage) {
                         if (e.target.parent.attrs.name == "rect-group") {
+                            console.log('inhere');
+
                             e.target = e.target.parent
                         }
                     }
+                    // if (self.propertiesLabelHorizontal != null) {
+                    //     self.propertiesLabelHorizontal.destroy()
+                    //     self.propertiesLabelHorizontal = null
+                    // }
+                    // if (self.propertiesLabelVertical != null) {
+                    //     self.propertiesLabelVertical.destroy()
+                    //     self.propertiesLabelVertical = null
+                    // }
+
                     clickTapHelper.destroyTransformer(self.stage, cb => {
                         clickTapHelper.setSelectedItem(e.target, self.findLayerItem, self
                             .selectedLayerTreeItem, self.selectedItem)
@@ -906,23 +1616,33 @@
                                 self.properties.name = self.selectedItem.children[0].attrs.name;
                                 self.properties.height = self.selectedItem.children[0].attrs.height;
                                 self.properties.width = self.selectedItem.children[0].attrs.width;
-                                self.properties.color = self.selectedItem.children[0].attrs.fill;
+                                self.properties.fill = self.selectedItem.children[0].attrs.fill;
                                 self.properties.radius = self.selectedItem.children[0].attrs.radius;
                             } else {
                                 self.properties.name = self.selectedItem.attrs.name;
                                 self.properties.height = self.selectedItem.attrs.height;
                                 self.properties.width = self.selectedItem.attrs.width;
-                                self.properties.color = self.selectedItem.attrs.fill;
+                                self.properties.fill = self.selectedItem.attrs.fill;
                                 self.properties.radius = self.selectedItem.attrs.radius;
                             }
+                            var tr
+                            if (self.selectedItem.attrs.name == "image") {
+                                tr = new Konva.Transformer({
+                                    enabledAnchors: ['top-left', 'top-right', 'bottom-left',
+                                        'bottom-right'
+                                    ],
+                                });
+                            } else {
+                                tr = new Konva.Transformer({
+                                    enabledAnchors: self.selectedItem.attrs.enabledAnchors,
+                                });
+                            }
 
-                            var tr = new Konva.Transformer({
-                                enabledAnchors: self.selectedItem.attrs.enabledAnchors,
-                            });
 
                             if (self.selectedItem.attrs.name == "rect-group" || self.selectedItem.attrs.name ==
                                 "image") {
                                 tr.rotateEnabled(true);
+
                             } else {
                                 tr.rotateEnabled(false);
                             }
@@ -930,23 +1650,18 @@
                             self.selectedLayer.add(tr);
 
                             tr.attachTo(e.target);
-
                             self.selectedLayer.draw();
-
                             tr.on('transform', function (z) {
                                 transFormerHelper.handleTransform(e.target, z, self.handleSnapping, self
                                     .stage,
                                     self.lastPosition, self.ctrlDown, self.selectedItem,
-                                    rotateAroundCenter)
-
-                             
+                                    rotateAroundCenter, self.transformProperties, self
+                                    .propertiesLabelHorizontal, self.propertiesLabelVertical)
                             });
 
                             tr.on('transformend', function () {
                                 transFormerHelper.handleTransformEnd(self.selectedItem, self.properties)
                                 self.stage.batchDraw();
-
-                               
                             });
                         }
                     }
@@ -978,7 +1693,7 @@
                         self.lastPosition, self.selectedTool, self.selectedLayerTree, self.selectImage,
                         isPaint,
                         self.wall, self.rect, self.circle, self.image, self.arrow, self.arrowStartY, self
-                        .arrowStartX, self.textNode, self.brush, self, callback => {
+                        .arrowStartX, self.textNode, self.brush, self, self.dotted, callback => {
                             self.wall = callback.wall
                             self.rect = callback.rect
                             self.circle = callback.circle
@@ -986,6 +1701,7 @@
                             self.arrow = callback.arrow
                             self.arrowStartY = self.firstPosition.y
                             self.arrowStartX = self.firstPosition.x
+                            self.dotted = callback.dotted
                         })
                 })
 
@@ -1008,8 +1724,11 @@
                             }
                             self.arrowStartY = 0
                             self.arrowStartX = 0
-                            if (self.selectedTool != "open_with") {
+                            if (self.selectedTool != "open_with" && self.selectedTool != "show_chart") {
                                 self.onToolChange("open_with")
+                            }
+                            if (self.dotted != null) {
+                                self.scaleSelected()
                             }
                         })
                 });
@@ -1023,7 +1742,9 @@
                         self.lastPosition, self.selectedTool, self.selectedLayerTree, self.selectImage,
                         isPaint,
                         self.wall, self.rect, self.circle, self.image, self.arrow, self.arrowStartY, self
-                        .arrowStartX, self.textNode, self.ctrlDown, self.handleSnapping, self.brush)
+                        .arrowStartX, self.textNode, self.ctrlDown, self.handleSnapping, self.brush, self
+                        .transformProperties, self.dotted)
+
                 });
 
                 self.stage.on('dragmove', function (e) {
@@ -1344,6 +2065,7 @@
                 }
             })
             var gridLayer = new Konva.Layer();
+            gridLayer.attrs.name = "grid"
             var padding = self.meterRatio;
 
             for (var i = 0; i < width / padding; i++) {
@@ -1370,7 +2092,8 @@
                 visible: true,
                 selected: true,
                 showChildren: true,
-                drawType: "Layer"
+                drawType: "Layer",
+                type: "Layer"
             });
             let tmplayertree = new treeItem({
                 KonvaID: startLayer._id,

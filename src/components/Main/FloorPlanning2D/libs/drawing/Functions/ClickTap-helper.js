@@ -9,7 +9,6 @@ class ClickTapHelper {
     }
 
     setSelectedItem(e, findLayerItem, selectedLayerTreeItem, selectedItem) {
-
         if (e.attrs.name == "front-Line" || e.attrs.name == "Gondola-Rect") {
             e = e.parent
 
@@ -30,7 +29,7 @@ class ClickTapHelper {
         if (e.attrs.name == "Gondola-Rect" || e.attrs.name == "front-Line") {
             e = e.parent
         }
-        if (ctrlDown && e.target.attrs.draggable) {
+        if (ctrlDown && e.attrs.draggable) {
             handleMultiSelect(e)
         }
 
