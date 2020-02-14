@@ -83,7 +83,7 @@ class DragHandler {
             }))
         }
         break;
-        case "view_carousel": {
+        case "crop_square": {
             rect = new Rect(SelectedLayer, {
                 x: firstPosition.x,
                 y: firstPosition.y,
@@ -246,7 +246,7 @@ class DragHandler {
             case "show_chart":
                 // wall.shape.width(hyp);
                 break;
-            case "view_carousel":
+            case "crop_square":
                 // rect.shape.width(hyp);
                 break;
 
@@ -324,7 +324,7 @@ class DragHandler {
 
                 break;
 
-            case "view_carousel":
+            case "crop_square":
                 // rect.shape.width(hyp);
                 // rect.line.width(hyp);
                 transformProperties.width = rect.shape.width()

@@ -150,25 +150,27 @@
                 let self = this
                 axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 self.$refs.spinner.show()
-                axios.post(process.env.VUE_APP_API + `FloorplanFixtureHeader?&Planogram_ID=${self.planogram_ID}`).then(
-                    r => {
-                        console.log("[header]", r);
+                self.stage.batchDraw()
+                // axios.post(process.env.VUE_APP_API + `FloorplanFixtureHeader?&Planogram_ID=${self.planogram_ID}`).then(
+                //     r => {
+                //         console.log("[header]", r);
 
-                        if (r.data != null) {
-                            self.saveArr = []
-                            console.log(self.stage.children[1].children);
+                //         if (r.data != null) {
+                self.saveArr = []
+                console.log(self.stage.children[1].children);
 
-                            self.FormatItems(self.stage.children[1].children, self.saveArr, 0, callback => {
+                self.FormatItems(self.stage.children[1].children, self.saveArr, 0, callback => {
+                    console.log("self.saveArr", self.saveArr);
 
-                                console.log(self.saveArr)
-                                axios.post(process.env.VUE_APP_API +
-                                        `FloorplanFixtureItem?Header_id=${r.data.id}`, self.saveArr)
-                                    .then(resp => {
-                                        self.$refs.spinner.hide()
-                                    })
-                            })
-                        }
-                    })
+                    console.log(self.saveArr)
+                    // axios.post(process.env.VUE_APP_API +
+                    //         `FloorplanFixtureItem?Header_id=${r.data.id}`, self.saveArr)
+                    //     .then(resp => {
+                    self.$refs.spinner.hide()
+                    //     })
+                })
+                //     }
+                // })
             },
             changeRotation(drop, amount) {
                 let self = this
@@ -329,6 +331,8 @@
                     if (e.target.attrs.name == "front-Line" || e.target.attrs.name == "Gondola-Rect") {
                         e.target = e.target.parent
                         self.selectedItem = e.target
+                        console.log("self.selectedItem", self.selectedItem);
+
                         self.findDrop(e.target, callback => {
                             self.selectedFixtures = callback
                         })
@@ -437,6 +441,28 @@
                 self.stage.on('dragend', (e) => {
                     // clear all previous lines on the screen
                     self.stage.find('.guid-line').destroy();
+                    let transform = self.stage.getAbsoluteTransform().copy();
+                    transform.invert();
+                    // let pos = self.stage.getPointerPosition();
+
+                    console.log("drag evvent",e);
+                     let abs = e.target.absolutePosition()
+
+                     
+                    let dropPos = transform.point({
+                        x: e.target.attrs.x,
+                        y: e.target.attrs.y
+                    });
+                    console.log("dragend", dropPos);
+                    console.log("abs", abs);
+
+
+                    e.target.setAttrs({
+                        x: dropPos.x,
+                        y: dropPos.y
+                    })
+
+
                     self.stage.batchDraw();
                 })
                 self.stage.addEventListener('wheel', (e) => {
@@ -603,8 +629,8 @@
 
                     circle.shape.saveID = item.id
                     circle.shape.guid = item.guid
-                    console.log("SHAPE",shape);
-                    
+                    console.log("SHAPE", shape);
+
                     self.findDrop(circle.shape, drop => {
                         drop.shape = "Circle"
                     })

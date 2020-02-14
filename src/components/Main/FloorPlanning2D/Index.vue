@@ -66,6 +66,13 @@
             <v-btn @click="resetStageScale">
                 reset zoom
             </v-btn>
+            <v-btn @click="openFloorSettings">
+                Floor Settings
+            </v-btn>
+            <v-btn @click="openMediaManager">
+                open media
+            </v-btn>
+
             <PlanogramLibrary />
             <!-- <div v-if="selectedItem!=null">{{selectedItem.attrs.name}}-{{properties.fill}}</div> -->
             <v-spacer></v-spacer>
@@ -120,6 +127,9 @@
                                 <v-text-field v-if="properties.radius!=null" @change="applyProperties" type="number"
                                     label="Radius" v-model="properties.radius" hide-details>
                                 </v-text-field>
+                                <v-text-field @change="applyProperties" type="number" label="rotation"
+                                    v-model="properties.rotation" hide-details>
+                                </v-text-field>
                                 <v-text-field type="color" label="Color" v-model="properties.fill"
                                     @change="applyProperties($event)">
                                 </v-text-field>
@@ -131,10 +141,10 @@
                             </v-toolbar>
                             <v-card-text v-if="selectedTool != 'open_with'" class="pt-3"
                                 style="height: 30%; overflow-y: scroll;">
-                                <v-text-field v-if="selectedTool=='view_carousel'||selectedTool=='show_chart'"
+                                <v-text-field v-if="selectedTool=='crop_square'||selectedTool=='show_chart'"
                                     label="Height" v-model="brush.height" hide-details>
                                 </v-text-field>
-                                <v-text-field v-if="selectedTool=='view_carousel'" label="Width" v-model="brush.width"
+                                <v-text-field v-if="selectedTool=='crop_square'" label="Width" v-model="brush.width"
                                     hide-details>
                                 </v-text-field>
                                 <v-text-field v-if="selectedTool=='fiber_manual_record'" label="Radius"
@@ -192,6 +202,8 @@
             <floorPlanSelector ref="floorPlanSelector" />
             <Prompt ref="Prompt" />
             <Spinner ref="spinner"></Spinner>
+            <FloorConfigModal ref="FloorConfigModal" />
+            <FloorPlanMediaModal ref="FloorPlanMediaModal" />
 
         </v-container>
         <v-snackbar v-model="snackbar" color="primary" :timeout="3000">
@@ -228,11 +240,12 @@
     import Spinner from '@/components/Common/Spinner';
 
 
-
+    import FloorPlanMediaModal from "./FloorPlanMediaModal"
     import Settings from './Settings'
     import RecursiveLayer from "./RecursiveLayer.vue"
     import PlanogramLibrary from "./PlanogramLibrary.vue"
     import floorPlanSelector from "./floorPlanSelector.vue"
+    import FloorConfigModal from "./FloorConfigModal"
 
 
     import axios from 'axios'
@@ -251,6 +264,7 @@
 
     export default {
         components: {
+            FloorConfigModal,
             Settings,
             RecursiveLayer,
             PlanogramDetailsSelector,
@@ -258,6 +272,7 @@
             floorPlanSelector,
             Prompt,
             Spinner,
+            FloorPlanMediaModal
 
         },
         // 1 block = 1 meter
@@ -321,6 +336,7 @@
                     height: null,
                     width: null,
                     fill: "#1976d2",
+                    rotation: null,
                 },
                 selectedItem: null,
                 selectedLayer: null,
@@ -337,8 +353,8 @@
                         name: 'open_with',
                         tooltip: "move & selection"
                     }, {
-                        name: 'view_carousel',
-                        tooltip: "Draw Gondola"
+                        name: 'crop_square',
+                        tooltip: "Draw Block"
                     }, {
                         name: 'fiber_manual_record',
                         tooltip: "Draw circle"
@@ -362,6 +378,13 @@
                         tooltip: "Use this to scale images"
                     }
                 ],
+                floorConfig: {
+                    blockRatio: 1,
+                    floorHeight: null,
+                    floorWidth: null,
+                    floorImageID: null,
+                    repeat: false
+                },
                 selectedTool: 'open_with',
                 transformProperties: {
                     radius: 0,
@@ -387,6 +410,40 @@
             }
         },
         methods: {
+            openMediaManager() {
+                let self = this
+                self.$refs.FloorPlanMediaModal.open(true, media => {
+
+                })
+            },
+            openFloorSettings() {
+                let self = this
+                self.$refs.FloorConfigModal.open(self.floorConfig, callback => {
+                    console.log("openFloorSettings", callback);
+
+                    self.floorConfig.blockRatio = parseFloat(callback.blockRatio)
+                    self.floorConfig.floorHeight = parseFloat(callback.floorHeight)
+                    self.floorConfig.floorWidth = parseFloat(callback.floorWidth)
+                    self.floorConfig.floorImageID = callback.floorImageID
+                    self.floorConfig.repeat = callback.repeat
+                    self.stage.setWidth(self.floorConfig.floorWidth * 25)
+                    self.stage.setHeight(self.floorConfig.floorHeight * 25)
+                    self.stage.children.forEach((element, idx) => {
+                        if (element.attrs.name == "grid") {
+                            element.destroy()
+                            self.drawGrid()
+                            self.stage.batchDraw()
+
+                        }
+                    })
+                })
+
+            },
+            FloorMediaSrc(id) {
+                let self = this
+                return process.env.VUE_APP_API +
+                    `FloorplanMedia/Image?ImageID=${id}&databaseID=${sessionStorage.currentDatabase}`
+            },
             DrawFixture(item, parentArr, parentLayerTree, callback) {
                 let self = this
                 switch (item.name) {
@@ -740,7 +797,11 @@
                     axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                     let req = {
                         id: self.Floorplan_ID,
-                        name: Name
+                        name: Name,
+                        width: self.floorConfig.floorWidth,
+                        height: self.floorConfig.floorHeight,
+                        blockWidth: self.floorConfig.blockWidth,
+                        repeat: self.floorConfig.repeat
                     }
                     axios.post(process.env.VUE_APP_API + `saveFloorHeader`, req).then(r => {
                         self.Floorplan_ID = r.data.id
@@ -895,8 +956,6 @@
                     let group = new Konva.Group({
                         name: cb.planogram_Name,
                         type: "planogramGroup",
-                        x: 0,
-                        y: 0,
                         visible: true,
                         showEditName: false,
                         selected: true,
@@ -1007,7 +1066,7 @@
             applyBrushProperties(tool) {
                 let self = this
                 switch (tool) {
-                    case "view_carousel": {
+                    case "crop_square": {
                         self.brush.height = 50
                         self.brush.width = 50
                     }
@@ -1064,12 +1123,14 @@
                                 self.properties.width = self.selectedItem.children[0].attrs.width;
                                 self.properties.fill = self.selectedItem.children[0].attrs.fill;
                                 self.properties.radius = self.selectedItem.children[0].attrs.radius;
+                                self.properties.rotation = self.selectedItem.children[0].attrs.rotation;
                             } else {
                                 self.properties.name = self.selectedItem.attrs.name;
                                 self.properties.height = self.selectedItem.attrs.height;
                                 self.properties.width = self.selectedItem.attrs.width;
                                 self.properties.fill = self.selectedItem.attrs.fill;
                                 self.properties.radius = self.selectedItem.attrs.radius;
+                                self.properties.rotation = self.selectedItem.attrs.rotation;
                             }
 
                             var tr
@@ -1197,17 +1258,21 @@
                             self.snackbarText = "Click and drag items to move them"
                             self.snackbar = true
                             break;
-                        case "view_carousel":
-                            self.snackbarText = "Click on stage to add a Gondola"
+                        case "crop_square":
+                            self.snackbarText = "Click on stage to add a Block"
                             self.snackbar = true
+                            self.brush.color = "#1976d2"
                             break;
                         case "fiber_manual_record":
                             self.snackbarText = "Click and drag on the stage to add Circle"
                             self.snackbar = true
+                            self.brush.color = "#00ff00"
+
                             break;
                         case "show_chart":
                             self.snackbarText = "Click and drag on the stage to add a wall"
                             self.snackbar = true
+                            self.brush.color = "#808080"
                             break;
                         case "image":
                             self.snackbarText = "Click on the stage to add an image"
@@ -1618,12 +1683,15 @@
                                 self.properties.width = self.selectedItem.children[0].attrs.width;
                                 self.properties.fill = self.selectedItem.children[0].attrs.fill;
                                 self.properties.radius = self.selectedItem.children[0].attrs.radius;
+                                self.properties.rotation = self.selectedItem.children[0].attrs.rotation;
                             } else {
                                 self.properties.name = self.selectedItem.attrs.name;
                                 self.properties.height = self.selectedItem.attrs.height;
                                 self.properties.width = self.selectedItem.attrs.width;
                                 self.properties.fill = self.selectedItem.attrs.fill;
                                 self.properties.radius = self.selectedItem.attrs.radius;
+                                self.properties.rotation = self.selectedItem.attrs.rotation;
+
                             }
                             var tr
                             if (self.selectedItem.attrs.name == "image") {
@@ -2040,7 +2108,59 @@
                         }
                     })
                 }
-            }
+            },
+            drawGrid() {
+                let self = this
+                var gridLayer = new Konva.Layer();
+                gridLayer.attrs.name = "grid"
+                let image = new StageImage(gridLayer, {
+                    x: 0,
+                    y: 0
+                });
+                var imageObj = new Image();
+
+                imageObj.onload = function () {
+                    image.shape.image(imageObj);
+                    self.selectedLayer.draw();
+                    self.imagePos.x = 0
+                    self.imagePos.y = 0
+                    image.shape.draggable(false)
+                    if (!self.floorConfig.repeat) {
+                        image.shape.attrs.width = self.stage.attrs.width
+                        image.shape.attrs.height = self.stage.attrs.height
+                    }
+
+                    self.stage.batchDraw()
+                }
+                imageObj.src = self.FloorMediaSrc(self.floorConfig.floorImageID);
+                var padding = self.meterRatio * self.floorConfig.blockRatio;
+
+                for (var i = 0; i < self.stage.attrs.width / padding; i++) {
+                    gridLayer.add(new Konva.Line({
+                        points: [Math.round(i * padding) + 0.5, 0, Math.round(i * padding) + 0.5, self.stage
+                            .attrs.height
+                        ],
+                        stroke: '#ddd',
+                        strokeWidth: 2,
+                    }));
+                }
+                gridLayer.add(new Konva.Line({
+                    points: [0, 0, 10, 10]
+                }));
+                for (var j = 0; j < self.stage.attrs.height / padding; j++) {
+                    gridLayer.add(new Konva.Line({
+                        points: [0, Math.round(j * padding), self.stage.attrs.width, Math.round(j *
+                            padding)],
+                        stroke: '#ddd',
+                        strokeWidth: 2,
+                    }));
+                }
+                self.stage.add(gridLayer);
+                gridLayer.setZIndex(0)
+                // self.stage.children.unshift(gridLayer)
+                self.stage.batchDraw()
+
+            },
         },
         mounted() {
             let self = this;
@@ -2049,6 +2169,9 @@
 
             height = container.offsetHeight
             width = container.offsetWidth
+            self.floorConfig.floorHeight = height / 25
+            self.floorConfig.floorWidth = width / 25
+
 
             self.stage = new Konva.Stage({
                 container: "container",
@@ -2064,29 +2187,7 @@
                     };
                 }
             })
-            var gridLayer = new Konva.Layer();
-            gridLayer.attrs.name = "grid"
-            var padding = self.meterRatio;
-
-            for (var i = 0; i < width / padding; i++) {
-                gridLayer.add(new Konva.Line({
-                    points: [Math.round(i * padding) + 0.5, 0, Math.round(i * padding) + 0.5, height],
-                    stroke: '#ddd',
-                    strokeWidth: 1,
-                }));
-            }
-            gridLayer.add(new Konva.Line({
-                points: [0, 0, 10, 10]
-            }));
-            for (var j = 0; j < height / padding; j++) {
-                gridLayer.add(new Konva.Line({
-                    points: [0, Math.round(j * padding), width, Math.round(j * padding)],
-                    stroke: '#ddd',
-                    strokeWidth: 0.5,
-                }));
-            }
-            self.stage.add(gridLayer);
-
+            self.drawGrid()
             let startLayer = new Konva.Layer({
                 name: 'Background',
                 visible: true,
