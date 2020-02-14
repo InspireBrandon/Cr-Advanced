@@ -66,7 +66,6 @@
                 self.getPlanograms()
                 self.getPage(() => {
                     self.getReportEmbedConfig();
-
                 })
             })
 
@@ -83,7 +82,7 @@
                     UpdateAll = true
                 }
                 Axios.post(process.env.VUE_APP_API +
-                    `PowerBI/UpdateTables?UpdateAll=${UpdateAll}`,self.selectedPlanograms).then(r => {
+                    `PowerBI/UpdateTables?UpdateAll=${UpdateAll}`, self.selectedPlanograms).then(r => {
                     console.log(r);
 
                 })
@@ -97,26 +96,22 @@
                 return new Promise((resolve, reject) => {
                     Axios.get(process.env.VUE_APP_API + 'TopLinePlanos')
                         .then(r => {
-                            console.log(self.userAccess);
-
 
                             r.data.forEach(e => {
-                                if (e.text != "AAA TEST PROJECT") {
-                                    if (self.userAccess == 2) {
-                                        self.planogramAccess.forEach(planogram => {
-                                            if (planogram == e.value) {
-                                                self.planograms.push({
-                                                    text: e.text,
-                                                    value: e.value
-                                                })
-                                            }
-                                        })
-                                    } else {
-                                        self.planograms.push({
-                                            text: e.text,
-                                            value: e.value
-                                        })
-                                    }
+                                if (self.userAccess == 2) {
+                                    self.planogramAccess.forEach(planogram => {
+                                        if (planogram == e.value) {
+                                            self.planograms.push({
+                                                text: e.text,
+                                                value: e.value
+                                            })
+                                        }
+                                    })
+                                } else {
+                                    self.planograms.push({
+                                        text: e.text,
+                                        value: e.value
+                                    })
                                 }
                             })
                             if (self.userAccess == 2) {
@@ -164,8 +159,6 @@
                 if (self.selectedPlanograms.length > 0) {
                     self.report.setFilters([supplierFilter, supplierFilter2])
                         .catch(errors => {
-
-                            // Handle error
                         });
                 } else {
                     self.applyReportFilters()
@@ -188,7 +181,6 @@
 
                 Axios.get(process.env.VUE_APP_API + "SystemPage?systemFolderFileID=" + folderFileID)
                     .then(r => {
-                        console.log("getPage", r);
 
                         if (r.data.systemPage != null) {
                             if (r.data.systemPage.systemPageSectionList.length > 0) {
@@ -251,19 +243,6 @@
             generateReport(reportEmbedConfig) {
                 let self = this;
 
-                // const basicFilter = {
-                //     $schema: "http://powerbi.com/product/schema#relativeDate",
-                //     target: {
-                //         table: "Store",
-                //         column: "StoreNumber"
-                //     },
-                //     operator: "In",
-                //     values: [3, 4, 5],
-                //     filterType: models.FilterType.Basic,
-                //     requiresSingleSelect: true // Limits selection of values to one.
-                // }
-                console.log("[generateReport]", reportEmbedConfig);
-
                 var config = {
                     type: 'report',
                     id: reportEmbedConfig.id,
@@ -281,6 +260,8 @@
                 self.report = powerbi.embed(container, config);
 
                 self.report.on('loaded', function (event) {
+                    console.log(self.report);
+
                     self.getFilters();
                     self.getActivePages(() => {
                         self.applyReportFilters()
