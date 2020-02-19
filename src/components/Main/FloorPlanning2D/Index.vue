@@ -879,17 +879,18 @@
                 self.$refs.floorPlanSelector.show(callback => {
                     console.log("floorPlanSelector", callback);
                     self.Floorplan_ID = callback.id
-                    if(callback.store_ID!=null){
-                        self.selectedClusterType="store"
-                        self.selectedClusterOption=callback.store_ID
+                    if (callback.store_ID != null) {
+                        self.selectedClusterType = "store"
+                        self.selectedClusterOption = callback.store_ID
                     }
-                    if(callback.storeCluster_ID!=null){
-                        self.selectedClusterType="stores"
-                        self.selectedClusterOption=callback.storeCluster_ID
+                    if (callback.storeCluster_ID != null) {
+                        self.selectedClusterType = "stores"
+                        self.selectedClusterOption = callback.storeCluster_ID
                     }
                     axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                    axios.get(process.env.VUE_APP_API + `GetFloorPlanItems?Header_ID=${callback}`).then(r => {
+                    axios.get(process.env.VUE_APP_API + `GetFloorPlanItems?Header_ID=${callback.id}`).then(
+                    r => {
                         console.log(r);
                         self.stage.children.forEach(child => {
                             if (child.attrs.name != 'grid') {
@@ -994,7 +995,7 @@
                                             `Floorplan/Image?ImageID=${saveditem.id}`, item
                                             .attrs.refFile).then(
                                             resp => {
-                                                self.$refs.spinner.hide()
+
                                             })
                                     }
                                 }
@@ -1002,9 +1003,9 @@
                         })
                     })
                 } else {
-                    self.$refs.spinner.hide()
-                }
 
+                }
+                self.$refs.spinner.hide()
             },
             generateName(Name) {
                 let self = this
@@ -1033,9 +1034,9 @@
                     let req = {
                         id: self.Floorplan_ID,
                         name: self.generateName(Name),
-                        width: self.floorConfig.floorWidth,
-                        height: self.floorConfig.floorHeight,
-                        blockWidth: self.floorConfig.blockWidth,
+                        width: parseFloat(self.floorConfig.floorWidth),
+                        height: parseFloat(self.floorConfig.floorHeight),
+                        blockWidth: parseFloat(self.floorConfig.blockWidth),
                         repeat: self.floorConfig.repeat
                     }
                     switch (self.selectedClusterType) {
