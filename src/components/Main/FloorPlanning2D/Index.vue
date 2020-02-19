@@ -791,27 +791,28 @@
                                 showChildren: layer.showChildren,
                                 drawType: "Layer"
                             })
-                            parentLayerTree.push(layertreeitem)
-                            parentArr.add(layer);
+
                             switch (item.name) {
                                 case "Background": {
-                                    self.backgroundLayer = layer
-                                    self.backgroundTree = layertreeitem
+                                    layer = self.backgroundLayer
+                                    layertreeitem = self.backgroundTree
                                     self.selectedLayer = self.backgroundLayer
                                 }
                                 break;
                             case "Fixtures": {
-                                self.fixtureLayer = layer
-                                self.fixtureTree = layertreeitem
+                                layer = self.fixtureLayer
+                                layertreeitem = self.fixtureTree
                             }
                             break;
                             case "Departments": {
-                                self.departmentLayer = layer
-                                self.departmentTree = layertreeitem
+                                layer = self.departmentLayer
+                                layertreeitem = self.departmentTree
                             }
                             break;
 
                             default:
+                                parentLayerTree.push(layertreeitem)
+                                parentArr.add(layer);
                                 break;
                             }
                             if (item.children.length > 0) {
@@ -877,20 +878,30 @@
                 let self = this
                 self.$refs.floorPlanSelector.show(callback => {
                     console.log("floorPlanSelector", callback);
-                    self.Floorplan_ID = callback
+                    self.Floorplan_ID = callback.id
+                    if(callback.store_ID!=null){
+                        self.selectedClusterType="store"
+                        self.selectedClusterOption=callback.store_ID
+                    }
+                    if(callback.storeCluster_ID!=null){
+                        self.selectedClusterType="stores"
+                        self.selectedClusterOption=callback.storeCluster_ID
+                    }
                     axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                     axios.get(process.env.VUE_APP_API + `GetFloorPlanItems?Header_ID=${callback}`).then(r => {
                         console.log(r);
-                        self.stage.destroyChildren()
-                        console.log(self.stage.children);
+                        self.stage.children.forEach(child => {
+                            if (child.attrs.name != 'grid') {
+                                child.destroyChildren()
+                            }
 
+                        })
 
-                        self.stage.batchDraw()
+                        console.log("children", self.stage.children);
+                        // self.createBaseLayers(cb => {
 
-                        self.createBaseLayers()
-                        self.layerTree = []
-                        self.drawGrid()
+                        //  self.drawGrid()
                         self.drawSavedItems(r.data, self.stage, self.layerTree,
                             cb => {
                                 console.log("LOOP CALLBACK");
@@ -899,6 +910,8 @@
                             })
                         self.Floorplan_ID = callback
                     })
+
+                    // })
                 })
             },
             CheckType(item) {
@@ -981,15 +994,17 @@
                                             `Floorplan/Image?ImageID=${saveditem.id}`, item
                                             .attrs.refFile).then(
                                             resp => {
-                                                console.log(resp);
+                                                self.$refs.spinner.hide()
                                             })
                                     }
                                 }
                             })
                         })
                     })
+                } else {
+                    self.$refs.spinner.hide()
                 }
-                self.$refs.spinner.hide()
+
             },
             generateName(Name) {
                 let self = this
@@ -1007,9 +1022,14 @@
                 let self = this
                 console.log('saving', self.stage);
                 self.saveArr = []
+                if (self.selectedClusterOption == null) {
+                    alert("Please fill in cluster options")
+                    return
+                }
                 self.$refs.Prompt.show("", " Save FloorPlan", "Please enter floorplan name", Name => {
                     self.$refs.spinner.show()
                     axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
                     let req = {
                         id: self.Floorplan_ID,
                         name: self.generateName(Name),
@@ -1912,6 +1932,7 @@
                             child.draggable(true)
                         })
                     })
+                    self.stage.batchDraw()
                 })
             },
             duplicateDrag(e) {
@@ -2598,7 +2619,7 @@
                 self.stage.batchDraw()
 
             },
-            createBaseLayers() {
+            createBaseLayers(callback) {
                 let self = this
                 let startLayer = new Konva.Layer({
                     name: 'Background',
@@ -2669,6 +2690,7 @@
                 self.stage.add(startLayer);
                 self.stage.add(FixtureLayer);
                 self.stage.add(DepartmentLayer);
+                callback()
 
             },
         },
@@ -2699,7 +2721,7 @@
                 }
             })
             self.drawGrid()
-            self.createBaseLayers()
+            self.createBaseLayers(cb => {})
             self.addStageEvents();
             self.addEvents();
             self.updateSnappingAngles();

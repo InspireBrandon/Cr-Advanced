@@ -102,7 +102,7 @@
                     self.dialog = false;
                      console.log("selectedFile",self.selectedFile.id);
                         
-                    self.afterComplete(self.selectedFile.id);
+                    self.afterComplete(self.selectedFile);
                 }
             },
         }
