@@ -85,10 +85,9 @@ class DragHandler {
         break;
         case "crop_square": {
             rect = new Rect(SelectedLayer, {
-                x: firstPosition.x,
-                y: firstPosition.y,
+                x:0 ,
+                y:0 ,
             }, null, null, brush);
-
             SelectedLayerTree.children.push(new treeItem({
                 KonvaID: rect.shape.parent._id,
                 visible: true,
@@ -99,6 +98,10 @@ class DragHandler {
                 name: "rect-group",
                 children: [],
             }))
+            rect.shape.parent.setAttrs({
+                x: firstPosition.x,
+                y: firstPosition.y
+            })
 
         }
         break;
@@ -195,7 +198,7 @@ class DragHandler {
             });
         }
         break;
-        case "zoom_out_map": {
+        case "linear_scale": {
             dotted = new Line(SelectedLayer, {
                 x: firstPosition.x,
                 y: firstPosition.y,
@@ -207,9 +210,9 @@ class DragHandler {
             })
             dotted.shape.setAttrs({
                 stroke: 'black',
-                strokeWidth: 10,
+                strokeWidth: 1,
                 dash: [10, 10],
-                name:"dotted"
+                name: "dotted"
             })
         }
         break;
@@ -325,16 +328,14 @@ class DragHandler {
                 break;
 
             case "crop_square":
-                // rect.shape.width(hyp);
-                // rect.line.width(hyp);
+                rect.shape.width(hyp);
+                rect.shape.height(hyp);
                 transformProperties.width = rect.shape.width()
                 transformProperties.height = rect.shape.height()
                 if (!ctrlDown) {
-                    rect.line.rotation(deg);
                     rect.shape.rotation(deg);
                 } else {
                     handleSnapping(rect.shape)
-                    handleSnapping(rect.line)
                     let updateDegrees = false;
                     let snappedAngle = 0;
                     let tolerance = brush.snapOption * 0.45;
@@ -351,7 +352,6 @@ class DragHandler {
 
                     if (updateDegrees) {
                         rect.shape.rotation(snappedAngle);
-                        rect.line.rotation(snappedAngle);
                     }
 
                 }
@@ -423,37 +423,36 @@ class DragHandler {
                         textNode.shape.rotation(snappedAngle);
                 }
                 break;
-            case "zoom_out_map": {
+            case "linear_scale": {
                 dotted.shape.width(hyp);
-
-
                 handleSnapping(dotted.shape)
-                let updateDegrees = false;
-                let snappedAngle = 0;
-                let tolerance = brush.snapOption * 0.45;
-                let snapping = [-180, -90, 0, 90]
-                snapping.forEach(sa => {
-                    let lowerBounds = sa - tolerance
-                    let upperBounds = sa + tolerance
+                if (!ctrlDown) {
+                    dotted.shape.rotation(deg);
+                } else {
+                    let updateDegrees = false;
+                    let snappedAngle = 0;
+                    let tolerance = brush.snapOption * 0.45;
 
-                    if (deg >= lowerBounds && deg <= upperBounds) {
-                        updateDegrees = true;
-                        snappedAngle = sa;
-                    }
-                })
+                    brush.snappingAngles.forEach(sa => {
+                        let lowerBounds = sa - tolerance
+                        let upperBounds = sa + tolerance
 
-                if (updateDegrees)
-                    dotted.shape.rotation(snappedAngle);
+                        if (deg >= lowerBounds && deg <= upperBounds) {
+                            updateDegrees = true;
+                            snappedAngle = sa;
+                        }
+                    })
+
+                    if (updateDegrees)
+                        dotted.shape.rotation(snappedAngle);
+                }
+                break;
 
             }
             default:
                 break;
         }
-        if (SelectedLayer.attrs.drawType == 'group') {
-            stage.batchDraw();
-        } else {
-            SelectedLayer.draw();
-        }
+        stage.batchDraw();
     }
 }
 

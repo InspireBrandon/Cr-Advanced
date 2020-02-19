@@ -15,7 +15,8 @@
                     <v-flex md6>
                         <v-card height="200" width="200">
                             <v-img @click="selectImage" :src="imageSrc == '' ? tmpImageURL : imageSrc" aspect-ratio="1"
-                                class="grey lighten-2" width="100%" max-height="200" style="cursor: pointer;"></v-img>
+                                class="grey lighten-2" width="100%" max-height="200" max-width="200"
+                                style="cursor: pointer;"></v-img>
                         </v-card>
                     </v-flex>
                     <v-flex>
@@ -30,11 +31,18 @@
             </v-card-actions>
         </v-card>
         <input @change="onFileChange" type="file" style="display: none;" ref="fileInput">
+        <Spinner ref="Spinner"></Spinner>
+
     </v-dialog>
 </template>
 <script>
     import axios from "axios"
+    import Spinner from '@/components/Common/Spinner';
+
     export default {
+        components: {
+            Spinner
+        },
         data() {
             return {
                 dialog: false,
@@ -52,6 +60,7 @@
         methods: {
             save() {
                 let self = this
+                self.$refs.Spinner.show()
                 axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 let req = {
                     parent_ID: self.parentID,
@@ -65,7 +74,9 @@
                         axios.post(process.env.VUE_APP_API + `FloorplanMedia/Image?ImageID=${r.data.id}`, self
                             .file).then(resp => {
                             console.log(resp);
-                            self.dialog=false
+                            self.$refs.Spinner.hide()
+                            self.callback()
+                            self.dialog = false
                         })
                     }
                 })
