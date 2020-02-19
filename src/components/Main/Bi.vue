@@ -2,7 +2,7 @@
     <div>
         <v-toolbar dark flat dense>
             <v-toolbar-items>
-                <v-select style="width: 300px;" class="ml-3" label="Page" @change="chooseActivePage" :items="pages"
+                <v-select style="width: 350px;" class="ml-3" label="Page" @change="chooseActivePage" :items="pages"
                     v-model="selectedPage"></v-select>
 
                 <v-autocomplete :items="planograms" v-model="selectedPlanograms" class="ml-3"
@@ -16,7 +16,8 @@
                 </v-btn> -->
             </v-toolbar-items>
             <v-btn color="primary" @click="printReport">Print</v-btn>
-            <v-btn color="primary" v-if="userAccess==0" @click="RefreshTables">refresh</v-btn>
+            <v-btn color="primary" :disabled="updating" v-if="userAccess==0" @click="RefreshTables">refresh</v-btn>
+            <v-progress-circular indeterminate v-if="updating"></v-progress-circular>
             <v-btn color="primary" v-if="userAccess==0" @click="CleanTables">Clean</v-btn>
 
             <!-- <v-btn color="primary" @click="switchMode">{{ currentMode == "edit" ? "View" : "Edit" }}</v-btn> -->
@@ -45,7 +46,6 @@
                 userAccess: null,
                 userAccessTypeID: null,
                 systemUserID: null,
-
                 planogramAccess: [],
                 report: null,
                 storeNumbers: [1, 2, 3, 4, 5, 6, 7],
@@ -55,18 +55,22 @@
                 pages: [],
                 selectedPage: null,
                 currentMode: "view",
+                updating: true,
+                timeout: null
             }
         },
         mounted() {
             let self = this;
 
             self.$refs.Spinner.show();
+            clearTimeout(self.timeout)
+
+            self.checkCanRefresh();
 
             self.checkAccessType(access => {
                 self.getPlanograms()
                 self.getPage(() => {
                     self.getReportEmbedConfig();
-
                 })
             })
 
@@ -75,18 +79,46 @@
             // });
         },
         methods: {
+            checkCanRefresh() {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + "BIQue")
+                    .then(r => {
+                        if(r.data == null) {
+                            self.updating = false;
+                        }
+                        else {
+                            self.updating = true;
+                        }
+
+                        delete Axios.defaults.headers.common["TenantID"];
+                        clearTimeout(self.timeout);
+
+                        console.log("refresh", r.data);
+
+                        self.timeout = setTimeout(() => {
+                            self.checkCanRefresh();
+                        }, 10000);
+                    })
+            },
             RefreshTables() {
                 let self = this
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                let UpdateAll = false
-                if (self.selectedPlanograms.length == 0) {
-                    UpdateAll = true
-                }
-                Axios.post(process.env.VUE_APP_API +
-                    `PowerBI/UpdateTables?UpdateAll=${UpdateAll}`,self.selectedPlanograms).then(r => {
-                    console.log(r);
 
-                })
+                self.updating = true;
+
+                let request = {
+                    userID: 1,
+                    planogramID: "",
+                    queStatus: 1
+                }
+
+                Axios.post(process.env.VUE_APP_API + "BIQue", request)
+                    .then(r => {
+                        console.log(r.data);
+                    })
             },
             CleanTables() {
                 let self = this
@@ -97,26 +129,22 @@
                 return new Promise((resolve, reject) => {
                     Axios.get(process.env.VUE_APP_API + 'TopLinePlanos')
                         .then(r => {
-                            console.log(self.userAccess);
-
 
                             r.data.forEach(e => {
-                                if (e.text != "AAA TEST PROJECT") {
-                                    if (self.userAccess == 2) {
-                                        self.planogramAccess.forEach(planogram => {
-                                            if (planogram == e.value) {
-                                                self.planograms.push({
-                                                    text: e.text,
-                                                    value: e.value
-                                                })
-                                            }
-                                        })
-                                    } else {
-                                        self.planograms.push({
-                                            text: e.text,
-                                            value: e.value
-                                        })
-                                    }
+                                if (self.userAccess == 2) {
+                                    self.planogramAccess.forEach(planogram => {
+                                        if (planogram == e.value) {
+                                            self.planograms.push({
+                                                text: e.text,
+                                                value: e.value
+                                            })
+                                        }
+                                    })
+                                } else {
+                                    self.planograms.push({
+                                        text: e.text,
+                                        value: e.value
+                                    })
                                 }
                             })
                             if (self.userAccess == 2) {
@@ -164,8 +192,6 @@
                 if (self.selectedPlanograms.length > 0) {
                     self.report.setFilters([supplierFilter, supplierFilter2])
                         .catch(errors => {
-
-                            // Handle error
                         });
                 } else {
                     self.applyReportFilters()
@@ -188,7 +214,6 @@
 
                 Axios.get(process.env.VUE_APP_API + "SystemPage?systemFolderFileID=" + folderFileID)
                     .then(r => {
-                        console.log("getPage", r);
 
                         if (r.data.systemPage != null) {
                             if (r.data.systemPage.systemPageSectionList.length > 0) {
@@ -251,19 +276,6 @@
             generateReport(reportEmbedConfig) {
                 let self = this;
 
-                // const basicFilter = {
-                //     $schema: "http://powerbi.com/product/schema#relativeDate",
-                //     target: {
-                //         table: "Store",
-                //         column: "StoreNumber"
-                //     },
-                //     operator: "In",
-                //     values: [3, 4, 5],
-                //     filterType: models.FilterType.Basic,
-                //     requiresSingleSelect: true // Limits selection of values to one.
-                // }
-                console.log("[generateReport]", reportEmbedConfig);
-
                 var config = {
                     type: 'report',
                     id: reportEmbedConfig.id,
@@ -281,6 +293,8 @@
                 self.report = powerbi.embed(container, config);
 
                 self.report.on('loaded', function (event) {
+                    console.log(self.report);
+
                     self.getFilters();
                     self.getActivePages(() => {
                         self.applyReportFilters()
