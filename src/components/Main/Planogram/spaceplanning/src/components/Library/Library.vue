@@ -16,11 +16,11 @@
             <v-icon>format_align_center</v-icon>
           </v-tab>
 
-          <v-tab href="#tab-fixture">Fixtures
+          <v-tab v-if="!isFloorplan" href="#tab-fixture">Fixtures
             <v-icon>toc</v-icon>
           </v-tab>
 
-          <v-tab href="#tab-subfixture">Sub Fixtures
+          <v-tab v-if="!isFloorplan" href="#tab-subfixture">Sub Fixtures
             <v-icon>view_quilt</v-icon>
           </v-tab>
 
@@ -32,7 +32,7 @@
             <v-icon>web</v-icon>
           </v-tab>
 
-          <v-tab href="#tab-misc">Miscellaneous
+          <v-tab v-if="!isFloorplan" href="#tab-misc">Miscellaneous
             <v-icon>extension</v-icon>
           </v-tab>
 
@@ -266,7 +266,8 @@
               <template v-for="(item, index) in customFixtures">
                 <v-list-tile :key="index" @click="selectLibraryItem(item)"
                   :class="{ 'active-item':(selectedItem != null && item.id == selectedItem.data.id), 'inactive-item' : (selectedItem == null || item.id != selectedItem.data.id)}"
-                  draggable="true" @drag="dragMove" @dragstart="dragCustomStart('LIBRARY', item, 'CUSTOM')" @dragend="clearDrag">
+                  draggable="true" @drag="dragMove" @dragstart="dragCustomStart('LIBRARY', item, 'CUSTOM')"
+                  @dragend="clearDrag">
                   <v-list-tile-content>
                     <v-list-tile-title>{{item.name}}</v-list-tile-title>
                     <v-list-tile-sub-title>
@@ -279,12 +280,17 @@
             </v-card>
           </v-tab-item>
 
-          <v-tab-item value="tab-planogram" class="list-item">
-            <v-card flat>
-              <template v-for="(item, index) in planograms">
+          <v-tab-item value="tab-planogram">
+            <v-toolbar dense flat>
+              <v-spacer></v-spacer>
+              <v-text-field v-model="searchText" style="width:200px" append-icon="search"></v-text-field>
+            </v-toolbar>
+            <v-card flat class="list-item">
+              <template v-for="(item, index) in filteredSpacePlans">
                 <v-list-tile :key="index" @click="selectLibraryItem(item)"
                   :class="{ 'active-item':(selectedItem != null && item.id == selectedItem.data.id), 'inactive-item' : (selectedItem == null || item.id != selectedItem.data.id)}"
-                  draggable="true" @drag="dragMove" @dragstart="dragCustomStart('LIBRARY', item, 'CUSTOM_PLANOGRAM')" @dragend="clearDrag">
+                  draggable="true" @drag="dragMove" @dragstart="dragCustomStart('LIBRARY', item, 'CUSTOM_PLANOGRAM')"
+                  @dragend="clearDrag">
                   <v-list-tile-content>
                     <v-list-tile-title>{{item.name}}</v-list-tile-title>
                     <v-list-tile-sub-title>
@@ -305,6 +311,7 @@
   import axios from "axios";
 
   export default {
+    props: ["isFloorplan"],
     data: () => ({
       fav: true,
       menu: false,
@@ -318,13 +325,22 @@
       miscArray: [],
       selectedItem: null,
       customFixtures: [],
-      planograms: []
+      planograms: [],
+      searchText: null,
     }),
     mounted() {
       let self = this;
       self.getLibraryData();
       self.getFixtures();
       self.getPlanograms();
+    },
+    computed: {
+      filteredSpacePlans() {
+        return this.planograms.filter(item => {
+          if (!this.searchText) return this.planograms;
+          return (item.name.toLowerCase().includes(this.searchText.toLowerCase()))
+        });
+      }
     },
     methods: {
       dragCustomStart(where, item, type) {

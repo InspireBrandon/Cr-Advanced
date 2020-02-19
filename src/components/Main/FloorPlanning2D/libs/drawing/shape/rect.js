@@ -52,20 +52,10 @@ class Rect extends Shape {
             strokeWidth: 1,
             stroke: 'black',
         });
-        self.line = new Konva.Rect({
-            x: config.x,
-            y: config.y,
-            name: "front-Line",
-            height: 5,
-            width: parseFloat(brush.width),
-            // fill: "red",
-            // draggable: true,
-            visible: true,
-            // strokeWidth: 1,
-            // stroke: 'black',
-        });
+        
 
         let rectGroup = new Konva.Group({
+            
             visible: true,
             showEditName: true,
             selected: true,
@@ -74,7 +64,6 @@ class Rect extends Shape {
             name: name.toString(),
         })
         rectGroup.add(self.shape)
-        rectGroup.add(self.line)
         if (dataUrl != "") {
             self.image = new Konva.Image({
                 name: "Gondola-Rect",
@@ -97,6 +86,7 @@ class Rect extends Shape {
             rectGroup.add(self.image)
         }
         self.parent.add(rectGroup);
+        
         self.parent.draw();
     }
 }

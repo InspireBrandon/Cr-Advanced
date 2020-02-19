@@ -4,6 +4,9 @@
             <v-toolbar-title>
                 Planogram Designer
             </v-toolbar-title>
+            <v-btn @click="log">
+                log
+            </v-btn>
         </v-toolbar>
         <v-container class="ma-0 pa-0" fluid>
             <v-layout row wrap>
@@ -101,6 +104,11 @@
             }
         },
         methods: {
+            log() {
+                let self = this
+                console.log(self.selectedLayer);
+
+            },
             checkForHeader(callback) {
                 let self = this
                 console.log("params", self.$route.params.ID);
@@ -150,6 +158,7 @@
                 let self = this
                 axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 self.$refs.spinner.show()
+                self.stage.batchDraw()
                 axios.post(process.env.VUE_APP_API + `FloorplanFixtureHeader?&Planogram_ID=${self.planogram_ID}`).then(
                     r => {
                         console.log("[header]", r);
@@ -159,6 +168,7 @@
                             console.log(self.stage.children[1].children);
 
                             self.FormatItems(self.stage.children[1].children, self.saveArr, 0, callback => {
+                                console.log("self.saveArr", self.saveArr);
 
                                 console.log(self.saveArr)
                                 axios.post(process.env.VUE_APP_API +
@@ -329,6 +339,8 @@
                     if (e.target.attrs.name == "front-Line" || e.target.attrs.name == "Gondola-Rect") {
                         e.target = e.target.parent
                         self.selectedItem = e.target
+                        console.log("self.selectedItem", self.selectedItem);
+
                         self.findDrop(e.target, callback => {
                             self.selectedFixtures = callback
                         })
@@ -437,6 +449,28 @@
                 self.stage.on('dragend', (e) => {
                     // clear all previous lines on the screen
                     self.stage.find('.guid-line').destroy();
+                    let transform = self.stage.getAbsoluteTransform().copy();
+                    transform.invert();
+                    // let pos = self.stage.getPointerPosition();
+
+                    console.log("drag evvent", e);
+                    let abs = e.target.absolutePosition()
+
+
+                    let dropPos = transform.point({
+                        x: e.target.attrs.x,
+                        y: e.target.attrs.y
+                    });
+                    console.log("dragend", dropPos);
+                    console.log("abs", abs);
+
+
+                    e.target.setAttrs({
+                        x: dropPos.x,
+                        y: dropPos.y
+                    })
+
+
                     self.stage.batchDraw();
                 })
                 self.stage.addEventListener('wheel', (e) => {
@@ -603,8 +637,8 @@
 
                     circle.shape.saveID = item.id
                     circle.shape.guid = item.guid
-                    console.log("SHAPE",shape);
-                    
+                    console.log("SHAPE", shape);
+
                     self.findDrop(circle.shape, drop => {
                         drop.shape = "Circle"
                     })
@@ -660,8 +694,8 @@
 
                             if (element.shape == "Circle") {
                                 let circle = new Circle(self.selectedLayer, {
-                                    x: lastPos + widthInc,
-                                    y: 75,
+                                    x: 0,
+                                    y: 0,
                                 }, null, {
                                     radius: element.width,
                                     color: "#1976d2"
@@ -670,21 +704,28 @@
                                     width: element.width,
                                     DropID: element.id.toString()
                                 })
+                                circle.shape.parent.setAttrs({
+                                    x: lastPos + widthInc,
+                                    y: 75
+                                })
                                 circle.shape.attrs.DropID = element.id.toString()
                                 lastPos = circle.shape.attrs.x + element.width
 
                             } else {
                                 element.shape = "Square"
                                 let rect = new Rect(self.selectedLayer, {
-                                    x: lastPos + widthInc,
-                                    y: 50,
+                                    x: 0,
+                                    y: 0,
                                 }, null, null, null, self.imageSrc(element
                                     .id,
                                     "Top"));
                                 rect.shape.setAttrs({
                                     width: element.width,
                                     height: element.height,
-
+                                })
+                                rect.shape.parent.setAttrs({
+                                    x: lastPos + widthInc,
+                                    y: 50
                                 })
                                 rect.line.setAttrs({
                                     width: element.width,

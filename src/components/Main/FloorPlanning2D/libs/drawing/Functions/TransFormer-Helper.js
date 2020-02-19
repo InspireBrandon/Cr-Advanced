@@ -119,6 +119,8 @@ class TransFormerHelper {
                     }
                     properties.height = item.height().toFixed(2);
                     properties.width = item.width().toFixed(2)
+                    properties.rotation = selectedItem.rotation().toFixed(2);
+
                 }
             });
         } else {
@@ -137,6 +139,7 @@ class TransFormerHelper {
             }
             properties.height = selectedItem.height().toFixed(2);
             properties.width = selectedItem.width().toFixed(2);
+            properties.rotation = selectedItem.rotation().toFixed(2);
         }
 
     }
