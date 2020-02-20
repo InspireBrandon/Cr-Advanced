@@ -4,7 +4,7 @@ class TransFormerHelper {
     constructor() {}
 
     handleTransform(e, z, handleSnapping, stage, lastPosition, ctrlDown, selectedItem, rotateAroundCenter, transformProperties, propertiesLabel, propertiesLabelVertical) {
-        handleSnapping(e)
+     //   handleSnapping(e)
         let transform = stage.getAbsoluteTransform().copy();
         // to detect relative position we need to invert transform
         transform.invert();

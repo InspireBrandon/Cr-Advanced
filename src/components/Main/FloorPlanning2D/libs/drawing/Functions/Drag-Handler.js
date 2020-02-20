@@ -306,7 +306,6 @@ class DragHandler {
                 if (!ctrlDown) {
                     wall.shape.rotation(deg);
                 } else {
-                    handleSnapping(wall.shape)
                     let updateDegrees = false;
                     let snappedAngle = 0;
                     let tolerance = brush.snapOption * 0.45;
@@ -335,7 +334,7 @@ class DragHandler {
                 if (!ctrlDown) {
                     rect.shape.rotation(deg);
                 } else {
-                    handleSnapping(rect.shape)
+                 //   handleSnapping(rect.shape)
                     let updateDegrees = false;
                     let snappedAngle = 0;
                     let tolerance = brush.snapOption * 0.45;
@@ -397,7 +396,7 @@ class DragHandler {
             case "fiber_manual_record":
                 circle.shape.width(hyp);
                 transformProperties.radius = circle.shape.width()
-                handleSnapping(circle.shape)
+             //   handleSnapping(circle.shape)
                 break;
             case "local_offer":
                 textNode.shape.width(hyp);
@@ -425,7 +424,7 @@ class DragHandler {
                 break;
             case "linear_scale": {
                 dotted.shape.width(hyp);
-                handleSnapping(dotted.shape)
+            //    handleSnapping(dotted.shape)
                 if (!ctrlDown) {
                     dotted.shape.rotation(deg);
                 } else {

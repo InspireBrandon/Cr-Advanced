@@ -347,7 +347,7 @@
                     },
                     {
                         text: "Store Cluster",
-                        value: "store"
+                        value: "cluster"
                     },
                     {
                         text: "Department Cluster",
@@ -371,7 +371,7 @@
                     custom: [],
                     department: [],
                     regional: [],
-                    store: [],
+                    cluster: [],
                     stores: [],
                 },
                 selectedClusterOption: null,
@@ -520,7 +520,7 @@
                     self.clusterOptions.stores = []
                     console.log("clusters", r.data);
                     r.data.forEach(store => {
-                        self.clusterOptions.store.push({
+                        self.clusterOptions.cluster.push({
                             text: store.store_Cluster,
                             value: store.id,
                         })
@@ -880,37 +880,37 @@
                     console.log("floorPlanSelector", callback);
                     self.Floorplan_ID = callback.id
                     if (callback.store_ID != null) {
-                        self.selectedClusterType = "store"
+                        self.selectedClusterType = "stores"
                         self.selectedClusterOption = callback.store_ID
                     }
                     if (callback.storeCluster_ID != null) {
-                        self.selectedClusterType = "stores"
+                        self.selectedClusterType = "cluster"
                         self.selectedClusterOption = callback.storeCluster_ID
                     }
                     axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                     axios.get(process.env.VUE_APP_API + `GetFloorPlanItems?Header_ID=${callback.id}`).then(
-                    r => {
-                        console.log(r);
-                        self.stage.children.forEach(child => {
-                            if (child.attrs.name != 'grid') {
-                                child.destroyChildren()
-                            }
+                        r => {
+                            console.log(r);
+                            self.stage.children.forEach(child => {
+                                if (child.attrs.name != 'grid') {
+                                    child.destroyChildren()
+                                }
 
-                        })
-
-                        console.log("children", self.stage.children);
-                        // self.createBaseLayers(cb => {
-
-                        //  self.drawGrid()
-                        self.drawSavedItems(r.data, self.stage, self.layerTree,
-                            cb => {
-                                console.log("LOOP CALLBACK");
-                                self.stage.batchDraw()
-                                self.selectLayer(self.backgroundTree, self.layerTree)
                             })
-                        self.Floorplan_ID = callback
-                    })
+
+                            console.log("children", self.stage.children);
+                            // self.createBaseLayers(cb => {
+
+                            //  self.drawGrid()
+                            self.drawSavedItems(r.data, self.stage, self.layerTree,
+                                cb => {
+                                    console.log("LOOP CALLBACK");
+                                    self.stage.batchDraw()
+                                    self.selectLayer(self.backgroundTree, self.layerTree)
+                                })
+                            self.Floorplan_ID = callback.id
+                        })
 
                     // })
                 })
@@ -987,8 +987,11 @@
                     axios.get(process.env.VUE_APP_API + `Floorplan?Floorplan_ID=${self.Floorplan_ID}`).then(r => {
                         r.data.forEach(saveditem => {
                             self.imageIDArr.forEach(item => {
-                                if (saveditem.x == item.attrs.x && saveditem.y == item.attrs
-                                    .y) {
+                                console.log("x" + saveditem.x + " " + item.attrs.x + " ||y" +
+                                    saveditem.y + "" + item.attrs.y);
+                                if (saveditem.x == item.attrs.x.toFixed(0) && saveditem.y ==
+                                    item.attrs
+                                    .y.toFixed(0)) {
                                     if (item.attrs.refFile != null && item.attrs.refFile !=
                                         undefined) {
                                         axios.post(process.env.VUE_APP_API +
@@ -1021,6 +1024,7 @@
             },
             saveFloorplan() {
                 let self = this
+                self.stage.find('Transformer').destroy()
                 console.log('saving', self.stage);
                 self.saveArr = []
                 if (self.selectedClusterOption == null) {
@@ -1029,22 +1033,23 @@
                 }
                 self.$refs.Prompt.show("", " Save FloorPlan", "Please enter floorplan name", Name => {
                     self.$refs.spinner.show()
-                    axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
 
                     let req = {
                         id: self.Floorplan_ID,
                         name: self.generateName(Name),
                         width: parseFloat(self.floorConfig.floorWidth),
                         height: parseFloat(self.floorConfig.floorHeight),
-                        blockWidth: parseFloat(self.floorConfig.blockWidth),
+                        blockWidth: parseFloat(self.floorConfig.blockRatio),
                         repeat: self.floorConfig.repeat
                     }
+
                     switch (self.selectedClusterType) {
-                        case "store": {
+                        case "stores": {
                             req.storeID = self.selectedClusterOption
                         }
                         break;
-                    case "stores": {
+                    case "cluster": {
                         req.storeCluster_ID = self.selectedClusterOption
                     }
                     break;
@@ -1052,6 +1057,8 @@
                     default:
                         break;
                     }
+                    console.log("Header", req);
+                    axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                     axios.post(process.env.VUE_APP_API + `saveFloorHeader`, req).then(r => {
                         self.Floorplan_ID = r.data.id
                         self.imageIDArr = []
@@ -1420,10 +1427,14 @@
                             self.selectedItem.attrs[prop] = parseFloat(self.properties[prop])
                         }
                         self.selectedItem.attrs["fill"] = self.properties["fill"]
+
                     }
                     callback()
                     self.stage.batchDraw()
                 } else {
+                    self.selectedItem.setAttrs({
+                        rotation: parseFloat(self.properties.rotation)
+                    })
                     self.selectedItem.children.forEach(item => {
                         for (var prop in self.properties) {
                             if (self.properties[prop] != null && prop != "name" && prop !=
@@ -1431,13 +1442,8 @@
                                 "fill") {
                                 item.attrs[prop] = parseFloat(self.properties[prop])
                             }
-                            if (item.attrs.name == "front-Line") {
-                                item.attrs.height = 0
-
-                            } else {
-                                item.attrs.height = parseFloat(self.properties["height"])
-                                item.attrs["fill"] = self.properties["fill"]
-                            }
+                            item.attrs.height = parseFloat(self.properties["height"])
+                            item.attrs["fill"] = self.properties["fill"]
                         }
 
                     })
@@ -2275,7 +2281,9 @@
                 });
 
                 self.stage.on('dragmove', function (e) {
-                    self.handleSnapping(e.target)
+                    if (self.selectedTool == "open_with") {
+                        self.handleSnapping(e.target)
+                    }
                 });
                 self.stage.on('dragstart', (e) => {
                     if (self.ctrlDown && self.selectedTool == "open_with") {
