@@ -6,6 +6,8 @@ import StageImage from '@/components/Main/FloorPlanning2D/libs/drawing/shape/ima
 import treeItem from '@/components/Main/FloorPlanning2D/libs/tree/TreeItem'
 import Label from '@/components/Main/FloorPlanning2D/libs/drawing/shape/label'
 import Arrow from '@/components/Main/FloorPlanning2D/libs/drawing/shape/arrow'
+import Area from '@/components/Main/FloorPlanning2D/libs/drawing/shape/area'
+
 
 
 
@@ -13,7 +15,7 @@ import Arrow from '@/components/Main/FloorPlanning2D/libs/drawing/shape/arrow'
 
 class DragHandler {
     constructor() {}
-    handleContentMousedown(SelectedLayer, stage, firstPosition, lastPosition, selectedTool, SelectedLayerTree, selectImage, isPaint, wall, rect, circle, image, arrow, arrowStartY, arrowStartX, textNode, brush, vueCtx, dotted, area,callback) {
+    handleContentMousedown(SelectedLayer, stage, firstPosition, lastPosition, selectedTool, SelectedLayerTree, selectImage, isPaint, wall, rect, circle, image, arrow, arrowStartY, arrowStartX, textNode, brush, vueCtx, dotted, area, areaLayertree, areaLayer, areaTree, callback) {
 
         if (SelectedLayer.attrs.visible == false && selectedTool != "open_with") {
             alert("cannot draw on invisible layer")
@@ -207,6 +209,28 @@ class DragHandler {
             // })
         }
         break;
+        case "tab_unselected": {
+            area = new Area(areaLayer, {
+                x: firstPosition.x,
+                y: firstPosition.y,
+                name: 'Area',
+                drawType: 'Area'
+            }, brush)
+
+            areaTree = new treeItem({
+                KonvaID: area.shape._id,
+                visible: true,
+                showEditName: true,
+                selected: true,
+                showChildren: true,
+                draggable: true,
+                name: "area",
+                children: [],
+            })
+            areaLayertree.children.push(areaTree)
+
+        }
+        break;
         default:
             break;
 
@@ -220,12 +244,13 @@ class DragHandler {
             arrowStartX: arrowStartX,
             arrowStartY: arrowStartX,
             dotted: dotted,
-            area:area
+            area: area,
+            areaTree: areaTree
         })
 
     }
 
-    handleContentMouseUp(SelectedLayer, stage, firstPosition, lastPosition, selectedTool, SelectedLayerTree, selectImage, isPaint, wall, rect, circle, image, arrow, arrowStartY, arrowStartX, textNode, resetDuplication, callback) {
+    handleContentMouseUp(SelectedLayer, stage, firstPosition, lastPosition, selectedTool, SelectedLayerTree, selectImage, isPaint, wall, rect, circle, image, arrow, arrowStartY, arrowStartX, textNode, resetDuplication, area, callback) {
         isPaint = false;
         var pos = stage.getPointerPosition();
 
@@ -266,6 +291,13 @@ class DragHandler {
                 // textNode.shape.width(hyp);
                 break;
 
+            case "tab_unselected":
+                if (area.shape.attrs.width < 5) {
+                    area.shape.width(5);
+                    area.shape.height(5);
+                }
+                break;
+
             default:
                 break;
         }
@@ -281,7 +313,7 @@ class DragHandler {
         callback()
     }
 
-    handleContentMousemove(SelectedLayer, stage, firstPosition, lastPosition, selectedTool, SelectedLayerTree, selectImage, isPaint, wall, rect, circle, image, arrow, arrowStartY, arrowStartX, textNode, ctrlDown, handleSnapping, brush, transformProperties, dotted) {
+    handleContentMousemove(SelectedLayer, stage, firstPosition, lastPosition, selectedTool, SelectedLayerTree, selectImage, isPaint, wall, rect, circle, image, arrow, arrowStartY, arrowStartX, textNode, ctrlDown, handleSnapping, brush, transformProperties, dotted, area) {
         let transform = stage.getAbsoluteTransform().copy();
         // to detect relative position we need to invert transform
         transform.invert();
@@ -451,6 +483,12 @@ class DragHandler {
                 break;
 
             }
+            case "tab_unselected":
+                area.shape.width(hyp);
+                area.shape.height(hyp);
+
+                //    handleSnapping(dotted.shape)
+                break;
             default:
                 break;
         }

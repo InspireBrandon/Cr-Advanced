@@ -414,6 +414,7 @@
                 arrowStartY: null,
                 arrowStartX: null,
                 textNode: null,
+                areaTree: null,
                 firstPosition: {
                     x: 0,
                     y: 0
@@ -766,6 +767,29 @@
                     }))
                     arrow.shape.points([item.x, item.y, item.arrowEndX, item.arrowEndY])
                 }
+
+                case "area": {
+                    let area = new area(parentArr, {
+                        x: item.x,
+                        y: item.y,
+                    });
+
+                    parentLayerTree.children.push(new treeItem({
+                        KonvaID: area.shape._id,
+                        visible: true,
+                        showEditName: false,
+                        selected: false,
+                        showChildren: true,
+                        draggable: true,
+                        name: "Area",
+                        children: [],
+                    }))
+                    area.setAttrs({
+                        width: item.width,
+                        height: item.height,
+                        fill: item.color
+                    })
+                }
                 default:
                     break;
                 }
@@ -815,6 +839,11 @@
                             }
                             break;
                             case "Departments": {
+                                layer = self.departmentLayer
+                                layertreeitem = self.departmentTree
+                            }
+                            break;
+                            case "Areas": {
                                 layer = self.departmentLayer
                                 layertreeitem = self.departmentTree
                             }
@@ -936,7 +965,7 @@
                     case "Fixture":
                         return 2
                         break;
-                        
+
                     default: {
                         return 2
                     }
@@ -1658,7 +1687,6 @@
                         case "tab_unselected":
                             self.snackbarText = "Drag to draw area"
                             self.snackbar = true
-                            self.addTapeMeasure()
                             break;
 
 
@@ -2254,7 +2282,8 @@
                         self.lastPosition, self.selectedTool, self.buildingLayerTree, self.selectImage,
                         isPaint,
                         self.wall, self.rect, self.circle, self.image, self.arrow, self.arrowStartY, self
-                        .arrowStartX, self.textNode, self.brush, self, self.dotted, self.area, callback => {
+                        .arrowStartX, self.textNode, self.brush, self, self.dotted, self.area, self
+                        .areaLayerTree, self.areaLayer, self.areaTree, callback => {
                             self.wall = callback.wall
                             self.rect = callback.rect
                             self.circle = callback.circle
@@ -2264,6 +2293,7 @@
                             self.arrowStartX = self.firstPosition.x
                             self.dotted = callback.dotted
                             self.area = callback.area
+                            self.areaTree = callback.areaTree
                         })
                 })
 
@@ -2275,7 +2305,7 @@
                         self.lastPosition, self.selectedTool, self.backgroundTree, self.selectImage,
                         isPaint,
                         self.wall, self.rect, self.circle, self.image, self.arrow, self.arrowStartY, self
-                        .arrowStartX, self.textNode, self.resetDuplication, callback => {
+                        .arrowStartX, self.textNode, self.resetDuplication, self.area, callback => {
                             self.lastPosition = {
                                 x: 0,
                                 y: 0
@@ -2287,7 +2317,16 @@
                             self.arrowStartY = 0
                             self.arrowStartX = 0
                             if (self.selectedTool != "open_with" && self.selectedTool != "show_chart") {
+                                if (self.selectedTool == "tab_unselected") {
+                                    self.$refs.Prompt.show("", " Area Name",
+                                        "Please Enter a  name for area", value => {
+                                            self.areaTree.name = value
+                                            self.area.attrs.LabelText = value
+                                        })
+                                }
                                 self.onToolChange("open_with")
+
+
                             }
                             if (self.dotted != null && self.selectedItem != null) {
                                 self.$refs.Prompt.show("", " Line Length",
@@ -2297,6 +2336,7 @@
                                         self.scaleSelected(parseFloat(value))
                                     })
                             }
+
                         })
                 });
 
@@ -2310,7 +2350,7 @@
                         isPaint,
                         self.wall, self.rect, self.circle, self.image, self.arrow, self.arrowStartY, self
                         .arrowStartX, self.textNode, self.ctrlDown, self.handleSnapping, self.brush, self
-                        .transformProperties, self.dotted)
+                        .transformProperties, self.dotted, self.area)
 
                 });
 
@@ -2716,7 +2756,7 @@
                     children: [],
                     name: 'Areas',
                     visible: true,
-                    selected: true,
+                    selected: false,
                     showChildren: false,
                     drawType: "Layer"
                 })
@@ -2739,7 +2779,7 @@
                     children: [],
                     name: 'Building',
                     visible: true,
-                    selected: true,
+                    selected: false,
                     showChildren: false,
                     drawType: "Layer"
                 })
