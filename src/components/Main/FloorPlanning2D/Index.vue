@@ -1323,12 +1323,14 @@
                 }))
                 let height = (libraryItem.data.depth / 100) * (self.meterRatio * self.floorConfig.blockRatio)
                 let width = (libraryItem.data.width / 100) * (self.meterRatio * self.floorConfig.blockRatio)
+                let depth = (libraryItem.data.height / 100) * (self.meterRatio * self.floorConfig.blockRatio)
                 console.log("height", height);
                 console.log("width", width);
 
                 rect.shape.setAttrs({
                     height: height,
-                    width: width
+                    width: width,
+                    depth:depth
                 })
                 self.selectLayer(self.fixtureTree, self.layers)
                 self.stage.batchDraw()
