@@ -93,6 +93,14 @@
                 </template>
                 <span>reset zoom</span>
             </v-tooltip>
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <v-btn v-on="on" icon @click="$refs.threeD.show()">
+                        3D
+                    </v-btn>
+                </template>
+                <span>View 3D</span>
+            </v-tooltip>
             <!-- <v-btn @click="openFloorSettings">
                 Floor Settings
             </v-btn> -->
@@ -277,6 +285,7 @@
                 Close
             </v-btn>
         </v-snackbar>
+        <threeD ref="threeD" />
     </div>
 </template>
 
@@ -311,6 +320,7 @@
     import PlanogramLibrary from "./PlanogramLibrary.vue"
     import floorPlanSelector from "./floorPlanSelector.vue"
     import FloorConfigModal from "./FloorConfigModal"
+    import threeD from './3D/Index'
 
     import library from "@/components/Main/Planogram/spaceplanning/src/components/Library/Library";
     import axios from 'axios'
@@ -338,8 +348,8 @@
             floorPlanSelector,
             Prompt,
             Spinner,
-            FloorPlanMediaModal
-
+            FloorPlanMediaModal,
+            threeD
         },
         // 1 block = 1 meter
         data() {
