@@ -19,6 +19,7 @@
     } from '@babylonjs/core/Legacy/legacy';
 
     import Axios from 'axios'
+    const pxlToMeterRatio = 25;
 
     export default {
         data() {
@@ -42,7 +43,7 @@
 
                 setTimeout(() => {
                     self.getItemsToDraw(items => {
-                        self.draw();
+                        self.draw(items);
                     })
                 }, 500)
             },
@@ -59,19 +60,24 @@
                     var scene = new BABYLON.Scene(engine);
 
                     // Add a camera to the scene and attach it to the canvas
-                    var camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, new BABYLON
-                        .Vector3(
-                            0, 0, 5), scene);
-                    camera.attachControl(canvas, true);
+                    var camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 1, -15), scene);
+                    scene.activeCamera = camera;
+                    scene.activeCamera.attachControl(canvas);
+                    scene.activeCamera.keysUp.push(87);
+                    scene.activeCamera.k.push(87);
+
+                    // var camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, new BABYLON
+                    //     .Vector3(
+                    //         0, 0, 5), scene);
+
+                    // camera.attachControl(canvas, true);
 
                     // Add lights to the scene
                     var light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 1, 0), scene);
                     var light2 = new BABYLON.PointLight("light2", new BABYLON.Vector3(0, 1, -1), scene);
 
                     var myMaterial = new BABYLON.StandardMaterial("myMaterial", scene);
-                    myMaterial.diffuseTexture = new BABYLON.Texture(
-                        "tile.jpg",
-                        scene);
+                    myMaterial.diffuseTexture = new BABYLON.Texture("tile.jpg", scene);
 
                     var myGround = BABYLON.MeshBuilder.CreateGround("ground", {
                         width: 50,
@@ -83,8 +89,25 @@
                     myGround.checkCollisions = true;
                     myGround.material = myMaterial;
 
-                    items.forEach(element => {
-                        console.log(element);
+                    items.forEach((element, idx) => {
+
+                        var material = new BABYLON.StandardMaterial("material", scene);
+                        material.diffuseTexture = new BABYLON.Texture("wood.jpg", scene);
+
+                        var box = BABYLON.MeshBuilder.CreateBox("box", {
+                            height: element.depth / pxlToMeterRatio,
+                            width: element.width / pxlToMeterRatio,
+                            depth: element.height / pxlToMeterRatio
+                        }, scene);
+                        box.position.x = element.x / pxlToMeterRatio;
+                        box.position.y = 0;
+                        box.position.z = element.y / pxlToMeterRatio;
+
+                        setTimeout(() => {
+                            box.rotation.y = degreesToRadians(element.rotation);
+                        }, 10000);
+
+                        box.material = material;
                     });
 
                     return scene;
@@ -108,12 +131,18 @@
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.get(process.env.VUE_APP_API + `FloorplanItems/3D?headerID=${40}`)
+                Axios.get(process.env.VUE_APP_API + `FloorplanItems/3D?headerID=${41}`)
                     .then(r => {
-                        console.log(r.data);
                         callback(r.data);
                     })
             }
         }
+    }
+
+    function degreesToRadians(degrees) {
+        if (degrees != 0)
+            return degrees / 57.2958;
+        else
+            return 0;
     }
 </script>
