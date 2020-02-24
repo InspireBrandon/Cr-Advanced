@@ -844,13 +844,39 @@
                             }
                             break;
                             case "Areas": {
-                                layer = self.departmentLayer
-                                layertreeitem = self.departmentTree
+                                layer = self.area
+                                layertreeitem = self.areaLayerTree
                             }
                             break;
 
                             default:
-                                parentLayerTree.push(layertreeitem)
+                                console.log("___________________________________________________________");
+
+                               
+                                 layer = new Konva.Group
+                                ({
+                                    name: item.name,
+                                    visible: true,
+                                    showEditName: false,
+                                    selected: false,
+                                    showChildren: false,
+                                    drawType: "Layer",
+                                    type: "Layer"
+                                })
+                                 layertreeitem = new treeItem({
+                                    KonvaID: layer._id,
+                                    children: [],
+                                    name: item.name,
+                                    showEditName: false,
+                                    visible: layer.visible,
+                                    selected: layer.selected,
+                                    showChildren: layer.showChildren,
+                                    drawType: "Layer"
+                                })
+                                 console.log(parentLayerTree);
+                                console.log(layertreeitem);
+                                console.log(layer);
+                                parentLayerTree.children.push(layertreeitem)
                                 parentArr.add(layer);
                                 break;
                             }
