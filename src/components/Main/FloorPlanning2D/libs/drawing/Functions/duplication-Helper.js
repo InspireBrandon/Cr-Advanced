@@ -274,8 +274,8 @@ class DuplicationHelper {
         switch (direction) {
             case "UP":
                 rect = new Rect(group, {
-                    x: SelectedItem.attrs.x+((rotHeight/2)*duplicationSequence.up),
-                    y: SelectedItem.attrs.y-  ((rotWidth/2) * duplicationSequence.up),
+                    x: SelectedItem.attrs.x+((dottedWidth)*duplicationSequence.up),
+                    y: SelectedItem.attrs.y-  ((dottedHeight) * duplicationSequence.up),
                 }, null, null, brush, dataurl);
                 break;
             case "RIGHT":
