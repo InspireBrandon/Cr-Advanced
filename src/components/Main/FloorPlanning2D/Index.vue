@@ -299,6 +299,8 @@
     import Line from './libs/drawing/shape/line'
     import Arrow from './libs/drawing/shape/arrow'
     import StageImage from './libs/drawing/shape/image'
+    import Area from './libs/drawing/shape/area'
+
 
 
     import DuplicationHelper from './libs/drawing/Functions/duplication-Helper'
@@ -708,7 +710,7 @@
                         DropID: item.fixture_ID,
                         fill: item.color,
                         width: item.width,
-                        depth:item.depth, 
+                        depth: item.depth,
                         height: item.height,
                         rotation: item.rotation,
                         draggable: true
@@ -769,13 +771,17 @@
                     arrow.shape.points([item.x, item.y, item.arrowEndX, item.arrowEndY])
                 }
 
-                case "area": {
-                    let area = new area(parentArr, {
+                case "Area": {
+                    let area = new Area(self.areaLayer, {
                         x: item.x,
                         y: item.y,
+                    }, {
+                        color: item.color,
+                        height: item.height,
+                        width: item.width
                     });
 
-                    parentLayerTree.children.push(new treeItem({
+                    self.areaLayerTree.children.push(new treeItem({
                         KonvaID: area.shape._id,
                         visible: true,
                         showEditName: false,
@@ -785,7 +791,7 @@
                         name: "Area",
                         children: [],
                     }))
-                    area.setAttrs({
+                    area.shape.setAttrs({
                         width: item.width,
                         height: item.height,
                         fill: item.color
@@ -799,7 +805,7 @@
             drawSavedItems(menuItems, parentArr, parentLayerTree, callback) {
                 let self = this
                 menuItems.forEach((item, idx) => {
-                    console.log("INSIDE LOOP");
+                    // console.log("INSIDE LOOP", item.name, item.type);
                     switch (item.type) {
                         case 0: {
                             let layer = new Konva.Layer({
@@ -853,9 +859,8 @@
                             default:
                                 console.log("___________________________________________________________");
 
-                               
-                                 layer = new Konva.Group
-                                ({
+
+                                layer = new Konva.Group({
                                     name: item.name,
                                     visible: true,
                                     showEditName: false,
@@ -864,7 +869,7 @@
                                     drawType: "Layer",
                                     type: "Layer"
                                 })
-                                 layertreeitem = new treeItem({
+                                layertreeitem = new treeItem({
                                     KonvaID: layer._id,
                                     children: [],
                                     name: item.name,
@@ -874,11 +879,13 @@
                                     showChildren: layer.showChildren,
                                     drawType: "Layer"
                                 })
-                                 console.log(parentLayerTree);
+                                console.log(parentLayerTree);
                                 console.log(layertreeitem);
                                 console.log(layer);
                                 parentLayerTree.children.push(layertreeitem)
                                 parentArr.add(layer);
+
+
                                 break;
                             }
                             if (item.children.length > 0) {
@@ -888,34 +895,40 @@
                         break;
                     case 1: {
                         let self = this;
-                        let group = new Konva.Group({
-                            x: item.x,
-                            y: item.y,
-                            name: item.name,
-                            visible: true,
-                            showEditName: false,
-                            selected: false,
-                            showChildren: true,
-                            draggable: true,
-                            locked: false,
-                            drawType: "group",
-                            type: "group",
-                        })
-                        let layertreeitem = new treeItem({
-                            KonvaID: group._id,
-                            children: [],
-                            name: item.name,
-                            showEditName: false,
-                            visible: group.visible,
-                            selected: group.selected,
-                            showChildren: group.showChildren,
-                            drawType: "group",
-                            locked: true,
-                        })
-                        parentArr.add(group)
-                        parentLayerTree.children.push(layertreeitem)
-                        if (item.children.length > 0) {
-                            self.drawSavedItems(item.children, group, layertreeitem, sb => {})
+                        if (item.name == "Gondola-Rect") {
+                            self.DrawFixture(item, parentArr, parentLayerTree, cb => {
+                                self.stage.batchDraw()
+                            })
+                        } else {
+                            let group = new Konva.Group({
+                                x: item.x,
+                                y: item.y,
+                                name: item.name,
+                                visible: true,
+                                showEditName: false,
+                                selected: false,
+                                showChildren: true,
+                                draggable: true,
+                                locked: false,
+                                drawType: "group",
+                                type: "group",
+                            })
+                            let layertreeitem = new treeItem({
+                                KonvaID: group._id,
+                                children: [],
+                                name: item.name,
+                                showEditName: false,
+                                visible: group.visible,
+                                selected: group.selected,
+                                showChildren: group.showChildren,
+                                drawType: "group",
+                                locked: true,
+                            })
+                            parentArr.add(group)
+                            parentLayerTree.children.push(layertreeitem)
+                            if (item.children.length > 0) {
+                                self.drawSavedItems(item.children, group, layertreeitem, sb => {})
+                            }
                         }
                         // drawGroup
                     }
@@ -2167,6 +2180,46 @@
                     self.selectedLayer.draw()
                 })
             },
+            clickselect(item) {
+                let self = this
+                console.log("item", item.parent.attrs.name);
+                switch (item.parent.attrs.name) {
+                    case "Building": {
+                        self.selectLayer(self.buildingLayerTree, self.layerTree)
+                    }
+                    break;
+
+                case "Background": {
+                    self.selectLayer(self.backgroundTree, self.layerTree)
+                }
+                break;
+
+                case "Areas": {
+                    self.selectLayer(self.areaLayerTree, self.layerTree)
+                }
+                break;
+
+                case "Fixtures": {
+                    self.selectLayer(self.fixtureTree, self.layerTree)
+                }
+                break;
+
+                case "Department": {
+                    self.selectLayer(self.departmentTree, self.layerTree)
+                }
+                break;
+
+                case "Duplication Group": {
+                    self.selectLayer(self.fixtureTree, self.layerTree)
+                }
+
+                break;
+                default: {
+                    self.selectLayer(self.departmentTree, self.layerTree)
+                }
+                break;
+                }
+            },
             addStageEvents() {
                 let self = this;
                 let isPaint = false;
@@ -2205,6 +2258,9 @@
                     self.resetDuplication()
 
                     if (self.selectedTool == "open_with") {
+                        if (e.target != self.stage) {
+                            self.clickselect(e.target)
+                        }
                         clickTapHelper.handleSelection(e.target, self.stage, self.selectedLayer, self
                             .selectedItem,
                             self.selectedLayerTreeItem, self.ctrlDown, self.handleMultiSelect, self
@@ -2345,10 +2401,13 @@
                             self.arrowStartX = 0
                             if (self.selectedTool != "open_with" && self.selectedTool != "show_chart") {
                                 if (self.selectedTool == "tab_unselected") {
+                                    console.log("area", self.area);
+
                                     self.$refs.Prompt.show("", " Area Name",
                                         "Please Enter a  name for area", value => {
+
                                             self.areaTree.name = value
-                                            self.area.attrs.LabelText = value
+                                            self.area.shape.attrs.LabelText = value
                                         })
                                 }
                                 self.onToolChange("open_with")
