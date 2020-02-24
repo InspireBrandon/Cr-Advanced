@@ -46,7 +46,7 @@
                     })
                 }, 500)
             },
-            draw() {
+            draw(items) {
                 let self = this;
 
                 var canvas = document.getElementById("renderCanvas"); // Get the canvas element 
@@ -83,6 +83,10 @@
                     myGround.checkCollisions = true;
                     myGround.material = myMaterial;
 
+                    items.forEach(element => {
+                        console.log(element);
+                    });
+
                     return scene;
                 };
                 /******* End of the create scene function ******/
@@ -104,7 +108,7 @@
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.get(process.env.VUE_APP_API + `GetFloorPlanItems?Header_ID=${40}`)
+                Axios.get(process.env.VUE_APP_API + `FloorplanItems/3D?headerID=${40}`)
                     .then(r => {
                         console.log(r.data);
                         callback(r.data);
