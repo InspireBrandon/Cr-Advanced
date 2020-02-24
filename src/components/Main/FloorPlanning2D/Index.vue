@@ -708,6 +708,7 @@
                         DropID: item.fixture_ID,
                         fill: item.color,
                         width: item.width,
+                        depth:item.depth, 
                         height: item.height,
                         rotation: item.rotation,
                         draggable: true
