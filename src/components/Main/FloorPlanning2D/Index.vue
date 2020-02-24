@@ -392,8 +392,11 @@
                 backgroundLayer: null,
                 buildingLayer: null,
                 buildingLayerTree: null,
+                areaLayer: null,
+                areaLayerTree: null,
                 dotted: null,
                 wall: null,
+                area: null,
                 rect: null,
                 circle: null,
                 image: null,
@@ -486,6 +489,10 @@
                     {
                         name: 'arrow_upward',
                         tooltip: "Draw Arrow"
+                    },
+                    {
+                        name: 'tab_unselected',
+                        tooltip: "Draw Areas"
                     },
                     {
                         name: 'linear_scale',
@@ -908,14 +915,18 @@
                         return 0
                         break;
                     case "group":
-                        return 1
+                        return 0
                         break;
                     case "planogramGroup":
-                        return 1
+                        return 0
                         break;
                     case "PlanogramFixture":
+                        return 1
+                        break;
+                    case "Fixture":
                         return 2
                         break;
+                        
                     default: {
                         return 2
                     }
@@ -1330,7 +1341,8 @@
                 rect.shape.setAttrs({
                     height: height,
                     width: width,
-                    depth:depth
+                    depth: depth,
+                    type: "fixture"
                 })
                 self.selectLayer(self.fixtureTree, self.layers)
                 self.stage.batchDraw()
@@ -1629,11 +1641,17 @@
                             self.snackbar = true
                             break;
                         case "linear_scale":
-                            self.snackbarText = "Drag a line then select an image to scale it"
+                            self.snackbarText = "Add tape measure to stage"
                             self.snackbar = true
                             self.addTapeMeasure()
-
                             break;
+                        case "tab_unselected":
+                            self.snackbarText = "Drag to draw area"
+                            self.snackbar = true
+                            self.addTapeMeasure()
+                            break;
+
+
                         default:
                             break;
                     }
@@ -1670,14 +1688,14 @@
                     // self.selectedTool = ''
                     image.shape.draggable(true)
                     image.shape.attrs.width = parseFloat(self.meterRatio) * parseFloat(self.floorConfig
-                        .blockRatio) * 10
+                        .blockRatio) * 23.48
                     image.shape.attrs.height = parseFloat(self.meterRatio) * parseFloat(self.floorConfig
                         .blockRatio) * 2
                     image.shape.attrs.name = "Tape"
                     self.stage.batchDraw()
 
                 }
-                imageObj.src = "/tapeMeasureTool.png";
+                imageObj.src = "/20M Tape with Head.png";
                 self.hasTape = image
                 console.log(image);
 
@@ -1907,7 +1925,7 @@
                 let self = this;
 
                 self.$nextTick(() => {
-                  //  console.log("selectedLayer", self.selectedLayer);
+                    //  console.log("selectedLayer", self.selectedLayer);
 
                     self.selectedLayer.children.forEach(child => {
 
@@ -1928,7 +1946,7 @@
                             })
                         }
                         layer.selected = true;
-                    //    console.log("select layer", self.selectedLayer);
+                        //    console.log("select layer", self.selectedLayer);
 
                         self.selectedLayer.children.forEach(child => {
                             child.draggable(true)
@@ -2226,7 +2244,7 @@
                         self.lastPosition, self.selectedTool, self.buildingLayerTree, self.selectImage,
                         isPaint,
                         self.wall, self.rect, self.circle, self.image, self.arrow, self.arrowStartY, self
-                        .arrowStartX, self.textNode, self.brush, self, self.dotted, callback => {
+                        .arrowStartX, self.textNode, self.brush, self, self.dotted, self.area, callback => {
                             self.wall = callback.wall
                             self.rect = callback.rect
                             self.circle = callback.circle
@@ -2235,6 +2253,7 @@
                             self.arrowStartY = self.firstPosition.y
                             self.arrowStartX = self.firstPosition.x
                             self.dotted = callback.dotted
+                            self.area = callback.area
                         })
                 })
 
@@ -2674,6 +2693,25 @@
                     showChildren: false,
                     drawType: "Layer"
                 })
+                let areaLayer = new Konva.Layer({
+                    name: 'Areas',
+                    visible: true,
+                    selected: true,
+                    showChildren: false,
+                    drawType: "Layer",
+                    type: "Layer"
+                });
+                let areaLayerTree = new treeItem({
+                    KonvaID: startLayer._id,
+                    children: [],
+                    name: 'Areas',
+                    visible: true,
+                    selected: true,
+                    showChildren: false,
+                    drawType: "Layer"
+                })
+                self.areaLayer = areaLayer
+                self.areaLayerTree = areaLayerTree
                 self.layerTree.push(tmplayertree)
                 self.selectedLayerTree = tmplayertree
                 self.selectedLayer = startLayer
@@ -2739,11 +2777,12 @@
                 self.buildingLayer = buildingLayer
                 self.buildingLayerTree = buildinglayertree
                 self.layerTree.push(buildinglayertree)
+                self.layerTree.push(areaLayerTree)
                 self.layerTree.push(FixtureTree)
                 self.layerTree.push(Depttree)
-
                 self.stage.add(startLayer);
                 self.stage.add(buildingLayer);
+                self.stage.add(areaLayer);
                 self.stage.add(FixtureLayer);
                 self.stage.add(DepartmentLayer);
                 callback()

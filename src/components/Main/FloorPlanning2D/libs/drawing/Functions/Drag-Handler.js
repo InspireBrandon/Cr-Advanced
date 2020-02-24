@@ -13,7 +13,7 @@ import Arrow from '@/components/Main/FloorPlanning2D/libs/drawing/shape/arrow'
 
 class DragHandler {
     constructor() {}
-    handleContentMousedown(SelectedLayer, stage, firstPosition, lastPosition, selectedTool, SelectedLayerTree, selectImage, isPaint, wall, rect, circle, image, arrow, arrowStartY, arrowStartX, textNode, brush, vueCtx, dotted, callback) {
+    handleContentMousedown(SelectedLayer, stage, firstPosition, lastPosition, selectedTool, SelectedLayerTree, selectImage, isPaint, wall, rect, circle, image, arrow, arrowStartY, arrowStartX, textNode, brush, vueCtx, dotted, area,callback) {
 
         if (SelectedLayer.attrs.visible == false && selectedTool != "open_with") {
             alert("cannot draw on invisible layer")
@@ -220,6 +220,7 @@ class DragHandler {
             arrowStartX: arrowStartX,
             arrowStartY: arrowStartX,
             dotted: dotted,
+            area:area
         })
 
     }
