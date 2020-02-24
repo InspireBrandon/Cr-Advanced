@@ -3,9 +3,9 @@ import Shape from './shape'
 import StageImage from "./image"
 
 class Rect extends Shape {
-    constructor(parent, config, ratio, name, brush, dataUrl) {
+    constructor(parent, config, ratio, name, brush, dataUrl, stage) {
         super(parent);
-
+        
         if (config == null || config == undefined) {
             config = {
                 x: 0,
@@ -20,7 +20,7 @@ class Rect extends Shape {
         }
         if (brush == undefined || brush == null) {
             brush = {
-                color: "#1976d2",
+
                 height: 5,
                 width: 5
 
@@ -31,62 +31,53 @@ class Rect extends Shape {
         }
         let self = this;
 
-        self.create(config, ratio, name, brush, dataUrl)
+        self.create(config, ratio, name, brush, dataUrl,stage)
     }
 
-    create(config, ratio, name, brush, dataUrl) {
+    create(config, ratio, name, brush, dataUrl,stage) {
         let self = this;
-
-
-        self.shape = new Konva.Rect({
-            x: config.x,
-            y: config.y,
-            height: parseFloat(brush.height),
-            width: parseFloat(brush.width),
-            fill: brush.color,
-            // fill: "#1976d2",
-            // draggable: true,
-            visible: 'inherit',
-            enabledAnchors: self.enabledAnchors,
-            name: "Gondola-Rect",
-            strokeWidth: 1,
-            stroke: 'black',
-        });
-        
-
-        let rectGroup = new Konva.Group({
-            
-            visible: true,
-            showEditName: true,
-            selected: true,
-            showChildren: true,
-            draggable: true,
-            name: name.toString(),
-        })
-        rectGroup.add(self.shape)
         if (dataUrl != "") {
-            self.image = new Konva.Image({
+            self.shape = new Konva.Image({
                 name: "Gondola-Rect",
                 visible: 'inherit',
                 x: config.x,
                 y: config.y,
                 height: parseFloat(brush.height),
                 width: parseFloat(brush.width),
-                draggable: false
+                draggable: true
             })
-
             var imageObj = new Image();
 
             imageObj.onload = function () {
-                self.image.image(imageObj);
-                self.parent.draw();
-                self.image.draggable(false)
+                self.shape.image(imageObj);
+
+                if (stage != null && stage != undefined) {
+
+                    stage.batchDraw()
+                } else {
+                    self.parent.draw();
+                }
+                console.log("[RECT IMAGE DRAW]");
+                
             }
             imageObj.src = dataUrl;
-            rectGroup.add(self.image)
+        } else {
+            self.shape = new Konva.Rect({
+                x: config.x,
+                y: config.y,
+                height: parseFloat(brush.height),
+                width: parseFloat(brush.width),
+                fill: brush.color,
+                // fill: "#1976d2",
+                draggable: true,
+                visible: 'inherit',
+                enabledAnchors: self.enabledAnchors,
+                name: "Gondola-Rect",
+                strokeWidth: 0.5,
+                stroke: 'black',
+            });
         }
-        self.parent.add(rectGroup);
-        
+        self.parent.add(self.shape);
         self.parent.draw();
     }
 }

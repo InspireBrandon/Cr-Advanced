@@ -26,10 +26,9 @@ class ClickTapHelper {
             selectedLayerTreeItem = null
             return;
         }
-        if (e.attrs.name == "Gondola-Rect" || e.attrs.name == "front-Line") {
-            e = e.parent
-        }
+        
         if (ctrlDown && e.attrs.draggable) {
+            console.log("HANDLING - CLICK TAP");
             handleMultiSelect(e)
         }
 

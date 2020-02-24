@@ -4,7 +4,7 @@ class TransFormerHelper {
     constructor() {}
 
     handleTransform(e, z, handleSnapping, stage, lastPosition, ctrlDown, selectedItem, rotateAroundCenter, transformProperties, propertiesLabel, propertiesLabelVertical) {
-     //   handleSnapping(e)
+        //   handleSnapping(e)
         let transform = stage.getAbsoluteTransform().copy();
         // to detect relative position we need to invert transform
         transform.invert();
@@ -85,49 +85,43 @@ class TransFormerHelper {
             }
         }
     }
-    handleTransformEnd(selectedItem, properties) {
+    handleTransformEnd(selectedItem, properties,blockratio) {
         if (selectedItem.attrs.name == "rect-group") {
+
+            // selectedItem.setAttrs({
+            //     height: selectedItem.height() * selectedItem
+            //         .scaleY().toFixed(2),
+            //     width: selectedItem.width() * selectedItem
+            //         .scaleX().toFixed(2),
+            // })
             selectedItem.children.forEach(item => {
-                console.log(item.attrs.name + "--x: " + item.attrs.x + "Y:" + item.attrs.y + item.attrs.image);
-                if (item.attrs.name == "front-Line") {
+                item.setAttrs({
+                    height: item.height() * item
+                        .scaleY().toFixed(2),
+                    width: item.width() * item
+                        .scaleX().toFixed(2),
+                    scaleX: 1,
+                    scaleY: 1,
+                });
+                if (item.attrs.image != undefined) {
                     item.setAttrs({
-                        height: 0,
-                        width: item.width() * item
-                            .scaleX().toFixed(2),
-                        scaleX: 1,
-                        scaleY: 1,
-                        rotation: item.rotation()
-                    });
-                } else {
-                    console.log(item);
-
-
-                    item.setAttrs({
-                        height: item.height() * item
-                            .scaleY().toFixed(2),
-                        width: item.width() * item
-                            .scaleX().toFixed(2),
-                        scaleX: 1,
-                        scaleY: 1,
-
-                    });
-                    if (item.attrs.image != undefined) {
-                        item.setAttrs({
-                            x: selectedItem.children[0].attrs.x,
-                            y: selectedItem.children[0].attrs.y
-                        })
-                    }
-                    properties.height = item.height().toFixed(2);
-                    properties.width = item.width().toFixed(2)
-                    properties.rotation = selectedItem.rotation().toFixed(2);
-
+                        x: selectedItem.children[0].attrs.x,
+                        y: selectedItem.children[0].attrs.y
+                    })
                 }
+                properties.height = (item.height()/blockratio).toFixed(2);
+                properties.width = (item.width()/blockratio).toFixed(2)
+                properties.rotation = selectedItem.rotation().toFixed(2);
+
             });
         } else {
 
             if (selectedItem.attrs.drawType == "label" || selectedItem.attrs.name == "rect-group") {
 
             } else {
+                if(selectedItem.rotation()>360){
+                    selectedItem.attrs.rotation = selectedItem.rotation()-360
+                }
                 selectedItem.setAttrs({
                     height: selectedItem.height() * selectedItem
                         .scaleY().toFixed(2),
@@ -137,8 +131,8 @@ class TransFormerHelper {
                     scaleY: 1
                 });
             }
-            properties.height = selectedItem.height().toFixed(2);
-            properties.width = selectedItem.width().toFixed(2);
+            properties.height = (selectedItem.height()/blockratio).toFixed(2);
+            properties.width = (selectedItem.width()/blockratio).toFixed(2);
             properties.rotation = selectedItem.rotation().toFixed(2);
         }
 

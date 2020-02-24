@@ -112,9 +112,13 @@
                                     <v-card v-on="on" :color="selectedTool == tool ? ' #111111;' : '#212121'"
                                         class="selected-tool mb-1 pa-1" dark flat
                                         style="text-align: center; cursor: pointer;" @click="onToolChange(tool.name)">
-                                        <v-icon :color="selectedTool == tool.name ? 'primary' : 'white'" :size="25">
+                                        <v-icon v-if="tool.name!='linear_scale'"
+                                            :color="selectedTool == tool.name ? 'primary' : 'white'" :size="25">
                                             {{ tool.name }}
                                         </v-icon>
+                                        <v-img :color="selectedTool == tool.name ? 'primary' : 'white'" :size="25"
+                                            v-else src="/tape-measure-2-xxl.png">
+                                        </v-img>
                                     </v-card>
                                 </template>
                                 <span>{{ tool.tooltip }}</span>
@@ -176,14 +180,17 @@
 
                                 <v-text-field @change="applyProperties" v-if="properties.name!=null" label="Name"
                                     v-model="properties.name" hide-details> </v-text-field>
-                                <v-text-field v-if="properties.height!=null" @change="applyProperties" type="number"
-                                    label="Height" v-model="properties.height" hide-details>
+                                <v-text-field v-if="properties.height!=null&&properties.height!=NaN"
+                                    @change="applyProperties" type="number" label="Height" v-model="properties.height"
+                                    hide-details>
                                 </v-text-field>
-                                <v-text-field v-if="properties.width!=null" @change="applyProperties" type="number"
-                                    label="Width" v-model="properties.width" hide-details>
+                                <v-text-field v-if="properties.width!=null&&properties.width!=NaN"
+                                    @change="applyProperties" type="number" label="Width" v-model="properties.width"
+                                    hide-details>
                                 </v-text-field>
-                                <v-text-field v-if="properties.radius!=null" @change="applyProperties" type="number"
-                                    label="Radius" v-model="properties.radius" hide-details>
+                                <v-text-field v-if="properties.radius!=null&&properties.radius!=NaN"
+                                    @change="applyProperties" type="number" label="Radius" v-model="properties.radius"
+                                    hide-details>
                                 </v-text-field>
                                 <v-text-field @change="applyProperties" type="number" label="rotation"
                                     v-model="properties.rotation" hide-details>
@@ -234,16 +241,16 @@
                                 </v-menu>
                             </v-toolbar>
                             <v-card-text class="pa-0 pt-0" style="height: 40%; overflow-y: scroll;">
-                                <div @dragover.prevent draggable="true" @drop="MoveLayerTopTop($event)">
+                                <!-- <div @dragover.prevent draggable="true" @drop="MoveLayerTopTop($event)">
                                     <div class="pa-1 grey lighten-3" style="display: flex;">
                                         <div>
                                             Drag layer here to move to top.
                                         </div>
                                     </div>
                                     <v-divider></v-divider>
-                                </div>
+                                </div> -->
                                 <RecursiveLayer v-if="layerTree.length>0" ref="RecursiveLayer"
-                                    :selectItemFromSidePanel="selectItemFromSidePanel"
+                                    :selectItemFromSidePanel="selectItemFromSidePanel" :setItemVisible="setItemVisible"
                                     :selectedLayerTreeItem="selectedLayerTreeItem" :editLayerName="editLayerName"
                                     :showChild="true" :layers="layerTree" :selectLayer="selectLayer"
                                     :setLayerVisible="setLayerVisible" :deleteLayer="deleteLayer" :endDrag="endDrag"
@@ -337,6 +344,7 @@
         // 1 block = 1 meter
         data() {
             return {
+                hasTape: null,
                 clusterTypes: [{
                         text: "All Stores Cluster",
                         value: "allStores"
@@ -382,6 +390,8 @@
                 backgroundTree: null,
                 departmentLayer: null,
                 backgroundLayer: null,
+                buildingLayer: null,
+                buildingLayerTree: null,
                 dotted: null,
                 wall: null,
                 rect: null,
@@ -479,7 +489,7 @@
                     },
                     {
                         name: 'linear_scale',
-                        tooltip: "Use this to scale images"
+                        tooltip: "Tape Measure"
                     }
                 ],
                 floorConfig: {
@@ -652,22 +662,22 @@
                 }
                 break;
 
-                case "rect-group": {
+                case "Gondola-Rect": {
                     let rect
                     if (item.fixture_ID == 0) {
                         rect = new Rect(parentArr, {
-                            x: 0,
-                            y: 0,
+                            x: item.x,
+                            y: item.y,
                         }, null, null, null);
                     } else {
                         rect = new Rect(parentArr, {
-                            x: 0,
-                            y: 0,
+                            x: item.x,
+                            y: item.y,
                         }, null, null, null, self.imageSrc(item.fixture_ID,
-                            "Top"));
+                            "Top"), self.stage);
                     }
                     parentLayerTree.children.push(new treeItem({
-                        KonvaID: rect.shape.parent._id,
+                        KonvaID: rect.shape._id,
                         visible: true,
                         showEditName: false,
                         selected: false,
@@ -676,34 +686,14 @@
                         name: "rect-group",
                         children: [],
                     }))
-                    rect.shape.parent.setAttrs({
-                        x: item.x,
-                        y: item.y,
-                        DropID: item.fixture_ID
+                    rect.shape.setAttrs({
+                        DropID: item.fixture_ID,
+                        fill: item.color,
+                        width: item.width,
+                        height: item.height,
+                        rotation: item.rotation,
+                        draggable: true
                     })
-                    rect.shape.parent.draggable(false)
-                    item.children.forEach(element => {
-                        console.log("element", element);
-
-                        rect.shape.setAttrs({
-                            fill: element.color,
-                            width: element.width,
-                            height: element.height,
-                            rotation: element.rotation,
-                            draggable: false
-                        })
-                        if (item.fixture_ID != 0) {
-                            rect.image.setAttrs({
-                                fill: element.color,
-                                width: element.width,
-                                height: element.height,
-                                rotation: element.rotation,
-                                draggable: false
-                            })
-                        }
-
-                    })
-
                 }
                 break;
 
@@ -766,8 +756,6 @@
             },
             drawSavedItems(menuItems, parentArr, parentLayerTree, callback) {
                 let self = this
-
-
                 menuItems.forEach((item, idx) => {
                     console.log("INSIDE LOOP");
                     switch (item.type) {
@@ -799,6 +787,11 @@
                                     self.selectedLayer = self.backgroundLayer
                                 }
                                 break;
+                            case "Building": {
+                                layer = self.buildingLayer
+                                layertreeitem = self.buildingLayerTree
+                            }
+                            break;
                             case "Fixtures": {
                                 layer = self.fixtureLayer
                                 layertreeitem = self.fixtureTree
@@ -859,7 +852,6 @@
                         self.DrawFixture(item, parentArr, parentLayerTree, cb => {
                             self.stage.batchDraw()
                         })
-
                     }
                     break;
 
@@ -896,18 +888,12 @@
                                 if (child.attrs.name != 'grid') {
                                     child.destroyChildren()
                                 }
-
                             })
-
-                            console.log("children", self.stage.children);
-                            // self.createBaseLayers(cb => {
-
-                            //  self.drawGrid()
                             self.drawSavedItems(r.data, self.stage, self.layerTree,
                                 cb => {
                                     console.log("LOOP CALLBACK");
                                     self.stage.batchDraw()
-                                    self.selectLayer(self.backgroundTree, self.layerTree)
+                                    self.selectLayer(self.fixtureTree, self.layerTree)
                                 })
                             self.Floorplan_ID = callback.id
                         })
@@ -969,6 +955,9 @@
                         if (item.attrs.name == "image") {
                             self.imageIDArr.push(item)
                         }
+                        //  if (item.attrs.name == "Label") {
+                        //     reqObj.label=item.attrs.text
+                        // }
                         parentArr.push(reqObj)
                         if (item.children.length > 0) {
                             self.FormatItems(item.children, reqObj.children, item.attrs.DropID, Floorplan_ID,
@@ -1033,7 +1022,10 @@
                 }
                 self.$refs.Prompt.show("", " Save FloorPlan", "Please enter floorplan name", Name => {
                     self.$refs.spinner.show()
-
+                    if (self.hasTape != null) {
+                        self.hasTape.destroy()
+                        self.hasTape = null
+                    }
 
                     let req = {
                         id: self.Floorplan_ID,
@@ -1088,28 +1080,29 @@
             },
             addShape(parent, item, idx, dropPos, callback) {
                 let self = this
-
-
                 let shape = JSON.parse(item.attributes)
+                console.log("sdhape", shape);
+                console.log("item", item);
+
                 console.log("x:" + shape.x + " y:" + shape.y);
                 switch (shape.name) {
-                    case "rect-group": {
+                    case "Gondola-Rect": {
                         let rect = new Rect(self.selectedLayer, {
-                            x: 0,
-                            y: 0,
+                            x: dropPos.x + (shape.x / 4),
+                            y: dropPos.y + (shape.y / 4)
                         }, null, null, null, self.imageSrc(item.floorplan_Fixture_ID,
                             "Top"));
 
-                        rect.shape.parent.saveID = item.id
-                        rect.shape.parent.guid = item.guid
-                        rect.shape.parent.attrs = shape
-                        rect.shape.parent.attrs.type = "PlanogramFixture"
-                        rect.shape.parent.setAttrs({
-                            x: dropPos.x + (shape.x / 4),
-                            y: dropPos.y + (shape.y / 4)
+                        rect.shape.saveID = item.id
+                        rect.shape.guid = item.guid
+                        // rect.shape.attrs = shape
+                        rect.shape.attrs.type = "PlanogramFixture"
+                        rect.shape.setAttrs({
+                            width: shape.width / 4,
+                            height: shape.height / 4
                         })
                         self.selectedLayerTree.children.push(new treeItem({
-                            KonvaID: rect.shape.parent._id,
+                            KonvaID: rect.shape._id,
                             visible: true,
                             showEditName: true,
                             selected: true,
@@ -1118,35 +1111,10 @@
                             name: "rect-group",
                             children: [],
                         }))
-                        item.children.forEach((child, idx) => {
-                            let childAttrs = JSON.parse(child.attributes)
-                            switch (childAttrs.name) {
-                                case "Gondola-Rect": {
-                                    if (idx == 0) {
-                                        rect.shape.attrs = childAttrs
-                                        rect.shape.saveID = child.id
-                                        rect.shape.guid = child.guid
-                                        rect.shape.setAttrs({
-                                            width: childAttrs.width / 4,
-                                            height: childAttrs.height / 4
-                                        })
-                                    } else {
-                                        rect.image.setAttrs({
-                                            width: childAttrs.width / 4,
-                                            height: childAttrs.height / 4
-                                        })
-                                        rect.image.saveID = child.id
-                                        rect.image.guid = child.guid
-                                    }
-                                }
-                                break;
-                                break;
-                            default:
-                                break;
-                            }
-                        })
-                        rect.shape.parent.moveTo(parent)
-                        rect.shape.parent.draggable(false)
+                        rect.shape.moveTo(parent)
+                        console.log("da rect", rect);
+
+                        rect.shape.draggable(false)
                     }
                     break;
                 case "circle": {
@@ -1180,7 +1148,7 @@
                         children: [],
                     }))
                     circle.shape.moveTo(parent)
-                    self.selectedLayer.draw()
+
                 }
                 break;
                 default:
@@ -1303,10 +1271,13 @@
                         self.selectedLayer.draw();
                         data.forEach((item, idx) => {
                             self.addShape(group, item, idx, dropPos, callback => {
-
+                                self.stage.batchDraw()
+                                self.departmentLayer.draw()
                             })
 
                         })
+                        self.selectLayer(self.departmentTree, self.layers)
+
                         self.selectedLayer = tmplayer
                         self.selectedLayerTree = tmplayertreeitem
                         self.stage.batchDraw()
@@ -1336,13 +1307,10 @@
                 self.stage._setPointerPosition(ev);
                 let dropPos = self.GetTransformedMousePoint(self.stage);
                 let rect = new Rect(self.fixtureLayer, {
-                    x: 0,
-                    y: 0,
-                }, null, null, self.brush);
-                rect.shape.parent.setAttrs({
                     x: dropPos.x,
                     y: dropPos.y
-                })
+                }, null, null);
+
                 self.fixtureTree.children.push(new treeItem({
                     KonvaID: rect.shape.parent._id,
                     visible: true,
@@ -1362,6 +1330,7 @@
                     height: height,
                     width: width
                 })
+                self.selectLayer(self.fixtureTree, self.layers)
                 self.stage.batchDraw()
 
             },
@@ -1414,43 +1383,29 @@
             },
             applyProperties(event) {
                 let self = this
-                self.makeChanges(callback => {
-                    self.stage.batchDraw()
+                self.$nextTick(() => {
+                    self.makeChanges(callback => {
+                        self.stage.batchDraw()
+                    })
                 })
+
             },
             makeChanges(callback) {
                 let self = this
-
-                if (self.selectedItem.attrs.name != "rect-group") {
-                    for (var prop in self.properties) {
-                        if (self.properties[prop] != null && prop != "name" && prop != "fill") {
-                            self.selectedItem.attrs[prop] = parseFloat(self.properties[prop])
-                        }
-                        self.selectedItem.attrs["fill"] = self.properties["fill"]
-
-                    }
-                    callback()
-                    self.stage.batchDraw()
-                } else {
-                    self.selectedItem.setAttrs({
-                        rotation: parseFloat(self.properties.rotation)
-                    })
-                    self.selectedItem.children.forEach(item => {
-                        for (var prop in self.properties) {
-                            if (self.properties[prop] != null && prop != "name" && prop !=
-                                "height" && prop !=
-                                "fill") {
-                                item.attrs[prop] = parseFloat(self.properties[prop])
-                            }
-                            item.attrs.height = parseFloat(self.properties["height"])
-                            item.attrs["fill"] = self.properties["fill"]
-                        }
-
-                    })
-                    callback()
-                    self.stage.batchDraw()
-                }
+                self.selectedItem.attrs.radius = parseFloat(self.properties.radius) * (self.meterRatio * self
+                    .floorConfig.blockRatio)
+                self.selectedItem.attrs.height = parseFloat(self.properties.height) * (self.meterRatio * self
+                    .floorConfig
+                    .blockRatio)
+                self.selectedItem.attrs.width = parseFloat(self.properties.width) * (self.meterRatio * self
+                    .floorConfig
+                    .blockRatio)
+                self.selectedItem.attrs.fill = self.properties.fill * (self.meterRatio * self.floorConfig
+                    .blockRatio)
+                self.selectedItem.attrs.rotation = parseFloat(self.properties.rotation)
+                self.selectedItem.attrs["fill"] = self.properties["fill"]
                 self.stage.batchDraw()
+                callback()
             },
             applyBrushProperties(tool) {
                 let self = this
@@ -1505,23 +1460,15 @@
                                 self.selectedLayerTreeItem = callback
                             })
                             console.log("self.selectedItem", self.selectedItem);
-
-                            if (self.selectedItem.attrs.name == "rect-group") {
-                                self.properties.name = self.selectedItem.children[0].attrs.name;
-                                self.properties.height = self.selectedItem.children[0].attrs.height;
-                                self.properties.width = self.selectedItem.children[0].attrs.width;
-                                self.properties.fill = self.selectedItem.children[0].attrs.fill;
-                                self.properties.radius = self.selectedItem.children[0].attrs.radius;
-                                self.properties.rotation = self.selectedItem.children[0].attrs.rotation;
-                            } else {
-                                self.properties.name = self.selectedItem.attrs.name;
-                                self.properties.height = self.selectedItem.attrs.height;
-                                self.properties.width = self.selectedItem.attrs.width;
-                                self.properties.fill = self.selectedItem.attrs.fill;
-                                self.properties.radius = self.selectedItem.attrs.radius;
-                                self.properties.rotation = self.selectedItem.attrs.rotation;
-                            }
-
+                            self.properties.name = self.selectedItem.attrs.name;
+                            self.properties.height = (self.selectedItem.attrs.height / (self.meterRatio *
+                                self.floorConfig.blockRatio)).toFixed(2);
+                            self.properties.width = (self.selectedItem.attrs.width / (self.meterRatio * self
+                                .floorConfig.blockRatio)).toFixed(2);
+                            self.properties.fill = self.selectedItem.attrs.fill;
+                            self.properties.radius = (self.selectedItem.attrs.radius / (self.meterRatio *
+                                self.floorConfig.blockRatio)).toFixed(2);
+                            self.properties.rotation = self.selectedItem.attrs.rotation;
                             var tr
                             if (self.selectedItem.attrs.name == "image") {
                                 tr = new Konva.Transformer({
@@ -1535,8 +1482,9 @@
                                 });
                             }
 
-                            if (self.selectedItem.attrs.name == "rect-group" || self.selectedItem.attrs.name ==
-                                "image") {
+                            if (self.selectedItem.attrs.name == "Gondola-Rect" || self.selectedItem.attrs
+                                .name ==
+                                "image" || self.selectedItem.attrs.name == "Label") {
                                 tr.rotateEnabled(true);
 
                             } else {
@@ -1554,7 +1502,8 @@
                             });
 
                             tr.on('transformend', function () {
-                                transFormerHelper.handleTransformEnd(self.selectedItem, self.properties)
+                                transFormerHelper.handleTransformEnd(self.selectedItem, self.properties,
+                                    (self.meterRatio * self.floorConfig.blockRatio))
                                 self.stage.batchDraw();
                             });
                         }
@@ -1680,12 +1629,56 @@
                         case "linear_scale":
                             self.snackbarText = "Drag a line then select an image to scale it"
                             self.snackbar = true
+                            self.addTapeMeasure()
 
                             break;
                         default:
                             break;
                     }
                 })
+            },
+            addTapeMeasure() {
+                let self = this
+                if (self.hasTape != null) {
+                    return
+                }
+                let image = new StageImage(self.selectedLayer, self.imagePos);
+
+                self.selectedLayerTree.children.push(new treeItem({
+                    KonvaID: image.shape._id,
+                    visible: true,
+                    showEditName: true,
+                    selected: true,
+                    showChildren: true,
+                    draggable: true,
+                    name: "Tape",
+                    children: [],
+                }))
+                console.log("addimage", image.shape.attrs.refFile);
+
+                var imageObj = new Image();
+
+                imageObj.onload = function () {
+                    image.shape.image(imageObj);
+                    self.selectedLayer.draw();
+                    self.onToolChange("open_with")
+                    self.imagePos.x = 0
+                    self.imagePos.y = 0
+
+                    // self.selectedTool = ''
+                    image.shape.draggable(true)
+                    image.shape.attrs.width = parseFloat(self.meterRatio) * parseFloat(self.floorConfig
+                        .blockRatio) * 10
+                    image.shape.attrs.height = parseFloat(self.meterRatio) * parseFloat(self.floorConfig
+                        .blockRatio) * 2
+                    image.shape.attrs.name = "Tape"
+                    self.stage.batchDraw()
+
+                }
+                imageObj.src = "/tapeMeasureTool.png";
+                self.hasTape = image
+                console.log(image);
+
             },
             swapIndex(item, layers, idx) {
                 let self = this
@@ -1912,7 +1905,7 @@
                 let self = this;
 
                 self.$nextTick(() => {
-                    console.log("selectedLayer", self.selectedLayer);
+                  //  console.log("selectedLayer", self.selectedLayer);
 
                     self.selectedLayer.children.forEach(child => {
 
@@ -1933,21 +1926,24 @@
                             })
                         }
                         layer.selected = true;
-                        console.log("select layer", self.selectedLayer);
+                    //    console.log("select layer", self.selectedLayer);
 
                         self.selectedLayer.children.forEach(child => {
                             child.draggable(true)
                         })
                     })
+                    if (self.hasTape != null) {
+                        self.hasTape.attrs.draggable = true
+                    }
                     self.stage.batchDraw()
                 })
             },
             duplicateDrag(e) {
                 let self = this
                 let duplicationHelper = new DuplicationHelper();
-
+                let layerTree
                 switch (e.target.attrs.name) {
-                    case "rect-group":
+                    case "Gondola-Rect":
                         duplicationHelper.DuplicateRectGroupDrag(e.target, self.selectedLayer, self
                             .selectedLayerTree)
 
@@ -2078,6 +2074,8 @@
                 if (!item.attrs.draggable) {
                     return
                 }
+                console.log("[MUTLISELECT]");
+
                 let multiSelectHelper = new MultiSelectHelper()
                 multiSelectHelper.handleMultiselect(self.multiSelectGroup, self.selectedLayer, item, callback => {
                     self.multiSelectGroup = callback
@@ -2095,14 +2093,10 @@
                     //     self.dotted.shape.destroy()
                     //     self.dotted = null
                     // }
-                    if (e.target != self.stage) {
-                        if (e.target.parent.attrs.name == "rect-group") {
-                            console.log('inhere');
-
-                            e.target = e.target.parent
-                        }
+                    if (e.target.attrs.name == "Tape") {
+                        e.target.draggable(true)
                     }
-                    console.log(e.target.attrs);
+                    console.log(e.target);
                     // if (self.propertiesLabelHorizontal != null) {
                     //     self.propertiesLabelHorizontal.destroy()
                     //     self.propertiesLabelHorizontal = null
@@ -2138,22 +2132,23 @@
                                 self.selectedLayerTreeItem = callback
                             })
 
-                            if (self.selectedItem.attrs.name == "rect-group") {
-                                self.properties.name = self.selectedItem.children[0].attrs.name;
-                                self.properties.height = self.selectedItem.children[0].attrs.height;
-                                self.properties.width = self.selectedItem.children[0].attrs.width;
-                                self.properties.fill = self.selectedItem.children[0].attrs.fill;
-                                self.properties.rotation = self.selectedItem.children[0].attrs.rotation;
-                            } else {
-                                self.properties.name = self.selectedItem.attrs.name;
-                                self.properties.height = self.selectedItem.attrs.height;
-                                self.properties.width = self.selectedItem.attrs.width;
-                                self.properties.fill = self.selectedItem.attrs.fill;
-                                self.properties.radius = self.selectedItem.attrs.radius;
-                                self.properties.rotation = self.selectedItem.attrs.rotation;
 
-                            }
+                            console.log(self.floorConfig.blockRatio, self.meterRatio, self.selectedItem
+                                .attrs.height);
+
+                            self.properties.name = self.selectedItem.attrs.name;
+                            self.properties.height = (self.selectedItem.attrs.height / (self.floorConfig
+                                .blockRatio * self.meterRatio)).toFixed(2);
+                            self.properties.width = (self.selectedItem.attrs.width / (self.floorConfig
+                                .blockRatio * self.meterRatio)).toFixed(2);
+                            self.properties.fill = self.selectedItem.attrs.fill;
+                            self.properties.radius = (self.selectedItem.attrs.radius / (self.floorConfig
+                                .blockRatio * self.meterRatio)).toFixed(2);
+                            self.properties.rotation = self.selectedItem.attrs.rotation;
+
                             var tr
+
+
                             if (self.selectedItem.attrs.name == "image") {
                                 tr = new Konva.Transformer({
                                     enabledAnchors: ['top-left', 'top-right', 'bottom-left',
@@ -2166,18 +2161,25 @@
                                 });
                             }
 
+                            if (self.selectedItem.attrs.name == "Tape") {
+                                tr = new Konva.Transformer({
+                                    enabledAnchors: [],
+                                });
+                            }
 
-                            if (self.selectedItem.attrs.name == "rect-group" || self.selectedItem.attrs.name ==
-                                "image") {
+
+                            if (self.selectedItem.attrs.name == "Gondola-Rect" || self.selectedItem.attrs
+                                .name ==
+                                "image" || self.selectedItem.attrs
+                                .name == "Tape") {
                                 tr.rotateEnabled(true);
 
                             } else {
                                 tr.rotateEnabled(false);
                             }
-
                             self.selectedLayer.add(tr);
-
                             tr.attachTo(e.target);
+
                             self.selectedLayer.draw();
                             tr.on('transform', function (z) {
                                 transFormerHelper.handleTransform(e.target, z, self.handleSnapping, self
@@ -2188,7 +2190,8 @@
                             });
 
                             tr.on('transformend', function () {
-                                transFormerHelper.handleTransformEnd(self.selectedItem, self.properties)
+                                transFormerHelper.handleTransformEnd(self.selectedItem, self.properties,
+                                    (self.floorConfig.blockRatio * self.meterRatio))
                                 self.stage.batchDraw();
                             });
                         }
@@ -2217,8 +2220,8 @@
 
                 self.stage.on('contentMousedown', function () {
 
-                    dragHandler.handleContentMousedown(self.backgroundLayer, self.stage, self.firstPosition,
-                        self.lastPosition, self.selectedTool, self.backgroundTree, self.selectImage,
+                    dragHandler.handleContentMousedown(self.buildingLayer, self.stage, self.firstPosition,
+                        self.lastPosition, self.selectedTool, self.buildingLayerTree, self.selectImage,
                         isPaint,
                         self.wall, self.rect, self.circle, self.image, self.arrow, self.arrowStartY, self
                         .arrowStartX, self.textNode, self.brush, self, self.dotted, callback => {
@@ -2282,7 +2285,7 @@
 
                 self.stage.on('dragmove', function (e) {
                     if (self.selectedTool == "open_with") {
-                        self.handleSnapping(e.target)
+                        // self.handleSnapping(e.target)
                     }
                 });
                 self.stage.on('dragstart', (e) => {
@@ -2409,6 +2412,9 @@
                         case "Delete":
                             if (self.selectedItem != null) {
                                 let tmpItem = null
+                                if (self.selectedItem.attrs.name == "Tape") {
+                                    self.hasTape = null
+                                }
                                 self.lastdeletedItem.unshift(self.selectedItem)
                                 deleteTreeItem(self.layerTree, self.selectedItem._id, self)
                                 self.selectedItem.parent.children.forEach((element, idx) => {
@@ -2423,7 +2429,7 @@
                                 if (self.lastDeletedTree.length > 50) {
                                     self.lastDeletedTree.splice(50, 1)
                                 }
-                                self.selectedLayer.draw();
+                                self.stage.batchDraw();
                                 self.selectedItem = null;
                                 for (var prop in self.properties) {
                                     self.properties[prop] = null
@@ -2471,6 +2477,19 @@
                     self.stage.batchDraw()
                 })
             },
+            setItemVisible(layer) {
+                let self = this;
+                self.findKonvaItem([self.stage], layer.KonvaID, callback => {
+                    layer.visible = !layer.visible
+                    if (callback.attrs.visible) {
+
+                        callback.hide();
+                    } else {
+                        callback.show();
+                    }
+                    self.stage.batchDraw()
+                })
+            },
             deleteLayer(layer, parent, idx) {
                 let self = this;
                 self.findKonvaItem(self.stage.children, layer.KonvaID, callback => {
@@ -2491,20 +2510,26 @@
                     return;
                 }
                 switch (self.selectedItem.attrs.name) {
-                    case "rect-group":
+                    case "Gondola-Rect":
                         duplicationHelper.DuplicateRectGroup(self.selectedItem, self.selectedLayer, self
-                            .selectedLayerTree, direction, self.duplicationSequence)
+                            .selectedLayerTree, direction, self.duplicationSequence, callback => {
+                                self.selectLayer(callback, self.layers)
+                            })
 
                         break;
 
                     case "circle":
                         duplicationHelper.DuplicateCircle(self.selectedItem, self.selectedLayer, self
-                            .selectedLayerTree, direction, self.duplicationSequence)
+                            .selectedLayerTree, direction, self.duplicationSequence, callback => {
+                                self.selectLayer(callback, self.layers)
+                            })
 
                         break;
                     case "wall":
                         duplicationHelper.DuplicateWall(self.selectedItem, self.selectedLayer, self
-                            .selectedLayerTree, direction, self.duplicationSequence)
+                            .selectedLayerTree, direction, self.duplicationSequence, callback => {
+                                self.selectLayer(callback, self.layers)
+                            })
                         break;
 
                     default:
@@ -2634,7 +2659,7 @@
                     name: 'Background',
                     visible: true,
                     selected: true,
-                    showChildren: true,
+                    showChildren: false,
                     drawType: "Layer",
                     type: "Layer"
                 });
@@ -2644,19 +2669,35 @@
                     name: 'Background',
                     visible: true,
                     selected: true,
-                    showChildren: true,
+                    showChildren: false,
                     drawType: "Layer"
                 })
                 self.layerTree.push(tmplayertree)
                 self.selectedLayerTree = tmplayertree
                 self.selectedLayer = startLayer
                 self.layers.unshift(startLayer);
-
+                let buildingLayer = new Konva.Layer({
+                    name: 'Building',
+                    visible: true,
+                    selected: true,
+                    showChildren: false,
+                    drawType: "Layer",
+                    type: "Layer"
+                });
+                let buildinglayertree = new treeItem({
+                    KonvaID: buildingLayer._id,
+                    children: [],
+                    name: 'Building',
+                    visible: true,
+                    selected: true,
+                    showChildren: false,
+                    drawType: "Layer"
+                })
                 let DepartmentLayer = new Konva.Layer({
                     name: 'Departments',
                     visible: true,
                     selected: true,
-                    showChildren: true,
+                    showChildren: false,
                     drawType: "Layer",
                     type: "Layer"
                 });
@@ -2666,7 +2707,7 @@
                     name: 'Departments',
                     visible: true,
                     selected: false,
-                    showChildren: true,
+                    showChildren: false,
                     drawType: "Layer"
                 })
 
@@ -2674,7 +2715,7 @@
                     name: 'Fixtures',
                     visible: true,
                     selected: true,
-                    showChildren: true,
+                    showChildren: false,
                     drawType: "Layer",
                     type: "Layer"
                 });
@@ -2684,7 +2725,7 @@
                     name: 'Fixtures',
                     visible: true,
                     selected: false,
-                    showChildren: true,
+                    showChildren: false,
                     drawType: "Layer"
                 })
                 self.fixtureLayer = FixtureLayer
@@ -2693,10 +2734,14 @@
                 self.departmentLayer = DepartmentLayer
                 self.departmentTree = Depttree
                 self.backgroundTree = tmplayertree
+                self.buildingLayer = buildingLayer
+                self.buildingLayerTree = buildinglayertree
+                self.layerTree.push(buildinglayertree)
                 self.layerTree.push(FixtureTree)
                 self.layerTree.push(Depttree)
 
                 self.stage.add(startLayer);
+                self.stage.add(buildingLayer);
                 self.stage.add(FixtureLayer);
                 self.stage.add(DepartmentLayer);
                 callback()

@@ -42,8 +42,11 @@
                 @drop="endgroupDrag(layer,layers,idx)" v-on:dragstart="dragStart(layer,idx,layers)"
                 v-if="(layer.drawType!='Layer'&&layer.drawType!='group')">
                 <div class="pa-1 grey lighten-3" style="display: flex;">
-                    <div :class="{ 'highlighted': selectedLayerTreeItem == layer  }">{{ layer.name }}
+                    <div :class="{ 'highlighted': selectedLayerTreeItem == layer  }" style="width: 80%">{{ layer.name }}
                     </div>
+                     <v-icon :size="22" @click="setItemVisible(layer)" color="grey darken-2">
+                    {{ layer.visible ? 'visibility' : 'visibility_off' }}</v-icon>
+                    
                 </div>
                 <v-divider></v-divider>
             </div>
@@ -53,7 +56,7 @@
                 v-if="((layer.children.length!=0||layer.drawType=='group')&&dragging==false&&layer.collapsed!=true)"
                 :layers="layer.children" :selectLayer="selectLayer" :selectedLayerTree="selectedLayerTree"
                 :setLayerVisible="setLayerVisible" :deleteLayer="deleteLayer" :showChild="layer.selected"
-                :endDrag="endDrag" :startDrag="startDrag" :swapIndex="swapIndex" :editLayerName="editLayerName"
+                :endDrag="endDrag" :startDrag="startDrag" :swapIndex="swapIndex" :editLayerName="editLayerName" :setItemVisible="setItemVisible"
                 :selectItemFromSidePanel="selectItemFromSidePanel" />
         </div>
     </div>
@@ -62,7 +65,7 @@
     export default {
         props: ["layers", "selectLayer", "setLayerVisible", "deleteLayer", "showChild", "startDrag", "endDrag",
             "selectedLayer", "editLayerName", "selectedLayerTree", "selectedLayerTreeItem", "toggleLock",
-            "swapIndex", "selectItemFromSidePanel"
+            "swapIndex", "selectItemFromSidePanel","setItemVisible"
         ],
         name: "RecursiveLayer",
         data() {

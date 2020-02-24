@@ -277,16 +277,10 @@
                             width: item.width,
                             height: item.height
                         })
-                        rect.line.setAttrs({
-                            width: item.width,
-                        })
-                        rect.image.setAttrs({
-                            width: item.width,
-                            height: item.height,
-                        })
+
                         console.log("rect", rect);
 
-                        rect.shape.parent.attrs.DropID = item.id.toString()
+                        rect.shape.attrs.DropID = item.id.toString()
                     }
                 })
                 self.stage.batchDraw()
@@ -336,11 +330,10 @@
             addStageEvents() {
                 let self = this
                 self.stage.on('click tap', function (e) {
-                    if (e.target.attrs.name == "front-Line" || e.target.attrs.name == "Gondola-Rect") {
-                        e.target = e.target.parent
+                    if (e.target.attrs.name == "Circle" || e.target.attrs.name == "Gondola-Rect") {
                         self.selectedItem = e.target
                         console.log("self.selectedItem", self.selectedItem);
-
+                        self.selectedItem.draggable(true)
                         self.findDrop(e.target, callback => {
                             self.selectedFixtures = callback
                         })
@@ -569,55 +562,21 @@
 
                 let shape = JSON.parse(item.attributes)
                 switch (shape.name) {
-                    case "rect-group": {
+                    case "Gondola-Rect": {
                         let rect = new Rect(parent, {
-                            x: 0,
-                            y: 0,
-                        }, null, null, null, self.imageSrc(item.floorplan_Fixture_ID,
-                            "Top"));
-                        rect.shape.parent.setAttrs({
                             x: shape.x,
                             y: shape.y
+                        }, null, null, null, self.imageSrc(item.floorplan_Fixture_ID,
+                            "Top"));
+
+                        rect.shape.saveID = item.id
+                        rect.shape.guid = item.guid
+                        rect.shape.setAttrs({
+                            width: shape.width,
+                            height: shape.height
                         })
-                        rect.shape.parent.saveID = item.id
-                        rect.shape.parent.guid = item.guid
-                        rect.shape.parent.attrs = shape
-                        item.children.forEach((child, idx) => {
+                        // rect.shape.attrs = shape
 
-                            let childAttrs = JSON.parse(child.attributes)
-                            switch (childAttrs.name) {
-                                case "Gondola-Rect": {
-                                    if (idx == 0) {
-                                        rect.shape.attrs = childAttrs
-                                        rect.shape.saveID = child.id
-                                        rect.shape.guid = child.guid
-
-                                    } else {
-                                        console.log("[IMAGE]", childAttrs);
-                                        rect.image.setAttrs({
-                                            width: childAttrs.width,
-                                            height: childAttrs.height
-                                        })
-                                        rect.image.saveID = child.id
-                                        rect.image.guid = child.guid
-                                    }
-
-                                }
-
-                                break;
-                            case "front-Line": {
-                                rect.line.attrs = childAttrs
-                                rect.line.saveID = child.id
-                                rect.line.guid = child.guid
-                            }
-
-                            break;
-
-                            default:
-                                break;
-                            }
-
-                        })
                     }
                     break;
                 case "circle": {
@@ -655,15 +614,10 @@
                 self.getSavedData(cb.id, data => {
                     console.log('[GETSAVEDDATA]', data);
                     data.forEach(item => {
-                        self.addShape(self.selectedLayer, item, callback => {
-
-                        })
-
+                        self.addShape(self.selectedLayer, item, callback => {})
                     })
-
                     self.stage.batchDraw()
                     self.$refs.spinner.hide()
-
                 })
             },
             getSavedData(header, callback) {
@@ -710,6 +664,7 @@
                                 })
                                 circle.shape.attrs.DropID = element.id.toString()
                                 lastPos = circle.shape.attrs.x + element.width
+                                circle.shape.draggable(true)
 
                             } else {
                                 element.shape = "Square"
@@ -722,25 +677,25 @@
                                 rect.shape.setAttrs({
                                     width: element.width,
                                     height: element.height,
+                                    draggable: true
                                 })
-                                rect.shape.parent.setAttrs({
+                                rect.shape.setAttrs({
                                     x: lastPos + widthInc,
                                     y: 50
                                 })
-                                rect.line.setAttrs({
-                                    width: element.width,
-                                })
-                                rect.image.setAttrs({
+
+                                rect.shape.setAttrs({
                                     width: element.width,
                                     height: element.height,
                                 })
                                 console.log("rect", rect);
-                                rect.shape.parent.attrs.DropID = element.id
+                                rect.shape.attrs.DropID = element.id
                                     .toString()
                                 lastPos = rect.shape.attrs.x + element.width
+                                rect.shape.draggable(true)
+
                             }
                             widthInc = element.width
-
                             self.snapableItems.push("." + element.id.toString())
                             self.stage.batchDraw()
                             self.$refs.spinner.hide()

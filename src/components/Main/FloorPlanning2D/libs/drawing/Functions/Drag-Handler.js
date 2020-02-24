@@ -15,7 +15,7 @@ class DragHandler {
     constructor() {}
     handleContentMousedown(SelectedLayer, stage, firstPosition, lastPosition, selectedTool, SelectedLayerTree, selectImage, isPaint, wall, rect, circle, image, arrow, arrowStartY, arrowStartX, textNode, brush, vueCtx, dotted, callback) {
 
-        if (SelectedLayer.attrs.visible == false) {
+        if (SelectedLayer.attrs.visible == false && selectedTool != "open_with") {
             alert("cannot draw on invisible layer")
             return
         }
@@ -85,8 +85,8 @@ class DragHandler {
         break;
         case "crop_square": {
             rect = new Rect(SelectedLayer, {
-                x:0 ,
-                y:0 ,
+                x: firstPosition.x,
+                y: firstPosition.y
             }, null, null, brush);
             SelectedLayerTree.children.push(new treeItem({
                 KonvaID: rect.shape.parent._id,
@@ -98,11 +98,6 @@ class DragHandler {
                 name: "rect-group",
                 children: [],
             }))
-            rect.shape.parent.setAttrs({
-                x: firstPosition.x,
-                y: firstPosition.y
-            })
-
         }
         break;
         case "fiber_manual_record": {
@@ -123,10 +118,6 @@ class DragHandler {
             }))
         }
         break;
-        // case "image": {
-        //     selectImage()
-        // }
-        // break;
         case "local_offer": {
             textNode = new Label(SelectedLayer, {
                 x: firstPosition.x,
@@ -199,21 +190,21 @@ class DragHandler {
         }
         break;
         case "linear_scale": {
-            dotted = new Line(SelectedLayer, {
-                x: firstPosition.x,
-                y: firstPosition.y,
-                name: 'wall',
-                drawType: 'wall'
-            }, {
-                height: 2,
-                color: "#1976d2"
-            })
-            dotted.shape.setAttrs({
-                stroke: 'black',
-                strokeWidth: 1,
-                dash: [10, 10],
-                name: "dotted"
-            })
+            // dotted = new Line(SelectedLayer, {
+            //     x: firstPosition.x,
+            //     y: firstPosition.y,
+            //     name: 'wall',
+            //     drawType: 'wall'
+            // }, {
+            //     height: 2,
+            //     color: "#1976d2"
+            // })
+            // dotted.shape.setAttrs({
+            //     stroke: 'black',
+            //     strokeWidth: 1,
+            //     dash: [10, 10],
+            //     name: "dotted"
+            // })
         }
         break;
         default:
@@ -247,13 +238,24 @@ class DragHandler {
         var deg = rad * (180 / Math.PI);
         switch (selectedTool) {
             case "show_chart":
-                // wall.shape.width(hyp);
+                if (wall.shape.attrs.width < 10) {
+                    wall.shape.width(10);
+                }
+
                 break;
             case "crop_square":
+                if (rect.shape.attrs.width < 5) {
+                    rect.shape.width(5);
+                    rect.shape.height(5);
+                }
                 // rect.shape.width(hyp);
                 break;
 
             case "fiber_manual_record":
+                if (circle.shape.attrs.width < 5) {
+                    circle.shape.width(5);
+                    circle.shape.height(5);
+                }
                 // circle.shape.width(hyp);
                 break;
             case "arrow_upward":
@@ -332,9 +334,9 @@ class DragHandler {
                 transformProperties.width = rect.shape.width()
                 transformProperties.height = rect.shape.height()
                 if (!ctrlDown) {
-                    rect.shape.rotation(deg);
+                    // rect.shape.rotation(deg);
                 } else {
-                 //   handleSnapping(rect.shape)
+                    //   handleSnapping(rect.shape)
                     let updateDegrees = false;
                     let snappedAngle = 0;
                     let tolerance = brush.snapOption * 0.45;
@@ -350,7 +352,7 @@ class DragHandler {
                     })
 
                     if (updateDegrees) {
-                        rect.shape.rotation(snappedAngle);
+                        // rect.shape.rotation(snappedAngle);
                     }
 
                 }
@@ -396,7 +398,7 @@ class DragHandler {
             case "fiber_manual_record":
                 circle.shape.width(hyp);
                 transformProperties.radius = circle.shape.width()
-             //   handleSnapping(circle.shape)
+                //   handleSnapping(circle.shape)
                 break;
             case "local_offer":
                 textNode.shape.width(hyp);
@@ -424,7 +426,7 @@ class DragHandler {
                 break;
             case "linear_scale": {
                 dotted.shape.width(hyp);
-            //    handleSnapping(dotted.shape)
+                //    handleSnapping(dotted.shape)
                 if (!ctrlDown) {
                     dotted.shape.rotation(deg);
                 } else {
