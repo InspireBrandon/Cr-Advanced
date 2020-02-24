@@ -63,8 +63,6 @@
                     var camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 1, -15), scene);
                     scene.activeCamera = camera;
                     scene.activeCamera.attachControl(canvas);
-                    scene.activeCamera.keysUp.push(87);
-                    scene.activeCamera.k.push(87);
 
                     // var camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, new BABYLON
                     //     .Vector3(
@@ -85,6 +83,9 @@
                         subdivisions: 60
                     }, scene, false);
 
+                    myGround.position.x = (50 / 2);
+                    myGround.position.z = (30 / 2);
+
                     myGround.receiveShadows = true;
                     myGround.checkCollisions = true;
                     myGround.material = myMaterial;
@@ -100,7 +101,7 @@
                             depth: element.height / pxlToMeterRatio
                         }, scene);
                         box.position.x = element.x / pxlToMeterRatio;
-                        box.position.y = 0;
+                        box.position.y = (element.depth / pxlToMeterRatio) / 2;
                         box.position.z = element.y / pxlToMeterRatio;
 
                         setTimeout(() => {
@@ -131,7 +132,7 @@
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.get(process.env.VUE_APP_API + `FloorplanItems/3D?headerID=${41}`)
+                Axios.get(process.env.VUE_APP_API + `FloorplanItems/3D?headerID=${43}`)
                     .then(r => {
                         callback(r.data);
                     })
