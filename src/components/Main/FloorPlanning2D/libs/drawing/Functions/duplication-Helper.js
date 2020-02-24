@@ -319,7 +319,8 @@ class DuplicationHelper {
                 .scaleX().toFixed(2),
             scaleX: 1,
             scaleY: 1,
-            rotation: SelectedItem.attrs.rotation
+            rotation: SelectedItem.attrs.rotation,
+            depth:SelectedItem.attrs.depth
         })
         SelectedItem.moveTo(group)
         Layer.draw()
@@ -354,6 +355,7 @@ class DuplicationHelper {
                 .scaleY().toFixed(2),
             width: SelectedItem.width() * SelectedItem
                 .scaleX().toFixed(2),
+            depth:SelectedItem.attrs.depth,
             scaleX: 1,
             scaleY: 1,
             rotation: SelectedItem.rotation()
