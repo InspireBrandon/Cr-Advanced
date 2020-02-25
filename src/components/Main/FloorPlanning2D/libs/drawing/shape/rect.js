@@ -61,6 +61,8 @@ class Rect extends Shape {
                 
             }
             imageObj.onerror = function() {
+                console.log("imageerror");
+                
                 self.shape.fill('#1976d2');
                 self.parent.draw();
             }
@@ -71,7 +73,7 @@ class Rect extends Shape {
                 y: config.y,
                 height: parseFloat(brush.height),
                 width: parseFloat(brush.width),
-                fill: "#1976d2",
+                fill: brush.color,
                 draggable: true,
                 visible: 'inherit',
                 enabledAnchors: self.enabledAnchors,

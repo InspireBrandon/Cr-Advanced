@@ -188,16 +188,24 @@
 
                                 <v-text-field @change="applyProperties" v-if="properties.name!=null" label="Name"
                                     v-model="properties.name" hide-details> </v-text-field>
-                                <v-text-field v-if="properties.height!=null&&properties.height!=NaN&&properties.height!=undefined"
+                                <v-text-field
+                                    v-if="properties.height!=null&&properties.height!=NaN&&properties.height!=undefined"
                                     @change="applyProperties" type="number" label="Height" v-model="properties.height"
                                     hide-details>
                                 </v-text-field>
-                                <v-text-field v-if="properties.width!=null&&properties.width!=NaN&&properties.height!=undefined"
+                                <v-text-field
+                                    v-if="properties.width!=null&&properties.width!=NaN&&properties.height!=undefined"
                                     @change="applyProperties" type="number" label="Width" v-model="properties.width"
                                     hide-details>
                                 </v-text-field>
-                                <v-text-field v-if="properties.radius!=null&&properties.radius!=NaN&&properties.height!=undefined"
+                                <v-text-field
+                                    v-if="properties.radius!=null&&properties.radius!=NaN&&properties.height!=undefined"
                                     @change="applyProperties" type="number" label="Radius" v-model="properties.radius"
+                                    hide-details>
+                                </v-text-field>
+                                <v-text-field
+                                    v-if="properties.depth!=null&&properties.depth!=NaN&&properties.depth!=undefined"
+                                    @change="applyProperties" type="number" label="Depth" v-model="properties.depth"
                                     hide-details>
                                 </v-text-field>
                                 <v-text-field @change="applyProperties" type="number" label="rotation"
@@ -464,7 +472,7 @@
                     name: "",
                     radius: null,
                     height: null,
-                    depth:null,
+                    depth: null,
                     width: null,
                     fill: "#1976d2",
                     rotation: null,
@@ -966,6 +974,9 @@
                         self.selectedClusterType = "cluster"
                         self.selectedClusterOption = callback.storeCluster_ID
                     }
+                    self.floorConfig.blockRatio = callback.blockWidth
+                    self.floorConfig.floorHeight = callback.height
+                    self.floorConfig.floorWidth = callback.width
                     axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                     axios.get(process.env.VUE_APP_API + `GetFloorPlanItems?Header_ID=${callback.id}`).then(
@@ -1496,7 +1507,7 @@
                     .blockRatio)
                 self.selectedItem.attrs.fill = self.properties.fill * (self.meterRatio * self.floorConfig
                     .blockRatio)
-                     self.selectedItem.attrs.depth = self.properties.depth * (self.meterRatio * self.floorConfig
+                self.selectedItem.attrs.depth = self.properties.depth * (self.meterRatio * self.floorConfig
                     .blockRatio)
                 self.selectedItem.attrs.rotation = parseFloat(self.properties.rotation)
                 self.selectedItem.attrs["fill"] = self.properties["fill"]
@@ -1562,9 +1573,10 @@
                             self.properties.width = (self.selectedItem.attrs.width / (self.meterRatio * self
                                 .floorConfig.blockRatio)).toFixed(2);
                             self.properties.fill = self.selectedItem.attrs.fill;
-                            self.properties.depth = sel.selectedItem.attrs.depth / (self.selectedItem.attrs.radius / (self.meterRatio *
-                                self.floorConfig.blockRatio)).toFixed(2);
-                            
+                            self.properties.depth = sel.selectedItem.attrs.depth / (self.selectedItem.attrs
+                                .radius / (self.meterRatio *
+                                    self.floorConfig.blockRatio)).toFixed(2);
+
                             self.properties.radius = (self.selectedItem.attrs.radius / (self.meterRatio *
                                 self.floorConfig.blockRatio)).toFixed(2);
                             self.properties.rotation = self.selectedItem.attrs.rotation;
@@ -2240,7 +2252,7 @@
                     if (e.target.attrs.name == "Tape") {
                         e.target.draggable(true)
                     }
-                    console.log("target",e.target);
+                    console.log("target", e.target);
                     // if (self.propertiesLabelHorizontal != null) {
                     //     self.propertiesLabelHorizontal.destroy()
                     //     self.propertiesLabelHorizontal = null
@@ -2292,9 +2304,9 @@
                             self.properties.radius = (self.selectedItem.attrs.radius / (self.floorConfig
                                 .blockRatio * self.meterRatio)).toFixed(2);
                             self.properties.rotation = self.selectedItem.attrs.rotation;
-                            self.properties.depth = self.selectedItem.attrs.depth /((self.floorConfig
+                            self.properties.depth = self.selectedItem.attrs.depth / ((self.floorConfig
                                 .blockRatio * self.meterRatio)).toFixed(2);
-                           
+
 
                             var tr
 
