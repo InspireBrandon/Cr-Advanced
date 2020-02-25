@@ -95,7 +95,7 @@
             </v-tooltip>
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
-                    <v-btn v-on="on" icon @click="$refs.threeD.show()">
+                    <v-btn v-on="on" icon @click="$refs.threeD.show(Floorplan_ID)">
                         3D
                     </v-btn>
                 </template>
