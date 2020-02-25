@@ -24,6 +24,8 @@
     import Axios from 'axios'
     const pxlToMeterRatio = 25;
 
+    let scene, canvas;
+
     export default {
         data() {
             return {
@@ -34,6 +36,7 @@
                 selectedCamera: null,
                 startingPoint: null,
                 currentMesh: null,
+                cameraType: 'free',
             }
         },
         mounted() {
@@ -53,14 +56,14 @@
             draw(items) {
                 let self = this;
 
-                var canvas = document.getElementById("renderCanvas"); // Get the canvas element 
+                canvas = document.getElementById("renderCanvas"); // Get the canvas element 
                 var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
 
                 /******* Add the create scene function ******/
                 var createScene = function () {
 
                     // Create the scene space
-                    var scene = new BABYLON.Scene(engine);
+                    scene = new BABYLON.Scene(engine);
 
                     // Add a camera to the scene and attach it to the canvas
                     var camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 1, -15), scene);
@@ -70,7 +73,10 @@
                     //camera.position.x = ;
                     //camera.position.x = (50 / 2);
                     //camera.position.z = (30 / 2);
-                    camera.position.y = 1.5;
+                    camera.position.x = 50 / 2;
+                    camera.position.z = -30;
+                    camera.position.y = 20;
+                    camera.rotation.x = degreesToRadians(45)
 
                     // var camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, new BABYLON
                     //     .Vector3(
@@ -131,8 +137,12 @@
                     myGround.checkCollisions = true;
 
                     items.forEach((element, idx) => {
-                        if (element.name == "Gondola-Rect") {
+                        if (element.name == "Gondola-Rect" && element.color == null) {
                             self.buildShelf(scene, element);
+                        }
+
+                        if (element.name == "Gondola-Rect" && element.color != null) {
+                            self.buildWall(scene, element);
                         }
 
                         if (element.name == "wall") {
@@ -172,10 +182,8 @@
                 var material = new BABYLON.StandardMaterial("material", scene);
                 material.diffuseTexture = new BABYLON.Texture("wall-white.jpg", scene);
 
-                console.log("depth", element.depth)
-
                 var box = BABYLON.MeshBuilder.CreateBox("box", {
-                    height: 80 / pxlToMeterRatio,
+                    height: element.depth / pxlToMeterRatio,
                     width: element.width / pxlToMeterRatio,
                     depth: element.height / pxlToMeterRatio
                 }, scene);
@@ -183,7 +191,7 @@
                 box.position.x = ((element.x + (0.5 * element.width)) / pxlToMeterRatio);
                 box.position.z = -((element.y + (0.5 * (element.height / 10))) /
                     pxlToMeterRatio);
-                box.position.y = (30 / pxlToMeterRatio) / 2;
+                box.position.y = (element.depth / pxlToMeterRatio) / 2;
 
                 // add rotation
                 let xPivot = -((element.width / 2) / pxlToMeterRatio);
@@ -289,6 +297,26 @@
                 shelf1.material = material;
                 shelf2.material = material;
                 shelf3.material = material;
+            },
+            switchCameraType() {
+                let self = this;
+
+                if(self.cameraType == "free") {
+
+                }
+                else {
+                    var camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 1, -15), scene);
+                    scene.activeCamera = camera;
+                    scene.activeCamera.attachControl(canvas);
+
+                    //camera.position.x = ;
+                    //camera.position.x = (50 / 2);
+                    //camera.position.z = (30 / 2);
+                    camera.position.x = 50 / 2;
+                    camera.position.z = -30;
+                    camera.position.y = 20;
+                    camera.rotation.x = degreesToRadians(45)
+                }
             }
         }
     }
