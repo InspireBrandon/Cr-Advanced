@@ -42,6 +42,7 @@ class Rect extends Shape {
                 visible: 'inherit',
                 x: config.x,
                 y: config.y,
+                
                 height: parseFloat(brush.height),
                 width: parseFloat(brush.width),
                 draggable: true
@@ -50,7 +51,8 @@ class Rect extends Shape {
 
             imageObj.onload = function () {
                 self.shape.image(imageObj);
-
+                self.shape.attrs.keepAspectRatio=true
+                self.shape.attrs.enabledAnchors= self.enabledAnchors
                 if (stage != null && stage != undefined) {
 
                     stage.batchDraw()

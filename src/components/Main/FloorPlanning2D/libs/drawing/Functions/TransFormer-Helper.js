@@ -124,9 +124,9 @@ class TransFormerHelper {
                 }
                 selectedItem.setAttrs({
                     height: selectedItem.height() * selectedItem
-                        .scaleY().toFixed(2),
+                        .scaleY(),
                     width: selectedItem.width() * selectedItem
-                        .scaleX().toFixed(2),
+                        .scaleX(),
                     scaleX: 1,
                     scaleY: 1
                 });

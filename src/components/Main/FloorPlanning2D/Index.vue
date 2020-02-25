@@ -198,10 +198,8 @@
                                     @change="applyProperties" type="number" label="Width" v-model="properties.width"
                                     hide-details>
                                 </v-text-field>
-                                <v-text-field
-                                    v-if="properties.radius!=null&&properties.radius!=NaN&&properties.height!=undefined"
-                                    @change="applyProperties" type="number" label="Radius" v-model="properties.radius"
-                                    hide-details>
+                                <v-text-field v-if="selectedItem.attrs.name=='circle'" @change="applyProperties"
+                                    type="number" label="Radius" v-model="properties.radius" hide-details>
                                 </v-text-field>
                                 <v-text-field
                                     v-if="properties.depth!=null&&properties.depth!=NaN&&properties.depth!=undefined"
@@ -211,6 +209,11 @@
                                 <v-text-field @change="applyProperties" type="number" label="rotation"
                                     v-model="properties.rotation" hide-details>
                                 </v-text-field>
+
+                                <v-checkbox @change="applyProperties" v-model="keepAspectRatio"
+                                    v-if="selectedItem.attrs.name=='image'" label="Keep aspect ratio">
+                                </v-checkbox>
+
                                 <v-text-field type="color" label="Color" v-model="properties.fill"
                                     @change="applyProperties($event)">
                                 </v-text-field>
@@ -477,6 +480,7 @@
                     fill: "#1976d2",
                     rotation: null,
                 },
+                keepAspectRatio: null,
                 selectedItem: null,
                 selectedLayer: null,
                 selectedLayerTree: null,
@@ -978,7 +982,7 @@
                     self.floorConfig.floorHeight = callback.height
                     self.floorConfig.floorWidth = callback.width
                     axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
+                    self.applyFloorProperties()
                     axios.get(process.env.VUE_APP_API + `GetFloorPlanItems?Header_ID=${callback.id}`).then(
                         r => {
                             console.log(r);
@@ -1383,8 +1387,7 @@
                         self.selectedLayer = tmplayer
                         self.selectedLayerTree = tmplayertreeitem
                         self.stage.batchDraw()
-                        window.libraryDrag = null
-                        window.library = null
+
                     })
                 })
             },
@@ -1456,7 +1459,9 @@
 
                 ev.preventDefault();
                 let self = this
+                // self.$refs.spinner.show()
                 console.log("library", window.library);
+                let librarydata = window.library
                 console.log("libraryDrag", window.libraryDrag);
                 if (window.library != null) {
                     if (window.library.type == "CUSTOM_PLANOGRAM") {
@@ -1465,17 +1470,111 @@
                             if (HeaderCallback != null) {
                                 self.drawSaved(HeaderCallback, ev)
                             } else {
-                                alert("No fixture setup found for spaceplan")
+                                console.log("window", librarydata);
+
+                                self.getPlanogramData(librarydata.data.id, defaultData => {
+                                    if (defaultData != null && defaultData != undefined) {
+                                        self.drawDefaultSpace(defaultData)
+                                    } else {
+                                        alert("No fixture setup found for spaceplan")
+                                    }
+                                })
+
                             }
                         })
                     } else {
-                        self.drawLibraryFixture(ev, window.library, cb => {})
+                        self.drawLibraryFixture(ev, window.library, cb => {
+                            window.libraryDrag = null
+                            window.library = null
+                        })
                     }
 
                 } else {
                     self.drawSaved(window.libraryDrag)
                 }
 
+            },
+            getPlanogramData(id, callback) {
+                let self = this
+                console.log("getPlanogramData-[ID]", id);
+
+                axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+
+                axios.get(process.env.VUE_APP_API +
+                    `FloorPlan_Fixtures/GetFixtures?planogramDetail_ID=${id}`).then(
+                    r => {
+                        console.log("getPlanogramData", r.data);
+                        callback(r.data)
+                    })
+            },
+            drawDefaultSpace(data) {
+                let widthInc = 0
+                let lastPos = 50
+                data.forEach((element, idx) => {
+
+                    if (element.shape == "Circle") {
+                        let circle = new Circle(self.selectedLayer, {
+                            x: 0,
+                            y: 0,
+                        }, null, {
+                            radius: element.width * (self.floorConfig.blockRatio * self.meterRatio)
+                                .toFixed(2),
+                            color: "#1976d2"
+                        });
+                        circle.shape.setAttrs({
+                            width: element.width * (self.floorConfig.blockRatio * self.meterRatio)
+                                .toFixed(2),
+                            DropID: element.id.toString()
+                        })
+                        circle.shape.parent.setAttrs({
+                            x: lastPos + widthInc,
+                            y: 75
+                        })
+                        circle.shape.attrs.DropID = element.id.toString()
+                        lastPos = circle.shape.attrs.x + element.width * (self.floorConfig.blockRatio * self
+                            .meterRatio).toFixed(2)
+                        circle.shape.draggable(true)
+
+                    } else {
+                        element.shape = "Square"
+                        let rect = new Rect(self.selectedLayer, {
+                            x: 0,
+                            y: 0,
+                        }, null, null, null, self.imageSrc(element
+                            .id,
+                            "Top"));
+                        rect.shape.setAttrs({
+                            width: element.width * (self.floorConfig.blockRatio * self.meterRatio)
+                                .toFixed(2),
+                            height: element.height * (self.floorConfig.blockRatio * self.meterRatio)
+                                .toFixed(2),
+                            draggable: true
+                        })
+                        rect.shape.setAttrs({
+                            x: lastPos + widthInc,
+                            y: 50
+                        })
+
+                        rect.shape.setAttrs({
+                            width: element.width * (self.floorConfig.blockRatio * self.meterRatio)
+                                .toFixed(2),
+                            height: element.height * (self.floorConfig.blockRatio * self.meterRatio)
+                                .toFixed(2),
+                        })
+                        console.log("rect", rect);
+                        rect.shape.attrs.DropID = element.id
+                            .toString()
+                        lastPos = rect.shape.attrs.x + element.width * (self.floorConfig.blockRatio * self
+                            .meterRatio).toFixed(2)
+                        rect.shape.draggable(true)
+
+                    }
+                    widthInc = element.width
+                    self.stage.batchDraw()
+                    self.$refs.spinner.hide()
+
+                })
             },
             MoveLayerTopTop(event) {
                 let self = this
@@ -1511,7 +1610,10 @@
                     .blockRatio)
                 self.selectedItem.attrs.rotation = parseFloat(self.properties.rotation)
                 self.selectedItem.attrs["fill"] = self.properties["fill"]
-                self.stage.batchDraw()
+                if (self.selectedItem.attrs.name == "image") {
+                    self.selectedItem.attrs.keepAspectRatio = self.keepAspectRatio
+                }
+
                 callback()
             },
             applyBrushProperties(tool) {
@@ -1580,13 +1682,26 @@
                             self.properties.radius = (self.selectedItem.attrs.radius / (self.meterRatio *
                                 self.floorConfig.blockRatio)).toFixed(2);
                             self.properties.rotation = self.selectedItem.attrs.rotation;
+                            if (self.selectedItem.attrs.name == "image") {
+                                self.selectedItem.attrs.keepAspectRatio = self.keepAspectRatio
+                            }
                             var tr
                             if (self.selectedItem.attrs.name == "image") {
-                                tr = new Konva.Transformer({
-                                    enabledAnchors: ['top-left', 'top-right', 'bottom-left',
-                                        'bottom-right'
-                                    ],
-                                });
+                                if (self.selectedItem.attrs.keepAspectRatio == true) {
+                                    tr = new Konva.Transformer({
+                                        enabledAnchors: ["top-left", "top-center", "top-right",
+                                            "middle-right", "middle-left", "bottom-left",
+                                            "bottom-center", "bottom-right"
+                                        ],
+                                    });
+                                } else {
+                                    tr = new Konva.Transformer({
+                                        enabledAnchors: ['top-left', 'top-right', 'bottom-left',
+                                            'bottom-right'
+                                        ],
+                                    });
+                                }
+
                             } else {
                                 tr = new Konva.Transformer({
                                     enabledAnchors: self.selectedItem.attrs.enabledAnchors,
@@ -2307,16 +2422,29 @@
                             self.properties.depth = self.selectedItem.attrs.depth / ((self.floorConfig
                                 .blockRatio * self.meterRatio)).toFixed(2);
 
+                            if (self.selectedItem.attrs.name == "image") {
+                                self.keepAspectRatio = self.selectedItem.attrs.keepAspectRatio
+                            }
+
 
                             var tr
 
 
                             if (self.selectedItem.attrs.name == "image") {
-                                tr = new Konva.Transformer({
-                                    enabledAnchors: ['top-left', 'top-right', 'bottom-left',
-                                        'bottom-right'
-                                    ],
-                                });
+                                if (self.selectedItem.attrs.keepAspectRatio == true) {
+                                    tr = new Konva.Transformer({
+                                        enabledAnchors: ["top-left", "top-center", "top-right",
+                                            "middle-right", "middle-left", "bottom-left",
+                                            "bottom-center", "bottom-right"
+                                        ],
+                                    });
+                                } else {
+                                    tr = new Konva.Transformer({
+                                        enabledAnchors: ['top-left', 'top-right', 'bottom-left',
+                                            'bottom-right'
+                                        ],
+                                    });
+                                }
                             } else {
                                 tr = new Konva.Transformer({
                                     enabledAnchors: self.selectedItem.attrs.enabledAnchors,
