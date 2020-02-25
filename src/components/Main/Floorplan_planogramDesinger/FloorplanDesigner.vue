@@ -4,9 +4,9 @@
             <v-toolbar-title>
                 Planogram Designer
             </v-toolbar-title>
-            <v-btn @click="log">
+            <!-- <v-btn @click="log">
                 log
-            </v-btn>
+            </v-btn> -->
         </v-toolbar>
         <v-container class="ma-0 pa-0" fluid>
             <v-layout row wrap>
@@ -498,7 +498,12 @@
             },
             imageSrc(imgID, type) {
                 let self = this;
-                return process.env.VUE_APP_API + `FloorplanFixture?mapImageID=${imgID}&type=${type}`
+                if(imgID!=null&&imgID!=undefined){
+                    return process.env.VUE_APP_API + `FloorplanFixture?mapImageID=${imgID}&type=${type}`
+                }else{
+                    return ""
+                }
+                
             },
             drawGrid() {
                 let self = this
