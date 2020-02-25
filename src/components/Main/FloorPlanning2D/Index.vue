@@ -3061,13 +3061,14 @@
                 self.backgroundTree = tmplayertree
                 self.buildingLayer = buildingLayer
                 self.buildingLayerTree = buildinglayertree
+                 self.layerTree.push(areaLayerTree)
                 self.layerTree.push(buildinglayertree)
-                self.layerTree.push(areaLayerTree)
+               
                 self.layerTree.push(FixtureTree)
                 self.layerTree.push(Depttree)
                 self.stage.add(startLayer);
+                 self.stage.add(areaLayer);
                 self.stage.add(buildingLayer);
-                self.stage.add(areaLayer);
                 self.stage.add(FixtureLayer);
                 self.stage.add(DepartmentLayer);
                 callback()
