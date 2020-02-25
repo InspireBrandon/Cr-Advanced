@@ -10,8 +10,6 @@ class ClickTapHelper {
 
     setSelectedItem(e, findLayerItem, selectedLayerTreeItem, selectedItem) {
         if (e.attrs.name == "front-Line" || e.attrs.name == "Gondola-Rect") {
-            e = e.parent
-
             findLayerItem(self.layerTree, e.parent._id, callback => {
                 selectedLayerTreeItem = callback
             })

@@ -169,47 +169,43 @@
                                     <div>Properties</div>
                                 </v-toolbar-title>
                             </v-toolbar>
-
                             <v-card-text v-if="selectedTool == 'open_with' &&selectedItem==null" class="pt-0"
                                 style="height: 30%; overflow-y: scroll;">
-                                <v-text-field type="number" v-model="floorConfig.blockRatio"
-                                    label="Block Width (meters)" @change="applyFloorProperties">
+                                <v-text-field type="number" v-model="floorConfig.blockRatio" label="Block Width (m)"
+                                    @change="applyFloorProperties">
                                 </v-text-field>
-                                <v-text-field type="number" v-model="floorConfig.floorWidth"
-                                    label="Floor Width (meters)" @change="applyFloorProperties">
+                                <v-text-field type="number" v-model="floorConfig.floorWidth" label="Floor Width (m)"
+                                    @change="applyFloorProperties">
                                 </v-text-field>
-                                <v-text-field type="number" v-model="floorConfig.floorHeight"
-                                    label="Floor Height (meters)" @change="applyFloorProperties">
+                                <v-text-field type="number" v-model="floorConfig.floorHeight" label="Floor Height (m)"
+                                    @change="applyFloorProperties">
                                 </v-text-field>
                             </v-card-text>
                             <v-card-text v-if="selectedTool == 'open_with' && selectedItem!=null" class="pt-0"
                                 style="height: 30%; overflow-y: scroll;">
-
-
                                 <v-text-field @change="applyProperties" v-if="properties.name!=null" label="Name"
                                     v-model="properties.name" hide-details> </v-text-field>
                                 <v-text-field
                                     v-if="properties.height!=null&&properties.height!=NaN&&properties.height!=undefined"
-                                    @change="applyProperties" type="number" label="Height" v-model="properties.height"
-                                    hide-details>
+                                    @change="applyProperties($event,'height')" type="number" label="Height (m)"
+                                    v-model="properties.height" hide-details>
                                 </v-text-field>
                                 <v-text-field
                                     v-if="properties.width!=null&&properties.width!=NaN&&properties.height!=undefined"
-                                    @change="applyProperties" type="number" label="Width" v-model="properties.width"
-                                    hide-details>
+                                    @change="applyProperties($event,'width')" type="number" label="Width (m)"
+                                    v-model="properties.width" hide-details>
                                 </v-text-field>
                                 <v-text-field v-if="selectedItem.attrs.name=='circle'" @change="applyProperties"
-                                    type="number" label="Radius" v-model="properties.radius" hide-details>
+                                    type="number" label="Radius (m)" v-model="properties.radius" hide-details>
                                 </v-text-field>
                                 <v-text-field
                                     v-if="properties.depth!=null&&properties.depth!=NaN&&properties.depth!=undefined"
-                                    @change="applyProperties" type="number" label="Depth" v-model="properties.depth"
+                                    @change="applyProperties" type="number" label="Depth (m)" v-model="properties.depth"
                                     hide-details>
                                 </v-text-field>
                                 <v-text-field @change="applyProperties" type="number" label="rotation"
                                     v-model="properties.rotation" hide-details>
                                 </v-text-field>
-
                                 <v-checkbox @change="applyProperties" v-model="keepAspectRatio"
                                     v-if="selectedItem.attrs.name=='image'" label="Keep aspect ratio">
                                 </v-checkbox>
@@ -653,6 +649,7 @@
                         wall.shape.setAttrs({
                             width: item.width,
                             height: item.height,
+                            depth: item.depth,
                             rotation: item.rotation,
                             fill: item.color,
                             draggable: false
@@ -677,8 +674,10 @@
                     });
                     circle.shape.setAttrs({
                         fill: item.color,
+                        depth: item.depth,
                         radius: item.radius,
                         draggable: false
+
                     })
                     parentLayerTree.children.push(new treeItem({
                         KonvaID: circle.shape._id,
@@ -749,6 +748,7 @@
                     }))
                     image.shape.setAttrs({
                         width: item.width,
+                        depth: item.depth,
                         height: item.height
                     })
                     image.shape.attrs.imageID = item.imageID
@@ -1417,7 +1417,7 @@
                 }, null, null);
 
                 self.fixtureTree.children.push(new treeItem({
-                    KonvaID: rect.shape.parent._id,
+                    KonvaID: rect.shape._id,
                     visible: true,
                     showEditName: true,
                     selected: true,
@@ -1459,10 +1459,7 @@
 
                 ev.preventDefault();
                 let self = this
-                // self.$refs.spinner.show()
-                console.log("library", window.library);
                 let librarydata = window.library
-                console.log("libraryDrag", window.libraryDrag);
                 if (window.library != null) {
                     if (window.library.type == "CUSTOM_PLANOGRAM") {
                         self.checkForHeader(window.library.data, HeaderCallback => {
@@ -1474,7 +1471,7 @@
 
                                 self.getPlanogramData(librarydata.data.id, defaultData => {
                                     if (defaultData != null && defaultData != undefined) {
-                                        self.drawDefaultSpace(defaultData)
+                                        self.drawDefaultSpace(defaultData, ev)
                                     } else {
                                         alert("No fixture setup found for spaceplan")
                                     }
@@ -1499,78 +1496,87 @@
                 console.log("getPlanogramData-[ID]", id);
 
                 axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
-
                 axios.get(process.env.VUE_APP_API +
-                    `FloorPlan_Fixtures/GetFixtures?planogramDetail_ID=${id}`).then(
-                    r => {
-                        console.log("getPlanogramData", r.data);
-                        callback(r.data)
-                    })
+                    `Planogram_Details/BysystemFileID?systemFile_ID=${id}`).then(resp => {
+                    console.log("details", resp);
+
+                    axios.get(process.env.VUE_APP_API +
+                        `FloorPlan_Fixtures/GetFixtures?planogramDetail_ID=${resp.data.id}`).then(
+                        r => {
+                            console.log("getPlanogramData", r.data);
+                            callback(r.data)
+                        })
+                })
+
+
             },
-            drawDefaultSpace(data) {
+            drawDefaultSpace(data, ev) {
+                let self = this
                 let widthInc = 0
-                let lastPos = 50
+                let lastPos = ev.x
+                let meters = self.meterRatio
+                if (self.floorConfig.blockRatio == 1) {
+                    meters = 1
+                } else {
+                    meters = self.meterRatio
+                }
+
                 data.forEach((element, idx) => {
 
                     if (element.shape == "Circle") {
                         let circle = new Circle(self.selectedLayer, {
-                            x: 0,
-                            y: 0,
+                            x: ev.x,
+                            y: ev.y + 0,
                         }, null, {
-                            radius: element.width * (self.floorConfig.blockRatio * self.meterRatio)
+                            radius: (element.width / 4) * (self.floorConfig.blockRatio * meters)
                                 .toFixed(2),
                             color: "#1976d2"
                         });
                         circle.shape.setAttrs({
-                            width: element.width * (self.floorConfig.blockRatio * self.meterRatio)
+                            width: (element.width / 4) * (self.floorConfig.blockRatio * meters)
                                 .toFixed(2),
-                            DropID: element.id.toString()
-                        })
-                        circle.shape.parent.setAttrs({
+                            DropID: element.id.toString(),
                             x: lastPos + widthInc,
-                            y: 75
+                            y: ev.y
                         })
                         circle.shape.attrs.DropID = element.id.toString()
-                        lastPos = circle.shape.attrs.x + element.width * (self.floorConfig.blockRatio * self
-                            .meterRatio).toFixed(2)
+                        lastPos = circle.shape.attrs.x + (element.width / 4) * (self.floorConfig.blockRatio *
+                            meters).toFixed(2)
                         circle.shape.draggable(true)
-
                     } else {
                         element.shape = "Square"
                         let rect = new Rect(self.selectedLayer, {
-                            x: 0,
-                            y: 0,
+                            x: ev.x,
+                            y: ev.y,
                         }, null, null, null, self.imageSrc(element
                             .id,
                             "Top"));
                         rect.shape.setAttrs({
-                            width: element.width * (self.floorConfig.blockRatio * self.meterRatio)
+                            width: (element.width / 4) * (self.floorConfig.blockRatio * meters)
                                 .toFixed(2),
-                            height: element.height * (self.floorConfig.blockRatio * self.meterRatio)
+                            height: (element.height / 4) * (self.floorConfig.blockRatio * meters)
                                 .toFixed(2),
                             draggable: true
                         })
                         rect.shape.setAttrs({
                             x: lastPos + widthInc,
-                            y: 50
+                            y: ev.y
                         })
 
                         rect.shape.setAttrs({
-                            width: element.width * (self.floorConfig.blockRatio * self.meterRatio)
+                            width: (element.width / 4) * (self.floorConfig.blockRatio * meters)
                                 .toFixed(2),
-                            height: element.height * (self.floorConfig.blockRatio * self.meterRatio)
+                            height: (element.height / 4) * (self.floorConfig.blockRatio * meters)
                                 .toFixed(2),
                         })
                         console.log("rect", rect);
                         rect.shape.attrs.DropID = element.id
                             .toString()
-                        lastPos = rect.shape.attrs.x + element.width * (self.floorConfig.blockRatio * self
-                            .meterRatio).toFixed(2)
+                        lastPos = rect.shape.attrs.x + (element.width / 4) * (self.floorConfig.blockRatio *
+                            meters).toFixed(2)
                         rect.shape.draggable(true)
-
                     }
-                    widthInc = element.width
+                    widthInc = (element.width / 4) * (self.floorConfig.blockRatio * meters)
                     self.stage.batchDraw()
                     self.$refs.spinner.hide()
 
@@ -1585,25 +1591,20 @@
                 self.layerTree.unshift(tmptreeItem[0]);
                 // self.layerTree.splice(0, 0, tmpt0reeItem);
             },
-            applyProperties(event) {
+            applyProperties(event, field) {
                 let self = this
                 self.$nextTick(() => {
-                    self.makeChanges(callback => {
+                    self.makeChanges(field, callback => {
                         self.stage.batchDraw()
                     })
                 })
 
             },
-            makeChanges(callback) {
+            makeChanges(field, callback) {
                 let self = this
-                self.selectedItem.attrs.radius = parseFloat(self.properties.radius) * (self.meterRatio * self
+                self.selectedItem.attrs.radius = parseFloat(self.properties.radius) * (self.meterRatio *
+                    self
                     .floorConfig.blockRatio)
-                self.selectedItem.attrs.height = parseFloat(self.properties.height) * (self.meterRatio * self
-                    .floorConfig
-                    .blockRatio)
-                self.selectedItem.attrs.width = parseFloat(self.properties.width) * (self.meterRatio * self
-                    .floorConfig
-                    .blockRatio)
                 self.selectedItem.attrs.fill = self.properties.fill * (self.meterRatio * self.floorConfig
                     .blockRatio)
                 self.selectedItem.attrs.depth = self.properties.depth * (self.meterRatio * self.floorConfig
@@ -1612,8 +1613,44 @@
                 self.selectedItem.attrs["fill"] = self.properties["fill"]
                 if (self.selectedItem.attrs.name == "image") {
                     self.selectedItem.attrs.keepAspectRatio = self.keepAspectRatio
-                }
+                    if (self.selectedItem.attrs.keepAspectRatio == true) {
+                        if (field == "height") {
+                            let aspectRatio = self.selectedItem.attrs.height / self.selectedItem.attrs.width
 
+                            self.selectedItem.attrs.height = parseFloat(self.properties.height) * (self.meterRatio *
+                                self.floorConfig.blockRatio)
+                            self.selectedItem.attrs.width = parseFloat(self.selectedItem.attrs.width) * aspectRatio
+                        } else {
+                            let aspectRatio = self.selectedItem.attrs.width / self.selectedItem.attrs.height
+
+                            self.selectedItem.attrs.width = parseFloat(self.properties.width) * (self
+                                .meterRatio *
+                                self
+                                .floorConfig
+                                .blockRatio)
+                            self.selectedItem.attrs.height = parseFloat(self.selectedItem.attrs.height) *
+                                aspectRatio
+                        }
+                    } else {
+                        self.selectedItem.attrs.height = parseFloat(self.properties.height) * (self
+                            .meterRatio * self
+                            .floorConfig
+                            .blockRatio)
+                        self.selectedItem.attrs.width = parseFloat(self.properties.width) * (self
+                            .meterRatio * self
+                            .floorConfig
+                            .blockRatio)
+                    }
+                } else {
+                    self.selectedItem.attrs.height = parseFloat(self.properties.height) * (self.meterRatio *
+                        self
+                        .floorConfig
+                        .blockRatio)
+                    self.selectedItem.attrs.width = parseFloat(self.properties.width) * (self.meterRatio *
+                        self
+                        .floorConfig
+                        .blockRatio)
+                }
                 callback()
             },
             applyBrushProperties(tool) {
@@ -1629,7 +1666,7 @@
                 }
                 break;
                 case "show_chart": {
-                    self.brush.height = 10
+                    self.brush.height = 6.25
                 }
                 break;
                 default:
@@ -1687,7 +1724,7 @@
                             }
                             var tr
                             if (self.selectedItem.attrs.name == "image") {
-                                if (self.selectedItem.attrs.keepAspectRatio == true) {
+                                if (self.selectedItem.attrs.keepAspectRatio != true) {
                                     tr = new Konva.Transformer({
                                         enabledAnchors: ["top-left", "top-center", "top-right",
                                             "middle-right", "middle-left", "bottom-left",
@@ -2010,6 +2047,7 @@
                     children: [],
                 }))
                 image.shape.attrs.refFile = file
+                image.shape.attrs.keepAspectRatio = true
                 console.log("addimage", image.shape.attrs.refFile);
 
                 var imageObj = new Image();
@@ -2313,42 +2351,65 @@
                     self.selectedLayer.draw()
                 })
             },
-            clickselect(item) {
+            clickselect(item, callback) {
                 let self = this
                 console.log("item", item.parent.attrs.name);
                 switch (item.parent.attrs.name) {
                     case "Building": {
                         self.selectLayer(self.buildingLayerTree, self.layerTree)
+                        callback(item)
                     }
                     break;
 
                 case "Background": {
                     self.selectLayer(self.backgroundTree, self.layerTree)
+                    callback(item)
                 }
                 break;
 
                 case "Areas": {
                     self.selectLayer(self.areaLayerTree, self.layerTree)
+                    callback(item)
                 }
                 break;
 
                 case "Fixtures": {
                     self.selectLayer(self.fixtureTree, self.layerTree)
+                    callback(item)
                 }
                 break;
 
                 case "Department": {
                     self.selectLayer(self.departmentTree, self.layerTree)
+                    callback(item)
                 }
                 break;
 
                 case "Duplication Group": {
-                    self.selectLayer(self.fixtureTree, self.layerTree)
+                    if (self.selectedLayerTree == self.fixtureTree) {
+                        console.log("selecting parent");
+                        if (item.parent != self.stage) {
+                            self.findLayerItem(self.layerTree, item.parent._id, callback => {
+                                self.selectLayer(callback, self.layerTree)
+                                callback(item)
+                            })
+                        } else {
+                            callback(item)
+                        }
+
+                    } else {
+                        console.log("selecting fixture layer");
+
+                        self.selectLayer(self.fixtureTree, self.layerTree)
+                        callback(item.parent)
+                    }
+
                 }
 
                 break;
                 default: {
                     self.selectLayer(self.departmentTree, self.layerTree)
+                    callback(item)
                 }
                 break;
                 }
@@ -2357,26 +2418,24 @@
                 let self = this;
                 let isPaint = false;
                 self.stage.on('click tap', function (e) {
-
-
                     self.stage.find('Transformer').destroy()
-                    // if (e.target == self.stage ) {
-                    //     self.dotted.shape.destroy()
-                    //     self.dotted = null
-                    // }
+                    if (e.target != self.stage) {
+                        self.clickselect(e.target, callback => {
+                            console.log("clickselect", callback);
+                                var tr = new Konva.Transformer({
+                                    enabledAnchors: ["top-left", "top-center", "top-right",
+                                        "middle-right", "middle-left", "bottom-left",
+                                        "bottom-center", "bottom-right"
+                                    ],
+                                });
+                                self.selectedLayer.add(tr);
+                                tr.attachTo(callback);
+                        })
+                    }
+
                     if (e.target.attrs.name == "Tape") {
                         e.target.draggable(true)
                     }
-                    console.log("target", e.target);
-                    // if (self.propertiesLabelHorizontal != null) {
-                    //     self.propertiesLabelHorizontal.destroy()
-                    //     self.propertiesLabelHorizontal = null
-                    // }
-                    // if (self.propertiesLabelVertical != null) {
-                    //     self.propertiesLabelVertical.destroy()
-                    //     self.propertiesLabelVertical = null
-                    // }
-
                     clickTapHelper.destroyTransformer(self.stage, cb => {
                         clickTapHelper.setSelectedItem(e.target, self.findLayerItem, self
                             .selectedLayerTreeItem, self.selectedItem)
@@ -2391,9 +2450,7 @@
                     self.resetDuplication()
 
                     if (self.selectedTool == "open_with") {
-                        if (e.target != self.stage) {
-                            self.clickselect(e.target)
-                        }
+
                         clickTapHelper.handleSelection(e.target, self.stage, self.selectedLayer, self
                             .selectedItem,
                             self.selectedLayerTreeItem, self.ctrlDown, self.handleMultiSelect, self
@@ -2425,13 +2482,11 @@
                             if (self.selectedItem.attrs.name == "image") {
                                 self.keepAspectRatio = self.selectedItem.attrs.keepAspectRatio
                             }
-
-
                             var tr
-
+                            console.log("adding transform er");
 
                             if (self.selectedItem.attrs.name == "image") {
-                                if (self.selectedItem.attrs.keepAspectRatio == true) {
+                                if (self.selectedItem.attrs.keepAspectRatio != true) {
                                     tr = new Konva.Transformer({
                                         enabledAnchors: ["top-left", "top-center", "top-right",
                                             "middle-right", "middle-left", "bottom-left",
@@ -3061,13 +3116,13 @@
                 self.backgroundTree = tmplayertree
                 self.buildingLayer = buildingLayer
                 self.buildingLayerTree = buildinglayertree
-                 self.layerTree.push(areaLayerTree)
+                self.layerTree.push(areaLayerTree)
                 self.layerTree.push(buildinglayertree)
-               
+
                 self.layerTree.push(FixtureTree)
                 self.layerTree.push(Depttree)
                 self.stage.add(startLayer);
-                 self.stage.add(areaLayer);
+                self.stage.add(areaLayer);
                 self.stage.add(buildingLayer);
                 self.stage.add(FixtureLayer);
                 self.stage.add(DepartmentLayer);

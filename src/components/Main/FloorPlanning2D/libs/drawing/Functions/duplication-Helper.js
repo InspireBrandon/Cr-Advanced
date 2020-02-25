@@ -303,7 +303,7 @@ class DuplicationHelper {
         }
 
         layertreeitem.children.push(new treeItem({
-            KonvaID: rect.shape.parent._id,
+            KonvaID: rect.shape._id,
             visible: true,
             showEditName: true,
             selected: true,
@@ -341,7 +341,7 @@ class DuplicationHelper {
             y: SelectedItem.attrs.y,
         }, null, null, brush, dataurl);
         LayerTree.children.push(new treeItem({
-            KonvaID: rect.shape.parent._id,
+            KonvaID: rect.shape._id,
             visible: true,
             showEditName: true,
             selected: true,

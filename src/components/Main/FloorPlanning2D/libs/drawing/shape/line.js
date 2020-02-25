@@ -24,6 +24,7 @@ class Line extends Shape {
         self.shape = new Konva.Rect({
             x: config.x,
             y: config.y,
+            
             name: config.name,
             drawType: config.drawType,
             height: parseFloat(brush.height),
@@ -34,7 +35,9 @@ class Line extends Shape {
             visible: 'inherit',
             enabledAnchors: self.enabledAnchors
         });
-
+        self.shape.setAttrs({
+            depth:80,
+        })
         parent.add(self.shape);
         parent.draw();
     }
