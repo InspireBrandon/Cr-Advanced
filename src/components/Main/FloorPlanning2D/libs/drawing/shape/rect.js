@@ -60,6 +60,10 @@ class Rect extends Shape {
                 console.log("[RECT IMAGE DRAW]");
                 
             }
+            imageObj.onerror = function() {
+                self.shape.fill('#1976d2');
+                self.parent.draw();
+            }
             imageObj.src = dataUrl;
         } else {
             self.shape = new Konva.Rect({
@@ -67,8 +71,7 @@ class Rect extends Shape {
                 y: config.y,
                 height: parseFloat(brush.height),
                 width: parseFloat(brush.width),
-                fill: brush.color,
-                // fill: "#1976d2",
+                fill: "#1976d2",
                 draggable: true,
                 visible: 'inherit',
                 enabledAnchors: self.enabledAnchors,

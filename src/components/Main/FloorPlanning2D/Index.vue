@@ -188,15 +188,15 @@
 
                                 <v-text-field @change="applyProperties" v-if="properties.name!=null" label="Name"
                                     v-model="properties.name" hide-details> </v-text-field>
-                                <v-text-field v-if="properties.height!=null&&properties.height!=NaN"
+                                <v-text-field v-if="properties.height!=null&&properties.height!=NaN&&properties.height!=undefined"
                                     @change="applyProperties" type="number" label="Height" v-model="properties.height"
                                     hide-details>
                                 </v-text-field>
-                                <v-text-field v-if="properties.width!=null&&properties.width!=NaN"
+                                <v-text-field v-if="properties.width!=null&&properties.width!=NaN&&properties.height!=undefined"
                                     @change="applyProperties" type="number" label="Width" v-model="properties.width"
                                     hide-details>
                                 </v-text-field>
-                                <v-text-field v-if="properties.radius!=null&&properties.radius!=NaN"
+                                <v-text-field v-if="properties.radius!=null&&properties.radius!=NaN&&properties.height!=undefined"
                                     @change="applyProperties" type="number" label="Radius" v-model="properties.radius"
                                     hide-details>
                                 </v-text-field>
@@ -464,6 +464,7 @@
                     name: "",
                     radius: null,
                     height: null,
+                    depth:null,
                     width: null,
                     fill: "#1976d2",
                     rotation: null,
@@ -1495,6 +1496,8 @@
                     .blockRatio)
                 self.selectedItem.attrs.fill = self.properties.fill * (self.meterRatio * self.floorConfig
                     .blockRatio)
+                     self.selectedItem.attrs.depth = self.properties.depth * (self.meterRatio * self.floorConfig
+                    .blockRatio)
                 self.selectedItem.attrs.rotation = parseFloat(self.properties.rotation)
                 self.selectedItem.attrs["fill"] = self.properties["fill"]
                 self.stage.batchDraw()
@@ -1559,6 +1562,9 @@
                             self.properties.width = (self.selectedItem.attrs.width / (self.meterRatio * self
                                 .floorConfig.blockRatio)).toFixed(2);
                             self.properties.fill = self.selectedItem.attrs.fill;
+                            self.properties.depth = sel.selectedItem.attrs.depth / (self.selectedItem.attrs.radius / (self.meterRatio *
+                                self.floorConfig.blockRatio)).toFixed(2);
+                            
                             self.properties.radius = (self.selectedItem.attrs.radius / (self.meterRatio *
                                 self.floorConfig.blockRatio)).toFixed(2);
                             self.properties.rotation = self.selectedItem.attrs.rotation;
@@ -1740,9 +1746,9 @@
                 if (self.hasTape != null) {
                     return
                 }
-                let image = new StageImage(self.selectedLayer, self.imagePos);
+                let image = new StageImage(self.departmentLayer, self.imagePos);
 
-                self.selectedLayerTree.children.push(new treeItem({
+                self.departmentTree.children.push(new treeItem({
                     KonvaID: image.shape._id,
                     visible: true,
                     showEditName: true,
@@ -1758,7 +1764,7 @@
 
                 imageObj.onload = function () {
                     image.shape.image(imageObj);
-                    self.selectedLayer.draw();
+                    self.departmentLayer.draw();
                     self.onToolChange("open_with")
                     self.imagePos.x = 0
                     self.imagePos.y = 0
@@ -2234,7 +2240,7 @@
                     if (e.target.attrs.name == "Tape") {
                         e.target.draggable(true)
                     }
-                    console.log(e.target);
+                    console.log("target",e.target);
                     // if (self.propertiesLabelHorizontal != null) {
                     //     self.propertiesLabelHorizontal.destroy()
                     //     self.propertiesLabelHorizontal = null
@@ -2286,6 +2292,9 @@
                             self.properties.radius = (self.selectedItem.attrs.radius / (self.floorConfig
                                 .blockRatio * self.meterRatio)).toFixed(2);
                             self.properties.rotation = self.selectedItem.attrs.rotation;
+                            self.properties.depth = self.selectedItem.attrs.depth /((self.floorConfig
+                                .blockRatio * self.meterRatio)).toFixed(2);
+                           
 
                             var tr
 
