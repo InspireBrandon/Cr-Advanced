@@ -1712,7 +1712,7 @@
                             self.properties.width = (self.selectedItem.attrs.width / (self.meterRatio * self
                                 .floorConfig.blockRatio)).toFixed(2);
                             self.properties.fill = self.selectedItem.attrs.fill;
-                            self.properties.depth = sel.selectedItem.attrs.depth / (self.selectedItem.attrs
+                            self.properties.depth = self.selectedItem.attrs.depth / (self.selectedItem.attrs
                                 .radius / (self.meterRatio *
                                     self.floorConfig.blockRatio)).toFixed(2);
 
@@ -2387,23 +2387,21 @@
 
                 case "Duplication Group": {
                     if (self.selectedLayerTree == self.fixtureTree) {
-                        console.log("selecting parent");
+                        console.log("selecting parent",item.parent);
                         if (item.parent != self.stage) {
-                            self.findLayerItem(self.layerTree, item.parent._id, callback => {
-                                self.selectLayer(callback, self.layerTree)
+                            self.findLayerItem(self.layerTree, item.parent._id, cb => {
+                                self.selectLayer(cb, self.layerTree)
                                 callback(item)
                             })
                         } else {
-                            callback(item)
+                           callback(item)
                         }
 
                     } else {
                         console.log("selecting fixture layer");
-
                         self.selectLayer(self.fixtureTree, self.layerTree)
                         callback(item.parent)
                     }
-
                 }
 
                 break;
@@ -2422,14 +2420,20 @@
                     if (e.target != self.stage) {
                         self.clickselect(e.target, callback => {
                             console.log("clickselect", callback);
-                                var tr = new Konva.Transformer({
+                                var ttr = new Konva.Transformer({
                                     enabledAnchors: ["top-left", "top-center", "top-right",
                                         "middle-right", "middle-left", "bottom-left",
                                         "bottom-center", "bottom-right"
                                     ],
                                 });
-                                self.selectedLayer.add(tr);
-                                tr.attachTo(callback);
+                                 console.log("tr0",ttr); 
+                                 console.log("self.selectedLayer",self.selectedLayer);
+                                 
+                                callback.parent.add(ttr);
+                                     
+                                ttr.attachTo(callback);
+                                console.log("callback",callback);
+                                self.stage.batchDraw()
                         })
                     }
 
