@@ -77,7 +77,7 @@
                 cameraType: "free",
                 showCanvas: false,
                 fullScreen: false,
-                fancyMode: true
+                fancyMode: false
             };
         },
         mounted() {
@@ -215,6 +215,10 @@
 
                         if (element.name == "wall") {
                             self.buildWall(scene, element, element.id == 10630);
+                        }
+
+                        if(element.name == "circle") {
+                            self.buildCircle(scene, element, element.id == 10630);
                         }
                     });
 
@@ -574,6 +578,44 @@
                 document.addEventListener("keydown", e => {
                     self.manageCamera(e.code);
                 });
+            },
+            buildCircle(scene, element) {
+                let self = this;
+
+                console.log(element)
+
+                var material = new BABYLON.StandardMaterial("material", scene);
+
+                let image = "wire.png";
+
+                material.diffuseTexture = new BABYLON.Texture(image, scene);
+                material.diffuseTexture.hasAlpha = true;
+
+                var box = BABYLON.MeshBuilder.CreateCylinder(
+                    "box", {
+                        diameterTop: element.radius / pxlToMeterRatio,
+                        diameterBottom: element.radius / pxlToMeterRatio,
+                        // radius: element.radius / pxlToMeterRatio,
+                        height: element.height / pxlToMeterRatio,
+                        tessellation: 0
+                    },
+                    scene
+                );
+
+                box.position.x = (element.x + 0.5 * element.width) / pxlToMeterRatio;
+                box.position.z = -(
+                    (element.y + 0.5 * (element.height / 10)) /
+                    pxlToMeterRatio
+                );
+                box.position.y = element.depth / pxlToMeterRatio / 2;
+
+                // add rotation
+                let xPivot = -(element.width / 2 / pxlToMeterRatio);
+                let zPivot = element.height / 2 / pxlToMeterRatio;
+
+                box.setPivotPoint(new BABYLON.Vector3(xPivot, 0, zPivot));
+                box.rotation.y = degreesToRadians(element.rotation);
+                box.material = material;
             }
         }
     };
