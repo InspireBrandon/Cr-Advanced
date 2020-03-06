@@ -49,41 +49,41 @@ class TransFormerHelper {
 
 
         // transformProperties.radius = e.target.radius
-        if (ctrlDown) {
-            if (z.currentTarget.movingResizer == "middle-left") {
-                const right = {
-                    x: selectedItem.width(),
-                    y: selectedItem.height() / 2
-                };
+        // if (ctrlDown) {
+        //     if (z.currentTarget.movingResizer == "middle-left") {
+        //         const right = {
+        //             x: selectedItem.width(),
+        //             y: selectedItem.height() / 2
+        //         };
 
-                const current = rotatePoint(right, Konva.getAngle(selectedItem.rotation()));
-                var deltaX = lastPosition.x - (selectedItem.attrs.x +
-                    current.x);
-                var deltaY = lastPosition.y - (selectedItem.attrs.y +
-                    current.y);
+        //         const current = rotatePoint(right, Konva.getAngle(selectedItem.rotation()));
+        //         var deltaX = lastPosition.x - (selectedItem.attrs.x +
+        //             current.x);
+        //         var deltaY = lastPosition.y - (selectedItem.attrs.y +
+        //             current.y);
 
-                let hyp = Math.hypot(deltaX, deltaY);
+        //         let hyp = Math.hypot(deltaX, deltaY);
 
-                // selectedItem.width(hyp);
+        //         // selectedItem.width(hyp);
 
-                var rad = Math.atan2(deltaY, deltaX);
-                var deg = rad * (180 / Math.PI);
-                rotateAroundCenter(selectedItem, (180 + deg), hyp)
-            }
+        //         var rad = Math.atan2(deltaY, deltaX);
+        //         var deg = rad * (180 / Math.PI);
+        //         rotateAroundCenter(selectedItem, (180 + deg), hyp)
+        //     }
 
-            if (z.currentTarget.movingResizer == "middle-right") {
-                var deltaX = lastPosition.x - e.attrs.x;
-                var deltaY = lastPosition.y - e.attrs.y;
+        //     if (z.currentTarget.movingResizer == "middle-right") {
+        //         var deltaX = lastPosition.x - e.attrs.x;
+        //         var deltaY = lastPosition.y - e.attrs.y;
 
-                let hyp = Math.hypot(deltaY, deltaX)
-                var rad = Math.atan2(deltaY, deltaX);
+        //         let hyp = Math.hypot(deltaY, deltaX)
+        //         var rad = Math.atan2(deltaY, deltaX);
 
-                var deg = rad * (180 / Math.PI);
-                selectedItem.rotation(deg);
+        //         var deg = rad * (180 / Math.PI);
+        //         selectedItem.rotation(deg);
 
-                selectedItem.width(hyp);
-            }
-        }
+        //         selectedItem.width(hyp);
+        //     }
+        // }
     }
     handleTransformEnd(selectedItem, properties,blockratio) {
         if (selectedItem.attrs.name == "rect-group") {

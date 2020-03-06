@@ -33,6 +33,8 @@ class MultiSelectHelper {
     handleMultiselect(multiSelectGroup, selectedLayer, item, callback) {
         if (multiSelectGroup == null || multiSelectGroup == undefined) {
             let multigroup = new Konva.Group({
+                x:0,
+                y:0,
                 name: "MultiSelectGroup",
                 visible: true,
                 showEditName: false,
@@ -60,6 +62,7 @@ class MultiSelectHelper {
                 multiSelectGroup.destroy()
                 multiSelectGroup = null
             }
+
             callback(multiSelectGroup)
         } else {
             item.draggable(false)
@@ -69,7 +72,16 @@ class MultiSelectHelper {
                 x: pos.x,
                 y: pos.y
             });
+
+            let tr = new Konva.Transformer({
+                enabledAnchors: [],
+            });
+            tr.rotateEnabled(true);
+            selectedLayer.add(tr);
+            tr.attachTo(multiSelectGroup);
             callback(multiSelectGroup)
+
+
         }
 
     }

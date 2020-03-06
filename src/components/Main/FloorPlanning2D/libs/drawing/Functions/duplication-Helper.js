@@ -20,6 +20,9 @@ class DuplicationHelper {
         }
         if (SelectedItem.parent.attrs.name != "Duplication Group") {
             group = new Konva.Group({
+                x: 0,
+                y: 0,
+
                 name: "Duplication Group",
                 visible: true,
                 showEditName: false,
@@ -40,6 +43,12 @@ class DuplicationHelper {
                 showChildren: group.showChildren,
                 drawType: "group",
                 locked: true,
+                parent: LayerTree
+
+            })
+            group.setAttrs({
+                x: SelectedItem.attrs.x,
+                y: SelectedItem.attrs.y
             })
             LayerTree.children.push(layertreeitem)
             Layer.add(group)
@@ -91,6 +100,7 @@ class DuplicationHelper {
             draggable: true,
             name: "wall",
             children: [],
+            parent: layertreeitem
         }))
         rect.shape.setAttrs({
             width: SelectedItem.width() * SelectedItem
@@ -105,7 +115,10 @@ class DuplicationHelper {
         SelectedItem.moveTo(group)
 
         Layer.draw()
-        callback(layertreeitem)
+        callback({
+            layer: layertreeitem,
+            item: rect.shape
+        })
     }
     DuplicateCircle(SelectedItem, Layer, LayerTree, direction, duplicationSequence, callback) {
         let circle
@@ -117,6 +130,8 @@ class DuplicationHelper {
         }
         if (SelectedItem.parent.attrs.name != "Duplication Group") {
             group = new Konva.Group({
+                x: 0,
+                y: 0,
                 name: "Duplication Group",
                 visible: true,
                 showEditName: false,
@@ -127,6 +142,8 @@ class DuplicationHelper {
                 drawType: "group",
                 type: "group",
             })
+            console.log("duplicate circle create group;", group);
+
             layertreeitem = new treeItem({
                 KonvaID: group._id,
                 children: [],
@@ -137,8 +154,13 @@ class DuplicationHelper {
                 showChildren: group.showChildren,
                 drawType: "group",
                 locked: true,
+                parent: LayerTree
             })
             LayerTree.children.push(layertreeitem)
+            // group.setAttrs({
+            //     x: SelectedItem.attrs.x,
+            //     y: SelectedItem.attrs.y
+            // })
             Layer.add(group)
         } else {
             group = SelectedItem.parent
@@ -189,6 +211,7 @@ class DuplicationHelper {
             draggable: true,
             name: "Circle",
             children: [],
+            parent: layertreeitem
         }))
         circle.shape.setAttrs({
             radius: SelectedItem.radius() * SelectedItem
@@ -198,7 +221,10 @@ class DuplicationHelper {
         })
         SelectedItem.moveTo(group)
         Layer.draw()
-        callback(layertreeitem)
+        callback({
+            layer: layertreeitem,
+            item: circle.shape
+        })
     }
     DuplicateRectGroup(SelectedItem, Layer, LayerTree, direction, duplicationSequence, callback) {
         let rect
@@ -209,10 +235,12 @@ class DuplicationHelper {
             width: SelectedItem.attrs.width,
             color: SelectedItem.attrs.fill,
         }
-      
+
 
         if (SelectedItem.parent.attrs.name != "Duplication Group") {
             group = new Konva.Group({
+                x: 0,
+                y: 0,
                 name: "Duplication Group",
                 visible: true,
                 showEditName: false,
@@ -233,6 +261,7 @@ class DuplicationHelper {
                 showChildren: group.showChildren,
                 drawType: "group",
                 locked: true,
+                parent: LayerTree
             })
             LayerTree.children.push(layertreeitem)
             Layer.add(group)
@@ -268,14 +297,14 @@ class DuplicationHelper {
         console.log("ROTATION", rotation);
         let rotHeight = Math.abs((width) * Math.sin(angle))
         let rotWidth = Math.abs((width) * Math.cos(angle))
-      
+
         console.log("height", Math.abs((width) * Math.sin(angle)));
         console.log("width", Math.abs((width) * Math.cos(angle)));
         switch (direction) {
             case "UP":
                 rect = new Rect(group, {
-                    x: SelectedItem.attrs.x+((dottedWidth)*duplicationSequence.up),
-                    y: SelectedItem.attrs.y-  ((dottedHeight) * duplicationSequence.up),
+                    x: (SelectedItem.attrs.x),
+                    y: SelectedItem.attrs.y - (dottedHeight * duplicationSequence.down),
                 }, null, null, brush, dataurl);
                 break;
             case "RIGHT":
@@ -311,6 +340,7 @@ class DuplicationHelper {
             draggable: true,
             name: "rect-group",
             children: [],
+            parent: layertreeitem
         }))
         rect.shape.setAttrs({
             height: SelectedItem.height() * SelectedItem
@@ -320,11 +350,14 @@ class DuplicationHelper {
             scaleX: 1,
             scaleY: 1,
             rotation: SelectedItem.attrs.rotation,
-            depth:SelectedItem.attrs.depth
+            depth: SelectedItem.attrs.depth
         })
         SelectedItem.moveTo(group)
         Layer.draw()
-        callback(layertreeitem)
+        callback({
+            layer: layertreeitem,
+            item: rect.shape
+        })
     }
     DuplicateRectGroupDrag(SelectedItem, Layer, LayerTree) {
         let brush = {
@@ -349,13 +382,14 @@ class DuplicationHelper {
             draggable: true,
             name: "rect-group",
             children: [],
+            parent: LayerTree
         }))
         rect.shape.setAttrs({
             height: SelectedItem.height() * SelectedItem
                 .scaleY().toFixed(2),
             width: SelectedItem.width() * SelectedItem
                 .scaleX().toFixed(2),
-            depth:SelectedItem.attrs.depth,
+            depth: SelectedItem.attrs.depth,
             scaleX: 1,
             scaleY: 1,
             rotation: SelectedItem.rotation()
@@ -383,6 +417,7 @@ class DuplicationHelper {
             draggable: true,
             name: "Circle",
             children: [],
+            parent: LayerTree
         }))
         circle.shape.setAttrs({
             radius: SelectedItem.radius() * SelectedItem
@@ -411,6 +446,7 @@ class DuplicationHelper {
             draggable: true,
             name: "wall",
             children: [],
+            parent: LayerTree
         }))
         rect.shape.setAttrs({
             width: SelectedItem.width() * SelectedItem
@@ -446,6 +482,7 @@ class DuplicationHelper {
             draggable: true,
             name: "Image",
             children: [],
+            parent: LayerTree
         }))
 
         var imageObj = new Image();
@@ -462,16 +499,6 @@ class DuplicationHelper {
     }
 
 }
-const rotatePoint = ({
-    x,
-    y
-}, rad) => {
-    const rcos = Math.cos(rad);
-    const rsin = Math.sin(rad);
-    return {
-        x: x * rcos - y * rsin,
-        y: y * rcos + x * rsin
-    };
-};
+
 
 export default DuplicationHelper;
