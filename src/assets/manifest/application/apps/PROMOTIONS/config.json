@@ -1,0 +1,14 @@
+
+{
+    "configName":"Promotions",
+    "openInNewWindow": false,
+    "report":false,
+    "routes": [
+        {
+            "route": "/Promotions",
+            "routeName": "/promotions",
+            "title": "Promotions",
+            "openInNewWindow": false
+        }
+    ]
+}

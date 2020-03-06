@@ -556,6 +556,8 @@
                     })
             },
             appendAndSaveFile(fileData) {
+                let self = this;
+
                 Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
                         SystemFile: {
                             SystemUser_ID: -1,
@@ -573,6 +575,7 @@
                     })
                     .catch(e => {
                         alert("Failed to save");
+                        console.log(e);
                     })
             },
             refreshBI(callback) {
@@ -580,7 +583,9 @@
 
                 let request = {
                     clusterType: 2,
-                    ClusterValue: self.selectedBasket.id
+                    clusterValue: self.selectedBasket.id,
+                    periodFromID: self.selectedPeriod.dateFrom,
+                    periodToID: self.selectedPeriod.dateTo 
                 }
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
