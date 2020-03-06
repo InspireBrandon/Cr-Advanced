@@ -10,6 +10,8 @@ class GroupingHandler {
 
     addItemToGroup(stage, selectedItem, selectedLayer, selectedLayerTree, selectedLayerTreeItem, multiselectGroup, findLayerItem, layerTree, callback) {
         let group = new Konva.Group({
+            x: 0,
+            y: 0,
             name: "group",
             visible: true,
             showEditName: false,
@@ -32,7 +34,7 @@ class GroupingHandler {
             locked: true,
             parent: selectedLayerTree
         })
-       
+
         selectedLayer.add(group)
         selectedLayerTree.children.push(groupTreeItem)
         console.log("selectedLayerTree.children", selectedLayerTree.children);
@@ -59,7 +61,7 @@ class GroupingHandler {
             })
         }
         console.log("[NEW GROUP ]", group);
-        group.rotation(multiselectGroup.rotation()) 
+        group.rotation(multiselectGroup.rotation())
         stage.batchDraw()
     }
 
@@ -67,7 +69,7 @@ class GroupingHandler {
         console.log("[REMOVE ITEM FROM GROUP]selectedIOterm", selectedItem);
         console.log("SELECTED LAYER", selectedLayer);
 
-        if (selectedItem.attrs.drawType == "group" && selectedItem.children.length > 0) {
+        if ((selectedItem.attrs.drawType == "group"||selectedItem.attrs.name == "Duplication Group") && selectedItem.children.length > 0) {
             for (let index = selectedItem.children.length - 1; index > -1; index--) {
                 const element = selectedItem.children[index];
                 findLayerItem(layerTree, element._id, cb => {
@@ -84,6 +86,10 @@ class GroupingHandler {
                             console.log("PARENT", parent)
 
                             element.moveTo(parent)
+                            // element.setAttrs({
+                            //     x: element.attrs.x + selectedItem.attrs.x,
+                            //     y: element.attrs.y + selectedItem.attrs.y
+                            // })
                             stage.batchDraw()
                         }
                     })

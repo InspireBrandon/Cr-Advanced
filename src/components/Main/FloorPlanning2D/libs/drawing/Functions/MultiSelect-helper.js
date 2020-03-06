@@ -30,11 +30,11 @@ class MultiSelectHelper {
             }
         }
     }
-    handleMultiselect(multiSelectGroup, selectedLayer, item, callback) {
+    handleMultiselect(multiSelectGroup, selectedLayer, item, stage,callback) {
         if (multiSelectGroup == null || multiSelectGroup == undefined) {
             let multigroup = new Konva.Group({
-                x:0,
-                y:0,
+                x: 0,
+                y: 0,
                 name: "MultiSelectGroup",
                 visible: true,
                 showEditName: false,
@@ -54,8 +54,8 @@ class MultiSelectHelper {
 
             item.moveTo(item.tmpParent)
             item.position({
-                x: pos.x,
-                y: pos.y
+                x: pos.x+multiSelectGroup.attrs.x,
+                y: pos.y+multiSelectGroup.attrs.y
             });
             item.tmpParent = null
             if (multiSelectGroup.children.length == 0) {
@@ -65,12 +65,13 @@ class MultiSelectHelper {
 
             callback(multiSelectGroup)
         } else {
+            // let dimension = selectedItem.getClientRect()
             item.draggable(false)
             item.tmpParent = item.parent
             item.moveTo(multiSelectGroup)
             item.position({
-                x: pos.x,
-                y: pos.y
+                x: item.attrs.x + multiSelectGroup.attrs.x,
+                y: item.attrs.y + multiSelectGroup.attrs.y
             });
 
             let tr = new Konva.Transformer({
@@ -80,7 +81,6 @@ class MultiSelectHelper {
             selectedLayer.add(tr);
             tr.attachTo(multiSelectGroup);
             callback(multiSelectGroup)
-
 
         }
 

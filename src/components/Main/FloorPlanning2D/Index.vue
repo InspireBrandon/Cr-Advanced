@@ -1725,10 +1725,12 @@
                 let self = this
                 self.$nextTick(() => {
                     self.makeChanges(field, callback => {
-
+                        self.stage.batchDraw()
                         self.$nextTick(() => {
-                            self.stage.batchDraw()
                             self.makingChanges = false
+                            console.log("batchDraw");
+                            self.selectedItem.draw()
+                            self.stage.batchDraw()
                         })
                     })
                 })
@@ -1737,6 +1739,30 @@
             makeChanges(field, callback) {
                 let self = this
                 self.makingChanges = true
+                let dimension = null
+                if (self.selectedItem.attrs.name == "group" || self.selectedItem.attrs.name == "Duplication Group") {
+                    dimension = self.selectedItem.getClientRect()
+                    console.log("[GROUP DIMENSION]", dimension);
+
+                }
+                console.log("[BEFORE CHANEGES APPLIED ]", self.selectedItem);
+
+                let asd = self.stage.find('Transformer')
+
+                let tr = asd[0]
+
+                console.log("[tr BEFORE]", tr);
+
+                if (dimension != null) {
+                    rotateAroundCenter(self.selectedItem, parseFloat(self.properties.rotation))
+                    // tr.rotation(parseFloat(self.properties.rotation))
+                } else {
+                    self.selectedItem.rotation(parseFloat(self.properties.rotation))
+                }
+
+                console.log("[tr AFTER]", tr);
+
+
                 self.selectedItem.attrs.radius = parseFloat(self.properties.radius) * (self.meterRatio *
                     self
                     .floorConfig.blockRatio)
@@ -1744,7 +1770,8 @@
                     .blockRatio)
                 self.selectedItem.attrs.depth = self.properties.depth * (self.meterRatio * self.floorConfig
                     .blockRatio)
-                self.selectedItem.attrs.rotation = parseFloat(self.properties.rotation)
+
+
                 self.selectedItem.attrs["fill"] = self.properties["fill"]
                 if (self.selectedItem.attrs.name == "image") {
                     self.selectedItem.attrs.keepAspectRatio = self.keepAspectRatio
@@ -1788,6 +1815,8 @@
                         .floorConfig
                         .blockRatio)
                 }
+
+                console.log("[AFTER CHANEGES APPLIED ]", self.selectedItem);
                 callback()
             },
             applyBrushProperties(tool) {
@@ -2337,7 +2366,7 @@
 
                     })
                     if (self.hasTape != null) {
-                        console.log("self.hasTape",self.hasTape);
+                        console.log("self.hasTape", self.hasTape);
                         self.hasTape.shape.attrs.draggable = true
                     }
                     self.stage.batchDraw()
@@ -2494,10 +2523,11 @@
                 }
 
                 let multiSelectHelper = new MultiSelectHelper()
-                multiSelectHelper.handleMultiselect(self.multiSelectGroup, self.selectedLayer, item, callback => {
-                    self.multiSelectGroup = callback
-                    self.selectedLayer.draw()
-                })
+                multiSelectHelper.handleMultiselect(self.multiSelectGroup, self.selectedLayer, item, self.stage,
+                    callback => {
+                        self.multiSelectGroup = callback
+                        self.selectedLayer.draw()
+                    })
             },
             clickselect(item, callback) {
                 let self = this
@@ -2587,7 +2617,7 @@
                     })
                 }
                 break;
-               
+
                 default: {
                     self.selectLayer(self.departmentTree, self.layerTree, layerCB => {
                         callback(item)
@@ -2642,7 +2672,7 @@
                             if (self.multiSelectGroup != null) {
                                 self.multiSelectGroup.draggable(true)
                             }
-                            
+
                             if (e.target.parent.attrs.name == "group" || e.target.parent.attrs.name ==
                                 "Duplication Group") {
                                 e.target.parent.draggable(true)
@@ -3423,9 +3453,12 @@
     // will work for shapes with top-left origin, like rectangle
     function rotateAroundCenter(node, rotation, hyp) {
         //current rotation origin (0, 0) relative to desired origin - center (node.width()/2, node.height()/2)
+        let dimension = node.getBoundingClientRect()
+        console.log("[rotateAroundCenter]", dimension);
+
         const right = {
-            x: -node.width(),
-            y: -node.height() / 2
+            x: -dimension.width / 2,
+            y: -dimension.height / 2
         };
         const current = rotatePoint(right, Konva.getAngle(node.rotation()));
         const rotated = rotatePoint(right, Konva.getAngle(rotation));
@@ -3436,6 +3469,7 @@
 
         node.x(node.x() + dx);
         node.y(node.y() + dy);
+
         // 
     }
 
