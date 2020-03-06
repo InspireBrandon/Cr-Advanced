@@ -11,6 +11,9 @@
             <v-spacer></v-spacer>
             <v-toolbar-title>
                 <span>Clustering</span>
+                <v-btn icon @click="showSettingsModal">
+                    <v-icon>settings</v-icon>
+                </v-btn>
             </v-toolbar-title>
         </v-toolbar>
         <v-tabs-items v-model="active">
@@ -20,6 +23,8 @@
                 </v-card>
             </v-tab-item>
         </v-tabs-items>
+        <SettingsModal ref="settingsModal" />
+        <Spinner ref="spinner"></Spinner>
     </v-card>
 </template>
 
@@ -32,6 +37,8 @@
     import Custom from '../Custom/Index'
     import Brand from "../Brand/Index.vue"
     import Department from "../Department/Index.vue"
+
+    import SettingsModal from './SettingsModal.vue'
 
     function TabItem(name, component) {
         this.name = name;
@@ -48,7 +55,8 @@
             Map,
             Research,
             Custom,
-            Brand
+            Brand,
+            SettingsModal
         },
         data() {
             return {
@@ -78,7 +86,14 @@
                         self.$refs.component[4].drawMap();
                     }
                 }, 1000);
-            }
+            },
+            showSettingsModal() {
+                let self = this;
+
+                self.$refs.settingsModal.show(() => {
+
+                })
+            },
         }
     }
 </script>
