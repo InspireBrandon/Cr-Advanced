@@ -432,9 +432,26 @@
                     })
                     .then(r => {
                         alert("Successfully saved");
+                        // self.refreshBI(() => {
+                        // })
                     })
                     .catch(e => {
                         alert("Failed to save");
+                    })
+            },
+            refreshBI(callback) {
+                let self = this;
+
+                let request = {
+                    clusterType: 3,
+                    ClusterValue: self.selectedBasket.id
+                }
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `PowerBI/UpdateClustering`, request)
+                    .then(r => {
+                        callback()
                     })
             },
             newFile() {

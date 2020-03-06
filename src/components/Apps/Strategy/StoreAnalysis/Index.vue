@@ -410,7 +410,7 @@
                     }
                 })
 
-                if(self.updateUser)
+                if (self.updateUser)
                     data = self.getUserDefined(data, levels)
 
                 self.rowData = data;
@@ -518,6 +518,8 @@
             saveFile() {
                 let self = this;
 
+                self.$refs.Spinner.show();
+
                 self.getFile(fileTransaction => {
 
                     let levelValues = [];
@@ -596,10 +598,27 @@
                     })
                     .then(r => {
                         self.fileData = fileData.store;
-                        alert("Successfully saved");
+                        self.refreshBI(() => {
+                            self.$refs.Spinner.hide();
+                        })
                     })
                     .catch(e => {
                         alert("Failed to save");
+                    })
+            },
+            refreshBI(callback) {
+                let self = this;
+
+                let request = {
+                    clusterType: 1, 
+                    ClusterValue: self.selectedSupergroup.id
+                }
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `PowerBI/UpdateClustering`, request)
+                    .then(r => {
+                        callback()
                     })
             },
             refreshFile() {
