@@ -152,6 +152,8 @@ import {
   APPLICATION_ROUTE as RouteConfig
 } from "./components/Main/NewViewTesting/RoutesForTesting/routerConfig";
 
+import Promotions from './components/Apps/Promotions/Index.vue'
+
 Vue.use(Router)
 
 export default new Router({
@@ -228,6 +230,10 @@ export default new Router({
               path: '/FloorPlanningViewer/:fileSrc',
               name: 'range_planning_view',
               component: FloorPlanningViewer,
+            }, {
+              path: '/Promotions',
+              name: 'promotions',
+              component: Promotions,              
             }, {
               path: '/Map',
               name: 'map',

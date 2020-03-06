@@ -2,7 +2,7 @@
     <div>
         <v-progress-linear v-if="showLoader" class="ma-0" color="primary" indeterminate height="5"></v-progress-linear>
         <v-container v-if="!showLoader" fluid grid-list-md style="height: calc(100vh - 65px); overflow-x: auto;">
-            <v-layout row wrap justify-center>
+            <v-layout row wrap>
                 <v-flex xl3 lg4 md4 sm6 xs12 v-for="(appConfigDetail, index) in appConfigDetail" :key="index">
                     <app-block :appConfigDetail="appConfigDetail"></app-block>
                 </v-flex>

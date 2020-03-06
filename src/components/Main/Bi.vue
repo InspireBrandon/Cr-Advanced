@@ -19,11 +19,15 @@
             <v-btn color="primary" :disabled="updating" v-if="userAccess==0" @click="RefreshTables">refresh</v-btn>
             <v-progress-circular indeterminate v-if="updating"></v-progress-circular>
             <v-btn color="primary" v-if="userAccess==0" @click="CleanTables">Clean</v-btn>
+            <v-btn v-if="selectedPlanograms.length == 1" icon color="primary" @click="updateBIPlanogramBaskets">
+                <v-icon>settings</v-icon>
+            </v-btn>
 
             <!-- <v-btn color="primary" @click="switchMode">{{ currentMode == "edit" ? "View" : "Edit" }}</v-btn> -->
         </v-toolbar>
         <div ref="reportContainer" id="reportContainer" style="width: 100%; height: calc(100vh - 110px);"></div>
         <Spinner ref="Spinner" />
+        <BIPlanogramBaskets ref="BIPlanogramBaskets" />
     </div>
 </template>
 
@@ -35,9 +39,12 @@
 
     import Spinner from '@/components/Common/Spinner';
 
+    import BIPlanogramBaskets from './BIPlanogramBaskets'
+
     export default {
         components: {
-            Spinner
+            Spinner,
+            BIPlanogramBaskets
         },
         data() {
             return {
@@ -96,8 +103,6 @@
                         delete Axios.defaults.headers.common["TenantID"];
                         clearTimeout(self.timeout);
 
-                        console.log("refresh", r.data);
-
                         self.timeout = setTimeout(() => {
                             self.checkCanRefresh();
                         }, 10000);
@@ -117,7 +122,6 @@
 
                 Axios.post(process.env.VUE_APP_API + "BIQue", request)
                     .then(r => {
-                        console.log(r.data);
                     })
             },
             CleanTables() {
@@ -293,7 +297,6 @@
                 self.report = powerbi.embed(container, config);
 
                 self.report.on('loaded', function (event) {
-                    console.log(self.report);
 
                     self.getFilters();
                     self.getActivePages(() => {
@@ -321,13 +324,10 @@
                 Axios.get(process.env.VUE_APP_API +
                         `TenantLink_AccessType?systemUserID=${systemUserID}&tenantID=${sessionStorage.currentDatabase}`)
                     .then(r => {
-                        console.log("[CHECK ACCESS]", r.data);
 
                         if (r.data.isDatabaseOwner == true) {
                             self.userAccess = 0
                         } else {
-                            console.log("[tenenant]");
-                            console.log(r.data);
 
                             self.userAccess = r.data.tenantLink_AccessTypeList[0].accessType
                             self.userAccessTypeID = r.data.tenantLink_AccessTypeList[0].tenantLink_AccessTypeID
@@ -349,8 +349,6 @@
                     let supplierFilter
                     let supplierFilter2
                     // apply filter
-
-                    console.log("[supplierFilter]", self.planogramAccess);
 
                     supplierFilter = {
                         $schema: "http://powerbi.com/product/schema#basic",
@@ -397,8 +395,6 @@
 
                 self.$nextTick(() => {
                     let page = self.report.page(self.selectedPage);
-                    console.log("[page]", page);
-
                     page.setActive();
                     self.applyReportFilters()
                 })
@@ -410,6 +406,19 @@
                     .catch(error => {
                         console.log("Print error: ", error);
                     });
+            },
+            updateBIPlanogramBaskets() {
+                let self = this;
+
+                var planogramID = self.selectedPlanograms[0];
+
+                var planogramName = self.planograms.find(e => {
+                    return e.value == planogramID;
+                }).text;
+
+                self.$refs.BIPlanogramBaskets.show(planogramID, planogramName, () => {
+
+                })
             }
         }
     }

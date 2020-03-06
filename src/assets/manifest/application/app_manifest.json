@@ -32,10 +32,14 @@
     },
     {
         "id": 9,
-        "system_code": "TESTING"
+        "system_code": "PROMOTIONS"
     },
     {
         "id": 10,
+        "system_code": "TESTING"
+    },
+    {
+        "id": 11,
         "system_code": "MAP"
     }
 ]

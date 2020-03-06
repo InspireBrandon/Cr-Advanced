@@ -598,29 +598,27 @@
                     })
                     .then(r => {
                         self.fileData = fileData.store;
-                        self.refreshBI(() => {
-                            self.$refs.Spinner.hide();
-                        })
+                        self.$refs.Spinner.hide();
                     })
                     .catch(e => {
                         alert("Failed to save");
                     })
             },
-            refreshBI(callback) {
-                let self = this;
+            // refreshBI(callback) {
+            //     let self = this;
 
-                let request = {
-                    clusterType: 1, 
-                    ClusterValue: self.selectedSupergroup.id
-                }
+            //     let request = {
+            //         clusterType: 1, 
+            //         ClusterValue: self.selectedSupergroup.id
+            //     }
 
-                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+            //     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.post(process.env.VUE_APP_API + `PowerBI/UpdateClustering`, request)
-                    .then(r => {
-                        callback()
-                    })
-            },
+            //     Axios.post(process.env.VUE_APP_API + `PowerBI/UpdateClustering`, request)
+            //         .then(r => {
+            //             callback()
+            //         })
+            // },
             refreshFile() {
                 let self = this;
 
