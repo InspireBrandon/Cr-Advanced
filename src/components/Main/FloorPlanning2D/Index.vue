@@ -101,12 +101,39 @@
                 </template>
                 <span>View 3D</span>
             </v-tooltip>
+            <v-btn @click="logMutli">log</v-btn>
+            <div v-show="multiSelectGroup !=null">
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn icon flat small v-on="on" @click="addItemToGroup()">
+                            <v-icon>blur_on</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Add Item to group</span>
+                </v-tooltip>
+            </div>
+            <div v-if="selectedItem!=null">
+                <div v-show="selectedItem.attrs.drawType=='group'">
+                    <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                            <v-btn icon flat small v-on="on" @click="removeItemFromGroup()">
+                                <v-icon>blur_off</v-icon>
+                            </v-btn>
+                        </template>
+                        <span>Remove Item from group</span>
+                    </v-tooltip>
+                </div>
+            </div>
             <!-- <v-btn @click="openFloorSettings">
                 Floor Settings
             </v-btn> -->
             <!-- <v-btn @click="openMediaManager">
                 open media
             </v-btn> -->
+            <!-- <div v-if="stage!=null">
+                xScale:{{stage.attrs.scaleX}} || yScale{{stage.attrs.scaleY}} || x:{{stage.attrs.x}} ||
+                y:{{stage.attrs.y}}
+            </div> -->
             <v-spacer></v-spacer>
             <v-toolbar-title>Floor Planning</v-toolbar-title>
         </v-toolbar>
@@ -181,8 +208,8 @@
                                     @change="applyFloorProperties">
                                 </v-text-field>
                             </v-card-text>
-                            <v-card-text v-if="selectedTool == 'open_with' && selectedItem!=null" class="pt-0"
-                                style="height: 30%; overflow-y: scroll;">
+                            <v-card-text v-if="selectedTool == 'open_with' && selectedItem!=null&&makingChanges==false"
+                                class="pt-0" style="height: 30%; overflow-y: scroll;">
                                 <v-text-field @change="applyProperties" v-if="properties.name!=null" label="Name"
                                     v-model="properties.name" hide-details> </v-text-field>
                                 <v-text-field
@@ -315,6 +342,10 @@
     import ClickTapHelper from './libs/drawing/Functions/ClickTap-helper'
     import TransFormerHelper from './libs/drawing/Functions/TransFormer-Helper'
     import MultiSelectHelper from './libs/drawing/Functions/MultiSelect-helper'
+    import GroupingHandler from './libs/drawing/Functions/Grouping-handler'
+    import GroupDuplicationHelper from './libs/drawing/Functions/Group-Duplication-Helper'
+
+
 
     import SnappingHandler from './libs/drawing/Functions/snapping-handler'
 
@@ -363,6 +394,7 @@
         // 1 block = 1 meter
         data() {
             return {
+                makingChanges: false,
                 hasTape: null,
                 clusterTypes: [{
                         text: "All Stores Cluster",
@@ -554,6 +586,48 @@
             }
         },
         methods: {
+            logMutli() {
+                let self = this
+                console.log("self.multiSelectGroup", self.multiSelectGroup);
+                console.log("self.stage", self.stage);
+                console.log("selectedItem", self.selectedItem);
+
+            },
+            addItemToGroup() {
+                let self = this
+                let groupingHandler = new GroupingHandler()
+                groupingHandler.addItemToGroup(self.stage, self.selectedItem, self.selectedLayer, self
+                    .selectedLayerTree, self.selectedLayerTreeItem, self.multiSelectGroup, self.findLayerItem, self
+                    .layerTree, callback => {
+                        self.multiSelectGroup.destroy()
+                        self.multiSelectGroup = null
+                        self.stage.find('Transformer').destroy()
+                        self.stage.batchDraw()
+                    })
+            },
+            removeItemFromGroup() {
+                let self = this
+                let groupingHandler = new GroupingHandler()
+                let parent = self.selectedItem.parent
+                groupingHandler.removeItemFromGroup(self.stage, self.selectedItem, self.selectedLayer, self
+                    .selectedLayerTree, self.selectedLayerTreeItem, self.multiSelectGroup, self.findLayerItem, self
+                    .layerTree, parent, callback => {
+                        self.findLayerItem(self.layerTree, callback._id, cb => {
+                            cb.parent.children.forEach((element, idx) => {
+                                if (cb == element) {
+                                    cb.parent.children.splice(idx, 1)
+                                    callback.destroy()
+                                    self.selectLayer(cb.parent, self.layerTree, layerCB => {
+                                        self.selectedItem = null
+                                        self.stage.batchDraw()
+                                        cb.parent.showChildren = false
+                                    })
+
+                                }
+                            })
+                        })
+                    })
+            },
             getClusters() {
                 let self = this
                 axios.get(process.env.VUE_APP_API + `Cluster/Store`).then(r => {
@@ -659,7 +733,8 @@
                             name: 'wall',
                             drawType: 'wall',
                             children: [],
-                            width: null
+                            width: null,
+                            parent: parentLayerTree
                         })
                         parentLayerTree.children.push(treeitem)
                         self.stage.batchDraw()
@@ -683,10 +758,11 @@
                         visible: true,
                         showEditName: false,
                         selected: false,
-                        showChildren: true,
+                        showChildren: false,
                         draggable: true,
                         name: "Circle",
                         children: [],
+                        parent: parentLayerTree
                     }))
                     self.stage.batchDraw()
 
@@ -712,10 +788,11 @@
                         visible: true,
                         showEditName: false,
                         selected: false,
-                        showChildren: true,
-                        draggable: true,
+                        showChildren: false,
+                        draggable: false,
                         name: "rect-group",
                         children: [],
+                        parent: parentLayerTree
                     }))
                     rect.shape.setAttrs({
                         DropID: item.fixture_ID,
@@ -740,10 +817,11 @@
                         visible: true,
                         showEditName: false,
                         selected: false,
-                        showChildren: true,
+                        showChildren: false,
                         draggable: false,
                         name: "Image",
                         children: [],
+                        parent: parentLayerTree
                     }))
                     image.shape.setAttrs({
                         width: item.width,
@@ -775,10 +853,11 @@
                         visible: true,
                         showEditName: false,
                         selected: false,
-                        showChildren: true,
-                        draggable: true,
+                        showChildren: false,
+                        draggable: false,
                         name: "arrow",
                         children: [],
+                        parent: parentLayerTree
                     }))
                     arrow.shape.points([item.x, item.y, item.arrowEndX, item.arrowEndY])
                 }
@@ -798,10 +877,11 @@
                         visible: true,
                         showEditName: false,
                         selected: false,
-                        showChildren: true,
-                        draggable: true,
+                        showChildren: false,
+                        draggable: false,
                         name: "Area",
                         children: [],
+                        parent: areaLayerTree
                     }))
                     area.shape.setAttrs({
                         width: item.width,
@@ -868,10 +948,9 @@
                             break;
 
                             default:
-                                //console.log("___________________________________________________________");
-
-
                                 layer = new Konva.Group({
+                                    x: item.x,
+                                    x: item.y,
                                     name: item.name,
                                     visible: true,
                                     showEditName: false,
@@ -890,9 +969,6 @@
                                     showChildren: layer.showChildren,
                                     drawType: "Layer"
                                 })
-                                //console.log(parentLayerTree);
-                                //console.log(layertreeitem);
-                                //console.log(layer);
                                 parentLayerTree.children.push(layertreeitem)
                                 parentArr.add(layer);
 
@@ -914,11 +990,12 @@
                             let group = new Konva.Group({
                                 x: item.x,
                                 y: item.y,
+                                rotation: item.rotation,
                                 name: item.name,
                                 visible: true,
                                 showEditName: false,
                                 selected: false,
-                                showChildren: true,
+                                showChildren: false,
                                 draggable: true,
                                 locked: false,
                                 drawType: "group",
@@ -934,6 +1011,7 @@
                                 showChildren: group.showChildren,
                                 drawType: "group",
                                 locked: true,
+                                parent: parentLayerTree
                             })
                             parentArr.add(group)
                             parentLayerTree.children.push(layertreeitem)
@@ -966,7 +1044,6 @@
             open() {
                 let self = this
                 self.$refs.floorPlanSelector.show(callback => {
-                    //console.log("floorPlanSelector", callback);
                     self.Floorplan_ID = callback.id
                     if (callback.store_ID != null) {
                         self.selectedClusterType = "stores"
@@ -983,7 +1060,6 @@
                     self.applyFloorProperties()
                     axios.get(process.env.VUE_APP_API + `GetFloorPlanItems?Header_ID=${callback.id}`).then(
                         r => {
-                            //console.log(r);
                             self.stage.children.forEach(child => {
                                 if (child.attrs.name != 'grid') {
                                     child.destroyChildren()
@@ -991,14 +1067,12 @@
                             })
                             self.drawSavedItems(r.data, self.stage, self.layerTree,
                                 cb => {
-                                    //console.log("LOOP CALLBACK");
                                     self.stage.batchDraw()
-                                    self.selectLayer(self.fixtureTree, self.layerTree)
+                                    self.selectLayer(self.fixtureTree, self.layerTree, cb => {})
                                 })
                             self.Floorplan_ID = callback.id
                         })
 
-                    // })
                 })
             },
             CheckType(item) {
@@ -1008,10 +1082,13 @@
                         return 0
                         break;
                     case "group":
-                        return 0
+                        return 1
                         break;
                     case "planogramGroup":
-                        return 0
+                        return 1
+                        break;
+                    case "Duplication Group":
+                        return 1
                         break;
                     case "PlanogramFixture":
                         return 1
@@ -1049,7 +1126,6 @@
                             children: []
                         }
                         if (item.attrs.name == "arrow") {
-                            //console.log(item);
                             reqObj.x = item.attrs.points[0]
                             reqObj.y = item.attrs.points[1]
                             reqObj.arrowEndX = item.attrs.points[2]
@@ -1059,9 +1135,6 @@
                         if (item.attrs.name == "image") {
                             self.imageIDArr.push(item)
                         }
-                        //  if (item.attrs.name == "Label") {
-                        //     reqObj.label=item.attrs.text
-                        // }
                         parentArr.push(reqObj)
                         if (item.children.length > 0) {
                             self.FormatItems(item.children, reqObj.children, item.attrs.DropID, Floorplan_ID,
@@ -1080,8 +1153,6 @@
                     axios.get(process.env.VUE_APP_API + `Floorplan?Floorplan_ID=${self.Floorplan_ID}`).then(r => {
                         r.data.forEach(saveditem => {
                             self.imageIDArr.forEach(item => {
-                                //console.log("x" + saveditem.x + " " + item.attrs.x + " ||y" +
-                                // saveditem.y + "" + item.attrs.y);
                                 if (saveditem.x == item.attrs.x.toFixed(0) && saveditem.y ==
                                     item.attrs
                                     .y.toFixed(0)) {
@@ -1118,7 +1189,6 @@
             saveFloorplan() {
                 let self = this
                 self.stage.find('Transformer').destroy()
-                //console.log('saving', self.stage);
                 self.saveArr = []
                 if (self.selectedClusterOption == null) {
                     alert("Please fill in cluster options")
@@ -1153,19 +1223,16 @@
                     default:
                         break;
                     }
-                    //console.log("Header", req);
                     axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                     axios.post(process.env.VUE_APP_API + `saveFloorHeader`, req).then(r => {
                         self.Floorplan_ID = r.data.id
                         self.imageIDArr = []
                         self.FormatItems(self.stage.children, self.saveArr, 0, self.Floorplan_ID,
                             callback => {
-                                //console.log("FormatItems", self.saveArr);
                                 axios.post(process.env.VUE_APP_API +
                                     `saveFloorHeader?header_ID=${self.Floorplan_ID}`, self
                                     .saveArr).then(
                                     resp => {
-                                        //console.log("savesimages", self.imageIDArr);
                                         self.handleImageSaving()
                                     })
 
@@ -1185,10 +1252,6 @@
             addShape(parent, item, idx, dropPos, callback) {
                 let self = this
                 let shape = JSON.parse(item.attributes)
-                //console.log("sdhape", shape);
-                //console.log("item", item);
-
-                //console.log("x:" + shape.x + " y:" + shape.y);
                 switch (shape.name) {
                     case "Gondola-Rect": {
                         let rect = new Rect(self.selectedLayer, {
@@ -1210,13 +1273,13 @@
                             visible: true,
                             showEditName: true,
                             selected: true,
-                            showChildren: true,
+                            showChildren: false,
                             draggable: true,
                             name: "rect-group",
                             children: [],
+                            parent: self.selectedLayerTree
                         }))
                         rect.shape.moveTo(parent)
-                        //console.log("da rect", rect);
 
                         rect.shape.draggable(false)
                     }
@@ -1246,10 +1309,11 @@
                         visible: true,
                         showEditName: true,
                         selected: true,
-                        showChildren: true,
+                        showChildren: false,
                         draggable: true,
                         name: "Circle",
                         children: [],
+                        parent: self.selectedLayerTree
                     }))
                     circle.shape.moveTo(parent)
 
@@ -1284,7 +1348,7 @@
                         visible: true,
                         showEditName: false,
                         selected: true,
-                        showChildren: true,
+                        showChildren: false,
                         draggable: true,
                         locked: true,
                         drawType: "group",
@@ -1301,6 +1365,7 @@
                         showChildren: retVal.Konvalayer.showChildren,
                         drawType: "group",
                         locked: true,
+                        parent: retVal.layerTreeItem
                     })
 
                     self.departmentTree.children.push(retVal.layerTreeItem)
@@ -1313,6 +1378,8 @@
             },
             getDepartment(planoID, callback) {
                 let self = this
+                console.log("getDepartment", planoID);
+
                 axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 axios.get(process.env.VUE_APP_API + `Planogram/department?ID=${planoID}`).then(r => {
@@ -1341,7 +1408,6 @@
                         let container = self.stage.container().getBoundingClientRect();
                         self.stage._setPointerPosition(ev);
                         let dropPos = self.GetTransformedMousePoint(self.stage);
-                        //console.log("dropPos", dropPos);
 
                         let group = new Konva.Group({
                             name: cb.planogram_Name,
@@ -1349,7 +1415,7 @@
                             visible: true,
                             showEditName: false,
                             selected: true,
-                            showChildren: true,
+                            showChildren: false,
                             draggable: true,
                             locked: true,
                             drawType: "group",
@@ -1366,6 +1432,7 @@
                             showChildren: group.showChildren,
                             drawType: "group",
                             locked: true,
+                            parent: depart.layerTreeItem
                         })
                         let tmplayer = self.selectedLayer
                         let tmplayertreeitem = self.selectedLayerTree
@@ -1380,11 +1447,13 @@
                             })
 
                         })
-                        self.selectLayer(self.departmentTree, self.layers)
+                        self.selectLayer(self.departmentTree, self.layers, layercb => {
+                            self.selectedLayer = tmplayer
+                            self.selectedLayerTree = tmplayertreeitem
+                            self.stage.batchDraw()
 
-                        self.selectedLayer = tmplayer
-                        self.selectedLayerTree = tmplayertreeitem
-                        self.stage.batchDraw()
+                        })
+
 
                     })
                 })
@@ -1395,7 +1464,6 @@
 
                 axios.get(process.env.VUE_APP_API +
                     `FloorplanItems/Exisitng?headerID=${header}`).then(r => {
-                    //console.log("getSavedData", r.data);
 
                     callback(r.data)
                 })
@@ -1405,7 +1473,6 @@
             },
             drawLibraryFixture(ev, libraryItem) {
                 let self = this
-                //console.log("libraryItem", libraryItem);
                 let container = self.stage.container().getBoundingClientRect();
                 self.stage._setPointerPosition(ev);
                 let dropPos = self.GetTransformedMousePoint(self.stage);
@@ -1419,16 +1486,15 @@
                     visible: true,
                     showEditName: true,
                     selected: true,
-                    showChildren: true,
+                    showChildren: false,
                     draggable: true,
                     name: "rect-group",
                     children: [],
+                    parent: self.fixtureTree
                 }))
                 let height = (libraryItem.data.depth / 100) * (self.meterRatio * self.floorConfig.blockRatio)
                 let width = (libraryItem.data.width / 100) * (self.meterRatio * self.floorConfig.blockRatio)
                 let depth = (libraryItem.data.height / 100) * (self.meterRatio * self.floorConfig.blockRatio)
-                //console.log("height", height);
-                //console.log("width", width);
 
                 rect.shape.setAttrs({
                     height: height,
@@ -1436,24 +1502,23 @@
                     depth: depth,
                     type: "fixture"
                 })
-                self.selectLayer(self.fixtureTree, self.layers)
+                self.selectLayer(self.fixtureTree, self.layers, layerCB => {
+
+                })
                 self.stage.batchDraw()
 
             },
             checkForHeader(item, callback) {
                 let self = this
-                //console.log("checkForHeader", item);
                 axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 axios.post(process.env.VUE_APP_API + `FloorPlanheader/Exisitng?systemFileID=${item.id}`)
                     .then(
                         r => {
-                            //console.log("CHECK HEADER", r);
                             callback(r.data)
                         })
             },
             dropDragItem(ev) {
-                //console.log("event", ev);
 
                 ev.preventDefault();
                 let self = this
@@ -1461,12 +1526,9 @@
                 if (window.library != null) {
                     if (window.library.type == "CUSTOM_PLANOGRAM") {
                         self.checkForHeader(window.library.data, HeaderCallback => {
-                            //console.log("HeaderCallback", HeaderCallback);
                             if (HeaderCallback != null) {
                                 self.drawSaved(HeaderCallback, ev)
                             } else {
-                                //console.log("window", librarydata);
-
                                 self.getPlanogramData(librarydata.data.id, defaultData => {
                                     if (defaultData != null && defaultData != undefined) {
                                         self.drawDefaultSpace(defaultData, ev)
@@ -1491,18 +1553,17 @@
             },
             getPlanogramData(id, callback) {
                 let self = this
-                //console.log("getPlanogramData-[ID]", id);
 
                 axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 axios.get(process.env.VUE_APP_API +
                     `Planogram_Details/BysystemFileID?systemFile_ID=${id}`).then(resp => {
-                    //console.log("details", resp);
-
                     axios.get(process.env.VUE_APP_API +
                         `FloorPlan_Fixtures/GetFixtures?planogramDetail_ID=${resp.data.id}`).then(
                         r => {
-                            //console.log("getPlanogramData", r.data);
-                            callback(r.data)
+                            callback({
+                                plano: resp.data,
+                                data: r.data
+                            })
                         })
                 })
 
@@ -1518,66 +1579,137 @@
                 } else {
                     meters = self.meterRatio
                 }
+                console.log("drawDefaultSpace[DATA]", data);
 
-                data.forEach((element, idx) => {
 
-                    if (element.shape == "Circle") {
-                        let circle = new Circle(self.selectedLayer, {
-                            x: ev.x,
-                            y: ev.y + 0,
-                        }, null, {
-                            radius: (element.width / 4) * (self.floorConfig.blockRatio * meters)
-                                .toFixed(2),
-                            color: "#1976d2"
-                        });
-                        circle.shape.setAttrs({
-                            width: (element.width / 4) * (self.floorConfig.blockRatio * meters)
-                                .toFixed(2),
-                            DropID: element.id.toString(),
-                            x: lastPos + widthInc,
-                            y: ev.y
-                        })
-                        circle.shape.attrs.DropID = element.id.toString()
-                        lastPos = circle.shape.attrs.x + (element.width / 4) * (self.floorConfig.blockRatio *
-                            meters).toFixed(2)
-                        circle.shape.draggable(true)
-                    } else {
-                        element.shape = "Square"
-                        let rect = new Rect(self.selectedLayer, {
-                            x: ev.x,
-                            y: ev.y,
-                        }, null, null, null, self.imageSrc(element
-                            .id,
-                            "Top"));
-                        rect.shape.setAttrs({
-                            width: (element.width / 4) * (self.floorConfig.blockRatio * meters)
-                                .toFixed(2),
-                            height: (element.height / 4) * (self.floorConfig.blockRatio * meters)
-                                .toFixed(2),
-                            draggable: true
-                        })
-                        rect.shape.setAttrs({
-                            x: lastPos + widthInc,
-                            y: ev.y
-                        })
+                self.getDepartment(data.plano.id, depart => {
+                    let container = self.stage.container().getBoundingClientRect();
+                    self.stage._setPointerPosition(ev);
+                    let dropPos = self.GetTransformedMousePoint(self.stage);
 
-                        rect.shape.setAttrs({
-                            width: (element.width / 4) * (self.floorConfig.blockRatio * meters)
-                                .toFixed(2),
-                            height: (element.height / 4) * (self.floorConfig.blockRatio * meters)
-                                .toFixed(2),
-                        })
-                        //console.log("rect", rect);
-                        rect.shape.attrs.DropID = element.id
-                            .toString()
-                        lastPos = rect.shape.attrs.x + (element.width / 4) * (self.floorConfig.blockRatio *
-                            meters).toFixed(2)
-                        rect.shape.draggable(true)
-                    }
-                    widthInc = (element.width / 4) * (self.floorConfig.blockRatio * meters)
-                    self.stage.batchDraw()
-                    self.$refs.spinner.hide()
+                    let group = new Konva.Group({
+                        name: data.plano.planogramName,
+                        type: "planogramGroup",
+                        visible: true,
+                        showEditName: false,
+                        selected: true,
+                        showChildren: false,
+                        draggable: true,
+                        locked: true,
+                        drawType: "group",
+                        isPlanogram: true,
+                    })
 
+                    let layertreeitem = new treeItem({
+                        KonvaID: group._id,
+                        children: [],
+                        name: data.plano.planogramName,
+                        showEditName: false,
+                        visible: group.visible,
+                        selected: group.selected,
+                        showChildren: group.showChildren,
+                        drawType: "group",
+                        locked: true,
+                        parent: depart.layerTreeItem
+                    })
+                    let tmplayer = self.selectedLayer
+                    let tmplayertreeitem = self.selectedLayerTree
+                    depart.layerTreeItem.children.push(layertreeitem)
+                    console.log("{OPEN DEFAULT SPACE}   dragged department", depart.Konvalayer);
+
+                    depart.Konvalayer.add(group);
+                    self.selectedLayerTree = layertreeitem
+                    self.selectedLayer.draw();
+                    data.data.forEach((element, idx) => {
+
+                        if (element.shape == "Circle") {
+                            let circle = new Circle(group, {
+                                x: ev.x,
+                                y: ev.y + 0,
+                            }, null, {
+                                radius: (element.width / 4) * (self.floorConfig.blockRatio *
+                                        meters)
+                                    .toFixed(2),
+                                color: "#1976d2"
+                            });
+                            circle.shape.setAttrs({
+                                width: (element.width / 4) * (self.floorConfig.blockRatio *
+                                        meters)
+                                    .toFixed(2),
+                                DropID: element.id.toString(),
+                                x: lastPos + widthInc,
+                                y: ev.y
+                            })
+                            circle.shape.attrs.DropID = element.id.toString()
+                            lastPos = circle.shape.attrs.x + (element.width / 4) * (self.floorConfig
+                                .blockRatio *
+                                meters).toFixed(2)
+                            layertreeitem.children.push(new treeItem({
+                                KonvaID: circle.shape._id,
+                                visible: true,
+                                showEditName: true,
+                                selected: true,
+                                showChildren: false,
+                                draggable: true,
+                                name: "circle",
+                                children: [],
+                                parent: layertreeitem
+                            }))
+                            circle.shape.draggable(true)
+                        } else {
+                            element.shape = "Square"
+                            let rect = new Rect(group, {
+                                x: ev.x,
+                                y: ev.y,
+                            }, null, null, null, self.imageSrc(element
+                                .id,
+                                "Top"));
+                            rect.shape.setAttrs({
+                                width: (element.width / 4) * (self.floorConfig.blockRatio *
+                                        meters)
+                                    .toFixed(2),
+                                height: (element.height / 4) * (self.floorConfig.blockRatio *
+                                        meters)
+                                    .toFixed(2),
+                                draggable: true
+                            })
+                            rect.shape.setAttrs({
+                                x: lastPos + widthInc,
+                                y: ev.y
+                            })
+
+                            rect.shape.setAttrs({
+                                width: (element.width / 4) * (self.floorConfig.blockRatio *
+                                        meters)
+                                    .toFixed(2),
+                                height: (element.height / 4) * (self.floorConfig.blockRatio *
+                                        meters)
+                                    .toFixed(2),
+                            })
+                            rect.shape.attrs.saveID = element.id
+                                .toString()
+                            lastPos = rect.shape.attrs.x + (element.width / 4) * (self.floorConfig
+                                .blockRatio *
+                                meters).toFixed(2)
+                            rect.shape.draggable(true)
+                            layertreeitem.children.push(new treeItem({
+                                KonvaID: rect.shape._id,
+                                visible: true,
+                                showEditName: true,
+                                selected: true,
+                                showChildren: false,
+                                draggable: true,
+                                name: "rect-group",
+                                children: [],
+                                parent: layertreeitem
+                            }))
+                        }
+                        widthInc = (element.width / 4) * (self.floorConfig.blockRatio * meters)
+
+                        self.stage.batchDraw()
+                        self.$refs.spinner.hide()
+
+                    })
                 })
             },
             MoveLayerTopTop(event) {
@@ -1593,13 +1725,18 @@
                 let self = this
                 self.$nextTick(() => {
                     self.makeChanges(field, callback => {
-                        self.stage.batchDraw()
+
+                        self.$nextTick(() => {
+                            self.stage.batchDraw()
+                            self.makingChanges = false
+                        })
                     })
                 })
 
             },
             makeChanges(field, callback) {
                 let self = this
+                self.makingChanges = true
                 self.selectedItem.attrs.radius = parseFloat(self.properties.radius) * (self.meterRatio *
                     self
                     .floorConfig.blockRatio)
@@ -1613,21 +1750,23 @@
                     self.selectedItem.attrs.keepAspectRatio = self.keepAspectRatio
                     if (self.selectedItem.attrs.keepAspectRatio == true) {
                         if (field == "height") {
-                            let aspectRatio = self.selectedItem.attrs.height / self.selectedItem.attrs.width
+                            // adjusted height = <user-chosen width> * original height / original width
+                            self.selectedItem.attrs.width = (parseFloat(self.properties.height) * (self.meterRatio *
+                                    self.floorConfig.blockRatio)) * self.selectedItem.attrs.width / self.selectedItem
+                                .attrs.height
 
                             self.selectedItem.attrs.height = parseFloat(self.properties.height) * (self.meterRatio *
                                 self.floorConfig.blockRatio)
-                            self.selectedItem.attrs.width = parseFloat(self.selectedItem.attrs.width) * aspectRatio
-                        } else {
-                            let aspectRatio = self.selectedItem.attrs.width / self.selectedItem.attrs.height
-
+                        }
+                        if (field == "width") {
+                            self.selectedItem.attrs.height = (parseFloat(self.properties.width) * (self.meterRatio *
+                                    self.floorConfig.blockRatio)) * self.selectedItem.attrs.height / self.selectedItem
+                                .attrs.width
                             self.selectedItem.attrs.width = parseFloat(self.properties.width) * (self
                                 .meterRatio *
                                 self
                                 .floorConfig
                                 .blockRatio)
-                            self.selectedItem.attrs.height = parseFloat(self.selectedItem.attrs.height) *
-                                aspectRatio
                         }
                     } else {
                         self.selectedItem.attrs.height = parseFloat(self.properties.height) * (self
@@ -1687,18 +1826,11 @@
             selectItemFromSidePanel(item) {
                 let self = this
                 self.findKonvaItem(self.stage.children, item.KonvaID, e => {
-                    //console.log("find konva item - [sidepanel] ", e);
-
                     clickTapHelper.destroyTransformer(self.stage, cb => {
-                        //console.log("selectItemFromSidePanel", item);
-
                         clickTapHelper.setSelectedItem(e, self.findLayerItem, self
                             .selectedLayerTreeItem, self.selectedItem, self.selectedLayer, self
                             .layerTree, cb => {
                                 self.selectedLayerTreeItem = cb
-                                //console.log("[selectItemFromSidePanel]setSelectedItem(cb)", self
-                                // .selectedLayerTreeItem);
-
                             })
                     })
                     self.selectedLayerTreeItem = item
@@ -1708,7 +1840,6 @@
 
                         if (e != self.stage) {
                             self.selectedItem = e;
-                            //console.log("self.selectedItem", self.selectedItem);
                             self.properties.name = self.selectedItem.attrs.name;
                             self.properties.height = (self.selectedItem.attrs.height / (self.meterRatio *
                                 self.floorConfig.blockRatio)).toFixed(2);
@@ -1759,8 +1890,6 @@
 
                             self.selectedLayer.add(tr);
                             tr.attachTo(e);
-                            //console.log("[sidepanel]-tr", tr);
-
                             self.selectedLayer.draw();
 
                             tr.on('transform', function (z) {
@@ -1840,7 +1969,6 @@
             openSpaceDesigner() {
                 let self = this
                 self.$refs.PlanogramDetailsSelector.show(null, false, null, spacePlanID => {
-                    //console.log("spacePlanID", spacePlanID);
 
                     self.$router.push("/FloorplanDesigner/" + spacePlanID.id)
                 })
@@ -1922,12 +2050,12 @@
                     visible: true,
                     showEditName: true,
                     selected: true,
-                    showChildren: true,
+                    showChildren: false,
                     draggable: true,
                     name: "Tape",
                     children: [],
+                    parent: self.departmentTree
                 }))
-                //console.log("addimage", image.shape.attrs.refFile);
 
                 var imageObj = new Image();
 
@@ -1938,7 +2066,6 @@
                     self.imagePos.x = 0
                     self.imagePos.y = 0
 
-                    // self.selectedTool = ''
                     image.shape.draggable(true)
                     image.shape.attrs.width = parseFloat(self.meterRatio) * parseFloat(self.floorConfig
                         .blockRatio) * 23.48
@@ -1950,7 +2077,6 @@
                 }
                 imageObj.src = "/20M Tape with Head.png";
                 self.hasTape = image
-                //console.log(image);
 
             },
             swapIndex(item, layers, idx) {
@@ -1979,7 +2105,9 @@
                 let self = this
                 if (self.dragItem != null && item != null && self.dragItem != item) {
                     item.children.push(self.dragItem)
-                    self.selectLayer(item, parent)
+                    self.selectLayer(item, parent, layerCB => {
+
+                    })
                     self.dragParent.splice(self.dragidx, 1)
                     var KonvaEndLayer
                     var konvaItem
@@ -2017,8 +2145,8 @@
             },
             log() {
                 let self = this
-                //console.log("log", self.stage);
-                //console.log("logTree", self.layerTree);
+                console.log("log", self.stage);
+                console.log("logTree", self.layerTree);
 
             },
             updateSnappingAngles() {
@@ -2046,15 +2174,14 @@
                     visible: true,
                     showEditName: true,
                     selected: true,
-                    showChildren: true,
+                    showChildren: false,
                     draggable: true,
                     name: "Image",
                     children: [],
+                    parent: self.selectedLayerTree
                 }))
                 image.shape.attrs.refFile = file
                 image.shape.attrs.keepAspectRatio = true
-                //console.log("addimage", image.shape.attrs.refFile);
-
                 var imageObj = new Image();
 
                 imageObj.onload = function () {
@@ -2064,14 +2191,12 @@
                     self.imagePos.x = 0
                     self.imagePos.y = 0
 
-                    // self.selectedTool = ''
                     image.shape.draggable(true)
                     image.shape.attrs.width = image.shape.attrs.image.width
                     image.shape.attrs.height = image.shape.attrs.image.height
                 }
                 imageObj.src = dataUrl;
 
-                //console.log("ADDIMAGE", image);
 
             },
             selectImage() {
@@ -2142,13 +2267,15 @@
 
                 self.layers.unshift(layer);
                 self.stage.add(layer);
-                self.selectLayer(layertreeitem, self.layerTree)
+                self.selectLayer(layertreeitem, self.layerTree, layerCB => {
+
+                })
                 self.$refs.RecursiveLayer.focusRename(layer._id)
             },
             addGroup() {
                 let self = this;
                 let group = new Konva.Group({
-                    name: "Group 1",
+                    name: "group",
                     visible: true,
                     showEditName: false,
                     selected: true,
@@ -2169,17 +2296,16 @@
                     showChildren: group.showChildren,
                     drawType: "group",
                     locked: true,
+                    parent: self.selectedLayerTree
                 })
 
                 self.selectedLayerTree.children.push(layertreeitem)
-                // self.selectedLayer.add(group);
                 self.selectedLayer.draw();
             },
-            selectLayer(layer, parent) {
+            selectLayer(layer, parent, callback) {
                 let self = this;
 
                 self.$nextTick(() => {
-                    //  //console.log("selectedLayer", self.selectedLayer);
 
                     self.selectedLayer.children.forEach(child => {
 
@@ -2200,8 +2326,6 @@
                             // })
                         }
                         layer.selected = true;
-                        console.log("[SELECT METHOD]select  layer", self.selectedLayer);
-                        console.log(self.selectedLayer.attrs.name);
 
                         if (self.selectedLayer.attrs.name == "Duplication Group") {
 
@@ -2213,14 +2337,17 @@
 
                     })
                     if (self.hasTape != null) {
-                        self.hasTape.attrs.draggable = true
+                        console.log("self.hasTape",self.hasTape);
+                        self.hasTape.shape.attrs.draggable = true
                     }
                     self.stage.batchDraw()
+                    callback()
                 })
             },
             duplicateDrag(e) {
                 let self = this
                 let duplicationHelper = new DuplicationHelper();
+                let groupDuplicationHelper = new GroupDuplicationHelper();
                 let layerTree
                 switch (e.target.attrs.name) {
                     case "Gondola-Rect":
@@ -2244,16 +2371,24 @@
                         duplicationHelper.DuplicateImageDrag(e.target, self.selectedLayer, self
                             .selectedLayerTree)
                         break;
+                    case "group": {
+                        groupDuplicationHelper.duplicateGroupDrag(e.target, self.selectedLayerTree)
+                    }
+                    break
+                case "Duplication Group": {
+                    groupDuplicationHelper.duplicateGroupDrag(e.target, self.selectedLayerTree)
 
-                    default:
-                        break;
+                }
+                break
+
+
+                default:
+                    break;
                 }
 
             },
             scaleSelected(Inputlength) {
                 let self = this
-                //console.log("self.dotted", self.dotted);
-                //console.log("self.selectedItem", self.selectedItem);
                 let useRotated = false
                 if (self.selectedItem == null) {
                     self.dotted.shape.destroy()
@@ -2265,14 +2400,12 @@
                     return
                 }
                 let rotation = self.dotted.shape.attrs.rotation
-                //console.log("[ROTATION]", rotation);
                 if (rotation == 180 || rotation == -180 || rotation == 0) {
                     rotation = 90
                     useRotated = true
                 } else {
                     if (Math.abs(rotation) > 90) {
                         rotation = Math.abs(rotation) - 90
-                        //console.log("[ROTATION TRANSFORMED]", rotation);
 
                     }
                 }
@@ -2283,8 +2416,6 @@
 
                 let dottedHeight = Math.abs((metersInPX) * Math.sin(angle))
                 let dottedWidth = Math.abs((metersInPX) * Math.cos(angle))
-                //console.log("dottedHeight", dottedHeight);
-                //console.log("dottedWidth", dottedWidth);
 
 
                 var heightRatio = dottedHeight / self.selectedItem.attrs.height
@@ -2292,13 +2423,6 @@
 
                 let newHeight = self.selectedItem.attrs.height * Math.abs(heightRatio)
                 let newWidth = self.selectedItem.attrs.width * Math.abs(WidthRatio)
-                //console.log("heightRatio", heightRatio);
-                //console.log("newHeight", newHeight);
-
-                //console.log("WidthRatio", WidthRatio);
-                //console.log("NewWidth", newWidth);
-
-
                 if (rotation == 90 || rotation == -90) {
                     let dottedHeightratio = self.dotted.shape.attrs.width / self.selectedItem.attrs.height
                     if (!useRotated) {
@@ -2315,7 +2439,6 @@
                     self.dotted.shape.destroy()
                     self.dotted = null
                     self.stage.batchDraw()
-                    //console.log("90 angle", self.selectedItem.attrs.width);
                     return
                 }
 
@@ -2333,7 +2456,6 @@
                         })
                     }
                 }
-                //console.log(self.dotted);
                 self.dotted.shape.destroy()
                 self.dotted = null
                 self.stage.batchDraw()
@@ -2349,12 +2471,27 @@
                     self.showMenu = true
                 })
             },
+            clearMultiselect(e) {
+                let self = this
+                if (self.multiSelectGroup != null) {
+                    let multiSelectHelper = new MultiSelectHelper()
+                    multiSelectHelper.clearMultiselect({
+                            target: self.multiSelectGroup
+                        }, self.multiSelectGroup, self.stage,
+                        callback => {
+                            self.multiSelectGroup.destroy()
+                            self.multiSelectGroup = null
+                            self.stage.find('Transformer').destroy()
+                            self.stage.batchDraw()
+                        })
+                }
+
+            },
             handleMultiSelect(item) {
                 let self = this
                 if (!item.attrs.draggable) {
                     return
                 }
-                //console.log("[MUTLISELECT]");
 
                 let multiSelectHelper = new MultiSelectHelper()
                 multiSelectHelper.handleMultiselect(self.multiSelectGroup, self.selectedLayer, item, callback => {
@@ -2365,119 +2502,181 @@
             clickselect(item, callback) {
                 let self = this
 
-                console.log("[CLICK SELECT]-item", item);
                 switch (item.parent.attrs.name) {
                     case "Building": {
-                        self.selectLayer(self.buildingLayerTree, self.layerTree)
-                        callback(item)
+                        self.selectLayer(self.buildingLayerTree, self.layerTree, layerCB => {
+                            callback(item)
+                        })
+
                     }
                     break;
 
                 case "Background": {
-                    self.selectLayer(self.backgroundTree, self.layerTree)
-                    callback(item)
+                    self.selectLayer(self.backgroundTree, self.layerTree, layerCB => {
+                        callback(item)
+                    })
+
                 }
                 break;
 
                 case "Areas": {
-                    self.selectLayer(self.areaLayerTree, self.layerTree)
-                    callback(item)
+                    self.selectLayer(self.areaLayerTree, self.layerTree, LayerCB => {
+                        callback(item)
+                    })
                 }
                 break;
 
                 case "Fixtures": {
-                    self.selectLayer(self.fixtureTree, self.layerTree)
-                    callback(item)
+                    self.selectLayer(self.fixtureTree, self.layerTree, LayerCB => {
+                        callback(item)
+                    })
                 }
                 break;
 
                 case "Department": {
-                    self.selectLayer(self.departmentTree, self.layerTree)
-                    callback(item)
+                    self.selectLayer(self.departmentTree, self.layerTree, layerCB => {
+                        callback(item)
+                    })
                 }
                 break;
 
                 case "Duplication Group": {
                     self.findLayerItem(self.layerTree, item.parent._id, cb => {
-                        self.selectLayer(cb, self.layerTree)
-                        callback(item.parent)
-                        item.parent.draggable(true)
-                        item.parent.children.forEach(child => {
-                            child.draggable(false)
+                        self.selectLayer(cb, self.layerTree, layerCB => {
+                            item.parent.draggable(true)
+                            item.parent.children.forEach(child => {
+                                child.draggable(false)
+                            })
+                            callback(item.parent)
                         })
+
                     })
                 }
 
                 break;
+                case "MultiSelectGroup": {
+                    self.findLayerItem(self.layerTree, item.parent._id, cb => {
+                        self.selectLayer(cb, self.layerTree, layerCB => {
+                            item.parent.draggable(true)
+                            item.parent.children.forEach(child => {
+                                child.draggable(false)
+                            })
+                            callback(item.parent)
+                        })
+
+                    })
+                }
+
+                break;
+                case "group": {
+                    self.findLayerItem(self.layerTree, item.parent._id, cb => {
+                        self.selectLayer(cb, self.layerTree, lasyerCB => {
+                            item.parent.draggable(true)
+                            item.parent.children.forEach(child => {
+                                child.draggable(false)
+                            })
+                            callback(item.parent)
+                        })
+
+                    })
+                }
+                break;
+                case "image": {
+                    self.selectLayer(self.backgroundTree, self.layerTree, layerCB => {
+                        callback(item)
+                    })
+                }
+                break;
+               
                 default: {
-                    self.selectLayer(self.departmentTree, self.layerTree)
-                    callback(item)
+                    self.selectLayer(self.departmentTree, self.layerTree, layerCB => {
+                        callback(item)
+                    })
                 }
                 break;
                 }
+            },
+            attachGondolaInsideGroup(target, dragItem, group) {
+                let self = this
+                console.log("attachGondola [TARGET]", target);
+                console.log("attachGondola [DRAGITEM]", dragItem);
+                target.attrs.hasAttached = dragItem.saveID
+                dragItem.setAttrs({
+                    x: target.attrs.x + group.attrs.x,
+                    y: target.attrs.y + group.attrs.y
+                })
+                self.stage.batchDraw()
+
+            },
+            attachGondola(target, dragItem) {
+                let self = this
+                console.log("attachGondola [TARGET]", target);
+                console.log("attachGondola [DRAGITEM]", dragItem);
+                target.attrs.hasAttached = dragItem.saveID
+                dragItem.setAttrs({
+                    x: target.attrs.x,
+                    y: target.attrs.y
+                })
+                self.stage.batchDraw()
+
             },
             addStageEvents() {
                 let self = this;
                 let isPaint = false;
                 self.stage.on('click tap', function (e) {
 
-                    var threshold = 300;
-                    var t0 = new Date();
-
-                    if (t0 - self.doubleClickTime > threshold) {
-                        setTimeout(function () {
-                            if (t0 - self.doubleClickTime > threshold) {
-                                console.log(
-                                    "-------------------------------[CLICK]---------------------");
-
-                                clickTapHelper.handleClickTap(e.target, self.stage, self
-                                    .selectedItem, self.clickselect, self
-                                    .findLayerItem, self.selectedLayerTreeItem, self.properties,
-                                    self.ctrlDown, self
-                                    .selectedTool, self.resetDuplication, self
-                                    .handleMultiSelect, self.layerTree, self
-                                    .floorConfig, self.meterRatio, self.keepAspectRatio, self
-                                    .handleSnapping, self
-                                    .lastPosition, self.transformProperties, self.imagePos, self
-                                    .selectImage, self
-                                    .selectedLayer, cb => {
-                                        self.selectedItem = cb.selectedItem
-                                        self.selectedLayerTreeItem = cb.selectedLayerTreeItem
-                                    });
-                            }
-                            self.doubleClickTime = 0;
-                        }, threshold);
-                    }
-
-
-                });
-                self.stage.on("dblclick", function (e) {
-                    self.doubleClickTime = new Date()
-                    if (e.target == self.stage) {
-                        return
-                    }
-                    console.log("doubleClick", e.target);
-                    console.log("-------------------------------[DOUBLE CLICK]---------------------");
-
-                    clickTapHelper.handleClickTapDoubleClick(e.target, self.stage, self.selectedItem, self
-                        .clickselect, self
-                        .findLayerItem, self.selectedLayerTreeItem, self.properties, self
-                        .ctrlDown, self
-                        .selectedTool, self.resetDuplication, self.handleMultiSelect, self
-                        .layerTree, self
+                    clickTapHelper.handleClickTap(e.target, self.stage, self
+                        .selectedItem, self.clickselect, self
+                        .findLayerItem, self.selectedLayerTreeItem, self.properties,
+                        self.ctrlDown, self
+                        .selectedTool, self.resetDuplication, self
+                        .handleMultiSelect, self.layerTree, self
                         .floorConfig, self.meterRatio, self.keepAspectRatio, self
                         .handleSnapping, self
                         .lastPosition, self.transformProperties, self.imagePos, self
                         .selectImage, self
-                        .selectedLayer, cb => {
+                        .selectedLayer, self.clearMultiselect, cb => {
+
                             self.selectedItem = cb.selectedItem
                             self.selectedLayerTreeItem = cb.selectedLayerTreeItem
+                            if (self.multiSelectGroup != null) {
+                                self.multiSelectGroup.draggable(true)
+                            }
+                            
+                            if (e.target.parent.attrs.name == "group" || e.target.parent.attrs.name ==
+                                "Duplication Group") {
+                                e.target.parent.draggable(true)
+                                e.target.parent.children.forEach(element => {
+                                    element.draggable(false)
+                                })
+                            }
                         });
+                });
+                // self.stage.on("dblclick", function (e) {
+                //     self.doubleClickTime = new Date()
+                //     if (e.target == self.stage) {
+                //         return
+                //     }
+
+                //     clickTapHelper.handleClickTapDoubleClick(e.target, self.stage, self.selectedItem, self
+                //         .clickselect, self
+                //         .findLayerItem, self.selectedLayerTreeItem, self.properties, self
+                //         .ctrlDown, self
+                //         .selectedTool, self.resetDuplication, self.handleMultiSelect, self
+                //         .layerTree, self
+                //         .floorConfig, self.meterRatio, self.keepAspectRatio, self
+                //         .handleSnapping, self
+                //         .lastPosition, self.transformProperties, self.imagePos, self
+                //         .selectImage, self
+                //         .selectedLayer, cb => {
+                //             self.selectedItem = cb.selectedItem
+                //             self.selectedLayerTreeItem = cb.selectedLayerTreeItem
+                //         });
 
 
-                    e.draggable = true
-                    self.selectedItem = e
-                })
+                //     e.draggable = true
+                //     self.selectedItem = e
+                // })
 
                 self.stage.on('contextmenu', function (ev) {
                     // self.stage.find('Transformer').destroy()             
@@ -2567,8 +2766,58 @@
                 self.stage.on('dragmove', function (e) {
                     if (self.selectedTool == "open_with") {
                         // self.handleSnapping(e.target)
+                        // var target = e.target;
+                        // var targetRect = e.target.getClientRect();
+                        // self.selectedLayer.children.each(function (group) {
+                        //     // do not check intersection with itself
+                        //     if (group === target) {
+                        //         return;
+                        //     }
+                        //     if (haveIntersection(group.getClientRect(), targetRect)) {
+                        //         group.fill('red');
+
+                        //     } else {
+                        //         group.fill('grey');
+                        //     }
+                        //     // do not need to call layer.draw() here
+                        //     // because it will be called by dragmove action
+                        // });
                     }
                 });
+                self.departmentLayer.on('dragmove', function (e) {
+                    if (self.selectedTool == "open_with" && e.target.attrs.name != 'Tape') {
+                        // self.handleSnapping(e.target)
+                        var target = e.target;
+                        var targetRect = e.target.getClientRect();
+                        self.fixtureLayer.children.each(function (group) {
+
+                            // do not check intersection with itself
+                            if (group === target) {
+                                return;
+                            }
+                            if (haveIntersection(group.getClientRect(), targetRect)) {
+                                if (group.attrs.name == "group" || group.attrs.name ==
+                                    "Duplication Group") {
+                                    group.children.each(function (item) {
+
+                                        if (haveIntersection(item.getClientRect(),
+                                                targetRect)) {
+                                            self.attachGondolaInsideGroup(item, target, group)
+                                        }
+                                    })
+                                } else {
+                                    self.attachGondola(group, target)
+                                }
+
+
+                            } else {
+
+                            }
+                            // do not need to call layer.draw() here
+                            // because it will be called by dragmove action
+                        });
+                    }
+                })
                 self.stage.on('dragstart', (e) => {
                     if (self.ctrlDown && self.selectedTool == "open_with") {
                         self.duplicateDrag(e)
@@ -2592,6 +2841,7 @@
                                 callback => {
                                     self.multiSelectGroup.destroy()
                                     self.multiSelectGroup = null
+                                    self.stage.find('Transformer').destroy()
                                     self.stage.batchDraw()
                                 })
                         }
@@ -2786,15 +3036,26 @@
                 let self = this;
 
                 let duplicationHelper = new DuplicationHelper()
-
+                let groupDuplicationHelper = new GroupDuplicationHelper()
                 if (self.selectedItem == null) {
                     return;
                 }
+                self.stage.find('Transformer').destroy()
+
+                let tr = new Konva.Transformer({
+                    enabledAnchors: [],
+                });
+                tr.rotateEnabled(true);
                 switch (self.selectedItem.attrs.name) {
                     case "Gondola-Rect":
                         duplicationHelper.DuplicateRectGroup(self.selectedItem, self.selectedLayer, self
                             .selectedLayerTree, direction, self.duplicationSequence, callback => {
-                                self.selectLayer(callback, self.layers)
+                                self.selectLayer(callback.layer, self.layers, layercb => {
+                                    callback.item.parent.add(tr);
+                                    tr.attachTo(callback.item)
+                                    self.selectedItem = callback.item
+                                    self.stage.batchDraw()
+                                })
                             })
 
                         break;
@@ -2802,36 +3063,75 @@
                     case "circle":
                         duplicationHelper.DuplicateCircle(self.selectedItem, self.selectedLayer, self
                             .selectedLayerTree, direction, self.duplicationSequence, callback => {
-                                self.selectLayer(callback, self.layers)
+                                self.selectLayer(callback.layer, self.layers, layercb => {
+                                    self.selectedItem = callback.item
+                                    callback.item.parent.add(tr);
+                                    tr.attachTo(callback.item)
+                                    self.stage.batchDraw()
+
+                                })
                             })
 
                         break;
                     case "wall":
                         duplicationHelper.DuplicateWall(self.selectedItem, self.selectedLayer, self
                             .selectedLayerTree, direction, self.duplicationSequence, callback => {
-                                self.selectLayer(callback, self.layers)
+                                self.selectLayer(callback.layer, self.layers, layercb => {
+                                    self.selectedItem = callback.item
+                                    callback.item.parent.add(tr);
+                                    tr.attachTo(callback.item)
+                                    self.stage.batchDraw()
+
+                                })
                             })
                         break;
 
-                    default:
-                        break;
+
+
+                    case "group": {
+                        groupDuplicationHelper.duplicateGroupDirection(self.selectedItem, self.selectedLayerTree,
+                            direction, self.stage, callback => {
+                                self.selectedItem = callback
+                                callback.parent.add(tr);
+                                tr.attachTo(callback)
+                                self.stage.batchDraw()
+
+                            })
+                    }
+                    break;
+                case "Duplication Group": {
+                    groupDuplicationHelper.duplicateGroupDirection(self.selectedItem, self.selectedLayerTree,
+                        direction, self.stage, callback => {
+                            self.selectedItem = callback
+                            callback.parent.add(tr);
+                            tr.attachTo(callback)
+                            self.stage.batchDraw()
+
+                        })
                 }
-                switch (direction) {
-                    case "UP":
-                        ++self.duplicationSequence.up
-                        break;
-                    case "DOWN":
-                        ++self.duplicationSequence.down
-                        break;
-                    case "LEFT":
-                        ++self.duplicationSequence.left
-                        break;
-                    case "RIGHT":
-                        ++self.duplicationSequence.right
-                        break;
-                    default:
-                        break;
+                break;
+
+
+
+                default:
+                    break;
                 }
+                // switch (direction) {
+                //     case "UP":
+                //         ++self.duplicationSequence.up
+                //         break;
+                //     case "DOWN":
+                //         ++self.duplicationSequence.down
+                //         break;
+                //     case "LEFT":
+                //         ++self.duplicationSequence.left
+                //         break;
+                //     case "RIGHT":
+                //         ++self.duplicationSequence.right
+                //         break;
+                //     default:
+                //         break;
+                // }
             },
             findLayerItem(subMenuItems, id, callback) {
                 let self = this
@@ -3076,6 +3376,7 @@
                     };
                 }
             })
+
             self.drawGrid()
             self.createBaseLayers(cb => {})
             self.addStageEvents();
@@ -3095,6 +3396,15 @@
             y: y * rcos + x * rsin
         };
     };
+
+    function haveIntersection(r1, r2) {
+        return !(
+            r2.x > r1.x + r1.width ||
+            r2.x + r2.width < r1.x ||
+            r2.y > r1.y + r1.height ||
+            r2.y + r2.height < r1.y
+        );
+    }
 
     function deleteTreeItem(subMenuItems, id, self) {
         if (subMenuItems) {

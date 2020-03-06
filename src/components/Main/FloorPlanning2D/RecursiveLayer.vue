@@ -7,7 +7,7 @@
                 @click="layer.showChildren = !layer.showChildren">
                 <v-icon :size="22" @click="toggleCollapsed(layer)" color="grey darken-2">
                     {{ layer.collapsed ? 'arrow_drop_down' : 'arrow_drop_up' }}</v-icon>
-                <input @change="selectLayer(layer,layers)" v-model="layer.selected"
+                <input @change="changeSelect(layer,layers)" v-model="layer.selected"
                     style="margin-top: 4px; margin-right: 10px;" type="checkbox">
                 <div style="width: 80%">
                     <div v-if="!layer.showEditName">{{ layer.name }}</div>
@@ -44,9 +44,9 @@
                 <div class="pa-1 grey lighten-3" style="display: flex;">
                     <div :class="{ 'highlighted': selectedLayerTreeItem == layer  }" style="width: 80%">{{ layer.name }}
                     </div>
-                     <v-icon :size="22" @click="setItemVisible(layer)" color="grey darken-2">
-                    {{ layer.visible ? 'visibility' : 'visibility_off' }}</v-icon>
-                    
+                    <v-icon :size="22" @click="setItemVisible(layer)" color="grey darken-2">
+                        {{ layer.visible ? 'visibility' : 'visibility_off' }}</v-icon>
+
                 </div>
                 <v-divider></v-divider>
             </div>
@@ -56,8 +56,8 @@
                 v-if="((layer.children.length!=0||layer.drawType=='group')&&dragging==false&&layer.collapsed!=true)"
                 :layers="layer.children" :selectLayer="selectLayer" :selectedLayerTree="selectedLayerTree"
                 :setLayerVisible="setLayerVisible" :deleteLayer="deleteLayer" :showChild="layer.selected"
-                :endDrag="endDrag" :startDrag="startDrag" :swapIndex="swapIndex" :editLayerName="editLayerName" :setItemVisible="setItemVisible"
-                :selectItemFromSidePanel="selectItemFromSidePanel" />
+                :endDrag="endDrag" :startDrag="startDrag" :swapIndex="swapIndex" :editLayerName="editLayerName"
+                :setItemVisible="setItemVisible" :selectItemFromSidePanel="selectItemFromSidePanel" />
         </div>
     </div>
 </template>
@@ -65,7 +65,7 @@
     export default {
         props: ["layers", "selectLayer", "setLayerVisible", "deleteLayer", "showChild", "startDrag", "endDrag",
             "selectedLayer", "editLayerName", "selectedLayerTree", "selectedLayerTreeItem", "toggleLock",
-            "swapIndex", "selectItemFromSidePanel","setItemVisible"
+            "swapIndex", "selectItemFromSidePanel", "setItemVisible"
         ],
         name: "RecursiveLayer",
         data() {
@@ -74,6 +74,14 @@
             }
         },
         methods: {
+            changeSelect(layer, layers) {
+                let self = this
+
+                self.selectLayer(layer, layers, cb => {
+
+
+                })
+            },
             focusRename(id) {
                 let self = this
                 self.$nextTick(() => {

@@ -55,7 +55,8 @@ class DragHandler {
                     name: 'wall',
                     drawType: 'wall',
                     children: [],
-                    width: null
+                    width: null,
+                    parent:SelectedLayerTree
                 })
                 SelectedLayerTree.children.push(treeitem)
             }
@@ -82,6 +83,7 @@ class DragHandler {
                 draggable: true,
                 name: "arrow",
                 children: [],
+                parent:SelectedLayerTree
             }))
         }
         break;
@@ -91,7 +93,7 @@ class DragHandler {
                 y: firstPosition.y
             }, null, null, brush);
             SelectedLayerTree.children.push(new treeItem({
-                KonvaID: rect.shape.parent._id,
+                KonvaID: rect.shape._id,
                 visible: true,
                 showEditName: true,
                 selected: true,
@@ -99,6 +101,7 @@ class DragHandler {
                 draggable: true,
                 name: "rect-group",
                 children: [],
+                parent:SelectedLayerTree
             }))
         }
         break;
@@ -117,6 +120,7 @@ class DragHandler {
                 draggable: true,
                 name: "Circle",
                 children: [],
+                parent:SelectedLayerTree
             }))
         }
         break;
@@ -136,6 +140,7 @@ class DragHandler {
                 draggable: true,
                 name: "Label",
                 children: [],
+                parent:SelectedLayerTree
             }))
             textNode.shape.on('dblclick dbltap', () => {
 
@@ -226,6 +231,7 @@ class DragHandler {
                 draggable: true,
                 name: "area",
                 children: [],
+                parent:areaLayertree
             })
             areaLayertree.children.push(areaTree)
 
