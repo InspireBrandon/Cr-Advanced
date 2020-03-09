@@ -79,6 +79,9 @@
             <v-list-tile @click="openJoinPlanogram">
               <v-list-tile-title>Join</v-list-tile-title>
             </v-list-tile>
+            <v-list-tile v-if="spacePlanID!=null" @click="openFloorDesigner">
+              <v-list-tile-title>Open Floor Designer</v-list-tile-title>
+            </v-list-tile>
             <!-- <v-list-tile
               v-if="PlanogramObject.status == null||PlanogramObject.status==0||PlanogramObject.status==1||PlanogramObject.status==3||PlanogramObject.status==6"
               @click="submitForApprovalPlano">
@@ -506,6 +509,7 @@
     <PlanogramRetractionModal ref="PlanogramRetractionModal"></PlanogramRetractionModal>
     <JoinPlanogram ref="JoinPlanogram"></JoinPlanogram>
     <SizeLoader ref="SizeLoader" />
+    <floorDesinger ref="floorDesinger" />
     <!-- <SaveDetailsModal ref="SaveDetailsModal" /> -->
     <Prompt ref="Prompt" />
     <HelpFileMaint ref="HelpFileMaint" />
@@ -531,6 +535,9 @@
   import PlanogramRetractionModal from "@/components/Main/Planogram/spaceplanning/src/components/Modals/PlanogramAproval/PlanogramRetractionModal.vue";
   import JoinPlanogram from "@/components/Main/Planogram/spaceplanning/src/components/Modals/JoinPlanogram/JoinPlanogram.vue";
   import Prompt from '@/components/Common/Prompt';
+
+  import floorDesinger from "@/components/Main/Floorplan_planogramDesinger/FloorplanDesigner";
+
   import HelpFileMaint from '../../../../../HelpFile/HelpFileMaint'
   // import SaveDetailsModal from "@/components/Main/Planogram/spaceplanning/src/components/Modals/SaveDetails/SaveDetailsModal";
 
@@ -558,7 +565,8 @@
       SizeLoader,
       Prompt,
       FixtureSelector,
-      HelpFileMaint
+      HelpFileMaint,
+      floorDesinger
     },
     data() {
       let width = 0;
@@ -1036,7 +1044,14 @@
       }
     },
     methods: {
-
+      openFloorDesigner() {
+        let self = this
+        axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+        axios.get(process.env.VUE_APP_API +
+          `Planogram_Details/BysystemFileID?systemFile_ID=${self.spacePlanID}`).then(resp => {
+          self.$refs.floorDesinger.open(resp.data.id)
+        })
+      },
       onHybridChange() {
         let self = this
         self.$nextTick(() => {

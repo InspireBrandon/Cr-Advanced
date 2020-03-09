@@ -86,6 +86,10 @@
                 <v-btn v-if="project!=null &&project.discontinued==true" outline dark @click.stop="Continue">
                     Reinstate
                 </v-btn>
+                <v-btn v-if="project!=null " outline dark @click.stop="endTasks">
+                    End Tasks
+                </v-btn>
+
                 <v-spacer></v-spacer>
                 <v-btn flat icon v-if="project!=null" @click="openProjectTXAdd()">
                     <v-icon>add</v-icon>
@@ -387,6 +391,48 @@
             }
         },
         methods: {
+            createProjectTransactionGroup(request, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `ProjectTXGroup`, request).then(r => {
+                    delete Axios.defaults.headers.common["TenantID"];
+                    callback(r.data.projectTXGroup);
+                })
+            },
+            createProjectTransaction(request, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `ProjectTX`, request).then(r => {
+                    delete Axios.defaults.headers.common["TenantID"];
+                    callback(r.data.projectTX)
+                })
+            },
+            endTasks() {
+                let self = this
+                console.log("self.project", self.project);
+
+                let projectTXGroupRequest = {
+                    projectID: self.project.id
+                }
+                // 53
+                self.createProjectTransactionGroup(projectTXGroupRequest, cb => {
+
+                    let request = self.ProjectTXs[self.ProjectTXs.length - 1]
+                    request.status = 53
+
+                    request.systemUserID = null;
+                    console.log("[REQUEST]", request);
+
+                    self.createProjectTransaction(request, txcb => {
+                        console.log("createProjectTransaction", txcb);
+
+                    })
+                })
+            },
             Continue() {
                 let self = this
                 self.$refs.yesNoModal.show('Are you sure you want to Reinstate this Category?', value => {
@@ -394,7 +440,9 @@
                         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                         Axios.post(process.env.VUE_APP_API +
                             `/Project?Project_ID=${self.project.id}&Value=${false}`).then(
-                            r => {})
+                            r => {
+
+                            })
                     }
                 })
             },
@@ -758,7 +806,7 @@
 
                 self.project = item
                 console.log(self.project);
-                
+
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 Axios.get(process.env.VUE_APP_API + `ProjectTX?projectID=${item.id}`).then(r => {
 
