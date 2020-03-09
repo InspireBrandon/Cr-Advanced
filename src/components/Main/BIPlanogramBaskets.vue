@@ -62,6 +62,19 @@
                 Axios.get(process.env.VUE_APP_API + "PowerBI/GetPlanogramBaskets?planogramID=" + self.planogramID)
                     .then(r => {
                         self.config = r.data;
+
+                        console.log(self.config);
+
+                        for(var i = 1; i < 6; i++) {
+                            let elem = self.config[`basket_${i}_Name`];
+
+                            console.log(elem == null);
+
+                            if(elem == null)
+                                self.config[`basket_${i}_Name`] = "None"
+                        }
+
+                        console.log(self.config);
                     })
             },
             saveConfig() {
@@ -74,8 +87,6 @@
                     if(item == undefined || item == null)
                         self.config[`basket_${i}_Name`] = "";
                 }
-                
-                console.log(self.config)
 
                 self.config.planogramID = self.planogramID;
 
@@ -92,7 +103,7 @@
                 Axios.get(process.env.VUE_APP_API + "PowerBI/GetDistinctGraphTypes")
                     .then(r => {
                         self.graphTypes = r.data;
-                        self.graphTypes.unshift('');
+                        self.graphTypes.unshift('None');
                     })
             },
         }
