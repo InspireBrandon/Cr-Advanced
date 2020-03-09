@@ -317,13 +317,13 @@ class projectStatusHandler {
                 type: [3],
                 color: "#ff7200",
                 friendly: "Variation complete"
-            },{
+            }, {
                 text: "Variation Sent",
                 value: 48,
                 type: [3],
                 color: "#ff7200",
                 friendly: "Variation Sent"
-            },{
+            }, {
                 text: "Recalled",
                 value: 49,
                 type: [3],
@@ -350,6 +350,13 @@ class projectStatusHandler {
                 type: [3],
                 color: "#ff7200",
                 friendly: "Variation Sent"
+            },
+            {
+                text: "Tasks Ended",
+                value: 53,
+                type: [3],
+                color: "#ff7200",
+                friendly: "Tasks Ended"
             },
         ]
 
@@ -681,7 +688,7 @@ function returnAcumulator(status, type) {
     }
     break;
     }
-    
+
     return acumulator;
 }
 

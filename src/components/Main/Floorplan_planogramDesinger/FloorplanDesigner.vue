@@ -1,65 +1,71 @@
 <template>
-    <div>
-        <v-toolbar color="primary" dark>
-            <v-toolbar-title>
-                Planogram Designer
-            </v-toolbar-title>
-            <!-- <v-btn @click="log">
+    <v-dialog fullscreen v-model="dialog">
+        <div>
+            <v-toolbar color="primary" dark>
+                <v-toolbar-title>
+                    Planogram Designer
+                </v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-btn icon @click="dialog=false">
+                    <v-icon>close</v-icon>
+                </v-btn>
+
+                <!-- <v-btn @click="log">
                 log
             </v-btn> -->
-        </v-toolbar>
-        <v-container class="ma-0 pa-0" fluid>
-            <v-layout row wrap>
-                <v-flex md2>
-                    <v-toolbar color="grey darken-3" dark dense>
-                        Drops
-                        <v-spacer></v-spacer>
-                        <v-toolbar-items>
-                            <v-menu dark offset-y style="margin-bottom: 10px;">
-                                <v-btn slot="activator" flat>
-                                    File
-                                </v-btn>
-                                <v-list dense class="px-2">
-                                    <v-list-tile>
-                                        <v-list-tile-title>New</v-list-tile-title>
-                                    </v-list-tile>
-                                    <v-divider></v-divider>
-                                    <v-list-tile>
-                                        <v-list-tile-title>Open</v-list-tile-title>
-                                    </v-list-tile>
-                                    <v-divider></v-divider>
-                                    <v-list-tile @click="save()">
-                                        <v-list-tile-title>Save</v-list-tile-title>
-                                    </v-list-tile>
-                                    <v-divider></v-divider>
-                                    <v-list-tile>
-                                        <v-list-tile-title>Close</v-list-tile-title>
-                                    </v-list-tile>
-                                    <v-divider></v-divider>
+            </v-toolbar>
+            <v-container class="ma-0 pa-0" fluid>
+                <v-layout row wrap>
+                    <v-flex md2>
+                        <v-toolbar color="grey darken-3" dark dense>
+                            Drops
+                            <v-spacer></v-spacer>
+                            <v-toolbar-items>
+                                <v-menu dark offset-y style="margin-bottom: 10px;">
+                                    <v-btn slot="activator" flat>
+                                        File
+                                    </v-btn>
+                                    <v-list dense class="px-2">
+                                        <v-list-tile>
+                                            <v-list-tile-title>New</v-list-tile-title>
+                                        </v-list-tile>
+                                        <v-divider></v-divider>
+                                        <v-list-tile>
+                                            <v-list-tile-title>Open</v-list-tile-title>
+                                        </v-list-tile>
+                                        <v-divider></v-divider>
+                                        <v-list-tile @click="save()">
+                                            <v-list-tile-title>Save</v-list-tile-title>
+                                        </v-list-tile>
+                                        <v-divider></v-divider>
+                                        <v-list-tile>
+                                            <v-list-tile-title>Close</v-list-tile-title>
+                                        </v-list-tile>
+                                        <v-divider></v-divider>
 
-                                </v-list>
-                            </v-menu>
-                        </v-toolbar-items>
-                    </v-toolbar>
-                    <v-card height="100vh" width="100%" style="overflow:auto">
-                        <div v-for="(item,idx) in drops" :key="idx">
-                            <expansionItem :selectedFixtures="selectedFixtures" :Drop="item"
-                                :changeRotation="changeRotation" :reDraw="reDraw">
-                            </expansionItem>
-                            <v-divider></v-divider>
-                        </div>
-                    </v-card>
-                </v-flex>
-                <v-flex md10>
-                    <v-card tile flat id="stage_container" class="fill-height" :style="{ 'cursor': currentCursor }">
-                        <div id="container"></div>
-                    </v-card>
-                </v-flex>
-            </v-layout>
-        </v-container>
-        <Spinner ref="spinner"></Spinner>
-
-    </div>
+                                    </v-list>
+                                </v-menu>
+                            </v-toolbar-items>
+                        </v-toolbar>
+                        <v-card height="100vh" width="100%" style="overflow:auto">
+                            <div v-for="(item,idx) in drops" :key="idx">
+                                <expansionItem :selectedFixtures="selectedFixtures" :Drop="item"
+                                    :changeRotation="changeRotation" :reDraw="reDraw">
+                                </expansionItem>
+                                <v-divider></v-divider>
+                            </div>
+                        </v-card>
+                    </v-flex>
+                    <v-flex md10>
+                        <v-card tile flat id="stage_container" class="fill-height" :style="{ 'cursor': currentCursor }">
+                            <div id="container"></div>
+                        </v-card>
+                    </v-flex>
+                </v-layout>
+            </v-container>
+            <Spinner ref="spinner"></Spinner>
+        </div>
+    </v-dialog>
 </template>
 <script>
     const meterPixelRatio = 3779.5275590551;
@@ -91,6 +97,7 @@
         },
         data() {
             return {
+                dialog: false,
                 selectedItem: null,
                 selectedLayer: null,
                 stage: null,
@@ -104,6 +111,12 @@
             }
         },
         methods: {
+            open(planogram_ID) {
+                let self = this
+                self.planogram_ID = planogram_ID
+                self.dialog = true
+                self.initialise()
+            },
             log() {
                 let self = this
                 console.log(self.selectedLayer);
@@ -113,12 +126,10 @@
                 let self = this
                 console.log("params", self.$route.params.ID);
 
-                if (self.$route.params.ID != null && self.$route.params.ID != "ID") {
-                    self.planogram_ID = self.$route.params.ID
-                }
+
                 axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                axios.post(process.env.VUE_APP_API + `FloorPlanheader/Exisitng?Planogram_ID=${self.$route.params.ID}`)
+                axios.post(process.env.VUE_APP_API + `FloorPlanheader/Exisitng?Planogram_ID=${self.planogram_ID}`)
                     .then(
                         r => {
                             console.log("CHECK HEADER", r);
@@ -498,12 +509,12 @@
             },
             imageSrc(imgID, type) {
                 let self = this;
-                if(imgID!=null&&imgID!=undefined){
+                if (imgID != null && imgID != undefined) {
                     return process.env.VUE_APP_API + `FloorplanFixture?mapImageID=${imgID}&type=${type}`
-                }else{
+                } else {
                     return ""
                 }
-                
+
             },
             drawGrid() {
                 let self = this
@@ -634,86 +645,82 @@
                     callback(r.data)
                 })
             },
-        },
+            initialise() {
+                let self = this;
+                self.$refs.spinner.show()
 
-        mounted() {
-            let self = this;
-            self.$refs.spinner.show()
+                self.checkForHeader(cb => {
+                    self.drawGrid()
+                    self.addStageEvents()
+                    self.stage.batchDraw()
+                    console.log("stage", self.stage);
+                    self.getPlanogramData(callback => {
+                        if (cb == null) {
+                            let widthInc = 0
+                            let lastPos = 50
+                            self.drops.forEach((element, idx) => {
 
-            self.checkForHeader(cb => {
-                self.drawGrid()
-                self.addStageEvents()
-                self.stage.batchDraw()
-                console.log("stage", self.stage);
-                self.getPlanogramData(callback => {
-                    if (cb == null) {
-                        let widthInc = 0
-                        let lastPos = 50
-                        self.drops.forEach((element, idx) => {
+                                if (element.shape == "Circle") {
+                                    let circle = new Circle(self.selectedLayer, {
+                                        x: 0,
+                                        y: 0,
+                                    }, null, {
+                                        radius: element.width,
+                                        color: "#1976d2"
+                                    });
+                                    circle.shape.setAttrs({
+                                        width: element.width,
+                                        DropID: element.id.toString()
+                                    })
+                                    circle.shape.parent.setAttrs({
+                                        x: lastPos + widthInc,
+                                        y: 75
+                                    })
+                                    circle.shape.attrs.DropID = element.id.toString()
+                                    lastPos = circle.shape.attrs.x + element.width
+                                    circle.shape.draggable(true)
 
-                            if (element.shape == "Circle") {
-                                let circle = new Circle(self.selectedLayer, {
-                                    x: 0,
-                                    y: 0,
-                                }, null, {
-                                    radius: element.width,
-                                    color: "#1976d2"
-                                });
-                                circle.shape.setAttrs({
-                                    width: element.width,
-                                    DropID: element.id.toString()
-                                })
-                                circle.shape.parent.setAttrs({
-                                    x: lastPos + widthInc,
-                                    y: 75
-                                })
-                                circle.shape.attrs.DropID = element.id.toString()
-                                lastPos = circle.shape.attrs.x + element.width
-                                circle.shape.draggable(true)
+                                } else {
+                                    element.shape = "Square"
+                                    let rect = new Rect(self.selectedLayer, {
+                                        x: 0,
+                                        y: 0,
+                                    }, null, null, null, self.imageSrc(element
+                                        .id,
+                                        "Top"));
+                                    rect.shape.setAttrs({
+                                        width: element.width,
+                                        height: element.height,
+                                        draggable: true
+                                    })
+                                    rect.shape.setAttrs({
+                                        x: lastPos + widthInc,
+                                        y: 50
+                                    })
 
-                            } else {
-                                element.shape = "Square"
-                                let rect = new Rect(self.selectedLayer, {
-                                    x: 0,
-                                    y: 0,
-                                }, null, null, null, self.imageSrc(element
-                                    .id,
-                                    "Top"));
-                                rect.shape.setAttrs({
-                                    width: element.width,
-                                    height: element.height,
-                                    draggable: true
-                                })
-                                rect.shape.setAttrs({
-                                    x: lastPos + widthInc,
-                                    y: 50
-                                })
+                                    rect.shape.setAttrs({
+                                        width: element.width,
+                                        height: element.height,
+                                    })
+                                    console.log("rect", rect);
+                                    rect.shape.attrs.DropID = element.id
+                                        .toString()
+                                    lastPos = rect.shape.attrs.x + element.width
+                                    rect.shape.draggable(true)
 
-                                rect.shape.setAttrs({
-                                    width: element.width,
-                                    height: element.height,
-                                })
-                                console.log("rect", rect);
-                                rect.shape.attrs.DropID = element.id
-                                    .toString()
-                                lastPos = rect.shape.attrs.x + element.width
-                                rect.shape.draggable(true)
+                                }
+                                widthInc = element.width
+                                self.snapableItems.push("." + element.id.toString())
+                                self.stage.batchDraw()
+                                self.$refs.spinner.hide()
 
-                            }
-                            widthInc = element.width
-                            self.snapableItems.push("." + element.id.toString())
-                            self.stage.batchDraw()
-                            self.$refs.spinner.hide()
-
-                        })
-                    } else {
-                        self.drawSaved(cb)
-                    }
+                            })
+                        } else {
+                            self.drawSaved(cb)
+                        }
+                    })
                 })
-            })
-
-
-
+            }
         },
         computed: {
             currentCursor() {
