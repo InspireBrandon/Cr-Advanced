@@ -69,10 +69,11 @@
                 <v-toolbar-title>
                     Project Planning
                 </v-toolbar-title>
-                <v-btn icon dark @click.stop="drawer = !drawer">
-                    <v-icon>
+                <v-btn outline dark @click="showUserProjects">
+                    Users
+                    <!-- <v-icon>
                         reorder
-                    </v-icon>
+                    </v-icon> -->
                 </v-btn>
                 <v-btn v-if="project!=null" outline dark @click.stop="$router.push('/Allocation/'+project.id)">
                     allocate
@@ -276,7 +277,8 @@
 
             <ProjectModal ref="ProjectModal"> </ProjectModal>
             <ProjectTXModal ref="ProjectTXModal"> </ProjectTXModal>
-
+            
+            <UserProjectsModal ref="UserProjectsModal" />
         </v-content>
 
     </div>
@@ -290,6 +292,8 @@
 
     import StatusHandler from '@/libs/system/projectStatusHandler'
 
+    import UserProjectsModal from './UserProjects/Index.vue'
+
     import Axios from 'axios'
     import jwt from 'jsonwebtoken';
 
@@ -299,7 +303,8 @@
             ProjectGroupModal,
             ProjectModal,
             ProjectTXModal,
-            YesNoModal
+            YesNoModal,
+            UserProjectsModal
         },
         data() {
             return {
@@ -827,6 +832,13 @@
             },
             getColor(type, status) {
                 return StatusHandler.getColorByTypeAndStatus(type, status)
+            },
+            showUserProjects() {
+                let self = this;
+                
+                self.$refs.UserProjectsModal.show(() => {
+
+                })
             }
         }
     }
