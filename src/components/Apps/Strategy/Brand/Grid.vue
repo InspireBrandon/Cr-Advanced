@@ -6,6 +6,7 @@
             :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true" :enableColResize="true"
             :floatingFilter="true" :groupMultiAutoColumn="true" :onGridReady="onGridReady">
         </ag-grid-vue>
+        
         <v-toolbar dark flat dense>
             Rows: {{rowData.length}}
         </v-toolbar>

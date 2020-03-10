@@ -144,10 +144,21 @@
                     }, {
                         "headerName": "Manufacturer",
                         "field": "manufacturer"
+                    },{
+                        "headerName": "Supplier",
+                        "field": "supplier"
                     }, {
                         "headerName": "Brand",
                         "hide": true,
                         "field": "brand"
+                    }, {
+                        "headerName": "Size",
+                        "hide": true,
+                        "field": "size"
+                    }, {
+                        "headerName": "UOM",
+                        "hide": true,
+                        "field": "uom"
                     }, {
                         "headerName": "Size Description",
                         "hide": true,
