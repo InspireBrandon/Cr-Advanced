@@ -17,7 +17,7 @@ class DuplicationHelper {
             visible: true,
             showEditName: false,
             selected: true,
-            showChildren: true,
+            showChildren: false,
             draggable: true,
             locked: true,
             drawType: "group",
@@ -43,7 +43,7 @@ class DuplicationHelper {
         // group.attrs = selectedItem.attrs
         group.setAttrs({
             draggable: true,
-            rotation:selectedItem.attrs.rotation
+            rotation: selectedItem.attrs.rotation
         })
         selectedItem.parent.add(group)
         selectedItem.children.forEach(element => {
@@ -59,28 +59,28 @@ class DuplicationHelper {
             case "UP":
                 group.setAttrs({
                     x: (selectedItem.attrs.x),
-                    y: (selectedItem.attrs.y) - (dimension.height/stage.attrs.scaleX)
+                    y: (selectedItem.attrs.y) - (dimension.height / stage.attrs.scaleX)
                 })
                 console.log("[GGROUP DUPLICATUION UP]", group);
 
                 break;
             case "RIGHT":
                 group.setAttrs({
-                    x: (selectedItem.attrs.x) + (dimension.width/stage.attrs.scaleX),
+                    x: (selectedItem.attrs.x) + (dimension.width / stage.attrs.scaleX),
                     y: (selectedItem.attrs.y)
                 })
 
                 break;
             case "LEFT":
                 group.setAttrs({
-                    x: (selectedItem.attrs.x) - (dimension.width/stage.attrs.scaleX),
+                    x: (selectedItem.attrs.x) - (dimension.width / stage.attrs.scaleX),
                     y: (selectedItem.attrs.y)
                 })
                 break;
             case "DOWN":
                 group.setAttrs({
                     x: (selectedItem.attrs.x),
-                    y: (selectedItem.attrs.y) + (dimension.height/stage.attrs.scaleX)
+                    y: (selectedItem.attrs.y) + (dimension.height / stage.attrs.scaleX)
                 })
                 break;
 
@@ -99,7 +99,7 @@ class DuplicationHelper {
             visible: true,
             showEditName: false,
             selected: true,
-            showChildren: true,
+            showChildren: false,
             draggable: true,
             locked: true,
             drawType: "group",
@@ -123,7 +123,7 @@ class DuplicationHelper {
 
         group.setAttrs({
             draggable: true,
-            rotation:selectedItem.attrs.rotation
+            rotation: selectedItem.attrs.rotation
         })
         selectedItem.parent.add(group)
         selectedItem.children.forEach(element => {
@@ -148,7 +148,7 @@ class DuplicationHelper {
                     visible: true,
                     showEditName: true,
                     selected: true,
-                    showChildren: true,
+                    showChildren: false,
                     draggable: true,
                     name: "Circle",
                     children: [],
@@ -184,7 +184,7 @@ class DuplicationHelper {
                 visible: true,
                 showEditName: true,
                 selected: true,
-                showChildren: true,
+                showChildren: false,
                 draggable: false,
                 name: "rect-group",
                 children: [],
@@ -220,7 +220,7 @@ class DuplicationHelper {
                 visible: true,
                 showEditName: true,
                 selected: true,
-                showChildren: true,
+                showChildren: false,
                 draggable: false,
                 name: "wall",
                 children: [],
@@ -253,7 +253,7 @@ class DuplicationHelper {
                 visible: true,
                 showEditName: true,
                 selected: true,
-                showChildren: true,
+                showChildren: false,
                 draggable: false,
                 name: "Image",
                 children: [],

@@ -1741,25 +1741,30 @@
                 self.makingChanges = true
                 let dimension = null
                 if (self.selectedItem.attrs.name == "group" || self.selectedItem.attrs.name == "Duplication Group") {
+                    const absTransform = self.selectedItem.getAbsoluteTransform();
+
+                    const invertedTransform = new Konva.Transform(
+                        absTransform.getMatrix()
+                    ).invert();
                     dimension = self.selectedItem.getClientRect()
+                    const shapePos = invertedTransform.point({
+                        x: dimension.x,
+                        y: dimension.y
+                    });
+                    console.log("[shapePos]", shapePos);
+
+
                     console.log("[GROUP DIMENSION]", dimension);
 
                 }
                 console.log("[BEFORE CHANEGES APPLIED ]", self.selectedItem);
 
-                let asd = self.stage.find('Transformer')
 
-                let tr = asd[0]
 
                 console.log("[tr BEFORE]", tr);
 
-                if (dimension != null) {
-                    rotateAroundCenter(self.selectedItem, parseFloat(self.properties.rotation))
-                    // tr.rotation(parseFloat(self.properties.rotation))
-                } else {
-                    self.selectedItem.rotation(parseFloat(self.properties.rotation))
-                }
 
+                self.selectedItem.rotation(parseFloat(self.properties.rotation))
                 console.log("[tr AFTER]", tr);
 
 
@@ -2401,12 +2406,21 @@
                             .selectedLayerTree)
                         break;
                     case "group": {
-                        groupDuplicationHelper.duplicateGroupDrag(e.target, self.selectedLayerTree)
+                        console.log("[SELECTED LAYERTREE] group", self.selectedLayerTree);
+                        if (self.selectedLayerTree.parent != undefined) {
+                            groupDuplicationHelper.duplicateGroupDrag(e.target, self.selectedLayerTree.parent)
+                        } else {
+                            groupDuplicationHelper.duplicateGroupDrag(e.target, self.selectedLayerTree)
+                        }
                     }
                     break
                 case "Duplication Group": {
-                    groupDuplicationHelper.duplicateGroupDrag(e.target, self.selectedLayerTree)
-
+                    console.log("[SELECTED LAYERTREE] Duplication Grou", self.selectedLayerTree);
+                    if (self.selectedLayerTree.parent != undefined) {
+                        groupDuplicationHelper.duplicateGroupDrag(e.target, self.selectedLayerTree.parent)
+                    } else {
+                        groupDuplicationHelper.duplicateGroupDrag(e.target, self.selectedLayerTree)
+                    }
                 }
                 break
 
