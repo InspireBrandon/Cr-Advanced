@@ -842,6 +842,8 @@
 
         let allGondolas = ctrl_store.getAllPlanogramItemsByType(self.$store, "GONDOLA");
         allGondolas.forEach(element => {
+          element.Group.hide();
+          element.Layer.draw();
           width += element.Group.getWidth() + 1;
         });
 
