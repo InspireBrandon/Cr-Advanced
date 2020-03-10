@@ -10,8 +10,6 @@ class GroupingHandler {
 
     addItemToGroup(stage, selectedItem, selectedLayer, selectedLayerTree, selectedLayerTreeItem, multiselectGroup, findLayerItem, layerTree, callback) {
         let group = new Konva.Group({
-            x: 0,
-            y: 0,
             name: "group",
             visible: true,
             showEditName: false,
@@ -34,11 +32,11 @@ class GroupingHandler {
             locked: true,
             parent: selectedLayerTree
         })
-
+        console.log("[NEW GROUP ADDED ]",group);
         selectedLayer.add(group)
+        console.log("[NEW GROUP ]", group);
+        
         selectedLayerTree.children.push(groupTreeItem)
-        console.log("selectedLayerTree.children", selectedLayerTree.children);
-        console.log("multiselectGroup", multiselectGroup.children);
         for (let index = multiselectGroup.children.length - 1; index > -1; index--) {
             const element = multiselectGroup.children[index];
             console.log("[INDEX]==", index);
@@ -54,22 +52,22 @@ class GroupingHandler {
                         console.log("[SPLICE ITEM]", spliceItem[0]);
                         element.moveTo(group)
                         if (index == 0) {
+                            group.rotation(multiselectGroup.rotation())
+                            stage.batchDraw()
                             callback()
                         }
                     }
                 }
             })
         }
-        console.log("[NEW GROUP ]", group);
-        group.rotation(multiselectGroup.rotation())
-        stage.batchDraw()
+       
     }
 
     removeItemFromGroup(stage, selectedItem, selectedLayer, selectedLayerTree, selectedLayerTreeItem, multiselectGroup, findLayerItem, layerTree, parent, callback) {
         console.log("[REMOVE ITEM FROM GROUP]selectedIOterm", selectedItem);
         console.log("SELECTED LAYER", selectedLayer);
 
-        if ((selectedItem.attrs.drawType == "group"||selectedItem.attrs.name == "Duplication Group") && selectedItem.children.length > 0) {
+        if ((selectedItem.attrs.drawType == "group" || selectedItem.attrs.name == "Duplication Group") && selectedItem.children.length > 0) {
             for (let index = selectedItem.children.length - 1; index > -1; index--) {
                 const element = selectedItem.children[index];
                 findLayerItem(layerTree, element._id, cb => {

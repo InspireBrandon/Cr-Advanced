@@ -1741,33 +1741,16 @@
                 self.makingChanges = true
                 let dimension = null
                 if (self.selectedItem.attrs.name == "group" || self.selectedItem.attrs.name == "Duplication Group") {
-                    const absTransform = self.selectedItem.getAbsoluteTransform();
+                    let tr = self.stage.find("Transformer")
+                    console.log('tr', tr);
+                    console.log('si', self.selectedItem);
+                    // calcCenterRotation(self.selectedItem, parseFloat(self.properties.rotation))
+                    // let dimension = node.getClientRect()
 
-                    const invertedTransform = new Konva.Transform(
-                        absTransform.getMatrix()
-                    ).invert();
-                    dimension = self.selectedItem.getClientRect()
-                    const shapePos = invertedTransform.point({
-                        x: dimension.x,
-                        y: dimension.y
-                    });
-                    console.log("[shapePos]", shapePos);
-
-
-                    console.log("[GROUP DIMENSION]", dimension);
-
+                    self.selectedItem.rotation(parseFloat(self.properties.rotation))
+                } else {
+                    self.selectedItem.rotation(parseFloat(self.properties.rotation))
                 }
-                console.log("[BEFORE CHANEGES APPLIED ]", self.selectedItem);
-
-
-
-                console.log("[tr BEFORE]", tr);
-
-
-                self.selectedItem.rotation(parseFloat(self.properties.rotation))
-                console.log("[tr AFTER]", tr);
-
-
                 self.selectedItem.attrs.radius = parseFloat(self.properties.radius) * (self.meterRatio *
                     self
                     .floorConfig.blockRatio)
@@ -3508,6 +3491,49 @@
 
         a.readAsDataURL(blob);
     }
+
+    const CentterRotatePoint = ({
+        x,
+        y
+    }, rad) => {
+        const rcos = Math.cos(rad);
+        const rsin = Math.sin(rad);
+        return {
+            x: x * rcos - y * rsin,
+            y: y * rcos + x * rsin
+        };
+    };
+
+    // will work for shapes with top-left origin, like rectangle
+    function calcCenterRotation(node, rotation) {
+        //current rotation origin (0, 0) relative to desired origin - center (node.width()/2, node.height()/2)
+        console.log("SELECTED ITEM", node);
+        let dimension = node.getClientRect()
+        console.log("dimension", dimension);
+
+        const topLeft = {
+            x: -dimension.width  ,
+            y: -dimension.height  
+        };
+        console.log("[ROTATION TOPLEFT]", topLeft);
+
+        const current = CentterRotatePoint(topLeft, Konva.getAngle(node.rotation()));
+        const rotated = CentterRotatePoint(topLeft, Konva.getAngle(rotation));
+        const dx = rotated.x - current.x,
+            dy = rotated.y - current.y;
+        console.log("[DX] ", dx);
+        console.log("[DY] ", dy);
+
+        node.rotation(rotation);
+        console.log("before: X" + node.x() + " Y:" + node.y());
+
+        node.x(node.x() + dx);
+        node.y(node.y() + dy);
+
+        console.log("After: X" + node.x() + " Y:" + node.y());
+    }
+
+    // then use it
 </script>
 
 <style>

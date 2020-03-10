@@ -148,8 +148,8 @@ class ClickTapHelper {
                                 transFormerHelper.handleTransform(e, z, handleSnapping, self
                                     .stage,
                                     lastPosition, ctrlDown, selectedItem,
-                                    rotateAroundCenter, transformProperties, self
-                                    .propertiesLabelHorizontal, propertiesLabelVertical)
+                                    '', transformProperties, self
+                                    .propertiesLabelHorizontal, '')
                             });
                             tr.on('transformend', function () {
                                 transFormerHelper.handleTransformEnd(selectedItem, properties,
