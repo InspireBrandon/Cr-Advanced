@@ -942,6 +942,92 @@
         //#endregion
         self.HideGondolaOutOfViewPort();
       },
+      downloadImageRecursive(ratio, width, idx) {
+        var self = this;
+        let ctrl_store = new StoreHelper();
+
+        self.ShowAllGondolas();
+        var stage = self.$refs.stage.getStage();
+        // stage.find('Shape').strokeWidth(1 / stage.scale());
+        stage.scaleX(1);
+        stage.scaleY(1);
+        stage.position({
+          x: 0,
+          y: 0
+        });
+        
+        stage.batchDraw();
+
+        let allProducts = ctrl_store.getAllPlanogramItemsByType(self.$store, "PRODUCT");
+
+        allProducts.forEach(element => {
+          element.Quality = ratio;
+          element.Cache();
+        });
+
+        let allGondolas = ctrl_store.getAllPlanogramItemsByType(self.$store, "GONDOLA");
+
+        allGondolas.forEach(element => {
+          width += (element.Group.getWidth() + 1);
+        });
+
+        let allItems = ctrl_store.getAllPlanogramItems(self.$store);
+
+        let lastY = 0;
+
+        allItems.forEach(element => {
+          if (element.Group.getAbsolutePosition().y < lastY) {
+            lastY = element.Group.getAbsolutePosition().y();
+          }
+        });
+
+        let height = stage.getHeight() - lastY;
+
+        // console.log("[download parameters]", "R", ratio, "Last Y", lastY, "TTL H DWN", height, "stage H", stage
+        //   .getHeight())
+
+        var dataURL = this.$refs.stage.getStage().toDataURL({
+          x: 0,
+          y: lastY,
+          width: width,
+          height: height,
+          mimeType: "image/png",
+          quality: 1.0,
+          pixelRatio: ratio
+        });
+        // Chrome 1+
+
+        var blob = self.b64toBlob(dataURL, "image/jpeg");
+        var blobUrl = URL.createObjectURL(blob);
+
+        //#region CHROME
+
+        var link = document.createElement("a");
+        // self.getPlanogramName(planogramID)
+        //   .then(planogramName => {
+        //     link.download = planogramName + ".png";
+        //     // Construct the uri
+        //     link.href = blobUrl;
+        //     document.body.appendChild(link);
+        //     link.click();
+        //     // Cleanup the DOM
+        //     document.body.removeChild(link);
+
+        //     //#endregion
+        //     self.HideGondolaOutOfViewPort();
+        //   })
+        let planogramDetails = self.$store.getters.getClusterData;
+        link.download = planogramDetails.planogramName + ".png";
+        // Construct the uri
+        link.href = blobUrl;
+        document.body.appendChild(link);
+        link.click();
+        // Cleanup the DOM
+        document.body.removeChild(link);
+
+        //#endregion
+        self.HideGondolaOutOfViewPort();
+      },
       downloadSelectedGondola() {
         var self = this;
         var stage = self.$refs.stage.getStage();
@@ -989,7 +1075,6 @@
 
         self.HideGondolaOutOfViewPort();
       },
-
       addNewGondola(data) {
         let self = this;
         let stage = self.$refs.stage.getStage();
