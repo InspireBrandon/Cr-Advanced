@@ -32,7 +32,7 @@ class LoadSavePlanogramBase {
     this.Create = create;
   }
 
-  save(vuex, stage, clusterData, dimensionData, spacePlanID, spacePlanName, updateName, image, updateLoader, close, fixtureData ,storeCount,hybridRanges,promoItemRefs, callback) {
+  save(vuex, stage, clusterData, dimensionData, spacePlanID, spacePlanName, updateName, image, updateLoader, close, fixtureData, storeCount, hybridRanges, promoItemRefs, callback) {
     let self = this;
     let ctrl_store = new StoreHelper();
     let allItems = ctrl_store.getAllPlanogramItems(vuex);
@@ -46,9 +46,10 @@ class LoadSavePlanogramBase {
       clusterData: clusterData,
       dimensionData: dimensionData,
       image: image,
-      hybridRanges:hybridRanges,
-      promoItemRefs:promoItemRefs
+      hybridRanges: hybridRanges,
+      promoItemRefs: promoItemRefs
     }
+    console.log("[ALL ITYEMS]", allItems);
 
     allItems.forEach(item => {
       // remove the line below to test that the positions are being saved and repopulated in the load
@@ -166,7 +167,7 @@ class LoadSavePlanogramBase {
 
       self.createDetailTX(clusterData, dimensionData, resultSpace, fixtureData, planogramProducts, createDetailCallback => {
         let floorPlanArray = generateFloorPlanArr(output.planogramData)
-        console.log("generateFloorPlanArr",floorPlanArray);
+        console.log("generateFloorPlanArr", floorPlanArray);
         let header = {
           planogram_Detail_ID: createDetailCallback.data.planogram_Details.id
         }
@@ -317,7 +318,7 @@ class LoadSavePlanogramBase {
     })
   }
 
-  saveNew(vuex, stage, clusterData, dimensionData, spacePlanID, spacePlanName, updateName, image, updateLoader, close, fixtureData, storeCount,hybridRanges,promoItemRefs, callback) {
+  saveNew(vuex, stage, clusterData, dimensionData, spacePlanID, spacePlanName, updateName, image, updateLoader, close, fixtureData, storeCount, hybridRanges, promoItemRefs, callback) {
     let self = this;
     let ctrl_store = new StoreHelper();
     let allItems = ctrl_store.getAllPlanogramItems(vuex);
@@ -331,8 +332,8 @@ class LoadSavePlanogramBase {
       clusterData: clusterData,
       dimensionData: dimensionData,
       image: image,
-      hybridRanges:hybridRanges,
-      promoItemRefs:promoItemRefs
+      hybridRanges: hybridRanges,
+      promoItemRefs: promoItemRefs
     }
 
     allItems.forEach(item => {
@@ -897,9 +898,9 @@ class LoadSavePlanogramBase {
       .then(r => {
 
         let jsonData = r.data.jsonObject
-        console.log("loadPlanogram",jsonData);
-        
-        afterGetSpacePlanFile(jsonData.clusterData,jsonData.hybridRanges,jsonData.promoItemRefs, jsonData.dimensionData, jsonData.name, rangeProducts => {
+        console.log("loadPlanogram", jsonData);
+
+        afterGetSpacePlanFile(jsonData.clusterData, jsonData.hybridRanges, jsonData.promoItemRefs, jsonData.dimensionData, jsonData.name, rangeProducts => {
           if (rangeProducts == null) {
             self.startLoadingPlanogram(jsonData, Stage, pxlRatio, MasterLayer, VueStore, hideLoader);
           } else {

@@ -572,6 +572,7 @@
       let width = 0;
       width = window.innerWidth * 0.4;
       return {
+        detailsFixture: [],
         promoItemRefs: [],
         HybridRanges: [],
         selectedHybridRange: null,
@@ -1996,7 +1997,9 @@
           if (self.spacePlanID == null) {
 
             self.$refs.SizeLoader.show()
+            self.createPlanogramFixture(stage.children, null, callback => {
 
+            })
             self.planogramHelper.save(self.$store, stage, clusterData, {
                 modules: self.modules,
                 height: self.height,
@@ -2247,6 +2250,34 @@
         });
 
         return retVal;
+      },
+      createPlanogramFixture(items, parent, callback) {
+        let self = this
+        items.forEach(e => {
+          if (e.type == "GONDOLA") {
+            let newGondola = {
+              height: e.height,
+              width: e.width,
+              depth: e.depth,
+              sales: 0,
+              units: 0,
+              profit: 0,
+              dos: 0,
+              itemCount: 0,
+              children: []
+            }
+            self.detailsFixture.push(newGondola)
+            let newparent = newGondola
+          }
+          if (e.type == "PRODUCT") {
+            parent.children
+          }
+          if (e.children.length > 0) {
+            self.createPlanogramFixture(e.children, newparent, callback)
+          } else {
+            callback()
+          }
+        })
       },
       dragProductStart(ev, data) {
         let self = this
