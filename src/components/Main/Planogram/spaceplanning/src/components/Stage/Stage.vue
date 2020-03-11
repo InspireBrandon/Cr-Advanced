@@ -818,6 +818,76 @@
         });
         return blob;
       },
+      getImagesRecursive(x, idx, retval, callback) {
+        let self = this;
+
+        let ctrl_store = new StoreHelper();
+
+        self.ShowAllGondolas();
+        var stage = self.$refs.stage.getStage();
+
+        stage.scaleX(1);
+        stage.scaleY(1);
+
+        stage.position({
+          x: 0,
+          y: 0
+        });
+
+        let allGondolas = ctrl_store.getAllPlanogramItemsByType(self.$store, "GONDOLA");
+
+        allGondolas.forEach(element => {
+          element.Group.hide();
+        })
+
+        stage.batchDraw();
+
+        var elemeno = allGondolas[idx];
+
+        elemeno.Group.show();
+        elemeno.Layer.draw();
+
+        let height = stage.getHeight();
+
+        var dataURL = this.$refs.stage.getStage().toDataURL({
+          x: x,
+          y: 0,
+          width: elemeno.Width,
+          height: height,
+          mimeType: "image/png",
+          quality: 1.0,
+          pixelRatio: 2
+        });
+
+        x += elemeno.Width;
+
+        var blob = self.b64toBlob(dataURL, "image/jpeg");
+        var blobUrl = URL.createObjectURL(blob);
+
+        retval.push({
+          blob: blob,
+          dataURL: dataURL,
+          id: 1
+        })
+
+        elemeno.Group.hide();
+        elemeno.Layer.draw();
+
+        if (idx + 1 == allGondolas.length) {
+          callback(retval)
+        } else {
+          idx++;
+          self.getImagesRecursive(x, idx, retval, callback)
+        }
+      },
+      getSplitImages(callback) {
+        let self = this;
+        let retval = [];
+        self.getImagesRecursive(0, 0, retval, final => {
+          self.ShowAllGondolas();
+          callback(retval);
+        })
+      },
       getImageBytes(ratio) {
         var self = this;
         let ctrl_store = new StoreHelper();
@@ -955,7 +1025,7 @@
           x: 0,
           y: 0
         });
-        
+
         stage.batchDraw();
 
         let allProducts = ctrl_store.getAllPlanogramItemsByType(self.$store, "PRODUCT");
@@ -1632,7 +1702,7 @@
         case "LIBRARY": {
           if (data.type == "CUSTOM") {
             self.addCustomLibraryItem(stage, data, ev)
-          } else if(data.type == "CUSTOM_PLANOGRAM") {
+          } else if (data.type == "CUSTOM_PLANOGRAM") {
             self.addCustomPlanogram(stage, data, ev);
           } else {
             self.addLibraryItem(stage, data, ev);
@@ -1941,7 +2011,8 @@
 
         let fileID = data.data.id;
 
-        axios.get(process.env.VUE_APP_API + `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${fileID}&file=config_advanced`)
+        axios.get(process.env.VUE_APP_API +
+            `SystemFile/JSON/Planogram?db=CR-Devinspire&id=${fileID}&file=config_advanced`)
           .then(r => {
             let jsonData = r.data.jsonObject;
             let planodata = jsonData.planogramData;

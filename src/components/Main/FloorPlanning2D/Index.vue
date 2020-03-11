@@ -230,7 +230,7 @@
                                     @change="applyProperties" type="number" label="Depth (m)" v-model="properties.depth"
                                     hide-details>
                                 </v-text-field>
-                                <v-text-field @change="applyProperties" type="number" label="rotation"
+                                <v-text-field v-if="showRotation" @change="applyProperties" type="number" label="rotation"
                                     v-model="properties.rotation" hide-details>
                                 </v-text-field>
                                 <v-checkbox @change="applyProperties" v-model="keepAspectRatio"
@@ -394,6 +394,7 @@
         // 1 block = 1 meter
         data() {
             return {
+                showRotation: false,
                 makingChanges: false,
                 hasTape: null,
                 clusterTypes: [{
@@ -2529,6 +2530,8 @@
             clickselect(item, callback) {
                 let self = this
 
+                self.showRotation = true;
+
                 switch (item.parent.attrs.name) {
                     case "Building": {
                         self.selectLayer(self.buildingLayerTree, self.layerTree, layerCB => {
@@ -2568,6 +2571,8 @@
                 break;
 
                 case "Duplication Group": {
+                    self.showRotation = false;
+
                     self.findLayerItem(self.layerTree, item.parent._id, cb => {
                         self.selectLayer(cb, self.layerTree, layerCB => {
                             item.parent.draggable(true)
@@ -2582,6 +2587,8 @@
 
                 break;
                 case "MultiSelectGroup": {
+                    self.showRotation = false;
+
                     self.findLayerItem(self.layerTree, item.parent._id, cb => {
                         self.selectLayer(cb, self.layerTree, layerCB => {
                             item.parent.draggable(true)
@@ -2596,6 +2603,8 @@
 
                 break;
                 case "group": {
+                    self.showRotation = false;
+
                     self.findLayerItem(self.layerTree, item.parent._id, cb => {
                         self.selectLayer(cb, self.layerTree, lasyerCB => {
                             item.parent.draggable(true)
