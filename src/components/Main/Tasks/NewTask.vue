@@ -8,12 +8,7 @@
                 <v-container class="pa-0" grid-list-md>
                     <v-layout row wrap>
                         <v-flex md6>
-                            <v-autocomplete v-model="selectedUser" :items="users" label="User" hide-details>
-                            </v-autocomplete>
-                        </v-flex>
-                        <v-flex md6></v-flex>
-                        <v-flex md6>
-                            <v-select v-model="selectedTask" :items="tasks" label="Task" hide-details></v-select>
+                            <v-select @change="getProjectUsers" v-model="selectedTask" :items="tasks" label="Task" hide-details></v-select>
                         </v-flex>
                         <v-flex md12>
                             <div class="mt-4"></div>
@@ -29,6 +24,10 @@
                         </v-flex>
                         <v-flex md12>
                             <div class="mt-4"></div>
+                        </v-flex>
+                        <v-flex md6>
+                            <v-autocomplete v-model="selectedUser" :items="users" label="User" hide-details>
+                            </v-autocomplete>
                         </v-flex>
                         <v-flex md12>
                             <v-autocomplete v-model="selectedRangeFile" :items="rangeFiles" label="Range File"
@@ -47,8 +46,8 @@
                         </v-flex>
                         <v-flex md6></v-flex>
                         <v-flex md3>
-                            <v-autocomplete :disabled="selectedStore != null" v-model="selectedStoreCluster" :items="storeClusters" label="Store Cluster"
-                                hide-details>
+                            <v-autocomplete :disabled="selectedStore != null" v-model="selectedStoreCluster"
+                                :items="storeClusters" label="Store Cluster" hide-details>
                             </v-autocomplete>
                         </v-flex>
                         <v-flex md3>
@@ -89,13 +88,13 @@
                 dialog: false,
                 afterReturn: null,
                 tasks: [{
-                    text: "Data Preparation",
+                    text: "Data Preperation",
                     value: 1
                 }, {
                     text: "Ranging",
                     value: 2
                 }, {
-                    text: "Planogram",
+                    text: "Space Planning",
                     value: 3
                 }],
                 selectedTask: null,
@@ -306,7 +305,7 @@
                 let self = this;
 
                 self.$nextTick(() => {
-                    if(self.selectedStore != null) {
+                    if (self.selectedStore != null) {
                         self.selectedStoreCluster = null;
                         self.selectedCustomCluster = null;
                         self.selectedCategoryCluster = null;
@@ -321,6 +320,7 @@
                         self.selectedPlanogramID = currentProject.planogram_ID;
                         self.getCategoryClusters();
                         self.getCustomClusters();
+                        self.getProjectUsers();
                     }
                 })
             },
@@ -372,6 +372,24 @@
                         })
                     })
             },
+            getProjectUsers() {
+                let self = this;
+
+                self.$nextTick(() => {
+                    let type = self.tasks.find(e => {
+                        return e.value == self.selectedTask;
+                    }).text;
+
+                    console.log(type);
+
+                    if (self.selectedProject != null && self.selectedTask != null) {
+                        Axios.get(process.env.VUE_APP_API + `ProjectUsers?typeName=${type}&projectID=${self.selectedProject}`)
+                            .then(r => {
+                                self.selectedUser = r.data[0].userID_1;
+                            })
+                    }
+                })
+            }
         }
     }
 </script>
