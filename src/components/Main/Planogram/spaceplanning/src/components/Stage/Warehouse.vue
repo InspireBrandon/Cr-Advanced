@@ -52,6 +52,7 @@
             File
           </v-btn>
           <v-list dense>
+          
             <v-list-tile @click="openFile">
               <v-list-tile-title>Open</v-list-tile-title>
             </v-list-tile>
@@ -1962,11 +1963,15 @@
             }
           })
       },
+     
       saveFile(isNew) {
         let self = this;
         let parent = self.$parent.$children[0].$children[2];
-        let stage = parent.getStage();
 
+        console.log(parent);
+
+        let stage = parent.getStage();
+        
         let b64 = parent.$parent.getImageBytes(2);
         let image = parent.$parent.b64toBlob(b64, "image/png")
 
@@ -1997,10 +2002,8 @@
           if (self.spacePlanID == null) {
 
             self.$refs.SizeLoader.show()
-            self.createPlanogramFixture(stage.children, null, callback => {
 
-            })
-            self.planogramHelper.save(self.$store, stage, clusterData, {
+            self.planogramHelper.save(self.$store, parent.$parent, clusterData, {
                 modules: self.modules,
                 height: self.height,
                 width: self.width,
@@ -2018,7 +2021,7 @@
             self.$refs.yesNoModal.show('Update file name with latest configuration?', value => {
               if (value == true) {
                 self.$refs.SizeLoader.show()
-                self.planogramHelper.save(self.$store, stage, clusterData, {
+                self.planogramHelper.save(self.$store, parent.$parent, clusterData, {
                     modules: self.modules,
                     height: self.height,
                     width: self.width,
@@ -2036,7 +2039,7 @@
                   })
               } else {
                 self.$refs.SizeLoader.show()
-                self.planogramHelper.save(self.$store, stage, clusterData, {
+                self.planogramHelper.save(self.$store, parent.$parent, clusterData, {
                     modules: self.modules,
                     height: self.height,
                     width: self.width,
@@ -2086,7 +2089,7 @@
 
             self.$refs.SizeLoader.show()
 
-            self.planogramHelper.save(self.$store, stage, clusterData, {
+            self.planogramHelper.save(self.$store, parent.$parent, clusterData, {
                 modules: self.modules,
                 height: self.height,
                 width: self.width,
@@ -2251,34 +2254,7 @@
 
         return retVal;
       },
-      createPlanogramFixture(items, parent, callback) {
-        let self = this
-        items.forEach(e => {
-          if (e.type == "GONDOLA") {
-            let newGondola = {
-              height: e.height,
-              width: e.width,
-              depth: e.depth,
-              sales: 0,
-              units: 0,
-              profit: 0,
-              dos: 0,
-              itemCount: 0,
-              children: []
-            }
-            self.detailsFixture.push(newGondola)
-            let newparent = newGondola
-          }
-          if (e.type == "PRODUCT") {
-            parent.children
-          }
-          if (e.children.length > 0) {
-            self.createPlanogramFixture(e.children, newparent, callback)
-          } else {
-            callback()
-          }
-        })
-      },
+     
       dragProductStart(ev, data) {
         let self = this
         console.log("dragProductStart", data);
