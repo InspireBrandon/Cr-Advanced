@@ -230,8 +230,8 @@
                                     @change="applyProperties" type="number" label="Depth (m)" v-model="properties.depth"
                                     hide-details>
                                 </v-text-field>
-                                <v-text-field v-if="showRotation" @change="applyProperties" type="number" label="rotation"
-                                    v-model="properties.rotation" hide-details>
+                                <v-text-field v-if="showRotation" @change="applyProperties" type="number"
+                                    label="rotation" v-model="properties.rotation" hide-details>
                                 </v-text-field>
                                 <v-checkbox @change="applyProperties" v-model="keepAspectRatio"
                                     v-if="selectedItem.attrs.name=='image'" label="Keep aspect ratio">
@@ -394,6 +394,7 @@
         // 1 block = 1 meter
         data() {
             return {
+                labelLeft: null,
                 showRotation: false,
                 makingChanges: false,
                 hasTape: null,
@@ -1198,7 +1199,7 @@
                 self.$refs.Prompt.show("", " Save FloorPlan", "Please enter floorplan name", Name => {
                     self.$refs.spinner.show()
                     if (self.hasTape != null) {
-                        self.hasTape.destroy()
+                        self.hasTape.shape.destroy()
                         self.hasTape = null
                     }
 
@@ -2660,7 +2661,6 @@
                 let self = this;
                 let isPaint = false;
                 self.stage.on('click tap', function (e) {
-
                     clickTapHelper.handleClickTap(e.target, self.stage, self
                         .selectedItem, self.clickselect, self
                         .findLayerItem, self.selectedLayerTreeItem, self.properties,
@@ -2820,6 +2820,49 @@
                         // });
                     }
                 });
+                // self.departmentLayer.on('mouseover', function (e) {
+                //     console.log("[MOUSEOVER]departmentLayer", e.target);
+                //     if (e.target.saveID != null && e.target.saveID != undefined) {
+                //         // label with left pointer
+                //         self.labelLeft = new Konva.Label({
+                //             x: e.target.attrs.x,
+                //             y: e.target.attrs.y,
+                //             opacity: 0.75
+                //         });
+
+                //         self.labelLeft.add(
+                //             new Konva.Tag({
+                //                 fill: 'green',
+                //                 pointerDirection: 'left',
+                //                 pointerWidth: 20,
+                //                 pointerHeight: 28,
+                //                 lineJoin: 'round'
+                //             })
+                //         );
+                //         self.getDropLabel(e.target.saveID, labeltext => {
+                //             self.labelLeft.add(
+                //                 new Konva.Text({
+                //                     text: labeltext,
+                //                     fontFamily: 'Calibri',
+                //                     fontSize: 18,
+                //                     padding: 5,
+                //                     fill: 'white'
+                //                 })
+                //             );
+                //             e.target.parent.add(self.labelLeft)
+                //             self.stage.batchDraw()
+                //         })
+
+                //     }
+
+                // })
+                // self.departmentLayer.on('mouseout', function () {
+                //     self.labelLeft.destroy()
+                //     self.labelLeft = null
+                //     self.stage.batchDraw()
+                // });
+
+
                 self.departmentLayer.on('dragmove', function (e) {
                     if (self.selectedTool == "open_with" && e.target.attrs.name != 'Tape') {
                         // self.handleSnapping(e.target)
@@ -2911,6 +2954,10 @@
                         self.stage.batchDraw();
                     }
                 });
+            },
+            getDropLabel(dropID, callback) {
+                let text = `YAAAAAAAA YEEET `
+                callback(text)
             },
             findparentLayer(item) {
                 let self = this
@@ -3521,8 +3568,8 @@
         console.log("dimension", dimension);
 
         const topLeft = {
-            x: -dimension.width  ,
-            y: -dimension.height  
+            x: -dimension.width,
+            y: -dimension.height
         };
         console.log("[ROTATION TOPLEFT]", topLeft);
 
