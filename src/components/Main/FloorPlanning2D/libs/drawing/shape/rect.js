@@ -42,7 +42,8 @@ class Rect extends Shape {
                 visible: 'inherit',
                 x: config.x,
                 y: config.y,
-                
+                strokeWidth: 0.5,
+                stroke: 'black',
                 height: parseFloat(brush.height),
                 width: parseFloat(brush.width),
                 draggable: true
@@ -70,19 +71,39 @@ class Rect extends Shape {
             }
             imageObj.src = dataUrl;
         } else {
-            self.shape = new Konva.Rect({
+            self.shape = new Konva.Image({
+                name: "Gondola-Rect",
+                visible: 'inherit',
                 x: config.x,
                 y: config.y,
+                 strokeWidth: 0.5,
+                stroke: 'black',
                 height: parseFloat(brush.height),
                 width: parseFloat(brush.width),
-                fill: brush.color,
-                draggable: true,
-                visible: 'inherit',
-                enabledAnchors: self.enabledAnchors,
-                name: "Gondola-Rect",
-                strokeWidth: 0.5,
-                stroke: 'black',
-            });
+                draggable: true
+            })
+            var imageObj = new Image();
+
+            imageObj.onload = function () {
+                self.shape.image(imageObj);
+                self.shape.attrs.keepAspectRatio=true
+                self.shape.attrs.enabledAnchors= self.enabledAnchors
+                if (stage != null && stage != undefined) {
+
+                    stage.batchDraw()
+                } else {
+                    self.parent.draw();
+                }
+                console.log("[RECT IMAGE DRAW]")
+                
+            }
+            imageObj.onerror = function() {
+                console.log("imageerror");
+                
+                self.shape.fill('#1976d2');
+                self.parent.draw();
+            }
+            imageObj.src = "/arrow.png";;
         }
         self.parent.add(self.shape);
         self.parent.draw();

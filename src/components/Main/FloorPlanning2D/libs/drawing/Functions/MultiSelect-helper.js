@@ -30,7 +30,9 @@ class MultiSelectHelper {
             }
         }
     }
-    handleMultiselect(multiSelectGroup, selectedLayer, item, stage,callback) {
+    handleMultiselect(multiSelectGroup, selectedLayer, item, stage, callback) {
+        console.log("multiSelectGroup", multiSelectGroup);
+
         if (multiSelectGroup == null || multiSelectGroup == undefined) {
             let multigroup = new Konva.Group({
                 x: 0,
@@ -54,8 +56,8 @@ class MultiSelectHelper {
 
             item.moveTo(item.tmpParent)
             item.position({
-                x: pos.x+multiSelectGroup.attrs.x,
-                y: pos.y+multiSelectGroup.attrs.y
+                x: pos.x + multiSelectGroup.attrs.x,
+                y: pos.y + multiSelectGroup.attrs.y
             });
             item.tmpParent = null
             if (multiSelectGroup.children.length == 0) {
