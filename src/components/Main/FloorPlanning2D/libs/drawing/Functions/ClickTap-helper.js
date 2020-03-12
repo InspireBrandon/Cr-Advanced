@@ -67,7 +67,7 @@ class ClickTapHelper {
                     if (ctrlDown && e.attrs.draggable) {
                         stage.find('Transformer').destroy()
                         if (selectedItem != null && selectedItem != undefined) {
-                            handleMultiSelect(selectedItem)
+                            // handleMultiSelect(selectedItem)
                         }
                         handleMultiSelect(e)
                     }
