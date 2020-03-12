@@ -851,9 +851,9 @@
 
         var dataURL = this.$refs.stage.getStage().toDataURL({
           x: x,
-          y: 0,
+          y: height - elemeno.Height,
           width: elemeno.Width,
-          height: height,
+          height: elemeno.Height,
           mimeType: "image/png",
           quality: 1.0,
           pixelRatio: 2

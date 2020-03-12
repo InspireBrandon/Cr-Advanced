@@ -93,6 +93,7 @@
                 Axios.post(process.env.VUE_APP_API + "PowerBI/SavePlanogramBaskets", self.config)
                     .then(r => {
                         self.dialog = false;
+                        self.afterRuturn();
                     })
             },
             getDistinctGraphTypes() {
