@@ -125,15 +125,14 @@ class ClickTapHelper {
                                 });
                             }
 
-                            if (selectedItem.attrs.name == "Tape" || selectedItem.attrs.name == "group" || selectedItem.attrs.name == "Duplication Group") {
+                            if (selectedItem.attrs.name == "Tape" || selectedItem.attrs.name == "group" || selectedItem.attrs.name == "Duplication Group" || selectedItem.attrs.isPlanogram) {
                                 tr = new Konva.Transformer({
                                     enabledAnchors: [],
                                 });
                             }
-                            if (selectedItem.attrs.name == "Gondola-Rect" || selectedItem.attrs
-                                .name ==
+                            if (selectedItem.attrs.name == "Gondola-Rect" || selectedItem.attrs.name ==
                                 "image" || selectedItem.attrs
-                                .name == "Tape" || selectedItem.attrs.name == "group" || selectedItem.attrs.name == "Duplication Group") {
+                                .name == "Tape" || selectedItem.attrs.name == "group" || selectedItem.attrs.name == "Duplication Group" || selectedItem.attrs.isPlanogram) {
                                 tr.rotateEnabled(true);
 
                             } else {
