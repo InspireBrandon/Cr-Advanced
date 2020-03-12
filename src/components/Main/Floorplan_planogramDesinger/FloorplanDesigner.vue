@@ -47,7 +47,7 @@
                                 </v-menu>
                             </v-toolbar-items>
                         </v-toolbar>
-                        <v-card height="100vh" width="100%" style="overflow:auto">
+                        <v-card height="calc(100vh - 115px)" width="100%" style="overflow:auto">
                             <div v-for="(item,idx) in drops" :key="idx">
                                 <expansionItem :selectedFixtures="selectedFixtures" :Drop="item"
                                     :changeRotation="changeRotation" :reDraw="reDraw">
@@ -383,99 +383,96 @@
 
                 self.stage.on('dragmove', function (e) {
 
-                    let snappingHandler = new SnappingHandler()
-                    // clear all previous lines on the screen
-                    self.stage.find('.guid-line').destroy();
+                    // let snappingHandler = new SnappingHandler()
+                    // // clear all previous lines on the screen
+                    // self.stage.find('.guid-line').destroy();
 
-                    // find possible snapping lines
-                    var lineGuideStops = snappingHandler.getLineGuideStops(e.target, self.stage, self
-                        .snapableItems);
+                    // // find possible snapping lines
+                    // var lineGuideStops = snappingHandler.getLineGuideStops(e.target, self.stage, self
+                    //     .snapableItems);
 
-                    // find snapping points of current object
-                    var itemBounds = snappingHandler.getObjectSnappingEdges(e.target, self.stage);
+                    // // find snapping points of current object
+                    // var itemBounds = snappingHandler.getObjectSnappingEdges(e.target, self.stage);
 
-                    // now find where can we snap current object
-                    var guides = snappingHandler.getGuides(lineGuideStops, itemBounds, self.stage);
+                    // // now find where can we snap current object
+                    // var guides = snappingHandler.getGuides(lineGuideStops, itemBounds, self.stage);
 
-                    // do nothing of no snapping
-                    if (!guides.length) {
-                        return;
-                    }
+                    // // do nothing of no snapping
+                    // if (!guides.length) {
+                    //     return;
+                    // }
 
-                    snappingHandler.drawGuides(guides, self.stage, self.selectedLayer);
+                    // snappingHandler.drawGuides(guides, self.stage, self.selectedLayer);
 
-                    // now force object position
-                    guides.forEach(lg => {
-                        switch (lg.snap) {
-                            case 'start': {
-                                switch (lg.orientation) {
-                                    case 'V': {
-                                        e.target.x(lg.lineGuide + lg.offset);
-                                        break;
-                                    }
-                                    case 'H': {
-                                        e.target.y(lg.lineGuide + lg.offset);
-                                        break;
-                                    }
-                                }
-                                break;
-                            }
-                            case 'center': {
-                                switch (lg.orientation) {
-                                    case 'V': {
-                                        e.target.x(lg.lineGuide + lg.offset);
-                                        break;
-                                    }
-                                    case 'H': {
-                                        e.target.y(lg.lineGuide + lg.offset);
-                                        break;
-                                    }
-                                }
-                                break;
-                            }
-                            case 'end': {
-                                switch (lg.orientation) {
-                                    case 'V': {
-                                        e.target.x(lg.lineGuide + lg.offset);
-                                        break;
-                                    }
-                                    case 'H': {
-                                        e.target.y(lg.lineGuide + lg.offset);
-                                        break;
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                    });
+                    // // now force object position
+                    // guides.forEach(lg => {
+                    //     switch (lg.snap) {
+                    //         case 'start': {
+                    //             switch (lg.orientation) {
+                    //                 case 'V': {
+                    //                     e.target.x(lg.lineGuide + lg.offset);
+                    //                     break;
+                    //                 }
+                    //                 case 'H': {
+                    //                     e.target.y(lg.lineGuide + lg.offset);
+                    //                     break;
+                    //                 }
+                    //             }
+                    //             break;
+                    //         }
+                    //         case 'center': {
+                    //             switch (lg.orientation) {
+                    //                 case 'V': {
+                    //                     e.target.x(lg.lineGuide + lg.offset);
+                    //                     break;
+                    //                 }
+                    //                 case 'H': {
+                    //                     e.target.y(lg.lineGuide + lg.offset);
+                    //                     break;
+                    //                 }
+                    //             }
+                    //             break;
+                    //         }
+                    //         case 'end': {
+                    //             switch (lg.orientation) {
+                    //                 case 'V': {
+                    //                     e.target.x(lg.lineGuide + lg.offset);
+                    //                     break;
+                    //                 }
+                    //                 case 'H': {
+                    //                     e.target.y(lg.lineGuide + lg.offset);
+                    //                     break;
+                    //                 }
+                    //             }
+                    //             break;
+                    //         }
+                    //     }
+                    // });
                 });
 
                 self.stage.on('dragend', (e) => {
-                    // clear all previous lines on the screen
-                    self.stage.find('.guid-line').destroy();
-                    let transform = self.stage.getAbsoluteTransform().copy();
-                    transform.invert();
-                    // let pos = self.stage.getPointerPosition();
+                    // // clear all previous lines on the screen
+                    // self.stage.find('.guid-line').destroy();
+                    // let transform = self.stage.getAbsoluteTransform().copy();
+                    // transform.invert();
+                    // // let pos = self.stage.getPointerPosition();
 
-                    console.log("drag evvent", e);
-                    let abs = e.target.absolutePosition()
-
-
-                    let dropPos = transform.point({
-                        x: e.target.attrs.x,
-                        y: e.target.attrs.y
-                    });
-                    console.log("dragend", dropPos);
-                    console.log("abs", abs);
+                    // console.log("drag evvent", e);
+                    // let abs = e.target.absolutePosition()
 
 
-                    e.target.setAttrs({
-                        x: dropPos.x,
-                        y: dropPos.y
-                    })
+                    // let dropPos = transform.point({
+                    //     x: e.target.attrs.x,
+                    //     y: e.target.attrs.y
+                    // });
+
+                    // e.target.setAttrs({
+                    //     x: dropPos.x,
+                    //     y: dropPos.y
+                    // })
 
 
-                    self.stage.batchDraw();
+                    // self.stage.batchDraw();
                 })
                 self.stage.addEventListener('wheel', (e) => {
                     var oldScale = self.stage.scaleX();
@@ -673,7 +670,7 @@
                                         DropID: element.id.toString()
                                     })
                                     circle.shape.parent.setAttrs({
-                                        x: lastPos + widthInc,
+                                        x: lastPos,
                                         y: 75
                                     })
                                     circle.shape.attrs.DropID = element.id.toString()
@@ -694,7 +691,7 @@
                                         draggable: true
                                     })
                                     rect.shape.setAttrs({
-                                        x: lastPos + widthInc,
+                                        x: lastPos,
                                         y: 50
                                     })
 
@@ -709,11 +706,11 @@
                                     rect.shape.draggable(true)
 
                                 }
+
                                 widthInc = element.width
-                                self.snapableItems.push("." + element.id.toString())
+                                // self.snapableItems.push("." + element.id.toString())
                                 self.stage.batchDraw()
                                 self.$refs.spinner.hide()
-
                             })
                         } else {
                             self.drawSaved(cb)

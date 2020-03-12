@@ -15,10 +15,18 @@
                     name
                 </v-btn> -->
             </v-toolbar-items>
+
+            <div v-show="showCluster"
+                style="height: 100vh; width: 40%; background: white; top: 0px; position: fixed; right: 0px; top: 48px;">
+                <v-toolbar color="primary">{{ planogramName }}</v-toolbar>
+                <BICluster ref="biCluster" />
+            </div>
+
             <v-btn color="primary" @click="printReport">Print</v-btn>
-            <v-btn color="primary" :disabled="updating" v-if="userAccess==0" @click="RefreshTables">refresh</v-btn>
+            <v-btn color="primary" :disabled="updating" v-if="userAccess==0" @click="RefreshTables">refresh db</v-btn>
             <v-progress-circular indeterminate v-if="updating"></v-progress-circular>
             <v-btn color="primary" v-if="userAccess==0" @click="CleanTables">Clean</v-btn>
+            <v-btn color="primary" @click="showCluster = !showCluster">Edit Clusters</v-btn>
             <v-btn v-if="selectedPlanograms.length == 1" icon color="primary" @click="updateBIPlanogramBaskets">
                 <v-icon>settings</v-icon>
             </v-btn>
@@ -40,14 +48,17 @@
     import Spinner from '@/components/Common/Spinner';
 
     import BIPlanogramBaskets from './BIPlanogramBaskets'
+    import BICluster from './BICluster'
 
     export default {
         components: {
             Spinner,
-            BIPlanogramBaskets
+            BIPlanogramBaskets,
+            BICluster
         },
         data() {
             return {
+                showCluster: false,
                 planograms: [],
                 selectedPlanograms: [],
                 userAccess: null,
@@ -63,7 +74,9 @@
                 selectedPage: null,
                 currentMode: "view",
                 updating: true,
-                timeout: null
+                timeout: null,
+                drawer: true,
+                planogramName: ""
             }
         },
         mounted() {
@@ -86,6 +99,8 @@
             // });
         },
         methods: {
+            // changeCategory
+
             checkCanRefresh() {
                 let self = this;
 
@@ -93,10 +108,9 @@
 
                 Axios.get(process.env.VUE_APP_API + "BIQue")
                     .then(r => {
-                        if(r.data == null) {
+                        if (r.data == null) {
                             self.updating = false;
-                        }
-                        else {
+                        } else {
                             self.updating = true;
                         }
 
@@ -121,8 +135,7 @@
                 }
 
                 Axios.post(process.env.VUE_APP_API + "BIQue", request)
-                    .then(r => {
-                    })
+                    .then(r => {})
             },
             CleanTables() {
                 let self = this
@@ -194,9 +207,18 @@
 
 
                 if (self.selectedPlanograms.length > 0) {
-                    self.report.setFilters([supplierFilter, supplierFilter2])
-                        .catch(errors => {
-                        });
+                    if (self.selectedPlanograms.length == 1 || self.selectedPlanograms.length == 0) {
+                        self.$refs.biCluster.changeCategory(self.selectedPlanograms[0])
+
+                        var planogramID = self.selectedPlanograms[0];
+
+                        var planogramName = self.planograms.find(e => {
+                            return e.value == planogramID;
+                        }).text;
+
+                        self.planogramName = planogramName;
+                    }
+                    self.report.setFilters([supplierFilter, supplierFilter2]).catch(errors => {});
                 } else {
                     self.applyReportFilters()
                 }
@@ -417,7 +439,10 @@
                 }).text;
 
                 self.$refs.BIPlanogramBaskets.show(planogramID, planogramName, () => {
-
+                    Axios.get(process.env.VUE_APP_API + "PowerBI/UpdateDatasets")
+                        .then(r => {
+                            console.log("Busy with refresh")
+                        })
                 })
             }
         }

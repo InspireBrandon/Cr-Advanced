@@ -31,6 +31,7 @@
 <script>
     import Selector from "./Selector.vue";
     import Axios from 'axios'
+
     import {
         AgGridVue
     } from "ag-grid-vue";
@@ -46,12 +47,12 @@
                 Category_Link: [],
                 pageNumber: 0,
                 allowedRecords: 25,
+                store_Cluster: [],
                 columnDefs: [],
                 rowData: [],
                 defaultColDef: {
                     onCellValueChanged: this.UpdateStoreCluster
                 },
-                store_Cluster: [],
                 gridOptions: {
                     rowHeight: 35,
                     pinnedTopRowData: [],
