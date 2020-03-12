@@ -1122,7 +1122,7 @@
                             radius: item.attrs.radius,
                             name: item.attrs.name,
                             Floorplan_ID: Floorplan_ID,
-                            Fixture_ID: item.attrs.DropID,
+                            Fixture_ID: item.saveID,
                             color: item.attrs.fill,
                             imageID: item.attrs.imageID,
                             children: []
@@ -1231,12 +1231,13 @@
                         self.imageIDArr = []
                         self.FormatItems(self.stage.children, self.saveArr, 0, self.Floorplan_ID,
                             callback => {
-                                axios.post(process.env.VUE_APP_API +
-                                    `saveFloorHeader?header_ID=${self.Floorplan_ID}`, self
-                                    .saveArr).then(
-                                    resp => {
-                                        self.handleImageSaving()
-                                    })
+                                console.log(self.saveArr);
+                                // axios.post(process.env.VUE_APP_API +
+                                //     `saveFloorHeader?header_ID=${self.Floorplan_ID}`, self
+                                //     .saveArr).then(
+                                //     resp => {
+                                //         self.handleImageSaving()
+                                //     })
 
                             })
                     })
@@ -1688,7 +1689,7 @@
                                         meters)
                                     .toFixed(2),
                             })
-                            rect.shape.attrs.saveID = element.id
+                            rect.shape.saveID = element.id
                                 .toString()
                             lastPos = rect.shape.attrs.x + (element.width / 4) * (self.floorConfig
                                 .blockRatio *

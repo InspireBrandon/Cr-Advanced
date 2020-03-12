@@ -109,7 +109,7 @@ class DuplicationHelper {
         let groupTreeItem = new treeItem({
             KonvaID: group._id,
             children: [],
-            name: "Group",
+            name: "group",
             showEditName: false,
             visible: group.visible,
             selected: group.selected,
@@ -133,6 +133,80 @@ class DuplicationHelper {
     }
     drawShape(item, parent, parentTree) {
         switch (item.attrs.name) {
+            case "Duplication Group": {
+                let newGroup = new Konva.Group({
+                    x: item.attrs.x,
+                    y: item.attrs.y,
+                    name: "group",
+                    visible: true,
+                    showEditName: false,
+                    selected: true,
+                    showChildren: false,
+                    draggable: false,
+                    locked: true,
+                    drawType: "group",
+                    type: "group",
+                })
+
+                let newgroupTreeItem = new treeItem({
+                    KonvaID: newGroup._id,
+                    children: [],
+                    name: "group",
+                    showEditName: false,
+                    visible: newGroup.visible,
+                    selected: newGroup.selected,
+                    showChildren: newGroup.showChildren,
+                    drawType: "group",
+                    locked: true,
+                    parent: parentTree
+                })
+                parentTree.children.push(newgroupTreeItem)
+                newGroup.setAttrs({
+                    draggable: false,
+                    rotation: item.attrs.rotation
+                })
+                parent.add(newGroup)
+                item.children.forEach(element => {
+                    this.drawShape(element, newGroup, newgroupTreeItem)
+                });
+            }
+            case "group": {
+                let newGroup = new Konva.Group({
+                    x: item.attrs.x,
+                    y: item.attrs.y,
+                    name: "group",
+                    visible: true,
+                    showEditName: false,
+                    selected: true,
+                    showChildren: false,
+                    draggable: false,
+                    locked: true,
+                    drawType: "group",
+                    type: "group",
+                })
+
+                let newgroupTreeItem = new treeItem({
+                    KonvaID: newGroup._id,
+                    children: [],
+                    name: "group",
+                    showEditName: false,
+                    visible: newGroup.visible,
+                    selected: newGroup.selected,
+                    showChildren: newGroup.showChildren,
+                    drawType: "group",
+                    locked: true,
+                    parent: parentTree
+                })
+                parentTree.children.push(newgroupTreeItem)
+                newGroup.setAttrs({
+                    draggable: false,
+                    rotation: item.attrs.rotation
+                })
+                parent.add(newGroup)
+                item.children.forEach(element => {
+                    this.drawShape(element, newGroup, newgroupTreeItem)
+                });
+            }
             case "circle": {
                 let brush = {
                     radius: item.attrs.radius,
@@ -155,7 +229,7 @@ class DuplicationHelper {
                     parent: parentTree
                 }))
                 circle.shape.setAttrs({
-                    radius: item.radius() * item
+                    radius: item.attrs.radius * item
                         .scaleY().toFixed(2),
                     scaleX: 1,
                     scaleY: 1,
