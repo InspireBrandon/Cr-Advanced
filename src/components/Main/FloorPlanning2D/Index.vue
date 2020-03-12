@@ -1639,7 +1639,7 @@
                                         meters)
                                     .toFixed(2),
                                 DropID: element.id.toString(),
-                                x: lastPos + widthInc,
+                                x: lastPos,
                                 y: ev.y
                             })
                             circle.shape.attrs.DropID = element.id.toString()
@@ -1652,7 +1652,7 @@
                                 showEditName: true,
                                 selected: true,
                                 showChildren: false,
-                                draggable: true,
+                                draggable: false,
                                 name: "circle",
                                 children: [],
                                 parent: layertreeitem
@@ -1673,10 +1673,10 @@
                                 height: (element.height / 4) * (self.floorConfig.blockRatio *
                                         meters)
                                     .toFixed(2),
-                                draggable: true
+                                draggable: false
                             })
                             rect.shape.setAttrs({
-                                x: lastPos + widthInc,
+                                x: lastPos,
                                 y: ev.y
                             })
 
@@ -1693,7 +1693,7 @@
                             lastPos = rect.shape.attrs.x + (element.width / 4) * (self.floorConfig
                                 .blockRatio *
                                 meters).toFixed(2)
-                            rect.shape.draggable(true)
+                            rect.shape.draggable(false)
                             layertreeitem.children.push(new treeItem({
                                 KonvaID: rect.shape._id,
                                 visible: true,
@@ -2572,7 +2572,8 @@
                 break;
 
                 case "Duplication Group": {
-                    self.showRotation = false;
+                    if(item.parent.attrs.rotation == 0)
+                        self.showRotation = false;
 
                     self.findLayerItem(self.layerTree, item.parent._id, cb => {
                         self.selectLayer(cb, self.layerTree, layerCB => {
@@ -2588,7 +2589,8 @@
 
                 break;
                 case "MultiSelectGroup": {
-                    self.showRotation = false;
+                    if(item.parent.attrs.rotation == 0)
+                        self.showRotation = false;
 
                     self.findLayerItem(self.layerTree, item.parent._id, cb => {
                         self.selectLayer(cb, self.layerTree, layerCB => {
@@ -2604,7 +2606,8 @@
 
                 break;
                 case "group": {
-                    self.showRotation = false;
+                    if(item.parent.attrs.rotation == 0)
+                        self.showRotation = false;
 
                     self.findLayerItem(self.layerTree, item.parent._id, cb => {
                         self.selectLayer(cb, self.layerTree, lasyerCB => {
@@ -2626,9 +2629,25 @@
                 break;
 
                 default: {
-                    self.selectLayer(self.departmentTree, self.layerTree, layerCB => {
-                        callback(item)
-                    })
+                    if (item.parent.attrs.isPlanogram) {
+                        if(item.parent.attrs.rotation == 0)
+                            self.showRotation = false;
+
+                        self.findLayerItem(self.layerTree, item.parent._id, cb => {
+                            self.selectLayer(cb, self.layerTree, lasyerCB => {
+                                item.parent.draggable(true)
+                                item.parent.children.forEach(child => {
+                                    child.draggable(false)
+                                })
+                                callback(item.parent)
+                            })
+
+                        })
+                    } else {
+                        self.selectLayer(self.departmentTree, self.layerTree, layerCB => {
+                            callback(item)
+                        })
+                    }
                 }
                 break;
                 }

@@ -77,7 +77,8 @@
                 cameraType: "free",
                 showCanvas: false,
                 fullScreen: false,
-                fancyMode: false
+                fancyMode: false,
+                header: null
             };
         },
         mounted() {
@@ -98,9 +99,13 @@
                 });
 
                 setTimeout(() => {
-                    self.getItemsToDraw(id, items => {
-                        self.draw(items);
-                    });
+                    self.getHeader(id, header => {
+                        self.header = header;
+
+                        self.getItemsToDraw(id, items => {
+                            self.draw(items);
+                        });
+                    })
                 }, 500);
             },
             draw(items) {
@@ -126,10 +131,9 @@
                     camera.checkCollisions = true;
                     camera.speed = 0.3;
 
-                    if(self.fancyMode) {
+                    if (self.fancyMode) {
 
-                    }
-                    else {
+                    } else {
                         camera.inputs.remove(camera.inputs.attached.keyboard);
                         self.addDocumentListeners();
                     }
@@ -167,10 +171,10 @@
                     myMaterial.diffuseTexture = new BABYLON.Texture("tile.jpg", scene);
 
                     // Parameters
-                    var xmin = -25;
-                    var zmin = -15;
-                    var xmax = 25;
-                    var zmax = 15;
+                    var xmin = (self.header.width / 2) * -1;
+                    var zmin = (self.header.height / 2) * -1;
+                    var xmax = (self.header.width / 2);
+                    var zmax = (self.header.height / 2);
 
                     var precision = {
                         w: 2,
@@ -178,8 +182,8 @@
                     };
 
                     var subdivisions = {
-                        h: 500 / 50,
-                        w: 500 / 30
+                        h: 500 / (self.header.width / 2),
+                        w: 500 / (self.header.height / 2)
                     };
 
                     var myGround = BABYLON.MeshBuilder.CreateTiledGround(
@@ -198,8 +202,8 @@
                     myGround.material = myMaterial;
                     myGround.material.shadowColor = BABYLON.Color3.Red();
 
-                    myGround.position.x = 50 / 2;
-                    myGround.position.z = -30 / 2;
+                    myGround.position.x = self.header.width / 2;
+                    myGround.position.z = (self.header.height * -1) / 2;
 
                     myGround.receiveShadows = true;
                     myGround.checkCollisions = true;
@@ -217,7 +221,7 @@
                             self.buildWall(scene, element, element.id == 10630);
                         }
 
-                        if(element.name == "circle") {
+                        if (element.name == "circle") {
                             self.buildCircle(scene, element, element.id == 10630);
                         }
                     });
@@ -247,6 +251,18 @@
                 Axios.get(
                     process.env.VUE_APP_API + `FloorplanItems/3D?headerID=${id}`
                 ).then(r => {
+                    callback(r.data);
+                });
+            },
+            getHeader(id, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(
+                    process.env.VUE_APP_API + `FloorplanFixtureHeader?floorPlanHeaderID=${id}`
+                ).then(r => {
+                    console.log("Header", r.data)
                     callback(r.data);
                 });
             },
@@ -527,11 +543,11 @@
                     }
                     break;
                 case "ArrowRight": {
-                        camera.rotation.y = camera.rotation.y + degreesToRadians(90);
-                        let nextPos = camera.getFrontPosition(1);
-                        nextPos.y = currentY;
-                        camera.position = BABYLON.Vector3.Lerp(camera.position, nextPos, 1);
-                        camera.rotation.y = camera.rotation.y - degreesToRadians(90);
+                    camera.rotation.y = camera.rotation.y + degreesToRadians(90);
+                    let nextPos = camera.getFrontPosition(1);
+                    nextPos.y = currentY;
+                    camera.position = BABYLON.Vector3.Lerp(camera.position, nextPos, 1);
+                    camera.rotation.y = camera.rotation.y - degreesToRadians(90);
                 }
                 break;
                 case "ArrowUp": {

@@ -65,8 +65,10 @@ class Rect extends Shape {
             }
             imageObj.onerror = function() {
                 console.log("imageerror");
+
+                imageObj.src = "/arrow.png";
                 
-                self.shape.fill('#1976d2');
+                // self.shape.fill('#1976d2');
                 self.parent.draw();
             }
             imageObj.src = dataUrl;
@@ -103,7 +105,7 @@ class Rect extends Shape {
                 self.shape.fill('#1976d2');
                 self.parent.draw();
             }
-            imageObj.src = "/arrow.png";;
+            imageObj.src = "/arrow.png";
         }
         self.parent.add(self.shape);
         self.parent.draw();
