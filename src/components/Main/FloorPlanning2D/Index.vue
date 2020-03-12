@@ -101,7 +101,7 @@
                 </template>
                 <span>View 3D</span>
             </v-tooltip>
-            <v-btn @click="logMutli">log</v-btn>
+            <!-- <v-btn @click="logMutli">log</v-btn> -->
             <div v-show="multiSelectGroup !=null">
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
@@ -112,7 +112,7 @@
                     <span>Add Item to group</span>
                 </v-tooltip>
             </div>
-            <div v-if="selectedItem!=null">
+            <!-- <div v-if="selectedItem!=null">
                 <div v-show="selectedItem.attrs.drawType=='group'">
                     <v-tooltip bottom>
                         <template v-slot:activator="{ on }">
@@ -123,7 +123,7 @@
                         <span>Remove Item from group</span>
                     </v-tooltip>
                 </div>
-            </div>
+            </div> -->
             <!-- <v-btn @click="openFloorSettings">
                 Floor Settings
             </v-btn> -->
@@ -601,8 +601,10 @@
                 groupingHandler.addItemToGroup(self.stage, self.selectedItem, self.selectedLayer, self
                     .selectedLayerTree, self.selectedLayerTreeItem, self.multiSelectGroup, self.findLayerItem, self
                     .layerTree, callback => {
-                        self.multiSelectGroup.destroy()
-                        self.multiSelectGroup = null
+                        if (self.multiSelectGroup != undefined && self.multiSelectGroup != null) {
+                            self.multiSelectGroup.destroy()
+                            self.multiSelectGroup = null
+                        }
                         self.stage.find('Transformer').destroy()
                         self.stage.batchDraw()
                     })
@@ -1232,12 +1234,12 @@
                         self.FormatItems(self.stage.children, self.saveArr, 0, self.Floorplan_ID,
                             callback => {
                                 console.log(self.saveArr);
-                                // axios.post(process.env.VUE_APP_API +
-                                //     `saveFloorHeader?header_ID=${self.Floorplan_ID}`, self
-                                //     .saveArr).then(
-                                //     resp => {
-                                //         self.handleImageSaving()
-                                //     })
+                                axios.post(process.env.VUE_APP_API +
+                                    `saveFloorHeader?header_ID=${self.Floorplan_ID}`, self
+                                    .saveArr).then(
+                                    resp => {
+                                        self.handleImageSaving()
+                                    })
 
                             })
                     })
@@ -2573,7 +2575,7 @@
                 break;
 
                 case "Duplication Group": {
-                    if(item.parent.attrs.rotation == 0)
+                    if (item.parent.attrs.rotation == 0)
                         self.showRotation = false;
 
                     self.findLayerItem(self.layerTree, item.parent._id, cb => {
@@ -2590,7 +2592,7 @@
 
                 break;
                 case "MultiSelectGroup": {
-                    if(item.parent.attrs.rotation == 0)
+                    if (item.parent.attrs.rotation == 0)
                         self.showRotation = false;
 
                     self.findLayerItem(self.layerTree, item.parent._id, cb => {
@@ -2607,7 +2609,7 @@
 
                 break;
                 case "group": {
-                    if(item.parent.attrs.rotation == 0)
+                    if (item.parent.attrs.rotation == 0)
                         self.showRotation = false;
 
                     self.findLayerItem(self.layerTree, item.parent._id, cb => {
@@ -2631,7 +2633,7 @@
 
                 default: {
                     if (item.parent.attrs.isPlanogram) {
-                        if(item.parent.attrs.rotation == 0)
+                        if (item.parent.attrs.rotation == 0)
                             self.showRotation = false;
 
                         self.findLayerItem(self.layerTree, item.parent._id, cb => {
@@ -2698,6 +2700,8 @@
                             if (self.multiSelectGroup != null) {
                                 self.multiSelectGroup.draggable(true)
                             }
+
+                            console.log(e.target.parent)
 
                             if (e.target.parent.attrs.name == "group" || e.target.parent.attrs.name ==
                                 "Duplication Group") {

@@ -313,10 +313,9 @@
                     img = "aas2.png";
                 }
 
-                console.log(element)
-
                 var paneMat = new BABYLON.StandardMaterial("material", scene);
-                paneMat.diffuseTexture = new BABYLON.Texture(process.env.VUE_APP_API + `FloorplanFixture?mapImageID=${element.fixture_ID}&type=front`, scene);
+                // paneMat.diffuseTexture = new BABYLON.Texture(process.env.VUE_APP_API + `FloorplanFixture?mapImageID=${element.fixture_ID}&type=front`, scene);
+                paneMat.diffuseTexture = new BABYLON.Texture(img, scene);
                 paneMat.diffuseTexture.hasAlpha = true;
 
                 var material = new BABYLON.StandardMaterial("material", scene);
