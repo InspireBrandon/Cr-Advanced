@@ -9,6 +9,13 @@ class GroupingHandler {
     }
 
     addItemToGroup(stage, selectedItem, selectedLayer, selectedLayerTree, selectedLayerTreeItem, multiselectGroup, findLayerItem, layerTree, callback) {
+        console.log("[addItemToGroup] selected layer tree", selectedLayerTree);
+        console.log("[addItemToGroup] selected layer tree", selectedLayer);
+
+        if (selectedLayer.attrs.name == "group" || selectedLayer.attrs.name == "Duplication Group") {
+            selectedLayer = selectedLayer.parent.parent
+            selectedLayerTree = selectedLayerTree.parent
+        }
         let group = new Konva.Group({
             name: "group",
             visible: true,
@@ -32,17 +39,21 @@ class GroupingHandler {
             locked: true,
             parent: selectedLayerTree
         })
-        console.log("[NEW GROUP ADDED ]",group);
+
         selectedLayer.add(group)
-        console.log("[NEW GROUP ]", group);
-        
         selectedLayerTree.children.push(groupTreeItem)
-        for (let index = multiselectGroup.children.length - 1; index > -1; index--) {
+        console.log("multiselectGroup.children",multiselectGroup.children);
+        console.log("selectedLayer",selectedLayer);
+      
+        for (let index = (multiselectGroup.children.length - 1); index > -1; index--) {
+            console.log("multiselectGroup.children",multiselectGroup.children);
+            
             const element = multiselectGroup.children[index];
-            console.log("[INDEX]==", index);
-            console.log("[ADD ITEMS TO GROUUP]element", element);
+           console.log("[LOOP INDEX]",index);
+           
             findLayerItem(layerTree, element._id, cb => {
-                console.log("[HANDLE MULTI]child find layer", cb);
+                console.log("findLayerItem",cb.parent);
+                
                 for (let idx = cb.parent.children.length - 1; idx > -1; idx--) {
                     const child = cb.parent.children[idx];
                     if (child == cb) {
@@ -50,6 +61,8 @@ class GroupingHandler {
                         groupTreeItem.children.push(spliceItem[0])
                         spliceItem[0].parent = groupTreeItem
                         console.log("[SPLICE ITEM]", spliceItem[0]);
+                        console.log("[SPLICE Index]", index);
+                        
                         element.moveTo(group)
                         if (index == 0) {
                             group.rotation(multiselectGroup.rotation())
@@ -60,7 +73,7 @@ class GroupingHandler {
                 }
             })
         }
-       
+
     }
 
     removeItemFromGroup(stage, selectedItem, selectedLayer, selectedLayerTree, selectedLayerTreeItem, multiselectGroup, findLayerItem, layerTree, parent, callback) {
