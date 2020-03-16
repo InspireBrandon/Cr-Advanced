@@ -36,10 +36,10 @@
     },
     {
         "id": 10,
-        "system_code": "TESTING"
+        "system_code": "MAP"
     },
     {
         "id": 11,
-        "system_code": "MAP"
+        "system_code": "TESTING"
     }
 ]
