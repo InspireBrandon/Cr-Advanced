@@ -622,15 +622,37 @@
             removeItemFromGroup() {
                 let self = this
                 let groupingHandler = new GroupingHandler()
+                let layerParent = self.selectedLayerTreeItem.parent
                 let parent = self.selectedItem.parent
                 console.log("self.selectedItem", self.selectedItem);
                 console.log("self.selectedLayerTreeItem", self.selectedLayerTreeItem);
-                self.selectedItem.children.forEach(child => {
-                    self.detatchShape(child, parent, callback => {
+                for (let index = self.selectedItem.children.length - 1; index > -1; index--) {
+                    const child = self.selectedItem.children[index];
+                    self.findLayerItem(self.layerTree, child._id, cb => {
+                        cb.parent.children.forEach((layerItem, idx) => {
+                            if (layerItem == cb) {
+                                let spliceItem = cb.parent.children.splice(idx, 1)
+                                self.selectedLayerTreeItem.parent.children.push(spliceItem[0])
+                                spliceItem[0].parent = self.selectedLayerTreeItem.parent
+                                self.detatchShape(child, parent, callback => {
+                                    if (index == 0) {
+                                        self.selectedItem.destroy()
+                                        self.selectedLayerTreeItem.parent.children.forEach((
+                                            tree,
+                                            tidx) => {
+                                            if (tree == self.selectedLayerTreeItem) {
+                                                self.selectedLayerTreeItem.parent
+                                                    .children
+                                                    .splice(tidx, 1)
+                                            }
+                                        })
+                                    }
+                                })
+                            }
+                        })
 
                     })
-
-                })
+                }
 
                 // groupingHandler.removeItemFromGroup(self.stage, self.selectedItem, self.selectedLayer, self
                 //     .selectedLayerTree, self.selectedLayerTreeItem, self.multiSelectGroup, self.findLayerItem, self
@@ -2637,6 +2659,9 @@
                             item.parent.children.forEach(child => {
                                 child.draggable(false)
                             })
+                            console.log("[CLICK SELECT ] clickselected", item);
+                            console.log("[CLICK SELECT ] parent", item.parent);
+
                             callback(item.parent)
                         })
 
@@ -2967,6 +2992,12 @@
                                     self.stage.batchDraw()
                                 })
                         }
+                        if (e.target.attrs.name == "group" || e.target.attrs.name == "Duplication Group") {
+                            self.applyGroupProps(e.target, applyCallback => {
+                                console.log("[DRAG END],finished apply");
+
+                            })
+                        }
                     }
                 })
                 var scaleBy = 1.05;
@@ -2997,6 +3028,31 @@
                         self.stage.batchDraw();
                     }
                 });
+            },
+            applyGroupProps(parent, callback) {
+                let self = this
+                parent.children.forEach((child, index) => {
+                    const matrix = child.getAbsoluteTransform().getMatrix();
+                    const attrs = decompose(matrix);
+                    child.setAttrs(attrs)
+                    if (child.children.length > 0) {
+                        self.applyGroupProps(child, cb => {
+
+                        })
+                    }
+                    if (index + 1 == parent.children.length) {
+                        parent.setAttrs({
+                            x: 0,
+                            y: 0,
+                            scaleX: 1,
+                            scaleY: 1,
+                            rotation: 0,
+                        })
+                        callback()
+                    }
+                })
+
+
             },
             getDropLabel(dropID, callback) {
                 let text = `YAAAAAAAA YEEET `
