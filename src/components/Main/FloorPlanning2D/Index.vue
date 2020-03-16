@@ -42,10 +42,10 @@
                         <v-list-tile>
                             <v-list-tile-title>Close</v-list-tile-title>
                         </v-list-tile>
-                        <!-- <v-divider></v-divider>
+                        <v-divider></v-divider>
                         <v-list-tile @click="openSpaceDesigner">
                             <v-list-tile-title>Open SpacePlan Designer</v-list-tile-title>
-                        </v-list-tile> -->
+                        </v-list-tile>
                     </v-list>
                 </v-menu>
                 <!-- <v-text-field label="block to meter ratio" v-model="meterRatio" style="width:200px">
