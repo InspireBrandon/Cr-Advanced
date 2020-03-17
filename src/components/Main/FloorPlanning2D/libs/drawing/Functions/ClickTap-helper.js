@@ -20,9 +20,6 @@ class ClickTapHelper {
         })
 
     }
-    handleSelection(e, stage, selectedLayer, selectedItem, selectedLayerTreeItem, ctrlDown, handleMultiSelect) {
-
-    }
     handleClickTap(e, stage, selectedItem, clickselect, findLayerItem, selectedLayerTreeItem, properties, ctrlDown, selectedTool, resetDuplication, handleMultiSelect, layerTree, floorConfig, meterRatio, keepAspectRatio, handleSnapping, lastPosition, transformProperties, imagePos, selectImage, selectedLayer, clearMultiselect, clicktapcallback) {
         let self = this
 
@@ -54,8 +51,8 @@ class ClickTapHelper {
             } else {
                 clickselect(e, callback => {
                     e = callback
-                    console.log("[CLICK SELECT CALLBACK]: ",callback);
-                    
+                    console.log("[CLICK SELECT CALLBACK]: ", callback);
+
                     e.draggable(true)
                     if (e.attrs.name == "group" || e.attrs.name == "Duplication Group") {
                         e.draggable(true)
@@ -67,102 +64,116 @@ class ClickTapHelper {
                     if (ctrlDown && e.attrs.draggable) {
                         stage.find('Transformer').destroy()
                         if (selectedItem != null && selectedItem != undefined) {
-                            // handleMultiSelect(selectedItem)
-                        }
-                        handleMultiSelect(e)
-                    }
-                    if (e.attrs.name == "Tape") {
-                        e.draggable(true)
-                    }
+                            console.log("before multi select", e, selectedItem);
 
-                    if (e.attrs.draggable && e != stage) {
-                        self.setSelectedItem(e, findLayerItem, selectedLayerTreeItem, selectedItem, selectedLayer, layerTree, cb => {
-                            selectedLayerTreeItem = cb
-                            selectedItem = e;
-                            if (e.attrs.name == "Duplication Group" || e.attrs.name == "group") {
-                                e.draggable(true)
-                                e.children.forEach(element => {
-                                    element.attrs.draggable = false
-                                    element.draggable(false)
+                            handleMultiSelect(selectedItem, cb => {
+                                console.log("----------------------------------[MULTISELECT] SELECTED ITYEM", cb);
+
+                                handleMultiSelect(e, ce => {
+                                    console.log("------------------------------------[MULTISELECT] 2ND ITEM", ce);
+
                                 })
-                            }
-                            stage.batchDraw()
-                            properties.name = selectedItem.attrs.name;
-                            properties.height = (selectedItem.attrs.height / (floorConfig
-                                .blockRatio * meterRatio)).toFixed(2);
-                            properties.width = (selectedItem.attrs.width / (floorConfig
-                                .blockRatio * meterRatio)).toFixed(2);
-                            properties.fill = selectedItem.attrs.fill;
-                            properties.radius = (selectedItem.attrs.radius / (floorConfig
-                                .blockRatio * meterRatio)).toFixed(2);
-                            properties.rotation = selectedItem.attrs.rotation;
-                            properties.depth = selectedItem.attrs.depth / ((floorConfig
-                                .blockRatio * meterRatio)).toFixed(2);
+                            })
+                        } else {
+                            handleMultiSelect(e, cb => {
 
-                            if (selectedItem.attrs.name == "image") {
-                                keepAspectRatio = selectedItem.attrs.keepAspectRatio
-                            }
-                            // start transform region
-                            var tr
-                            if (selectedItem.attrs.name == "image") {
-                                if (selectedItem.attrs.keepAspectRatio != true) {
-                                    tr = new Konva.Transformer({
-                                        enabledAnchors: ["top-left", "top-center", "top-right",
-                                            "middle-right", "middle-left", "bottom-left",
-                                            "bottom-center", "bottom-right"
-                                        ],
-                                    });
+                            })
+                        }
+
+                    } else {
+                        if (e.attrs.name == "Tape") {
+                            e.draggable(true)
+                        }
+
+                        if (e.attrs.draggable && e != stage) {
+                            self.setSelectedItem(e, findLayerItem, selectedLayerTreeItem, selectedItem, selectedLayer, layerTree, cb => {
+                                selectedLayerTreeItem = cb
+                                selectedItem = e;
+                                if (e.attrs.name == "Duplication Group" || e.attrs.name == "group") {
+                                    e.draggable(true)
+                                    e.children.forEach(element => {
+                                        element.attrs.draggable = false
+                                        element.draggable(false)
+                                    })
+                                }
+                                stage.batchDraw()
+                                properties.name = selectedItem.attrs.name;
+                                properties.height = (selectedItem.attrs.height / (floorConfig
+                                    .blockRatio * meterRatio)).toFixed(2);
+                                properties.width = (selectedItem.attrs.width / (floorConfig
+                                    .blockRatio * meterRatio)).toFixed(2);
+                                properties.fill = selectedItem.attrs.fill;
+                                properties.radius = (selectedItem.attrs.radius / (floorConfig
+                                    .blockRatio * meterRatio)).toFixed(2);
+                                properties.rotation = selectedItem.attrs.rotation;
+                                properties.depth = selectedItem.attrs.depth / ((floorConfig
+                                    .blockRatio * meterRatio)).toFixed(2);
+
+                                if (selectedItem.attrs.name == "image") {
+                                    keepAspectRatio = selectedItem.attrs.keepAspectRatio
+                                }
+                                // start transform region
+                                var tr
+                                if (selectedItem.attrs.name == "image") {
+                                    if (selectedItem.attrs.keepAspectRatio != true) {
+                                        tr = new Konva.Transformer({
+                                            enabledAnchors: ["top-left", "top-center", "top-right",
+                                                "middle-right", "middle-left", "bottom-left",
+                                                "bottom-center", "bottom-right"
+                                            ],
+                                        });
+                                    } else {
+                                        tr = new Konva.Transformer({
+                                            enabledAnchors: ['top-left', 'top-right', 'bottom-left',
+                                                'bottom-right'
+                                            ],
+                                        });
+                                    }
                                 } else {
                                     tr = new Konva.Transformer({
-                                        enabledAnchors: ['top-left', 'top-right', 'bottom-left',
-                                            'bottom-right'
-                                        ],
+                                        enabledAnchors: selectedItem.attrs.enabledAnchors,
                                     });
                                 }
-                            } else {
-                                tr = new Konva.Transformer({
-                                    enabledAnchors: selectedItem.attrs.enabledAnchors,
-                                });
-                            }
 
-                            if (selectedItem.attrs.name == "Tape" || selectedItem.attrs.name == "group" || selectedItem.attrs.name == "Duplication Group" || selectedItem.attrs.isPlanogram) {
-                                tr = new Konva.Transformer({
-                                    enabledAnchors: [],
-                                });
-                            }
-                            if (selectedItem.attrs.name == "Gondola-Rect" || selectedItem.attrs.name ==
-                                "image" || selectedItem.attrs
-                                .name == "Tape" || selectedItem.attrs.name == "group" || selectedItem.attrs.name == "Duplication Group" || selectedItem.attrs.isPlanogram) {
-                                tr.rotateEnabled(true);
+                                if (selectedItem.attrs.name == "Tape" || selectedItem.attrs.name == "group" || selectedItem.attrs.name == "Duplication Group" || selectedItem.attrs.isPlanogram) {
+                                    tr = new Konva.Transformer({
+                                        enabledAnchors: [],
+                                    });
+                                }
+                                if (selectedItem.attrs.name == "Gondola-Rect" || selectedItem.attrs.name ==
+                                    "image" || selectedItem.attrs
+                                    .name == "Tape" || selectedItem.attrs.name == "group" || selectedItem.attrs.name == "Duplication Group" || selectedItem.attrs.isPlanogram) {
+                                    tr.rotateEnabled(true);
 
-                            } else {
-                                tr.rotateEnabled(false);
-                            }
+                                } else {
+                                    tr.rotateEnabled(false);
+                                }
 
-                            e.parent.add(tr);
+                                e.parent.add(tr);
 
-                            tr.attachTo(e);
-                            stage.batchDraw();
-                            tr.on('transform', function (z) {
-                                transFormerHelper.handleTransform(e, z, handleSnapping, self
-                                    .stage,
-                                    lastPosition, ctrlDown, selectedItem,
-                                    '', transformProperties, self
-                                    .propertiesLabelHorizontal, '')
-                            });
-                            tr.on('transformend', function () {
-                                transFormerHelper.handleTransformEnd(selectedItem, properties,
-                                    (floorConfig.blockRatio * meterRatio))
+                                tr.attachTo(e);
                                 stage.batchDraw();
-                            });
-                            clicktapcallback({
-                                selectedLayerTreeItem: selectedLayerTreeItem,
-                                selectedItem: selectedItem,
+                                tr.on('transform', function (z) {
+                                    transFormerHelper.handleTransform(e, z, handleSnapping, self
+                                        .stage,
+                                        lastPosition, ctrlDown, selectedItem,
+                                        '', transformProperties, self
+                                        .propertiesLabelHorizontal, '')
+                                });
+                                tr.on('transformend', function () {
+                                    transFormerHelper.handleTransformEnd(selectedItem, properties,
+                                        (floorConfig.blockRatio * meterRatio))
+                                    stage.batchDraw();
+                                });
+                                clicktapcallback({
+                                    selectedLayerTreeItem: selectedLayerTreeItem,
+                                    selectedItem: selectedItem,
+                                })
                             })
-                        })
-                    }
-                    // End transform region
+                        }
+                        // End transform region
 
+                    }
                 })
             }
 

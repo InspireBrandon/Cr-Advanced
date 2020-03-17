@@ -112,7 +112,7 @@
                     <span>Add Item to group</span>
                 </v-tooltip>
             </div>
-            <!-- <div v-if="selectedItem!=null">
+            <div v-if="selectedItem!=null">
                 <div v-show="selectedItem.attrs.drawType=='group'">
                     <v-tooltip bottom>
                         <template v-slot:activator="{ on }">
@@ -123,7 +123,7 @@
                         <span>Remove Item from group</span>
                     </v-tooltip>
                 </div>
-            </div> -->
+            </div>
             <!-- <v-btn @click="openFloorSettings">
                 Floor Settings
             </v-btn> -->
@@ -588,6 +588,16 @@
             }
         },
         methods: {
+            detatchShape(node, layer, callback) {
+                let self = this
+
+                const matrix = node.getAbsoluteTransform().getMatrix();
+                console.log("matrix", matrix);
+                const attrs = decompose(matrix);
+                node.moveTo(layer);
+                node.setAttrs(attrs)
+                callback()
+            },
             logMutli() {
                 let self = this
                 console.log("self.multiSelectGroup", self.multiSelectGroup);
@@ -612,25 +622,56 @@
             removeItemFromGroup() {
                 let self = this
                 let groupingHandler = new GroupingHandler()
+                let layerParent = self.selectedLayerTreeItem.parent
                 let parent = self.selectedItem.parent
-                groupingHandler.removeItemFromGroup(self.stage, self.selectedItem, self.selectedLayer, self
-                    .selectedLayerTree, self.selectedLayerTreeItem, self.multiSelectGroup, self.findLayerItem, self
-                    .layerTree, parent, callback => {
-                        self.findLayerItem(self.layerTree, callback._id, cb => {
-                            cb.parent.children.forEach((element, idx) => {
-                                if (cb == element) {
-                                    cb.parent.children.splice(idx, 1)
-                                    callback.destroy()
-                                    self.selectLayer(cb.parent, self.layerTree, layerCB => {
-                                        self.selectedItem = null
-                                        self.stage.batchDraw()
-                                        cb.parent.showChildren = false
-                                    })
-
-                                }
-                            })
+                console.log("self.selectedItem", self.selectedItem);
+                console.log("self.selectedLayerTreeItem", self.selectedLayerTreeItem);
+                for (let index = self.selectedItem.children.length - 1; index > -1; index--) {
+                    const child = self.selectedItem.children[index];
+                    self.findLayerItem(self.layerTree, child._id, cb => {
+                        cb.parent.children.forEach((layerItem, idx) => {
+                            if (layerItem == cb) {
+                                let spliceItem = cb.parent.children.splice(idx, 1)
+                                self.selectedLayerTreeItem.parent.children.push(spliceItem[0])
+                                spliceItem[0].parent = self.selectedLayerTreeItem.parent
+                                self.detatchShape(child, parent, callback => {
+                                    if (index == 0) {
+                                        self.selectedItem.destroy()
+                                        self.selectedLayerTreeItem.parent.children.forEach((
+                                            tree,
+                                            tidx) => {
+                                            if (tree == self.selectedLayerTreeItem) {
+                                                self.selectedLayerTreeItem.parent
+                                                    .children
+                                                    .splice(tidx, 1)
+                                            }
+                                        })
+                                    }
+                                })
+                            }
                         })
+
                     })
+                }
+
+                // groupingHandler.removeItemFromGroup(self.stage, self.selectedItem, self.selectedLayer, self
+                //     .selectedLayerTree, self.selectedLayerTreeItem, self.multiSelectGroup, self.findLayerItem, self
+                //     .layerTree, parent, callback => {
+                //         self.findLayerItem(self.layerTree, callback._id, cb => {
+                //             cb.parent.children.forEach((element, idx) => {
+                //                 if (cb == element) {
+                //                     cb.parent.children.splice(idx, 1)
+                //                     callback.destroy()
+                //                     self.selectLayer(cb.parent, self.layerTree, layerCB => {
+                //                         self.selectedItem = null
+                //                         self.stage.batchDraw()
+                //                         cb.parent.showChildren = false
+                //                     })
+
+                //                 }
+                //             })
+                //         })
+                //     })
             },
             getClusters() {
                 let self = this
@@ -2518,18 +2559,32 @@
                 }
 
             },
-            handleMultiSelect(item) {
+            handleMultiSelect(item, callback) {
                 let self = this
                 if (!item.attrs.draggable) {
-                    return
+                    console.log("[handleMultiSelect]--------------------------item not draggable");
+                    callback()
                 }
+                self.clickFindParentLayer(item, layerchild => {
+                    let multiSelectHelper = new MultiSelectHelper()
+                    console.log("[handleMultiSelect]--------------------------item is draggable");
+                    let muitiParent = null
+                    if (layerchild.drawType == "Layer") {
+                        muitiParent = layerchild
+                    } else {
+                        muitiParent = layerchild.parent
+                    }
+                    multiSelectHelper.handleMultiselect(self.multiSelectGroup, layerchild.parent, item, self
+                        .stage,
+                        cb => {
+                            console.log("[handleMultiSelect]--------------------------item callback");
+                            self.multiSelectGroup = cb
+                            self.selectedLayer.draw()
+                            callback(cb)
+                        })
+                })
 
-                let multiSelectHelper = new MultiSelectHelper()
-                multiSelectHelper.handleMultiselect(self.multiSelectGroup, self.selectedLayer, item, self.stage,
-                    callback => {
-                        self.multiSelectGroup = callback
-                        self.selectedLayer.draw()
-                    })
+
             },
             clickselect(item, callback) {
                 let self = this
@@ -2577,17 +2632,20 @@
                 case "Duplication Group": {
                     if (item.parent.attrs.rotation == 0)
                         self.showRotation = false;
-
-                    self.findLayerItem(self.layerTree, item.parent._id, cb => {
-                        self.selectLayer(cb, self.layerTree, layerCB => {
-                            item.parent.draggable(true)
-                            item.parent.children.forEach(child => {
-                                child.draggable(false)
+                    self.clickSelectFindCurrentParent(item, cbitem => {
+                        self.findLayerItem(self.layerTree, cbitem._id, cb => {
+                            self.selectLayer(cb, self.layerTree, layerCB => {
+                                cbitem.draggable(true)
+                                if (cbitem.children.length > 0) {
+                                    
+                                    self.setChildrendraggable(cbitem.children)
+                                }
+                                callback(cbitem)
                             })
-                            callback(item.parent)
-                        })
 
+                        })
                     })
+
                 }
 
                 break;
@@ -2598,9 +2656,11 @@
                     self.findLayerItem(self.layerTree, item.parent._id, cb => {
                         self.selectLayer(cb, self.layerTree, layerCB => {
                             item.parent.draggable(true)
-                            item.parent.children.forEach(child => {
-                                child.draggable(false)
-                            })
+                            if (cbitem.children.length > 0) {
+                                self.setChildrendraggable(cbitem.children)
+                            }
+
+
                             callback(item.parent)
                         })
 
@@ -2611,17 +2671,21 @@
                 case "group": {
                     if (item.parent.attrs.rotation == 0)
                         self.showRotation = false;
-
-                    self.findLayerItem(self.layerTree, item.parent._id, cb => {
-                        self.selectLayer(cb, self.layerTree, lasyerCB => {
-                            item.parent.draggable(true)
-                            item.parent.children.forEach(child => {
-                                child.draggable(false)
+                    self.clickSelectFindCurrentParent(item, cbitem => {
+                        self.findLayerItem(self.layerTree, cbitem._id, cb => {
+                            self.selectLayer(cb, self.layerTree, layerCB => {
+                                console.log("clickselect--------------",cbitem);
+                                
+                                cbitem.draggable(true)
+                                if (cbitem.children.length > 0) {
+                                    self.setChildrendraggable(cbitem.children)
+                                }
+                                callback(cbitem)
                             })
-                            callback(item.parent)
-                        })
 
+                        })
                     })
+
                 }
                 break;
                 case "image": {
@@ -2679,6 +2743,47 @@
                 self.stage.batchDraw()
 
             },
+            clickFindParentLayer(item, callback) {
+                let self = this
+                if (item.parent.attrs.drawType == "Layer") {
+                    callback(item)
+                } else {
+                    self.clickFindParentLayer(item.parent, cb => {
+                        callback(cb)
+                    })
+                }
+            },
+            clickSelectFindCurrentParent(item, callback) {
+                let self = this
+                console.log("clickSelectFindCurrentParent", item);
+                console.log("selectedItem", self.selectedItem);
+
+                if (self.selectedItem == null) {
+                    self.clickFindParentLayer(item, cb => {
+                        callback(cb)
+                    })
+                } else {
+                    if (item.parent == self.selectedItem || item.parent.attrs.drawType == "Layer") {
+                        callback(item)
+                    } else {
+                        self.clickSelectFindCurrentParent(item.parent, cb => {
+                            callback(cb)
+                        })
+                    }
+                }
+            },
+            setChildrendraggable(children) {
+                let self = this
+                children.forEach(child => {
+                    child.draggable(false)
+                    console.log("[DRAAGGABLE]"+child.attrs.name , child.draggable());
+                    if (child.children.length > 0) {
+                        
+
+                        self.setChildrendraggable(child.children)
+                    }
+                })
+            },
             addStageEvents() {
                 let self = this;
                 let isPaint = false;
@@ -2705,47 +2810,19 @@
 
                             if (e.target.parent.attrs.name == "group" || e.target.parent.attrs.name ==
                                 "Duplication Group") {
-                                e.target.parent.draggable(true)
-                                e.target.parent.children.forEach(element => {
-                                    element.draggable(false)
-                                })
+                                    
+                                // e.target.parent.draggable(true)
+                                // e.target.parent.children.forEach(element => {
+                                //     element.draggable(false)
+                                // })
                             }
                         });
                 });
-                // self.stage.on("dblclick", function (e) {
-                //     self.doubleClickTime = new Date()
-                //     if (e.target == self.stage) {
-                //         return
-                //     }
-
-                //     clickTapHelper.handleClickTapDoubleClick(e.target, self.stage, self.selectedItem, self
-                //         .clickselect, self
-                //         .findLayerItem, self.selectedLayerTreeItem, self.properties, self
-                //         .ctrlDown, self
-                //         .selectedTool, self.resetDuplication, self.handleMultiSelect, self
-                //         .layerTree, self
-                //         .floorConfig, self.meterRatio, self.keepAspectRatio, self
-                //         .handleSnapping, self
-                //         .lastPosition, self.transformProperties, self.imagePos, self
-                //         .selectImage, self
-                //         .selectedLayer, cb => {
-                //             self.selectedItem = cb.selectedItem
-                //             self.selectedLayerTreeItem = cb.selectedLayerTreeItem
-                //         });
-
-
-                //     e.draggable = true
-                //     self.selectedItem = e
-                // })
-
                 self.stage.on('contextmenu', function (ev) {
-                    // self.stage.find('Transformer').destroy()             
                     self.onContextMenu(ev)
-
                 })
 
                 self.stage.on('contentMousedown', function () {
-
                     dragHandler.handleContentMousedown(self.buildingLayer, self.stage, self.firstPosition,
                         self.lastPosition, self.selectedTool, self.buildingLayerTree, self.selectImage,
                         isPaint,
@@ -2824,25 +2901,7 @@
                 });
 
                 self.stage.on('dragmove', function (e) {
-                    if (self.selectedTool == "open_with") {
-                        // self.handleSnapping(e.target)
-                        // var target = e.target;
-                        // var targetRect = e.target.getClientRect();
-                        // self.selectedLayer.children.each(function (group) {
-                        //     // do not check intersection with itself
-                        //     if (group === target) {
-                        //         return;
-                        //     }
-                        //     if (haveIntersection(group.getClientRect(), targetRect)) {
-                        //         group.fill('red');
-
-                        //     } else {
-                        //         group.fill('grey');
-                        //     }
-                        //     // do not need to call layer.draw() here
-                        //     // because it will be called by dragmove action
-                        // });
-                    }
+                    if (self.selectedTool == "open_with") {}
                 });
                 // self.departmentLayer.on('mouseover', function (e) {
                 //     console.log("[MOUSEOVER]departmentLayer", e.target);
@@ -2948,6 +3007,12 @@
                                     self.stage.batchDraw()
                                 })
                         }
+                        if (e.target.attrs.name == "group" || e.target.attrs.name == "Duplication Group") {
+                            self.applyGroupProps(e.target, applyCallback => {
+                                console.log("[DRAG END],finished apply");
+
+                            })
+                        }
                     }
                 })
                 var scaleBy = 1.05;
@@ -2978,6 +3043,31 @@
                         self.stage.batchDraw();
                     }
                 });
+            },
+            applyGroupProps(parent, callback) {
+                // let self = this
+                // parent.children.forEach((child, index) => {
+                //     const matrix = child.getAbsoluteTransform().getMatrix();
+                //     const attrs = decompose(matrix);
+                //     child.setAttrs(attrs)
+                //     if (child.children.length > 0) {
+                //         self.applyGroupProps(child, cb => {
+
+                //         })
+                //     }
+                //     if (index + 1 == parent.children.length) {
+                //         parent.setAttrs({
+                //             x: 0,
+                //             y: 0,
+                //             scaleX: 1,
+                //             scaleY: 1,
+                //             rotation: 0,
+                //         })
+                //         callback()
+                //     }
+                // })
+
+
             },
             getDropLabel(dropID, callback) {
                 let text = `YAAAAAAAA YEEET `
@@ -3503,6 +3593,50 @@
             y: y * rcos + x * rsin
         };
     };
+
+    function decompose(mat) {
+        var a = mat[0];
+        var b = mat[1];
+        var c = mat[2];
+        var d = mat[3];
+        var e = mat[4];
+        var f = mat[5];
+
+        var delta = a * d - b * c;
+
+        let result = {
+            x: e,
+            y: f,
+            rotation: 0,
+            scaleX: 0,
+            scaleY: 0,
+            skewX: 0,
+            skewY: 0,
+        };
+
+        // Apply the QR-like decomposition.
+        if (a != 0 || b != 0) {
+            var r = Math.sqrt(a * a + b * b);
+            result.rotation = b > 0 ? Math.acos(a / r) : -Math.acos(a / r);
+            result.scaleX = r;
+            result.scaleY = delta / r;
+            result.skewX = Math.atan((a * c + b * d) / (r * r));
+            result.scleY = 0;
+        } else if (c != 0 || d != 0) {
+            var s = Math.sqrt(c * c + d * d);
+            result.rotation =
+                Math.PI / 2 - (d > 0 ? Math.acos(-c / s) : -Math.acos(c / s));
+            result.scaleX = delta / s
+            result.scaleY = s;
+            result.skewX = 0
+            result.skewY = Math.atan((a * c + b * d) / (s * s));
+        } else {
+            // a = b = c = d = 0
+        }
+
+        result.rotation *= 180 / Math.PI;
+        return result;
+    }
 
     function haveIntersection(r1, r2) {
         return !(

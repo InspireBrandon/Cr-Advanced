@@ -1,6 +1,9 @@
 import Konva from 'konva'
 import TransFormerHelper from './TransFormer-Helper'
 import treeItem from '@/components/Main/FloorPlanning2D/libs/tree/TreeItem'
+import {
+    Z_DEFAULT_STRATEGY
+} from 'zlib';
 let transFormerHelper = new TransFormerHelper()
 
 class GroupingHandler {
@@ -42,18 +45,18 @@ class GroupingHandler {
 
         selectedLayer.add(group)
         selectedLayerTree.children.push(groupTreeItem)
-        console.log("multiselectGroup.children",multiselectGroup.children);
-        console.log("selectedLayer",selectedLayer);
-      
+        console.log("multiselectGroup.children", multiselectGroup.children);
+        console.log("selectedLayer", selectedLayer);
+
         for (let index = (multiselectGroup.children.length - 1); index > -1; index--) {
-            console.log("multiselectGroup.children",multiselectGroup.children);
-            
+            console.log("multiselectGroup.children", multiselectGroup.children);
+
             const element = multiselectGroup.children[index];
-           console.log("[LOOP INDEX]",index);
-           
+            console.log("[LOOP INDEX]", index);
+
             findLayerItem(layerTree, element._id, cb => {
-                console.log("findLayerItem",cb.parent);
-                
+                console.log("findLayerItem", cb.parent);
+
                 for (let idx = cb.parent.children.length - 1; idx > -1; idx--) {
                     const child = cb.parent.children[idx];
                     if (child == cb) {
@@ -62,8 +65,9 @@ class GroupingHandler {
                         spliceItem[0].parent = groupTreeItem
                         console.log("[SPLICE ITEM]", spliceItem[0]);
                         console.log("[SPLICE Index]", index);
-                        
+
                         element.moveTo(group)
+                        element.draggable(false)
                         if (index == 0) {
                             group.rotation(multiselectGroup.rotation())
                             stage.batchDraw()

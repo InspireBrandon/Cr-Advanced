@@ -30,16 +30,21 @@ class MultiSelectHelper {
             }
         }
     }
-    handleMultiselect(multiSelectGroup, selectedLayer, item, stage, callback) {
-        console.log("multiSelectGroup", multiSelectGroup);
-        console.log("selected layuer", selectedLayer);
-        console.log("item", item);
-        if (selectedLayer == item) {
-            selectedLayer = item.parent
-            console.log("[CHANGED SELECTED LAYER]", selectedLayer);
-
+    findparentLayer(item, callback) {
+        if (item.parent.attrs.drawType == "Layer") {
+            callback(item.parent)
+        } else {
+            this.findparentLayer(item.parent, cb => {
+                callback(cb)
+            })
         }
-
+    }
+    handleMultiselect(multiSelectGroup, selectedLayer, item, stage, callback) {
+        if (selectedLayer == item) {
+            this.findparentLayer(item, cb => {
+                selectedLayer = cb
+            })
+        }
         if (multiSelectGroup == null || multiSelectGroup == undefined) {
             let multigroup = new Konva.Group({
                 x: 0,
