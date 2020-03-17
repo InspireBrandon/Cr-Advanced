@@ -2559,18 +2559,32 @@
                 }
 
             },
-            handleMultiSelect(item) {
+            handleMultiSelect(item, callback) {
                 let self = this
                 if (!item.attrs.draggable) {
-                    return
+                    console.log("[handleMultiSelect]--------------------------item not draggable");
+                    callback()
                 }
+                self.clickFindParentLayer(item, layerchild => {
+                    let multiSelectHelper = new MultiSelectHelper()
+                    console.log("[handleMultiSelect]--------------------------item is draggable");
+                    let muitiParent = null
+                    if (layerchild.drawType == "Layer") {
+                        muitiParent = layerchild
+                    } else {
+                        muitiParent = layerchild.parent
+                    }
+                    multiSelectHelper.handleMultiselect(self.multiSelectGroup, layerchild.parent, item, self
+                        .stage,
+                        cb => {
+                            console.log("[handleMultiSelect]--------------------------item callback");
+                            self.multiSelectGroup = cb
+                            self.selectedLayer.draw()
+                            callback(cb)
+                        })
+                })
 
-                let multiSelectHelper = new MultiSelectHelper()
-                multiSelectHelper.handleMultiselect(self.multiSelectGroup, self.selectedLayer, item, self.stage,
-                    callback => {
-                        self.multiSelectGroup = callback
-                        self.selectedLayer.draw()
-                    })
+
             },
             clickselect(item, callback) {
                 let self = this
@@ -2618,17 +2632,20 @@
                 case "Duplication Group": {
                     if (item.parent.attrs.rotation == 0)
                         self.showRotation = false;
-
-                    self.findLayerItem(self.layerTree, item.parent._id, cb => {
-                        self.selectLayer(cb, self.layerTree, layerCB => {
-                            item.parent.draggable(true)
-                            item.parent.children.forEach(child => {
-                                child.draggable(false)
+                    self.clickSelectFindCurrentParent(item, cbitem => {
+                        self.findLayerItem(self.layerTree, cbitem._id, cb => {
+                            self.selectLayer(cb, self.layerTree, layerCB => {
+                                cbitem.draggable(true)
+                                if (cbitem.children.length > 0) {
+                                    
+                                    self.setChildrendraggable(cbitem.children)
+                                }
+                                callback(cbitem)
                             })
-                            callback(item.parent)
-                        })
 
+                        })
                     })
+
                 }
 
                 break;
@@ -2639,9 +2656,11 @@
                     self.findLayerItem(self.layerTree, item.parent._id, cb => {
                         self.selectLayer(cb, self.layerTree, layerCB => {
                             item.parent.draggable(true)
-                            item.parent.children.forEach(child => {
-                                child.draggable(false)
-                            })
+                            if (cbitem.children.length > 0) {
+                                self.setChildrendraggable(cbitem.children)
+                            }
+
+
                             callback(item.parent)
                         })
 
@@ -2652,20 +2671,21 @@
                 case "group": {
                     if (item.parent.attrs.rotation == 0)
                         self.showRotation = false;
-
-                    self.findLayerItem(self.layerTree, item.parent._id, cb => {
-                        self.selectLayer(cb, self.layerTree, lasyerCB => {
-                            item.parent.draggable(true)
-                            item.parent.children.forEach(child => {
-                                child.draggable(false)
+                    self.clickSelectFindCurrentParent(item, cbitem => {
+                        self.findLayerItem(self.layerTree, cbitem._id, cb => {
+                            self.selectLayer(cb, self.layerTree, layerCB => {
+                                console.log("clickselect--------------",cbitem);
+                                
+                                cbitem.draggable(true)
+                                if (cbitem.children.length > 0) {
+                                    self.setChildrendraggable(cbitem.children)
+                                }
+                                callback(cbitem)
                             })
-                            console.log("[CLICK SELECT ] clickselected", item);
-                            console.log("[CLICK SELECT ] parent", item.parent);
 
-                            callback(item.parent)
                         })
-
                     })
+
                 }
                 break;
                 case "image": {
@@ -2723,6 +2743,47 @@
                 self.stage.batchDraw()
 
             },
+            clickFindParentLayer(item, callback) {
+                let self = this
+                if (item.parent.attrs.drawType == "Layer") {
+                    callback(item)
+                } else {
+                    self.clickFindParentLayer(item.parent, cb => {
+                        callback(cb)
+                    })
+                }
+            },
+            clickSelectFindCurrentParent(item, callback) {
+                let self = this
+                console.log("clickSelectFindCurrentParent", item);
+                console.log("selectedItem", self.selectedItem);
+
+                if (self.selectedItem == null) {
+                    self.clickFindParentLayer(item, cb => {
+                        callback(cb)
+                    })
+                } else {
+                    if (item.parent == self.selectedItem || item.parent.attrs.drawType == "Layer") {
+                        callback(item)
+                    } else {
+                        self.clickSelectFindCurrentParent(item.parent, cb => {
+                            callback(cb)
+                        })
+                    }
+                }
+            },
+            setChildrendraggable(children) {
+                let self = this
+                children.forEach(child => {
+                    child.draggable(false)
+                    console.log("[DRAAGGABLE]"+child.attrs.name , child.draggable());
+                    if (child.children.length > 0) {
+                        
+
+                        self.setChildrendraggable(child.children)
+                    }
+                })
+            },
             addStageEvents() {
                 let self = this;
                 let isPaint = false;
@@ -2749,47 +2810,19 @@
 
                             if (e.target.parent.attrs.name == "group" || e.target.parent.attrs.name ==
                                 "Duplication Group") {
-                                e.target.parent.draggable(true)
-                                e.target.parent.children.forEach(element => {
-                                    element.draggable(false)
-                                })
+                                    
+                                // e.target.parent.draggable(true)
+                                // e.target.parent.children.forEach(element => {
+                                //     element.draggable(false)
+                                // })
                             }
                         });
                 });
-                // self.stage.on("dblclick", function (e) {
-                //     self.doubleClickTime = new Date()
-                //     if (e.target == self.stage) {
-                //         return
-                //     }
-
-                //     clickTapHelper.handleClickTapDoubleClick(e.target, self.stage, self.selectedItem, self
-                //         .clickselect, self
-                //         .findLayerItem, self.selectedLayerTreeItem, self.properties, self
-                //         .ctrlDown, self
-                //         .selectedTool, self.resetDuplication, self.handleMultiSelect, self
-                //         .layerTree, self
-                //         .floorConfig, self.meterRatio, self.keepAspectRatio, self
-                //         .handleSnapping, self
-                //         .lastPosition, self.transformProperties, self.imagePos, self
-                //         .selectImage, self
-                //         .selectedLayer, cb => {
-                //             self.selectedItem = cb.selectedItem
-                //             self.selectedLayerTreeItem = cb.selectedLayerTreeItem
-                //         });
-
-
-                //     e.draggable = true
-                //     self.selectedItem = e
-                // })
-
                 self.stage.on('contextmenu', function (ev) {
-                    // self.stage.find('Transformer').destroy()             
                     self.onContextMenu(ev)
-
                 })
 
                 self.stage.on('contentMousedown', function () {
-
                     dragHandler.handleContentMousedown(self.buildingLayer, self.stage, self.firstPosition,
                         self.lastPosition, self.selectedTool, self.buildingLayerTree, self.selectImage,
                         isPaint,
@@ -2868,25 +2901,7 @@
                 });
 
                 self.stage.on('dragmove', function (e) {
-                    if (self.selectedTool == "open_with") {
-                        // self.handleSnapping(e.target)
-                        // var target = e.target;
-                        // var targetRect = e.target.getClientRect();
-                        // self.selectedLayer.children.each(function (group) {
-                        //     // do not check intersection with itself
-                        //     if (group === target) {
-                        //         return;
-                        //     }
-                        //     if (haveIntersection(group.getClientRect(), targetRect)) {
-                        //         group.fill('red');
-
-                        //     } else {
-                        //         group.fill('grey');
-                        //     }
-                        //     // do not need to call layer.draw() here
-                        //     // because it will be called by dragmove action
-                        // });
-                    }
+                    if (self.selectedTool == "open_with") {}
                 });
                 // self.departmentLayer.on('mouseover', function (e) {
                 //     console.log("[MOUSEOVER]departmentLayer", e.target);
@@ -3030,27 +3045,27 @@
                 });
             },
             applyGroupProps(parent, callback) {
-                let self = this
-                parent.children.forEach((child, index) => {
-                    const matrix = child.getAbsoluteTransform().getMatrix();
-                    const attrs = decompose(matrix);
-                    child.setAttrs(attrs)
-                    if (child.children.length > 0) {
-                        self.applyGroupProps(child, cb => {
+                // let self = this
+                // parent.children.forEach((child, index) => {
+                //     const matrix = child.getAbsoluteTransform().getMatrix();
+                //     const attrs = decompose(matrix);
+                //     child.setAttrs(attrs)
+                //     if (child.children.length > 0) {
+                //         self.applyGroupProps(child, cb => {
 
-                        })
-                    }
-                    if (index + 1 == parent.children.length) {
-                        parent.setAttrs({
-                            x: 0,
-                            y: 0,
-                            scaleX: 1,
-                            scaleY: 1,
-                            rotation: 0,
-                        })
-                        callback()
-                    }
-                })
+                //         })
+                //     }
+                //     if (index + 1 == parent.children.length) {
+                //         parent.setAttrs({
+                //             x: 0,
+                //             y: 0,
+                //             scaleX: 1,
+                //             scaleY: 1,
+                //             rotation: 0,
+                //         })
+                //         callback()
+                //     }
+                // })
 
 
             },
