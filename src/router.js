@@ -119,6 +119,9 @@ import DepartmentView from '@/components/Apps/Strategy/View/Department/Index.vue
 import ListingView from '@/components/Apps/Strategy/View/Listing/Index.vue'
 import CustomView from '@/components/Apps/Strategy/View/Custom/Index.vue'
 
+// Category Role
+import CategoryRole from '@/components/Apps/CategoryRole/Index.vue'
+
 // import PlanogramDistributionNew from '@/components/Main/PlanogramImplementation/PlanogramOverView/StorePlanogramOverview.vue'
 import PlanogramDistributionNew from '@/components/Main/PlanogramDistribution/PlanogramOverView/StorePlanogramOverview'
 
@@ -328,6 +331,11 @@ export default new Router({
           path: '/Clustering',
           name: 'clustering',
           component: Clustering
+        },
+        {
+          path: '/CategoryRole',
+          name: 'CategoryRole',
+          component: CategoryRole
         },
         {
           path: '/ListingClusters',

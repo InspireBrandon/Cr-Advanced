@@ -1,0 +1,17 @@
+{
+    "configName": "CATEGORY-ROLE",
+    "report": true,
+    "routes": [{
+        "route": "/CategoryRole",
+        "routeName": "category-role",
+        "title": "Category Role",
+        "openInNewWindow": false
+    }
+],
+    "ReportListRoute":{
+        "route": "/SpacePlanningReportList",
+        "routeName": "space_planning_report_list",
+        "title": "Space Planning Report List",
+        "openInNewWindow": false
+    }
+}

@@ -400,6 +400,13 @@
           headerName: 'Manufacturer',
           field: 'manufacturer',
           filter: "agTextColumnFilter",
+          hide: true,
+          editable: true
+        },
+        {
+          headerName: 'Supplier',
+          field: 'supplier',
+          filter: "agTextColumnFilter",
           hide: true
         },
         {

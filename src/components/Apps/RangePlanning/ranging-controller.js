@@ -138,6 +138,8 @@ class RangingController {
   getIndicatorsByCluster(clusterData, clusterType, clusterID) {
     let self = this;
 
+    console.log(clusterData, clusterType, clusterID)
+
     let stores = getStoresByCluster(clusterData, clusterType, clusterID);
 
     console.log(stores);

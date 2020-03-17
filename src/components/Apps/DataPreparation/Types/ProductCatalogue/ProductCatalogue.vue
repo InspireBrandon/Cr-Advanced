@@ -449,6 +449,12 @@
         {
           headerName: 'Manufacturer',
           field: 'manufacturer',
+          hide: true,
+          editable: true
+        },
+        {
+          headerName: 'Supplier',
+          field: 'supplier',
           hide: true
         },
         {
