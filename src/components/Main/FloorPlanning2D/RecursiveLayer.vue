@@ -9,7 +9,7 @@
                     {{ layer.collapsed ? 'arrow_drop_down' : 'arrow_drop_up' }}</v-icon>
                 <input @change="changeSelect(layer,layers)" v-model="layer.selected"
                     style="margin-top: 4px; margin-right: 10px;" type="checkbox">
-                <div style="width: 80%">
+                <div style="width: 80%" @click="selectItemFromSidePanel(layer)">
                     <div v-if="!layer.showEditName">{{ layer.name }}</div>
                     <v-form @submit.prevent="editname(layer)">
                         <input @blur="editname(layer)" :ref="'editLayer' + layer.KonvaID" v-model="layer.name"

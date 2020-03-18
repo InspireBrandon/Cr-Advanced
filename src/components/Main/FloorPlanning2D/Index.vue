@@ -1888,13 +1888,23 @@
             },
             selectItemFromSidePanel(item) {
                 let self = this
+                console.log("selectItemFromSidePanel", item);
+
                 self.findKonvaItem(self.stage.children, item.KonvaID, e => {
+                    if (e.attrs.drawType == "Layer") {
+                        return
+                    }
                     clickTapHelper.destroyTransformer(self.stage, cb => {
-                        clickTapHelper.setSelectedItem(e, self.findLayerItem, self
-                            .selectedLayerTreeItem, self.selectedItem, self.selectedLayer, self
-                            .layerTree, cb => {
-                                self.selectedLayerTreeItem = cb
-                            })
+                        self.clickselect(e, callback => {
+
+                        })
+                        // clickTapHelper.setSelectedItem(e, self.findLayerItem, self
+                        //     .selectedLayerTreeItem, self.selectedItem, self.selectedLayer, self
+                        //     .layerTree, cb => {
+                        //         console.log("self.selectedLayerTreeItem",cb);
+
+                        //         self.selectedLayerTreeItem = cb
+                        //     })
                     })
                     self.selectedLayerTreeItem = item
                     self.resetDuplication()
@@ -2637,7 +2647,7 @@
                             self.selectLayer(cb, self.layerTree, layerCB => {
                                 cbitem.draggable(true)
                                 if (cbitem.children.length > 0) {
-                                    
+
                                     self.setChildrendraggable(cbitem.children)
                                 }
                                 callback(cbitem)
@@ -2674,8 +2684,8 @@
                     self.clickSelectFindCurrentParent(item, cbitem => {
                         self.findLayerItem(self.layerTree, cbitem._id, cb => {
                             self.selectLayer(cb, self.layerTree, layerCB => {
-                                console.log("clickselect--------------",cbitem);
-                                
+                                console.log("clickselect--------------", cbitem);
+
                                 cbitem.draggable(true)
                                 if (cbitem.children.length > 0) {
                                     self.setChildrendraggable(cbitem.children)
@@ -2776,9 +2786,9 @@
                 let self = this
                 children.forEach(child => {
                     child.draggable(false)
-                    console.log("[DRAAGGABLE]"+child.attrs.name , child.draggable());
+                    console.log("[DRAAGGABLE]" + child.attrs.name, child.draggable());
                     if (child.children.length > 0) {
-                        
+
 
                         self.setChildrendraggable(child.children)
                     }
@@ -2788,6 +2798,9 @@
                 let self = this;
                 let isPaint = false;
                 self.stage.on('click tap', function (e) {
+                    if (e.target == self.stage) {
+                        self.selectedItem = null
+                    }
                     clickTapHelper.handleClickTap(e.target, self.stage, self
                         .selectedItem, self.clickselect, self
                         .findLayerItem, self.selectedLayerTreeItem, self.properties,
@@ -2806,16 +2819,6 @@
                                 self.multiSelectGroup.draggable(true)
                             }
 
-                            console.log(e.target.parent)
-
-                            if (e.target.parent.attrs.name == "group" || e.target.parent.attrs.name ==
-                                "Duplication Group") {
-                                    
-                                // e.target.parent.draggable(true)
-                                // e.target.parent.children.forEach(element => {
-                                //     element.draggable(false)
-                                // })
-                            }
                         });
                 });
                 self.stage.on('contextmenu', function (ev) {
@@ -3010,7 +3013,13 @@
                         if (e.target.attrs.name == "group" || e.target.attrs.name == "Duplication Group") {
                             self.applyGroupProps(e.target, applyCallback => {
                                 console.log("[DRAG END],finished apply");
-
+                                e.target.setAttrs({
+                                    x: 0,
+                                    y: 0,
+                                    scaleX: 1,
+                                    scaleY: 1,
+                                    rotation: 0,
+                                })
                             })
                         }
                     }
@@ -3045,27 +3054,35 @@
                 });
             },
             applyGroupProps(parent, callback) {
-                // let self = this
-                // parent.children.forEach((child, index) => {
-                //     const matrix = child.getAbsoluteTransform().getMatrix();
-                //     const attrs = decompose(matrix);
-                //     child.setAttrs(attrs)
-                //     if (child.children.length > 0) {
-                //         self.applyGroupProps(child, cb => {
+                let self = this
+                parent.children.forEach((child, index) => {
+                    if (child.children.length > 0) {
+                        self.applyGroupProps(child, cb => {
+                            child.setAttrs({
+                                x: 0,
+                                y: 0,
+                                scaleX: 1,
+                                scaleY: 1,
+                                rotation: 0,
+                            })
+                        })
+                    } else {
+                        const matrix = child.getAbsoluteTransform().getMatrix();
+                        console.log(matrix);
 
-                //         })
-                //     }
-                //     if (index + 1 == parent.children.length) {
-                //         parent.setAttrs({
-                //             x: 0,
-                //             y: 0,
-                //             scaleX: 1,
-                //             scaleY: 1,
-                //             rotation: 0,
-                //         })
-                //         callback()
-                //     }
-                // })
+                        const attrs = decompose(matrix);
+                        console.log("applyGroupProps------------------------" + index);
+                        console.log("applyGroupProps", attrs, "child:", child);
+                        child.setAttrs({
+                            x: (attrs.x - self.stage.attrs.x) / self.stage.attrs.scaleX,
+                            y: (attrs.y - self.stage.attrs.y) / self.stage.attrs.scaleY,
+                            rotation: attrs.rotation,
+                        })
+                    }
+                    if (index + 1 == parent.children.length) {
+                        callback()
+                    }
+                })
 
 
             },
@@ -3563,6 +3580,8 @@
                 container: "container",
                 width: width,
                 height: height,
+                scaleX: 1,
+                scaleY: 1,
                 draggable: true,
                 dragBoundFunc: function (pos) {
                     var newY = pos.y > 0 ? 0 : pos.y;
