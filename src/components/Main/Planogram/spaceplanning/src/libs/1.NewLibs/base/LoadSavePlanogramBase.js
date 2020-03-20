@@ -1488,7 +1488,7 @@ function generateFloorPlanArr(planodata, vuex, storeCount) {
     children: []
   }
   // create gondola baseitems
-
+  
   planodata.forEach(item => {
     if (item.Type == "GONDOLA") {
       floorArr.push({
@@ -1496,6 +1496,10 @@ function generateFloorPlanArr(planodata, vuex, storeCount) {
         floorplan_Item_ID: item.Data.ID,
         parent_ID: null,
         type: item.Type,
+        x: item.RelativePosition.x,
+        y: item.RelativePosition.y,
+        absoluteX: item.AbsolutePosition.x,
+        absoluteY: item.AbsolutePosition.y,
         height: item.Data.Data.depth,
         width: item.Data.Data.width,
         depth: item.Data.Data.height,
@@ -1528,6 +1532,10 @@ function getChildren(planodata, parentID, vuex, storeCount) {
       shape: fixture.Data.Data.floorplanShape,
       depth: fixture.Data.Data.height,
       sales: fixture.Data.Data.sales_Retail,
+      x: fixture.RelativePosition.x,
+      y: fixture.RelativePosition.y,
+      absoluteX: fixture.AbsolutePosition.x,
+      absoluteY: fixture.AbsolutePosition.y,
       units: fixture.Data.Data.sales_Units,
       profit: fixture.Data.Data.sales_Profit,
 
