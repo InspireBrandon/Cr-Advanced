@@ -220,7 +220,9 @@
                     }
                     self.report.setFilters([supplierFilter, supplierFilter2]).catch(errors => {});
                 } else {
+                    self.planogramName = "";
                     self.applyReportFilters()
+                    self.$refs.biCluster.changeCategory(null)
                 }
             },
             switchMode() {

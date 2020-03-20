@@ -30,18 +30,21 @@
                         headerName: "Store Name",
                         field: "store",
                         editable: false,
+                        sortable: true,
                         hide: false
                     },
                     {
                         headerName: "Store Cluster",
                         editable: true,
                         hide: false,
+                        sortable: true,
                         field: "storeCluster"
                     },
                     {
                         headerName: "Custom Cluster",
                         field: "customCluster",
                         editable: true,
+                        sortable: true,
                         hide: false
                     }
                 ],

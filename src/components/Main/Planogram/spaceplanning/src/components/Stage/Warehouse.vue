@@ -52,7 +52,7 @@
             File
           </v-btn>
           <v-list dense>
-          
+
             <v-list-tile @click="openFile">
               <v-list-tile-title>Open</v-list-tile-title>
             </v-list-tile>
@@ -61,6 +61,9 @@
             </v-list-tile>
             <v-list-tile @click="importRange">
               <v-list-tile-title>Select Range</v-list-tile-title>
+            </v-list-tile>
+            <v-list-tile @click="setScanMode">
+              <v-list-tile-title>Scan barcode</v-list-tile-title>
             </v-list-tile>
             <v-list-tile @click="saveFile(false)">
               <v-list-tile-title>Save</v-list-tile-title>
@@ -172,15 +175,18 @@
               <v-layout row wrap>
 
 
-                <v-flex xs2 v-if="rangingData.planogramID != null && gotData" md6 style="padding: 2px;">
+                <v-flex xs2 v-if="(rangingData.planogramID != null && gotData)" md6 style="padding: 2px;">
                   <v-select light dense solo hide-details :items="HybridRanges" v-model="selectedHybridRange"
                     @change="onHybridChange"></v-select>
                 </v-flex>
-                <v-flex xs2 v-if="rangingData.planogramID != null && gotData" md3 style="padding: 2px;">
-                  <v-btn small color="primary" @click="addHybridRange">add </v-btn>
+                <v-flex xs2 v-if="(rangingData.planogramID != null && gotData)" md3 style="padding: 2px;">
+                  <v-btn small color="primary" @click="addHybridRange">add</v-btn>
                 </v-flex>
-                <v-flex xs2 v-if="rangingData.planogramID != null && gotData" md3 style="padding: 2px;">
+                <v-flex xs2 v-if="(rangingData.planogramID != null && gotData)" md3 style="padding: 2px;">
                   <v-btn small color="error" @click="removeHybridRange">Delete </v-btn>
+                </v-flex>
+                <v-flex xs2 v-if="scanProducts" md3 style="padding: 2px;">
+                  <v-btn small color="primary" @click="scan">Scan </v-btn>
                 </v-flex>
                 <v-flex v-if="rangingData.planogramID != null" md6 style="padding: 2px;">
 
@@ -190,16 +196,16 @@
             :items="categoryCluster" v-model="selectedCategoryCluster" solo hide-details></v-select> -->
                   <!-- v-if="showCategoryCluster==true" -->
                 </v-flex>
-                <v-flex v-if="rangingData.planogramID != null && gotData" md6 style="padding: 2px;">
+                <v-flex v-if="(rangingData.planogramID != null && gotData) || scanProducts" md6 style="padding: 2px;">
                   <v-select light @change="onClusterOptionChange" v-if="selectedClusterType != null"
                     :placeholder="'Select ' + selectedClusterType + ' cluster'" dense
                     :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" solo hide-details>
                   </v-select>
                 </v-flex>
-                <v-flex xs2 v-if="rangingData.planogramID != null && gotData" md6 style="padding: 2px;">
+                <v-flex xs2 v-if="(rangingData.planogramID != null && gotData)" md6 style="padding: 2px;">
                   <v-checkbox hide-details label="Use Potential" v-model="$store.state.usePotential"></v-checkbox>
                 </v-flex>
-                <v-flex xs10 v-if="rangingData.planogramID != null && gotData" md6 style="padding: 2px;">
+                <v-flex xs10 v-if="(rangingData.planogramID != null && gotData)" md6 style="padding: 2px;">
                   <h4>Active Items Selected</h4>
                   <div>
                     <div>Sales: R{{ ais_Sales }}</div>
@@ -207,7 +213,7 @@
                   </div>
                 </v-flex>
 
-                <v-flex xs12 v-if="rangingData.planogramID != null">
+                <v-flex xs12 v-if="rangingData.planogramID != null || scanProducts">
                   <div>
                     <v-layout row wrap>
                       <v-flex md8>
@@ -514,6 +520,7 @@
     <!-- <SaveDetailsModal ref="SaveDetailsModal" /> -->
     <Prompt ref="Prompt" />
     <HelpFileMaint ref="HelpFileMaint" />
+    <ScanProduct ref="ScanProduct" />
   </div>
 </template>
 
@@ -538,6 +545,7 @@
   import Prompt from '@/components/Common/Prompt';
 
   import floorDesinger from "@/components/Main/Floorplan_planogramDesinger/FloorplanDesigner";
+  import ScanProduct from '../Modals/ScanProduct.vue'
 
   import HelpFileMaint from '../../../../../HelpFile/HelpFileMaint'
   // import SaveDetailsModal from "@/components/Main/Planogram/spaceplanning/src/components/Modals/SaveDetails/SaveDetailsModal";
@@ -567,12 +575,14 @@
       Prompt,
       FixtureSelector,
       HelpFileMaint,
-      floorDesinger
+      floorDesinger,
+      ScanProduct
     },
     data() {
       let width = 0;
       width = window.innerWidth * 0.4;
       return {
+        scanProducts: false,
         detailsFixture: [],
         promoItemRefs: [],
         HybridRanges: [],
@@ -910,7 +920,10 @@
         let self = this;
         let tmp = [];
         let final = [];
-        if (self.HybridRanges != null && self.HybridRanges != undefined) {
+
+        console.log(self.scanProducts, self.products)
+
+        if (self.HybridRanges.length > 0) {
 
           if (self.HybridRanges.length == 0) {
             return
@@ -1020,6 +1033,42 @@
 
           }
         }
+
+        if (self.scanProducts) {
+          console.log("SCAN", self.scanProducts)
+
+          self.products.forEach(el => {
+            if (el.height == undefined || el.height == null || parseFloat(el.height) <= 0)
+              el.height = 10
+
+            if (el.width == undefined || el.width == null || parseFloat(el.width) <= 0)
+              el.width = 10
+
+            if (el.depth == undefined || el.depth == null || parseFloat(el.depth) <= 0)
+              el.depth = 10
+          })
+
+          if (self.searchText == "") {
+            final = self.products;
+          } else {
+            self.products.forEach(product => {
+              if (inIndex(product.description, self.searchText) || inIndex(product.barcode, self.searchText))
+                tmp.push(product);
+              final.push(product)
+            })
+          }
+
+          // if (tmp.length > 0) {
+          //   for (var i = 0; i < tmp.length; i++) {
+          //     let element = tmp[i];
+          //     if (!self.productInStore(element.productID)) {
+          //     }
+          //   }
+          // }
+        }
+
+        console.log("final", final)
+
         return final;
       }
     },
@@ -1046,6 +1095,30 @@
       }
     },
     methods: {
+      scan() {
+        let self = this;
+
+        self.$refs.ScanProduct.show(self.onAddProduct);
+      },
+      onAddProduct(newProduct) {
+        let self = this;
+
+        let canAdd = true;
+
+        self.products.forEach(product => {
+          if (product.barcode == newProduct.barcode)
+            canAdd = false;
+        });
+
+        if (canAdd) {
+          self.products.push(newProduct);
+        }
+      },
+      setScanMode() {
+        let self = this;
+
+        self.scanProducts = true;
+      },
       openFloorDesigner() {
         let self = this
         axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -1565,6 +1638,7 @@
 
         self.$refs.rangeSelectorModal.show(fileID => {
           self.$store.commit("setRangeID", fileID);
+          self.scanProducts = false;
           axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&id=${fileID}`)
             .then(r => {
               if (r.data) {
@@ -1643,6 +1717,8 @@
         let self = this;
 
         self.$refs.spacePlanSelector.show((spacePlanID, item) => {
+
+          self.scanProducts = false;
 
           setTimeout(() => {
             self.PlanogramObject = item
@@ -1963,7 +2039,7 @@
             }
           })
       },
-     
+
       saveFile(isNew) {
         let self = this;
         let parent = self.$parent.$children[0].$children[2];
@@ -1971,7 +2047,7 @@
         console.log(parent);
 
         let stage = parent.getStage();
-        
+
         let b64 = parent.$parent.getImageBytes(2);
         let image = parent.$parent.b64toBlob(b64, "image/png")
 
@@ -2254,13 +2330,17 @@
 
         return retVal;
       },
-     
+
       dragProductStart(ev, data) {
         let self = this
         console.log("dragProductStart", data);
-        if (self.selectedHybridRange != self.HybridRanges[0].value) {
-          data.isHybridProduct = true
+
+        if (self.HybridRanges.length > 0) {
+          if (self.selectedHybridRange != self.HybridRanges[0].value) {
+            data.isHybridProduct = true
+          }
         }
+
 
         window.warehouseDragData = data;
       },
