@@ -101,7 +101,7 @@
                 </template>
                 <span>View 3D</span>
             </v-tooltip>
-            <!-- <v-btn @click="logMutli">log</v-btn> -->
+            <v-btn @click="logMutli">log</v-btn>
             <div v-show="multiSelectGroup !=null">
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
@@ -188,7 +188,6 @@
                                     </v-flex>
                                 </v-layout>
                             </v-container>
-
                         </v-card>
                         <v-card tile flat id="panel_container" class="fill-height">
                             <v-toolbar v-if="selectedTool == 'open_with'" dark dense flat color="grey darken-3">
@@ -213,12 +212,12 @@
                                 <v-text-field @change="applyProperties" v-if="properties.name!=null" label="Name"
                                     v-model="properties.name" hide-details> </v-text-field>
                                 <v-text-field
-                                    v-if="properties.height!=null&&properties.height!=NaN&&properties.height!=undefined"
+                                    v-if="properties.height!=null&&properties.height.toString()!='NaN'&&properties.height!=undefined"
                                     @change="applyProperties($event,'height')" type="number" label="Height (m)"
                                     v-model="properties.height" hide-details>
                                 </v-text-field>
                                 <v-text-field
-                                    v-if="properties.width!=null&&properties.width!=NaN&&properties.height!=undefined"
+                                    v-if="properties.width!=null&&properties.width.toString()!='NaN'&&properties.height!=undefined"
                                     @change="applyProperties($event,'width')" type="number" label="Width (m)"
                                     v-model="properties.width" hide-details>
                                 </v-text-field>
@@ -226,7 +225,7 @@
                                     type="number" label="Radius (m)" v-model="properties.radius" hide-details>
                                 </v-text-field>
                                 <v-text-field
-                                    v-if="properties.depth!=null&&properties.depth!=NaN&&properties.depth!=undefined"
+                                    v-if="properties.depth!=null&&properties.depth.toString()!='NaN'&&properties.depth!=undefined"
                                     @change="applyProperties" type="number" label="Depth (m)" v-model="properties.depth"
                                     hide-details>
                                 </v-text-field>
@@ -365,12 +364,10 @@
     import library from "@/components/Main/Planogram/spaceplanning/src/components/Library/Library";
     import axios from 'axios'
 
-    // import config from 'config';
     let dragHandler = new DragHandler(this)
     let clickTapHelper = new ClickTapHelper()
     let transFormerHelper = new TransFormerHelper()
     let multiSelectHelper = new MultiSelectHelper()
-    const meterPixelRatio = 3779.5275590551;
 
     var height = 0;
     var width = 0;
@@ -394,7 +391,6 @@
         // 1 block = 1 meter
         data() {
             return {
-                labelLeft: null,
                 showRotation: false,
                 makingChanges: false,
                 hasTape: null,
@@ -495,8 +491,6 @@
                 dragItem: null,
                 dragParent: null,
                 dragidx: null,
-                panX: 0,
-                panY: 0,
                 ctrlDown: false,
                 stage: null,
                 layer: null,
@@ -569,8 +563,6 @@
                     height: 0,
                     width: 0
                 },
-                propertiesLabelHorizontal: null,
-                propertiesLabelVertical: null,
                 Floorplan_ID: null,
                 LabelText: "",
                 saveArr: [],
@@ -603,11 +595,13 @@
                 console.log("self.multiSelectGroup", self.multiSelectGroup);
                 console.log("self.stage", self.stage);
                 console.log("selectedItem", self.selectedItem);
+                console.log("properties", self.properties);
 
             },
             addItemToGroup() {
                 let self = this
                 let groupingHandler = new GroupingHandler()
+                
                 groupingHandler.addItemToGroup(self.stage, self.selectedItem, self.selectedLayer, self
                     .selectedLayerTree, self.selectedLayerTreeItem, self.multiSelectGroup, self.findLayerItem, self
                     .layerTree, callback => {
@@ -1565,7 +1559,6 @@
                         })
             },
             dropDragItem(ev) {
-
                 ev.preventDefault();
                 let self = this
                 let librarydata = window.library
@@ -1582,7 +1575,6 @@
                                         alert("No fixture setup found for spaceplan")
                                     }
                                 })
-
                             }
                         })
                     } else {
@@ -1591,11 +1583,9 @@
                             window.library = null
                         })
                     }
-
                 } else {
                     self.drawSaved(window.libraryDrag)
                 }
-
             },
             getPlanogramData(id, callback) {
                 let self = this
@@ -2572,22 +2562,19 @@
             handleMultiSelect(item, callback) {
                 let self = this
                 if (!item.attrs.draggable) {
-                    console.log("[handleMultiSelect]--------------------------item not draggable");
                     callback()
                 }
                 self.clickFindParentLayer(item, layerchild => {
                     let multiSelectHelper = new MultiSelectHelper()
-                    console.log("[handleMultiSelect]--------------------------item is draggable");
                     let muitiParent = null
                     if (layerchild.drawType == "Layer") {
                         muitiParent = layerchild
                     } else {
                         muitiParent = layerchild.parent
                     }
-                    multiSelectHelper.handleMultiselect(self.multiSelectGroup, layerchild.parent, item, self
+                    multiSelectHelper.handleMultiselect(self.multiSelectGroup, muitiParent, item, self
                         .stage,
                         cb => {
-                            console.log("[handleMultiSelect]--------------------------item callback");
                             self.multiSelectGroup = cb
                             self.selectedLayer.draw()
                             callback(cb)
@@ -2598,15 +2585,12 @@
             },
             clickselect(item, callback) {
                 let self = this
-
                 self.showRotation = true;
-
                 switch (item.parent.attrs.name) {
                     case "Building": {
                         self.selectLayer(self.buildingLayerTree, self.layerTree, layerCB => {
                             callback(item)
                         })
-
                     }
                     break;
 
@@ -2614,7 +2598,6 @@
                     self.selectLayer(self.backgroundTree, self.layerTree, layerCB => {
                         callback(item)
                     })
-
                 }
                 break;
 
@@ -2669,11 +2652,8 @@
                             if (cbitem.children.length > 0) {
                                 self.setChildrendraggable(cbitem.children)
                             }
-
-
                             callback(item.parent)
                         })
-
                     })
                 }
 
@@ -2684,18 +2664,14 @@
                     self.clickSelectFindCurrentParent(item, cbitem => {
                         self.findLayerItem(self.layerTree, cbitem._id, cb => {
                             self.selectLayer(cb, self.layerTree, layerCB => {
-                                console.log("clickselect--------------", cbitem);
-
                                 cbitem.draggable(true)
                                 if (cbitem.children.length > 0) {
                                     self.setChildrendraggable(cbitem.children)
                                 }
                                 callback(cbitem)
                             })
-
                         })
                     })
-
                 }
                 break;
                 case "image": {
@@ -2704,7 +2680,6 @@
                     })
                 }
                 break;
-
                 default: {
                     if (item.parent.attrs.isPlanogram) {
                         if (item.parent.attrs.rotation == 0)
@@ -2718,7 +2693,6 @@
                                 })
                                 callback(item.parent)
                             })
-
                         })
                     } else {
                         self.selectLayer(self.departmentTree, self.layerTree, layerCB => {
@@ -2731,27 +2705,21 @@
             },
             attachGondolaInsideGroup(target, dragItem, group) {
                 let self = this
-                console.log("attachGondola [TARGET]", target);
-                console.log("attachGondola [DRAGITEM]", dragItem);
                 target.attrs.hasAttached = dragItem.saveID
                 dragItem.setAttrs({
                     x: target.attrs.x + group.attrs.x,
                     y: target.attrs.y + group.attrs.y
                 })
                 self.stage.batchDraw()
-
             },
             attachGondola(target, dragItem) {
                 let self = this
-                console.log("attachGondola [TARGET]", target);
-                console.log("attachGondola [DRAGITEM]", dragItem);
                 target.attrs.hasAttached = dragItem.saveID
                 dragItem.setAttrs({
                     x: target.attrs.x,
                     y: target.attrs.y
                 })
                 self.stage.batchDraw()
-
             },
             clickFindParentLayer(item, callback) {
                 let self = this
@@ -2765,10 +2733,7 @@
             },
             clickSelectFindCurrentParent(item, callback) {
                 let self = this
-                console.log("clickSelectFindCurrentParent", item);
-                console.log("selectedItem", self.selectedItem);
-
-                if (self.selectedItem == null) {
+                if (self.selectedItem == null||self.ctrlDown) {
                     self.clickFindParentLayer(item, cb => {
                         callback(cb)
                     })
@@ -2786,10 +2751,7 @@
                 let self = this
                 children.forEach(child => {
                     child.draggable(false)
-                    console.log("[DRAAGGABLE]" + child.attrs.name, child.draggable());
                     if (child.children.length > 0) {
-
-
                         self.setChildrendraggable(child.children)
                     }
                 })
@@ -2866,26 +2828,20 @@
                             self.arrowStartX = 0
                             if (self.selectedTool != "open_with" && self.selectedTool != "show_chart") {
                                 if (self.selectedTool == "tab_unselected") {
-
                                     self.$refs.Prompt.show("", " Area Name",
                                         "Please Enter a  name for area", value => {
-
                                             self.areaTree.name = value
                                             self.area.shape.attrs.LabelText = value
                                         })
                                 }
                                 self.onToolChange("open_with")
-
-
                             }
                             if (self.dotted != null && self.selectedItem != null) {
                                 self.$refs.Prompt.show("", " Line Length",
                                     "Please enter line length in meters", value => {
-
                                         self.scaleSelected(parseFloat(value))
                                     })
                             }
-
                         })
                 });
 
@@ -2902,61 +2858,11 @@
                         .transformProperties, self.dotted, self.area)
 
                 });
-
-                self.stage.on('dragmove', function (e) {
-                    if (self.selectedTool == "open_with") {}
-                });
-                // self.departmentLayer.on('mouseover', function (e) {
-                //     console.log("[MOUSEOVER]departmentLayer", e.target);
-                //     if (e.target.saveID != null && e.target.saveID != undefined) {
-                //         // label with left pointer
-                //         self.labelLeft = new Konva.Label({
-                //             x: e.target.attrs.x,
-                //             y: e.target.attrs.y,
-                //             opacity: 0.75
-                //         });
-
-                //         self.labelLeft.add(
-                //             new Konva.Tag({
-                //                 fill: 'green',
-                //                 pointerDirection: 'left',
-                //                 pointerWidth: 20,
-                //                 pointerHeight: 28,
-                //                 lineJoin: 'round'
-                //             })
-                //         );
-                //         self.getDropLabel(e.target.saveID, labeltext => {
-                //             self.labelLeft.add(
-                //                 new Konva.Text({
-                //                     text: labeltext,
-                //                     fontFamily: 'Calibri',
-                //                     fontSize: 18,
-                //                     padding: 5,
-                //                     fill: 'white'
-                //                 })
-                //             );
-                //             e.target.parent.add(self.labelLeft)
-                //             self.stage.batchDraw()
-                //         })
-
-                //     }
-
-                // })
-                // self.departmentLayer.on('mouseout', function () {
-                //     self.labelLeft.destroy()
-                //     self.labelLeft = null
-                //     self.stage.batchDraw()
-                // });
-
-
                 self.departmentLayer.on('dragmove', function (e) {
                     if (self.selectedTool == "open_with" && e.target.attrs.name != 'Tape') {
-                        // self.handleSnapping(e.target)
                         var target = e.target;
                         var targetRect = e.target.getClientRect();
                         self.fixtureLayer.children.each(function (group) {
-
-                            // do not check intersection with itself
                             if (group === target) {
                                 return;
                             }
@@ -2978,8 +2884,6 @@
                             } else {
 
                             }
-                            // do not need to call layer.draw() here
-                            // because it will be called by dragmove action
                         });
                     }
                 })
@@ -2998,7 +2902,6 @@
                     if (self.selectedTool != "open_with") {
                         self.stage.stopDrag()
                     } else {
-                        // clear all previous lines on the screen
                         self.stage.find('.guid-line').destroy();
                         self.stage.batchDraw();
                         if (e.target.attrs.name == "MultiSelectGroup") {
@@ -3012,7 +2915,6 @@
                         }
                         if (e.target.attrs.name == "group" || e.target.attrs.name == "Duplication Group") {
                             self.applyGroupProps(e.target, applyCallback => {
-                                console.log("[DRAG END],finished apply");
                                 e.target.setAttrs({
                                     x: 0,
                                     y: 0,
@@ -3068,11 +2970,7 @@
                         })
                     } else {
                         const matrix = child.getAbsoluteTransform().getMatrix();
-                        console.log(matrix);
-
                         const attrs = decompose(matrix);
-                        console.log("applyGroupProps------------------------" + index);
-                        console.log("applyGroupProps", attrs, "child:", child);
                         child.setAttrs({
                             x: (attrs.x - self.stage.attrs.x) / self.stage.attrs.scaleX,
                             y: (attrs.y - self.stage.attrs.y) / self.stage.attrs.scaleY,
@@ -3083,12 +2981,6 @@
                         callback()
                     }
                 })
-
-
-            },
-            getDropLabel(dropID, callback) {
-                let text = `YAAAAAAAA YEEET `
-                callback(text)
             },
             findparentLayer(item) {
                 let self = this
@@ -3211,7 +3103,6 @@
                 let self = this;
                 let tmpItems = self.stage.find("." + layer.name)
                 self.findKonvaItem([self.stage], layer.KonvaID, callback => {
-
                     if (callback.attrs.visible) {
                         callback.hide();
                         self.setRecursiveVisibility(callback.children, false)
@@ -3248,7 +3139,6 @@
             },
             duplicate(direction) {
                 let self = this;
-
                 let duplicationHelper = new DuplicationHelper()
                 let groupDuplicationHelper = new GroupDuplicationHelper()
                 if (self.selectedItem == null) {
@@ -3285,7 +3175,6 @@
 
                                 })
                             })
-
                         break;
                     case "wall":
                         duplicationHelper.DuplicateWall(self.selectedItem, self.selectedLayer, self
@@ -3299,9 +3188,6 @@
                                 })
                             })
                         break;
-
-
-
                     case "group": {
                         groupDuplicationHelper.duplicateGroupDirection(self.selectedItem, self.selectedLayerTree,
                             direction, self.stage, callback => {
@@ -3574,8 +3460,6 @@
             width = container.offsetWidth
             self.floorConfig.floorHeight = height / 25
             self.floorConfig.floorWidth = width / 25
-
-
             self.stage = new Konva.Stage({
                 container: "container",
                 width: width,
@@ -3592,7 +3476,6 @@
                     };
                 }
             })
-
             self.drawGrid()
             self.createBaseLayers(cb => {})
             self.addStageEvents();
@@ -3684,7 +3567,6 @@
     function rotateAroundCenter(node, rotation, hyp) {
         //current rotation origin (0, 0) relative to desired origin - center (node.width()/2, node.height()/2)
         let dimension = node.getBoundingClientRect()
-        console.log("[rotateAroundCenter]", dimension);
 
         const right = {
             x: -dimension.width / 2,
@@ -3694,20 +3576,15 @@
         const rotated = rotatePoint(right, Konva.getAngle(rotation));
         const dx = rotated.x - current.x,
             dy = rotated.y - current.y;
-        //  node.width(hyp);
         node.rotation(rotation);
 
         node.x(node.x() + dx);
         node.y(node.y() + dy);
 
-        // 
     }
 
     function arraymove(arr, fromIndex, toIndex, comparitor) {
-
         if (fromIndex != toIndex && fromIndex > -1 && toIndex > -1 && toIndex < arr.length + 1) {
-
-
             var element = arr[fromIndex];
             arr.splice(fromIndex, 1);
             arr.splice(toIndex, 0, element);
@@ -3740,33 +3617,22 @@
     // will work for shapes with top-left origin, like rectangle
     function calcCenterRotation(node, rotation) {
         //current rotation origin (0, 0) relative to desired origin - center (node.width()/2, node.height()/2)
-        console.log("SELECTED ITEM", node);
         let dimension = node.getClientRect()
-        console.log("dimension", dimension);
-
         const topLeft = {
             x: -dimension.width,
             y: -dimension.height
         };
-        console.log("[ROTATION TOPLEFT]", topLeft);
 
         const current = CentterRotatePoint(topLeft, Konva.getAngle(node.rotation()));
         const rotated = CentterRotatePoint(topLeft, Konva.getAngle(rotation));
         const dx = rotated.x - current.x,
             dy = rotated.y - current.y;
-        console.log("[DX] ", dx);
-        console.log("[DY] ", dy);
 
         node.rotation(rotation);
-        console.log("before: X" + node.x() + " Y:" + node.y());
 
         node.x(node.x() + dx);
         node.y(node.y() + dy);
-
-        console.log("After: X" + node.x() + " Y:" + node.y());
     }
-
-    // then use it
 </script>
 
 <style>

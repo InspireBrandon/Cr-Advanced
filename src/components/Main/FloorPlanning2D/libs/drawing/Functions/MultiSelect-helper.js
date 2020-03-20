@@ -32,19 +32,21 @@ class MultiSelectHelper {
     }
     findparentLayer(item, callback) {
         if (item.parent.attrs.drawType == "Layer") {
-            callback(item.parent)
+            callback(item)
         } else {
             this.findparentLayer(item.parent, cb => {
                 callback(cb)
             })
         }
     }
+
+
     handleMultiselect(multiSelectGroup, selectedLayer, item, stage, callback) {
-        if (selectedLayer == item) {
-            this.findparentLayer(item, cb => {
-                selectedLayer = cb
-            })
-        }
+        console.log("[handleMultiselect]--------------SAELECTED IUTE,", item);
+        this.findparentLayer(item, cb => {
+            selectedLayer = cb.parent
+            item = cb
+        })
         if (multiSelectGroup == null || multiSelectGroup == undefined) {
             let multigroup = new Konva.Group({
                 x: 0,
@@ -62,6 +64,8 @@ class MultiSelectHelper {
             multiSelectGroup = multigroup
             selectedLayer.add(multigroup)
         }
+        console.log(item);
+
         var pos = item.getAbsolutePosition(); // get abs position
         if (item.tmpParent != null && item.tmpParent != undefined) {
             item.draggable(true)
