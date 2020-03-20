@@ -129,7 +129,7 @@
                 break;
                 case 3: {
                     // Handle Store
-                    app = self.handleSuperUser(app);
+                    app = self.handleStore(app);
                 }
                 break;
                 }

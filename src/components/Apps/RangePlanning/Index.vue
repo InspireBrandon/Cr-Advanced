@@ -846,7 +846,7 @@
                 self.gotData = true;
               });
 
-              self.promptForFileSync();
+              // self.promptForFileSync();
             });
           });
         });
@@ -927,7 +927,7 @@
                 self.gotData = true;
               });
 
-              self.promptForFileSync();
+              // self.promptForFileSync();
             });
           });
         });
@@ -1607,7 +1607,7 @@
               self.gotData = true;
             });
 
-            self.promptForFileSync();
+            // self.promptForFileSync();
           });
         });
       },
