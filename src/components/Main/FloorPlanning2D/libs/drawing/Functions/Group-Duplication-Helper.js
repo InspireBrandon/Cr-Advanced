@@ -137,7 +137,7 @@ class DuplicationHelper {
                 let newGroup = new Konva.Group({
                     x: item.attrs.x,
                     y: item.attrs.y,
-                    name: "group",
+                    name: "Duplication Group",
                     visible: true,
                     showEditName: false,
                     selected: true,
@@ -151,7 +151,7 @@ class DuplicationHelper {
                 let newgroupTreeItem = new treeItem({
                     KonvaID: newGroup._id,
                     children: [],
-                    name: "group",
+                    name: "Duplication Group",
                     showEditName: false,
                     visible: newGroup.visible,
                     selected: newGroup.selected,
@@ -206,8 +206,10 @@ class DuplicationHelper {
                 item.children.forEach(element => {
                     this.drawShape(element, newGroup, newgroupTreeItem)
                 });
-            }
+            } break;
             case "circle": {
+                console.log('------------DRAWING A POES LAYER CIRCLE------------',item);
+                
                 let brush = {
                     radius: item.attrs.radius,
                     color: item.attrs.fill,

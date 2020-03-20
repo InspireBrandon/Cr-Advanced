@@ -1,23 +1,18 @@
 import Konva from 'konva'
-import TransFormerHelper from './TransFormer-Helper'
 import treeItem from '@/components/Main/FloorPlanning2D/libs/tree/TreeItem'
-import {
-    Z_DEFAULT_STRATEGY
-} from 'zlib';
-let transFormerHelper = new TransFormerHelper()
-
 class GroupingHandler {
-    constructor() {
-
-    }
+    constructor() {}
 
     addItemToGroup(stage, selectedItem, selectedLayer, selectedLayerTree, selectedLayerTreeItem, multiselectGroup, findLayerItem, layerTree, callback) {
-        console.log("[addItemToGroup] selected layer tree", selectedLayerTree);
-        console.log("[addItemToGroup] selected layer tree", selectedLayer);
 
         if (selectedLayer.attrs.name == "group" || selectedLayer.attrs.name == "Duplication Group") {
-            selectedLayer = selectedLayer.parent.parent
-            selectedLayerTree = selectedLayerTree.parent
+            console.log("[addItemToGroup]-----------------selectedLayer", selectedLayer);
+            this.findparentLayer(selectedLayer, cb => {
+                selectedLayer = cb
+                findLayerItem(layerTree, cb._id, treecb => {
+                    selectedLayerTree = treecb
+                })
+            })
         }
         let group = new Konva.Group({
             name: "group",
@@ -45,27 +40,15 @@ class GroupingHandler {
 
         selectedLayer.add(group)
         selectedLayerTree.children.push(groupTreeItem)
-        console.log("multiselectGroup.children", multiselectGroup.children);
-        console.log("selectedLayer", selectedLayer);
-
         for (let index = (multiselectGroup.children.length - 1); index > -1; index--) {
-            console.log("multiselectGroup.children", multiselectGroup.children);
-
             const element = multiselectGroup.children[index];
-            console.log("[LOOP INDEX]", index);
-
             findLayerItem(layerTree, element._id, cb => {
-                console.log("findLayerItem", cb.parent);
-
                 for (let idx = cb.parent.children.length - 1; idx > -1; idx--) {
                     const child = cb.parent.children[idx];
                     if (child == cb) {
                         let spliceItem = cb.parent.children.splice(idx, 1)
                         groupTreeItem.children.push(spliceItem[0])
                         spliceItem[0].parent = groupTreeItem
-                        console.log("[SPLICE ITEM]", spliceItem[0]);
-                        console.log("[SPLICE Index]", index);
-
                         element.moveTo(group)
                         element.draggable(false)
                         if (index == 0) {
@@ -77,29 +60,26 @@ class GroupingHandler {
                 }
             })
         }
-
     }
-
+    findparentLayer(item, callback) {
+        if (item.parent.attrs.drawType == "Layer") {
+            callback(item.parent)
+        } else {
+            this.findparentLayer(item.parent, cb => {
+                callback(cb)
+            })
+        }
+    }
     removeItemFromGroup(stage, selectedItem, selectedLayer, selectedLayerTree, selectedLayerTreeItem, multiselectGroup, findLayerItem, layerTree, parent, callback) {
-        console.log("[REMOVE ITEM FROM GROUP]selectedIOterm", selectedItem);
-        console.log("SELECTED LAYER", selectedLayer);
-
         if ((selectedItem.attrs.drawType == "group" || selectedItem.attrs.name == "Duplication Group") && selectedItem.children.length > 0) {
             for (let index = selectedItem.children.length - 1; index > -1; index--) {
                 const element = selectedItem.children[index];
                 findLayerItem(layerTree, element._id, cb => {
-
-                    console.log("[FIND LAYER ITEM]", cb);
-
                     cb.parent.children.forEach((child, idx) => {
                         if (child == cb) {
-                            console.log("CHILD S", child);
-
                             let spliceItem = cb.parent.children.splice(idx, 1)
                             selectedLayerTree.parent.children.push(spliceItem[0])
                             spliceItem[0].parent = selectedLayerTree.parent
-                            console.log("PARENT", parent)
-
                             element.moveTo(parent)
                             // element.setAttrs({
                             //     x: element.attrs.x + selectedItem.attrs.x,
@@ -108,17 +88,12 @@ class GroupingHandler {
                             stage.batchDraw()
                         }
                     })
-                    console.log("Index== ", index);
                     if (index == 0) {
-                        console.log("[CALLBACK]-------------------");
-
                         callback(selectedItem)
                     }
                 })
-
             }
         }
     }
-
 }
 export default GroupingHandler
