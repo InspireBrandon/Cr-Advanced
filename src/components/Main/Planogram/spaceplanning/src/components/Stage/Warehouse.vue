@@ -921,8 +921,6 @@
         let tmp = [];
         let final = [];
 
-        console.log(self.scanProducts, self.products)
-
         if (self.HybridRanges.length > 0) {
 
           if (self.HybridRanges.length == 0) {
@@ -1066,8 +1064,6 @@
           //   }
           // }
         }
-
-        console.log("final", final)
 
         return final;
       }
@@ -1678,6 +1674,7 @@
                     self.$store.commit("setCurrentStoreCount", self.storeCount);
                   }
                   self.gotData = true;
+                  let stage = self.$parent.$children[0].$children[2].getStage().draw();
                 })
               } else {
                 alert("Failed to get Range Data.");
@@ -2409,7 +2406,13 @@
               if (storeProducts.length > 0) {
                 storeProducts.forEach(storeProduct => {
                   self.products.forEach(product => {
-                    if (storeProduct.Data.productID == product.productID) {
+                    console.log(product);
+
+                    if(storeProduct.Data == undefined || storeProduct.Data == null) {
+                        console.log("null Item", product);
+                    }
+
+                    if (storeProduct.Data.productID == product.productID || storeProduct.Data.id == product.productID) {
                       for (var prop in product) {
                         storeProduct.Data[prop] = product[prop];
                       }
