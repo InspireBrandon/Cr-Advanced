@@ -65,9 +65,9 @@ class ClickTapHelper {
                         stage.find('Transformer').destroy()
                         if (selectedItem != null && selectedItem != undefined) {
                             console.log("before multi select", e, selectedItem);
-
+                            
                             handleMultiSelect(selectedItem, cb => {
-                                console.log("----------------------------------[MULTISELECT] SELECTED ITYEM", cb);
+                                console.log("----------------------------------[MULTISELECT] SELECTED ITEM", cb);
 
                                 handleMultiSelect(e, ce => {
                                     console.log("------------------------------------[MULTISELECT] 2ND ITEM", ce);

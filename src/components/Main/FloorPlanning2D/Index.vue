@@ -601,7 +601,7 @@
             addItemToGroup() {
                 let self = this
                 let groupingHandler = new GroupingHandler()
-                
+
                 groupingHandler.addItemToGroup(self.stage, self.selectedItem, self.selectedLayer, self
                     .selectedLayerTree, self.selectedLayerTreeItem, self.multiSelectGroup, self.findLayerItem, self
                     .layerTree, callback => {
@@ -618,8 +618,6 @@
                 let groupingHandler = new GroupingHandler()
                 let layerParent = self.selectedLayerTreeItem.parent
                 let parent = self.selectedItem.parent
-                console.log("self.selectedItem", self.selectedItem);
-                console.log("self.selectedLayerTreeItem", self.selectedLayerTreeItem);
                 for (let index = self.selectedItem.children.length - 1; index > -1; index--) {
                     const child = self.selectedItem.children[index];
                     self.findLayerItem(self.layerTree, child._id, cb => {
@@ -2415,7 +2413,7 @@
                 switch (e.target.attrs.name) {
                     case "Gondola-Rect":
                         duplicationHelper.DuplicateRectGroupDrag(e.target, self.selectedLayer, self
-                            .selectedLayerTree)
+                            .selectedLayerTree, )
 
                         break;
 
@@ -2561,9 +2559,11 @@
             },
             handleMultiSelect(item, callback) {
                 let self = this
-                if (!item.attrs.draggable) {
-                    callback()
-                }
+                // if (!item.attrs.draggable) {
+                //     console.log("[HANDLEMULTI SELECTE INDEX]------not raggable");
+
+                //     callback()
+                // }
                 self.clickFindParentLayer(item, layerchild => {
                     let multiSelectHelper = new MultiSelectHelper()
                     let muitiParent = null
@@ -2572,6 +2572,8 @@
                     } else {
                         muitiParent = layerchild.parent
                     }
+                    console.log("[handleMultiSelect]-----layerchild", layerchild);
+
                     multiSelectHelper.handleMultiselect(self.multiSelectGroup, muitiParent, item, self
                         .stage,
                         cb => {
@@ -2733,7 +2735,7 @@
             },
             clickSelectFindCurrentParent(item, callback) {
                 let self = this
-                if (self.selectedItem == null||self.ctrlDown) {
+                if (self.selectedItem == null || self.ctrlDown) {
                     self.clickFindParentLayer(item, cb => {
                         callback(cb)
                     })
@@ -3153,7 +3155,8 @@
                 switch (self.selectedItem.attrs.name) {
                     case "Gondola-Rect":
                         duplicationHelper.DuplicateRectGroup(self.selectedItem, self.selectedLayer, self
-                            .selectedLayerTree, direction, self.duplicationSequence, callback => {
+                            .selectedLayerTree, direction, self.duplicationSequence, self.findLayerItem,
+                            callback => {
                                 self.selectLayer(callback.layer, self.layers, layercb => {
                                     callback.item.parent.add(tr);
                                     tr.attachTo(callback.item)
@@ -3167,7 +3170,7 @@
                     case "circle":
                         duplicationHelper.DuplicateCircle(self.selectedItem, self.selectedLayer, self
                             .selectedLayerTree, direction, self.duplicationSequence, callback => {
-                                self.selectLayer(callback.layer, self.layers, layercb => {
+                                self.selectLayer(callback.layer, self.layers, self.findLayerItem, layercb => {
                                     self.selectedItem = callback.item
                                     callback.item.parent.add(tr);
                                     tr.attachTo(callback.item)
@@ -3179,7 +3182,7 @@
                     case "wall":
                         duplicationHelper.DuplicateWall(self.selectedItem, self.selectedLayer, self
                             .selectedLayerTree, direction, self.duplicationSequence, callback => {
-                                self.selectLayer(callback.layer, self.layers, layercb => {
+                                self.selectLayer(callback.layer, self.layers, self.findLayerItem, layercb => {
                                     self.selectedItem = callback.item
                                     callback.item.parent.add(tr);
                                     tr.attachTo(callback.item)

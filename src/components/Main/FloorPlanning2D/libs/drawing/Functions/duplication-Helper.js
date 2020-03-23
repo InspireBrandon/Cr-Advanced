@@ -10,7 +10,7 @@ class DuplicationHelper {
     constructor() {
 
     }
-    DuplicateWall(SelectedItem, Layer, LayerTree, direction, duplicationSequence, callback) {
+    DuplicateWall(SelectedItem, Layer, LayerTree, direction, duplicationSequence, findLayerItem, callback) {
         let rect
         let layertreeitem
         let group
@@ -113,6 +113,17 @@ class DuplicationHelper {
             draggable: false
         })
         SelectedItem.moveTo(group)
+        findLayerItem(LayerTree.children, SelectedItem._id, cb => {
+            if (cb.parent != layertreeitem) {
+                cb.parent.children.forEach((element, idx) => {
+                    if (element == cb) {
+                        let SplicItem = cb.parent.children.splice(idx, 1)
+                        SplicItem[0].parent = layertreeitem
+                        layertreeitem.children.push(SplicItem[0])
+                    }
+                });
+            }
+        })
 
         Layer.draw()
         callback({
@@ -120,7 +131,7 @@ class DuplicationHelper {
             item: rect.shape
         })
     }
-    DuplicateCircle(SelectedItem, Layer, LayerTree, direction, duplicationSequence, callback) {
+    DuplicateCircle(SelectedItem, Layer, LayerTree, direction, duplicationSequence, findLayerItem, callback) {
         let circle
         let group
         let layertreeitem
@@ -220,13 +231,24 @@ class DuplicationHelper {
             scaleY: 1
         })
         SelectedItem.moveTo(group)
+        findLayerItem(LayerTree.children, SelectedItem._id, cb => {
+            if (cb.parent != layertreeitem) {
+                cb.parent.children.forEach((element, idx) => {
+                    if (element == cb) {
+                        let SplicItem = cb.parent.children.splice(idx, 1)
+                        SplicItem[0].parent = layertreeitem
+                        layertreeitem.children.push(SplicItem[0])
+                    }
+                });
+            }
+        })
         Layer.draw()
         callback({
             layer: layertreeitem,
             item: circle.shape
         })
     }
-    DuplicateRectGroup(SelectedItem, Layer, LayerTree, direction, duplicationSequence, callback) {
+    DuplicateRectGroup(SelectedItem, Layer, LayerTree, direction, duplicationSequence, findLayerItem, callback) {
         let rect
         let group
         let layertreeitem
@@ -353,6 +375,17 @@ class DuplicationHelper {
             depth: SelectedItem.attrs.depth
         })
         SelectedItem.moveTo(group)
+        findLayerItem(LayerTree.children, SelectedItem._id, cb => {
+            if (cb.parent != layertreeitem) {
+                cb.parent.children.forEach((element, idx) => {
+                    if (element == cb) {
+                        let SplicItem = cb.parent.children.splice(idx, 1)
+                        SplicItem[0].parent = layertreeitem
+                        layertreeitem.children.push(SplicItem[0])
+                    }
+                });
+            }
+        })
         Layer.draw()
         callback({
             layer: layertreeitem,
