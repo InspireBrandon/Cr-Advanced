@@ -301,7 +301,7 @@ class ProductBase extends ProductItemBase {
     let totalWidth = (self.Orientation_Width * self.Facings_X) + ((spreadFacingSpacer) * (self.Facings_X - 1)) - ((squish) * (self.Facings_X));
     // (self.Orientation_Width + (((spreadFacingSpacer - squish) * (self.Facings_X - 1)) * self.Facings_X));
 
-    if (storeResult.Data.store_Range_Indicator == "NO") {
+    if (storeResult.Data.store_Range_Indicator == undefined || storeResult.Data.store_Range_Indicator == null || storeResult.Data.store_Range_Indicator == "NO") {
 
       self.Indicator1 = new Konva.Line({
         x: 0,

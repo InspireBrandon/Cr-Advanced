@@ -217,19 +217,22 @@
                                     </v-list>
                                   </v-menu>
                                   <div class="subheading">Front</div>
-                                  <v-card style="text-align: center;" @click="openFile(1)" light @contextmenu="showImageMenu($event, 1)">
-                                    <img class="product-image" :src="image1" alt="" >
+                                  <v-card style="text-align: center;" @click="openFile(1)" light
+                                    @contextmenu="showImageMenu($event, 1)">
+                                    <img class="product-image" :src="image1" alt="">
                                   </v-card>
                                 </v-flex>
                                 <v-flex md4 sm4>
                                   <div class="subheading">Side</div>
-                                  <v-card style="text-align: center;" light @click="openFile(2)" @contextmenu="showImageMenu($event, 2)">
+                                  <v-card style="text-align: center;" light @click="openFile(2)"
+                                    @contextmenu="showImageMenu($event, 2)">
                                     <img class="product-image" :src="image2" alt="">
                                   </v-card>
                                 </v-flex>
                                 <v-flex md4 sm4>
                                   <div class="subheading">Top</div>
-                                  <v-card style="text-align: center;" light @click="openFile(3)" @contextmenu="showImageMenu($event, 3)">
+                                  <v-card style="text-align: center;" light @click="openFile(3)"
+                                    @contextmenu="showImageMenu($event, 3)">
                                     <img class="product-image" :src="image3" alt="">
                                   </v-card>
                                 </v-flex>
@@ -567,27 +570,33 @@
                 newObj.object.Data[prop] = self.form[prop];
               }
 
-              newObj.object.Data.useAlternateBarcode = self.bcDropdown != -1;
+              Axios.put(process.env.VUE_APP_API + "Product?db=CR-Hinterland-Live", newObj.object.Data)
+                .then(r => {
+                  newObj.object.Data.useAlternateBarcode = self.bcDropdown != -1;
 
-              let bc = "";
+                  let bc = "";
 
-              if (self.bcDropdown == -1)
-                bc = self.form.barcode;
-              else {
-                self.form.aleternateBarcode.forEach(el => {
-                  if (el.value == self.bcDropdown) {
-                    bc = el.text;
+                  if (self.bcDropdown == -1)
+                    bc = self.form.barcode;
+                  else {
+                    self.form.aleternateBarcode.forEach(el => {
+                      if (el.value == self.bcDropdown) {
+                        bc = el.text;
+                      }
+                    })
                   }
+
+                  newObj.object.Data.alternateBarcode = bc;
+                  newObj.object.Data.alternatePackingType = self.product_type;
+
+                  let event = new CustomEmitter();
+                  event.modal_saved(EventBus, self.planoData.type, self.planoData.subType, newObj, self
+                    .planoData.id, self.planoData.object);
+                  self.hide();
                 })
-              }
+                .catch(e => {
 
-              newObj.object.Data.alternateBarcode = bc;
-              newObj.object.Data.alternatePackingType = self.product_type;
-
-              let event = new CustomEmitter();
-              event.modal_saved(EventBus, self.planoData.type, self.planoData.subType, newObj, self.planoData
-                .id, self.planoData.object);
-              self.hide();
+                })
             }
           })
         }
@@ -1241,7 +1250,7 @@
         let productData;
 
         let ctrl_store = new StoreHelper();
-        
+
         let productStoreCopy = ctrl_store.getAllPlanogramItemsByType(
           self.$store,
           "PRODUCT"
@@ -1270,7 +1279,8 @@
 
         calcData.DaysOfSupply = self.CalculationHandler.Calculate_Days_Of_Supply_Potential(
           productData.TotalFacings,
-          self.$store.state.usePotential ? productData.ProductData.volume_Potential : productData.ProductData.sales_Units
+          self.$store.state.usePotential ? productData.ProductData.volume_Potential : productData.ProductData
+          .sales_Units
         );
 
         self.currentSalesPotential = productEventData.Data.sales_potential;
