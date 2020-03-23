@@ -112,8 +112,32 @@
                     </v-text-field>
                   </v-flex>
                   <v-flex lg8 md12 v-if="!newData.rendering||newData.type == 2">
-                    <v-select v-model="newData.floorplanShape" :items="floorplanShapes" label="Floorplan Shape:"
-                      ></v-select>
+                    <v-select v-model="newData.floorplanShape" :items="floorplanShapes" label="Floorplan Shape:">
+                    </v-select>
+                  </v-flex>
+                </v-layout>
+                <v-layout>
+                  <v-flex lg4 md6>
+                    <div>
+                      <label>Top Image</label>
+                      <img width="100%"
+                        src="https://assets-global.website-files.com/5d779dddc494dd2921fdd1b2/5d9b2dac574a7d4009312775_placeholder.jpg"
+                        alt="">
+                      <div>
+                        <a href="#">remove image</a>
+                      </div>
+                    </div>
+                  </v-flex>
+                  <v-flex lg4 md6>
+                    <div>
+                      <label>Top Image</label>
+                      <img width="100%"
+                        src="https://assets-global.website-files.com/5d779dddc494dd2921fdd1b2/5d9b2dac574a7d4009312775_placeholder.jpg"
+                        alt="">
+                      <div>
+                        <a href="#">remove image</a>
+                      </div>
+                    </div>
                   </v-flex>
                 </v-layout>
               </v-container>
