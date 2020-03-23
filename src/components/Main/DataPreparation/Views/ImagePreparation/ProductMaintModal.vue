@@ -570,6 +570,10 @@
                 newObj.object.Data[prop] = self.form[prop];
               }
 
+              console.log(newObj.object)
+
+              newObj.object.Data.id = newObj.object.Data.productID;
+
               Axios.put(process.env.VUE_APP_API + "Product?db=CR-Hinterland-Live", newObj.object.Data)
                 .then(r => {
                   newObj.object.Data.useAlternateBarcode = self.bcDropdown != -1;
