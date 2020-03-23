@@ -104,7 +104,7 @@
                 selectedTool: ["open_with"],
                 drops: [],
                 planogram_ID: null,
-                snapableItems: ['.wall', '.rect-group', '.circle'],
+                snapableItems: ['.wall', '.Gondola-Rect', '.circle'],
                 selectedFixtures: null,
                 saveArr: [],
 
@@ -195,41 +195,9 @@
                 let self = this
                 self.findKonvaItem(self.selectedLayer.children, drop.id, callback => {
                     let rotation = parseFloat(amount)
-                    //    = callback.item.children[0]
-                    callback.item.children.forEach(child => {
-                        let node = child
-                        const degToRad = Math.PI / 180
-                        const rotatePoint = ({
-                            x,
-                            y
-                        }, deg) => {
-                            const rcos = Math.cos(deg * degToRad),
-                                rsin = Math.sin(deg * degToRad)
-                            return {
-                                x: x * rcos - y * rsin,
-                                y: y * rcos + x * rsin
-                            }
-                        }
-                        //current rotation origin (0, 0) relative to desired origin - center (node.width()/2, node.height()/2)
-                        var topLeft = {
-                            x: -node.width() / 2,
-                            y: -node.height() / 2
-                        }
-                        const current = rotatePoint(topLeft, node.rotation())
-                        const rotated = rotatePoint(topLeft, rotation)
-                        const dx = rotated.x - current.x,
-                            dy = rotated.y - current.y
-
-                        node.rotation(rotation)
-                        node.x(node.x() + dx)
-                        node.y(node.y() + dy)
-                        self.selectedLayer.draw()
-                        console.log("node", node);
-                    })
-
-
-
-                    // callback.item.rotation(parseFloat(rotation))
+                    console.log("changerotation ----- callvbackl", callback);
+                    callback.item.rotation(amount)
+                    self.selectedLayer.draw()
                 })
             },
             guid() {
@@ -255,21 +223,21 @@
             },
             reDraw(item) {
                 let self = this
-                console.log(item);
 
                 self.stage.find('Transformer').destroy()
                 let tmp
                 self.findKonvaItem(self.selectedLayer.children, item.id, callback => {
                     console.log("callback", callback);
                     console.log(item);
-
-                    tmp = self.selectedLayer.children.splice(callback.count, 1)
+                    let asd = self.selectedLayer.children.splice(callback.count, 1)
+                    tmp = asd[0]
+                    console.log("[REDRAW]--item", tmp);
 
 
                     if (item.shape == "Circle") {
                         let circle = new Circle(self.selectedLayer, {
-                            x: tmp[0].children[0].attrs.x,
-                            y: tmp[0].children[0].attrs.y,
+                            x: tmp.attrs.x,
+                            y: tmp.attrs.y,
                         }, null, {
                             radius: item.width,
                             color: "#1976d2"
@@ -281,8 +249,8 @@
                     } else {
                         console.log("square", tmp);
                         let rect = new Rect(self.selectedLayer, {
-                            x: tmp[0].attrs.x,
-                            y: tmp[0].attrs.y,
+                            x: tmp.attrs.x,
+                            y: tmp.attrs.y,
                         }, null, null, null, self.imageSrc(item.id, "Top"));
                         rect.shape.setAttrs({
                             width: item.width,
@@ -342,25 +310,40 @@
                 let self = this
                 self.stage.on('click tap', function (e) {
                     if (e.target.attrs.name == "Circle" || e.target.attrs.name == "Gondola-Rect") {
-                        self.selectedItem = e.target
-                        console.log("self.selectedItem", self.selectedItem);
-                        self.selectedItem.draggable(true)
-                        self.findDrop(e.target, callback => {
-                            self.selectedFixtures = callback
-                        })
+                        if (self.selectedItem == null) {
+                            self.selectedItem = e.target.parent
+                            console.log("self.selectedItem", self.selectedItem);
+                            self.selectedItem.draggable(true)
+                            self.selectedItem.children.forEach(child => {
+                                child.draggable(false)
+                            })
+                        } else if (self.selectedItem.parent.attrs.name != "planoGroup") {
+                            self.selectedItem = e.target
+                            console.log("self.selectedItem", self.selectedItem);
+                            self.selectedItem.draggable(true)
+                            self.findDrop(e.target, callback => {
+                                self.selectedFixtures = callback
+                            })
+                        } else {
+                            self.selectedItem = e.target.parent
+                            console.log("self.selectedItem", self.selectedItem);
+                            self.selectedItem.draggable(true)
+                            self.selectedItem.children.forEach(child => {
+                                child.draggable(false)
+                            })
+
+                        }
+
                     }
                     if (e.target === self.stage) {
                         self.stage.find('Transformer').destroy()
+                        self.selectedItem = null
                         self.selectedLayer.draw();
                         self.selectedFixtures = null
                         return;
                     }
                     self.stage.find('Transformer').destroy();
-                    if (e.target.attrs.draggable) {
-                        self.selectedItem = e.target;
-                        self.findDrop(e.target, callback => {
-                            self.selectedFixtures = callback
-                        })
+                    if (self.selectedItem.attrs.draggable) {
                         var tr = new Konva.Transformer({
                             enabledAnchors: [],
                             boundBoxFunc: function (oldBoundBox, newBoundBox) {
@@ -370,87 +353,88 @@
                                 return newBoundBox;
                             }
                         });
-                        self.selectedLayer.add(tr);
-
-                        tr.attachTo(e.target);
+                        self.selectedItem.parent.add(tr);
+                        
+                        tr.attachTo(self.selectedItem);
 
                         tr.on('transform', function (z) {
-                            console.log(e.target);
                         });
-                        self.selectedLayer.draw();
+                        self.stage.batchDraw();
                     }
                 });
 
                 self.stage.on('dragmove', function (e) {
 
-                    // let snappingHandler = new SnappingHandler()
-                    // // clear all previous lines on the screen
-                    // self.stage.find('.guid-line').destroy();
+                    let snappingHandler = new SnappingHandler()
+                    // clear all previous lines on the screen
+                    self.stage.find('.guid-line').destroy();
 
-                    // // find possible snapping lines
-                    // var lineGuideStops = snappingHandler.getLineGuideStops(e.target, self.stage, self
-                    //     .snapableItems);
+                    // find possible snapping lines
+                    var lineGuideStops = snappingHandler.getLineGuideStops(e.target, self.stage, self
+                        .snapableItems);
 
-                    // // find snapping points of current object
-                    // var itemBounds = snappingHandler.getObjectSnappingEdges(e.target, self.stage);
+                    // find snapping points of current object
+                    var itemBounds = snappingHandler.getObjectSnappingEdges(e.target, self.stage);
 
-                    // // now find where can we snap current object
-                    // var guides = snappingHandler.getGuides(lineGuideStops, itemBounds, self.stage);
+                    // now find where can we snap current object
+                    var guides = snappingHandler.getGuides(lineGuideStops, itemBounds, self.stage);
 
-                    // // do nothing of no snapping
-                    // if (!guides.length) {
-                    //     return;
-                    // }
+                    // do nothing of no snapping
+                    if (!guides.length) {
+                        return;
+                    }
 
-                    // snappingHandler.drawGuides(guides, self.stage, self.selectedLayer);
+                    snappingHandler.drawGuides(guides, self.stage, self.selectedLayer);
 
-                    // // now force object position
-                    // guides.forEach(lg => {
-                    //     switch (lg.snap) {
-                    //         case 'start': {
-                    //             switch (lg.orientation) {
-                    //                 case 'V': {
-                    //                     e.target.x(lg.lineGuide + lg.offset);
-                    //                     break;
-                    //                 }
-                    //                 case 'H': {
-                    //                     e.target.y(lg.lineGuide + lg.offset);
-                    //                     break;
-                    //                 }
-                    //             }
-                    //             break;
-                    //         }
-                    //         case 'center': {
-                    //             switch (lg.orientation) {
-                    //                 case 'V': {
-                    //                     e.target.x(lg.lineGuide + lg.offset);
-                    //                     break;
-                    //                 }
-                    //                 case 'H': {
-                    //                     e.target.y(lg.lineGuide + lg.offset);
-                    //                     break;
-                    //                 }
-                    //             }
-                    //             break;
-                    //         }
-                    //         case 'end': {
-                    //             switch (lg.orientation) {
-                    //                 case 'V': {
-                    //                     e.target.x(lg.lineGuide + lg.offset);
-                    //                     break;
-                    //                 }
-                    //                 case 'H': {
-                    //                     e.target.y(lg.lineGuide + lg.offset);
-                    //                     break;
-                    //                 }
-                    //             }
-                    //             break;
-                    //         }
-                    //     }
-                    // });
+                    // now force object position
+                    guides.forEach(lg => {
+                        switch (lg.snap) {
+                            case 'start': {
+                                switch (lg.orientation) {
+                                    case 'V': {
+                                        e.target.x(lg.lineGuide + lg.offset);
+                                        break;
+                                    }
+                                    case 'H': {
+                                        e.target.y(lg.lineGuide + lg.offset);
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                            case 'center': {
+                                switch (lg.orientation) {
+                                    case 'V': {
+                                        e.target.x(lg.lineGuide + lg.offset);
+                                        break;
+                                    }
+                                    case 'H': {
+                                        e.target.y(lg.lineGuide + lg.offset);
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                            case 'end': {
+                                switch (lg.orientation) {
+                                    case 'V': {
+                                        e.target.x(lg.lineGuide + lg.offset);
+                                        break;
+                                    }
+                                    case 'H': {
+                                        e.target.y(lg.lineGuide + lg.offset);
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    });
                 });
 
                 self.stage.on('dragend', (e) => {
+                    self.stage.find('.guid-line').destroy();
+
                     // // clear all previous lines on the screen
                     // self.stage.find('.guid-line').destroy();
                     // let transform = self.stage.getAbsoluteTransform().copy();
@@ -472,7 +456,7 @@
                     // })
 
 
-                    // self.stage.batchDraw();
+                    self.stage.batchDraw();
                 })
                 self.stage.addEventListener('wheel', (e) => {
                     var oldScale = self.stage.scaleX();
@@ -566,7 +550,15 @@
                     showChildren: true,
                     drawType: "Layer"
                 });
-                self.selectedLayer = startLayer
+                let group = new Konva.Group({
+                    name: 'planoGroup',
+                    visible: true,
+                    selected: true,
+                    showChildren: true,
+                    drawType: "Group"
+                });
+                startLayer.add(group)
+                self.selectedLayer = group
                 self.stage.add(startLayer);
             },
             addShape(parent, item, callback) {
@@ -708,7 +700,7 @@
                                 }
 
                                 widthInc = element.width
-                                // self.snapableItems.push("." + element.id.toString())
+                                self.snapableItems.push("." + element.id.toString())
                                 self.stage.batchDraw()
                                 self.$refs.spinner.hide()
                             })

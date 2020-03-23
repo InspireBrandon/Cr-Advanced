@@ -1758,6 +1758,8 @@
 
         switch (data.type.toUpperCase()) {
           case "GONDOLA": {
+            console.log("[LIBRARY ADD]-----DATA", data);
+
             self.addNewGondola(data.data);
           }
           break;

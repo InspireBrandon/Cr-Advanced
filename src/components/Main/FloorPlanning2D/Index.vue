@@ -101,7 +101,7 @@
                 </template>
                 <span>View 3D</span>
             </v-tooltip>
-            <v-btn @click="logMutli">log</v-btn>
+            <!-- <v-btn @click="logMutli">log</v-btn> -->
             <div v-show="multiSelectGroup !=null">
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
@@ -584,7 +584,7 @@
                 let self = this
 
                 const matrix = node.getAbsoluteTransform().getMatrix();
-                console.log("matrix", matrix);
+                //console.log("matrix", matrix);
                 const attrs = decompose(matrix);
                 node.moveTo(layer);
                 node.setAttrs(attrs)
@@ -592,10 +592,10 @@
             },
             logMutli() {
                 let self = this
-                console.log("self.multiSelectGroup", self.multiSelectGroup);
-                console.log("self.stage", self.stage);
-                console.log("selectedItem", self.selectedItem);
-                console.log("properties", self.properties);
+                //console.log("self.multiSelectGroup", self.multiSelectGroup);
+                //console.log("self.stage", self.stage);
+                //console.log("selectedItem", self.selectedItem);
+                //console.log("properties", self.properties);
 
             },
             addItemToGroup() {
@@ -1266,7 +1266,7 @@
                         self.imageIDArr = []
                         self.FormatItems(self.stage.children, self.saveArr, 0, self.Floorplan_ID,
                             callback => {
-                                console.log(self.saveArr);
+                                //console.log(self.saveArr);
                                 axios.post(process.env.VUE_APP_API +
                                     `saveFloorHeader?header_ID=${self.Floorplan_ID}`, self
                                     .saveArr).then(
@@ -1416,7 +1416,7 @@
             },
             getDepartment(planoID, callback) {
                 let self = this
-                console.log("getDepartment", planoID);
+                //console.log("getDepartment", planoID);
 
                 axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
@@ -1613,7 +1613,7 @@
                 } else {
                     meters = self.meterRatio
                 }
-                console.log("drawDefaultSpace[DATA]", data);
+                //console.log("drawDefaultSpace[DATA]", data);
 
 
                 self.getDepartment(data.plano.id, depart => {
@@ -1649,7 +1649,7 @@
                     let tmplayer = self.selectedLayer
                     let tmplayertreeitem = self.selectedLayerTree
                     depart.layerTreeItem.children.push(layertreeitem)
-                    console.log("{OPEN DEFAULT SPACE}   dragged department", depart.Konvalayer);
+                    //console.log("{OPEN DEFAULT SPACE}   dragged department", depart.Konvalayer);
 
                     depart.Konvalayer.add(group);
                     self.selectedLayerTree = layertreeitem
@@ -1762,7 +1762,7 @@
                         self.stage.batchDraw()
                         self.$nextTick(() => {
                             self.makingChanges = false
-                            console.log("batchDraw");
+                            //console.log("batchDraw");
                             self.selectedItem.draw()
                             self.stage.batchDraw()
                         })
@@ -1776,8 +1776,8 @@
                 let dimension = null
                 if (self.selectedItem.attrs.name == "group" || self.selectedItem.attrs.name == "Duplication Group") {
                     let tr = self.stage.find("Transformer")
-                    console.log('tr', tr);
-                    console.log('si', self.selectedItem);
+                    //console.log('tr', tr);
+                    //console.log('si', self.selectedItem);
                     // calcCenterRotation(self.selectedItem, parseFloat(self.properties.rotation))
                     // let dimension = node.getClientRect()
 
@@ -1838,7 +1838,7 @@
                         .blockRatio)
                 }
 
-                console.log("[AFTER CHANEGES APPLIED ]", self.selectedItem);
+                //console.log("[AFTER CHANEGES APPLIED ]", self.selectedItem);
                 callback()
             },
             applyBrushProperties(tool) {
@@ -1876,7 +1876,7 @@
             },
             selectItemFromSidePanel(item) {
                 let self = this
-                console.log("selectItemFromSidePanel", item);
+                //console.log("selectItemFromSidePanel", item);
 
                 self.findKonvaItem(self.stage.children, item.KonvaID, e => {
                     if (e.attrs.drawType == "Layer") {
@@ -1889,7 +1889,7 @@
                         // clickTapHelper.setSelectedItem(e, self.findLayerItem, self
                         //     .selectedLayerTreeItem, self.selectedItem, self.selectedLayer, self
                         //     .layerTree, cb => {
-                        //         console.log("self.selectedLayerTreeItem",cb);
+                        //         //console.log("self.selectedLayerTreeItem",cb);
 
                         //         self.selectedLayerTreeItem = cb
                         //     })
@@ -2206,8 +2206,8 @@
             },
             log() {
                 let self = this
-                console.log("log", self.stage);
-                console.log("logTree", self.layerTree);
+                //console.log("log", self.stage);
+                //console.log("logTree", self.layerTree);
 
             },
             updateSnappingAngles() {
@@ -2398,7 +2398,7 @@
 
                     })
                     if (self.hasTape != null) {
-                        console.log("self.hasTape", self.hasTape);
+                        //console.log("self.hasTape", self.hasTape);
                         self.hasTape.shape.attrs.draggable = true
                     }
                     self.stage.batchDraw()
@@ -2433,7 +2433,7 @@
                             .selectedLayerTree)
                         break;
                     case "group": {
-                        console.log("[SELECTED LAYERTREE] group", self.selectedLayerTree);
+                        //console.log("[SELECTED LAYERTREE] group", self.selectedLayerTree);
                         if (self.selectedLayerTree.parent != undefined) {
                             groupDuplicationHelper.duplicateGroupDrag(e.target, self.selectedLayerTree.parent)
                         } else {
@@ -2442,7 +2442,7 @@
                     }
                     break
                 case "Duplication Group": {
-                    console.log("[SELECTED LAYERTREE] Duplication Grou", self.selectedLayerTree);
+                    //console.log("[SELECTED LAYERTREE] Duplication Grou", self.selectedLayerTree);
                     if (self.selectedLayerTree.parent != undefined) {
                         groupDuplicationHelper.duplicateGroupDrag(e.target, self.selectedLayerTree.parent)
                     } else {
@@ -2560,7 +2560,7 @@
             handleMultiSelect(item, callback) {
                 let self = this
                 // if (!item.attrs.draggable) {
-                //     console.log("[HANDLEMULTI SELECTE INDEX]------not raggable");
+                //     //console.log("[HANDLEMULTI SELECTE INDEX]------not raggable");
 
                 //     callback()
                 // }
@@ -2572,12 +2572,15 @@
                     } else {
                         muitiParent = layerchild.parent
                     }
-                    console.log("[handleMultiSelect]-----layerchild", layerchild);
+                    //console.log("[handleMultiSelect]-----layerchild", layerchild);
 
                     multiSelectHelper.handleMultiselect(self.multiSelectGroup, muitiParent, item, self
                         .stage,
                         cb => {
                             self.multiSelectGroup = cb
+                            if (self.selectedItem == item) {
+                                self.selectedItem = null
+                            }
                             self.selectedLayer.draw()
                             callback(cb)
                         })

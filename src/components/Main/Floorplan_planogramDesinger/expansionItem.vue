@@ -11,18 +11,18 @@
                                 </v-select>
                             </v-flex>
                             <v-flex md2>
-                                <v-btn icon color="primary" @click="saveImages">
+                                <!-- <v-btn icon color="primary" @click="saveImages">
                                     <v-icon>
                                         save
                                     </v-icon>
-                                </v-btn>
+                                </v-btn> -->
                             </v-flex>
                             <v-flex md12>
                                 <v-text-field v-if="Drop.shape=='Square'" @change="changeRotation(Drop,rotation)"
                                     type="number" label="Rotation" v-model="rotation" hide-details>
                                 </v-text-field>
                             </v-flex>
-                            <v-flex md6>
+                            <!-- <v-flex md6>
                                 <h4 style="text-decoration: underline;"> Top</h4>
                                 <v-card width="100" height="100" @click="openFileDialog('Top')">
                                     <img style="width: 100%;height:100%"
@@ -53,7 +53,7 @@
                                         :src="imgURL.BackImg  == null ? tmpImageURL : imgURL.BackImg"
                                         alt="no image found">
                                 </v-card>
-                            </v-flex>
+                            </v-flex> -->
                         </v-layout>
                     </v-container>
                 </v-card>

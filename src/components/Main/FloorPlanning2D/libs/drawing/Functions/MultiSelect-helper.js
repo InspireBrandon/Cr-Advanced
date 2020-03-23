@@ -42,7 +42,7 @@ class MultiSelectHelper {
 
 
     handleMultiselect(multiSelectGroup, selectedLayer, item, stage, callback) {
-        console.log("[handleMultiselect]--------------SELECTED ITEM,", item);
+        //console.log("[handleMultiselect]--------------SELECTED ITEM,", item);
         this.findparentLayer(item, cb => {
             selectedLayer = cb.parent
             item = cb
@@ -64,7 +64,7 @@ class MultiSelectHelper {
             multiSelectGroup = multigroup
             selectedLayer.add(multigroup)
         }
-        console.log("[handleMultiselect]-------------item",item);
+        //console.log("[handleMultiselect]-------------item",item);
 
         var pos = item.getAbsolutePosition(); // get abs position
         if (item.tmpParent != null && item.tmpParent != undefined) {

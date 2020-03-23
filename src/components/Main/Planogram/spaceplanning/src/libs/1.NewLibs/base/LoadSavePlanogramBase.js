@@ -750,7 +750,21 @@ class LoadSavePlanogramBase {
               data: output
             })
             .then(result => {
+              console.log("result", result);
+
               self.uploadFixtureImage(image, name, fixtureID, callback);
+              let floorPlanArray = generateFloorPlanArr(output.planogramData, vuex, null)
+              let header = {
+                fixture_ID: fixtureID
+              }
+              let request = {
+                fixtureHeader: header,
+                fixtureItems: floorPlanArray
+              }
+              axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+              axios.post(self.ServerAddress + `FloorPlan_Fixtures/Create`, request).then(r => {
+
+              })
             })
         })
     } else {
@@ -1488,7 +1502,7 @@ function generateFloorPlanArr(planodata, vuex, storeCount) {
     children: []
   }
   // create gondola baseitems
-  
+
   planodata.forEach(item => {
     if (item.Type == "GONDOLA") {
       floorArr.push({
@@ -1504,6 +1518,7 @@ function generateFloorPlanArr(planodata, vuex, storeCount) {
         width: item.Data.Data.width,
         depth: item.Data.Data.height,
         shape: item.Data.Data.floorplanShape,
+        spaceplan_Fixture_ID: item.Data.Data.id,
         name: item.Data.Data.name,
         sales: item.Data.Data.sales_Retail,
         units: item.Data.Data.sales_Units,
@@ -1530,6 +1545,7 @@ function getChildren(planodata, parentID, vuex, storeCount) {
       width: fixture.Data.Data.width,
       name: fixture.Data.Data.name,
       shape: fixture.Data.Data.floorplanShape,
+      spaceplan_Fixture_ID: fixture.Data.Data.id,
       depth: fixture.Data.Data.height,
       sales: fixture.Data.Data.sales_Retail,
       x: fixture.RelativePosition.x,
