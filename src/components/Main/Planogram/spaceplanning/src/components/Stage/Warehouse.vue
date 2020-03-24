@@ -1347,6 +1347,7 @@
               el["segmentWidth"] = 0;
               el["depth"] = 0;
               el["isDefault"] = idx == 0 ? true : false;
+              el["fixtureType_ID"] =el.id
               self.fixture_types.push(el);
             })
 

@@ -189,6 +189,24 @@
                       label="Squish Amount:"></v-text-field>
                   </v-flex>
                 </v-layout>
+                  <v-layout>
+                    <v-flex lg6 md6 sm6 xs6>
+                        <h3>Side Image</h3>
+                        <v-card class="elevation-5" @click="openSideFileExplorer"
+                          style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
+                          <img ref="changeSideImage" style="max-height: 150px; max-width: 150px;" src="" alt="">
+                        </v-card>
+                        <input ref="fileSideInput" style="display: none" @change="imageSideChange" type="file">
+                      </v-flex>
+                       <v-flex lg6 md6 sm6 xs6>
+                        <h3>Top Image</h3>
+                        <v-card class="elevation-5" @click="openTopFileExplorer"
+                          style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
+                          <img ref="changeTopImage" style="max-height: 150px; max-width: 150px;" src="" alt="">
+                        </v-card>
+                        <input ref="fileTopInput" style="display: none" @change="imageTopChange" type="file">
+                      </v-flex>
+                </v-layout>
               </v-container>
             </v-card>
           </v-flex>
@@ -1153,6 +1171,16 @@
         // self.id = null;
         // self.type = null;
       },
+        openSideFileExplorer() {
+        let self = this;
+        self.$refs.fileSideInput.value = null
+        self.$refs.fileSideInput.click();
+      },
+        openTopFileExplorer() {
+        let self = this;
+        self.$refs.fileTopInput.value = null
+        self.$refs.fileTopInput.click();
+      },
       openFileExplorer() {
         let self = this;
         self.$refs.fileInput.value = null
@@ -1194,6 +1222,28 @@
 
           self.$refs.changeImageLabel.src = url;
           self.newData.RenderingsItems.LabelHolder.image = imageString;
+        })
+      },
+      imageTopChange(e) {
+        let self = this;
+        const files = e.target.files;
+        let file = files[0];
+        self.blobToDataUrl(file, url => {
+          let splitUrl = url.split(',', 2);
+          let imageString = splitUrl[1];
+          self.$refs.changeTopImage.src = url;
+          self.newData.topImage = imageString;
+        })
+      },
+       imageSideChange(e) {
+        let self = this;
+        const files = e.target.files;
+        let file = files[0];
+        self.blobToDataUrl(file, url => {
+          let splitUrl = url.split(',', 2);
+          let imageString = splitUrl[1];
+          self.$refs.changeSideImage.src = url;
+          self.newData.sideImage = imageString;
         })
       },
       imageChangeRender(e) {

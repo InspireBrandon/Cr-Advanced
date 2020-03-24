@@ -221,7 +221,7 @@ class LoadSavePlanogramBase {
 
           stage.getSplitImages(callback => {
             console.log("getSplitImages", callback);
-            r.data.forEach((Drop, Dropindex) => {
+            r.data.gondolas.forEach((Drop, Dropindex) => {
               callback.forEach((image, imageindex) => {
                 if (Dropindex == imageindex) {
                   axios.post(process.env.VUE_APP_API + `FloorPlan_Fixtures/UploadImages?imageID=${Drop.id}&type=Front`, image.blob).then(resp => {
@@ -229,7 +229,28 @@ class LoadSavePlanogramBase {
                   })
                 }
               })
+
             })
+          })
+          console.log("[FloorPlan_Fixtures/Create]-----response", r);
+
+          r.data.allfixtures.forEach(saveFixture => {
+            allItems.forEach(element => {
+              console.log("save response", r.data);
+              console.log("allItems", allItems);
+
+              console.log("saveID", saveFixture.id);
+              if (saveFixture.floorplan_Item_ID == element.Data.ID) {
+
+
+                if (element.Data.topImage != null && element.Data.topImage != undefined) {
+                  axios.post(process.env.VUE_APP_API + `FloorPlan_Fixtures/UploadImages?imageID=${saveFixture.id}&type=Top`, element.Data.topImage).then(resp => {})
+                }
+                if (element.Data.sideImage != null && element.Data.sideImage != undefined) {
+                  axios.post(process.env.VUE_APP_API + `FloorPlan_Fixtures/UploadImages?imageID=${saveFixture.id}&type=Side`, element.Data.sideImage).then(rep => {})
+                }
+              }
+            });
           })
         })
       })
@@ -843,6 +864,7 @@ class LoadSavePlanogramBase {
 
     let defaultItem = null
     let totalModules = 0;
+    console.log("[CREATE DETAIL TX]fixtureData", fixtureData);
 
     fixtureData.forEach(item => {
       if (item.isDefault == true) {
@@ -888,6 +910,8 @@ class LoadSavePlanogramBase {
 
     axios.post(process.env.VUE_APP_API + 'Planogram_Details/Save', request).then(
       r => {
+        console.log("details", r);
+
         let planogramDetailID = r.data.planogram_Details.id;
 
         self.createPlanogram_Detail_Product(planogramDetailID, products)
