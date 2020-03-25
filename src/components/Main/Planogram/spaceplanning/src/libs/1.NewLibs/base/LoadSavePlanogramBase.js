@@ -202,58 +202,7 @@ class LoadSavePlanogramBase {
         alert("folder created")
       }
 
-      self.createDetailTX(clusterData, dimensionData, resultSpace, fixtureData, planogramProducts, createDetailCallback => {
-        let floorPlanArray = generateFloorPlanArr(output.planogramData, vuex, storeCount)
-        console.log("[generateFloorPlanArr],output.planogramData", output.planogramData);
 
-        console.log("generateFloorPlanArr", floorPlanArray);
-        let header = {
-          planogram_Detail_ID: createDetailCallback.data.planogram_Details.id
-        }
-        let request = {
-          fixtureHeader: header,
-          fixtureItems: floorPlanArray
-        }
-        axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-        axios.post(process.env.VUE_APP_API + `FloorPlan_Fixtures/Create`, request).then(r => {
-          console.log("details request", r);
-          console.log(stage);
-
-          stage.getSplitImages(callback => {
-            console.log("getSplitImages", callback);
-            r.data.gondolas.forEach((Drop, Dropindex) => {
-              callback.forEach((image, imageindex) => {
-                if (Dropindex == imageindex) {
-                  axios.post(process.env.VUE_APP_API + `FloorPlan_Fixtures/UploadImages?imageID=${Drop.id}&type=Front`, image.blob).then(resp => {
-                    console.log(resp);
-                  })
-                }
-              })
-
-            })
-          })
-          console.log("[FloorPlan_Fixtures/Create]-----response", r);
-
-          r.data.allfixtures.forEach(saveFixture => {
-            allItems.forEach(element => {
-              console.log("save response", r.data);
-              console.log("allItems", allItems);
-
-              console.log("saveID", saveFixture.id);
-              if (saveFixture.floorplan_Item_ID == element.Data.ID) {
-
-
-                if (element.Data.topImage != null && element.Data.topImage != undefined) {
-                  axios.post(process.env.VUE_APP_API + `FloorPlan_Fixtures/UploadImages?imageID=${saveFixture.id}&type=Top`, element.Data.topImage).then(resp => {})
-                }
-                if (element.Data.sideImage != null && element.Data.sideImage != undefined) {
-                  axios.post(process.env.VUE_APP_API + `FloorPlan_Fixtures/UploadImages?imageID=${saveFixture.id}&type=Side`, element.Data.sideImage).then(rep => {})
-                }
-              }
-            });
-          })
-        })
-      })
 
       output.image = null
       let startTime = new Date()
@@ -376,7 +325,12 @@ class LoadSavePlanogramBase {
               totalFiles: 3,
             })
             setTimeout(() => {
-              close()
+              self.createDetailTX(clusterData, dimensionData, resultSpace, fixtureData, planogramProducts, createDetailCallback => {
+                self.createFloorplanFixtures(createDetailCallback, allItems, output, vuex, storeCount, stage, floorfixturecb => {
+                  close()
+                })
+              })
+
             }, 500);
           }
 
@@ -389,6 +343,55 @@ class LoadSavePlanogramBase {
       })
 
       callback(resultSpace)
+    })
+  }
+  createFloorplanFixtures(createDetailCallback, allItems, output, vuex, storeCount, stage, callback) {
+    let floorPlanArray = generateFloorPlanArr(output.planogramData, vuex, storeCount)
+
+    let header = {
+      planogram_Detail_ID: createDetailCallback.data.planogram_Details.id
+    }
+    let request = {
+      fixtureHeader: header,
+      fixtureItems: floorPlanArray
+    }
+    axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+    axios.post(process.env.VUE_APP_API + `FloorPlan_Fixtures/Create`, request).then(r => {
+      stage.getSplitImages(callback => {
+        r.data.gondolas.forEach((Drop, Dropindex) => {
+          callback.forEach((image, imageindex) => {
+            if (Dropindex == imageindex) {
+              axios.post(process.env.VUE_APP_API + `FloorPlan_Fixtures/UploadImages?imageID=${Drop.id}&type=Front`, image.blob).then(resp => {
+
+              })
+            }
+          })
+
+        })
+      })
+      r.data.allfixtures.forEach((saveFixture, idx) => {
+        allItems.forEach((element, allidx) => {
+          if (saveFixture.floorplan_Item_ID == element.ID) {
+            if (element.Data.topImage != null && element.Data.topImage != undefined && element.Data.uploadTop == true) {
+              element.Data.floorplanFixture_ID = saveFixture.id
+              console.log("saveFixture.id", saveFixture.id);
+
+              axios.post(process.env.VUE_APP_API + `FloorPlan_Fixtures/UploadImages?imageID=${saveFixture.id}&type=Top`, element.Data.topImage).then(resp => {
+                console.log("topimg", resp);
+
+              })
+            }
+            if (element.Data.sideImage != null && element.Data.sideImage != undefined && element.Data.uploadSide == true) {
+              axios.post(process.env.VUE_APP_API + `FloorPlan_Fixtures/UploadImages?imageID=${saveFixture.id}&type=Side`, element.Data.sideImage).then(rep => {
+                console.log("Sideimg", rep);
+              })
+            }
+          }
+          if (idx == r.data.allfixtures.length - 1 && allidx == allItems.length - 1) {
+            callback()
+          }
+        });
+      })
     })
   }
 
@@ -520,31 +523,7 @@ class LoadSavePlanogramBase {
     axios.post(self.ServerAddress + "SystemFolder?db=CR-Devinspire", tmp, config).then(resp => {
       let resultSpace = resp.data.systemFileID
 
-      self.createDetailTX(clusterData, dimensionData, resultSpace, fixtureData, planogramProducts, createDetailCallback => {
-        let floorPlanArray = generateFloorPlanArr(output.planogramData, vuex, storeCount)
-        let header = {
-          planogram_Detail_ID: createDetailCallback.data.planogram_Details.id
-        }
-        let request = {
-          fixtureHeader: header,
-          fixtureItems: floorPlanArray
-        }
-        axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-        axios.post(process.env.VUE_APP_API + `FloorPlan_Fixtures/Create`, request).then(r => {
-          stage.getSplitImages(callback => {
-            console.log("getSplitImages", callback);
-            r.data.forEach((Drop, Dropindex) => {
-              callback.forEach((image, imageindex) => {
-                if (Dropindex == imageindex) {
-                  axios.post(process.env.VUE_APP_API + `FloorPlan_Fixtures/UploadImages?imageID=${Drop.id}&type=Front`, image.blob).then(resp => {
-                    console.log(resp);
-                  })
-                }
-              })
-            })
-          })
-        })
-      })
+
 
       output.image = null
       let startTime = new Date()
@@ -680,7 +659,12 @@ class LoadSavePlanogramBase {
               totalFiles: 3,
             })
             setTimeout(() => {
-              close()
+              self.createDetailTX(clusterData, dimensionData, resultSpace, fixtureData, planogramProducts, createDetailCallback => {
+                self.createFloorplanFixtures(createDetailCallback, allItems, output, vuex, storeCount, stage, floorfixturecb => {
+                  close()
+                })
+              })
+
             }, 500);
           }
 
@@ -1019,6 +1003,12 @@ class LoadSavePlanogramBase {
           } else {
             jsonData.planogramData = StageWarehouseMiddleware.verifyIntegrityOfWarehouseData(jsonData.planogramData, rangeProducts);
             self.startLoadingPlanogram(jsonData, Stage, pxlRatio, MasterLayer, VueStore, hideLoader, () => {
+              let ctrl_store = new StoreHelper();
+              let allItems = ctrl_store.getAllPlanogramItems(VueStore);
+              allItems.forEach(element => {
+                element.Data.uploadSide = false
+                element.Data.uploadTop = false
+              });
               callRedraw();
             });
           }
