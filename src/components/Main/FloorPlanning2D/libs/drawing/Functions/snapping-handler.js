@@ -169,7 +169,7 @@ class snappinghandler {
                     name: 'guid-line',
                     dash: [4, 6]
                 });
-                selectedLayer.add(line);
+                stage.children[0].add(line);
                 stage.batchDraw();
             } else if (lg.orientation === 'V') {
                 x_V = lg.lineGuide - xOffset; // * scaleX;// - ((lg.lineGuide * scaleX) - lg.lineGuide);
@@ -180,7 +180,7 @@ class snappinghandler {
                     name: 'guid-line',
                     dash: [4, 6]
                 });
-                selectedLayer.add(line);
+                stage.children[0].add(line);
                 stage.batchDraw();
             }
         });

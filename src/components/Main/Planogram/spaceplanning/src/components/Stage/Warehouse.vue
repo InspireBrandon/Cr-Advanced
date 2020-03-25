@@ -83,7 +83,7 @@
             <v-list-tile @click="openJoinPlanogram">
               <v-list-tile-title>Join</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile v-if="spacePlanID!=null" @click="openFloorDesigner">
+            <v-list-tile v-if="spacePlanID!=null||fixtureID!=null" @click="openFloorDesigner">
               <v-list-tile-title>Open Floor Designer</v-list-tile-title>
             </v-list-tile>
             <!-- <v-list-tile
@@ -1118,10 +1118,15 @@
       openFloorDesigner() {
         let self = this
         axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-        axios.get(process.env.VUE_APP_API +
-          `Planogram_Details/BysystemFileID?systemFile_ID=${self.spacePlanID}`).then(resp => {
-          self.$refs.floorDesinger.open(resp.data.id)
-        })
+        if (self.fixtureID != null) {
+          self.$refs.floorDesinger.open(self.fixtureID)
+        } else {
+          axios.get(process.env.VUE_APP_API +
+            `Planogram_Details/BysystemFileID?systemFile_ID=${self.spacePlanID}`).then(resp => {
+            self.$refs.floorDesinger.open(resp.data.id)
+          })
+        }
+
       },
       onHybridChange() {
         let self = this
@@ -1342,6 +1347,7 @@
               el["segmentWidth"] = 0;
               el["depth"] = 0;
               el["isDefault"] = idx == 0 ? true : false;
+              el["fixtureType_ID"] =el.id
               self.fixture_types.push(el);
             })
 
@@ -2408,11 +2414,12 @@
                   self.products.forEach(product => {
                     console.log(product);
 
-                    if(storeProduct.Data == undefined || storeProduct.Data == null) {
-                        console.log("null Item", product);
+                    if (storeProduct.Data == undefined || storeProduct.Data == null) {
+                      console.log("null Item", product);
                     }
 
-                    if (storeProduct.Data.productID == product.productID || storeProduct.Data.id == product.productID) {
+                    if (storeProduct.Data.productID == product.productID || storeProduct.Data.id == product
+                      .productID) {
                       for (var prop in product) {
                         storeProduct.Data[prop] = product[prop];
                       }
