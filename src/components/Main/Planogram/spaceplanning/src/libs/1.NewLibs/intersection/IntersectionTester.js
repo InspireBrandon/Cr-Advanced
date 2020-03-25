@@ -110,10 +110,8 @@ class IntersectionTester {
    * @param {*} TypeArr - UPPERCASE --> Array - gondola, shelf, basket, base, pegbar, pegboard
    * @param {*} dropPos 
    */
-  TestIntersectsWithMany(stage, ItemType, TypeArr, VueStore, dropPosPossibility) {
+  TestIntersectsWithMany(stage, ItemType, TypeArr, VueStore, dropPosPossibility, item) {
     let self = this;
-
-    console.log("BECAUSE INTERSECTION???")
 
     let dropPos = null;
 
@@ -166,6 +164,7 @@ class IntersectionTester {
           }
 
           var shelfIntrsct = results.find(x => x.Type == "SHELF");
+
           if (shelfIntrsct != undefined && shelfIntrsct.intersects == true) {
             hasIntersection = true;
             resolve(shelfIntrsct);
@@ -231,6 +230,23 @@ class IntersectionTester {
             console.log("BASKET/PRODUCT/SHAREBOX TEST INTRSCT", ItemType, TypeArr)
 
             if (ItemType == "BASKET" || ItemType == "PRODUCT" || ItemType == "SHAREBOX") {
+              
+              if(ItemType == "PRODUCT") {
+                let ctrl_store = new StoreHelper();
+                let parent = ctrl_store.getAllPlanogramItems(VueStore, item.ParentID);
+
+                console.log("PARENT", parent)
+
+                if(parent.Type == "SHELF") {
+                  if(parent.Data.rejectProducts) {
+                    resolve(retVal);
+                    return;
+                  }
+                }
+              }
+
+              console.log("But still I am here?")
+
               // console.log("BASKET TEST INTRSCT", ItemType)
               self.Internal_TestForIntersectionBelow(VueStore, dropPos, stage)
                 .then(finalTestResult => {

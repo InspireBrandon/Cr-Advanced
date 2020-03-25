@@ -92,32 +92,11 @@
                     <v-checkbox hide-details label="Labels On" v-model="newData.labelsOn"></v-checkbox>
                   </v-flex>
                   <v-flex lg8 md12 sm12 xs12>
+                    <v-checkbox hide-details label="Reject Products" v-model="newData.rejectProducts"></v-checkbox>
+                  </v-flex>
+                  <v-flex lg8 md12 sm12 xs12 class="mt-3">
                     <v-text-field type="number" label="Cost of Fixture" prefix="R" v-model="newData.cost">
                     </v-text-field>
-                  </v-flex>
-                  <v-flex lg8 md12 sm12 xs12>
-                    <v-btn @click="addSegment" color="primary">Add segment</v-btn>
-                  </v-flex>
-                  <v-flex lg12 md12 sm12 xs12>
-                    <v-card color="grey darken-4" v-for="(segment, idx) in segments" :key="idx" class="mt-3 pa-1">
-                      <v-card-title class="pa-1">
-                        <div>Segment {{ idx + 1 }}</div>
-                        <v-spacer></v-spacer>
-                        <v-btn icon @click="removeSegment(segment)">
-                          <v-icon>close</v-icon>
-                        </v-btn>
-                      </v-card-title>
-                      <v-card-text class="pa-1">
-                        <v-layout row wrap>
-                          <v-flex md6>
-                            <v-text-field v-model="segment.height" label="Height:"></v-text-field>
-                          </v-flex>
-                          <v-flex md6>
-                            <v-text-field v-model="segment.width" label="Width:"></v-text-field>
-                          </v-flex>
-                        </v-layout>
-                      </v-card-text>
-                    </v-card>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -151,6 +130,11 @@
                   <v-flex lg8 md12
                     v-if="!newData.rendering && ((newData.fixtureType == 4 || newData.fixtureType == 3 || newData.fixtureType == 0 || newData.fixtureType == 1) && (newData.type == 2 || newData.type == 3))">
                     <v-text-field type="number" v-model="newData.productOffset" label="Product offset:" suffix="cm">
+                    </v-text-field>
+                  </v-flex>
+                  <v-flex lg8 md12
+                    v-if="!newData.rendering && ((newData.fixtureType == 4 || newData.fixtureType == 3 || newData.fixtureType == 0 || newData.fixtureType == 1) && (newData.type == 2 || newData.type == 3))">
+                    <v-text-field type="number" v-model="newData.zOffset" label="Z Offset:" suffix="cm">
                     </v-text-field>
                   </v-flex>
                   <v-flex lg8 md12 v-if="!newData.rendering && (newData.fixtureType == 0 && newData.type == 3)">
@@ -1158,6 +1142,8 @@
         self.newData.squishAmount = returnFloat(self.newData.squishAmount);
         self.newData.facingOffsetX = returnFloat(self.newData.facingOffsetX);
         self.newData.facingOffsetY = returnFloat(self.newData.facingOffsetY);
+        self.newData.rejectProducts = self.newData.rejectProducts;
+        self.newData.zOffset = self.newData.zOffset;
 
         if (self.newData.productRenderingMargin == undefined || self.newData.productRenderingMargin == null) {
           self.newData.productRenderingMargin = 15;

@@ -1,17 +1,15 @@
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
-// Purpose: A general helper to assist in the drawing of 3D shelfs
+// Purpose: A helper class to assist in the drawing of 3D planes
 // Author: Brandon Lange
-// Date: 2020-03-23
+// Date: 2020-03-25
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-import * as BABYLON from "@babylonjs/core/Legacy/legacy";
+import Drawingbase from './Drawingbase.js'
 
-import Boxbase from './Boxbase.js'
-
-class Shelf extends Boxbase {
+class Planebase extends Drawingbase {
     constructor(params) {
-        super(params)
+        super(params);
     }
 }
 
-export default Shelf;
+export default Planebase;
