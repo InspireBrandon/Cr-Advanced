@@ -55,6 +55,8 @@
     import PlanogramLib from "@/components/Main/FloorPlanning/BaseLibs/Planogram/Planogram.js";
     import * as BABYLON from "@babylonjs/core/Legacy/legacy";
 
+    import Shelf from './Libs/Drawing/Shelf.js'
+
     import {
         Vector3
     } from "@babylonjs/core/Legacy/legacy";
@@ -211,7 +213,7 @@
 
                     items.forEach((element, idx) => {
                         if (element.name == "Gondola-Rect" && element.color == null) {
-                            self.buildShelf(scene, element, idx);
+                            self.buildAlt(scene, element, idx);
                         }
 
                         if (element.name == "Gondola-Rect" && element.color != null) {
@@ -674,6 +676,16 @@
                 box.setPivotPoint(new BABYLON.Vector3(xPivot, 0, zPivot));
                 box.rotation.y = degreesToRadians(element.rotation);
                 box.material = material;
+            },
+            buildAlt(scene, data) {
+                let config = {
+                    scene: scene,
+                    data: data,
+                    name: 'SHELF'
+                }
+
+                let shelf = new Shelf(config);
+                shelf.draw();
             }
         }
     };
