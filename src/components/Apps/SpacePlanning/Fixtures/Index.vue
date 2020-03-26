@@ -67,6 +67,9 @@
                           <v-list-tile-title>Name</v-list-tile-title>
                         </v-list-tile-content>
                         <v-spacer></v-spacer>
+                        <v-list-tile-content>
+                         
+                        </v-list-tile-content>
                         <v-list-tile-action>
                           <v-btn style="margin-bottom: 10px;" @click="$refs.fixturesModal.openAdd(0, afterAdd)"
                             color="primary">
@@ -77,14 +80,13 @@
                       <hr>
                       <template v-for="(item,index) in filteredgondolas">
                         <div :key="index">
-                          <v-list-tile style="padding:2px">
+                          <v-list-tile style="padding-right:2px">
                             <v-list-tile-avatar tile>
                               <img :ref="item.id" :src="getFixtureImage(item.id)" alt="">
                             </v-list-tile-avatar>
                             <v-list-tile-content>
-                              <v-list-tile-title>{{item.name}}</v-list-tile-title>
+                              <v-list-tile-title>{{item.name}} - {{getType(item)}} </v-list-tile-title>
                             </v-list-tile-content>
-
                             <v-spacer></v-spacer>
                             <v-list-tile-action>
                               <v-menu bottom offset-y transition="scale-transition">
@@ -101,7 +103,6 @@
                                 </v-list>
                               </v-menu>
                             </v-list-tile-action>
-
                           </v-list-tile>
                           <v-divider></v-divider>
                         </div>
@@ -131,6 +132,9 @@
                         <v-list-tile-content>
                           <v-list-tile-title>Name</v-list-tile-title>
                         </v-list-tile-content>
+                        <v-list-tile-content>
+                         
+                        </v-list-tile-content>
                         <v-spacer></v-spacer>
                         <v-list-tile-action>
                           <v-btn @click="$refs.fixturesModal.openAdd(1, afterAdd)" color="primary">
@@ -146,7 +150,7 @@
                               <img :src="'data:image/png;base64,' + item.image" alt="">
                             </v-list-tile-avatar>
                             <v-list-tile-content>
-                              <v-list-tile-title>{{item.name}}</v-list-tile-title>
+                              <v-list-tile-title>{{item.name}} - {{getType(item)}}</v-list-tile-title>
                             </v-list-tile-content>
                             <v-spacer></v-spacer>
                             <v-list-tile-action>
@@ -169,9 +173,7 @@
                           <v-divider></v-divider>
                         </div>
                       </template>
-
                     </v-list>
-
                   </v-flex>
                 </v-card-text>
               </v-card>
@@ -195,6 +197,9 @@
                         <v-list-tile-content>
                           <v-list-tile-title>Name</v-list-tile-title>
                         </v-list-tile-content>
+                        <v-list-tile-content>
+                         
+                        </v-list-tile-content>
                         <v-spacer></v-spacer>
                         <v-list-tile-action>
                           <v-btn @click="$refs.fixturesModal.openAdd(2, afterAdd)" color="primary">
@@ -210,7 +215,7 @@
                               <img :ref="item.id" :src="getFixtureImage(item.id)" alt="">
                             </v-list-tile-avatar>
                             <v-list-tile-content>
-                              <v-list-tile-title>{{item.name}}</v-list-tile-title>
+                              <v-list-tile-title>{{item.name}} - {{getType(item)}}</v-list-tile-title>
                             </v-list-tile-content>
                             <v-spacer></v-spacer>
                             <v-list-tile-action>
@@ -258,6 +263,9 @@
                         <v-list-tile-content>
                           <v-list-tile-title>Name</v-list-tile-title>
                         </v-list-tile-content>
+                        <v-list-tile-content>
+                         
+                        </v-list-tile-content>
                         <v-spacer></v-spacer>
                         <v-list-tile-action>
                           <v-btn @click="$refs.fixturesModal.openAdd(3, afterAdd)" color="primary">
@@ -274,7 +282,7 @@
                               <img :ref="item.id" :src="getFixtureImage(item.id)" alt="">
                             </v-list-tile-avatar>
                             <v-list-tile-content>
-                              <v-list-tile-title>{{item.name}}</v-list-tile-title>
+                              <v-list-tile-title>{{item.name}} - {{getType(item)}}</v-list-tile-title>
                             </v-list-tile-content>
                             <v-spacer></v-spacer>
                             <v-list-tile-action>
@@ -322,6 +330,9 @@
                         <v-list-tile-content>
                           <v-list-tile-title>Name</v-list-tile-title>
                         </v-list-tile-content>
+                        <v-list-tile-content>
+                         
+                        </v-list-tile-content>
                         <v-spacer></v-spacer>
                         <v-list-tile-action>
                           <v-btn @click="$refs.fixturesModal.openAdd(4, afterAdd)" color="primary">
@@ -338,7 +349,7 @@
                               <img :ref="item.id" :src="getFixtureImage(item.id)" alt="">
                             </v-list-tile-avatar>
                             <v-list-tile-content>
-                              <v-list-tile-title>{{item.name}}</v-list-tile-title>
+                              <v-list-tile-title>{{item.name}} - {{getType(item)}}</v-list-tile-title>
                             </v-list-tile-content>
                             <v-spacer></v-spacer>
                             <v-list-tile-action>
@@ -386,6 +397,9 @@
                         <v-list-tile-content>
                           <v-list-tile-title>Name</v-list-tile-title>
                         </v-list-tile-content>
+                        <v-list-tile-content>
+                         
+                        </v-list-tile-content>
                         <v-spacer></v-spacer>
                         <v-list-tile-action>
                           <v-btn @click="$refs.fixturesModal.openAdd(5, afterAdd)" color="primary">
@@ -402,7 +416,7 @@
                               <img :ref="item.id" :src="getFixtureImage(item.id)" alt="">
                             </v-list-tile-avatar>
                             <v-list-tile-content>
-                              <v-list-tile-title>{{item.name}}</v-list-tile-title>
+                              <v-list-tile-title>{{item.name}} - {{getType(item)}}</v-list-tile-title>
                             </v-list-tile-content>
                             <v-spacer></v-spacer>
                             <v-list-tile-action>
@@ -559,6 +573,7 @@
         });
       },
     },
+
     mounted() {
       let self = this;
 
@@ -587,6 +602,52 @@
         })
     },
     methods: {
+      getType(item) {
+        let self = this
+        if (item.type == 0)
+          return "Gondola"
+        if (item.type == 1)
+          return "Obstruction"
+        if (item.type == 2) {
+          switch (item.fixtureType) {
+            case 0:
+              return "Base"
+              break;
+            case 1:
+              return "Shelf"
+              break;
+            case 2:
+              return "Pegboard"
+              break;
+            case 3:
+              return "Pegbar"
+              break;
+            case 4:
+              return "ShareBox"
+              break;
+
+            default:
+              break;
+          }
+        }
+        if (item.type == 3) {
+          switch (item.fixtureType) {
+            case 0:
+              return "Peg"
+              break;
+            case 1:
+              return "Basket"
+              break;
+            case 2:
+              return "Divider"
+            default:
+              break;
+          }
+        }
+        if (item.type == 4)
+          return "Palette"
+
+      },
       getFixtureImage(id) {
         let self = this;
 

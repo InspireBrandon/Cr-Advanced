@@ -1117,7 +1117,7 @@
                     self.floorConfig.floorWidth = callback.width
                     axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                     self.applyFloorProperties()
-                    axios.get(process.env.VUE_APP_API + `GetFloorPlanItems?Header_ID=${callback.id}`).then(
+                    axios.get(process.env.VUE_APP_API + `GetFloorPlanItems?Header_ID=${callback.id}&versionID=${callback.version_ID}`).then(
                         r => {
                             self.stage.children.forEach(child => {
                                 if (child.attrs.name != 'grid') {
