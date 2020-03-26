@@ -42,7 +42,8 @@
                   </v-flex>
                   <v-flex xs12>
                     <FixtureRecursive :addGroup="addGroup" :editGroup="editGroup" :deleteGroup="deleteGroup"
-                      v-for="(fg, idx) in fixtureGroups" :key="idx" :fixtureGroup="fg" :parentArr="fixtureGroups">
+                      v-for="(fg, idx) in fixtureGroups" :key="idx" :fixtureGroup="fg" :parentArr="fixtureGroups"
+                      :editFixture="editFixture" :deleteFixture="deleteFixture">
                     </FixtureRecursive>
                   </v-flex>
                 </v-card-text>
@@ -78,7 +79,7 @@
                         <div :key="index">
                           <v-list-tile style="padding:2px">
                             <v-list-tile-avatar tile>
-                              <img :src="'data:image/png;base64,' + item.image" alt="">
+                              <img :ref="item.id" :src="getFixtureImage(item.id)" alt="">
                             </v-list-tile-avatar>
                             <v-list-tile-content>
                               <v-list-tile-title>{{item.name}}</v-list-tile-title>
@@ -206,7 +207,7 @@
                         <div :key="index">
                           <v-list-tile style="padding:2px">
                             <v-list-tile-avatar tile>
-                              <img :src="'data:image/png;base64,' + item.image" alt="">
+                              <img :ref="item.id" :src="getFixtureImage(item.id)" alt="">
                             </v-list-tile-avatar>
                             <v-list-tile-content>
                               <v-list-tile-title>{{item.name}}</v-list-tile-title>
@@ -270,7 +271,7 @@
                         <div :key="index">
                           <v-list-tile style="padding:2px">
                             <v-list-tile-avatar tile>
-                              <img :src="'data:image/png;base64,' + item.image" alt="">
+                              <img :ref="item.id" :src="getFixtureImage(item.id)" alt="">
                             </v-list-tile-avatar>
                             <v-list-tile-content>
                               <v-list-tile-title>{{item.name}}</v-list-tile-title>
@@ -334,7 +335,7 @@
                         <div :key="index">
                           <v-list-tile style="padding:2px">
                             <v-list-tile-avatar tile>
-                              <img :src="'data:image/png;base64,' + item.image" alt="">
+                              <img :ref="item.id" :src="getFixtureImage(item.id)" alt="">
                             </v-list-tile-avatar>
                             <v-list-tile-content>
                               <v-list-tile-title>{{item.name}}</v-list-tile-title>
@@ -398,7 +399,7 @@
                         <div :key="index">
                           <v-list-tile style="padding:2px">
                             <v-list-tile-avatar tile>
-                              <img :src="'data:image/png;base64,' + item.image" alt="">
+                              <img :ref="item.id" :src="getFixtureImage(item.id)" alt="">
                             </v-list-tile-avatar>
                             <v-list-tile-content>
                               <v-list-tile-title>{{item.name}}</v-list-tile-title>
@@ -488,43 +489,73 @@
     },
     computed: {
       filteredObstruction() {
+        if (this.searchObstruction == "") {
+          return this.gondolas.filter(item => {
+            return item.fixtureGroupID == null
+          });
+        }
+
         return this.gondolas.filter(item => {
-          if (!this.searchObstruction) return this.Obstruction;
-          return (item.name.toLowerCase().includes(this.searchGondola.toLowerCase()))
+          return (item.name.toLowerCase().includes(this.searchGondola.toLowerCase()) && item.fixtureGroupID == null)
         });
       },
       filteredgondolas() {
+        if (this.searchGondola == "") {
+          return this.gondolas.filter(item => {
+            return item.fixtureGroupID == null
+          });
+        }
+
         return this.gondolas.filter(item => {
-          if (!this.searchGondola) return this.gondolas;
-          return (item.name.toLowerCase().includes(this.searchGondola.toLowerCase()))
+          return (item.name.toLowerCase().includes(this.searchGondola.toLowerCase()) && item.fixtureGroupID == null)
         });
 
       },
       filteredfixture() {
+        if (this.fixture == "") {
+          return this.fixture.filter(item => {
+            return item.fixtureGroupID == null
+          });
+        }
+
         return this.fixture.filter(item => {
-          if (!this.searchFixture) return this.fixture;
-          return (item.name.toLowerCase().includes(this.searchFixture.toLowerCase()))
+          return (item.name.toLowerCase().includes(this.searchFixture.toLowerCase()) && item.fixtureGroupID == null)
         });
 
       },
       filteredSubFixture() {
+        if (this.searchSubFixture == "") {
+          return this.subFixture.filter(item => {
+            return item.fixtureGroupID == null
+          });
+        }
+
         return this.subFixture.filter(item => {
-          if (!this.searchSubFixture) return this.subFixture;
-          return (item.name.toLowerCase().includes(this.searchSubFixture.toLowerCase()))
+          return (item.name.toLowerCase().includes(this.searchSubFixture.toLowerCase()) && item.fixtureGroupID ==
+            null)
         });
       },
-
       filteredpalette() {
+        if (this.searchPalette == "") {
+          return this.palette.filter(item => {
+            return item.fixtureGroupID == null
+          });
+        }
+
         return this.palette.filter(item => {
-          if (!this.searchPalette) return this.palette;
-          return (item.name.toLowerCase().includes(this.searchPalette.toLowerCase()))
+          return (item.name.toLowerCase().includes(this.searchPalette.toLowerCase()) && item.fixtureGroupID == null)
         });
       },
-
       filteredrendering() {
+        if (this.searchRenderings == "") {
+          return this.rendering.filter(item => {
+            return item.fixtureGroupID == null
+          });
+        }
+
         return this.rendering.filter(item => {
-          if (!this.searchRenderings) return this.rendering;
-          return (item.name.toLowerCase().includes(this.searchRenderings.toLowerCase()))
+          return (item.name.toLowerCase().includes(this.searchRenderings.toLowerCase()) && item.fixtureGroupID ==
+            null)
         });
       },
     },
@@ -556,6 +587,17 @@
         })
     },
     methods: {
+      getFixtureImage(id) {
+        let self = this;
+
+        Axios.get(process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&id=` + id)
+          .then(r => {
+            self.$refs[id][0].src = 'data:image/png;base64,' + r.data;
+          })
+          .catch(e => {
+            return null;
+          })
+      },
       afterAdd(el) {
         let self = this;
 
@@ -613,7 +655,9 @@
           .then(r => {
             self.fixtureGroups = [];
 
-            r.data.forEach(fg => {
+            console.log(r.data)
+
+            r.data.fixtureGroups.forEach(fg => {
               self.fixtureGroups.push(new FixtureGroup(fg));
             });
           })
@@ -665,12 +709,38 @@
 
         self.$refs.yesNo.show("Would you like to delete this group?", goThrough => {
           if (goThrough) {
-            Axios.delete(process.env.VUE_APP_API + "FixtureGroup?db=CR-Devinspire&fixtureGroupID=" + fixtureGroup.id)
+            Axios.delete(process.env.VUE_APP_API + "FixtureGroup?db=CR-Devinspire&fixtureGroupID=" + fixtureGroup
+                .id)
               .then(r => {
                 parentArr.splice(parentArr.indexOf(fixtureGroup), 1);
               })
               .catch(e => {
                 console.log(e);
+              })
+          }
+        })
+      },
+      editFixture(item) {
+        let self = this;
+
+        self.$refs.fixturesModal.openEdit(item, function (newItem) {
+          Axios.get(process.env.VUE_APP_API + `Fixture/${item.id}?db=CR-Devinspire`)
+            .then(r => {})
+            .catch(e => {
+
+            })
+        })
+      },
+      deleteFixture(item, parentArr) {
+        let self = this;
+
+        self.$refs.dialog.openDialog({
+          headline: "Are you sure?",
+          text: "Delete this fixture?",
+          callback: () => {
+            Axios.delete(process.env.VUE_APP_API + `Fixture/${item.id}?db=CR-Devinspire`)
+              .then(r => {
+                parentArr.splice(parentArr.indexOf(item), 1);
               })
           }
         })
@@ -684,6 +754,7 @@
     self.parentID = params.parentID;
     self.name = params.name;
     self.children = [];
+    self.fixtures = params.fixtures;
     self.showChildren = false;
   }
 </script>

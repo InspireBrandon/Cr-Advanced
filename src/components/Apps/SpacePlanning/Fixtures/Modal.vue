@@ -22,7 +22,8 @@
               <v-container grid-list-md>
                 <v-layout row wrap>
                   <v-flex lg8 md12 sm12 xs12>
-                    <v-autocomplete item-text="name" item-value="id" :items="fixtureGroups" v-model="form.fixtureGroupID" label="Fixture Group:"></v-autocomplete>
+                    <v-autocomplete item-text="name" item-value="id" :items="fixtureGroups"
+                      v-model="form.fixtureGroupID" label="Fixture Group:"></v-autocomplete>
                   </v-flex>
                   <v-flex lg8 md12 sm12 xs12>
                     <v-text-field v-model="form.name" label="Name:"></v-text-field>
@@ -397,6 +398,7 @@
           id: 1,
           uid: "da141b3c-436c-4933-bea2-ed36d4466140",
           type: -1,
+          fixtureGroupID: null,
           fixtureType: null,
           renderingType: null,
           name: "sample string 5",
@@ -483,6 +485,7 @@
       openEdit(fixture, afterEdit) {
         let self = this;
         self.getFixtureGroups();
+        self.getFixtureImage(fixture.id);
 
         for (var prop in this.form) {
           this.form[prop] = fixture[prop];
@@ -550,6 +553,20 @@
             self.form.image = Array.from(new Uint8Array(result));
           })
         })
+      },
+      getFixtureImage(id) {
+        let self = this;
+
+        axios.get(process.env.VUE_APP_API + "FixtureImage?db=CR-Devinspire&id=" + id)
+          .then(r => {
+            // self.form.image = r.data;
+
+            if (r.data != undefined && r.data != null)
+              self.$refs.changeImage.src = 'data:image/png;base64,' + r.data;
+          })
+          .catch(e => {
+            console.log(e);
+          })
       },
       blobToArrayBuffer(blob, callback) {
         var a = new FileReader();
