@@ -4,11 +4,6 @@
     "report":false,
     "routes": [
         {
-            "route": "/FloorPlanning",
-            "routeName": "FloorPlanning",
-            "title": "Floor Planning",
-            "openInNewWindow": false
-        }, {
             "route": "/FloorPlanning2D",
             "routeName": "FloorPlanning2D",
             "title": "Floor Planning 2D",

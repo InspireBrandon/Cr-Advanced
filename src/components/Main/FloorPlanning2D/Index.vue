@@ -24,7 +24,7 @@
                         File
                     </v-btn>
                     <v-list dense class="px-2">
-                        <v-list-tile>
+                        <v-list-tile @click="startNew()">
                             <v-list-tile-title>New</v-list-tile-title>
                         </v-list-tile>
                         <v-divider></v-divider>
@@ -303,6 +303,8 @@
                     </v-flex>
                 </v-layout>
             </div>
+            <DateRangeSelector ref="DateRangeSelector" />
+
             <input @change="onFileChange" type="file" style="display: none;" ref="fileInput">
             <PlanogramDetailsSelector ref="PlanogramDetailsSelector" />
             <floorPlanSelector ref="floorPlanSelector" />
@@ -335,7 +337,7 @@
     import Area from './libs/drawing/shape/area'
 
 
-
+    import DateRangeSelector from "@/components/Common/DateRangeSelector";
     import DuplicationHelper from './libs/drawing/Functions/duplication-Helper'
     import DragHandler from './libs/drawing/Functions/Drag-Handler'
     import ClickTapHelper from './libs/drawing/Functions/ClickTap-helper'
@@ -363,6 +365,9 @@
 
     import library from "@/components/Main/Planogram/spaceplanning/src/components/Library/Library";
     import axios from 'axios'
+    import {
+        strictEqual
+    } from 'assert';
 
     let dragHandler = new DragHandler(this)
     let clickTapHelper = new ClickTapHelper()
@@ -376,6 +381,7 @@
 
     export default {
         components: {
+            DateRangeSelector,
             FloorConfigModal,
             Settings,
             RecursiveLayer,
@@ -391,6 +397,8 @@
         // 1 block = 1 meter
         data() {
             return {
+                version_ID: null,
+                dateRange: null,
                 showRotation: false,
                 makingChanges: false,
                 hasTape: null,
@@ -580,6 +588,13 @@
             }
         },
         methods: {
+            startNew() {
+                let self = this
+                self.$refs.DateRangeSelector.show(dateRange => {
+                    self.dateRange = dateRange
+                    console.log("dateRange", dateRange)
+                })
+            },
             detatchShape(node, layer, callback) {
                 let self = this
 
@@ -590,6 +605,7 @@
                 node.setAttrs(attrs)
                 callback()
             },
+
             logMutli() {
                 let self = this
                 //console.log("self.multiSelectGroup", self.multiSelectGroup);
@@ -1090,6 +1106,12 @@
                         self.selectedClusterType = "cluster"
                         self.selectedClusterOption = callback.storeCluster_ID
                     }
+                    self.dateRange = {
+                        periodTo: callback.periodTo,
+                        periodFrom: callback.periodFrom,
+                        periodToString: callback.periodToString,
+                        periodFromString: callback.periodFromString
+                    }
                     self.floorConfig.blockRatio = callback.blockWidth
                     self.floorConfig.floorHeight = callback.height
                     self.floorConfig.floorWidth = callback.width
@@ -1157,6 +1179,7 @@
                             radius: item.attrs.radius,
                             name: item.attrs.name,
                             Floorplan_ID: Floorplan_ID,
+                            version_ID:self.version_ID,
                             Fixture_ID: item.saveID,
                             color: item.attrs.fill,
                             imageID: item.attrs.imageID,
@@ -1211,7 +1234,7 @@
                 }
                 self.$refs.spinner.hide()
             },
-            generateName(Name) {
+            generateName() {
                 let self = this
                 let perp
                 self.clusterOptions[self.selectedClusterType].forEach(element => {
@@ -1220,7 +1243,11 @@
                     }
                 })
                 let string = ""
-                string += perp + " - " + Name
+                string += perp + " - "
+                string += self.dateRange.dateFromString
+                string += " - "
+                string += self.dateRange.dateToString
+
                 return string
             },
             saveFloorplan() {
@@ -1231,52 +1258,55 @@
                     alert("Please fill in cluster options")
                     return
                 }
-                self.$refs.Prompt.show("", " Save FloorPlan", "Please enter floorplan name", Name => {
-                    self.$refs.spinner.show()
-                    if (self.hasTape != null) {
-                        self.hasTape.shape.destroy()
-                        self.hasTape = null
-                    }
+                // self.$refs.Prompt.show("", " Save FloorPlan", "Please enter floorplan name", Name => {
+                self.$refs.spinner.show()
+                if (self.hasTape != null) {
+                    self.hasTape.shape.destroy()
+                    self.hasTape = null
+                }
+                let req = {
+                    id: self.Floorplan_ID,
+                    name: self.generateName(),
+                    width: parseFloat(self.floorConfig.floorWidth),
+                    height: parseFloat(self.floorConfig.floorHeight),
+                    blockWidth: parseFloat(self.floorConfig.blockRatio),
+                    periodTo: self.dateRange.periodTo,
+                    periodFrom: self.dateRange.periodFrom,
+                    periodToString: self.dateRange.periodToString,
+                    periodFromString: self.dateRange.periodFromString
+                }
 
-                    let req = {
-                        id: self.Floorplan_ID,
-                        name: self.generateName(Name),
-                        width: parseFloat(self.floorConfig.floorWidth),
-                        height: parseFloat(self.floorConfig.floorHeight),
-                        blockWidth: parseFloat(self.floorConfig.blockRatio),
-                        repeat: self.floorConfig.repeat
-                    }
-
-                    switch (self.selectedClusterType) {
-                        case "stores": {
-                            req.storeID = self.selectedClusterOption
-                        }
-                        break;
-                    case "cluster": {
-                        req.storeCluster_ID = self.selectedClusterOption
+                switch (self.selectedClusterType) {
+                    case "stores": {
+                        req.storeID = self.selectedClusterOption
                     }
                     break;
+                case "cluster": {
+                    req.storeCluster_ID = self.selectedClusterOption
+                }
+                break;
 
-                    default:
-                        break;
-                    }
-                    axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                    axios.post(process.env.VUE_APP_API + `saveFloorHeader`, req).then(r => {
-                        self.Floorplan_ID = r.data.id
-                        self.imageIDArr = []
-                        self.FormatItems(self.stage.children, self.saveArr, 0, self.Floorplan_ID,
-                            callback => {
-                                //console.log(self.saveArr);
-                                axios.post(process.env.VUE_APP_API +
-                                    `saveFloorHeader?header_ID=${self.Floorplan_ID}`, self
-                                    .saveArr).then(
-                                    resp => {
-                                        self.handleImageSaving()
-                                    })
+                default:
+                    break;
+                }
+                axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                axios.post(process.env.VUE_APP_API + `saveFloorHeader`, req).then(r => {
+                    self.Floorplan_ID = r.data.header.id
+                    self.version_ID = r.data.version.id
+                    self.imageIDArr = []
+                    self.FormatItems(self.stage.children, self.saveArr, 0, self.Floorplan_ID,
+                        callback => {
+                            //console.log(self.saveArr);
+                            axios.post(process.env.VUE_APP_API +
+                                `saveFloorHeader?header_ID=${self.Floorplan_ID}`, self
+                                .saveArr).then(
+                                resp => {
+                                    self.handleImageSaving()
+                                })
 
-                            })
-                    })
+                        })
                 })
+                // })
             },
             imageSrc(imgID, type) {
                 let self = this;

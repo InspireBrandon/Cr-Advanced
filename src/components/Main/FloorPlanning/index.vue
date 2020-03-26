@@ -79,7 +79,7 @@
                         <v-btn flat small dark v-on="on">File</v-btn>
                     </template>
                     <v-list dense>
-                        <v-list-tile tile>
+                        <v-list-tile tile @click="startNew()">
                             <v-list-tile-title>New File</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
@@ -238,18 +238,18 @@
                                                     <span>Position</span>
                                                 </v-flex>
                                                 <v-flex md4 class="pt-0">
-                                                    <v-text-field type="number" v-model="currentMesh.position.x"
-                                                        box label="X" hide-details>
+                                                    <v-text-field type="number" v-model="currentMesh.position.x" box
+                                                        label="X" hide-details>
                                                     </v-text-field>
                                                 </v-flex>
                                                 <v-flex md4 class="pt-0">
-                                                    <v-text-field type="number" v-model="currentMesh.position.y"
-                                                        box label="y" hide-details>
+                                                    <v-text-field type="number" v-model="currentMesh.position.y" box
+                                                        label="y" hide-details>
                                                     </v-text-field>
                                                 </v-flex>
                                                 <v-flex md4 class="pt-0">
-                                                    <v-text-field type="number" v-model="currentMesh.position.z"
-                                                        box label="Z" hide-details>
+                                                    <v-text-field type="number" v-model="currentMesh.position.z" box
+                                                        label="Z" hide-details>
                                                     </v-text-field>
                                                 </v-flex>
                                                 <v-flex md12 class="pa-0">
@@ -259,15 +259,18 @@
                                                     <span>Dimension</span>
                                                 </v-flex>
                                                 <v-flex md4 class="pt-0">
-                                                    <v-text-field type="number" box label="X" hide-details v-model="currentMesh.scaling.x">
+                                                    <v-text-field type="number" box label="X" hide-details
+                                                        v-model="currentMesh.scaling.x">
                                                     </v-text-field>
                                                 </v-flex>
                                                 <v-flex md4 class="pt-0">
-                                                    <v-text-field type="number" box label="y" hide-details v-model="currentMesh.scaling.y">
+                                                    <v-text-field type="number" box label="y" hide-details
+                                                        v-model="currentMesh.scaling.y">
                                                     </v-text-field>
                                                 </v-flex>
                                                 <v-flex md4 class="pt-0">
-                                                    <v-text-field type="number" box label="Z" hide-details v-model="currentMesh.scaling.z">
+                                                    <v-text-field type="number" box label="Z" hide-details
+                                                        v-model="currentMesh.scaling.z">
                                                     </v-text-field>
                                                 </v-flex>
                                                 <v-flex md12 class="pa-0">
@@ -277,15 +280,18 @@
                                                     <span>Rotation</span>
                                                 </v-flex>
                                                 <v-flex md4 class="pt-0">
-                                                    <v-text-field type="number" box label="X" hide-details v-model="currentMesh.rotation.x">
+                                                    <v-text-field type="number" box label="X" hide-details
+                                                        v-model="currentMesh.rotation.x">
                                                     </v-text-field>
                                                 </v-flex>
                                                 <v-flex md4 class="pt-0">
-                                                    <v-text-field type="number" box label="y" hide-details v-model="currentMesh.rotation.y">
+                                                    <v-text-field type="number" box label="y" hide-details
+                                                        v-model="currentMesh.rotation.y">
                                                     </v-text-field>
                                                 </v-flex>
                                                 <v-flex md4 class="pt-0">
-                                                    <v-text-field type="number" box label="Z" hide-details v-model="currentMesh.rotation.z">
+                                                    <v-text-field type="number" box label="Z" hide-details
+                                                        v-model="currentMesh.rotation.z">
                                                     </v-text-field>
                                                 </v-flex>
                                                 <v-flex md12 class="pa-0">
@@ -307,6 +313,7 @@
             </v-card>
         </v-content>
         <SpaceplanSelector ref="SpaceplanSelector" />
+        <DateRangeSelector ref="DateRangeSelector" />
     </v-app>
 </template>
 
@@ -316,6 +323,8 @@
     import BoxLib from "@/components/Main/FloorPlanning/BaseLibs/Scene/Playground/product.js";
     import PlanogramLib from "@/components/Main/FloorPlanning/BaseLibs/Planogram/Planogram.js";
     import SpaceplanSelector from "@/components/Common/SpacePlanSelector"
+    import DateRangeSelector from "@/components/Common/DateRangeSelector";
+
     import * as BABYLON from '@babylonjs/core/Legacy/legacy';
     import {
         Vector3
@@ -323,7 +332,8 @@
 
     export default {
         components: {
-            SpaceplanSelector
+            SpaceplanSelector,
+            DateRangeSelector
         },
         data() {
             return {
@@ -413,6 +423,19 @@
             }
         },
         methods: {
+            startNew() {
+                let self = this
+                self.$refs.dateRangeSelector.show(dateRange => {
+                    console.log("dateRange", dateRange)
+                })
+
+            },
+            openDaterange() {
+                let self = this
+                self.$refs.dateRangeSelector.show(dateRange => {
+
+                })
+            },
             toggleCamera() {
                 let self = this;
                 self.sceneObj.toggleCamera();
