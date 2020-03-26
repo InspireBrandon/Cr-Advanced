@@ -409,9 +409,7 @@ class PlanogramItemBase {
       if (self.Type == "GONDOLA" || self.Type == "TEXTHEADER") {
         self.PositionElement();
       } else {
-        ctrl_intrsct.TestIntersectsWithMany(self.Stage, self.Type, typeArr, self.VueStore, null, self).then(results => {
-          console.log("Intersect Results", results);
-
+        ctrl_intrsct.TestIntersectsWithMany(self.Stage, self.Type, typeArr, self.VueStore, null).then(results => {
           self.PositionElement(results);
         })
       }

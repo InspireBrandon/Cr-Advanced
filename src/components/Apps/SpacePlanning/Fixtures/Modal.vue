@@ -22,6 +22,9 @@
               <v-container grid-list-md>
                 <v-layout row wrap>
                   <v-flex lg8 md12 sm12 xs12>
+                    <v-autocomplete item-text="name" item-value="id" :items="fixtureGroups" v-model="form.fixtureGroupID" label="Fixture Group:"></v-autocomplete>
+                  </v-flex>
+                  <v-flex lg8 md12 sm12 xs12>
                     <v-text-field v-model="form.name" label="Name:"></v-text-field>
                   </v-flex>
                   <v-flex lg8 md12 sm12 xs12>
@@ -236,6 +239,7 @@
     name: 'FixturesModal',
     data() {
       return {
+        fixtureGroups: [],
         isSubtype: false,
         dialog: false,
         afterEdit: null,
@@ -434,9 +438,24 @@
       }
     },
     methods: {
+      getFixtureGroups() {
+        let self = this;
+
+        axios.get(process.env.VUE_APP_API + "FixtureGroup?db=CR-Devinspire")
+          .then(r => {
+            self.fixtureGroups = r.data;
+          })
+          .catch(e => {
+            console.log(e);
+          })
+      },
       openAdd(type, afterAdd) {
+        let self = this;
+
         this.isAdd = true;
         this.afterAdd = afterAdd;
+
+        self.getFixtureGroups();
 
         for (var prop in this.form) {
           this.form[prop] = null;
@@ -463,7 +482,7 @@
       },
       openEdit(fixture, afterEdit) {
         let self = this;
-        console.log(fixture);
+        self.getFixtureGroups();
 
         for (var prop in this.form) {
           this.form[prop] = fixture[prop];

@@ -134,6 +134,11 @@
                   </v-flex>
                   <v-flex lg8 md12
                     v-if="!newData.rendering && ((newData.fixtureType == 4 || newData.fixtureType == 3 || newData.fixtureType == 0 || newData.fixtureType == 1) && (newData.type == 2 || newData.type == 3))">
+                    <v-text-field type="number" v-model="newData.xOffset" label="X Offset:" suffix="cm">
+                    </v-text-field>
+                  </v-flex>
+                  <v-flex lg8 md12
+                    v-if="!newData.rendering && ((newData.fixtureType == 4 || newData.fixtureType == 3 || newData.fixtureType == 0 || newData.fixtureType == 1) && (newData.type == 2 || newData.type == 3))">
                     <v-text-field type="number" v-model="newData.zOffset" label="Z Offset:" suffix="cm">
                     </v-text-field>
                   </v-flex>
@@ -172,23 +177,23 @@
                       label="Squish Amount:"></v-text-field>
                   </v-flex>
                 </v-layout>
-                  <v-layout>
-                    <v-flex lg6 md6 sm6 xs6>
-                        <h3>Side Image</h3>
-                        <v-card class="elevation-5" @click="openSideFileExplorer"
-                          style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
-                          <img ref="changeSideImage" style="max-height: 150px; max-width: 150px;" src="" alt="">
-                        </v-card>
-                        <input ref="fileSideInput" style="display: none" @change="imageSideChange" type="file">
-                      </v-flex>
-                       <v-flex lg6 md6 sm6 xs6>
-                        <h3>Top Image</h3>
-                        <v-card class="elevation-5" @click="openTopFileExplorer"
-                          style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
-                          <img ref="changeTopImage" style="max-height: 150px; max-width: 150px;" src="" alt="">
-                        </v-card>
-                        <input ref="fileTopInput" style="display: none" @change="imageTopChange" type="file">
-                      </v-flex>
+                <v-layout>
+                  <v-flex lg6 md6 sm6 xs6>
+                    <h3>Side Image</h3>
+                    <v-card class="elevation-5" @click="openSideFileExplorer"
+                      style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
+                      <img ref="changeSideImage" style="max-height: 150px; max-width: 150px;" src="" alt="">
+                    </v-card>
+                    <input ref="fileSideInput" style="display: none" @change="imageSideChange" type="file">
+                  </v-flex>
+                  <v-flex lg6 md6 sm6 xs6>
+                    <h3>Top Image</h3>
+                    <v-card class="elevation-5" @click="openTopFileExplorer"
+                      style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
+                      <img ref="changeTopImage" style="max-height: 150px; max-width: 150px;" src="" alt="">
+                    </v-card>
+                    <input ref="fileTopInput" style="display: none" @change="imageTopChange" type="file">
+                  </v-flex>
                 </v-layout>
               </v-container>
             </v-card>
@@ -1124,6 +1129,7 @@
         self.newData.facingOffsetY = returnFloat(self.newData.facingOffsetY);
         self.newData.rejectProducts = self.newData.rejectProducts;
         self.newData.zOffset = self.newData.zOffset;
+        self.newData.xOffset = self.newData.xOffset;
 
         if (self.newData.productRenderingMargin == undefined || self.newData.productRenderingMargin == null) {
           self.newData.productRenderingMargin = 15;
@@ -1156,12 +1162,12 @@
         // self.id = null;
         // self.type = null;
       },
-        openSideFileExplorer() {
+      openSideFileExplorer() {
         let self = this;
         self.$refs.fileSideInput.value = null
         self.$refs.fileSideInput.click();
       },
-        openTopFileExplorer() {
+      openTopFileExplorer() {
         let self = this;
         self.$refs.fileTopInput.value = null
         self.$refs.fileTopInput.click();
@@ -1220,7 +1226,7 @@
           self.newData.topImage = imageString;
         })
       },
-       imageSideChange(e) {
+      imageSideChange(e) {
         let self = this;
         const files = e.target.files;
         let file = files[0];
