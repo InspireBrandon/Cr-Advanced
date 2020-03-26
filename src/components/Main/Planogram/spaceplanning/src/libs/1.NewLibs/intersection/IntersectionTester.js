@@ -227,15 +227,11 @@ class IntersectionTester {
             //   return el == "BASKET" || el == "PRODUCT";
             // });
 
-            console.log("BASKET/PRODUCT/SHAREBOX TEST INTRSCT", ItemType, TypeArr)
-
             if (ItemType == "BASKET" || ItemType == "PRODUCT" || ItemType == "SHAREBOX") {
               
               if(ItemType == "PRODUCT") {
                 let ctrl_store = new StoreHelper();
                 let parent = ctrl_store.getAllPlanogramItems(VueStore, item.ParentID);
-
-                console.log("PARENT", parent)
 
                 if(parent.Type == "SHELF") {
                   if(parent.Data.rejectProducts) {
@@ -244,8 +240,6 @@ class IntersectionTester {
                   }
                 }
               }
-
-              console.log("But still I am here?")
 
               // console.log("BASKET TEST INTRSCT", ItemType)
               self.Internal_TestForIntersectionBelow(VueStore, dropPos, stage)

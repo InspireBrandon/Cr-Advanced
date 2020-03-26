@@ -134,6 +134,11 @@
                   </v-flex>
                   <v-flex lg8 md12
                     v-if="!newData.rendering && ((newData.fixtureType == 4 || newData.fixtureType == 3 || newData.fixtureType == 0 || newData.fixtureType == 1) && (newData.type == 2 || newData.type == 3))">
+                    <v-text-field type="number" v-model="newData.xOffset" label="X Offset:" suffix="cm">
+                    </v-text-field>
+                  </v-flex>
+                  <v-flex lg8 md12
+                    v-if="!newData.rendering && ((newData.fixtureType == 4 || newData.fixtureType == 3 || newData.fixtureType == 0 || newData.fixtureType == 1) && (newData.type == 2 || newData.type == 3))">
                     <v-text-field type="number" v-model="newData.zOffset" label="Z Offset:" suffix="cm">
                     </v-text-field>
                   </v-flex>
@@ -1144,6 +1149,7 @@
         self.newData.facingOffsetY = returnFloat(self.newData.facingOffsetY);
         self.newData.rejectProducts = self.newData.rejectProducts;
         self.newData.zOffset = self.newData.zOffset;
+        self.newData.xOffset = self.newData.xOffset;
 
         if (self.newData.productRenderingMargin == undefined || self.newData.productRenderingMargin == null) {
           self.newData.productRenderingMargin = 15;

@@ -1,10 +1,15 @@
 <template>
   <div>
-    <v-card class="elevation-1" style="background: url('../../../static/img/banner.png'); background-size: cover; background-position: center;">
+    <v-card class="elevation-1"
+      style="background: url('../../../static/img/banner.png'); background-size: cover; background-position: center;">
       <v-card-text style="height: 150px; position: relative; padding-top: 0px">
         <v-container class="container-height " grid-list-md absolute dark fab top>
           <v-tabs class="elevation-4" centered dark fixed-tabs justify-content: center>
             <v-tabs-slider color="white"></v-tabs-slider>
+
+            <v-tab href="#tab-main" justify-content: center fixed-tabs>
+              Main
+            </v-tab>
 
             <v-tab href="#tab-1" justify-content: center fixed-tabs>
               Gondola
@@ -25,11 +30,31 @@
               Renderings
             </v-tab>
 
+            <v-tab-item id="tab-main" class="elevation-2" justify-content: center>
+              <v-card justify-content: center class="tab-item-wrapper elevation-2 back-height">
+                <v-card-title>
+                  <v-spacer></v-spacer>
+                  <v-btn @click="addNewGroup" color="primary">Add Group</v-btn>
+                </v-card-title>
+                <v-card-text>
+                  <v-flex xs12>
+                    <v-divider class="mx-2"></v-divider>
+                  </v-flex>
+                  <v-flex xs12>
+                    <FixtureRecursive :addGroup="addGroup" :editGroup="editGroup" :deleteGroup="deleteGroup"
+                      v-for="(fg, idx) in fixtureGroups" :key="idx" :fixtureGroup="fg" :parentArr="fixtureGroups"
+                      :editFixture="editFixture" :deleteFixture="deleteFixture">
+                    </FixtureRecursive>
+                  </v-flex>
+                </v-card-text>
+              </v-card>
+            </v-tab-item>
             <v-tab-item id="tab-1" class="elevation-2" justify-content: center>
               <v-card justify-content: center class="tab-item-wrapper elevation-2 back-height">
                 <v-card-title>
                   <v-spacer></v-spacer>
-                  <v-text-field v-model="searchGondola" append-icon="search" label="Search" single-line hide-details></v-text-field>
+                  <v-text-field v-model="searchGondola" append-icon="search" label="Search" single-line hide-details>
+                  </v-text-field>
                 </v-card-title>
                 <v-card-text>
                   <v-flex xs12>
@@ -43,7 +68,8 @@
                         </v-list-tile-content>
                         <v-spacer></v-spacer>
                         <v-list-tile-action>
-                          <v-btn style="margin-bottom: 10px;" @click="$refs.fixturesModal.openAdd(0, afterAdd)" color="primary">
+                          <v-btn style="margin-bottom: 10px;" @click="$refs.fixturesModal.openAdd(0, afterAdd)"
+                            color="primary">
                             add
                           </v-btn>
                         </v-list-tile-action>
@@ -53,7 +79,7 @@
                         <div :key="index">
                           <v-list-tile style="padding:2px">
                             <v-list-tile-avatar tile>
-                              <img :src="'data:image/png;base64,' + item.image" alt="">
+                              <img :ref="item.id" :src="getFixtureImage(item.id)" alt="">
                             </v-list-tile-avatar>
                             <v-list-tile-content>
                               <v-list-tile-title>{{item.name}}</v-list-tile-title>
@@ -96,7 +122,7 @@
                 </v-card-title>
                 <v-card-text>
                   <v-flex xs12>
-                    
+
                     <v-list dense>
                       <v-list-tile style="padding:2px">
                         <v-list-tile-content>
@@ -108,8 +134,8 @@
                         <v-spacer></v-spacer>
                         <v-list-tile-action>
                           <v-btn @click="$refs.fixturesModal.openAdd(1, afterAdd)" color="primary">
-                        Add
-                      </v-btn>
+                            Add
+                          </v-btn>
                         </v-list-tile-action>
                       </v-list-tile>
                       <hr>
@@ -154,13 +180,14 @@
               <v-card justify-content: center class="tab-item-wrapper elevation-2 back-height">
                 <v-card-title>
                   <v-spacer></v-spacer>
-                  <v-text-field v-model="searchFixture" append-icon="search" label="Search" single-line hide-details></v-text-field>
+                  <v-text-field v-model="searchFixture" append-icon="search" label="Search" single-line hide-details>
+                  </v-text-field>
                 </v-card-title>
                 <v-card-text>
                   <v-flex xs12>
-                    
+
                     <v-list dense>
-                     
+
                       <v-list-tile style="padding:2px">
                         <v-list-tile-content>
                           <v-list-tile-title>Image</v-list-tile-title>
@@ -171,8 +198,8 @@
                         <v-spacer></v-spacer>
                         <v-list-tile-action>
                           <v-btn @click="$refs.fixturesModal.openAdd(2, afterAdd)" color="primary">
-                        Add
-                      </v-btn>
+                            Add
+                          </v-btn>
                         </v-list-tile-action>
                       </v-list-tile>
                       <hr>
@@ -180,7 +207,7 @@
                         <div :key="index">
                           <v-list-tile style="padding:2px">
                             <v-list-tile-avatar tile>
-                              <img :src="'data:image/png;base64,' + item.image" alt="">
+                              <img :ref="item.id" :src="getFixtureImage(item.id)" alt="">
                             </v-list-tile-avatar>
                             <v-list-tile-content>
                               <v-list-tile-title>{{item.name}}</v-list-tile-title>
@@ -217,11 +244,12 @@
               <v-card justify-content: center class="tab-item-wrapper elevation-2 back-height">
                 <v-card-title>
                   <v-spacer></v-spacer>
-                  <v-text-field v-model="searchSubFixture" append-icon="search" label="Search" single-line hide-details></v-text-field>
+                  <v-text-field v-model="searchSubFixture" append-icon="search" label="Search" single-line hide-details>
+                  </v-text-field>
                 </v-card-title>
                 <v-card-text>
                   <v-flex xs12>
-                    
+
                     <v-list dense>
                       <v-list-tile style="padding:2px">
                         <v-list-tile-content>
@@ -233,8 +261,8 @@
                         <v-spacer></v-spacer>
                         <v-list-tile-action>
                           <v-btn @click="$refs.fixturesModal.openAdd(3, afterAdd)" color="primary">
-                        Add
-                      </v-btn>
+                            Add
+                          </v-btn>
                         </v-list-tile-action>
                       </v-list-tile>
                       <hr>
@@ -243,7 +271,7 @@
                         <div :key="index">
                           <v-list-tile style="padding:2px">
                             <v-list-tile-avatar tile>
-                              <img :src="'data:image/png;base64,' + item.image" alt="">
+                              <img :ref="item.id" :src="getFixtureImage(item.id)" alt="">
                             </v-list-tile-avatar>
                             <v-list-tile-content>
                               <v-list-tile-title>{{item.name}}</v-list-tile-title>
@@ -280,11 +308,12 @@
               <v-card justify-content: center class="tab-item-wrapper elevation-2 back-height">
                 <v-card-title>
                   <v-spacer></v-spacer>
-                  <v-text-field v-model="searchPalette" append-icon="search" label="Search" single-line hide-details></v-text-field>
+                  <v-text-field v-model="searchPalette" append-icon="search" label="Search" single-line hide-details>
+                  </v-text-field>
                 </v-card-title>
                 <v-card-text>
                   <v-flex xs12>
-                   
+
                     <v-list dense>
                       <v-list-tile style="padding:2px">
                         <v-list-tile-content>
@@ -296,8 +325,8 @@
                         <v-spacer></v-spacer>
                         <v-list-tile-action>
                           <v-btn @click="$refs.fixturesModal.openAdd(4, afterAdd)" color="primary">
-                        Add
-                      </v-btn>
+                            Add
+                          </v-btn>
                         </v-list-tile-action>
                       </v-list-tile>
                       <hr>
@@ -306,7 +335,7 @@
                         <div :key="index">
                           <v-list-tile style="padding:2px">
                             <v-list-tile-avatar tile>
-                              <img :src="'data:image/png;base64,' + item.image" alt="">
+                              <img :ref="item.id" :src="getFixtureImage(item.id)" alt="">
                             </v-list-tile-avatar>
                             <v-list-tile-content>
                               <v-list-tile-title>{{item.name}}</v-list-tile-title>
@@ -343,11 +372,12 @@
               <v-card justify-content: center class="tab-item-wrapper elevation-2 back-height">
                 <v-card-title>
                   <v-spacer></v-spacer>
-                  <v-text-field v-model="searchRenderings" append-icon="search" label="Search" single-line hide-details></v-text-field>
+                  <v-text-field v-model="searchRenderings" append-icon="search" label="Search" single-line hide-details>
+                  </v-text-field>
                 </v-card-title>
                 <v-card-text>
                   <v-flex xs12>
-                  
+
                     <v-list dense>
                       <v-list-tile style="padding:2px">
                         <v-list-tile-content>
@@ -359,8 +389,8 @@
                         <v-spacer></v-spacer>
                         <v-list-tile-action>
                           <v-btn @click="$refs.fixturesModal.openAdd(5, afterAdd)" color="primary">
-                        Add
-                      </v-btn>
+                            Add
+                          </v-btn>
                         </v-list-tile-action>
                       </v-list-tile>
                       <hr>
@@ -369,7 +399,7 @@
                         <div :key="index">
                           <v-list-tile style="padding:2px">
                             <v-list-tile-avatar tile>
-                              <img :src="'data:image/png;base64,' + item.image" alt="">
+                              <img :ref="item.id" :src="getFixtureImage(item.id)" alt="">
                             </v-list-tile-avatar>
                             <v-list-tile-content>
                               <v-list-tile-title>{{item.name}}</v-list-tile-title>
@@ -407,6 +437,8 @@
     </v-card>
     <Dialog ref="dialog"></Dialog>
     <FixturesModal ref="fixturesModal"></FixturesModal>
+    <Prompt ref="prompt"></Prompt>
+    <YesNoModal ref="yesNo"></YesNoModal>
   </div>
 </template>
 
@@ -415,15 +447,22 @@
   import Axios from 'axios';
   import FixturesModal from './Modal';
   import Dialog from '@/components/Common/Dialog';
+  import FixtureRecursive from './FixtureRecursive.vue'
+  import Prompt from "@/components/Common/Prompt";
+  import YesNoModal from "@/components/Common/YesNoModal";
 
   export default {
     name: 'List',
     components: {
       FixturesModal,
-      Dialog
+      Dialog,
+      FixtureRecursive,
+      Prompt,
+      YesNoModal
     },
     data() {
       return {
+        fixtureGroups: [],
         searchGondola: '',
         searchObstruction: '',
         searchFixture: '',
@@ -450,48 +489,80 @@
     },
     computed: {
       filteredObstruction() {
+        if (this.searchObstruction == "") {
+          return this.gondolas.filter(item => {
+            return item.fixtureGroupID == null
+          });
+        }
+
         return this.gondolas.filter(item => {
-          if (!this.searchObstruction) return this.Obstruction;
-          return (item.name.toLowerCase().includes(this.searchGondola.toLowerCase()))
+          return (item.name.toLowerCase().includes(this.searchGondola.toLowerCase()) && item.fixtureGroupID == null)
         });
       },
       filteredgondolas() {
+        if (this.searchGondola == "") {
+          return this.gondolas.filter(item => {
+            return item.fixtureGroupID == null
+          });
+        }
+
         return this.gondolas.filter(item => {
-          if (!this.searchGondola) return this.gondolas;
-          return (item.name.toLowerCase().includes(this.searchGondola.toLowerCase()))
+          return (item.name.toLowerCase().includes(this.searchGondola.toLowerCase()) && item.fixtureGroupID == null)
         });
 
       },
       filteredfixture() {
+        if (this.fixture == "") {
+          return this.fixture.filter(item => {
+            return item.fixtureGroupID == null
+          });
+        }
+
         return this.fixture.filter(item => {
-          if (!this.searchFixture) return this.fixture;
-          return (item.name.toLowerCase().includes(this.searchFixture.toLowerCase()))
+          return (item.name.toLowerCase().includes(this.searchFixture.toLowerCase()) && item.fixtureGroupID == null)
         });
 
       },
       filteredSubFixture() {
+        if (this.searchSubFixture == "") {
+          return this.subFixture.filter(item => {
+            return item.fixtureGroupID == null
+          });
+        }
+
         return this.subFixture.filter(item => {
-          if (!this.searchSubFixture) return this.subFixture;
-          return (item.name.toLowerCase().includes(this.searchSubFixture.toLowerCase()))
+          return (item.name.toLowerCase().includes(this.searchSubFixture.toLowerCase()) && item.fixtureGroupID ==
+            null)
         });
       },
-
       filteredpalette() {
+        if (this.searchPalette == "") {
+          return this.palette.filter(item => {
+            return item.fixtureGroupID == null
+          });
+        }
+
         return this.palette.filter(item => {
-          if (!this.searchPalette) return this.palette;
-          return (item.name.toLowerCase().includes(this.searchPalette.toLowerCase()))
+          return (item.name.toLowerCase().includes(this.searchPalette.toLowerCase()) && item.fixtureGroupID == null)
         });
       },
-
       filteredrendering() {
+        if (this.searchRenderings == "") {
+          return this.rendering.filter(item => {
+            return item.fixtureGroupID == null
+          });
+        }
+
         return this.rendering.filter(item => {
-          if (!this.searchRenderings) return this.rendering;
-          return (item.name.toLowerCase().includes(this.searchRenderings.toLowerCase()))
+          return (item.name.toLowerCase().includes(this.searchRenderings.toLowerCase()) && item.fixtureGroupID ==
+            null)
         });
       },
     },
     mounted() {
       let self = this;
+
+      self.getFixtureGroups();
 
       Axios.get(process.env.VUE_APP_API + "Fixture?db=CR-Devinspire")
         .then(r => {
@@ -516,6 +587,17 @@
         })
     },
     methods: {
+      getFixtureImage(id) {
+        let self = this;
+
+        Axios.get(process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&id=` + id)
+          .then(r => {
+            self.$refs[id][0].src = 'data:image/png;base64,' + r.data;
+          })
+          .catch(e => {
+            return null;
+          })
+      },
       afterAdd(el) {
         let self = this;
 
@@ -565,8 +647,115 @@
               })
           }
         })
+      },
+      getFixtureGroups() {
+        let self = this;
+
+        Axios.get(process.env.VUE_APP_API + "FixtureGroup?db=CR-Devinspire&parentID=" + null)
+          .then(r => {
+            self.fixtureGroups = [];
+
+            console.log(r.data)
+
+            r.data.fixtureGroups.forEach(fg => {
+              self.fixtureGroups.push(new FixtureGroup(fg));
+            });
+          })
+          .catch(e => {
+            console.log(e);
+          })
+      },
+      addNewGroup() {
+        let self = this;
+
+        self.addGroup(null, newChild => {
+          self.fixtureGroups.push(new FixtureGroup(newChild));
+        })
+      },
+      addGroup(fixtureGroup, callback) {
+        let self = this;
+
+        self.$refs.prompt.show('', "Group name", "Name", groupName => {
+          let request = {
+            parentID: fixtureGroup == null ? null : fixtureGroup.id,
+            name: groupName
+          }
+
+          Axios.post(process.env.VUE_APP_API + "FixtureGroup?db=CR-Devinspire", request)
+            .then(r => {
+              callback(r.data);
+            })
+            .catch(e => {
+              console.log(e);
+            })
+        })
+      },
+      editGroup(fixtureGroup) {
+        let self = this;
+
+        self.$refs.prompt.show(fixtureGroup.name, "Group name", "Name", groupName => {
+
+          fixtureGroup.name = groupName;
+
+          Axios.put(process.env.VUE_APP_API + "FixtureGroup?db=CR-Devinspire", fixtureGroup)
+            .then(r => {})
+            .catch(e => {
+              console.log(e);
+            })
+        })
+      },
+      deleteGroup(fixtureGroup, parentArr) {
+        let self = this;
+
+        self.$refs.yesNo.show("Would you like to delete this group?", goThrough => {
+          if (goThrough) {
+            Axios.delete(process.env.VUE_APP_API + "FixtureGroup?db=CR-Devinspire&fixtureGroupID=" + fixtureGroup
+                .id)
+              .then(r => {
+                parentArr.splice(parentArr.indexOf(fixtureGroup), 1);
+              })
+              .catch(e => {
+                console.log(e);
+              })
+          }
+        })
+      },
+      editFixture(item) {
+        let self = this;
+
+        self.$refs.fixturesModal.openEdit(item, function (newItem) {
+          Axios.get(process.env.VUE_APP_API + `Fixture/${item.id}?db=CR-Devinspire`)
+            .then(r => {})
+            .catch(e => {
+
+            })
+        })
+      },
+      deleteFixture(item, parentArr) {
+        let self = this;
+
+        self.$refs.dialog.openDialog({
+          headline: "Are you sure?",
+          text: "Delete this fixture?",
+          callback: () => {
+            Axios.delete(process.env.VUE_APP_API + `Fixture/${item.id}?db=CR-Devinspire`)
+              .then(r => {
+                parentArr.splice(parentArr.indexOf(item), 1);
+              })
+          }
+        })
       }
     }
+  }
+
+  function FixtureGroup(params) {
+    let self = this;
+    self.id = params.id;
+    self.parentID = params.parentID;
+    self.name = params.name;
+    self.children = [];
+    self.fixtures = params.fixtures;
+    self.showChildren = false;
   }
 </script>
 
