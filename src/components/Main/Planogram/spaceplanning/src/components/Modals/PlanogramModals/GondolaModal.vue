@@ -466,11 +466,9 @@
           self.modalShow = true;
 
           self.newData = JSON.parse(JSON.stringify(eventData.data));
-          console.log("eventData", eventData);
           self.newData.uploadSide = false 
           self.newData.uploadTop = false 
 
-          console.log("openModal", self.newData);
           if (self.newData.RenderingsItems == undefined) {
             self.newData.RenderingsItems = {}
             self.newData.RenderingsItems.Front = {
