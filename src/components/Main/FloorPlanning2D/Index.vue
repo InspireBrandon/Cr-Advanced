@@ -1264,6 +1264,8 @@
                     self.hasTape.shape.destroy()
                     self.hasTape = null
                 }
+                console.log("self.dateRange",self.dateRange);
+                
                 let req = {
                     id: self.Floorplan_ID,
                     name: self.generateName(),
@@ -1275,6 +1277,7 @@
                     periodToString: self.dateRange.periodToString,
                     periodFromString: self.dateRange.periodFromString
                 }
+                
 
                 switch (self.selectedClusterType) {
                     case "stores": {
@@ -1289,6 +1292,9 @@
                 default:
                     break;
                 }
+
+                console.log("SAVE REQ",req);
+                
                 axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 axios.post(process.env.VUE_APP_API + `saveFloorHeader`, req).then(r => {
                     self.Floorplan_ID = r.data.header.id

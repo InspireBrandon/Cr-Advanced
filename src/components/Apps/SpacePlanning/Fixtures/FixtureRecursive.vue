@@ -7,15 +7,40 @@
 
                 <div @click="getChildren">{{ fixtureGroup.name }}</div>
                 <v-spacer></v-spacer>
-                <v-btn class="ma-0 hoverableAction" small icon @click="addNewGroup">
-                    <v-icon>add</v-icon>
-                </v-btn>
                 <v-btn class="ma-0 ml-2 hoverableAction" small icon @click="editNewGroup">
                     <v-icon>edit</v-icon>
                 </v-btn>
                 <v-btn class="ma-0 ml-2 hoverableAction" small icon @click="deleteNewGroup">
                     <v-icon>delete</v-icon>
                 </v-btn>
+                <v-menu bottom offset-y transition="scale-transition">
+                    <v-btn icon slot="activator" class="ma-0 ml-2 hoverableAction" flat>
+                        <v-icon :size="22">more_vert</v-icon>
+                    </v-btn>
+                    <v-list>
+                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Group')">
+                            <v-list-tile-title>Add Group</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Gondola')">
+                            <v-list-tile-title>Add Gondola</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Obstruction')">
+                            <v-list-tile-title>Add Obstruction</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Fixture')">
+                            <v-list-tile-title>Add Fixture</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="addNewGroup(fixtureGroup, 'SubFixture')">
+                            <v-list-tile-title>Add SubFixture</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Palette')">
+                            <v-list-tile-title>Add Palette</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Rendering')">
+                            <v-list-tile-title>Add Rendering</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
             </v-card-title>
             <v-divider></v-divider>
         </v-card>
@@ -23,7 +48,7 @@
             <div v-for="(fg, idx) in fixtureGroup.children" :key="idx">
                 <fixture-recursive :addGroup="addGroup" :editGroup="editGroup" :deleteGroup="deleteGroup"
                     :parentArr="fixtureGroup.children" class="ml-4" :fixtureGroup="fg" :editFixture="editFixture"
-                    :deleteFixture="deleteFixture" />
+                    :deleteFixture="deleteFixture" :openMenuAdd="openMenuAdd" />
             </div>
             <div class="ml-4" v-for="(fixture, idx) in fixtureGroup.fixtures" :key="idx">
                 <v-card style="width: 50%; cursor: pointer;" tile flat>
@@ -41,7 +66,7 @@
                 </v-card>
             </div>
             <div class="ml-3" v-if="fixtureGroup.children.length == 0 && fixtureGroup.fixtures.length == 0">
-                <a href="#" @click.prevent="addNewGroup">Add new group</a>
+                <a href="#" @click.prevent="addNewGroup(fixtureGroup, 'Group')">Add new group</a>
             </div>
         </div>
     </div>
@@ -52,7 +77,9 @@
 
     export default {
         name: 'fixture-recursive',
-        props: ['fixtureGroup', 'addGroup', 'editGroup', 'deleteGroup', 'editFixture', 'deleteFixture', 'parentArr'],
+        props: ['fixtureGroup', 'addGroup', 'editGroup', 'deleteGroup', 'editFixture', 'deleteFixture', 'parentArr',
+            "openMenuAdd"
+        ],
         data() {
             return {}
         },
@@ -129,13 +156,17 @@
                     self.fixtureGroup.showChildren = false;
                 }
             },
-            addNewGroup() {
+            addNewGroup(item, type) {
                 let self = this;
 
-                self.addGroup(self.fixtureGroup, self.type, child => {
-                    self.fixtureGroup.children.push(new FixtureGroup(child));
-                    self.fixtureGroup.showChildren = true;
-                })
+                if (type == "Group") {
+                    self.addGroup(self.fixtureGroup, self.type, child => {
+                        self.fixtureGroup.children.push(new FixtureGroup(child));
+                        self.fixtureGroup.showChildren = true;
+                    })
+                } else {
+                    self.openMenuAdd(type,item)
+                }
             },
             editNewGroup() {
                 let self = this;

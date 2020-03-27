@@ -32,7 +32,7 @@
                   <v-flex xs12>
                     <FixtureRecursive :addGroup="addGroup" :editGroup="editGroup" :deleteGroup="deleteGroup"
                       v-for="(fg, idx) in fixtureTab" :key="idx" :fixtureGroup="fg" :parentArr="fixtureGroups"
-                      :editFixture="editFixture" :deleteFixture="deleteFixture" :type="1">
+                      :editFixture="editFixture" :deleteFixture="deleteFixture" :type="1" :openMenuAdd="openMenuAdd">
                     </FixtureRecursive>
                   </v-flex>
                 </v-card-text>
@@ -52,7 +52,7 @@
                   <v-flex xs12>
                     <FixtureRecursive :addGroup="addGroup" :editGroup="editGroup" :deleteGroup="deleteGroup"
                       v-for="(fg, idx) in imageTab" :key="idx" :fixtureGroup="fg" :parentArr="fixtureGroups"
-                      :editFixture="editFixture" :deleteFixture="deleteFixture" :type="2">
+                      :editFixture="editFixture" :deleteFixture="deleteFixture" :type="2" :openMenuAdd="openMenuAdd">
                     </FixtureRecursive>
                   </v-flex>
                 </v-card-text>
@@ -369,6 +369,41 @@
           .catch(e => {
             console.log(e);
           })
+      },
+      openMenuAdd(type, group) {
+        let self = this
+        console.log("[openMenuAdd]--type:",type);
+        console.log("[openMenuAdd]--group:",group);
+
+        
+        switch (type) {
+          case "Gondola": {
+            self.$refs.fixturesModal.openAdd(0, group, self.afterAdd)
+          }
+          break;
+        case "Obstruction": {
+          self.$refs.fixturesModal.openAdd(1,group, self.afterAdd)
+        }
+        break;
+        case "Fixture": {
+          self.$refs.fixturesModal.openAdd(2, group, self.afterAdd)
+        }
+        break;
+        case "SubFixture": {
+          self.$refs.fixturesModal.openAdd(3, group, self.afterAdd)
+        }
+        break;
+        case "Palette": {
+          self.$refs.fixturesModal.openAdd(4, group, self.afterAdd)
+        }
+        break;
+        case "Rendering": {
+          self.$refs.fixturesModal.openAdd(5, group, self.afterAdd)
+        }
+        break;
+        default:
+          break;
+        }
       },
       addNewGroup(type) {
         let self = this;
