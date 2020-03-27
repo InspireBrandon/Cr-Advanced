@@ -326,9 +326,9 @@ class LoadSavePlanogramBase {
             })
             setTimeout(() => {
               self.createDetailTX(clusterData, dimensionData, resultSpace, fixtureData, planogramProducts, createDetailCallback => {
-                self.createFloorplanFixtures(createDetailCallback, allItems, output, vuex, storeCount, stage, floorfixturecb => {
+                // self.createFloorplanFixtures(createDetailCallback, allItems, output, vuex, storeCount, stage, floorfixturecb => {
                   close()
-                })
+                // })
               })
 
             }, 500);
@@ -412,6 +412,7 @@ class LoadSavePlanogramBase {
       hybridRanges: hybridRanges,
       promoItemRefs: promoItemRefs
     }
+    console.log("allitems");
 
     allItems.forEach(item => {
       // remove the line below to test that the positions are being saved and repopulated in the load
@@ -660,9 +661,9 @@ class LoadSavePlanogramBase {
             })
             setTimeout(() => {
               self.createDetailTX(clusterData, dimensionData, resultSpace, fixtureData, planogramProducts, createDetailCallback => {
-                self.createFloorplanFixtures(createDetailCallback, allItems, output, vuex, storeCount, stage, floorfixturecb => {
+                // self.createFloorplanFixtures(createDetailCallback, allItems, output, vuex, storeCount, stage, floorfixturecb => {
                   close()
-                })
+                // })
               })
 
             }, 500);
