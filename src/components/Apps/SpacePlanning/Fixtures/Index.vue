@@ -372,17 +372,17 @@
       },
       openMenuAdd(type, group) {
         let self = this
-        console.log("[openMenuAdd]--type:",type);
-        console.log("[openMenuAdd]--group:",group);
+        console.log("[openMenuAdd]--type:", type);
+        console.log("[openMenuAdd]--group:", group);
 
-        
+
         switch (type) {
           case "Gondola": {
             self.$refs.fixturesModal.openAdd(0, group, self.afterAdd)
           }
           break;
         case "Obstruction": {
-          self.$refs.fixturesModal.openAdd(1,group, self.afterAdd)
+          self.$refs.fixturesModal.openAdd(1, group, self.afterAdd)
         }
         break;
         case "Fixture": {

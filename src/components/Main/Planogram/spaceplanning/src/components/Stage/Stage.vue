@@ -1691,25 +1691,32 @@
           data = window.library;
         }
         //#endregion
+        
+        axios.get(process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&id=` + data.data.id)
+          .then(r => {
+            data.data.image =   r.data;
+            switch (dragType.toUpperCase()) {
+              case "WAREHOUSE": {
+                self.addWarehouseProduct(stage, data, ev);
+              }
+              break;
+            case "LIBRARY": {
+              if (data.type == "CUSTOM") {
+                self.addCustomLibraryItem(stage, data, ev)
+              } else if (data.type == "CUSTOM_PLANOGRAM") {
+                self.addCustomPlanogram(stage, data, ev);
+              } else {
+                self.addLibraryItem(stage, data, ev);
+              }
+            }
+            break;
+            }
+          })
+          .catch(e => {
+            return null;
+          })
 
-        console.log(data.type)
 
-        switch (dragType.toUpperCase()) {
-          case "WAREHOUSE": {
-            self.addWarehouseProduct(stage, data, ev);
-          }
-          break;
-        case "LIBRARY": {
-          if (data.type == "CUSTOM") {
-            self.addCustomLibraryItem(stage, data, ev)
-          } else if (data.type == "CUSTOM_PLANOGRAM") {
-            self.addCustomPlanogram(stage, data, ev);
-          } else {
-            self.addLibraryItem(stage, data, ev);
-          }
-        }
-        break;
-        }
       },
       addWarehouseProduct(stage, data, ev) {
         let self = this;
