@@ -43,7 +43,7 @@
                   <v-flex xs12>
                     <FixtureRecursive :addGroup="addGroup" :editGroup="editGroup" :deleteGroup="deleteGroup"
                       v-for="(fg, idx) in fixtureGroups" :key="idx" :fixtureGroup="fg" :parentArr="fixtureGroups"
-                      :editFixture="editFixture" :deleteFixture="deleteFixture">
+                      :editFixture="editFixture" :deleteFixture="deleteFixture" :openMenuAdd="openMenuAdd">
                     </FixtureRecursive>
                   </v-flex>
                 </v-card-text>
@@ -68,7 +68,7 @@
                         </v-list-tile-content>
                         <v-spacer></v-spacer>
                         <v-list-tile-content>
-                         
+
                         </v-list-tile-content>
                         <v-list-tile-action>
                           <v-btn style="margin-bottom: 10px;" @click="$refs.fixturesModal.openAdd(0, afterAdd)"
@@ -133,7 +133,7 @@
                           <v-list-tile-title>Name</v-list-tile-title>
                         </v-list-tile-content>
                         <v-list-tile-content>
-                         
+
                         </v-list-tile-content>
                         <v-spacer></v-spacer>
                         <v-list-tile-action>
@@ -198,7 +198,7 @@
                           <v-list-tile-title>Name</v-list-tile-title>
                         </v-list-tile-content>
                         <v-list-tile-content>
-                         
+
                         </v-list-tile-content>
                         <v-spacer></v-spacer>
                         <v-list-tile-action>
@@ -264,7 +264,7 @@
                           <v-list-tile-title>Name</v-list-tile-title>
                         </v-list-tile-content>
                         <v-list-tile-content>
-                         
+
                         </v-list-tile-content>
                         <v-spacer></v-spacer>
                         <v-list-tile-action>
@@ -331,7 +331,7 @@
                           <v-list-tile-title>Name</v-list-tile-title>
                         </v-list-tile-content>
                         <v-list-tile-content>
-                         
+
                         </v-list-tile-content>
                         <v-spacer></v-spacer>
                         <v-list-tile-action>
@@ -398,7 +398,7 @@
                           <v-list-tile-title>Name</v-list-tile-title>
                         </v-list-tile-content>
                         <v-list-tile-content>
-                         
+
                         </v-list-tile-content>
                         <v-spacer></v-spacer>
                         <v-list-tile-action>
@@ -725,6 +725,41 @@
           .catch(e => {
             console.log(e);
           })
+      },
+      openMenuAdd(type, group) {
+        let self = this
+        console.log("[openMenuAdd]--type:",type);
+        console.log("[openMenuAdd]--group:",group);
+
+        
+        switch (type) {
+          case "Gondola": {
+            self.$refs.fixturesModal.openAdd(0, group, self.afterAdd)
+          }
+          break;
+        case "Obstruction": {
+          self.$refs.fixturesModal.openAdd(1,group, self.afterAdd)
+        }
+        break;
+        case "Fixture": {
+          self.$refs.fixturesModal.openAdd(2, group, self.afterAdd)
+        }
+        break;
+        case "SubFixture": {
+          self.$refs.fixturesModal.openAdd(3, group, self.afterAdd)
+        }
+        break;
+        case "Palette": {
+          self.$refs.fixturesModal.openAdd(4, group, self.afterAdd)
+        }
+        break;
+        case "Rendering": {
+          self.$refs.fixturesModal.openAdd(5, group, self.afterAdd)
+        }
+        break;
+        default:
+          break;
+        }
       },
       addNewGroup() {
         let self = this;

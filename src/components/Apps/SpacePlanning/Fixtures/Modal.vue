@@ -454,7 +454,7 @@
             console.log(e);
           })
       },
-      openAdd(type, afterAdd) {
+      openAdd(type,group, afterAdd) {
         let self = this;
 
         this.isAdd = true;
@@ -465,7 +465,7 @@
         for (var prop in this.form) {
           this.form[prop] = null;
         }
-
+        self.form.fixtureGroupID = group.id
         this.form.color = {
           hex: "#fff"
         }
