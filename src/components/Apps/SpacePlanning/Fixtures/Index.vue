@@ -85,7 +85,7 @@
                               <img :ref="item.id" :src="getFixtureImage(item.id)" alt="">
                             </v-list-tile-avatar>
                             <v-list-tile-content>
-                              <v-list-tile-title>{{item.name}} - {{getType(item)}} </v-list-tile-title>
+                              <v-list-tile-title>{{ getType(item) }} - {{item.name}}</v-list-tile-title>
                             </v-list-tile-content>
                             <v-spacer></v-spacer>
                             <v-list-tile-action>
@@ -150,7 +150,7 @@
                               <img :src="'data:image/png;base64,' + item.image" alt="">
                             </v-list-tile-avatar>
                             <v-list-tile-content>
-                              <v-list-tile-title>{{item.name}} - {{getType(item)}}</v-list-tile-title>
+                              <v-list-tile-title>{{ getType(item) }} - {{item.name}}</v-list-tile-title>
                             </v-list-tile-content>
                             <v-spacer></v-spacer>
                             <v-list-tile-action>
@@ -215,7 +215,7 @@
                               <img :ref="item.id" :src="getFixtureImage(item.id)" alt="">
                             </v-list-tile-avatar>
                             <v-list-tile-content>
-                              <v-list-tile-title>{{item.name}} - {{getType(item)}}</v-list-tile-title>
+                              <v-list-tile-title>{{ getType(item) }} - {{item.name}}</v-list-tile-title>
                             </v-list-tile-content>
                             <v-spacer></v-spacer>
                             <v-list-tile-action>
@@ -282,7 +282,7 @@
                               <img :ref="item.id" :src="getFixtureImage(item.id)" alt="">
                             </v-list-tile-avatar>
                             <v-list-tile-content>
-                              <v-list-tile-title>{{item.name}} - {{getType(item)}}</v-list-tile-title>
+                              <v-list-tile-title>{{ getType(item) }} - {{item.name}}</v-list-tile-title>
                             </v-list-tile-content>
                             <v-spacer></v-spacer>
                             <v-list-tile-action>
@@ -349,7 +349,7 @@
                               <img :ref="item.id" :src="getFixtureImage(item.id)" alt="">
                             </v-list-tile-avatar>
                             <v-list-tile-content>
-                              <v-list-tile-title>{{item.name}} - {{getType(item)}}</v-list-tile-title>
+                              <v-list-tile-title>{{ getType(item) }} - {{item.name}}</v-list-tile-title>
                             </v-list-tile-content>
                             <v-spacer></v-spacer>
                             <v-list-tile-action>
@@ -416,7 +416,7 @@
                               <img :ref="item.id" :src="getFixtureImage(item.id)" alt="">
                             </v-list-tile-avatar>
                             <v-list-tile-content>
-                              <v-list-tile-title>{{item.name}} - {{getType(item)}}</v-list-tile-title>
+                              <v-list-tile-title>{{ getType(item) }} - {{item.name}}</v-list-tile-title>
                             </v-list-tile-content>
                             <v-spacer></v-spacer>
                             <v-list-tile-action>
