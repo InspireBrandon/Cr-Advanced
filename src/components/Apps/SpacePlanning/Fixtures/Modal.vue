@@ -170,6 +170,9 @@
               </v-toolbar>
               <v-container style="text-align: center;" grid-list-md>
                 <v-layout row wrap>
+                  <v-flex md3>
+                    <div>Top</div>
+                  </v-flex>
                   <v-flex lg12 md12 sm12 xs12>
                     <h3>Image</h3>
                     <v-card class="elevation-5" @click="openFileExplorer"

@@ -1,9 +1,10 @@
 <template>
     <div>
-        <v-card style="width: 50%; cursor: pointer;" class="hoverable" tile flat>
+        <v-card style="width: 50%; cursor: pointer;" class="hoverable" dark tile flat>
             <v-card-title class="pa-0 pl-2" style="height: 28px">
                 <v-icon class="mr-2" v-if="fixtureGroup.showChildren" @click="getChildren">expand_more</v-icon>
                 <v-icon class="mr-2" v-if="!fixtureGroup.showChildren" @click="getChildren">chevron_right</v-icon>
+
                 <div @click="getChildren">{{ fixtureGroup.name }}</div>
                 <v-spacer></v-spacer>
                 <v-btn class="ma-0 hoverableAction" small icon @click="addNewGroup">
@@ -21,12 +22,13 @@
         <div v-if="fixtureGroup.showChildren">
             <div v-for="(fg, idx) in fixtureGroup.children" :key="idx">
                 <fixture-recursive :addGroup="addGroup" :editGroup="editGroup" :deleteGroup="deleteGroup"
-                    :parentArr="fixtureGroup.children" class="ml-4" :fixtureGroup="fg" :editFixture="editFixture" :deleteFixture="deleteFixture" />
+                    :parentArr="fixtureGroup.children" class="ml-4" :fixtureGroup="fg" :editFixture="editFixture"
+                    :deleteFixture="deleteFixture" />
             </div>
             <div class="ml-4" v-for="(fixture, idx) in fixtureGroup.fixtures" :key="idx">
-                <v-card class="mt-1" style="width: 450px; cursor: pointer;" tile color="primary" dark flat>
+                <v-card style="width: 50%; cursor: pointer;" tile flat>
                     <v-card-title class="pa-0 pl-2">
-                        <div>{{ fixture.name }}</div>
+                        <div>{{ getType(fixture) }} - {{ fixture.name }}</div>
                         <v-spacer></v-spacer>
                         <v-btn class="ma-0 ml-2" small icon @click="editNewFixture(fixture)">
                             <v-icon>edit</v-icon>
@@ -35,6 +37,7 @@
                             <v-icon>delete</v-icon>
                         </v-btn>
                     </v-card-title>
+                    <v-divider></v-divider>
                 </v-card>
             </div>
             <div class="ml-3" v-if="fixtureGroup.children.length == 0 && fixtureGroup.fixtures.length == 0">
@@ -54,6 +57,52 @@
             return {}
         },
         methods: {
+            getType(item) {
+                let self = this
+                if (item.type == 0)
+                    return "Gondola"
+                if (item.type == 1)
+                    return "Obstruction"
+                if (item.type == 2) {
+                    switch (item.fixtureType) {
+                        case 0:
+                            return "Base"
+                            break;
+                        case 1:
+                            return "Shelf"
+                            break;
+                        case 2:
+                            return "Pegboard"
+                            break;
+                        case 3:
+                            return "Pegbar"
+                            break;
+                        case 4:
+                            return "ShareBox"
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+                if (item.type == 3) {
+                    switch (item.fixtureType) {
+                        case 0:
+                            return "Peg"
+                            break;
+                        case 1:
+                            return "Basket"
+                            break;
+                        case 2:
+                            return "Divider"
+                        default:
+                            break;
+                    }
+                }
+                if (item.type == 4)
+                    return "Palette"
+
+            },
             getChildren() {
                 let self = this;
 
@@ -100,7 +149,7 @@
 
                 self.editFixture(fixture);
             },
-            deleteNewFixture(fixture) {    
+            deleteNewFixture(fixture) {
                 let self = this;
 
                 self.deleteFixture(fixture, self.fixtureGroup.fixtures);
@@ -125,7 +174,7 @@
     }
 
     .hoverable:hover {
-        background-color: lightgray!important;
+        background-color: rgb(34, 34, 34) !important;
     }
 
     .hoverableAction {
