@@ -95,6 +95,10 @@
                             break;
                         case 2:
                             return "Divider"
+                            break;
+                        case 3:
+                            return "Cabinet"
+                            break;
                         default:
                             break;
                     }
@@ -107,8 +111,7 @@
                 let self = this;
 
                 if (!self.fixtureGroup.showChildren) {
-                    Axios.get(process.env.VUE_APP_API + "FixtureGroup?db=CR-Devinspire&parentID=" + self.fixtureGroup
-                            .id)
+                    Axios.get(process.env.VUE_APP_API + `FixtureGroup?db=CR-Devinspire&parentID=${self.fixtureGroup.id}&type=1`)
                         .then(r => {
                             self.fixtureGroup.children = [];
 
@@ -129,7 +132,7 @@
             addNewGroup() {
                 let self = this;
 
-                self.addGroup(self.fixtureGroup, child => {
+                self.addGroup(self.fixtureGroup, self.type, child => {
                     self.fixtureGroup.children.push(new FixtureGroup(child));
                     self.fixtureGroup.showChildren = true;
                 })
@@ -162,6 +165,7 @@
         self.id = params.id;
         self.parentID = params.parentID;
         self.name = params.name;
+        self.type = params.type;
         self.children = [];
         self.fixtures = params.fixtures;
         self.showChildren = false;
