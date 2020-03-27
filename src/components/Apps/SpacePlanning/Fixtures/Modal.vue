@@ -443,10 +443,10 @@
       }
     },
     methods: {
-      getFixtureGroups() {
+      getFixtureGroups(groupType) {
         let self = this;
 
-        axios.get(process.env.VUE_APP_API + "FixtureGroup?db=CR-Devinspire")
+        axios.get(process.env.VUE_APP_API + "FixtureGroup?db=CR-Devinspire&type=" + groupType)
           .then(r => {
             self.fixtureGroups = r.data;
           })
@@ -454,13 +454,13 @@
             console.log(e);
           })
       },
-      openAdd(type,group, afterAdd) {
+      openAdd(type, group, groupType, afterAdd) {
         let self = this;
 
         this.isAdd = true;
         this.afterAdd = afterAdd;
 
-        self.getFixtureGroups();
+        self.getFixtureGroups(groupType);
 
         for (var prop in this.form) {
           this.form[prop] = null;
@@ -485,9 +485,9 @@
 
         this.dialog = true;
       },
-      openEdit(fixture, afterEdit) {
+      openEdit(fixture, groupType, afterEdit) {
         let self = this;
-        self.getFixtureGroups();
+        self.getFixtureGroups(groupType);
         self.getFixtureImage(fixture.id);
 
         for (var prop in this.form) {

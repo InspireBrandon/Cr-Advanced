@@ -48,7 +48,7 @@
             <div v-for="(fg, idx) in fixtureGroup.children" :key="idx">
                 <fixture-recursive :addGroup="addGroup" :editGroup="editGroup" :deleteGroup="deleteGroup"
                     :parentArr="fixtureGroup.children" class="ml-4" :fixtureGroup="fg" :editFixture="editFixture"
-                    :deleteFixture="deleteFixture" :openMenuAdd="openMenuAdd" />
+                    :deleteFixture="deleteFixture" :openMenuAdd="openMenuAdd" :type="type" />
             </div>
             <div class="ml-4" v-for="(fixture, idx) in fixtureGroup.fixtures" :key="idx">
                 <v-card style="width: 50%; cursor: pointer;" tile flat>
@@ -78,7 +78,7 @@
     export default {
         name: 'fixture-recursive',
         props: ['fixtureGroup', 'addGroup', 'editGroup', 'deleteGroup', 'editFixture', 'deleteFixture', 'parentArr',
-            "openMenuAdd"
+            "openMenuAdd", "type"
         ],
         data() {
             return {}
@@ -182,7 +182,9 @@
             editNewFixture(fixture) {
                 let self = this;
 
-                self.editFixture(fixture);
+                console.log(self.type)
+
+                self.editFixture(fixture, self.type);
             },
             deleteNewFixture(fixture) {
                 let self = this;

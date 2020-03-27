@@ -105,7 +105,7 @@
                                   <v-icon>more_horiz</v-icon>
                                 </v-btn>
                                 <v-list>
-                                  <v-list-tile @click="editItem(item, 'rendering')">
+                                  <v-list-tile @click="editItem(item, 'rendering', 2)">
                                     <v-list-tile-title>modify</v-list-tile-title>
                                   </v-list-tile>
                                   <v-list-tile @click="remove('rendering', item,index)">
@@ -321,12 +321,12 @@
             self.palette.push(el);
         }
       },
-      editItem(item, type) {
+      editItem(item, type, groupType) {
         let self = this;
 
         let idx = self[type].indexOf(item)
 
-        self.$refs.fixturesModal.openEdit(item, function (newItem) {
+        self.$refs.fixturesModal.openEdit(item, groupType, function (newItem) {
           Axios.get(process.env.VUE_APP_API + `Fixture/${item.id}?db=CR-Devinspire`)
             .then(r => {
               self[type].splice(idx, 1);
@@ -461,10 +461,10 @@
           }
         })
       },
-      editFixture(item) {
+      editFixture(item, groupType) {
         let self = this;
 
-        self.$refs.fixturesModal.openEdit(item, function (newItem) {
+        self.$refs.fixturesModal.openEdit(item, groupType, function (newItem) {
           Axios.get(process.env.VUE_APP_API + `Fixture/${item.id}?db=CR-Devinspire`)
             .then(r => {})
             .catch(e => {
