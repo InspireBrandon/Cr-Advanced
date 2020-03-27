@@ -7,40 +7,40 @@
 
                 <div @click="getChildren">{{ fixtureGroup.name }}</div>
                 <v-spacer></v-spacer>
+                <v-menu bottom offset-y transition="scale-transition">
+                    <v-btn icon small slot="activator" class="ma-0 ml-2 hoverableAction" flat>
+                        <v-icon :size="22">add</v-icon>
+                    </v-btn>
+                    <v-list dense class="pa-0">
+                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Group')">
+                            <v-list-tile-title>Group</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Gondola')">
+                            <v-list-tile-title>Gondola</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Obstruction')">
+                            <v-list-tile-title>Obstruction</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Fixture')">
+                            <v-list-tile-title>Fixture</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="addNewGroup(fixtureGroup, 'SubFixture')">
+                            <v-list-tile-title>SubFixture</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Palette')">
+                            <v-list-tile-title>Palette</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Rendering')">
+                            <v-list-tile-title>Rendering</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
                 <v-btn class="ma-0 ml-2 hoverableAction" small icon @click="editNewGroup">
                     <v-icon>edit</v-icon>
                 </v-btn>
                 <v-btn class="ma-0 ml-2 hoverableAction" small icon @click="deleteNewGroup">
                     <v-icon>delete</v-icon>
                 </v-btn>
-                <v-menu bottom offset-y transition="scale-transition">
-                    <v-btn icon slot="activator" class="ma-0 ml-2 hoverableAction" flat>
-                        <v-icon :size="22">more_vert</v-icon>
-                    </v-btn>
-                    <v-list>
-                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Group')">
-                            <v-list-tile-title>Add Group</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Gondola')">
-                            <v-list-tile-title>Add Gondola</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Obstruction')">
-                            <v-list-tile-title>Add Obstruction</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Fixture')">
-                            <v-list-tile-title>Add Fixture</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="addNewGroup(fixtureGroup, 'SubFixture')">
-                            <v-list-tile-title>Add SubFixture</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Palette')">
-                            <v-list-tile-title>Add Palette</v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Rendering')">
-                            <v-list-tile-title>Add Rendering</v-list-tile-title>
-                        </v-list-tile>
-                    </v-list>
-                </v-menu>
             </v-card-title>
             <v-divider></v-divider>
         </v-card>
@@ -138,7 +138,8 @@
                 let self = this;
 
                 if (!self.fixtureGroup.showChildren) {
-                    Axios.get(process.env.VUE_APP_API + `FixtureGroup?db=CR-Devinspire&parentID=${self.fixtureGroup.id}&type=1`)
+                    Axios.get(process.env.VUE_APP_API +
+                            `FixtureGroup?db=CR-Devinspire&parentID=${self.fixtureGroup.id}&type=1`)
                         .then(r => {
                             self.fixtureGroup.children = [];
 
@@ -165,7 +166,7 @@
                         self.fixtureGroup.showChildren = true;
                     })
                 } else {
-                    self.openMenuAdd(type,item)
+                    self.openMenuAdd(type, item)
                 }
             },
             editNewGroup() {
