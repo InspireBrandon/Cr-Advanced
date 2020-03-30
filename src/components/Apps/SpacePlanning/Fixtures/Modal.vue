@@ -174,18 +174,24 @@
                     <div>Front</div>
                     <img v-if="!hideImages" ref="frontImage" style="width: 100%; max-height: 120px;" :src="getFixtureImageNew(form.frontImageID)" alt=""
                       @click="openFileDialog('front')">
+                      <a href="#" @click.prevent="openFileDialog('front')">Change</a>
+                      <span class="mr-2"></span>
                       <a href="#" @click.prevent="form.frontImageID = null">Remove</a>
                   </v-flex>
                   <v-flex md4 class="px-3">
                     <div>Side</div>
                     <img v-if="!hideImages" ref="sideImage" style="width: 100%; max-height: 120px;" :src="getFixtureImageNew(form.sideImageID)" alt=""
                       @click="openFileDialog('side')">
+                      <a href="#" @click.prevent="openFileDialog('side')">Change</a>
+                      <span class="mr-2"></span>
                       <a href="#" @click.prevent="form.sideImageID = null">Remove</a>
                   </v-flex>
                   <v-flex md4 class="px-3">
                     <div>Top</div>
                     <img v-if="!hideImages" ref="topImage" style="width: 100%; max-height: 120px;" :src="getFixtureImageNew(form.topImageID)" alt=""
                       @click="openFileDialog('top')">
+                      <a href="#" @click.prevent="openFileDialog('side')">Change</a>
+                      <span class="mr-2"></span>
                       <a href="#" @click.prevent="form.topImageID = null">Remove</a>
                   </v-flex>
                   <input ref="imageInput" style="display: none" @change="changeImage" type="file">
