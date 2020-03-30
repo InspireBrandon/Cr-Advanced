@@ -168,26 +168,37 @@
               <v-toolbar dense>
                 <v-toolbar-title class="toolbar-title">Display</v-toolbar-title>
               </v-toolbar>
-              <v-container style="text-align: center;" grid-list-md>
+              <v-container grid-list-md>
                 <v-layout row wrap>
-                  <v-flex md3>
-                    <div>Top</div>
+                  <v-flex md4 class="px-3">
+                    <div>Front</div>
+                    <img v-if="!hideImages" ref="frontImage" style="width: 100%;" :src="getFixtureImageNew(form.frontImageID)" alt=""
+                      @click="openFileDialog('front')">
                   </v-flex>
-                  <v-flex lg12 md12 sm12 xs12>
-                    <h3>Image</h3>
-                    <v-card class="elevation-5" @click="openFileExplorer"
-                      style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
-                      <img ref="changeImage" style="max-height: 150px; max-width: 150px;" src="" alt="">
-                    </v-card>
+                  <v-flex md4 class="px-3">
+                    <div>Side</div>
+                    <img v-if="!hideImages" ref="sideImage" style="width: 100%;" :src="getFixtureImageNew(form.sideImageID)" alt=""
+                      @click="openFileDialog('side')">
+                  </v-flex>
+                  <v-flex md4 class="px-3">
+                    <div>Top</div>
+                    <img v-if="!hideImages" ref="topImage" style="width: 100%;" :src="getFixtureImageNew(form.topImageID)" alt=""
+                      @click="openFileDialog('top')">
+                  </v-flex>
+                  <input ref="imageInput" style="display: none" @change="changeImage" type="file">
+                  <v-flex lg12 md12 sm12 xs12 class="px-3">
+                    <div>Old Image</div>
+                    <img ref="changeImage" @click="openFileExplorer"
+                      style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;" src=""
+                      alt="">
                     <input ref="fileInput" style="display: none" @change="imageChange" type="file">
                   </v-flex>
                   <v-flex lg12 md12 sm12 xs12>
                     <div v-show="form.type == 2 && (form.fixtureType == 0 || form.fixtureType == 1) && !form.rendering">
                       <h3>Bar image</h3>
-                      <v-card class="elevation-5" @click="openFileExplorerBar"
-                        style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
-                        <img ref="changeImageBar" style="max-height: 150px; max-width: 150px;" src="" alt="">
-                      </v-card>
+                      <img @click="openFileExplorerBar"
+                        style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;"
+                        ref="changeImageBar" src="" alt="">
                       <input ref="fileInputBar" style="display: none" @change="imageChangeBar" type="file">
                     </div>
                   </v-flex>
@@ -243,6 +254,7 @@
     name: 'FixturesModal',
     data() {
       return {
+        changingSide: "",
         fixtureGroups: [],
         isSubtype: false,
         dialog: false,
@@ -437,9 +449,16 @@
           cost: null,
           squish: null,
           autoSquish: null,
-          squishAmount: null
+          squishAmount: null,
+          frontImage: null,
+          frontImageID: null,
+          sideImage: null,
+          sideImageID: null,
+          topImage: null,
+          topImageID: null
         },
-        showModal: false
+        showModal: false,
+        hideImages: false
       }
     },
     methods: {
@@ -493,6 +512,8 @@
         for (var prop in this.form) {
           this.form[prop] = fixture[prop];
         }
+
+        console.log(this.form)
 
         this.form.color = {
           hex: fixture.color
@@ -620,6 +641,60 @@
       },
       setRadius() {
         this.form.pegRadius = this.form.pegDiameter / 2;
+      },
+      // New Image Work
+      changeImage(e) {
+        let self = this;
+
+        const files = e.target.files;
+        let file = files[0];
+
+        // self.blobToDataUrl(file, url => {
+        //   self.$refs[self.changingSide + "Image"].src = url;
+        // })
+
+        let request = {
+          name: file.name,
+          type: file.type == null ? "" : file.type
+        }
+
+        self.hideImages = true;
+
+        axios.post(process.env.VUE_APP_API + "FixtureImage?db=CR-DEVINSPIRE", request)
+          .then(r => {
+            self.form[self.changingSide + "ImageID"] = r.data.id;
+
+            axios.put(process.env.VUE_APP_API + "Fixture?db=CR-Devinspire", self.form)
+              .then(fr => {
+                axios.post(process.env.VUE_APP_API + "FixtureImage?db=CR-DEVINSPIRE&fixtureImageID=" + r.data.id, file)
+                  .then(image => {
+                    self.form[self.changingSide + "ImageID"] = r.data.id;
+                    self.hideImages = false;
+                  })
+              })
+              .catch(e => {
+
+              })
+          })
+          .catch(e => {
+
+          })
+      },
+      openFileDialog(side) {
+        let self = this;
+
+        self.changingSide = side;
+
+        self.$refs.imageInput.value = null;
+
+        self.$refs.imageInput.click();
+      },
+      getFixtureImageNew(imageID) {
+        if (imageID == undefined || imageID == null) {
+          return "https://sisterhoodofstyle.com/wp-content/uploads/2018/02/no-image-1.jpg"
+        } else {
+          return process.env.VUE_APP_API + "FixtureImage?db=CR-DEVINSPIRE&fixtureImageID=" + imageID
+        }
       }
     },
     computed: {
