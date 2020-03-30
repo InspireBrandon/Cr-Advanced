@@ -55,9 +55,8 @@
             <div class="ml-4" v-for="(fixture, idx) in fixtureGroup.fixtures" :key="idx">
                 <v-card style="width: 50%; cursor: pointer;" tile flat>
                     <v-card-title class="pa-0 pl-2">
-
                         <div v-if="isEdit">{{ getType(fixture) }} - {{ fixture.name }}</div>
-                        <div v-else @click="selectLibraryItem(fixture)"
+                        <div v-if="!isEdit" @click="selectLibraryItem(fixture)"
                             :class="{ 'active-item':(selectedItem != null && fixture.id == selectedItem.data.id), 'inactive-item' : (selectedItem == null || fixture.id != selectedItem.data.id)}"
                             draggable="true" @drag="dragMove" @dragstart="dragStart('LIBRARY', fixture)"
                             @dragend="clearDrag">{{ getType(fixture) }} - {{ fixture.name }}</div>
