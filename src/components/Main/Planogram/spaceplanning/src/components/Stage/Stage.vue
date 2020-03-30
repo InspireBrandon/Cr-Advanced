@@ -1691,9 +1691,11 @@
           data = window.library;
         }
         //#endregion
-
-        data.data.image = process.env.VUE_APP_API +
+        if (data.data.frontImageID != null) {
+           data.data.image = process.env.VUE_APP_API +
           `FixtureImage?db=CR-Devinspire&fixtureImageID=${data.data.frontImageID}`
+        }
+       
         switch (dragType.toUpperCase()) {
           case "WAREHOUSE": {
             self.addWarehouseProduct(stage, data, ev);
