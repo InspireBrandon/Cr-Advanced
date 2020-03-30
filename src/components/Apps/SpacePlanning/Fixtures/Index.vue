@@ -32,7 +32,7 @@
                   <v-flex xs12>
                     <FixtureRecursive :addGroup="addGroup" :editGroup="editGroup" :deleteGroup="deleteGroup"
                       v-for="(fg, idx) in fixtureGroups" :key="idx" :fixtureGroup="fg" :parentArr="fixtureGroups"
-                      :editFixture="editFixture" :deleteFixture="deleteFixture" :type="1" :openMenuAdd="openMenuAdd">
+                      :editFixture="editFixture" :deleteFixture="deleteFixture" :type="1" :openMenuAdd="openMenuAdd" :isEdit="true">
                     </FixtureRecursive>
                   </v-flex>
                 </v-card-text>

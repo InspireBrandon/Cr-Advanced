@@ -12,11 +12,11 @@
         <v-tabs centered color="primary" dark icons-and-text>
           <v-tabs-slider color="white"></v-tabs-slider>
 
-          <v-tab href="#tab-gondola">Gondolas
+          <v-tab href="#tab-gondola">Fixtures
             <v-icon>format_align_center</v-icon>
           </v-tab>
 
-          <v-tab v-if="!isFloorplan" href="#tab-fixture">Fixtures
+          <!-- <v-tab v-if="!isFloorplan" href="#tab-fixture">Fixtures
             <v-icon>toc</v-icon>
           </v-tab>
 
@@ -34,7 +34,7 @@
 
           <v-tab v-if="!isFloorplan" href="#tab-misc">Miscellaneous
             <v-icon>extension</v-icon>
-          </v-tab>
+          </v-tab> -->
 
           <v-tab href="#tab-custom">Custom
             <v-icon>extension</v-icon>
@@ -47,21 +47,11 @@
           <!-- GONDOLAS TAB -->
           <v-tab-item value="tab-gondola" class="list-item">
             <v-card flat>
-              <v-list>
-                <template v-for="(item, index) in gondolaDataArray">
-                  <v-list-tile :key="index" @click="selectLibraryItem(item)"
-                    :class="{ 'active-item':(selectedItem != null && item.id == selectedItem.data.id), 'inactive-item' : (selectedItem == null || item.id != selectedItem.data.id)}"
-                    draggable="true" @drag="dragMove" @dragstart="dragStart('LIBRARY', item)" @dragend="clearDrag">
-                    <v-list-tile-content>
-                      <v-list-tile-title>{{item.name}}</v-list-tile-title>
-                      <v-list-tile-sub-title>
-                        possible description :
-                        {{item.name}}
-                      </v-list-tile-sub-title>
-                    </v-list-tile-content>
-                  </v-list-tile>
-                </template>
-              </v-list>
+              <FixtureRecursive :addGroup="''" :editGroup="''" :deleteGroup="''" v-for="(fg, idx) in fixtureGroups"
+                :key="idx" :fixtureGroup="fg" :parentArr="fixtureGroups" :editFixture="''" :deleteFixture="''" :type="1"
+                :openMenuAdd="''" :isEdit="false" :selectedItem="selectedItem" :selectLibraryItem="selectLibraryItem"
+                :dragStart="dragStart" :dragMove="dragMove" :clearDrag="clearDrag">
+              </FixtureRecursive>
             </v-card>
           </v-tab-item>
 
@@ -281,11 +271,12 @@
           </v-tab-item>
 
           <v-tab-item value="tab-planogram">
-            <v-toolbar dense flat>
-              <v-spacer></v-spacer>
-              <v-text-field v-model="searchText" style="width:200px" append-icon="search"></v-text-field>
-            </v-toolbar>
+
             <v-card flat class="list-item">
+              <v-toolbar dense flat>
+                <v-spacer></v-spacer>
+                <v-text-field v-model="searchText" style="width:200px" append-icon="search"></v-text-field>
+              </v-toolbar>
               <template v-for="(item, index) in filteredSpacePlans">
                 <v-list-tile :key="index" @click="selectLibraryItem(item)"
                   :class="{ 'active-item':(selectedItem != null && item.id == selectedItem.data.id), 'inactive-item' : (selectedItem == null || item.id != selectedItem.data.id)}"
@@ -309,10 +300,16 @@
 </template>
 <script>
   import axios from "axios";
+  import FixtureRecursive from '@/components/Apps/SpacePlanning/Fixtures/FixtureRecursive.vue'
+
 
   export default {
+    components: {
+      FixtureRecursive
+    },
     props: ["isFloorplan"],
     data: () => ({
+      fixtureGroups: [],
       fav: true,
       menu: false,
       message: false,
@@ -330,6 +327,7 @@
     }),
     mounted() {
       let self = this;
+      self.getFixtureGroups();
       self.getLibraryData();
       self.getFixtures();
       self.getPlanograms();
@@ -343,6 +341,23 @@
       }
     },
     methods: {
+      getFixtureGroups() {
+        let self = this;
+
+        axios.get(process.env.VUE_APP_API + `FixtureGroup?db=CR-Devinspire&parentID=${null}&type=1`)
+          .then(r => {
+            self.fixtureGroups = [];
+
+            console.log(r.data)
+
+            r.data.fixtureGroups.forEach(fg => {
+              self.fixtureGroups.push(new FixtureGroup(fg));
+            });
+          })
+          .catch(e => {
+            console.log(e);
+          })
+      },
       dragCustomStart(where, item, type) {
         let self = this;
         if (where == "CHIP") {
@@ -569,7 +584,19 @@
           })
       },
     }
+
   };
+
+  function FixtureGroup(params) {
+    let self = this;
+    self.id = params.id;
+    self.parentID = params.parentID;
+    self.name = params.name;
+    self.type = params.type;
+    self.children = [];
+    self.fixtures = params.fixtures;
+    self.showChildren = false;
+  }
 </script>
 <style scoped>
   .active-item {

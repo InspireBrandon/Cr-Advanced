@@ -7,7 +7,7 @@
 
                 <div @click="getChildren">{{ fixtureGroup.name }}</div>
                 <v-spacer></v-spacer>
-                <v-menu bottom offset-y transition="scale-transition">
+                <v-menu v-if="isEdit" bottom offset-y transition="scale-transition">
                     <v-btn icon small slot="activator" class="ma-0 ml-2 hoverableAction" flat>
                         <v-icon :size="22">add</v-icon>
                     </v-btn>
@@ -35,10 +35,10 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
-                <v-btn class="ma-0 ml-2 hoverableAction" small icon @click="editNewGroup">
+                <v-btn v-if="isEdit" class="ma-0 ml-2 hoverableAction" small icon @click="editNewGroup">
                     <v-icon>edit</v-icon>
                 </v-btn>
-                <v-btn class="ma-0 ml-2 hoverableAction" small icon @click="deleteNewGroup">
+                <v-btn v-if="isEdit" class="ma-0 ml-2 hoverableAction" small icon @click="deleteNewGroup">
                     <v-icon>delete</v-icon>
                 </v-btn>
             </v-card-title>
@@ -48,24 +48,31 @@
             <div v-for="(fg, idx) in fixtureGroup.children" :key="idx">
                 <fixture-recursive :addGroup="addGroup" :editGroup="editGroup" :deleteGroup="deleteGroup"
                     :parentArr="fixtureGroup.children" class="ml-4" :fixtureGroup="fg" :editFixture="editFixture"
-                    :deleteFixture="deleteFixture" :openMenuAdd="openMenuAdd" :type="type" />
+                    :deleteFixture="deleteFixture" :openMenuAdd="openMenuAdd" :type="type" :isEdit="isEdit"
+                    :selectedItem="selectedItem" :selectLibraryItem="selectLibraryItem" :dragStart="dragStart"
+                    :dragMove="dragMove" :clearDrag="clearDrag" />
             </div>
             <div class="ml-4" v-for="(fixture, idx) in fixtureGroup.fixtures" :key="idx">
                 <v-card style="width: 50%; cursor: pointer;" tile flat>
                     <v-card-title class="pa-0 pl-2">
-                        <div>{{ getType(fixture) }} - {{ fixture.name }}</div>
+
+                        <div v-if="isEdit">{{ getType(fixture) }} - {{ fixture.name }}</div>
+                        <div v-else @click="selectLibraryItem(fixture)"
+                            :class="{ 'active-item':(selectedItem != null && fixture.id == selectedItem.data.id), 'inactive-item' : (selectedItem == null || fixture.id != selectedItem.data.id)}"
+                            draggable="true" @drag="dragMove" @dragstart="dragStart('LIBRARY', fixture)"
+                            @dragend="clearDrag">{{ getType(fixture) }} - {{ fixture.name }}</div>
                         <v-spacer></v-spacer>
-                        <v-btn class="ma-0 ml-2" small icon @click="editNewFixture(fixture)">
+                        <v-btn v-if="isEdit" class="ma-0 ml-2" small icon @click="editNewFixture(fixture)">
                             <v-icon>edit</v-icon>
                         </v-btn>
-                        <v-btn class="ma-0 ml-2" small icon @click="deleteNewFixture(fixture)">
+                        <v-btn v-if="isEdit" class="ma-0 ml-2" small icon @click="deleteNewFixture(fixture)">
                             <v-icon>delete</v-icon>
                         </v-btn>
                     </v-card-title>
                     <v-divider></v-divider>
                 </v-card>
             </div>
-            <div class="ml-3" v-if="fixtureGroup.children.length == 0 && fixtureGroup.fixtures.length == 0">
+            <div class="ml-3" v-if="isEdit &&fixtureGroup.children.length == 0 && fixtureGroup.fixtures.length == 0">
                 <a href="#" @click.prevent="addNewGroup(fixtureGroup, 'Group')">Add new group</a>
             </div>
         </div>
@@ -78,7 +85,8 @@
     export default {
         name: 'fixture-recursive',
         props: ['fixtureGroup', 'addGroup', 'editGroup', 'deleteGroup', 'editFixture', 'deleteFixture', 'parentArr',
-            "openMenuAdd", "type"
+            "openMenuAdd", "type", "isEdit", "selectedItem", "selectLibraryItem", "dragStart", "dragMove",
+            "clearDrag"
         ],
         data() {
             return {}
@@ -207,6 +215,14 @@
 </script>
 
 <style>
+    .active-item {
+        background-color: #b0efb0;
+    }
+
+    .inactive-item {
+        background-color: white;
+    }
+
     .hoverable {
         cursor: pointer;
     }
