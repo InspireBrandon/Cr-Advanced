@@ -32,7 +32,9 @@
                   <v-flex xs12>
                     <FixtureRecursive :addGroup="addGroup" :editGroup="editGroup" :deleteGroup="deleteGroup"
                       v-for="(fg, idx) in fixtureGroups" :key="idx" :fixtureGroup="fg" :parentArr="fixtureGroups"
-                      :editFixture="editFixture" :deleteFixture="deleteFixture" :type="1" :openMenuAdd="openMenuAdd" :isEdit="true">
+                      :editFixture="editFixture" :deleteFixture="deleteFixture" :type="1" :openMenuAdd="openMenuAdd"
+                      :isEdit="true" :selectedItem="dragPlaceHolder" :selectLibraryItem="dragPlaceHolder" :dragStart="dragPlaceHolder" :dragMove="dragPlaceHolder"
+                      :clearDrag="dragPlaceHolder">
                     </FixtureRecursive>
                   </v-flex>
                 </v-card-text>
@@ -52,7 +54,8 @@
                   <v-flex xs12>
                     <FixtureRecursive :addGroup="addGroup" :editGroup="editGroup" :deleteGroup="deleteGroup"
                       v-for="(fg, idx) in fixtureGroups" :key="idx" :fixtureGroup="fg" :parentArr="fixtureGroups"
-                      :editFixture="editFixture" :deleteFixture="deleteFixture" :type="2" :openMenuAdd="openMenuAdd">
+                      :editFixture="editFixture" :deleteFixture="deleteFixture" :type="2" :openMenuAdd="openMenuAdd" :isEdit="true" :selectedItem="dragPlaceHolder" :selectLibraryItem="dragPlaceHolder" :dragStart="dragPlaceHolder" :dragMove="dragPlaceHolder"
+                      :clearDrag="dragPlaceHolder">
                     </FixtureRecursive>
                   </v-flex>
                 </v-card-text>
@@ -224,6 +227,7 @@
         })
     },
     methods: {
+      dragPlaceHolder(){},
       getType(item) {
         let self = this
         if (item.type == 0)
