@@ -23,7 +23,7 @@
               <v-card justify-content: center class="tab-item-wrapper elevation-2 back-height">
                 <v-card-title>
                   <v-spacer></v-spacer>
-                  <v-btn @click="addNewGroup(1)" color="primary">Add Group</v-btn>
+                  <v-btn @click="addNewGroup" color="primary">Add Group</v-btn>
                 </v-card-title>
                 <v-card-text>
                   <v-flex xs12>
@@ -31,7 +31,7 @@
                   </v-flex>
                   <v-flex xs12>
                     <FixtureRecursive :addGroup="addGroup" :editGroup="editGroup" :deleteGroup="deleteGroup"
-                      v-for="(fg, idx) in fixtureTab" :key="idx" :fixtureGroup="fg" :parentArr="fixtureGroups"
+                      v-for="(fg, idx) in fixtureGroups" :key="idx" :fixtureGroup="fg" :parentArr="fixtureGroups"
                       :editFixture="editFixture" :deleteFixture="deleteFixture" :type="1" :openMenuAdd="openMenuAdd">
                     </FixtureRecursive>
                   </v-flex>
@@ -43,7 +43,7 @@
               <v-card justify-content: center class="tab-item-wrapper elevation-2 back-height">
                 <v-card-title>
                   <v-spacer></v-spacer>
-                  <v-btn @click="addNewGroup(2)" color="primary">Add Group</v-btn>
+                  <v-btn @click="addNewGroup" color="primary">Add Group</v-btn>
                 </v-card-title>
                 <v-card-text>
                   <v-flex xs12>
@@ -51,7 +51,7 @@
                   </v-flex>
                   <v-flex xs12>
                     <FixtureRecursive :addGroup="addGroup" :editGroup="editGroup" :deleteGroup="deleteGroup"
-                      v-for="(fg, idx) in imageTab" :key="idx" :fixtureGroup="fg" :parentArr="fixtureGroups"
+                      v-for="(fg, idx) in fixtureGroups" :key="idx" :fixtureGroup="fg" :parentArr="fixtureGroups"
                       :editFixture="editFixture" :deleteFixture="deleteFixture" :type="2" :openMenuAdd="openMenuAdd">
                     </FixtureRecursive>
                   </v-flex>
@@ -182,24 +182,6 @@
       }
     },
     computed: {
-      fixtureTab() {
-        let self = this;
-
-        let filtered = self.fixtureGroups.filter(e => {
-          return e.type == 1
-        })
-
-        return filtered;
-      },
-      imageTab() {
-        let self = this;
-
-        let filtered = self.fixtureGroups.filter(e => {
-          return e.type == 2
-        })
-
-        return filtered;
-      },
       filteredrendering() {
         if (this.searchRenderings == "") {
           return this.rendering.filter(item => {
@@ -372,9 +354,6 @@
       },
       openMenuAdd(type, group) {
         let self = this
-        console.log("[openMenuAdd]--type:", type);
-        console.log("[openMenuAdd]--group:", group);
-
 
         switch (type) {
           case "Gondola": {
@@ -405,21 +384,20 @@
           break;
         }
       },
-      addNewGroup(type) {
+      addNewGroup() {
         let self = this;
 
-        self.addGroup(null, type, newChild => {
+        self.addGroup(null, newChild => {
           self.fixtureGroups.push(new FixtureGroup(newChild));
         })
       },
-      addGroup(fixtureGroup, type, callback) {
+      addGroup(fixtureGroup, callback) {
         let self = this;
 
         self.$refs.prompt.show('', "Group name", "Name", groupName => {
           let request = {
             parentID: fixtureGroup == null ? null : fixtureGroup.id,
-            name: groupName,
-            type: type
+            name: groupName
           }
 
           Axios.post(process.env.VUE_APP_API + "FixtureGroup?db=CR-Devinspire", request)
