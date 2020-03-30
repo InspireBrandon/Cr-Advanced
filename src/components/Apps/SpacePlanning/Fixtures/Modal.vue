@@ -172,18 +172,21 @@
                 <v-layout row wrap>
                   <v-flex md4 class="px-3">
                     <div>Front</div>
-                    <img v-if="!hideImages" ref="frontImage" style="width: 100%;" :src="getFixtureImageNew(form.frontImageID)" alt=""
+                    <img v-if="!hideImages" ref="frontImage" style="width: 100%; max-height: 120px;" :src="getFixtureImageNew(form.frontImageID)" alt=""
                       @click="openFileDialog('front')">
+                      <a href="#" @click.prevent="form.frontImageID = null">Remove</a>
                   </v-flex>
                   <v-flex md4 class="px-3">
                     <div>Side</div>
-                    <img v-if="!hideImages" ref="sideImage" style="width: 100%;" :src="getFixtureImageNew(form.sideImageID)" alt=""
+                    <img v-if="!hideImages" ref="sideImage" style="width: 100%; max-height: 120px;" :src="getFixtureImageNew(form.sideImageID)" alt=""
                       @click="openFileDialog('side')">
+                      <a href="#" @click.prevent="form.sideImageID = null">Remove</a>
                   </v-flex>
                   <v-flex md4 class="px-3">
                     <div>Top</div>
-                    <img v-if="!hideImages" ref="topImage" style="width: 100%;" :src="getFixtureImageNew(form.topImageID)" alt=""
+                    <img v-if="!hideImages" ref="topImage" style="width: 100%; max-height: 120px;" :src="getFixtureImageNew(form.topImageID)" alt=""
                       @click="openFileDialog('top')">
+                      <a href="#" @click.prevent="form.topImageID = null">Remove</a>
                   </v-flex>
                   <input ref="imageInput" style="display: none" @change="changeImage" type="file">
                   <v-flex lg12 md12 sm12 xs12 class="px-3">
@@ -197,22 +200,25 @@
                     <div v-show="form.type == 2 && (form.fixtureType == 0 || form.fixtureType == 1) && !form.rendering">
                       <h3>Bar image</h3>
                       <img @click="openFileExplorerBar"
-                        style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;"
+                        style="width: 150px; height: 150px; background: white; cursor: pointer;"
                         ref="changeImageBar" src="" alt="">
                       <input ref="fileInputBar" style="display: none" @change="imageChangeBar" type="file">
                     </div>
                   </v-flex>
-                  <v-flex lg12 md12 sm12 xs12>
+                  <v-flex lg12 md12 sm12 xs12 class="px-3">
                     <div v-if="!form.rendering">
                       <h3>Colour</h3>
-                      <compact-picker style="margin: 0 auto;" v-model="form.color" />
+                      <compact-picker v-model="form.color" />
                     </div>
                   </v-flex>
-                  <v-flex lg12 md12 sm12 xs12>
+                  <v-flex lg12 md12 sm12 xs12 class="px-3">
                     <div v-if="form.type == 2 && form.fixtureType == 2 && !form.rendering">
                       <h3>Peg Hole Colour</h3>
-                      <compact-picker style="margin: 0 auto;" v-model="form.pegHoleColor" />
+                      <compact-picker v-model="form.pegHoleColor" />
                     </div>
+                  </v-flex>
+                  <v-flex lg12 md12 sm12 xs12 class="px-3">
+                    <v-checkbox v-model="form.transparent" label="Transparent"></v-checkbox>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -455,7 +461,8 @@
           sideImage: null,
           sideImageID: null,
           topImage: null,
-          topImageID: null
+          topImageID: null,
+          transparent: false
         },
         showModal: false,
         hideImages: false
@@ -465,7 +472,7 @@
       getFixtureGroups(groupType) {
         let self = this;
 
-        axios.get(process.env.VUE_APP_API + "FixtureGroup?db=CR-Devinspire&type=" + groupType)
+        axios.get(process.env.VUE_APP_API + "FixtureGroup?db=CR-Devinspire&type=1")
           .then(r => {
             self.fixtureGroups = r.data;
           })
@@ -473,13 +480,13 @@
             console.log(e);
           })
       },
-      openAdd(type, group, groupType, afterAdd) {
+      openAdd(type, group, afterAdd) {
         let self = this;
 
         this.isAdd = true;
         this.afterAdd = afterAdd;
 
-        self.getFixtureGroups(groupType);
+        self.getFixtureGroups();
 
         for (var prop in this.form) {
           this.form[prop] = null;

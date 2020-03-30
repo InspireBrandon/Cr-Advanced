@@ -289,23 +289,10 @@
             return null;
           })
       },
-      afterAdd(el) {
+      afterAdd(el, arr) {
         let self = this;
 
-        if (el.rendering) {
-          self.rendering.push(el);
-        } else {
-          if (el.type == 0)
-            self.gondolas.push(el);
-          if (el.type == 1)
-            self.obstruction.push(el);
-          if (el.type == 2)
-            self.fixture.push(el);
-          if (el.type == 3)
-            self.subFixture.push(el);
-          if (el.type == 4)
-            self.palette.push(el);
-        }
+        arr.push(el);
       },
       editItem(item, type, groupType) {
         let self = this;
@@ -356,32 +343,44 @@
             console.log(e);
           })
       },
-      openMenuAdd(type, group) {
+      openMenuAdd(type, group, arr) {
         let self = this
 
         switch (type) {
           case "Gondola": {
-            self.$refs.fixturesModal.openAdd(0, group, self.afterAdd)
+            self.$refs.fixturesModal.openAdd(0, group, el => {
+              self.afterAdd(el, arr)
+            })
           }
           break;
         case "Obstruction": {
-          self.$refs.fixturesModal.openAdd(1, group, self.afterAdd)
+          self.$refs.fixturesModal.openAdd(1, group, el => {
+            self.afterAdd(el, arr)
+          })
         }
         break;
         case "Fixture": {
-          self.$refs.fixturesModal.openAdd(2, group, self.afterAdd)
+          self.$refs.fixturesModal.openAdd(2, group, el => {
+            self.afterAdd(el, arr)
+          })
         }
         break;
         case "SubFixture": {
-          self.$refs.fixturesModal.openAdd(3, group, self.afterAdd)
+          self.$refs.fixturesModal.openAdd(3, group, el => {
+            self.afterAdd(el, arr)
+          })
         }
         break;
         case "Palette": {
-          self.$refs.fixturesModal.openAdd(4, group, self.afterAdd)
+          self.$refs.fixturesModal.openAdd(4, group, el => {
+            self.afterAdd(el, arr)
+          })
         }
         break;
         case "Rendering": {
-          self.$refs.fixturesModal.openAdd(5, group, self.afterAdd)
+          self.$refs.fixturesModal.openAdd(5, group, el => {
+            self.afterAdd(el, arr)
+          })
         }
         break;
         default:
@@ -443,15 +442,13 @@
           }
         })
       },
-      editFixture(item, groupType) {
+      editFixture(item, groupType, arr) {
         let self = this;
 
         self.$refs.fixturesModal.openEdit(item, groupType, function (newItem) {
-          Axios.get(process.env.VUE_APP_API + `Fixture/${item.id}?db=CR-Devinspire`)
-            .then(r => {})
-            .catch(e => {
-
-            })
+          for(var prop in item) {
+            item[prop] = newItem[prop]
+          }
         })
       },
       deleteFixture(item, parentArr) {

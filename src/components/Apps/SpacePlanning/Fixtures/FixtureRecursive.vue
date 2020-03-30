@@ -53,7 +53,7 @@
                     :dragMove="dragMove" :clearDrag="clearDrag" />
             </div>
             <div class="ml-4" v-for="(fixture, idx) in fixtureGroup.fixtures" :key="idx">
-                <v-card style="width: 50%; cursor: pointer;" tile flat>
+                <v-card style="width: 50%; cursor: pointer;" tile flat v-if="type == 1 && !fixture.rendering || type == 2 && fixture.rendering">
                     <v-card-title class="pa-0 pl-2">
                         <div v-if="isEdit">{{ getType(fixture) }} - {{ fixture.name }}</div>
                         <div v-if="!isEdit" @click="selectLibraryItem(fixture)"
@@ -173,7 +173,7 @@
                         self.fixtureGroup.showChildren = true;
                     })
                 } else {
-                    self.openMenuAdd(type, item)
+                    self.openMenuAdd(type, item, self.fixtureGroup.fixtures)
                 }
             },
             editNewGroup() {
@@ -189,9 +189,7 @@
             editNewFixture(fixture) {
                 let self = this;
 
-                console.log(self.type)
-
-                self.editFixture(fixture, self.type);
+                self.editFixture(fixture, self.type, self.fixtureGroup.fixtures);
             },
             deleteNewFixture(fixture) {
                 let self = this;
