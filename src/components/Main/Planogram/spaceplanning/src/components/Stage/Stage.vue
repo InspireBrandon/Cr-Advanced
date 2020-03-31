@@ -1690,6 +1690,9 @@
           dragType = "LIBRARY";
           data = window.library;
         }
+
+        console.log("frontImageID", data.data.frontImageID)
+
         //#endregion
         if (data.data.frontImageID != null) {
            data.data.image = process.env.VUE_APP_API +

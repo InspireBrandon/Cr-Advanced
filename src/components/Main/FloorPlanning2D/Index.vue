@@ -172,18 +172,16 @@
                     </v-flex>
                     <v-flex sm2 class="pa-0">
                         <v-card>
-                            <v-container grid-list-md>
+                            <v-container grid-list-md class="pa-0">
                                 <v-layout row wrap>
-                                    <v-flex md12 style="padding: 2px;">
+                                    <v-flex md12 style="padding: 2px;" class="px-2">
                                         <v-select light placeholder="Clusters" @change="onClusterTypeChange" dense
                                             :items="clusterTypes" v-model="selectedClusterType" solo hide-details>
                                         </v-select>
                                     </v-flex>
-                                    <v-flex md12 style="padding: 2px;">
-                                        <v-select light v-if="selectedClusterType != null"
-                                            :placeholder="'Select ' + selectedClusterType + ' cluster'" dense
-                                            :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption"
-                                            solo hide-details>
+                                    <v-flex md12 style="padding: 2px;" class="px-2 mb-1">
+                                        <v-select light :disabled="selectedClusterType == null" :placeholder="'Select ' + selectedClusterType + ' cluster'" dense
+                                            :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" solo hide-details>
                                         </v-select>
                                     </v-flex>
                                 </v-layout>
