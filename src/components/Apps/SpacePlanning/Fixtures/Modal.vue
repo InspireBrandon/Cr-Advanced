@@ -172,27 +172,27 @@
                 <v-layout row wrap>
                   <v-flex md4 class="px-3">
                     <div>Front</div>
-                    <img v-if="!hideImages" ref="frontImage" style="width: 100%; max-height: 120px;" :src="getFixtureImageNew(form.frontImageID)" alt=""
-                      @click="openFileDialog('front')">
-                      <a href="#" @click.prevent="openFileDialog('front')">Change</a>
-                      <span class="mr-2"></span>
-                      <a href="#" @click.prevent="form.frontImageID = null">Remove</a>
+                    <img v-if="!hideImages" ref="frontImage" style="width: 100%; max-height: 120px;"
+                      :src="getFixtureImageNew(form.frontImageID)" alt="" @click="openFileDialog('front')">
+                    <a href="#" @click.prevent="openFileDialog('front')">Change</a>
+                    <span class="mr-2"></span>
+                    <a href="#" @click.prevent="form.frontImageID = null">Remove</a>
                   </v-flex>
                   <v-flex md4 class="px-3">
                     <div>Side</div>
-                    <img v-if="!hideImages" ref="sideImage" style="width: 100%; max-height: 120px;" :src="getFixtureImageNew(form.sideImageID)" alt=""
-                      @click="openFileDialog('side')">
-                      <a href="#" @click.prevent="openFileDialog('side')">Change</a>
-                      <span class="mr-2"></span>
-                      <a href="#" @click.prevent="form.sideImageID = null">Remove</a>
+                    <img v-if="!hideImages" ref="sideImage" style="width: 100%; max-height: 120px;"
+                      :src="getFixtureImageNew(form.sideImageID)" alt="" @click="openFileDialog('side')">
+                    <a href="#" @click.prevent="openFileDialog('side')">Change</a>
+                    <span class="mr-2"></span>
+                    <a href="#" @click.prevent="form.sideImageID = null">Remove</a>
                   </v-flex>
                   <v-flex md4 class="px-3">
                     <div>Top</div>
-                    <img v-if="!hideImages" ref="topImage" style="width: 100%; max-height: 120px;" :src="getFixtureImageNew(form.topImageID)" alt=""
-                      @click="openFileDialog('top')">
-                      <a href="#" @click.prevent="openFileDialog('side')">Change</a>
-                      <span class="mr-2"></span>
-                      <a href="#" @click.prevent="form.topImageID = null">Remove</a>
+                    <img v-if="!hideImages" ref="topImage" style="width: 100%; max-height: 120px;"
+                      :src="getFixtureImageNew(form.topImageID)" alt="" @click="openFileDialog('top')">
+                    <a href="#" @click.prevent="openFileDialog('side')">Change</a>
+                    <span class="mr-2"></span>
+                    <a href="#" @click.prevent="form.topImageID = null">Remove</a>
                   </v-flex>
                   <input ref="imageInput" style="display: none" @change="changeImage" type="file">
                   <v-flex lg12 md12 sm12 xs12 class="px-3">
@@ -206,8 +206,8 @@
                     <div v-show="form.type == 2 && (form.fixtureType == 0 || form.fixtureType == 1) && !form.rendering">
                       <h3>Bar image</h3>
                       <img @click="openFileExplorerBar"
-                        style="width: 150px; height: 150px; background: white; cursor: pointer;"
-                        ref="changeImageBar" src="" alt="">
+                        style="width: 150px; height: 150px; background: white; cursor: pointer;" ref="changeImageBar"
+                        src="" alt="">
                       <input ref="fileInputBar" style="display: none" @change="imageChangeBar" type="file">
                     </div>
                   </v-flex>
@@ -225,6 +225,26 @@
                   </v-flex>
                   <v-flex lg12 md12 sm12 xs12 class="px-3">
                     <v-checkbox v-model="form.transparent" label="Transparent"></v-checkbox>
+                  </v-flex>
+                  <v-flex v-if="renderingType0.length>0" lg8 md12 sm12 xs12>
+                    <v-select placeholder="please select" :items="renderingType0" v-model="selectedRenderingType0"
+                      label="Label Holder:">
+                    </v-select>
+                  </v-flex>
+                  <v-flex v-if="renderingType1.length>0" lg8 md12 sm12 xs12>
+                    <v-select placeholder="please select" :items="renderingType1" v-model="selectedRenderingType1"
+                      label="Shelf Edge:">
+                    </v-select>
+                  </v-flex>
+                  <v-flex v-if="renderingType2.length>0" lg8 md12 sm12 xs12>
+                    <v-select placeholder="please select" :items="renderingType2" v-model="selectedRenderingType2"
+                      label="Back Face:">
+                    </v-select>
+                  </v-flex>
+                  <v-flex v-if="renderingType3.length>0" lg8 md12 sm12 xs12>
+                    <v-select placeholder="please select" :items="renderingType3" v-model="selectedRenderingType3"
+                      label="Front Face:">
+                    </v-select>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -266,6 +286,14 @@
     name: 'FixturesModal',
     data() {
       return {
+        renderingType0: [],
+        selectedRenderingType0: null,
+        renderingType1: [],
+        selectedRenderingType1: null,
+        renderingType2: [],
+        selectedRenderingType2: null,
+        renderingType3: [],
+        selectedRenderingType3: null,
         changingSide: "",
         fixtureGroups: [],
         isSubtype: false,
@@ -475,6 +503,60 @@
       }
     },
     methods: {
+      getRenderingTypes() {
+        let self = this
+        axios.get(process.env.VUE_APP_API +
+            `Renderings?db=CR-Devinspire&type=${self.form.type}&subType=${self.form.fixtureType}`)
+          .then(r => {
+            console.log("getRenderingTypes", r.data);
+            self.renderingType0 = []
+            self.renderingType1 = []
+            self.renderingType2 = []
+            self.renderingType3 = []
+
+            r.data.forEach(rendering => {
+              switch (rendering.renderingType) {
+                case 0: {
+                  self.renderingType0.push({
+                    text: rendering.name,
+                    value: rendering.id
+                  })
+                }
+                break;
+              case 1: {
+                self.renderingType1.push({
+                  text: rendering.name,
+                  value: rendering.id
+                })
+              }
+              break;
+              case 2: {
+                self.renderingType2.push({
+                  text: rendering.name,
+                  value: rendering.id
+                })
+              }
+              break;
+              case 3: {
+                self.renderingType3.push({
+                  text: rendering.name,
+                  value: rendering.id
+                })
+              }
+              break;
+
+              default:
+                break;
+              }
+            })
+
+          })
+          .catch(e => {
+            console.log(e);
+          })
+
+      },
+
       getFixtureGroups(groupType) {
         let self = this;
 
@@ -488,7 +570,10 @@
       },
       openAdd(type, group, afterAdd) {
         let self = this;
-
+        self.selectedRenderingType0 = null
+        self.selectedRenderingType1 = null
+        self.selectedRenderingType2 = null
+        self.selectedRenderingType3 = null
         this.isAdd = true;
         this.afterAdd = afterAdd;
 
@@ -517,8 +602,44 @@
 
         this.dialog = true;
       },
+      getSelectedRenderings() {
+        let self = this
+        axios.get(process.env.VUE_APP_API + `FixtureRenderingLink?db=CR-Devinspire&Fixture_ID=${self.form.id}`)
+          .then(r => {
+            // self.form.image = r.data;
+            r.data.forEach(item => {
+              switch (item.renderingType) {
+                case 0: {
+                  self.selectedRenderingType0 = item.id
+                }
+                break;
+              case 1: {
+                self.selectedRenderingType1 = item.id
+              }
+              break;
+              case 2: {
+                self.selectedRenderingType2 = item.id
+              }
+              break;
+              case 3: {
+                self.selectedRenderingType3 = item.id
+              }
+              break;
+              default:
+                break;
+              }
+            })
+          })
+          .catch(e => {
+            console.log(e);
+          })
+      },
       openEdit(fixture, groupType, afterEdit) {
         let self = this;
+        self.selectedRenderingType0 = null
+        self.selectedRenderingType1 = null
+        self.selectedRenderingType2 = null
+        self.selectedRenderingType3 = null
         self.getFixtureGroups(groupType);
         self.getFixtureImage(fixture.id);
 
@@ -526,8 +647,9 @@
           this.form[prop] = fixture[prop];
         }
 
-        console.log(this.form)
-
+        console.log("form", this.form)
+        self.getRenderingTypes()
+        self.getSelectedRenderings()
         this.form.color = {
           hex: fixture.color
         }
@@ -555,6 +677,7 @@
 
         this.isAdd = false;
         this.afterEdit = afterEdit;
+
         this.dialog = true;
       },
       openFileExplorer() {
@@ -619,6 +742,49 @@
         }
         a.readAsDataURL(blob);
       },
+      handleRenderingLinks(callback) {
+        let self = this
+        let allRenderingArr = []
+        if (self.selectedRenderingType0 != null) {
+          allRenderingArr.push({
+            Fixture_ID: self.form.id,
+            Rendering_Fixture_ID: self.selectedRenderingType0
+          })
+        }
+        if (self.selectedRenderingType1 != null) {
+          allRenderingArr.push({
+            Fixture_ID: self.form.id,
+            Rendering_Fixture_ID: self.selectedRenderingType1
+          })
+        }
+        if (self.selectedRenderingType2 != null) {
+          allRenderingArr.push({
+            Fixture_ID: self.form.id,
+            Rendering_Fixture_ID: self.selectedRenderingType2
+          })
+        }
+        if (self.selectedRenderingType3 != null) {
+          allRenderingArr.push({
+            Fixture_ID: self.form.id,
+            Rendering_Fixture_ID: self.selectedRenderingType3
+          })
+        }
+        console.log("allRenderingArr", allRenderingArr);
+        if (allRenderingArr.length > 0) {
+          axios.post(process.env.VUE_APP_API + "FixtureRenderingLink?db=CR-Devinspire", allRenderingArr)
+            .then(r => {
+              console.log("allRenderingArr", allRenderingArr);
+
+              callback()
+            }).catch(e => {
+              console.log(e);
+              alert("error saving links")
+              callback()
+            })
+        } else {
+          callback()
+        }
+      },
       submit() {
         let self = this;
 
@@ -632,8 +798,11 @@
         if (this.isAdd) {
           axios.post(process.env.VUE_APP_API + "Fixture?db=CR-Devinspire", self.form)
             .then(r => {
-              this.afterAdd(r.data);
-              this.dialog = false;
+              self.handleRenderingLinks(cb => {
+                this.afterEdit(self.form);
+                this.dialog = false;
+              })
+
             })
             .catch(e => {
 
@@ -641,8 +810,13 @@
         } else {
           axios.put(process.env.VUE_APP_API + "Fixture?db=CR-Devinspire", self.form)
             .then(r => {
-              this.afterEdit(self.form);
-              this.dialog = false;
+              console.log("edit resp", r);
+
+              self.handleRenderingLinks(cb => {
+                this.afterEdit(self.form);
+                this.dialog = false;
+              })
+
             })
             .catch(e => {
 
@@ -679,7 +853,8 @@
 
             axios.put(process.env.VUE_APP_API + "Fixture?db=CR-Devinspire", self.form)
               .then(fr => {
-                axios.post(process.env.VUE_APP_API + "FixtureImage?db=CR-DEVINSPIRE&fixtureImageID=" + r.data.id, file)
+                axios.post(process.env.VUE_APP_API + "FixtureImage?db=CR-DEVINSPIRE&fixtureImageID=" + r.data.id,
+                    file)
                   .then(image => {
                     self.form[self.changingSide + "ImageID"] = r.data.id;
                     self.hideImages = false;
