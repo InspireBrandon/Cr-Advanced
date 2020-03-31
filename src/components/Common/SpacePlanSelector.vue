@@ -14,7 +14,7 @@
 
           </v-toolbar>
         </v-card-title>
-        <v-card-text style="display: block;">
+        <v-card-text class="pa-0" style="display: block;">
           <grid v-if="dialog" :headers="headers" :rowData="filteredSpacePlans" :setCanDistribute="setCanDistribute"
             :setComplete="setComplete" :selectedSpacePlan="selectedSpacePlan" :setSelectedPlano="setSelectedPlano" />
           <!-- <v-list class="pa-0" dense hover v-for="(sp, idx) in filteredSpacePlans" :key="idx">

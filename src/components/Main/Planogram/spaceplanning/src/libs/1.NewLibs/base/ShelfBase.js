@@ -115,7 +115,13 @@ class ShelfBase extends PlanogramItemBase {
   PositionShelf() {
     let self = this;
 
-    self.Group.setX(0 + self.Data.xOffset == undefined ? 0 : self.Data.xOffset);
+    let offset = self.Data.xOffset == undefined ? 0 : self.Data.xOffset;
+    self.Group.setX(0 + parseFloat(offset));
+
+    console.log("Groupie", self)
+    console.log("offset", offset)
+    // self.Group.setX(self.Group);
+    // self.Group.setX(0 + self.Data.xOffset == undefined ? 0 : self.Data.xOffset);
 
     // adjust label values + fixture positions
     let ctrl_label = new LabelHelper();
