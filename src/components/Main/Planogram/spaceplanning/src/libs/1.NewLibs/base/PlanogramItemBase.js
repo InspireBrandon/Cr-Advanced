@@ -444,9 +444,14 @@ class PlanogramItemBase {
     let self = this;
     if (imageData != null) {
       var backPanelImage = new Image();
-      console.log("imageData",imageData);
       
-      backPanelImage.src =  imageData;
+      let prepend = ""
+
+      if(self.Data.frontImageID == undefined || self.Data.frontImageID == null) {
+        prepend = "data:image/png;base64,"
+      }
+      
+      backPanelImage.src = prepend + imageData;
       konvaImage.image(backPanelImage);
       backPanelImage.onload = function () {
         self.Stage.draw();

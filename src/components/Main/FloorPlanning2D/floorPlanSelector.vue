@@ -1,7 +1,7 @@
 <template>
     <div>
-        <v-dialog v-model="dialog" fullscreen persistent scrollable>
-            <v-card height="400px" style="overflow: auto;">
+        <v-dialog v-model="dialog" persistent scrollable width="600px">
+            <v-card height="600px" style="overflow: auto;">
                 <v-card-title style="text-align: center; display: block;" class="headline pa-0">
                     <v-toolbar dark color="primary">
                         <v-toolbar-title>Select A Floorplan</v-toolbar-title>
