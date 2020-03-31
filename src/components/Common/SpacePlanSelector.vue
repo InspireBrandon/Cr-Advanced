@@ -14,9 +14,10 @@
 
           </v-toolbar>
         </v-card-title>
-
         <v-card-text style="display: block;">
-          <v-list class="pa-0" dense hover v-for="(sp, idx) in filteredSpacePlans" :key="idx">
+          <grid v-if="dialog" :headers="headers" :rowData="filteredSpacePlans" :setCanDistribute="setCanDistribute"
+            :setComplete="setComplete" :selectedSpacePlan="selectedSpacePlan" :setSelectedPlano="setSelectedPlano" />
+          <!-- <v-list class="pa-0" dense hover v-for="(sp, idx) in filteredSpacePlans" :key="idx">
             <v-divider v-if="!sp.archived"></v-divider>
             <v-list-tile :class="{ 'highlighted': selectedSpacePlan == sp  }" avatar @click="selectedSpacePlan = sp"
               v-if="!sp.archived">
@@ -32,7 +33,7 @@
                 </div>
               </v-list-tile-action>
             </v-list-tile>
-          </v-list>
+          </v-list> -->
         </v-card-text>
         <v-spacer></v-spacer>
         <v-card-actions>
@@ -54,14 +55,39 @@
 <script>
   import Axios from 'axios';
   import Dialog from '@/components/Common/Dialog';
-
+  import {
+    AgGridVue
+  } from "ag-grid-vue";
+  import completeCheckbox from '@/components/Common/spacePlanSelectorGridComponents/completeCheckBox'
+  import grid from '@/components/Common/spacePlanSelectorGridComponents/Grid'
   export default {
     name: 'RangeSelectorModal',
     components: {
-      Dialog
+      Dialog,
+      grid,
+      AgGridVue,
+      completeCheckbox
     },
     data() {
       return {
+
+        headers: [{
+            "headerName": "Name",
+            "field": "name",
+            "minWidth": 500,
+          }, {
+            "headerName": "",
+            "hide": false,
+            "maxWidth": 340,
+            "cellRendererFramework": "completeCheckbox"
+          },
+          {
+            "headerName": "",
+            "hide": false,
+            "maxWidth": 340,
+            "cellRendererFramework": "distribute"
+          }
+        ],
         searchText: null,
         dialog: false,
         spaceData: [],
@@ -108,6 +134,10 @@
       }
     },
     methods: {
+      setSelectedPlano(data) {
+        let self = this
+        self.selectedSpacePlan = data
+      },
       getSpacePlans(callback) {
         let self = this;
 
