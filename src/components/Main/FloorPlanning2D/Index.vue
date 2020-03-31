@@ -180,8 +180,10 @@
                                         </v-select>
                                     </v-flex>
                                     <v-flex md12 style="padding: 2px;" class="px-2 mb-1">
-                                        <v-select light :disabled="selectedClusterType == null" :placeholder="'Select ' + selectedClusterType + ' cluster'" dense
-                                            :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption" solo hide-details>
+                                        <v-select light :disabled="selectedClusterType == null"
+                                            :placeholder="'Select ' + selectedClusterType + ' cluster'" dense
+                                            :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption"
+                                            solo hide-details>
                                         </v-select>
                                     </v-flex>
                                 </v-layout>
@@ -1095,6 +1097,8 @@
             open() {
                 let self = this
                 self.$refs.floorPlanSelector.show(callback => {
+                    console.log("floorPlanSelector callback", callback);
+
                     self.Floorplan_ID = callback.id
                     if (callback.store_ID != null) {
                         self.selectedClusterType = "stores"
@@ -1115,8 +1119,11 @@
                     self.floorConfig.floorWidth = callback.width
                     axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                     self.applyFloorProperties()
-                    axios.get(process.env.VUE_APP_API + `GetFloorPlanItems?Header_ID=${callback.id}&versionID=${callback.version_ID}`).then(
+                    axios.get(process.env.VUE_APP_API +
+                        `GetFloorPlanItems?Header_ID=${callback.id}&versionID=${callback.version_ID}`).then(
                         r => {
+                            console.log("get floor items", r);
+
                             self.stage.children.forEach(child => {
                                 if (child.attrs.name != 'grid') {
                                     child.destroyChildren()
@@ -1177,7 +1184,7 @@
                             radius: item.attrs.radius,
                             name: item.attrs.name,
                             Floorplan_ID: Floorplan_ID,
-                            version_ID:self.version_ID,
+                            version_ID: self.version_ID,
                             Fixture_ID: item.saveID,
                             color: item.attrs.fill,
                             imageID: item.attrs.imageID,
@@ -1248,6 +1255,16 @@
 
                 return string
             },
+            checkdate(callback) {
+                let self = this
+                if (self.dateRange == null) {
+                    self.$refs.DateRangeSelector.show(dateRange => {
+                        self.dateRange = dateRange
+                    })
+                } else {
+                    callback()
+                }
+            },
             saveFloorplan() {
                 let self = this
                 self.stage.find('Transformer').destroy()
@@ -1257,58 +1274,62 @@
                     return
                 }
                 // self.$refs.Prompt.show("", " Save FloorPlan", "Please enter floorplan name", Name => {
-                self.$refs.spinner.show()
-                if (self.hasTape != null) {
-                    self.hasTape.shape.destroy()
-                    self.hasTape = null
-                }
-                console.log("self.dateRange",self.dateRange);
-                
-                let req = {
-                    id: self.Floorplan_ID,
-                    name: self.generateName(),
-                    width: parseFloat(self.floorConfig.floorWidth),
-                    height: parseFloat(self.floorConfig.floorHeight),
-                    blockWidth: parseFloat(self.floorConfig.blockRatio),
-                    periodTo: self.dateRange.periodTo,
-                    periodFrom: self.dateRange.periodFrom,
-                    periodToString: self.dateRange.periodToString,
-                    periodFromString: self.dateRange.periodFromString
-                }
-                
+                self.checkdate(cb => {
 
-                switch (self.selectedClusterType) {
-                    case "stores": {
-                        req.storeID = self.selectedClusterOption
+
+                    self.$refs.spinner.show()
+                    if (self.hasTape != null) {
+                        self.hasTape.shape.destroy()
+                        self.hasTape = null
+                    }
+                    console.log("self.dateRange", self.dateRange);
+
+                    let req = {
+                        id: self.Floorplan_ID,
+                        name: self.generateName(),
+                        width: parseFloat(self.floorConfig.floorWidth),
+                        height: parseFloat(self.floorConfig.floorHeight),
+                        blockWidth: parseFloat(self.floorConfig.blockRatio),
+                        periodTo: self.dateRange.periodTo,
+                        periodFrom: self.dateRange.periodFrom,
+                        periodToString: self.dateRange.periodToString,
+                        periodFromString: self.dateRange.periodFromString
+                    }
+
+
+                    switch (self.selectedClusterType) {
+                        case "stores": {
+                            req.storeID = self.selectedClusterOption
+                        }
+                        break;
+                    case "cluster": {
+                        req.storeCluster_ID = self.selectedClusterOption
                     }
                     break;
-                case "cluster": {
-                    req.storeCluster_ID = self.selectedClusterOption
-                }
-                break;
 
-                default:
-                    break;
-                }
+                    default:
+                        break;
+                    }
 
-                console.log("SAVE REQ",req);
-                
-                axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                axios.post(process.env.VUE_APP_API + `saveFloorHeader`, req).then(r => {
-                    self.Floorplan_ID = r.data.header.id
-                    self.version_ID = r.data.version.id
-                    self.imageIDArr = []
-                    self.FormatItems(self.stage.children, self.saveArr, 0, self.Floorplan_ID,
-                        callback => {
-                            //console.log(self.saveArr);
-                            axios.post(process.env.VUE_APP_API +
-                                `saveFloorHeader?header_ID=${self.Floorplan_ID}`, self
-                                .saveArr).then(
-                                resp => {
-                                    self.handleImageSaving()
-                                })
+                    console.log("SAVE REQ", req);
 
-                        })
+                    axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                    axios.post(process.env.VUE_APP_API + `saveFloorHeader`, req).then(r => {
+                        self.Floorplan_ID = r.data.header.id
+                        self.version_ID = r.data.version.id
+                        self.imageIDArr = []
+                        self.FormatItems(self.stage.children, self.saveArr, 0, self.Floorplan_ID,
+                            callback => {
+                                //console.log(self.saveArr);
+                                axios.post(process.env.VUE_APP_API +
+                                    `saveFloorHeader?header_ID=${self.Floorplan_ID}`, self
+                                    .saveArr).then(
+                                    resp => {
+                                        self.handleImageSaving()
+                                    })
+
+                            })
+                    })
                 })
                 // })
             },

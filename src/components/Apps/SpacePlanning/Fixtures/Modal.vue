@@ -509,10 +509,10 @@
             `Renderings?db=CR-Devinspire&type=${self.form.type}&subType=${self.form.fixtureType}`)
           .then(r => {
             console.log("getRenderingTypes", r.data);
-            self.renderingType0 = []
-            self.renderingType1 = []
-            self.renderingType2 = []
-            self.renderingType3 = []
+            self.renderingType0 = [{text:"none",value:-1}]
+            self.renderingType1 = [{text:"none",value:-1}]
+            self.renderingType2 = [{text:"none",value:-1}]
+            self.renderingType3 = [{text:"none",value:-1}]
 
             r.data.forEach(rendering => {
               switch (rendering.renderingType) {
