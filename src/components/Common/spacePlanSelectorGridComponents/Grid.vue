@@ -1,15 +1,12 @@
 <template>
     <div>
         <ag-grid-vue v-if="rowData" :gridOptions="gridOptions" @selection-changed="onSelectionChanged" :sideBar='false'
-            style="width: 100%;  height: calc(100vh - 223px);" :defaultColDef="defaultColDef" class="ag-theme-balham"
+            style="width: 100%;  height: calc(100vh - 120px);" :defaultColDef="defaultColDef" class="ag-theme-balham"
             :columnDefs="headers" :rowData="rowData" :enableSorting="true" :enableFilter="true"
             :suppressRowClickSelection="false" :enableRangeSelection="true" rowSelection="multiple"
             :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :gridReady="gridReady"
             :onGridReady="onGridReady" :groupMultiAutoColumn="true">
         </ag-grid-vue>
-        <v-toolbar dark dense class="pa-0">
-            <span>rows : {{rowData.length}}</span>
-        </v-toolbar>
     </div>
 </template>
 

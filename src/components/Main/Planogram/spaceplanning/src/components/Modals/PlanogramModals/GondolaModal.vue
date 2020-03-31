@@ -116,7 +116,7 @@
                     </v-select>
                   </v-flex>
                 </v-layout>
-                <v-layout>
+                <!-- <v-layout>
                   <v-flex lg6 md6 sm6 xs6>
                     <h3>Side Image</h3>
                     <v-card class="elevation-5" @click="openSideFileExplorer"
@@ -135,7 +135,7 @@
                     </v-card>
                     <input ref="fileTopInput" style="display: none" @change="imageTopChange" type="file">
                   </v-flex>
-                </v-layout>
+                </v-layout> -->
               </v-container>
             </v-card>
           </v-flex>
