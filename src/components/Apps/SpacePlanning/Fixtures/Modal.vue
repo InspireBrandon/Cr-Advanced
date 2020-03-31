@@ -246,6 +246,11 @@
                       label="Front Face:">
                     </v-select>
                   </v-flex>
+                  <v-flex v-if="renderingType4.length>0" lg8 md12 sm12 xs12>
+                    <v-select placeholder="please select" :items="renderingType4" v-model="selectedRenderingType4"
+                      label="Front Face:">
+                    </v-select>
+                  </v-flex>
                 </v-layout>
               </v-container>
             </v-card>
@@ -294,6 +299,8 @@
         selectedRenderingType2: null,
         renderingType3: [],
         selectedRenderingType3: null,
+         renderingType4: [],
+        selectedRenderingType4: null,
         changingSide: "",
         fixtureGroups: [],
         isSubtype: false,
@@ -403,6 +410,9 @@
           }, {
             text: 'Back Face',
             value: 2
+          }, {
+            text: 'Bracket',
+            value: 4
           }
         ],
         renderingTypeBase: [{
@@ -509,11 +519,26 @@
             `Renderings?db=CR-Devinspire&type=${self.form.type}&subType=${self.form.fixtureType}`)
           .then(r => {
             console.log("getRenderingTypes", r.data);
-            self.renderingType0 = [{text:"none",value:-1}]
-            self.renderingType1 = [{text:"none",value:-1}]
-            self.renderingType2 = [{text:"none",value:-1}]
-            self.renderingType3 = [{text:"none",value:-1}]
-
+            self.renderingType0 = [{
+              text: "none",
+              value: -1
+            }]
+            self.renderingType1 = [{
+              text: "none",
+              value: -1
+            }]
+            self.renderingType2 = [{
+              text: "none",
+              value: -1
+            }]
+            self.renderingType3 = [{
+              text: "none",
+              value: -1
+            }]
+            self.renderingType4 = [{
+              text: "none",
+              value: -1
+            }]
             r.data.forEach(rendering => {
               switch (rendering.renderingType) {
                 case 0: {
@@ -539,6 +564,14 @@
               break;
               case 3: {
                 self.renderingType3.push({
+                  text: rendering.name,
+                  value: rendering.id
+                })
+              }
+              break;
+
+                case 4: {
+                self.renderingType4.push({
                   text: rendering.name,
                   value: rendering.id
                 })
@@ -574,6 +607,7 @@
         self.selectedRenderingType1 = null
         self.selectedRenderingType2 = null
         self.selectedRenderingType3 = null
+        self.selectedRenderingType4 = null
         this.isAdd = true;
         this.afterAdd = afterAdd;
 
@@ -625,6 +659,10 @@
                 self.selectedRenderingType3 = item.id
               }
               break;
+              case 4: {
+                self.selectedRenderingType4 = item.id
+              }
+              break;
               default:
                 break;
               }
@@ -640,6 +678,7 @@
         self.selectedRenderingType1 = null
         self.selectedRenderingType2 = null
         self.selectedRenderingType3 = null
+         self.selectedRenderingType4 = null
         self.getFixtureGroups(groupType);
         self.getFixtureImage(fixture.id);
 
@@ -767,6 +806,12 @@
           allRenderingArr.push({
             Fixture_ID: self.form.id,
             Rendering_Fixture_ID: self.selectedRenderingType3
+          })
+        }
+         if (self.selectedRenderingType4 != null) {
+          allRenderingArr.push({
+            Fixture_ID: self.form.id,
+            Rendering_Fixture_ID: self.selectedRenderingType4
           })
         }
         console.log("allRenderingArr", allRenderingArr);

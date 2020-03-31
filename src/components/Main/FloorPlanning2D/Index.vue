@@ -1260,6 +1260,7 @@
                 if (self.dateRange == null) {
                     self.$refs.DateRangeSelector.show(dateRange => {
                         self.dateRange = dateRange
+                        callback()
                     })
                 } else {
                     callback()
@@ -1275,8 +1276,6 @@
                 }
                 // self.$refs.Prompt.show("", " Save FloorPlan", "Please enter floorplan name", Name => {
                 self.checkdate(cb => {
-
-
                     self.$refs.spinner.show()
                     if (self.hasTape != null) {
                         self.hasTape.shape.destroy()
@@ -1290,10 +1289,10 @@
                         width: parseFloat(self.floorConfig.floorWidth),
                         height: parseFloat(self.floorConfig.floorHeight),
                         blockWidth: parseFloat(self.floorConfig.blockRatio),
-                        periodTo: self.dateRange.periodTo,
-                        periodFrom: self.dateRange.periodFrom,
-                        periodToString: self.dateRange.periodToString,
-                        periodFromString: self.dateRange.periodFromString
+                        periodTo: self.dateRange.dateTo,
+                        periodFrom: self.dateRange.dateFrom,
+                        periodToString: self.dateRange.dateToString,
+                        periodFromString: self.dateRange.dateFromString
                     }
 
 
