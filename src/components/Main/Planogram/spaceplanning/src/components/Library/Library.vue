@@ -6,9 +6,9 @@
       <div v-else>NOTHING SELECTED</div>
     </v-chip>
     <v-divider vertical></v-divider>
-    <v-menu v-model="menu" :close-on-content-click="false" :nudge-width="200" offset-x>
+    <v-menu v-model="menu" :close-on-content-click="false" :nudge-width="100" offset-y>
       <v-btn small slot="activator">Library</v-btn>
-      <v-card>
+      <v-card width="1000">
         <v-tabs centered color="primary" dark icons-and-text>
           <v-tabs-slider color="white"></v-tabs-slider>
 
