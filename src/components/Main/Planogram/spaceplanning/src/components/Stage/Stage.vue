@@ -1689,25 +1689,25 @@
               }
               switch (item.renderingType) {
                 case 0: {
-                  fixture.RenderingsItems.Front = item
+                  fixture.RenderingsItems.LabelHolder = item
                   if (fixture.frontImageID != null) {
-                    fixture.RenderingsItems.Front.image = process.env.VUE_APP_API +
+                    fixture.RenderingsItems.LabelHolder.image = process.env.VUE_APP_API +
                       `FixtureImage?db=CR-Devinspire&fixtureImageID=${item.id}`
                   }
                 }
                 break;
               case 1: {
-                fixture.RenderingsItems.Front = item
+                fixture.RenderingsItems.ShelfEdge = item
                 if (fixture.frontImageID != null) {
-                  fixture.RenderingsItems.Front.image = process.env.VUE_APP_API +
+                  fixture.RenderingsItems.ShelfEdge.image = process.env.VUE_APP_API +
                     `FixtureImage?db=CR-Devinspire&fixtureImageID=${item.id}`
                 }
               }
               break;
               case 2: {
-                fixture.RenderingsItems.Front = item
+                fixture.RenderingsItems.Back = item
                 if (fixture.frontImageID != null) {
-                  fixture.RenderingsItems.Front.image = process.env.VUE_APP_API +
+                  fixture.RenderingsItems.Back.image = process.env.VUE_APP_API +
                     `FixtureImage?db=CR-Devinspire&fixtureImageID=${item.id}`
                 }
               }
@@ -1722,7 +1722,13 @@
 
               }
               break;
-              case 4: {}
+              case 4: {
+                fixture.RenderingsItems.Side = item
+                if (fixture.frontImageID != null) {
+                  fixture.RenderingsItems.Side.image = process.env.VUE_APP_API +
+                    `FixtureImage?db=CR-Devinspire&fixtureImageID=${item.id}`
+                }
+              }
               break;
               default:
                 break;
@@ -1756,6 +1762,15 @@
         if (data.data.frontImageID != null) {
           data.data.image = process.env.VUE_APP_API +
             `FixtureImage?db=CR-Devinspire&fixtureImageID=${data.data.frontImageID}`
+        }
+        if (data.data.defaultPeg != 0) {
+          if (data.data.defaultPegDetails == null) {
+            axios.get(process.env.VUE_APP_API + `Fixture/${data.data.defaultPeg}?db=CR-Devinspire`)
+              .then(r => {
+                console.log("defaultPegDetails", r);
+                data.data.defaultPegDetails = r.data
+              })
+          }
         }
         self.getSelectedRenderings(data.data, cb => {
           data.data = cb
@@ -2010,6 +2025,8 @@
         }
         break;
         case "PEGBOARD": {
+          console.log("PEGBOARD", data.data);
+
           if (data.data.defaultPegDetails == null) {
             console.error("[PEGBOARD] Pegboar has no default peg assigned");
             // TODO: Call generic error modal

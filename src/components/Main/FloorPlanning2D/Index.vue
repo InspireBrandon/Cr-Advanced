@@ -1294,11 +1294,11 @@
                         periodToString: self.dateRange.dateToString,
                         periodFromString: self.dateRange.dateFromString
                     }
-
-
+                    console.log();
+                    
                     switch (self.selectedClusterType) {
                         case "stores": {
-                            req.storeID = self.selectedClusterOption
+                            req.store_ID = self.selectedClusterOption
                         }
                         break;
                     case "cluster": {
@@ -1307,6 +1307,7 @@
                     break;
 
                     default:
+                    alert("didnt set cluster")
                         break;
                     }
 
