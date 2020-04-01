@@ -187,7 +187,7 @@ class PaletteBase extends PlanogramItemBase {
       y: 0,
       width: self.TotalWidth,
       height: self.TotalHeight,
-      fill: self.Data.color,
+      color: 'transparent',
       transformsEnabled: 'position'
     })
 

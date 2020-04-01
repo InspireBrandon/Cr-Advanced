@@ -340,7 +340,7 @@ class BasketBase extends PlanogramItemBase {
       y: 0,
       width: self.Data.width * self.Ratio,
       height: self.Data.height * self.Ratio,
-      fill: self.Data.color,
+      color: 'transparent',
       transformsEnabled: 'position'
     })
 
