@@ -46,16 +46,12 @@ class ShelfBuilder {
             case 'BASE': {
             }break;
             case 'SHELF': {
-
             }break;
             case 'LABELHOLDER': {
-
             }break;
             case 'BASKET': {
-
             }break;
             case 'PEGBOARD': {
-
             }break;
         }
     }

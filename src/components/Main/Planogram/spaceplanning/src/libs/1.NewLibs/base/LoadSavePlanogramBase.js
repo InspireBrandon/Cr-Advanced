@@ -326,9 +326,9 @@ class LoadSavePlanogramBase {
             })
             setTimeout(() => {
               self.createDetailTX(clusterData, dimensionData, resultSpace, fixtureData, planogramProducts, createDetailCallback => {
-                // self.createFloorplanFixtures(createDetailCallback, allItems, output, vuex, storeCount, stage, floorfixturecb => {
+                self.createFloorplanFixtures(createDetailCallback, allItems, output, vuex, storeCount, stage, floorfixturecb => {
                   close()
-                // })
+                })
               })
 
             }, 500);
@@ -661,9 +661,9 @@ class LoadSavePlanogramBase {
             })
             setTimeout(() => {
               self.createDetailTX(clusterData, dimensionData, resultSpace, fixtureData, planogramProducts, createDetailCallback => {
-                // self.createFloorplanFixtures(createDetailCallback, allItems, output, vuex, storeCount, stage, floorfixturecb => {
+                self.createFloorplanFixtures(createDetailCallback, allItems, output, vuex, storeCount, stage, floorfixturecb => {
                   close()
-                // })
+                })
               })
 
             }, 500);

@@ -248,7 +248,7 @@
                   </v-flex>
                   <v-flex v-if="renderingType4.length>0" lg8 md12 sm12 xs12>
                     <v-select placeholder="please select" :items="renderingType4" v-model="selectedRenderingType4"
-                      label="Front Face:">
+                      label="Bracket:">
                     </v-select>
                   </v-flex>
                 </v-layout>
