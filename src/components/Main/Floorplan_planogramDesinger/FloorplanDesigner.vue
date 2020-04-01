@@ -114,6 +114,8 @@
             open(planogram_ID) {
                 let self = this
                 self.planogram_ID = planogram_ID
+                console.log("planogram_ID",self.planogram_ID);
+                
                 self.dialog = true
                 self.initialise()
             },
@@ -293,7 +295,7 @@
                 axios.get(process.env.VUE_APP_API +
                     `FloorPlan_Fixtures/GetFixtures?planogramDetail_ID=${self.planogram_ID}`).then(
                     r => {
-                        console.log(r.data);
+                        console.log("getPlanogramData",r.data);
                         self.drops = r.data
                         callback()
                     })

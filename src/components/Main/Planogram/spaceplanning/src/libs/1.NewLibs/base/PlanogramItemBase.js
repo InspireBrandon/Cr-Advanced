@@ -443,6 +443,9 @@ class PlanogramItemBase {
   LoadImage(konvaImage, imageData) {
     let self = this;
     if (imageData != null) {
+      console.log("LoadDataa",self.Data);
+      
+      
       var backPanelImage = new Image();
       
       let prepend = ""

@@ -326,9 +326,9 @@ class LoadSavePlanogramBase {
             })
             setTimeout(() => {
               self.createDetailTX(clusterData, dimensionData, resultSpace, fixtureData, planogramProducts, createDetailCallback => {
-                // self.createFloorplanFixtures(createDetailCallback, allItems, output, vuex, storeCount, stage, floorfixturecb => {
+                self.createFloorplanFixtures(createDetailCallback, allItems, output, vuex, storeCount, stage, floorfixturecb => {
                   close()
-                // })
+                })
               })
 
             }, 500);
@@ -357,6 +357,8 @@ class LoadSavePlanogramBase {
     }
     axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
     axios.post(process.env.VUE_APP_API + `FloorPlan_Fixtures/Create`, request).then(r => {
+      console.log("FloorPlan_Fixtures/Create",r);
+      
       stage.getSplitImages(callback => {
         r.data.gondolas.forEach((Drop, Dropindex) => {
           callback.forEach((image, imageindex) => {
@@ -661,9 +663,9 @@ class LoadSavePlanogramBase {
             })
             setTimeout(() => {
               self.createDetailTX(clusterData, dimensionData, resultSpace, fixtureData, planogramProducts, createDetailCallback => {
-                // self.createFloorplanFixtures(createDetailCallback, allItems, output, vuex, storeCount, stage, floorfixturecb => {
+                self.createFloorplanFixtures(createDetailCallback, allItems, output, vuex, storeCount, stage, floorfixturecb => {
                   close()
-                // })
+                })
               })
 
             }, 500);

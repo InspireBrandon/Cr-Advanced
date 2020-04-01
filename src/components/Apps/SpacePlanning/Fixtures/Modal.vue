@@ -226,27 +226,27 @@
                   <v-flex lg12 md12 sm12 xs12 class="px-3">
                     <v-checkbox v-model="form.transparent" label="Transparent"></v-checkbox>
                   </v-flex>
-                  <v-flex v-if="renderingType0.length>0" lg8 md12 sm12 xs12>
+                  <v-flex v-if="renderingType0.length>1" lg8 md12 sm12 xs12>
                     <v-select placeholder="please select" :items="renderingType0" v-model="selectedRenderingType0"
                       label="Label Holder:">
                     </v-select>
                   </v-flex>
-                  <v-flex v-if="renderingType1.length>0" lg8 md12 sm12 xs12>
+                  <v-flex v-if="renderingType1.length>1" lg8 md12 sm12 xs12>
                     <v-select placeholder="please select" :items="renderingType1" v-model="selectedRenderingType1"
                       label="Shelf Edge:">
                     </v-select>
                   </v-flex>
-                  <v-flex v-if="renderingType2.length>0" lg8 md12 sm12 xs12>
+                  <v-flex v-if="renderingType2.length>1" lg8 md12 sm12 xs12>
                     <v-select placeholder="please select" :items="renderingType2" v-model="selectedRenderingType2"
                       label="Back Face:">
                     </v-select>
                   </v-flex>
-                  <v-flex v-if="renderingType3.length>0" lg8 md12 sm12 xs12>
+                  <v-flex v-if="renderingType3.length>1" lg8 md12 sm12 xs12>
                     <v-select placeholder="please select" :items="renderingType3" v-model="selectedRenderingType3"
                       label="Front Face:">
                     </v-select>
                   </v-flex>
-                  <v-flex v-if="renderingType4.length>0" lg8 md12 sm12 xs12>
+                  <v-flex v-if="renderingType4.length>1" lg8 md12 sm12 xs12>
                     <v-select placeholder="please select" :items="renderingType4" v-model="selectedRenderingType4"
                       label="Front Face:">
                     </v-select>

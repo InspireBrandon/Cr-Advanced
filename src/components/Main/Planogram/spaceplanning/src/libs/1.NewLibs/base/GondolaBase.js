@@ -136,7 +136,8 @@ class GondolaBase extends PlanogramItemBase {
     let self = this;
 
     self.RemoveRenderings();
-
+    console.log("AddRenderings",self.Data);
+    
     if (self.Data.RenderingsItems == undefined || self.Data.RenderingsItems == null) {
       return;
     }
