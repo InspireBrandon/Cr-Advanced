@@ -1673,6 +1673,65 @@
       acceptDrag(ev) {
         ev.preventDefault();
       },
+      getSelectedRenderings(fixture, callback) {
+        let self = this
+        console.log("getSelectedRenderings---fixture", fixture);
+
+        axios.get(process.env.VUE_APP_API + `FixtureRenderingLink?db=CR-Devinspire&Fixture_ID=${fixture.id}`)
+          .then(r => {
+            // self.form.image = r.data;
+            r.data.forEach(item => {
+              if (fixture.RenderingsItems == null || fixture.RenderingsItems == undefined) {
+                let Front
+                fixture.RenderingsItems = {
+                  Front
+                }
+              }
+              switch (item.renderingType) {
+                case 0: {
+                  fixture.RenderingsItems.Front = item
+                  if (fixture.frontImageID != null) {
+                    fixture.RenderingsItems.Front.image = process.env.VUE_APP_API +
+                      `FixtureImage?db=CR-Devinspire&fixtureImageID=${item.id}`
+                  }
+                }
+                break;
+              case 1: {
+                fixture.RenderingsItems.Front = item
+                if (fixture.frontImageID != null) {
+                  fixture.RenderingsItems.Front.image = process.env.VUE_APP_API +
+                    `FixtureImage?db=CR-Devinspire&fixtureImageID=${item.id}`
+                }
+              }
+              break;
+              case 2: {
+                fixture.RenderingsItems.Front = item
+                if (fixture.frontImageID != null) {
+                  fixture.RenderingsItems.Front.image = process.env.VUE_APP_API +
+                    `FixtureImage?db=CR-Devinspire&fixtureImageID=${item.id}`
+                }
+              }
+              break;
+              case 3: {
+                // front
+                fixture.RenderingsItems.Front = item
+                if (fixture.frontImageID != null) {
+                  fixture.RenderingsItems.Front.image = process.env.VUE_APP_API +
+                    `FixtureImage?db=CR-Devinspire&fixtureImageID=${item.id}`
+                }
+
+              }
+              break;
+              case 4: {}
+              break;
+              default:
+                break;
+              }
+            })
+            callback(fixture)
+          })
+
+      },
       dropDragItem(ev) {
         ev.preventDefault();
 
@@ -1695,26 +1754,29 @@
 
         //#endregion
         if (data.data.frontImageID != null) {
-           data.data.image = process.env.VUE_APP_API +
-          `FixtureImage?db=CR-Devinspire&fixtureImageID=${data.data.frontImageID}`
+          data.data.image = process.env.VUE_APP_API +
+            `FixtureImage?db=CR-Devinspire&fixtureImageID=${data.data.frontImageID}`
         }
-       
-        switch (dragType.toUpperCase()) {
-          case "WAREHOUSE": {
-            self.addWarehouseProduct(stage, data, ev);
+        self.getSelectedRenderings(data.data, cb => {
+          data.data = cb
+          switch (dragType.toUpperCase()) {
+            case "WAREHOUSE": {
+              self.addWarehouseProduct(stage, data, ev);
+            }
+            break;
+          case "LIBRARY": {
+            if (data.type == "CUSTOM") {
+              self.addCustomLibraryItem(stage, data, ev)
+            } else if (data.type == "CUSTOM_PLANOGRAM") {
+              self.addCustomPlanogram(stage, data, ev);
+            } else {
+              self.addLibraryItem(stage, data, ev);
+            }
           }
           break;
-        case "LIBRARY": {
-          if (data.type == "CUSTOM") {
-            self.addCustomLibraryItem(stage, data, ev)
-          } else if (data.type == "CUSTOM_PLANOGRAM") {
-            self.addCustomPlanogram(stage, data, ev);
-          } else {
-            self.addLibraryItem(stage, data, ev);
           }
-        }
-        break;
-        }
+        })
+
 
 
       },
