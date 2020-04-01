@@ -124,6 +124,10 @@
                     v-if="!form.rendering && (form.type == 2 && (form.fixtureType == 0 || form.fixtureType == 1))">
                     <v-text-field type="number" v-model="form.overhang" label="Overhang:" suffix="cm"></v-text-field>
                   </v-flex>
+                  <v-flex lg8 md12
+                    v-if="!form.rendering && (( form.type == 2 && form.fixtureType == 1 || form.type == 3 && form.fixtureType == 4))">
+                    <v-text-field type="number" v-model="form.x_Offset" label="X Offset:" suffix="cm"></v-text-field>
+                  </v-flex>
                   <v-flex lg8 md12 sm12 xs12
                     v-if="form.spreadProducts!='SFE'&&(!form.rendering && form.type == 2 && form.fixtureType != 2 || form.fixtureType==4&&form.type==3)">
                     <v-checkbox hide-details label="Squish" v-model="form.squish"></v-checkbox>
@@ -506,7 +510,8 @@
           sideImageID: null,
           topImage: null,
           topImageID: null,
-          transparent: false
+          transparent: false,
+          x_Offset:null
         },
         showModal: false,
         hideImages: false
