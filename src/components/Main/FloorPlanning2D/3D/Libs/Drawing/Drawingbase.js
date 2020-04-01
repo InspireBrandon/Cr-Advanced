@@ -18,15 +18,18 @@ class DrawingBase {
     setPosition() {
         let self = this;
 
-        self.element.x = (self.data.x + 0.5 * self.data.width) / self.pxlToMeterRatio;
-        self.element.y = self.data.depth / self.pxlToMeterRatio / 2;
-        self.element.z = -((self.data.y + 0.5 * self.data.height) / self.pxlToMeterRatio);
+        self.element.position.x = (self.data.x + 0.5 * self.data.width) / self.pxlToMeterRatio;
+        self.element.position.y = self.data.depth / self.pxlToMeterRatio / 2;
+        self.element.position.z = -((self.data.y + 0.5 * self.data.height) / self.pxlToMeterRatio);
 
-        let xPivot = -(self.data.width / 2 / self.pxlToMeterRatio);
-        let zPivot = self.data.height / 2 / self.pxlToMeterRatio;
+        console.log(self.data);
 
-        self.element.setPivotPoint(new BABYLON.Vector3(xPivot, 0, zPivot));
-        self.element.rotation.y = degreesToRadians(self.data.rotation);
+        if (self.data.rotation != undefined && self.data.rotation != null) {
+            let xPivot = -(self.data.width / 2 / self.pxlToMeterRatio);
+            let zPivot = self.data.height / 2 / self.pxlToMeterRatio;
+            self.element.setPivotPoint(new BABYLON.Vector3(xPivot, 0, zPivot));
+            self.element.rotation.y = degreesToRadians(self.data.rotation);
+        }
     }
 }
 

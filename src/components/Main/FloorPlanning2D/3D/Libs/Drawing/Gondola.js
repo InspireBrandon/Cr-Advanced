@@ -4,9 +4,11 @@
 // Date: 2020-04-01
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class Gondola {
-    constructor() {
+import Boxbase from './Boxbase.js'
 
+class Gondola extends Boxbase {
+    constructor(params) {
+        super(params);
     }
 }
 

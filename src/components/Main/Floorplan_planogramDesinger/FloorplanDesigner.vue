@@ -6,6 +6,7 @@
                     Planogram Designer
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
+                <v-btn icon @click="openThreeDee">3D</v-btn>
                 <v-btn icon @click="dialog=false">
                     <v-icon>close</v-icon>
                 </v-btn>
@@ -64,6 +65,7 @@
                 </v-layout>
             </v-container>
             <Spinner ref="spinner"></Spinner>
+            <ThreeDee ref="threeDee"></ThreeDee>
         </div>
     </v-dialog>
 </template>
@@ -85,6 +87,7 @@
     import SnappingHandler from '@/components/Main/FloorPlanning2D/libs/drawing/Functions/snapping-handler'
     import Spinner from '@/components/Common/Spinner';
 
+    import ThreeDee from './ThreeDee';
 
     import expansionItem from "./expansionItem"
     import {
@@ -94,6 +97,7 @@
         components: {
             expansionItem,
             Spinner,
+            ThreeDee
         },
         data() {
             return {
@@ -711,6 +715,11 @@
                         }
                     })
                 })
+            },
+            openThreeDee() {
+                let self = this;
+
+                self.$refs.threeDee.show(self.drops);
             }
         },
         computed: {
