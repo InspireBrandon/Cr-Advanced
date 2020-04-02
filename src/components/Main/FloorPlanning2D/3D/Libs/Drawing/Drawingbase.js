@@ -22,8 +22,6 @@ class DrawingBase {
         self.element.position.y = self.data.depth / self.pxlToMeterRatio / 2;
         self.element.position.z = -((self.data.y + 0.5 * self.data.height) / self.pxlToMeterRatio);
 
-        console.log(self.data);
-
         if (self.data.rotation != undefined && self.data.rotation != null) {
             let xPivot = -(self.data.width / 2 / self.pxlToMeterRatio);
             let zPivot = self.data.height / 2 / self.pxlToMeterRatio;

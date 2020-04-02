@@ -165,6 +165,8 @@
                 let self = this;
 
                 drops.forEach(drop => {
+                    console.log(drop);
+
                     self.drawingHelper.draw(drop);
                 });
             }
