@@ -1847,6 +1847,11 @@
             self.addNewGondola(data.data);
           }
           break;
+        case "OBSTRUCTION": {
+          //
+          self.addNewGondola(data.data);
+        }
+        break;
         case "LABELHOLDER": {
           data.data["Type"] = "LABELHOLDER";
 
@@ -1970,10 +1975,6 @@
               }
             })
 
-        }
-        break;
-        case "OBSTRUCTION": {
-          //
         }
         break;
         case "SHELF": {

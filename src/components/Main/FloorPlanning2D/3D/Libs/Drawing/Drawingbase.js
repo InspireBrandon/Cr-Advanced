@@ -8,7 +8,7 @@ import * as BABYLON from "@babylonjs/core/Legacy/legacy";
 
 class DrawingBase {
     constructor(params) {
-        this.pxlToMeterRatio = 25;
+        this.pxlToMeterRatio = 100;
         this.scene = params.scene;
         this.name = params.name;
         this.data = params.data;

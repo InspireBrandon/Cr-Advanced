@@ -782,6 +782,30 @@
           hex: "#fff"
         };
 
+        this.form.frontColor = {
+          hex: "#fff"
+        };
+
+        this.form.backColor = {
+          hex: "#fff"
+        };
+
+        this.form.topColor = {
+          hex: "#fff"
+        };
+
+        this.form.bottomColor = {
+          hex: "#fff"
+        };
+
+        this.form.leftColor = {
+          hex: "#fff"
+        };
+
+        this.form.rightColor = {
+          hex: "#fff"
+        };
+
         this.form.pegHoleColor = {
           hex: "#000"
         };
@@ -853,8 +877,33 @@
         console.log("form", this.form);
         self.getRenderingTypes();
         self.getSelectedRenderings();
+
         this.form.color = {
           hex: fixture.color
+        };
+
+        this.form.frontColor = {
+          hex: fixture.frontColor
+        };
+
+        this.form.backColor = {
+          hex: fixture.backColor
+        };
+
+        this.form.topColor = {
+          hex: fixture.topColor
+        };
+
+        this.form.bottomColor = {
+          hex: fixture.bottomColor
+        };
+
+        this.form.leftColor = {
+          hex: fixture.leftColor
+        };
+
+        this.form.rightColor = {
+          hex: fixture.rightColor
         };
 
         this.form.pegHoleColor = {
@@ -1003,16 +1052,14 @@
       submit() {
         let self = this;
 
-        console.log(self.form.color);
-
-        self.form.color =
-          self.form.color.hex == undefined ? "#fff" : self.form.color.hex;
-        self.form.pegHoleColor =
-          self.form.pegHoleColor.hex == undefined ?
-          "#000" :
-          self.form.pegHoleColor.hex;
-
-        console.log(this.isAdd);
+        self.form.color = self.form.color.hex == undefined ? "#fff" : self.form.color.hex;
+        self.form.frontColor = self.form.frontColor.hex == undefined ? "#fff" : self.form.frontColor.hex;
+        self.form.backColor = self.form.backColor.hex == undefined ? "#fff" : self.form.backColor.hex;
+        self.form.leftColor = self.form.leftColor.hex == undefined ? "#fff" : self.form.leftColor.hex;
+        self.form.rightColor = self.form.rightColor.hex == undefined ? "#fff" : self.form.rightColor.hex;
+        self.form.topColor = self.form.topColor.hex == undefined ? "#fff" : self.form.topColor.hex;
+        self.form.bottomColor = self.form.bottomColor.hex == undefined ? "#fff" : self.form.bottomColor.hex;
+        self.form.pegHoleColor = self.form.pegHoleColor.hex == undefined ? "#000" : self.form.pegHoleColor.hex;
 
         if (this.isAdd) {
           axios
