@@ -640,7 +640,7 @@
                 self.form.leftTransparent = self.form.rightTransparent
                 self.form.leftColor = self.form.rightColor
                 break;
-                
+
               case "Left":
                 self.form.rightImageID = self.form.leftImageID
                 self.form.rightTransparent = self.form.leftTransparent
@@ -1071,10 +1071,14 @@
           axios
             .post(process.env.VUE_APP_API + "Fixture?db=CR-Devinspire", self.form)
             .then(r => {
-              self.handleRenderingLinks(cb => {
-                this.afterEdit(self.form);
-                this.dialog = false;
-              });
+              if (r.data == null) {
+                alert("Failed to save")
+              } else {
+                self.handleRenderingLinks(cb => {
+                  this.afterEdit(self.form);
+                  this.dialog = false;
+                });
+              }
             })
             .catch(e => {});
         } else {
