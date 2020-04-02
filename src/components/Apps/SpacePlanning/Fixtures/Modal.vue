@@ -637,21 +637,33 @@
             switch (side) {
               case "Right":
                 self.form.leftImageID = self.form.rightImageID
+                self.form.leftTransparent = self.form.rightTransparent
+                self.form.leftColor = self.form.rightColor
                 break;
               case "Left":
                 self.form.rightImageID = self.form.leftImageID
+                self.form.rightTransparent = self.form.leftTransparent
+                self.form.rightColor = self.form.leftColor
                 break;
               case "Top":
                 self.form.bottomImageID = self.form.topImageID
+                self.form.bottomTransparent = self.form.topTransparent
+                self.form.bottomColor = self.form.topColor
                 break;
               case "Bottom":
                 self.form.topImageID = self.form.bottomImageID
+                self.form.topTransparent = self.form.bottomTransparent
+                self.form.topColor = self.form.bottomColor
                 break;
               case "Back":
                 self.form.frontImageID = self.form.backImageID
+                self.form.frontTransparent = self.form.backTransparent
+                self.form.frontColor = self.form.backColor
                 break;
               case "Front":
                 self.form.backImageID = self.form.frontImageID
+                self.form.backTransparent = self.form.frontTransparent
+                self.form.backColor = self.form.frontColor
                 break;
               default:
                 break;
