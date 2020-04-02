@@ -162,7 +162,7 @@
                   <v-flex lg8 md12>
                     <v-text-field type="number" v-model="form.width" label="Width:" suffix="cm"></v-text-field>
                   </v-flex>
-                  <v-flex lg8 md12 v-if="!form.rendering">
+                  <v-flex lg8 md12>
                     <v-text-field type="number" v-model="form.depth" label="Depth:" suffix="cm"></v-text-field>
                   </v-flex>
                   <!-- <v-flex lg8 md12 sm12 xs12
@@ -191,6 +191,18 @@
                       type="number"
                       v-model="form.x_Offset"
                       label="X Offset:"
+                      suffix="cm"
+                    ></v-text-field>
+                  </v-flex>
+                  <v-flex
+                    lg8
+                    md12
+                   
+                  >
+                    <v-text-field
+                      type="number"
+                      v-model="form.y_Offset"
+                      label="Y Offset:"
                       suffix="cm"
                     ></v-text-field>
                   </v-flex>
@@ -740,7 +752,8 @@ export default {
         rightTransparent: false,
         bottomTransparent: false,
         topTransparent: false,
-        x_Offset: null
+        x_Offset: null,
+        y_Offset: null
       },
       showModal: false,
       hideImages: false
