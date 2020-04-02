@@ -719,7 +719,9 @@
             openThreeDee() {
                 let self = this;
 
-                self.$refs.threeDee.show(self.drops);
+                console.log(self.selectedLayer.children)
+
+                self.$refs.threeDee.show(self.selectedLayer.children);
             }
         },
         computed: {

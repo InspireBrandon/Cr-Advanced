@@ -45,6 +45,20 @@
                     self.draw(drops);
                 }, 200);
             },
+            getFloorDimensions(drops) {
+                let self = this;
+
+                let topLeft = 0;
+                let topRight = 0;
+                let bottomLeft = 0;
+                let bottomRight = 0;
+
+                drops.forEach(el => {
+                    if(el.x < topLeft) {
+                        
+                    }
+                })
+            },
             draw(drops) {
                 let self = this;
 
