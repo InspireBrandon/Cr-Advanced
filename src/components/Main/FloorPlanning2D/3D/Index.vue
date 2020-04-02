@@ -80,7 +80,7 @@
                 cameraType: "free",
                 showCanvas: false,
                 fullScreen: false,
-                fancyMode: false,
+                fancyMode: true,
                 header: null
             };
         },
@@ -124,7 +124,7 @@
 
                     camera = new BABYLON.FreeCamera(
                         "FreeCamera",
-                        new BABYLON.Vector3(0, 5, 50),
+                        new BABYLON.Vector3(0, 2, 50),
                         scene
                     );
 
@@ -132,7 +132,7 @@
                     camera.wheelPrecision = 50;
                     camera.applyGravity = true;
                     camera.checkCollisions = true;
-                    camera.speed = 0.3;
+                    camera.speed = 0.1;
 
                     if (self.fancyMode) {
 
@@ -151,7 +151,7 @@
                     //camera.position.z = (30 / 2);
                     camera.position.x = 30 / 2;
                     camera.position.z = -15;
-                    camera.position.y = 2;
+                    camera.position.y = 1.5;
 
                     // Add lights to the scene
                     // var light1 = new BABYLON.DirectionalLight('light', new BABYLON.Vector3(1, 1, 0), scene)
@@ -213,7 +213,8 @@
 
                     items.forEach((element, idx) => {
                         if (element.name == "Gondola-Rect" && element.color == null) {
-                            self.buildAlt(scene, element, idx);
+                            // self.buildAlt(scene, element, idx);
+                            self.buildShelf(scene, element);
                         }
 
                         if (element.name == "Gondola-Rect" && element.color != null) {
