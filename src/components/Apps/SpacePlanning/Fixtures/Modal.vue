@@ -175,8 +175,12 @@
                         </a>
                       </span>
                       <span class="ml-2">
-                        <a href="#" @click.prevent="frontBackMirror = !frontBackMirror"
-                          :style="{ 'background': frontBackMirror ? 'white': 'transparent' }">m</a>
+                        <a v-if="frontBack=='Front'" href="#"
+                          @click.prevent="handleMirror(frontBack,form.frontMirrored)"
+                          :style="{ 'background': form.frontMirrored ? 'white': 'transparent' }">m</a>
+
+                        <a v-else href="#" @click.prevent="handleMirror(frontBack,form.backMirrored)"
+                          :style="{ 'background':  form.backMirrored ? 'white': 'transparent' }">m</a>
                       </span>
                       <span class="ml-2">
                         <v-icon size="18" @click="changeDisplay(frontBack)">swap_horiz</v-icon>
@@ -199,8 +203,11 @@
                         </a>
                       </span>
                       <span class="ml-2">
-                        <a href="#" @click.prevent="leftRightMirror = !leftRightMirror"
-                          :style="{ 'background': leftRightMirror ? 'white': 'transparent' }">m</a>
+                        <a v-if="leftRight=='Left'" href="#" @click.prevent="handleMirror(leftRight,form.leftMirrored)"
+                          :style="{ 'background': form.leftMirrored ? 'white': 'transparent' }">m</a>
+
+                        <a v-else href="#" @click.prevent="handleMirror(leftRight,form.rightMirrored)"
+                          :style="{ 'background':  form.rightMirrored ? 'white': 'transparent' }">m</a>
                       </span>
                       <span class="ml-2">
                         <v-icon size="18" @click="changeDisplay(leftRight)">swap_horiz</v-icon>
@@ -226,8 +233,10 @@
                       </span>
 
                       <span class="ml-2">
-                        <a href="#" @click.prevent="topBottomMirror = !topBottomMirror"
-                          :style="{ 'background': topBottomMirror ? 'white': 'transparent' }">m</a>
+                        <a v-if="topBottom=='Top'" href="#" @click.prevent="handleMirror(topBottom,form.topMirrored)"
+                          :style="{ 'background':  form.topMirrored ? 'white': 'transparent' }">m</a>
+                        <a v-else href="#" @click.prevent="handleMirror(topBottom,form.bottomMirrored)"
+                          :style="{ 'background':  form.bottomMirrored ? 'white': 'transparent' }">m</a>
                       </span>
                       <span class="ml-2">
                         <v-icon size="18" @click="changeDisplay(topBottom)">swap_horiz</v-icon>
@@ -554,6 +563,12 @@
           }
         ],
         form: {
+          leftMirrored: false,
+          rightMirrored: false,
+          bottomMirrored: false,
+          topMirrored: false,
+          frontMirrored: false,
+          backMirrored: false,
           id: 1,
           uid: "da141b3c-436c-4933-bea2-ed36d4466140",
           type: -1,
@@ -634,6 +649,42 @@
       };
     },
     methods: {
+      handleMirror(side, value) {
+        let self = this
+        console.log("handle mirror: ", side, " value: ", value);
+        if (value == undefined) {
+          value = false
+        }
+
+        switch (side) {
+          case "Right":
+            self.form.rightMirrored = !value
+            self.form.leftMirrored = false
+            break;
+          case "Left":
+            self.form.leftMirrored = !value
+            self.form.rightMirrored = false
+            break;
+          case "Top":
+            self.form.topMirrored = !value
+            self.form.bottomMirrored = false
+            break;
+          case "Bottom":
+            self.form.bottomMirrored = !value
+            self.form.topMirrored = false
+            break;
+          case "Back":
+            self.form.backMirrored = !value
+            self.form.frontMirrored = false
+            break;
+          case "Front":
+            self.form.frontMirrored = !value
+            self.form.backMirrored = false
+            break;
+          default:
+            break;
+        }
+      },
       mirrorSides(side) {
         let self = this
         console.log("mirrorSides", side);
@@ -802,6 +853,7 @@
         self.selectedRenderingType2 = null;
         self.selectedRenderingType3 = null;
         self.selectedRenderingType4 = null;
+
         this.isAdd = true;
         this.afterEdit = afterAdd;
 
@@ -852,7 +904,6 @@
         // this.$refs.changeImageBar.src = "";
 
         if (type == 5) this.form.rendering = true;
-
         this.dialog = true;
       },
       getSelectedRenderings() {
