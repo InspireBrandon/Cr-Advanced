@@ -668,6 +668,7 @@
                                     });
                                     circle.shape.setAttrs({
                                         width: element.width,
+                                        depth:element.depth,
                                         DropID: element.id.toString()
                                     })
                                     circle.shape.parent.setAttrs({
@@ -689,6 +690,8 @@
                                     rect.shape.setAttrs({
                                         width: element.width,
                                         height: element.height,
+                                        depth:element.depth,
+
                                         draggable: true
                                     })
                                     rect.shape.setAttrs({
