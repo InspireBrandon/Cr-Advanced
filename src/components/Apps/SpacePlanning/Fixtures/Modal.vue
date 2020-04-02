@@ -396,7 +396,7 @@
                   <v-flex v-if="!form.rendering" lg12 md12 sm12 xs12 class="px-3">
                     <h3>Renderings</h3>
                   </v-flex>
-                  <v-flex v-if="renderingType0.length>1" lg8 md12 sm12 xs12 class="px-3">
+                  <v-flex v-if="!form.rendering &&renderingType0.length>1" lg8 md12 sm12 xs12 class="px-3">
                     <v-select
                       placeholder="please select"
                       :items="renderingType0"
@@ -404,7 +404,7 @@
                       label="Label Holder:"
                     ></v-select>
                   </v-flex>
-                  <v-flex v-if="renderingType1.length>1" lg8 md12 sm12 xs12 class="px-3">
+                  <v-flex v-if="!form.rendering &&renderingType1.length>1" lg8 md12 sm12 xs12 class="px-3">
                     <v-select
                       placeholder="please select"
                       :items="renderingType1"
@@ -412,7 +412,7 @@
                       label="Shelf Edge:"
                     ></v-select>
                   </v-flex>
-                  <v-flex v-if="renderingType2.length>1" lg8 md12 sm12 xs12 class="px-3">
+                  <v-flex v-if="!form.rendering &&renderingType2.length>1" lg8 md12 sm12 xs12 class="px-3">
                     <v-select
                       placeholder="please select"
                       :items="renderingType2"
@@ -420,7 +420,7 @@
                       label="Back Face:"
                     ></v-select>
                   </v-flex>
-                  <v-flex v-if="renderingType3.length>1" lg8 md12 sm12 xs12 class="px-3">
+                  <v-flex v-if="!form.rendering &&renderingType3.length>1" lg8 md12 sm12 xs12 class="px-3">
                     <v-select
                       placeholder="please select"
                       :items="renderingType3"
@@ -428,7 +428,7 @@
                       label="Front Face:"
                     ></v-select>
                   </v-flex>
-                  <v-flex v-if="renderingType4.length>1" lg8 md12 sm12 xs12 class="px-3">
+                  <v-flex v-if="!form.rendering &&renderingType4.length>1" lg8 md12 sm12 xs12 class="px-3">
                     <v-select
                       placeholder="please select"
                       :items="renderingType4"
@@ -610,7 +610,7 @@ export default {
           value: 2
         },
         {
-          text: "Bracket",
+          text: "Side Face",
           value: 4
         }
       ],
@@ -859,14 +859,16 @@ export default {
       self.selectedRenderingType3 = null;
       self.selectedRenderingType4 = null;
       this.isAdd = true;
-      this.afterAdd = afterAdd;
+      this.afterEdit = afterAdd;
 
       self.getFixtureGroups();
 
       for (var prop in this.form) {
         this.form[prop] = null;
       }
+      if(group!=null){
       self.form.fixtureGroupID = group.id;
+      }
       this.form.color = {
         hex: "#fff"
       };
