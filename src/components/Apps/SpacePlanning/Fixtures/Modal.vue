@@ -242,8 +242,8 @@
                         <v-icon size="18" @click="changeDisplay(topBottom)">swap_horiz</v-icon>
                       </span>
                     </span>
-                    {{ form.topImageID }}
-                    {{ form.bottomImageID }}
+                    <!-- {{ form.topImageID }}
+                    {{ form.bottomImageID }} -->
                     <img v-if="!hideImages" ref="topImage" style="width: 100%; max-height: 120px;"
                       :src="getFixtureImageNew(topBottom == 'Top' ? form.topImageID : form.bottomImageID)" alt
                       @click="openFileDialog(topBottom.toLowerCase())" />
