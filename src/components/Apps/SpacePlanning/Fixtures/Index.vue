@@ -85,7 +85,7 @@
                         </v-list-tile-content>
                         <v-spacer></v-spacer>
                         <v-list-tile-action>
-                          <v-btn @click="$refs.fixturesModal.openAdd(5, afterAdd)" color="primary">
+                          <v-btn @click="openMenuAdd('Rendering', null, rendering)" color="primary">
                             Add
                           </v-btn>
                         </v-list-tile-action>
