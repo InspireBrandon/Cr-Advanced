@@ -187,7 +187,8 @@
                       @click="openFileDialog(frontBack.toLowerCase())" />
                     <a href="#" @click.prevent="openFileDialog(frontBack.toLowerCase())">Change</a>
                     <span class="mr-2"></span>
-                    <a href="#" @click.prevent="form.frontImageID = null">Remove</a>
+                    <a href="#" v-if="frontBack == 'Front'" @click.prevent="form.frontImageID = null">Remove</a>
+                    <a href="#" v-else @click.prevent="form.backImageID = null">Remove</a>
                   </v-flex>
                   <v-flex md4 class="px-3">
                     <span>
@@ -210,7 +211,9 @@
                       @click="openFileDialog(leftRight.toLowerCase())" />
                     <a href="#" @click.prevent="openFileDialog(leftRight.toLowerCase())">Change</a>
                     <span class="mr-2"></span>
-                    <a href="#" @click.prevent="form.sideImageID = null">Remove</a>
+                    <a href="#" v-if="leftRight == 'Left' " @click.prevent="form.leftImageID = null">Remove</a>
+                    <a href="#" v-else @click.prevent="form.rightImageID = null">Remove</a>
+
                   </v-flex>
                   <v-flex md4 class="px-3">
                     <!-- <div>Top</div> -->
@@ -237,7 +240,9 @@
                       @click="openFileDialog(topBottom.toLowerCase())" />
                     <a href="#" @click.prevent="openFileDialog(topBottom.toLowerCase())">Change</a>
                     <span class="mr-2"></span>
-                    <a href="#" @click.prevent="form.topImageID = null">Remove</a>
+                    <a href="#" v-if="topBottom == 'Top'" @click.prevent="form.topImageID = null">Remove</a>
+                    <a href="#" v-else @click.prevent="form.bottomImageID = null">Remove</a>
+
                   </v-flex>
                   <input ref="imageInput" style="display: none" @change="changeImage" type="file" />
                   <!-- <v-flex lg12 md12 sm12 xs12 class="px-3">
@@ -632,7 +637,31 @@
       mirrorSides(side) {
         let self = this
         console.log("mirrorSides", side);
-        self.$refs.YesNoModal.show("Are you sure you want to mirror sides", value => {
+
+        let stringEnd = ""
+        switch (side) {
+          case "Right":
+            stringEnd = "Left"
+            break;
+          case "Left":
+            stringEnd = "Right"
+            break;
+          case "Top":
+            stringEnd = "Bottom"
+            break;
+          case "Bottom":
+            stringEnd = "Top"
+            break;
+          case "Back":
+            stringEnd = "Front"
+            break;
+          case "Front":
+            stringEnd = "Back"
+            break;
+          default:
+            break;
+        }
+        self.$refs.YesNoModal.show("do you want to copy this image to the " + stringEnd, value => {
           if (value) {
             switch (side) {
               case "Right":
@@ -640,7 +669,7 @@
                 self.form.leftTransparent = self.form.rightTransparent
                 self.form.leftColor = self.form.rightColor
                 break;
-                
+
               case "Left":
                 self.form.rightImageID = self.form.leftImageID
                 self.form.rightTransparent = self.form.leftTransparent
