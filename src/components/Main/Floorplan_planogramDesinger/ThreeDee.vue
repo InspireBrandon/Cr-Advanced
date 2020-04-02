@@ -24,6 +24,8 @@
 </template>
 <script>
     import * as BABYLON from "@babylonjs/core/Legacy/legacy";
+
+    import FloorPlanItem from '../FloorPlanning2D/3D/Libs/Models/FloorPlanItem.js'
     import DrawingHelper from '../FloorPlanning2D/3D/Libs/Drawing/DrawingHelper.js'
 
     const pxlToMeterRatio = 25;
@@ -55,7 +57,7 @@
 
                 drops.forEach(el => {
                     if(el.x < topLeft) {
-                        
+
                     }
                 })
             },
@@ -179,9 +181,8 @@
                 let self = this;
 
                 drops.forEach(drop => {
-                    console.log(drop);
-
-                    self.drawingHelper.draw(drop);
+                    let fpI = new FloorPlanItem(drop.attrs);
+                    self.drawingHelper.draw(fpI);
                 });
             }
         }
