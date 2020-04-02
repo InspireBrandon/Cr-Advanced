@@ -197,7 +197,6 @@
                   <v-flex
                     lg8
                     md12
-                   
                   >
                     <v-text-field
                       type="number"
