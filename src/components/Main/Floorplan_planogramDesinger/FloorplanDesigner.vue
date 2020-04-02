@@ -624,9 +624,12 @@
                 let self = this
                 self.getSavedData(cb.id, data => {
                     console.log('[GETSAVEDDATA]', data);
-                    data.forEach(item => {
+                    
+                    data[0].children.forEach(item => {
                         self.addShape(self.selectedLayer, item, callback => {})
                     })
+                    
+                    console.log("[drawSaved]-----selectedLayer",self.selectedLayer);
                     self.stage.batchDraw()
                     self.$refs.spinner.hide()
                 })
