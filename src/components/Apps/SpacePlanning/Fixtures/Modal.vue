@@ -168,8 +168,13 @@
                   <v-flex md4 class="px-3">
                     <!-- <div>Front</div> -->
                     <span>
-                      <span style="padding-right: 75px;">{{ frontBack }}</span>
-                      <span>
+                      <span style="padding-right: 45px;">{{ frontBack }}</span>
+                      <span class="ml-2">
+                        <a>
+                          <v-icon size="18" @click="mirrorSides(frontBack)"> = </v-icon>
+                        </a>
+                      </span>
+                      <span class="ml-2">
                         <a href="#" @click.prevent="frontBackMirror = !frontBackMirror"
                           :style="{ 'background': frontBackMirror ? 'white': 'transparent' }">m</a>
                       </span>
@@ -210,8 +215,14 @@
                   <v-flex md4 class="px-3">
                     <!-- <div>Top</div> -->
                     <span>
-                      <span style="padding-right: 60px;">{{ topBottom }}</span>
-                      <span>
+                      <span style="padding-right: 35px;">{{ topBottom }}</span>
+                      <span class="ml-2">
+                        <a>
+                          <v-icon size="18" @click="mirrorSides(topBottom)"> = </v-icon>
+                        </a>
+                      </span>
+
+                      <span class="ml-2">
                         <a href="#" @click.prevent="topBottomMirror = !topBottomMirror"
                           :style="{ 'background': topBottomMirror ? 'white': 'transparent' }">m</a>
                       </span>
@@ -623,10 +634,27 @@
         console.log("mirrorSides", side);
         self.$refs.YesNoModal.show("Are you sure you want to mirror sides", value => {
           if (value) {
-            if (side == "Right") {
-              self.form.leftImageID = self.form.rightImageID
-            } else {
-              self.form.rightImageID = self.form.leftImageID
+            switch (side) {
+              case "Right":
+                self.form.leftImageID = self.form.rightImageID
+                break;
+              case "Left":
+                self.form.rightImageID = self.form.leftImageID
+                break;
+              case "Top":
+                self.form.bottomImageID = self.form.topImageID
+                break;
+              case "Bottom":
+                self.form.topImageID = self.form.bottomImageID
+                break;
+              case "Back":
+                self.form.frontImageID = self.form.backImageID
+                break;
+              case "Front":
+                self.form.backImageID = self.form.frontImageID
+                break;
+              default:
+                break;
             }
           }
         })
