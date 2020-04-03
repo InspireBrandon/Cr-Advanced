@@ -25,6 +25,7 @@ class Boxbase extends Drawingbase {
             this.scene);
 
         self.setPosition();
+        self.setMaterial();
     }
 }
 

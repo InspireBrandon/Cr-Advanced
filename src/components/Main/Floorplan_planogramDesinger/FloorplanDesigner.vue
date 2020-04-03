@@ -569,9 +569,10 @@
             },
             addShape(parent, item, callback) {
                 let self = this
-                console.log("[ADDSHAPE-ITEM]", item);
-
                 let shape = JSON.parse(item.attributes)
+
+                console.log("Shape", shape)
+
                 switch (shape.name) {
                     case "Gondola-Rect": {
                         let rect = new Rect(parent, {
@@ -584,7 +585,8 @@
                         rect.shape.guid = item.guid
                         rect.shape.setAttrs({
                             width: shape.width,
-                            height: shape.height
+                            height: shape.height,
+                            depth: shape.depth
                         })
                         // rect.shape.attrs = shape
 

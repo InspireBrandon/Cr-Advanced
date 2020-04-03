@@ -29,6 +29,22 @@ class DrawingBase {
             self.element.rotation.y = degreesToRadians(self.data.rotation);
         }
     }
+
+    setMaterial() {
+        let self = this;
+
+        var material = new BABYLON.StandardMaterial("material", self.scene);
+
+        let image = "https://upload.wikimedia.org/wikipedia/commons/8/87/Alaskan_Malamute%2BBlank.png";
+        material.diffuseTexture = new BABYLON.Texture(image, self.scene);
+        material.diffuseTexture.hasAlpha = true;
+        // material.diffuseColor = new BABYLON.Color3(1, 0, 1);
+        // material.diffuseColor.hasAlpha = true;
+        // material.alpha = 0.8;
+        material.backFaceCulling = false;
+
+        self.element.material = material;
+    }
 }
 
 function degreesToRadians(degrees) {

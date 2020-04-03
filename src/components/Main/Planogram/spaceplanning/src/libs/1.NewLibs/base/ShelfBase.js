@@ -115,7 +115,7 @@ class ShelfBase extends PlanogramItemBase {
   PositionShelf() {
     let self = this;
 
-    let offset = self.Data.xOffset == undefined ? 0 : self.Data.xOffset;
+    let offset = (self.Data.xOffset == undefined ? 0 : self.Data.xOffset) * 3;
     self.Group.setX(0 + parseFloat(offset));
 
     console.log("Groupie", self)

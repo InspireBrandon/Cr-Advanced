@@ -181,6 +181,7 @@
                 let self = this;
 
                 drops.forEach(drop => {
+                    console.log(drop);
                     let fpI = new FloorPlanItem(drop.attrs);
                     self.drawingHelper.draw(fpI);
                 });
