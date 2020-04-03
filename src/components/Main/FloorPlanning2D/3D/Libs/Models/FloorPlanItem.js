@@ -19,6 +19,9 @@ class FloorPlanItem {
         self.height = params.height;
         self.width = params.width;
         self.depth = params.depth;
+
+        // Rotation
+        self.rotation = params.rotation;
     }
 }
 
