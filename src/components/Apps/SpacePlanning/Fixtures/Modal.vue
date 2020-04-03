@@ -854,6 +854,10 @@
         self.selectedRenderingType3 = null;
         self.selectedRenderingType4 = null;
 
+        self.frontBack = 'Front';
+        self.leftRight = 'Left';
+        self.topBottom = 'Top';
+
         this.isAdd = true;
         this.afterEdit = afterAdd;
 
@@ -953,6 +957,11 @@
         self.selectedRenderingType2 = null;
         self.selectedRenderingType3 = null;
         self.selectedRenderingType4 = null;
+
+        self.frontBack = 'Front';
+        self.leftRight = 'Left';
+        self.topBottom = 'Top';
+
         self.getFixtureGroups(groupType);
         // self.getFixtureImage(fixture.id);
 
