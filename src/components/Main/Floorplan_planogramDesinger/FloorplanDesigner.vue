@@ -31,10 +31,6 @@
                                             <v-list-tile-title>New</v-list-tile-title>
                                         </v-list-tile>
                                         <v-divider></v-divider>
-                                        <v-list-tile>
-                                            <v-list-tile-title>Open</v-list-tile-title>
-                                        </v-list-tile>
-                                        <v-divider></v-divider>
                                         <v-list-tile @click="save()">
                                             <v-list-tile-title>Save</v-list-tile-title>
                                         </v-list-tile>
@@ -118,8 +114,8 @@
             open(planogram_ID) {
                 let self = this
                 self.planogram_ID = planogram_ID
-                console.log("planogram_ID",self.planogram_ID);
-                
+                console.log("planogram_ID", self.planogram_ID);
+
                 self.dialog = true
                 self.initialise()
             },
@@ -299,7 +295,7 @@
                 axios.get(process.env.VUE_APP_API +
                     `FloorPlan_Fixtures/GetFixtures?planogramDetail_ID=${self.planogram_ID}`).then(
                     r => {
-                        console.log("getPlanogramData",r.data);
+                        console.log("getPlanogramData", r.data);
                         self.drops = r.data
                         callback()
                     })
@@ -360,11 +356,10 @@
                             }
                         });
                         self.selectedItem.parent.add(tr);
-                        
+
                         tr.attachTo(self.selectedItem);
 
-                        tr.on('transform', function (z) {
-                        });
+                        tr.on('transform', function (z) {});
                         self.stage.batchDraw();
                     }
                 });
@@ -580,15 +575,16 @@
                             y: shape.y
                         }, null, null, null, self.imageSrc(item.floorplan_Fixture_ID,
                             "Top"));
-
+                        rect.shape.attrs = shape
                         rect.shape.saveID = item.id
                         rect.shape.guid = item.guid
                         rect.shape.setAttrs({
                             width: shape.width,
                             height: shape.height,
-                            depth: shape.depth
+                            depth: shape.depth,
+                            DropID: shape.DropID,
                         })
-                        // rect.shape.attrs = shape
+
 
                     }
                     break;
@@ -598,12 +594,15 @@
                         y: 0,
                     }, null, {
                         radius: shape.radius,
+                        depth: shape.depth,
                         color: "#1976d2"
                     });
+                    circle.shape.attrs = shape
                     circle.shape.setAttrs({
                         x: shape.x,
                         y: shape.y,
                         width: shape.width,
+                        DropID: shape.DropID,
                     })
                     circle.shape.attrs = shape
 
@@ -626,12 +625,12 @@
                 let self = this
                 self.getSavedData(cb.id, data => {
                     console.log('[GETSAVEDDATA]', data);
-                    
+
                     data[0].children.forEach(item => {
                         self.addShape(self.selectedLayer, item, callback => {})
                     })
-                    
-                    console.log("[drawSaved]-----selectedLayer",self.selectedLayer);
+
+                    console.log("[drawSaved]-----selectedLayer", self.selectedLayer);
                     self.stage.batchDraw()
                     self.$refs.spinner.hide()
                 })
@@ -670,7 +669,7 @@
                                     });
                                     circle.shape.setAttrs({
                                         width: element.width,
-                                        depth:element.depth,
+                                        depth: element.depth,
                                         DropID: element.id.toString()
                                     })
                                     circle.shape.parent.setAttrs({
@@ -692,7 +691,7 @@
                                     rect.shape.setAttrs({
                                         width: element.width,
                                         height: element.height,
-                                        depth:element.depth,
+                                        depth: element.depth,
 
                                         draggable: true
                                     })
