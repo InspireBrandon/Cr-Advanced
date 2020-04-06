@@ -16,13 +16,24 @@ class Boxbase extends Drawingbase {
     draw() {
         let self = this;
 
+        var material = self.setMaterial();
+
+        let config = {
+            height: self.data.depth / self.pxlToMeterRatio,
+            width: self.data.width / self.pxlToMeterRatio,
+            depth: self.data.height / self.pxlToMeterRatio,
+            faceColors: material.faceColors,
+            faceUV: material.faceUV,
+            wrap: true,
+        }
+
         self.element = BABYLON.MeshBuilder.CreateBox(
-            this.name, {
-                height: self.data.depth / self.pxlToMeterRatio,
-                width: self.data.width / self.pxlToMeterRatio,
-                depth: self.data.height / self.pxlToMeterRatio,
-            },
+            this.name,
+            config,
             this.scene);
+
+        self.element.material = material.material;
+        self.element.hasVertexAlpha = true
 
         self.setPosition();
     }

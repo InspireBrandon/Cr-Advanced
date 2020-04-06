@@ -14,7 +14,8 @@
                 <v-layout row wrap>
                     <v-flex md12>
                         <v-card tile class="fill-height">
-                            <canvas style="height: calc(100vh - 65px)!important;" id="renderCanvas" touch-action="none"></canvas>
+                            <canvas style="height: calc(100vh - 65px)!important;" id="renderCanvas"
+                                touch-action="none"></canvas>
                         </v-card>
                     </v-flex>
                 </v-layout>
@@ -24,6 +25,7 @@
 </template>
 <script>
     import * as BABYLON from "@babylonjs/core/Legacy/legacy";
+    import Axios from 'axios';
 
     import FloorPlanItem from '../FloorPlanning2D/3D/Libs/Models/FloorPlanItem.js'
     import DrawingHelper from '../FloorPlanning2D/3D/Libs/Drawing/DrawingHelper.js'
@@ -56,7 +58,7 @@
                 let bottomRight = 0;
 
                 drops.forEach(el => {
-                    if(el.x < topLeft) {
+                    if (el.x < topLeft) {
 
                     }
                 })
@@ -84,9 +86,17 @@
                 let self = this;
                 self.createCamera(scene, canvas);
                 self.createLight(scene);
-                self.createFloor(scene);
+                // self.createFloor(scene);
                 // self.createSkybox(scene);
                 self.createFixtures(scene, drops)
+                self.createCans(scene, 0.10);
+                self.createCans(scene, 0.24);
+                self.createCans(scene, 0.38);
+                self.createCans(scene, 0.52);
+                self.createCans(scene, 0.66);
+                self.createCans(scene, 0.80);
+                // self.createCans(scene, 0.92);
+                // self.createCans(scene, 1.06);
                 return scene;
             },
             createCamera(scene, canvas) {
@@ -181,12 +191,112 @@
                 let self = this;
 
                 drops.forEach(drop => {
-                    let fpI = new FloorPlanItem(drop.attrs);
-                    self.drawingHelper.draw(fpI);
+                    self.getFloorPlanItem(drop.attrs.DropID, children => {
+                        let notProducts = children.filter(child => {
+                            return child.type != "PRODUCT";
+                        })
+
+                        let parent = notProducts.find(child => {
+                            return child.id == drop.attrs.DropID;
+                        });
+
+                        notProducts.forEach(child => {
+                            let fpI;
+
+                            self.getFixture(child.spaceplan_Fixture_ID, () => {
+
+                            })
+
+                            console.log(child);
+
+                            if (child.type == "GONDOLA") {
+                                fpI = new FloorPlanItem({
+                                    name: child.name,
+                                    type: child.type,
+                                    x: child.absoluteX,
+                                    y: child.absoluteY,
+                                    height: 0.3,
+                                    width: child.width,
+                                    depth: child.depth,
+                                    rotation: child.rotation
+                                });
+                            } else {
+                                fpI = new FloorPlanItem({
+                                    name: child.name,
+                                    type: child.type,
+                                    x: child.absoluteX,
+                                    y: child.y,
+                                    height: child.height,
+                                    width: child.width,
+                                    depth: child.depth,
+                                    rotation: child.rotation,
+                                    parent: parent
+                                });
+                            }
+
+                            self.drawingHelper.draw(fpI);
+                        })
+                    })
                 });
+            },
+            createCans(scene, x) {
+                let self = this;
+
+                var canMaterial = new BABYLON.StandardMaterial("material", scene);
+                canMaterial.diffuseTexture = new BABYLON.Texture("https://i.imgur.com/Q6i4ZiX.jpg", scene)
+
+                var faceUV = [];
+                faceUV[0] = new BABYLON.Vector4(0, 0, 0, 0);
+                faceUV[1] = new BABYLON.Vector4(1, 0, 0.32, 1);
+                faceUV[2] = new BABYLON.Vector4(0, 0, 0.25, 1);
+
+
+
+                var faceColors = [];
+                faceColors[0] = new BABYLON.Color4(0.5, 0.5, 0.5, 1)
+
+                var can = BABYLON.MeshBuilder.CreateCylinder("can", {
+                    height: 0.2,
+                    diameter: 0.13,
+                    faceUV: faceUV,
+                    faceColors: faceColors
+                }, scene);
+                can.material = canMaterial;
+
+                can.position.z = -2.4;
+                can.position.y = 0.06;
+                can.position.x = x;
+                can.rotation.y = degreesToRadians(160);
+            },
+            getFloorPlanItem(dropID, callback) {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API + `FloorPlan_Fixtures/GetChildren?parentID=${dropID}`)
+                    .then(r => {
+                        callback(r.data);
+                    })
+                    .catch(e => {
+                        alert("Failed to get floorplan fixture data");
+                    })
+            },
+            getFixture(fixtureID, callback) {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_API + `Fixture?db=CR-DEVINSPIRE&id=${fixtureID}`)
+                    .then(r => {
+                        console.log("Fixture", r.data);
+                    })
+                    .catch(e => {
+                        console.log("Failed to get fixture")
+                    })
             }
         }
     }
+
+    function degreesToRadians(degrees) {
+    if (degrees != 0) return degrees / 57.2958;
+    else return 0;
+}
 </script>
 
 <style>
