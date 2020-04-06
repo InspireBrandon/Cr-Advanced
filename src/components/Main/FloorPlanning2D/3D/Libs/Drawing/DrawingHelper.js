@@ -5,6 +5,7 @@
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 import Gondola from './Gondola.js'
+import Shelf from './Shelf.js'
 
 class DrawingHelper {
     constructor(scene) {
@@ -15,13 +16,36 @@ class DrawingHelper {
     draw(drop) {
         let self = this;
 
-        let gondola = new Gondola({
-            scene: self.scene,
-            name: 'Gondola',
-            data: drop
-        })
+        let fixture;
 
-        gondola.draw();
+        let params = {
+            scene: self.scene, 
+            data: drop
+        }
+
+        switch(drop.type.toUpperCase()) {
+            case "GONDOLA": {
+                fixture = new Gondola(params);
+            }break;
+            case "BASE": {
+                fixture = new Shelf(params);
+            }break;
+            case "SHELF": {
+                fixture = new Shelf(params);
+            }break;
+            case "PEGBAR": {
+                fixture = new Shelf(params);
+            }break;
+            case "PEGBOARD": {
+                fixture = new Shelf(params);
+            }break;
+        }
+
+        if(fixture != undefined && fixture != null) {
+            fixture.draw();
+        } else {
+            console.warn(`[DRAWING-HELPER] Failed to draw fixture. Type of ${drop.type} is not defined.`);
+        }
     }
 }
 

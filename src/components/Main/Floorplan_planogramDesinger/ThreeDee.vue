@@ -86,15 +86,9 @@
                 let self = this;
                 self.createCamera(scene, canvas);
                 self.createLight(scene);
-                // self.createFloor(scene);
+                self.createFloor(scene);
                 // self.createSkybox(scene);
                 self.createFixtures(scene, drops)
-                self.createCans(scene, 0.10);
-                self.createCans(scene, 0.24);
-                self.createCans(scene, 0.38);
-                self.createCans(scene, 0.52);
-                self.createCans(scene, 0.66);
-                self.createCans(scene, 0.80);
                 // self.createCans(scene, 0.92);
                 // self.createCans(scene, 1.06);
                 return scene;
@@ -117,8 +111,8 @@
             createLight(scene) {
                 let self = this;
 
-                let light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(15 / pxlToMeterRatio, 25 /
-                    pxlToMeterRatio, 0), scene);
+                let light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(15 / pxlToMeterRatio, 25 / pxlToMeterRatio, 0), scene);
+                light.position = new BABYLON.Vector3(0,10,10);
             },
             createFloor(scene) {
                 let self = this;
@@ -207,8 +201,6 @@
 
                             })
 
-                            console.log(child);
-
                             if (child.type == "GONDOLA") {
                                 fpI = new FloorPlanItem({
                                     name: child.name,
@@ -225,7 +217,7 @@
                                     name: child.name,
                                     type: child.type,
                                     x: child.absoluteX,
-                                    y: child.y,
+                                    y: child.absoluteY,
                                     height: child.height,
                                     width: child.width,
                                     depth: child.depth,
@@ -238,35 +230,6 @@
                         })
                     })
                 });
-            },
-            createCans(scene, x) {
-                let self = this;
-
-                var canMaterial = new BABYLON.StandardMaterial("material", scene);
-                canMaterial.diffuseTexture = new BABYLON.Texture("https://i.imgur.com/Q6i4ZiX.jpg", scene)
-
-                var faceUV = [];
-                faceUV[0] = new BABYLON.Vector4(0, 0, 0, 0);
-                faceUV[1] = new BABYLON.Vector4(1, 0, 0.32, 1);
-                faceUV[2] = new BABYLON.Vector4(0, 0, 0.25, 1);
-
-
-
-                var faceColors = [];
-                faceColors[0] = new BABYLON.Color4(0.5, 0.5, 0.5, 1)
-
-                var can = BABYLON.MeshBuilder.CreateCylinder("can", {
-                    height: 0.2,
-                    diameter: 0.13,
-                    faceUV: faceUV,
-                    faceColors: faceColors
-                }, scene);
-                can.material = canMaterial;
-
-                can.position.z = -2.4;
-                can.position.y = 0.06;
-                can.position.x = x;
-                can.rotation.y = degreesToRadians(160);
             },
             getFloorPlanItem(dropID, callback) {
                 let self = this;
@@ -284,7 +247,6 @@
 
                 Axios.get(process.env.VUE_APP_API + `Fixture?db=CR-DEVINSPIRE&id=${fixtureID}`)
                     .then(r => {
-                        console.log("Fixture", r.data);
                     })
                     .catch(e => {
                         console.log("Failed to get fixture")

@@ -19,23 +19,11 @@ class DrawingBase {
     setPosition() {
         let self = this;
 
-        // self.element.position.x = self.data.x;
-        // self.element.position.y = self.data.y;
-        // self.element.position.z = self.data.z;
+        let parentY = (self.data.parent.y + self.data.parent.height + 572);
 
-        if(self.data.type == "GONDOLA") {
-            self.element.position.x = (self.data.x + 0.5 * self.data.width) / self.pxlToMeterRatio;
-            self.element.position.y = ((self.data.depth / self.pxlToMeterRatio) / 2);
-            self.element.position.z = -((self.data.y + 0.5 * self.data.height) / self.pxlToMeterRatio);            
-        }
-        else {
-            self.element.position.x = (self.data.x + 0.5 * self.data.width) / self.pxlToMeterRatio;
-
-            let parentY = (self.data.parent.y + self.data.parent.height);
-
-            self.element.position.y = (((parentY - ((self.data.height / 2) + self.data.y)) / self.pxlToMeterRatio) / 2);
-            self.element.position.z = -((self.data.parent.y + (0.5 * self.data.height)) / self.pxlToMeterRatio);
-        }
+        self.element.position.x = (self.data.x + 0.5 * self.data.width) / self.pxlToMeterRatio;
+        self.element.position.y = (((parentY - ((self.data.height / 2) + self.data.y)) / self.pxlToMeterRatio) / 4);
+        self.element.position.z = -((self.data.parent.y + (0.5 * self.data.height)) / self.pxlToMeterRatio);
 
         if (self.data.rotation != undefined && self.data.rotation != null) {
             let xPivot = -(self.data.width / 2 / self.pxlToMeterRatio);
@@ -90,6 +78,7 @@ class DrawingBase {
             faceUV[1] = faceUp;
             faceUV[2] = faceUp; // Right
             faceUV[3] = faceUp; // Left
+            
             // faceUV[1] = new BABYLON.Vector4(Ubottom_left, Vbottom_left, Utop_right, Vtop_right);
 
             retval.faceColors = faceColors;
@@ -98,22 +87,13 @@ class DrawingBase {
         else {
             material.diffuseColor = new BABYLON.Color3(0, 0, 1);
             material.diffuseColor.hasAlpha = true;
-            material.alpha = 0.5;
+            material.alpha = 0.6;
         }
 
-        // material.backFaceCulling = false;
         retval.material = material
-
         return retval;
-        // self.element.material = material;
     }
 }
-
-function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
-  }
 
 function degreesToRadians(degrees) {
     if (degrees != 0) return degrees / 57.2958;

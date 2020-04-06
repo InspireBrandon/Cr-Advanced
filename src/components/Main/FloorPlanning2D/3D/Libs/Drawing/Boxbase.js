@@ -27,14 +27,9 @@ class Boxbase extends Drawingbase {
             wrap: true,
         }
 
-        self.element = BABYLON.MeshBuilder.CreateBox(
-            this.name,
-            config,
-            this.scene);
-
+        self.element = BABYLON.MeshBuilder.CreateBox(this.name, config, this.scene);
         self.element.material = material.material;
-        self.element.hasVertexAlpha = true
-
+        self.element.receiveShadows = true;
         self.setPosition();
     }
 }
