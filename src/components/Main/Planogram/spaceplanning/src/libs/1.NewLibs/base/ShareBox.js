@@ -144,13 +144,20 @@ class ShareBox extends PlanogramItemBase {
         self.Data = newData;
     
         self.SetObjectDimensions();
-        self.Bar.fill(self.Data.color);
+        self.Bar.fill(self.Data.frontTransparent ? 'transparent' : self.Data.frontColor);
         self.Bar.setWidth(self.TotalWidth); // sample
         self.Bar.setHeight(self.TotalHeight); // sample
         self.Group.setWidth(self.TotalWidth);
         self.Group.setHeight(self.TotalHeight);
         self.HideShowLabels();
-        self.LoadImage(self.Bar, self.Data.image);
+
+        if (self.Data.frontImageID == undefined || self.Data.frontImageID == null) {
+          self.LoadImage(self.Bar, "data:image/png;base64," + self.Data.image);
+        } else {
+          self.LoadImage(self.Bar, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.frontImageID}`);
+        }
+
+        // self.LoadImage(self.Bar, self.Data.image);
         // call position element
         self.PositionElement();
         // call direct children to reposition
@@ -192,11 +199,17 @@ class ShareBox extends PlanogramItemBase {
             y: (h * -1) - offset,
             width: w,
             height: h,
-            color: 'transparent',
+            fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
             listening: false
           })
+
+          if (self.Data.RenderingsItems.ShelfEdge.frontImageID == undefined || self.Data.RenderingsItems.ShelfEdge.frontImageID == null) {
+            self.LoadImage(shelfEdge, "data:image/png;base64," + self.Data.RenderingsItems.ShelfEdge.image);
+          } else {
+            self.LoadImage(shelfEdge, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.RenderingsItems.ShelfEdge.frontImageID}`);
+          }
     
-          self.LoadImage(shelfEdge, self.Data.RenderingsItems.ShelfEdge.image);
+          // self.LoadImage(shelfEdge, self.Data.RenderingsItems.ShelfEdge.image);
     
           self.Renderings.push({
             type: 'SHELFEDGE',
@@ -222,11 +235,17 @@ class ShareBox extends PlanogramItemBase {
             y: 0 + offset,
             width: w,
             height: h,
-            color: 'transparent',
+            fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
             listening: false
           })
+
+          if (self.Data.RenderingsItems.LabelHolder.frontImageID == undefined || self.Data.RenderingsItems.LabelHolder.frontImageID == null) {
+            self.LoadImage(shelfLabelHolder, "data:image/png;base64," + self.Data.RenderingsItems.LabelHolder.image);
+          } else {
+            self.LoadImage(shelfLabelHolder, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.RenderingsItems.LabelHolder.frontImageID}`);
+          }
     
-          self.LoadImage(shelfLabelHolder, self.Data.RenderingsItems.LabelHolder.image);
+          // self.LoadImage(shelfLabelHolder, self.Data.RenderingsItems.LabelHolder.image);
     
           self.Renderings.push({
             type: 'LABELHOLDER',
@@ -252,11 +271,17 @@ class ShareBox extends PlanogramItemBase {
             y: (h * -1) - offset,
             width: w,
             height: h,
-            color: 'transparent',
+            fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
             listening: false
           })
+
+          if (self.Data.RenderingsItems.Back.frontImageID == undefined || self.Data.RenderingsItems.Back.frontImageID == null) {
+            self.LoadImage(shelfBack, "data:image/png;base64," + self.Data.RenderingsItems.Back.image);
+          } else {
+            self.LoadImage(shelfBack, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.RenderingsItems.Back.frontImageID}`);
+          }
     
-          self.LoadImage(shelfBack, self.Data.RenderingsItems.Back.image);
+          // self.LoadImage(shelfBack, self.Data.RenderingsItems.Back.image);
     
           self.Renderings.push({
             type: 'BACKRENDERING',
@@ -329,10 +354,16 @@ class ShareBox extends PlanogramItemBase {
           y: 0,
           width: self.Data.width * self.Ratio,
           height: self.Data.height * self.Ratio,
-          fill: self.Data.color
+          fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor
         })
+
+        if (self.Data.frontImageID == undefined || self.Data.frontImageID == null) {
+          self.LoadImage(self.Bar, "data:image/png;base64," + self.Data.image);
+        } else {
+          self.LoadImage(self.Bar, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.frontImageID}`);
+        }
     
-        self.LoadImage(self.Bar, self.Data.image);
+        // self.LoadImage(self.Bar, self.Data.image);
     
         self.Group.add(self.Bar);
       }

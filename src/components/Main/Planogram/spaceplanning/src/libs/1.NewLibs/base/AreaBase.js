@@ -142,13 +142,20 @@ class AreaBase extends PlanogramItemBase {
     self.Data = newData;
 
     self.SetObjectDimensions();
-    self.Area.fill(self.Data.color);
+    self.Area.fill(self.Data.frontTransparent ? 'transparent' : self.Data.frontColor);
     self.Area.setWidth(self.TotalWidth); // sample
     self.Area.setHeight(self.TotalHeight); // sample
     self.Group.setWidth(self.TotalWidth);
     self.Group.setHeight(self.TotalHeight);
     self.HideShowLabels();
-    self.LoadImage(self.Area, self.Data.image);
+
+    if(self.Data.frontImageID == undefined || self.Data.frontImageID == null) {
+      self.LoadImage(self.Area, "data:image/png;base64," + self.Data.image);
+    } else {
+      self.LoadImage(self.Area, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.frontImageID}`);
+    }
+
+    // self.LoadImage(self.Area, self.Data.image);
 
     // call position element
     self.PositionElement();
@@ -183,11 +190,17 @@ class AreaBase extends PlanogramItemBase {
         y: 0 + offset,
         width: w,
         height: h,
-        color: 'transparent',
+        fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
         listening: false
       })
 
-      self.LoadImage(front, self.Data.RenderingsItems.Front.image);
+      if(self.Data.RenderingsItems.Front.frontImageID == undefined || self.Data.RenderingsItems.Front.frontImageID == null) {
+        self.LoadImage(front, "data:image/png;base64," + self.Data.RenderingsItems.Front.image);
+      } else {
+        self.LoadImage(front, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.RenderingsItems.Front.frontImageID}`);
+      }
+
+      // self.LoadImage(front, self.Data.RenderingsItems.Front.image);
 
       self.Renderings.push({
         type: 'FRONTRENDERING',
@@ -213,11 +226,17 @@ class AreaBase extends PlanogramItemBase {
         y: (h * -1) - offset,
         width: w,
         height: h,
-        color: 'transparent',
+        fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
         listening: false
       })
 
-      self.LoadImage(areaBack, self.Data.RenderingsItems.Back.image);
+      if(self.Data.RenderingsItems.Back.frontImageID == undefined || self.Data.RenderingsItems.Back.frontImageID == null) {
+        self.LoadImage(areaBack, "data:image/png;base64," + self.Data.RenderingsItems.Back.image);
+      } else {
+        self.LoadImage(areaBack, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.RenderingsItems.Back.frontImageID}`);
+      }
+
+      // self.LoadImage(areaBack, self.Data.RenderingsItems.Back.image);
 
       self.Renderings.push({
         type: 'BACKRENDERING',
@@ -252,10 +271,16 @@ class AreaBase extends PlanogramItemBase {
       y: 0,
       width: self.Data.width * self.Ratio,
       height: self.Data.height * self.Ratio,
-      fill: self.Data.color
+      fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor
     })
 
-    self.LoadImage(self.Area, self.Data.image);
+    if(self.Data.frontImageID == undefined || self.Data.frontImageID == null) {
+      self.LoadImage(self.Area, "data:image/png;base64," + self.Data.image);
+    } else {
+      self.LoadImage(self.Area, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.frontImageID}`);
+    }
+
+    // self.LoadImage(self.Area, self.Data.image);
 
     self.Group.add(self.Area);
   }

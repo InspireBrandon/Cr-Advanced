@@ -117,7 +117,7 @@ class ShareboxBase extends PlanogramItemBase {
 
   PositionSharebox() {
     let self = this;
-    
+
     let ctrl_store = new StoreHelper();
     let ctrl_position = new GeneralPositionHelper();
     ctrl_position.PositionToParent(self.VueStore, self, self.ParentID);
@@ -131,9 +131,8 @@ class ShareboxBase extends PlanogramItemBase {
     } else if (self.Data.snapRight != undefined && self.Data.snapRight != null && self.Data.snapRight == true) {
       let parentItem = ctrl_store.getPlanogramItemById(self.VueStore, self.ParentID);
       let xPos = parentItem.TotalWidth - self.TotalWidth;
-      self.Group.setX(xPos); 
-    }
-    else {
+      self.Group.setX(xPos);
+    } else {
       self.PositionToPeg(); // Will only move product if it belongs to a peg
     }
 
@@ -213,7 +212,7 @@ class ShareboxBase extends PlanogramItemBase {
 
     self.Data = newData;
     self.SetObjectDimensions();
-    self.Area.fill(self.Data.color);
+    self.Area.fill(self.Data.frontTransparent ? 'transparent' : self.Data.frontColor);
     self.Area.setWidth(self.TotalWidth); // sample
     self.Area.setHeight(self.TotalHeight); // sample
     self.Group.setWidth(self.TotalWidth);
@@ -262,11 +261,17 @@ class ShareboxBase extends PlanogramItemBase {
         y: self.TotalHeight - h + (offset),
         width: w,
         height: h,
-        color: 'transparent',
+        fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
         listening: false
       })
 
-      self.LoadImage(front, self.Data.RenderingsItems.Front.image);
+      if (self.Data.RenderingsItems.Front.frontImageID == undefined || self.Data.RenderingsItems.Front.frontImageID == null) {
+        self.LoadImage(front, "data:image/png;base64," + self.Data.RenderingsItems.Front.image);
+      } else {
+        self.LoadImage(front, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.RenderingsItems.Front.frontImageID}`);
+      }
+
+      // self.LoadImage(front, self.Data.RenderingsItems.Front.image);
 
       self.Renderings.push({
         type: 'FRONTRENDERING',
@@ -278,7 +283,7 @@ class ShareboxBase extends PlanogramItemBase {
 
     /** This will be applied if a productRendering is turned on */
     self.AddProductRenderings();
-    
+
     self.Layer.draw();
     // self.Group.draw();
   }
@@ -297,7 +302,7 @@ class ShareboxBase extends PlanogramItemBase {
       if (self.Data.productRenderingMargin != undefined && self.Data.productRenderingMargin != null) {
         margin = self.Data.productRenderingMargin;
       }
-      
+
       allProducts.forEach(product => {
         // add rendering
         product.RemoveRendering();
@@ -340,17 +345,22 @@ class ShareboxBase extends PlanogramItemBase {
       y: 0,
       width: self.Data.width * self.Ratio,
       height: self.Data.height * self.Ratio,
-      fill: self.Data.color,
+      fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
       transformsEnabled: 'position'
     })
 
-    self.LoadImage(self.Area, self.Data.image);
+    if (self.Data.frontImageID == undefined || self.Data.frontImageID == null) {
+      self.LoadImage(self.Area, "data:image/png;base64," + self.Data.image);
+    } else {
+      self.LoadImage(self.Area, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.frontImageID}`);
+    }
+
+    // self.LoadImage(self.Area, self.Data.image);
 
     self.Group.add(self.Area);
   }
 
-  AdjustBarPosition() {
-  }
+  AdjustBarPosition() {}
 }
 
 export default ShareboxBase;

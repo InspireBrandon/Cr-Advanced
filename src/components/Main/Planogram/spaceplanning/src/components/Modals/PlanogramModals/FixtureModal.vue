@@ -134,12 +134,12 @@
                   </v-flex>
                   <v-flex lg8 md12
                     v-if="!newData.rendering && ((newData.fixtureType == 4 || newData.fixtureType == 3 || newData.fixtureType == 0 || newData.fixtureType == 1) && (newData.type == 2 || newData.type == 3))">
-                    <v-text-field type="number" v-model="newData.xOffset" label="X Offset:" suffix="cm">
+                    <v-text-field type="number" v-model="newData.x_Offset" label="X Offset:" suffix="cm">
                     </v-text-field>
                   </v-flex>
                   <v-flex lg8 md12
                     v-if="!newData.rendering && ((newData.fixtureType == 4 || newData.fixtureType == 3 || newData.fixtureType == 0 || newData.fixtureType == 1) && (newData.type == 2 || newData.type == 3))">
-                    <v-text-field type="number" v-model="newData.zOffset" label="Z Offset:" suffix="cm">
+                    <v-text-field type="number" v-model="newData.z_Offset" label="Z Offset:" suffix="cm">
                     </v-text-field>
                   </v-flex>
                   <v-flex lg8 md12 v-if="!newData.rendering && (newData.fixtureType == 0 && newData.type == 3)">
@@ -205,206 +205,182 @@
               <v-toolbar dense>
                 <v-toolbar-title class="toolbar-title">Display</v-toolbar-title>
               </v-toolbar>
-              <v-container style="text-align: center;" grid-list-md class="card-height">
+              <v-container grid-list-md>
                 <v-layout row wrap>
-                  <v-expansion-panel v-model="generalPanel" inset expand>
-                    <v-expansion-panel-content class="elevation-0">
-                      <div slot="header">General</div>
-                      <v-flex lg12 md12 sm12 xs12>
-                        <h3>Image</h3>
-                        <v-card class="elevation-5" @click="openFileExplorer"
-                          style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
-                          <img ref="changeImage" style="max-height: 150px; max-width: 150px;" src="" alt="">
-                        </v-card>
-                        <input ref="fileInput" style="display: none" @change="imageChange" type="file">
-                      </v-flex>
-                      <!-- <v-flex lg12 md12 sm12 xs12> -->
-                      <!-- <div v-show="newData.type == 2 && (newData.fixtureType == 0 || newData.fixtureType == 1) && !newData.rendering">
-                          <h3>Bar image</h3>
-                          <v-card class="elevation-5" @click="openFileExplorerBar" style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
-                            <img ref="changeImageBar" style="max-height: 150px; max-width: 150px;" src="" alt="">
-                          </v-card>
-                          <input ref="fileInputBar" style="display: none" @change="imageChangeBar" type="file">
-                        </div> -->
-                      <!-- </v-flex> -->
-                      <v-flex lg12 md12 sm12 xs12>
-                        <div v-if="!newData.rendering">
-                          <h3>Colour</h3>
-                          <compact-picker style="margin: 0 auto;" v-model="newData.color" />
-                          <v-flex lg8 md12 sm12 xs12>
-                            <v-checkbox hide-details label="Transparent" v-model="newData.transparent"
-                              @change="handleTransparency"></v-checkbox>
-                          </v-flex>
-                        </div>
-                      </v-flex>
-                      <v-flex lg12 md12 sm12 xs12>
-                        <div v-if="newData.type == 2 && newData.fixtureType == 2 && !newData.rendering">
-                          <h3>Peg Hole Colour</h3>
-                          <compact-picker style="margin: 0 auto;" v-model="newData.pegHoleColor" />
-                        </div>
-                      </v-flex>
-                    </v-expansion-panel-content>
-                  </v-expansion-panel>
+                  <v-flex md4 class="px-3">
+                    <!-- <div>Front</div> -->
+                    <span>
+                      <span style="padding-right: 45px;">{{ frontBack }}</span>
+                      <span class="ml-2">
+                        <a>
+                          <v-icon size="18" @click="mirrorSides(frontBack)"> = </v-icon>
+                        </a>
+                      </span>
+                      <span class="ml-2">
+                        <a v-if="frontBack=='Front'" href="#"
+                          @click.prevent="handleMirror(frontBack,newData.frontMirrored)"
+                          :style="{ 'background': newData.frontMirrored ? 'white': 'transparent' }">m</a>
 
-                  <!-- start of  render display settings -->
-                  <v-expansion-panel v-model="renderingPanel" inset expand
-                    v-if="!(newData.type == 3 && newData.fixtureType == 0)">
-                    <v-expansion-panel-content class="elevation-0">
-                      <div slot="header">Rendering Options</div>
-                      <v-flex
-                        v-if="newData.type == 2 && (newData.fixtureType == 0 || newData.fixtureType == 1 || newData.fixtureType == 3)">
-                        <v-checkbox label="Product Renderings" v-model="newData.productRendering"></v-checkbox>
-                      </v-flex>
-                      <v-flex
-                        v-if="newData.type == 2 && (newData.fixtureType == 0 || newData.fixtureType == 1 || newData.fixtureType == 3)">
-                        <v-text-field label="Product Rendering Margin" type="number"
-                          v-model="newData.productRenderingMargin"></v-text-field>
-                      </v-flex>
-                      <v-flex>
-                        <hr>
-                        <br>
-                        <p>Front Face Renderings</p>
-                        <v-divider></v-divider>
-                        <v-expansion-panel inset expand v-model="renderingPanel2"
-                          v-if="newData.fixtureType==1 && newData.type==2||newData.fixtureType==3 && newData.type ==2 ||newData.fixtureType == 0 && newData.type==2 || (newData.fixtureType == 0 && newData.type==2) || newData.fixtureType==4&&newData.type==3">
-                          <v-expansion-panel-content class="elevation-0 pa-0">
-                            <div slot="header">Label Holder </div>
-                            <v-select placeholder="please select" :items="labelType" v-model="newData.labelType"
-                              label="Label Holder Type:" @change="changeLabelImage">
-                            </v-select>
-                            <v-card class="elevation-5" @click="openFileExplorerLabel"
-                              style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
-                              <img ref="changeImageLabel" style="max-height: 150px; max-width: 150px;" src="" alt="">
-                            </v-card>
-                            <input ref="fileInputLabel" style="display: none" @change="imageChangeLabel" type="file">
-                            <v-layout>
-                              <v-flex>
-                                <v-text-field type="number" v-model="viewRenderLabel.height" label="Height:" suffix="cm"
-                                  :rules=numberRules></v-text-field>
-                              </v-flex>
-                              <v-flex>
-                                <v-text-field type="number" v-model="viewRenderLabel.width" label="Width:" suffix="cm"
-                                  :rules=numberRules></v-text-field>
-                              </v-flex>
-                              <v-flex>
-                                <v-text-field type="number" v-model="viewRenderLabel.yOffset" label="Y Offset:"
-                                  suffix="cm"></v-text-field>
-                              </v-flex>
-                            </v-layout>
+                        <a v-else href="#" @click.prevent="handleMirror(frontBack, newData.backMirrored)"
+                          :style="{ 'background':  newData.backMirrored ? 'white': 'transparent' }">m</a>
+                      </span>
+                      <span class="ml-2">
+                        <v-icon size="18" @click="changeDisplay(frontBack)">swap_horiz</v-icon>
+                      </span>
+                    </span>
+                    <img v-if="!hideImages" ref="frontImage" style="width: 100%; max-height: 120px;"
+                      :src="getFixtureImageNew(frontBack == 'Front' ? newData.frontImageID : newData.backImageID)" alt
+                      @click="openFileDialog(frontBack.toLowerCase())" />
+                    <a href="#" @click.prevent="openFileDialog(frontBack.toLowerCase())">Change</a>
+                    <span class="mr-2"></span>
+                    <a href="#" v-if="frontBack == 'Front'" @click.prevent="newData.frontImageID = null">Remove</a>
+                    <a href="#" v-else @click.prevent="newData.backImageID = null">Remove</a>
+                  </v-flex>
+                  <v-flex md4 class="px-3">
+                    <span>
+                      <span style="padding-right: 45px;">{{ leftRight }}</span>
+                      <span class="ml-2">
+                        <a>
+                          <v-icon size="18" @click="mirrorSides(leftRight)"> = </v-icon>
+                        </a>
+                      </span>
+                      <span class="ml-2">
+                        <a v-if="leftRight=='Left'" href="#"
+                          @click.prevent="handleMirror(leftRight,newData.leftMirrored)"
+                          :style="{ 'background': newData.leftMirrored ? 'white': 'transparent' }">m</a>
 
-                          </v-expansion-panel-content>
-                        </v-expansion-panel>
-                      </v-flex>
-                      <v-flex v-if="newData.fixtureType==1&&newData.type==2">
-                        <v-expansion-panel expand v-model="renderingPanel3" inset>
-                          <v-expansion-panel-content class="elevation-0 pa-0">
-                            <div slot="header">Shelf Edge </div>
-                            <v-select placeholder="please select" :items="ShelfEdgeType" v-model="newData.ShelfEdgeType"
-                              label="Shelf Edge Rendering:" @change="changeShelfEdgeImage">
-                            </v-select>
-                            <v-card class="elevation-5" @click="openFileExplorerShelfEdge"
-                              style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
-                              <img ref="changeImageShelfEdge" style="max-height: 150px; max-width: 150px;" src=""
-                                alt="">
-                            </v-card>
-                            <input ref="fileInputShelfEdge" style="display: none" @change="imageChangeShelfEdge"
-                              type="file">
-                            <v-layout>
-                              <v-flex>
-                                <v-text-field type="number" v-model="viewRenderShelfEdge.height" label="Height:"
-                                  suffix="cm" :rules=numberRules></v-text-field>
-                              </v-flex>
+                        <a v-else href="#" @click.prevent="handleMirror(leftRight,newData.rightMirrored)"
+                          :style="{ 'background':  newData.rightMirrored ? 'white': 'transparent' }">m</a>
+                      </span>
+                      <span class="ml-2">
+                        <v-icon size="18" @click="changeDisplay(leftRight)">swap_horiz</v-icon>
+                      </span>
+                    </span>
+                    <img v-if="!hideImages" ref="sideImage" style="width: 100%; max-height: 120px;"
+                      :src="getFixtureImageNew(leftRight == 'Left' ? newData.leftImageID : newData.rightImageID)" alt
+                      @click="openFileDialog(leftRight.toLowerCase())" />
+                    <a href="#" @click.prevent="openFileDialog(leftRight.toLowerCase())">Change</a>
+                    <span class="mr-2"></span>
+                    <a href="#" v-if="leftRight == 'Left' " @click.prevent="newData.leftImageID = null">Remove</a>
+                    <a href="#" v-else @click.prevent="newData.rightImageID = null">Remove</a>
 
-                              <v-flex>
-                                <v-text-field type="number" v-model="viewRenderShelfEdge.width" label="Width:"
-                                  suffix="cm" :rules=numberRules></v-text-field>
+                  </v-flex>
+                  <v-flex md4 class="px-3">
+                    <!-- <div>Top</div> -->
+                    <span>
+                      <span style="padding-right: 35px;">{{ topBottom }}</span>
+                      <span class="ml-2">
+                        <a>
+                          <v-icon size="18" @click="mirrorSides(topBottom)"> = </v-icon>
+                        </a>
+                      </span>
 
-                              </v-flex>
-                              <v-flex>
-                                <v-text-field type="number" v-model="viewRenderShelfEdge.yOffset" label="Y Offset:"
-                                  suffix="cm"></v-text-field>
-                              </v-flex>
-                            </v-layout>
-                          </v-expansion-panel-content>
-                        </v-expansion-panel>
+                      <span class="ml-2">
+                        <a v-if="topBottom=='Top'" href="#" @click.prevent="handleMirror(topBottom,newData.topMirrored)"
+                          :style="{ 'background':  newData.topMirrored ? 'white': 'transparent' }">m</a>
+                        <a v-else href="#" @click.prevent="handleMirror(topBottom,newData.bottomMirrored)"
+                          :style="{ 'background':  newData.bottomMirrored ? 'white': 'transparent' }">m</a>
+                      </span>
+                      <span class="ml-2">
+                        <v-icon size="18" @click="changeDisplay(topBottom)">swap_horiz</v-icon>
+                      </span>
+                    </span>
+                    <!-- {{ form.topImageID }}
+                    {{ form.bottomImageID }} -->
+                    <img v-if="!hideImages" ref="topImage" style="width: 100%; max-height: 120px;"
+                      :src="getFixtureImageNew(topBottom == 'Top' ? newData.topImageID : newData.bottomImageID)" alt
+                      @click="openFileDialog(topBottom.toLowerCase())" />
+                    <a href="#" @click.prevent="openFileDialog(topBottom.toLowerCase())">Change</a>
+                    <span class="mr-2"></span>
+                    <a href="#" v-if="topBottom == 'Top'" @click.prevent="newData.topImageID = null">Remove</a>
+                    <a href="#" v-else @click.prevent="newData.bottomImageID = null">Remove</a>
 
-                      </v-flex>
-                      <v-flex>
-                        <v-expansion-panel inset expand v-model="renderingPanel4"
-                          v-if="newData.fixtureType==1&&newData.type==3 || newData.fixtureType == 3 && newData.type == 3">
-                          <v-expansion-panel-content class="elevation-0 pa-0">
-                            <div slot="header"> Front rendering</div>
-                            <v-flex>
-                              <v-select placeholder="Render Image" :items="renderingselect"
-                                v-model="newData.renderImage" label="Rendering:" @change="changeImageSelect">
-                              </v-select>
-                              <v-card class="elevation-5" @click="openFileExplorerRender"
-                                style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
-                                <img ref="changeRenderImage" style="max-height: 150px; max-width: 150px;" src="" alt="">
-                              </v-card>
-                              <input ref="fileInputRender" style="display: none" @change="imageChangeRender"
-                                type="file">
-
-
-                              <v-layout>
-                                <v-flex>
-                                  <v-text-field type="number" v-model="viewRender.height" label="Height:" suffix="cm"
-                                    :rules=numberRules></v-text-field>
-                                </v-flex>
-                                <v-flex>
-                                  <v-text-field type="number" v-model="viewRender.width" label="Width:" suffix="cm"
-                                    :rules=numberRules></v-text-field>
-                                </v-flex>
-                                <v-flex>
-                                  <v-text-field type="number" v-model="viewRender.yOffset" label="Y Offeset:"
-                                    suffix="cm"></v-text-field>
-                                </v-flex>
-                              </v-layout>
-                            </v-flex>
-
-                          </v-expansion-panel-content>
-                        </v-expansion-panel>
-                      </v-flex>
-                      <!-- data type for select box newData.fixtureType==1&&newData.type==3|| -->
-                      <v-flex
-                        v-if="newData.fixtureType==1&&newData.type==2||newData.fixtureType==0&&newData.type==2 || newData.fixtureType == 3 && newData.type == 3">
-                        <p>Back Face Renderings</p>
-                        <v-divider></v-divider>
-                        <v-expansion-panel inset expand v-model="BackFaceRenderingsPanel5">
-                          <v-expansion-panel-content class="elevation-0 pa-0">
-                            <div slot="header">Back Rendering </div>
-                            <v-select placeholder="please select" :items="RenderBacks"
-                              v-model="newData.RenderingsItems.Backs" label="Back Renderings:"
-                              @change="changeImageRenderBack">
-                            </v-select>
-
-                            <v-card class="elevation-5" @click="openFileExplorerRenderBack"
-                              style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
-                              <img ref="RenderBackImage" style="max-height: 150px; max-width: 150px;" src="" alt="">
-                            </v-card>
-                            <input ref="fileInputRenderBack" style="display: none" @change="imageChangeBack"
-                              type="file">
-                            <v-layout>
-                              <v-flex>
-                                <v-text-field type="number" v-model="RenderBackModel.height" label="Height:" suffix="cm"
-                                  :rules=numberRules></v-text-field>
-                              </v-flex>
-
-                              <v-flex>
-                                <v-text-field type="number" v-model="RenderBackModel.width" label="Width:" suffix="cm"
-                                  :rules=numberRules></v-text-field>
-                              </v-flex>
-                              <v-flex>
-                                <v-text-field type="number" v-model="RenderBackModel.yOffset" label="Y Offset:"
-                                  suffix="cm"></v-text-field>
-                              </v-flex>
-                            </v-layout>
-                          </v-expansion-panel-content>
-                        </v-expansion-panel>
-                      </v-flex>
-                    </v-expansion-panel-content>
-                  </v-expansion-panel>
-
+                  </v-flex>
+                  <input ref="imageInput" style="display: none" @change="changeImage" type="file" />
+                  <!-- <v-flex lg12 md12 sm12 xs12 class="px-3">
+                    <div>Old Image</div>
+                    <img ref="changeImage" @click="openFileExplorer"
+                      style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;" src=""
+                      alt="">
+                    <input ref="fileInput" style="display: none" @change="imageChange" type="file">
+                  </v-flex>-->
+                  <!-- <v-flex lg12 md12 sm12 xs12>
+                    <div v-show="form.type == 2 && (form.fixtureType == 0 || form.fixtureType == 1) && !form.rendering">
+                      <h3>Bar image</h3>
+                      <img @click="openFileExplorerBar"
+                        style="width: 150px; height: 150px; background: white; cursor: pointer;" ref="changeImageBar"
+                        src="" alt="">
+                      <input ref="fileInputBar" style="display: none" @change="imageChangeBar" type="file">
+                    </div>
+                  </v-flex>-->
+                  <v-flex md4 class="px-3">
+                    <div v-if="!newData.rendering">
+                      <div>Colour</div>
+                      <compact-picker v-if="frontBack == 'Front'" style="width: 100%" v-model="newData.frontColor" />
+                      <compact-picker v-if="frontBack == 'Back'" style="width: 100%" v-model="newData.backColor" />
+                    </div>
+                  </v-flex>
+                  <v-flex md4 class="px-3">
+                    <div v-if="!newData.rendering">
+                      <div>Colour</div>
+                      <compact-picker v-if="leftRight == 'Left'" style="width: 100%" v-model="newData.leftColor" />
+                      <compact-picker v-if="leftRight == 'Right'" style="width: 100%" v-model="newData.rightColor" />
+                    </div>
+                  </v-flex>
+                  <v-flex md4 class="px-3">
+                    <div v-if="!newData.rendering">
+                      <div>Colour</div>
+                      <compact-picker v-if="topBottom == 'Top'" style="width: 100%" v-model="newData.topColor" />
+                      <compact-picker v-if="topBottom == 'Bottom'" style="width: 100%" v-model="newData.bottomColor" />
+                    </div>
+                  </v-flex>
+                  <!-- <v-flex lg12 md12 sm12 xs12 class="px-3">
+                    <div v-if="form.type == 2 && form.fixtureType == 2 && !form.rendering">
+                      <h3>Peg Hole Colour</h3>
+                      <compact-picker v-model="form.pegHoleColor" />
+                    </div>
+                  </v-flex>-->
+                  <v-flex md4 class="px-3">
+                    <v-checkbox @change="transparentChange('Front')" v-if="frontBack == 'Front'"
+                      v-model="newData.frontTransparent" label="Transparent"></v-checkbox>
+                    <v-checkbox @change="transparentChange('Back')" v-if="frontBack == 'Back'"
+                      v-model="newData.backTransparent" label="Transparent"></v-checkbox>
+                  </v-flex>
+                  <v-flex md4 class="px-3">
+                    <v-checkbox @change="transparentChange('Left')" v-if="leftRight == 'Left'"
+                      v-model="newData.leftTransparent" label="Transparent"></v-checkbox>
+                    <v-checkbox @change="transparentChange('Right')" v-if="leftRight == 'Right'"
+                      v-model="newData.rightTransparent" label="Transparent"></v-checkbox>
+                  </v-flex>
+                  <v-flex md4 class="px-3">
+                    <v-checkbox @change="transparentChange('Top')" v-if="topBottom == 'Top'"
+                      v-model="newData.topTransparent" label="Transparent"></v-checkbox>
+                    <v-checkbox @change="transparentChange('Bottom')" v-if="topBottom == 'Bottom'"
+                      v-model="newData.bottomTransparent" label="Transparent"></v-checkbox>
+                  </v-flex>
+                  <v-flex v-if="!newData.rendering" lg12 md12 sm12 xs12 class="px-3">
+                    <h3>Renderings</h3>
+                  </v-flex>
+                  <v-flex v-if="!newData.rendering &&renderingType0.length>1" lg8 md12 sm12 xs12 class="px-3">
+                    <v-select placeholder="please select" :items="renderingType0" v-model="selectedRenderingType0"
+                      label="Label Holder:"></v-select>
+                  </v-flex>
+                  <v-flex v-if="!newData.rendering &&renderingType1.length>1" lg8 md12 sm12 xs12 class="px-3">
+                    <v-select placeholder="please select" :items="renderingType1" v-model="selectedRenderingType1"
+                      label="Shelf Edge:"></v-select>
+                  </v-flex>
+                  <v-flex v-if="!newData.rendering &&renderingType2.length>1" lg8 md12 sm12 xs12 class="px-3">
+                    <v-select placeholder="please select" :items="renderingType2" v-model="selectedRenderingType2"
+                      label="Back Face:"></v-select>
+                  </v-flex>
+                  <v-flex v-if="!newData.rendering &&renderingType3.length>1" lg8 md12 sm12 xs12 class="px-3">
+                    <v-select placeholder="please select" :items="renderingType3" v-model="selectedRenderingType3"
+                      label="Front Face:"></v-select>
+                  </v-flex>
+                  <v-flex v-if="!newData.rendering &&renderingType4.length>1" lg8 md12 sm12 xs12 class="px-3">
+                    <v-select placeholder="please select" :items="renderingType4" v-model="selectedRenderingType4"
+                      label="Side Face:"></v-select>
+                  </v-flex>
                 </v-layout>
               </v-container>
             </v-card>
@@ -433,6 +409,23 @@
 
     data() {
       return {
+        frontBack: "Front",
+        frontBackMirror: false,
+        leftRight: "Left",
+        leftRightMirror: true,
+        topBottom: "Top",
+        topBottomMirror: true,
+        renderingType0: [],
+        selectedRenderingType0: null,
+        renderingType1: [],
+        selectedRenderingType1: null,
+        renderingType2: [],
+        selectedRenderingType2: null,
+        renderingType3: [],
+        selectedRenderingType3: null,
+        renderingType4: [],
+        selectedRenderingType4: null,
+        hideImages: false,
         floorplanFixture: null,
         numberRules: [
           v =>
@@ -631,6 +624,123 @@
       EventBus.$off("MODAL_LOAD", this.open);
     },
     methods: {
+      getRenderingTypes() {
+        let self = this;
+        axios
+          .get(
+            process.env.VUE_APP_API +
+            `Renderings?db=CR-Devinspire&type=${self.newData.type}&subType=${self.newData.fixtureType}`
+          )
+          .then(r => {
+            console.log("getRenderingTypes", r.data);
+            self.renderingType0 = [{
+              text: "none",
+              value: -1
+            }];
+            self.renderingType1 = [{
+              text: "none",
+              value: -1
+            }];
+            self.renderingType2 = [{
+              text: "none",
+              value: -1
+            }];
+            self.renderingType3 = [{
+              text: "none",
+              value: -1
+            }];
+            self.renderingType4 = [{
+              text: "none",
+              value: -1
+            }];
+            r.data.forEach(rendering => {
+              switch (rendering.renderingType) {
+                case 0: {
+                  self.renderingType0.push({
+                    text: rendering.name,
+                    value: rendering.id
+                  });
+                }
+                break;
+              case 1: {
+                self.renderingType1.push({
+                  text: rendering.name,
+                  value: rendering.id
+                });
+              }
+              break;
+              case 2: {
+                self.renderingType2.push({
+                  text: rendering.name,
+                  value: rendering.id
+                });
+              }
+              break;
+              case 3: {
+                self.renderingType3.push({
+                  text: rendering.name,
+                  value: rendering.id
+                });
+              }
+              break;
+
+              case 4: {
+                self.renderingType4.push({
+                  text: rendering.name,
+                  value: rendering.id
+                });
+              }
+              break;
+
+              default:
+                break;
+              }
+            });
+          })
+          .catch(e => {
+            console.log(e);
+          });
+      },
+      getSelectedRenderings() {
+        let self = this;
+        axios
+          .get(
+            process.env.VUE_APP_API +
+            `FixtureRenderingLink?db=CR-Devinspire&Fixture_ID=${self.newData.id}`
+          )
+          .then(r => {
+            // self.newData.image = r.data;
+            r.data.forEach(item => {
+              switch (item.renderingType) {
+                case 0: {
+                  self.selectedRenderingType0 = item.id;
+                }
+                break;
+              case 1: {
+                self.selectedRenderingType1 = item.id;
+              }
+              break;
+              case 2: {
+                self.selectedRenderingType2 = item.id;
+              }
+              break;
+              case 3: {
+                self.selectedRenderingType3 = item.id;
+              }
+              break;
+              case 4: {
+                self.selectedRenderingType4 = item.id;
+              }
+              break;
+              default:
+                break;
+              }
+            });
+          })
+          .catch(e => {
+            console.log(e);
+          });
+      },
       addSegment() {
         let self = this;
 
@@ -662,7 +772,7 @@
 
           if (self.newData.renderImage == "None") {
             self.newData.RenderingsItems.Front.image = null
-            self.$refs.changeRenderImage.src = null
+            // self.$refs.changeRenderImage.src = null
             self.viewRender.yOffset = 0
             self.viewRender.height = 1
             self.viewRender.width = 1
@@ -688,7 +798,7 @@
 
                 }
               })
-              self.$refs.changeRenderImage.src = 'data:image/png;base64,' + Response.data;
+              // self.$refs.changeRenderImage.src = 'data:image/png;base64,' + Response.data;
             }).catch(e => {
               console.log("no image attatched to selection" + e);
 
@@ -703,7 +813,7 @@
         self.$nextTick(() => {
           if (self.newData.labelType == "None") {
             self.newData.RenderingsItems.LabelHolder.image = null
-            self.$refs.changeImageLabel.src = null
+            // self.$refs.changeImageLabel.src = null
             self.viewRenderLabel.yOffset = 0
 
             self.viewRenderLabel.height = 1
@@ -727,7 +837,7 @@
                   self.viewRenderLabel.depth = element.depth
                 }
               })
-              self.$refs.changeImageLabel.src = 'data:image/png;base64,' + Response.data;
+              // self.$refs.changeImageLabel.src = 'data:image/png;base64,' + Response.data;
             }).catch(e => {
               console.log("no image attatched to selection" + e);
 
@@ -741,7 +851,7 @@
         self.$nextTick(() => {
           if (self.newData.ShelfEdgeType == "None") {
             self.newData.RenderingsItems.ShelfEdge.image = null
-            self.$refs.changeImageShelfEdge.src = null
+            // self.$refs.changeImageShelfEdge.src = null
 
             self.viewRenderShelfEdge.yOffset = 0
 
@@ -768,7 +878,7 @@
                   }
                 })
               }
-              self.$refs.changeImageShelfEdge.src = 'data:image/png;base64,' + Response.data;
+              // self.$refs.changeImageShelfEdge.src = 'data:image/png;base64,' + Response.data;
             }).catch(e => {
               console.log("no image attatched to selection" + e);
 
@@ -781,7 +891,7 @@
         self.$nextTick(() => {
           if (self.newData.RenderingsItems.Backs == "None") {
             self.newData.RenderingsItems.Back.image = null
-            self.$refs.RenderBackImage.src = null
+            // self.$refs.RenderBackImage.src = null
 
             self.RenderBackModel.yOffset = 0
 
@@ -810,7 +920,7 @@
                   }
                 })
               }
-              self.$refs.RenderBackImage.src = 'data:image/png;base64,' + Response.data;
+              // self.$refs.RenderBackImage.src = 'data:image/png;base64,' + Response.data;
             }).catch(e => {
               console.log("no image attatched to selection" + e);
 
@@ -829,8 +939,8 @@
       },
       open(eventData) {
         let self = this;
-        console.log("fixtureeventData",eventData);
-        
+        console.log("fixtureeventData", eventData);
+
         self.getFixtureTX(eventData.id, fixturecb => {
 
         })
@@ -858,8 +968,6 @@
         self.renderingPanel4 = [false]
         self.BackFaceRenderingsPanel5 = [false]
 
-        console.log(eventData.type);
-
         if (eventData.type.toUpperCase() === "FIXTURE") {
           self.newData = {}
           self.modalShow = true;
@@ -868,9 +976,14 @@
           self.newData.uploadSide = false
           self.newData.uploadTop = false
 
+          console.log(self.newData)
+
           self.newData.labelsOn = self.newData.labelsOn == undefined || self.newData.labelsOn == null ? true : self
             .newData
             .labelsOn;
+
+          self.getRenderingTypes()
+          self.getSelectedRenderings()
 
           console.log(self.newData)
           // spreadfacings data toggle
@@ -1021,63 +1134,60 @@
             hex: self.newData.color
           }
           self.$nextTick(() => {
-            if (self.newData.fixtureType == 1 && self.newData.type == 3) {
-              if (self.newData.RenderingsItems.Front.image != undefined && self.newData.RenderingsItems.Front
-                .image !=
-                null)
-                self.$refs.changeRenderImage.src = 'data:image/png;base64,' + self.newData.RenderingsItems.Front
-                .image;
-              else
-                self.$refs.changeRenderImage.src = '';
-            }
+            // if (self.newData.fixtureType == 1 && self.newData.type == 3) {
+            //   if (self.newData.RenderingsItems.Front.image != undefined && self.newData.RenderingsItems.Front .image != null)
+            //     self.$refs.changeRenderImage.src = 'data:image/png;base64,' + self.newData.RenderingsItems.Front .image;
+            //   else
+            //     self.$refs.changeRenderImage.src = '';
+            // }
 
-            if (self.newData.image != undefined && self.newData.image != null)
-              self.$refs.changeImage.src = 'data:image/png;base64,' + self.newData.image;
-            else
-              self.$refs.changeImage.src = '';
+            // if (self.newData.image != undefined && self.newData.image != null)
+            //   self.$refs.changeImage.src = 'data:image/png;base64,' + self.newData.image;
+            // else
+            //   self.$refs.changeImage.src = '';
 
             // if (self.newData.barImage != undefined && self.newData.barImage != null)
             //   self.$refs.changeImageBar.src = 'data:image/png;base64,' + self.newData.barImage;
             // else
 
             //   self.$refs.changeImageBar.src = '';
-            if (self.newData.fixtureType == 1 && self.newData.type == 2 || self.newData.fixtureType == 3 && self
-              .newData
-              .type == 2 ||
-              self.newData.fixtureType == 0 && self.newData.type == 2) {
-              if (self.newData.RenderingsItems.LabelHolder.image != undefined && self.newData.RenderingsItems
-                .LabelHolder
-                .image != null)
-                self.$refs.changeImageLabel.src = 'data:image/png;base64,' + self.newData.RenderingsItems
-                .LabelHolder
-                .image;
-              else
+            // if (self.newData.fixtureType == 1 && self.newData.type == 2 || self.newData.fixtureType == 3 && self
+            //   .newData
+            //   .type == 2 ||
+            //   self.newData.fixtureType == 0 && self.newData.type == 2) {
+            //   if (self.newData.RenderingsItems.LabelHolder.image != undefined && self.newData.RenderingsItems
+            //     .LabelHolder
+            //     .image != null)
+            //     self.$refs.changeImageLabel.src = 'data:image/png;base64,' + self.newData.RenderingsItems
+            //     .LabelHolder
+            //     .image;
+            //   else
 
-                self.$refs.changeImageLabel.src = '';
-            }
+            //     self.$refs.changeImageLabel.src = '';
+            // }
 
-            if (self.newData.fixtureType == 1 && self.newData.type == 2) {
-              if (self.newData.RenderingsItems.ShelfEdge.image != undefined && self.newData.RenderingsItems
-                .ShelfEdge
-                .image != null)
-                self.$refs.changeImageShelfEdge.src = 'data:image/png;base64,' + self.newData.RenderingsItems
-                .ShelfEdge
-                .image;
-              else
+            // if (self.newData.fixtureType == 1 && self.newData.type == 2) {
+            //   if (self.newData.RenderingsItems.ShelfEdge.image != undefined && self.newData.RenderingsItems
+            //     .ShelfEdge
+            //     .image != null)
+            //     self.$refs.changeImageShelfEdge.src = 'data:image/png;base64,' + self.newData.RenderingsItems
+            //     .ShelfEdge
+            //     .image;
+            //   else
 
-                self.$refs.changeImageShelfEdge.src = '';
-            }
+            //     self.$refs.changeImageShelfEdge.src = '';
+            // }
 
-            if (self.newData.fixtureType == 1 && self.newData.type == 3 || self.newData.fixtureType == 1 && self
-              .newData
-              .type == 2 ||
-              self.newData.fixtureType == 0 && self.newData.type == 2) {
-              if (self.newData.RenderingsItems.Back.image != undefined && self.newData.RenderingsItems.Back.image !=
-                null)
-                self.$refs.RenderBackImage.src = 'data:image/png;base64,' + self.newData.RenderingsItems.Back.image;
-              else
-                self.$refs.RenderBackImage.src = '';
-            }
+            // if (self.newData.fixtureType == 1 && self.newData.type == 3 || self.newData.fixtureType == 1 && self
+            //   .newData
+            //   .type == 2 ||
+            //   self.newData.fixtureType == 0 && self.newData.type == 2) {
+            //   if (self.newData.RenderingsItems.Back.image != undefined && self.newData.RenderingsItems.Back.image !=
+            //     null)
+            //     self.$refs.RenderBackImage.src = 'data:image/png;base64,' + self.newData.RenderingsItems.Back.image;
+            //   else
+            //     self.$refs.RenderBackImage.src = '';
+            // }
 
           })
         } else {
@@ -1148,8 +1258,8 @@
         self.newData.facingOffsetX = returnFloat(self.newData.facingOffsetX);
         self.newData.facingOffsetY = returnFloat(self.newData.facingOffsetY);
         self.newData.rejectProducts = self.newData.rejectProducts;
-        self.newData.zOffset = self.newData.zOffset;
-        self.newData.xOffset = self.newData.xOffset;
+        self.newData.z_Offset = self.newData.z_Offset;
+        self.newData.x_Offset = self.newData.x_Offset;
 
         if (self.newData.productRenderingMargin == undefined || self.newData.productRenderingMargin == null) {
           self.newData.productRenderingMargin = 15;
@@ -1345,6 +1455,185 @@
           callback(a.result);
         }
         a.readAsDataURL(blob);
+      },
+      getFixtureImageNew(imageID) {
+        if (imageID == undefined || imageID == null) {
+          return "https://sisterhoodofstyle.com/wp-content/uploads/2018/02/no-image-1.jpg";
+        } else {
+          return (
+            process.env.VUE_APP_API +
+            "FixtureImage?db=CR-DEVINSPIRE&fixtureImageID=" +
+            imageID
+          );
+        }
+      },
+      changeImage(e) {
+        let self = this;
+
+        const files = e.target.files;
+        let file = files[0];
+
+        // self.blobToDataUrl(file, url => {
+        //   self.$refs[self.changingSide + "Image"].src = url;
+        // })
+
+        let request = {
+          name: file.name,
+          type: file.type == null ? "" : file.type
+        };
+
+        self.hideImages = true;
+
+        axios
+          .post(
+            process.env.VUE_APP_API + "FixtureImage?db=CR-DEVINSPIRE",
+            request
+          )
+          .then(r => {
+            axios.post(process.env.VUE_APP_API + "FixtureImage?db=CR-DEVINSPIRE&fixtureImageID=" + r.data.id, file)
+              .then(image => {
+                self.checkSideImageChange(r.data.id);
+                self.hideImages = false;
+              });
+          })
+          .catch(e => {});
+      },
+      checkSideImageChange(imageID) {
+        let self = this
+
+        switch (self.changingSide) {
+          case 'front': {
+            self.newData.frontImageID = imageID;
+
+            if (self.frontBackMirror) {
+              self.newData.backImageID = imageID;
+            }
+          }
+          break;
+        case 'back': {
+          self.newData.backImageID = imageID;
+
+          if (self.frontBackMirror) {
+            self.newData.frontImageID = imageID;
+          }
+        }
+        break;
+        case 'top': {
+          self.newData.topImageID = imageID;
+
+          if (self.topBottomMirror) {
+            self.newData.bottomImageID = imageID;
+          }
+        }
+        break;
+        case 'bottom': {
+          self.newData.bottomImageID = imageID;
+
+          if (self.topBottomMirror) {
+            self.newData.topImageID = imageID;
+          }
+        }
+        break;
+        case 'left': {
+          self.newData.leftImageID = imageID;
+
+          if (self.leftRightMirror) {
+            self.newData.rightImageID = imageID;
+          }
+        }
+        break;
+        case 'right': {
+          self.newData.rightImageID = imageID;
+
+          if (self.leftRightMirror) {
+            self.newData.leftImageID = imageID;
+          }
+        }
+        break;
+        }
+      },
+      changeDisplay(prop) {
+        let self = this;
+
+        switch (prop) {
+          case "Front": {
+            self.frontBack = "Back";
+          }
+          break;
+        case "Back": {
+          self.frontBack = "Front";
+        }
+        break;
+        case "Left": {
+          self.leftRight = "Right";
+        }
+        break;
+        case "Right": {
+          self.leftRight = "Left";
+        }
+        break;
+        case "Top": {
+          self.topBottom = "Bottom";
+        }
+        break;
+        case "Bottom": {
+          self.topBottom = "Top";
+        }
+        break;
+        }
+      },
+      transparentChange(side) {
+        let self = this;
+
+        self.$nextTick(() => {
+          switch (side) {
+            case "Front": {
+              if (self.frontBackMirror) {
+                self.newData.backTransparent = self.newData.frontTransparent;
+              }
+            }
+            break;
+          case "Back": {
+            if (self.frontBackMirror) {
+              self.newData.frontTransparent = self.newData.backTransparent;
+            }
+          }
+          break;
+          case "Left": {
+            if (self.leftRightMirror) {
+              self.newData.rightTransparent = self.newData.leftTransparent;
+            }
+          }
+          break;
+          case "Right": {
+            if (self.leftRightMirror) {
+              self.newData.leftTransparent = self.newData.rightTransparent;
+            }
+          }
+          break;
+          case "Top": {
+            if (self.topBottomMirror) {
+              self.newData.bottomTransparent = self.newData.topTransparent;
+            }
+          }
+          break;
+          case "Bottom": {
+            if (self.topBottomMirror) {
+              self.newData.topTransparent = self.newData.bottomTransparent;
+            }
+          }
+          break;
+          }
+        })
+      },
+      openFileDialog(side) {
+        let self = this;
+
+        self.changingSide = side;
+
+        self.$refs.imageInput.value = null;
+
+        self.$refs.imageInput.click();
       },
     }
   }

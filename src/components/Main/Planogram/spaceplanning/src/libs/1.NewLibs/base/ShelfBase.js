@@ -115,11 +115,9 @@ class ShelfBase extends PlanogramItemBase {
   PositionShelf() {
     let self = this;
 
-    let offset = (self.Data.xOffset == undefined ? 0 : self.Data.xOffset) * 3;
+    let offset = (self.Data.x_Offset == undefined ? 0 : self.Data.x_Offset) * 3;
     self.Group.setX(0 + parseFloat(offset));
 
-    console.log("Groupie", self)
-    console.log("offset", offset)
     // self.Group.setX(self.Group);
     // self.Group.setX(0 + self.Data.xOffset == undefined ? 0 : self.Data.xOffset);
 
@@ -148,13 +146,20 @@ class ShelfBase extends PlanogramItemBase {
     self.Data = newData;
 
     self.SetObjectDimensions();
-    self.Bar.fill(self.Data.color);
+    self.Bar.fill(self.Data.frontTransparent ? 'transparent' : self.Data.frontColor);
     self.Bar.setWidth(self.TotalWidth); // sample
     self.Bar.setHeight(self.TotalHeight); // sample
     self.Group.setWidth(self.TotalWidth);
     self.Group.setHeight(self.TotalHeight);
     self.HideShowLabels();
-    self.LoadImage(self.Bar, self.Data.image);
+
+    if(self.Data.frontImageID == undefined || self.Data.frontImageID == null) {
+      self.LoadImage(self.Bar, "data:image/png;base64," + self.Data.image);
+    } else {
+      self.LoadImage(self.Bar, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.frontImageID}`);
+    }
+
+    // self.LoadImage(self.Bar, self.Data.image);
     // call position element
     self.PositionElement();
     // call direct children to reposition
@@ -196,11 +201,17 @@ class ShelfBase extends PlanogramItemBase {
         y: (h * -1) - offset,
         width: w,
         height: h,
-        color: 'transparent',
+        fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
         listening: false
       })
 
-      self.LoadImage(shelfEdge, self.Data.RenderingsItems.ShelfEdge.image);
+      if(self.Data.RenderingsItems.ShelfEdge.frontImageID == undefined || self.Data.RenderingsItems.ShelfEdge.frontImageID == null) {
+        self.LoadImage(shelfEdge, "data:image/png;base64," + self.Data.RenderingsItems.ShelfEdge.image);
+      } else {
+        self.LoadImage(shelfEdge, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.RenderingsItems.ShelfEdge.frontImageID}`);
+      }
+
+      // self.LoadImage(shelfEdge, self.Data.RenderingsItems.ShelfEdge.image);
 
       self.Renderings.push({
         type: 'SHELFEDGE',
@@ -226,11 +237,17 @@ class ShelfBase extends PlanogramItemBase {
         y: 0 + offset,
         width: w,
         height: h,
-        color: 'transparent',
+        fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
         listening: false
       })
 
-      self.LoadImage(shelfLabelHolder, self.Data.RenderingsItems.LabelHolder.image);
+      if(self.Data.RenderingsItems.LabelHolder.frontImageID == undefined || self.Data.RenderingsItems.LabelHolder.frontImageID == null) {
+        self.LoadImage(shelfLabelHolder, "data:image/png;base64," + self.Data.RenderingsItems.LabelHolder.image);
+      } else {
+        self.LoadImage(shelfLabelHolder, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.RenderingsItems.LabelHolder.frontImageID}`);
+      }
+
+      // self.LoadImage(shelfLabelHolder, self.Data.RenderingsItems.LabelHolder.image);
 
       self.Renderings.push({
         type: 'LABELHOLDER',
@@ -256,11 +273,17 @@ class ShelfBase extends PlanogramItemBase {
         y: (h * -1) - offset,
         width: w,
         height: h,
-        color: 'transparent',
+        fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
         listening: false
       })
 
-      self.LoadImage(shelfBack, self.Data.RenderingsItems.Back.image);
+      if(self.Data.RenderingsItems.Back.frontImageID == undefined || self.Data.RenderingsItems.Back.frontImageID == null) {
+        self.LoadImage(shelfBack, "data:image/png;base64," + self.Data.RenderingsItems.Back.image);
+      } else {
+        self.LoadImage(shelfBack, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.RenderingsItems.Back.frontImageID}`);
+      }
+
+      // self.LoadImage(shelfBack, self.Data.RenderingsItems.Back.image);
 
       self.Renderings.push({
         type: 'BACKRENDERING',
@@ -297,7 +320,6 @@ class ShelfBase extends PlanogramItemBase {
         product.AddRendering(self, margin);
       });
     } else {
-      console.warn("[PRODUCT RENDERING]", self.Type, "Product rendering setting off")
       let allProducts = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "PRODUCT", self.ID);
 
       if (allProducts.length == 0) {
@@ -333,10 +355,14 @@ class ShelfBase extends PlanogramItemBase {
       y: 0,
       width: self.Data.width * self.Ratio,
       height: self.Data.height * self.Ratio,
-      fill: self.Data.color
+      fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
     })
 
-    self.LoadImage(self.Bar, self.Data.image);
+    if(self.Data.frontImageID == undefined || self.Data.frontImageID == null) {
+      self.LoadImage(self.Bar, "data:image/png;base64," + self.Data.image);
+    } else {
+      self.LoadImage(self.Bar, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.frontImageID}`);
+    }
 
     self.Group.add(self.Bar);
   }

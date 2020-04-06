@@ -39,6 +39,9 @@ class DrawingHelper {
             case "PEGBOARD": {
                 fixture = new Shelf(params);
             }break;
+            case "LABELHOLDER": {
+                fixture = new Shelf(params);
+            }break;
         }
 
         if(fixture != undefined && fixture != null) {

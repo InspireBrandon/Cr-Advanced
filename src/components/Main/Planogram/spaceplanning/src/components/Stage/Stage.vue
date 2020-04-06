@@ -1756,13 +1756,22 @@
           data = window.library;
         }
 
-        console.log("frontImageID", data.data.frontImageID)
+        console.log("frontImageID", data)
 
         //#endregion
-        if (data.data.frontImageID != null) {
-          data.data.image = process.env.VUE_APP_API +
-            `FixtureImage?db=CR-Devinspire&fixtureImageID=${data.data.frontImageID}`
+
+        if (data.type == "GONDOLA") {
+          if (data.data.backImageID != null) {
+            data.data.image = process.env.VUE_APP_API +
+              `FixtureImage?db=CR-Devinspire&fixtureImageID=${data.data.backImageID}`
+          }
+        } else {
+          if (data.data.frontImageID != null) {
+            data.data.image = process.env.VUE_APP_API +
+              `FixtureImage?db=CR-Devinspire&fixtureImageID=${data.data.frontImageID}`
+          }
         }
+
         if (data.data.defaultPeg != 0) {
           if (data.data.defaultPegDetails == null) {
             axios.get(process.env.VUE_APP_API + `Fixture/${data.data.defaultPeg}?db=CR-Devinspire`)

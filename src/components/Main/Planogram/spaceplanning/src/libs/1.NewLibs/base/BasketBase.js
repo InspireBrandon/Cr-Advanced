@@ -213,7 +213,7 @@ class BasketBase extends PlanogramItemBase {
 
     self.Data = newData;
     self.SetObjectDimensions();
-    self.Area.fill(self.Data.color);
+    self.Area.fill(self.Data.frontTransparent ? 'transparent' : self.Data.frontColor);
     self.Area.setWidth(self.TotalWidth); // sample
     self.Area.setHeight(self.TotalHeight); // sample
     self.Group.setWidth(self.TotalWidth);
@@ -262,11 +262,18 @@ class BasketBase extends PlanogramItemBase {
         y: self.TotalHeight - h + (offset),
         width: w,
         height: h,
-        color: 'transparent',
+        fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
         listening: false
       })
 
-      self.LoadImage(front, self.Data.RenderingsItems.Front.image);
+
+      if(self.Data.RenderingsItems.Front.frontImageID == undefined || self.Data.RenderingsItems.Front.frontImageID == null) {
+        self.LoadImage(front, "data:image/png;base64," + self.Data.RenderingsItems.Front.image);
+      } else {
+        self.LoadImage(front, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.RenderingsItems.Front.frontImageID}`);
+      }
+
+      // self.LoadImage(front, self.Data.RenderingsItems.Front.image);
 
       self.Renderings.push({
         type: 'FRONTRENDERING',
@@ -340,11 +347,17 @@ class BasketBase extends PlanogramItemBase {
       y: 0,
       width: self.Data.width * self.Ratio,
       height: self.Data.height * self.Ratio,
-      color: 'transparent',
+      fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
       transformsEnabled: 'position'
     })
 
-    self.LoadImage(self.Area, self.Data.image);
+    if(self.Data.frontImageID == undefined || self.Data.frontImageID == null) {
+      self.LoadImage(self.Area, "data:image/png;base64," + self.Data.image);
+    } else {
+      self.LoadImage(self.Area, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.frontImageID}`);
+    }
+
+    // self.LoadImage(self.Area, self.Data.image);
 
     self.Group.add(self.Area);
   }

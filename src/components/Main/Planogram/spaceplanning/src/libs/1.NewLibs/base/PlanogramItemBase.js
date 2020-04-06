@@ -442,19 +442,11 @@ class PlanogramItemBase {
 
   LoadImage(konvaImage, imageData) {
     let self = this;
-    if (imageData != null) {
-      console.log("LoadDataa",self.Data);
-      
-      
+    if (imageData != null && imageData != "data:image/png;base64,null") {
       var backPanelImage = new Image();
-      
-      let prepend = ""
 
-      if(self.Data.frontImageID == undefined || self.Data.frontImageID == null) {
-        prepend = "data:image/png;base64,"
-      }
-      
-      backPanelImage.src = prepend + imageData;
+      backPanelImage.src = imageData
+
       konvaImage.image(backPanelImage);
       backPanelImage.onload = function () {
         self.Stage.draw();

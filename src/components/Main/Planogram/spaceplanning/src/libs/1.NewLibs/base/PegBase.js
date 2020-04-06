@@ -83,7 +83,7 @@ class PegBase extends PlanogramItemBase {
                 console.log("PEG INTRSCT", intersects);
                 self.Group.setX(intersects.ContainerPosition.x)
                 self.Group.setY(0);
-                
+
                 ctrl_position.PositionToParent(self.VueStore, null, self.ParentID) // IMPORTANT!
 
                 self.ParentID = intersects.ID;
@@ -109,7 +109,7 @@ class PegBase extends PlanogramItemBase {
         ctrl_label.SetNewLabelAndPositionNumbers(self.VueStore);
 
         self.Group.setY(0);
-        
+
         self.LastPositionRelative = self.Group.position();
         self.LastPositionAbsolute = self.Group.getAbsolutePosition();
 
@@ -128,12 +128,19 @@ class PegBase extends PlanogramItemBase {
 
         self.Data = newData;
         self.SetObjectDimensions();
-        self.Area.fill(self.Data.color);
+        self.Area.fill(self.Data.frontTransparent ? 'transparent' : self.Data.frontColor);
         self.Area.setWidth(self.TotalWidth); // sample
         self.Area.setHeight(self.TotalHeight); // sample
         self.Group.setWidth(self.TotalWidth);
         self.Group.setHeight(self.TotalHeight);
-        self.LoadImage(self.Area, self.Data.image);
+
+        if (self.Data.frontImageID == undefined || self.Data.frontImageID == null) {
+            self.LoadImage(self.Area, "data:image/png;base64," + self.Data.image);
+        } else {
+            self.LoadImage(self.Area, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.frontImageID}`);
+        }
+
+        // self.LoadImage(self.Area, self.Data.image);
 
         // call position element
         self.AddRenderings();
@@ -167,11 +174,17 @@ class PegBase extends PlanogramItemBase {
                 y: 0 + offset,
                 width: w,
                 height: h,
-                color: 'transparent',
+                fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
                 listening: false
             })
 
-            self.LoadImage(shelfLabelHolder, self.Data.RenderingsItems.LabelHolder.image);
+            if (self.Data.RenderingsItems.LabelHolder.frontImageID == undefined || self.Data.RenderingsItems.LabelHolder.frontImageID == null) {
+                self.LoadImage(shelfLabelHolder, "data:image/png;base64," + self.Data.RenderingsItems.LabelHolder.image);
+            } else {
+                self.LoadImage(shelfLabelHolder, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.RenderingsItems.LabelHolder.frontImageID}`);
+            }
+
+            // self.LoadImage(shelfLabelHolder, self.Data.RenderingsItems.LabelHolder.image);
 
             self.Renderings.push({
                 type: 'LABELHOLDER',
@@ -203,11 +216,17 @@ class PegBase extends PlanogramItemBase {
             y: 0,
             width: self.Data.width * self.Ratio,
             height: self.Data.height * self.Ratio,
-            fill: self.Data.color,
+            fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
             transformsEnabled: 'position'
         })
 
-        self.LoadImage(self.Area, self.Data.image);
+        if (self.Data.frontImageID == undefined || self.Data.frontImageID == null) {
+            self.LoadImage(self.Area, "data:image/png;base64," + self.Data.image);
+        } else {
+            self.LoadImage(self.Area, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.frontImageID}`);
+        }
+
+        // self.LoadImage(self.Area, self.Data.image);
 
         self.Group.add(self.Area);
     }

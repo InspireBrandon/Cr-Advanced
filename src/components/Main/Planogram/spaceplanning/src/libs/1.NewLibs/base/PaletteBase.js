@@ -134,13 +134,20 @@ class PaletteBase extends PlanogramItemBase {
 
     self.Data = newData;
     self.SetObjectDimensions();
-    self.Area.fill(self.Data.color);
+    self.Area.fill(self.Data.frontTransparent ? 'transparent' : self.Data.frontColor);
     self.Area.setWidth(self.TotalWidth); // sample
     self.Area.setHeight(self.TotalHeight); // sample
     self.Group.setWidth(self.TotalWidth);
     self.Group.setHeight(self.TotalHeight);
     self.HideShowLabels();
-    self.LoadImage(self.Area, self.Data.image);
+
+    if(self.Data.frontImageID == undefined || self.Data.frontImageID == null) {
+      self.LoadImage(self.Area, "data:image/png;base64," + self.Data.image);
+    } else {
+      self.LoadImage(self.Area, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.frontImageID}`);
+    }
+
+    // self.LoadImage(self.Area, self.Data.image);
 
     // call position element
     self.PositionElement();
@@ -187,11 +194,17 @@ class PaletteBase extends PlanogramItemBase {
       y: 0,
       width: self.TotalWidth,
       height: self.TotalHeight,
-      color: 'transparent',
+      fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
       transformsEnabled: 'position'
     })
 
-    self.LoadImage(self.Area, self.Data.image);
+    if(self.Data.frontImageID == undefined || self.Data.frontImageID == null) {
+      self.LoadImage(self.Area, "data:image/png;base64," + self.Data.image);
+    } else {
+      self.LoadImage(self.Area, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.frontImageID}`);
+    }
+
+    // self.LoadImage(self.Area, self.Data.image);
 
     self.Group.add(self.Area);
   }

@@ -151,206 +151,184 @@
               <v-toolbar dense>
                 <v-toolbar-title class="toolbar-title">Display</v-toolbar-title>
               </v-toolbar>
-              <v-layout row wrap>
-                <v-expansion-panel inset v-model="general" expand>
-                  <v-expansion-panel-content class="elevation-0 pa-0">
-                    <div slot="header">General</div>
-                    <v-layout row wrap>
-                      <v-flex md4 class="px-3">
-                        <!-- <div>Front</div> -->
-                        <span>
-                          <span style="padding-right: 45px;">{{ frontBack }}</span>
-                          <span class="ml-2">
-                            <a>
-                              <v-icon size="18" @click="mirrorSides(frontBack)"> = </v-icon>
-                            </a>
-                          </span>
-                          <span class="ml-2">
-                            <a v-if="frontBack=='Front'" href="#"
-                              @click.prevent="handleMirror(frontBack,newData.frontMirrored)"
-                              :style="{ 'background': newData.frontMirrored ? 'white': 'transparent' }">m</a>
+              <v-container grid-list-md>
+                <v-layout row wrap>
+                  <v-flex md4 class="px-3">
+                    <!-- <div>Front</div> -->
+                    <span>
+                      <span style="padding-right: 45px;">{{ frontBack }}</span>
+                      <span class="ml-2">
+                        <a>
+                          <v-icon size="18" @click="mirrorSides(frontBack)"> = </v-icon>
+                        </a>
+                      </span>
+                      <span class="ml-2">
+                        <a v-if="frontBack=='Front'" href="#"
+                          @click.prevent="handleMirror(frontBack,newData.frontMirrored)"
+                          :style="{ 'background': newData.frontMirrored ? 'white': 'transparent' }">m</a>
 
-                            <a v-else href="#" @click.prevent="handleMirror(frontBack,newData.backMirrored)"
-                              :style="{ 'background':  newData.backMirrored ? 'white': 'transparent' }">m</a>
-                          </span>
-                          <span class="ml-2">
-                            <v-icon size="18" @click="changeDisplay(frontBack)">swap_horiz</v-icon>
-                          </span>
-                        </span>
-                        <img v-if="!hideImages" ref="frontImage" style="width: 100%; max-height: 120px;"
-                          :src="getFixtureImageNew(frontBack == 'Front' ? newData.frontImageID : newData.backImageID)"
-                          alt @click="openFileDialog(frontBack.toLowerCase())" />
-                        <a href="#" @click.prevent="openFileDialog(frontBack.toLowerCase())">Change</a>
-                        <span class="mr-2"></span>
-                        <a href="#" v-if="frontBack == 'Front'" @click.prevent="newData.frontImageID = null">Remove</a>
-                        <a href="#" v-else @click.prevent="newData.backImageID = null">Remove</a>
-                      </v-flex>
-                      <v-flex md4 class="px-3">
-                        <span>
-                          <span style="padding-right: 45px;">{{ leftRight }}</span>
-                          <span class="ml-2">
-                            <a>
-                              <v-icon size="18" @click="mirrorSides(leftRight)"> = </v-icon>
-                            </a>
-                          </span>
-                          <span class="ml-2">
-                            <a v-if="leftRight=='Left'" href="#"
-                              @click.prevent="handleMirror(leftRight,newData.leftMirrored)"
-                              :style="{ 'background': newData.leftMirrored ? 'white': 'transparent' }">m</a>
+                        <a v-else href="#" @click.prevent="handleMirror(frontBack, newData.backMirrored)"
+                          :style="{ 'background':  newData.backMirrored ? 'white': 'transparent' }">m</a>
+                      </span>
+                      <span class="ml-2">
+                        <v-icon size="18" @click="changeDisplay(frontBack)">swap_horiz</v-icon>
+                      </span>
+                    </span>
+                    <img v-if="!hideImages" ref="frontImage" style="width: 100%; max-height: 120px;"
+                      :src="getFixtureImageNew(frontBack == 'Front' ? newData.frontImageID : newData.backImageID)" alt
+                      @click="openFileDialog(frontBack.toLowerCase())" />
+                    <a href="#" @click.prevent="openFileDialog(frontBack.toLowerCase())">Change</a>
+                    <span class="mr-2"></span>
+                    <a href="#" v-if="frontBack == 'Front'" @click.prevent="newData.frontImageID = null">Remove</a>
+                    <a href="#" v-else @click.prevent="newData.backImageID = null">Remove</a>
+                  </v-flex>
+                  <v-flex md4 class="px-3">
+                    <span>
+                      <span style="padding-right: 45px;">{{ leftRight }}</span>
+                      <span class="ml-2">
+                        <a>
+                          <v-icon size="18" @click="mirrorSides(leftRight)"> = </v-icon>
+                        </a>
+                      </span>
+                      <span class="ml-2">
+                        <a v-if="leftRight=='Left'" href="#"
+                          @click.prevent="handleMirror(leftRight,newData.leftMirrored)"
+                          :style="{ 'background': newData.leftMirrored ? 'white': 'transparent' }">m</a>
 
-                            <a v-else href="#" @click.prevent="handleMirror(leftRight,newData.rightMirrored)"
-                              :style="{ 'background':  newData.rightMirrored ? 'white': 'transparent' }">m</a>
-                          </span>
-                          <span class="ml-2">
-                            <v-icon size="18" @click="changeDisplay(leftRight)">swap_horiz</v-icon>
-                          </span>
-                        </span>
-                        <img v-if="!hideImages" ref="sideImage" style="width: 100%; max-height: 120px;"
-                          :src="getFixtureImageNew(leftRight == 'Left' ? newData.leftImageID : newData.rightImageID)"
-                          alt @click="openFileDialog(leftRight.toLowerCase())" />
-                        <a href="#" @click.prevent="openFileDialog(leftRight.toLowerCase())">Change</a>
-                        <span class="mr-2"></span>
-                        <a href="#" v-if="leftRight == 'Left' " @click.prevent="newData.leftImageID = null">Remove</a>
-                        <a href="#" v-else @click.prevent="newData.rightImageID = null">Remove</a>
+                        <a v-else href="#" @click.prevent="handleMirror(leftRight,newData.rightMirrored)"
+                          :style="{ 'background':  newData.rightMirrored ? 'white': 'transparent' }">m</a>
+                      </span>
+                      <span class="ml-2">
+                        <v-icon size="18" @click="changeDisplay(leftRight)">swap_horiz</v-icon>
+                      </span>
+                    </span>
+                    <img v-if="!hideImages" ref="sideImage" style="width: 100%; max-height: 120px;"
+                      :src="getFixtureImageNew(leftRight == 'Left' ? newData.leftImageID : newData.rightImageID)" alt
+                      @click="openFileDialog(leftRight.toLowerCase())" />
+                    <a href="#" @click.prevent="openFileDialog(leftRight.toLowerCase())">Change</a>
+                    <span class="mr-2"></span>
+                    <a href="#" v-if="leftRight == 'Left' " @click.prevent="newData.leftImageID = null">Remove</a>
+                    <a href="#" v-else @click.prevent="newData.rightImageID = null">Remove</a>
 
-                      </v-flex>
-                      <v-flex md4 class="px-3">
-                        <!-- <div>Top</div> -->
-                        <span>
-                          <span style="padding-right: 35px;">{{ topBottom }}</span>
-                          <span class="ml-2">
-                            <a>
-                              <v-icon size="18" @click="mirrorSides(topBottom)"> = </v-icon>
-                            </a>
-                          </span>
+                  </v-flex>
+                  <v-flex md4 class="px-3">
+                    <!-- <div>Top</div> -->
+                    <span>
+                      <span style="padding-right: 35px;">{{ topBottom }}</span>
+                      <span class="ml-2">
+                        <a>
+                          <v-icon size="18" @click="mirrorSides(topBottom)"> = </v-icon>
+                        </a>
+                      </span>
 
-                          <span class="ml-2">
-                            <a v-if="topBottom=='Top'" href="#"
-                              @click.prevent="handleMirror(topBottom,newData.topMirrored)"
-                              :style="{ 'background':  newData.topMirrored ? 'white': 'transparent' }">m</a>
-                            <a v-else href="#" @click.prevent="handleMirror(topBottom,newData.bottomMirrored)"
-                              :style="{ 'background':  newData.bottomMirrored ? 'white': 'transparent' }">m</a>
-                          </span>
-                          <span class="ml-2">
-                            <v-icon size="18" @click="changeDisplay(topBottom)">swap_horiz</v-icon>
-                          </span>
-                        </span>
-                        <!-- {{ newData.topImageID }}
-                    {{ newData.bottomImageID }} -->
-                        <img v-if="!hideImages" ref="topImage" style="width: 100%; max-height: 120px;"
-                          :src="getFixtureImageNew(topBottom == 'Top' ? newData.topImageID : newData.bottomImageID)" alt
-                          @click="openFileDialog(topBottom.toLowerCase())" />
-                        <a href="#" @click.prevent="openFileDialog(topBottom.toLowerCase())">Change</a>
-                        <span class="mr-2"></span>
-                        <a href="#" v-if="topBottom == 'Top'" @click.prevent="newData.topImageID = null">Remove</a>
-                        <a href="#" v-else @click.prevent="newData.bottomImageID = null">Remove</a>
+                      <span class="ml-2">
+                        <a v-if="topBottom=='Top'" href="#" @click.prevent="handleMirror(topBottom,newData.topMirrored)"
+                          :style="{ 'background':  newData.topMirrored ? 'white': 'transparent' }">m</a>
+                        <a v-else href="#" @click.prevent="handleMirror(topBottom,newData.bottomMirrored)"
+                          :style="{ 'background':  newData.bottomMirrored ? 'white': 'transparent' }">m</a>
+                      </span>
+                      <span class="ml-2">
+                        <v-icon size="18" @click="changeDisplay(topBottom)">swap_horiz</v-icon>
+                      </span>
+                    </span>
+                    <!-- {{ form.topImageID }}
+                    {{ form.bottomImageID }} -->
+                    <img v-if="!hideImages" ref="topImage" style="width: 100%; max-height: 120px;"
+                      :src="getFixtureImageNew(topBottom == 'Top' ? newData.topImageID : newData.bottomImageID)" alt
+                      @click="openFileDialog(topBottom.toLowerCase())" />
+                    <a href="#" @click.prevent="openFileDialog(topBottom.toLowerCase())">Change</a>
+                    <span class="mr-2"></span>
+                    <a href="#" v-if="topBottom == 'Top'" @click.prevent="newData.topImageID = null">Remove</a>
+                    <a href="#" v-else @click.prevent="newData.bottomImageID = null">Remove</a>
 
-                      </v-flex>
-                      <input ref="imageInput" style="display: none" @change="changeImage" type="file" />
-                      <v-flex lg12 md12 sm12 xs12>
-                        <div
-                          v-show="newData.type == 2 && (newData.fixtureType == 0 || newData.fixtureType == 1) && !newData.rendering">
-                          <h3>Bar image</h3>
-                          <v-card class="elevation-5" @click="openFileExplorerBar"
-                            style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
-                            <img ref="changeImageBar" style="max-height: 150px; max-width: 150px;" src="" alt="">
-                          </v-card>
-                          <input ref="fileInputBar" style="display: none" @change="imageChangeBar" type="file">
-                        </div>
-                      </v-flex>
-                      <v-flex md4 class="px-3">
-                        <div v-if="!newData.rendering">
-                          <div>Colour</div>
-                          <compact-picker v-if="frontBack == 'Front'" style="width: 100%"
-                            v-model="newData.frontColor" />
-                          <compact-picker v-if="frontBack == 'Back'" style="width: 100%" v-model="newData.backColor" />
-                        </div>
-                      </v-flex>
-                      <v-flex md4 class="px-3">
-                        <div v-if="!newData.rendering">
-                          <div>Colour</div>
-                          <compact-picker v-if="leftRight == 'Left'" style="width: 100%" v-model="newData.leftColor" />
-                          <compact-picker v-if="leftRight == 'Right'" style="width: 100%"
-                            v-model="newData.rightColor" />
-                        </div>
-                      </v-flex>
-                      <v-flex md4 class="px-3">
-                        <div v-if="!newData.rendering">
-                          <div>Colour</div>
-                          <compact-picker v-if="topBottom == 'Top'" style="width: 100%" v-model="newData.topColor" />
-                          <compact-picker v-if="topBottom == 'Bottom'" style="width: 100%"
-                            v-model="newData.bottomColor" />
-                        </div>
-                      </v-flex>
-                      <!-- <v-flex lg12 md12 sm12 xs12 class="px-3">
-                    <div v-if="newData.type == 2 && newData.fixtureType == 2 && !newData.rendering">
-                      <h3>Peg Hole Colour</h3>
-                      <compact-picker v-model="newData.pegHoleColor" />
+                  </v-flex>
+                  <input ref="imageInput" style="display: none" @change="changeImage" type="file" />
+                  <!-- <v-flex lg12 md12 sm12 xs12 class="px-3">
+                    <div>Old Image</div>
+                    <img ref="changeImage" @click="openFileExplorer"
+                      style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;" src=""
+                      alt="">
+                    <input ref="fileInput" style="display: none" @change="imageChange" type="file">
+                  </v-flex>-->
+                  <!-- <v-flex lg12 md12 sm12 xs12>
+                    <div v-show="form.type == 2 && (form.fixtureType == 0 || form.fixtureType == 1) && !form.rendering">
+                      <h3>Bar image</h3>
+                      <img @click="openFileExplorerBar"
+                        style="width: 150px; height: 150px; background: white; cursor: pointer;" ref="changeImageBar"
+                        src="" alt="">
+                      <input ref="fileInputBar" style="display: none" @change="imageChangeBar" type="file">
                     </div>
                   </v-flex>-->
-                      <v-flex md4 class="px-3">
-                        <v-checkbox @change="transparentChange('Front')" v-if="frontBack == 'Front'"
-                          v-model="newData.frontTransparent" label="Transparent"></v-checkbox>
-                        <v-checkbox @change="transparentChange('Back')" v-if="frontBack == 'Back'"
-                          v-model="newData.backTransparent" label="Transparent"></v-checkbox>
-                      </v-flex>
-                      <v-flex md4 class="px-3">
-                        <v-checkbox @change="transparentChange('Left')" v-if="leftRight == 'Left'"
-                          v-model="newData.leftTransparent" label="Transparent"></v-checkbox>
-                        <v-checkbox @change="transparentChange('Right')" v-if="leftRight == 'Right'"
-                          v-model="newData.rightTransparent" label="Transparent"></v-checkbox>
-                      </v-flex>
-                      <v-flex md4 class="px-3">
-                        <v-checkbox @change="transparentChange('Top')" v-if="topBottom == 'Top'"
-                          v-model="newData.topTransparent" label="Transparent"></v-checkbox>
-                        <v-checkbox @change="transparentChange('Bottom')" v-if="topBottom == 'Bottom'"
-                          v-model="newData.bottomTransparent" label="Transparent"></v-checkbox>
-                      </v-flex>
-
-                      <v-flex lg12 md12 sm12 xs12>
-                        <div v-if="newData.type == 2 && newData.fixtureType == 2 && !newData.rendering">
-                          <h3>Peg Hole Colour</h3>
-                          <compact-picker style="margin: 0 auto;" v-model="newData.pegHoleColor" />
-                        </div>
-                      </v-flex>
-                    </v-layout>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-                <!-- start of rendering -->
-                <v-expansion-panel inset v-model="RenderingPanel">
-                  <v-expansion-panel-content class="elevation-0 pa-0">
-                    <div slot="header">Rendering Options</div>
-                    <v-flex lg10 md12 sm12 xs12>
-                      <h3>Front Face rendering</h3>
-                      <v-select placeholder="Render Image" :items="renderingselect" v-model="newData.renderImage"
-                        label="Rendering:" @change="changeImageSelect">
-                      </v-select>
-                      <v-card class="elevation-5" @click="openFileExplorerRender"
-                        style="width: 150px; height: 150px; background: white; cursor: pointer; margin: 0 auto;">
-                        <img ref="changeRenderImage" style="max-height: 150px; max-width: 150px;" src="" alt="">
-                      </v-card>
-                      <input ref="fileInputRender" style="display: none" @change="imageChangeRender" type="file">
-
-
-                      <v-layout>
-                        <v-flex>
-                          <v-text-field type="number" v-model="viewRender.height" label="Height:" suffix="cm"
-                            :rules=numberRules></v-text-field>
-                        </v-flex>
-                        <v-flex>
-                          <v-text-field type="number" v-model="viewRender.width" label="Width:" suffix="cm"
-                            :rules=numberRules></v-text-field>
-                        </v-flex>
-                        <v-flex>
-                          <v-text-field type="number" v-model="viewRender.yOffset" label="Y Offeset:" suffix="cm">
-                          </v-text-field>
-                        </v-flex>
-                      </v-layout>
-                    </v-flex>
-
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-              </v-layout>
+                  <v-flex md4 class="px-3">
+                    <div v-if="!newData.rendering">
+                      <div>Colour</div>
+                      <compact-picker v-if="frontBack == 'Front'" style="width: 100%" v-model="newData.frontColor" />
+                      <compact-picker v-if="frontBack == 'Back'" style="width: 100%" v-model="newData.backColor" />
+                    </div>
+                  </v-flex>
+                  <v-flex md4 class="px-3">
+                    <div v-if="!newData.rendering">
+                      <div>Colour</div>
+                      <compact-picker v-if="leftRight == 'Left'" style="width: 100%" v-model="newData.leftColor" />
+                      <compact-picker v-if="leftRight == 'Right'" style="width: 100%" v-model="newData.rightColor" />
+                    </div>
+                  </v-flex>
+                  <v-flex md4 class="px-3">
+                    <div v-if="!newData.rendering">
+                      <div>Colour</div>
+                      <compact-picker v-if="topBottom == 'Top'" style="width: 100%" v-model="newData.topColor" />
+                      <compact-picker v-if="topBottom == 'Bottom'" style="width: 100%" v-model="newData.bottomColor" />
+                    </div>
+                  </v-flex>
+                  <!-- <v-flex lg12 md12 sm12 xs12 class="px-3">
+                    <div v-if="form.type == 2 && form.fixtureType == 2 && !form.rendering">
+                      <h3>Peg Hole Colour</h3>
+                      <compact-picker v-model="form.pegHoleColor" />
+                    </div>
+                  </v-flex>-->
+                  <v-flex md4 class="px-3">
+                    <v-checkbox @change="transparentChange('Front')" v-if="frontBack == 'Front'"
+                      v-model="newData.frontTransparent" label="Transparent"></v-checkbox>
+                    <v-checkbox @change="transparentChange('Back')" v-if="frontBack == 'Back'"
+                      v-model="newData.backTransparent" label="Transparent"></v-checkbox>
+                  </v-flex>
+                  <v-flex md4 class="px-3">
+                    <v-checkbox @change="transparentChange('Left')" v-if="leftRight == 'Left'"
+                      v-model="newData.leftTransparent" label="Transparent"></v-checkbox>
+                    <v-checkbox @change="transparentChange('Right')" v-if="leftRight == 'Right'"
+                      v-model="newData.rightTransparent" label="Transparent"></v-checkbox>
+                  </v-flex>
+                  <v-flex md4 class="px-3">
+                    <v-checkbox @change="transparentChange('Top')" v-if="topBottom == 'Top'"
+                      v-model="newData.topTransparent" label="Transparent"></v-checkbox>
+                    <v-checkbox @change="transparentChange('Bottom')" v-if="topBottom == 'Bottom'"
+                      v-model="newData.bottomTransparent" label="Transparent"></v-checkbox>
+                  </v-flex>
+                  <v-flex v-if="!newData.rendering" lg12 md12 sm12 xs12 class="px-3">
+                    <h3>Renderings</h3>
+                  </v-flex>
+                  <v-flex v-if="!newData.rendering &&renderingType0.length>1" lg8 md12 sm12 xs12 class="px-3">
+                    <v-select placeholder="please select" :items="renderingType0" v-model="selectedRenderingType0"
+                      label="Label Holder:"></v-select>
+                  </v-flex>
+                  <v-flex v-if="!newData.rendering &&renderingType1.length>1" lg8 md12 sm12 xs12 class="px-3">
+                    <v-select placeholder="please select" :items="renderingType1" v-model="selectedRenderingType1"
+                      label="Shelf Edge:"></v-select>
+                  </v-flex>
+                  <v-flex v-if="!newData.rendering &&renderingType2.length>1" lg8 md12 sm12 xs12 class="px-3">
+                    <v-select placeholder="please select" :items="renderingType2" v-model="selectedRenderingType2"
+                      label="Back Face:"></v-select>
+                  </v-flex>
+                  <v-flex v-if="!newData.rendering &&renderingType3.length>1" lg8 md12 sm12 xs12 class="px-3">
+                    <v-select placeholder="please select" :items="renderingType3" v-model="selectedRenderingType3"
+                      label="Front Face:"></v-select>
+                  </v-flex>
+                  <v-flex v-if="!newData.rendering &&renderingType4.length>1" lg8 md12 sm12 xs12 class="px-3">
+                    <v-select placeholder="please select" :items="renderingType4" v-model="selectedRenderingType4"
+                      label="Side Face:"></v-select>
+                  </v-flex>
+                </v-layout>
+              </v-container>
             </v-card>
           </v-flex>
         </v-layout>
@@ -377,13 +355,23 @@
   export default {
     data() {
       return {
-        hideImages: false,
         frontBack: "Front",
         frontBackMirror: false,
         leftRight: "Left",
         leftRightMirror: true,
         topBottom: "Top",
         topBottomMirror: true,
+        renderingType0: [],
+        selectedRenderingType0: null,
+        renderingType1: [],
+        selectedRenderingType1: null,
+        renderingType2: [],
+        selectedRenderingType2: null,
+        renderingType3: [],
+        selectedRenderingType3: null,
+        renderingType4: [],
+        selectedRenderingType4: null,
+        hideImages: false,
         floorplanFixture: null,
         numberRules: [
           v =>
@@ -527,8 +515,6 @@
     methods: {
       getRenderingTypes() {
         let self = this;
-        console.log("[GETRENDERTYPEES]", self.newdata);
-
         axios
           .get(
             process.env.VUE_APP_API +
@@ -536,21 +522,65 @@
           )
           .then(r => {
             console.log("getRenderingTypes", r.data);
-            self.renderings = []
-            self.renderingselect = [{
+            self.renderingType0 = [{
+              text: "none",
+              value: -1
+            }];
+            self.renderingType1 = [{
+              text: "none",
+              value: -1
+            }];
+            self.renderingType2 = [{
+              text: "none",
+              value: -1
+            }];
+            self.renderingType3 = [{
+              text: "none",
+              value: -1
+            }];
+            self.renderingType4 = [{
               text: "none",
               value: -1
             }];
             r.data.forEach(rendering => {
               switch (rendering.renderingType) {
-                case 3: {
-                  self.renderings.push(rendering)
-                  self.renderingselect.push({
+                case 0: {
+                  self.renderingType0.push({
                     text: rendering.name,
                     value: rendering.id
                   });
                 }
                 break;
+              case 1: {
+                self.renderingType1.push({
+                  text: rendering.name,
+                  value: rendering.id
+                });
+              }
+              break;
+              case 2: {
+                self.renderingType2.push({
+                  text: rendering.name,
+                  value: rendering.id
+                });
+              }
+              break;
+              case 3: {
+                self.renderingType3.push({
+                  text: rendering.name,
+                  value: rendering.id
+                });
+              }
+              break;
+
+              case 4: {
+                self.renderingType4.push({
+                  text: rendering.name,
+                  value: rendering.id
+                });
+              }
+              break;
+
               default:
                 break;
               }
@@ -670,97 +700,6 @@
             }
           }
         })
-      },
-      transparentChange(side) {
-        let self = this;
-
-        self.$nextTick(() => {
-          switch (side) {
-            case "Front": {
-              if (self.frontBackMirror) {
-                self.newData.backTransparent = self.newData.frontTransparent;
-              }
-            }
-            break;
-          case "Back": {
-            if (self.frontBackMirror) {
-              self.newData.frontTransparent = self.newData.backTransparent;
-            }
-          }
-          break;
-          case "Left": {
-            if (self.leftRightMirror) {
-              self.newData.rightTransparent = self.newData.leftTransparent;
-            }
-          }
-          break;
-          case "Right": {
-            if (self.leftRightMirror) {
-              self.newData.leftTransparent = self.newData.rightTransparent;
-            }
-          }
-          break;
-          case "Top": {
-            if (self.topBottomMirror) {
-              self.newData.bottomTransparent = self.newData.topTransparent;
-            }
-          }
-          break;
-          case "Bottom": {
-            if (self.topBottomMirror) {
-              self.newData.topTransparent = self.newData.bottomTransparent;
-            }
-          }
-          break;
-          }
-        })
-      },
-      changeImage(e) {
-        let self = this;
-
-        const files = e.target.files;
-        let file = files[0];
-
-        // self.blobToDataUrl(file, url => {
-        //   self.$refs[self.changingSide + "Image"].src = url;
-        // })
-
-        let request = {
-          name: file.name,
-          type: file.type == null ? "" : file.type
-        };
-
-        self.hideImages = true;
-
-        axios
-          .post(
-            process.env.VUE_APP_API + "FixtureImage?db=CR-DEVINSPIRE",
-            request
-          )
-          .then(r => {
-            self.checkSideImageChange(r.data.id);
-
-            axios
-              .put(
-                process.env.VUE_APP_API + "Fixture?db=CR-Devinspire",
-                self.newData
-              )
-              .then(fr => {
-                axios
-                  .post(
-                    process.env.VUE_APP_API +
-                    "FixtureImage?db=CR-DEVINSPIRE&fixtureImageID=" +
-                    r.data.id,
-                    file
-                  )
-                  .then(image => {
-                    self.checkSideImageChange(r.data.id);
-                    self.hideImages = false;
-                  });
-              })
-              .catch(e => {});
-          })
-          .catch(e => {});
       },
       getFixtureImageNew(imageID) {
         if (imageID == undefined || imageID == null) {
@@ -897,10 +836,11 @@
           }
 
           self.$nextTick(() => {
-            if (self.newData.image != undefined && self.newData.image != null)
-              self.$refs.changeImage.src = 'data:image/png;base64,' + self.newData.image;
-            else
-              self.$refs.changeImage.src = '';
+            if (self.newData.image != undefined && self.newData.image != null) {
+              // self.$refs.changeImage.src = 'data:image/png;base64,' + self.newData.image; 
+            } else {
+              //self.$refs.changeImage.src = '';
+            }
             console.log("[DEBUG]");
             if (self.newData.RenderingsItems.Front == null) {
               self.newData.RenderingsItems.Front = {
@@ -912,19 +852,18 @@
               }
             }
             if (self.newData.RenderingsItems.Front.image != undefined && self.newData.RenderingsItems.Front.image !=
-              null)
-              self.$refs.changeRenderImage.src = 'data:image/png;base64,' + self.newData.RenderingsItems.Front
-              .image;
+              null) {
+              // self.$refs.changeRenderImage.src = 'data:image/png;base64,' + self.newData.RenderingsItems.Front
+              // .image;
+            } else {
+              //self.$refs.changeRenderImage.src = '';
+            }
 
 
-            else
-              self.$refs.changeRenderImage.src = '';
-
-
-            if (self.newData.barImage != undefined && self.newData.barImage != null)
-              self.$refs.changeImageBar.src = 'data:image/png;base64,' + self.newData.barImage;
-            else
-              self.$refs.changeImageBar.src = '';
+            // if (self.newData.barImage != undefined && self.newData.barImage != null)
+            //   self.$refs.changeImageBar.src = 'data:image/png;base64,' + self.newData.barImage;
+            // else
+            //   self.$refs.changeImageBar.src = '';
           })
         } else {
           self.destroy();
@@ -935,8 +874,14 @@
         let event = new CustomEmitter();
         // let tmp = self.newData.color.hex;
 
-        self.newData.color = self.newData.color.hex;
-        self.newData.pegHoleColor = self.newData.pegHoleColor.hex;
+        self.newData.color = self.newData.color.hex == undefined ? "#fff" : self.newData.color.hex;
+        self.newData.frontColor = self.newData.frontColor.hex == undefined ? "#fff" : self.newData.frontColor.hex;
+        self.newData.backColor = self.newData.backColor.hex == undefined ? "#fff" : self.newData.backColor.hex;
+        self.newData.leftColor = self.newData.leftColor.hex == undefined ? "#fff" : self.newData.leftColor.hex;
+        self.newData.rightColor = self.newData.rightColor.hex == undefined ? "#fff" : self.newData.rightColor.hex;
+        self.newData.topColor = self.newData.topColor.hex == undefined ? "#fff" : self.newData.topColor.hex;
+        self.newData.bottomColor = self.newData.bottomColor.hex == undefined ? "#fff" : self.newData.bottomColor.hex;
+        self.newData.pegHoleColor = self.newData.pegHoleColor.hex == undefined ? "#000" : self.newData.pegHoleColor.hex;
 
         console.log("renderImage");
         self.newData.RenderingsItems.Front.height = returnFloat(self.viewRender.height)
@@ -1093,6 +1038,174 @@
           callback(a.result);
         }
         a.readAsDataURL(blob);
+      },
+      changeImage(e) {
+        let self = this;
+
+        const files = e.target.files;
+        let file = files[0];
+
+        // self.blobToDataUrl(file, url => {
+        //   self.$refs[self.changingSide + "Image"].src = url;
+        // })
+
+        let request = {
+          name: file.name,
+          type: file.type == null ? "" : file.type
+        };
+
+        self.hideImages = true;
+
+        axios
+          .post(
+            process.env.VUE_APP_API + "FixtureImage?db=CR-DEVINSPIRE",
+            request
+          )
+          .then(r => {
+            axios.post(process.env.VUE_APP_API + "FixtureImage?db=CR-DEVINSPIRE&fixtureImageID=" + r.data.id, file)
+              .then(image => {
+                self.checkSideImageChange(r.data.id);
+                self.hideImages = false;
+              });
+          })
+          .catch(e => {});
+      },
+      checkSideImageChange(imageID) {
+        let self = this
+
+        switch (self.changingSide) {
+          case 'front': {
+            self.newData.frontImageID = imageID;
+
+            if (self.frontBackMirror) {
+              self.newData.backImageID = imageID;
+            }
+          }
+          break;
+        case 'back': {
+          self.newData.backImageID = imageID;
+
+          if (self.frontBackMirror) {
+            self.newData.frontImageID = imageID;
+          }
+        }
+        break;
+        case 'top': {
+          self.newData.topImageID = imageID;
+
+          if (self.topBottomMirror) {
+            self.newData.bottomImageID = imageID;
+          }
+        }
+        break;
+        case 'bottom': {
+          self.newData.bottomImageID = imageID;
+
+          if (self.topBottomMirror) {
+            self.newData.topImageID = imageID;
+          }
+        }
+        break;
+        case 'left': {
+          self.newData.leftImageID = imageID;
+
+          if (self.leftRightMirror) {
+            self.newData.rightImageID = imageID;
+          }
+        }
+        break;
+        case 'right': {
+          self.newData.rightImageID = imageID;
+
+          if (self.leftRightMirror) {
+            self.newData.leftImageID = imageID;
+          }
+        }
+        break;
+        }
+      },
+      changeDisplay(prop) {
+        let self = this;
+
+        switch (prop) {
+          case "Front": {
+            self.frontBack = "Back";
+          }
+          break;
+        case "Back": {
+          self.frontBack = "Front";
+        }
+        break;
+        case "Left": {
+          self.leftRight = "Right";
+        }
+        break;
+        case "Right": {
+          self.leftRight = "Left";
+        }
+        break;
+        case "Top": {
+          self.topBottom = "Bottom";
+        }
+        break;
+        case "Bottom": {
+          self.topBottom = "Top";
+        }
+        break;
+        }
+      },
+      transparentChange(side) {
+        let self = this;
+
+        self.$nextTick(() => {
+          switch (side) {
+            case "Front": {
+              if (self.frontBackMirror) {
+                self.newData.backTransparent = self.newData.frontTransparent;
+              }
+            }
+            break;
+          case "Back": {
+            if (self.frontBackMirror) {
+              self.newData.frontTransparent = self.newData.backTransparent;
+            }
+          }
+          break;
+          case "Left": {
+            if (self.leftRightMirror) {
+              self.newData.rightTransparent = self.newData.leftTransparent;
+            }
+          }
+          break;
+          case "Right": {
+            if (self.leftRightMirror) {
+              self.newData.leftTransparent = self.newData.rightTransparent;
+            }
+          }
+          break;
+          case "Top": {
+            if (self.topBottomMirror) {
+              self.newData.bottomTransparent = self.newData.topTransparent;
+            }
+          }
+          break;
+          case "Bottom": {
+            if (self.topBottomMirror) {
+              self.newData.topTransparent = self.newData.bottomTransparent;
+            }
+          }
+          break;
+          }
+        })
+      },
+      openFileDialog(side) {
+        let self = this;
+
+        self.changingSide = side;
+
+        self.$refs.imageInput.value = null;
+
+        self.$refs.imageInput.click();
       },
     }
   };

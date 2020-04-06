@@ -124,13 +124,20 @@ class PegBarBase extends PlanogramItemBase {
 
     self.Data = newData;
     self.SetObjectDimensions();
-    self.HangingBar.fill(self.Data.color);
+    self.HangingBar.fill(self.Data.frontTransparent ? 'transparent' : self.Data.frontColor);
     self.HangingBar.setWidth(self.TotalWidth); // sample
     self.HangingBar.setHeight(self.TotalHeight); // sample
     self.Group.setWidth(self.TotalWidth);
     self.Group.setHeight(self.TotalHeight);
     self.HideShowLabels();
-    self.LoadImage(self.HangingBar, self.Data.image);
+
+    if(self.Data.frontImageID == undefined || self.Data.frontImageID == null) {
+      self.LoadImage(self.HangingBar, "data:image/png;base64," + self.Data.image);
+    } else {
+      self.LoadImage(self.HangingBar, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.frontImageID}`);
+    }
+
+    // self.LoadImage(self.HangingBar, self.Data.image);
 
     // call position element
     self.PositionElement();
@@ -173,11 +180,17 @@ class PegBarBase extends PlanogramItemBase {
         y: 0 + offset,
         width: w,
         height: h,
-        color: 'transparent',
+        fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
         listening: false
       })
 
-      self.LoadImage(shelfLabelHolder, self.Data.RenderingsItems.LabelHolder.image);
+      if(self.Data.RenderingsItems.LabelHolder.frontImageID == undefined || self.Data.RenderingsItems.LabelHolder.frontImageID == null) {
+        self.LoadImage(shelfLabelHolder, "data:image/png;base64," + self.Data.RenderingsItems.LabelHolder.image);
+      } else {
+        self.LoadImage(shelfLabelHolder, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.RenderingsItems.LabelHolder.frontImageID}`);
+      }
+
+      // self.LoadImage(shelfLabelHolder, self.Data.RenderingsItems.LabelHolder.image);
 
       self.Renderings.push({
         type: 'LABELHOLDER',
@@ -213,11 +226,17 @@ class PegBarBase extends PlanogramItemBase {
       y: 0,
       width: self.Data.width * self.Ratio,
       height: self.Data.height * self.Ratio,
-      fill: self.Data.color,
+      fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
       transformsEnabled: 'position'
     })
 
-    self.LoadImage(self.HangingBar, self.Data.image);
+    if(self.Data.frontImageID == undefined || self.Data.frontImageID == null) {
+      self.LoadImage(self.HangingBar, "data:image/png;base64," + self.Data.image);
+    } else {
+      self.LoadImage(self.HangingBar, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.frontImageID}`);
+    }
+
+    // self.LoadImage(self.HangingBar, self.Data.image);
 
     self.Group.add(self.HangingBar);
   }

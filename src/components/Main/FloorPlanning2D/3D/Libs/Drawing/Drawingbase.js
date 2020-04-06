@@ -22,7 +22,7 @@ class DrawingBase {
         let parentY = (self.data.parent.y + self.data.parent.height + 572);
 
         self.element.position.x = (self.data.x + 0.5 * self.data.width) / self.pxlToMeterRatio;
-        self.element.position.y = (((parentY - ((self.data.height / 2) + self.data.y)) / self.pxlToMeterRatio) / 4);
+        self.element.position.y = (((parentY - ((self.data.height / 2) + self.data.y)) / self.pxlToMeterRatio) / 3);
         self.element.position.z = -((self.data.parent.y + (0.5 * self.data.height)) / self.pxlToMeterRatio);
 
         if (self.data.rotation != undefined && self.data.rotation != null) {

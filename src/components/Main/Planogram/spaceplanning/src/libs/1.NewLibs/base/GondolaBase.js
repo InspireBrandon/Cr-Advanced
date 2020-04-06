@@ -111,12 +111,17 @@ class GondolaBase extends PlanogramItemBase {
 
     self.Data = newData;
     self.SetObjectDimensions();
-    self.Area.fill(self.Data.color);
+    self.Area.fill(self.Data.backTransparent ? 'transparent' : self.Data.backColor);
     self.Area.setWidth(self.TotalWidth); // sample
     self.Area.setHeight(self.TotalHeight); // sample
     self.Group.setWidth(self.TotalWidth);
     self.Group.setHeight(self.TotalHeight);
-    self.LoadImage(self.Area, self.Data.image);
+
+    if(self.Data.backImageID == undefined || self.Data.backImageID == null) {
+      self.LoadImage(self.Area, "data:image/png;base64," + self.Data.image);
+    } else {
+      self.LoadImage(self.Area, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.backImageID}`);
+    }
 
     // call position element
     self.PositionElement();
@@ -136,15 +141,15 @@ class GondolaBase extends PlanogramItemBase {
     let self = this;
 
     self.RemoveRenderings();
-    console.log("AddRenderings",self.Data);
-    
+    console.log("AddRenderings", self.Data);
+
     if (self.Data.RenderingsItems == undefined || self.Data.RenderingsItems == null) {
       return;
     }
 
     if (self.Data.RenderingsItems.Front != undefined || self.Data.RenderingsItems.Front != null) {
       console.log("[GONDOLA RENDERING] FRONT FACE", self.Data.RenderingsItems.Front);
-      
+
       // add shelf edge rendering
       let w = self.Data.RenderingsItems.Front.width * self.Ratio;
       let h = self.Data.RenderingsItems.Front.height * self.Ratio;
@@ -154,11 +159,16 @@ class GondolaBase extends PlanogramItemBase {
         y: 0,
         width: w,
         height: h,
-        color: 'transparent',
+        fill: self.Data.backTransparent ? 'transparent' : self.Data.backColor,
+        // color: self.Data.backColor,
         listening: false
       })
 
-      self.LoadImage(frontFace, self.Data.RenderingsItems.Front.image);
+      if(self.Data.RenderingsItems.Front.frontImageID == undefined || self.Data.RenderingsItems.Front.frontImageID == null) {
+        self.LoadImage(self.Area, "data:image/png;base64," + self.Data.RenderingsItems.Front.image);
+      } else {
+        self.LoadImage(self.Area, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.RenderingsItems.Front.frontImageID}`);
+      }
 
       self.Renderings.push({
         type: 'FRONTRENDERING',
@@ -186,15 +196,18 @@ class GondolaBase extends PlanogramItemBase {
       y: 0,
       width: self.Width,
       height: self.Height,
-      // fill: self.Data.color,
-      color: 'transparent',
+      fill: self.Data.backTransparent ? 'transparent' : self.Data.backColor,
+      // color: self.Data.backColor,
       // stroke: 'black',
       // strokeWidth: 0.5,
       transformsEnabled: 'position'
     })
 
-
-    self.LoadImage(self.Area, self.Data.image);
+    if(self.Data.backImageID == undefined || self.Data.backImageID == null) {
+      self.LoadImage(self.Area, "data:image/png;base64," + self.Data.image);
+    } else {
+      self.LoadImage(self.Area, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.backImageID}`);
+    }
 
     self.Group.add(self.Area);
   }

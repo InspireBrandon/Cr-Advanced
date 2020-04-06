@@ -110,7 +110,7 @@ class PegboardBase extends PlanogramItemBase {
 
     self.LastPositionRelative = self.Group.position();
     self.LastPositionAbsolute = self.Group.getAbsolutePosition();
-    
+
     self.Layer.draw();
   }
 
@@ -127,13 +127,20 @@ class PegboardBase extends PlanogramItemBase {
     self.Data = newData;
     self.SetObjectDimensions();
     self.AddHoles();
-    self.Area.fill(self.Data.color);
+    self.Area.fill(self.Data.frontTransparent ? 'transparent' : self.Data.frontColor);
     self.Area.setWidth(self.TotalWidth); // sample
     self.Area.setHeight(self.TotalHeight); // sample
     self.Group.setWidth(self.TotalWidth);
     self.Group.setHeight(self.TotalHeight);
     self.HideShowLabels();
-    self.LoadImage(self.Area, self.Data.image);
+
+    if (self.Data.frontImageID == undefined || self.Data.frontImageID == null) {
+      self.LoadImage(self.Area, "data:image/png;base64," + self.Data.image);
+    } else {
+      self.LoadImage(self.Area, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.frontImageID}`);
+    }
+
+    // self.LoadImage(self.Area, self.Data.image);
 
     // call position element
     self.PositionElement();
@@ -178,11 +185,17 @@ class PegboardBase extends PlanogramItemBase {
       y: 0,
       width: self.TotalWidth,
       height: self.TotalHeight,
-      fill: self.Data.color,
+      fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
       transformsEnabled: 'position'
     })
 
-    self.LoadImage(self.Area, self.Data.image);
+    if (self.Data.frontImageID == undefined || self.Data.frontImageID == null) {
+      self.LoadImage(self.Area, "data:image/png;base64," + self.Data.image);
+    } else {
+      self.LoadImage(self.Area, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.frontImageID}`);
+    }
+
+    // self.LoadImage(self.Area, self.Data.image);
 
     self.Group.add(self.Area);
   }
@@ -190,54 +203,54 @@ class PegboardBase extends PlanogramItemBase {
   AddHoles() {
     let self = this;
     return new Promise((resolve) => {
-        let ySpace = self.Data.yHoleSpacing * self.Ratio;
-        let xSpace = self.Data.xHoleSpacing * self.Ratio;
-        let radius = self.Data.pegRadius * self.Ratio;
-        let xHoles = parseInt(self.TotalWidth / ((xSpace) + (radius * 2)))
-        let yHoles = parseInt(self.TotalHeight / ((ySpace) + (radius * 2)))
+      let ySpace = self.Data.yHoleSpacing * self.Ratio;
+      let xSpace = self.Data.xHoleSpacing * self.Ratio;
+      let radius = self.Data.pegRadius * self.Ratio;
+      let xHoles = parseInt(self.TotalWidth / ((xSpace) + (radius * 2)))
+      let yHoles = parseInt(self.TotalHeight / ((ySpace) + (radius * 2)))
 
-        // destroy first
-        // if (self.Holes.length > 0) {
-        //   self.Holes.forEach(hole => {
-        //     hole.destroy();
-        //   });
-        // }
+      // destroy first
+      // if (self.Holes.length > 0) {
+      //   self.Holes.forEach(hole => {
+      //     hole.destroy();
+      //   });
+      // }
 
-        self.Holes = [];
+      self.Holes = [];
 
-        let xPos = 0;
-        let yPos = 0;
+      let xPos = 0;
+      let yPos = 0;
 
-        for (var y = 0; y < yHoles; y++) {
-          yPos = ((y) * ySpace) + ((y) * (radius * 2));
-          for (var x = 0; x < xHoles; x++) {
-            xPos = ((x + 1) * xSpace) + ((x + 1) * (radius * 2));
-            // let holeKonva = new Konva.Circle({
-            //   id: "pegboard_hole_id_x_y" + self.ID + "_" + x + "_" + y,
-            //   name: "pegboard_peg",
-            //   x: xPos,
-            //   y: yPos,
-            //   radius: radius,
-            //   fill: 'black',
-            //   listening: false
-            // })
-            // self.Group.add(holeKonva);
-            
-            let hole = {
-              x: xPos,
-              y: yPos
-            }
+      for (var y = 0; y < yHoles; y++) {
+        yPos = ((y) * ySpace) + ((y) * (radius * 2));
+        for (var x = 0; x < xHoles; x++) {
+          xPos = ((x + 1) * xSpace) + ((x + 1) * (radius * 2));
+          // let holeKonva = new Konva.Circle({
+          //   id: "pegboard_hole_id_x_y" + self.ID + "_" + x + "_" + y,
+          //   name: "pegboard_peg",
+          //   x: xPos,
+          //   y: yPos,
+          //   radius: radius,
+          //   fill: 'black',
+          //   listening: false
+          // })
+          // self.Group.add(holeKonva);
 
-
-            // hole.cache();
-            self.Holes.push(hole);
-            xPos += xSpace + (radius * 2);
+          let hole = {
+            x: xPos,
+            y: yPos
           }
-          xPos = xSpace + (radius);
-        }
 
-        self.Group.draw();
-        resolve(true);
+
+          // hole.cache();
+          self.Holes.push(hole);
+          xPos += xSpace + (radius * 2);
+        }
+        xPos = xSpace + (radius);
+      }
+
+      self.Group.draw();
+      resolve(true);
     });
   }
 
