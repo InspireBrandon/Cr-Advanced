@@ -687,7 +687,6 @@
       },
       mirrorSides(side) {
         let self = this
-        console.log("mirrorSides", side);
 
         let stringEnd = ""
         switch (side) {

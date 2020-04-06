@@ -1774,6 +1774,8 @@
         }
         self.getSelectedRenderings(data.data, cb => {
           data.data = cb
+          console.log("[getSelectedRenderings]--calbnack", cb);
+
           switch (dragType.toUpperCase()) {
             case "WAREHOUSE": {
               self.addWarehouseProduct(stage, data, ev);
