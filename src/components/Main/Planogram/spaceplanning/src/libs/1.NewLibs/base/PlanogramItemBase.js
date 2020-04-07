@@ -442,7 +442,7 @@ class PlanogramItemBase {
 
   LoadImage(konvaImage, imageData) {
     let self = this;
-    if (imageData != null && imageData != "data:image/png;base64,null") {
+    if (imageData != null && imageData != "data:image/png;base64,null" && imageData != 'data:image/png;base64,undefined') {
       var backPanelImage = new Image();
 
       backPanelImage.src = imageData

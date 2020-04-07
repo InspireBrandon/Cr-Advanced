@@ -14,6 +14,9 @@
             <v-list-tile @click="openRange" v-if="!$route.path.includes('RangePlanningView')">
               <v-list-tile-title>Open</v-list-tile-title>
             </v-list-tile>
+            <v-list-tile @click="openRetailChainSelector">
+              <v-list-tile-title>RCS</v-list-tile-title>
+            </v-list-tile>
             <v-list-tile :disabled="fileData.planogramName == ''" @click="promptForTag">
               <v-list-tile-title>Save</v-list-tile-title>
             </v-list-tile>
@@ -234,6 +237,7 @@
     <SyncModalStatus ref="SyncModalStatus" />
     <HandleDescrepancy ref="HandleDescrepancy" />
     <CustomRange ref="CustomRange" />
+    <RetailChainSelector ref="RetailChainSelector" />
   </div>
 </template>
 
@@ -280,6 +284,8 @@
   import HandleDescrepancy from "./HandleDescrepancy";
   import CustomRange from "./CustomRange/Index";
 
+  import RetailChainSelector from "@/components/Common/RetailChainSelector";
+
   import {
     AgGridVue
   } from "ag-grid-vue";
@@ -322,7 +328,8 @@
       HelpFileMaint,
       SyncModalStatus,
       HandleDescrepancy,
-      CustomRange
+      CustomRange,
+      RetailChainSelector
     },
     data() {
       return {
@@ -473,6 +480,14 @@
       self.getStores();
     },
     methods: {
+      openRetailChainSelector(callback) {
+          let self = this;
+
+          self.$refs.RetailChainSelector.show(retailChain => {
+            callback(retailChain)
+            console.log(retailChain);
+          })
+      },
       openIndicatorModal() {
         let self = this;
         self.$refs.MapIndicatorModal.open(callback => {});

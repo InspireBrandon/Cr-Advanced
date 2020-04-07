@@ -361,25 +361,25 @@
                   <v-flex v-if="!newData.rendering" lg12 md12 sm12 xs12 class="px-3">
                     <h3>Renderings</h3>
                   </v-flex>
-                  <v-flex v-if="!newData.rendering &&renderingType0.length>1" lg8 md12 sm12 xs12 class="px-3">
-                    <v-select placeholder="please select" :items="renderingType0" v-model="selectedRenderingType0"
-                      label="Label Holder:"></v-select>
+                  <v-flex v-if="!newData.rendering && renderingType0.length>1" lg8 md12 sm12 xs12 class="px-3">
+                    <v-select @change="onRenderingChange(0)" return-object item-text="name" placeholder="please select" :items="renderingType0"
+                      v-model="newData.RenderingsItems.LabelHolder" label="Label Holder:"></v-select>
                   </v-flex>
                   <v-flex v-if="!newData.rendering &&renderingType1.length>1" lg8 md12 sm12 xs12 class="px-3">
-                    <v-select placeholder="please select" :items="renderingType1" v-model="selectedRenderingType1"
-                      label="Shelf Edge:"></v-select>
+                    <v-select return-object item-text="name" placeholder="please select" :items="renderingType1"
+                      v-model="newData.RenderingsItems.ShelfEdge" label="Shelf Edge:"></v-select>
                   </v-flex>
                   <v-flex v-if="!newData.rendering &&renderingType2.length>1" lg8 md12 sm12 xs12 class="px-3">
-                    <v-select placeholder="please select" :items="renderingType2" v-model="selectedRenderingType2"
-                      label="Back Face:"></v-select>
+                    <v-select return-object item-text="name" placeholder="please select" :items="renderingType2"
+                      v-model="newData.RenderingsItems.Back" label="Back Face:"></v-select>
                   </v-flex>
                   <v-flex v-if="!newData.rendering &&renderingType3.length>1" lg8 md12 sm12 xs12 class="px-3">
-                    <v-select placeholder="please select" :items="renderingType3" v-model="selectedRenderingType3"
-                      label="Front Face:"></v-select>
+                    <v-select return-object item-text="name" placeholder="please select" :items="renderingType3"
+                      v-model="newData.RenderingsItems.Front" label="Front Face:"></v-select>
                   </v-flex>
                   <v-flex v-if="!newData.rendering &&renderingType4.length>1" lg8 md12 sm12 xs12 class="px-3">
-                    <v-select placeholder="please select" :items="renderingType4" v-model="selectedRenderingType4"
-                      label="Side Face:"></v-select>
+                    <v-select return-object item-text="name" placeholder="please select" :items="renderingType4"
+                      v-model="newData.RenderingsItems.Side" label="Side Face:"></v-select>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -632,63 +632,48 @@
             `Renderings?db=CR-Devinspire&type=${self.newData.type}&subType=${self.newData.fixtureType}`
           )
           .then(r => {
-            console.log("getRenderingTypes", r.data);
             self.renderingType0 = [{
-              text: "none",
-              value: -1
+              name: "none",
+              id: -1
             }];
             self.renderingType1 = [{
-              text: "none",
-              value: -1
+              name: "none",
+              id: -1
             }];
             self.renderingType2 = [{
-              text: "none",
-              value: -1
+              name: "none",
+              id: -1
             }];
             self.renderingType3 = [{
-              text: "none",
-              value: -1
+              name: "none",
+              id: -1
             }];
             self.renderingType4 = [{
-              text: "none",
-              value: -1
+              name: "none",
+              id: -1
             }];
+
             r.data.forEach(rendering => {
               switch (rendering.renderingType) {
                 case 0: {
-                  self.renderingType0.push({
-                    text: rendering.name,
-                    value: rendering.id
-                  });
+                  self.renderingType0.push(rendering);
                 }
                 break;
               case 1: {
-                self.renderingType1.push({
-                  text: rendering.name,
-                  value: rendering.id
-                });
+                self.renderingType1.push(rendering);
               }
               break;
               case 2: {
-                self.renderingType2.push({
-                  text: rendering.name,
-                  value: rendering.id
-                });
+                self.renderingType2.push(rendering);
               }
               break;
               case 3: {
-                self.renderingType3.push({
-                  text: rendering.name,
-                  value: rendering.id
-                });
+                self.renderingType3.push(rendering);
               }
               break;
 
               case 4: {
-                self.renderingType4.push({
-                  text: rendering.name,
-                  value: rendering.id
-                });
+                self.renderingType4.push(rendering);
               }
               break;
 
@@ -703,43 +688,42 @@
       },
       getSelectedRenderings() {
         let self = this;
-        axios
-          .get(
-            process.env.VUE_APP_API +
-            `FixtureRenderingLink?db=CR-Devinspire&Fixture_ID=${self.newData.id}`
-          )
-          .then(r => {
-            // self.newData.image = r.data;
-            r.data.forEach(item => {
-              switch (item.renderingType) {
-                case 0: {
-                  self.selectedRenderingType0 = item.id;
-                }
-                break;
-              case 1: {
-                self.selectedRenderingType1 = item.id;
-              }
-              break;
-              case 2: {
-                self.selectedRenderingType2 = item.id;
-              }
-              break;
-              case 3: {
-                self.selectedRenderingType3 = item.id;
-              }
-              break;
-              case 4: {
-                self.selectedRenderingType4 = item.id;
-              }
-              break;
-              default:
-                break;
-              }
-            });
-          })
-          .catch(e => {
-            console.log(e);
-          });
+
+        console.log("Selected Renderings", self.newData);
+
+        // axios.get(process.env.VUE_APP_API + `FixtureRenderingLink?db=CR-Devinspire&Fixture_ID=${self.newData.id}`)
+        //   .then(r => {
+        //     // self.newData.image = r.data;
+        //     r.data.forEach(item => {
+        //       switch (item.renderingType) {
+        //         case 0: {
+        //           self.selectedRenderingType0 = item.id;
+        //         }
+        //         break;
+        //       case 1: {
+        //         self.selectedRenderingType1 = item.id;
+        //       }
+        //       break;
+        //       case 2: {
+        //         self.selectedRenderingType2 = item.id;
+        //       }
+        //       break;
+        //       case 3: {
+        //         self.selectedRenderingType3 = item.id;
+        //       }
+        //       break;
+        //       case 4: {
+        //         self.selectedRenderingType4 = item.id;
+        //       }
+        //       break;
+        //       default:
+        //         break;
+        //       }
+        //     });
+        //   })
+        //   .catch(e => {
+        //     console.log(e);
+        //   });
       },
       addSegment() {
         let self = this;
@@ -961,6 +945,7 @@
             text: 'None',
             value: 'None'
           }]
+
         self.generalPanel = [true]
         self.renderingPanel = [false]
         self.renderingPanel2 = [false]
@@ -975,8 +960,6 @@
           self.newData = JSON.parse(JSON.stringify(eventData.data.Data));
           self.newData.uploadSide = false
           self.newData.uploadTop = false
-
-          console.log(self.newData)
 
           self.newData.labelsOn = self.newData.labelsOn == undefined || self.newData.labelsOn == null ? true : self
             .newData
@@ -1202,35 +1185,40 @@
         self.newData.color = self.newData.color.hex;
         self.newData.pegHoleColor = self.newData.pegHoleColor.hex;
 
-        self.newData.RenderingsItems.ShelfEdge.height = returnFloat(self.viewRenderShelfEdge.height)
-        self.newData.RenderingsItems.ShelfEdge.width = returnFloat(self.viewRenderShelfEdge.width)
-        self.newData.RenderingsItems.ShelfEdge.yOffset = returnFloat(self.viewRenderShelfEdge.yOffset)
+        // self.newData.RenderingsItems.ShelfEdge.height = returnFloat(self.viewRenderShelfEdge.height)
+        // self.newData.RenderingsItems.ShelfEdge.width = returnFloat(self.viewRenderShelfEdge.width)
+        // self.newData.RenderingsItems.ShelfEdge.yOffset = returnFloat(self.viewRenderShelfEdge.yOffset)
 
-        self.newData.RenderingsItems.LabelHolder.height = returnFloat(self.viewRenderLabel.height)
-        self.newData.RenderingsItems.LabelHolder.width = returnFloat(self.viewRenderLabel.width)
-        self.newData.RenderingsItems.LabelHolder.yOffset = returnFloat(self.viewRenderLabel.yOffset)
+        // self.newData.RenderingsItems.LabelHolder.height = returnFloat(self.viewRenderLabel.height)
+        // self.newData.RenderingsItems.LabelHolder.width = returnFloat(self.viewRenderLabel.width)
+        // self.newData.RenderingsItems.LabelHolder.yOffset = returnFloat(self.viewRenderLabel.yOffset)
 
-        self.newData.RenderingsItems.Back.height = returnFloat(self.RenderBackModel.height)
-        self.newData.RenderingsItems.Back.width = returnFloat(self.RenderBackModel.width)
-        self.newData.RenderingsItems.Back.yOffset = returnFloat(self.RenderBackModel.yOffset)
+        // self.newData.RenderingsItems.Back.height = returnFloat(self.RenderBackModel.height)
+        // self.newData.RenderingsItems.Back.width = returnFloat(self.RenderBackModel.width)
+        // self.newData.RenderingsItems.Back.yOffset = returnFloat(self.RenderBackModel.yOffset)
 
-        self.newData.RenderingsItems.Front.height = returnFloat(self.viewRender.height)
-        self.newData.RenderingsItems.Front.width = returnFloat(self.viewRender.width)
-        self.newData.RenderingsItems.Front.depth = returnFloat(self.viewRender.depth)
+        // self.newData.RenderingsItems.Front.height = returnFloat(self.viewRender.height)
+        // self.newData.RenderingsItems.Front.width = returnFloat(self.viewRender.width)
+        // self.newData.RenderingsItems.Front.depth = returnFloat(self.viewRender.depth)
 
-        self.newData.RenderingsItems.Front.yOffset = self.viewRender.yOffset
-        if (self.newData.renderImage == "None" || self.newData.renderImage == undefined) {
-          self.newData.RenderingsItems.Front = null
-        }
-        if (self.newData.labelType == "None" || self.newData.labelType == undefined) {
-          self.newData.RenderingsItems.LabelHolder = null
-        }
-        if (self.newData.ShelfEdgeType == "None" || self.newData.ShelfEdgeType == undefined) {
-          self.newData.RenderingsItems.ShelfEdge = null
-        }
-        if (self.newData.RenderingsItems.Backs == "None" || self.newData.RenderingsItems.Backs == undefined) {
-          self.newData.RenderingsItems.Back = null
-        }
+        // self.newData.RenderingsItems.Front.yOffset = self.viewRender.yOffset
+
+        // if (self.newData.renderImage == "None" || self.newData.renderImage == undefined) {
+        //   self.newData.RenderingsItems.Front = null
+        // }
+
+        // if (self.newData.labelType == "None" || self.newData.labelType == undefined) {
+        //   self.newData.RenderingsItems.LabelHolder = null
+        // }
+
+        // if (self.newData.ShelfEdgeType == "None" || self.newData.ShelfEdgeType == undefined) {
+        //   self.newData.RenderingsItems.ShelfEdge = null
+        // }
+
+        // if (self.newData.RenderingsItems.Backs == "None" || self.newData.RenderingsItems.Backs == undefined) {
+        //   self.newData.RenderingsItems.Back = null
+        // }
+
         if (self.newData.fixtureType == 2 || self.newData.fixtureType == 3) {
           if (self.tmpPegs != null && self.tmpPegs.length > 0) {
             self.tmpPegs.forEach(element => {
@@ -1635,6 +1623,20 @@
 
         self.$refs.imageInput.click();
       },
+      onRenderingChange(rendering) {
+        let self = this;
+
+        self.$nextTick(() => {
+          console.log("Label Holder", self.newData.RenderingsItems.LabelHolder);
+
+          switch (rendering) {
+            case 0: {
+
+            }
+            break;
+          }
+        })
+      }
     }
   }
 

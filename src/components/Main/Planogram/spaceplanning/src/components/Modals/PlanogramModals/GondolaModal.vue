@@ -792,7 +792,7 @@
           self.newData.uploadTop = false
           console.log("[OPEN]----rendering Items", self.newData.RenderingsItems);
           self.getRenderingTypes()
-          self.getSelectedRenderings()
+          // self.getSelectedRenderings()
           if (self.newData.RenderingsItems == undefined) {
             self.newData.RenderingsItems = {}
             self.newData.RenderingsItems.Front = {
@@ -883,19 +883,20 @@
         self.newData.bottomColor = self.newData.bottomColor.hex == undefined ? "#fff" : self.newData.bottomColor.hex;
         self.newData.pegHoleColor = self.newData.pegHoleColor.hex == undefined ? "#000" : self.newData.pegHoleColor.hex;
 
-        console.log("renderImage");
-        self.newData.RenderingsItems.Front.height = returnFloat(self.viewRender.height)
-        self.newData.RenderingsItems.Front.width = returnFloat(self.viewRender.width)
-        self.newData.RenderingsItems.Front.depth = returnFloat(self.viewRender.depth)
+        // self.newData.RenderingsItems.Front.height = returnFloat(self.viewRender.height)
+        // self.newData.RenderingsItems.Front.width = returnFloat(self.viewRender.width)
+        // self.newData.RenderingsItems.Front.depth = returnFloat(self.viewRender.depth)
 
-        self.newData.RenderingsItems.Front.yOffset = self.viewRender.yOffset
-        if (self.newData.RenderingsItems.Front.yOffset == null || self.newData.RenderingsItems.Front.yOffset ==
-          undefined) {
-          self.newData.RenderingsItems.Front.yOffset = 0
-        }
-        if (self.newData.renderImage == "None" || self.newData.renderImage == undefined) {
-          self.newData.RenderingsItems.Front = null
-        }
+        // self.newData.RenderingsItems.Front.yOffset = self.viewRender.yOffset
+
+        // if (self.newData.RenderingsItems.Front.yOffset == null || self.newData.RenderingsItems.Front.yOffset == undefined) {
+        //   self.newData.RenderingsItems.Front.yOffset = 0
+        // }
+
+        // if (self.newData.renderImage == "None" || self.newData.renderImage == undefined) {
+        //   self.newData.RenderingsItems.Front = null
+        // }
+        
         self.newData.height = returnFloat(self.newData.height);
         self.newData.width = returnFloat(self.newData.width);
         self.newData.depth = returnFloat(self.newData.depth);
