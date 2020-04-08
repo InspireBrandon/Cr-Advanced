@@ -195,12 +195,19 @@
             },
             changeRotation(drop, amount) {
                 let self = this
-                self.findKonvaItem(self.selectedLayer.children, drop.id, callback => {
-                    let rotation = parseFloat(amount)
-                    console.log("changerotation ----- callvbackl", callback);
-                    callback.item.rotation(amount)
-                    self.selectedLayer.draw()
+                self.$nextTick(() => {
+
+                    self.findKonvaItem(self.selectedLayer.children, drop.id, callback => {
+                        let rotation = parseFloat(amount)
+                        console.log("changerotation ----- callvbackl", callback);
+                        callback.item.rotation(amount)
+                        self.selectedLayer.draw()
+                        self.$nextTick(() => {
+                            self.stage.batchDraw()
+                        })
+                    })
                 })
+
             },
             guid() {
                 function s4() {

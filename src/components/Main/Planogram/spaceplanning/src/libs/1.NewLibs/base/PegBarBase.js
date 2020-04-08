@@ -101,7 +101,9 @@ class PegBarBase extends PlanogramItemBase {
   PositionPegbar() {
     let self = this;
     self.Group.setX(0);
-
+    let offset = (self.Data.x_Offset == undefined ? 0 : self.Data.x_Offset) * 3;
+    self.Group.setX(0 + parseFloat(offset));
+    
     // adjust label values + fixture positions
     let ctrl_label = new LabelHelper();
     ctrl_label.SetNewLabelAndPositionNumbers(self.VueStore);

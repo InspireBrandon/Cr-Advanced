@@ -253,7 +253,11 @@
 
           <v-tab-item value="tab-custom" class="list-item">
             <v-card flat>
-              <template v-for="(item, index) in customFixtures">
+               <v-toolbar dense flat>
+                <v-spacer></v-spacer>
+                <v-text-field v-model="customSearch" style="width:200px" append-icon="search"></v-text-field>
+              </v-toolbar>
+              <template v-for="(item, index) in filteredCustomFixtures">
                 <v-list-tile :key="index" @click="selectLibraryItem(item)"
                   :class="{ 'active-item':(selectedItem != null && item.id == selectedItem.data.id), 'inactive-item' : (selectedItem == null || item.id != selectedItem.data.id)}"
                   draggable="true" @drag="dragMove" @dragstart="dragCustomStart('LIBRARY', item, 'CUSTOM')"
@@ -324,6 +328,7 @@
       customFixtures: [],
       planograms: [],
       searchText: null,
+      customSearch:null,
     }),
     mounted() {
       let self = this;
@@ -337,6 +342,12 @@
         return this.planograms.filter(item => {
           if (!this.searchText) return this.planograms;
           return (item.name.toLowerCase().includes(this.searchText.toLowerCase()))
+        });
+      },
+      filteredCustomFixtures(){
+         return this.customFixtures.filter(item => {
+          if (!this.customSearch) return this.customFixtures;
+          return (item.name.toLowerCase().includes(this.customSearch.toLowerCase()))
         });
       }
     },

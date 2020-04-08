@@ -47,6 +47,7 @@ class BasketBase extends PlanogramItemBase {
     self.AddShelfCosmetic();
 
     self.AddArea();
+    self.AddAreaCosmetic();
     self.AddTextCosmetic();
 
     if (positionElementRequired == true) {
@@ -235,7 +236,28 @@ class BasketBase extends PlanogramItemBase {
     self.AddRenderings();
     self.ApplyZIndexing();
   }
+  AddAreaCosmetic() {
+    let self = this;
+    self.Area = new Konva.Image({
+      x: 0,
+      y: 0,
+      width: self.Width,
+      height: self.Height,
+      fill: self.Data.backTransparent ? 'transparent' : self.Data.backColor,
+      // color: self.Data.backColor,
+      // stroke: 'black',
+      // strokeWidth: 0.5,
+      transformsEnabled: 'position'
+    })
 
+    if(self.Data.backImageID == undefined || self.Data.backImageID == null) {
+      self.LoadImage(self.Area, "data:image/png;base64," + self.Data.image);
+    } else {
+      self.LoadImage(self.Area, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.backImageID}`);
+    }
+
+    self.Group.add(self.Area);
+  }
   AddRenderings() {
     let self = this;
 
