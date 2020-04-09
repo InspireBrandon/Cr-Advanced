@@ -349,7 +349,9 @@ class LoadSavePlanogramBase {
     let floorPlanArray = generateFloorPlanArr(output.planogramData, vuex, storeCount)
 
     let header = {
-      planogram_Detail_ID: createDetailCallback.data.planogram_Details.id
+      planogram_Detail_ID: createDetailCallback.data.planogram_Details.id,
+      systemFile_ID:createDetailCallback.data.planogram_Details.systemFile_ID
+
     }
     let request = {
       fixtureHeader: header,
@@ -681,7 +683,8 @@ class LoadSavePlanogramBase {
         createDetailTX(clusterData, dimensionData, fixtureData, resultSpace, planogramProducts, createDetailCallback => {
           let floorPlanArray = generateFloorPlanArr(output.planogramData, vuex, storeCount)
           let header = {
-            planogram_Detail_ID: createDetailCallback.data.planogram_Details.id
+            planogram_Detail_ID: createDetailCallback.data.planogram_Details.id,
+            systemFile_ID:createDetailCallback.data.planogram_Details.systemFile_ID
           }
           let request = {
             fixtureHeader: header,
@@ -763,7 +766,9 @@ class LoadSavePlanogramBase {
               self.uploadFixtureImage(image, name, fixtureID, callback);
               let floorPlanArray = generateFloorPlanArr(output.planogramData, vuex, null)
               let header = {
-                fixture_ID: fixtureID
+                fixture_ID: fixtureID,
+                systemFile_ID:fixtureID
+
               }
               let request = {
                 fixtureHeader: header,
@@ -787,7 +792,22 @@ class LoadSavePlanogramBase {
           data: output
         })
         .then(result => {
+          console.log("reslt",result);
+          
           self.uploadFixtureImage(image, name, fixtureID, callback);
+              let floorPlanArray = generateFloorPlanArr(output.planogramData, vuex, null)
+              let header = {
+                fixture_ID: fixtureID,
+                systemFile_ID:fixtureID
+              }
+              let request = {
+                fixtureHeader: header,
+                fixtureItems: floorPlanArray
+              }
+              axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+              axios.post(self.ServerAddress + `FloorPlan_Fixtures/Create`, request).then(r => {
+
+              })
         })
     }
   }

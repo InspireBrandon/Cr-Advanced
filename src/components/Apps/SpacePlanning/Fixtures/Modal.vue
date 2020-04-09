@@ -113,7 +113,7 @@
                     <v-text-field type="number" v-model="form.overhang" label="Overhang:" suffix="cm"></v-text-field>
                   </v-flex>
                   <v-flex lg8 md12
-                    v-if="!form.rendering && (( form.type == 2 && form.fixtureType == 1 || form.type == 3 && form.fixtureType == 4))">
+                    v-if="!form.rendering && (( (form.type == 2 && form.fixtureType == 1) || (form.type == 3 && form.fixtureType == 4)||(form.type == 2 && form.fixtureType == 0 ))||(form.type == 2 && form.fixtureType == 3 ))">
                     <v-text-field type="number" v-model="form.x_Offset" label="X Offset:" suffix="cm"></v-text-field>
                   </v-flex>
                   <v-flex lg8 md12>
@@ -150,6 +150,10 @@
                     <v-text-field type="number" v-model="form.xHoleSpacing" label="X hole spacing:" suffix="cm">
                     </v-text-field>
                   </v-flex>
+                  <v-flex lg8 md12 v-if="form.type==0&&!form.rendering">
+                    <v-select label="floor plan shape" :items="shapes" v-model="form.shape"></v-select>
+                  </v-flex>
+
                 </v-layout>
               </v-container>
             </v-card>
@@ -558,7 +562,9 @@
             value: 1
           }
         ],
+        shapes: ["Circle", "Square"],
         form: {
+          shape: null,
           leftMirrored: false,
           rightMirrored: false,
           bottomMirrored: false,
@@ -956,6 +962,8 @@
         self.frontBack = 'Front';
         self.leftRight = 'Left';
         self.topBottom = 'Top';
+
+        console.log("[OPEN EDIT]fixture", fixture);
 
         self.getFixtureGroups(groupType);
         // self.getFixtureImage(fixture.id);

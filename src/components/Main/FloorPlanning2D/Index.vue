@@ -1615,8 +1615,11 @@
                 ev.preventDefault();
                 let self = this
                 let librarydata = window.library
+                    console.log("[DRAG DROP] - library",window.library);
                 if (window.library != null) {
-                    if (window.library.type == "CUSTOM_PLANOGRAM") {
+                
+                    
+                    if (window.library.type == "CUSTOM_PLANOGRAM"||window.library.type == "CUSTOM") {
                         self.checkForHeader(window.library.data, HeaderCallback => {
                             if (HeaderCallback != null) {
                                 self.drawSaved(HeaderCallback, ev)

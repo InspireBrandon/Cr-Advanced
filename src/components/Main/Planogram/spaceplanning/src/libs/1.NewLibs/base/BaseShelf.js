@@ -110,13 +110,14 @@ class BaseShelf extends PlanogramItemBase {
 
   PositionBase() {
     let self = this;
-
+    
     let ctrl_store = new StoreHelper();
     let gondolaItem = ctrl_store.getPlanogramItemById(self.VueStore, self.ParentID);
 
-    self.Group.setX(0);
     self.Group.setY(((gondolaItem.TotalHeight) - self.TotalHeight));
 
+    let offset = (self.Data.x_Offset == undefined ? 0 : self.Data.x_Offset) * 3;
+    self.Group.setX(0 + parseFloat(offset));
     // adjust label values + fixture positions
     let ctrl_label = new LabelHelper();
     ctrl_label.SetNewLabelAndPositionNumbers(self.VueStore);
