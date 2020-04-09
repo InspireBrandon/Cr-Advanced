@@ -63,6 +63,11 @@ class RangingController {
       })
   }
 
+  getEndingStockData() {
+    let self = this;
+    return self.endingStock;
+  }
+
   getRangingFile() {
     return {
       allRangeProducts: this.allRangeProducts,
@@ -293,7 +298,7 @@ class RangingController {
 
     console.log("[RANGING CONTROLLER] SELECTED STORE", store);
 
-    let sales = getSalesDataByStore(store, this.allRangeProducts, this.storeSales);
+    let sales = getSalesDataByStore(store, this.allRangeProducts, this.storeSales, this.endingStock);
     return sales;
   }
 
@@ -424,6 +429,8 @@ function getStoreByID(storeID, storeSales) {
 function getStoresByCluster(clusters, clusterType, clusterID) {
   let stores = [];
 
+  console.log("ClusterType", clusterType)
+
   let clusterItems = clusters[clusterType + "Clusters"];
 
   for (let i = 0; i < clusterItems.length; i++) {
@@ -431,6 +438,9 @@ function getStoresByCluster(clusters, clusterType, clusterID) {
     if (clusterItem.clusterID == clusterID)
       stores = clusterItem.clusterStores;
   }
+
+  if(clusterType == "stores")
+  stores = [1];
 
   return stores;
 }
@@ -628,36 +638,65 @@ function getDaysOfSupplyFacings(clusters, clusterType, clusterID, volume_potenti
 
 function getStockCost(stockData, productID, clusters, clusterType, clusterID) {
   let clusterStores = getStoresByCluster(clusters, clusterType, clusterID);
-  
+
   let stockCost = 0;
 
   stockData.forEach(stockData => {
     if (IsClusterStore(clusterStores, stockData.store_ID)) {
-      if(stockData.product_ID == productID) {
+      if (stockData.product_ID == productID) {
         stockCost += stockData.closingCost;
       }
     }
   })
 
-  return (stockCost / clusterStores.length);
+  return stockCost;
+}
+
+function getStockCostStore(stockData, productID, storeID) {
+  let stockCost = 0;
+
+  stockData.forEach(stockData => {
+    if(stockData.store_ID == storeID) {
+      if (stockData.product_ID == productID) {
+        stockCost += stockData.closingCost;
+      }
+    }
+  })
+
+  return stockCost;
 }
 
 function getStockUnits(stockData, productID, clusters, clusterType, clusterID) {
   let clusterStores = getStoresByCluster(clusters, clusterType, clusterID);
-  
+
   let stockunits = 0;
 
   stockData.forEach(stockData => {
     if (IsClusterStore(clusterStores, stockData.store_ID)) {
-      if(stockData.product_ID == productID) {
+      if (stockData.product_ID == productID) {
         stockunits += stockData.closingUnits;
       }
     }
   })
 
-  return (stockunits / clusterStores.length);
+  return stockunits;
 }
 
+function getStockUnitsStore(stockData, productID, storeID) {
+  let stockUnits = 0;
+
+  stockData.forEach(stockData => {
+    if(stockData.store_ID == storeID) {
+      if (stockData.product_ID == productID) {
+        stockUnits += stockData.closingUnits;
+      }
+    }
+  })
+
+  return stockUnits;
+}
+
+// Out Of Stock Days
 function getOosDays(storeSales, productID, clusters, clusterType, clusterID) {
   let oosDays = 0;
 
@@ -675,6 +714,23 @@ function getOosDays(storeSales, productID, clusters, clusterType, clusterID) {
   })
 
   return (oosDays / clusterStores.length) / 6;
+}
+
+function getOosDaysStore(storeSales, productID, storeID) {
+  let oosDays = 0;
+
+  storeSales.forEach(store => {
+    if (store.storeID == storeID) {
+      store.salesData.forEach(product => {
+        if (product.productID == productID) {
+          if (numberifySales(product.ooS_Days) > 0)
+            oosDays += numberifySales(product.ooS_Days);
+        }
+      })
+    }
+  })
+
+  return oosDays / 6;
 }
 
 function IsClusterStore(clusterStores, storeID) {
@@ -826,7 +882,7 @@ function GetRanks(storeSales, clusters, clusterType, clusterID) {
   return retArr
 }
 
-function getSalesDataByStore(store, allProducts, storeSales) {
+function getSalesDataByStore(store, allProducts, storeSales, endingStock) {
   let sales = [];
 
   let salesArr = getStoreSalesByStoreID(storeSales, store.storeID);
@@ -836,7 +892,7 @@ function getSalesDataByStore(store, allProducts, storeSales) {
     sales.push(salesItem);
   }
 
-  let totalSales = getTotalStoreProductSales(allProducts, sales, storeSales, [store], store.storeID);
+  let totalSales = getTotalStoreProductSales(allProducts, sales, storeSales, [store], store.storeID, endingStock);
   return totalSales;
 }
 
@@ -871,7 +927,7 @@ function getStoreSalesByStoreID(storeSales, storeID) {
   return sales;
 }
 
-function getTotalStoreProductSales(allProducts, sales, storeSales, stores, storeID) {
+function getTotalStoreProductSales(allProducts, sales, storeSales, stores, storeID, endingStock) {
   let productSales = [];
 
   let totalSales = 0;
@@ -920,6 +976,21 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
     let sales_potential_rank = 0
     let volume_potential_rank = 0
 
+    let new_Stock_Cost = getStockCostStore(endingStock, product.productID, storeID);
+    let new_Stock_Units = getStockUnitsStore(endingStock, product.productID, storeID);
+
+    let calculated_oos_days = getOosDaysStore(storeSales, product.productID, storeID);
+    let average_cost = isNaN(sales_cost / sales_units) ? 0 : sales_cost / sales_units;
+    let average_price = isNaN(sales_retail / sales_units) ? 0 : sales_retail / sales_units;
+
+    let days_of_supply = isNaN(new_Stock_Units / sales_units) ? 0 : new_Stock_Units / sales_units;
+    let stock_turn = isNaN((sales_cost * 12) / new_Stock_Units) ? 0 : (sales_cost * 12) / new_Stock_Units;
+
+    let lost_sales = sales_retail / ((30 * 6) - calculated_oos_days) * calculated_oos_days;
+    let lost_units = sales_units / ((30 * 6) - calculated_oos_days) * calculated_oos_days;
+    let lost_profit = sales_profit / ((30 * 6) - calculated_oos_days) * calculated_oos_days;
+    let lost_cost = sales_cost / ((30 * 6) - calculated_oos_days) * calculated_oos_days;
+
     tmp.forEach(t => {
       if (product.productID == t.productID) {
         item_sales_rank = t.itemSalesRank
@@ -944,8 +1015,17 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
       sales_cost: sales_cost.toFixed(0),
       sales_units: sales_units.toFixed(0),
       sales_profit: sales_profit.toFixed(0),
-      stock_units: stock_units.toFixed(0),
-      stock_cost: stock_cost.toFixed(0),
+      stock_units: parseFloat(new_Stock_Units.toFixed(2)),
+      stock_cost: parseFloat(new_Stock_Cost.toFixed(2)),
+      oos_days: parseFloat(calculated_oos_days.toFixed(2)),
+      lost_sales: parseFloat(lost_sales.toFixed(2)),
+      lost_units: parseFloat(lost_units.toFixed(2)),
+      lost_profit: parseFloat(lost_profit.toFixed(2)),
+      lost_cost: parseFloat(lost_cost.toFixed(2)),
+      average_cost: parseFloat(average_cost.toFixed(2)),
+      average_price: parseFloat(average_price.toFixed(2)),
+      days_of_supply: parseFloat(days_of_supply.toFixed(2)),
+      stock_turn: parseFloat(stock_turn.toFixed(2)),
       number_distribution: number_distribution.toFixed(0),
       weighted_distribution: weighted_distribution.toFixed(0),
       sales_potential: sales_potential.toFixed(0),
@@ -1042,6 +1122,11 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
     let new_Stock_Units = getStockUnits(endingStock, product.productID, clusters, clusterType, clusterID);
 
     let calculated_oos_days = getOosDays(storeSales, product.productID, clusters, clusterType, clusterID);
+    let average_cost = isNaN(sales_cost / sales_units) ? 0 : sales_cost / sales_units;
+    let average_price = isNaN(sales_retail / sales_units) ? 0 : sales_retail / sales_units;
+
+    let days_of_supply = isNaN(new_Stock_Units / sales_units) ? 0 : new_Stock_Units / sales_units;
+    let stock_turn = isNaN((sales_cost * 12) / new_Stock_Units) ? 0 : (sales_cost * 12) / new_Stock_Units;
 
     let lost_sales = sales_retail / ((30 * 6) - calculated_oos_days) * calculated_oos_days;
     let lost_units = sales_units / ((30 * 6) - calculated_oos_days) * calculated_oos_days;
@@ -1094,6 +1179,10 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
       lost_units: parseFloat(lost_units.toFixed(2)),
       lost_profit: parseFloat(lost_profit.toFixed(2)),
       lost_cost: parseFloat(lost_cost.toFixed(2)),
+      average_cost: parseFloat(average_cost.toFixed(2)),
+      average_price: parseFloat(average_price.toFixed(2)),
+      days_of_supply: parseFloat(days_of_supply.toFixed(2)),
+      stock_turn: parseFloat(stock_turn.toFixed(2)),
       number_distribution: number_distribution.toFixed(0),
       weighted_distribution: weighted_distribution.toFixed(0),
       sales_potential: parseFloat(sales_potential.toFixed(0)),
@@ -1227,13 +1316,17 @@ function RangeProduct(productData, salesData, indicator) {
   self.sales_Units = salesData.sales_units;
   self.sales_Profit = salesData.sales_profit;
   self.stock_Cost = salesData.stock_cost,
-  self.stock_Units = salesData.stock_units,
-  self.oos_Days = salesData.oos_days,
-  self.lost_Sales = salesData.lost_sales,
-  self.lost_Units = salesData.lost_units,
-  self.lost_Profit = salesData.lost_profit,
-  self.lost_Cost = salesData.lost_cost,
-  self.number_Distribution = salesData.number_distribution + " %";
+    self.stock_Units = salesData.stock_units,
+    self.oos_Days = salesData.oos_days,
+    self.lost_Sales = salesData.lost_sales,
+    self.lost_Units = salesData.lost_units,
+    self.lost_Profit = salesData.lost_profit,
+    self.lost_Cost = salesData.lost_cost,
+    self.average_cost = salesData.average_cost,
+    self.average_price = salesData.average_price,
+    self.days_of_supply = salesData.days_of_supply,
+    self.stock_turn = salesData.stock_turn,
+    self.number_Distribution = salesData.number_distribution + " %";
   self.weighted_Distribution = salesData.weighted_distribution + " %";
   self.sales_potential = salesData.sales_potential;
   self.volume_potential = salesData.volume_potential;

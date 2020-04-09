@@ -288,6 +288,22 @@
         }
     },
     {
+        "headerName": "Days Of Supply",
+        "field": "days_of_supply",
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
+        "headerName": "Stock Turns",
+        "field": "stock_turn",
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
         "headerName": "Stock Cost",
         "field": "stock_Cost",
         "hide": true,
@@ -380,6 +396,20 @@
             "newRowsAction": "keep"
         }
     },
+    {
+        "headerName": "Avg Cost",
+        "field": "average_cost",
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
+        "headerName": "Avg Price",
+        "field": "average_price",
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },    
     {
         "headerName": "GP%",
         "field": "gross_profit",
