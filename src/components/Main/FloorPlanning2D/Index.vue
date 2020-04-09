@@ -1295,7 +1295,7 @@
                         periodFromString: self.dateRange.dateFromString
                     }
                     console.log();
-                    
+
                     switch (self.selectedClusterType) {
                         case "stores": {
                             req.store_ID = self.selectedClusterOption
@@ -1307,7 +1307,7 @@
                     break;
 
                     default:
-                    alert("didnt set cluster")
+                        alert("didnt set cluster")
                         break;
                     }
 
@@ -1471,15 +1471,22 @@
             },
             getDepartment(planoID, callback) {
                 let self = this
-                //console.log("getDepartment", planoID);
 
                 axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 axios.get(process.env.VUE_APP_API + `Planogram/department?ID=${planoID}`).then(r => {
-                    self.createDepartment(r.data, departmentLayers => {
-                        callback(departmentLayers)
-                    })
+                    console.log("getdepartment resp", r);
 
+                    if (r.data != null) {
+                        self.createDepartment(r.data, departmentLayers => {
+                            callback(departmentLayers)
+                        })
+                    } else {
+                        callback({
+                            layerTreeItem: self.fixtureTree,
+                            Konvalayer: self.fixtureLayer,
+                        })
+                    }
                 })
             },
             GetTransformedMousePoint(stage) {
@@ -1615,16 +1622,20 @@
                 ev.preventDefault();
                 let self = this
                 let librarydata = window.library
-                    console.log("[DRAG DROP] - library",window.library);
+                console.log("[DRAG DROP] - library", window.library);
                 if (window.library != null) {
-                
-                    
-                    if (window.library.type == "CUSTOM_PLANOGRAM"||window.library.type == "CUSTOM") {
+
+
+                    if (window.library.type == "CUSTOM_PLANOGRAM" || window.library.type == "CUSTOM") {
                         self.checkForHeader(window.library.data, HeaderCallback => {
+                            console.log("[checkForHeader]--HeaderCallback", HeaderCallback);
+
                             if (HeaderCallback != null) {
                                 self.drawSaved(HeaderCallback, ev)
                             } else {
-                                self.getPlanogramData(librarydata.data.id, defaultData => {
+                                console.log("librarydata", librarydata);
+
+                                self.getPlanogramData(librarydata, defaultData => {
                                     if (defaultData != null && defaultData != undefined) {
                                         self.drawDefaultSpace(defaultData, ev)
                                     } else {
@@ -1643,22 +1654,36 @@
                     self.drawSaved(window.libraryDrag)
                 }
             },
-            getPlanogramData(id, callback) {
+            getPlanogramData(data, callback) {
                 let self = this
 
                 axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                axios.get(process.env.VUE_APP_API +
-                    `Planogram_Details/BysystemFileID?systemFile_ID=${id}`).then(resp => {
+                if (data.type == "CUSTOM") {
                     axios.get(process.env.VUE_APP_API +
-                        `FloorPlan_Fixtures/GetFixtures?planogramDetail_ID=${resp.data.id}`).then(
+                        `FloorPlan_Fixtures/GetFixtures?planogramDetail_ID=${data.data.id}`).then(
                         r => {
+                            console.log("get custokm fixtures", r);
+
                             callback({
-                                plano: resp.data,
+                                plano: data.data,
                                 data: r.data
                             })
                         })
-                })
+                } else {
+                    axios.get(process.env.VUE_APP_API +
+                        `Planogram_Details/BysystemFileID?systemFile_ID=${data.data.id}`).then(resp => {
+                        console.log("get details reesp", resp);
 
+                        axios.get(process.env.VUE_APP_API +
+                            `FloorPlan_Fixtures/GetFixtures?planogramDetail_ID=${resp.data.id}`).then(
+                            r => {
+                                callback({
+                                    plano: resp.data,
+                                    data: r.data
+                                })
+                            })
+                    })
+                }
 
             },
             drawDefaultSpace(data, ev) {
@@ -1675,12 +1700,14 @@
 
 
                 self.getDepartment(data.plano.id, depart => {
+                    console.log("get departments callback", depart);
+
                     let container = self.stage.container().getBoundingClientRect();
                     self.stage._setPointerPosition(ev);
                     let dropPos = self.GetTransformedMousePoint(self.stage);
 
                     let group = new Konva.Group({
-                        name: data.plano.planogramName,
+                        name: "Group",
                         type: "planogramGroup",
                         visible: true,
                         showEditName: false,
