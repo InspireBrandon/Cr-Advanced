@@ -133,6 +133,9 @@
                         case 3:
                             return "Cabinet"
                             break;
+                        case 4:
+                            return "Label Holder"
+                            break;
                         default:
                             break;
                     }

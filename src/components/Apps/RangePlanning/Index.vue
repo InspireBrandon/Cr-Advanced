@@ -14,9 +14,6 @@
             <v-list-tile @click="openRange" v-if="!$route.path.includes('RangePlanningView')">
               <v-list-tile-title>Open</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile @click="openRetailChainSelector">
-              <v-list-tile-title>RCS</v-list-tile-title>
-            </v-list-tile>
             <v-list-tile :disabled="fileData.planogramName == ''" @click="promptForTag">
               <v-list-tile-title>Save</v-list-tile-title>
             </v-list-tile>
@@ -67,6 +64,9 @@
             </v-list-tile>
             <v-list-tile :disabled="selectedClusterOption == null" @click="setViewType('STORE')">
               <v-list-tile-title>Store</v-list-tile-title>
+            </v-list-tile>
+            <v-list-tile @click="setupView">
+              <v-list-tile-title>Setup</v-list-tile-title>
             </v-list-tile>
           </v-list>
         </v-menu>
@@ -238,6 +238,7 @@
     <HandleDescrepancy ref="HandleDescrepancy" />
     <CustomRange ref="CustomRange" />
     <RetailChainSelector ref="RetailChainSelector" />
+    <ViewSetup ref="ViewSetup" />
   </div>
 </template>
 
@@ -283,6 +284,7 @@
   import SyncModalStatus from "./SyncModalStatus";
   import HandleDescrepancy from "./HandleDescrepancy";
   import CustomRange from "./CustomRange/Index";
+  import ViewSetup from "./ViewSetup.vue";
 
   import RetailChainSelector from "@/components/Common/RetailChainSelector";
 
@@ -296,6 +298,12 @@
     let self = this;
     self.text = data.clusterName;
     self.value = data.clusterID;
+  }
+
+  const headerOptions = {
+    yes: 1,
+    no: 2,
+    all: 3
   }
 
   export default {
@@ -329,7 +337,8 @@
       SyncModalStatus,
       HandleDescrepancy,
       CustomRange,
-      RetailChainSelector
+      RetailChainSelector,
+      ViewSetup
     },
     data() {
       return {
@@ -480,13 +489,342 @@
       self.getStores();
     },
     methods: {
-      openRetailChainSelector(callback) {
-          let self = this;
+      getEndingStock(callback) {
+        let self = this;
 
-          self.$refs.RetailChainSelector.show(retailChain => {
-            callback(retailChain)
-            console.log(retailChain);
+        let planogramID = self.fileData.planogramID;
+        let periodID = self.fileData.dateTo;
+
+        Axios.get(process.env.VUE_APP_API + `Ranging/ClosingStock?planogramID=${planogramID}&periodID=${periodID}`)
+          .then(r => {
+            callback(r.data);
           })
+          .catch(e => {
+
+          })
+      },
+      setupView() {
+        let self = this;
+
+        self.$refs.ViewSetup.show(options => {
+          self.handleViewSetup(options);
+        })
+      },
+      handleViewSetup(options) {
+        let self = this;
+
+        self.columnDefs.forEach(cd => {
+          self.setVisible(cd.field, options);
+        })
+      },
+      setVisible(prop, options) {
+        let self = this;
+        self.columnApi.setColumnVisible(prop, self.checkShow(prop, options));
+      },
+      checkShow(prop, options) {
+        let self = this;
+
+        let retval = false;
+
+        switch(prop) {
+          // Product
+          case 'product_System_ID': {
+            retval = options.products == headerOptions.all;
+          }break;
+          case 'barcode': {
+            retval = options.products == headerOptions.all;
+          }break;
+          case 'product_Code': {
+            retval = options.products == headerOptions.all;
+          }break;
+          case 'brand': {
+            retval = options.products == headerOptions.all;
+          }break;
+          case 'manufacturer': {
+            retval = options.products == headerOptions.all;
+          }break;
+          case 'supplier': {
+            retval = options.products == headerOptions.all;
+          }break;
+          case 'description': {
+            retval = options.products == headerOptions.yes || options.products == headerOptions.all;
+          }break;
+          case 'size_Description': {
+            retval = options.products == headerOptions.all;
+          }break;
+          case 'size': {
+            retval = options.products == headerOptions.all;
+          }break;
+          case 'uom': {
+            retval = options.products == headerOptions.all;
+          }break;
+          // END Product
+          // Hierachy
+          case 'category': {
+            retval = options.hierachy == headerOptions.all;
+          }break;
+          case 'subcategory': {
+            retval = options.hierachy == headerOptions.yes || options.hierachy == headerOptions.all;
+          }break;
+          case 'segment': {
+            retval = options.hierachy == headerOptions.all;
+          }break;
+          // END Hierachy
+          // Dimension
+          case 'height': {
+            retval = options.dimensions == headerOptions.yes || options.dimensions == headerOptions.all;
+          }break;
+          case 'width': {
+            retval = options.dimensions == headerOptions.yes || options.dimensions == headerOptions.all;
+          }break;
+          case 'depth': {
+            retval = options.dimensions == headerOptions.yes || options.dimensions == headerOptions.all;
+          }break;
+          // END Dimension
+          // Indicators
+          case 'active_Shop_Code': {
+            retval = options.indicators == headerOptions.all;
+          }break;
+          case 'store_Range_Indicator': {
+            retval = options.indicators == headerOptions.yes || options.indicators == headerOptions.all;
+          }break;
+          // END Indicators
+          // Sales Analysis
+          case 'sales_Retail': {
+            retval = options.salesAnalysis == headerOptions.yes || options.salesAnalysis == headerOptions.all;
+          }break;
+          case 'item_sales_rank': {
+            retval = options.salesAnalysis == headerOptions.all;
+          }break;
+          case 'sales_potential': {
+            retval = options.salesAnalysis == headerOptions.yes || options.salesAnalysis == headerOptions.all;
+          }break;
+          case 'sales_potential_rank': {
+            retval = options.salesAnalysis == headerOptions.yes || options.salesAnalysis == headerOptions.all;
+          }break;
+          // END Sales Analysis
+          // Volume Analysis
+          case 'sales_Units': {
+            retval = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis == headerOptions.all;
+          }break;
+          case 'item_volume_rank': {
+            retval = options.volumeAnalysis == headerOptions.all;
+          }break;
+          case 'volume_potential': {
+            retval = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis == headerOptions.all;
+          }break;
+          case 'volume_potential_rank': {
+            retval = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis == headerOptions.all;
+          }break;
+          // END Volume Analysis
+          // Profit Analysis
+          case 'sales_Profit': {
+            retval = options.profitAnalysis == headerOptions.yes || options.profitAnalysis == headerOptions.all;
+          }break;
+          case 'item_profit_rank': {
+            retval = options.profitAnalysis == headerOptions.all;
+          }break;
+          case 'profit_potential': {
+            retval = options.profitAnalysis == headerOptions.yes || options.profitAnalysis == headerOptions.all;
+          }break;
+          case 'profit_potential_rank': {
+            retval = options.profitAnalysis == headerOptions.yes || options.profitAnalysis == headerOptions.all;
+          }break;
+          // END Profit Analysis
+          // Cost Analysis
+          case 'sales_Cost': {
+            retval = options.costAnalysis == headerOptions.yes || options.costAnalysis == headerOptions.all;
+          }break;
+          case 'item_cost_rank': {
+            retval = options.costAnalysis == headerOptions.all;
+          }break;
+          case 'cost_potential': {
+            retval = options.costAnalysis == headerOptions.yes || options.costAnalysis == headerOptions.all;
+          }break;
+          case 'cost_potential_rank': {
+            retval = options.costAnalysis == headerOptions.yes || options.costAnalysis == headerOptions.all;
+          }break;
+          // END Cost Analysis
+          // Stock Analysis
+          case 'dos_fac': {
+            retval = options.stockAnalysis == headerOptions.yes || options.stockAnalysis == headerOptions.all;
+          }break;
+          case 'days_of_supply': {
+            retval = options.stockAnalysis == headerOptions.all;
+          }break;
+          case 'stock_Turns': {
+            retval = options.stockAnalysis == headerOptions.all;
+          }break;
+          case 'stock_Cost': {
+            retval = options.stockAnalysis == headerOptions.all;
+          }break;
+          case 'stock_Units': {
+            retval = options.stockAnalysis == headerOptions.all;
+          }break;
+          case 'lost_Sales': {
+            let stockAnalysisAll = options.stockAnalysis == headerOptions.all;
+            let stockAnalysisYes = options.stockAnalysis == headerOptions.yes;
+            let salesAnalysisYesOrAll = options.salesAnalysis == headerOptions.yes || options.salesAnalysis == headerOptions.all;
+
+            retval = stockAnalysisAll || (stockAnalysisYes && salesAnalysisYesOrAll);
+          }break;
+          case 'lost_Sales': {
+            let stockAnalysisAll = options.stockAnalysis == headerOptions.all;
+            let stockAnalysisYes = options.stockAnalysis == headerOptions.yes;
+            let salesAnalysisYesOrAll = options.salesAnalysis == headerOptions.yes || options.salesAnalysis == headerOptions.all;
+
+            retval = stockAnalysisAll || (stockAnalysisYes && salesAnalysisYesOrAll);
+          }break;
+          case 'lost_Units': {
+            let stockAnalysisAll = options.stockAnalysis == headerOptions.all;
+            let stockAnalysisYes = options.stockAnalysis == headerOptions.yes;
+            let volumeAnalysisYesOrAll = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis == headerOptions.all;
+
+            retval = stockAnalysisAll || (stockAnalysisYes && volumeAnalysisYesOrAll);
+          }break;
+          case 'lost_Profit': {
+            let stockAnalysisAll = options.stockAnalysis == headerOptions.all;
+            let stockAnalysisYes = options.stockAnalysis == headerOptions.yes;
+            let profitAnalysisYesOrAll = options.profitAnalysis == headerOptions.yes || options.profitAnalysis == headerOptions.all;
+
+            retval = stockAnalysisAll || (stockAnalysisYes && profitAnalysisYesOrAll);
+          }break;
+          case 'lost_Cost': {
+            let stockAnalysisAll = options.stockAnalysis == headerOptions.all;
+            let stockAnalysisYes = options.stockAnalysis == headerOptions.yes;
+            let costAnalysisYesOrAll = options.costAnalysis == headerOptions.yes || options.costAnalysis == headerOptions.all;
+
+            retval = stockAnalysisAll || (stockAnalysisYes && costAnalysisYesOrAll);
+          }break;
+          case 'oos_Days': {
+            retval = options.stockAnalysis == headerOptions.all;
+          }break;
+          // END Stock Analysis
+          // Distribution
+          case 'number_Distribution': {
+            retval = options.distribution == headerOptions.all;
+          }break;
+          case 'weighted_Distribution': {
+            retval = options.distribution == headerOptions.yes || options.distribution == headerOptions.all;
+          }break;
+          // END Distribution
+          // Index
+          case 'sales_contribution': {
+            let indexAll = options.index == headerOptions.all;
+            let indexYes = options.index == headerOptions.yes;
+            let salesAnalysisYesOrAll = options.salesAnalysis == headerOptions.yes || options.salesAnalysis == headerOptions.all;
+
+            retval = indexAll || (indexYes && salesAnalysisYesOrAll);
+          }break;
+          case 'units_contribution': {
+            let indexAll = options.index == headerOptions.all;
+            let indexYes = options.index == headerOptions.yes;
+            let volumeAnalysisYesOrAll = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis == headerOptions.all;
+
+            retval = indexAll || (indexYes && volumeAnalysisYesOrAll);
+          }break;
+          case 'profit_contribution': {
+            let indexAll = options.index == headerOptions.all;
+            let indexYes = options.index == headerOptions.yes;
+            let profitAnalysisYesOrAll = options.profitAnalysis == headerOptions.yes || options.profitAnalysis == headerOptions.all;
+
+            retval = indexAll || (indexYes && profitAnalysisYesOrAll);
+          }break;
+          case 'cost_contribution': {
+            let indexAll = options.index == headerOptions.all;
+            let indexYes = options.index == headerOptions.yes;
+            let costAnalysisYesOrAll = options.costAnalysis == headerOptions.yes || options.costAnalysis == headerOptions.all;
+
+            retval = indexAll || (indexYes && costAnalysisYesOrAll);
+          }break;
+          // END Index
+          // Price & Margin
+          case 'average_cost': {
+            retval = options.priceAndMargin == headerOptions.all;
+          }break;
+          case 'average_price': {
+            retval = options.priceAndMargin == headerOptions.yes || options.priceAndMargin == headerOptions.all;
+          }break;
+          case 'gross_profit': {
+            retval = options.priceAndMargin == headerOptions.yes || options.priceAndMargin == headerOptions.all;
+          }break;
+          case 'markup': {
+            retval = options.priceAndMargin == headerOptions.yes || options.priceAndMargin == headerOptions.all;
+          }break;
+          // END Price & Margin
+          // Base Line Sales
+          case 'markup': {
+            retval = options.priceAndMargin == headerOptions.yes || options.priceAndMargin == headerOptions.all;
+          }break;
+          // Base Line Sales
+          case 'base_line_sales': {
+            let baseLineAll = options.baseLineAnalysis == headerOptions.all;
+            let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
+            let salesAnalysisYesOrAll = options.salesAnalysis == headerOptions.yes || options.salesAnalysis == headerOptions.all;
+
+            retval = baseLineAll || (baseLineYes && salesAnalysisYesOrAll);
+          }break;
+          case 'base_line_sales_potential': {
+            let baseLineAll = options.baseLineAnalysis == headerOptions.all;
+            let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
+            let salesAnalysisYesOrAll = options.salesAnalysis == headerOptions.yes || options.salesAnalysis == headerOptions.all;
+
+            retval = baseLineAll || (baseLineYes && salesAnalysisYesOrAll);
+          }break;
+          case 'base_line_units': {
+            let baseLineAll = options.baseLineAnalysis == headerOptions.all;
+            let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
+            let volumeAnalysisYesOrAll = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis == headerOptions.all;
+
+            retval = baseLineAll || (baseLineYes && volumeAnalysisYesOrAll);
+          }break;
+          case 'base_line_units_potential': {
+            let baseLineAll = options.baseLineAnalysis == headerOptions.all;
+            let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
+            let volumeAnalysisYesOrAll = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis == headerOptions.all;
+
+            retval = baseLineAll || (baseLineYes && volumeAnalysisYesOrAll);
+          }break;
+          case 'base_line_profit': {
+            let baseLineAll = options.baseLineAnalysis == headerOptions.all;
+            let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
+            let profitAnalysisYesOrAll = options.profitAnalysis == headerOptions.yes || options.profitAnalysis == headerOptions.all;
+
+            retval = baseLineAll || (baseLineYes && profitAnalysisYesOrAll);
+          }break;
+          case 'base_line_profit_potential': {
+            let baseLineAll = options.baseLineAnalysis == headerOptions.all;
+            let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
+            let profitAnalysisYesOrAll = options.profitAnalysis == headerOptions.yes || options.profitAnalysis == headerOptions.all;
+
+            retval = baseLineAll || (baseLineYes && profitAnalysisYesOrAll);
+          }break;
+          case 'base_line_cost': {
+            let baseLineAll = options.baseLineAnalysis == headerOptions.all;
+            let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
+            let costAnalysisYesOrAll = options.costAnalysis == headerOptions.yes || options.costAnalysis == headerOptions.all;
+
+            retval = baseLineAll || (baseLineYes && costAnalysisYesOrAll);
+          }break;
+          case 'base_line_cost_potential': {
+            let baseLineAll = options.baseLineAnalysis == headerOptions.all;
+            let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
+            let costAnalysisYesOrAll = options.costAnalysis == headerOptions.yes || options.costAnalysis == headerOptions.all;
+
+            retval = baseLineAll || (baseLineYes && costAnalysisYesOrAll);
+          }break;
+          // END Base Line Sales
+        }
+
+        return retval;
+      },
+      openRetailChainSelector(callback) {
+        let self = this;
+
+        self.$refs.RetailChainSelector.show(retailChain => {
+          callback(retailChain)
+          console.log(retailChain);
+        })
       },
       openIndicatorModal() {
         let self = this;
@@ -725,7 +1063,7 @@
 
             self.rangingController = new RangingController(r.data);
 
-            self.rangingController.getSalesMonthlyTotals(() => {
+            self.rangingController.getSalesMonthlyTotals(self.fileData.planogramID, () => {
               self.setRangingClusterData(r.data.clusterData);
               if (
                 self.selectedClusterType != null &&
@@ -812,57 +1150,64 @@
             self.fileData.tag = "CATEGORY";
             self.fileData.useType = "CATEGORY";
 
-            self.getHelpFile();
+            self.openRetailChainSelector(retailChain => {
+              self.fileData.retailChainID = retailChain.id;
+              self.fileData.retailChainDisplayname = retailChain.displayname;
 
-            Axios.get(
-              process.env.VUE_APP_API +
-              `RangingAdvanced?planogramID=${category.id}&dateFromID=${dateRange.dateFrom}&dateToID=${dateRange.dateTo}&type=CATEGORY`
-            ).then(r => {
-              r.data["dateFrom"] = dateRange.dateFrom;
-              r.data["dateTo"] = dateRange.dateTo;
-              self.rangingController = new RangingController(r.data);
+              self.getHelpFile();
 
-              self.rangingController.getSalesMonthlyTotals(() => {
-                self.setRangingClusterData(r.data.clusterData);
-                if (
-                  self.selectedClusterType != null &&
-                  self.selectedClusterOption != null
-                ) {
-                  if (self.selectedClusterType == "stores") {
-                    self.rowData = self.rangingController.getSalesDataByStore(
-                      self.selectedClusterOption
-                    );
-                  } else {
-                    self.rowData = self.rangingController.getSalesDataByCluster(
-                      self.selectedClusterType,
-                      self.selectedClusterOption,
-                      self.autoRangeData
-                    );
-                  }
+              // TODO: add retail chain selector
 
-                  self.ais_Sales = 0;
-                  self.ais_SalesPotential = 0;
+              Axios.get(
+                process.env.VUE_APP_API +
+                `RangingAdvanced?planogramID=${category.id}&dateFromID=${dateRange.dateFrom}&dateToID=${dateRange.dateTo}&type=CATEGORY&retailChainID=${retailChain.id}`
+              ).then(r => {
+                r.data["dateFrom"] = dateRange.dateFrom;
+                r.data["dateTo"] = dateRange.dateTo;
+                self.rangingController = new RangingController(r.data);
 
-                  self.rowData.forEach(el => {
-                    if (el.store_Range_Indicator == "YES") {
-                      self.ais_Sales = (
-                        parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)
-                      ).toFixed(2);
-                      self.ais_SalesPotential = (
-                        parseFloat(self.ais_SalesPotential) +
-                        parseFloat(el.sales_potential)
-                      ).toFixed(2);
+                self.rangingController.getSalesMonthlyTotals(self.fileData.planogramID, () => {
+                  self.setRangingClusterData(r.data.clusterData);
+                  if (
+                    self.selectedClusterType != null &&
+                    self.selectedClusterOption != null
+                  ) {
+                    if (self.selectedClusterType == "stores") {
+                      self.rowData = self.rangingController.getSalesDataByStore(
+                        self.selectedClusterOption
+                      );
+                    } else {
+                      self.rowData = self.rangingController.getSalesDataByCluster(
+                        self.selectedClusterType,
+                        self.selectedClusterOption,
+                        self.autoRangeData
+                      );
                     }
-                  });
 
-                  self.fitColumns();
-                }
-                self.$refs.spinner.hide();
-                self.gotData = true;
+                    self.ais_Sales = 0;
+                    self.ais_SalesPotential = 0;
+
+                    self.rowData.forEach(el => {
+                      if (el.store_Range_Indicator == "YES") {
+                        self.ais_Sales = (
+                          parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)
+                        ).toFixed(2);
+                        self.ais_SalesPotential = (
+                          parseFloat(self.ais_SalesPotential) +
+                          parseFloat(el.sales_potential)
+                        ).toFixed(2);
+                      }
+                    });
+
+                    self.fitColumns();
+                  }
+                  self.$refs.spinner.hide();
+                  self.gotData = true;
+                });
+
+                // self.promptForFileSync();
               });
-
-              // self.promptForFileSync();
-            });
+            })
           });
         });
       },
@@ -878,72 +1223,77 @@
 
           self.$refs.dateRangeSelector.show(dateRange => {
             self.selectedDateRange = dateRange;
-            self.$refs.spinner.show();
 
-            self.fileData.planogramName = planogram.displayname;
-            self.fileData.planogramID = planogram.planogram_ID;
-            self.fileData.dateFrom = dateRange.dateFrom;
-            self.fileData.dateTo = dateRange.dateTo;
-            self.fileData.dateFromString = dateRange.dateFromString;
-            self.fileData.dateToString = dateRange.dateToString;
-            self.fileData.periodic = dateRange.periodic;
-            self.fileData.monthsBetween = dateRange.monthsBetween;
-            self.fileData.tag = "";
-            self.fileData.useType = "PLANOGRAM";
+            self.openRetailChainSelector(retailChain => {
+              self.$refs.spinner.show();
 
-            self.getHelpFile();
+              self.fileData.planogramName = planogram.displayname;
+              self.fileData.planogramID = planogram.planogram_ID;
+              self.fileData.dateFrom = dateRange.dateFrom;
+              self.fileData.dateTo = dateRange.dateTo;
+              self.fileData.dateFromString = dateRange.dateFromString;
+              self.fileData.dateToString = dateRange.dateToString;
+              self.fileData.periodic = dateRange.periodic;
+              self.fileData.monthsBetween = dateRange.monthsBetween;
+              self.fileData.tag = "";
+              self.fileData.useType = "PLANOGRAM";
+              self.fileData.retailChainID = retailChain.id;
+              self.fileData.retailChainDisplayname = retailChain.displayname;
 
-            Axios.get(
-              process.env.VUE_APP_API +
-              `RangingAdvanced?planogramID=${planogram.planogram_ID}&dateFromID=${dateRange.dateFrom}&dateToID=${dateRange.dateTo}&type=PLANOGRAM`
-            ).then(r => {
-              r.data["dateFrom"] = dateRange.dateFrom;
-              r.data["dateTo"] = dateRange.dateTo;
-              self.rangingController = new RangingController(r.data);
+              self.getHelpFile();
 
-              self.rangingController.getSalesMonthlyTotals(() => {
-                self.setRangingClusterData(r.data.clusterData);
-                self.currentClusterData = self.rangingController.getClusterData();
+              Axios.get(
+                process.env.VUE_APP_API +
+                `RangingAdvanced?planogramID=${planogram.planogram_ID}&dateFromID=${dateRange.dateFrom}&dateToID=${dateRange.dateTo}&type=PLANOGRAM&retailChainID=${retailChain.id}`
+              ).then(r => {
+                r.data["dateFrom"] = dateRange.dateFrom;
+                r.data["dateTo"] = dateRange.dateTo;
+                self.rangingController = new RangingController(r.data);
 
-                if (
-                  self.selectedClusterType != null &&
-                  self.selectedClusterOption != null
-                ) {
-                  if (self.selectedClusterType == "stores") {
-                    self.rowData = self.rangingController.getSalesDataByStore(
-                      self.selectedClusterOption
-                    );
-                  } else {
-                    self.rowData = self.rangingController.getSalesDataByCluster(
-                      self.selectedClusterType,
-                      self.selectedClusterOption,
-                      self.autoRangeData
-                    );
-                  }
+                self.rangingController.getSalesMonthlyTotals(self.fileData.planogramID, () => {
+                  self.setRangingClusterData(r.data.clusterData);
+                  self.currentClusterData = self.rangingController.getClusterData();
 
-                  self.ais_Sales = 0;
-                  self.ais_SalesPotential = 0;
-
-                  self.rowData.forEach(el => {
-                    if (el.store_Range_Indicator == "YES") {
-                      self.ais_Sales = (
-                        parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)
-                      ).toFixed(2);
-                      self.ais_SalesPotential = (
-                        parseFloat(self.ais_SalesPotential) +
-                        parseFloat(el.sales_potential)
-                      ).toFixed(2);
+                  if (
+                    self.selectedClusterType != null &&
+                    self.selectedClusterOption != null
+                  ) {
+                    if (self.selectedClusterType == "stores") {
+                      self.rowData = self.rangingController.getSalesDataByStore(
+                        self.selectedClusterOption
+                      );
+                    } else {
+                      self.rowData = self.rangingController.getSalesDataByCluster(
+                        self.selectedClusterType,
+                        self.selectedClusterOption,
+                        self.autoRangeData
+                      );
                     }
-                  });
 
-                  self.fitColumns();
-                }
-                self.$refs.spinner.hide();
-                self.gotData = true;
+                    self.ais_Sales = 0;
+                    self.ais_SalesPotential = 0;
+
+                    self.rowData.forEach(el => {
+                      if (el.store_Range_Indicator == "YES") {
+                        self.ais_Sales = (
+                          parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)
+                        ).toFixed(2);
+                        self.ais_SalesPotential = (
+                          parseFloat(self.ais_SalesPotential) +
+                          parseFloat(el.sales_potential)
+                        ).toFixed(2);
+                      }
+                    });
+
+                    self.fitColumns();
+                  }
+                  self.$refs.spinner.hide();
+                  self.gotData = true;
+                });
+
+                // self.promptForFileSync();
               });
-
-              // self.promptForFileSync();
-            });
+            })
           });
         });
       },
@@ -1044,7 +1394,7 @@
             self.rangingController = new RangingController(r.data);
             self.setStoreClusterStuff();
 
-            self.rangingController.getSalesMonthlyTotals(() => {
+            self.rangingController.getSalesMonthlyTotals(self.fileData.planogramID, () => {
               self.setRangingClusterData(r.data.clusterData);
 
               if (
@@ -1418,8 +1768,7 @@
 
         Axios.get(
             process.env.VUE_APP_API +
-            "Ranging/GetClusterData?planogramID=" +
-            self.fileData.planogramID
+            "Ranging/GetClusterData?planogramID=" + self.fileData.planogramID + "&retailChainID=" + self.fileData.retailChainID
           )
           .then(r => {
             let clusterData = r.data.clusterData;
@@ -1573,57 +1922,63 @@
           self.fileData.periodic = dateRange.periodic;
           self.fileData.monthsBetween = dateRange.monthsBetween;
 
-          self.$refs.spinner.show();
-          Axios.get(
-            process.env.VUE_APP_API +
-            `RangingAdvanced?planogramID=${self.fileData.planogramID}&dateFromID=${self.fileData.dateFrom}&dateToID=${self.fileData.dateTo}&type=${self.fileData.useType}`
-          ).then(r => {
-            r.data["dateFrom"] = self.fileData.dateFrom;
-            r.data["dateTo"] = self.fileData.dateTo;
+          // TODO: add retail chain selector
 
-            self.rangingController = new RangingController(r.data);
+          self.openRetailChainSelector(retailChain => {
+            self.fileData.retailChainID = retailChain.id;
+            self.fileData.retailChainDisplayname = retailChain.displayname;
+            self.$refs.spinner.show();
+            Axios.get(
+              process.env.VUE_APP_API +
+              `RangingAdvanced?planogramID=${self.fileData.planogramID}&dateFromID=${self.fileData.dateFrom}&dateToID=${self.fileData.dateTo}&type=${self.fileData.useType}&retailChainID=${retailChain.id}`
+            ).then(r => {
+              r.data["dateFrom"] = self.fileData.dateFrom;
+              r.data["dateTo"] = self.fileData.dateTo;
 
-            self.rangingController.getSalesMonthlyTotals(() => {
-              self.setRangingClusterData(r.data.clusterData);
-              if (
-                self.selectedClusterType != null &&
-                self.selectedClusterOption != null
-              ) {
-                if (self.selectedClusterType == "stores") {
-                  self.rowData = self.rangingController.getSalesDataByStore(
-                    self.selectedClusterOption
-                  );
-                } else {
-                  self.rowData = self.rangingController.getSalesDataByCluster(
-                    self.selectedClusterType,
-                    self.selectedClusterOption,
-                    self.autoRangeData
-                  );
-                }
+              self.rangingController = new RangingController(r.data);
 
-                self.ais_Sales = 0;
-                self.ais_SalesPotential = 0;
-
-                self.rowData.forEach(el => {
-                  if (el.store_Range_Indicator == "YES") {
-                    self.ais_Sales = (
-                      parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)
-                    ).toFixed(2);
-                    self.ais_SalesPotential = (
-                      parseFloat(self.ais_SalesPotential) +
-                      parseFloat(el.sales_potential)
-                    ).toFixed(2);
+              self.rangingController.getSalesMonthlyTotals(self.fileData.planogramID, () => {
+                self.setRangingClusterData(r.data.clusterData);
+                if (
+                  self.selectedClusterType != null &&
+                  self.selectedClusterOption != null
+                ) {
+                  if (self.selectedClusterType == "stores") {
+                    self.rowData = self.rangingController.getSalesDataByStore(
+                      self.selectedClusterOption
+                    );
+                  } else {
+                    self.rowData = self.rangingController.getSalesDataByCluster(
+                      self.selectedClusterType,
+                      self.selectedClusterOption,
+                      self.autoRangeData
+                    );
                   }
-                });
 
-                self.fitColumns();
-              }
-              self.$refs.spinner.hide();
-              self.gotData = true;
+                  self.ais_Sales = 0;
+                  self.ais_SalesPotential = 0;
+
+                  self.rowData.forEach(el => {
+                    if (el.store_Range_Indicator == "YES") {
+                      self.ais_Sales = (
+                        parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)
+                      ).toFixed(2);
+                      self.ais_SalesPotential = (
+                        parseFloat(self.ais_SalesPotential) +
+                        parseFloat(el.sales_potential)
+                      ).toFixed(2);
+                    }
+                  });
+
+                  self.fitColumns();
+                }
+                self.$refs.spinner.hide();
+                self.gotData = true;
+              });
+
+              // self.promptForFileSync();
             });
-
-            // self.promptForFileSync();
-          });
+          })
         });
       },
       getColumnDefenitions() {
@@ -1641,7 +1996,7 @@
             //   })
             // }
 
-            self.columnDefs[4] = {
+            self.columnDefs[6] = {
               headerName: "Description",
               field: "description",
               filterParams: {
@@ -1662,7 +2017,7 @@
               }
             };
 
-            (self.columnDefs[13] = {
+            (self.columnDefs[17] = {
               headerName: "Indicator",
               field: "store_Range_Indicator",
               editable: true,
@@ -2178,9 +2533,9 @@
         let self = this;
         if (self.fileData.planogramName != "") {
           if (self.fileData.periodic) {
-            return `${self.fileData.planogramName} - ${self.fileData.monthsBetween} MMA`;
+            return `${self.fileData.retailChainDisplayname} - ${self.fileData.planogramName} - ${self.fileData.monthsBetween} MMA`;
           } else {
-            return `${self.fileData.planogramName} Average Monthly ${self.fileData.dateFromString} To ${self.fileData.dateToString}`;
+            return `${self.fileData.retailChainDisplayname} - ${self.fileData.planogramName} Average Monthly ${self.fileData.dateFromString} To ${self.fileData.dateToString}`;
           }
         } else {
           return "";
@@ -2638,8 +2993,7 @@
 
         Axios.get(
           process.env.VUE_APP_API +
-          "Ranging/GetClusterData?planogramID=" +
-          self.fileData.planogramID
+          "Ranging/GetClusterData?planogramID=" + self.fileData.planogramID + "&retailChainID=" + self.fileData.retailChainID 
         ).then(r => {
           let clusterData = r.data.clusterData;
           self.rangingController.setClusterData(clusterData);
