@@ -1431,6 +1431,9 @@
               "PLANOGRAM" :
               "CATEGORY";
 
+            self.fileData.retailChainID = r.data.retailChainID;
+            self.fileData.retailChainDisplayname = r.data.retailChainDisplayname;
+
             self.getHelpFile();
 
             if (
@@ -2489,6 +2492,8 @@
         fileData["periodic"] = self.fileData.periodic;
         fileData["monthsBetween"] = self.fileData.monthsBetween;
         fileData["tag"] = tag;
+        fileData["retailChainID"] = self.fileData.retailChainID;
+        fileData["retailChainDisplayname"] = self.fileData.retailChainDisplayname;
 
         fileData["autoRangeConfig"] = self.autoRangeData;
 
@@ -2515,7 +2520,7 @@
         let self = this
 
         if (self.systemFileID != null) {
-          Axios.post(process.env.VUE_APP_API + `SystemFile/JSON/Rename?id=${self.systemFileID}&name=${name}`)
+          Axios.post(process.env.VUE_APP_API + `SystemFile/Rename?id=${self.systemFileID}&name=${name}`)
             .then(r => {
               callback();
             })  
@@ -3035,7 +3040,8 @@
       },
       calculateReport() {
         let self = this;
-        let reportObj = new RangeReports(self.rowData);
+        let endingStock = self.rangingController.getEndingStockData(self.selectedClusterType, self.selectedClusterOption);
+        let reportObj = new RangeReports(self.rowData, endingStock);
         return reportObj;
       },
       getContextMenuItems(params) {
@@ -3145,37 +3151,27 @@
     }
   };
 
-  function RangeReports(rangingData) {
+  function RangeReports(rangingData, endingStock) {
     let self = this;
-    self.current = new RangeReport(rangingData, "current");
-    self.potential = new RangeReport(rangingData, "potential");
+    self.current = new RangeReport(rangingData, "current", endingStock);
+    self.potential = new RangeReport(rangingData, "potential", endingStock);
   }
 
-  function RangeReport(data, type) {
+  function RangeReport(data, type, endingStock) {
     let self = this;
     self.type = type;
 
-    self.sales = new RangeReportRow(data, type, "sales", "money");
-    self.units = new RangeReportRow(data, type, "units", "number");
-    self.profit = new RangeReportRow(data, type, "profit", "money");
-    self.item_count = new RangeReportRow(data, type, "item_count", "number");
-    self.gross_profit = new RangeReportRow(data, type, "gross_profit", "percent");
-    self.stock_on_hand_units = new RangeReportRow(
-      data,
-      type,
-      "stock_on_hand_units",
-      "number"
-    );
-    self.stock_on_hand_cost = new RangeReportRow(
-      data,
-      type,
-      "stock_on_hand_cost",
-      "money"
-    );
-    self.stock_turn = new RangeReportRow(data, type, "stock_turn", "decimal");
+    self.sales = new RangeReportRow(data, type, "sales", "money", endingStock);
+    self.units = new RangeReportRow(data, type, "units", "number", endingStock);
+    self.profit = new RangeReportRow(data, type, "profit", "money", endingStock);
+    self.item_count = new RangeReportRow(data, type, "item_count", "number", endingStock);
+    self.gross_profit = new RangeReportRow(data, type, "gross_profit", "percent", endingStock);
+    self.stock_on_hand_units = new RangeReportRow(data, type, "stock_on_hand_units", "number", endingStock);
+    self.stock_on_hand_cost = new RangeReportRow(data, type, "stock_on_hand_cost", "money", endingStock);
+    self.stock_turn = new RangeReportRow(data, type, "stock_turn", "decimal", endingStock);
   }
 
-  function RangeReportRow(rowData, report_type, type, format) {
+  function RangeReportRow(rowData, report_type, type, format, endingStock) {
     let self = this;
     self.total_category = 0;
     self.items_selected = 0;
@@ -3288,35 +3284,51 @@
       case "stock_on_hand_units": {
         self.total_category += parseFloat(productData.stock_Units.toFixed(2));
 
+        let stockProducts = endingStock.filter(e => {
+          return e.product_ID == productData.productID;
+        })
+
+        let units = 0;
+
+        stockProducts.forEach(el => {
+          units += el.closingUnits
+        })
+
         if (productData.store_Range_Indicator == "YES")
-          self.items_selected += parseFloat(
-            productData.stock_Units.toFixed(2)
-          );
+          self.items_selected += parseFloat(units.toFixed(0));
 
         if (productData.store_Range_Indicator == "SELECT")
-          self.selected_stores += parseFloat(
-            productData.stock_Units.toFixed(2)
-          );
+          self.selected_stores += parseFloat(units.toFixed(0));
 
         if (productData.store_Range_Indicator == "NO")
-          self.discontinued += parseFloat(productData.stock_Units.toFixed(2));
+          self.discontinued += parseFloat(units.toFixed(0));
       }
       break;
       case "stock_on_hand_cost": {
         self.total_category += parseFloat(productData.stock_Cost.toFixed(2));
 
+        let stockProducts = endingStock.filter(e => {
+          return e.product_ID == productData.productID;
+        })
+
+        let sales = 0;
+
+        stockProducts.forEach(el => {
+          sales += el.closingCost
+        })
+
         if (productData.store_Range_Indicator == "YES")
           self.items_selected += parseFloat(
-            productData.stock_Cost.toFixed(2)
+            sales.toFixed(2)
           );
 
         if (productData.store_Range_Indicator == "SELECT")
           self.selected_stores += parseFloat(
-            productData.stock_Cost.toFixed(2)
+            sales.toFixed(2)
           );
 
         if (productData.store_Range_Indicator == "NO")
-          self.discontinued += parseFloat(productData.stock_Cost.toFixed(2));
+          self.discontinued += parseFloat(sales.toFixed(2));
       }
       break;
       // case 'stock_turn': {
@@ -3352,7 +3364,7 @@
     break;
     case "percent": {
       self.total_category = self.total_category.toFixed(2) + "%";
-      self.items_selected = +self.items_selected.toFixed(2) + "%";
+      self.items_selected = + self.items_selected.toFixed(2) + "%";
       self.selected_stores = +self.selected_stores.toFixed(2) + "%";
       self.discontinued = self.discontinued.toFixed(2) + "%";
     }

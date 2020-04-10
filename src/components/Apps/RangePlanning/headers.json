@@ -192,6 +192,8 @@
     {
         "headerName": "Sales Potential Rank",
         "field": "sales_potential_rank",
+        "sortable": true,
+        "sort": "asc",
         "cellStyle": {
             "background-color": "#e4e4e4"
         },
