@@ -3,7 +3,7 @@
         <v-dialog persistent v-model="dialog" width="700">
             <v-card>
                 <v-toolbar dark flat color="primary">
-                    <v-toolbar-title>Range Report</v-toolbar-title>
+                    <v-toolbar-title>Range Report: {{ cluster }}</v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-btn icon @click="dialog = false">
                         <v-icon>close</v-icon>
@@ -71,18 +71,18 @@
                                 <td>{{ reportData.current.stock_on_hand_cost.discontinued }}</td>
                             </tr>
                             <tr>
-                                <td>Stock Turn</td>
-                                <td>{{ reportData.current.stock_on_hand_cost.total_category }}</td>
-                                <td>{{ reportData.current.stock_on_hand_cost.items_selected }}</td>
-                                <td>{{ reportData.current.stock_on_hand_cost.selected_stores }}</td>
-                                <td>{{ reportData.current.stock_on_hand_cost.discontinued }}</td>
+                                <td>Stock Turns</td>
+                                <td>{{ reportData.current.stock_turn.total_category }}</td>
+                                <td>{{ reportData.current.stock_turn.items_selected }}</td>
+                                <td>{{ reportData.current.stock_turn.selected_stores }}</td>
+                                <td>{{ reportData.current.stock_turn.discontinued }}</td>
                             </tr>
                             <tr>
                                 <td>Days Cover</td>
-                                <td>{{ reportData.current.stock_on_hand_cost.total_category }}</td>
-                                <td>{{ reportData.current.stock_on_hand_cost.items_selected }}</td>
-                                <td>{{ reportData.current.stock_on_hand_cost.selected_stores }}</td>
-                                <td>{{ reportData.current.stock_on_hand_cost.discontinued }}</td>
+                                <td>{{ reportData.current.days_cover.total_category }}</td>
+                                <td>{{ reportData.current.days_cover.items_selected }}</td>
+                                <td>{{ reportData.current.days_cover.selected_stores }}</td>
+                                <td>{{ reportData.current.days_cover.discontinued }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -146,13 +146,15 @@
         data() {
             return {
                 dialog: false,
-                reportData: null
+                reportData: null,
+                cluster: ""
             }
         },
         methods: {
-            show(reportData) {
+            show(reportData, cluster) {
                 let self = this;
                 self.dialog = true;
+                self.cluster = cluster;
                 self.reportData = reportData;
             }
         }

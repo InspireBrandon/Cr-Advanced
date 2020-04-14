@@ -628,7 +628,8 @@
         // END Sales Analysis
         // Volume Analysis
         case 'sales_Units': {
-          retval = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis == headerOptions.all;
+          retval = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis == headerOptions.all || options
+            .stockAnalysis == headerOptions.yes || options.stockAnalysis == headerOptions.all;
         }
         break;
         case 'item_volume_rank': {
@@ -2523,7 +2524,7 @@
           Axios.post(process.env.VUE_APP_API + `SystemFile/Rename?id=${self.systemFileID}&name=${name}`)
             .then(r => {
               callback();
-            })  
+            })
         } else {
           callback();
         }
@@ -2853,7 +2854,11 @@
 
         let reportObj = self.calculateReport();
 
-        self.$refs.RangingReportModal.show(reportObj);
+        let cluster = self.clusterOptions[self.selectedClusterType].find(x => {
+          return x.value == self.selectedClusterOption;
+        })
+
+        self.$refs.RangingReportModal.show(reportObj, cluster.text);
       },
       calculateAutoRange() {
         let self = this;
@@ -3040,7 +3045,8 @@
       },
       calculateReport() {
         let self = this;
-        let endingStock = self.rangingController.getEndingStockData(self.selectedClusterType, self.selectedClusterOption);
+        let endingStock = self.rangingController.getEndingStockData(self.selectedClusterType, self
+          .selectedClusterOption);
         let reportObj = new RangeReports(self.rowData, endingStock);
         return reportObj;
       },
@@ -3168,7 +3174,8 @@
     self.gross_profit = new RangeReportRow(data, type, "gross_profit", "percent", endingStock);
     self.stock_on_hand_units = new RangeReportRow(data, type, "stock_on_hand_units", "number", endingStock);
     self.stock_on_hand_cost = new RangeReportRow(data, type, "stock_on_hand_cost", "money", endingStock);
-    self.stock_turn = new RangeReportRow(data, type, "stock_turn", "decimal", endingStock);
+    self.stock_turn = new RangeReportRow(data, type, "stock_turn", "number", endingStock);
+    self.days_cover = new RangeReportRow(data, type, "days_cover", "number", endingStock);
   }
 
   function RangeReportRow(rowData, report_type, type, format, endingStock) {
@@ -3181,78 +3188,80 @@
     rowData.forEach(productData => {
       switch (type) {
         case "sales": {
+          console.log(productData.sales_potential)
+
           self.total_category +=
             report_type == "current" ?
             parseFloat(productData.sales_Retail.toFixed(2)) :
-            parseFloat(productData.sales_potential.toFixed(2));
+            parseFloat(productData.sales_potential == undefined ? 0 : productData.sales_potential.toFixed(2));
 
           if (productData.store_Range_Indicator == "YES")
             self.items_selected +=
             report_type == "current" ?
             parseFloat(productData.sales_Retail.toFixed(2)) :
-            parseFloat(productData.sales_potential.toFixed(2));
+            parseFloat(productData.sales_potential == undefined ? 0 : productData.sales_potential.toFixed(2));
 
           if (productData.store_Range_Indicator == "SELECT")
             self.selected_stores +=
             report_type == "current" ?
             parseFloat(productData.sales_Retail.toFixed(2)) :
-            parseFloat(productData.sales_potential.toFixed(2));
+            parseFloat(productData.sales_potential == undefined ? 0 : productData.sales_potential.toFixed(2));
 
           if (productData.store_Range_Indicator == "NO")
             self.discontinued +=
             report_type == "current" ?
             parseFloat(productData.sales_Retail.toFixed(2)) :
-            parseFloat(productData.sales_potential.toFixed(2));
+            parseFloat(productData.sales_potential == undefined ? 0 : productData.sales_potential.toFixed(2));
         }
         break;
       case "units": {
         self.total_category +=
           report_type == "current" ?
           parseFloat(productData.sales_Units.toFixed(2)) :
-          parseFloat(productData.volume_potential.toFixed(2));
+          parseFloat(productData.volume_potential == undefined ? 0 : productData.volume_potential.toFixed(2));
 
         if (productData.store_Range_Indicator == "YES")
           self.items_selected +=
           report_type == "current" ?
           parseFloat(productData.sales_Units.toFixed(2)) :
-          parseFloat(productData.volume_potential.toFixed(2));
+          parseFloat(productData.volume_potential == undefined ? 0 : productData.volume_potential.toFixed(2));
 
         if (productData.store_Range_Indicator == "SELECT")
           self.selected_stores +=
           report_type == "current" ?
           parseFloat(productData.sales_Units.toFixed(2)) :
-          parseFloat(productData.volume_potential.toFixed(2));
+          parseFloat(productData.volume_potential == undefined ? 0 : productData.volume_potential.toFixed(2));
 
         if (productData.store_Range_Indicator == "NO")
           self.discontinued +=
           report_type == "current" ?
           parseFloat(productData.sales_Units.toFixed(2)) :
-          parseFloat(productData.volume_potential.toFixed(2));
+          parseFloat(productData.volume_potential == undefined ? 0 : productData.volume_potential.toFixed(2));
       }
       break;
       case "profit": {
         self.total_category +=
           report_type == "current" ?
           parseFloat(productData.sales_Profit.toFixed(2)) :
-          parseFloat(productData.profit_potential.toFixed(2));
+          parseFloat(productData.profit_potential == undefined ? 0 : productData.profit_potential.toFixed(2));
 
         if (productData.store_Range_Indicator == "YES")
           self.items_selected +=
           report_type == "current" ?
           parseFloat(productData.sales_Profit.toFixed(2)) :
-          parseFloat(productData.profit_potential.toFixed(2));
+          parseFloat(productData.profit_potential == undefined ? 0 : productData.profit_potential.toFixed(2));
 
         if (productData.store_Range_Indicator == "SELECT")
           self.selected_stores +=
           report_type == "current" ?
           parseFloat(productData.sales_Profit.toFixed(2)) :
-          parseFloat(productData.profit_potential.toFixed(2));
+          parseFloat(productData.profit_potential == undefined ? 0 : productData.profit_potential.toFixed(2));
 
         if (productData.store_Range_Indicator == "NO")
           self.discontinued +=
           report_type == "current" ?
           parseFloat(productData.sales_Profit.toFixed(2)) :
-          parseFloat(productData.profit_potential.toFixed(2));
+          parseFloat(productData.profit_potential == undefined ? 0 : productData.profit_potential.toFixed(2));
       }
       break;
       case "item_count": {
@@ -3331,19 +3340,60 @@
           self.discontinued += parseFloat(sales.toFixed(2));
       }
       break;
-      // case 'stock_turn': {
-      //   self.stock_turn = parseFloat(productData.stock_Cost.toFixed(2));
+      case 'stock_turn': {
+        let units = 0;
+        let cost = 0;
 
-      //   if (productData.store_Range_Indicator == 'YES')
-      //     self.items_selected += parseFloat(productData.stock_Cost.toFixed(2));
+        let stockProducts = endingStock.filter(e => {
+          return e.product_ID == productData.productID;
+        })
 
-      //   if (productData.store_Range_Indicator == 'SELECT')
-      //     self.selected_stores += parseFloat(productData.stock_Cost.toFixed(2));
+        stockProducts.forEach(el => {
+          units += el.closingUnits
+          cost += el.closingCost
+        })
 
-      //   if (productData.store_Range_Indicator == 'NO')
-      //     self.discontinued += parseFloat(productData.stock_Cost.toFixed(2));
-      // }
-      // break;
+        if (productData.sales_Cost > 0 && units > 0) {
+          self.total_category += (parseFloat(productData.sales_Cost) * 12) / cost;
+
+          if (productData.store_Range_Indicator == 'YES')
+            self.items_selected += (parseFloat(productData.sales_Cost) * 12) / cost;
+
+          if (productData.store_Range_Indicator == 'SELECT')
+            self.selected_stores += (parseFloat(productData.sales_Cost) * 12) / cost;
+
+          if (productData.store_Range_Indicator == 'NO')
+            self.discontinued += (parseFloat(productData.sales_Cost) * 12) / cost;
+        }
+      }
+      break;
+      case 'days_cover': {
+        let units = 0;
+        let cost = 0;
+
+        let stockProducts = endingStock.filter(e => {
+          return e.product_ID == productData.productID;
+        })
+
+        stockProducts.forEach(el => {
+          units += el.closingUnits
+          cost += el.closingCost
+        })
+
+        if (productData.sales_Cost > 0 && units > 0) {
+          self.total_category += cost / ((productData.sales_Retail - productData.sales_Cost)) * 25
+
+          if (productData.store_Range_Indicator == 'YES')
+            self.items_selected += cost / ((productData.sales_Retail - productData.sales_Cost)) * 25
+
+          if (productData.store_Range_Indicator == 'SELECT')
+            self.selected_stores += cost / ((productData.sales_Retail - productData.sales_Cost)) * 25
+
+          if (productData.store_Range_Indicator == 'NO')
+            self.discontinued += cost / ((productData.sales_Retail - productData.sales_Cost)) * 25
+        }
+      }
+      break;
       }
     });
 
@@ -3364,7 +3414,7 @@
     break;
     case "percent": {
       self.total_category = self.total_category.toFixed(2) + "%";
-      self.items_selected = + self.items_selected.toFixed(2) + "%";
+      self.items_selected = +self.items_selected.toFixed(2) + "%";
       self.selected_stores = +self.selected_stores.toFixed(2) + "%";
       self.discontinued = self.discontinued.toFixed(2) + "%";
     }
@@ -3391,6 +3441,10 @@
   //     total_category_sales += parseFloat(report_type == "current" ? el.sales_Retail : el.sales_potential);
   //   })
   // }
+
+  function calculate_stock_turn(allProducts, indicator, report_type) {
+    let totalCost = 0;
+  }
 
   function calculate_gp(allProducts, indicator, report_type) {
     let total_category_sales = 0;
