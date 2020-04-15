@@ -711,15 +711,6 @@
           retval = stockAnalysisAll || (stockAnalysisYes && salesAnalysisYesOrAll);
         }
         break;
-        case 'lost_Sales': {
-          let stockAnalysisAll = options.stockAnalysis == headerOptions.all;
-          let stockAnalysisYes = options.stockAnalysis == headerOptions.yes;
-          let salesAnalysisYesOrAll = options.salesAnalysis == headerOptions.yes || options.salesAnalysis ==
-            headerOptions.all;
-
-          retval = stockAnalysisAll || (stockAnalysisYes && salesAnalysisYesOrAll);
-        }
-        break;
         case 'lost_Units': {
           let stockAnalysisAll = options.stockAnalysis == headerOptions.all;
           let stockAnalysisYes = options.stockAnalysis == headerOptions.yes;
@@ -906,7 +897,6 @@
 
         self.$refs.RetailChainSelector.show(retailChain => {
           callback(retailChain)
-          console.log(retailChain);
         })
       },
       openIndicatorModal() {
@@ -988,7 +978,8 @@
         self.$refs.HighlightCluster.show(highlightObj, data => {
           if (self.selectedClusterType == "stores") {
             self.rowData = self.rangingController.getSalesDataByStore(
-              self.selectedClusterOption
+              self.selectedClusterOption,
+              self.autoRangeData
             );
           } else {
             self.rowData = self.rangingController.getSalesDataByCluster(
@@ -1074,7 +1065,8 @@
 
             if (self.selectedClusterType == "stores") {
               self.rowData = self.rangingController.getSalesDataByStore(
-                self.selectedClusterOption
+                self.selectedClusterOption,
+                self.autoRangeData
               );
             } else {
               self.rowData = self.rangingController.getSalesDataByCluster(
@@ -1142,6 +1134,9 @@
             self.fileData.tag = r.data.tag;
             self.fileData.active_Shop_Code_ID = r.data.active_Shop_Code_ID;
 
+            self.fileData.retailChainID = r.data.retailChainID;
+            self.fileData.retailChainDisplayname = r.data.retailChainDisplayname;
+
             self.canRefresh = true;
 
             self.rangingController = new RangingController(r.data);
@@ -1154,7 +1149,8 @@
               ) {
                 if (self.selectedClusterType == "stores") {
                   self.rowData = self.rangingController.getSalesDataByStore(
-                    self.selectedClusterOption
+                    self.selectedClusterOption,
+                    self.autoRangeData
                   );
                 } else {
                   self.rowData = self.rangingController.getSalesDataByCluster(
@@ -1257,7 +1253,8 @@
                   ) {
                     if (self.selectedClusterType == "stores") {
                       self.rowData = self.rangingController.getSalesDataByStore(
-                        self.selectedClusterOption
+                        self.selectedClusterOption,
+                        self.autoRangeData
                       );
                     } else {
                       self.rowData = self.rangingController.getSalesDataByCluster(
@@ -1343,7 +1340,8 @@
                   ) {
                     if (self.selectedClusterType == "stores") {
                       self.rowData = self.rangingController.getSalesDataByStore(
-                        self.selectedClusterOption
+                        self.selectedClusterOption,
+                        self.autoRangeData
                       );
                     } else {
                       self.rowData = self.rangingController.getSalesDataByCluster(
@@ -1492,7 +1490,8 @@
               ) {
                 if (self.selectedClusterType == "stores") {
                   self.rowData = self.rangingController.getSalesDataByStore(
-                    self.selectedClusterOption
+                    self.selectedClusterOption,
+                    self.autoRangeData
                   );
                 } else {
                   self.rowData = self.rangingController.getSalesDataByCluster(
@@ -2036,7 +2035,8 @@
                 ) {
                   if (self.selectedClusterType == "stores") {
                     self.rowData = self.rangingController.getSalesDataByStore(
-                      self.selectedClusterOption
+                      self.selectedClusterOption,
+                      self.autoRangeData
                     );
                   } else {
                     self.rowData = self.rangingController.getSalesDataByCluster(
@@ -2251,7 +2251,8 @@
 
         if (self.selectedClusterType == "stores") {
           self.rowData = self.rangingController.getSalesDataByStore(
-            self.selectedClusterOption
+            self.selectedClusterOption,
+            self.autoRangeData
           );
         } else {
           self.rowData = self.rangingController.getSalesDataByCluster(
@@ -2345,7 +2346,8 @@
 
                     if (self.selectedClusterType == "stores") {
                       self.rowData = self.rangingController.getSalesDataByStore(
-                        self.selectedClusterOption
+                        self.selectedClusterOption,
+                        self.autoRangeData
                       );
                     } else {
                       self.rowData = self.rangingController.getSalesDataByCluster(
@@ -2410,17 +2412,12 @@
 
         self.$nextTick(() => {
           if (self.selectedClusterOption != null) {
-            // self.rowData = [];
-
             self.setViewType(self.viewType);
 
             if (self.selectedClusterOption == "stores") {
               self.storesInCluster = 1;
             } else {
-              self.storesInCluster = self.rangingController.getStoresByCluster(
-                self.selectedClusterType,
-                self.selectedClusterOption
-              ).length;
+              self.storesInCluster = self.rangingController.getStoresByCluster(self.selectedClusterType, self.selectedClusterOption).length;
             }
 
             self.fitColumns();
@@ -2562,7 +2559,8 @@
 
               if (self.selectedClusterType == "stores") {
                 self.rowData = self.rangingController.getSalesDataByStore(
-                  self.selectedClusterOption
+                  self.selectedClusterOption,
+                  self.autoRangeData
                 );
               } else {
                 self.rowData = self.rangingController.getSalesDataByCluster(
@@ -2609,7 +2607,8 @@
 
               if (self.selectedClusterType == "stores") {
                 self.rowData = self.rangingController.getSalesDataByStore(
-                  self.selectedClusterOption
+                  self.selectedClusterOption,
+                  self.autoRangeData
                 );
               } else {
                 self.rowData = self.rangingController.getSalesDataByCluster(
@@ -2675,7 +2674,8 @@
 
             if (self.selectedClusterType == "stores") {
               tmp = self.rangingController.getSalesDataByStore(
-                self.selectedClusterOption
+                self.selectedClusterOption,
+                self.autoRangeData
               );
             } else {
               tmp = self.rangingController.getSalesDataByCluster(
@@ -2822,7 +2822,8 @@
 
           if (self.selectedClusterType == "stores") {
             self.rowData = self.rangingController.getSalesDataByStore(
-              self.selectedClusterOption
+              self.selectedClusterOption,
+              self.autoRangeData
             );
           } else {
             self.rowData = self.rangingController.getSalesDataByCluster(
@@ -3159,6 +3160,9 @@
 
   function RangeReports(rangingData, endingStock) {
     let self = this;
+
+    console.log("endingStock", endingStock);
+
     self.current = new RangeReport(rangingData, "current", endingStock);
     self.potential = new RangeReport(rangingData, "potential", endingStock);
   }
@@ -3174,7 +3178,7 @@
     self.gross_profit = new RangeReportRow(data, type, "gross_profit", "percent", endingStock);
     self.stock_on_hand_units = new RangeReportRow(data, type, "stock_on_hand_units", "number", endingStock);
     self.stock_on_hand_cost = new RangeReportRow(data, type, "stock_on_hand_cost", "money", endingStock);
-    self.stock_turn = new RangeReportRow(data, type, "stock_turn", "number", endingStock);
+    self.stock_turn = new RangeReportRow(data, type, "stock_turn", "decimal", endingStock);
     self.days_cover = new RangeReportRow(data, type, "days_cover", "number", endingStock);
   }
 
@@ -3188,8 +3192,6 @@
     rowData.forEach(productData => {
       switch (type) {
         case "sales": {
-          console.log(productData.sales_potential)
-
           self.total_category +=
             report_type == "current" ?
             parseFloat(productData.sales_Retail.toFixed(2)) :
@@ -3341,57 +3343,32 @@
       }
       break;
       case 'stock_turn': {
-        let units = 0;
-        let cost = 0;
+        self.total_category = calculate_stock_turn(rowData, "", report_type, endingStock);
 
-        let stockProducts = endingStock.filter(e => {
-          return e.product_ID == productData.productID;
-        })
+        if (productData.store_Range_Indicator == 'YES') {
+          self.items_selected = calculate_stock_turn(rowData, "YES", report_type, endingStock);
+        }
 
-        stockProducts.forEach(el => {
-          units += el.closingUnits
-          cost += el.closingCost
-        })
+        if (productData.store_Range_Indicator == 'SELECT') {
+          self.selected_stores = calculate_stock_turn(rowData, "SELECT", report_type, endingStock);
+        }
 
-        if (productData.sales_Cost > 0 && units > 0) {
-          self.total_category += (parseFloat(productData.sales_Cost) * 12) / cost;
-
-          if (productData.store_Range_Indicator == 'YES')
-            self.items_selected += (parseFloat(productData.sales_Cost) * 12) / cost;
-
-          if (productData.store_Range_Indicator == 'SELECT')
-            self.selected_stores += (parseFloat(productData.sales_Cost) * 12) / cost;
-
-          if (productData.store_Range_Indicator == 'NO')
-            self.discontinued += (parseFloat(productData.sales_Cost) * 12) / cost;
+        if (productData.store_Range_Indicator == 'NO') {
+          self.discontinued = calculate_stock_turn(rowData, "NO", report_type, endingStock);
         }
       }
       break;
       case 'days_cover': {
-        let units = 0;
-        let cost = 0;
+        self.total_category = calculate_days_cover(rowData, "", report_type, endingStock)
 
-        let stockProducts = endingStock.filter(e => {
-          return e.product_ID == productData.productID;
-        })
+        if (productData.store_Range_Indicator == 'YES')
+          self.items_selected = calculate_days_cover(rowData, "YES", report_type, endingStock)
 
-        stockProducts.forEach(el => {
-          units += el.closingUnits
-          cost += el.closingCost
-        })
+        if (productData.store_Range_Indicator == 'SELECT')
+          self.selected_stores = calculate_days_cover(rowData, "SELECT", report_type, endingStock)
 
-        if (productData.sales_Cost > 0 && units > 0) {
-          self.total_category += cost / ((productData.sales_Retail - productData.sales_Cost)) * 25
-
-          if (productData.store_Range_Indicator == 'YES')
-            self.items_selected += cost / ((productData.sales_Retail - productData.sales_Cost)) * 25
-
-          if (productData.store_Range_Indicator == 'SELECT')
-            self.selected_stores += cost / ((productData.sales_Retail - productData.sales_Cost)) * 25
-
-          if (productData.store_Range_Indicator == 'NO')
-            self.discontinued += cost / ((productData.sales_Retail - productData.sales_Cost)) * 25
-        }
+        if (productData.store_Range_Indicator == 'NO')
+          self.discontinued = calculate_days_cover(rowData, "NO", report_type, endingStock)
       }
       break;
       }
@@ -3420,30 +3397,76 @@
     }
     break;
     case "decimal": {
-      self.total_category = self.total_category.toFixed(2) + "%";
-      self.items_selected = +self.items_selected.toFixed(2) + "%";
-      self.selected_stores = +self.selected_stores.toFixed(2) + "%";
-      self.discontinued = self.discontinued.toFixed(2) + "%";
-      // self.stock_turn = self.stock_turn.toFixed(2);
+      self.total_category = self.total_category.toFixed(2);
+      self.items_selected = +self.items_selected.toFixed(2);
+      self.selected_stores = +self.selected_stores.toFixed(2);
+      self.discontinued = self.discontinued.toFixed(2);
     }
     break;
     }
   }
 
-  // function calculateStockTurn(allProducts, indicator, report_type) {
-  //   let total_category_sales = 0;
-  //   let total_category_profit = 0;
+  function calculate_days_cover(allProducts, indicator, report_type, stockProducts) {
+    let totalUnits = 0;
+    let totalStockUnits = 0;
 
-  //   let total_indicator_sales = 0;
-  //   let total_indicator_profit = 0;
+    allProducts.forEach(el => {
+      if (indicator == "") {
+        let productRecords = stockProducts.filter(x => {
+          return x.product_ID == el.productID;
+        })
 
-  //   allProducts.forEach(el => {
-  //     total_category_sales += parseFloat(report_type == "current" ? el.sales_Retail : el.sales_potential);
-  //   })
-  // }
+        productRecords.forEach(pr => {
+          totalStockUnits += pr.closingUnits
+        })
 
-  function calculate_stock_turn(allProducts, indicator, report_type) {
+        totalUnits += el.sales_Units;
+      } else if (el.store_Range_Indicator == indicator) {
+        let productRecords = stockProducts.filter(x => {
+          return x.product_ID == el.productID;
+        })
+
+        productRecords.forEach(pr => {
+          totalStockUnits += pr.closingUnits
+        })
+
+        totalUnits += el.sales_Units;
+      }
+    })
+
+    return isNaN(totalStockUnits / totalUnits * 30) ? 0 : totalStockUnits / totalUnits * 30;
+  }
+
+  function calculate_stock_turn(allProducts, indicator, report_type, stockProducts) {
     let totalCost = 0;
+    let totalStockCost = 0;
+
+    allProducts.forEach(el => {
+      if (indicator == "") {
+
+        let productRecords = stockProducts.filter(x => {
+          return x.product_ID == el.productID;
+        })
+
+        productRecords.forEach(pr => {
+          totalStockCost += pr.closingCost
+        })
+
+        totalCost += (el.sales_Retail - el.sales_Profit);
+      } else if (el.store_Range_Indicator == indicator) {
+        let productRecords = stockProducts.filter(x => {
+          return x.product_ID == el.productID;
+        })
+
+        productRecords.forEach(pr => {
+          totalStockCost += pr.closingCost
+        })
+
+        totalCost += (el.sales_Retail - el.sales_Profit);
+      }
+    })
+
+    return isNaN((totalCost * 12) / totalStockCost) ? 0 : (totalCost * 12) / totalStockCost;
   }
 
   function calculate_gp(allProducts, indicator, report_type) {

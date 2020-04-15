@@ -83,12 +83,17 @@
                 break;
             case 2: {
                 button_1.set('warning', 'visibility', cp.routeToView, "View")
-                if (item.approvalUserID == null) {
-                    button_2.set('error', 'check', cp.setComplete, "Complete")
-                }
-                if (item.approvalUserID != null) {
-                    button_2.set('error', 'send', cp.sendToApprovalUser, "Send for Approval")
-                }
+
+                // TODO: add logic for an approval user
+
+                // if (item.approvalUserID == null) {
+                //     button_2.set('error', 'check', cp.setComplete, "Complete")
+                // }
+                // if (item.approvalUserID != null) {
+                //     button_2.set('error', 'send', cp.sendToApprovalUser, "Send for Approval")
+                // }
+
+                button_2.set('error', 'send', cp.sendToApprovalUser, "Send for Approval")
             }
             break;
             case 3: {
