@@ -229,17 +229,20 @@ class IntersectionTester {
 
             if (ItemType == "BASKET" || ItemType == "PRODUCT" || ItemType == "SHAREBOX") {
               
-              if(ItemType == "PRODUCT") {
-                let ctrl_store = new StoreHelper();
-                let parent = ctrl_store.getAllPlanogramItems(VueStore, item.ParentID);
+              // if(ItemType == "PRODUCT") {
+              //   let ctrl_store = new StoreHelper();
 
-                if(parent.Type == "SHELF") {
-                  if(parent.Data.rejectProducts) {
-                    resolve(retVal);
-                    return;
-                  }
-                }
-              }
+              //   console.log("POSITION", item)
+
+              //   let parent = ctrl_store.getAllPlanogramItems(VueStore, item.ParentID);
+
+              //   if(parent.Type == "SHELF") {
+              //     if(parent.Data.rejectProducts) {
+              //       resolve(retVal);
+              //       return;
+              //     }
+              //   }
+              // }
 
               // console.log("BASKET TEST INTRSCT", ItemType)
               self.Internal_TestForIntersectionBelow(VueStore, dropPos, stage)
