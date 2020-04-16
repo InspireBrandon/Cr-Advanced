@@ -1756,8 +1756,6 @@
           data = window.library;
         }
 
-        console.log("frontImageID", data)
-
         //#endregion
 
         if (data.type == "GONDOLA") {
@@ -1766,45 +1764,48 @@
               `FixtureImage?db=CR-Devinspire&fixtureImageID=${data.data.backImageID}`
           }
         } else {
-          if (data.data.frontImageID != null) {
-            data.data.image = process.env.VUE_APP_API +
-              `FixtureImage?db=CR-Devinspire&fixtureImageID=${data.data.frontImageID}`
+          if (data.type != undefined) {
+            if (data.data.frontImageID != null) {
+              data.data.image = process.env.VUE_APP_API +
+                `FixtureImage?db=CR-Devinspire&fixtureImageID=${data.data.frontImageID}`
+            }
           }
         }
 
-        if (data.data.defaultPeg != 0) {
-          if (data.data.defaultPegDetails == null) {
-            axios.get(process.env.VUE_APP_API + `Fixture/${data.data.defaultPeg}?db=CR-Devinspire`)
-              .then(r => {
-                console.log("defaultPegDetails", r);
-                data.data.defaultPegDetails = r.data
-              })
+        if (data.type != undefined) {
+          if (data.data.defaultPeg != 0) {
+            if (data.data.defaultPegDetails == null) {
+              axios.get(process.env.VUE_APP_API + `Fixture/${data.data.defaultPeg}?db=CR-Devinspire`)
+                .then(r => {
+                  data.data.defaultPegDetails = r.data
+                })
+            }
           }
-        }
-        self.getSelectedRenderings(data.data, cb => {
-          data.data = cb
-          console.log("[getSelectedRenderings]--calbnack", cb);
 
-          switch (dragType.toUpperCase()) {
-            case "WAREHOUSE": {
-              self.addWarehouseProduct(stage, data, ev);
+          self.getSelectedRenderings(data.data, cb => {
+            data.data = cb
+            console.log("[getSelectedRenderings]--calbnack", cb);
+
+            switch (dragType.toUpperCase()) {
+              case "WAREHOUSE": {
+                self.addWarehouseProduct(stage, data, ev);
+              }
+              break;
+            case "LIBRARY": {
+              if (data.type == "CUSTOM") {
+                self.addCustomLibraryItem(stage, data, ev)
+              } else if (data.type == "CUSTOM_PLANOGRAM") {
+                self.addCustomPlanogram(stage, data, ev);
+              } else {
+                self.addLibraryItem(stage, data, ev);
+              }
             }
             break;
-          case "LIBRARY": {
-            if (data.type == "CUSTOM") {
-              self.addCustomLibraryItem(stage, data, ev)
-            } else if (data.type == "CUSTOM_PLANOGRAM") {
-              self.addCustomPlanogram(stage, data, ev);
-            } else {
-              self.addLibraryItem(stage, data, ev);
             }
-          }
-          break;
-          }
-        })
-
-
-
+          })
+        } else {
+          self.addWarehouseProduct(stage, data, ev);
+        }
       },
       addWarehouseProduct(stage, data, ev) {
         let self = this;

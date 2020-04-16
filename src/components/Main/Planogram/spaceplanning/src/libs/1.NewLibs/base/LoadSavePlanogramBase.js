@@ -282,7 +282,7 @@ class LoadSavePlanogramBase {
 
           xhrObj.open("Post", url);
           let startTime = new Date()
-          
+
           xhrObj.upload.onprogress = function (pe) {
             var currentFileSize = pe.loaded * 0.000001
             var FileTotalSize = pe.total * 0.000001
@@ -314,8 +314,6 @@ class LoadSavePlanogramBase {
           }
 
           xhrObj.upload.onloadend = function (e) {
-            alert("I got here")
-
             updateLoader({
               currentFile: 3,
               totalFiles: 3,
@@ -347,7 +345,7 @@ class LoadSavePlanogramBase {
 
     let header = {
       planogram_Detail_ID: createDetailCallback.data.planogram_Details.id,
-      systemFile_ID:createDetailCallback.data.planogram_Details.systemFile_ID
+      systemFile_ID: createDetailCallback.data.planogram_Details.systemFile_ID
 
     }
     let request = {
@@ -356,8 +354,8 @@ class LoadSavePlanogramBase {
     }
     axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
     axios.post(process.env.VUE_APP_API + `FloorPlan_Fixtures/Create`, request).then(r => {
-      console.log("FloorPlan_Fixtures/Create",r);
-      
+      console.log("FloorPlan_Fixtures/Create", r);
+
       stage.getSplitImages(callback => {
         r.data.gondolas.forEach((Drop, Dropindex) => {
           callback.forEach((image, imageindex) => {
@@ -681,7 +679,7 @@ class LoadSavePlanogramBase {
           let floorPlanArray = generateFloorPlanArr(output.planogramData, vuex, storeCount)
           let header = {
             planogram_Detail_ID: createDetailCallback.data.planogram_Details.id,
-            systemFile_ID:createDetailCallback.data.planogram_Details.systemFile_ID
+            systemFile_ID: createDetailCallback.data.planogram_Details.systemFile_ID
           }
           let request = {
             fixtureHeader: header,
@@ -764,7 +762,7 @@ class LoadSavePlanogramBase {
               let floorPlanArray = generateFloorPlanArr(output.planogramData, vuex, null)
               let header = {
                 fixture_ID: fixtureID,
-                systemFile_ID:fixtureID
+                systemFile_ID: fixtureID
 
               }
               let request = {
@@ -789,22 +787,22 @@ class LoadSavePlanogramBase {
           data: output
         })
         .then(result => {
-          console.log("reslt",result);
-          
-          self.uploadFixtureImage(image, name, fixtureID, callback);
-              let floorPlanArray = generateFloorPlanArr(output.planogramData, vuex, null)
-              let header = {
-                fixture_ID: fixtureID,
-                systemFile_ID:fixtureID
-              }
-              let request = {
-                fixtureHeader: header,
-                fixtureItems: floorPlanArray
-              }
-              axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-              axios.post(self.ServerAddress + `FloorPlan_Fixtures/Create`, request).then(r => {
+          console.log("reslt", result);
 
-              })
+          self.uploadFixtureImage(image, name, fixtureID, callback);
+          let floorPlanArray = generateFloorPlanArr(output.planogramData, vuex, null)
+          let header = {
+            fixture_ID: fixtureID,
+            systemFile_ID: fixtureID
+          }
+          let request = {
+            fixtureHeader: header,
+            fixtureItems: floorPlanArray
+          }
+          axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+          axios.post(self.ServerAddress + `FloorPlan_Fixtures/Create`, request).then(r => {
+
+          })
         })
     }
   }
@@ -1557,7 +1555,37 @@ function generateFloorPlanArr(planodata, vuex, storeCount) {
         sales: item.Data.Data.sales_Retail,
         units: item.Data.Data.sales_Units,
         profit: item.Data.Data.sales_Profit,
-        children: getChildren(planodata, item.Data.ID, vuex, storeCount)
+        children: getChildren(planodata, item.Data.ID, vuex, storeCount),
+        // New Details
+        frontColor: item.Data.Data.frontColor,
+        backColor: item.Data.Data.backColor,
+        leftColor: item.Data.Data.leftColor,
+        rightColor: item.Data.Data.rightColor,
+        bottomColor: item.Data.Data.bottomColor,
+        topColor: item.Data.Data.topColor,
+        frontTransparent: item.Data.Data.frontTransparent,
+        backTransparent: item.Data.Data.backTransparent,
+        leftTransparent: item.Data.Data.leftTransparent,
+        rightTransparent: item.Data.Data.rightTransparent,
+        bottomTransparent: item.Data.Data.bottomTransparent,
+        topTransparent: item.Data.Data.topTransparent,
+        frontImageID: item.Data.Data.frontImageID,
+        backImageID: item.Data.Data.backImageID,
+        sideImageID: item.Data.Data.sideImageID,
+        leftImageID: item.Data.Data.leftImageID,
+        rightImageID: item.Data.Data.rightImageID,
+        topImageID: item.Data.Data.topImageID,
+        bottomImageID: item.Data.Data.bottomImageID,
+        leftMirrored: item.Data.Data.leftMirrored,
+        rightMirrored: item.Data.Data.rightMirrored,
+        bottomMirrored: item.Data.Data.bottomMirrored,
+        topMirrored: item.Data.Data.topMirrored,
+        frontMirrored: item.Data.Data.frontMirrored,
+        backMirrored: item.Data.Data.backMirrored,
+        xOffset: item.Data.Data.xOffset,
+        yOffset: item.Data.Data.yOffset,
+        zOffset: item.Data.Data.zOffset,
+        rendering: item.Data.Data.rendering
       })
     }
   })
@@ -1588,10 +1616,99 @@ function getChildren(planodata, parentID, vuex, storeCount) {
       absoluteY: fixture.AbsolutePosition.y,
       units: fixture.Data.Data.sales_Units,
       profit: fixture.Data.Data.sales_Profit,
-
-      //daysOfSupply:fixture.Data.Data.sales_Profit,
-      children: getChildren(planodata, fixture.Data.ID, vuex, storeCount)
+      children: getChildren(planodata, fixture.Data.ID, vuex, storeCount),
+      // Details
+      frontColor: fixture.Data.Data.frontColor,
+      backColor: fixture.Data.Data.backColor,
+      leftColor: fixture.Data.Data.leftColor,
+      rightColor: fixture.Data.Data.rightColor,
+      bottomColor: fixture.Data.Data.bottomColor,
+      topColor: fixture.Data.Data.topColor,
+      frontTransparent: fixture.Data.Data.frontTransparent,
+      backTransparent: fixture.Data.Data.backTransparent,
+      leftTransparent: fixture.Data.Data.leftTransparent,
+      rightTransparent: fixture.Data.Data.rightTransparent,
+      bottomTransparent: fixture.Data.Data.bottomTransparent,
+      topTransparent: fixture.Data.Data.topTransparent,
+      frontImageID: fixture.Data.Data.frontImageID,
+      backImageID: fixture.Data.Data.backImageID,
+      sideImageID: fixture.Data.Data.sideImageID,
+      leftImageID: fixture.Data.Data.leftImageID,
+      rightImageID: fixture.Data.Data.rightImageID,
+      topImageID: fixture.Data.Data.topImageID,
+      bottomImageID: fixture.Data.Data.bottomImageID,
+      leftMirrored: fixture.Data.Data.leftMirrored,
+      rightMirrored: fixture.Data.Data.rightMirrored,
+      bottomMirrored: fixture.Data.Data.bottomMirrored,
+      topMirrored: fixture.Data.Data.topMirrored,
+      frontMirrored: fixture.Data.Data.frontMirrored,
+      backMirrored: fixture.Data.Data.backMirrored,
+      xOffset: fixture.Data.Data.xOffset,
+      yOffset: fixture.Data.Data.yOffset,
+      zOffset: fixture.Data.Data.zOffset,
+      rendering: fixture.Data.Data.rendering
     }
+
+    for(var prop in fixture.Data.Data.RenderingsItems) {
+      if(fixture.Data.Data.RenderingsItems[prop] != null && fixture.Data.Data.RenderingsItems[prop] != {}) {
+        let renderingData = fixture.Data.Data.RenderingsItems[prop];
+
+        console.log("renderingData", renderingData)
+
+        item.children.push({
+          id: renderingData.ID,
+          floorplan_Item_ID: renderingData.ID,
+          parent_ID: renderingData.ParentID,
+          type: prop.toUpperCase(),
+          height: renderingData.depth,
+          width: renderingData.width,
+          name: renderingData.name,
+          shape: renderingData.floorplanShape,
+          renderingData: renderingData.id,
+          depth: renderingData.height,
+          sales: renderingData.sales_Retail,
+          // x: renderingData.RelativePosition.x,
+          // y: renderingData.RelativePosition.y,
+          // absoluteX: renderingData.AbsolutePosition.x,
+          // absoluteY: renderingData.AbsolutePosition.y,
+          units: renderingData.sales_Units,
+          profit: renderingData.sales_Profit,
+          children:[],
+          // children: getChildren(planodata, renderingData.ID, vuex, storeCount),
+          // Details
+          frontColor: renderingData.frontColor,
+          backColor: renderingData.backColor,
+          leftColor: renderingData.leftColor,
+          rightColor: renderingData.rightColor,
+          bottomColor: renderingData.bottomColor,
+          topColor: renderingData.topColor,
+          frontTransparent: renderingData.frontTransparent,
+          backTransparent: renderingData.backTransparent,
+          leftTransparent: renderingData.leftTransparent,
+          rightTransparent: renderingData.rightTransparent,
+          bottomTransparent: renderingData.bottomTransparent,
+          topTransparent: renderingData.topTransparent,
+          frontImageID: renderingData.frontImageID,
+          backImageID: renderingData.backImageID,
+          sideImageID: renderingData.sideImageID,
+          leftImageID: renderingData.leftImageID,
+          rightImageID: renderingData.rightImageID,
+          topImageID: renderingData.topImageID,
+          bottomImageID: renderingData.bottomImageID,
+          leftMirrored: renderingData.leftMirrored,
+          rightMirrored: renderingData.rightMirrored,
+          bottomMirrored: renderingData.bottomMirrored,
+          topMirrored: renderingData.topMirrored,
+          frontMirrored: renderingData.frontMirrored,
+          backMirrored: renderingData.backMirrored,
+          xOffset: renderingData.xOffset,
+          yOffset: renderingData.yOffset,
+          zOffset: renderingData.zOffset,
+          rendering: renderingData.rendering
+        })
+      }
+    }
+
     if (fixture.Type == "PRODUCT") {
       let calcData = calculateAdvanced(fixture, vuex, storeCount);
       console.log("[product] calcData", calcData);
@@ -1599,6 +1716,7 @@ function getChildren(planodata, parentID, vuex, storeCount) {
       item.itemCount = parseFloat(calcData.ZFacings) * parseFloat(calcData.YFacings)
       item.name = fixture.Data.Data.description
     }
+
     childArr.push(item)
   })
   return childArr;
