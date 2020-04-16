@@ -192,6 +192,8 @@
     {
         "headerName": "Sales Potential Rank",
         "field": "sales_potential_rank",
+        "sortable": true,
+        "sort": "asc",
         "cellStyle": {
             "background-color": "#e4e4e4"
         },
@@ -283,6 +285,22 @@
     {
         "headerName": "DOS FAC",
         "field": "dos_fac",
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
+        "headerName": "Days Of Supply",
+        "field": "days_of_supply",
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
+        "headerName": "Stock Turns",
+        "field": "stock_turn",
+        "hide": true,
         "filterParams": {
             "newRowsAction": "keep"
         }
@@ -380,6 +398,20 @@
             "newRowsAction": "keep"
         }
     },
+    {
+        "headerName": "Avg Cost",
+        "field": "average_cost",
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
+        "headerName": "Avg Price",
+        "field": "average_price",
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },    
     {
         "headerName": "GP%",
         "field": "gross_profit",

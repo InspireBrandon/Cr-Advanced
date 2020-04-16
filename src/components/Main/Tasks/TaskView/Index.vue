@@ -528,7 +528,6 @@
                                 `SystemFile/UpdateStatus?db=CR-Devinspire&systemFileID=${item.systemFileID}&newStatus=1`
                             )
                             .then(nsr => {
-                                console.log(r);
                                 delete Axios.defaults.headers.common["TenantID"];
                             })
                     })
@@ -671,7 +670,6 @@
 
                 Axios.get(process.env.VUE_APP_API + "SystemFile?db=CR-DEVINSPIRE&id=" + fileID)
                     .then(r => {
-                        console.log(r.data);
                         callback(r.data);
                     })
             },
@@ -697,11 +695,12 @@
                         // Create "New Group"
 
                         // Create New Process Assigned for "New Group"
-                        request.systemUserID = request.approvalUserID;
-                        request.actionedByUserID = null;
-                        request.notes = self.findAndReplaceNote(request.notes);
-                        self.createProjectTransaction(request,
-                            processStartProjectTX => {
+                        self.getApprovalUser(request.project_ID, request.approvalUserID,
+                        systemUserID => {
+                            request.systemUserID = systemUserID;
+                            request.actionedByUserID = null;
+                            request.notes = self.findAndReplaceNote(request.notes);
+                            self.createProjectTransaction(request, processStartProjectTX => {
                                 // Create Requesting Approval process for "New Group"
                                 request.status = 10;
                                 request.notes = self.findAndReplaceNote(
@@ -713,8 +712,24 @@
                                             .getTaskViewData();
                                     })
                             })
+                        })
                     })
                 })
+            },
+            getApprovalUser(projectID, approvalUserID, callback) {
+                let self = this;
+
+                if (approvalUserID == null) {
+                    Axios.get(process.env.VUE_APP_API + `ProjectUsers?typeName=Ranging&projectID=${projectID}`)
+                        .then(r => {
+                            callback(r.data[0].userID_2);
+                        })
+                        .catch(e => {
+                            callback(approvalUserID);
+                        })
+                } else {
+                    callback(approvalUserID);
+                }
             },
             setDeclined(item) {
                 let self = this
@@ -730,7 +745,6 @@
                         if (r.data.projectTX == null) {
                             alert("No user transaction")
                         }
-                        console.log(r);
                         self.$refs.NotesModal.show("Reason for decline", callback => {
                             self.checkTaskTakeover(request, () => {
                                 request.status = 11;
@@ -856,6 +870,9 @@
                         })
                     })
                 })
+            },
+            getProjectUser() {
+                let self = this;
             },
             routeToImplementation(item) {
                 let self = this;
@@ -1123,8 +1140,6 @@
                 let newRequest = JSON.parse(JSON.stringify(item));
                 let tmpUser = request.systemUserID;
 
-                console.log(tmpUser);
-
                 self.checkTaskTakeover(request, () => {
                     newRequest.systemUserID = tmpUser;
 
@@ -1136,7 +1151,6 @@
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                     Axios.put(process.env.VUE_APP_API + "ProjectTX?update=false", item).then(r => {
-                        console.log(r);
 
                         self.$refs.NotesModal.show("Subtask complete notes", notes => {
                             newRequest.status++;
@@ -1321,14 +1335,9 @@
                 self.checkTaskTakeover(request, () => {
                     request.systemUserID = tmpUser;
                     request.status = 46;
-                    console.log(request.notes);
 
                     request.projectTXGroup_ID = item.projectTXGroup_ID
                     self.createProjectTransaction(request, newItem => {
-                        // self.updateStorePlanogramStatus(request.store_ID, request
-                        //     .systemFileID, 3, sp => {
-                        //         self.routeToView(newItem)
-                        //     })
                         self.routeToView(newItem)
                     })
                 })

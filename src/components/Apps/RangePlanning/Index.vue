@@ -342,6 +342,7 @@
     },
     data() {
       return {
+        systemFileID: null,
         showNote: false,
         note: "",
         filters: null,
@@ -526,294 +527,367 @@
 
         let retval = false;
 
-        switch(prop) {
+        switch (prop) {
           // Product
           case 'product_System_ID': {
             retval = options.products == headerOptions.all;
-          }break;
-          case 'barcode': {
-            retval = options.products == headerOptions.all;
-          }break;
-          case 'product_Code': {
-            retval = options.products == headerOptions.all;
-          }break;
-          case 'brand': {
-            retval = options.products == headerOptions.all;
-          }break;
-          case 'manufacturer': {
-            retval = options.products == headerOptions.all;
-          }break;
-          case 'supplier': {
-            retval = options.products == headerOptions.all;
-          }break;
-          case 'description': {
-            retval = options.products == headerOptions.yes || options.products == headerOptions.all;
-          }break;
-          case 'size_Description': {
-            retval = options.products == headerOptions.all;
-          }break;
-          case 'size': {
-            retval = options.products == headerOptions.all;
-          }break;
-          case 'uom': {
-            retval = options.products == headerOptions.all;
-          }break;
-          // END Product
-          // Hierachy
-          case 'category': {
-            retval = options.hierachy == headerOptions.all;
-          }break;
-          case 'subcategory': {
-            retval = options.hierachy == headerOptions.yes || options.hierachy == headerOptions.all;
-          }break;
-          case 'segment': {
-            retval = options.hierachy == headerOptions.all;
-          }break;
-          // END Hierachy
-          // Dimension
-          case 'height': {
-            retval = options.dimensions == headerOptions.yes || options.dimensions == headerOptions.all;
-          }break;
-          case 'width': {
-            retval = options.dimensions == headerOptions.yes || options.dimensions == headerOptions.all;
-          }break;
-          case 'depth': {
-            retval = options.dimensions == headerOptions.yes || options.dimensions == headerOptions.all;
-          }break;
-          // END Dimension
-          // Indicators
-          case 'active_Shop_Code': {
-            retval = options.indicators == headerOptions.all;
-          }break;
-          case 'store_Range_Indicator': {
-            retval = options.indicators == headerOptions.yes || options.indicators == headerOptions.all;
-          }break;
-          // END Indicators
-          // Sales Analysis
-          case 'sales_Retail': {
-            retval = options.salesAnalysis == headerOptions.yes || options.salesAnalysis == headerOptions.all;
-          }break;
-          case 'item_sales_rank': {
-            retval = options.salesAnalysis == headerOptions.all;
-          }break;
-          case 'sales_potential': {
-            retval = options.salesAnalysis == headerOptions.yes || options.salesAnalysis == headerOptions.all;
-          }break;
-          case 'sales_potential_rank': {
-            retval = options.salesAnalysis == headerOptions.yes || options.salesAnalysis == headerOptions.all;
-          }break;
-          // END Sales Analysis
-          // Volume Analysis
-          case 'sales_Units': {
-            retval = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis == headerOptions.all;
-          }break;
-          case 'item_volume_rank': {
-            retval = options.volumeAnalysis == headerOptions.all;
-          }break;
-          case 'volume_potential': {
-            retval = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis == headerOptions.all;
-          }break;
-          case 'volume_potential_rank': {
-            retval = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis == headerOptions.all;
-          }break;
-          // END Volume Analysis
-          // Profit Analysis
-          case 'sales_Profit': {
-            retval = options.profitAnalysis == headerOptions.yes || options.profitAnalysis == headerOptions.all;
-          }break;
-          case 'item_profit_rank': {
-            retval = options.profitAnalysis == headerOptions.all;
-          }break;
-          case 'profit_potential': {
-            retval = options.profitAnalysis == headerOptions.yes || options.profitAnalysis == headerOptions.all;
-          }break;
-          case 'profit_potential_rank': {
-            retval = options.profitAnalysis == headerOptions.yes || options.profitAnalysis == headerOptions.all;
-          }break;
-          // END Profit Analysis
-          // Cost Analysis
-          case 'sales_Cost': {
-            retval = options.costAnalysis == headerOptions.yes || options.costAnalysis == headerOptions.all;
-          }break;
-          case 'item_cost_rank': {
-            retval = options.costAnalysis == headerOptions.all;
-          }break;
-          case 'cost_potential': {
-            retval = options.costAnalysis == headerOptions.yes || options.costAnalysis == headerOptions.all;
-          }break;
-          case 'cost_potential_rank': {
-            retval = options.costAnalysis == headerOptions.yes || options.costAnalysis == headerOptions.all;
-          }break;
-          // END Cost Analysis
-          // Stock Analysis
-          case 'dos_fac': {
-            retval = options.stockAnalysis == headerOptions.yes || options.stockAnalysis == headerOptions.all;
-          }break;
-          case 'days_of_supply': {
-            retval = options.stockAnalysis == headerOptions.all;
-          }break;
-          case 'stock_Turns': {
-            retval = options.stockAnalysis == headerOptions.all;
-          }break;
-          case 'stock_Cost': {
-            retval = options.stockAnalysis == headerOptions.all;
-          }break;
-          case 'stock_Units': {
-            retval = options.stockAnalysis == headerOptions.all;
-          }break;
-          case 'lost_Sales': {
-            let stockAnalysisAll = options.stockAnalysis == headerOptions.all;
-            let stockAnalysisYes = options.stockAnalysis == headerOptions.yes;
-            let salesAnalysisYesOrAll = options.salesAnalysis == headerOptions.yes || options.salesAnalysis == headerOptions.all;
+          }
+          break;
+        case 'barcode': {
+          retval = options.products == headerOptions.all;
+        }
+        break;
+        case 'product_Code': {
+          retval = options.products == headerOptions.all;
+        }
+        break;
+        case 'brand': {
+          retval = options.products == headerOptions.all;
+        }
+        break;
+        case 'manufacturer': {
+          retval = options.products == headerOptions.all;
+        }
+        break;
+        case 'supplier': {
+          retval = options.products == headerOptions.all;
+        }
+        break;
+        case 'description': {
+          retval = options.products == headerOptions.yes || options.products == headerOptions.all;
+        }
+        break;
+        case 'size_Description': {
+          retval = options.products == headerOptions.all;
+        }
+        break;
+        case 'size': {
+          retval = options.products == headerOptions.all;
+        }
+        break;
+        case 'uom': {
+          retval = options.products == headerOptions.all;
+        }
+        break;
+        // END Product
+        // Hierachy
+        case 'category': {
+          retval = options.hierachy == headerOptions.all;
+        }
+        break;
+        case 'subcategory': {
+          retval = options.hierachy == headerOptions.yes || options.hierachy == headerOptions.all;
+        }
+        break;
+        case 'segment': {
+          retval = options.hierachy == headerOptions.all;
+        }
+        break;
+        // END Hierachy
+        // Dimension
+        case 'height': {
+          retval = options.dimensions == headerOptions.yes || options.dimensions == headerOptions.all;
+        }
+        break;
+        case 'width': {
+          retval = options.dimensions == headerOptions.yes || options.dimensions == headerOptions.all;
+        }
+        break;
+        case 'depth': {
+          retval = options.dimensions == headerOptions.yes || options.dimensions == headerOptions.all;
+        }
+        break;
+        // END Dimension
+        // Indicators
+        case 'active_Shop_Code': {
+          retval = options.indicators == headerOptions.all;
+        }
+        break;
+        case 'store_Range_Indicator': {
+          retval = options.indicators == headerOptions.yes || options.indicators == headerOptions.all;
+        }
+        break;
+        // END Indicators
+        // Sales Analysis
+        case 'sales_Retail': {
+          retval = options.salesAnalysis == headerOptions.yes || options.salesAnalysis == headerOptions.all;
+        }
+        break;
+        case 'item_sales_rank': {
+          retval = options.salesAnalysis == headerOptions.all;
+        }
+        break;
+        case 'sales_potential': {
+          retval = options.salesAnalysis == headerOptions.yes || options.salesAnalysis == headerOptions.all;
+        }
+        break;
+        case 'sales_potential_rank': {
+          retval = options.salesAnalysis == headerOptions.yes || options.salesAnalysis == headerOptions.all;
+        }
+        break;
+        // END Sales Analysis
+        // Volume Analysis
+        case 'sales_Units': {
+          retval = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis == headerOptions.all || options
+            .stockAnalysis == headerOptions.yes || options.stockAnalysis == headerOptions.all;
+        }
+        break;
+        case 'item_volume_rank': {
+          retval = options.volumeAnalysis == headerOptions.all;
+        }
+        break;
+        case 'volume_potential': {
+          retval = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis == headerOptions.all;
+        }
+        break;
+        case 'volume_potential_rank': {
+          retval = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis == headerOptions.all;
+        }
+        break;
+        // END Volume Analysis
+        // Profit Analysis
+        case 'sales_Profit': {
+          retval = options.profitAnalysis == headerOptions.yes || options.profitAnalysis == headerOptions.all;
+        }
+        break;
+        case 'item_profit_rank': {
+          retval = options.profitAnalysis == headerOptions.all;
+        }
+        break;
+        case 'profit_potential': {
+          retval = options.profitAnalysis == headerOptions.yes || options.profitAnalysis == headerOptions.all;
+        }
+        break;
+        case 'profit_potential_rank': {
+          retval = options.profitAnalysis == headerOptions.yes || options.profitAnalysis == headerOptions.all;
+        }
+        break;
+        // END Profit Analysis
+        // Cost Analysis
+        case 'sales_Cost': {
+          retval = options.costAnalysis == headerOptions.yes || options.costAnalysis == headerOptions.all;
+        }
+        break;
+        case 'item_cost_rank': {
+          retval = options.costAnalysis == headerOptions.all;
+        }
+        break;
+        case 'cost_potential': {
+          retval = options.costAnalysis == headerOptions.yes || options.costAnalysis == headerOptions.all;
+        }
+        break;
+        case 'cost_potential_rank': {
+          retval = options.costAnalysis == headerOptions.yes || options.costAnalysis == headerOptions.all;
+        }
+        break;
+        // END Cost Analysis
+        // Stock Analysis
+        case 'dos_fac': {
+          retval = options.stockAnalysis == headerOptions.yes || options.stockAnalysis == headerOptions.all;
+        }
+        break;
+        case 'days_of_supply': {
+          retval = options.stockAnalysis == headerOptions.all;
+        }
+        break;
+        case 'stock_Turns': {
+          retval = options.stockAnalysis == headerOptions.all;
+        }
+        break;
+        case 'stock_Cost': {
+          retval = options.stockAnalysis == headerOptions.all;
+        }
+        break;
+        case 'stock_Units': {
+          retval = options.stockAnalysis == headerOptions.all;
+        }
+        break;
+        case 'lost_Sales': {
+          let stockAnalysisAll = options.stockAnalysis == headerOptions.all;
+          let stockAnalysisYes = options.stockAnalysis == headerOptions.yes;
+          let salesAnalysisYesOrAll = options.salesAnalysis == headerOptions.yes || options.salesAnalysis ==
+            headerOptions.all;
 
-            retval = stockAnalysisAll || (stockAnalysisYes && salesAnalysisYesOrAll);
-          }break;
-          case 'lost_Sales': {
-            let stockAnalysisAll = options.stockAnalysis == headerOptions.all;
-            let stockAnalysisYes = options.stockAnalysis == headerOptions.yes;
-            let salesAnalysisYesOrAll = options.salesAnalysis == headerOptions.yes || options.salesAnalysis == headerOptions.all;
+          retval = stockAnalysisAll || (stockAnalysisYes && salesAnalysisYesOrAll);
+        }
+        break;
+        case 'lost_Units': {
+          let stockAnalysisAll = options.stockAnalysis == headerOptions.all;
+          let stockAnalysisYes = options.stockAnalysis == headerOptions.yes;
+          let volumeAnalysisYesOrAll = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis ==
+            headerOptions.all;
 
-            retval = stockAnalysisAll || (stockAnalysisYes && salesAnalysisYesOrAll);
-          }break;
-          case 'lost_Units': {
-            let stockAnalysisAll = options.stockAnalysis == headerOptions.all;
-            let stockAnalysisYes = options.stockAnalysis == headerOptions.yes;
-            let volumeAnalysisYesOrAll = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis == headerOptions.all;
+          retval = stockAnalysisAll || (stockAnalysisYes && volumeAnalysisYesOrAll);
+        }
+        break;
+        case 'lost_Profit': {
+          let stockAnalysisAll = options.stockAnalysis == headerOptions.all;
+          let stockAnalysisYes = options.stockAnalysis == headerOptions.yes;
+          let profitAnalysisYesOrAll = options.profitAnalysis == headerOptions.yes || options.profitAnalysis ==
+            headerOptions.all;
 
-            retval = stockAnalysisAll || (stockAnalysisYes && volumeAnalysisYesOrAll);
-          }break;
-          case 'lost_Profit': {
-            let stockAnalysisAll = options.stockAnalysis == headerOptions.all;
-            let stockAnalysisYes = options.stockAnalysis == headerOptions.yes;
-            let profitAnalysisYesOrAll = options.profitAnalysis == headerOptions.yes || options.profitAnalysis == headerOptions.all;
+          retval = stockAnalysisAll || (stockAnalysisYes && profitAnalysisYesOrAll);
+        }
+        break;
+        case 'lost_Cost': {
+          let stockAnalysisAll = options.stockAnalysis == headerOptions.all;
+          let stockAnalysisYes = options.stockAnalysis == headerOptions.yes;
+          let costAnalysisYesOrAll = options.costAnalysis == headerOptions.yes || options.costAnalysis == headerOptions
+            .all;
 
-            retval = stockAnalysisAll || (stockAnalysisYes && profitAnalysisYesOrAll);
-          }break;
-          case 'lost_Cost': {
-            let stockAnalysisAll = options.stockAnalysis == headerOptions.all;
-            let stockAnalysisYes = options.stockAnalysis == headerOptions.yes;
-            let costAnalysisYesOrAll = options.costAnalysis == headerOptions.yes || options.costAnalysis == headerOptions.all;
+          retval = stockAnalysisAll || (stockAnalysisYes && costAnalysisYesOrAll);
+        }
+        break;
+        case 'oos_Days': {
+          retval = options.stockAnalysis == headerOptions.all;
+        }
+        break;
+        // END Stock Analysis
+        // Distribution
+        case 'number_Distribution': {
+          retval = options.distribution == headerOptions.all;
+        }
+        break;
+        case 'weighted_Distribution': {
+          retval = options.distribution == headerOptions.yes || options.distribution == headerOptions.all;
+        }
+        break;
+        // END Distribution
+        // Index
+        case 'sales_contribution': {
+          let indexAll = options.index == headerOptions.all;
+          let indexYes = options.index == headerOptions.yes;
+          let salesAnalysisYesOrAll = options.salesAnalysis == headerOptions.yes || options.salesAnalysis ==
+            headerOptions.all;
 
-            retval = stockAnalysisAll || (stockAnalysisYes && costAnalysisYesOrAll);
-          }break;
-          case 'oos_Days': {
-            retval = options.stockAnalysis == headerOptions.all;
-          }break;
-          // END Stock Analysis
-          // Distribution
-          case 'number_Distribution': {
-            retval = options.distribution == headerOptions.all;
-          }break;
-          case 'weighted_Distribution': {
-            retval = options.distribution == headerOptions.yes || options.distribution == headerOptions.all;
-          }break;
-          // END Distribution
-          // Index
-          case 'sales_contribution': {
-            let indexAll = options.index == headerOptions.all;
-            let indexYes = options.index == headerOptions.yes;
-            let salesAnalysisYesOrAll = options.salesAnalysis == headerOptions.yes || options.salesAnalysis == headerOptions.all;
+          retval = indexAll || (indexYes && salesAnalysisYesOrAll);
+        }
+        break;
+        case 'units_contribution': {
+          let indexAll = options.index == headerOptions.all;
+          let indexYes = options.index == headerOptions.yes;
+          let volumeAnalysisYesOrAll = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis ==
+            headerOptions.all;
 
-            retval = indexAll || (indexYes && salesAnalysisYesOrAll);
-          }break;
-          case 'units_contribution': {
-            let indexAll = options.index == headerOptions.all;
-            let indexYes = options.index == headerOptions.yes;
-            let volumeAnalysisYesOrAll = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis == headerOptions.all;
+          retval = indexAll || (indexYes && volumeAnalysisYesOrAll);
+        }
+        break;
+        case 'profit_contribution': {
+          let indexAll = options.index == headerOptions.all;
+          let indexYes = options.index == headerOptions.yes;
+          let profitAnalysisYesOrAll = options.profitAnalysis == headerOptions.yes || options.profitAnalysis ==
+            headerOptions.all;
 
-            retval = indexAll || (indexYes && volumeAnalysisYesOrAll);
-          }break;
-          case 'profit_contribution': {
-            let indexAll = options.index == headerOptions.all;
-            let indexYes = options.index == headerOptions.yes;
-            let profitAnalysisYesOrAll = options.profitAnalysis == headerOptions.yes || options.profitAnalysis == headerOptions.all;
+          retval = indexAll || (indexYes && profitAnalysisYesOrAll);
+        }
+        break;
+        case 'cost_contribution': {
+          let indexAll = options.index == headerOptions.all;
+          let indexYes = options.index == headerOptions.yes;
+          let costAnalysisYesOrAll = options.costAnalysis == headerOptions.yes || options.costAnalysis == headerOptions
+            .all;
 
-            retval = indexAll || (indexYes && profitAnalysisYesOrAll);
-          }break;
-          case 'cost_contribution': {
-            let indexAll = options.index == headerOptions.all;
-            let indexYes = options.index == headerOptions.yes;
-            let costAnalysisYesOrAll = options.costAnalysis == headerOptions.yes || options.costAnalysis == headerOptions.all;
+          retval = indexAll || (indexYes && costAnalysisYesOrAll);
+        }
+        break;
+        // END Index
+        // Price & Margin
+        case 'average_cost': {
+          retval = options.priceAndMargin == headerOptions.all;
+        }
+        break;
+        case 'average_price': {
+          retval = options.priceAndMargin == headerOptions.yes || options.priceAndMargin == headerOptions.all;
+        }
+        break;
+        case 'gross_profit': {
+          retval = options.priceAndMargin == headerOptions.yes || options.priceAndMargin == headerOptions.all;
+        }
+        break;
+        case 'markup': {
+          retval = options.priceAndMargin == headerOptions.yes || options.priceAndMargin == headerOptions.all;
+        }
+        break;
+        // END Price & Margin
+        // Base Line Sales
+        case 'markup': {
+          retval = options.priceAndMargin == headerOptions.yes || options.priceAndMargin == headerOptions.all;
+        }
+        break;
+        // Base Line Sales
+        case 'base_line_sales': {
+          let baseLineAll = options.baseLineAnalysis == headerOptions.all;
+          let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
+          let salesAnalysisYesOrAll = options.salesAnalysis == headerOptions.yes || options.salesAnalysis ==
+            headerOptions.all;
 
-            retval = indexAll || (indexYes && costAnalysisYesOrAll);
-          }break;
-          // END Index
-          // Price & Margin
-          case 'average_cost': {
-            retval = options.priceAndMargin == headerOptions.all;
-          }break;
-          case 'average_price': {
-            retval = options.priceAndMargin == headerOptions.yes || options.priceAndMargin == headerOptions.all;
-          }break;
-          case 'gross_profit': {
-            retval = options.priceAndMargin == headerOptions.yes || options.priceAndMargin == headerOptions.all;
-          }break;
-          case 'markup': {
-            retval = options.priceAndMargin == headerOptions.yes || options.priceAndMargin == headerOptions.all;
-          }break;
-          // END Price & Margin
-          // Base Line Sales
-          case 'markup': {
-            retval = options.priceAndMargin == headerOptions.yes || options.priceAndMargin == headerOptions.all;
-          }break;
-          // Base Line Sales
-          case 'base_line_sales': {
-            let baseLineAll = options.baseLineAnalysis == headerOptions.all;
-            let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
-            let salesAnalysisYesOrAll = options.salesAnalysis == headerOptions.yes || options.salesAnalysis == headerOptions.all;
+          retval = baseLineAll || (baseLineYes && salesAnalysisYesOrAll);
+        }
+        break;
+        case 'base_line_sales_potential': {
+          let baseLineAll = options.baseLineAnalysis == headerOptions.all;
+          let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
+          let salesAnalysisYesOrAll = options.salesAnalysis == headerOptions.yes || options.salesAnalysis ==
+            headerOptions.all;
 
-            retval = baseLineAll || (baseLineYes && salesAnalysisYesOrAll);
-          }break;
-          case 'base_line_sales_potential': {
-            let baseLineAll = options.baseLineAnalysis == headerOptions.all;
-            let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
-            let salesAnalysisYesOrAll = options.salesAnalysis == headerOptions.yes || options.salesAnalysis == headerOptions.all;
+          retval = baseLineAll || (baseLineYes && salesAnalysisYesOrAll);
+        }
+        break;
+        case 'base_line_units': {
+          let baseLineAll = options.baseLineAnalysis == headerOptions.all;
+          let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
+          let volumeAnalysisYesOrAll = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis ==
+            headerOptions.all;
 
-            retval = baseLineAll || (baseLineYes && salesAnalysisYesOrAll);
-          }break;
-          case 'base_line_units': {
-            let baseLineAll = options.baseLineAnalysis == headerOptions.all;
-            let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
-            let volumeAnalysisYesOrAll = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis == headerOptions.all;
+          retval = baseLineAll || (baseLineYes && volumeAnalysisYesOrAll);
+        }
+        break;
+        case 'base_line_units_potential': {
+          let baseLineAll = options.baseLineAnalysis == headerOptions.all;
+          let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
+          let volumeAnalysisYesOrAll = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis ==
+            headerOptions.all;
 
-            retval = baseLineAll || (baseLineYes && volumeAnalysisYesOrAll);
-          }break;
-          case 'base_line_units_potential': {
-            let baseLineAll = options.baseLineAnalysis == headerOptions.all;
-            let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
-            let volumeAnalysisYesOrAll = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis == headerOptions.all;
+          retval = baseLineAll || (baseLineYes && volumeAnalysisYesOrAll);
+        }
+        break;
+        case 'base_line_profit': {
+          let baseLineAll = options.baseLineAnalysis == headerOptions.all;
+          let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
+          let profitAnalysisYesOrAll = options.profitAnalysis == headerOptions.yes || options.profitAnalysis ==
+            headerOptions.all;
 
-            retval = baseLineAll || (baseLineYes && volumeAnalysisYesOrAll);
-          }break;
-          case 'base_line_profit': {
-            let baseLineAll = options.baseLineAnalysis == headerOptions.all;
-            let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
-            let profitAnalysisYesOrAll = options.profitAnalysis == headerOptions.yes || options.profitAnalysis == headerOptions.all;
+          retval = baseLineAll || (baseLineYes && profitAnalysisYesOrAll);
+        }
+        break;
+        case 'base_line_profit_potential': {
+          let baseLineAll = options.baseLineAnalysis == headerOptions.all;
+          let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
+          let profitAnalysisYesOrAll = options.profitAnalysis == headerOptions.yes || options.profitAnalysis ==
+            headerOptions.all;
 
-            retval = baseLineAll || (baseLineYes && profitAnalysisYesOrAll);
-          }break;
-          case 'base_line_profit_potential': {
-            let baseLineAll = options.baseLineAnalysis == headerOptions.all;
-            let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
-            let profitAnalysisYesOrAll = options.profitAnalysis == headerOptions.yes || options.profitAnalysis == headerOptions.all;
+          retval = baseLineAll || (baseLineYes && profitAnalysisYesOrAll);
+        }
+        break;
+        case 'base_line_cost': {
+          let baseLineAll = options.baseLineAnalysis == headerOptions.all;
+          let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
+          let costAnalysisYesOrAll = options.costAnalysis == headerOptions.yes || options.costAnalysis == headerOptions
+            .all;
 
-            retval = baseLineAll || (baseLineYes && profitAnalysisYesOrAll);
-          }break;
-          case 'base_line_cost': {
-            let baseLineAll = options.baseLineAnalysis == headerOptions.all;
-            let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
-            let costAnalysisYesOrAll = options.costAnalysis == headerOptions.yes || options.costAnalysis == headerOptions.all;
+          retval = baseLineAll || (baseLineYes && costAnalysisYesOrAll);
+        }
+        break;
+        case 'base_line_cost_potential': {
+          let baseLineAll = options.baseLineAnalysis == headerOptions.all;
+          let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
+          let costAnalysisYesOrAll = options.costAnalysis == headerOptions.yes || options.costAnalysis == headerOptions
+            .all;
 
-            retval = baseLineAll || (baseLineYes && costAnalysisYesOrAll);
-          }break;
-          case 'base_line_cost_potential': {
-            let baseLineAll = options.baseLineAnalysis == headerOptions.all;
-            let baseLineYes = options.baseLineAnalysis == headerOptions.yes;
-            let costAnalysisYesOrAll = options.costAnalysis == headerOptions.yes || options.costAnalysis == headerOptions.all;
-
-            retval = baseLineAll || (baseLineYes && costAnalysisYesOrAll);
-          }break;
-          // END Base Line Sales
+          retval = baseLineAll || (baseLineYes && costAnalysisYesOrAll);
+        }
+        break;
+        // END Base Line Sales
         }
 
         return retval;
@@ -823,7 +897,6 @@
 
         self.$refs.RetailChainSelector.show(retailChain => {
           callback(retailChain)
-          console.log(retailChain);
         })
       },
       openIndicatorModal() {
@@ -905,7 +978,8 @@
         self.$refs.HighlightCluster.show(highlightObj, data => {
           if (self.selectedClusterType == "stores") {
             self.rowData = self.rangingController.getSalesDataByStore(
-              self.selectedClusterOption
+              self.selectedClusterOption,
+              self.autoRangeData
             );
           } else {
             self.rowData = self.rangingController.getSalesDataByCluster(
@@ -991,7 +1065,8 @@
 
             if (self.selectedClusterType == "stores") {
               self.rowData = self.rangingController.getSalesDataByStore(
-                self.selectedClusterOption
+                self.selectedClusterOption,
+                self.autoRangeData
               );
             } else {
               self.rowData = self.rangingController.getSalesDataByCluster(
@@ -1059,6 +1134,9 @@
             self.fileData.tag = r.data.tag;
             self.fileData.active_Shop_Code_ID = r.data.active_Shop_Code_ID;
 
+            self.fileData.retailChainID = r.data.retailChainID;
+            self.fileData.retailChainDisplayname = r.data.retailChainDisplayname;
+
             self.canRefresh = true;
 
             self.rangingController = new RangingController(r.data);
@@ -1071,7 +1149,8 @@
               ) {
                 if (self.selectedClusterType == "stores") {
                   self.rowData = self.rangingController.getSalesDataByStore(
-                    self.selectedClusterOption
+                    self.selectedClusterOption,
+                    self.autoRangeData
                   );
                 } else {
                   self.rowData = self.rangingController.getSalesDataByCluster(
@@ -1174,7 +1253,8 @@
                   ) {
                     if (self.selectedClusterType == "stores") {
                       self.rowData = self.rangingController.getSalesDataByStore(
-                        self.selectedClusterOption
+                        self.selectedClusterOption,
+                        self.autoRangeData
                       );
                     } else {
                       self.rowData = self.rangingController.getSalesDataByCluster(
@@ -1260,7 +1340,8 @@
                   ) {
                     if (self.selectedClusterType == "stores") {
                       self.rowData = self.rangingController.getSalesDataByStore(
-                        self.selectedClusterOption
+                        self.selectedClusterOption,
+                        self.autoRangeData
                       );
                     } else {
                       self.rowData = self.rangingController.getSalesDataByCluster(
@@ -1325,6 +1406,9 @@
           }
         };
         self.$refs.rangeSelectorModal.show(fileID => {
+
+          self.systemFileID = fileID;
+
           self.$refs.SizeLoader.show();
           Axios.get(
             process.env.VUE_APP_API +
@@ -1345,6 +1429,9 @@
               r.data.useType == undefined || r.data.useType == null ?
               "PLANOGRAM" :
               "CATEGORY";
+
+            self.fileData.retailChainID = r.data.retailChainID;
+            self.fileData.retailChainDisplayname = r.data.retailChainDisplayname;
 
             self.getHelpFile();
 
@@ -1403,7 +1490,8 @@
               ) {
                 if (self.selectedClusterType == "stores") {
                   self.rowData = self.rangingController.getSalesDataByStore(
-                    self.selectedClusterOption
+                    self.selectedClusterOption,
+                    self.autoRangeData
                   );
                 } else {
                   self.rowData = self.rangingController.getSalesDataByCluster(
@@ -1768,7 +1856,8 @@
 
         Axios.get(
             process.env.VUE_APP_API +
-            "Ranging/GetClusterData?planogramID=" + self.fileData.planogramID + "&retailChainID=" + self.fileData.retailChainID
+            "Ranging/GetClusterData?planogramID=" + self.fileData.planogramID + "&retailChainID=" + self.fileData
+            .retailChainID
           )
           .then(r => {
             let clusterData = r.data.clusterData;
@@ -1908,6 +1997,7 @@
         self.rowData = [];
         self.selectedPlanogram = null;
         self.selectedDateRange = null;
+        self.systemFileID = null;
         self.selectedItems = [];
         self.gotData = false;
       },
@@ -1945,7 +2035,8 @@
                 ) {
                   if (self.selectedClusterType == "stores") {
                     self.rowData = self.rangingController.getSalesDataByStore(
-                      self.selectedClusterOption
+                      self.selectedClusterOption,
+                      self.autoRangeData
                     );
                   } else {
                     self.rowData = self.rangingController.getSalesDataByCluster(
@@ -2160,7 +2251,8 @@
 
         if (self.selectedClusterType == "stores") {
           self.rowData = self.rangingController.getSalesDataByStore(
-            self.selectedClusterOption
+            self.selectedClusterOption,
+            self.autoRangeData
           );
         } else {
           self.rowData = self.rangingController.getSalesDataByCluster(
@@ -2254,7 +2346,8 @@
 
                     if (self.selectedClusterType == "stores") {
                       self.rowData = self.rangingController.getSalesDataByStore(
-                        self.selectedClusterOption
+                        self.selectedClusterOption,
+                        self.autoRangeData
                       );
                     } else {
                       self.rowData = self.rangingController.getSalesDataByCluster(
@@ -2319,17 +2412,12 @@
 
         self.$nextTick(() => {
           if (self.selectedClusterOption != null) {
-            // self.rowData = [];
-
             self.setViewType(self.viewType);
 
             if (self.selectedClusterOption == "stores") {
               self.storesInCluster = 1;
             } else {
-              self.storesInCluster = self.rangingController.getStoresByCluster(
-                self.selectedClusterType,
-                self.selectedClusterOption
-              ).length;
+              self.storesInCluster = self.rangingController.getStoresByCluster(self.selectedClusterType, self.selectedClusterOption).length;
             }
 
             self.fitColumns();
@@ -2402,24 +2490,41 @@
         fileData["periodic"] = self.fileData.periodic;
         fileData["monthsBetween"] = self.fileData.monthsBetween;
         fileData["tag"] = tag;
+        fileData["retailChainID"] = self.fileData.retailChainID;
+        fileData["retailChainDisplayname"] = self.fileData.retailChainDisplayname;
 
         fileData["autoRangeConfig"] = self.autoRangeData;
 
-        Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
-            SystemFile: {
-              SystemUser_ID: -1,
-              Folder: "Ranging",
-              Name: self.generateFileName() + tag,
-              Extension: ".json"
-            },
-            Data: fileData
-          })
-          .then(r => {
-            alert("Successfully saved: " + self.generateFileName() + tag);
-          })
-          .catch(e => {
-            console.log(e);
-          });
+        self.updateFileName(self.generateFileName() + tag, () => {
+          Axios.post(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire", {
+              SystemFile: {
+                SystemUser_ID: -1,
+                Folder: "Ranging",
+                Name: self.generateFileName() + tag,
+                Extension: ".json"
+              },
+              Data: fileData
+            })
+            .then(r => {
+              self.systemFileID = r.data.systemFileID;
+              alert("Successfully saved: " + self.generateFileName() + tag);
+            })
+            .catch(e => {
+              console.log(e);
+            });
+        })
+      },
+      updateFileName(name, callback) {
+        let self = this
+
+        if (self.systemFileID != null) {
+          Axios.post(process.env.VUE_APP_API + `SystemFile/Rename?id=${self.systemFileID}&name=${name}`)
+            .then(r => {
+              callback();
+            })
+        } else {
+          callback();
+        }
       },
       setSelectedStores() {
         let self = this;
@@ -2454,7 +2559,8 @@
 
               if (self.selectedClusterType == "stores") {
                 self.rowData = self.rangingController.getSalesDataByStore(
-                  self.selectedClusterOption
+                  self.selectedClusterOption,
+                  self.autoRangeData
                 );
               } else {
                 self.rowData = self.rangingController.getSalesDataByCluster(
@@ -2501,7 +2607,8 @@
 
               if (self.selectedClusterType == "stores") {
                 self.rowData = self.rangingController.getSalesDataByStore(
-                  self.selectedClusterOption
+                  self.selectedClusterOption,
+                  self.autoRangeData
                 );
               } else {
                 self.rowData = self.rangingController.getSalesDataByCluster(
@@ -2567,7 +2674,8 @@
 
             if (self.selectedClusterType == "stores") {
               tmp = self.rangingController.getSalesDataByStore(
-                self.selectedClusterOption
+                self.selectedClusterOption,
+                self.autoRangeData
               );
             } else {
               tmp = self.rangingController.getSalesDataByCluster(
@@ -2714,7 +2822,8 @@
 
           if (self.selectedClusterType == "stores") {
             self.rowData = self.rangingController.getSalesDataByStore(
-              self.selectedClusterOption
+              self.selectedClusterOption,
+              self.autoRangeData
             );
           } else {
             self.rowData = self.rangingController.getSalesDataByCluster(
@@ -2746,7 +2855,11 @@
 
         let reportObj = self.calculateReport();
 
-        self.$refs.RangingReportModal.show(reportObj);
+        let cluster = self.clusterOptions[self.selectedClusterType].find(x => {
+          return x.value == self.selectedClusterOption;
+        })
+
+        self.$refs.RangingReportModal.show(reportObj, cluster.text);
       },
       calculateAutoRange() {
         let self = this;
@@ -2933,7 +3046,9 @@
       },
       calculateReport() {
         let self = this;
-        let reportObj = new RangeReports(self.rowData);
+        let endingStock = self.rangingController.getEndingStockData(self.selectedClusterType, self
+          .selectedClusterOption);
+        let reportObj = new RangeReports(self.rowData, endingStock);
         return reportObj;
       },
       getContextMenuItems(params) {
@@ -2993,7 +3108,8 @@
 
         Axios.get(
           process.env.VUE_APP_API +
-          "Ranging/GetClusterData?planogramID=" + self.fileData.planogramID + "&retailChainID=" + self.fileData.retailChainID 
+          "Ranging/GetClusterData?planogramID=" + self.fileData.planogramID + "&retailChainID=" + self.fileData
+          .retailChainID
         ).then(r => {
           let clusterData = r.data.clusterData;
           self.rangingController.setClusterData(clusterData);
@@ -3042,37 +3158,31 @@
     }
   };
 
-  function RangeReports(rangingData) {
+  function RangeReports(rangingData, endingStock) {
     let self = this;
-    self.current = new RangeReport(rangingData, "current");
-    self.potential = new RangeReport(rangingData, "potential");
+
+    console.log("endingStock", endingStock);
+
+    self.current = new RangeReport(rangingData, "current", endingStock);
+    self.potential = new RangeReport(rangingData, "potential", endingStock);
   }
 
-  function RangeReport(data, type) {
+  function RangeReport(data, type, endingStock) {
     let self = this;
     self.type = type;
 
-    self.sales = new RangeReportRow(data, type, "sales", "money");
-    self.units = new RangeReportRow(data, type, "units", "number");
-    self.profit = new RangeReportRow(data, type, "profit", "money");
-    self.item_count = new RangeReportRow(data, type, "item_count", "number");
-    self.gross_profit = new RangeReportRow(data, type, "gross_profit", "percent");
-    self.stock_on_hand_units = new RangeReportRow(
-      data,
-      type,
-      "stock_on_hand_units",
-      "number"
-    );
-    self.stock_on_hand_cost = new RangeReportRow(
-      data,
-      type,
-      "stock_on_hand_cost",
-      "money"
-    );
-    self.stock_turn = new RangeReportRow(data, type, "stock_turn", "decimal");
+    self.sales = new RangeReportRow(data, type, "sales", "money", endingStock);
+    self.units = new RangeReportRow(data, type, "units", "number", endingStock);
+    self.profit = new RangeReportRow(data, type, "profit", "money", endingStock);
+    self.item_count = new RangeReportRow(data, type, "item_count", "number", endingStock);
+    self.gross_profit = new RangeReportRow(data, type, "gross_profit", "percent", endingStock);
+    self.stock_on_hand_units = new RangeReportRow(data, type, "stock_on_hand_units", "number", endingStock);
+    self.stock_on_hand_cost = new RangeReportRow(data, type, "stock_on_hand_cost", "money", endingStock);
+    self.stock_turn = new RangeReportRow(data, type, "stock_turn", "decimal", endingStock);
+    self.days_cover = new RangeReportRow(data, type, "days_cover", "number", endingStock);
   }
 
-  function RangeReportRow(rowData, report_type, type, format) {
+  function RangeReportRow(rowData, report_type, type, format, endingStock) {
     let self = this;
     self.total_category = 0;
     self.items_selected = 0;
@@ -3085,75 +3195,75 @@
           self.total_category +=
             report_type == "current" ?
             parseFloat(productData.sales_Retail.toFixed(2)) :
-            parseFloat(productData.sales_potential.toFixed(2));
+            parseFloat(productData.sales_potential == undefined ? 0 : productData.sales_potential.toFixed(2));
 
           if (productData.store_Range_Indicator == "YES")
             self.items_selected +=
             report_type == "current" ?
             parseFloat(productData.sales_Retail.toFixed(2)) :
-            parseFloat(productData.sales_potential.toFixed(2));
+            parseFloat(productData.sales_potential == undefined ? 0 : productData.sales_potential.toFixed(2));
 
           if (productData.store_Range_Indicator == "SELECT")
             self.selected_stores +=
             report_type == "current" ?
             parseFloat(productData.sales_Retail.toFixed(2)) :
-            parseFloat(productData.sales_potential.toFixed(2));
+            parseFloat(productData.sales_potential == undefined ? 0 : productData.sales_potential.toFixed(2));
 
           if (productData.store_Range_Indicator == "NO")
             self.discontinued +=
             report_type == "current" ?
             parseFloat(productData.sales_Retail.toFixed(2)) :
-            parseFloat(productData.sales_potential.toFixed(2));
+            parseFloat(productData.sales_potential == undefined ? 0 : productData.sales_potential.toFixed(2));
         }
         break;
       case "units": {
         self.total_category +=
           report_type == "current" ?
           parseFloat(productData.sales_Units.toFixed(2)) :
-          parseFloat(productData.volume_potential.toFixed(2));
+          parseFloat(productData.volume_potential == undefined ? 0 : productData.volume_potential.toFixed(2));
 
         if (productData.store_Range_Indicator == "YES")
           self.items_selected +=
           report_type == "current" ?
           parseFloat(productData.sales_Units.toFixed(2)) :
-          parseFloat(productData.volume_potential.toFixed(2));
+          parseFloat(productData.volume_potential == undefined ? 0 : productData.volume_potential.toFixed(2));
 
         if (productData.store_Range_Indicator == "SELECT")
           self.selected_stores +=
           report_type == "current" ?
           parseFloat(productData.sales_Units.toFixed(2)) :
-          parseFloat(productData.volume_potential.toFixed(2));
+          parseFloat(productData.volume_potential == undefined ? 0 : productData.volume_potential.toFixed(2));
 
         if (productData.store_Range_Indicator == "NO")
           self.discontinued +=
           report_type == "current" ?
           parseFloat(productData.sales_Units.toFixed(2)) :
-          parseFloat(productData.volume_potential.toFixed(2));
+          parseFloat(productData.volume_potential == undefined ? 0 : productData.volume_potential.toFixed(2));
       }
       break;
       case "profit": {
         self.total_category +=
           report_type == "current" ?
           parseFloat(productData.sales_Profit.toFixed(2)) :
-          parseFloat(productData.profit_potential.toFixed(2));
+          parseFloat(productData.profit_potential == undefined ? 0 : productData.profit_potential.toFixed(2));
 
         if (productData.store_Range_Indicator == "YES")
           self.items_selected +=
           report_type == "current" ?
           parseFloat(productData.sales_Profit.toFixed(2)) :
-          parseFloat(productData.profit_potential.toFixed(2));
+          parseFloat(productData.profit_potential == undefined ? 0 : productData.profit_potential.toFixed(2));
 
         if (productData.store_Range_Indicator == "SELECT")
           self.selected_stores +=
           report_type == "current" ?
           parseFloat(productData.sales_Profit.toFixed(2)) :
-          parseFloat(productData.profit_potential.toFixed(2));
+          parseFloat(productData.profit_potential == undefined ? 0 : productData.profit_potential.toFixed(2));
 
         if (productData.store_Range_Indicator == "NO")
           self.discontinued +=
           report_type == "current" ?
           parseFloat(productData.sales_Profit.toFixed(2)) :
-          parseFloat(productData.profit_potential.toFixed(2));
+          parseFloat(productData.profit_potential == undefined ? 0 : productData.profit_potential.toFixed(2));
       }
       break;
       case "item_count": {
@@ -3185,50 +3295,82 @@
       case "stock_on_hand_units": {
         self.total_category += parseFloat(productData.stock_Units.toFixed(2));
 
+        let stockProducts = endingStock.filter(e => {
+          return e.product_ID == productData.productID;
+        })
+
+        let units = 0;
+
+        stockProducts.forEach(el => {
+          units += el.closingUnits
+        })
+
         if (productData.store_Range_Indicator == "YES")
-          self.items_selected += parseFloat(
-            productData.stock_Units.toFixed(2)
-          );
+          self.items_selected += parseFloat(units.toFixed(0));
 
         if (productData.store_Range_Indicator == "SELECT")
-          self.selected_stores += parseFloat(
-            productData.stock_Units.toFixed(2)
-          );
+          self.selected_stores += parseFloat(units.toFixed(0));
 
         if (productData.store_Range_Indicator == "NO")
-          self.discontinued += parseFloat(productData.stock_Units.toFixed(2));
+          self.discontinued += parseFloat(units.toFixed(0));
       }
       break;
       case "stock_on_hand_cost": {
         self.total_category += parseFloat(productData.stock_Cost.toFixed(2));
 
+        let stockProducts = endingStock.filter(e => {
+          return e.product_ID == productData.productID;
+        })
+
+        let sales = 0;
+
+        stockProducts.forEach(el => {
+          sales += el.closingCost
+        })
+
         if (productData.store_Range_Indicator == "YES")
           self.items_selected += parseFloat(
-            productData.stock_Cost.toFixed(2)
+            sales.toFixed(2)
           );
 
         if (productData.store_Range_Indicator == "SELECT")
           self.selected_stores += parseFloat(
-            productData.stock_Cost.toFixed(2)
+            sales.toFixed(2)
           );
 
         if (productData.store_Range_Indicator == "NO")
-          self.discontinued += parseFloat(productData.stock_Cost.toFixed(2));
+          self.discontinued += parseFloat(sales.toFixed(2));
       }
       break;
-      // case 'stock_turn': {
-      //   self.stock_turn = parseFloat(productData.stock_Cost.toFixed(2));
+      case 'stock_turn': {
+        self.total_category = calculate_stock_turn(rowData, "", report_type, endingStock);
 
-      //   if (productData.store_Range_Indicator == 'YES')
-      //     self.items_selected += parseFloat(productData.stock_Cost.toFixed(2));
+        if (productData.store_Range_Indicator == 'YES') {
+          self.items_selected = calculate_stock_turn(rowData, "YES", report_type, endingStock);
+        }
 
-      //   if (productData.store_Range_Indicator == 'SELECT')
-      //     self.selected_stores += parseFloat(productData.stock_Cost.toFixed(2));
+        if (productData.store_Range_Indicator == 'SELECT') {
+          self.selected_stores = calculate_stock_turn(rowData, "SELECT", report_type, endingStock);
+        }
 
-      //   if (productData.store_Range_Indicator == 'NO')
-      //     self.discontinued += parseFloat(productData.stock_Cost.toFixed(2));
-      // }
-      // break;
+        if (productData.store_Range_Indicator == 'NO') {
+          self.discontinued = calculate_stock_turn(rowData, "NO", report_type, endingStock);
+        }
+      }
+      break;
+      case 'days_cover': {
+        self.total_category = calculate_days_cover(rowData, "", report_type, endingStock)
+
+        if (productData.store_Range_Indicator == 'YES')
+          self.items_selected = calculate_days_cover(rowData, "YES", report_type, endingStock)
+
+        if (productData.store_Range_Indicator == 'SELECT')
+          self.selected_stores = calculate_days_cover(rowData, "SELECT", report_type, endingStock)
+
+        if (productData.store_Range_Indicator == 'NO')
+          self.discontinued = calculate_days_cover(rowData, "NO", report_type, endingStock)
+      }
+      break;
       }
     });
 
@@ -3255,27 +3397,77 @@
     }
     break;
     case "decimal": {
-      self.total_category = self.total_category.toFixed(2) + "%";
-      self.items_selected = +self.items_selected.toFixed(2) + "%";
-      self.selected_stores = +self.selected_stores.toFixed(2) + "%";
-      self.discontinued = self.discontinued.toFixed(2) + "%";
-      // self.stock_turn = self.stock_turn.toFixed(2);
+      self.total_category = self.total_category.toFixed(2);
+      self.items_selected = +self.items_selected.toFixed(2);
+      self.selected_stores = +self.selected_stores.toFixed(2);
+      self.discontinued = self.discontinued.toFixed(2);
     }
     break;
     }
   }
 
-  // function calculateStockTurn(allProducts, indicator, report_type) {
-  //   let total_category_sales = 0;
-  //   let total_category_profit = 0;
+  function calculate_days_cover(allProducts, indicator, report_type, stockProducts) {
+    let totalUnits = 0;
+    let totalStockUnits = 0;
 
-  //   let total_indicator_sales = 0;
-  //   let total_indicator_profit = 0;
+    allProducts.forEach(el => {
+      if (indicator == "") {
+        let productRecords = stockProducts.filter(x => {
+          return x.product_ID == el.productID;
+        })
 
-  //   allProducts.forEach(el => {
-  //     total_category_sales += parseFloat(report_type == "current" ? el.sales_Retail : el.sales_potential);
-  //   })
-  // }
+        productRecords.forEach(pr => {
+          totalStockUnits += pr.closingUnits
+        })
+
+        totalUnits += el.sales_Units;
+      } else if (el.store_Range_Indicator == indicator) {
+        let productRecords = stockProducts.filter(x => {
+          return x.product_ID == el.productID;
+        })
+
+        productRecords.forEach(pr => {
+          totalStockUnits += pr.closingUnits
+        })
+
+        totalUnits += el.sales_Units;
+      }
+    })
+
+    return isNaN(totalStockUnits / totalUnits * 30) ? 0 : totalStockUnits / totalUnits * 30;
+  }
+
+  function calculate_stock_turn(allProducts, indicator, report_type, stockProducts) {
+    let totalCost = 0;
+    let totalStockCost = 0;
+
+    allProducts.forEach(el => {
+      if (indicator == "") {
+
+        let productRecords = stockProducts.filter(x => {
+          return x.product_ID == el.productID;
+        })
+
+        productRecords.forEach(pr => {
+          totalStockCost += pr.closingCost
+        })
+
+        totalCost += (el.sales_Retail - el.sales_Profit);
+      } else if (el.store_Range_Indicator == indicator) {
+        let productRecords = stockProducts.filter(x => {
+          return x.product_ID == el.productID;
+        })
+
+        productRecords.forEach(pr => {
+          totalStockCost += pr.closingCost
+        })
+
+        totalCost += (el.sales_Retail - el.sales_Profit);
+      }
+    })
+
+    return isNaN((totalCost * 12) / totalStockCost) ? 0 : (totalCost * 12) / totalStockCost;
+  }
 
   function calculate_gp(allProducts, indicator, report_type) {
     let total_category_sales = 0;
