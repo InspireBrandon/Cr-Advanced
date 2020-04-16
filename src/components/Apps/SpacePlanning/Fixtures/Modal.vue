@@ -114,10 +114,10 @@
                   </v-flex>
                   <v-flex lg8 md12
                     v-if="!form.rendering && (( (form.type == 2 && form.fixtureType == 1) || (form.type == 3 && form.fixtureType == 4)||(form.type == 2 && form.fixtureType == 0 ))||(form.type == 2 && form.fixtureType == 3 ))">
-                    <v-text-field type="number" v-model="form.x_Offset" label="X Offset:" suffix="cm"></v-text-field>
+                    <v-text-field type="number" v-model="form.xOffset" label="X Offset:" suffix="cm"></v-text-field>
                   </v-flex>
                   <v-flex lg8 md12>
-                    <v-text-field type="number" v-model="form.y_Offset" label="Y Offset:" suffix="cm"></v-text-field>
+                    <v-text-field type="number" v-model="form.yOffset" label="Y Offset:" suffix="cm"></v-text-field>
                   </v-flex>
                   <v-flex lg8 md12 sm12 xs12
                     v-if="form.spreadProducts!='SFE'&&(!form.rendering && form.type == 2 && form.fixtureType != 2 || form.fixtureType==4&&form.type==3)">
@@ -134,7 +134,7 @@
                       label="Squish Amount:"></v-text-field>
                   </v-flex>
                   <v-flex lg8 md12
-                    v-if="!form.rendering && form.fixtureType == 3 || form.fixtureType==4&&form.type==3">
+                    v-if="!form.rendering && form.fixtureType == 3 || form.fixtureType==4 &&form.type==3">
                     <v-text-field type="number" v-model="form.productOffset" label="Product offset:" suffix="cm">
                     </v-text-field>
                   </v-flex>
@@ -142,10 +142,10 @@
                     v-if="!form.rendering && (form.type == 2 && (form.fixtureType == 0 || form.fixtureType == 1))">
                     <v-text-field type="number" v-model="form.overhang" label="Overhang:" suffix="cm"></v-text-field>
                   </v-flex>
-                  <v-flex lg8 md12 v-if="!form.rendering && (form.fixtureType == 3 || form.fixtureType == 2)">
+                  <!-- <v-flex lg8 md12 v-if="!form.rendering && (form.fixtureType == 3 || form.fixtureType == 2)">
                     <v-text-field type="number" v-model="form.productOffset" label="Product offset:" suffix="cm">
                     </v-text-field>
-                  </v-flex>
+                  </v-flex> -->
                   <v-flex lg8 md12 v-if="form.fixtureType == 2 && !form.rendering">
                     <v-text-field type="number" v-model="form.xHoleSpacing" label="X hole spacing:" suffix="cm">
                     </v-text-field>
@@ -643,8 +643,8 @@
           rightTransparent: false,
           bottomTransparent: false,
           topTransparent: false,
-          x_Offset: null,
-          y_Offset: null
+          xOffset: null,
+          yOffset: null
         },
         showModal: false,
         hideImages: false
