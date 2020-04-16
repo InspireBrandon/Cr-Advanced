@@ -5,7 +5,7 @@ import StageImage from "./image"
 class Rect extends Shape {
     constructor(parent, config, ratio, name, brush, dataUrl, stage) {
         super(parent);
-        
+
         if (config == null || config == undefined) {
             config = {
                 x: 0,
@@ -31,10 +31,10 @@ class Rect extends Shape {
         }
         let self = this;
 
-        self.create(config, ratio, name, brush, dataUrl,stage)
+        self.create(config, ratio, name, brush, dataUrl, stage)
     }
 
-    create(config, ratio, name, brush, dataUrl,stage) {
+    create(config, ratio, name, brush, dataUrl, stage) {
         let self = this;
         if (dataUrl != "") {
             self.shape = new Konva.Image({
@@ -52,24 +52,23 @@ class Rect extends Shape {
 
             imageObj.onload = function () {
                 self.shape.image(imageObj);
-                self.shape.attrs.keepAspectRatio=true
-                self.shape.attrs.enabledAnchors= self.enabledAnchors
+                self.shape.attrs.keepAspectRatio = true
+                self.shape.attrs.enabledAnchors = self.enabledAnchors
                 if (stage != null && stage != undefined) {
-
                     stage.batchDraw()
                 } else {
                     self.parent.draw();
                 }
                 console.log("[RECT IMAGE DRAW]");
-                
-            }
-            imageObj.onerror = function() {
-                console.log("imageerror");
 
-                imageObj.src = "/chevron-right.png";
-                
+            }
+            imageObj.onerror = function () {
+                console.log("imageerror--this one");
+                imageObj.src = "chevron-right.png";
                 // self.shape.fill('#1976d2');
-                self.parent.draw();
+                console.log("shape after error", self.shape);
+
+               
             }
             imageObj.src = dataUrl;
         } else {
@@ -78,7 +77,7 @@ class Rect extends Shape {
                 visible: 'inherit',
                 x: config.x,
                 y: config.y,
-                 strokeWidth: 0.5,
+                strokeWidth: 0.5,
                 stroke: 'black',
                 height: parseFloat(brush.height),
                 width: parseFloat(brush.width),
@@ -88,8 +87,8 @@ class Rect extends Shape {
 
             imageObj.onload = function () {
                 self.shape.image(imageObj);
-                self.shape.attrs.keepAspectRatio=true
-                self.shape.attrs.enabledAnchors= self.enabledAnchors
+                self.shape.attrs.keepAspectRatio = true
+                self.shape.attrs.enabledAnchors = self.enabledAnchors
                 if (stage != null && stage != undefined) {
 
                     stage.batchDraw()
@@ -97,15 +96,20 @@ class Rect extends Shape {
                     self.parent.draw();
                 }
                 console.log("[RECT IMAGE DRAW]")
-                
+
             }
-            imageObj.onerror = function() {
+            imageObj.onerror = function () {
                 console.log("imageerror");
-                
+
                 self.shape.fill('#1976d2');
-                self.parent.draw();
+                if (stage != null && stage != undefined) {
+
+                    stage.batchDraw()
+                } else {
+                    self.parent.draw();
+                }
             }
-            imageObj.src = "/chevron-right.png";
+            imageObj.src = "chevron-right.png";
         }
         self.parent.add(self.shape);
         self.parent.draw();

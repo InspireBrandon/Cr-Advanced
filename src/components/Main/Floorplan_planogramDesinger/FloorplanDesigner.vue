@@ -581,7 +581,7 @@
                             x: shape.x,
                             y: shape.y
                         }, null, null, null, self.imageSrc(item.floorplan_Fixture_ID,
-                            "Top"));
+                            "Top"),self.stage);
                         rect.shape.attrs = shape
                         rect.shape.saveID = item.id
                         rect.shape.guid = item.guid
@@ -611,8 +611,6 @@
                         width: shape.width,
                         DropID: shape.DropID,
                     })
-                    circle.shape.attrs = shape
-
                     circle.shape.saveID = item.id
                     circle.shape.guid = item.guid
                     console.log("SHAPE", shape);
@@ -633,13 +631,17 @@
                 self.getSavedData(cb.id, data => {
                     console.log('[GETSAVEDDATA]', data);
 
-                    data[0].children.forEach(item => {
-                        self.addShape(self.selectedLayer, item, callback => {})
+                    data[0].children.forEach((item, idx) => {
+                        self.addShape(self.selectedLayer, item, callback => {
+                            if (idx == data[0].children.length - 1) {
+                                self.$refs.spinner.hide()
+                            }
+
+                        })
                     })
 
                     console.log("[drawSaved]-----selectedLayer", self.selectedLayer);
-                    self.stage.batchDraw()
-                    self.$refs.spinner.hide()
+
                 })
             },
             getSavedData(header, callback) {

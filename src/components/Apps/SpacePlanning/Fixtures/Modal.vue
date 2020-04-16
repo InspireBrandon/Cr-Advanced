@@ -133,8 +133,7 @@
                     <v-text-field hide-details v-if="!form.rendering" v-model="form.squishAmount"
                       label="Squish Amount:"></v-text-field>
                   </v-flex>
-                  <v-flex lg8 md12
-                    v-if="!form.rendering && form.fixtureType == 3 || form.fixtureType==4 &&form.type==3">
+                  <v-flex lg8 md12 v-if="!form.rendering && form.fixtureType == 3 || form.fixtureType==4&&form.type==3">
                     <v-text-field type="number" v-model="form.productOffset" label="Product offset:" suffix="cm">
                     </v-text-field>
                   </v-flex>
@@ -321,22 +320,32 @@
                   <v-flex v-if="!form.rendering &&renderingType0.length>1" lg8 md12 sm12 xs12 class="px-3">
                     <v-select placeholder="please select" :items="renderingType0" v-model="selectedRenderingType0"
                       label="Label Holder:"></v-select>
+                    <v-text-field v-if="selectedRenderingType0!=null" type="number" v-model="rendering0_yOffset"
+                      label="Y Offset:" suffix="cm"></v-text-field>
                   </v-flex>
                   <v-flex v-if="!form.rendering &&renderingType1.length>1" lg8 md12 sm12 xs12 class="px-3">
                     <v-select placeholder="please select" :items="renderingType1" v-model="selectedRenderingType1"
                       label="Shelf Edge:"></v-select>
+                    <v-text-field v-if="selectedRenderingType1!=null" type="number" v-model="rendering1_yOffset"
+                      label="Y Offset:" suffix="cm"></v-text-field>
                   </v-flex>
                   <v-flex v-if="!form.rendering &&renderingType2.length>1" lg8 md12 sm12 xs12 class="px-3">
                     <v-select placeholder="please select" :items="renderingType2" v-model="selectedRenderingType2"
                       label="Back Face:"></v-select>
+                    <v-text-field v-if="selectedRenderingType2!=null" type="number" v-model="rendering2_yOffset"
+                      label="Y Offset:" suffix="cm"></v-text-field>
                   </v-flex>
                   <v-flex v-if="!form.rendering &&renderingType3.length>1" lg8 md12 sm12 xs12 class="px-3">
                     <v-select placeholder="please select" :items="renderingType3" v-model="selectedRenderingType3"
                       label="Front Face:"></v-select>
+                    <v-text-field v-if="selectedRenderingType3!=null" type="number" v-model="rendering3_yOffset"
+                      label="Y Offset:" suffix="cm"></v-text-field>
                   </v-flex>
                   <v-flex v-if="!form.rendering &&renderingType4.length>1" lg8 md12 sm12 xs12 class="px-3">
                     <v-select placeholder="please select" :items="renderingType4" v-model="selectedRenderingType4"
                       label="Side Face:"></v-select>
+                    <v-text-field v-if="selectedRenderingType4!=null" type="number" v-model="rendering4_yOffset"
+                      label="Y Offset:" suffix="cm"></v-text-field>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -392,14 +401,19 @@
         topBottomMirror: true,
         renderingType0: [],
         selectedRenderingType0: null,
+        rendering0_yOffset: null,
         renderingType1: [],
         selectedRenderingType1: null,
+        rendering1_yOffset: null,
         renderingType2: [],
         selectedRenderingType2: null,
+        rendering2_yOffset: null,
         renderingType3: [],
         selectedRenderingType3: null,
+        rendering3_yOffset: null,
         renderingType4: [],
         selectedRenderingType4: null,
+        rendering4_yOffset: null,
         changingSide: "",
         fixtureGroups: [],
         isSubtype: false,
@@ -919,27 +933,34 @@
             `FixtureRenderingLink?db=CR-Devinspire&Fixture_ID=${self.form.id}`
           )
           .then(r => {
+            console.log("getSelectedRenderings", r.data);
+
             // self.form.image = r.data;
             r.data.forEach(item => {
               switch (item.renderingType) {
                 case 0: {
                   self.selectedRenderingType0 = item.id;
+                  self.rendering0_yOffset = item.yOffset
                 }
                 break;
               case 1: {
                 self.selectedRenderingType1 = item.id;
+                self.rendering1_yOffset = item.yOffset
               }
               break;
               case 2: {
                 self.selectedRenderingType2 = item.id;
+                self.rendering2_yOffset = item.yOffset
               }
               break;
               case 3: {
                 self.selectedRenderingType3 = item.id;
+                self.rendering3_yOffset = item.yOffset
               }
               break;
               case 4: {
                 self.selectedRenderingType4 = item.id;
+                self.rendering4_yOffset = item.yOffset
               }
               break;
               default:
@@ -1099,30 +1120,35 @@
         if (self.selectedRenderingType0 != null) {
           allRenderingArr.push({
             Fixture_ID: self.form.id,
+            y_Offset: self.rendering0_yOffset,
             Rendering_Fixture_ID: self.selectedRenderingType0
           });
         }
         if (self.selectedRenderingType1 != null) {
           allRenderingArr.push({
             Fixture_ID: self.form.id,
+            y_Offset: self.rendering1_yOffset,
             Rendering_Fixture_ID: self.selectedRenderingType1
           });
         }
         if (self.selectedRenderingType2 != null) {
           allRenderingArr.push({
             Fixture_ID: self.form.id,
+            y_Offset: self.rendering2_yOffset,
             Rendering_Fixture_ID: self.selectedRenderingType2
           });
         }
         if (self.selectedRenderingType3 != null) {
           allRenderingArr.push({
             Fixture_ID: self.form.id,
+            y_Offset: self.rendering3_yOffset,
             Rendering_Fixture_ID: self.selectedRenderingType3
           });
         }
         if (self.selectedRenderingType4 != null) {
           allRenderingArr.push({
             Fixture_ID: self.form.id,
+            y_Offset: self.rendering4_yOffset,
             Rendering_Fixture_ID: self.selectedRenderingType4
           });
         }
