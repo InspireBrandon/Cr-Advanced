@@ -19,7 +19,7 @@ class DrawingBase {
     setPosition() {
         let self = this;
 
-        let parentY = (self.data.parent.y + self.data.parent.height + 572);
+        let parentY = (self.data.parent.y + self.data.parent.height + 320);
 
         self.element.position.x = (self.data.x + 0.5 * self.data.width) / self.pxlToMeterRatio;
         self.element.position.y = (((parentY - ((self.data.height / 2) + self.data.y)) / self.pxlToMeterRatio) / 3);

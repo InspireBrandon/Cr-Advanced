@@ -87,7 +87,6 @@ class LoadSavePlanogramBase {
       hybridRanges: hybridRanges,
       promoItemRefs: promoItemRefs
     }
-    console.log("[ALL ITYEMS]", allItems);
 
     allItems.forEach(item => {
       // remove the line below to test that the positions are being saved and repopulated in the load
@@ -103,7 +102,6 @@ class LoadSavePlanogramBase {
         }
       })
     })
-    // add planogram detail products
 
     let planogramProducts = [];
 
@@ -169,6 +167,7 @@ class LoadSavePlanogramBase {
         })
       }
     }
+
     let tmp = {}
 
     if (this.Create == true) {
@@ -198,14 +197,10 @@ class LoadSavePlanogramBase {
     axios.post(self.ServerAddress + "SystemFolder?db=CR-Devinspire", tmp, config).then(resp => {
       let resultSpace = resp.data.systemFileID
 
-      if (resp.success == true) {
-        alert("folder created")
-      }
-
-
-
       output.image = null
+
       let startTime = new Date()
+
       let config = {
         onUploadProgress: progressEvent => {
           var currentFileSize = progressEvent.loaded * 0.000001
@@ -251,7 +246,9 @@ class LoadSavePlanogramBase {
             }
           }
         })
+
         let startTime = new Date()
+
         let config = {
           onUploadProgress: progressEvent => {
             var currentFileSize = progressEvent.loaded * 0.000001
@@ -269,6 +266,7 @@ class LoadSavePlanogramBase {
             })
           }
         }
+
         axios.post(self.ServerAddress + "SystemFile/JSON/Planogram?db=CR-Devinspire", {
           file: "config_simple",
           systemFile: {
@@ -278,17 +276,13 @@ class LoadSavePlanogramBase {
           },
           data: output
         }, config).then(res => {
-          let config = {
-            onUploadProgress: progressEvent => {
 
-            }
-          }
           let xhrObj = new XMLHttpRequest();
-          let url = self.ServerAddress +
-            `SystemFile/JSON/PlanogramImage?db=CR-Devinspire&fileName=${encodeURIComponent(output.name)}`
+          let url = self.ServerAddress + `SystemFile/JSON/PlanogramImage?db=CR-Devinspire&fileName=${encodeURIComponent(output.name)}`
 
           xhrObj.open("Post", url);
           let startTime = new Date()
+          
           xhrObj.upload.onprogress = function (pe) {
             var currentFileSize = pe.loaded * 0.000001
             var FileTotalSize = pe.total * 0.000001
@@ -297,7 +291,6 @@ class LoadSavePlanogramBase {
             updateLoader({
               text1: "uploading Planogram Image",
               text2: "File Progresss",
-
               currentFileSize: pe.loaded * 0.000001,
               FileTotalSize: pe.total * 0.000001,
               progress: ((currentFileSize / FileTotalSize) * 100) / 3,
@@ -308,29 +301,32 @@ class LoadSavePlanogramBase {
           }
 
           xhrObj.upload.onreadystatechange = function (oEvent) {
-
             if (xhrObj.upload.readyState === 4) {
               if (xhrObj.upload.status !== 200) {
                 alert("ERROR")
               }
             }
           };
+
           xhrObj.upload.onerror = function (e) {
             alert("ERROR")
             hasError = true;
           }
+
           xhrObj.upload.onloadend = function (e) {
+            alert("I got here")
+
             updateLoader({
               currentFile: 3,
               totalFiles: 3,
             })
+
             setTimeout(() => {
               self.createDetailTX(clusterData, dimensionData, resultSpace, fixtureData, planogramProducts, createDetailCallback => {
                 self.createFloorplanFixtures(createDetailCallback, allItems, output, vuex, storeCount, stage, floorfixturecb => {
                   close()
                 })
               })
-
             }, 500);
           }
 
@@ -345,6 +341,7 @@ class LoadSavePlanogramBase {
       callback(resultSpace)
     })
   }
+
   createFloorplanFixtures(createDetailCallback, allItems, output, vuex, storeCount, stage, callback) {
     let floorPlanArray = generateFloorPlanArr(output.planogramData, vuex, storeCount)
 

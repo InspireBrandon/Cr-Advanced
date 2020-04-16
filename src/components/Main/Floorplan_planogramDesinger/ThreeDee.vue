@@ -226,6 +226,8 @@
                                 });
                             }
 
+                            console.log(fpI);
+
                             self.drawingHelper.draw(fpI);
                         })
                     })

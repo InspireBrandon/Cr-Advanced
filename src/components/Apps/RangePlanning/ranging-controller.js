@@ -709,7 +709,7 @@ function getProfitContributionStore(storeSales, productID, storeID, totalsData) 
 function getDaysOfSupplyPerX(dos_units, clusters, clusterType, clusterID, volume_potential, autoRangeData) {
   let clusterStores = getStoresByCluster(clusters, clusterType, clusterID);
   let storeCount = clusterStores.length;
-  let capacity = autoRangeData.dos_units;
+  let capacity = autoRangeData == undefined ? 6 : autoRangeData.dos_units;
   let other = volume_potential == 0 ? 0 : capacity / (volume_potential / storeCount) * 30 / storeCount;
   return other;
 }
@@ -719,12 +719,7 @@ function getDaysOfSupplyFacings(clusters, clusterType, clusterID, volume_potenti
   let storeCount = clusterStores.length;
   let fdepth = parseFloat(depth);
 
-  if (fdepth < 1)
-    fdepth = 1;
-
-  let capacity = ((38 / fdepth));
-
-  capacity = parseInt(capacity);
+  let capacity = autoRangeData == undefined ? 6 : autoRangeData.dos_units;
 
   let other = volume_potential == 0 ? 0 : capacity / (volume_potential / storeCount) * 30;
 
@@ -734,9 +729,7 @@ function getDaysOfSupplyFacings(clusters, clusterType, clusterID, volume_potenti
 function getDaysOfSupplyFacingsStore(storeID, volume_potential, depth, autoRangeData) {
   let storeCount = 1;
 
-  let capacity = autoRangeData.dos_units;
-
-  capacity = parseInt(capacity);
+  let capacity = autoRangeData == undefined ? 6 : autoRangeData.dos_units;
 
   let other = volume_potential == 0 ? 0 : capacity / (volume_potential / storeCount) * 30;
 

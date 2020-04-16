@@ -1159,7 +1159,7 @@
 
                   self.rangingController = new RangingController(r.data);
 
-                  self.rangingController.getSalesMonthlyTotals(() => {
+                  self.rangingController.getSalesMonthlyTotals(self.rangingData.planogramID, () => {
                     if (self.selectedClusterType != null && self.selectedClusterOption != null) {
                       self.hybridProducts = self.rangingController.getSalesDataByCluster(self
                         .selectedClusterType,
@@ -1218,7 +1218,7 @@
               if (vscd.clusterType != null && vscd.storeID == null || vscd
                 .vscd !=
                 undefined && vscd.storeID == undefined) {
-                self.rangingController.getSalesMonthlyTotals(() => {
+                self.rangingController.getSalesMonthlyTotals(self.rangingData.planogramID, () => {
                   if (self.selectedClusterType != null && self.selectedClusterOption != null) {
                     self.hybridProducts = self.rangingController.getSalesDataByCluster(self
                       .selectedClusterType,
@@ -1657,7 +1657,7 @@
 
                 self.rangingController = new RangingController(r.data);
 
-                self.rangingController.getSalesMonthlyTotals(() => {
+                self.rangingController.getSalesMonthlyTotals(self.rangingData.planogramID, () => {
                   if (self.selectedClusterType != null && self.selectedClusterOption != null) {
                     self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType,
                       self.selectedClusterOption);
@@ -1857,7 +1857,7 @@
                 self.gotData = true;
                 self.rangingController = new RangingController(r.data);
 
-                self.rangingController.getSalesMonthlyTotals(() => {
+                self.rangingController.getSalesMonthlyTotals(clusterData.planogramID, () => {
                   self.selectedClusterType = clusterData.clusterType;
                   self.$store.commit("setClusterName", clusterData.storeCluster);
                   self.$store.commit("setClusterType", clusterData.clusterType);
@@ -2091,9 +2091,18 @@
                 supplierStands: self.supplierStands,
                 bins: self.bins,
                 FixtureType: self.selectedFixtureType
-              }, self.spacePlanID, self.generateName(self.fixture_types), true, image, self.updateLoader, self
-              .$refs.SizeLoader.close, self.fixture_types, self.storeCount, self.HybridRanges, self.promoItemRefs,
+              }, self.spacePlanID, 
+              self.generateName(self.fixture_types), 
+              true, 
+              image, 
+              self.updateLoader, 
+              self.$refs.SizeLoader.close, 
+              self.fixture_types, 
+              self.storeCount, 
+              self.HybridRanges, 
+              self.promoItemRefs,
               data => {
+                console.log("data finished planogram", data);
                 self.spacePlanID = data
               })
           } else {

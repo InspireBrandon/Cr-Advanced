@@ -18,13 +18,27 @@ class Boxbase extends Drawingbase {
 
         var material = self.setMaterial();
 
-        let config = {
-            height: self.data.depth / self.pxlToMeterRatio,
-            width: self.data.width / self.pxlToMeterRatio,
-            depth: self.data.height / self.pxlToMeterRatio,
-            faceColors: material.faceColors,
-            faceUV: material.faceUV,
-            wrap: true,
+        let config;
+
+        if(self.data.type == "GONDOLA") {
+            config = {
+                height: self.data.depth / self.pxlToMeterRatio,
+                width: self.data.width / self.pxlToMeterRatio,
+                depth: self.data.height / self.pxlToMeterRatio,
+                faceColors: material.faceColors,
+                faceUV: material.faceUV,
+                wrap: true,
+            }
+        }
+        else {
+            config = {
+                height: self.data.depth / self.pxlToMeterRatio,
+                width: self.data.width / self.pxlToMeterRatio,
+                depth: self.data.height / self.pxlToMeterRatio,
+                faceColors: material.faceColors,
+                faceUV: material.faceUV,
+                wrap: true,
+            }
         }
 
         self.element = BABYLON.MeshBuilder.CreateBox(this.name, config, this.scene);

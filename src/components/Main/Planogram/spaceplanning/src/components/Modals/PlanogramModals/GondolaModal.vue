@@ -308,8 +308,8 @@
                     <h3>Renderings</h3>
                   </v-flex>
                   <v-flex v-if="!newData.rendering &&renderingType0.length>1" lg8 md12 sm12 xs12 class="px-3">
-                    <v-select placeholder="please select" :items="renderingType0" v-model="selectedRenderingType0"
-                      label="Label Holder:"></v-select>
+                    <v-select placeholder="please select" :items="renderingType0" v-model="selectedRenderingType0" label="Label Holder:"></v-select>
+                      <v-text-field label="Y Offset"></v-text-field>
                   </v-flex>
                   <v-flex v-if="!newData.rendering &&renderingType1.length>1" lg8 md12 sm12 xs12 class="px-3">
                     <v-select placeholder="please select" :items="renderingType1" v-model="selectedRenderingType1"
