@@ -2795,20 +2795,49 @@
             },
             attachGondolaInsideGroup(target, dragItem, group) {
                 let self = this
+                console.log("attachGondolaInsideGroup");
+                
                 target.attrs.hasAttached = dragItem.saveID
+                const matrix = target.getAbsoluteTransform().getMatrix();
+                const attrs = decompose(matrix);
                 dragItem.setAttrs({
-                    x: target.attrs.x + group.attrs.x,
-                    y: target.attrs.y + group.attrs.y
+                    x: (attrs.x - self.stage.attrs.x) / self.stage.attrs.scaleX,
+                    y: (attrs.y - self.stage.attrs.y) / self.stage.attrs.scaleY,
+                    rotation: attrs.rotation,
                 })
+                // dragItem.setAttrs({
+                //     x: target.attrs.x + group.attrs.x,
+                //     y: target.attrs.y + group.attrs.y
+                // })
                 self.stage.batchDraw()
             },
             attachGondola(target, dragItem) {
                 let self = this
+                console.log("[attachGondola] target:", target);
+                console.log("[attachGondola] dragItem:", dragItem);
+
+
                 target.attrs.hasAttached = dragItem.saveID
+                if (self.stage.attrs.scaleX == 0||self.stage.attrs.scaleX==undefined||self.stage.attrs.scaleX==null) {
+                    self.stage.attrs.scaleX = 1
+                }
+                if (self.stage.attrs.scaleY == 0||self.stage.attrs.scaleY==undefined||self.stage.attrs.scaleY==null) {
+                    self.stage.attrs.scaleY = 1
+                }
+
+                const matrix = target.getAbsoluteTransform().getMatrix();
+                const attrs = decompose(matrix);
                 dragItem.setAttrs({
-                    x: target.attrs.x,
-                    y: target.attrs.y
+                    x: (attrs.x - self.stage.attrs.x) / self.stage.attrs.scaleX,
+                    y: (attrs.y - self.stage.attrs.y) / self.stage.attrs.scaleY,
+                    rotation: attrs.rotation,
                 })
+                // dragItem.setAttrs({
+                // x: target.attrs.x,
+                // y: target.attrs.y
+                // })
+                console.log("[attachGondola---end] target:", target);
+                console.log("[attachGondola---end] dragItem:", dragItem);
                 self.stage.batchDraw()
             },
             clickFindParentLayer(item, callback) {
@@ -2957,15 +2986,15 @@
                                 return;
                             }
                             if (haveIntersection(group.getClientRect(), targetRect)) {
-                                if (group.attrs.name == "group" || group.attrs.name ==
-                                    "Duplication Group") {
-                                    group.children.each(function (item) {
-
-                                        if (haveIntersection(item.getClientRect(),
-                                                targetRect)) {
-                                            self.attachGondolaInsideGroup(item, target, group)
-                                        }
-                                    })
+                                if (target.children.length>0) {
+                                target.children.each(function (item) {
+                                    console.log(haveIntersection(item.getClientRect(),
+                                        targetRect));
+                                    if (haveIntersection(item.getClientRect(),
+                                            targetRect)) {
+                                        self.attachGondolaInsideGroup(item, target, group)
+                                    }
+                                })
                                 } else {
                                     self.attachGondola(group, target)
                                 }

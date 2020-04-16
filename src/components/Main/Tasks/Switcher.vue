@@ -57,9 +57,10 @@
                                 <v-icon>home</v-icon>
                             </v-btn>
                         </v-toolbar-items>
-                        <v-btn v-if="userAccess == 0 || userAccess == 1"
-                            color="primary" @click="startNewTask">Start new task</v-btn>
+                        <v-btn v-if="userAccess == 0 || userAccess == 1" color="primary" @click="startNewTask">Start new
+                            task</v-btn>
                         <v-btn color="primary" @click="sendMail">Send Mail</v-btn>
+                        <!-- <v-btn color="primary" @click="sendDailyMails">Send Task Mails</v-btn> -->
                         <v-spacer></v-spacer>
                         <v-btn v-show="userAccess == 3" @click="$refs.guide.click()" dark outline>Help</v-btn>
                         <a style="display: none;" ref="guide" download
@@ -135,8 +136,7 @@
                     </v-toolbar>
                     <v-container style="max-width: 100vw;" fluid grid-list-xs class="pa-0">
                         <v-layout row wrap class="pa-0">
-                            <v-flex class="pa-0" xs12
-                                v-if="selectedView==0">
+                            <v-flex class="pa-0" xs12 v-if="selectedView==0">
                                 <TaskView :accessType="userAccess" :data="filteredData" :typeList="typeList"
                                     :statusList="statusList" :systemUserID="selectedUser"
                                     :goToDistribution="goToDistribution" />
@@ -334,6 +334,17 @@
             }
         },
         methods: {
+            sendDailyMails() {
+                let self = this
+                self.$refs.SplashLoader.show()
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.post(process.env.VUE_APP_API + `sendMails`).then(r => {
+                    console.log("sendDailyMails", r);
+                    self.$refs.SplashLoader.close()
+
+                })
+            },
             showOutstandingTasks() {
                 let self = this;
                 self.$refs.OutstandingTasks.show();
