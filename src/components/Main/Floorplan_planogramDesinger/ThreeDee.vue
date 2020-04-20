@@ -195,38 +195,11 @@
                         });
 
                         notProducts.forEach(child => {
-                            let fpI;
+                            let fpI = new FloorPlanItem(child, parent);;
 
                             self.getFixture(child.spaceplan_Fixture_ID, () => {
 
                             })
-
-                            if (child.type == "GONDOLA") {
-                                fpI = new FloorPlanItem({
-                                    name: child.name,
-                                    type: child.type,
-                                    x: child.absoluteX,
-                                    y: child.absoluteY,
-                                    height: 0.3,
-                                    width: child.width,
-                                    depth: child.depth,
-                                    rotation: child.rotation
-                                });
-                            } else {
-                                fpI = new FloorPlanItem({
-                                    name: child.name,
-                                    type: child.type,
-                                    x: child.absoluteX,
-                                    y: child.absoluteY,
-                                    height: child.height,
-                                    width: child.width,
-                                    depth: child.depth,
-                                    rotation: child.rotation,
-                                    parent: parent
-                                });
-                            }
-
-                            console.log(fpI);
 
                             self.drawingHelper.draw(fpI);
                         })

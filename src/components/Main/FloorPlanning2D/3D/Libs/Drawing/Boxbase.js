@@ -24,7 +24,8 @@ class Boxbase extends Drawingbase {
             config = {
                 height: self.data.depth / self.pxlToMeterRatio,
                 width: self.data.width / self.pxlToMeterRatio,
-                depth: self.data.height / self.pxlToMeterRatio,
+                // depth: self.data.height / self.pxlToMeterRatio,
+                depth: 0.3 / self.pxlToMeterRatio,
                 faceColors: material.faceColors,
                 faceUV: material.faceUV,
                 wrap: true,

@@ -4,8 +4,10 @@
 // Author: Brandon Lange
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+import SideItem from './SideItem.js'
+
 class FloorPlanItem {
-    constructor(params) {
+    constructor(params, parent) {
         let self = this;
         
         // Identifiers
@@ -25,7 +27,54 @@ class FloorPlanItem {
         self.rotation = params.rotation;
 
         // Parent Information
-        self.parent = params.parent;
+        self.parent = parent;
+
+        // Colors
+        self.color = new SideItem({
+            front: params.frontColor,
+            back: params.backColor,
+            left: params.leftColor,
+            right: params.rightColor,
+            bottom: params.bottomColor,
+            top: params.topColor
+        });
+
+        // Images
+        self.imageID = new SideItem({
+            front: params.frontImageID,
+            back: params.backImageID,
+            left: params.leftImageID,
+            right: params.rightImageID,
+            bottom: params.bottomImageID,
+            top: params.topImageID
+        });
+
+        // Transparency
+        self.transparency = new SideItem({
+            front: params.frontTransparent,
+            back: params.backTransparent,
+            left: params.leftTransparent,
+            right: params.rightTransparent,
+            bottom: params.bottomTransparent,
+            top: params.topTransparent
+        });
+
+        // Mirrored
+        self.mirrored = new SideItem({
+            front: params.frontMirrored,
+            back: params.backMirrored,
+            left: params.leftMirrored,
+            right: params.rightMirrored,
+            bottom: params.bottomMirrored,
+            top: params.topMirrored
+        });
+        
+        // Offsets
+        self.offset = {
+            x: params.xOffset,
+            y: params.yOffset,
+            z: params.zOffset
+        }
     }
 }
 
