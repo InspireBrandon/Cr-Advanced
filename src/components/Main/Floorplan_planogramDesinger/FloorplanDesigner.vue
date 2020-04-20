@@ -190,6 +190,8 @@
                                         self.$refs.spinner.hide()
                                     })
                             })
+                        } else {
+                            self.$refs.spinner.hide()
                         }
                     })
             },
@@ -581,7 +583,7 @@
                             x: shape.x,
                             y: shape.y
                         }, null, null, null, self.imageSrc(item.floorplan_Fixture_ID,
-                            "Top"),self.stage);
+                            "Top"), self.stage);
                         rect.shape.attrs = shape
                         rect.shape.saveID = item.id
                         rect.shape.guid = item.guid
@@ -590,6 +592,7 @@
                             height: shape.height,
                             depth: shape.depth,
                             DropID: shape.DropID,
+                            rotation: shape.rotation
                         })
 
 
@@ -630,7 +633,9 @@
                 let self = this
                 self.getSavedData(cb.id, data => {
                     console.log('[GETSAVEDDATA]', data);
+                    let shape = JSON.parse(data[0].attributes)
 
+                    self.selectedLayer.attrs = shape
                     data[0].children.forEach((item, idx) => {
                         self.addShape(self.selectedLayer, item, callback => {
                             if (idx == data[0].children.length - 1) {
