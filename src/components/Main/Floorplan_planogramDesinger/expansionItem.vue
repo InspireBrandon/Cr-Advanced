@@ -19,7 +19,7 @@
                             </v-flex>
                             <v-flex md12>
                                 <v-text-field v-if="Drop.shape=='Square'" @change="changeRotation(Drop,rotation)"
-                                    type="number" label="Rotation" v-model="rotation" hide-details>
+                                    type="number" label="Rotation" v-model="Drop.rotation" hide-details>
                                 </v-text-field>
                             </v-flex>
                             <!-- <v-flex md6>

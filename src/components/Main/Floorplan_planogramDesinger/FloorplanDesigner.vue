@@ -367,8 +367,19 @@
                         self.selectedItem.parent.add(tr);
 
                         tr.attachTo(self.selectedItem);
+                        tr.on('transformend', function () {
+                            console.log("transformend");
 
-                        tr.on('transform', function (z) {});
+
+                        });
+                        tr.on('transform', function (z) {
+                            console.log("transform");
+                            self.findDrop(e.target, callback => {
+                                console.log(callback);
+                                
+                                callback.rotation = e.target.attrs.rotation
+                            })
+                        });
                         self.stage.batchDraw();
                     }
                 });
