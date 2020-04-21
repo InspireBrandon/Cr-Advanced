@@ -294,6 +294,8 @@
                 let self = this
                 let filterData = []
 
+                console.log("TASK VIEW DATA", self.taskViewData)
+
                 switch (self.selectedView) {
                     case 0: {
                         filterData = self.filter_off_of_view(self.taskViewData);
@@ -533,19 +535,19 @@
                             self.taskViewData = r.data.projectTXList;
                             delete Axios.defaults.headers.common["TenantID"];
 
-                            if (self.userAccess == 2) {
-                                self.filterOutSupplierPlanograms(() => {
-                                    if (callback != undefined) {
-                                        self.$refs.SplashLoader.close()
-                                        callback();
-                                    }
-                                });
-                            } else {
-                                if (callback != undefined) {
-                                    self.$refs.SplashLoader.close()
-                                    callback();
-                                }
-                            }
+                            // if (self.userAccess == 2) {
+                            //     self.filterOutSupplierPlanograms(() => {
+                            //         if (callback != undefined) {
+                            //             self.$refs.SplashLoader.close()
+                            //             callback();
+                            //         }
+                            //     });
+                            // } else {
+                            //     if (callback != undefined) {
+                            //         self.$refs.SplashLoader.close()
+                            //         callback();
+                            //     }
+                            // }
 
                             self.taskViewData.forEach(e => {
                                 if (!filterList.includes(e.planogram_ID)) {

@@ -624,6 +624,22 @@ class PlanogramItemBase {
       gondola.Group.draw();
     });
 
+    let obstructions = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "OBSTRUCTION", parentID);
+
+    obstructions.forEach(obstruction => {
+      if (obstruction.Renderings && obstruction.Renderings.length > 0) {
+        obstruction.Renderings.forEach(rendering => {
+          switch (rendering.type.toUpperCase()) {
+            case "FRONTRENDERING": {
+              rendering.konva.moveToTop();
+            }
+            break;
+          }
+        });
+      }
+      obstruction.Group.draw();
+    });
+
     //#endregion
     //#region Fixture Positions
 
@@ -1285,7 +1301,7 @@ class PlanogramItemBase {
 
     let ctrl_store = new StoreHelper();
     let itemArr = ctrl_store.getAllPlanogramItems(self.VueStore);
-    let actualArr = itemArr.filter((el) => el.Type.toUpperCase() == "GONDOLA");
+    let actualArr = itemArr.filter((el) => el.Type.toUpperCase() == "GONDOLA" || el.Type.toUpperCase() == "OBSTRUCTION");
 
     actualArr.forEach(planogramItem => {
       if (planogramItem.ID != self.ID) {
@@ -1789,6 +1805,10 @@ class PlanogramItemBase {
         event.modal_load(EventBus, "GONDOLA", null, self.Data, self.ID, self);
       }
       break;
+      case "OBSTRUCTION": {
+        event.modal_load(EventBus, "OBSTRUCTION", null, self.Data, self.ID, self);
+      }
+      break;
     case "PALETTE": {
       event.modal_load(EventBus, "FIXTURE", "PALETTE", self, self.ID, self);
     }
@@ -2136,6 +2156,28 @@ class PlanogramItemBase {
     }
     break;
     case "GONDOLA": {
+      retVal = {
+        Type: self.Type.toUpperCase(),
+        RelativePosition: {
+          x: self.Group.getX(),
+          y: self.Group.getY(),
+        },
+        AbsolutePosition: {
+          x: self.Group.getAbsolutePosition().x,
+          y: self.Group.getAbsolutePosition().y
+        },
+        Data: {
+          Data: self.Data,
+          ID: self.ID,
+          ParentID: self.ParentID,
+          Config: self.Config
+        },
+        Position: self.Position,
+        Label: self.LabelText
+      }
+    }
+    break;
+    case "OBSTRUCTION": {
       retVal = {
         Type: self.Type.toUpperCase(),
         RelativePosition: {

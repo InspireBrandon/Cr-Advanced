@@ -1,6 +1,7 @@
 import Konva from 'konva';
 import StoreHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/StoreHelper/StoreHelper.js";
 import GondolaNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/GondolaBase.js";
+import ObstructionNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/ObstructionBase.js";
 import TextHeaderNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/TextHeaderBase.js";
 import PaletteNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PaletteBase.js";
 import ShelfNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/ShelfBase.js";
@@ -39,7 +40,7 @@ class LoadSavePlanogramBase {
     items.forEach(e => {
       console.log("[RECURSIVE TYPE]", e.type);
 
-      if (e.type == "GONDOLA") {
+      if (e.type == "GONDOLA" || e.type == "OBSTRUCTION") {
         let newGondola = {
           height: e.height,
           width: e.width,
@@ -1079,7 +1080,7 @@ class LoadSavePlanogramBase {
     }
 
     // Init Gondolas
-    let gondolaArr = MasterData.filter((el) => el.Type == "GONDOLA");
+    let gondolaArr = MasterData.filter((el) => el.Type == "GONDOLA" || el.Type == "OBSTRUCTION");
     gondolaArr.sort((a, b) => a.RelativePosition.x - b.RelativePosition.x);
 
     gondolaArr.forEach(CurrentItem => {
@@ -1128,6 +1129,27 @@ class LoadSavePlanogramBase {
           CurrentItem.Data.Data,
           PxlRatio,
           "GONDOLA",
+          ParentID
+        )
+
+        if (CurrentItem.Position != undefined && CurrentItem.Position != null) {
+          ctrl_item.Position = CurrentItem.Position;
+        }
+
+        // set json data values to the object
+        ctrl_item.ID = CurrentItem.Data.ID;
+
+        ctrl_item.Initialise(CurrentItem.RelativePosition, false);
+      }
+      break;
+      case "OBSTRUCTION": {
+        let ctrl_item = new ObstructionNew(
+          VueStore,
+          Stage,
+          MasterLayer,
+          CurrentItem.Data.Data,
+          PxlRatio,
+          "OBSTRUCTION",
           ParentID
         )
 
@@ -1541,7 +1563,7 @@ function generateFloorPlanArr(planodata, vuex, storeCount) {
   // create gondola baseitems
 
   planodata.forEach(item => {
-    if (item.Type == "GONDOLA") {
+    if (item.Type == "GONDOLA" || item.Type == "OBSTRUCTION") {
       floorArr.push({
         floorplan_Item_ID: item.Data.ID,
         parent_ID: null,
