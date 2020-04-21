@@ -5,7 +5,7 @@ import PlanogramItemBase from "@/components/Main/Planogram/spaceplanning/src/lib
 import CloneBase from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/CloneBase.js";
 import SideHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/SideHelper.js"
 
-class GondolaBase extends PlanogramItemBase {
+class ObstructionBase extends PlanogramItemBase {
   constructor(vueStore, stage, layer, data, ratio, type) {
     super(vueStore, stage, layer, data, ratio, type)
 
@@ -17,7 +17,7 @@ class GondolaBase extends PlanogramItemBase {
   }
 
   /**
-   * Initialises a new instance of the gondola and will call the build aspect to stage
+   * Initialises a new instance of the Obstruction and will call the build aspect to stage
    */
   Initialise(dropPos, positionElementRequired = true) {
     let self = this;
@@ -67,26 +67,26 @@ class GondolaBase extends PlanogramItemBase {
     let ctrl_store = new StoreHelper();
 
     if (ctrl_store.getCloneItem(self.VueStore) == self.ID) {
-      let ctrl_clone = new CloneBase("GONDOLA");
+      let ctrl_clone = new CloneBase("Obstruction");
       ctrl_clone.Clone(self.VueStore, self.Stage, self, null, null);
       ctrl_store.setCloneItem(self.VueStore, null);
       return;
     }
 
-    self.PositionGondola();
+    self.PositionObstruction();
   }
 
-  PositionGondola() {
+  PositionObstruction() {
     let self = this;
 
-    let ctrl_positionGondola = new GondolaPosition();
+    let ctrl_positionObstruction = new GondolaPosition();
     let ctrl_store = new StoreHelper();
 
-    let y = ctrl_positionGondola.PositionToBottom(self.Stage, self);
+    let y = ctrl_positionObstruction.PositionToBottom(self.Stage, self);
 
-    // get all gondolas
+    // get all Obstructions
     let existingItemsOverall = ctrl_store.getAllPlanogramItems(self.VueStore);
-    let existingItems = existingItemsOverall.filter((el) => el.Type.toUpperCase() == "GONDOLA")
+    let existingItems = existingItemsOverall.filter((el) => el.Type.toUpperCase() == "Obstruction")
 
     existingItems.sort((a, b) => (a.Group.getX() + (a.TotalWidth / 2)) - (b.Group.getX() + (b.TotalWidth / 2)));
 
@@ -153,7 +153,7 @@ class GondolaBase extends PlanogramItemBase {
     }
 
     if (self.Data.RenderingsItems.Front != undefined || self.Data.RenderingsItems.Front != null) {
-      console.log("[GONDOLA RENDERING] FRONT FACE", self.Data.RenderingsItems.Front);
+      console.log("[Obstruction RENDERING] FRONT FACE", self.Data.RenderingsItems.Front);
 
       // add shelf edge rendering
       let w = self.Data.RenderingsItems.Front.width * self.Ratio;
@@ -238,4 +238,4 @@ class GondolaBase extends PlanogramItemBase {
   }
 }
 
-export default GondolaBase;
+export default ObstructionBase;

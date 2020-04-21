@@ -58,6 +58,7 @@
 
   import EventBus from "@/components/Main/Planogram/spaceplanning/src/libs/EventBus/EventBus.js";
   import GondolaNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/GondolaBase.js";
+  import ObstructionNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/ObstructionBase.js";
   import PaletteNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PaletteBase.js";
   import ShelfNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/ShelfBase.js";
   import BaseNew from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/BaseShelf.js";
@@ -518,7 +519,7 @@
         }
 
         let gondolas = result.data.planogramData.filter(
-          g => g.Type === "GONDOLA"
+          g => g.Type === "GONDOLA" || g.Type == "OBSTRUCTION"
         );
 
         if (gondolas.length == 0) {
@@ -1158,6 +1159,22 @@
           "GONDOLA");
 
         ctrl_gondola.Initialise(dropPos);
+
+        self.HideGondolaOutOfViewPort();
+      },
+      addNewObstruction(data) {
+        let self = this;
+        let stage = self.$refs.stage.getStage();
+
+        let ctrl_positioning = new PositioningBase();
+        let dropPos = ctrl_positioning.GetTransformedMousePoint(stage)
+        console.log("OBSTRUCTION ADD - STAGE", dropPos, self.MasterLayer, data);
+
+        let ctrl_obstruction = new GondolaNew(self.$store, stage, self.MasterLayer, JSON.parse(JSON.stringify(data)), self
+          .$PixelToCmRatio,
+          "OBSTRUCTION");
+
+        ctrl_obstruction.Initialise(dropPos);
 
         self.HideGondolaOutOfViewPort();
       },
@@ -1854,8 +1871,6 @@
 
         switch (data.type.toUpperCase()) {
           case "GONDOLA": {
-            console.log("[LIBRARY ADD]-----DATA", data);
-
             self.addNewGondola(data.data);
           }
           break;
