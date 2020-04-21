@@ -1,13 +1,13 @@
 <template>
-    <v-dialog v-model="dialog" persistent width="800" height="800">
+    <v-dialog v-model="dialog" persistent width="400" height="800">
         <v-toolbar dark color="primary">
             <v-toolbar-title>
                 {{title}}
             </v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn icon @click="dialog=false">
+            <!-- <v-btn icon @click="dialog=false">
                 <v-icon>close</v-icon>
-            </v-btn>
+            </v-btn> -->
         </v-toolbar>
         <v-card>
             <v-card-text>
@@ -16,7 +16,7 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="error" @click="dialog=false">cancel</v-btn>
+                <!-- <v-btn color="error" @click="dialog=false">cancel</v-btn> -->
                 <v-btn color=" primary" @click="submit">submit</v-btn>
             </v-card-actions>
         </v-card>
@@ -40,6 +40,7 @@
                 self.title = title
                 self.items = items
                 self.callback = callback
+                self.dialog=true
             },
             submit() {
                 if (self.selected != null) {

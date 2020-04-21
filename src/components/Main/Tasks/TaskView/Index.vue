@@ -725,15 +725,29 @@
                 if (approvalUserID == null) {
                     Axios.get(process.env.VUE_APP_API + `ProjectUsers?typeName=Ranging&projectID=${projectID}`)
                         .then(r => {
-                            if (r.data.length > 2) {
+                            console.log("project users", r.data);
+
+
+                            if (r.data.length > 1) {
                                 let items = []
+                                console.log("All users", self.users);
                                 r.data.forEach(item => {
-                                    items.push({
-                                        text: item.firstname + " " + item.lastname,
-                                        value: item.userID_2
+                                    self.users.forEach(user => {
+                                        console.log("user.systemUserID == item.userID_2:", user
+                                            .systemUserID == item.userID_2);
+
+                                        if (user.systemUserID == item.userID_2) {
+                                            items.push({
+                                                text: user.firstname + " " + user.lastname,
+                                                value: user.systemUserID
+                                            })
+                                        }
                                     })
+
                                 })
-                                self.$refs.UserSelectorModalDynamic.open("please select a user to send to", items,
+                                console.log("items to push", items);
+
+                                self.$refs.UserSelectorModalDynamic.open("Please select a user to send to", items,
                                     cb => {
                                         callback(cb);
                                     })
@@ -743,10 +757,10 @@
                                 self.users.forEach(item => {
                                     items.push({
                                         text: item.firstname + " " + item.lastname,
-                                        value: item.id
+                                        value: item.systemUserID
                                     })
                                 })
-                                self.$refs.UserSelectorModalDynamic.open("please select a user to send to", items,
+                                self.$refs.UserSelectorModalDynamic.open("Please select a user to send to", items,
                                     cb => {
                                         callback(cb);
                                     })
@@ -757,6 +771,8 @@
 
                         })
                         .catch(e => {
+                            console.log("approval ussesr catch", e);
+
                             callback(approvalUserID);
                         })
                 } else {
