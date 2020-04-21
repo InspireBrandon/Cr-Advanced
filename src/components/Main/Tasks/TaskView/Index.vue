@@ -35,6 +35,7 @@
         <YesNoModal ref="yesNoModal"></YesNoModal>
         <NotesModal ref="NotesModal"></NotesModal>
         <NewTask ref="NewTask"></NewTask>
+        <UserSelectorModalDynamic ref="UserSelectorModalDynamic" />
     </v-container>
 </template>
 
@@ -63,6 +64,7 @@
     import UserNotesModal from '@/components/Common/UserNotesModal.vue'
     import NotesModal from '@/components/Common/NotesModal.vue'
     import NewTask from '../NewTask'
+    import UserSelectorModalDynamic from '@/components/Common/UserSelectorModalDynamic.vue'
 
     import {
         AgGridVue
@@ -86,7 +88,8 @@
             Options,
             Notes,
             Type,
-            Status
+            Status,
+            UserSelectorModalDynamic
         },
         data() {
             return {
@@ -696,23 +699,23 @@
 
                         // Create New Process Assigned for "New Group"
                         self.getApprovalUser(request.project_ID, request.approvalUserID,
-                        systemUserID => {
-                            request.systemUserID = systemUserID;
-                            request.actionedByUserID = null;
-                            request.notes = self.findAndReplaceNote(request.notes);
-                            self.createProjectTransaction(request, processStartProjectTX => {
-                                // Create Requesting Approval process for "New Group"
-                                request.status = 10;
-                                request.notes = self.findAndReplaceNote(
-                                    request
-                                    .notes);
-                                self.createProjectTransaction(request,
-                                    approvalTransaction => {
-                                        self.$parent.$parent
-                                            .getTaskViewData();
-                                    })
+                            systemUserID => {
+                                request.systemUserID = systemUserID;
+                                request.actionedByUserID = null;
+                                request.notes = self.findAndReplaceNote(request.notes);
+                                self.createProjectTransaction(request, processStartProjectTX => {
+                                    // Create Requesting Approval process for "New Group"
+                                    request.status = 10;
+                                    request.notes = self.findAndReplaceNote(
+                                        request
+                                        .notes);
+                                    self.createProjectTransaction(request,
+                                        approvalTransaction => {
+                                            self.$parent.$parent
+                                                .getTaskViewData();
+                                        })
+                                })
                             })
-                        })
                     })
                 })
             },
@@ -722,7 +725,36 @@
                 if (approvalUserID == null) {
                     Axios.get(process.env.VUE_APP_API + `ProjectUsers?typeName=Ranging&projectID=${projectID}`)
                         .then(r => {
-                            callback(r.data[0].userID_2);
+                            if (r.data.length > 2) {
+                                let items = []
+                                r.data.forEach(item => {
+                                    items.push({
+                                        text: item.firstname + " " + item.lastname,
+                                        value: item.userID_2
+                                    })
+                                })
+                                self.$refs.UserSelectorModalDynamic.open("please select a user to send to", items,
+                                    cb => {
+                                        callback(cb);
+                                    })
+                            }
+                            if (r.data.length == 0 || r.data == null) {
+                                let items = []
+                                self.users.forEach(item => {
+                                    items.push({
+                                        text: item.firstname + " " + item.lastname,
+                                        value: item.id
+                                    })
+                                })
+                                self.$refs.UserSelectorModalDynamic.open("please select a user to send to", items,
+                                    cb => {
+                                        callback(cb);
+                                    })
+                            }
+                            if (r.data.length == 1) {
+                                callback(r.data[0].userID_2);
+                            }
+
                         })
                         .catch(e => {
                             callback(approvalUserID);
