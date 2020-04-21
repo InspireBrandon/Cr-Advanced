@@ -827,7 +827,8 @@ class GeneralPosition {
     break;
     case "PEGBOARD": {
       //
-      currentItem.StackIndex = null;
+      if(currentItem != undefined && currentItem != null)
+        currentItem.StackIndex = null;
     }
     break;
     case "LABELHOLDER": {

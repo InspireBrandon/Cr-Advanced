@@ -226,6 +226,9 @@ class ShelfBase extends PlanogramItemBase {
       // add shelf edge rendering
       let w = self.Data.RenderingsItems.LabelHolder.width * self.Ratio;
       let h = self.Data.RenderingsItems.LabelHolder.height * self.Ratio;
+
+      console.log("Label Holder Width and height", self.Data, w, h)
+
       let offset = 0;
 
       if (self.Data.RenderingsItems.LabelHolder.yOffset != undefined) {
