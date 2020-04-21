@@ -443,10 +443,9 @@ class PlanogramItemBase {
   LoadImage(konvaImage, imageData) {
     let self = this;
 
-    console.log(imageData);
-
     if (imageData != null && imageData != "data:image/png;base64,null" && imageData != 'data:image/png;base64,undefined') {
       var backPanelImage = new Image();
+      backPanelImage.crossOrigin = 'Anonymous';
 
       backPanelImage.src = imageData
 

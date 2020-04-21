@@ -3,6 +3,7 @@ import GondolaPosition from "@/components/Main/Planogram/spaceplanning/src/libs/
 import StoreHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/StoreHelper/StoreHelper.js";
 import PlanogramItemBase from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/PlanogramItemBase.js";
 import CloneBase from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/CloneBase.js";
+import SideHelper from "@/components/Main/Planogram/spaceplanning/src/libs/1.NewLibs/base/SideHelper.js"
 
 class GondolaBase extends PlanogramItemBase {
   constructor(vueStore, stage, layer, data, ratio, type) {
@@ -31,6 +32,8 @@ class GondolaBase extends PlanogramItemBase {
     self.Group.setHeight(self.TotalHeight);
 
     self.Build(dropPos, positionElementRequired);
+
+    let sh = new SideHelper(self.Data)
   }
 
   SetObjectDimensions() {
@@ -193,6 +196,7 @@ class GondolaBase extends PlanogramItemBase {
 
   AddAreaCosmetic() {
     let self = this;
+
     self.Area = new Konva.Image({
       x: 0,
       y: 0,
@@ -204,8 +208,6 @@ class GondolaBase extends PlanogramItemBase {
       // strokeWidth: 0.5,
       transformsEnabled: 'position'
     })
-
-    console.log("FI ID", self.Data);
 
     if (self.Data.frontImageID != undefined && self.Data.frontImageID != null) {
       self.LoadImage(self.Area, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.frontImageID}`);
