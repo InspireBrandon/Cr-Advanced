@@ -165,7 +165,7 @@ class snappinghandler {
                 var line = new Konva.Line({
                     points: [x_H1, y_H, x_H2, y_H],
                     stroke: 'rgb(0, 161, 255)',
-                    strokeWidth: 1,
+                    strokeWidth: 0.5,
                     name: 'guid-line',
                     dash: [4, 6]
                 });
@@ -176,7 +176,7 @@ class snappinghandler {
                 var line = new Konva.Line({
                     points: [x_V, y_V1, x_V, y_V2],
                     stroke: 'rgb(0, 161, 255)',
-                    strokeWidth: 1,
+                    strokeWidth: 0.5,
                     name: 'guid-line',
                     dash: [4, 6]
                 });

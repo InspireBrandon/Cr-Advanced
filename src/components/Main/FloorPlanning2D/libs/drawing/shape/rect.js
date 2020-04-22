@@ -42,7 +42,7 @@ class Rect extends Shape {
                 visible: 'inherit',
                 x: config.x,
                 y: config.y,
-                strokeWidth: 0.5,
+                strokeWidth: 1,
                 stroke: 'black',
                 height: parseFloat(brush.height),
                 width: parseFloat(brush.width),
@@ -52,8 +52,8 @@ class Rect extends Shape {
 
             imageObj.onload = function () {
                 self.shape.image(imageObj);
-                self.shape.attrs.keepAspectRatio = true
-                self.shape.attrs.enabledAnchors = self.enabledAnchors
+                self.shape.attrs.image.width = self.shape.attrs.width
+                self.shape.attrs.image.height = self.shape.attrs.height
                 if (stage != null && stage != undefined) {
                     stage.batchDraw()
                 } else {
@@ -67,8 +67,6 @@ class Rect extends Shape {
                 imageObj.src = "chevron-right.png";
                 // self.shape.fill('#1976d2');
                 console.log("shape after error", self.shape);
-
-               
             }
             imageObj.src = dataUrl;
         } else {
@@ -87,32 +85,24 @@ class Rect extends Shape {
 
             imageObj.onload = function () {
                 self.shape.image(imageObj);
-                self.shape.attrs.keepAspectRatio = true
-                self.shape.attrs.enabledAnchors = self.enabledAnchors
+                self.shape.attrs.image.width = self.shape.attrs.width
+                self.shape.attrs.image.height = self.shape.attrs.height
                 if (stage != null && stage != undefined) {
 
                     stage.batchDraw()
                 } else {
+
                     self.parent.draw();
                 }
-                console.log("[RECT IMAGE DRAW]")
 
             }
             imageObj.onerror = function () {
                 console.log("imageerror");
-
                 self.shape.fill('#1976d2');
-                if (stage != null && stage != undefined) {
-
-                    stage.batchDraw()
-                } else {
-                    self.parent.draw();
-                }
             }
             imageObj.src = "chevron-right.png";
         }
         self.parent.add(self.shape);
-        self.parent.draw();
     }
 }
 

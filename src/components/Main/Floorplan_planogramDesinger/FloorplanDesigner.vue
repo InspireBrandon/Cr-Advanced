@@ -362,16 +362,12 @@
                                     return oldBoundBox;
                                 }
                                 return newBoundBox;
-                            }
+                            },
+                            ignoreStroke: true
                         });
                         self.selectedItem.parent.add(tr);
 
                         tr.attachTo(self.selectedItem);
-                        tr.on('transformend', function () {
-                            console.log("transformend");
-
-
-                        });
                         tr.on('transform', function (z) {
                             console.log("transform");
                             self.findDrop(e.target, callback => {
@@ -594,7 +590,7 @@
                             x: shape.x,
                             y: shape.y
                         }, null, null, null, self.imageSrc(item.floorplan_Fixture_ID,
-                            "Top"), self.stage);
+                            "Top"),self.stage);
                         rect.shape.attrs = shape
                         rect.shape.saveID = item.id
                         rect.shape.guid = item.guid
