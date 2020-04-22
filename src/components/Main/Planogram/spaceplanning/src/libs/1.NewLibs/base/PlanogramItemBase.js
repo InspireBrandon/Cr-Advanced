@@ -134,7 +134,7 @@ class PlanogramItemBase {
     //   dropPos = newPoint;
     // }
     // TODO: Based on type set drag bound function
-    if (self.Type.toUpperCase() == "GONDOLA") {
+    if (self.Type.toUpperCase() == "GONDOLA" || self.Type.toUpperCase() == "OBSTRUCTION") {
       self.Group = new Konva.Group({
         id: self.Type + '_master_group_' + self.ID,
         name: self.Type + '_master_group',
@@ -357,6 +357,10 @@ class PlanogramItemBase {
 
         }
         break;
+        case "OBSTRUCTION": {
+
+        }
+        break;
       case "AREA": {
         typeArr = ["GONDOLA"];
       }
@@ -406,7 +410,7 @@ class PlanogramItemBase {
       }
       break;
       }
-      if (self.Type == "GONDOLA" || self.Type == "TEXTHEADER") {
+      if (self.Type == "GONDOLA" || self.Type == "OBSTRUCTION" || self.Type == "TEXTHEADER") {
         self.PositionElement();
       } else {
         ctrl_intrsct.TestIntersectsWithMany(self.Stage, self.Type, typeArr, self.VueStore, null).then(results => {

@@ -11,6 +11,8 @@ class ObstructionBase extends PlanogramItemBase {
 
     // AREA
     this.Area = null;
+    this.AreaFront = null;
+    this.AreaBack = null;
 
     // TAG
     this.Text = null;
@@ -56,7 +58,7 @@ class ObstructionBase extends PlanogramItemBase {
       self.PositionElement();
     }
 
-    self.AddRenderings();
+    // self.AddRenderings();
     self.ApplyZIndexing();
 
     self.Stage.draw();
@@ -114,18 +116,36 @@ class ObstructionBase extends PlanogramItemBase {
 
     self.Data = newData;
     self.SetObjectDimensions();
-    self.Area.fill(self.Data.backTransparent ? 'transparent' : self.Data.backColor);
-    self.Area.setWidth(self.TotalWidth); // sample
-    self.Area.setHeight(self.TotalHeight); // sample
+    // Fill
+    // self.Area.fill(self.Data.backTransparent ? 'transparent' : self.Data.backColor);
+    self.AreaBack.fill(self.Data.backTransparent ? 'transparent' : self.Data.backColor)
+    self.AreaFront.fill(self.Data.frontTransparent ? 'transparent' : self.Data.frontColor)
+    // Dimensions
+    // self.Area.setWidth(self.TotalWidth); // sample
+    self.AreaBack.setWidth(self.TotalWidth)
+    self.AreaFront.setWidth(self.TotalWidth)
+
+    // self.Area.setHeight(self.TotalHeight); // sample
+    self.AreaBack.setHeight(self.TotalHeight);
+    self.AreaFront.setHeight(self.TotalHeight);
+
     self.Group.setWidth(self.TotalWidth);
     self.Group.setHeight(self.TotalHeight);
 
-    if (self.Data.frontImageID != undefined && self.Data.frontImageID == null) {
-      self.LoadImage(self.Area, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.frontImageID}`);
-    } else if (self.Data.backImageID != undefined || self.Data.backImageID != null) {
-      self.LoadImage(self.Area, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.backImageID}`);
+    console.log("Loading image", self.Data)
+
+    if (self.Data.backImageID != undefined && self.Data.backImageID != null) {
+      self.LoadImage(self.AreaBack, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.backImageID}`);
     } else {
-      self.LoadImage(self.Area, "data:image/png;base64," + self.Data.image);
+      if(!self.Data.image.includes("fixtureImageID"))
+        self.LoadImage(self.AreaBack, "data:image/png;base64," + self.Data.image);
+    }
+
+    if (self.Data.frontImageID != undefined && self.Data.frontImageID != null) {
+      self.LoadImage(self.AreaFront, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.frontImageID}`);
+    } else {
+      if(!self.Data.image.includes("fixtureImageID"))
+        self.LoadImage(self.AreaFront, "data:image/png;base64," + self.Data.image);
     }
 
     // call position element
@@ -197,7 +217,30 @@ class ObstructionBase extends PlanogramItemBase {
   AddAreaCosmetic() {
     let self = this;
 
-    self.Area = new Konva.Image({
+    console.log("Loading image", self.Data)
+
+    self.AreaBack = new Konva.Image({
+      x: 0,
+      y: 0,
+      width: self.Width,
+      height: self.Height,
+      fill: self.Data.backTransparent ? 'transparent' : self.Data.backColor,
+      // color: self.Data.backColor,
+      // stroke: 'black',
+      // strokeWidth: 0.5,
+      transformsEnabled: 'position'
+    })
+
+    if (self.Data.backImageID != undefined && self.Data.backImageID != null) {
+      self.LoadImage(self.AreaBack, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.backImageID}`);
+    } else {
+      if(!self.Data.image.includes("fixtureImageID"))
+        self.LoadImage(self.AreaBack, "data:image/png;base64," + self.Data.image);
+    }
+
+    self.Group.add(self.AreaBack);
+
+    self.AreaFront = new Konva.Image({
       x: 0,
       y: 0,
       width: self.Width,
@@ -210,14 +253,13 @@ class ObstructionBase extends PlanogramItemBase {
     })
 
     if (self.Data.frontImageID != undefined && self.Data.frontImageID != null) {
-      self.LoadImage(self.Area, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.frontImageID}`);
-    } else if (self.Data.backImageID != undefined || self.Data.backImageID != null) {
-      self.LoadImage(self.Area, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.backImageID}`);
+      self.LoadImage(self.AreaFront, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.frontImageID}`);
     } else {
-      self.LoadImage(self.Area, "data:image/png;base64," + self.Data.image);
+      if(!self.Data.image.includes("fixtureImageID"))
+        self.LoadImage(self.AreaFront, "data:image/png;base64," + self.Data.image);
     }
 
-    self.Group.add(self.Area);
+    self.Group.add(self.AreaFront);
   }
 
   AddTextCosmetic() {

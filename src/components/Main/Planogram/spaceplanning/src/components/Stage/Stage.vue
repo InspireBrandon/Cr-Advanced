@@ -302,7 +302,6 @@
               }
 
               if (e.keyCode == 46) {
-                alert("DELETE");
                 // ctrl_store.dele
               }
             }
@@ -1170,7 +1169,7 @@
         let dropPos = ctrl_positioning.GetTransformedMousePoint(stage)
         console.log("OBSTRUCTION ADD - STAGE", dropPos, self.MasterLayer, data);
 
-        let ctrl_obstruction = new GondolaNew(self.$store, stage, self.MasterLayer, JSON.parse(JSON.stringify(data)),
+        let ctrl_obstruction = new ObstructionNew(self.$store, stage, self.MasterLayer, JSON.parse(JSON.stringify(data)),
           self
           .$PixelToCmRatio,
           "OBSTRUCTION");
@@ -1795,7 +1794,7 @@
               }
             }
 
-            if (data.data.defaultPeg != 0) {
+            if (data.data.defaultPeg != 0 && data.type != "TEXTHEADER") {
               if (data.data.defaultPegDetails == null) {
                 axios.get(process.env.VUE_APP_API + `Fixture/${data.data.defaultPeg}?db=CR-Devinspire`)
                   .then(r => {
@@ -1885,7 +1884,7 @@
           break;
         case "OBSTRUCTION": {
           //
-          self.addNewGondola(data.data);
+          self.addNewObstruction(data.data);
         }
         break;
         case "LABELHOLDER": {

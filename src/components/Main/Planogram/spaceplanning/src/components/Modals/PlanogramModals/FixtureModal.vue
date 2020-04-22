@@ -1019,8 +1019,17 @@
         let self = this;
         let event = new CustomEmitter();
 
-        self.newData.color = self.newData.color.hex;
-        self.newData.pegHoleColor = self.newData.pegHoleColor.hex;
+        // self.newData.color = self.newData.color.hex;
+        // self.newData.pegHoleColor = self.newData.pegHoleColor.hex;
+
+        self.newData.color = self.newData.color.hex == undefined ? "#fff" : self.newData.color.hex;
+        self.newData.frontColor = self.newData.frontColor.hex == undefined ? "#fff" : self.newData.frontColor.hex;
+        self.newData.backColor = self.newData.backColor.hex == undefined ? "#fff" : self.newData.backColor.hex;
+        self.newData.leftColor = self.newData.leftColor.hex == undefined ? "#fff" : self.newData.leftColor.hex;
+        self.newData.rightColor = self.newData.rightColor.hex == undefined ? "#fff" : self.newData.rightColor.hex;
+        self.newData.topColor = self.newData.topColor.hex == undefined ? "#fff" : self.newData.topColor.hex;
+        self.newData.bottomColor = self.newData.bottomColor.hex == undefined ? "#fff" : self.newData.bottomColor.hex;
+        self.newData.pegHoleColor = self.newData.pegHoleColor.hex == undefined ? "#000" : self.newData.pegHoleColor.hex;
 
         if (self.newData.fixtureType == 2 || self.newData.fixtureType == 3) {
           if (self.tmpPegs != null && self.tmpPegs.length > 0) {
