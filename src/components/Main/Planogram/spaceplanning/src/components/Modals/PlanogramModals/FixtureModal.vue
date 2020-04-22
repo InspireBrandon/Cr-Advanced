@@ -362,25 +362,120 @@
                     <h3>Renderings</h3>
                   </v-flex>
                   <v-flex v-if="!newData.rendering && renderingType0.length>1" lg8 md12 sm12 xs12 class="px-3">
-                    <v-select @change="onRenderingChange(0)" return-object item-text="name" placeholder="please select" :items="renderingType0" v-model="newData.RenderingsItems.LabelHolder" label="Label Holder:"></v-select>
-                    <v-text-field v-if="newData.RenderingsItems.LabelHolder != null" label="Y Offset" v-model="newData.RenderingsItems.LabelHolder.yOffset"></v-text-field>
+                    <v-select @change="onRenderingChange(0)" return-object item-text="name" placeholder="please select"
+                      :items="renderingType0" v-model="newData.RenderingsItems.LabelHolder" label="Label Holder:">
+                    </v-select>
+                    <div style="display: flex">
+                      <div style="width: 25%;">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.LabelHolder != null" label="Height"
+                          v-model="newData.RenderingsItems.LabelHolder.height"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.LabelHolder != null" label="Width"
+                          v-model="newData.RenderingsItems.LabelHolder.width"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.LabelHolder != null" label="Depth"
+                          v-model="newData.RenderingsItems.LabelHolder.depth"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.LabelHolder != null" label="Y Offset"
+                          v-model="newData.RenderingsItems.LabelHolder.yOffset"></v-text-field>
+                      </div>
+                    </div>
+                    <v-divider></v-divider>
                   </v-flex>
                   <v-flex v-if="!newData.rendering &&renderingType1.length>1" lg8 md12 sm12 xs12 class="px-3">
-                    <v-select return-object item-text="name" placeholder="please select" :items="renderingType1" v-model="newData.RenderingsItems.ShelfEdge" label="Shelf Edge:"></v-select>
-                    <v-text-field v-if="newData.RenderingsItems.ShelfEdge != null" label="Y Offset" v-model="newData.RenderingsItems.ShelfEdge.yOffset"></v-text-field>
+                    <v-select return-object item-text="name" placeholder="please select" :items="renderingType1"
+                      v-model="newData.RenderingsItems.ShelfEdge" label="Shelf Edge:"></v-select>
+                    <div style="display: flex">
+                      <div style="width: 25%;">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.ShelfEdge != null" label="Height"
+                          v-model="newData.RenderingsItems.ShelfEdge.height"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.ShelfEdge != null" label="Width"
+                          v-model="newData.RenderingsItems.ShelfEdge.width"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.ShelfEdge != null" label="Depth"
+                          v-model="newData.RenderingsItems.ShelfEdge.depth"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.ShelfEdge != null" label="Y Offset"
+                          v-model="newData.RenderingsItems.ShelfEdge.yOffset"></v-text-field>
+                      </div>
+                    </div>
+                    <v-divider></v-divider>
                   </v-flex>
                   <v-flex v-if="!newData.rendering &&renderingType2.length>1" lg8 md12 sm12 xs12 class="px-3">
-                    <v-select return-object item-text="name" placeholder="please select" :items="renderingType2" v-model="newData.RenderingsItems.Back" label="Back Face:"></v-select>
-                    <v-text-field v-if="newData.RenderingsItems.Back != null" label="Y Offset" v-model="newData.RenderingsItems.Back.yOffset"></v-text-field>
+                    <v-select return-object item-text="name" placeholder="please select" :items="renderingType2"
+                      v-model="newData.RenderingsItems.Back" label="Back Face:"></v-select>
+                    <div style="display: flex">
+                      <div style="width: 25%;">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Back != null" label="Height"
+                          v-model="newData.RenderingsItems.Back.height"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Back != null" label="Width"
+                          v-model="newData.RenderingsItems.Back.width"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Back != null" label="Depth"
+                          v-model="newData.RenderingsItems.Back.depth"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Back != null" label="Y Offset"
+                          v-model="newData.RenderingsItems.Back.yOffset"></v-text-field>
+                      </div>
+                    </div>
+                    <v-divider></v-divider>
                   </v-flex>
                   <v-flex v-if="!newData.rendering &&renderingType3.length>1" lg8 md12 sm12 xs12 class="px-3">
-                    <v-select return-object item-text="name" placeholder="please select" :items="renderingType3" v-model="newData.RenderingsItems.Front" label="Front Face:"></v-select>
-                    <v-text-field label="Y Offset"></v-text-field>
-                    <v-text-field v-if="newData.RenderingsItems.Front != null" label="Y Offset" v-model="newData.RenderingsItems.Front.yOffset"></v-text-field>
+                    <v-select return-object item-text="name" placeholder="please select" :items="renderingType3"
+                      v-model="newData.RenderingsItems.Front" label="Front Face:"></v-select>
+                    <div style="display: flex">
+                      <div style="width: 25%;">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Front != null" label="Height"
+                          v-model="newData.RenderingsItems.Front.height"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Front != null" label="Width"
+                          v-model="newData.RenderingsItems.Front.width"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Front != null" label="Depth"
+                          v-model="newData.RenderingsItems.Front.depth"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Front != null" label="Y Offset"
+                          v-model="newData.RenderingsItems.Front.yOffset"></v-text-field>
+                      </div>
+                    </div>
+                    <v-divider></v-divider>
                   </v-flex>
                   <v-flex v-if="!newData.rendering &&renderingType4.length>1" lg8 md12 sm12 xs12 class="px-3">
-                    <v-select return-object item-text="name" placeholder="please select" :items="renderingType4" v-model="newData.RenderingsItems.Side" label="Side Face:"></v-select>
-                    <v-text-field v-if="newData.RenderingsItems.Side != null" label="Y Offset" v-model="newData.RenderingsItems.Side.yOffset"></v-text-field>
+                    <v-select return-object item-text="name" placeholder="please select" :items="renderingType4"
+                      v-model="newData.RenderingsItems.Side" label="Side Face:"></v-select>
+                    <div style="display: flex">
+                      <div style="width: 25%;">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Side != null" label="Height"
+                          v-model="newData.RenderingsItems.Side.height"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Side != null" label="Width"
+                          v-model="newData.RenderingsItems.Side.width"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Side != null" label="Depth"
+                          v-model="newData.RenderingsItems.Side.depth"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Side != null" label="Y Offset"
+                          v-model="newData.RenderingsItems.Side.yOffset"></v-text-field>
+                      </div>
+                    </div>
+                    <v-divider></v-divider>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -924,8 +1019,17 @@
         let self = this;
         let event = new CustomEmitter();
 
-        self.newData.color = self.newData.color.hex;
-        self.newData.pegHoleColor = self.newData.pegHoleColor.hex;
+        // self.newData.color = self.newData.color.hex;
+        // self.newData.pegHoleColor = self.newData.pegHoleColor.hex;
+
+        self.newData.color = self.newData.color.hex == undefined ? "#fff" : self.newData.color.hex;
+        self.newData.frontColor = self.newData.frontColor.hex == undefined ? "#fff" : self.newData.frontColor.hex;
+        self.newData.backColor = self.newData.backColor.hex == undefined ? "#fff" : self.newData.backColor.hex;
+        self.newData.leftColor = self.newData.leftColor.hex == undefined ? "#fff" : self.newData.leftColor.hex;
+        self.newData.rightColor = self.newData.rightColor.hex == undefined ? "#fff" : self.newData.rightColor.hex;
+        self.newData.topColor = self.newData.topColor.hex == undefined ? "#fff" : self.newData.topColor.hex;
+        self.newData.bottomColor = self.newData.bottomColor.hex == undefined ? "#fff" : self.newData.bottomColor.hex;
+        self.newData.pegHoleColor = self.newData.pegHoleColor.hex == undefined ? "#000" : self.newData.pegHoleColor.hex;
 
         if (self.newData.fixtureType == 2 || self.newData.fixtureType == 3) {
           if (self.tmpPegs != null && self.tmpPegs.length > 0) {

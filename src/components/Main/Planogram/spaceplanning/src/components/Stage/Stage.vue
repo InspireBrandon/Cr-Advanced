@@ -302,7 +302,6 @@
               }
 
               if (e.keyCode == 46) {
-                alert("DELETE");
                 // ctrl_store.dele
               }
             }
@@ -1170,7 +1169,8 @@
         let dropPos = ctrl_positioning.GetTransformedMousePoint(stage)
         console.log("OBSTRUCTION ADD - STAGE", dropPos, self.MasterLayer, data);
 
-        let ctrl_obstruction = new GondolaNew(self.$store, stage, self.MasterLayer, JSON.parse(JSON.stringify(data)), self
+        let ctrl_obstruction = new ObstructionNew(self.$store, stage, self.MasterLayer, JSON.parse(JSON.stringify(data)),
+          self
           .$PixelToCmRatio,
           "OBSTRUCTION");
 
@@ -1775,53 +1775,61 @@
 
         //#endregion
 
-        if (data.type == "GONDOLA") {
-          if (data.data.backImageID != null) {
-            data.data.image = process.env.VUE_APP_API +
-              `FixtureImage?db=CR-Devinspire&fixtureImageID=${data.data.backImageID}`
-          }
-        } else {
-          if (data.type != undefined) {
-            if (data.data.frontImageID != null) {
-              data.data.image = process.env.VUE_APP_API +
-                `FixtureImage?db=CR-Devinspire&fixtureImageID=${data.data.frontImageID}`
-            }
-          }
-        }
-
         if (data.type != undefined) {
-          if (data.data.defaultPeg != 0) {
-            if (data.data.defaultPegDetails == null) {
-              axios.get(process.env.VUE_APP_API + `Fixture/${data.data.defaultPeg}?db=CR-Devinspire`)
-                .then(r => {
-                  data.data.defaultPegDetails = r.data
-                })
-            }
-          }
-
           self.getSelectedRenderings(data.data, cb => {
             data.data = cb
             console.log("[getSelectedRenderings]--calbnack", cb);
 
-            switch (dragType.toUpperCase()) {
-              case "WAREHOUSE": {
-                self.addWarehouseProduct(stage, data, ev);
+            if (data.type == "GONDOLA") {
+              if (data.data.backImageID != null) {
+                data.data.image = process.env.VUE_APP_API +
+                  `FixtureImage?db=CR-Devinspire&fixtureImageID=${data.data.backImageID}`
               }
-              break;
-            case "LIBRARY": {
-              if (data.type == "CUSTOM") {
-                self.addCustomLibraryItem(stage, data, ev)
-              } else if (data.type == "CUSTOM_PLANOGRAM") {
-                self.addCustomPlanogram(stage, data, ev);
-              } else {
-                self.addLibraryItem(stage, data, ev);
+            } else {
+              if (data.type != undefined) {
+                if (data.data.frontImageID != null) {
+                  data.data.image = process.env.VUE_APP_API +
+                    `FixtureImage?db=CR-Devinspire&fixtureImageID=${data.data.frontImageID}`
+                }
               }
             }
-            break;
+
+            if (data.data.defaultPeg != 0 && data.type != "TEXTHEADER") {
+              if (data.data.defaultPegDetails == null) {
+                axios.get(process.env.VUE_APP_API + `Fixture/${data.data.defaultPeg}?db=CR-Devinspire`)
+                  .then(r => {
+                    data.data.defaultPegDetails = r.data
+                    self.addItem(dragType, stage, data, ev);
+                  })
+              } else {
+                self.addItem(dragType, stage, data, ev);
+              }
+            } else {
+              self.addItem(dragType, stage, data, ev);
             }
           })
         } else {
           self.addWarehouseProduct(stage, data, ev);
+        }
+      },
+      addItem(dragType, stage, data, ev) {
+        let self = this;
+
+        switch (dragType.toUpperCase()) {
+          case "WAREHOUSE": {
+            self.addWarehouseProduct(stage, data, ev);
+          }
+          break;
+        case "LIBRARY": {
+          if (data.type == "CUSTOM") {
+            self.addCustomLibraryItem(stage, data, ev)
+          } else if (data.type == "CUSTOM_PLANOGRAM") {
+            self.addCustomPlanogram(stage, data, ev);
+          } else {
+            self.addLibraryItem(stage, data, ev);
+          }
+        }
+        break;
         }
       },
       addWarehouseProduct(stage, data, ev) {
@@ -1876,7 +1884,7 @@
           break;
         case "OBSTRUCTION": {
           //
-          self.addNewGondola(data.data);
+          self.addNewObstruction(data.data);
         }
         break;
         case "LABELHOLDER": {

@@ -69,7 +69,7 @@ class LabelHolderBase extends PlanogramItemBase {
 
     if (ctrl_store.getCloneItem(self.VueStore) == self.ID) {
       let ctrl_clone = new CloneBase("PEGBAR");
-      ctrl_clone.Clone(self.VueStore, self.Stage, self, null, null);
+      ctrl_clone.Clone(self.VueStore, self.Stage, self, null, null, null);
       ctrl_store.setCloneItem(self.VueStore, null);
       return;
     }

@@ -30,11 +30,11 @@
 
           <v-tab href="#tab-palette">Palettes
             <v-icon>web</v-icon>
-          </v-tab>
+          </v-tab> -->
 
           <v-tab v-if="!isFloorplan" href="#tab-misc">Miscellaneous
             <v-icon>extension</v-icon>
-          </v-tab> -->
+          </v-tab>
 
           <v-tab href="#tab-custom">Custom
             <v-icon>extension</v-icon>
@@ -253,7 +253,7 @@
 
           <v-tab-item value="tab-custom" class="list-item">
             <v-card flat>
-               <v-toolbar dense flat>
+              <v-toolbar dense flat>
                 <v-spacer></v-spacer>
                 <v-text-field v-model="customSearch" style="width:200px" append-icon="search"></v-text-field>
               </v-toolbar>
@@ -300,6 +300,8 @@
         </v-tabs>
       </v-card>
     </v-menu>
+    <!-- <v-card @click="selectLibraryItem(item)" v-for="(item, idx) in miscArray" draggable :dragStart="dragStart('LIBRARY', item)" :dragMove="dragMove" :clearDrag="clearDrag"
+      style="width: 80px; text-align: center; height: 25px; padding-top: 2px;" class="mt-2" :key="idx">Text</v-card> -->
   </v-layout>
 </template>
 <script>
@@ -328,7 +330,7 @@
       customFixtures: [],
       planograms: [],
       searchText: null,
-      customSearch:null,
+      customSearch: null,
     }),
     mounted() {
       let self = this;
@@ -344,8 +346,8 @@
           return (item.name.toLowerCase().includes(this.searchText.toLowerCase()))
         });
       },
-      filteredCustomFixtures(){
-         return this.customFixtures.filter(item => {
+      filteredCustomFixtures() {
+        return this.customFixtures.filter(item => {
           if (!this.customSearch) return this.customFixtures;
           return (item.name.toLowerCase().includes(this.customSearch.toLowerCase()))
         });

@@ -52,40 +52,43 @@ class CloneBase {
 
     switch (item.Type.toUpperCase()) {
       case "GONDOLA": {
-        self.CloneGondola(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item, )
+        self.CloneGondola(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item)
           .then(newItem => {
             childrenItemArr.forEach(childItem => {
               self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
             });
 
             if (childrenItemArr.length == 0) {
-              afterCloneCallBack();
+              if (self.afterCloneCallBack != null)
+                afterCloneCallBack();
             }
           })
       }
       break;
     case "AREA": {
-      self.CloneArea(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item, )
+      self.CloneArea(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item)
         .then(newItem => {
           childrenItemArr.forEach(childItem => {
             self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
           });
 
           if (childrenItemArr.length == 0) {
-            afterCloneCallBack();
+            if (self.afterCloneCallBack != null)
+              afterCloneCallBack();
           }
         })
     }
     break;
     case "LABELHOLDER": {
-      self.CloneLabelHolder(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item, )
+      self.CloneLabelHolder(stage, VueStore, item.Layer, item.Ratio, item.ParentID, item.Data, dropPos, item, prev_original_item, prev_clone_item)
         .then(newItem => {
           childrenItemArr.forEach(childItem => {
             self.Clone(VueStore, stage, childItem, item, newItem, afterCloneCallBack);
           });
 
           if (childrenItemArr.length == 0) {
-            afterCloneCallBack();
+            if (self.afterCloneCallBack != null)
+              afterCloneCallBack();
           }
         })
     }
@@ -98,7 +101,8 @@ class CloneBase {
           });
 
           if (childrenItemArr.length == 0) {
-            afterCloneCallBack();
+            if (self.afterCloneCallBack != null)
+              afterCloneCallBack();
           }
         })
     }
