@@ -721,63 +721,72 @@
             },
             getApprovalUser(projectID, approvalUserID, callback) {
                 let self = this;
+                Axios.get(process.env.VUE_APP_API + `SystemUser`).then(userresp => {
+                    let users = userresp.data
+                    if (approvalUserID == null) {
+                        Axios.get(process.env.VUE_APP_API +
+                                `ProjectUsers?typeName=Ranging&projectID=${projectID}`)
+                            .then(r => {
+                                console.log("project users", r.data);
 
-                if (approvalUserID == null) {
-                    Axios.get(process.env.VUE_APP_API + `ProjectUsers?typeName=Ranging&projectID=${projectID}`)
-                        .then(r => {
-                            console.log("project users", r.data);
 
+                                if (r.data.length > 1) {
+                                    let items = []
+                                    console.log("All users", users);
+                                    r.data.forEach(item => {
+                                        users.forEach(user => {
+                                            console.log(
+                                                "user.systemUserID == item.userID_2:",
+                                                user
+                                                .systemUserID == item.userID_2);
 
-                            if (r.data.length > 1) {
-                                let items = []
-                                console.log("All users", self.users);
-                                r.data.forEach(item => {
-                                    self.users.forEach(user => {
-                                        console.log("user.systemUserID == item.userID_2:", user
-                                            .systemUserID == item.userID_2);
+                                            if (user.systemUserID == item.userID_2) {
+                                                items.push({
+                                                    text: user.firstname + " " +
+                                                        user.lastname,
+                                                    value: user.systemUserID
+                                                })
+                                            }
+                                        })
 
-                                        if (user.systemUserID == item.userID_2) {
-                                            items.push({
-                                                text: user.firstname + " " + user.lastname,
-                                                value: user.systemUserID
-                                            })
-                                        }
                                     })
+                                    console.log("items to push", items);
 
-                                })
-                                console.log("items to push", items);
-
-                                self.$refs.UserSelectorModalDynamic.open("Please select a user to send to", items,
-                                    cb => {
-                                        callback(cb);
+                                    self.$refs.UserSelectorModalDynamic.open(
+                                        "Please select a user to send to", items,
+                                        cb => {
+                                            callback(cb);
+                                        })
+                                }
+                                if (r.data.length == 0 || r.data == null) {
+                                    let items = []
+                                    users.forEach(item => {
+                                        items.push({
+                                            text: item.firstname + " " + item.lastname,
+                                            value: item.systemUserID
+                                        })
                                     })
-                            }
-                            if (r.data.length == 0 || r.data == null) {
-                                let items = []
-                                self.users.forEach(item => {
-                                    items.push({
-                                        text: item.firstname + " " + item.lastname,
-                                        value: item.systemUserID
-                                    })
-                                })
-                                self.$refs.UserSelectorModalDynamic.open("Please select a user to send to", items,
-                                    cb => {
-                                        callback(cb);
-                                    })
-                            }
-                            if (r.data.length == 1) {
-                                callback(r.data[0].userID_2);
-                            }
+                                    self.$refs.UserSelectorModalDynamic.open(
+                                        "Please select a user to send to", items,
+                                        cb => {
+                                            callback(cb);
+                                        })
+                                }
+                                if (r.data.length == 1) {
+                                    callback(r.data[0].userID_2);
+                                }
 
-                        })
-                        .catch(e => {
-                            console.log("approval ussesr catch", e);
+                            })
+                            .catch(e => {
+                                console.log("approval ussesr catch", e);
 
-                            callback(approvalUserID);
-                        })
-                } else {
-                    callback(approvalUserID);
-                }
+                                callback(approvalUserID);
+                            })
+                    } else {
+                        callback(approvalUserID);
+                    }
+                })
+
             },
             setDeclined(item) {
                 let self = this
