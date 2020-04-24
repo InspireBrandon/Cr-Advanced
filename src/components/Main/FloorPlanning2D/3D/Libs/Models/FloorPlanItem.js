@@ -17,6 +17,9 @@ class FloorPlanItem {
         // Coordinates
         self.x = params.x;
         self.y = params.y;
+
+        self.absoluteX = params.absoluteX;
+        self.absoluteY = params.absoluteY;
         
         // Dimensions
         self.height = params.height == 0 ? 0.1 : params.height;
