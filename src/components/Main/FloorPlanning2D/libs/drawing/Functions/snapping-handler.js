@@ -50,11 +50,11 @@ class snappinghandler {
                     offset: Math.round(node.x() - box.x),
                     snap: 'start'
                 },
-                // {
-                //     guide: Math.round(box.x + box.width / 2),
-                //     offset: Math.round(node.x() - box.x - box.width / 2),
-                //     snap: 'center'
-                // },
+                {
+                    guide: Math.round(box.x + box.width / 2),
+                    offset: Math.round(node.x() - box.x - box.width / 2),
+                    snap: 'center'
+                },
                 {
                     guide: Math.round(box.x + box.width),
                     offset: Math.round(node.x() - box.x - box.width),
@@ -66,11 +66,11 @@ class snappinghandler {
                     offset: Math.round(node.y() - box.y),
                     snap: 'start'
                 },
-                // {
-                //     guide: Math.round(box.y + box.height / 2),
-                //     offset: Math.round(node.y() - box.y - box.height / 2),
-                //     snap: 'center'
-                // },
+                {
+                    guide: Math.round(box.y + box.height / 2),
+                    offset: Math.round(node.y() - box.y - box.height / 2),
+                    snap: 'center'
+                },
                 {
                     guide: Math.round(box.y + box.height),
                     offset: Math.round(node.y() - box.y - box.height),
