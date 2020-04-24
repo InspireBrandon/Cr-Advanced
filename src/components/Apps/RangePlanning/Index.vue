@@ -68,6 +68,9 @@
             <v-list-tile @click="setupView">
               <v-list-tile-title>Setup</v-list-tile-title>
             </v-list-tile>
+            <v-list-tile @click="indicatorView">
+              <v-list-tile-title>Indicators</v-list-tile-title>
+            </v-list-tile>
           </v-list>
         </v-menu>
         <v-menu v-if="rowData.length > 0 && !$route.path.includes('RangePlanningView')" dark offset-y
@@ -239,6 +242,7 @@
     <CustomRange ref="CustomRange" />
     <RetailChainSelector ref="RetailChainSelector" />
     <ViewSetup ref="ViewSetup" />
+    <IndicatorSetup ref="IndicatorSetup" />
   </div>
 </template>
 
@@ -285,6 +289,7 @@
   import HandleDescrepancy from "./HandleDescrepancy";
   import CustomRange from "./CustomRange/Index";
   import ViewSetup from "./ViewSetup.vue";
+  import IndicatorSetup from './IndicatorSetup.vue'
 
   import RetailChainSelector from "@/components/Common/RetailChainSelector";
 
@@ -338,7 +343,8 @@
       HandleDescrepancy,
       CustomRange,
       RetailChainSelector,
-      ViewSetup
+      ViewSetup,
+      IndicatorSetup
     },
     data() {
       return {
@@ -478,7 +484,8 @@
         ais_SalesPotential: 0,
         periodData: [],
         tmpClusters: null,
-        currentClusterData: null
+        currentClusterData: null,
+        indicatorOptions: ["YES", "NO"]
       };
     },
     mounted() {
@@ -503,6 +510,14 @@
           .catch(e => {
 
           })
+      },
+      indicatorView() {
+        let self = this;
+
+        self.$refs.IndicatorSetup.show(self.indicatorOptions, newIndicatorOptions => {
+          self.indicatorOptions = newIndicatorOptions;
+          self.onClusterOptionChange();
+        })
       },
       setupView() {
         let self = this;
@@ -1050,6 +1065,15 @@
             percent: "percent"
           },
           callback => {
+            self.rowData.forEach(rowitem => {
+              self.rangingController.setClusterIndicator(
+                self.selectedClusterType,
+                self.selectedClusterOption,
+                rowitem.productID,
+                "NO"
+              );
+            });
+
             callback.forEach(el => {
               self.rowData.forEach(rowitem => {
                 if (el.productID == rowitem.productID) {
@@ -2114,7 +2138,7 @@
               editable: true,
               cellEditor: "agRichSelectCellEditor",
               cellEditorParams: {
-                values: ["YES", "NO", "SELECTED", "SELECT"]
+                values: self.indicatorOptions
               },
               cellStyle: function (params) {
                 if (params.data.autoRangeOneItem && params.data.autoRangeItem) {
@@ -2417,7 +2441,8 @@
             if (self.selectedClusterOption == "stores") {
               self.storesInCluster = 1;
             } else {
-              self.storesInCluster = self.rangingController.getStoresByCluster(self.selectedClusterType, self.selectedClusterOption).length;
+              self.storesInCluster = self.rangingController.getStoresByCluster(self.selectedClusterType, self
+                .selectedClusterOption).length;
             }
 
             self.fitColumns();

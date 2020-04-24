@@ -115,7 +115,7 @@ class ShelfBase extends PlanogramItemBase {
   PositionShelf() {
     let self = this;
 
-    let offset = (self.Data.x_Offset == undefined ? 0 : self.Data.x_Offset) * 3;
+    let offset = (self.Data.xOffset == undefined ? 0 : self.Data.xOffset) * 3;
     self.Group.setX(0 + parseFloat(offset));
 
     // self.Group.setX(self.Group);
@@ -201,7 +201,7 @@ class ShelfBase extends PlanogramItemBase {
         y: (h * -1) - offset,
         width: w,
         height: h,
-        fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
+        fill: self.Data.RenderingsItems.ShelfEdge.frontTransparent ? 'transparent' : self.Data.RenderingsItems.ShelfEdge.frontColor,
         listening: false
       })
 
@@ -240,7 +240,7 @@ class ShelfBase extends PlanogramItemBase {
         y: 0 + offset,
         width: w,
         height: h,
-        fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
+        fill: self.Data.RenderingsItems.LabelHolder.frontTransparent ? 'transparent' : self.Data.RenderingsItems.LabelHolder.frontColor,
         listening: false
       })
 
@@ -276,7 +276,7 @@ class ShelfBase extends PlanogramItemBase {
         y: (h * -1) - offset,
         width: w,
         height: h,
-        fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
+        fill: self.Data.RenderingsItems.Back.frontTransparent ? 'transparent' : self.Data.RenderingsItems.Back.frontColor,
         listening: false
       })
 

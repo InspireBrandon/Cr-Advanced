@@ -1169,7 +1169,8 @@
         let dropPos = ctrl_positioning.GetTransformedMousePoint(stage)
         console.log("OBSTRUCTION ADD - STAGE", dropPos, self.MasterLayer, data);
 
-        let ctrl_obstruction = new ObstructionNew(self.$store, stage, self.MasterLayer, JSON.parse(JSON.stringify(data)),
+        let ctrl_obstruction = new ObstructionNew(self.$store, stage, self.MasterLayer, JSON.parse(JSON.stringify(
+            data)),
           self
           .$PixelToCmRatio,
           "OBSTRUCTION");
@@ -1692,18 +1693,19 @@
       },
       getSelectedRenderings(fixture, callback) {
         let self = this
-        console.log("getSelectedRenderings---fixture", fixture);
 
         axios.get(process.env.VUE_APP_API + `FixtureRenderingLink?db=CR-Devinspire&Fixture_ID=${fixture.id}`)
           .then(r => {
+
+            if (fixture.RenderingsItems == null || fixture.RenderingsItems == undefined) {
+              let Front
+              fixture.RenderingsItems = {
+                Front
+              }
+            }
+
             // self.form.image = r.data;
             r.data.forEach(item => {
-              if (fixture.RenderingsItems == null || fixture.RenderingsItems == undefined) {
-                let Front
-                fixture.RenderingsItems = {
-                  Front
-                }
-              }
               switch (item.renderingType) {
                 case 0: {
                   fixture.RenderingsItems.LabelHolder = item
@@ -1775,39 +1777,47 @@
 
         //#endregion
 
-        if (data.type != undefined) {
-          self.getSelectedRenderings(data.data, cb => {
-            data.data = cb
-            console.log("[getSelectedRenderings]--calbnack", cb);
 
-            if (data.type == "GONDOLA") {
-              if (data.data.backImageID != null) {
-                data.data.image = process.env.VUE_APP_API +
-                  `FixtureImage?db=CR-Devinspire&fixtureImageID=${data.data.backImageID}`
-              }
-            } else {
-              if (data.type != undefined) {
-                if (data.data.frontImageID != null) {
+
+        if (data.type != undefined) {
+          console.log("DATA TYPE", data.type)
+
+          if (data.type == "CUSTOM" || data.type == "CUSTOM_PLANOGRAM") {
+            self.addItem(dragType, stage, data, ev);
+          } else {
+            self.getSelectedRenderings(data.data, cb => {
+              data.data = cb
+              console.log("[getSelectedRenderings]--calbnack", cb);
+
+              if (data.type == "GONDOLA") {
+                if (data.data.backImageID != null) {
                   data.data.image = process.env.VUE_APP_API +
-                    `FixtureImage?db=CR-Devinspire&fixtureImageID=${data.data.frontImageID}`
+                    `FixtureImage?db=CR-Devinspire&fixtureImageID=${data.data.backImageID}`
+                }
+              } else {
+                if (data.type != undefined) {
+                  if (data.data.frontImageID != null) {
+                    data.data.image = process.env.VUE_APP_API +
+                      `FixtureImage?db=CR-Devinspire&fixtureImageID=${data.data.frontImageID}`
+                  }
                 }
               }
-            }
 
-            if (data.data.defaultPeg != 0 && data.type != "TEXTHEADER") {
-              if (data.data.defaultPegDetails == null) {
-                axios.get(process.env.VUE_APP_API + `Fixture/${data.data.defaultPeg}?db=CR-Devinspire`)
-                  .then(r => {
-                    data.data.defaultPegDetails = r.data
-                    self.addItem(dragType, stage, data, ev);
-                  })
+              if (data.data.defaultPeg != 0 && data.type != "TEXTHEADER") {
+                if (data.data.defaultPegDetails == null) {
+                  axios.get(process.env.VUE_APP_API + `Fixture/${data.data.defaultPeg}?db=CR-Devinspire`)
+                    .then(r => {
+                      data.data.defaultPegDetails = r.data
+                      self.addItem(dragType, stage, data, ev);
+                    })
+                } else {
+                  self.addItem(dragType, stage, data, ev);
+                }
               } else {
                 self.addItem(dragType, stage, data, ev);
               }
-            } else {
-              self.addItem(dragType, stage, data, ev);
-            }
-          })
+            })
+          }
         } else {
           self.addWarehouseProduct(stage, data, ev);
         }

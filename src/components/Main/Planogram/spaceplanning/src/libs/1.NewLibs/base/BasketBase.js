@@ -284,7 +284,7 @@ class BasketBase extends PlanogramItemBase {
         y: self.TotalHeight - h + (offset),
         width: w,
         height: h,
-        fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
+        fill: self.Data.RenderingsItems.Front.frontTransparent ? 'transparent' : self.Data.RenderingsItems.Front.frontColor,
         listening: false
       })
 

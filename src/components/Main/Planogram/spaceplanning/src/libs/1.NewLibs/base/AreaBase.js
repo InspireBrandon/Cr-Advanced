@@ -190,7 +190,7 @@ class AreaBase extends PlanogramItemBase {
         y: 0 + offset,
         width: w,
         height: h,
-        fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
+        fill: self.Data.RenderingsItems.Front.frontTransparent ? 'transparent' : self.Data.RenderingsItems.Front.frontColor,
         listening: false
       })
 
@@ -226,7 +226,7 @@ class AreaBase extends PlanogramItemBase {
         y: (h * -1) - offset,
         width: w,
         height: h,
-        fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
+        fill: self.Data.RenderingsItems.Back.frontTransparent ? 'transparent' : self.Data.RenderingsItems.Back.frontColor,
         listening: false
       })
 

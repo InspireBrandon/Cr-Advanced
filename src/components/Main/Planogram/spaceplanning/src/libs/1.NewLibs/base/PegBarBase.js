@@ -182,7 +182,7 @@ class PegBarBase extends PlanogramItemBase {
         y: 0 + offset,
         width: w,
         height: h,
-        fill: self.Data.frontTransparent ? 'transparent' : self.Data.frontColor,
+        fill: self.Data.RenderingsItems.LabelHolder.frontTransparent ? 'transparent' : self.Data.RenderingsItems.LabelHolder.frontColor,
         listening: false
       })
 

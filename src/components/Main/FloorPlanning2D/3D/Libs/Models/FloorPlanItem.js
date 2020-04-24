@@ -68,6 +68,13 @@ class FloorPlanItem {
             bottom: params.bottomMirrored,
             top: params.topMirrored
         });
+
+        if(params.type == "OBSTRUCTION") {
+            self.color.switchSides();
+            self.imageID.switchSides();
+            self.transparency.switchSides();
+            self.mirrored.switchSides();
+        }
         
         // Offsets
         self.offset = {

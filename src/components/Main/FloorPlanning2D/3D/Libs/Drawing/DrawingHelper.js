@@ -5,7 +5,9 @@
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 import Gondola from './Gondola.js'
+import Obstruction from './Obstruction.js'
 import Shelf from './Shelf.js'
+import Basket from './Basket.js'
 
 class DrawingHelper {
     constructor(scene) {
@@ -27,6 +29,9 @@ class DrawingHelper {
             case "GONDOLA": {
                 fixture = new Gondola(params);
             }break;
+            case "OBSTRUCTION": {
+                fixture = new Obstruction(params);
+            }break;
             case "BASE": {
                 fixture = new Shelf(params);
             }break;
@@ -41,6 +46,12 @@ class DrawingHelper {
             }break;
             case "LABELHOLDER": {
                 fixture = new Shelf(params);
+            }break;
+            case "SIDE": {
+                fixture = new Shelf(params);
+            }break;
+            case "BASKET": {
+                fixture = new Basket(params);
             }break;
         }
 
