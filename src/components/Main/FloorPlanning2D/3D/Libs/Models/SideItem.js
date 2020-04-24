@@ -14,6 +14,14 @@ class SideItem {
         self.bottom = params.bottom;
         self.top = params.top;
     }
+
+    switchSides() {
+        let self = this;
+
+        let tmpFront = self.front;
+        self.front = self.back;
+        self.back = tmpFront;
+    }
 }
 
 export default SideItem;

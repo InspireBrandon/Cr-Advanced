@@ -16,18 +16,13 @@ class Boxbase extends Drawingbase {
     draw() {
         let self = this;
 
-        var material = self.setMaterial();
-
         let config;
 
-        if(self.data.type == "GONDOLA") {
+        if(self.data.type == "GONDOLA" || self.data.type == "OBSTRUCTION") {
             config = {
                 height: self.data.depth / self.pxlToMeterRatio,
                 width: self.data.width / self.pxlToMeterRatio,
-                // depth: self.data.height / self.pxlToMeterRatio,
-                depth: 0.3 / self.pxlToMeterRatio,
-                faceColors: material.faceColors,
-                faceUV: material.faceUV,
+                depth: self.data.height / self.pxlToMeterRatio,
                 wrap: true,
             }
         }
@@ -36,16 +31,14 @@ class Boxbase extends Drawingbase {
                 height: self.data.depth / self.pxlToMeterRatio,
                 width: self.data.width / self.pxlToMeterRatio,
                 depth: self.data.height / self.pxlToMeterRatio,
-                faceColors: material.faceColors,
-                faceUV: material.faceUV,
                 wrap: true,
             }
         }
 
         self.element = BABYLON.MeshBuilder.CreateBox(this.name, config, this.scene);
-        self.element.material = material.material;
-        self.element.receiveShadows = true;
+        self.setMaterialAlt();
         self.setPosition();
+        self.element.receiveShadows = true;
     }
 }
 

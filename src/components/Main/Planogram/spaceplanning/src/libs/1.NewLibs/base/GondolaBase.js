@@ -164,7 +164,7 @@ class GondolaBase extends PlanogramItemBase {
         y: 0,
         width: w,
         height: h,
-        fill: self.Data.backTransparent ? 'transparent' : self.Data.backColor,
+        fill: self.Data.RenderingsItems.Front.frontTransparent ? 'transparent' : self.Data.RenderingsItems.Front.frontColor,
         // color: self.Data.backColor,
         listening: false
       })

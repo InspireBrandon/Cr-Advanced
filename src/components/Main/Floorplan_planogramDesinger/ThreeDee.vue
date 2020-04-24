@@ -96,29 +96,32 @@
             createCamera(scene, canvas) {
                 let self = this;
 
-                camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, BABYLON.Vector3.Zero(),
-                    scene);
+                camera = new BABYLON.ArcRotateCamera("Camera", 5, 0, 0, new BABYLON.Vector3(0, 0, 0), scene);
                 camera.attachControl(canvas, true);
 
                 camera.wheelPrecision = 50;
-                camera.applyGravity = true;
-                camera.checkCollisions = true;
+                // camera.applyGravity = true;
+                // camera.checkCollisions = true;
                 camera.speed = 0.3;
 
-                camera.position.x = 20 / 2;
-                camera.position.z = -10;
+                //camera.setPosition(new BABYLON.Vector3(20, 5, 20));
+                camera.setTarget(new BABYLON.Vector3(5, 0, 0));
+
+                // camera.position.x = 20 / 2;
+                // camera.position.z = -10;
             },
             createLight(scene) {
                 let self = this;
 
-                let light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(15 / pxlToMeterRatio, 25 / pxlToMeterRatio, 0), scene);
-                light.position = new BABYLON.Vector3(0,10,10);
+                let light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(15 / pxlToMeterRatio, 25 /
+                    pxlToMeterRatio, 0), scene);
+                light.position = new BABYLON.Vector3(0, 10, 10);
             },
-            createFloor(scene) {
+            createFloor(scene, height, width) {
                 let self = this;
 
-                let height = 20;
-                let width = 20;
+                height = 10;
+                width = 10;
 
                 let myScale = 2;
                 let myScale2 = 2;
@@ -141,8 +144,8 @@
                 };
 
                 var subdivisions = {
-                    h: 20 / (width / 2),
-                    w: 20 / (height / 2)
+                    h: width / (width / 2),
+                    w: height / (height / 2)
                 };
 
                 var myGround = BABYLON.MeshBuilder.CreateTiledGround(
@@ -184,6 +187,12 @@
             createFixtures(scene, drops) {
                 let self = this;
 
+                let closestX = 0;
+                let furthestX = 0;
+
+                let closestY = 0;
+                let furthestY = 0;
+
                 drops.forEach(drop => {
                     self.getFloorPlanItem(drop.attrs.DropID, children => {
                         let notProducts = children.filter(child => {
@@ -195,14 +204,33 @@
                         });
 
                         notProducts.forEach(child => {
-                            let fpI = new FloorPlanItem(child, parent);;
+                            let fpI = new FloorPlanItem(child, parent);
 
-                            self.getFixture(child.spaceplan_Fixture_ID, () => {
+                            if (fpI.x < closestX)
+                                closestX = fpI.x;
 
-                            })
+                            if ((fpI.x + fpI.width) > furthestX)
+                                furthestX = +fpI.width;
+
+                            if (fpI.y < closestY)
+                                closestY = fpI.y;
+
+                            if ((fpI.y + fpI.height) > furthestY)
+                                furthestY = +fpI.height;
+
+                            // self.getFixture(child.spaceplan_Fixture_ID, () => {
+
+                            // })
 
                             self.drawingHelper.draw(fpI);
                         })
+
+                        let pointX = ((furthestX / 100) - (closestX / 100));
+                        let pointY = ((furthestY / 100) - (closestY / 100));
+
+                        console.log(pointX, pointY)
+
+                        camera.setTarget(new BABYLON.Vector3(pointX, 0, pointY));
                     })
                 });
             },
@@ -214,6 +242,7 @@
                         callback(r.data);
                     })
                     .catch(e => {
+                        console.log(e);
                         alert("Failed to get floorplan fixture data");
                     })
             },
@@ -221,8 +250,7 @@
                 let self = this;
 
                 Axios.get(process.env.VUE_APP_API + `Fixture?db=CR-DEVINSPIRE&id=${fixtureID}`)
-                    .then(r => {
-                    })
+                    .then(r => {})
                     .catch(e => {
                         console.log("Failed to get fixture")
                     })
@@ -231,9 +259,9 @@
     }
 
     function degreesToRadians(degrees) {
-    if (degrees != 0) return degrees / 57.2958;
-    else return 0;
-}
+        if (degrees != 0) return degrees / 57.2958;
+        else return 0;
+    }
 </script>
 
 <style>

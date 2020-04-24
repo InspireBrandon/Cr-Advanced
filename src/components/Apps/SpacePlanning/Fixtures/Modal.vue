@@ -79,6 +79,13 @@
                     <v-select placeholder="please select" :items="SpreadProducts" v-model="form.spreadProducts"
                       label="Spread products:"></v-select>
                   </v-flex>
+                  <v-flex lg8 md12 sm12 xs12>
+                    <v-checkbox hide-details label="Product Renderings" v-model="form.productRendering"></v-checkbox>
+                  </v-flex>
+                  <v-flex lg8 md12 sm12 xs12>
+                    <v-text-field type="number" hide-details label="Product Rendering Margin"
+                      v-model="form.productRenderingMargin"></v-text-field>
+                  </v-flex>
 
                   <v-flex lg8 md12 sm12 xs12>
                     <v-text-field type="number" label="Cost of Fixture" prefix="R" v-model="form.cost"></v-text-field>

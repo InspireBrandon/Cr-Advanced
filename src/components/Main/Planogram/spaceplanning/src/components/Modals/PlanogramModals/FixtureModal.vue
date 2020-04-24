@@ -94,6 +94,12 @@
                   <v-flex lg8 md12 sm12 xs12>
                     <v-checkbox hide-details label="Reject Products" v-model="newData.rejectProducts"></v-checkbox>
                   </v-flex>
+                  <v-flex lg8 md12 sm12 xs12>
+                    <v-checkbox hide-details label="Product Renderings" v-model="newData.productRendering"></v-checkbox>
+                  </v-flex>
+                  <v-flex lg8 md12 sm12 xs12>
+                    <v-text-field type="number" hide-details label="Product Rendering Margin" v-model="newData.productRenderingMargin"></v-text-field>
+                  </v-flex>
                   <v-flex lg8 md12 sm12 xs12 class="mt-3">
                     <v-text-field type="number" label="Cost of Fixture" prefix="R" v-model="newData.cost">
                     </v-text-field>
@@ -134,7 +140,7 @@
                   </v-flex>
                   <v-flex lg8 md12
                     v-if="!newData.rendering && ((newData.fixtureType == 4 || newData.fixtureType == 3 || newData.fixtureType == 0 || newData.fixtureType == 1) && (newData.type == 2 || newData.type == 3))">
-                    <v-text-field type="number" v-model="newData.x_Offset" label="X Offset:" suffix="cm">
+                    <v-text-field type="number" v-model="newData.xOffset" label="X Offset:" suffix="cm">
                     </v-text-field>
                   </v-flex>
                   <v-flex lg8 md12
