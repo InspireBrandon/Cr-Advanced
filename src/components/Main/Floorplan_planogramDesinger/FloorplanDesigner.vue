@@ -19,7 +19,7 @@
                 <v-layout row wrap>
                     <v-flex md2>
                         <v-toolbar color="grey darken-3" dark dense>
-                            Drops
+                            <div>Properties</div>
                             <v-spacer></v-spacer>
                             <v-toolbar-items>
                                 <v-menu dark offset-y style="margin-bottom: 10px;">
@@ -27,30 +27,47 @@
                                         File
                                     </v-btn>
                                     <v-list dense class="px-2">
-                                        <v-list-tile>
-                                            <v-list-tile-title>New</v-list-tile-title>
-                                        </v-list-tile>
-                                        <v-divider></v-divider>
                                         <v-list-tile @click="save()">
                                             <v-list-tile-title>Save</v-list-tile-title>
                                         </v-list-tile>
                                         <v-divider></v-divider>
-                                        <v-list-tile>
-                                            <v-list-tile-title>Close</v-list-tile-title>
-                                        </v-list-tile>
-                                        <v-divider></v-divider>
-
                                     </v-list>
                                 </v-menu>
                             </v-toolbar-items>
                         </v-toolbar>
                         <v-card height="calc(100vh - 115px)" width="100%" style="overflow:auto">
-                            <div v-for="(item,idx) in drops" :key="idx">
+                            <v-container grid-list-md>
+                                <v-layout row wrap v-if="selectedItem!=null">
+                                    <v-flex md10
+                                        v-if="selectedItem.attrs.name == 'Circle' || selectedItem.attrs.name == 'Gondola-Rect'">
+                                        <v-select :items="shapes" v-model="properties.shape" @change="reDraw">
+                                        </v-select>
+                                    </v-flex>
+                                    <v-flex md2>
+                                        <!-- <v-btn icon color="primary" @click="saveImages">
+                                    <v-icon>
+                                        save
+                                    </v-icon>
+                                </v-btn> -->
+                                    </v-flex>
+                                    <v-flex md12>
+                                        <v-text-field @change="changeRotation" type="number" label="Rotation"
+                                            v-model="properties.rotation" hide-details>
+                                        </v-text-field>
+                                    </v-flex>
+                                </v-layout>
+                                <v-layout row wrap v-else>
+                                    <v-flex md12>
+                                        Click an Item to display its properties
+                                    </v-flex>
+                                </v-layout>
+                            </v-container>
+                            <!-- <div v-for="(item,idx) in drops" :key="idx">
                                 <expansionItem :selectedFixtures="selectedFixtures" :Drop="item"
                                     :changeRotation="changeRotation" :reDraw="reDraw">
                                 </expansionItem>
                                 <v-divider></v-divider>
-                            </div>
+                            </div> -->
                         </v-card>
                     </v-flex>
                     <v-flex md10>
@@ -97,6 +114,11 @@
         },
         data() {
             return {
+                shapes: ["Circle", "Square"],
+                properties: {
+                    rotation: 0,
+                    shape: "square"
+                },
                 dialog: false,
                 selectedItem: null,
                 selectedLayer: null,
@@ -195,19 +217,13 @@
                         }
                     })
             },
-            changeRotation(drop, amount) {
+            changeRotation() {
                 let self = this
+                let rotation = parseFloat(self.properties.rotation)
+                self.selectedItem.rotation(rotation)
+                self.selectedLayer.draw()
                 self.$nextTick(() => {
-
-                    self.findKonvaItem(self.selectedLayer.children, drop.id, callback => {
-                        let rotation = parseFloat(amount)
-                        console.log("changerotation ----- callvbackl", callback);
-                        callback.item.rotation(amount)
-                        self.selectedLayer.draw()
-                        self.$nextTick(() => {
-                            self.stage.batchDraw()
-                        })
-                    })
+                    self.stage.batchDraw()
                 })
 
             },
@@ -232,10 +248,17 @@
                     s4()
                 );
             },
-            reDraw(item) {
+            reDraw() {
                 let self = this
-
+                let item
                 self.stage.find('Transformer').destroy()
+                self.drops.forEach(drop => {
+                    if (self.selectedItem.attrs.DropID == drop.id) {
+                        item = drop
+                    }
+                })
+                console.log("redreaw", item);
+
                 let tmp
                 self.findKonvaItem(self.selectedLayer.children, item.id, callback => {
                     console.log("callback", callback);
@@ -245,7 +268,7 @@
                     console.log("[REDRAW]--item", tmp);
 
 
-                    if (item.shape == "Circle") {
+                    if (self.properties.shape == "Circle") {
                         let circle = new Circle(self.selectedLayer, {
                             x: tmp.attrs.x,
                             y: tmp.attrs.y,
@@ -267,7 +290,7 @@
                             width: item.width,
                             height: item.height
                         })
-
+                        rect.shape.attrs.rotation = parseFloat(self.properties.rotation)
                         console.log("rect", rect);
 
                         rect.shape.attrs.DropID = item.id.toString()
@@ -307,7 +330,9 @@
                         console.log("getPlanogramData", r.data);
                         self.drops = r.data
                         callback()
-                    })
+                    }).catch(e => {
+                    self.$refs.spinner.hide()
+                })
             },
             findDrop(target, callback) {
                 let self = this
@@ -317,10 +342,21 @@
                     }
                 })
             },
+            setproperties(item) {
+                let self = this
+                self.properties.rotation = item.attrs.rotation.toFixed(2)
+                console.log("set props------", item.attrs.rotation);
+                if (item.attrs.name == "Circle") {
+                    self.properties.shape = "Circle"
+                } else {
+                    self.properties.shape = "Square"
+                }
+            },
             addStageEvents() {
                 let self = this
                 self.stage.on('click tap', function (e) {
                     if (e.target.attrs.name == "Circle" || e.target.attrs.name == "Gondola-Rect") {
+
                         if (self.selectedItem == null) {
                             self.selectedItem = e.target.parent
                             console.log("self.selectedItem", self.selectedItem);
@@ -333,6 +369,7 @@
                             console.log("self.selectedItem", self.selectedItem);
                             self.selectedItem.draggable(true)
                             self.findDrop(e.target, callback => {
+                                self.setproperties(e.target)
                                 self.selectedFixtures = callback
                             })
                         } else {
@@ -344,7 +381,7 @@
                             })
 
                         }
-
+                        self.setproperties(self.selectedItem)
                     }
                     if (e.target === self.stage) {
                         self.stage.find('Transformer').destroy()
@@ -372,7 +409,7 @@
                             console.log("transform");
                             self.findDrop(e.target, callback => {
                                 console.log(callback);
-                                
+
                                 callback.rotation = e.target.attrs.rotation
                             })
                         });
@@ -395,6 +432,7 @@
 
                     // now find where can we snap current object
                     var guides = snappingHandler.getGuides(lineGuideStops, itemBounds, self.stage);
+                    console.log("[SNAPPING]-guides", guides);
 
                     // do nothing of no snapping
                     if (!guides.length) {
@@ -590,7 +628,7 @@
                             x: shape.x,
                             y: shape.y
                         }, null, null, null, self.imageSrc(item.floorplan_Fixture_ID,
-                            "Top"),self.stage);
+                            "Top"), self.stage);
                         rect.shape.attrs = shape
                         rect.shape.saveID = item.id
                         rect.shape.guid = item.guid
@@ -743,6 +781,7 @@
                         }
                     })
                 })
+
             },
             openThreeDee() {
                 let self = this;
