@@ -1692,65 +1692,65 @@ function getChildren(planodata, parentID, vuex, storeCount) {
       rendering: fixture.Data.Data.rendering
     }
 
-    // for(var prop in fixture.Data.Data.RenderingsItems) {
-    //   if(fixture.Data.Data.RenderingsItems[prop] != null && fixture.Data.Data.RenderingsItems[prop] != {}) {
-    //     let renderingData = fixture.Data.Data.RenderingsItems[prop];
+    for(var prop in fixture.Data.Data.RenderingsItems) {
+      if(fixture.Data.Data.RenderingsItems[prop] != null && fixture.Data.Data.RenderingsItems[prop] != {}) {
+        let renderingData = fixture.Data.Data.RenderingsItems[prop];
 
-    //     console.log("renderingData", renderingData)
-
-    //     item.children.push({
-    //       id: renderingData.ID,
-    //       floorplan_Item_ID: renderingData.ID,
-    //       parent_ID: renderingData.ParentID,
-    //       type: prop.toUpperCase(),
-    //       height: renderingData.depth,
-    //       width: renderingData.width,
-    //       name: renderingData.name,
-    //       shape: renderingData.floorplanShape,
-    //       renderingData: renderingData.id,
-    //       depth: renderingData.height,
-    //       sales: renderingData.sales_Retail,
-    //       // x: renderingData.RelativePosition.x,
-    //       // y: renderingData.RelativePosition.y,
-    //       // absoluteX: renderingData.AbsolutePosition.x,
-    //       // absoluteY: renderingData.AbsolutePosition.y,
-    //       units: renderingData.sales_Units,
-    //       profit: renderingData.sales_Profit,
-    //       children:[],
-    //       // children: getChildren(planodata, renderingData.ID, vuex, storeCount),
-    //       // Details
-    //       frontColor: renderingData.frontColor,
-    //       backColor: renderingData.backColor,
-    //       leftColor: renderingData.leftColor,
-    //       rightColor: renderingData.rightColor,
-    //       bottomColor: renderingData.bottomColor,
-    //       topColor: renderingData.topColor,
-    //       frontTransparent: renderingData.frontTransparent,
-    //       backTransparent: renderingData.backTransparent,
-    //       leftTransparent: renderingData.leftTransparent,
-    //       rightTransparent: renderingData.rightTransparent,
-    //       bottomTransparent: renderingData.bottomTransparent,
-    //       topTransparent: renderingData.topTransparent,
-    //       frontImageID: renderingData.frontImageID,
-    //       backImageID: renderingData.backImageID,
-    //       sideImageID: renderingData.sideImageID,
-    //       leftImageID: renderingData.leftImageID,
-    //       rightImageID: renderingData.rightImageID,
-    //       topImageID: renderingData.topImageID,
-    //       bottomImageID: renderingData.bottomImageID,
-    //       leftMirrored: renderingData.leftMirrored,
-    //       rightMirrored: renderingData.rightMirrored,
-    //       bottomMirrored: renderingData.bottomMirrored,
-    //       topMirrored: renderingData.topMirrored,
-    //       frontMirrored: renderingData.frontMirrored,
-    //       backMirrored: renderingData.backMirrored,
-    //       xOffset: renderingData.xOffset,
-    //       yOffset: renderingData.yOffset,
-    //       zOffset: renderingData.zOffset,
-    //       rendering: renderingData.rendering
-    //     })
-    //   }
-    // }
+        childArr.push({
+          id: renderingData.ID,
+          floorplan_Item_ID: renderingData.ID,
+          parent_ID: renderingData.ParentID,
+          type: prop.toUpperCase(),
+          height: renderingData.depth,
+          width: renderingData.width,
+          name: renderingData.name,
+          shape: renderingData.floorplanShape,
+          renderingData: renderingData.id,
+          depth: renderingData.height,
+          sales: renderingData.sales_Retail,
+          x: parseFloat(fixture.RelativePosition.x.toFixed(2)),
+          y: parseFloat((fixture.RelativePosition.y < 0 ? fixture.RelativePosition.y * -1 : fixture.RelativePosition.y).toFixed(2)),
+          absoluteX: parseFloat(fixture.AbsolutePosition.x.toFixed(2)),
+          absoluteY: parseFloat(fixture.AbsolutePosition.y.toFixed(2)),
+          // absoluteX: renderingData.AbsolutePosition.x,
+          // absoluteY: renderingData.AbsolutePosition.y,
+          units: renderingData.sales_Units,
+          profit: renderingData.sales_Profit,
+          children:[],
+          // children: getChildren(planodata, renderingData.ID, vuex, storeCount),
+          // Details
+          frontColor: renderingData.frontColor,
+          backColor: renderingData.backColor,
+          leftColor: renderingData.leftColor,
+          rightColor: renderingData.rightColor,
+          bottomColor: renderingData.bottomColor,
+          topColor: renderingData.topColor,
+          frontTransparent: renderingData.frontTransparent,
+          backTransparent: renderingData.backTransparent,
+          leftTransparent: renderingData.leftTransparent,
+          rightTransparent: renderingData.rightTransparent,
+          bottomTransparent: renderingData.bottomTransparent,
+          topTransparent: renderingData.topTransparent,
+          frontImageID: renderingData.frontImageID,
+          backImageID: renderingData.backImageID,
+          sideImageID: renderingData.sideImageID,
+          leftImageID: renderingData.leftImageID,
+          rightImageID: renderingData.rightImageID,
+          topImageID: renderingData.topImageID,
+          bottomImageID: renderingData.bottomImageID,
+          leftMirrored: renderingData.leftMirrored,
+          rightMirrored: renderingData.rightMirrored,
+          bottomMirrored: renderingData.bottomMirrored,
+          topMirrored: renderingData.topMirrored,
+          frontMirrored: renderingData.frontMirrored,
+          backMirrored: renderingData.backMirrored,
+          xOffset: renderingData.xOffset,
+          yOffset: renderingData.yOffset,
+          zOffset: renderingData.zOffset,
+          rendering: renderingData.rendering
+        })
+      }
+    }
 
     if (fixture.Type == "PRODUCT") {
       let calcData = calculateAdvanced(fixture, vuex, storeCount);

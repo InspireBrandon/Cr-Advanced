@@ -7,6 +7,7 @@
 import * as BABYLON from "@babylonjs/core/Legacy/legacy";
 
 import Drawingbase from './Drawingbase.js'
+import CubeHelper from './CubeHelper.js'
 
 class Boxbase extends Drawingbase {
     constructor(params) {
@@ -22,21 +23,20 @@ class Boxbase extends Drawingbase {
             config = {
                 height: self.data.depth / self.pxlToMeterRatio,
                 width: self.data.width / self.pxlToMeterRatio,
-                depth: self.data.height / self.pxlToMeterRatio,
-                wrap: true,
+                depth: self.data.height / self.pxlToMeterRatio
             }
         }
         else {
             config = {
                 height: self.data.depth / self.pxlToMeterRatio,
                 width: self.data.width / self.pxlToMeterRatio,
-                depth: self.data.height / self.pxlToMeterRatio,
-                wrap: true,
+                depth: self.data.height / self.pxlToMeterRatio
             }
         }
 
-        self.element = BABYLON.MeshBuilder.CreateBox(this.name, config, this.scene);
-        self.setMaterialAlt();
+        var ch = new CubeHelper();
+        self.element = ch.createCube(self.data, config, self.scene); // BABYLON.MeshBuilder.CreateBox(this.name, config, this.scene);
+        // self.setMaterialAlt();
         self.setPosition();
         self.element.receiveShadows = true;
     }
