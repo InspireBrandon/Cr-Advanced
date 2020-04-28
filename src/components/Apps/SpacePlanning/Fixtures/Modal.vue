@@ -46,10 +46,10 @@
                   <v-flex lg8 md12 sm12 xs12>
                     <v-select placeholder="please select" v-if="form.rendering" :items="types" v-model="form.type"
                       label="Type:"></v-select>
-                    <v-select placeholder="please select" v-if="form.type == 2" :items="fixtureTypes"
-                      v-model="form.fixtureType" label="Type:"></v-select>
-                    <v-select placeholder="please select" v-if="form.type == 3" :items="subTypes"
-                      v-model="form.fixtureType" label="Subtype:"></v-select>
+                    <v-select @change="getRenderingTypes" placeholder="please select" v-if="form.type == 2"
+                      :items="fixtureTypes" v-model="form.fixtureType" label="Type:"></v-select>
+                    <v-select @change="getRenderingTypes" placeholder="please select" v-if="form.type == 3"
+                      :items="subTypes" v-model="form.fixtureType" label="Subtype:"></v-select>
                     <v-select placeholder="please select" v-if="form.type == 0  && form.rendering"
                       :items="renderingTypeGondola" v-model="form.renderingType" label="Rendering Type:"></v-select>
                     <v-select placeholder="please select"
@@ -781,6 +781,10 @@
       },
       getRenderingTypes() {
         let self = this;
+        console.log("subTypes", self.form.fixtureType);
+        if (self.form.type == 0) {
+          self.form.fixtureType = 0
+        }
         axios
           .get(
             process.env.VUE_APP_API +
@@ -884,7 +888,6 @@
         this.afterEdit = afterAdd;
 
         self.getFixtureGroups();
-
         for (var prop in this.form) {
           this.form[prop] = null;
         }
@@ -925,6 +928,9 @@
 
         this.form.wireMesh = false;
         this.form.type = type;
+        console.log(type);
+
+        self.getRenderingTypes();
 
         // this.$refs.changeImage.src = "";
         // this.$refs.changeImageBar.src = "";
