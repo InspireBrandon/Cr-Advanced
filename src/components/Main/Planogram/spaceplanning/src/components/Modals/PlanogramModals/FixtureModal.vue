@@ -767,39 +767,39 @@
       getSelectedRenderings() {
         let self = this;
 
-        // axios.get(process.env.VUE_APP_API + `FixtureRenderingLink?db=CR-Devinspire&Fixture_ID=${self.newData.id}`)
-        //   .then(r => {
-        //     // self.newData.image = r.data;
-        //     r.data.forEach(item => {
-        //       switch (item.renderingType) {
-        //         case 0: {
-        //           self.selectedRenderingType0 = item.id;
-        //         }
-        //         break;
-        //       case 1: {
-        //         self.selectedRenderingType1 = item.id;
-        //       }
-        //       break;
-        //       case 2: {
-        //         self.selectedRenderingType2 = item.id;
-        //       }
-        //       break;
-        //       case 3: {
-        //         self.selectedRenderingType3 = item.id;
-        //       }
-        //       break;
-        //       case 4: {
-        //         self.selectedRenderingType4 = item.id;
-        //       }
-        //       break;
-        //       default:
-        //         break;
-        //       }
-        //     });
-        //   })
-        //   .catch(e => {
-        //     console.log(e);
-        //   });
+        axios.get(process.env.VUE_APP_API + `FixtureRenderingLink?db=CR-Devinspire&Fixture_ID=${self.newData.id}`)
+          .then(r => {
+
+            r.data.forEach(item => {
+              switch (item.renderingType) {
+                case 0: {
+                  self.selectedRenderingType0 = item.id;
+                }
+                break;
+              case 1: {
+                self.selectedRenderingType1 = item.id;
+              }
+              break;
+              case 2: {
+                self.selectedRenderingType2 = item.id;
+              }
+              break;
+              case 3: {
+                self.selectedRenderingType3 = item.id;
+              }
+              break;
+              case 4: {
+                self.selectedRenderingType4 = item.id;
+              }
+              break;
+              default:
+                break;
+              }
+            });
+          })
+          .catch(e => {
+            console.log(e);
+          });
       },
       addSegment() {
         let self = this;

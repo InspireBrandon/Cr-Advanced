@@ -132,7 +132,7 @@
                   </v-flex>
 
                   <v-flex lg8 md12 sm12 xs12
-                    v-if="(!form.rendering && form.squish) && (form.type == 2 && form.fixtureType != 2 || form.fixtureType==4&&form.type==3)">
+                    v-if="(!form.rendering && form.squish) && (form.type == 2 && form.fixtureType != 2 || form.fixtureType==4 && form.type==3)">
                     <v-checkbox hide-details label="Auto Squish" v-model="form.autoSquish"></v-checkbox>
                   </v-flex>
                   <v-flex lg8 md12 sm12 xs12
@@ -596,7 +596,7 @@
           uid: "da141b3c-436c-4933-bea2-ed36d4466140",
           type: -1,
           fixtureGroupID: null,
-          fixtureType: null,
+          fixtureType: 1,
           renderingType: null,
           name: "sample string 5",
           label: "sample string 6",
@@ -884,10 +884,18 @@
         this.afterEdit = afterAdd;
 
         self.getFixtureGroups();
+        self.getRenderingTypes();
 
         for (var prop in this.form) {
           this.form[prop] = null;
         }
+
+        this.form.type = type;
+
+        if(this.form.fixtureType == null) {
+          this.form.fixtureType = 1;
+        }
+
         if (group != null) {
           self.form.fixtureGroupID = group.id;
         }
@@ -924,7 +932,6 @@
         };
 
         this.form.wireMesh = false;
-        this.form.type = type;
 
         // this.$refs.changeImage.src = "";
         // this.$refs.changeImageBar.src = "";

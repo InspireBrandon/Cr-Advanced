@@ -119,7 +119,7 @@
                     <v-text-field type="number" v-model="newData.y_Offset" label="Y Offset:" suffix="cm"></v-text-field>
                   </v-flex>
                   <v-flex lg8 md12 v-if="!newData.rendering||newData.type == 2">
-                    <v-select v-model="newData.floorplanShape" :items="floorplanShapes" label="Floorplan Shape:">
+                    <v-select v-model="newData.shape" :items="floorplanShapes" label="Floorplan Shape:">
                     </v-select>
                   </v-flex>
                 </v-layout>
@@ -307,25 +307,121 @@
                   <v-flex v-if="!newData.rendering" lg12 md12 sm12 xs12 class="px-3">
                     <h3>Renderings</h3>
                   </v-flex>
-                  <v-flex v-if="!newData.rendering &&renderingType0.length>1" lg8 md12 sm12 xs12 class="px-3">
-                    <v-select placeholder="please select" :items="renderingType0" v-model="selectedRenderingType0" label="Label Holder:"></v-select>
-                      <v-text-field label="Y Offset"></v-text-field>
+                  <v-flex v-if="!newData.rendering && renderingType0.length>1" lg8 md12 sm12 xs12 class="px-3">
+                    <v-select @change="onRenderingChange(0)" return-object item-text="name" placeholder="please select"
+                      :items="renderingType0" v-model="newData.RenderingsItems.LabelHolder" label="Label Holder:">
+                    </v-select>
+                    <div style="display: flex">
+                      <div style="width: 25%;">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.LabelHolder != null" label="Height"
+                          v-model="newData.RenderingsItems.LabelHolder.height"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.LabelHolder != null" label="Width"
+                          v-model="newData.RenderingsItems.LabelHolder.width"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.LabelHolder != null" label="Depth"
+                          v-model="newData.RenderingsItems.LabelHolder.depth"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.LabelHolder != null" label="Y Offset"
+                          v-model="newData.RenderingsItems.LabelHolder.yOffset"></v-text-field>
+                      </div>
+                    </div>
+                    <v-divider></v-divider>
                   </v-flex>
                   <v-flex v-if="!newData.rendering &&renderingType1.length>1" lg8 md12 sm12 xs12 class="px-3">
-                    <v-select placeholder="please select" :items="renderingType1" v-model="selectedRenderingType1"
-                      label="Shelf Edge:"></v-select>
+                    <v-select return-object item-text="name" placeholder="please select" :items="renderingType1"
+                      v-model="newData.RenderingsItems.ShelfEdge" label="Shelf Edge:"></v-select>
+                    <div style="display: flex">
+                      <div style="width: 25%;">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.ShelfEdge != null" label="Height"
+                          v-model="newData.RenderingsItems.ShelfEdge.height"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.ShelfEdge != null" label="Width"
+                          v-model="newData.RenderingsItems.ShelfEdge.width"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.ShelfEdge != null" label="Depth"
+                          v-model="newData.RenderingsItems.ShelfEdge.depth"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.ShelfEdge != null" label="Y Offset"
+                          v-model="newData.RenderingsItems.ShelfEdge.yOffset"></v-text-field>
+                      </div>
+                    </div>
+                    <v-divider></v-divider>
                   </v-flex>
                   <v-flex v-if="!newData.rendering &&renderingType2.length>1" lg8 md12 sm12 xs12 class="px-3">
-                    <v-select placeholder="please select" :items="renderingType2" v-model="selectedRenderingType2"
-                      label="Back Face:"></v-select>
+                    <v-select return-object item-text="name" placeholder="please select" :items="renderingType2"
+                      v-model="newData.RenderingsItems.Back" label="Back Face:"></v-select>
+                    <div style="display: flex">
+                      <div style="width: 25%;">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Back != null" label="Height"
+                          v-model="newData.RenderingsItems.Back.height"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Back != null" label="Width"
+                          v-model="newData.RenderingsItems.Back.width"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Back != null" label="Depth"
+                          v-model="newData.RenderingsItems.Back.depth"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Back != null" label="Y Offset"
+                          v-model="newData.RenderingsItems.Back.yOffset"></v-text-field>
+                      </div>
+                    </div>
+                    <v-divider></v-divider>
                   </v-flex>
                   <v-flex v-if="!newData.rendering &&renderingType3.length>1" lg8 md12 sm12 xs12 class="px-3">
-                    <v-select placeholder="please select" :items="renderingType3" v-model="selectedRenderingType3"
-                      label="Front Face:"></v-select>
+                    <v-select return-object item-text="name" placeholder="please select" :items="renderingType3"
+                      v-model="newData.RenderingsItems.Front" label="Front Face:"></v-select>
+                    <div style="display: flex">
+                      <div style="width: 25%;">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Front != null" label="Height"
+                          v-model="newData.RenderingsItems.Front.height"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Front != null" label="Width"
+                          v-model="newData.RenderingsItems.Front.width"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Front != null" label="Depth"
+                          v-model="newData.RenderingsItems.Front.depth"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Front != null" label="Y Offset"
+                          v-model="newData.RenderingsItems.Front.yOffset"></v-text-field>
+                      </div>
+                    </div>
+                    <v-divider></v-divider>
                   </v-flex>
                   <v-flex v-if="!newData.rendering &&renderingType4.length>1" lg8 md12 sm12 xs12 class="px-3">
-                    <v-select placeholder="please select" :items="renderingType4" v-model="selectedRenderingType4"
-                      label="Side Face:"></v-select>
+                    <v-select return-object item-text="name" placeholder="please select" :items="renderingType4"
+                      v-model="newData.RenderingsItems.Side" label="Side Face:"></v-select>
+                    <div style="display: flex">
+                      <div style="width: 25%;">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Side != null" label="Height"
+                          v-model="newData.RenderingsItems.Side.height"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Side != null" label="Width"
+                          v-model="newData.RenderingsItems.Side.width"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Side != null" label="Depth"
+                          v-model="newData.RenderingsItems.Side.depth"></v-text-field>
+                      </div>
+                      <div style="width: 25%;" class="ml-1">
+                        <v-text-field type="number" v-if="newData.RenderingsItems.Side != null" label="Y Offset"
+                          v-model="newData.RenderingsItems.Side.yOffset"></v-text-field>
+                      </div>
+                    </div>
+                    <v-divider></v-divider>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -523,61 +619,47 @@
           .then(r => {
             console.log("getRenderingTypes", r.data);
             self.renderingType0 = [{
-              text: "none",
-              value: -1
+              name: "none",
+              id: -1
             }];
             self.renderingType1 = [{
-              text: "none",
-              value: -1
+              name: "none",
+              id: -1
             }];
             self.renderingType2 = [{
-              text: "none",
-              value: -1
+              name: "none",
+              id: -1
             }];
             self.renderingType3 = [{
-              text: "none",
-              value: -1
+              name: "none",
+              id: -1
             }];
             self.renderingType4 = [{
-              text: "none",
-              value: -1
+              name: "none",
+              id: -1
             }];
+            
             r.data.forEach(rendering => {
               switch (rendering.renderingType) {
                 case 0: {
-                  self.renderingType0.push({
-                    text: rendering.name,
-                    value: rendering.id
-                  });
+                  self.renderingType0.push(rendering);
                 }
                 break;
               case 1: {
-                self.renderingType1.push({
-                  text: rendering.name,
-                  value: rendering.id
-                });
+                self.renderingType1.push(rendering);
               }
               break;
               case 2: {
-                self.renderingType2.push({
-                  text: rendering.name,
-                  value: rendering.id
-                });
+                self.renderingType2.push(rendering);
               }
               break;
               case 3: {
-                self.renderingType3.push({
-                  text: rendering.name,
-                  value: rendering.id
-                });
+                self.renderingType3.push(rendering);
               }
               break;
 
               case 4: {
-                self.renderingType4.push({
-                  text: rendering.name,
-                  value: rendering.id
-                });
+                self.renderingType4.push(rendering);
               }
               break;
 
@@ -598,7 +680,6 @@
             `FixtureRenderingLink?db=CR-Devinspire&Fixture_ID=${self.newData.id}`
           )
           .then(r => {
-            // self.newData.image = r.data;
             r.data.forEach(item => {
               switch (item.renderingType) {
                 case 0: {
@@ -792,7 +873,7 @@
           self.newData.uploadTop = false
           console.log("[OPEN]----rendering Items", self.newData.RenderingsItems);
           self.getRenderingTypes()
-          // self.getSelectedRenderings()
+          self.getSelectedRenderings()
           if (self.newData.RenderingsItems == undefined) {
             self.newData.RenderingsItems = {}
             self.newData.RenderingsItems.Front = {
@@ -896,7 +977,7 @@
         // if (self.newData.renderImage == "None" || self.newData.renderImage == undefined) {
         //   self.newData.RenderingsItems.Front = null
         // }
-        
+
         self.newData.height = returnFloat(self.newData.height);
         self.newData.width = returnFloat(self.newData.width);
         self.newData.depth = returnFloat(self.newData.depth);
