@@ -873,10 +873,7 @@
             },
             openThreeDee() {
                 let self = this;
-
-                console.log(self.selectedLayer.children)
-
-                self.$refs.threeDee.show(self.selectedLayer.children);
+                self.$refs.threeDee.show(self.fixtureHeaderID);
             }
         },
         computed: {

@@ -2,9 +2,7 @@
     <v-dialog fullscreen v-model="dialog">
         <div>
             <v-toolbar color="primary" dark>
-                <v-toolbar-title>
-                    Planogram Designer 3D
-                </v-toolbar-title>
+                <v-toolbar-title>Planogram Designer 3D</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-btn icon @click="dialog=false">
                     <v-icon>close</v-icon>
@@ -25,13 +23,13 @@
 </template>
 <script>
     import * as BABYLON from "@babylonjs/core/Legacy/legacy";
-    import Axios from 'axios';
+    import Axios from "axios";
 
-    import FloorPlanItem from '../FloorPlanning2D/3D/Libs/Models/FloorPlanItem.js'
-    import DrawingHelper from '../FloorPlanning2D/3D/Libs/Drawing/DrawingHelper.js'
+    import FloorPlanItem from "../FloorPlanning2D/3D/Libs/Models/FloorPlanItem.js";
+    import DrawingHelper from "../FloorPlanning2D/3D/Libs/Drawing/DrawingHelper.js";
 
     const pxlToMeterRatio = 25;
-    let scene, camera, sceneObj, canvas;
+    let scene, camera, sceneObj, canvas, shadowGenerator;
 
     export default {
         data() {
@@ -39,15 +37,16 @@
                 dialog: false,
                 sceneObj: null,
                 drawingHelper: null
-            }
+            };
         },
         methods: {
-            show(drops) {
+            show(fixtureHeaderID) {
                 let self = this;
                 self.dialog = true;
-                setTimeout(() => {
+
+                self.getFixtures(fixtureHeaderID, drops => {
                     self.draw(drops);
-                }, 200);
+                });
             },
             getFloorDimensions(drops) {
                 let self = this;
@@ -58,10 +57,8 @@
                 let bottomRight = 0;
 
                 drops.forEach(el => {
-                    if (el.x < topLeft) {
-
-                    }
-                })
+                    if (el.x < topLeft) {}
+                });
             },
             draw(drops) {
                 let self = this;
@@ -86,8 +83,8 @@
                 let self = this;
                 self.createCamera(scene, canvas);
                 self.createLight(scene);
-                self.createFixtures(scene, drops)
                 self.createFloor(scene);
+                self.createFixtures(scene, drops);
                 // self.createSkybox(scene);
                 // self.createCans(scene, 0.92);
                 // self.createCans(scene, 1.06);
@@ -96,26 +93,41 @@
             createCamera(scene, canvas) {
                 let self = this;
 
-                camera = new BABYLON.ArcRotateCamera("Camera", 5, 0, 0, new BABYLON.Vector3(0, 0, 0), scene);
+                camera = new BABYLON.FreeCamera(
+                    "FreeCamera",
+                    new BABYLON.Vector3(0, 2, 50),
+                    scene
+                );
+
                 camera.attachControl(canvas, true);
-
                 camera.wheelPrecision = 50;
-                // camera.applyGravity = true;
-                // camera.checkCollisions = true;
-                camera.speed = 0.3;
+                camera.applyGravity = true;
+                camera.checkCollisions = true;
+                camera.speed = 0.1;
+                camera.inputs.remove(camera.inputs.attached.keyboard);
+                self.addDocumentListeners();
 
-                //camera.setPosition(new BABYLON.Vector3(20, 5, 20));
-                camera.setTarget(new BABYLON.Vector3(5, 0, 0));
+                camera.inputs.remove(camera.inputs.attached.keyboard);
+                self.addDocumentListeners();
 
-                // camera.position.x = 20 / 2;
-                // camera.position.z = -10;
+                camera.position.x = 30 / 2;
+                camera.position.z = -15;
+                camera.position.y = 1.5;
             },
             createLight(scene) {
                 let self = this;
 
-                let light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(15 / pxlToMeterRatio, 25 /
-                    pxlToMeterRatio, 0), scene);
+                let light = new BABYLON.DirectionalLight("*dir00", new BABYLON.Vector3(0, -20, 5), scene);
+
+                let light2 = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(15 / pxlToMeterRatio, 25 / pxlToMeterRatio, 0),
+                    scene
+                );
+
                 light.position = new BABYLON.Vector3(0, 10, 10);
+                light.intensity = 1;
+
+                shadowGenerator = new BABYLON.ShadowGenerator(1024, light);
+                shadowGenerator.usePoissonSampling = true;
             },
             createFloor(scene, height, width) {
                 let self = this;
@@ -135,8 +147,8 @@
                 // Parameters
                 var xmin = (width / 2) * -1;
                 var zmin = (height / 2) * -1;
-                var xmax = (width / 2);
-                var zmax = (height / 2);
+                var xmax = width / 2;
+                var zmax = height / 2;
 
                 var precision = {
                     w: 2,
@@ -173,13 +185,20 @@
             createSkybox(scene) {
                 let self = this;
 
-                let skybox = BABYLON.MeshBuilder.CreateBox("skyBox", {
-                    size: 1000.0
-                }, scene);
+                let skybox = BABYLON.MeshBuilder.CreateBox(
+                    "skyBox", {
+                        size: 1000.0
+                    },
+                    scene
+                );
                 let skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
                 skyboxMaterial.backFaceCulling = false;
-                skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("skybox", scene);
-                skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+                skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture(
+                    "skybox",
+                    scene
+                );
+                skyboxMaterial.reflectionTexture.coordinatesMode =
+                    BABYLON.Texture.SKYBOX_MODE;
                 skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
                 skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
                 skybox.material = skyboxMaterial;
@@ -193,70 +212,189 @@
                 let closestY = 0;
                 let furthestY = 0;
 
-                drops.forEach(drop => {
-                    self.getFloorPlanItem(drop.attrs.DropID, children => {
-                        let notProducts = children.filter(child => {
-                            return child.type != "PRODUCT";
-                        })
-
-                        let parent = notProducts.find(child => {
-                            return child.id == drop.attrs.DropID;
-                        });
-
-                        notProducts.forEach(child => {
-                            let fpI = new FloorPlanItem(child, parent);
-
-                            if (fpI.x < closestX)
-                                closestX = fpI.x;
-
-                            if ((fpI.x + fpI.width) > furthestX)
-                                furthestX = +fpI.width;
-
-                            if (fpI.y < closestY)
-                                closestY = fpI.y;
-
-                            if ((fpI.y + fpI.height) > furthestY)
-                                furthestY = +fpI.height;
-
-                            // self.getFixture(child.spaceplan_Fixture_ID, () => {
-
-                            // })
-
-                            self.drawingHelper.draw(fpI);
-                        })
-
-                        let pointX = ((furthestX) - (closestX));
-                        let pointY = ((furthestY) - (closestY));
-
-                        console.log("pointyPoints", pointX, pointY)
-
-                        camera.setTarget(new BABYLON.Vector3(pointX, 0, pointY));
-                    })
+                let notProducts = drops.filter(child => {
+                    return child.type != "PRODUCT";
                 });
+
+                notProducts.forEach(drop => {
+                    let parent = notProducts.find(el => {
+                        return el.id == drop.parent_ID;
+                    });
+
+                    let children = notProducts.filter(el => {
+                        return el.parent_ID == drop.id;
+                    });
+
+                    let fpI = new FloorPlanItem(drop, parent, children);
+
+                    if (fpI.x < closestX) closestX = fpI.x;
+
+                    if (fpI.x + fpI.width > furthestX) furthestX = +fpI.width;
+
+                    if (fpI.y < closestY) closestY = fpI.y;
+
+                    if (fpI.y + fpI.height > furthestY) furthestY = +fpI.height;
+
+                    self.drawingHelper.draw(fpI, shadowGenerator);
+                });
+
+                let pointX = ((furthestX) - (closestX)) / 100;
+                let pointY = ((furthestY) - (closestY)) / 100;
+                // camera.setTarget(new BABYLON.Vector3(pointX, 0, pointY));
+
+                // drops.forEach(drop => {
+                //     self.getFloorPlanItem(drop.attrs.DropID, children => {
+                //         let notProducts = children.filter(child => {
+                //             return child.type != "PRODUCT";
+                //         })
+
+                //         let parent = notProducts.find(child => {
+                //             return child.id == drop.attrs.DropID;
+                //         });
+
+                //         notProducts.forEach(child => {
+                //             let fpI = new FloorPlanItem(child, parent);
+
+                //             if (fpI.x < closestX)
+                //                 closestX = fpI.x;
+
+                //             if ((fpI.x + fpI.width) > furthestX)
+                //                 furthestX = +fpI.width;
+
+                //             if (fpI.y < closestY)
+                //                 closestY = fpI.y;
+
+                //             if ((fpI.y + fpI.height) > furthestY)
+                //                 furthestY = +fpI.height;
+
+                //             // self.getFixture(child.spaceplan_Fixture_ID, () => {
+
+                //             // })
+
+                //             self.drawingHelper.draw(fpI);
+                //         })
+
+                //         let pointX = ((furthestX) - (closestX));
+                //         let pointY = ((furthestY) - (closestY));
+
+                //         console.log("pointyPoints", pointX, pointY)
+
+                //         camera.setTarget(new BABYLON.Vector3(pointX, 0, pointY));
+                //     })
+                // });
             },
             getFloorPlanItem(dropID, callback) {
                 let self = this;
 
-                Axios.get(process.env.VUE_APP_API + `FloorPlan_Fixtures/GetChildren?parentID=${dropID}`)
+                Axios.get(
+                        process.env.VUE_APP_API +
+                        `FloorPlan_Fixtures/GetChildren?parentID=${dropID}`
+                    )
                     .then(r => {
                         callback(r.data);
                     })
                     .catch(e => {
                         console.log(e);
                         alert("Failed to get floorplan fixture data");
-                    })
+                    });
             },
             getFixture(fixtureID, callback) {
                 let self = this;
 
-                Axios.get(process.env.VUE_APP_API + `Fixture?db=CR-DEVINSPIRE&id=${fixtureID}`)
+                Axios.get(
+                        process.env.VUE_APP_API + `Fixture?db=CR-DEVINSPIRE&id=${fixtureID}`
+                    )
                     .then(r => {})
                     .catch(e => {
-                        console.log("Failed to get fixture")
+                        console.log("Failed to get fixture");
+                    });
+            },
+            getFixtures(fixtureHeaderID, callback) {
+                let self = this;
+
+                Axios.get(
+                        process.env.VUE_APP_API +
+                        `FloorPlan_Fixtures/GetFixtureByHeaderID?fixtureHeaderID=${fixtureHeaderID}`
+                    )
+                    .then(r => {
+                        callback(r.data);
                     })
-            }
+                    .catch(e => {
+                        console.log(e);
+                    });
+            },
+            addDocumentListeners() {
+                let self = this;
+
+                document.addEventListener("keydown", e => {
+                    self.manageCamera(e.code);
+                });
+            },
+            manageCamera(key) {
+                let stepDistance = 0.25;
+                let rotationDistance = 5;
+
+                let currentX = camera.position.x;
+                let currentY = camera.position.y;
+                let currentZ = camera.position.z;
+
+                switch (key) {
+                    case "ArrowLeft": {
+                        camera.rotation.y = camera.rotation.y + degreesToRadians(270);
+                        let nextPos = camera.getFrontPosition(stepDistance);
+                        nextPos.y = currentY;
+                        camera.position = BABYLON.Vector3.Lerp(camera.position, nextPos, 1);
+                        camera.rotation.y = camera.rotation.y - degreesToRadians(270);
+                    }
+                    break;
+                case "ArrowRight": {
+                    camera.rotation.y = camera.rotation.y + degreesToRadians(90);
+                    let nextPos = camera.getFrontPosition(stepDistance);
+                    nextPos.y = currentY;
+                    camera.position = BABYLON.Vector3.Lerp(camera.position, nextPos, stepDistance);
+                    camera.rotation.y = camera.rotation.y - degreesToRadians(90);
+                }
+                break;
+                case "ArrowUp": {
+                    let nextPos = camera.getFrontPosition(stepDistance);
+                    nextPos.y = currentY;
+                    camera.position = BABYLON.Vector3.Lerp(camera.position, nextPos, stepDistance);
+                }
+                break;
+                case "ArrowDown": {
+                    let nextPos = camera.getFrontPosition(-stepDistance);
+                    nextPos.y = currentY;
+                    camera.position = BABYLON.Vector3.Lerp(camera.position, nextPos, stepDistance);
+                }
+                break;
+                case "PageUp": {
+                    camera.position.y += stepDistance;
+                }
+                break;
+                case "PageDown": {
+                    camera.position.y -= stepDistance;
+                }
+                break;
+                case "KeyA": {
+                    camera.rotation.y -= degreesToRadians(rotationDistance);
+                }
+                break;
+                case "KeyD": {
+                    camera.rotation.y += degreesToRadians(rotationDistance);
+                }
+                break;
+                case "KeyW": {
+                    camera.rotation.x += degreesToRadians(rotationDistance);
+                }
+                break;
+                case "KeyS": {
+                    camera.rotation.x -= degreesToRadians(rotationDistance);
+                }
+                break;
+                }
+            },
         }
-    }
+    };
 
     function degreesToRadians(degrees) {
         if (degrees != 0) return degrees / 57.2958;

@@ -14,12 +14,6 @@ class Gondola extends Boxbase {
     setPosition() {
         let self = this;
 
-        // self.element.position.x = 0; // (self.data.x + 0.5 * self.data.width) / self.pxlToMeterRatio;
-        // self.element.position.y = ((self.data.depth / self.pxlToMeterRatio) / 2);
-        // self.element.position.z = 0; // -((self.data.y + 0.5 * self.data.height) / self.pxlToMeterRatio);
-
-        console.log("self", self);
-
         self.element.position.x = (self.data.x + 0.5 * self.data.width) / self.pxlToMeterRatio;
         self.element.position.y = ((self.data.depth / self.pxlToMeterRatio) / 2);
         self.element.position.z = -((self.data.y + (self.data.height * 0.5)) / 100);

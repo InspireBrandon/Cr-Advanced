@@ -4,11 +4,15 @@
 // Date: 2020-04-01
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Fixtures
 import Base from './Base.js'
 import Basket from './Basket.js'
 import Gondola from './Gondola.js'
 import Obstruction from './Obstruction.js'
 import Shelf from './Shelf.js'
+
+// Renderings
+import Rendering_LabelHolder from './Renderings/LabelHolder';
 
 class DrawingHelper {
     constructor(scene) {
@@ -16,7 +20,7 @@ class DrawingHelper {
         self.scene = scene;
     }
 
-    draw(drop) {
+    draw(drop, shadowGenerator) {
         let self = this;
 
         let fixture;
@@ -25,8 +29,6 @@ class DrawingHelper {
             scene: self.scene, 
             data: drop
         }
-
-        console.log("DROP", drop)
 
         switch(drop.type.toUpperCase()) {
             case "GONDOLA": {
@@ -48,7 +50,7 @@ class DrawingHelper {
                 fixture = new Shelf(params);
             }break;
             case "LABELHOLDER": {
-                fixture = new Shelf(params);
+                fixture = new Rendering_LabelHolder(params);
             }break;
             case "SIDE": {
                 fixture = new Shelf(params);
@@ -60,6 +62,7 @@ class DrawingHelper {
 
         if(fixture != undefined && fixture != null) {
             fixture.draw();
+            shadowGenerator.addShadowCaster(fixture.element)
         } else {
             console.warn(`[DRAWING-HELPER] Failed to draw fixture. Type of ${drop.type} is not defined.`);
         }

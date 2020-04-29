@@ -1696,7 +1696,7 @@ function getChildren(planodata, parentID, vuex, storeCount) {
       if(fixture.Data.Data.RenderingsItems[prop] != null && fixture.Data.Data.RenderingsItems[prop] != {}) {
         let renderingData = fixture.Data.Data.RenderingsItems[prop];
 
-        childArr.push({
+        item.children.push({
           id: renderingData.ID,
           floorplan_Item_ID: renderingData.ID,
           parent_ID: renderingData.ParentID,
