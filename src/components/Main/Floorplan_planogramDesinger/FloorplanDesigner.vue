@@ -346,9 +346,8 @@
             },
             setproperties(item) {
                 let self = this
-                if (item.attrs.rotation) {
-                    self.properties.rotation = item.attrs.rotation.toFixed(0)
-                }
+
+                self.properties.rotation = item.attrs.rotation.toFixed(0)
                 console.log("set props------", item.attrs.rotation);
                 if (item.attrs.name == "Circle") {
                     self.properties.shape = "Circle"
