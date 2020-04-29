@@ -86,9 +86,9 @@
                 let self = this;
                 self.createCamera(scene, canvas);
                 self.createLight(scene);
+                self.createFixtures(scene, drops)
                 self.createFloor(scene);
                 // self.createSkybox(scene);
-                self.createFixtures(scene, drops)
                 // self.createCans(scene, 0.92);
                 // self.createCans(scene, 1.06);
                 return scene;
@@ -225,10 +225,10 @@
                             self.drawingHelper.draw(fpI);
                         })
 
-                        let pointX = ((furthestX / 100) - (closestX / 100));
-                        let pointY = ((furthestY / 100) - (closestY / 100));
+                        let pointX = ((furthestX) - (closestX));
+                        let pointY = ((furthestY) - (closestY));
 
-                        console.log(pointX, pointY)
+                        console.log("pointyPoints", pointX, pointY)
 
                         camera.setTarget(new BABYLON.Vector3(pointX, 0, pointY));
                     })

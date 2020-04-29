@@ -157,7 +157,7 @@
                     .then(
                         r => {
                             console.log("CHECK HEADER", r);
-
+                            
                             callback(r.data)
                         })
             },
