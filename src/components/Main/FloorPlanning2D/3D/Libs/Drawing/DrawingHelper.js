@@ -4,10 +4,11 @@
 // Date: 2020-04-01
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+import Base from './Base.js'
+import Basket from './Basket.js'
 import Gondola from './Gondola.js'
 import Obstruction from './Obstruction.js'
 import Shelf from './Shelf.js'
-import Basket from './Basket.js'
 
 class DrawingHelper {
     constructor(scene) {
@@ -25,6 +26,8 @@ class DrawingHelper {
             data: drop
         }
 
+        console.log("DROP", drop)
+
         switch(drop.type.toUpperCase()) {
             case "GONDOLA": {
                 fixture = new Gondola(params);
@@ -33,7 +36,7 @@ class DrawingHelper {
                 fixture = new Obstruction(params);
             }break;
             case "BASE": {
-                fixture = new Shelf(params);
+                fixture = new Base(params);
             }break;
             case "SHELF": {
                 fixture = new Shelf(params);

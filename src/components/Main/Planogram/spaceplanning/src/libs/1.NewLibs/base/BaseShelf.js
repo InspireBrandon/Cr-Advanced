@@ -116,7 +116,7 @@ class BaseShelf extends PlanogramItemBase {
 
     self.Group.setY(((gondolaItem.TotalHeight) - self.TotalHeight));
 
-    let offset = (self.Data.x_Offset == undefined ? 0 : self.Data.x_Offset) * 3;
+    let offset = (self.Data.xOffset == undefined ? 0 : self.Data.xOffset) * 3;
     self.Group.setX(0 + parseFloat(offset));
     // adjust label values + fixture positions
     let ctrl_label = new LabelHelper();

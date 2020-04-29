@@ -57,6 +57,28 @@ function drawSide(side, parent, scene, config, data) {
         let sidePositionDetails = getSidePosition(side, config)
     
         var plane1 = BABYLON.MeshBuilder.CreatePlane("plane1", { width: sidePositionDetails.width, height: sidePositionDetails.height }, scene, true, BABYLON.MeshBuilder.DOUBLESIDE);
+        plane1.receiveShadows = true;
+        plane1.position = new BABYLON.Vector3(0, 0, 0);
+        plane1.material = mat1trans; 
+        plane1.parent = parent;
+        plane1.position.x = sidePositionDetails.position.x;
+        plane1.position.y = sidePositionDetails.position.y;
+        plane1.position.z = sidePositionDetails.position.z;
+    
+        applyRotation(side, plane1);
+    }
+
+    if(!data.transparency[side]) {
+        var mat1trans = new BABYLON.StandardMaterial("mat1_trans", scene, true);
+        mat1trans.diffuseColor = new BABYLON.Color3(255, 255, 0);
+        mat1trans.emissiveColor = new BABYLON.Color3(1, 1, 1); // self-illuminate
+        mat1trans.anisotropicFilteringLevel = 0;
+        mat1trans.backFaceCulling = false;
+    
+        let sidePositionDetails = getSidePosition(side, config)
+    
+        var plane1 = BABYLON.MeshBuilder.CreatePlane("plane1", { width: sidePositionDetails.width, height: sidePositionDetails.height }, scene, true, BABYLON.MeshBuilder.DOUBLESIDE);
+        plane1.receiveShadows = true;
         plane1.position = new BABYLON.Vector3(0, 0, 0);
         plane1.material = mat1trans; 
         plane1.parent = parent;
