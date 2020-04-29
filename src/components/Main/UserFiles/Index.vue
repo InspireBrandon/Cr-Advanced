@@ -157,20 +157,24 @@
                         delete Axios.defaults.headers.common["TenantID"];
 
                         let tmpsharedUsers = []
+                        console.log("getSharedFiles", r.data);
 
                         r.data.forEach(folderFile => {
                             let add = true;
                             let currentItem = null;
 
                             tmpsharedUsers.forEach(sharedUser => {
-                                if (folderFile.systemUserID == sharedUser.systemUserID) {
+                                console.log(folderFile.Owner_ID == sharedUser.Owner_ID);
+                                
+                                if (folderFile.Owner_ID == sharedUser.Owner_ID) {
                                     currentItem = sharedUser;
-                                    add = false;
+                                    // add = false;
                                 }
                             })
 
                             if (add) {
                                 currentItem = new treeItem(folderFile)
+                                console.log("currentItem",currentItem);
                                 tmpsharedUsers.push(currentItem);
                             }
 

@@ -295,7 +295,8 @@
                     }
 
                     // Add task folders to department folder
-                    departmentTreeItem.children.push(taskInProgress, taskApprovalInProgress, taskApproved);
+
+                    // departmentTreeItem.children.push(taskInProgress, taskApprovalInProgress, taskApproved);
 
                     // On click get all tasks by department and populate
                     departmentTreeItem.click = function () {
@@ -307,103 +308,126 @@
                             taskInProgress.children = [];
                             taskApprovalInProgress.children = [];
                             taskApproved.children = [];
-
                             self.getTasksByProjectGroup(department.id, tasks => {
                                 self.getRangeFileByProjectGroup(department.id, rangeFiles => {
-                                    // Handle tasks in progress
-                                    let inProgressTasks = tasks.filter(task => {
-                                        return task.type == 2 && (task.status ==
-                                            1 || task
-                                            .status == 2 || task.status == 7);
-                                    })
-
-                                    inProgressTasks.forEach(task => {
-                                        let taskItem = new treeItem({
-                                            name: task.rangeFileName,
-                                            icon: 'insert_drive_file',
-                                            children: [],
-                                            type: 'PlanogramID',
-                                            value: task.planogram_ID
-                                        })
-
-                                        taskItem.click = function () {
-                                            self.$router.push(
-                                                `/RangePlanningView/${task.rangeFileID}`
-                                            );
-                                        }
-
-                                        taskInProgress.children.push(taskItem);
-
-                                        rangeFiles.forEach((rangeFile, idx) => {
-                                            if (rangeFile.rangeFileID ==
-                                                task.rangeFileID) {
-                                                rangeFiles.splice(idx, 1);
-                                            }
-                                        })
-                                    })
-
-                                    // Handle tasks in progress
-                                    let approvalInProgressTasks = tasks.filter(task => {
-                                        return task.type == 2 && (task.status ==
-                                            10 || task
-                                            .status == 20);
-                                    })
-
-                                    approvalInProgressTasks.forEach(task => {
-                                        let taskItem = new treeItem({
-                                            name: task.rangeFileName,
-                                            icon: 'insert_drive_file',
-                                            children: [],
-                                            type: 'PlanogramID',
-                                            value: task.planogram_ID
-                                        })
-
-                                        taskItem.click = function () {
-                                            self.$router.push(
-                                                `/RangePlanningView/${task.rangeFileID}`
-                                            );
-                                        }
-
-                                        taskApprovalInProgress.children.push(
-                                            taskItem);
-
-                                        rangeFiles.forEach((rangeFile, idx) => {
-                                            if (rangeFile.rangeFileID ==
-                                                task.rangeFileID) {
-                                                rangeFiles.splice(idx, 1);
-                                            }
-                                        })
-                                    })
-
-                                    // Handle approved tasks
-                                    let approvedTasks = tasks.filter(task => {
-                                        return task.type == 2 && (task.status ==
-                                            12);
-                                    })
-
                                     rangeFiles.forEach(task => {
                                         let taskItem = new treeItem({
-                                            name: task.rangeFileName,
+                                            name: task.fileName,
                                             icon: 'insert_drive_file',
                                             children: [],
                                             type: 'PlanogramID',
-                                            value: task.planogram_ID
+                                            value: task.systemFileID
                                         })
 
                                         taskItem.click = function () {
                                             self.$router.push(
-                                                `/RangePlanningView/${task.rangeFileID}`
+                                                `/RangePlanningView/${task.systemFileID}`
                                             );
                                         }
 
-                                        taskApproved.children.push(taskItem);
+                                        departmentTreeItem.children.push(taskItem);
                                     })
-
                                     departmentTreeItem.loading = false;
                                     departmentTreeItem.showChildren = true;
                                     departmentTreeItem.icon = "folder_open";
                                 })
                             })
+                            // self.getTasksByProjectGroup(department.id, tasks => {
+                            //     self.getRangeFileByProjectGroup(department.id, rangeFiles => {
+                            //         // Handle tasks in progress
+                            //         let inProgressTasks = tasks.filter(task => {
+                            //             return task.type == 2 && (task.status ==
+                            //                 1 || task
+                            //                 .status == 2 || task.status == 7);
+                            //         })
+
+                            //         inProgressTasks.forEach(task => {
+                            //             let taskItem = new treeItem({
+                            //                 name: task.rangeFileName,
+                            //                 icon: 'insert_drive_file',
+                            //                 children: [],
+                            //                 type: 'PlanogramID',
+                            //                 value: task.planogram_ID
+                            //             })
+
+                            //             taskItem.click = function () {
+                            //                 self.$router.push(
+                            //                     `/RangePlanningView/${task.rangeFileID}`
+                            //                 );
+                            //             }
+
+                            //             taskInProgress.children.push(taskItem);
+
+                            //             rangeFiles.forEach((rangeFile, idx) => {
+                            //                 if (rangeFile.rangeFileID ==
+                            //                     task.rangeFileID) {
+                            //                     rangeFiles.splice(idx, 1);
+                            //                 }
+                            //             })
+                            //         })
+
+                            //         // Handle tasks in progress
+                            //         let approvalInProgressTasks = tasks.filter(task => {
+                            //             return task.type == 2 && (task.status ==
+                            //                 10 || task
+                            //                 .status == 20);
+                            //         })
+
+                            //         approvalInProgressTasks.forEach(task => {
+                            //             let taskItem = new treeItem({
+                            //                 name: task.rangeFileName,
+                            //                 icon: 'insert_drive_file',
+                            //                 children: [],
+                            //                 type: 'PlanogramID',
+                            //                 value: task.planogram_ID
+                            //             })
+
+                            //             taskItem.click = function () {
+                            //                 self.$router.push(
+                            //                     `/RangePlanningView/${task.rangeFileID}`
+                            //                 );
+                            //             }
+
+                            //             taskApprovalInProgress.children.push(
+                            //                 taskItem);
+
+                            //             rangeFiles.forEach((rangeFile, idx) => {
+                            //                 if (rangeFile.rangeFileID ==
+                            //                     task.rangeFileID) {
+                            //                     rangeFiles.splice(idx, 1);
+                            //                 }
+                            //             })
+                            //         })
+
+                            //         // Handle approved tasks
+                            //         let approvedTasks = tasks.filter(task => {
+                            //             return task.type == 2 && (task.status ==
+                            //                 12);
+                            //         })
+
+                            //         rangeFiles.forEach(task => {
+                            //             let taskItem = new treeItem({
+                            //                 name: task.rangeFileName,
+                            //                 icon: 'insert_drive_file',
+                            //                 children: [],
+                            //                 type: 'PlanogramID',
+                            //                 value: task.planogram_ID
+                            //             })
+
+                            //             taskItem.click = function () {
+                            //                 self.$router.push(
+                            //                     `/RangePlanningView/${task.rangeFileID}`
+                            //                 );
+                            //             }
+
+                            //             taskApproved.children.push(taskItem);
+                            //         })
+
+                            //         departmentTreeItem.loading = false;
+                            //         departmentTreeItem.showChildren = true;
+                            //         departmentTreeItem.icon = "folder_open";
+                            //     })
+                            // })
                         }
                     }
 
@@ -487,7 +511,7 @@
                     }
 
                     // Add task folders to department folder
-                    departmentTreeItem.children.push(taskInProgress, taskApprovalInProgress, taskApproved);
+                    // departmentTreeItem.children.push(taskInProgress, taskApprovalInProgress, taskApproved);
 
                     // On click get all tasks by department and populate
                     departmentTreeItem.click = function () {
@@ -503,114 +527,130 @@
                             self.getTasksByProjectGroup(department.id, tasks => {
                                 self.getPlanogramFileByProjectGroup(department.id,
                                     planogramFiles => {
-                                        console.log(planogramFiles);
-
-                                        // Handle tasks in progress
-                                        let inProgressTasks = tasks.filter(task => {
-                                            return task.type == 3 && (task.status ==
-                                                1 || task
-                                                .status == 2);
-                                        })
-
-                                        inProgressTasks.forEach(task => {
-                                            if (task.systemFileName != null) {
-                                                let taskItem = new treeItem({
-                                                    name: task.systemFileName ==
-                                                        null ? "" : task
-                                                        .systemFileName.split(
-                                                            "- XXX")[0],
-                                                    icon: 'insert_drive_file',
-                                                    children: []
-                                                })
-
-                                                taskItem.click = function () {
-                                                    self.$router.push(
-                                                        `/PlanogramImplementationNew/${task.project_ID}/${task.systemFileID}/20`
-                                                    );
-                                                }
-
-                                                taskInProgress.children.push(taskItem);
-
-                                                planogramFiles.forEach((planogramFile,
-                                                    idx) => {
-                                                    if (planogramFile
-                                                        .PlanogramFileID == task
-                                                        .systemFileID) {
-                                                        planogramFiles.splice(
-                                                            idx,
-                                                            1);
-                                                    }
-                                                })
-                                            }
-                                        })
-
-                                        // Handle tasks in progress
-                                        let approvalInProgressTasks = tasks.filter(task => {
-                                            return task.type == 3 && (task.status ==
-                                                10 || task
-                                                .status == 20);
-                                        })
-
-                                        approvalInProgressTasks.forEach(task => {
-                                            if (task.systemFileName != null) {
-                                                let taskItem = new treeItem({
-                                                    name: task.systemFileName ==
-                                                        null ? "" : task
-                                                        .systemFileName.split(
-                                                            "- XXX")[0],
-                                                    icon: 'insert_drive_file',
-                                                    children: []
-                                                })
-
-                                                taskItem.click = function () {
-                                                    self.$router.push(
-                                                        `/PlanogramImplementationNew/${task.project_ID}/${task.systemFileID}/20`
-                                                    );
-                                                }
-
-                                                taskApprovalInProgress.children.push(
-                                                    taskItem);
-
-                                                planogramFiles.forEach((planogramFile,
-                                                    idx) => {
-                                                    if (planogramFile
-                                                        .PlanogramFileID == task
-                                                        .systemFileID) {
-                                                        planogramFiles.splice(
-                                                            idx,
-                                                            1);
-                                                    }
-                                                })
-                                            }
-                                        })
-
-                                        // Handle approved tasks
-                                        let approvedTasks = tasks.filter(task => {
-                                            return task.type == 3 && (task.status ==
-                                                12 || task
-                                                .status == 21 || task.status ==
-                                                27 || task
-                                                .status == 44);
-                                        })
-
                                         planogramFiles.forEach(task => {
                                             let taskItem = new treeItem({
-                                                name: task.planogramFileName ==
-                                                    null ? "" : task
-                                                    .planogramFileName.split(
-                                                        "- XXX")[0],
+                                                name: task.fileName,
                                                 icon: 'insert_drive_file',
                                                 children: []
                                             })
 
                                             taskItem.click = function () {
                                                 self.$router.push(
-                                                    `/PlanogramImplementationNew/${task.project_ID}/${task.planogramFileID}/20`
+                                                    `/PlanogramImplementationNew/${task.project_ID}/${task.systemFileID}/20`
                                                 );
                                             }
 
-                                            taskApproved.children.push(taskItem);
+                                            departmentTreeItem.children.push(taskItem)
                                         })
+
+                                        // console.log(planogramFiles);
+
+                                        // // Handle tasks in progress
+                                        // let inProgressTasks = tasks.filter(task => {
+                                        //     return task.type == 3 && (task.status ==
+                                        //         1 || task
+                                        //         .status == 2);
+                                        // })
+
+                                        // inProgressTasks.forEach(task => {
+                                        //     if (task.systemFileName != null) {
+                                        //         let taskItem = new treeItem({
+                                        //             name: task.systemFileName ==
+                                        //                 null ? "" : task
+                                        //                 .systemFileName.split(
+                                        //                     "- XXX")[0],
+                                        //             icon: 'insert_drive_file',
+                                        //             children: []
+                                        //         })
+
+                                        //         taskItem.click = function () {
+                                        //             self.$router.push(
+                                        //                 `/PlanogramImplementationNew/${task.project_ID}/${task.systemFileID}/20`
+                                        //             );
+                                        //         }
+
+                                        //         taskInProgress.children.push(taskItem);
+
+                                        //         planogramFiles.forEach((planogramFile,
+                                        //             idx) => {
+                                        //             if (planogramFile
+                                        //                 .PlanogramFileID == task
+                                        //                 .systemFileID) {
+                                        //                 planogramFiles.splice(
+                                        //                     idx,
+                                        //                     1);
+                                        //             }
+                                        //         })
+                                        //     }
+                                        // })
+
+                                        // // Handle tasks in progress
+                                        // let approvalInProgressTasks = tasks.filter(task => {
+                                        //     return task.type == 3 && (task.status ==
+                                        //         10 || task
+                                        //         .status == 20);
+                                        // })
+
+                                        // approvalInProgressTasks.forEach(task => {
+                                        //     if (task.systemFileName != null) {
+                                        //         let taskItem = new treeItem({
+                                        //             name: task.systemFileName ==
+                                        //                 null ? "" : task
+                                        //                 .systemFileName.split(
+                                        //                     "- XXX")[0],
+                                        //             icon: 'insert_drive_file',
+                                        //             children: []
+                                        //         })
+
+                                        //         taskItem.click = function () {
+                                        //             self.$router.push(
+                                        //                 `/PlanogramImplementationNew/${task.project_ID}/${task.systemFileID}/20`
+                                        //             );
+                                        //         }
+
+                                        //         taskApprovalInProgress.children.push(
+                                        //             taskItem);
+
+                                        //         planogramFiles.forEach((planogramFile,
+                                        //             idx) => {
+                                        //             if (planogramFile
+                                        //                 .PlanogramFileID == task
+                                        //                 .systemFileID) {
+                                        //                 planogramFiles.splice(
+                                        //                     idx,
+                                        //                     1);
+                                        //             }
+                                        //         })
+                                        //     }
+                                        // })
+
+                                        // // Handle approved tasks
+                                        // let approvedTasks = tasks.filter(task => {
+                                        //     return task.type == 3 && (task.status ==
+                                        //         12 || task
+                                        //         .status == 21 || task.status ==
+                                        //         27 || task
+                                        //         .status == 44);
+                                        // })
+
+                                        // planogramFiles.forEach(task => {
+                                        //     let taskItem = new treeItem({
+                                        //         name: task.planogramFileName ==
+                                        //             null ? "" : task
+                                        //             .planogramFileName.split(
+                                        //                 "- XXX")[0],
+                                        //         icon: 'insert_drive_file',
+                                        //         children: []
+                                        //     })
+
+                                        //     taskItem.click = function () {
+                                        //         self.$router.push(
+                                        //             `/PlanogramImplementationNew/${task.project_ID}/${task.planogramFileID}/20`
+                                        //         );
+                                        //     }
+
+                                        //     taskApproved.children.push(taskItem);
+                                        // })
 
                                         departmentTreeItem.loading = false;
                                         departmentTreeItem.showChildren = true;
@@ -1268,6 +1308,8 @@
                         `GetTasksByProjectGroup?projectGroupID=${projectGroupID}`)
                     .then(r => {
                         delete Axios.defaults.headers.common["TenantID"];
+                        console.log("getTasksByProjectGroup", r.data.projectTXList);
+
                         callback(r.data.projectTXList);
                     })
                     .catch(e => {
@@ -1311,6 +1353,9 @@
                 Axios.get(process.env.VUE_APP_API + `GetRangeFileByProjectGroup?projectGroupID=${projectGroupID}`)
                     .then(r => {
                         delete Axios.defaults.headers.common["TenantID"];
+
+                        console.log("getRangeFileByProjectGroup", r.data);
+
                         callback(r.data);
                     })
                     .catch(e => {
@@ -1325,6 +1370,8 @@
                 Axios.get(process.env.VUE_APP_API + `GetPlanogramFileByProjectGroup?projectGroupID=${projectGroupID}`)
                     .then(r => {
                         delete Axios.defaults.headers.common["TenantID"];
+                        console.log("getPlanogramFileByProjectGroup",r.data);
+                        
                         callback(r.data);
                     })
                     .catch(e => {

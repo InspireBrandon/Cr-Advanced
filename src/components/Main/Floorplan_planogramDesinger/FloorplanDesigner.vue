@@ -330,10 +330,11 @@
                     r => {
                         console.log("getPlanogramData", r.data);
                         self.drops = r.data
-                        self.fixtureHeaderID = self.drops[0].Floorplan_Fixture_Header_ID
+                        self.fixtureHeaderID = self.drops[0].floorplan_Fixture_Header_ID
                         callback()
                     }).catch(e => {
                     self.$refs.spinner.hide()
+                    alert("no transactions found, please save the spaceplan/fixture")
                 })
             },
             findDrop(target, callback) {
