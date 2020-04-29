@@ -21,7 +21,7 @@ class BaseShelf extends PlanogramItemBase {
 
     self.BuildBase(dropPos);
     self.SetBaseDraggable(true);
-    self.MoveThisToTop();
+    // self.MoveThisToTop();
 
     // set width heights
     self.SetObjectDimensions();

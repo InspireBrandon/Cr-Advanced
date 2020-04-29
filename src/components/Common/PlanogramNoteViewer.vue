@@ -5,7 +5,7 @@
                 <v-container fluid grid-list-xs>
                     <v-layout row wrap>
                         <template v-for="(item, idx) in items">
-                            <v-flex xs7 :key="idx">
+                            <v-flex xs8 :key="idx">
                                 <v-card flat style="border: 1px solid lightgrey">
                                     <v-toolbar flat color="white">
                                         <v-toolbar-title>
@@ -131,6 +131,6 @@
 
 <style>
     .anyimg img {
-        max-width: 60%;
+        width: 100%;
     }
 </style>

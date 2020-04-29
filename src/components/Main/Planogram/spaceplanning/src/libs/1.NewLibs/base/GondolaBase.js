@@ -120,9 +120,7 @@ class GondolaBase extends PlanogramItemBase {
     self.Group.setWidth(self.TotalWidth);
     self.Group.setHeight(self.TotalHeight);
 
-    if (self.Data.frontImageID != undefined && self.Data.frontImageID == null) {
-      self.LoadImage(self.Area, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.frontImageID}`);
-    } else if (self.Data.backImageID != undefined || self.Data.backImageID != null) {
+    if (self.Data.backImageID != undefined || self.Data.backImageID != null) {
       self.LoadImage(self.Area, process.env.VUE_APP_API + `FixtureImage?db=CR-Devinspire&fixtureImageID=${self.Data.backImageID}`);
     } else {
       self.LoadImage(self.Area, "data:image/png;base64," + self.Data.image);

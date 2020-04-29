@@ -449,11 +449,11 @@ class ProductItemBase extends PlanogramItemBase {
                 x: 0,
                 y: 0,
                 width: image_rect_og.image().width,
-                height: pH
+                height: self.Data.nesting_Type == "Outward" ? image_rect_og.image().height : pH
               });
 
               image_rect.setWidth(self.image_orientation_width);
-              image_rect.setHeight(nestingHeight);
+              image_rect.setHeight(self.Data.nesting_Type == "Outward" ? self.image_orientation_height : nestingHeight);
               image_rect.offset({
                 x: self.image_orientation_width / 2,
                 y: nestingHeight / 2

@@ -253,6 +253,6 @@
 
 <style>
   .anyimg img {
-    max-width: 60%;
+    max-width: 100%;
   }
 </style>

@@ -481,6 +481,9 @@
                                   <v-text-field v-model="form.nesting_Height" type="number" dense hide-details
                                     label="Nesting Height"></v-text-field>
                                 </v-flex>
+                                <v-flex md12>
+                                  <v-select :items="nesting_Types" v-model="form.nesting_Type" type="number" dense hide-details label="Nesting Type"></v-select>
+                                </v-flex>
                               </v-layout>
                             </v-card-text>
                           </v-card>
@@ -689,8 +692,10 @@
           pallet_Height: null,
           pallet_Width: null,
           pallet_Depth: null,
-          nesting_Height: null
+          nesting_Height: null,
+          nesting_Type: "Inward"
         },
+        nesting_Types: ["Inward", "Outward"],
         facings: {
           Facings_X: 0,
           Facings_Y: 0,
@@ -777,6 +782,10 @@
               } else {
                 self.form[prop] = args.formData[prop];
               }
+            }
+
+            if(self.form.nesting_Type == undefined || self.form.nesting_Type == null) {
+              self.form.nesting_Type = "Inward"
             }
 
             if (self.planoData != undefined && self.planoData != null) {
@@ -918,7 +927,8 @@
             pallet_Height: self.form.pallet_Height,
             pallet_Width: self.form.pallet_Width,
             pallet_Depth: self.form.pallet_Depth,
-            nesting_Height: self.form.nesting_Height
+            nesting_Height: self.form.nesting_Height,
+            nesting_Type: self.form.nesting_Type == undefined || self.form.nesting_Type == null ? 'Inward' : self.form.nesting_Type,
           }
 
           self.afterClose(request);
@@ -992,6 +1002,7 @@
         self.form.pallet_Width = null;
         self.form.pallet_Depth = null;
         self.form.nesting_Height = null;
+        self.form.nesting_Type = null;
       },
       openFile(facing) {
         let self = this;
