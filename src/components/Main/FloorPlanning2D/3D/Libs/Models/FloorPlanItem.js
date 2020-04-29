@@ -7,9 +7,9 @@
 import SideItem from './SideItem.js'
 
 class FloorPlanItem {
-    constructor(params, parent) {
+    constructor(params, parent, children) {
         let self = this;
-        
+
         // Identifiers
         self.name = params.name;
         self.type = params.type;
@@ -20,7 +20,7 @@ class FloorPlanItem {
 
         self.absoluteX = params.absoluteX;
         self.absoluteY = params.absoluteY;
-        
+
         // Dimensions
         self.height = params.height == 0 ? 0.1 : params.height;
         self.width = params.width == 0 ? 0.1 : params.width;
@@ -31,6 +31,9 @@ class FloorPlanItem {
 
         // Parent Information
         self.parent = parent;
+
+        // Children Information
+        self.children = children;
 
         // Colors
         self.color = new SideItem({
@@ -72,13 +75,13 @@ class FloorPlanItem {
             top: params.topMirrored
         });
 
-        if(params.type == "OBSTRUCTION") {
+        if (params.type == "OBSTRUCTION") {
             self.color.switchSides();
             self.imageID.switchSides();
             self.transparency.switchSides();
             self.mirrored.switchSides();
         }
-        
+
         // Offsets
         self.offset = {
             x: params.xOffset,

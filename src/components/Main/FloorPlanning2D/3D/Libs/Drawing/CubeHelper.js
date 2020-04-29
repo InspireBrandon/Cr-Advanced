@@ -22,6 +22,11 @@ class CubeHelper {
             drawSide(side, parent, scene, config, data)
         });
 
+        if(data.type == "SIDE") {
+            parent.rotate(BABYLON.Axis.Y, Math.PI / 2, BABYLON.Space.WORLD)
+            parent.position.x 
+        }
+
         return parent;
     }
 }
@@ -49,7 +54,7 @@ function drawSide(side, parent, scene, config, data) {
 
         var mat1trans = new BABYLON.StandardMaterial("mat1_trans", scene, true);
         mat1trans.diffuseTexture = new BABYLON.Texture(url + imageID, scene);
-        mat1trans.emissiveColor = new BABYLON.Color3(1, 1, 1); // self-illuminate
+        //mat1trans.emissiveColor = new BABYLON.Color3(1, 1, 1); // self-illuminate
         mat1trans.anisotropicFilteringLevel = 0;
         mat1trans.diffuseTexture.hasAlpha = true;
         mat1trans.backFaceCulling = false;
@@ -70,8 +75,8 @@ function drawSide(side, parent, scene, config, data) {
 
     if(!data.transparency[side]) {
         var mat1trans = new BABYLON.StandardMaterial("mat1_trans", scene, true);
-        mat1trans.diffuseColor = new BABYLON.Color3(255, 255, 0);
-        mat1trans.emissiveColor = new BABYLON.Color3(1, 1, 1); // self-illuminate
+        mat1trans.diffuseColor = new BABYLON.Color3(255, 255, 255);
+        // mat1trans.emissiveColor = new BABYLON.Color3(1, 1, 1); // self-illuminate
         mat1trans.anisotropicFilteringLevel = 0;
         mat1trans.backFaceCulling = false;
     
@@ -161,6 +166,10 @@ function applyRotation(side, plane1) {
             plane1.rotate(BABYLON.Axis.X, Math.PI / 2, BABYLON.Space.WORLD)
         }break;
     }
+}
+
+function checkMirror() {
+    
 }
 
 export default CubeHelper;
