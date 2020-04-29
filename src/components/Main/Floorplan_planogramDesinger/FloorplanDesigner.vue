@@ -129,6 +129,7 @@
                 snapableItems: ['.wall', '.Gondola-Rect', '.circle'],
                 selectedFixtures: null,
                 saveArr: [],
+                fixtureHeaderID: null,
 
             }
         },
@@ -329,6 +330,7 @@
                     r => {
                         console.log("getPlanogramData", r.data);
                         self.drops = r.data
+                        self.fixtureHeaderID = self.drops[0].Floorplan_Fixture_Header_ID
                         callback()
                     }).catch(e => {
                     self.$refs.spinner.hide()
