@@ -2796,7 +2796,7 @@
             attachGondolaInsideGroup(target, dragItem, group) {
                 let self = this
                 console.log("attachGondolaInsideGroup");
-                
+
                 target.attrs.hasAttached = dragItem.saveID
                 const matrix = target.getAbsoluteTransform().getMatrix();
                 const attrs = decompose(matrix);
@@ -2818,10 +2818,12 @@
 
 
                 target.attrs.hasAttached = dragItem.saveID
-                if (self.stage.attrs.scaleX == 0||self.stage.attrs.scaleX==undefined||self.stage.attrs.scaleX==null) {
+                if (self.stage.attrs.scaleX == 0 || self.stage.attrs.scaleX == undefined || self.stage.attrs.scaleX ==
+                    null) {
                     self.stage.attrs.scaleX = 1
                 }
-                if (self.stage.attrs.scaleY == 0||self.stage.attrs.scaleY==undefined||self.stage.attrs.scaleY==null) {
+                if (self.stage.attrs.scaleY == 0 || self.stage.attrs.scaleY == undefined || self.stage.attrs.scaleY ==
+                    null) {
                     self.stage.attrs.scaleY = 1
                 }
 
@@ -2986,15 +2988,15 @@
                                 return;
                             }
                             if (haveIntersection(group.getClientRect(), targetRect)) {
-                                if (target.children.length>0) {
-                                target.children.each(function (item) {
-                                    console.log(haveIntersection(item.getClientRect(),
-                                        targetRect));
-                                    if (haveIntersection(item.getClientRect(),
-                                            targetRect)) {
-                                        self.attachGondolaInsideGroup(item, target, group)
-                                    }
-                                })
+                                if (target.children.length > 0) {
+                                    target.children.each(function (item) {
+                                        console.log(haveIntersection(item.getClientRect(),
+                                            targetRect));
+                                        if (haveIntersection(item.getClientRect(),
+                                                targetRect)) {
+                                            self.attachGondolaInsideGroup(item, target, group)
+                                        }
+                                    })
                                 } else {
                                     self.attachGondola(group, target)
                                 }
@@ -3162,6 +3164,8 @@
             },
             addEvents() {
                 let self = this;
+                let keyMoveAmount = 0.5
+
                 document.addEventListener('keydown', function (event) {
                     const key = event.key;
                     switch (key) {
@@ -3207,6 +3211,36 @@
                                 })
                             }
                             break;
+                        case "ArrowLeft": {
+                            if (self.selectedItem != null) {
+                                self.selectedItem.x(self.selectedItem.attrs.x - keyMoveAmount)
+                                self.stage.batchDraw()
+                            }
+                        }
+                        break;
+                    case "ArrowRight": {
+                        if (self.selectedItem != null) {
+                            self.selectedItem.x(self.selectedItem.attrs.x + keyMoveAmount)
+                            self.stage.batchDraw()
+
+                        }
+                    }
+                    break;
+                    case "ArrowDown": {
+                        if (self.selectedItem != null) {
+                            self.selectedItem.y(self.selectedItem.attrs.y + keyMoveAmount)
+                            self.stage.batchDraw()
+                        }
+                    }
+                    break;
+                    case "ArrowUp": {
+                        if (self.selectedItem != null) {
+                            self.selectedItem.y(self.selectedItem.attrs.y - keyMoveAmount)
+                            self.stage.batchDraw()
+                        }
+                    }
+                    break;
+
                     }
                 });
                 document.addEventListener('keyup', function (event) {

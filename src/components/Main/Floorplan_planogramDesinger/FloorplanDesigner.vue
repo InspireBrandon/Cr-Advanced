@@ -344,7 +344,8 @@
             },
             setproperties(item) {
                 let self = this
-                self.properties.rotation = item.attrs.rotation.toFixed(2)
+
+                self.properties.rotation = item.attrs.rotation.toFixed(0)
                 console.log("set props------", item.attrs.rotation);
                 if (item.attrs.name == "Circle") {
                     self.properties.shape = "Circle"
@@ -354,6 +355,7 @@
             },
             addStageEvents() {
                 let self = this
+                let tooltip
                 self.stage.on('click tap', function (e) {
                     if (e.target.attrs.name == "Circle" || e.target.attrs.name == "Gondola-Rect") {
 
@@ -432,7 +434,6 @@
 
                     // now find where can we snap current object
                     var guides = snappingHandler.getGuides(lineGuideStops, itemBounds, self.stage);
-                    console.log("[SNAPPING]-guides", guides);
 
                     // do nothing of no snapping
                     if (!guides.length) {
@@ -542,6 +543,48 @@
                         self.stage.batchDraw();
                     }
                 });
+                self.selectedLayer.on("mouseover", (e) => {
+                    console.log("mouseover", e.target);
+                    self.findDrop(e.target, drop => {
+                        tooltip = new Konva.Label({
+                            x: e.target.attrs.x,
+                            y: e.target.attrs.y,
+                            opacity: 0.75
+                        });
+
+                        tooltip.add(
+                            new Konva.Tag({
+                                fill: 'black',
+                                pointerDirection: 'down',
+                                pointerWidth: 10,
+                                pointerHeight: 10,
+                                lineJoin: 'round',
+                                shadowColor: 'black',
+                                shadowBlur: 10,
+                                shadowOffsetX: 10,
+                                shadowOffsetY: 10,
+                                shadowOpacity: 0.5
+                            })
+                        );
+                        tooltip.add(
+                            new Konva.Text({
+                                text: drop.name,
+                                fontFamily: 'Calibri',
+                                fontSize: 18,
+                                padding: 5,
+                                fill: 'white'
+                            })
+                        );
+                        e.target.parent.add(tooltip)
+                        self.stage.batchDraw()
+                    })
+
+                })
+                self.selectedLayer.on("mouseout", (e) => {
+                    console.log(e.target);
+                    tooltip.destroy()
+                    self.stage.batchDraw();
+                })
             },
             imageSrc(imgID, type) {
                 let self = this;
@@ -615,6 +658,48 @@
                 startLayer.add(group)
                 self.selectedLayer = group
                 self.stage.add(startLayer);
+            },
+            addEvents() {
+                let self = this;
+                let keyMoveAmount = 0.5
+                document.addEventListener('keydown', function (event) {
+                    const key = event.key;
+                    switch (key) {
+                        case "ArrowLeft": {
+                            if (self.selectedItem != null) {
+                                self.selectedItem.x(self.selectedItem.attrs.x - keyMoveAmount)
+                                self.stage.batchDraw()
+                            }
+                        }
+                        break;
+                    case "ArrowRight": {
+                        if (self.selectedItem != null) {
+                            self.selectedItem.x(self.selectedItem.attrs.x + keyMoveAmount)
+                            self.stage.batchDraw()
+
+                        }
+                    }
+                    break;
+                    case "ArrowDown": {
+                        if (self.selectedItem != null) {
+                            self.selectedItem.y(self.selectedItem.attrs.y + keyMoveAmount)
+                            self.stage.batchDraw()
+                        }
+                    }
+                    break;
+                    case "ArrowUp": {
+                        if (self.selectedItem != null) {
+                            self.selectedItem.y(self.selectedItem.attrs.y - keyMoveAmount)
+                            self.stage.batchDraw()
+                        }
+                    }
+                    break;
+
+                    default:
+                        break;
+                    }
+
+                });
             },
             addShape(parent, item, callback) {
                 let self = this
@@ -706,7 +791,7 @@
             initialise() {
                 let self = this;
                 self.$refs.spinner.show()
-
+                self.addEvents()
                 self.checkForHeader(cb => {
                     self.drawGrid()
                     self.addStageEvents()
