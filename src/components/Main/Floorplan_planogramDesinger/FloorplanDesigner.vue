@@ -547,7 +547,6 @@
                     }
                 });
                 self.selectedLayer.on("mouseover", (e) => {
-                    console.log("mouseover", e.target);
                     self.findDrop(e.target, drop => {
                         tooltip = new Konva.Label({
                             x: e.target.attrs.x,
@@ -585,7 +584,9 @@
                 })
                 self.selectedLayer.on("mouseout", (e) => {
                     console.log(e.target);
-                    tooltip.destroy()
+                    if (tooltip != null) {
+                        tooltip.destroy()
+                    }
                     self.stage.batchDraw();
                 })
             },
