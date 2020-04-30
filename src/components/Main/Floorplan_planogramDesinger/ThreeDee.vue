@@ -216,16 +216,16 @@
                     return child.type != "PRODUCT";
                 });
 
-                notProducts.forEach(drop => {
+                let gondolas = notProducts.filter(child => {
+                    return child.type == "GONDOLA";
+                });
+
+                gondolas.forEach(drop => {
                     let parent = notProducts.find(el => {
                         return el.id == drop.parent_ID;
                     });
 
-                    let children = notProducts.filter(el => {
-                        return el.parent_ID == drop.id;
-                    });
-
-                    let fpI = new FloorPlanItem(drop, parent, children);
+                    let fpI = new FloorPlanItem(drop, parent);
 
                     if (fpI.x < closestX) closestX = fpI.x;
 
@@ -235,7 +235,7 @@
 
                     if (fpI.y + fpI.height > furthestY) furthestY = +fpI.height;
 
-                    self.drawingHelper.draw(fpI, shadowGenerator);
+                    self.drawingHelper.draw(fpI, shadowGenerator, notProducts);
                 });
 
                 let pointX = ((furthestX) - (closestX)) / 100;
@@ -392,7 +392,7 @@
                 }
                 break;
                 }
-            },
+            }
         }
     };
 

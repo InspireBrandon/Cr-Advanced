@@ -1159,7 +1159,9 @@
 
                   self.rangingController = new RangingController(r.data);
 
-                  self.rangingController.getSalesMonthlyTotals(self.rangingData.planogramID, () => {
+                  let type = self.rangingData.tag == " - CATEGORY" ? 2 : 1;
+
+                  self.rangingController.getSalesMonthlyTotals(self.rangingData.planogramID, type, () => {
                     if (self.selectedClusterType != null && self.selectedClusterOption != null) {
                       self.hybridProducts = self.rangingController.getSalesDataByCluster(self
                         .selectedClusterType,
@@ -1218,7 +1220,10 @@
               if (vscd.clusterType != null && vscd.storeID == null || vscd
                 .vscd !=
                 undefined && vscd.storeID == undefined) {
-                self.rangingController.getSalesMonthlyTotals(self.rangingData.planogramID, () => {
+
+                let type = self.rangingData.tag == " - CATEGORY" ? 2 : 1;
+
+                self.rangingController.getSalesMonthlyTotals(self.rangingData.planogramID, type, () => {
                   if (self.selectedClusterType != null && self.selectedClusterOption != null) {
                     self.hybridProducts = self.rangingController.getSalesDataByCluster(self
                       .selectedClusterType,
@@ -1657,7 +1662,9 @@
 
                 self.rangingController = new RangingController(r.data);
 
-                self.rangingController.getSalesMonthlyTotals(self.rangingData.planogramID, () => {
+                let type = self.rangingData.tag == " - CATEGORY" ? 2 : 1;
+
+                self.rangingController.getSalesMonthlyTotals(self.rangingData.planogramID, type, () => {
                   if (self.selectedClusterType != null && self.selectedClusterOption != null) {
                     self.products = self.rangingController.getSalesDataByCluster(self.selectedClusterType,
                       self.selectedClusterOption);
@@ -1857,7 +1864,9 @@
                 self.gotData = true;
                 self.rangingController = new RangingController(r.data);
 
-                self.rangingController.getSalesMonthlyTotals(clusterData.planogramID, () => {
+                let type = clusterData.tag == " - CATEGORY" ? 2 : 1;
+
+                self.rangingController.getSalesMonthlyTotals(clusterData.planogramID, type, () => {
                   self.selectedClusterType = clusterData.clusterType;
                   self.$store.commit("setClusterName", clusterData.storeCluster);
                   self.$store.commit("setClusterType", clusterData.clusterType);

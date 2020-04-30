@@ -7,10 +7,11 @@
 import SideItem from './SideItem.js'
 
 class FloorPlanItem {
-    constructor(params, parent, children) {
+    constructor(params, parent) {
         let self = this;
 
         // Identifiers
+        self.id = params.id;
         self.name = params.name;
         self.type = params.type;
 
@@ -31,9 +32,6 @@ class FloorPlanItem {
 
         // Parent Information
         self.parent = parent;
-
-        // Children Information
-        self.children = children;
 
         // Colors
         self.color = new SideItem({

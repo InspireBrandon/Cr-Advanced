@@ -13,6 +13,7 @@ import Shelf from './Shelf.js'
 
 // Renderings
 import Rendering_LabelHolder from './Renderings/LabelHolder';
+import FloorPlanItem from "../Models/FloorPlanItem.js";
 
 class DrawingHelper {
     constructor(scene) {
@@ -20,7 +21,7 @@ class DrawingHelper {
         self.scene = scene;
     }
 
-    draw(drop, shadowGenerator) {
+    draw(drop, shadowGenerator, allItems) {
         let self = this;
 
         let fixture;
@@ -63,6 +64,15 @@ class DrawingHelper {
         if(fixture != undefined && fixture != null) {
             fixture.draw();
             shadowGenerator.addShadowCaster(fixture.element)
+
+            let children = allItems.filter(e => {
+                return e.parent_ID == params.data.id;
+            })
+
+            children.forEach(child => {
+                let fpI = new FloorPlanItem(child, fixture);
+                self.draw(fpI, shadowGenerator, allItems) 
+            });
         } else {
             console.warn(`[DRAWING-HELPER] Failed to draw fixture. Type of ${drop.type} is not defined.`);
         }
