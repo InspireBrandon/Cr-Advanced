@@ -35,8 +35,6 @@ class StageWarehouseMiddleware {
                 }
               }
 
-              console.log(productData);
-
               productData["sales_Retail"] = warehouseProduct["sales_Retail"];
               productData["sales_Cost"] = warehouseProduct["sales_Cost"];
               productData["sales_Units"] = warehouseProduct["sales_Units"];
@@ -74,7 +72,6 @@ class StageWarehouseMiddleware {
           })
 
           if (!itemExists) {
-
             if (productData.isHybridProduct) {
               productData.store_Range_Indicator = 'YES';
             } else {

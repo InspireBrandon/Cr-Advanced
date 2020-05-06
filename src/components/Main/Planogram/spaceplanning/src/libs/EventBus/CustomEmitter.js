@@ -8,7 +8,6 @@ class CustomEmitter {
   }
 
   notify_gondola_selected_deselected(emitter, selected, data) {
-    console.log("Gondola selected")
     emitter.$emit('NOTIFY_GONDOLA_SELECTED_DESELECTED', {
       selected: selected,
       data: data,
@@ -16,7 +15,6 @@ class CustomEmitter {
   }
 
   notify_product_group_selected_deselected(emitter, selected, data) {
-    console.log("Product group selected")
     emitter.$emit('NOTIFY_PRODUCT_GROUP_SELECTED_DESELECTED', {
       selected: selected,
       data: data,
@@ -31,8 +29,6 @@ class CustomEmitter {
   }
 
   modal_load(emitter, type, subType, data, id, object) {
-    console.log("MODAL OPEN ", type);
-
     emitter.$emit('MODAL_LOAD', {
       data: data,
       id: id,
@@ -43,8 +39,6 @@ class CustomEmitter {
   }
 
   modal_saved(emitter, type, subType, data, id, object) {
-    console.log("MODAL SAVED ", type);
-
     emitter.$emit('MODAL_SAVED', {
       data: data,
       id: id,
@@ -55,8 +49,6 @@ class CustomEmitter {
   }
 
   delete_gondola(emitter, data, gondola) {
-    console.log("DELETE GONDOLA");
-
     emitter.$emit('DELETE_GONDOLA', {
       data: data,
       gondola: gondola
@@ -64,8 +56,6 @@ class CustomEmitter {
   }
 
   delete_gondola(emitter, data, fixture) {
-    console.log("DELETE FIXTURE");
-
     emitter.$emit('DELETE_FIXTURE', {
       data: data,
       fixture: fixture
@@ -84,8 +74,6 @@ class CustomEmitter {
   }
 
   delete_product(emitter, data, product_object) {
-    console.log("DELETE PRODUCT");
-
     emitter.$emit('DELETE_PRODUCT', {
       data: data,
       product_object: product_object

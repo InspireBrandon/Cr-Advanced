@@ -22,6 +22,24 @@ class SideItem {
         self.front = self.back;
         self.back = tmpFront;
     }
+
+    rotate() {
+        let self = this;
+
+        let tmpObj = {
+            front: self.front,
+            back: self.back,
+            left: self.left,
+            right: self.right,
+            bottom: self.bottom,
+            top: self.top
+        }
+
+        self.front = tmpObj.right;
+        self.back = tmpObj.left;
+        self.left = tmpObj.front;
+        self.right = tmpObj.back;
+    }
 }
 
 export default SideItem;

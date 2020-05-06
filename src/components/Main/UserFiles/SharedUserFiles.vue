@@ -2,8 +2,7 @@
     <div>
         <div>
             <div v-for="(item, idx) in items" :key="idx">
-                <div @click="folderClick(item)" class="route-item"
-                    v-if="item.type == 0">
+                <div @click="folderClick(item)" class="route-item" v-if="item.type == 0">
                     <v-progress-circular :size="12" v-if="item.loading" :width="2" indeterminate color="primary">
                     </v-progress-circular>
                     <v-icon size="12">{{ item.showChildren ? 'folder_open' : 'folder' }}</v-icon>
@@ -13,7 +12,8 @@
                             v-model="item.name" class="ml-1" style="border: 1px solid lightgrey" type="text">
                     </v-form>
                 </div>
-                <div @contextmenu.prevent="onContextMenuFile($event, item)" class="route-item" v-if="item.type == 1">
+                <div @mouseleave="showPreviewMenu = false" @mouseover="showPreview($event, item)" @contextmenu.prevent="onContextMenuFile($event, item)"
+                    class="route-item" v-if="item.type == 1">
                     <v-progress-circular :size="12" v-if="item.loading" :width="2" indeterminate color="primary">
                     </v-progress-circular>
                     <v-icon size="12">insert_drive_file</v-icon>
@@ -40,6 +40,9 @@
                     </v-list-tile>
                 </v-list>
             </v-menu>
+            <v-menu v-model="showPreviewMenu" :position-x="previewX" :position-y="previewY" absolute offset-y>
+                <img style="min-height: 200px; max-height: 500px; min-width: 200px; max-width: 500px;" :src="previewImageURL" alt="">
+            </v-menu>
             <input multiple @change="onFileChange" type="file" ref="fileInput" style="display: none" />
             <a style="display: none;" ref="downloadLink" href="" download></a>
         </div>
@@ -62,12 +65,16 @@
             return {
                 showMenu: false,
                 showFileMenu: false,
+                showPreviewMenu: false,
                 x: 0,
                 y: 0,
+                previewX: 0,
+                previewY: 0,
                 files: [],
                 showAddFolder: false,
                 folderName: "",
-                selectedItem: null
+                selectedItem: null,
+                previewImageURL: "https://designshack.net/wp-content/uploads/placeholder-image.png"
             }
         },
         props: ['items', 'systemUserID'],
@@ -93,6 +100,22 @@
                 self.y = e.clientY
                 self.$nextTick(() => {
                     self.showFileMenu = true
+                })
+            },
+            showPreview(e, item) {
+                let self = this;
+
+                self.showFileMenu = false;
+                self.showPreviewMenu = false
+                self.previewX = e.clientX + 50;
+                self.previewY = e.clientY;
+
+                console.log(item);
+
+                self.previewImageURL = process.env.VUE_APP_API + `FolderFile/Stream?folderFileID=${item.id}`,
+
+                self.$nextTick(() => {
+                    self.showPreviewMenu = true;
                 })
             },
             getFolderFileByParentID(parentID, callback) {
@@ -322,7 +345,8 @@
                 self.$refs.UserSelector.show(self.selectedItem.id, userIDs => {
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                    Axios.post(process.env.VUE_APP_API + `SharedFolderFile?folderFileID=${self.selectedItem.id}`, userIDs)
+                    Axios.post(process.env.VUE_APP_API +
+                            `SharedFolderFile?folderFileID=${self.selectedItem.id}`, userIDs)
                         .then(r => {
                             delete Axios.defaults.headers.common["TenantID"];
                         })

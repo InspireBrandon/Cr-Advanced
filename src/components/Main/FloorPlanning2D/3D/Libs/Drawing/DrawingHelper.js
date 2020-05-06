@@ -10,9 +10,14 @@ import Basket from './Basket.js'
 import Gondola from './Gondola.js'
 import Obstruction from './Obstruction.js'
 import Shelf from './Shelf.js'
+import Pegboard from './Pegboard.js'
 
 // Renderings
-import Rendering_LabelHolder from './Renderings/LabelHolder';
+import Rendering_LabelHolder from './Renderings/LabelHolder.js';
+import Rendering_SideFace from './Renderings/SideFace.js';
+import Rendering_ShelfEdge from './Renderings/ShelfEdge.js';
+
+// Models
 import FloorPlanItem from "../Models/FloorPlanItem.js";
 
 class DrawingHelper {
@@ -48,16 +53,30 @@ class DrawingHelper {
                 fixture = new Shelf(params);
             }break;
             case "PEGBOARD": {
-                fixture = new Shelf(params);
+                fixture = new Pegboard(params);
             }break;
             case "LABELHOLDER": {
-                fixture = new Rendering_LabelHolder(params);
+                if(params.data.parent.data.type == "PEGBOARD") {
+                    fixture = new Shelf(params);
+                } else {
+                    fixture = new Rendering_LabelHolder(params);
+                }
             }break;
             case "SIDE": {
-                fixture = new Shelf(params);
+                fixture = new Rendering_SideFace(params);
             }break;
             case "BASKET": {
                 fixture = new Basket(params);
+            }break;
+            case "SHELFEDGE": {
+                console.log("EDGE", params)
+                fixture = new Rendering_ShelfEdge(params);
+            }break;
+            case "BACK": {
+                fixture = new Rendering_ShelfEdge(params);
+            }break;
+            case "FRONT": {
+                fixture = new Rendering_ShelfEdge(params);
             }break;
         }
 

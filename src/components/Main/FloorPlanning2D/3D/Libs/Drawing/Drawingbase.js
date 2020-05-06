@@ -20,25 +20,29 @@ class DrawingBase {
     setPosition() {
         let self = this;
 
-        console.log(self.data);
-
         let parentElement = self.data.parent.element;
-        let parentY = (self.data.parent.data.height.y + (self.data.parent.data.height * 0.5));
+        let parentY = (self.data.parent.data.y + (self.data.parent.data.height * 0.5));
 
         self.element.position.x = parentElement.position.x;
-        self.element.position.y = parentElement.position.y; // (((parentY - ((self.data.depth) + self.data.y)) / self.pxlToMeterRatio) / 2);
-        self.element.position.z = parentElement.position.z;
 
-        // self.element.position.x = (self.data.x + 0.5 * self.data.width) / self.pxlToMeterRatio;
-        // self.element.position.y = (((parentY - ((self.data.depth) + self.data.y)) / self.pxlToMeterRatio) / 2);
-        // self.element.position.z = -((self.data.parent.data.y + (0.5 * self.data.height)) / self.pxlToMeterRatio);
+        let parentBottom = self.data.parent.data.y - (0.5 * self.data.parent.data.depth);
 
-        // if (self.data.rotation != undefined && self.data.rotation != null) {
-        //     let xPivot = -(self.data.width / 2 / self.pxlToMeterRatio);
-        //     let zPivot = self.data.height / 2 / self.pxlToMeterRatio;
-        //     self.element.setPivotPoint(new BABYLON.Vector3(xPivot, 0, zPivot));
-        //     self.element.rotation.y = degreesToRadians(self.data.rotation);
-        // }
+        let childY = parentBottom - (self.data.absoluteY - self.data.parent.data.absoluteY);
+
+        if(childY < 0) {
+            childY = childY * -1
+        }
+
+        let diff = childY - parentBottom;
+
+        // console.log(parentBottom, childY);
+        self.element.position.y = (self.data.parent.data.y + diff + (self.data.depth * 0.5)) / 300 // self.pxlToMeterRatio;
+
+        // self.element.position.y = (((0.5 * self.data.depth) / self.pxlToMeterRatio)); <-- POSITION TO BOTTOM
+
+        // Get difference between parent depth and child depth
+        let pcDiff = self.data.parent.data.height - self.data.height - 0.1;
+        self.element.position.z = parentElement.position.z + ((0.5 * pcDiff) / self.pxlToMeterRatio);
     }
 }
 

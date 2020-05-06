@@ -35,8 +35,7 @@ class Boxbase extends Drawingbase {
         }
 
         var ch = new CubeHelper();
-        self.element = ch.createCube(self.data, config, self.scene); // BABYLON.MeshBuilder.CreateBox(this.name, config, this.scene);
-        // self.setMaterialAlt();
+        self.element = ch.createCube(self.data, config, self.scene);
         self.setPosition();
         self.element.receiveShadows = true;
     }

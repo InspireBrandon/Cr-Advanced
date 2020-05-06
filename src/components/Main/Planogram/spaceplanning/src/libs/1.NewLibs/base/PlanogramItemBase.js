@@ -651,7 +651,7 @@ class PlanogramItemBase {
     gondolas.forEach(element => {
       let allItems = ctrl_store.getAllPlanogramItems(self.VueStore, element.ID);
 
-      if (allItems.length > 0) {
+      if (allItems.length > 1) {
         let gPegboards = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "PEGBOARD", element.ID);
         gPegboards.forEach(element => {
           element.Group.moveToTop();
@@ -685,7 +685,7 @@ class PlanogramItemBase {
 
     gondolas.forEach(element => {
       let allItems = ctrl_store.getAllPlanogramItems(self.VueStore, element.ID);
-      if (allItems.length > 0) {
+      if (allItems.length > 1) {
 
         let gShelves = ctrl_store.getAllPlanogramItemsByType(self.VueStore, "SHELF", element.ID);
         gShelves.forEach(element => {

@@ -23,6 +23,9 @@
                 <v-list-tile class="pa-0" @click="addFolderFile('page')">
                     <v-list-tile-title class="pa-0">Add Page</v-list-tile-title>
                 </v-list-tile>
+                <v-list-tile class="pa-0" @click="addFolderFile('page')">
+                    <v-list-tile-title class="pa-0">Yass</v-list-tile-title>
+                </v-list-tile>
             </v-list>
         </v-menu>
     </div>
