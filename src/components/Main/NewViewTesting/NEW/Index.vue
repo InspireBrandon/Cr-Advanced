@@ -38,6 +38,12 @@
     import FolderTreeItem from './Sections/FolderTreeItem/FolderTreeItem.js'
     let folderTreeItem;
 
+    import ArchivedTreeItem from './Sections/ArchivedTreeItem'
+    let archivedTreeItem;
+
+    import CheckPlanogramTreeItem from './Sections/CheckPlanogramTreeItem'
+    let checkPlanogramTreeItem;
+
     import UserFiles from '../../UserFiles/Index'
     import SystemFiles from '../../SystemFiles/Index'
 
@@ -74,6 +80,14 @@
             })
 
             folderTreeItem = new FolderTreeItem({
+                vueCtx: self
+            })
+
+            archivedTreeItem = new ArchivedTreeItem({
+                vueCtx: self
+            })
+
+            checkPlanogramTreeItem = new CheckPlanogramTreeItem({
                 vueCtx: self
             })
         },
@@ -149,6 +163,8 @@
                     self.buildRangePlanningTree();
                     self.buildModelPlanogramTree();
                     self.buildStorePlanogramTree();
+                    archivedTreeItem.build(self.treeItems);
+                    checkPlanogramTreeItem.build(self.treeItems);
                     self.buildFloorPlanningTree();
                     self.buildClusteringTree();
                     self.buildPromotionalPlanningFolder();
@@ -1370,8 +1386,8 @@
                 Axios.get(process.env.VUE_APP_API + `GetPlanogramFileByProjectGroup?projectGroupID=${projectGroupID}`)
                     .then(r => {
                         delete Axios.defaults.headers.common["TenantID"];
-                        console.log("getPlanogramFileByProjectGroup",r.data);
-                        
+                        console.log("getPlanogramFileByProjectGroup", r.data);
+
                         callback(r.data);
                     })
                     .catch(e => {

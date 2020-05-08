@@ -710,6 +710,7 @@
                 let shape = JSON.parse(item.attributes)
 
                 console.log("Shape", shape)
+                console.log("item", item)
 
                 switch (shape.name) {
                     case "Gondola-Rect": {
@@ -725,7 +726,7 @@
                             width: shape.width,
                             height: shape.height,
                             depth: shape.depth,
-                            DropID: shape.DropID,
+                            DropID: item.floorplan_Fixture_ID,
                             rotation: shape.rotation
                         })
 
@@ -746,7 +747,7 @@
                         x: shape.x,
                         y: shape.y,
                         width: shape.width,
-                        DropID: shape.DropID,
+                        DropID: item.floorplan_Fixture_ID,
                     })
                     circle.shape.saveID = item.id
                     circle.shape.guid = item.guid

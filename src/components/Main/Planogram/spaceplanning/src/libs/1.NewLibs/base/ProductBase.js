@@ -282,7 +282,7 @@ class ProductBase extends ProductItemBase {
     // console.log("[PRODUCT] Show product indicators");
     let self = this;
     // TODO: Get this product inside ActiveProductItems store and test show indactor value for X/tick
-    let storeResult = self.VueStore.getters.getPlanogramActiveProductById(self.Data.productID);
+    let storeResult = self.VueStore.getters.getPlanogramActiveProductByIdOrBarcode(self.Data.productID, self.Data.barcode);
 
     if (storeResult == null) {
       return;
@@ -331,7 +331,7 @@ class ProductBase extends ProductItemBase {
       self.Indicator2.moveToTop()
     }
 
-    if(storeResult.Data.store_Range_Indicator == "SELECTED" || storeResult.Data.store_Range_Indicator == "SELECT") {
+    if (storeResult.Data.store_Range_Indicator == "SELECTED" || storeResult.Data.store_Range_Indicator == "SELECT") {
       self.Indicator1 = new Konva.Line({
         x: 0,
         y: 0,
@@ -418,7 +418,7 @@ class ProductBase extends ProductItemBase {
 
   //#region Toggles
 
-  ToggleImages() {
+  ToggleImages(color) {
     let self = this;
     if (self.ImagesOn == true) {
       self.GetImages().then(result => {
@@ -435,7 +435,11 @@ class ProductBase extends ProductItemBase {
       });
 
       self.ProductRects.forEach(element => {
-        element.fill(self.RandomColor);
+        if(!self.HighlightsOn) {
+          element.fill(self.RandomColor);
+        } else {
+          element.fill(color);
+        }
         element.stroke('black');
         element.strokeWidth(0.5);
       });
@@ -444,13 +448,63 @@ class ProductBase extends ProductItemBase {
     self.Stage.draw();
   }
 
+  ToggleHighlights() {
+    let self = this;
+
+    if(self.HighlightsOn == true) {
+
+    }
+  }
+
   AddRemoveBordersAndBackground() {
     let self = this;
 
     self.ProductRects.forEach(element => {
       switch (self.LastFace.toUpperCase()) {
-        case "FRONT":
-          {
+        case "FRONT": {
+          if (self.ImageAvailable.front == true && self.ImagesOn == true) {
+            element.fill('transparent');
+            element.stroke('transparent');
+            element.strokeWidth(0);
+          } else {
+            element.fill(self.RandomColor);
+            element.fill(self.RandomColor);
+            element.stroke('black');
+            element.strokeWidth(0.5);
+          }
+        }
+        break;
+      case "LEFT": {
+        if (self.ImageAvailable.side == true && self.ImagesOn == true) {
+          element.fill('transparent');
+          element.stroke('transparent');
+          element.strokeWidth(0);
+        } else {
+          element.fill(self.RandomColor);
+          element.fill(self.RandomColor);
+          element.stroke('black');
+          element.strokeWidth(0.5);
+        }
+      }
+      break;
+      case "TOP": {
+        if (self.ImageAvailable.top == true && self.ImagesOn == true) {
+          element.fill('transparent');
+          element.stroke('transparent');
+          element.strokeWidth(0);
+        } else {
+          element.fill(self.RandomColor);
+          element.fill(self.RandomColor);
+          element.stroke('black');
+          element.strokeWidth(0.5);
+        }
+      }
+      break;
+      }
+
+      if (element.name() == 'cap-facing') {
+        switch (self.Caps_Face.toUpperCase()) {
+          case "FRONT": {
             if (self.ImageAvailable.front == true && self.ImagesOn == true) {
               element.fill('transparent');
               element.stroke('transparent');
@@ -463,80 +517,32 @@ class ProductBase extends ProductItemBase {
             }
           }
           break;
-        case "LEFT":
-          {
-            if (self.ImageAvailable.side == true && self.ImagesOn == true) {
-              element.fill('transparent');
-              element.stroke('transparent');
-              element.strokeWidth(0);
-            } else {
-              element.fill(self.RandomColor);
-              element.fill(self.RandomColor);
-              element.stroke('black');
-              element.strokeWidth(0.5);
-            }
+        case "LEFT": {
+          if (self.ImageAvailable.side == true && self.ImagesOn == true) {
+            element.fill('transparent');
+            element.stroke('transparent');
+            element.strokeWidth(0);
+          } else {
+            element.fill(self.RandomColor);
+            element.fill(self.RandomColor);
+            element.stroke('black');
+            element.strokeWidth(0.5);
           }
-          break;
-        case "TOP":
-          {
-            if (self.ImageAvailable.top == true && self.ImagesOn == true) {
-              element.fill('transparent');
-              element.stroke('transparent');
-              element.strokeWidth(0);
-            } else {
-              element.fill(self.RandomColor);
-              element.fill(self.RandomColor);
-              element.stroke('black');
-              element.strokeWidth(0.5);
-            }
+        }
+        break;
+        case "TOP": {
+          if (self.ImageAvailable.top == true && self.ImagesOn == true) {
+            element.fill('transparent');
+            element.stroke('transparent');
+            element.strokeWidth(0);
+          } else {
+            element.fill(self.RandomColor);
+            element.fill(self.RandomColor);
+            element.stroke('black');
+            element.strokeWidth(0.5);
           }
-          break;
-      }
-
-      if (element.name() == 'cap-facing') {
-        switch (self.Caps_Face.toUpperCase()) {
-          case "FRONT":
-            {
-              if (self.ImageAvailable.front == true && self.ImagesOn == true) {
-                element.fill('transparent');
-                element.stroke('transparent');
-                element.strokeWidth(0);
-              } else {
-                element.fill(self.RandomColor);
-                element.fill(self.RandomColor);
-                element.stroke('black');
-                element.strokeWidth(0.5);
-              }
-            }
-            break;
-          case "LEFT":
-            {
-              if (self.ImageAvailable.side == true && self.ImagesOn == true) {
-                element.fill('transparent');
-                element.stroke('transparent');
-                element.strokeWidth(0);
-              } else {
-                element.fill(self.RandomColor);
-                element.fill(self.RandomColor);
-                element.stroke('black');
-                element.strokeWidth(0.5);
-              }
-            }
-            break;
-          case "TOP":
-            {
-              if (self.ImageAvailable.top == true && self.ImagesOn == true) {
-                element.fill('transparent');
-                element.stroke('transparent');
-                element.strokeWidth(0);
-              } else {
-                element.fill(self.RandomColor);
-                element.fill(self.RandomColor);
-                element.stroke('black');
-                element.strokeWidth(0.5);
-              }
-            }
-            break;
+        }
+        break;
         }
       }
     });
@@ -678,7 +684,7 @@ class ProductBase extends ProductItemBase {
 
   //#region Renderings
 
-  AddRendering (fixture, margin) {
+  AddRendering(fixture, margin) {
     let self = this;
 
     if (self.Rendering != null) {
@@ -690,7 +696,7 @@ class ProductBase extends ProductItemBase {
     self.Rendering = newRendering;
   }
 
-  RemoveRendering () {
+  RemoveRendering() {
     let self = this;
     if (self.Rendering != null) {
       self.Rendering.DestroyRendering();

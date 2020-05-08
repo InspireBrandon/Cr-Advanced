@@ -32,7 +32,7 @@ class RangingController {
     return self.clusterData;
   }
 
-  getSalesMonthlyTotals(planogramID, callback) {
+  getSalesMonthlyTotals(planogramID, type, callback) {
     let self = this;
     self.planogramID = planogramID;
 
@@ -40,16 +40,16 @@ class RangingController {
 
     Axios.post(process.env.VUE_APP_API + `Sales_Monthly_Total?period_from_id=${self.dateFrom}&period_to_id=${self.dateTo}`).then(r => {
       self.totalsData = r.data.sales_Monthly_Total_List;
-      self.getEndingStock(() => {
+      self.getEndingStock(type, () => {
         callback();
       })
     })
   }
 
-  getEndingStock(callback) {
+  getEndingStock(type, callback) {
     let self = this;
 
-    Axios.get(process.env.VUE_APP_API + `Ranging/ClosingStock?planogramID=${self.planogramID}&periodID=${self.dateTo}`)
+    Axios.get(process.env.VUE_APP_API + `Ranging/ClosingStock?planogramID=${self.planogramID}&periodID=${self.dateTo}&type=${type}`)
       .then(r => {
         self.endingStock = r.data;
         callback(r.data);

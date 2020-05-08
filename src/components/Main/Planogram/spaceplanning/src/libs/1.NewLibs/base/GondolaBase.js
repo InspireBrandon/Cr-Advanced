@@ -144,14 +144,12 @@ class GondolaBase extends PlanogramItemBase {
     let self = this;
 
     self.RemoveRenderings();
-    console.log("AddRenderings", self.Data);
 
     if (self.Data.RenderingsItems == undefined || self.Data.RenderingsItems == null) {
       return;
     }
 
     if (self.Data.RenderingsItems.Front != undefined || self.Data.RenderingsItems.Front != null) {
-      console.log("[GONDOLA RENDERING] FRONT FACE", self.Data.RenderingsItems.Front);
 
       // add shelf edge rendering
       let w = self.Data.RenderingsItems.Front.width * self.Ratio;

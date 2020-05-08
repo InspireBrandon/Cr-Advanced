@@ -1014,8 +1014,9 @@
                                                 .notes);
                                             self.createProjectTransaction(request,
                                                 approvalTransaction => {
-                                                    self.$parent.$parent
-                                                        .getTaskViewData();
+                                                    self.createCheckPlanogramSubtask(request, () => {
+                                                        self.$parent.$parent.getTaskViewData();
+                                                    })
                                                 })
                                         })
                                 })
@@ -1074,6 +1075,25 @@
                                     })
                             })
                         })
+                    })
+                })
+            },
+            createCheckPlanogramSubtask(request, callback) {
+                let self = this;
+
+                let projectTXGroupRequest = {
+                    projectID: request.project_ID
+                }
+
+                self.createProjectTransactionGroup(projectTXGroupRequest, newGroupTX => {
+                    request.rollingUserID = self.systemUserID;
+                    request.projectTXGroup_ID = newGroupTX.id;
+                    request.type = 6;
+                    request.status = 37;
+                    request.systemUserID = 12;
+
+                    self.createProjectTransaction(request, newItem => {
+                        callback();
                     })
                 })
             },

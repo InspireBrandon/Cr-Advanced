@@ -4,7 +4,7 @@
             <v-toolbar color="primary" dark>
                 <v-toolbar-title>Planogram Designer 3D</v-toolbar-title>
                 <v-spacer></v-spacer>
-                <v-btn icon @click="dialog=false">
+                <v-btn icon @click="close">
                     <v-icon>close</v-icon>
                 </v-btn>
             </v-toolbar>
@@ -12,7 +12,7 @@
                 <v-layout row wrap>
                     <v-flex md12>
                         <v-card tile class="fill-height">
-                            <canvas style="height: calc(100vh - 65px)!important;" id="renderCanvas"
+                            <canvas v-if="showCanvas" style="height: calc(100vh - 65px)!important;" id="renderCanvas"
                                 touch-action="none"></canvas>
                         </v-card>
                     </v-flex>
@@ -36,13 +36,15 @@
             return {
                 dialog: false,
                 sceneObj: null,
-                drawingHelper: null
+                drawingHelper: null,
+                showCanvas: false
             };
         },
         methods: {
             show(fixtureHeaderID) {
                 let self = this;
                 self.dialog = true;
+                self.showCanvas = true;
 
                 self.getFixtures(fixtureHeaderID, drops => {
                     self.draw(drops);
@@ -110,9 +112,9 @@
                 camera.inputs.remove(camera.inputs.attached.keyboard);
                 self.addDocumentListeners();
 
-                camera.position.x = 30 / 2;
-                camera.position.z = -15;
-                camera.position.y = 1.5;
+                camera.position.x = 2 / 2;
+                camera.position.z = -4;
+                camera.position.y = 1;
             },
             createLight(scene) {
                 let self = this;
@@ -126,14 +128,14 @@
                 light.position = new BABYLON.Vector3(0, 10, 10);
                 light.intensity = 1;
 
-                shadowGenerator = new BABYLON.ShadowGenerator(1024, light);
+                shadowGenerator = new BABYLON.ShadowGenerator(2048, light);
                 shadowGenerator.usePoissonSampling = true;
             },
             createFloor(scene, height, width) {
                 let self = this;
 
-                height = 10;
-                width = 10;
+                height = 2;
+                width = 2;
 
                 let myScale = 2;
                 let myScale2 = 2;
@@ -216,26 +218,22 @@
                     return child.type != "PRODUCT";
                 });
 
-                notProducts.forEach(drop => {
-                    let parent = notProducts.find(el => {
-                        return el.id == drop.parent_ID;
-                    });
+                let gondolas = notProducts.filter(child => {
+                    return child.type == "GONDOLA" || child.type == "OBSTRUCTION";
+                });
 
-                    let children = notProducts.filter(el => {
-                        return el.parent_ID == drop.id;
-                    });
+                gondolas.forEach(drop => {
+                    self.getPlanogramItem(drop.id, positionData => {
+                        let fpI = new FloorPlanItem(drop, null);
+                        let attributes = JSON.parse(positionData.attributes);
 
-                    let fpI = new FloorPlanItem(drop, parent, children);
+                        console.log(attributes);
 
-                    if (fpI.x < closestX) closestX = fpI.x;
-
-                    if (fpI.x + fpI.width > furthestX) furthestX = +fpI.width;
-
-                    if (fpI.y < closestY) closestY = fpI.y;
-
-                    if (fpI.y + fpI.height > furthestY) furthestY = +fpI.height;
-
-                    self.drawingHelper.draw(fpI, shadowGenerator);
+                        fpI.x = attributes.x;
+                        fpI.y = attributes.y;
+                        fpI.rotation = attributes.rotation;
+                        self.drawingHelper.draw(fpI, shadowGenerator, notProducts);
+                    })
                 });
 
                 let pointX = ((furthestX) - (closestX)) / 100;
@@ -393,6 +391,27 @@
                 break;
                 }
             },
+            getPlanogramItem(fixtureID, callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + `FloorplanPlanogramItem?floorplanFixtureId=${fixtureID}`)
+                    .then(
+                        r => {
+                            console.log(r.data);
+                            callback(r.data)
+                        })
+            },
+            close() {
+                let self = this;
+                document.removeEventListener("keydown", e => {
+                    self.manageCamera(e.code);
+                });
+                sceneObj.dispose();
+                self.showCanvas = false;
+                self.dialog = false;
+            }
         }
     };
 

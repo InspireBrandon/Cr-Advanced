@@ -1165,7 +1165,9 @@
 
             self.rangingController = new RangingController(r.data);
 
-            self.rangingController.getSalesMonthlyTotals(self.fileData.planogramID, () => {
+            let type = self.fileData.tag == " - CATEGORY" ? 2 : 1;
+
+            self.rangingController.getSalesMonthlyTotals(self.fileData.planogramID, type, () => {
               self.setRangingClusterData(r.data.clusterData);
               if (
                 self.selectedClusterType != null &&
@@ -1240,7 +1242,6 @@
 
           self.$refs.dateRangeSelector.show(dateRange => {
             self.selectedDateRange = dateRange;
-            self.$refs.spinner.show();
 
             self.fileData.planogramName = category.displayName;
             self.fileData.planogramID = category.id;
@@ -1256,6 +1257,7 @@
             self.openRetailChainSelector(retailChain => {
               self.fileData.retailChainID = retailChain.id;
               self.fileData.retailChainDisplayname = retailChain.displayname;
+              self.$refs.spinner.show();
 
               self.getHelpFile();
 
@@ -1269,7 +1271,9 @@
                 r.data["dateTo"] = dateRange.dateTo;
                 self.rangingController = new RangingController(r.data);
 
-                self.rangingController.getSalesMonthlyTotals(self.fileData.planogramID, () => {
+                let type = self.fileData.tag == " - CATEGORY" ? 2 : 1;
+
+                self.rangingController.getSalesMonthlyTotals(self.fileData.planogramID, type, () => {
                   self.setRangingClusterData(r.data.clusterData);
                   if (
                     self.selectedClusterType != null &&
@@ -1354,7 +1358,7 @@
                 r.data["dateTo"] = dateRange.dateTo;
                 self.rangingController = new RangingController(r.data);
 
-                self.rangingController.getSalesMonthlyTotals(self.fileData.planogramID, () => {
+                self.rangingController.getSalesMonthlyTotals(self.fileData.planogramID, 1, () => {
                   self.setRangingClusterData(r.data.clusterData);
                   self.currentClusterData = self.rangingController.getClusterData();
 
@@ -1505,7 +1509,9 @@
             self.rangingController = new RangingController(r.data);
             self.setStoreClusterStuff();
 
-            self.rangingController.getSalesMonthlyTotals(self.fileData.planogramID, () => {
+            let type = self.fileData.tag == " - CATEGORY" ? 2 : 1;
+
+            self.rangingController.getSalesMonthlyTotals(self.fileData.planogramID, type, () => {
               self.setRangingClusterData(r.data.clusterData);
 
               if (
@@ -2051,7 +2057,9 @@
 
               self.rangingController = new RangingController(r.data);
 
-              self.rangingController.getSalesMonthlyTotals(self.fileData.planogramID, () => {
+              let type = self.fileData.tag == " - CATEGORY" ? 2 : 1;
+
+              self.rangingController.getSalesMonthlyTotals(self.fileData.planogramID, type, () => {
                 self.setRangingClusterData(r.data.clusterData);
                 if (
                   self.selectedClusterType != null &&

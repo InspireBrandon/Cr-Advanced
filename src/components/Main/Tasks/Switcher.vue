@@ -127,22 +127,22 @@
                             <span>Outstanding tasks</span>
                         </v-tooltip>
 
-                        <!-- <v-btn v-show="selectedView==0" style="margin-left: 20px;" icon small color="secondary">
+                        <v-btn v-show="selectedView==0" style="margin-left: 20px;" icon small color="secondary">
                             <v-icon @click="showNotices = !showNotices" v-if="showNotices">
                                 visibility_off</v-icon>
                             <v-icon @click="showNotices = !showNotices" v-else>visibility</v-icon>
-                        </v-btn> -->
+                        </v-btn>
 
                     </v-toolbar>
                     <v-container style="max-width: 100vw;" fluid grid-list-xs class="pa-0">
                         <v-layout row wrap class="pa-0">
-                            <v-flex class="pa-0" xs12 v-if="selectedView==0">
+                            <v-flex class="pa-0" :class="{ 'md9 sm6 xs6': showNotices, 'md12 sm12 xs12': !showNotices }" v-if="selectedView==0">
                                 <TaskView :accessType="userAccess" :data="filteredData" :typeList="typeList"
                                     :statusList="statusList" :systemUserID="selectedUser"
                                     :goToDistribution="goToDistribution" />
                             </v-flex>
-                            <!-- <v-flex class="pa-0" v-if="selectedView==0 && showNotices"
-                                :class="{ 'md2 sm6 xs6': showNotices, 'md1 sm1 xs1': !showNotices }">
+                            <v-flex class="pa-0" v-if="selectedView==0 && showNotices"
+                                :class="{ 'md3 sm6 xs6': showNotices, 'md2 sm2 xs2': !showNotices }">
                                 <v-card tile flat style="border-left: 1px solid lightgrey;">
                                     <v-toolbar flat dark dense color="grey darken-3">
                                         <v-toolbar-title v-if="showNotices">Notices</v-toolbar-title>
@@ -151,7 +151,7 @@
                                         <NoticeBoard ref="NoticeBoard" />
                                     </v-card-text>
                                 </v-card>
-                            </v-flex> -->
+                            </v-flex>
                             <v-flex class="pa-0" md12 v-if="selectedView==1">
                                 <PlanogramDistribution ref="PlanogramDistribution" :userAccess="userAccess" />
                                 <!-- <ProjectView :data="filteredData" :typeList="typeList" :statusList="statusList"

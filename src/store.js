@@ -232,8 +232,28 @@ export const store = new Vuex.Store({
     },
     getPlanogramActiveProductById: (state) => (productID) => {
       var found = state.activePlanogramProducts.find(function (el) {
-        return el.Data.productID == productID;
+        return el.Data.productID == productID || el.Data.id == productID;
       })
+
+      if (found == null || found == undefined) {
+        console.warn("[STORE] Failed to get getPlanogramActiveProductById By ID", productID)
+        return null;
+      }
+
+      return found;
+    },
+    getPlanogramActiveProductByIdOrBarcode: (state) => (productID, barcode) => {
+      var found = null;
+
+      if(productID == undefined || productID == null) {
+        found = state.activePlanogramProducts.find(function (el) {
+          return el.Data.barcode == barcode;
+        })
+      } else {
+        found = state.activePlanogramProducts.find(function (el) {
+          return el.Data.productID == productID;
+        })
+      }
 
       if (found == null || found == undefined) {
         console.warn("[STORE] Failed to get getPlanogramActiveProductById By ID", productID)

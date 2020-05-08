@@ -22,6 +22,7 @@ class StageWarehouseMiddleware {
 
           let productData = currentPlanogramItem.Data.Data; // actual product data
           let itemExists = false;
+
           // Check through warehouse to see if find the correct product
           warehouseProducts.forEach(warehouseProduct => {
 
@@ -34,8 +35,6 @@ class StageWarehouseMiddleware {
                   }
                 }
               }
-
-              console.log(productData);
 
               productData["sales_Retail"] = warehouseProduct["sales_Retail"];
               productData["sales_Cost"] = warehouseProduct["sales_Cost"];
@@ -74,7 +73,6 @@ class StageWarehouseMiddleware {
           })
 
           if (!itemExists) {
-
             if (productData.isHybridProduct) {
               productData.store_Range_Indicator = 'YES';
             } else {

@@ -347,21 +347,21 @@
                     </div>
                   </v-flex>-->
                   <v-flex md4 class="px-3">
-                    <v-checkbox @change="transparentChange('Front')" v-if="frontBack == 'Front'"
+                    <v-checkbox v-if="frontBack == 'Front'"
                       v-model="newData.frontTransparent" label="Transparent"></v-checkbox>
-                    <v-checkbox @change="transparentChange('Back')" v-if="frontBack == 'Back'"
+                    <v-checkbox v-if="frontBack == 'Back'"
                       v-model="newData.backTransparent" label="Transparent"></v-checkbox>
                   </v-flex>
                   <v-flex md4 class="px-3">
-                    <v-checkbox @change="transparentChange('Left')" v-if="leftRight == 'Left'"
+                    <v-checkbox v-if="leftRight == 'Left'"
                       v-model="newData.leftTransparent" label="Transparent"></v-checkbox>
-                    <v-checkbox @change="transparentChange('Right')" v-if="leftRight == 'Right'"
+                    <v-checkbox v-if="leftRight == 'Right'"
                       v-model="newData.rightTransparent" label="Transparent"></v-checkbox>
                   </v-flex>
                   <v-flex md4 class="px-3">
-                    <v-checkbox @change="transparentChange('Top')" v-if="topBottom == 'Top'"
+                    <v-checkbox v-if="topBottom == 'Top'"
                       v-model="newData.topTransparent" label="Transparent"></v-checkbox>
-                    <v-checkbox @change="transparentChange('Bottom')" v-if="topBottom == 'Bottom'"
+                    <v-checkbox v-if="topBottom == 'Bottom'"
                       v-model="newData.bottomTransparent" label="Transparent"></v-checkbox>
                   </v-flex>
                   <v-flex v-if="!newData.rendering" lg12 md12 sm12 xs12 class="px-3">
