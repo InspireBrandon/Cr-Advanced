@@ -51,7 +51,7 @@
                 <!-- <v-text-field label="block to meter ratio" v-model="meterRatio" style="width:200px">
                 </v-text-field> -->
             </v-toolbar-items>
-            <library ref="library" :isFloorplan="true"></library>
+            <library ref="library" :isFloorplan="true" :floorplanFilters="floorplanFilters"></library>
 
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
@@ -182,8 +182,9 @@
                                     <v-flex md12 style="padding: 2px;" class="px-2 mb-1">
                                         <v-select light :disabled="selectedClusterType == null"
                                             :placeholder="'Select ' + selectedClusterType + ' cluster'" dense
-                                            :items="clusterOptions[selectedClusterType]" v-model="selectedClusterOption"
-                                            solo hide-details>
+                                            :items="clusterOptions[selectedClusterType]"
+                                            @change="setLibraryFilter(clusterOptions[selectedClusterType],selectedClusterOption)"
+                                            v-model="selectedClusterOption" solo hide-details>
                                         </v-select>
                                     </v-flex>
                                 </v-layout>
@@ -397,6 +398,7 @@
         // 1 block = 1 meter
         data() {
             return {
+                floorplanFilters: null,
                 version_ID: null,
                 dateRange: null,
                 showRotation: false,
@@ -588,6 +590,18 @@
             }
         },
         methods: {
+            setLibraryFilter(options, selectedOption) {
+                let self = this
+                console.log("[setLibraryFilter]options:", options);
+                console.log("[setLibraryFilter]selectedOption:", selectedOption);
+                options.forEach(option => {
+                    if (option.value == selectedOption) {
+                        self.floorplanFilters = option
+                        console.log("setLibraryFilter",self.floorplanFilters);
+                        
+                    }
+                })
+            },
             startNew() {
                 let self = this
                 self.$refs.DateRangeSelector.show(dateRange => {

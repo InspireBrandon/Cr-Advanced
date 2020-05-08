@@ -313,7 +313,7 @@
     components: {
       FixtureRecursive
     },
-    props: ["isFloorplan"],
+    props: ["isFloorplan", "floorplanFilters"],
     data: () => ({
       fixtureGroups: [],
       fav: true,
@@ -341,10 +341,21 @@
     },
     computed: {
       filteredSpacePlans() {
-        return this.planograms.filter(item => {
-          if (!this.searchText) return this.planograms;
-          return (item.name.toLowerCase().includes(this.searchText.toLowerCase()))
-        });
+        if (this.floorplanFilters  == null) {
+          return this.planograms.filter(item => {
+            if (!this.searchText) return this.planograms;
+            return (item.name.toLowerCase().includes(this.searchText.toLowerCase()))
+          });
+        } else {
+          let filterList = this.planograms.filter(item => {
+            return (item.name.toLowerCase().includes(this.floorplanFilters.text.toLowerCase()))
+          })
+          return filterList.filter(item => {
+            if (!this.searchText) return filterList;
+            return (item.name.toLowerCase().includes(this.searchText.toLowerCase()))
+          });
+        }
+
       },
       filteredCustomFixtures() {
         return this.customFixtures.filter(item => {
@@ -591,6 +602,7 @@
         axios.get(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire&folder=Space Planning")
           .then(r => {
             self.planograms = r.data;
+            console.log("self.planograms ", self.planograms);
           })
           .catch(e => {
             alert("Failed to get data...");
