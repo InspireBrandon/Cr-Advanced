@@ -9,6 +9,12 @@
                         <v-list-tile-title class="pa-0">Add note</v-list-tile-title>
                     </v-list-tile>
                     <v-divider></v-divider>
+                    <div v-if="selectedItem">
+                        <v-list-tile v-if="selectedItem.value.archived" class="pa-0" @click="restore">
+                            <v-list-tile-title class="pa-0">Restore File</v-list-tile-title>
+                        </v-list-tile>
+                        <v-divider></v-divider>
+                    </div>
                 </v-list>
             </v-menu>
             <PlanogramNoteModal ref="PlanogramNoteModal" />
@@ -92,6 +98,12 @@
             })
         },
         methods: {
+            restore() {
+                let self = this
+                Axios.post(process.env.VUE_APP_API + `SystemFile/RestoreArchived?db=CR-Devinspire&fileID=${self.selectedItem.value.id}`).then(r=>{
+
+                })
+            },
             getStores() {
                 let self = this;
 
@@ -1397,6 +1409,8 @@
             onContextMenu(e, item) {
                 let self = this;
                 self.selectedItem = item;
+                console.log("on contyext", item);
+
                 self.showMenu = false
                 self.x = e.clientX
                 self.y = e.clientY
