@@ -35,6 +35,7 @@ class PlanogramItemBase {
     this.LabelText = this.Type + " " + this.Position;
     this.RenderingsOn = false;
     this.ImagesOn = false;
+    this.HighlightsOn = false;
     this.GroupsOn = false;
     this.labelsOn = false;
 
@@ -183,7 +184,7 @@ class PlanogramItemBase {
           }
 
           if (dragPos.y < gondola.Group.getAbsolutePosition().y - (self.TotalHeight / 2)) {
-             y = dragPos.y;
+            y = dragPos.y;
           }
           //#endregion Pop out of gondola
 
@@ -218,8 +219,7 @@ class PlanogramItemBase {
         y: dropPos.y,
         draggable: true
       })
-    } 
-    else {
+    } else {
       self.Group = new Konva.Group({
         id: self.Type + '_master_group_' + self.ID,
         name: self.Type + '_master_group',
@@ -276,7 +276,7 @@ class PlanogramItemBase {
             y: pos.y
           }
         }
-      }) 
+      })
     }
 
     if (self.ParentID == undefined || self.ParentID == null) {
@@ -357,10 +357,10 @@ class PlanogramItemBase {
 
         }
         break;
-        case "OBSTRUCTION": {
+      case "OBSTRUCTION": {
 
-        }
-        break;
+      }
+      break;
       case "AREA": {
         typeArr = ["GONDOLA"];
       }
@@ -1682,6 +1682,37 @@ class PlanogramItemBase {
     }
   }
 
+  TurnHighlightsOn(color) {
+    let self = this;
+    self.ImagesOn = false;
+    self.HighlightsOn = true;
+    self.GroupsOn = false;
+
+    switch (self.Type.toUpperCase()) {
+      case "PRODUCT": {
+        self.ToggleImages(color);
+        self.Cache();
+        self.Layer.batchDraw();
+      }
+      break;;
+    }
+  }
+
+  TurnHighlightsOff(color) {
+    let self = this;
+    self.ImagesOn = false;
+    self.HighlightsOn = false;
+
+    switch (self.Type.toUpperCase()) {
+      case "PRODUCT": {
+        self.ToggleImages(color);
+        self.Cache();
+        self.Layer.batchDraw();
+      }
+      break;;
+    }
+  }
+
   TurnLabelsOn() {
     let self = this;
     self.labelsOn = true;
@@ -1810,10 +1841,10 @@ class PlanogramItemBase {
         event.modal_load(EventBus, "GONDOLA", null, self.Data, self.ID, self);
       }
       break;
-      case "OBSTRUCTION": {
-        event.modal_load(EventBus, "OBSTRUCTION", null, self.Data, self.ID, self);
-      }
-      break;
+    case "OBSTRUCTION": {
+      event.modal_load(EventBus, "OBSTRUCTION", null, self.Data, self.ID, self);
+    }
+    break;
     case "PALETTE": {
       event.modal_load(EventBus, "FIXTURE", "PALETTE", self, self.ID, self);
     }

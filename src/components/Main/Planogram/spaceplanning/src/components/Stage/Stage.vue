@@ -11,6 +11,14 @@
       :style="{height: windowHeight}">
       <v-stage v-if="stageShowing" ref="stage" :config="stageConfiguration"></v-stage>
     </div>
+    <div id="legend" v-if="allPlanograms.length > 0">
+      <h5>Legend: Categories</h5>
+      <v-divider class="my-1"></v-divider>
+      <div style="display: flex;" v-for="(p, idx) in allPlanograms" :key="idx">
+        <v-icon :size="13" :color="p.color">lens</v-icon>
+        <div style="font-size: 12px; margin-left: 3px;">{{ p.name }}</div>
+      </div>
+    </div>
     <GondolaModal></GondolaModal>
     <PlanogramOptionsModal></PlanogramOptionsModal>
     <FixtureModal></FixtureModal>
@@ -79,6 +87,34 @@
   // postioning controller
   import PositioningBase from '@/components/Main/Planogram/spaceplanning/src/libs/BaseLibs/PositioningBase.js';
 
+  const colors = [
+    'blue',
+    'green',
+    'purple',
+    'red',
+    'orange',
+    'teal',
+    '#dc143c',
+    '#8FBC8F',
+    '#FF69B4',
+    '#ADD8E6',
+    '#BA55D3',
+    '#EEE8AA'
+  ]
+
+  function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
+
+  for(var i = 0; i < 20; i++) {
+    colors.push(getRandomColor());
+  }
+
   export default {
     components: {
       PlanogramToolbar,
@@ -131,10 +167,14 @@
           selectedProductGroup: null
         },
         ImagesOff: true,
+        HighlightsOff: true,
         GroupsOff: true,
         labelsOn: false,
         ProductSelected: false,
-        MasterLayer: null
+        MasterLayer: null,
+        planograms: [],
+        categories: [],
+        allPlanograms: []
       };
     },
     computed: {
@@ -167,6 +207,9 @@
       let self = this;
       //#region Zoom
       var stage = this.$refs.stage.getStage();
+
+      self.getPlanograms();
+      self.getCategories();
 
       self.createNewLayer("originalInit");
 
@@ -254,6 +297,22 @@
       EventBus.$off("DELETE_PRODUCT", this.event_delete_product);
     },
     methods: {
+      getCategories() {
+        let self = this;
+
+        axios.get(process.env.VUE_APP_API + 'Retailer/Category_Link')
+          .then(r => {
+            self.categories = r.data;
+          })
+      },
+      getPlanograms() {
+        let self = this;
+
+        axios.get(process.env.VUE_APP_API + 'Planogram/Distinct')
+          .then(r => {
+            self.planograms = r.data.planogramList;
+          })
+      },
       createNewLayer(name) {
         let self = this;
         var stage = self.$refs.stage.getStage();
@@ -1264,6 +1323,65 @@
           }
         });
       },
+      ToggleHighlight() {
+        let self = this;
+
+        self.allPlanograms = [];
+
+        let ctrl_store = new StoreHelper();
+        let stage = self.$refs.stage.getStage();
+
+        self.HighlightsOff = !self.HighlightsOff;
+
+        let allItems = ctrl_store.getAllPlanogramItems(self.$store);
+        let productGroupArr = allItems.filter((el) => el.Type.toUpperCase() == "PRODUCT");
+
+        productGroupArr.forEach((element, index) => {
+          let planogramFound = false;
+          let currentPlanogram = null;
+
+          self.allPlanograms.forEach(ap => {
+            if (ap.id == element.Data.categoryLink_ID) {
+              planogramFound = true;
+              currentPlanogram = ap;
+            }
+          });
+
+          // Find planogram and add to list
+          if (!planogramFound) {
+
+            console.log('element.Data', element.Data);
+
+            let fp = self.categories.find(e => {
+              return e.id == element.Data.categoryLink_ID;
+            })
+
+            let planogram = {
+              name: fp.displayName,
+              id: element.Data.categoryLink_ID,
+              color: colors[self.allPlanograms.length]
+            }
+
+            self.allPlanograms.push(planogram);
+
+            currentPlanogram = planogram;
+          }
+
+          console.log('currentPlanogram', currentPlanogram)
+
+          if (self.HighlightsOff) {
+            self.allPlanograms = [];
+            element.TurnHighlightsOff(currentPlanogram.color);
+          } else {
+            element.TurnHighlightsOn(currentPlanogram.color);
+          }
+
+          if (index == productGroupArr.length - 1) {
+            element.Group.draw();
+            self.ImagesLoading = false;
+          }
+        });
+      },
       ToggleGroups() {
 
         let self = this;
@@ -1682,6 +1800,10 @@
         let allProductItems = ctrl_store.getAllPlanogramItemsByType(self.$store, "PRODUCT");
 
         allProductItems.forEach(product => {
+          if (product.Data.barcode == '700083657251') {
+            console.log("allProductItems", product);
+          }
+
           product.DisplayProductIndicator();
         });
       },
@@ -2195,5 +2317,18 @@
     padding: 5px;
     overflow-y: hidden;
     overflow-x: hidden;
+  }
+
+  #legend {
+    width: 250px;
+    max-height: 250px;
+    overflow: auto;
+    padding: 5px;
+    background: white;
+    box-shadow: 0px 3px 5px 5px rgb(243, 243, 243);
+    position: absolute;
+    left: 20px;
+    top: 85px;
+    border: 1px solid rgb(235, 235, 235);
   }
 </style>

@@ -62,22 +62,21 @@ class DrawingHelper {
                     fixture = new Rendering_LabelHolder(params);
                 }
             }break;
-            case "SIDE": {
-                fixture = new Rendering_SideFace(params);
-            }break;
+            // case "SIDE": {
+            //     fixture = new Rendering_SideFace(params);
+            // }break;
             case "BASKET": {
                 fixture = new Basket(params);
             }break;
             case "SHELFEDGE": {
-                console.log("EDGE", params)
                 fixture = new Rendering_ShelfEdge(params);
             }break;
             case "BACK": {
                 fixture = new Rendering_ShelfEdge(params);
             }break;
-            case "FRONT": {
-                fixture = new Rendering_ShelfEdge(params);
-            }break;
+            // case "FRONT": {
+            //     fixture = new Rendering_ShelfEdge(params);
+            // }break;
         }
 
         if(fixture != undefined && fixture != null) {

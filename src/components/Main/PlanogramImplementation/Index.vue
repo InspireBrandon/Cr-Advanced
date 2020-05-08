@@ -56,7 +56,8 @@
                             </div>
                         </v-toolbar>
                         <v-toolbar dark dense flat v-if="projectsStatus == null"></v-toolbar>
-                        <v-toolbar dark dense flat v-if="selectedPlanogram != null || routeProjectID != null && projectsStatus != null">
+                        <v-toolbar dark dense flat
+                            v-if="selectedPlanogram != null || routeProjectID != null && projectsStatus != null">
                             <v-btn v-if="(projectsStatus.status==20||routeStatus==20)" flat outline @click="approve()"
                                 :disabled="Disableapprove">
                                 Approve</v-btn>
@@ -74,6 +75,13 @@
                                 @click="distribute(projectsStatus.status,4,timelineItems[0])">Distribute</v-btn>
                             <v-btn color="blue-grey darken-3" v-if="(projectsStatus.status== 44 || routeStatus == 44)"
                                 @click="setParked()">Park</v-btn>
+                            <v-btn color="red" outline @click="sendBackToRange()" v-if="authorityType == 0">Send back to
+                                range</v-btn>
+                            <v-btn color="red" outline @click="headOfficeApprove()"
+                                v-if="authorityType == 0 && projectsStatus.status== 37 || projectsStatus.status== 38">
+                                Head office approve</v-btn>
+                            <v-btn color="red" outline @click="sendCheckPlanogram" v-if="authorityType == 0">Check
+                                Planogram</v-btn>
                         </v-toolbar>
                     </v-flex>
                     <v-flex v-if="planogramObj != null && !showLoader" lg12 md12 sm12 xs12>
@@ -123,8 +131,6 @@
                         </v-card-text>
                     </v-card>
                 </v-flex>
-
-
             </v-layout>
         </v-container>
         <v-dialog fullscreen v-model="imageModal">
@@ -152,7 +158,8 @@
         <NotesModal ref="notesModal"></NotesModal>
         <SpacePlanSelector ref="SpacePlanSelector" />
         <PlanogramDetailsSelector ref="PlanogramDetailsSelector" />
-
+        <UserSelectorModalDynamic ref="UserSelectorModalDynamic" />
+        <UserSelector ref="userSelector" />
         <SizeLoader ref="SizeLoader" />
     </v-card>
 </template>
@@ -171,6 +178,8 @@
     import PlanogramDetailsSelector from '@/components/Common/PlanogramDetailsSelector'
     import StorePlanogramOverview from '@/components/Main/PlanogramImplementation/PlanogramOverView/StorePlanogramOverview'
     import SizeLoader from '@/components/Common/SizeLoader'
+    import UserSelectorModalDynamic from '@/components/Common/UserSelectorModalDynamic.vue'
+    import UserSelector from '@/components/Common/UserSelector'
 
     let _MODULE = "Planogram Implementation";
 
@@ -184,7 +193,9 @@
             AssignTask,
             YesNoModal,
             NotesModal,
-            StorePlanogramOverview
+            StorePlanogramOverview,
+            UserSelectorModalDynamic,
+            UserSelector
         },
         data: () => {
             return {
@@ -232,14 +243,14 @@
             self.initialise();
             if (self.$route.params.projectTransactionID != undefined) {
                 self.routeProjectID = self.$route.params.projectTransactionID;
-                console.log("routeProjectID",self.routeProjectID);
-                
+                console.log("routeProjectID", self.routeProjectID);
+
                 self.selectedProject = self.routeProjectID;
                 self.routePlanogramID = self.$route.params.planogramID
                 self.routeStatus = self.$route.params.status
                 self.onRouteEnter(function () {
                     self.selectPlanogram(self.routePlanogramID);
-                   
+
                 })
             } else {
                 self.initialise();
@@ -347,8 +358,8 @@
                             self.displayName = r.data.jsonObject.name
                             self.planogramObj = r.data.jsonObject
                             self.$refs.SizeLoader.close()
-                            console.log("self.selectedProject",self.selectedProject);
-                            
+                            console.log("self.selectedProject", self.selectedProject);
+
                             self.getProjectTransactionsByProjectID(self.selectedProject)
                             if (r.data.fromFolder == false) {
                                 self.image = r.data.jsonObject.image
@@ -785,8 +796,8 @@
             getProjectTransactionsByProjectID(projectID) {
                 let self = this;
                 console.log("getProjectTransactionsByProjectID");
-                
-                
+
+
                 self.projectID = projectID
                 return new Promise((resolve, reject) => {
 
@@ -795,7 +806,7 @@
                     Axios.get(process.env.VUE_APP_API + `ProjectTX?projectID=${projectID}`)
                         .then(r => {
                             console.log(r);
-                            
+
                             delete Axios.defaults.headers.common["TenantID"];
 
                             self.timelineItems = [];
@@ -814,7 +825,8 @@
                                 if (element.deleted != true) {
                                     if (!hasIn) {
 
-                                        if (element.status == self.routeStatus && element.systemFileID == self.$route.params.planogramID) {
+                                        if (element.status == self.routeStatus && element
+                                            .systemFileID == self.$route.params.planogramID) {
                                             self.tmpRequest = element;
                                             hasIn = true;
                                         }
@@ -1077,32 +1089,32 @@
             getColor(type, status) {
                 return StatusHandler.getColorByTypeAndStatus(type, status)
             },
-            // testForNotAssignedUser(request, systemUserID, callback) {
-            //     let self = this;
+            sendCheckPlanogram() {
+                let self = this;
 
-            //     let projectTXGroupRequest = {
-            //         projectID: request.project_ID
-            //     }
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
 
-            //     if (request.userID != systemUserID) {
-            //         // Create task handover
-            //         request.status = 42;
-            //         request.actionedByUserID = request.systemUserID;
-            //         request.systemUserID = null;
-            //         self.createProjectTransaction(request, () => {
-            //             self.createProjectTransactionGroup(projectTXGroupRequest, newProjectTXGroup => {
-            //                 request.projectTXGroup_ID = newProjectTXGroup.id;
-            //                 request.actionedByUserID = null;
-            //                 request.systemUserID = systemUserID;
-            //                 self.createProjectTransaction(request, newTransaction => {
-            //                     callback(newTransaction);
-            //                 })
-            //             })
-            //         })
-            //     } else {
-            //         callback(request);
-            //     }
-            // },
+                let request = JSON.parse(JSON.stringify(self.tmpRequest))
+
+                let projectTXGroupRequest = {
+                    projectID: request.project_ID
+                }
+
+                self.$refs.userSelector.show(user => {
+                    self.createProjectTransactionGroup(projectTXGroupRequest, newGroupTX => {
+                        request.rollingUserID = systemUserID;
+                        request.projectTXGroup_ID = newGroupTX.id;
+                        request.type = 6;
+                        request.status = 37;
+                        request.systemUserID = user.systemUserID;
+
+                        self.createProjectTransaction(request, newItem => {
+                            self.getProjectTransactionsByProjectID(request.project_ID);
+                        })
+                    })
+                })
+            },
             approve() {
                 let self = this;
                 self.Disableapprove = true
@@ -1373,6 +1385,58 @@
                     self.getProjectTransactionsByProjectID(request.project_ID);
                 })
             },
+            sendBackToRange() {
+                let self = this;
+
+                let request = JSON.parse(JSON.stringify(self.tmpRequest));
+
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+
+                let projectTXGroupRequest = {
+                    projectID: request.project_ID
+                }
+
+                self.getApprovalUser(request.project_ID, null, user => {
+                    self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
+                        request.systemUserID = user;
+                        request.type = 2;
+                        request.status = 7;
+                        request.actionedByUserID = null;
+                        request.projectTXGroup_ID = newGroup.id;
+                        self.createProjectTransaction(request, newOnHold => {
+                            self.getProjectTransactionsByProjectID(request.project_ID);
+                        })
+                    })
+                })
+            },
+            headOfficeApprove() {
+                let self = this;
+
+                let request = JSON.parse(JSON.stringify(self.tmpRequest));
+
+                let encoded_details = jwt.decode(sessionStorage.accessToken);
+                let systemUserID = encoded_details.USER_ID;
+
+                self.checkStartApprove(request, () => {
+                    request.status = 39;
+                    self.createProjectTransaction(request, newOne => {
+                        self.getProjectTransactionsByProjectID(request.project_ID);
+                    })
+                })
+            },
+            checkStartApprove(request, callback) {
+                let self = this;
+
+                if (request.status == 37) {
+                    request.status = 38;
+                    self.createProjectTransaction(request, newOne => {
+                        callback();
+                    })
+                } else {
+                    callback();
+                }
+            },
             expandImage() {
                 let self = this;
 
@@ -1414,7 +1478,69 @@
                 pwa.document.open();
                 pwa.document.write(html);
                 pwa.document.close();
-            }
+            },
+            getApprovalUser(projectID, approvalUserID, callback) {
+                let self = this;
+                Axios.get(process.env.VUE_APP_API + `SystemUser`).then(userresp => {
+                    let users = userresp.data
+                    if (approvalUserID == null) {
+                        Axios.get(process.env.VUE_APP_API +
+                                `ProjectUsers?typeName=Ranging&projectID=${projectID}`)
+                            .then(r => {
+
+                                if (r.data.length > 1) {
+                                    let items = []
+                                    console.log("All users", users);
+                                    r.data.forEach(item => {
+                                        users.forEach(user => {
+                                            if (user.systemUserID == item.userID_1) {
+                                                items.push({
+                                                    text: user.firstname + " " +
+                                                        user.lastname,
+                                                    value: user.systemUserID
+                                                })
+                                            }
+                                        })
+
+                                    })
+                                    console.log("items to push", items);
+
+                                    self.$refs.UserSelectorModalDynamic.open(
+                                        "Please select a user to send to", items,
+                                        cb => {
+                                            callback(cb);
+                                        })
+                                }
+                                if (r.data.length == 0 || r.data == null) {
+                                    let items = []
+                                    users.forEach(item => {
+                                        items.push({
+                                            text: item.firstname + " " + item.lastname,
+                                            value: item.systemUserID
+                                        })
+                                    })
+                                    self.$refs.UserSelectorModalDynamic.open(
+                                        "Please select a user to send to", items,
+                                        cb => {
+                                            callback(cb);
+                                        })
+                                }
+                                if (r.data.length == 1) {
+                                    callback(r.data[0].userID_1);
+                                }
+
+                            })
+                            .catch(e => {
+                                console.log("approval ussesr catch", e);
+
+                                callback(approvalUserID);
+                            })
+                    } else {
+                        callback(approvalUserID);
+                    }
+                })
+
+            },
         }
     }
 </script>

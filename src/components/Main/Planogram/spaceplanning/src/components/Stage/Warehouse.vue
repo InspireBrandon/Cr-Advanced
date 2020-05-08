@@ -961,8 +961,6 @@
           else {
             // promotion range start
             if (self.selectedHybridRange == "Promotion items") {
-              console.log("inPromoItemsFilter", self.promoItems);
-
               self.promoItems.forEach(el => {
                 if (el.height == undefined || el.height == null || parseFloat(el.height) <= 0)
                   el.height = 10
@@ -990,7 +988,6 @@
                   final.push(element)
                 }
               }
-              console.log("inPromoItemsend", final);
 
               // promotion range end
             } else {
@@ -1033,7 +1030,6 @@
         }
 
         if (self.scanProducts) {
-          console.log("SCAN", self.scanProducts)
 
           self.products.forEach(el => {
             if (el.height == undefined || el.height == null || parseFloat(el.height) <= 0)
@@ -1137,13 +1133,11 @@
             axios.post(process.env.VUE_APP_API + 'Product/ProductByBarcodes?db=CR-Hinterland-Live', self
                 .promoItemRefs)
               .then(r => {
-                console.log("[addPromotionItem]", r);
                 self.promoItems = []
                 r.data.forEach(item => {
                   item.store_Range_Indicator = "YES"
                   self.promoItems.push(item)
                 })
-                console.log(self.promoItems);
 
                 self.$refs.spinner.hide()
               })
@@ -1199,7 +1193,6 @@
       addHybridRange() {
         let self = this
         let vscd = self.$store.getters.getClusterData;
-        console.log("vscd", vscd);
 
         self.rangingData.rangeID
         self.$refs.rangeSelectorModal.show(fileID => {
@@ -1278,12 +1271,10 @@
       },
       addPromotionItem() {
         let self = this;
-        console.log("self.promoItemRefs", self.promoItemRefs);
         if (self.promoItemRefs == undefined || self.promoItemRefs == null) {
           self.promoItemRefs = []
         }
         let promoItems = self.promoItemBarcode.split(" ");
-        console.log("promoItems", promoItems);
 
         promoItems.forEach(element => {
           if (element != "") {
@@ -1352,7 +1343,7 @@
               el["segmentWidth"] = 0;
               el["depth"] = 0;
               el["isDefault"] = idx == 0 ? true : false;
-              el["fixtureType_ID"] =el.id
+              el["fixtureType_ID"] = el.id
               self.fixture_types.push(el);
             })
 
@@ -1642,6 +1633,8 @@
         let self = this;
 
         self.products = [];
+        self.HybridRanges = []
+        self.selectedHybridRange = null;
 
         self.$refs.rangeSelectorModal.show(fileID => {
           self.$store.commit("setRangeID", fileID);
@@ -1685,6 +1678,9 @@
                       self
                       .selectedClusterOption);
                     self.$store.commit("setCurrentStoreCount", self.storeCount);
+
+                    self.customEmitter.notify_cluster_change(EventBus);
+                    self.onClusterOptionChange();
                   }
                   self.gotData = true;
                   let stage = self.$parent.$children[0].$children[2].getStage().draw();
@@ -1801,7 +1797,6 @@
         let self = this;
 
         self.spacePlanName = spacePlanName == undefined ? "" : spacePlanName;
-        console.log("setClusterAndDimensionData", hybridRanges);
 
         if (hybridRanges != null && hybridRanges != undefined) {
           self.HybridRanges = hybridRanges
@@ -2056,8 +2051,6 @@
         let self = this;
         let parent = self.$parent.$children[0].$children[2];
 
-        console.log(parent);
-
         let stage = parent.getStage();
 
         let b64 = parent.$parent.getImageBytes(2);
@@ -2100,18 +2093,17 @@
                 supplierStands: self.supplierStands,
                 bins: self.bins,
                 FixtureType: self.selectedFixtureType
-              }, self.spacePlanID, 
-              self.generateName(self.fixture_types), 
-              true, 
-              image, 
-              self.updateLoader, 
-              self.$refs.SizeLoader.close, 
-              self.fixture_types, 
-              self.storeCount, 
-              self.HybridRanges, 
+              }, self.spacePlanID,
+              self.generateName(self.fixture_types),
+              true,
+              image,
+              self.updateLoader,
+              self.$refs.SizeLoader.close,
+              self.fixture_types,
+              self.storeCount,
+              self.HybridRanges,
               self.promoItemRefs,
               data => {
-                console.log("data finished planogram", data);
                 self.spacePlanID = data
               })
           } else {
@@ -2218,7 +2210,6 @@
           self.planogramHelper.setCreate(self.fixtureID == null);
 
           self.planogramHelper.saveFixture(self.$store, fixtureName, image, self.fixtureID, systemFileID => {
-            console.log(systemFileID);
             self.spacePlanID = null;
             self.fixtureID = systemFileID;
             self.fixtureName = fixtureName;
@@ -2243,8 +2234,6 @@
 
           rangingFileUpdated.categoryCharacteristics.userCategoryRole = self.userCategoryRole;
           rangingFileUpdated.categoryCharacteristics.systemCategoryRole = self.systemCategoryRole;
-
-          console.log(rangingFileUpdated)
 
           axios.put(process.env.VUE_APP_API + "SystemFile/JSON/NoRename?db=CR-Devinspire&id=" + rangeID,
               rangingFileUpdated)
@@ -2354,7 +2343,6 @@
 
       dragProductStart(ev, data) {
         let self = this
-        console.log("dragProductStart", data);
 
         if (self.HybridRanges.length > 0) {
           if (self.selectedHybridRange != self.HybridRanges[0].value) {
@@ -2429,20 +2417,25 @@
 
               if (storeProducts.length > 0) {
                 storeProducts.forEach(storeProduct => {
-                  self.products.forEach(product => {
-                    console.log(product);
+                  let productFound = false;
 
-                    if (storeProduct.Data == undefined || storeProduct.Data == null) {
-                      console.log("null Item", product);
-                    }
+                  self.products.forEach(product => {
+
+                    if (storeProduct.Data == undefined || storeProduct.Data == null) {}
 
                     if (storeProduct.Data.productID == product.productID || storeProduct.Data.id == product
-                      .productID) {
+                      .productID || storeProduct.Data.barcode == product.barcode) {
+                      productFound = true;
+
                       for (var prop in product) {
                         storeProduct.Data[prop] = product[prop];
                       }
                     }
                   })
+
+                  if (!productFound) {
+                    storeProduct.Data.store_Range_Indicator = "NO";
+                  }
                 });
               }
 
@@ -2486,10 +2479,9 @@
               self.customEmitter.notify_cluster_change(EventBus);
 
             }
+
             if (self.HybridRanges != null && self.HybridRanges != undefined) {
               if (self.HybridRanges.length == 0) {
-                console.log("nohybrids");
-
                 self.HybridRanges = []
                 let vscd = self.$store.getters.getClusterData;
                 self.HybridRanges.push({

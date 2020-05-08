@@ -1090,7 +1090,7 @@
                     request.projectTXGroup_ID = newGroupTX.id;
                     request.type = 6;
                     request.status = 37;
-                    request.systemUserID = 4;
+                    request.systemUserID = 12;
 
                     self.createProjectTransaction(request, newItem => {
                         callback();

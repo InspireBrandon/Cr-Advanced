@@ -9,7 +9,7 @@
         <!-- <v-list-tile v-if="imagesOff" @click="ToggleImages">
           <v-icon color="black" class="mr-1">image</v-icon>
           <v-list-tile-title>Toggle Images</v-list-tile-title>
-        </v-list-tile> -->
+        </v-list-tile>-->
         <v-menu dark offset-x right open-on-hover>
           <v-list-tile slot="activator">
             <v-icon color="black" class="mr-1">image</v-icon>
@@ -41,7 +41,7 @@
         <v-list-tile v-else @click="ToggleGroups">
           <v-icon color="white" class="mr-1">image</v-icon>
           <v-list-tile-title>Toggle Groups</v-list-tile-title>
-        </v-list-tile> -->
+        </v-list-tile>-->
         <!-- PRODUCT LABELS -->
         <v-list-tile v-if="labelsOn == false" @click="ToggleProductLabels">
           <v-icon color="black" class="mr-1">label_off</v-icon>
@@ -50,6 +50,10 @@
         <v-list-tile v-else @click="ToggleProductLabels">
           <v-icon color="white" class="mr-1">label</v-icon>
           <v-list-tile-title>Toggle Product Labels</v-list-tile-title>
+        </v-list-tile>
+        <v-list-tile @click="ToggleHighlight">
+          <v-icon color="black" class="mr-1">highlight</v-icon>
+          <v-list-tile-title>Toggle Highlight</v-list-tile-title>
         </v-list-tile>
         <!--  -->
         <v-list-tile @click="resetStagePosition">
@@ -107,63 +111,66 @@
   </div>
 </template>
 <script>
-  import CustomEmitter from "@/components/Main/Planogram/spaceplanning/src/libs/EventBus/CustomEmitter.js";
-  import EventBus from "@/components/Main/Planogram/spaceplanning/src/libs/EventBus/EventBus.js";
+import CustomEmitter from "@/components/Main/Planogram/spaceplanning/src/libs/EventBus/CustomEmitter.js";
+import EventBus from "@/components/Main/Planogram/spaceplanning/src/libs/EventBus/EventBus.js";
 
-  export default {
-    data() {
-      return {
-        fab: false
-      };
+export default {
+  data() {
+    return {
+      fab: false
+    };
+  },
+  computed: {
+    imagesOff() {
+      return this.$parent.$parent.$parent.ImagesOff;
     },
-    computed: {
-      imagesOff() {
-        return this.$parent.$parent.$parent.ImagesOff;
-      },
-      groupsOff() {
-        return this.$parent.$parent.$parent.GroupsOff;
-      },
-      labelsOn() {
-        return this.$parent.$parent.$parent.labelsOn;
-      }
+    groupsOff() {
+      return this.$parent.$parent.$parent.GroupsOff;
     },
-    methods: {
-      ToggleImages(val) {
-        let self = this;
-        this.$parent.$parent.$parent.ToggleImages(val);
-      },
-      ToggleGroups() {
-        let self = this;
-        this.$parent.$parent.$parent.ToggleGroups();
-      },
-      ToggleProductLabels() {
-        let self = this;
-        this.$parent.$parent.$parent.ToggleProductLabels();
-      },
-      resetStagePosition() {
-        this.$parent.$parent.$parent.resetStagePosition();
-      },
-      downloadImage(ratio) {
-        this.$parent.$parent.$parent.downloadImage(ratio);
-      },
-      savePlanogram() {
-        this.$parent.$parent.$parent.savePlanogram();
-      },
-      loadPlanogram() {
-        this.$parent.$parent.$parent.loadPlanogram();
-      },
-      redrawPlanogram() {
-        this.$parent.$parent.$parent.redrawPlanogram();
-      },
-      refreshLibrary() {
-        this.$parent.$parent.$parent.refreshLibrary();
-      },
-      planogramProperties() {
-        let self = this;
-        let event = new CustomEmitter();
-        event.modal_load(EventBus, "PLANOGRAM", null, null, null);
-      }
+    labelsOn() {
+      return this.$parent.$parent.$parent.labelsOn;
     }
-  };
-
+  },
+  methods: {
+    ToggleImages(val) {
+      let self = this;
+      this.$parent.$parent.$parent.ToggleImages(val);
+    },
+    ToggleHighlight() {
+      let self = this;
+      this.$parent.$parent.$parent.ToggleHighlight();
+    },
+    ToggleGroups() {
+      let self = this;
+      this.$parent.$parent.$parent.ToggleGroups();
+    },
+    ToggleProductLabels() {
+      let self = this;
+      this.$parent.$parent.$parent.ToggleProductLabels();
+    },
+    resetStagePosition() {
+      this.$parent.$parent.$parent.resetStagePosition();
+    },
+    downloadImage(ratio) {
+      this.$parent.$parent.$parent.downloadImage(ratio);
+    },
+    savePlanogram() {
+      this.$parent.$parent.$parent.savePlanogram();
+    },
+    loadPlanogram() {
+      this.$parent.$parent.$parent.loadPlanogram();
+    },
+    redrawPlanogram() {
+      this.$parent.$parent.$parent.redrawPlanogram();
+    },
+    refreshLibrary() {
+      this.$parent.$parent.$parent.refreshLibrary();
+    },
+    planogramProperties() {
+      let self = this;
+      let event = new CustomEmitter();
+      event.modal_load(EventBus, "PLANOGRAM", null, null, null);
+    }
+  }
+};
 </script>

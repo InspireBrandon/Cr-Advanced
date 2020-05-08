@@ -22,6 +22,7 @@ class StageWarehouseMiddleware {
 
           let productData = currentPlanogramItem.Data.Data; // actual product data
           let itemExists = false;
+
           // Check through warehouse to see if find the correct product
           warehouseProducts.forEach(warehouseProduct => {
 
