@@ -14,6 +14,10 @@
                             <v-list-tile-title class="pa-0">Restore File</v-list-tile-title>
                         </v-list-tile>
                         <v-divider></v-divider>
+                        <v-list-tile v-if="selectedItem.value.archived" class="pa-0" @click="deleteArchived">
+                            <v-list-tile-title class="pa-0">Delete</v-list-tile-title>
+                        </v-list-tile>
+                        <v-divider></v-divider>
                     </div>
                 </v-list>
             </v-menu>
@@ -21,6 +25,7 @@
             <SystemFiles ref="SystemFiles" />
         </div>
         <UserFiles />
+        <YesNoModal ref="YesNoModal" />
     </div>
 </template>
 
@@ -29,6 +34,8 @@
 
     import Recursive from './Recursive'
     import PlanogramNoteModal from '@/components/Common/PlanogramNoteModal'
+    import YesNoModal from '@/components/Common/YesNoModal'
+
     import jwt from "jsonwebtoken";
 
     import {
@@ -59,7 +66,8 @@
             Recursive,
             PlanogramNoteModal,
             UserFiles,
-            SystemFiles
+            SystemFiles,
+            YesNoModal
         },
         data() {
             return {
@@ -100,8 +108,39 @@
         methods: {
             restore() {
                 let self = this
-                Axios.post(process.env.VUE_APP_API + `SystemFile/RestoreArchived?db=CR-Devinspire&fileID=${self.selectedItem.value.id}`).then(r=>{
+                Axios.post(process.env.VUE_APP_API +
+                    `SystemFile/RestoreArchived?db=CR-Devinspire&fileID=${self.selectedItem.value.id}`).then(r => {
+                    self.treeItems.forEach(tree => {
+                        if (tree.name == "Archived Planograms") {
+                            tree.children.forEach((plano, idx) => {
+                                if (plano == selectedItem) {
+                                    tree.children.splice(idx, 1)
+                                }
+                            })
+                        }
+                    })
+                })
+            },
+            deleteArchived() {
+                let self = this
+                console.log("tree items", self.treeItems);
 
+                self.$refs.YesNoModal.show("Are you sure you want to delete the selected file", value => {
+                    if (value) {
+                        Axios.post(process.env.VUE_APP_API +
+                            `SystemFile/JSON/Delete?db=CR-Devinspire&id=${self.selectedItem.value.id}`
+                        ).then(r => {
+                            self.treeItems.forEach(tree => {
+                                if (tree.name == "Archived Planograms") {
+                                    tree.children.forEach((plano, idx) => {
+                                        if (plano == selectedItem) {
+                                            tree.children.splice(idx, 1)
+                                        }
+                                    })
+                                }
+                            })
+                        })
+                    }
                 })
             },
             getStores() {
@@ -262,7 +301,8 @@
 
                 modelPlanogramTreeItem.click = function () {
                     modelPlanogramTreeItem.showChildren = !modelPlanogramTreeItem.showChildren;
-                    modelPlanogramTreeItem.icon = modelPlanogramTreeItem.showChildren ? 'folder_open' : 'folder';
+                    modelPlanogramTreeItem.icon = modelPlanogramTreeItem.showChildren ? 'folder_open' :
+                        'folder';
                 }
 
                 self.departments.forEach(department => {
@@ -287,7 +327,8 @@
 
                     taskInProgress.click = function () {
                         taskInProgress.showChildren = !taskInProgress.showChildren;
-                        taskInProgress.icon = taskInProgress.showChildren ? 'folder_open' : 'folder';
+                        taskInProgress.icon = taskInProgress.showChildren ? 'folder_open' :
+                            'folder';
                     }
                     // ////////////////////////////////////////////////////////////////////////////////////////////////////
                     // APPROVAL IN PROGRESS
@@ -301,8 +342,10 @@
                     taskApprovalInProgress.showChildrenCount = true;
 
                     taskApprovalInProgress.click = function () {
-                        taskApprovalInProgress.showChildren = !taskApprovalInProgress.showChildren;
-                        taskApprovalInProgress.icon = taskApprovalInProgress.showChildren ? 'folder_open' :
+                        taskApprovalInProgress.showChildren = !taskApprovalInProgress
+                            .showChildren;
+                        taskApprovalInProgress.icon = taskApprovalInProgress.showChildren ?
+                            'folder_open' :
                             'folder';
                     }
                     // ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -337,28 +380,31 @@
                             taskApprovalInProgress.children = [];
                             taskApproved.children = [];
                             self.getTasksByProjectGroup(department.id, tasks => {
-                                self.getRangeFileByProjectGroup(department.id, rangeFiles => {
-                                    rangeFiles.forEach(task => {
-                                        let taskItem = new treeItem({
-                                            name: task.fileName,
-                                            icon: 'insert_drive_file',
-                                            children: [],
-                                            type: 'PlanogramID',
-                                            value: task.systemFileID
+                                self.getRangeFileByProjectGroup(department.id,
+                                    rangeFiles => {
+                                        rangeFiles.forEach(task => {
+                                            let taskItem = new treeItem({
+                                                name: task.fileName,
+                                                icon: 'insert_drive_file',
+                                                children: [],
+                                                type: 'PlanogramID',
+                                                value: task
+                                                    .systemFileID
+                                            })
+
+                                            taskItem.click = function () {
+                                                self.$router.push(
+                                                    `/RangePlanningView/${task.systemFileID}`
+                                                );
+                                            }
+
+                                            departmentTreeItem.children
+                                                .push(taskItem);
                                         })
-
-                                        taskItem.click = function () {
-                                            self.$router.push(
-                                                `/RangePlanningView/${task.systemFileID}`
-                                            );
-                                        }
-
-                                        departmentTreeItem.children.push(taskItem);
+                                        departmentTreeItem.loading = false;
+                                        departmentTreeItem.showChildren = true;
+                                        departmentTreeItem.icon = "folder_open";
                                     })
-                                    departmentTreeItem.loading = false;
-                                    departmentTreeItem.showChildren = true;
-                                    departmentTreeItem.icon = "folder_open";
-                                })
                             })
                             // self.getTasksByProjectGroup(department.id, tasks => {
                             //     self.getRangeFileByProjectGroup(department.id, rangeFiles => {
@@ -476,7 +522,8 @@
 
                 modelPlanogramTreeItem.click = function () {
                     modelPlanogramTreeItem.showChildren = !modelPlanogramTreeItem.showChildren;
-                    modelPlanogramTreeItem.icon = modelPlanogramTreeItem.showChildren ? 'folder_open' : 'folder';
+                    modelPlanogramTreeItem.icon = modelPlanogramTreeItem.showChildren ? 'folder_open' :
+                        'folder';
                 }
 
                 // Get unique departments
@@ -503,7 +550,8 @@
 
                     taskInProgress.click = function () {
                         taskInProgress.showChildren = !taskInProgress.showChildren;
-                        taskInProgress.icon = taskInProgress.showChildren ? 'folder_open' : 'folder';
+                        taskInProgress.icon = taskInProgress.showChildren ? 'folder_open' :
+                            'folder';
                     }
                     // ////////////////////////////////////////////////////////////////////////////////////////////////////
                     // APPROVAL IN PROGRESS
@@ -517,8 +565,10 @@
                     taskApprovalInProgress.showChildrenCount = true;
 
                     taskApprovalInProgress.click = function () {
-                        taskApprovalInProgress.showChildren = !taskApprovalInProgress.showChildren;
-                        taskApprovalInProgress.icon = taskApprovalInProgress.showChildren ? 'folder_open' :
+                        taskApprovalInProgress.showChildren = !taskApprovalInProgress
+                            .showChildren;
+                        taskApprovalInProgress.icon = taskApprovalInProgress.showChildren ?
+                            'folder_open' :
                             'folder';
                     }
                     // ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -568,7 +618,8 @@
                                                 );
                                             }
 
-                                            departmentTreeItem.children.push(taskItem)
+                                            departmentTreeItem.children
+                                                .push(taskItem)
                                         })
 
                                         // console.log(planogramFiles);
@@ -704,7 +755,8 @@
 
                 storePlanogramTreeItem.click = function () {
                     storePlanogramTreeItem.showChildren = !storePlanogramTreeItem.showChildren;
-                    storePlanogramTreeItem.icon = storePlanogramTreeItem.showChildren ? 'folder_open' : 'folder';
+                    storePlanogramTreeItem.icon = storePlanogramTreeItem.showChildren ? 'folder_open' :
+                        'folder';
                 }
 
                 if (self.storeID != null)
@@ -735,7 +787,8 @@
                                     let canAdd = true;
 
                                     uniqueDepartments.forEach(ud => {
-                                        if (department.projectGroup == ud
+                                        if (department.projectGroup ==
+                                            ud
                                             .projectGroup)
                                             canAdd = false;
                                     })
@@ -753,10 +806,12 @@
                                     })
 
                                     departmentItem.click = function () {
-                                        departmentItem.showChildren = !departmentItem
+                                        departmentItem.showChildren = !
+                                            departmentItem
                                             .showChildren;
                                         departmentItem.icon = departmentItem
-                                            .showChildren ? 'folder_open' : 'folder';
+                                            .showChildren ? 'folder_open' :
+                                            'folder';
                                     }
 
                                     // ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -771,9 +826,11 @@
                                     taskPending.showChildrenCount = true;
 
                                     taskPending.click = function () {
-                                        taskPending.showChildren = !taskPending
+                                        taskPending.showChildren = !
+                                            taskPending
                                             .showChildren;
-                                        taskPending.icon = taskPending.showChildren ?
+                                        taskPending.icon = taskPending
+                                            .showChildren ?
                                             'folder_open' :
                                             'folder';
                                     }
@@ -789,7 +846,8 @@
                                     taskInProgress.showChildrenCount = true;
 
                                     taskInProgress.click = function () {
-                                        taskInProgress.showChildren = !taskInProgress
+                                        taskInProgress.showChildren = !
+                                            taskInProgress
                                             .showChildren;
                                         taskInProgress.icon = taskInProgress
                                             .showChildren ?
@@ -808,9 +866,11 @@
                                     taskImplemented.showChildrenCount = true;
 
                                     taskImplemented.click = function () {
-                                        taskImplemented.showChildren = !taskImplemented
+                                        taskImplemented.showChildren = !
+                                            taskImplemented
                                             .showChildren;
-                                        taskImplemented.icon = taskImplemented
+                                        taskImplemented.icon =
+                                            taskImplemented
                                             .showChildren ? 'folder_open' :
                                             'folder';
                                     }
@@ -819,37 +879,46 @@
                                         taskInProgress, taskImplemented);
 
                                     departments.forEach(department => {
-                                        if (department.projectGroup == ud
+                                        if (department.projectGroup ==
+                                            ud
                                             .projectGroup) {
-                                            let taskItem = new treeItem({
-                                                name: department.fileName,
-                                                icon: 'insert_drive_file',
-                                                children: [],
-                                                click: function () {
-                                                    console.log(
-                                                        department);
+                                            let taskItem =
+                                                new treeItem({
+                                                    name: department
+                                                        .fileName,
+                                                    icon: 'insert_drive_file',
+                                                    children: [],
+                                                    click: function () {
+                                                        console
+                                                            .log(
+                                                                department
+                                                            );
 
-                                                    self.$router.push(
-                                                        `/PlanogramImplementationNew/${department.project_ID}/${department.systemFileID}/13`
-                                                    );
-                                                }
-                                            })
+                                                        self.$router
+                                                            .push(
+                                                                `/PlanogramImplementationNew/${department.project_ID}/${department.systemFileID}/13`
+                                                            );
+                                                    }
+                                                })
 
                                             switch (department
                                                 .planogramStoreStatus) {
                                                 case 2: {
-                                                    taskPending.children.push(
-                                                        taskItem);
+                                                    taskPending.children
+                                                        .push(
+                                                            taskItem);
                                                 }
                                                 break;
                                             case 3: {
-                                                taskInProgress.children.push(
-                                                    taskItem);
+                                                taskInProgress.children
+                                                    .push(
+                                                        taskItem);
                                             }
                                             break;
                                             case 4: {
-                                                taskImplemented.children.push(
-                                                    taskItem);
+                                                taskImplemented.children
+                                                    .push(
+                                                        taskItem);
                                             }
                                             break;
                                             }
@@ -882,7 +951,8 @@
 
                 floorPlanningTreeItem.click = function () {
                     floorPlanningTreeItem.showChildren = !floorPlanningTreeItem.showChildren;
-                    floorPlanningTreeItem.icon = floorPlanningTreeItem.showChildren ? 'folder_open' : 'folder';
+                    floorPlanningTreeItem.icon = floorPlanningTreeItem.showChildren ? 'folder_open' :
+                        'folder';
                 }
 
                 // ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -897,8 +967,10 @@
                 })
 
                 departmentClusteringTreeItem.click = function () {
-                    departmentClusteringTreeItem.showChildren = !departmentClusteringTreeItem.showChildren;
-                    departmentClusteringTreeItem.icon = departmentClusteringTreeItem.showChildren ? 'folder_open' :
+                    departmentClusteringTreeItem.showChildren = !departmentClusteringTreeItem
+                        .showChildren;
+                    departmentClusteringTreeItem.icon = departmentClusteringTreeItem.showChildren ?
+                        'folder_open' :
                         'folder';
                 }
 
@@ -910,8 +982,10 @@
                 })
 
                 departmentModelFloorPlanTreeItem.click = function () {
-                    departmentModelFloorPlanTreeItem.showChildren = !departmentModelFloorPlanTreeItem.showChildren;
-                    departmentModelFloorPlanTreeItem.icon = departmentModelFloorPlanTreeItem.showChildren ?
+                    departmentModelFloorPlanTreeItem.showChildren = !departmentModelFloorPlanTreeItem
+                        .showChildren;
+                    departmentModelFloorPlanTreeItem.icon = departmentModelFloorPlanTreeItem
+                        .showChildren ?
                         'folder_open' : 'folder';
                 }
 
@@ -960,7 +1034,8 @@
                             icon: "insert_drive_file",
                             children: [],
                             click: function () {
-                                self.$router.push("/FloorPlanningViewer/Delmas - Floorplan.jpg")
+                                self.$router.push(
+                                    "/FloorPlanningViewer/Delmas - Floorplan.jpg")
                             }
                         }),
                         new treeItem({
@@ -968,7 +1043,8 @@
                             icon: "insert_drive_file",
                             children: [],
                             click: function () {
-                                self.$router.push("/FloorPlanningViewer/Klerksdorp Floorplan.jpg")
+                                self.$router.push(
+                                    "/FloorPlanningViewer/Klerksdorp Floorplan.jpg")
                             }
                         }),
                     ]
@@ -980,7 +1056,8 @@
                         'folder_open' : 'folder';
                 }
 
-                floorPlanningTreeItem.children.push(departmentClusteringTreeItem, departmentModelFloorPlanTreeItem,
+                floorPlanningTreeItem.children.push(departmentClusteringTreeItem,
+                    departmentModelFloorPlanTreeItem,
                     storeFloorPlanTreeItem);
                 self.treeItems.push(floorPlanningTreeItem);
             },
@@ -1024,7 +1101,8 @@
 
                     storeTreeItem.click = function () {
                         storeTreeItem.showChildren = !storeTreeItem.showChildren;
-                        storeTreeItem.icon = storeTreeItem.showChildren ? 'folder_open' : 'folder';
+                        storeTreeItem.icon = storeTreeItem.showChildren ? 'folder_open' :
+                            'folder';
                     }
                     self.stores.forEach(store => {
                         let taskItem = new treeItem({
@@ -1050,7 +1128,8 @@
 
                     customTreeItem.click = function () {
                         customTreeItem.showChildren = !customTreeItem.showChildren;
-                        customTreeItem.icon = customTreeItem.showChildren ? 'folder_open' : 'folder';
+                        customTreeItem.icon = customTreeItem.showChildren ? 'folder_open' :
+                            'folder';
                     }
 
                     customTreeItem.children.push(new treeItem({
@@ -1073,7 +1152,8 @@
 
                     basketTreeItem.click = function () {
                         basketTreeItem.showChildren = !basketTreeItem.showChildren;
-                        basketTreeItem.icon = basketTreeItem.showChildren ? 'folder_open' : 'folder';
+                        basketTreeItem.icon = basketTreeItem.showChildren ? 'folder_open' :
+                            'folder';
                     }
 
                     self.baskets.forEach(basket => {
@@ -1105,7 +1185,8 @@
 
                     listingTreeItem.click = function () {
                         listingTreeItem.showChildren = !listingTreeItem.showChildren;
-                        listingTreeItem.icon = listingTreeItem.showChildren ? 'folder_open' : 'folder';
+                        listingTreeItem.icon = listingTreeItem.showChildren ? 'folder_open' :
+                            'folder';
                     }
 
                     self.listings.forEach(listing => {
@@ -1141,7 +1222,8 @@
 
                     categoryTreeItem.click = function () {
                         categoryTreeItem.showChildren = !categoryTreeItem.showChildren;
-                        categoryTreeItem.icon = categoryTreeItem.showChildren ? 'folder_open' : 'folder';
+                        categoryTreeItem.icon = categoryTreeItem.showChildren ? 'folder_open' :
+                            'folder';
                     }
 
                     self.getFile("Category Cluster", "REPORT", ccfileData => {
@@ -1157,7 +1239,8 @@
                                 icon: "insert_drive_file",
                                 children: [],
                                 click() {
-                                    self.$router.push("/CategoryClusterView/" +
+                                    self.$router.push(
+                                        "/CategoryClusterView/" +
                                         categoryCluster);
                                 }
                             })
@@ -1177,7 +1260,8 @@
 
                     departmentTreeItem.click = function () {
                         departmentTreeItem.showChildren = !departmentTreeItem.showChildren;
-                        departmentTreeItem.icon = departmentTreeItem.showChildren ? 'folder_open' :
+                        departmentTreeItem.icon = departmentTreeItem.showChildren ?
+                            'folder_open' :
                             'folder';
                     }
 
@@ -1230,7 +1314,8 @@
 
                 spacialMappingTreeItem.click = function () {
                     spacialMappingTreeItem.showChildren = !spacialMappingTreeItem.showChildren;
-                    spacialMappingTreeItem.icon = spacialMappingTreeItem.showChildren ? 'folder_open' : 'folder';
+                    spacialMappingTreeItem.icon = spacialMappingTreeItem.showChildren ? 'folder_open' :
+                        'folder';
                 }
 
                 let marketShareTreeItem = new treeItem({
@@ -1278,7 +1363,8 @@
 
                 promotionalTreeItem.click = function () {
                     promotionalTreeItem.showChildren = !promotionalTreeItem.showChildren;
-                    promotionalTreeItem.icon = promotionalTreeItem.showChildren ? 'folder_open' : 'folder';
+                    promotionalTreeItem.icon = promotionalTreeItem.showChildren ? 'folder_open' :
+                        'folder';
                 }
 
                 self.treeItems.push(promotionalTreeItem);
@@ -1350,7 +1436,8 @@
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.get(process.env.VUE_APP_API +
-                        `Store_Planogram/StoreAndDepartment?storeID=${storeID}&projectGroupID=${projectGroupID}`)
+                        `Store_Planogram/StoreAndDepartment?storeID=${storeID}&projectGroupID=${projectGroupID}`
+                    )
                     .then(r => {
                         delete Axios.defaults.headers.common["TenantID"];
                         callback(r.data.queryResult);
@@ -1378,7 +1465,8 @@
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.get(process.env.VUE_APP_API + `GetRangeFileByProjectGroup?projectGroupID=${projectGroupID}`)
+                Axios.get(process.env.VUE_APP_API +
+                        `GetRangeFileByProjectGroup?projectGroupID=${projectGroupID}`)
                     .then(r => {
                         delete Axios.defaults.headers.common["TenantID"];
 
@@ -1395,7 +1483,8 @@
 
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                Axios.get(process.env.VUE_APP_API + `GetPlanogramFileByProjectGroup?projectGroupID=${projectGroupID}`)
+                Axios.get(process.env.VUE_APP_API +
+                        `GetPlanogramFileByProjectGroup?projectGroupID=${projectGroupID}`)
                     .then(r => {
                         delete Axios.defaults.headers.common["TenantID"];
                         console.log("getPlanogramFileByProjectGroup", r.data);

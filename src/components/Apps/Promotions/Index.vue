@@ -78,7 +78,7 @@
                                     <v-spacer></v-spacer>
                                     <v-list-tile-actions>
                                         <v-btn small color="primary" @click="getPromotionByID(item)">Edit</v-btn>
-                                        <v-btn small color="primary">Categories & resources</v-btn>
+                                        <v-btn small color="primary" @click="openCatgeories(item.id)">Categories & resources</v-btn>
                                         <v-btn small color="primary">Event Planning</v-btn>
                                         <v-btn small color="primary">Costs</v-btn>
                                         <v-btn small color="primary">Item Selection</v-btn>
@@ -188,7 +188,7 @@
                 <v-flex md3 lg3>
                     <label>Store Name</label>
                     <v-autocomplete style="border: 1px solid lightgrey;" flat solo hide-details :items="stores"
-                        item-text="store_Name" item-value="store_ID" v-model="selectedStore" label="Store Name"
+                        item-text="store_Name" item-value="store_ID" v-model="promotion.stores" label="Store Name"
                         multiple>
                     </v-autocomplete>
                 </v-flex>
@@ -326,6 +326,11 @@
             this.getPromotionTypes();
         },
         methods: {
+            openCatgeories(id){
+                let self = this
+                self.$router.push(`/Promotions/CategoriesAndResources/${id}`)
+                // /Promotions/CategoriesAndResources/:promotionID
+            },
             getPromotionByID(item) {
                 let self = this
                 self.promotion = item
@@ -535,7 +540,7 @@
                 // self.promotion.startDate = self.dateFrom.text
                 // self.promotion.startPeriodID = self.dateFrom.value
 
-                self.promotion.stores = self.selectedStore
+                // self.promotion.stores = self.selectedStore
                 console.log("[savefile] promotion", self.promotion);
 
                 Axios.post(process.env.VUE_APP_API + `CreatePromotion`, self.promotion).then(r => {
@@ -588,6 +593,7 @@
         self.products = [];
         self.event_Group = null;
         self.event_Theme = null;
+        self.stores = []
     }
 
     function Promotion_Product() {

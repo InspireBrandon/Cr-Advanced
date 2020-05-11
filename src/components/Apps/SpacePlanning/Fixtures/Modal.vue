@@ -304,53 +304,58 @@
                     </div>
                   </v-flex>-->
                   <v-flex md4 class="px-3">
-                    <v-checkbox v-if="frontBack == 'Front'"
-                      v-model="form.frontTransparent" label="Transparent"></v-checkbox>
-                    <v-checkbox v-if="frontBack == 'Back'"
-                      v-model="form.backTransparent" label="Transparent"></v-checkbox>
+                    <v-checkbox v-if="frontBack == 'Front'" v-model="form.frontTransparent" label="Transparent">
+                    </v-checkbox>
+                    <v-checkbox v-if="frontBack == 'Back'" v-model="form.backTransparent" label="Transparent">
+                    </v-checkbox>
                   </v-flex>
                   <v-flex md4 class="px-3">
-                    <v-checkbox v-if="leftRight == 'Left'"
-                      v-model="form.leftTransparent" label="Transparent"></v-checkbox>
-                    <v-checkbox v-if="leftRight == 'Right'"
-                      v-model="form.rightTransparent" label="Transparent"></v-checkbox>
+                    <v-checkbox v-if="leftRight == 'Left'" v-model="form.leftTransparent" label="Transparent">
+                    </v-checkbox>
+                    <v-checkbox v-if="leftRight == 'Right'" v-model="form.rightTransparent" label="Transparent">
+                    </v-checkbox>
                   </v-flex>
                   <v-flex md4 class="px-3">
-                    <v-checkbox v-if="topBottom == 'Top'"
-                      v-model="form.topTransparent" label="Transparent"></v-checkbox>
-                    <v-checkbox v-if="topBottom == 'Bottom'"
-                      v-model="form.bottomTransparent" label="Transparent"></v-checkbox>
+                    <v-checkbox v-if="topBottom == 'Top'" v-model="form.topTransparent" label="Transparent">
+                    </v-checkbox>
+                    <v-checkbox v-if="topBottom == 'Bottom'" v-model="form.bottomTransparent" label="Transparent">
+                    </v-checkbox>
                   </v-flex>
                   <v-flex v-if="!form.rendering" lg12 md12 sm12 xs12 class="px-3">
                     <h3>Renderings</h3>
                   </v-flex>
                   <v-flex v-if="!form.rendering &&renderingType0.length>1" lg8 md12 sm12 xs12 class="px-3">
-                    <v-select placeholder="please select" :items="renderingType0" v-model="selectedRenderingType0"
-                      label="Label Holder:"></v-select>
+                    <v-select placeholder="please select" item-text="name" item-value="id" :items="renderingType0"
+                      v-model="selectedRenderingType0" label="Label Holder:"
+                      @change="setYoffset(0,renderingType0,selectedRenderingType0)"></v-select>
                     <v-text-field v-if="selectedRenderingType0!=null" type="number" v-model="rendering0_yOffset"
                       label="Y Offset:" suffix="cm"></v-text-field>
                   </v-flex>
                   <v-flex v-if="!form.rendering &&renderingType1.length>1" lg8 md12 sm12 xs12 class="px-3">
-                    <v-select placeholder="please select" :items="renderingType1" v-model="selectedRenderingType1"
-                      label="Shelf Edge:"></v-select>
+                    <v-select placeholder="please select" item-text="name" item-value="id" :items="renderingType1"
+                      v-model="selectedRenderingType1" label="Shelf Edge:"
+                      @change="setYoffset(1,renderingType1,selectedRenderingType1)"></v-select>
                     <v-text-field v-if="selectedRenderingType1!=null" type="number" v-model="rendering1_yOffset"
                       label="Y Offset:" suffix="cm"></v-text-field>
                   </v-flex>
                   <v-flex v-if="!form.rendering &&renderingType2.length>1" lg8 md12 sm12 xs12 class="px-3">
-                    <v-select placeholder="please select" :items="renderingType2" v-model="selectedRenderingType2"
-                      label="Back Face:"></v-select>
+                    <v-select placeholder="please select" item-text="name" item-value="id" :items="renderingType2"
+                      v-model="selectedRenderingType2" label="Back Face:"
+                      @change="setYoffset(2,renderingType2,selectedRenderingType2)"></v-select>
                     <v-text-field v-if="selectedRenderingType2!=null" type="number" v-model="rendering2_yOffset"
                       label="Y Offset:" suffix="cm"></v-text-field>
                   </v-flex>
                   <v-flex v-if="!form.rendering &&renderingType3.length>1" lg8 md12 sm12 xs12 class="px-3">
-                    <v-select placeholder="please select" :items="renderingType3" v-model="selectedRenderingType3"
-                      label="Front Face:"></v-select>
+                    <v-select placeholder="please select" item-text="name" item-value="id" :items="renderingType3"
+                      v-model="selectedRenderingType3" label="Front Face:"
+                      @change="setYoffset(3,renderingType3,selectedRenderingType3)"></v-select>
                     <v-text-field v-if="selectedRenderingType3!=null" type="number" v-model="rendering3_yOffset"
                       label="Y Offset:" suffix="cm"></v-text-field>
                   </v-flex>
                   <v-flex v-if="!form.rendering &&renderingType4.length>1" lg8 md12 sm12 xs12 class="px-3">
-                    <v-select placeholder="please select" :items="renderingType4" v-model="selectedRenderingType4"
-                      label="Side Face:"></v-select>
+                    <v-select placeholder="please select" item-text="name" item-value="id" :items="renderingType4"
+                      v-model="selectedRenderingType4" label="Side Face:"
+                      @change="setYoffset(4,renderingType4,selectedRenderingType4)"></v-select>
                     <v-text-field v-if="selectedRenderingType4!=null" type="number" v-model="rendering4_yOffset"
                       label="Y Offset:" suffix="cm"></v-text-field>
                   </v-flex>
@@ -672,6 +677,37 @@
       };
     },
     methods: {
+      setYoffset(offsetField, items, selectedID) {
+        let self = this
+
+        self.$nextTick(() => {
+          items.forEach(element => {
+            if (element.id == selectedID) {
+              console.log("setYoffset", selectedID, element.yOffset);
+              switch (offsetField) {
+                case 0:
+                  self.rendering0_yOffset = element.yOffset
+                  break;
+                case 1:
+                  self.rendering1_yOffset = element.yOffset
+                  break;
+                case 2:
+                  self.rendering2_yOffset = element.yOffset
+                  break;
+                case 3:
+                  self.rendering3_yOffset = element.yOffset
+                  break;
+                case 4:
+                  self.rendering4_yOffset = element.yOffset
+                  break;
+                default:
+                  break;
+              }
+
+            }
+          });
+        })
+      },
       handleMirror(side, value) {
         let self = this
         console.log("handle mirror: ", side, " value: ", value);
@@ -793,61 +829,46 @@
           .then(r => {
             console.log("getRenderingTypes", r.data);
             self.renderingType0 = [{
-              text: "none",
-              value: -1
+              name: "none",
+              id: -1
             }];
             self.renderingType1 = [{
-              text: "none",
-              value: -1
+              name: "none",
+              id: -1
             }];
             self.renderingType2 = [{
-              text: "none",
-              value: -1
+              name: "none",
+              id: -1
             }];
             self.renderingType3 = [{
-              text: "none",
-              value: -1
+              name: "none",
+              id: -1
             }];
             self.renderingType4 = [{
-              text: "none",
-              value: -1
+              name: "none",
+              id: -1
             }];
             r.data.forEach(rendering => {
               switch (rendering.renderingType) {
                 case 0: {
-                  self.renderingType0.push({
-                    text: rendering.name,
-                    value: rendering.id
-                  });
+                  self.renderingType0.push(rendering);
                 }
                 break;
               case 1: {
-                self.renderingType1.push({
-                  text: rendering.name,
-                  value: rendering.id
-                });
+                self.renderingType1.push(rendering);
               }
               break;
               case 2: {
-                self.renderingType2.push({
-                  text: rendering.name,
-                  value: rendering.id
-                });
+                self.renderingType2.push(rendering);
               }
               break;
               case 3: {
-                self.renderingType3.push({
-                  text: rendering.name,
-                  value: rendering.id
-                });
+                self.renderingType3.push(rendering);
               }
               break;
 
               case 4: {
-                self.renderingType4.push({
-                  text: rendering.name,
-                  value: rendering.id
-                });
+                self.renderingType4.push(rendering);
               }
               break;
 
@@ -895,7 +916,7 @@
 
         this.form.type = type;
 
-        if(this.form.fixtureType == null) {
+        if (this.form.fixtureType == null) {
           this.form.fixtureType = 1;
         }
 
