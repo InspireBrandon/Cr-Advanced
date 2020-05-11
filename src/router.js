@@ -156,6 +156,9 @@ import {
 } from "./components/Main/NewViewTesting/RoutesForTesting/routerConfig";
 
 import Promotions from './components/Apps/Promotions/Index.vue'
+import CategoriesAndResources from './components/Apps/Promotions/CategoriesAndResources.vue'
+
+
 
 Vue.use(Router)
 
@@ -237,7 +240,13 @@ export default new Router({
               path: '/Promotions',
               name: 'promotions',
               component: Promotions,              
-            }, {
+            }, 
+            {
+              path: '/Promotions/CategoriesAndResources/:promotionID',
+              name: 'CategoriesAndResources',
+              component: CategoriesAndResources,              
+            },     
+            {
               path: '/Map',
               name: 'map',
               component: map,
