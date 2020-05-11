@@ -215,11 +215,11 @@
                 let furthestY = 0;
 
                 let notProducts = drops.filter(child => {
-                    return child.type != "PRODUCT";
+                    return child.type != "PRODUCT" && child.name != null;
                 });
 
                 let gondolas = notProducts.filter(child => {
-                    return child.type == "GONDOLA" || child.type == "OBSTRUCTION";
+                    return child.type == "GONDOLA" || child.type == "OBSTRUCTION" && child.name != null;
                 });
 
                 gondolas.forEach(drop => {

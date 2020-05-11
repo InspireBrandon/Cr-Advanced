@@ -36,13 +36,13 @@ class DrawingBase {
         let diff = childY - parentBottom;
 
         // console.log(parentBottom, childY);
-        self.element.position.y = (self.data.parent.data.y + diff + (self.data.depth)) / 300 // self.pxlToMeterRatio;
+        self.element.position.y = (self.data.parent.data.y + diff + (0.5 * self.data.depth)) / 300 // self.pxlToMeterRatio;
 
         // self.element.position.y = (((0.5 * self.data.depth) / self.pxlToMeterRatio)); <-- POSITION TO BOTTOM
 
         // Get difference between parent depth and child depth
         let pcDiff = self.data.parent.data.height - self.data.height - 0.1;
-        self.element.position.z = parentElement.position.z + ((0.5 * pcDiff) / self.pxlToMeterRatio);
+        self.element.position.z = parentElement.position.z - 0.02 + ((0.5 * pcDiff) / self.pxlToMeterRatio);
     }
 }
 
