@@ -21,7 +21,7 @@ class DrawingBase {
         let self = this;
 
         let parentElement = self.data.parent.element;
-        let parentY = (self.data.parent.data.y + (self.data.parent.data.height * 0.5));
+        let parentY = (self.data.parent.data.y + (self.data.parent.data.height));
 
         self.element.position.x = parentElement.position.x;
 
@@ -36,7 +36,7 @@ class DrawingBase {
         let diff = childY - parentBottom;
 
         // console.log(parentBottom, childY);
-        self.element.position.y = (self.data.parent.data.y + diff + (self.data.depth * 0.5)) / 300 // self.pxlToMeterRatio;
+        self.element.position.y = (self.data.parent.data.y + diff + (self.data.depth)) / 300 // self.pxlToMeterRatio;
 
         // self.element.position.y = (((0.5 * self.data.depth) / self.pxlToMeterRatio)); <-- POSITION TO BOTTOM
 

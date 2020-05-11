@@ -11,27 +11,34 @@ class CheckPlanogramTreeItem {
     build(treeItems) {
         let self = this;
 
-        let checkPlanogramTreeItem = buildCheckPlanogramFolder(self.vueCtx.$router);
+        let checkPlanogramTreeItem = new TreeItem({
+            name: 'Planograms to check',
+            icon: "folder"
+        });
+
+        checkPlanogramTreeItem.click = function () {
+            checkPlanogramTreeItem.showChildren = !checkPlanogramTreeItem.showChildren;
+            checkPlanogramTreeItem.icon = checkPlanogramTreeItem.showChildren ? 'folder_open' : 'folder';
+        }
+        
+        buildCheckPlanogramFolder(self.vueCtx.$router, children => {
+            checkPlanogramTreeItem.children = children;
+            checkPlanogramTreeItem.showChildrenCount = true;
+        });
 
         treeItems.push(checkPlanogramTreeItem);
     }
 }
 
-function buildCheckPlanogramFolder(router) {
+function buildCheckPlanogramFolder(router, callback) {
     let checkPlanogramTreeItem = new TreeItem({
         name: 'Planograms to check',
         icon: "folder"
     });
 
-    checkPlanogramTreeItem.click = function () {
-        getUserTasks(data => {
-            checkPlanogramTreeItem.children = buildCheckPlanogramItems(data, router)
-            checkPlanogramTreeItem.showChildren = !checkPlanogramTreeItem.showChildren;
-            checkPlanogramTreeItem.icon = checkPlanogramTreeItem.showChildren ? 'folder_open' : 'folder';
-        });
-    }
-
-    return checkPlanogramTreeItem;
+    getUserTasks(data => {
+        callback(buildCheckPlanogramItems(data, router));
+    });
 }
 
 function buildCheckPlanogramItems(checkItems, router) {
@@ -64,9 +71,8 @@ function getUserTasks(callback) {
     Axios.get(process.env.VUE_APP_API + `UserProjectTX?userID=${systemUserID}`)
         .then(r => {
             let filtered = r.data.projectTXList.filter(e => {
-                return e.status == 37 || e.status == 38;
+                return (e.status == 37 || e.status == 38) && e.systemUserID == systemUserID;
             })
-            console.log(filtered);
             callback(filtered);
         })
         .catch(e => {

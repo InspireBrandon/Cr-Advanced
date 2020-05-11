@@ -1,4 +1,6 @@
 import TreeItem from './TreeItem'
+import Axios from "axios";
+import jwt from 'jsonwebtoken';
 
 class SoftwareTreeItem {
     constructor(data) {
@@ -25,6 +27,11 @@ class SoftwareTreeItem {
             }
         })
 
+        getUserTasks(tasks => {
+            taskItem.children = tasks;
+            taskItem.showChildrenCount = true;
+        })
+
         let observationsItemItem = new TreeItem({
             name: "Observations & Insights",
             icon: "build",
@@ -35,6 +42,22 @@ class SoftwareTreeItem {
 
         treeItems.push(appItem, taskItem, observationsItemItem);
     }
+}
+
+function getUserTasks(callback) {
+    Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+    let encoded_details = jwt.decode(sessionStorage.accessToken);
+    let systemUserID = encoded_details.USER_ID;
+
+    Axios.get(process.env.VUE_APP_API + `UserProjectTX?userID=${systemUserID}`)
+        .then(r => {
+            console.log('user tasks', r.data);
+            callback(r.data.projectTXList);
+        })
+        .catch(e => {
+            return [];
+        })
 }
 
 export default SoftwareTreeItem;

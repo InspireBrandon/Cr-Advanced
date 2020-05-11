@@ -75,12 +75,16 @@
                                 @click="distribute(projectsStatus.status,4,timelineItems[0])">Distribute</v-btn>
                             <v-btn color="blue-grey darken-3" v-if="(projectsStatus.status== 44 || routeStatus == 44)"
                                 @click="setParked()">Park</v-btn>
-                            <v-btn color="red" outline @click="sendBackToRange()" v-if="authorityType == 0">Send back to
+                            <v-btn color="red" outline @click="sendBackToRange()"
+                                v-if="authorityType == 0 && $route.params.status != 13 && $route.params.status != 24 && $route.params.status != 26">
+                                Send back to
                                 range</v-btn>
                             <v-btn color="red" outline @click="headOfficeApprove()"
-                                v-if="authorityType == 0 && projectsStatus.status== 37 || projectsStatus.status== 38">
+                                v-if="authorityType == 0 && $route.params.status != 13 && $route.params.status != 24 && $route.params.status != 26">
                                 Head office approve</v-btn>
-                            <v-btn color="red" outline @click="sendCheckPlanogram" v-if="authorityType == 0">Check
+                            <v-btn color="red" outline @click="sendCheckPlanogram"
+                                v-if="authorityType == 0 && $route.params.status != 13 && $route.params.status != 24 && $route.params.status != 26">
+                                Check
                                 Planogram</v-btn>
                         </v-toolbar>
                     </v-flex>
@@ -247,6 +251,9 @@
 
                 self.selectedProject = self.routeProjectID;
                 self.routePlanogramID = self.$route.params.planogramID
+
+                console.log("routePlanogram", self.routePlanogramID);
+
                 self.routeStatus = self.$route.params.status
                 self.onRouteEnter(function () {
                     self.selectPlanogram(self.routePlanogramID);
@@ -1095,7 +1102,15 @@
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
 
-                let request = JSON.parse(JSON.stringify(self.tmpRequest))
+                let items = self.items.filter(e => {
+                    // $route.params.status != 13 && $route.params.status != 24 && $route.params.status != 26"
+                    return e.systemFileID == self.routePlanogramID && e.status != 13 && e.status != 24 && e
+                        .status != 26;
+                });
+
+                let request = items[0]; // JSON.parse(JSON.stringify(self.currentProjectTx))
+                request.removed = null;
+                request.deleted = null;
 
                 let projectTXGroupRequest = {
                     projectID: request.project_ID
@@ -1108,6 +1123,9 @@
                         request.type = 6;
                         request.status = 37;
                         request.systemUserID = user.systemUserID;
+                        request.systemFileID = self.routePlanogramID
+
+                        console.log("PTG", request);
 
                         self.createProjectTransaction(request, newItem => {
                             self.getProjectTransactionsByProjectID(request.project_ID);
@@ -1413,13 +1431,14 @@
             headOfficeApprove() {
                 let self = this;
 
-                let request = JSON.parse(JSON.stringify(self.tmpRequest));
-
+                let request = JSON.parse(JSON.stringify(self.currentProjectTx));
                 let encoded_details = jwt.decode(sessionStorage.accessToken);
                 let systemUserID = encoded_details.USER_ID;
 
                 self.checkStartApprove(request, () => {
                     request.status = 39;
+                    request.systemUserID = request.rollingUserID;
+                    request.rollingUserID = null;
                     self.createProjectTransaction(request, newOne => {
                         self.getProjectTransactionsByProjectID(request.project_ID);
                     })
