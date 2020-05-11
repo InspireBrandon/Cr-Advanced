@@ -11,6 +11,8 @@ import Boxbase from './Boxbase.js'
 class Shelf extends Boxbase {
     constructor(params) {
         super(params)
+
+        console.log("SHELF", params);
     }
 }
 

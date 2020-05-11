@@ -16,6 +16,7 @@ import Pegboard from './Pegboard.js'
 import Rendering_LabelHolder from './Renderings/LabelHolder.js';
 import Rendering_SideFace from './Renderings/SideFace.js';
 import Rendering_ShelfEdge from './Renderings/ShelfEdge.js';
+import Rendering_BackFace from './Renderings/BackFace.js';
 
 // Models
 import FloorPlanItem from "../Models/FloorPlanItem.js";
@@ -62,18 +63,18 @@ class DrawingHelper {
                     fixture = new Rendering_LabelHolder(params);
                 }
             }break;
-            // case "SIDE": {
-            //     fixture = new Rendering_SideFace(params);
-            // }break;
+            case "SIDE": {
+                fixture = new Rendering_SideFace(params);
+            }break;
             case "BASKET": {
                 fixture = new Basket(params);
             }break;
-            case "SHELFEDGE": {
-                fixture = new Rendering_ShelfEdge(params);
-            }break;
-            case "BACK": {
-                fixture = new Rendering_ShelfEdge(params);
-            }break;
+            // case "SHELFEDGE": {
+            //     fixture = new Rendering_ShelfEdge(params);
+            // }break;
+            // case "BACK": {
+            //     fixture = new Rendering_BackFace(params);
+            // }break;
             // case "FRONT": {
             //     fixture = new Rendering_ShelfEdge(params);
             // }break;

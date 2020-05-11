@@ -15,7 +15,10 @@
                 <span @click="item.click" class="ml-1">{{item.name}}</span>
                 <input v-model="item.Comparison" @change="onComparisonSelect(item)"
                     style="margin-top: 3px; margin-left: 5px;" type="checkbox" v-if="item.allowComparison" />
-                <span @click="item.click" class="ml-1" v-if="item.showChildrenCount">({{ item.children.length }})</span>
+                <div @click="item.click" class="ml-1" v-if="item.showChildrenCount" style="display: flex;">
+                    <v-icon :color="item.children.length > 0 ? 'red' : 'grey lighten-2'" :size="14">notifications</v-icon>
+                    <div class="ml-1">({{ item.children.length }})</div>
+                </div>
                 <v-icon v-for="action in item.actions" :key="action.name" class="ml-1" size="12">{{ action.icon }}
                 </v-icon>
             </div>
