@@ -63,9 +63,9 @@ class DrawingHelper {
                     fixture = new Rendering_LabelHolder(params);
                 }
             }break;
-            // case "SIDE": {
-            //     fixture = new Rendering_SideFace(params);
-            // }break;
+            case "SIDE": {
+                fixture = new Rendering_SideFace(params);
+            }break;
             case "BASKET": {
                 fixture = new Basket(params);
             }break;
@@ -83,11 +83,15 @@ class DrawingHelper {
 
         if(fixture != undefined && fixture != null) {
             fixture.draw();
-            shadowGenerator.addShadowCaster(fixture.element)
+            // shadowGenerator.addShadowCaster(fixture.element)
 
             let children = allItems.filter(e => {
                 return e.parent_ID == params.data.id;
             })
+
+            if(fixture.data.type != 'GONDOLA' && fixture.data.type != 'OBSTRUCTION') {
+                // fixture.element.parent = fixture.data.parent.element;
+            }
 
             children.forEach(child => {
                 let fpI = new FloorPlanItem(child, fixture);

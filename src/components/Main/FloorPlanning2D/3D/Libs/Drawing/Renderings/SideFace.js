@@ -8,8 +8,8 @@ import Boxbase from '../Boxbase.js'
 
 class Rendering_SideFace extends Boxbase {
     constructor(params) {
-        params.data.height = params.data.width;
-        params.data.width = params.data.parent.data.width;
+        params.data.height = params.data.parent.data.height;
+        params.data.width = params.data.parent.data.width + 0.03;
 
         params.data.color.rotate();
         params.data.imageID.rotate();
@@ -32,7 +32,7 @@ class Rendering_SideFace extends Boxbase {
 
         self.element.position.x = self.data.parent.element.position.x;
         self.element.position.y = self.data.parent.element.position.y + ((0.5 * (self.data.parent.data.depth - self.data.depth) + self.data.offset.y) / self.pxlToMeterRatio); // (((parentY - ((self.data.depth) + self.data.y)) / self.pxlToMeterRatio) / 2);
-        self.element.position.z = self.data.parent.element.position.z;
+        self.element.position.z = self.data.parent.element.position.z - (0.1 / self.pxlToMeterRatio);
 
         if (self.data.rotation != undefined && self.data.rotation != null) {
             let xPivot = -(self.data.width / 2 / self.pxlToMeterRatio);
