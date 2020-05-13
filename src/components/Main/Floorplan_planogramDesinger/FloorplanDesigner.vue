@@ -875,7 +875,11 @@
             },
             openThreeDee() {
                 let self = this;
-                self.$refs.threeDee.show(self.fixtureHeaderID);
+                var group = self.stage.find('.planoGroup')[0];
+                let groupData = group.getClientRect();
+                
+                let drops = self.drops;
+                self.$refs.threeDee.show(self.fixtureHeaderID, drops, groupData);
             }
         },
         computed: {

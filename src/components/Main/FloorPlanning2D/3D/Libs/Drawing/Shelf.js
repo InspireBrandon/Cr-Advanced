@@ -27,9 +27,16 @@ class Shelf extends Boxbase {
         // let bottom = parentData.height; 
         let diff =  parentData.depth - self.data.y; // + (0.5 + this.data.height);
 
-        console.log('diff', parentData);
+        let extra = 0;
 
-        self.element.position.y = ((diff + (parentData.depth * 2) - (self.data.depth)) / 300);
+        if(parentData.type == 'PEGBOARD') {
+            let yDIff = parentData.parent.data.y - parentData.y;
+            let heightDIff = parentData.parent.data.depth - parentData.depth;
+            let totalDiff = heightDIff + yDIff;
+            extra = totalDiff;
+        }
+
+        self.element.position.y = ((diff + extra + (parentData.depth * 2) - (self.data.depth)) / 300);
 
         if (self.data.rotation != undefined && self.data.rotation != null) {
             let xPivot = -(self.data.width / 2 / self.pxlToMeterRatio);

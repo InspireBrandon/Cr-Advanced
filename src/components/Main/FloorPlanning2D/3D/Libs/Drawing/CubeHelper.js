@@ -79,7 +79,7 @@ function drawSide(side, parent, scene, config, data) {
             height: sidePositionDetails.height
         }, scene);
 
-        plane1.receiveShadows = true;
+        // plane1.receiveShadows = true;
         plane1.position = new BABYLON.Vector3(0, 0, 0);
         plane1.material = mat1trans;
         plane1.parent = parent;
@@ -103,7 +103,7 @@ function drawSide(side, parent, scene, config, data) {
             width: sidePositionDetails.width,
             height: sidePositionDetails.height
         }, scene, true, BABYLON.MeshBuilder.DOUBLESIDE);
-        plane1.receiveShadows = true;
+        // plane1.receiveShadows = true;
         plane1.position = new BABYLON.Vector3(0, 0, 0);
         plane1.material = mat1trans;
         plane1.parent = parent;

@@ -17,7 +17,7 @@ class Rendering_LabelHolder extends Boxbase {
 
         // self.element.position.x = (self.data.x + 0.5 * self.data.width) / self.pxlToMeterRatio;
         self.element.position.x = self.data.parent.element.position.x;
-        // self.element.position.y = self.data.parent.element.position.y + ((0.5 * (self.data.parent.data.depth - (0.5 * self.data.depth) - (self.data.parent.data.depth * 2)) + (0.5 * self.data.depth) - self.data.offset.y) / self.pxlToMeterRatio); // (((parentY - ((self.data.depth) + self.data.y)) / self.pxlToMeterRatio) / 2);
+        self.element.position.y = self.data.parent.element.position.y + ((0.5 * self.data.parent.data.depth) / self.pxlToMeterRatio) - (0.5 * self.data.depth / self.pxlToMeterRatio) - (self.data.offset.y / self.pxlToMeterRatio); // + (0.5 * self.data.parent.data.depth) / self.pxlToMeterRatio;
         self.element.position.z = self.data.parent.element.position.z - ((0.5 * self.data.parent.data.height + 0.2) / self.pxlToMeterRatio);
 
         if (self.data.rotation != undefined && self.data.rotation != null) {
