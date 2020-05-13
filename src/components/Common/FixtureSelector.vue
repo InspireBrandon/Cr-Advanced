@@ -18,13 +18,22 @@
         <v-card-text style="display: block;">
           <v-list class="pa-0" dense hover v-for="(sp, idx) in filteredSpacePlans" :key="idx">
             <v-divider v-if="!sp.archived"></v-divider>
-            <v-list-tile :class="{ 'highlighted': selectedSpacePlan == sp  }" avatar @click="selectedSpacePlan = sp" v-if="!sp.archived">
+            <v-list-tile :class="{ 'highlighted': selectedSpacePlan == sp  }" avatar @click="selectedSpacePlan = sp"
+              v-if="!sp.archived">
               <v-list-tile-content>
                 <v-list-tile-title v-text="sp.name"></v-list-tile-title>
               </v-list-tile-content>
               <v-list-tile-action>
-                <v-checkbox la label="Can Distribute" @change="setCanDistribute(sp)" v-model="sp.canDistribute"
-                  hide-details color="primary"></v-checkbox>
+                <v-layout row wrap>
+                  <v-flex>
+                    <v-checkbox la label="Is Floorplan" @change="setCanFloorplan(sp)" v-model="sp.floorplan"
+                      hide-details color="primary"></v-checkbox>
+                  </v-flex>
+                  <v-flex>
+                    <v-checkbox la label="Can Distribute" @change="setCanDistribute(sp)" v-model="sp.canDistribute"
+                      hide-details color="primary"></v-checkbox>
+                  </v-flex>
+                </v-layout>
               </v-list-tile-action>
             </v-list-tile>
           </v-list>
@@ -172,6 +181,18 @@
                 }
               })
           }
+        })
+      },
+      setCanFloorplan(sp) {
+        let self = this
+        console.log("setCanFloorplan",sp);
+        
+        self.$nextTick(() => {
+          Axios.post(process.env.VUE_APP_API +
+              `SystemFile/Setfloorplan?db=CR-DEVINSPIRE&systemFileID=${sp.id}&floorplan=${sp.floorplan}`)
+            .then(r => {
+              console.log(r.data);
+            })
         })
       },
       setCanDistribute(sp) {
