@@ -27,6 +27,7 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
+                <v-btn @click="openAdmin">manage admin</v-btn>
             </v-toolbar-items>
             <v-spacer></v-spacer>
             <v-toolbar-title>
@@ -78,7 +79,8 @@
                                     <v-spacer></v-spacer>
                                     <v-list-tile-actions>
                                         <v-btn small color="primary" @click="getPromotionByID(item)">Edit</v-btn>
-                                        <v-btn small color="primary" @click="openCatgeories(item.id)">Categories & resources</v-btn>
+                                        <v-btn small color="primary" @click="openCatgeories(item.id)">Categories &
+                                            resources</v-btn>
                                         <v-btn small color="primary">Event Planning</v-btn>
                                         <v-btn small color="primary">Costs</v-btn>
                                         <v-btn small color="primary">Item Selection</v-btn>
@@ -246,6 +248,7 @@
         </v-container>
         <PromotionSelector ref="promotionSelector" />
         <Spinner ref="spinner"></Spinner>
+        <AdminModal ref="AdminModal" />
     </v-card>
 </template>
 
@@ -253,12 +256,15 @@
     import Axios from 'axios'
     import PromotionSelector from './PromotionSelector.vue'
     import Spinner from "@/components/Common/Spinner";
+    import AdminModal from "./AdminModal.vue";
+
 
     export default {
         name: 'promotions',
         components: {
             PromotionSelector,
-            Spinner
+            Spinner,
+            AdminModal
         },
         data() {
             return {
@@ -326,7 +332,13 @@
             this.getPromotionTypes();
         },
         methods: {
-            openCatgeories(id){
+            openAdmin() {
+                let self = this
+                self.$refs.AdminModal.open(cb => {
+
+                })
+            },
+            openCatgeories(id) {
                 let self = this
                 self.$router.push(`/Promotions/CategoriesAndResources/${id}`)
                 // /Promotions/CategoriesAndResources/:promotionID
