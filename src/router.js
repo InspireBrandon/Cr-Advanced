@@ -72,7 +72,7 @@ import StoreClusters from '@/components/Apps/DataPreparation/Types/Store_Cluster
 import PlanogramMaintenance from '@/components/Apps/DataPreparation/Types/PlanogramMaintenance/Index.vue';
 import ProductCatalogue from '@/components/Apps/DataPreparation/Types/ProductCatalogue/ProductCatalogue.vue';
 import CategoryCode from '@/components/Apps/DataPreparation/Types/CategoryCode/CategoryCode.vue';
-
+import TestRange from '@/components/Apps/DataPreparation/Types/Test_Range/Index.vue'
 
 
 //projectPlanning
@@ -582,6 +582,11 @@ export default new Router({
                 path: 'Store',
                 name: 'Store',
                 component: StoreMaint
+              },
+              {
+                path: 'TestRange',
+                name: 'TestRange',
+                component: TestRange
               },
               {
                 path: 'Geographic_Location',

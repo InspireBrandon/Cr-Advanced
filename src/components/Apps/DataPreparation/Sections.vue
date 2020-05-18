@@ -162,6 +162,10 @@
                         name: 'Planogram Maintenance',
                         route: 'PlanogramMaintenance'
                     }),
+                    new navItem({
+                        name: 'Test Range',
+                        route: 'TestRange'
+                    }),
                 ],
                 period: [
                     new navItem({

@@ -164,6 +164,21 @@
         }
     },
     {
+        "headerName": "Test Indicator",
+        "field": "test_Range_Indicator",
+        "editable": true,
+        "cellEditor": "agRichSelectCellEditor",
+        "cellEditorParams": {
+            "values": ["YES", "NO", "SELECTED", "SELECT"]
+        },
+        "cellStyle": {
+            "background-color": "#E3F2FD"
+        },
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
         "headerName": "Sales",
         "field": "sales_Retail",
         "chartDataType": "series",

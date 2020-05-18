@@ -110,8 +110,6 @@
             },
             getStores() {
                 let self = this
-
-
             },
             getCategories() {
                 let self = this

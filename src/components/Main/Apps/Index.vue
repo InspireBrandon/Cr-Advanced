@@ -196,7 +196,7 @@
 
                 switch (app.system_code) {
                     case "RANGE-PLANNING": {
-                        app["demo"] = true;
+                        app["demo"] = false;
                     }
                     break;
                 case "SPACE-PLANNING": {
