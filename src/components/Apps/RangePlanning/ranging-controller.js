@@ -5,9 +5,11 @@
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
 import csvToDataObject from '@/libs/helpers/csvToDataObject.js'
 import Axios from 'axios';
+import Vue from 'vue';
+
 
 class RangingController {
-  constructor(rangingData) {
+  constructor(rangingData, vueInstance) {
     let self = this;
 
     self.allRangeProducts = rangingData.allRangeProducts;
@@ -25,6 +27,23 @@ class RangingController {
     self.totalsData = null;
     self.endingStock = null;
     self.categoryCharacteristics = rangingData.categoryCharacteristics;
+
+    console.log(self.clusterData);
+
+    // SET TEST INDICATORS
+    self.storeSales.forEach(store => {
+      store.salesData.forEach(storeSale => {
+        // SET TEST INDICATORS
+
+        if (storeSale.test_Range_Indicator == undefined || storeSale.test_Range_Indicator == null) {
+          Vue.set(storeSale, 'test_Range_Indicator', 'NO');
+        }
+
+        if (storeSale.test_Range_Indicator_ID == undefined || storeSale.test_Range_Indicator_ID == null) {
+          Vue.set(storeSale, 'test_Range_Indicator_ID', 1);
+        }
+      });
+    });
   }
 
   getClusterData() {
@@ -41,7 +60,8 @@ class RangingController {
     Axios.post(process.env.VUE_APP_API + `Sales_Monthly_Total?period_from_id=${self.dateFrom}&period_to_id=${self.dateTo}`).then(r => {
       self.totalsData = r.data.sales_Monthly_Total_List;
       self.getEndingStock(type, () => {
-        callback();
+        self.getTemporaryClusters(callback);
+        // callback();
       })
     })
   }
@@ -63,11 +83,9 @@ class RangingController {
     let self = this;
     let retval = [];
 
-    console.log("clusterType", clusterType, clusterID);
-
-    if(clusterType == "stores") {
+    if (clusterType == "stores") {
       self.endingStock.forEach(es => {
-        if(es.store_ID == clusterID) {
+        if (es.store_ID == clusterID) {
           retval.push(es)
         }
       })
@@ -82,6 +100,28 @@ class RangingController {
     }
 
     return retval;
+  }
+
+  getTemporaryClusters(callback) {
+    let self = this;
+
+    let tempClusters = []
+
+    Axios.get(process.env.VUE_APP_API + `Clusters/TemporaryCluster`)
+      .then(r => {
+        tempClusters.push({
+          clusterID: 1,
+          clusterName: 'TEST',
+          clusterStores: r.data
+        })
+
+        console.log(r.data);
+
+        tempClusters = r.data;
+
+        Vue.set(self.clusterData, 'tempClusters', tempClusters);
+        callback();
+      })
   }
 
   getRangingFile() {
@@ -179,6 +219,27 @@ class RangingController {
     return finalArr
   }
 
+  getTestImportCSV() {
+    let finalArr = [];
+
+    for (let i = 0; i < this.storeSales.length; i++) {
+      let store = this.storeSales[i];
+      for (let j = 0; j < store.salesData.length; j++) {
+        let product = store.salesData[j];
+
+        let storeIndicator = {
+          Store_ID: store.storeID,
+          Product_ID: product.productID,
+          Store_Range_Indicator_ID: product.test_Range_Indicator_ID
+        }
+
+        finalArr.push(storeIndicator);
+      }
+    }
+
+    return finalArr
+  }
+
   getIndicatorsByCluster(clusterData, clusterType, clusterID) {
     let self = this;
 
@@ -243,6 +304,10 @@ class RangingController {
     setStoreIndicatorByProductID(stores, this.storeSales, productID);
   }
 
+  setTestStoreIndicatorByProductID(stores, productID) {
+    setTestStoreIndicatorByProductID(stores, this.storeSales, productID);
+  }
+
   getAllProducts() {
     return this.allRangeProducts;
   }
@@ -297,6 +362,46 @@ class RangingController {
               case "SELECT": {
                 product.store_Range_Indicator = "SELECTED";
                 product.store_Range_Indicator_ID = 3;
+                product["updated"] = true;
+              }
+              break;
+              }
+            }
+          })
+        }
+      });
+    })
+  }
+
+  setTestClusterIndicator(clusterType, clusterID, productID, indicator) {
+    let stores = getStoresByCluster(this.clusterData, clusterType, clusterID);
+
+    stores.forEach(store => {
+      this.storeSales.forEach(storeSales => {
+        if (store.storeID == storeSales.storeID) {
+
+          let products = storeSales.salesData;
+
+          products.forEach(product => {
+
+            if (product.productID == productID) {
+
+              switch (indicator) {
+                case "YES": {
+                  product.test_Range_Indicator = indicator;
+                  product.test_Range_Indicator_ID = 2;
+                  product["updated"] = true;
+                }
+                break;
+              case "NO": {
+                product.test_Range_Indicator = indicator;
+                product.test_Range_Indicator_ID = 1;
+                product["updated"] = true;
+              }
+              break;
+              case "SELECT": {
+                product.test_Range_Indicator = "SELECTED";
+                product.test_Range_Indicator_ID = 3;
                 product["updated"] = true;
               }
               break;
@@ -845,10 +950,10 @@ function calculateLostSales(storeSales, productID, clusters, clusterType, cluste
     let oosDays = 0;
 
     storeSales.forEach(store => {
-      if(store.storeID == clusterStore.storeID) {
+      if (store.storeID == clusterStore.storeID) {
         store.salesData.forEach(product => {
           if (product.productID == productID) {
-            if(parseFloat(product.sales_Retail) > 0) {
+            if (parseFloat(product.sales_Retail) > 0) {
               productSales += parseFloat(product.sales_Retail);
             }
 
@@ -860,7 +965,7 @@ function calculateLostSales(storeSales, productID, clusters, clusterType, cluste
       }
     })
 
-    if(productSales > 0) {
+    if (productSales > 0) {
       let days = 30 * 6;
       let lostSales = productSales / days * oosDays;
       totalLostSales += lostSales;
@@ -879,10 +984,10 @@ function calculateLostUnits(storeSales, productID, clusters, clusterType, cluste
     let oosDays = 0;
 
     storeSales.forEach(store => {
-      if(store.storeID == clusterStore.storeID) {
+      if (store.storeID == clusterStore.storeID) {
         store.salesData.forEach(product => {
           if (product.productID == productID) {
-            if(parseFloat(product.sales_Units) > 0) {
+            if (parseFloat(product.sales_Units) > 0) {
               productUnits += parseFloat(product.sales_Units);
             }
 
@@ -894,7 +999,7 @@ function calculateLostUnits(storeSales, productID, clusters, clusterType, cluste
       }
     })
 
-    if(productUnits > 0) {
+    if (productUnits > 0) {
       let days = 30 * 6;
       let lostSales = productUnits / days * oosDays;
       totalLostSales += lostSales;
@@ -913,10 +1018,10 @@ function calculateLostProfit(storeSales, productID, clusters, clusterType, clust
     let oosDays = 0;
 
     storeSales.forEach(store => {
-      if(store.storeID == clusterStore.storeID) {
+      if (store.storeID == clusterStore.storeID) {
         store.salesData.forEach(product => {
           if (product.productID == productID) {
-            if(parseFloat(product.sales_Retail) > 0) {
+            if (parseFloat(product.sales_Retail) > 0) {
               productProfit += parseFloat(product.sales_Retail) - parseFloat(product.sales_Cost);
             }
 
@@ -928,7 +1033,7 @@ function calculateLostProfit(storeSales, productID, clusters, clusterType, clust
       }
     })
 
-    if(productProfit > 0) {
+    if (productProfit > 0) {
       let days = 30 * 6;
       let lostSales = productProfit / days * oosDays;
       totalLostSales += lostSales;
@@ -947,10 +1052,10 @@ function calculateLostCost(storeSales, productID, clusters, clusterType, cluster
     let oosDays = 0;
 
     storeSales.forEach(store => {
-      if(store.storeID == clusterStore.storeID) {
+      if (store.storeID == clusterStore.storeID) {
         store.salesData.forEach(product => {
           if (product.productID == productID) {
-            if(parseFloat(product.sales_Cost) > 0) {
+            if (parseFloat(product.sales_Cost) > 0) {
               productCost += parseFloat(product.sales_Cost);
             }
 
@@ -962,7 +1067,7 @@ function calculateLostCost(storeSales, productID, clusters, clusterType, cluster
       }
     })
 
-    if(productCost > 0) {
+    if (productCost > 0) {
       let days = 30 * 6;
       let lostSales = productCost / days * oosDays;
       totalLostSales += lostSales;
@@ -1263,7 +1368,7 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
       sales_retail: parseFloat((sales_retail).toFixed(0)),
       sales_cost: parseFloat((sales_cost).toFixed(0)),
       sales_units: parseFloat((sales_units).toFixed(0)),
-      sales_profit:parseFloat((sales_profit).toFixed(0)),
+      sales_profit: parseFloat((sales_profit).toFixed(0)),
       stock_units: parseFloat(new_Stock_Units.toFixed(0)),
       stock_cost: parseFloat(new_Stock_Cost.toFixed(0)),
       oos_days: parseFloat(oos_days.toFixed(0)),
@@ -1292,7 +1397,7 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
       sales_contribution: parseFloat(sales_contribution.toFixed(0)),
       units_contribution: parseFloat(units_contribution.toFixed(0)),
       profit_contribution: parseFloat(profit_contribution.toFixed(0))
-    }, getProductIndicator(product.productID, storeSales, stores)))
+    }, getProductIndicator(product.productID, storeSales, stores), getTestProductIndicator(product.productID, storeSales, stores)))
   }
 
   productSales.sort((a, b) => (parseFloat(a.sales_potential) > parseFloat(b.sales_potential)) ? 1 : ((parseFloat(b.sales_potential) > parseFloat(a.sales_potential)) ? -1 : 0));
@@ -1387,7 +1492,7 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
     let lost_sales = (sales_retail * 6 / (totalDays - calculated_oos_days.oos_days) * calculated_oos_days.oos_days / 6);
     let lost_units = (sales_units * 6 / (totalDays - calculated_oos_days.oos_days)) * calculated_oos_days.oos_days / 6;
     let lost_profit = (sales_profit * 6 / (totalDays - calculated_oos_days.oos_days)) * calculated_oos_days.oos_days / 6
-    let lost_cost =  (sales_cost * 6 / (totalDays - calculated_oos_days.oos_days)) * calculated_oos_days.oos_days / 6;
+    let lost_cost = (sales_cost * 6 / (totalDays - calculated_oos_days.oos_days)) * calculated_oos_days.oos_days / 6;
 
     let sales_potential = 0;
     let volume_potential = 0;
@@ -1457,7 +1562,7 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
       sales_contribution: parseFloat(sales_contribution.toFixed(0)),
       units_contribution: parseFloat(units_contribution.toFixed(0)),
       profit_contribution: parseFloat(profit_contribution.toFixed(0))
-    }, getProductIndicator(product.productID, storeSales, stores)))
+    }, getProductIndicator(product.productID, storeSales, stores), getTestProductIndicator(product.productID, storeSales, stores)))
   }
 
   productSales.sort((a, b) => (parseFloat(a.sales_potential) > parseFloat(b.sales_potential)) ? 1 : ((parseFloat(b.sales_potential) > parseFloat(a.sales_potential)) ? -1 : 0));
@@ -1496,6 +1601,27 @@ function setStoreIndicatorByProductID(stores, storeSales, productID) {
               product.store_Range_Indicator = "NO"
               product.store_Range_Indicator_ID = 1;
               product["updated"] = true;
+            }
+          }
+        })
+      }
+    })
+  })
+}
+
+function setTestStoreIndicatorByProductID(stores, storeSales, productID) {
+
+  stores.forEach(store => {
+    storeSales.forEach(storeSale => {
+      if (store.storeID == storeSale.storeID) {
+        storeSale.salesData.forEach(product => {
+          if (product.productID == productID) {
+            if (store.selected) {
+              product.test_Range_Indicator = "YES"
+              product.test_Range_Indicator_ID = 2;
+            } else {
+              product.test_Range_Indicator = "NO"
+              product.test_Range_Indicator_ID = 1;
             }
           }
         })
@@ -1551,14 +1677,63 @@ function getProductIndicator(productID, storeSales, stores) {
   return indicator;
 }
 
+function getTestProductIndicator(productID, storeSales, stores) {
+  let indicator = "NO";
+  let indicatorComparer = "";
+  let select = true;
+
+  for (let i = 0; i < storeSales.length; i++) {
+    let storeSale = storeSales[i];
+
+    if (storeInCluster(storeSale.storeID, stores)) {
+      // Check to see if select
+      for (let j = 0; j < storeSale.salesData.length; j++) {
+        const saleItem = storeSale.salesData[j];
+        if (saleItem.productID == productID) {
+          if (saleItem.test_Range_Indicator != "SELECTED")
+            select = false;
+        }
+      }
+
+      if (!select) {
+        for (let j = 0; j < storeSale.salesData.length; j++) {
+          if (indicator != "SELECTED") {
+            const saleItem = storeSale.salesData[j];
+            if (saleItem.productID == productID) {
+
+              let sri = saleItem.test_Range_Indicator;
+
+              if (indicatorComparer == "") {
+                indicatorComparer = sri;
+                indicator = sri;
+              } else {
+
+                if (indicatorComparer != sri) {
+                  indicator = "SELECTED"
+                }
+              }
+            }
+          }
+        }
+      } else {
+        indicator = "SELECT";
+      }
+    }
+  }
+
+  return indicator;
+}
+
 // Helper function to format numbers
 function numberifySales(string) {
   return parseFloat(string);
 }
 
 // Class for range product
-function RangeProduct(productData, salesData, indicator) {
+function RangeProduct(productData, salesData, indicator, testIndicator) {
   let self = this;
+
+  console.log('testIndicator', testIndicator)
 
   for (var prop in productData) {
     self[prop] = productData[prop]
@@ -1603,6 +1778,7 @@ function RangeProduct(productData, salesData, indicator) {
   self.autoRangeOneItem = false;
   self.alt_Store_Range_Indicator = "";
   self.alt_Store_Range_Indicator_ID = null;
+  self.test_Range_Indicator = testIndicator;
 }
 
 function storeStocksProduct(storeSales, storeID, productID) {

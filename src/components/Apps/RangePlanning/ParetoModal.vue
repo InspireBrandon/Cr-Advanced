@@ -62,13 +62,12 @@
                 chart = null;
 
                 if (this.chart) {
-                    console.log("[Destroyed]");
                     this.chart.dispose();
                     this.chart = null;
                 }
                 this.dialog = false
             },
-            open(data, key_value, callback) {
+            open(data, key_value, testMode, callback) {
                 let self = this
 
                 self.fact = key_value.value
@@ -78,7 +77,7 @@
 
                 self.callback = callback;
                 setTimeout(() => {
-                    self.drawChart(data, key_value);
+                    self.drawChart(data, key_value, testMode);
                 }, 300);
             },
             closeAndSendRowdata(data) {
@@ -96,8 +95,6 @@
                 self.item_index = item_index
                 self.item_name = item_name
                 self.$refs.Dialog.openDialog(obj)
-                console.log("[CLICK EVT]", item_index + " || " + item_name)
-
             },
             HandleRowData() {
                 let self = this
@@ -108,24 +105,18 @@
                         tmp.push(element)
                     }
                 }
-                console.log(tmp.length);
-                console.log("handleing rowdata");
+
                 self.closeAndSendRowdata(tmp)
             },
-            drawChart(data, key_value) {
+            drawChart(data, key_value, testMode) {
                 let self = this;
-                console.log(data);
-                console.log(key_value);
 
                 let chart = am4core.create("chartdiv", am4charts.XYChart);
 
                 chart.events.on("hit", function (event) {
-                    console.log("[CLICK EVT]", event)
                     this.handleClick(data, event.target.series.values[1].tooltipDataItem.categoryX, event.target
                         .series.values[1].tooltipDataItem.categoryz)
                 }, this);
-
-                console.log("sort function");
 
                 let sortedData = data.sort(function (a, b) {
                     return b[key_value.value] - a[key_value.value];
@@ -136,7 +127,6 @@
                 prepareParetoData();
 
                 function prepareParetoData() {
-                    console.log("Pareto function");
 
                     let total = 0;
 
@@ -152,14 +142,13 @@
                     let sum = 0;
                     for (var i = 0; i < chart.data.length; i++) {
                         let value = chart.data[i][key_value.value];
-                        chart.data[i].color = getColors(data[i].store_Range_Indicator)
+                        chart.data[i].color = getColors(data[i][testMode ? 'test_Range_Indicator' : 'store_Range_Indicator'])
                         sum += value;
                         chart.data[i].pareto = sum / total * 100;
 
                     }
                 }
                 // Create axes
-                console.log("after Pareto function");
                 let categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
                 categoryAxis.dataFields.category = key_value.altValue;
                 categoryAxis.renderer.grid.template.location = 0;

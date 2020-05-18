@@ -44,6 +44,9 @@
             <v-list-tile :disabled="rowData.length < 1" @click="updateStoreIndicators">
               <v-list-tile-title>Update Indicators</v-list-tile-title>
             </v-list-tile>
+            <v-list-tile :disabled="rowData.length < 1" @click="updateTestIndicators">
+              <v-list-tile-title>Update Test Indicators</v-list-tile-title>
+            </v-list-tile>
             <v-list-tile :disabled="rowData.length < 1" @click="updateProductDetails">
               <v-list-tile-title>Update Product Details</v-list-tile-title>
             </v-list-tile>
@@ -70,6 +73,9 @@
             </v-list-tile>
             <v-list-tile @click="indicatorView">
               <v-list-tile-title>Indicators</v-list-tile-title>
+            </v-list-tile>
+            <v-list-tile @click="toggleTestMode">
+              <v-list-tile-title>Test Mode</v-list-tile-title>
             </v-list-tile>
           </v-list>
         </v-menu>
@@ -202,6 +208,10 @@
           </div>
           <div style="margin-left: 10px;">
             <span>{{ selectedItems.length }} Selected</span>
+          </div>
+          <v-spacer></v-spacer>
+          <div style="margin-left: 10px;">
+            <span>Test Mode: {{ testMode ? 'On' : 'Off' }}</span>
           </div>
         </v-toolbar>
       </v-layout>
@@ -348,6 +358,7 @@
     },
     data() {
       return {
+        testMode: false,
         systemFileID: null,
         showNote: false,
         note: "",
@@ -451,6 +462,10 @@
           {
             text: "Custom Cluster",
             value: "custom"
+          },
+          {
+            text: "Test Cluster",
+            value: "temp"
           }
         ],
         selectedClusterOption: "allStores",
@@ -461,7 +476,8 @@
           department: [],
           regional: [],
           store: [],
-          stores: []
+          stores: [],
+          temp: []
         },
         selectedPlanogram: null,
         selectedDateRange: null,
@@ -497,6 +513,14 @@
       self.getStores();
     },
     methods: {
+      toggleTestMode() {
+        let self = this;
+
+        self.testMode = !self.testMode;
+
+        self.columnApi.setColumnVisible('store_Range_Indicator', !self.testMode);
+        self.columnApi.setColumnVisible('test_Range_Indicator', self.testMode);
+      },
       getEndingStock(callback) {
         let self = this;
 
@@ -960,30 +984,70 @@
         let self = this;
 
         self.rowData.forEach(el => {
-          if (el.alt_Store_Range_Indicator == indicator) {
-            self.rangingController.setClusterIndicator(
-              self.selectedClusterType,
-              self.selectedClusterOption,
-              el.productID,
-              indicator
-            );
+          if (self.testMode) {
+            if(indicator == 'YES' && (el.autoRangeOneItem || el.autoRangeItem)) {
+              self.rangingController[self.testMode ? 'setTestClusterIndicator' : 'setClusterIndicator'](
+                self.selectedClusterType,
+                self.selectedClusterOption,
+                el.productID,
+                indicator
+              );
 
-            self.gridApi.forEachNodeAfterFilter((node, idx) => {
-              if (node.data.productID == el.productID) {
-                node.setDataValue("alt_Store_Range_Indicator", indicator);
-                node.setDataValue("store_Range_Indicator", indicator);
-                node.setDataValue(
-                  "alt_Store_Range_Indicator_ID",
-                  indicator == "YES" ? 2 : 1
-                );
-                node.setDataValue(
-                  "store_Range_Indicator_ID",
-                  indicator == "YES" ? 2 : 1
-                );
-              }
-            });
+              self.gridApi.forEachNodeAfterFilter((node, idx) => {
+                if (node.data.productID == el.productID) {
+                  node.setDataValue("alt_Store_Range_Indicator", indicator);
+                  node.setDataValue(self.testMode ? "test_Range_Indicator" : "store_Range_Indicator",
+                  indicator);
+                  node.setDataValue("alt_Store_Range_Indicator_ID", indicator == "YES" ? 2 : 1);
+                  node.setDataValue(self.testMode ? "test_Range_Indicator_ID" : "store_Range_Indicator_ID",
+                    indicator == "YES" ? 2 : 1);
+                }
+              });
 
-            self.gridApi.redrawRows();
+              self.gridApi.redrawRows();
+            } else if(indicator == 'NO' && (!el.autoRangeOneItem && !el.autoRangeItem)) {
+              self.rangingController[self.testMode ? 'setTestClusterIndicator' : 'setClusterIndicator'](
+                self.selectedClusterType,
+                self.selectedClusterOption,
+                el.productID,
+                indicator
+              );
+
+              self.gridApi.forEachNodeAfterFilter((node, idx) => {
+                if (node.data.productID == el.productID) {
+                  node.setDataValue("alt_Store_Range_Indicator", indicator);
+                  node.setDataValue(self.testMode ? "test_Range_Indicator" : "store_Range_Indicator",
+                  indicator);
+                  node.setDataValue("alt_Store_Range_Indicator_ID", indicator == "YES" ? 2 : 1);
+                  node.setDataValue(self.testMode ? "test_Range_Indicator_ID" : "store_Range_Indicator_ID",
+                    indicator == "YES" ? 2 : 1);
+                }
+              });
+
+              self.gridApi.redrawRows();
+            }
+          } else {
+            if (el.alt_Store_Range_Indicator == indicator) {
+              self.rangingController[self.testMode ? 'setTestClusterIndicator' : 'setClusterIndicator'](
+                self.selectedClusterType,
+                self.selectedClusterOption,
+                el.productID,
+                indicator
+              );
+
+              self.gridApi.forEachNodeAfterFilter((node, idx) => {
+                if (node.data.productID == el.productID) {
+                  node.setDataValue("alt_Store_Range_Indicator", indicator);
+                  node.setDataValue(self.testMode ? "test_Range_Indicator" : "store_Range_Indicator",
+                  indicator);
+                  node.setDataValue("alt_Store_Range_Indicator_ID", indicator == "YES" ? 2 : 1);
+                  node.setDataValue(self.testMode ? "test_Range_Indicator_ID" : "store_Range_Indicator_ID",
+                    indicator == "YES" ? 2 : 1);
+                }
+              });
+
+              self.gridApi.redrawRows();
+            }
           }
         });
       },
@@ -1007,9 +1071,10 @@
           altRowData.forEach(element => {
             self.rowData.forEach(el => {
               if (el.productID == element.productID) {
-                el.alt_Store_Range_Indicator = element.store_Range_Indicator;
-                el.alt_Store_Range_Indicator_ID =
-                  element.store_Range_Indicator_ID;
+                el.alt_Store_Range_Indicator = self.testMode ? element.test_Range_Indicator : element
+                  .store_Range_Indicator;
+                el.alt_Store_Range_Indicator_ID = self.testMode ? element.test_Range_Indicator_ID : element
+                  .store_Range_Indicator_ID;
               }
             });
           });
@@ -1064,9 +1129,10 @@
             rangeName: self.generateFileName(),
             percent: "percent"
           },
+          self.testMode,
           callback => {
             self.rowData.forEach(rowitem => {
-              self.rangingController.setClusterIndicator(
+              self.rangingController[self.testMode ? 'setTestClusterIndicator' : 'setClusterIndicator'](
                 self.selectedClusterType,
                 self.selectedClusterOption,
                 rowitem.productID,
@@ -1077,7 +1143,7 @@
             callback.forEach(el => {
               self.rowData.forEach(rowitem => {
                 if (el.productID == rowitem.productID) {
-                  self.rangingController.setClusterIndicator(
+                  self.rangingController[self.testMode ? 'setTestClusterIndicator' : 'setClusterIndicator'](
                     self.selectedClusterType,
                     self.selectedClusterOption,
                     rowitem.productID,
@@ -1433,7 +1499,7 @@
             });
           }
         };
-        self.$refs.rangeSelectorModal.show(fileID => {
+        self.$refs.rangeSelectorModal.show((fileID, fileName) => {
 
           self.systemFileID = fileID;
 
@@ -1459,7 +1525,14 @@
               "CATEGORY";
 
             self.fileData.retailChainID = r.data.retailChainID;
-            self.fileData.retailChainDisplayname = r.data.retailChainDisplayname;
+
+            let retailChainName = r.data.retailChainDisplayname;
+
+            if (retailChainName == undefined || retailChainName == null || retailChainName == '') {
+              retailChainName = fileName.split(" - ")[0];
+            }
+
+            self.fileData.retailChainDisplayname = retailChainName;
 
             self.getHelpFile();
 
@@ -2140,7 +2213,7 @@
               }
             };
 
-            (self.columnDefs[17] = {
+            self.columnDefs[17] = {
               headerName: "Indicator",
               field: "store_Range_Indicator",
               editable: true,
@@ -2163,12 +2236,58 @@
                   };
                 }
               }
-            }),
+            };
+
+            self.columnDefs[18] = {
+              headerName: "Test Indicator",
+              field: "test_Range_Indicator",
+              hide: true,
+              editable: true,
+              cellEditor: "agRichSelectCellEditor",
+              cellEditorParams: {
+                values: self.indicatorOptions
+              },
+              cellStyle: function (params) {
+                if (params.data.autoRangeOneItem && params.data.autoRangeItem) {
+                  return {
+                    backgroundColor: "#96bbde"
+                  };
+                } else if (params.data.autoRangeOneItem) {
+                  return {
+                    backgroundColor: "#afc6dc"
+                  };
+                } else {
+                  return {
+                    backgroundColor: "#dcdcdc"
+                  };
+                }
+              }
+            };
+
             resolve(true);
           } catch (exc) {
             reject();
           }
         });
+      },
+      updateTestIndicators() {
+        let self = this;
+
+        let updatedIndicators = self.rangingController.getTestImportCSV();
+        console.table(updatedIndicators);
+        self.$refs.spinner.show();
+
+        Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+        Axios.post(process.env.VUE_APP_API + "TestIndicator", updatedIndicators)
+          .then(r => {
+            self.$refs.spinner.hide();
+            alert("Successfully updated test indicators!");
+          })
+          .catch(e => {
+            self.$refs.spinner.hide();
+            alert("Failed to update test indicators");
+          })
       },
       updateStoreIndicators() {
         let self = this;
@@ -2263,6 +2382,15 @@
           if (element.clusterStores.length > 0)
             self.clusterOptions.store.push(new textValue(element));
         });
+
+        self.clusterOptions.temp = [];
+
+        console.log('data before crash', data)
+
+        data.tempClusters.forEach(element => {
+          if (element.clusterStores.length > 0)
+            self.clusterOptions.temp.push(new textValue(element));
+        });
       },
       onSelectionChanged(e) {
         let self = this;
@@ -2273,7 +2401,7 @@
         let self = this;
 
         self.selectedItems.forEach(el => {
-          self.rangingController.setClusterIndicator(
+          self.rangingController[self.testMode ? 'setTestClusterIndicator' : 'setClusterIndicator'](
             self.selectedClusterType,
             self.selectedClusterOption,
             el.data.productID,
@@ -2336,7 +2464,7 @@
               );
             }
           }
-        } else {
+        } else if (field == "store_Range_Indicator") {
           if (e.oldValue != e.newValue) {
             if (self.selectedClusterType == "stores") {
               let store = self.selectedClusterOption;
@@ -2406,7 +2534,7 @@
                   }
                 );
               } else {
-                self.rangingController.setClusterIndicator(
+                self.rangingController[self.testMode ? 'setTestClusterIndicator' : 'setClusterIndicator'](
                   self.selectedClusterType,
                   self.selectedClusterOption,
                   e.data.productID,
@@ -2418,6 +2546,100 @@
 
                 self.rowData.forEach(el => {
                   if (el.store_Range_Indicator == "YES") {
+                    self.ais_Sales = (
+                      parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)
+                    ).toFixed(2);
+                    self.ais_SalesPotential = (
+                      parseFloat(self.ais_SalesPotential) +
+                      parseFloat(el.sales_potential)
+                    ).toFixed(2);
+                  }
+                });
+              }
+            }
+          }
+        } else if (field == "test_Range_Indicator") {
+          if (e.oldValue != e.newValue) {
+            if (self.selectedClusterType == "stores") {
+              let store = self.selectedClusterOption;
+              let stores = [{
+                storeID: store,
+                selected: e.newValue == "YES"
+              }];
+
+              self.rangingController.setTestStoreIndicatorByProductID(
+                stores,
+                e.data.productID
+              );
+            } else {
+              if (e.newValue == "SELECTED") {
+                let stores = self.rangingController.getStoresByCluster(
+                  self.selectedClusterType,
+                  self.selectedClusterOption
+                );
+
+                let tmpStores = [];
+
+                stores.forEach(el => {
+                  tmpStores.push({
+                    storeID: el.storeID,
+                    storeName: el.storeName,
+                    selected: false
+                  });
+                });
+
+                self.$refs.storeIndicatorSelector.show(
+                  tmpStores,
+                  self.selectedClusterType,
+                  self.selectedClusterOption,
+                  newStores => {
+                    self.rangingController.setTestStoreIndicatorByProductID(
+                      newStores,
+                      e.data.productID
+                    );
+
+                    if (self.selectedClusterType == "stores") {
+                      self.rowData = self.rangingController.getSalesDataByStore(
+                        self.selectedClusterOption,
+                        self.autoRangeData
+                      );
+                    } else {
+                      self.rowData = self.rangingController.getSalesDataByCluster(
+                        self.selectedClusterType,
+                        self.selectedClusterOption,
+                        self.autoRangeData
+                      );
+                    }
+
+                    self.ais_Sales = 0;
+                    self.ais_SalesPotential = 0;
+
+                    self.rowData.forEach(el => {
+                      if (el.test_Range_Indicator == "YES") {
+                        self.ais_Sales = (
+                          parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)
+                        ).toFixed(2);
+                        self.ais_SalesPotential = (
+                          parseFloat(self.ais_SalesPotential) +
+                          parseFloat(el.sales_potential)
+                        ).toFixed(2);
+                      }
+                    });
+                  }
+                );
+              } else {
+                self.rangingController[self.testMode ? 'setTestClusterIndicator' : 'setClusterIndicator'](
+                  self.selectedClusterType,
+                  self.selectedClusterOption,
+                  e.data.productID,
+                  e.newValue
+                );
+
+                self.ais_Sales = 0;
+                self.ais_SalesPotential = 0;
+
+                self.rowData.forEach(el => {
+                  if (el.test_Range_Indicator == "YES") {
                     self.ais_Sales = (
                       parseFloat(self.ais_Sales) + parseFloat(el.sales_Retail)
                     ).toFixed(2);

@@ -96,7 +96,7 @@
         } else {
           self.dialog = false;
 
-          self.afterComplete(self.selectedRange.id);
+          self.afterComplete(self.selectedRange.id, self.selectedRange.name);
         }
       },
       deleteRangeFile() {
