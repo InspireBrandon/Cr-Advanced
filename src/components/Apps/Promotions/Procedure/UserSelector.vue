@@ -1,5 +1,5 @@
 <template>
-    <v-menu offset-y :close-on-content-click="false" v-model="menu">
+    <v-menu offset-y :close-on-content-click="false">
         <template v-slot:activator="{ on }">
             <div v-on="on" style="cursor: pointer;">Click to select...</div>
         </template>
@@ -52,8 +52,7 @@
                 stage: 0,
                 selected: {
                     adminGroup: null,
-                    user: null,
-                    menu: false
+                    user: null
                 }
             };
         },
