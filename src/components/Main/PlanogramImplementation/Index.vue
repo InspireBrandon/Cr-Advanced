@@ -1406,24 +1406,28 @@
             sendBackToRange() {
                 let self = this;
 
-                let request = JSON.parse(JSON.stringify(self.tmpRequest));
+                self.$refs.notesModal.show("Notes", notes => {
+                    let request = JSON.parse(JSON.stringify(self.tmpRequest));
 
-                let encoded_details = jwt.decode(sessionStorage.accessToken);
-                let systemUserID = encoded_details.USER_ID;
+                    let encoded_details = jwt.decode(sessionStorage.accessToken);
+                    let systemUserID = encoded_details.USER_ID;
 
-                let projectTXGroupRequest = {
-                    projectID: request.project_ID
-                }
+                    let projectTXGroupRequest = {
+                        projectID: request.project_ID
+                    }
 
-                self.getApprovalUser(request.project_ID, null, user => {
-                    self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
-                        request.systemUserID = user;
-                        request.type = 2;
-                        request.status = 7;
-                        request.actionedByUserID = null;
-                        request.projectTXGroup_ID = newGroup.id;
-                        self.createProjectTransaction(request, newOnHold => {
-                            self.getProjectTransactionsByProjectID(request.project_ID);
+                    self.getApprovalUser(request.project_ID, null, user => {
+                        self.createProjectTransactionGroup(projectTXGroupRequest, newGroup => {
+                            request.systemUserID = user;
+                            request.type = 2;
+                            request.status = 7;
+                            request.actionedByUserID = null;
+                            request.projectTXGroup_ID = newGroup.id;
+                            request.notes = notes;
+                            self.createProjectTransaction(request, newOnHold => {
+                                self.getProjectTransactionsByProjectID(request
+                                    .project_ID);
+                            })
                         })
                     })
                 })

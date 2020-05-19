@@ -12,7 +12,7 @@
                 <v-progress-circular :size="12" v-if="item.loading" :width="2" indeterminate color="primary">
                 </v-progress-circular>
                 <v-icon @click="item.click" :size="12" v-if="!item.loading && item.showIcon">{{ item.icon }}</v-icon>
-                <span @click="item.click" class="ml-1">{{item.name}}</span>
+                <span style="font-size: 9px;" @click="item.click" class="ml-1">{{item.name}}</span>
                 <input v-model="item.Comparison" @change="onComparisonSelect(item)"
                     style="margin-top: 3px; margin-left: 5px;" type="checkbox" v-if="item.allowComparison" />
                 <div @click="item.click" class="ml-1" v-if="item.showChildrenCount" style="display: flex;">
@@ -56,7 +56,7 @@
 <style>
     .route-item {
         cursor: pointer;
-        font-size: 12px;
+        font-size: 9px;
         display: flex;
     }
 </style>

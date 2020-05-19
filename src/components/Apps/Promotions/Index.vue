@@ -79,9 +79,8 @@
                                     <v-spacer></v-spacer>
                                     <v-list-tile-actions>
                                         <v-btn small color="primary" @click="getPromotionByID(item)">Edit</v-btn>
-                                        <v-btn small color="primary" @click="openCatgeories(item.id)">Categories &
-                                            resources</v-btn>
-                                        <v-btn small color="primary">Event Planning</v-btn>
+                                        <v-btn small color="primary" @click="openCatgeories(item.id)">Categories & resources</v-btn>
+                                        <v-btn small color="primary" @click="openProcedures(item.id)">Event Planning</v-btn>
                                         <v-btn small color="primary">Costs</v-btn>
                                         <v-btn small color="primary">Item Selection</v-btn>
                                         <v-btn small color="primary">Evaulate</v-btn>
@@ -342,6 +341,10 @@
                 let self = this
                 self.$router.push(`/Promotions/CategoriesAndResources/${id}`)
                 // /Promotions/CategoriesAndResources/:promotionID
+            },
+            openProcedures(id) {
+                let self = this
+                self.$router.push(`/Promotions/Procedures/${id}`)
             },
             getPromotionByID(item) {
                 let self = this

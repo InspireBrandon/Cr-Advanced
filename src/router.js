@@ -157,8 +157,7 @@ import {
 
 import Promotions from './components/Apps/Promotions/Index.vue'
 import CategoriesAndResources from './components/Apps/Promotions/CategoriesAndResources.vue'
-
-
+import Procedure from './components/Apps/Promotions/Procedure/Index.vue'
 
 Vue.use(Router)
 
@@ -245,6 +244,11 @@ export default new Router({
               path: '/Promotions/CategoriesAndResources/:promotionID',
               name: 'CategoriesAndResources',
               component: CategoriesAndResources,              
+            },    
+            {
+              path: '/Promotions/Procedures/:promotionID',
+              name: 'promo_procedures',
+              component: Procedure,              
             },     
             {
               path: '/Map',

@@ -606,8 +606,13 @@
                                 self.getPlanogramFileByProjectGroup(department.id,
                                     planogramFiles => {
                                         planogramFiles.forEach(task => {
+                                            console.log('task', task);
+
+                                            var tmpName = task.fileName.replace('- XXX ', '').replace('- 6MMA ', '').split('Module')[0];
+                                            tmpName = tmpName.substring(0, tmpName.length - 4);
+
                                             let taskItem = new treeItem({
-                                                name: task.fileName,
+                                                name: tmpName,
                                                 icon: 'insert_drive_file',
                                                 children: []
                                             })
