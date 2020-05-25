@@ -18,11 +18,13 @@
                                     <h2>Procedures</h2>
                                 </div>
                                 <div style="display: table-cell; text-align: right;">
-                                    <v-btn small color="primary" text class="ma-0 mb-2">New procedure</v-btn>
+                                    <v-btn small color="primary" text class="ma-0 mb-2" @click="createNewProcedure">New
+                                        procedure</v-btn>
                                 </div>
                             </div>
                             <v-divider class="mb-3"></v-divider>
-                            <ProcedureBlock class="mb-2" v-for="i in 2" :key="i" :index="i" />
+                            <ProcedureBlock class="mb-2" v-for="(i,idx) in procedures" :key="idx" :item="i"
+                                :renameItem="renameItem" :deleteItem="deleteItem" :addNewStep="addNewStep" />
                         </v-card-text>
                     </v-card>
                 </v-flex>
@@ -36,18 +38,96 @@
                 </v-flex>
             </v-layout>
         </v-container>
+        <Prompt ref="Prompt" />
+        <YesNoModal ref="YesNoModal" />
     </v-card>
 </template>
 
 <script>
     import ProcedureBlock from './ProcedureBlock.vue'
+    import axios from "axios"
+    import Prompt from "@/components/Common/Prompt";
+    import YesNoModal from "@/components/Common/YesNoModal.vue";
+
+
 
     export default {
         components: {
-            ProcedureBlock
+            ProcedureBlock,
+            Prompt,
+            YesNoModal
         },
         data() {
-            return {}
+            return {
+                procedures: []
+            }
+        },
+        mounted() {
+            this.getProcedures()
+        },
+        methods: {
+            addNewStep(item, step) {
+                let self = this
+                axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                console.log("item", item);
+                console.log("step", step);
+                step.promotion_Procedure_ID = item.id
+                axios.post(process.env.VUE_APP_API + `PromotionProcedureStep`, step).then(r => {
+                    console.log("addNewStep",r);
+                    
+                })
+                // PromotionProcedureStep
+            },
+            renameItem(item) {
+                let self = this
+                // self.$refs.Prompt.show("Name", "Please enter a new name for the procedure", "Procedure name",
+                //     afterRuturn => {
+                //         item.Description = afterRuturn
+                axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                axios.put(process.env.VUE_APP_API + `PromotionProcedure`, item)
+                    .then(r => {
+                        self.getProcedures()
+                    })
+                // })
+            },
+            getProcedures() {
+                let self = this
+                axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                axios.get(process.env.VUE_APP_API + `PromotionProcedure?promotionID=${self.$route.params.promotionID}`)
+                    .then(r => {
+                        self.procedures = r.data
+                        console.log("getProcedures", r);
+                    })
+            },
+            createNewProcedure() {
+                let self = this
+                let req = {
+                    iD: null,
+                    promotion_ID: self.$route.params.promotionID,
+                    IsTemplate: false,
+                    Description: "new procedure"
+                }
+                console.log(self.$route.params.promotionID);
+
+                axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                axios.post(process.env.VUE_APP_API + `PromotionProcedure`, req).then(r => {
+                    console.log(r);
+                    self.getProcedures()
+                })
+            },
+            deleteItem(item) {
+                let self = this
+                self.$refs.YesNoModal.show("are you sure you want to delete this?", value => {
+                    if (value) {
+                        axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                        axios.delete(process.env.VUE_APP_API + `PromotionProcedure`, item).then(r => {
+                            self.getProcedures()
+                        })
+                    }
+                })
+            },
         }
     }
 </script>
