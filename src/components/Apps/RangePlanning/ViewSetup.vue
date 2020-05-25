@@ -4,7 +4,7 @@
             <v-toolbar color="primary" dark>
                 <v-toolbar-title>View Setup</v-toolbar-title>
             </v-toolbar>
-            <v-card-text style="height: 480px;">
+            <v-card-text>
                 <div class="inline">
                     <div class="inline-item main" style="width: 100%;">Main</div>
                 </div>
@@ -105,6 +105,15 @@
                     </div>
                 </div>
                 <div class="inline">
+                    <div class="inline-item extended">Stock Levels</div>
+                    <div class="inline-item">
+                        <select v-model="form.stockLevels" style="width: 100%;">
+                            <option :value="option.value" v-for="(option, key) in options" :key="key">{{ option.text }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="inline">
                     <div class="inline-item extended">Distribution</div>
                     <div class="inline-item">
                         <select v-model="form.distribution" style="width: 100%;">
@@ -171,6 +180,7 @@
                     costAnalysis: 2,
                     baseLineAnalysis: 1,
                     stockAnalysis: 1,
+                    stockLevels: 1,
                     distribution: 1,
                     index: 1,
                     priceAndMargin: 1

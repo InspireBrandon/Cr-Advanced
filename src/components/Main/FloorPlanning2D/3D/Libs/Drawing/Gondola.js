@@ -9,8 +9,6 @@ import Boxbase from './Boxbase.js'
 class Gondola extends Boxbase {
     constructor(params) {
         super(params);
-
-        console.log("GONDOLA", params);
     }
 
     setPosition() {

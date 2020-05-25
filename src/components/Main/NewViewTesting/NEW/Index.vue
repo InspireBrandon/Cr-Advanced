@@ -383,8 +383,11 @@
                                 self.getRangeFileByProjectGroup(department.id,
                                     rangeFiles => {
                                         rangeFiles.forEach(task => {
+                                            var tmpName = task.fileName.replace('- XXX ', '').replace('- 6MMA ', '').split('Module')[0];
+                                            tmpName = tmpName.substring(0, tmpName.length - 4);
+
                                             let taskItem = new treeItem({
-                                                name: task.fileName,
+                                                name: tmpName,
                                                 icon: 'insert_drive_file',
                                                 children: [],
                                                 type: 'PlanogramID',
@@ -884,13 +887,13 @@
                                         taskInProgress, taskImplemented);
 
                                     departments.forEach(department => {
-                                        if (department.projectGroup ==
-                                            ud
-                                            .projectGroup) {
+                                        if (department.projectGroup == ud.projectGroup) {
+                                            var tmpName = department.fileName.replace('- XXX ', '').replace('- 6MMA ', '').split('Module')[0];
+                                            tmpName = tmpName.substring(0, tmpName.length - 4);
+
                                             let taskItem =
                                                 new treeItem({
-                                                    name: department
-                                                        .fileName,
+                                                    name: tmpName,
                                                     icon: 'insert_drive_file',
                                                     children: [],
                                                     click: function () {

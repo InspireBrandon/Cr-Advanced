@@ -35,6 +35,8 @@ import DrawingHelper from "../FloorPlanning2D/3D/Libs/Drawing/DrawingHelper.js";
 const pxlToMeterRatio = 25;
 let scene, camera, sceneObj, canvas, shadowGenerator;
 
+let docClickEvent;
+
 export default {
   data() {
     return {
@@ -304,10 +306,17 @@ export default {
       gondolas.forEach(drop => {
         self.getPlanogramItem(drop.id, positionData => {
           let fpI = new FloorPlanItem(drop, null);
-          let attributes = JSON.parse(positionData.attributes);
-          fpI.x = attributes.x;
-          fpI.y = attributes.y;
-          fpI.rotation = attributes.rotation;
+
+          if (positionData != null) {
+            let attributes = JSON.parse(positionData.attributes);
+            fpI.x = attributes.x;
+            fpI.y = attributes.y;
+            fpI.rotation = attributes.rotation;
+          } else {
+            // fpI.x = 0;
+            fpI.y = -1;
+          }
+
           self.drawingHelper.draw(fpI, shadowGenerator, notProducts);
         });
       });
@@ -391,6 +400,7 @@ export default {
           `FloorPlan_Fixtures/GetFixtureByHeaderID?fixtureHeaderID=${fixtureHeaderID}`
       )
         .then(r => {
+          console.log("get fixtures", r.data);
           callback(r.data);
         })
         .catch(e => {

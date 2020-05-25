@@ -77,6 +77,9 @@
             <v-list-tile @click="toggleTestMode">
               <v-list-tile-title>Test Mode</v-list-tile-title>
             </v-list-tile>
+            <v-list-tile @click="showSeasonalityReport">
+              <v-list-tile-title>Seasonality</v-list-tile-title>
+            </v-list-tile>
           </v-list>
         </v-menu>
         <v-menu v-if="rowData.length > 0 && !$route.path.includes('RangePlanningView')" dark offset-y
@@ -100,6 +103,9 @@
             </v-list-tile>
             <v-list-tile @click="exportData('Csv')">
               <v-list-tile-title>CSV</v-list-tile-title>
+            </v-list-tile>
+            <v-list-tile @click="exportStockOrder">
+              <v-list-tile-title>Stock Orders</v-list-tile-title>
             </v-list-tile>
           </v-list>
         </v-menu>
@@ -253,6 +259,7 @@
     <RetailChainSelector ref="RetailChainSelector" />
     <ViewSetup ref="ViewSetup" />
     <IndicatorSetup ref="IndicatorSetup" />
+    <SeasonalityGraph ref="SeasonalityGraph" />
   </div>
 </template>
 
@@ -300,6 +307,8 @@
   import CustomRange from "./CustomRange/Index";
   import ViewSetup from "./ViewSetup.vue";
   import IndicatorSetup from './IndicatorSetup.vue'
+  import SeasonalityGraph from './SeasonalityGraph.vue'
+  // import XLSX from 'xlsx';
 
   import RetailChainSelector from "@/components/Common/RetailChainSelector";
 
@@ -354,7 +363,8 @@
       CustomRange,
       RetailChainSelector,
       ViewSetup,
-      IndicatorSetup
+      IndicatorSetup,
+      SeasonalityGraph
     },
     data() {
       return {
@@ -396,6 +406,24 @@
           potential_profit: 60,
           audit: false,
           dos_units: 6,
+          inclusive_units: 6,
+          minimum_units: 1,
+          // Product Supply
+          safety_stock_highlight: 1,
+          casepack_qty: 12,
+          surplus_stock: 12,
+          minumum_stock: 4,
+          maximum_stock: 6,
+          default_minimum: 2,
+          default_minimum_max: 0,
+          default_price_minimum: 100,
+          default_price_minimum_min: 3,
+          default_price_minimum_max: 5,
+          lead_time: 21,
+          safety_stock_value: 1,
+          use_seasonal_index: false,
+          excess_distribution_weeks: 12,
+          excess_recievable_stock: 8,
           setDefaults() {
             this.use_sales_index = true;
             this.sales_index = 100;
@@ -427,7 +455,21 @@
             this.audit = false;
             this.use_audit = true;
 
+            this.inclusive_units = 6;
+            this.use_inclusive_units = true;
+
+            this.minimum_units = 1;
+            this.use_minimum_units = true;
+
             this.dos_units = 6;
+
+            // Product Supply
+            this.overstock = 3;
+            this.minumum_stock = 4;
+            this.maximum_stock = 6;
+            this.lead_time = 21;
+            this.price_minimum = 100;
+            this.excess_distribution_weeks = 12;
           }
         },
         gotData: false,
@@ -513,6 +555,17 @@
       self.getStores();
     },
     methods: {
+      showSeasonalityReport() {
+        let self = this;
+
+        let queryData = {
+          planogramID: self.fileData.planogramID,
+          periodFromID: self.fileData.dateTo - 11,
+          periodToID: self.fileData.dateTo,
+        }
+
+        self.$refs.SeasonalityGraph.show(queryData);
+      },
       toggleTestMode() {
         let self = this;
 
@@ -985,7 +1038,7 @@
 
         self.rowData.forEach(el => {
           if (self.testMode) {
-            if(indicator == 'YES' && (el.autoRangeOneItem || el.autoRangeItem)) {
+            if (indicator == 'YES' && (el.autoRangeOneItem || el.autoRangeItem)) {
               self.rangingController[self.testMode ? 'setTestClusterIndicator' : 'setClusterIndicator'](
                 self.selectedClusterType,
                 self.selectedClusterOption,
@@ -997,7 +1050,7 @@
                 if (node.data.productID == el.productID) {
                   node.setDataValue("alt_Store_Range_Indicator", indicator);
                   node.setDataValue(self.testMode ? "test_Range_Indicator" : "store_Range_Indicator",
-                  indicator);
+                    indicator);
                   node.setDataValue("alt_Store_Range_Indicator_ID", indicator == "YES" ? 2 : 1);
                   node.setDataValue(self.testMode ? "test_Range_Indicator_ID" : "store_Range_Indicator_ID",
                     indicator == "YES" ? 2 : 1);
@@ -1005,7 +1058,7 @@
               });
 
               self.gridApi.redrawRows();
-            } else if(indicator == 'NO' && (!el.autoRangeOneItem && !el.autoRangeItem)) {
+            } else if (indicator == 'NO' && (!el.autoRangeOneItem && !el.autoRangeItem)) {
               self.rangingController[self.testMode ? 'setTestClusterIndicator' : 'setClusterIndicator'](
                 self.selectedClusterType,
                 self.selectedClusterOption,
@@ -1017,7 +1070,7 @@
                 if (node.data.productID == el.productID) {
                   node.setDataValue("alt_Store_Range_Indicator", indicator);
                   node.setDataValue(self.testMode ? "test_Range_Indicator" : "store_Range_Indicator",
-                  indicator);
+                    indicator);
                   node.setDataValue("alt_Store_Range_Indicator_ID", indicator == "YES" ? 2 : 1);
                   node.setDataValue(self.testMode ? "test_Range_Indicator_ID" : "store_Range_Indicator_ID",
                     indicator == "YES" ? 2 : 1);
@@ -1039,7 +1092,7 @@
                 if (node.data.productID == el.productID) {
                   node.setDataValue("alt_Store_Range_Indicator", indicator);
                   node.setDataValue(self.testMode ? "test_Range_Indicator" : "store_Range_Indicator",
-                  indicator);
+                    indicator);
                   node.setDataValue("alt_Store_Range_Indicator_ID", indicator == "YES" ? 2 : 1);
                   node.setDataValue(self.testMode ? "test_Range_Indicator_ID" : "store_Range_Indicator_ID",
                     indicator == "YES" ? 2 : 1);
@@ -1575,6 +1628,9 @@
               self.autoRangeData.use_audit = true;
 
               self.autoRangeData.dos_units = 6;
+
+              self.autoRangeData.inclusive_units = 6;
+              self.autoRangeData.use_inclusive_units = true;
             }
 
             self.canRefresh = true;
@@ -2264,6 +2320,77 @@
               }
             };
 
+            self.columnDefs[32] = {
+              headerName: "Case Pack Qty",
+              field: "case_Pack_Qty",
+              hide: true,
+              cellStyle: function (params) {
+                let checkValue = parseFloat(params.data.case_Pack_Qty) + parseFloat(params.data.minimum_Stock);
+
+                let oneWeekVolume = params.data.sales_Units / 4;
+                let casePackQtyVolume = oneWeekVolume * self.autoRangeData.casepack_qty;
+
+                if (checkValue > casePackQtyVolume && params.data.sales_Units != 0) {
+                  return {
+                    backgroundColor: "#ffa3bc"
+                  };
+                }
+
+                // let leadTimeDays = self.autoRangeData.lead_time;
+                // let safety_stock_highlightDays = self.autoRangeData.safety_stock_highlight * 7;
+
+                // let totalDays = leadTimeDays + safety_stock_highlightDays;
+                // let totalWeeks = totalDays / 7;
+
+                // let oneWeekVolume = params.data.sales_Units / 4;
+                // let safetyVolume = oneWeekVolume * totalWeeks;
+
+                // if (params.data.stock_Units < safetyVolume) {
+                //   return {
+                //     backgroundColor: "#ffa3bc"
+                //   };
+                // }
+              }
+            };
+
+            self.columnDefs[38] = {
+              headerName: "Minimum Stock",
+              field: "minimum_Stock",
+              hide: true,
+              cellStyle: function (params) {
+                let leadTimeDays = self.autoRangeData.lead_time;
+                let safety_stock_highlightDays = self.autoRangeData.safety_stock_highlight * 7;
+
+                let totalDays = leadTimeDays + safety_stock_highlightDays;
+                let totalWeeks = totalDays / 7;
+
+                let oneWeekVolume = params.data.sales_Units / 4;
+                let safetyVolume = oneWeekVolume * totalWeeks;
+
+                if (params.data.stock_Units < safetyVolume) {
+                  return {
+                    backgroundColor: "#ffa3bc"
+                  };
+                }
+              }
+            };
+
+            self.columnDefs[42] = {
+              headerName: "Surplus Stock",
+              field: "surplus_Stock",
+              hide: true,
+              cellStyle: function (params) {
+                let oneWeekVolume = params.data.sales_Units / 4;
+                let surplusStockVolume = oneWeekVolume * self.autoRangeData.surplus_stock;
+
+                if (params.data.stock_Units > surplusStockVolume) {
+                  return {
+                    backgroundColor: "#ffa3bc"
+                  };
+                }
+              }
+            };
+
             resolve(true);
           } catch (exc) {
             reject();
@@ -2274,7 +2401,6 @@
         let self = this;
 
         let updatedIndicators = self.rangingController.getTestImportCSV();
-        console.table(updatedIndicators);
         self.$refs.spinner.show();
 
         Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
@@ -2384,8 +2510,6 @@
         });
 
         self.clusterOptions.temp = [];
-
-        console.log('data before crash', data)
 
         data.tempClusters.forEach(element => {
           if (element.clusterStores.length > 0)
@@ -3072,7 +3196,7 @@
       openAutoRangeModal() {
         let self = this;
 
-        self.$refs.AutoRangeModal.show(self.autoRangeData, autoRangeData => {
+        self.$refs.AutoRangeModal.show(self.autoRangeData, self.fileData.planogramID, autoRangeData => {
           self.autoRangeData = autoRangeData;
 
           if (self.selectedClusterType == "stores") {
@@ -3124,6 +3248,7 @@
           el.autoRangeOneItem = false;
 
           var test = self.testAutoRangeProduct(el, self.rowData);
+          self.testExcessDistribution(el);
 
           if (test.passesOne) el.autoRangeOneItem = true;
 
@@ -3167,6 +3292,15 @@
         // Volume Index
         if (config.use_volume_index) {
           if (product.units_contribution <= config.volume_index) {
+            passesAll = false;
+          } else {
+            passesOne = true;
+          }
+        }
+
+        // Minimum Units
+        if (config.use_inclusive_units) {
+          if (product.sales_Units < config.inclusive_units) {
             passesAll = false;
           } else {
             passesOne = true;
@@ -3269,10 +3403,28 @@
           }
         }
 
+        // Minimum Units
+        if (config.use_minimum_units) {
+          if (product.sales_Units < config.minimum_units) {
+            passesAll = false;
+            passesOne = false;
+          }
+        }
+
         return {
           passesOne: passesOne,
           passesAll: passesAll
         };
+      },
+      testExcessDistribution(product) {
+        let self = this;
+        let config = self.autoRangeData;
+        let currentStock = product.stock_Units;
+        let avgVolume = product.sales_Units;
+
+        let weeksOfStock = (avgVolume / currentStock) / 4;
+
+        // let productCurrentStock = product.
       },
       inPercentage(allProducts, percentage, product, field) {
         let self = this;
@@ -3395,6 +3547,25 @@
 
         self.gridApi[`exportDataAs${type}`](params);
       },
+      exportStockOrder() {
+        let self = this;
+
+        var exportData = [];
+
+        for (var i = 0; i < 50; i++) {
+          exportData.push(new ExportItem({
+            plant: 'V001',
+            material: '11011466',
+            min: 3,
+            max: 20
+          }))
+        }
+
+        // var sheet = XLSX.utils.json_to_sheet(exportData);
+        // var workBook = XLSX.utils.book_new();
+        // XLSX.utils.book_append_sheet(workBook, sheet, 'Sheeet');
+        // XLSX.writeFile(workBook, self.fileData.planogramName + ' Stock Order .xlsx');
+      },
       setStoreClusterStuff() {
         let self = this;
         self.tmpClusters = self.rangingController.getClusterData();
@@ -3412,6 +3583,16 @@
       }
     }
   };
+
+  function ExportItem(params) {
+    let self = this;
+    self.Plant = params.plant;
+    self.Material = params.material;
+    self.TYP = 'V1';
+    self.LS = 'HB';
+    self.min = params.min;
+    self.max = params.max;
+  }
 
   function RangeReports(rangingData, endingStock) {
     let self = this;

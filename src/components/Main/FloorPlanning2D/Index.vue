@@ -101,7 +101,6 @@
                 </template>
                 <span>View 3D</span>
             </v-tooltip>
-            <!-- <v-btn @click="logMutli">log</v-btn> -->
             <div v-show="multiSelectGroup !=null">
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
@@ -269,7 +268,6 @@
                                 <v-spacer></v-spacer>
                                 <v-menu offset-y>
                                     <template v-slot:activator="{ on }">
-                                        <v-btn v-on="on" small @click="log" color="primary">add</v-btn>
                                     </template>
                                     <v-list dense class="pa-0">
                                         <v-list-tile tile @click="addLayer">
@@ -592,13 +590,9 @@
         methods: {
             setLibraryFilter(options, selectedOption) {
                 let self = this
-                console.log("[setLibraryFilter]options:", options);
-                console.log("[setLibraryFilter]selectedOption:", selectedOption);
                 options.forEach(option => {
                     if (option.value == selectedOption) {
                         self.floorplanFilters = option
-                        console.log("setLibraryFilter",self.floorplanFilters);
-                        
                     }
                 })
             },
@@ -606,27 +600,19 @@
                 let self = this
                 self.$refs.DateRangeSelector.show(dateRange => {
                     self.dateRange = dateRange
-                    console.log("dateRange", dateRange)
                 })
             },
             detatchShape(node, layer, callback) {
                 let self = this
 
                 const matrix = node.getAbsoluteTransform().getMatrix();
-                //console.log("matrix", matrix);
                 const attrs = decompose(matrix);
                 node.moveTo(layer);
                 node.setAttrs(attrs)
                 callback()
             },
-
             logMutli() {
                 let self = this
-                //console.log("self.multiSelectGroup", self.multiSelectGroup);
-                //console.log("self.stage", self.stage);
-                //console.log("selectedItem", self.selectedItem);
-                //console.log("properties", self.properties);
-
             },
             addItemToGroup() {
                 let self = this
@@ -675,25 +661,6 @@
 
                     })
                 }
-
-                // groupingHandler.removeItemFromGroup(self.stage, self.selectedItem, self.selectedLayer, self
-                //     .selectedLayerTree, self.selectedLayerTreeItem, self.multiSelectGroup, self.findLayerItem, self
-                //     .layerTree, parent, callback => {
-                //         self.findLayerItem(self.layerTree, callback._id, cb => {
-                //             cb.parent.children.forEach((element, idx) => {
-                //                 if (cb == element) {
-                //                     cb.parent.children.splice(idx, 1)
-                //                     callback.destroy()
-                //                     self.selectLayer(cb.parent, self.layerTree, layerCB => {
-                //                         self.selectedItem = null
-                //                         self.stage.batchDraw()
-                //                         cb.parent.showChildren = false
-                //                     })
-
-                //                 }
-                //             })
-                //         })
-                //     })
             },
             getClusters() {
                 let self = this
@@ -769,7 +736,6 @@
                         }
                     })
                 })
-
             },
             FloorMediaSrc(id) {
                 let self = this
@@ -1111,8 +1077,6 @@
             open() {
                 let self = this
                 self.$refs.floorPlanSelector.show(callback => {
-                    console.log("floorPlanSelector callback", callback);
-
                     self.Floorplan_ID = callback.id
                     if (callback.store_ID != null) {
                         self.selectedClusterType = "stores"
@@ -1136,8 +1100,6 @@
                     axios.get(process.env.VUE_APP_API +
                         `GetFloorPlanItems?Header_ID=${callback.id}&versionID=${callback.version_ID}`).then(
                         r => {
-                            console.log("get floor items", r);
-
                             self.stage.children.forEach(child => {
                                 if (child.attrs.name != 'grid') {
                                     child.destroyChildren()
@@ -1295,7 +1257,6 @@
                         self.hasTape.shape.destroy()
                         self.hasTape = null
                     }
-                    console.log("self.dateRange", self.dateRange);
 
                     let req = {
                         id: self.Floorplan_ID,
@@ -1308,7 +1269,6 @@
                         periodToString: self.dateRange.dateToString,
                         periodFromString: self.dateRange.dateFromString
                     }
-                    console.log();
 
                     switch (self.selectedClusterType) {
                         case "stores": {
@@ -1325,8 +1285,6 @@
                         break;
                     }
 
-                    console.log("SAVE REQ", req);
-
                     axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                     axios.post(process.env.VUE_APP_API + `saveFloorHeader`, req).then(r => {
                         self.Floorplan_ID = r.data.header.id
@@ -1334,7 +1292,6 @@
                         self.imageIDArr = []
                         self.FormatItems(self.stage.children, self.saveArr, 0, self.Floorplan_ID,
                             callback => {
-                                //console.log(self.saveArr);
                                 axios.post(process.env.VUE_APP_API +
                                     `saveFloorHeader?header_ID=${self.Floorplan_ID}`, self
                                     .saveArr).then(
@@ -1369,7 +1326,6 @@
 
                         rect.shape.saveID = item.id
                         rect.shape.guid = item.guid
-                        // rect.shape.attrs = shape
                         rect.shape.attrs.type = "PlanogramFixture"
                         rect.shape.setAttrs({
                             width: shape.width / 4,
@@ -1489,8 +1445,6 @@
                 axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 axios.get(process.env.VUE_APP_API + `Planogram/department?ID=${planoID}`).then(r => {
-                    console.log("getdepartment resp", r);
-
                     if (r.data != null) {
                         self.createDepartment(r.data, departmentLayers => {
                             callback(departmentLayers)
@@ -1636,18 +1590,15 @@
                 ev.preventDefault();
                 let self = this
                 let librarydata = window.library
-                console.log("[DRAG DROP] - library", window.library);
                 if (window.library != null) {
 
 
                     if (window.library.type == "CUSTOM_PLANOGRAM" || window.library.type == "CUSTOM") {
                         self.checkForHeader(window.library.data, HeaderCallback => {
-                            console.log("[checkForHeader]--HeaderCallback", HeaderCallback);
 
                             if (HeaderCallback != null) {
                                 self.drawSaved(HeaderCallback, ev)
                             } else {
-                                console.log("librarydata", librarydata);
 
                                 self.getPlanogramData(librarydata, defaultData => {
                                     if (defaultData != null && defaultData != undefined) {
@@ -1676,7 +1627,6 @@
                     axios.get(process.env.VUE_APP_API +
                         `FloorPlan_Fixtures/GetFixtures?planogramDetail_ID=${data.data.id}`).then(
                         r => {
-                            console.log("get custokm fixtures", r);
 
                             callback({
                                 plano: data.data,
@@ -1686,7 +1636,6 @@
                 } else {
                     axios.get(process.env.VUE_APP_API +
                         `Planogram_Details/BysystemFileID?systemFile_ID=${data.data.id}`).then(resp => {
-                        console.log("get details reesp", resp);
 
                         axios.get(process.env.VUE_APP_API +
                             `FloorPlan_Fixtures/GetFixtures?planogramDetail_ID=${resp.data.id}`).then(
@@ -1710,11 +1659,8 @@
                 } else {
                     meters = self.meterRatio
                 }
-                //console.log("drawDefaultSpace[DATA]", data);
-
 
                 self.getDepartment(data.plano.id, depart => {
-                    console.log("get departments callback", depart);
 
                     let container = self.stage.container().getBoundingClientRect();
                     self.stage._setPointerPosition(ev);
@@ -1748,7 +1694,6 @@
                     let tmplayer = self.selectedLayer
                     let tmplayertreeitem = self.selectedLayerTree
                     depart.layerTreeItem.children.push(layertreeitem)
-                    //console.log("{OPEN DEFAULT SPACE}   dragged department", depart.Konvalayer);
 
                     depart.Konvalayer.add(group);
                     self.selectedLayerTree = layertreeitem
@@ -1861,7 +1806,6 @@
                         self.stage.batchDraw()
                         self.$nextTick(() => {
                             self.makingChanges = false
-                            //console.log("batchDraw");
                             self.selectedItem.draw()
                             self.stage.batchDraw()
                         })
@@ -1875,10 +1819,6 @@
                 let dimension = null
                 if (self.selectedItem.attrs.name == "group" || self.selectedItem.attrs.name == "Duplication Group") {
                     let tr = self.stage.find("Transformer")
-                    //console.log('tr', tr);
-                    //console.log('si', self.selectedItem);
-                    // calcCenterRotation(self.selectedItem, parseFloat(self.properties.rotation))
-                    // let dimension = node.getClientRect()
 
                     self.selectedItem.rotation(parseFloat(self.properties.rotation))
                 } else {
@@ -1937,7 +1877,6 @@
                         .blockRatio)
                 }
 
-                //console.log("[AFTER CHANEGES APPLIED ]", self.selectedItem);
                 callback()
             },
             applyBrushProperties(tool) {
@@ -1975,7 +1914,6 @@
             },
             selectItemFromSidePanel(item) {
                 let self = this
-                //console.log("selectItemFromSidePanel", item);
 
                 self.findKonvaItem(self.stage.children, item.KonvaID, e => {
                     if (e.attrs.drawType == "Layer") {
@@ -1988,7 +1926,6 @@
                         // clickTapHelper.setSelectedItem(e, self.findLayerItem, self
                         //     .selectedLayerTreeItem, self.selectedItem, self.selectedLayer, self
                         //     .layerTree, cb => {
-                        //         //console.log("self.selectedLayerTreeItem",cb);
 
                         //         self.selectedLayerTreeItem = cb
                         //     })
@@ -2303,12 +2240,6 @@
                     })
                 })
             },
-            log() {
-                let self = this
-                //console.log("log", self.stage);
-                //console.log("logTree", self.layerTree);
-
-            },
             updateSnappingAngles() {
                 let self = this;
 
@@ -2497,7 +2428,6 @@
 
                     })
                     if (self.hasTape != null) {
-                        //console.log("self.hasTape", self.hasTape);
                         self.hasTape.shape.attrs.draggable = true
                     }
                     self.stage.batchDraw()
@@ -2532,7 +2462,6 @@
                             .selectedLayerTree)
                         break;
                     case "group": {
-                        //console.log("[SELECTED LAYERTREE] group", self.selectedLayerTree);
                         if (self.selectedLayerTree.parent != undefined) {
                             groupDuplicationHelper.duplicateGroupDrag(e.target, self.selectedLayerTree.parent)
                         } else {
@@ -2541,7 +2470,6 @@
                     }
                     break
                 case "Duplication Group": {
-                    //console.log("[SELECTED LAYERTREE] Duplication Grou", self.selectedLayerTree);
                     if (self.selectedLayerTree.parent != undefined) {
                         groupDuplicationHelper.duplicateGroupDrag(e.target, self.selectedLayerTree.parent)
                     } else {
@@ -2659,7 +2587,6 @@
             handleMultiSelect(item, callback) {
                 let self = this
                 // if (!item.attrs.draggable) {
-                //     //console.log("[HANDLEMULTI SELECTE INDEX]------not raggable");
 
                 //     callback()
                 // }
@@ -2671,7 +2598,6 @@
                     } else {
                         muitiParent = layerchild.parent
                     }
-                    //console.log("[handleMultiSelect]-----layerchild", layerchild);
 
                     multiSelectHelper.handleMultiselect(self.multiSelectGroup, muitiParent, item, self
                         .stage,
@@ -2809,7 +2735,6 @@
             },
             attachGondolaInsideGroup(target, dragItem, group) {
                 let self = this
-                console.log("attachGondolaInsideGroup");
 
                 target.attrs.hasAttached = dragItem.saveID
                 const matrix = target.getAbsoluteTransform().getMatrix();
@@ -2827,9 +2752,6 @@
             },
             attachGondola(target, dragItem) {
                 let self = this
-                console.log("[attachGondola] target:", target);
-                console.log("[attachGondola] dragItem:", dragItem);
-
 
                 target.attrs.hasAttached = dragItem.saveID
                 if (self.stage.attrs.scaleX == 0 || self.stage.attrs.scaleX == undefined || self.stage.attrs.scaleX ==
@@ -2852,8 +2774,6 @@
                 // x: target.attrs.x,
                 // y: target.attrs.y
                 // })
-                console.log("[attachGondola---end] target:", target);
-                console.log("[attachGondola---end] dragItem:", dragItem);
                 self.stage.batchDraw()
             },
             clickFindParentLayer(item, callback) {
@@ -3004,18 +2924,14 @@
                             if (haveIntersection(group.getClientRect(), targetRect)) {
                                 if (target.children.length > 0) {
                                     target.children.each(function (item) {
-                                        console.log(haveIntersection(item.getClientRect(),
-                                            targetRect));
-                                        if (haveIntersection(item.getClientRect(),
-                                                targetRect)) {
+                                            // targetRect));
+                                        if (haveIntersection(item.getClientRect(), targetRect)) {
                                             self.attachGondolaInsideGroup(item, target, group)
                                         }
                                     })
                                 } else {
                                     self.attachGondola(group, target)
                                 }
-
-
                             } else {
 
                             }

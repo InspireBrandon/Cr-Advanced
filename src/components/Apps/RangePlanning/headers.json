@@ -298,6 +298,11 @@
         }
     },
     {
+        "headerName": "Case Pack Qty",
+        "field": "case_Pack_Qty",
+        "hide": true
+    },
+    {
         "headerName": "DOS FAC",
         "field": "dos_fac",
         "filterParams": {
@@ -331,6 +336,46 @@
     {
         "headerName": "Stock Units",
         "field": "stock_Units",
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
+        "headerName": "Minimum Stock",
+        "field": "minimum_Stock",
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
+        "headerName": "Maximum Stock",
+        "field": "maximum_Stock",
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
+        "headerName": "Seasonal Minimum",
+        "field": "seasonal_Minimum",
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
+        "headerName": "Seasonal Maximum",
+        "field": "seasonal_Maximum",
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
+        "headerName": "Surplus Stock",
+        "field": "surplus_Stock",
         "hide": true,
         "filterParams": {
             "newRowsAction": "keep"

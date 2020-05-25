@@ -14,8 +14,6 @@ class Obstruction extends Boxbase {
     setPosition() {
         let self = this;
 
-        console.log("self", self);
-
         self.element.position.x = (self.data.x + 0.5 * self.data.width) / self.pxlToMeterRatio;
         self.element.position.y = (((0.5 * self.data.depth) / self.pxlToMeterRatio));
         self.element.position.z = -((self.data.y + (self.data.height * 0.5)) / 100);

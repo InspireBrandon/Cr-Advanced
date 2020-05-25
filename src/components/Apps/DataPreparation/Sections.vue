@@ -156,6 +156,10 @@
                          name: 'Geographic_Location',
                         route: 'Geographic_Location'
                     }),
+                    new navItem({
+                        name: 'Planogram Role',
+                        route: 'PlanogramRole'
+                    }),
                 ],
                 fact: [
                     new navItem({

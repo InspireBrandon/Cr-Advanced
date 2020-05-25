@@ -8,7 +8,14 @@
                     </v-toolbar>
                     <v-toolbar flat dense dark color="grey darken-3">
                         <v-toolbar-items>
-                            <v-btn flat>File</v-btn>
+                            <v-menu offset-y>
+                                <v-btn slot="activator" flat>File</v-btn>
+                                <v-list dense>
+                                    <v-list-tile @click="resetRange">
+                                        <v-list-tile-title>Reset</v-list-tile-title>
+                                    </v-list-tile>
+                                </v-list>
+                            </v-menu>
                             <v-menu offset-y>
                                 <v-btn slot="activator" flat>Setup</v-btn>
                                 <v-list dense>
@@ -33,6 +40,7 @@
         </v-container>
         <TmpStoreClusterModal ref="tmpStoreClusterModal" />
         <Loader ref="loader" />
+        <YesNoModal ref="yesNoModal" />
     </div>
 </template>
 
@@ -40,6 +48,7 @@
     import Axios from "axios";
     import TmpStoreClusterModal from "./TmpStoreClusterModal/Index.vue";
     import Loader from "./loader.vue";
+    import YesNoModal from "../../../../Common/YesNoModal.vue";
 
     import {
         AgGridVue
@@ -114,7 +123,8 @@
         components: {
             AgGridVue,
             TmpStoreClusterModal,
-            Loader
+            Loader,
+            YesNoModal
         },
         created() {
             let self = this;
@@ -138,7 +148,7 @@
 
                 var config = {
                     onDownloadProgress(progressEvent) {
-                        if(progressEvent.lengthComputable) {
+                        if (progressEvent.lengthComputable) {
                             self.$refs.loader.update(progressEvent.loaded, progressEvent.total);
                         }
                     }
@@ -148,7 +158,8 @@
                     Axios.get(
                             process.env.VUE_APP_API +
                             "TestIndicator/Report?clusterID=" +
-                            self.selectedTemp, config
+                            self.selectedTemp,
+                            config
                         )
                         .then(r => {
                             self.rowData = r.data;
@@ -174,6 +185,23 @@
                 let self = this;
 
                 self.$refs.tmpStoreClusterModal.show(() => {});
+            },
+            resetRange() {
+                let self = this;
+
+                self.$refs.yesNoModal.show("Reset test range report?", value => {
+                    if (value) {
+                        self.$refs.loader.show();
+
+                        Axios.delete(process.env.VUE_APP_API + 'TestIndicator/Report')
+                            .then(r => {
+                                self.$refs.loader.hide();
+                            })
+                            .catch(e => {
+                                self.$refs.loader.hide();
+                            })
+                    }
+                });
             }
         }
     };

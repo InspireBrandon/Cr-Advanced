@@ -15,23 +15,26 @@
                         <v-list-tile @click="addNewGroup(fixtureGroup, 'Group')">
                             <v-list-tile-title>Group</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Gondola')">
+                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Gondola')" v-if="type == 1">
                             <v-list-tile-title>Gondola</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Obstruction')">
+                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Obstruction')" v-if="type == 1">
                             <v-list-tile-title>Obstruction</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Fixture')">
+                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Fixture')" v-if="type == 1">
                             <v-list-tile-title>Fixture</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile @click="addNewGroup(fixtureGroup, 'SubFixture')">
+                        <v-list-tile @click="addNewGroup(fixtureGroup, 'SubFixture')" v-if="type == 1">
                             <v-list-tile-title>SubFixture</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Palette')">
+                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Palette')" v-if="type == 1">
                             <v-list-tile-title>Palette</v-list-tile-title>
                         </v-list-tile>
-                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Rendering')">
+                        <v-list-tile @click="addNewGroup(fixtureGroup, 'Rendering')" v-if="type == 2">
                             <v-list-tile-title>Rendering</v-list-tile-title>
+                        </v-list-tile>
+                        <v-list-tile @click="addSpacePlan(fixtureGroup)" v-if="type == 3">
+                            <v-list-tile-title>Floor Plan</v-list-tile-title>
                         </v-list-tile>
                     </v-list>
                 </v-menu>
@@ -44,16 +47,18 @@
             </v-card-title>
             <v-divider></v-divider>
         </v-card>
+        <!-- {{ fixtureGroup.systemFiles }} -->
         <div v-if="fixtureGroup.showChildren">
             <div v-for="(fg, idx) in fixtureGroup.children" :key="idx">
                 <fixture-recursive :addGroup="addGroup" :editGroup="editGroup" :deleteGroup="deleteGroup"
                     :parentArr="fixtureGroup.children" class="ml-4" :fixtureGroup="fg" :editFixture="editFixture"
                     :deleteFixture="deleteFixture" :openMenuAdd="openMenuAdd" :type="type" :isEdit="isEdit"
                     :selectedItem="selectedItem" :selectLibraryItem="selectLibraryItem" :dragStart="dragStart"
-                    :dragMove="dragMove" :clearDrag="clearDrag" />
+                    :dragMove="dragMove" :clearDrag="clearDrag" :selectFixture="selectFixture" />
             </div>
             <div class="ml-4" v-for="(fixture, idx) in fixtureGroup.fixtures" :key="idx">
-                <v-card style="width: 50%; cursor: pointer;" tile flat v-if="type == 1 && !fixture.rendering || type == 2 && fixture.rendering">
+                <v-card style="width: 50%; cursor: pointer;" tile flat
+                    v-if="type == 1 && !fixture.rendering || type == 2 && fixture.rendering">
                     <v-card-title class="pa-0 pl-2">
                         <div v-if="isEdit">{{ getType(fixture) }} - {{ fixture.name }}</div>
                         <div v-if="!isEdit" @click="selectLibraryItem(fixture)"
@@ -71,6 +76,26 @@
                     <v-divider></v-divider>
                 </v-card>
             </div>
+            <div class="ml-4" v-for="(file, fidx) in fixtureGroup.systemFiles" :key="fidx + 'f'">
+                <v-card style="width: 50%; cursor: pointer;" tile flat v-if="type == 3">
+                    <v-card-title class="pa-0 pl-2">
+                        <div>{{ file.name }}</div>
+                        <v-spacer></v-spacer>
+                        <v-btn v-if="isEdit && type != 3" class="ma-0 ml-2" small icon @click="editNewFixture(fixture)">
+                            <v-icon>edit</v-icon>
+                        </v-btn>
+                        <v-btn v-if="isEdit && type != 3" class="ma-0 ml-2" small icon
+                            @click="deleteNewFixture(fixture)">
+                            <v-icon>delete</v-icon>
+                        </v-btn>
+                        <v-btn v-if="isEdit && type == 3" class="ma-0 ml-2" small icon
+                            @click="removeSpacePlan(file.id, fidx)">
+                            <v-icon>delete</v-icon>
+                        </v-btn>
+                    </v-card-title>
+                    <v-divider></v-divider>
+                </v-card>
+            </div>
             <div class="ml-3" v-if="isEdit &&fixtureGroup.children.length == 0 && fixtureGroup.fixtures.length == 0">
                 <a href="#" @click.prevent="addNewGroup(fixtureGroup, 'Group')">Add new group</a>
             </div>
@@ -79,40 +104,52 @@
 </template>
 
 <script>
-    import Axios from 'axios';
+    import Axios from "axios";
 
     export default {
-        name: 'fixture-recursive',
-        props: ['fixtureGroup', 'addGroup', 'editGroup', 'deleteGroup', 'editFixture', 'deleteFixture', 'parentArr',
-            "openMenuAdd", "type", "isEdit", "selectedItem", "selectLibraryItem", "dragStart", "dragMove",
-            "clearDrag"
+        name: "fixture-recursive",
+        props: [
+            "fixtureGroup",
+            "addGroup",
+            "editGroup",
+            "deleteGroup",
+            "editFixture",
+            "deleteFixture",
+            "parentArr",
+            "openMenuAdd",
+            "type",
+            "isEdit",
+            "selectedItem",
+            "selectLibraryItem",
+            "dragStart",
+            "dragMove",
+            "clearDrag",
+            "selectFixture"
         ],
         data() {
-            return {}
+            return {};
         },
         methods: {
             getType(item) {
-                let self = this
-                if (item.type == 0)
-                    return "Gondola"
-                if (item.type == 1)
-                    return "Obstruction"
+                let self = this;
+                if (item.type == 0) return "Gondola";
+                if (item.type == 1) return "Obstruction";
                 if (item.type == 2) {
                     switch (item.fixtureType) {
                         case 0:
-                            return "Base"
+                            return "Base";
                             break;
                         case 1:
-                            return "Shelf"
+                            return "Shelf";
                             break;
                         case 2:
-                            return "Pegboard"
+                            return "Pegboard";
                             break;
                         case 3:
-                            return "Pegbar"
+                            return "Pegbar";
                             break;
                         case 4:
-                            return "ShareBox"
+                            return "ShareBox";
                             break;
 
                         default:
@@ -122,34 +159,34 @@
                 if (item.type == 3) {
                     switch (item.fixtureType) {
                         case 0:
-                            return "Peg"
+                            return "Peg";
                             break;
                         case 1:
-                            return "Basket"
+                            return "Basket";
                             break;
                         case 2:
-                            return "Divider"
+                            return "Divider";
                             break;
                         case 3:
-                            return "Cabinet"
+                            return "Cabinet";
                             break;
                         case 4:
-                            return "Label Holder"
+                            return "Label Holder";
                             break;
                         default:
                             break;
                     }
                 }
-                if (item.type == 4)
-                    return "Palette"
-
+                if (item.type == 4) return "Palette";
             },
             getChildren() {
                 let self = this;
 
                 if (!self.fixtureGroup.showChildren) {
-                    Axios.get(process.env.VUE_APP_API +
-                            `FixtureGroup?db=CR-Devinspire&parentID=${self.fixtureGroup.id}&type=1`)
+                    Axios.get(
+                            process.env.VUE_APP_API +
+                            `FixtureGroup?db=CR-Devinspire&parentID=${self.fixtureGroup.id}&type=1`
+                        )
                         .then(r => {
                             self.fixtureGroup.children = [];
 
@@ -158,11 +195,12 @@
                             });
 
                             self.fixtureGroup.fixtures = r.data.fixtures;
+                            self.fixtureGroup.systemFiles = r.data.systemFiles;
                             self.fixtureGroup.showChildren = true;
                         })
                         .catch(e => {
                             console.log(e);
-                        })
+                        });
                 } else {
                     self.fixtureGroup.showChildren = false;
                 }
@@ -174,10 +212,36 @@
                     self.addGroup(self.fixtureGroup, self.type, child => {
                         self.fixtureGroup.children.push(new FixtureGroup(child));
                         self.fixtureGroup.showChildren = true;
-                    })
+                    });
                 } else {
-                    self.openMenuAdd(type, item, self.fixtureGroup.fixtures)
+                    self.openMenuAdd(type, item, self.fixtureGroup.fixtures);
                 }
+            },
+            addSpacePlan(item) {
+                let self = this;
+
+                self.selectFixture((fixtureID, sp) => {
+                    Axios.put(
+                            process.env.VUE_APP_API +
+                            `FixtureGroup?db=CR-DEVINSPIRE&systemFileID=${fixtureID}&groupID=${item.id}`
+                        )
+                        .then(r => {
+                            self.fixtureGroup.systemFiles.push(sp);
+                        })
+                        .catch(e => {});
+                });
+            },
+            removeSpacePlan(fixtureID, idx) {
+                let self = this;
+
+                Axios.put(
+                        process.env.VUE_APP_API +
+                        `FixtureGroup?db=CR-DEVINSPIRE&systemFileID=${fixtureID}&groupID=null`
+                    )
+                    .then(r => {
+                        self.fixtureGroup.systemFiles.splice(idx, 1);
+                    })
+                    .catch(e => {});
             },
             editNewGroup() {
                 let self = this;
@@ -200,7 +264,7 @@
                 self.deleteFixture(fixture, self.fixtureGroup.fixtures);
             }
         }
-    }
+    };
 
     function FixtureGroup(params) {
         let self = this;
@@ -210,6 +274,7 @@
         self.type = params.type;
         self.children = [];
         self.fixtures = params.fixtures;
+        self.systemFiles = params.systemFiles;
         self.showChildren = false;
     }
 </script>

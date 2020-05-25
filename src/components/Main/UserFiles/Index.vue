@@ -2,15 +2,15 @@
     <div style="margin-top: 3px;">
         <div class="route-item" @click="folderClick">
             <v-icon size="12">{{ showFolders ? 'folder_open' : 'folder' }}</v-icon>
-            <span class="ml-1">Documents</span>
+            <span style="font-size: 9px;" class="ml-1">Documents</span>
         </div>
-        <div style="margin-left: 15px;" v-if="showFolders">
+        <div style="margin-left: 5px;" v-if="showFolders">
             <div>
                 <div @contextmenu.prevent="onContextMenu" @click="myFolderClick" class="route-item">
                     <v-icon size="12">{{ showMyFiles ? 'folder_open' : 'folder' }}</v-icon>
-                    <span class="ml-1">My Files</span>
+                    <span style="font-size: 9px;" class="ml-1">My Files</span>
                 </div>
-                <div style="margin-left: 15px;" v-if="showMyFiles">
+                <div style="margin-left: 5px;" v-if="showMyFiles">
                     <!-- add Uploaded Files -->
                     <UserFiles :systemUserID="systemUserID" :items="myFilesMain" />
                     <div v-if="showAddFolder">
@@ -25,16 +25,16 @@
             <div>
                 <div @click="sharedFolderClick" class="route-item">
                     <v-icon size="12">{{ showSharedFiles ? 'folder_open' : 'folder' }}</v-icon>
-                    <span class="ml-1">Shared With Me</span>
+                    <span style="font-size: 9px;" class="ml-1">Shared With Me</span>
                 </div>
-                <div style="margin-left: 15px;" v-if="showSharedFiles">
+                <div style="margin-left: 5px;" v-if="showSharedFiles">
                     <!-- <UserFiles :systemUserID="systemUserID" :items="myFilesMain" /> -->
                     <div v-for="(item, idx) in sharedFiles" :key="idx">
                         <div @click="item.showChildren = !item.showChildren" class="route-item">
                             <v-icon size="12">{{ item.showChildren ? 'folder_open' : 'folder' }}</v-icon>
-                            <span class="ml-1">{{ item.ownerName }}</span>
+                            <span style="font-size: 9px;" class="ml-1">{{ item.ownerName }}</span>
                         </div>
-                        <div v-if="item.showChildren" style="margin-left: 15px;">
+                        <div v-if="item.showChildren" style="margin-left: 5px;">
                             <SharedUserFiles :systemUserID="systemUserID" :items="item.children" />
                         </div>
                     </div>

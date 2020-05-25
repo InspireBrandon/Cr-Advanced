@@ -7,6 +7,15 @@ import csvToDataObject from '@/libs/helpers/csvToDataObject.js'
 import Axios from 'axios';
 import Vue from 'vue';
 
+// Seasonality
+let seasonalData = {
+  average: 0,
+  averageHigh: 0,
+  averageLow: 0,
+  rangeVolume: 0,
+  currentOverSeasonalAverage: 0,
+  seasonalPercent: 0
+}
 
 class RangingController {
   constructor(rangingData, vueInstance) {
@@ -27,8 +36,6 @@ class RangingController {
     self.totalsData = null;
     self.endingStock = null;
     self.categoryCharacteristics = rangingData.categoryCharacteristics;
-
-    console.log(self.clusterData);
 
     // SET TEST INDICATORS
     self.storeSales.forEach(store => {
@@ -60,7 +67,9 @@ class RangingController {
     Axios.post(process.env.VUE_APP_API + `Sales_Monthly_Total?period_from_id=${self.dateFrom}&period_to_id=${self.dateTo}`).then(r => {
       self.totalsData = r.data.sales_Monthly_Total_List;
       self.getEndingStock(type, () => {
-        self.getTemporaryClusters(callback);
+        self.getTemporaryClusters(() => {
+          self.getSeasonality(callback)
+        });
         // callback();
       })
     })
@@ -115,12 +124,91 @@ class RangingController {
           clusterStores: r.data
         })
 
-        console.log(r.data);
-
         tempClusters = r.data;
 
         Vue.set(self.clusterData, 'tempClusters', tempClusters);
         callback();
+      })
+  }
+
+  getSeasonality(callback) {
+    let self = this;
+
+    Axios.get(process.env.VUE_APP_API +
+        `SeasonalityReport?planogramID=${self.planogramID}&periodFromID=${(self.dateFrom - 6)}&periodToID=${self.dateTo}`
+      )
+      .then(r => {
+        console.log('seasonality', r.data)
+
+        let data = r.data;
+        let rangeVolume = 0;
+
+        for (var i = ((data.length / 2)); i < data.length; i++) {
+          let el = data[i];
+          rangeVolume += el.volume;
+          console.log(el);
+        }
+
+        rangeVolume = rangeVolume / (data.length / 2);
+
+        let avgVolume = 0;
+        let avgHighVolume = 0;
+        let avgLowVolume = 0;
+
+        // Get sum of all volume
+        data.forEach(element => {
+          avgVolume += element.volume;
+        });
+
+        // Get average volume
+        avgVolume = avgVolume / data.length;
+
+        let highs = [];
+        let lows = [];
+
+        // Get percent away from average and get high and low volumes
+        data.forEach(element => {
+          element['percentOf'] = (((element.volume - avgVolume) / avgVolume) * 100).toFixed(1);
+
+          if (element.volume > avgVolume) {
+            highs.push(element.volume);
+          }
+
+          if (element.volume <= avgVolume) {
+            lows.push(element.volume);
+          }
+        });
+
+        // sum average high volume
+        highs.forEach(volume => {
+          avgHighVolume += volume;
+        })
+
+        // sum average low volume
+        lows.forEach(volume => {
+          avgLowVolume += volume;
+        })
+
+        // get average
+        avgHighVolume = avgHighVolume / highs.length;
+        avgLowVolume = avgLowVolume / lows.length;
+
+        // Set averages for display
+        seasonalData.average = avgVolume.toFixed(0);
+        seasonalData.averageHigh = avgHighVolume.toFixed(0);
+        seasonalData.averageLow = avgLowVolume.toFixed(0);
+        seasonalData.rangeVolume = rangeVolume.toFixed(0);
+        seasonalData.currentOverSeasonalAverage = (((rangeVolume - seasonalData.average) / seasonalData.average) * 100).toFixed(0);
+
+        let seasonalDiff = seasonalData.rangeVolume - seasonalData.average;
+        seasonalData.seasonalPercent = (seasonalDiff / seasonalData.average) * 100;
+
+        console.log('seasonalData', seasonalData);
+
+        callback();
+      })
+      .catch(e => {
+        console.log(e);
       })
   }
 
@@ -1328,12 +1416,24 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
     let stock_turn = isNaN((sales_cost * 12) / new_Stock_Cost) ? 0 : (sales_cost * 12) / new_Stock_Cost;
 
     let lost_sales = (parseFloat(sales_retail * 6).toFixed(0) / ((30 * 6) - calculated_oos_days) * calculated_oos_days) / 6;
-    let lost_units = (parseFloat(sales_units * 6).toFixed(0) / ((30 * 6) - calculated_oos_days) * calculated_oos_days) / 6;
+    let lost_units = (parseFloat(sales_units * 6).toFixed(1) / ((30 * 6) - calculated_oos_days) * calculated_oos_days) / 6;
     let lost_profit = (parseFloat(sales_profit * 6).toFixed(0) / ((30 * 6) - calculated_oos_days) * calculated_oos_days) / 6;
     let lost_cost = (parseFloat(sales_cost * 6).toFixed(0) / ((30 * 6) - calculated_oos_days) * calculated_oos_days) / 6;
 
     let gross_profit = ((selling_price - cost_price) / selling_price) * 100;
     let markup = ((selling_price - cost_price) / cost_price) * 100;
+
+    let oneWeekStock = sales_units / 4;
+
+    // console.log('seasonalPercent', seasonalData.seasonalPercent);
+
+    let unitPercent = (seasonalData.seasonalPercent / 100) * oneWeekStock;
+
+    let minimum_Stock = oneWeekStock * autoRangeData.minumum_stock;
+    let maximum_Stock = oneWeekStock * autoRangeData.maximum_stock;
+    let seasonal_Minimum = (oneWeekStock + unitPercent) * autoRangeData.minumum_stock;
+    let seasonal_Maximum = (oneWeekStock + unitPercent) * autoRangeData.maximum_stock;
+    let surplus_Stock = new_Stock_Units - sales_units;
 
     let sales_potential = 0;
     let volume_potential = 0;
@@ -1367,7 +1467,7 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
     productSales.push(new RangeProduct(product, {
       sales_retail: parseFloat((sales_retail).toFixed(0)),
       sales_cost: parseFloat((sales_cost).toFixed(0)),
-      sales_units: parseFloat((sales_units).toFixed(0)),
+      sales_units: parseFloat((sales_units).toFixed(1)),
       sales_profit: parseFloat((sales_profit).toFixed(0)),
       stock_units: parseFloat(new_Stock_Units.toFixed(0)),
       stock_cost: parseFloat(new_Stock_Cost.toFixed(0)),
@@ -1396,7 +1496,12 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
       markup: markup.toFixed(0),
       sales_contribution: parseFloat(sales_contribution.toFixed(0)),
       units_contribution: parseFloat(units_contribution.toFixed(0)),
-      profit_contribution: parseFloat(profit_contribution.toFixed(0))
+      profit_contribution: parseFloat(profit_contribution.toFixed(0)),
+      minimum_Stock: parseFloat(minimum_Stock.toFixed(1)),
+      maximum_Stock: parseFloat(maximum_Stock.toFixed(1)),
+      seasonal_Minimum: parseFloat(seasonal_Minimum.toFixed(1)),
+      seasonal_Maximum: parseFloat(seasonal_Maximum.toFixed(1)),
+      surplus_Stock: parseFloat(surplus_Stock.toFixed(1)),
     }, getProductIndicator(product.productID, storeSales, stores), getTestProductIndicator(product.productID, storeSales, stores)))
   }
 
@@ -1494,6 +1599,18 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
     let lost_profit = (sales_profit * 6 / (totalDays - calculated_oos_days.oos_days)) * calculated_oos_days.oos_days / 6
     let lost_cost = (sales_cost * 6 / (totalDays - calculated_oos_days.oos_days)) * calculated_oos_days.oos_days / 6;
 
+    let oneWeekStock = sales_units / 4;
+
+    // console.log('seasonalPercent', seasonalData.seasonalPercent);
+
+    let unitPercent = (seasonalData.seasonalPercent / 100) * oneWeekStock;
+
+    let minimum_Stock = oneWeekStock * autoRangeData.minumum_stock;
+    let maximum_Stock = oneWeekStock * autoRangeData.maximum_stock;
+    let seasonal_Minimum = (oneWeekStock + unitPercent) * autoRangeData.minumum_stock;
+    let seasonal_Maximum = (oneWeekStock + unitPercent) * autoRangeData.maximum_stock;
+    let surplus_Stock = new_Stock_Units - sales_units;
+
     let sales_potential = 0;
     let volume_potential = 0;
     let profit_potential = 0;
@@ -1531,7 +1648,7 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
     productSales.push(new RangeProduct(product, {
       sales_retail: parseFloat((sales_retail).toFixed(0)),
       sales_cost: parseFloat((sales_cost).toFixed(0)),
-      sales_units: parseFloat((sales_units).toFixed(0)),
+      sales_units: parseFloat((sales_units).toFixed(1)),
       sales_profit: parseFloat((sales_profit).toFixed(0)),
       stock_units: parseFloat(new_Stock_Units.toFixed(0)),
       stock_cost: parseFloat(new_Stock_Cost.toFixed(0)),
@@ -1561,7 +1678,12 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
       markup: markup.toFixed(0),
       sales_contribution: parseFloat(sales_contribution.toFixed(0)),
       units_contribution: parseFloat(units_contribution.toFixed(0)),
-      profit_contribution: parseFloat(profit_contribution.toFixed(0))
+      profit_contribution: parseFloat(profit_contribution.toFixed(0)),
+      minimum_Stock: parseFloat(minimum_Stock.toFixed(0)),
+      maximum_Stock: parseFloat(maximum_Stock.toFixed(0)),
+      seasonal_Minimum: parseFloat(seasonal_Minimum.toFixed(0)),
+      seasonal_Maximum: parseFloat(seasonal_Maximum.toFixed(0)),
+      surplus_Stock: parseFloat(surplus_Stock.toFixed(0)),
     }, getProductIndicator(product.productID, storeSales, stores), getTestProductIndicator(product.productID, storeSales, stores)))
   }
 
@@ -1746,27 +1868,27 @@ function RangeProduct(productData, salesData, indicator, testIndicator) {
   self.sales_Cost = salesData.sales_cost;
   self.sales_Units = salesData.sales_units;
   self.sales_Profit = salesData.sales_profit;
-  self.stock_Cost = salesData.stock_cost,
-    self.stock_Units = salesData.stock_units,
-    self.oos_Days = salesData.oos_days,
-    self.lost_Sales = salesData.lost_sales,
-    self.lost_Units = salesData.lost_units,
-    self.lost_Profit = salesData.lost_profit,
-    self.lost_Cost = salesData.lost_cost,
-    self.average_cost = salesData.average_cost,
-    self.average_price = salesData.average_price,
-    self.days_of_supply = salesData.days_of_supply,
-    self.stock_turn = salesData.stock_turn,
-    self.number_Distribution = salesData.number_distribution + " %";
+  self.stock_Cost = salesData.stock_cost;
+  self.stock_Units = salesData.stock_units;
+  self.oos_Days = salesData.oos_days;
+  self.lost_Sales = salesData.lost_sales;
+  self.lost_Units = salesData.lost_units;
+  self.lost_Profit = salesData.lost_profit;
+  self.lost_Cost = salesData.lost_cost;
+  self.average_cost = salesData.average_cost;
+  self.average_price = salesData.average_price;
+  self.days_of_supply = salesData.days_of_supply;
+  self.stock_turn = salesData.stock_turn;
+  self.number_Distribution = salesData.number_distribution + " %";
   self.weighted_Distribution = salesData.weighted_distribution + " %";
   self.sales_potential = salesData.sales_potential;
   self.volume_potential = salesData.volume_potential;
   self.profit_potential = salesData.profit_potential;
   self.cost_potential = salesData.cost_potential;
   self.profit_potential_rank = salesData.profit_potential_rank;
-  self.item_volume_rank = salesData.item_volume_rank
-  self.item_sales_rank = salesData.item_sales_rank
-  self.item_profit_rank = salesData.item_profit_rank
+  self.item_volume_rank = salesData.item_volume_rank;
+  self.item_sales_rank = salesData.item_sales_rank;
+  self.item_profit_rank = salesData.item_profit_rank;
   self.dos_fac = salesData.dos_fac;
   self.gross_profit = (isNaN(salesData.gross_profit) ? 0 : salesData.gross_profit) + "%";
   self.markup = (isNaN(salesData.markup) ? 0 : salesData.markup) + "%";
@@ -1779,6 +1901,12 @@ function RangeProduct(productData, salesData, indicator, testIndicator) {
   self.alt_Store_Range_Indicator = "";
   self.alt_Store_Range_Indicator_ID = null;
   self.test_Range_Indicator = testIndicator;
+  // Product Supply Fields
+  self.minimum_Stock = salesData.minimum_Stock;
+  self.maximum_Stock = salesData.maximum_Stock;
+  self.seasonal_Minimum = salesData.seasonal_Minimum;
+  self.seasonal_Maximum = salesData.seasonal_Maximum;
+  self.surplus_Stock = salesData.surplus_Stock;
 }
 
 function storeStocksProduct(storeSales, storeID, productID) {

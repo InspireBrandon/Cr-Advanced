@@ -22,8 +22,6 @@ class Basket extends Boxbase {
 
         // self.element.position.x = (self.data.x + 0.5 * self.data.width) / 100;
 
-        console.log(self.data.parent);
-
         let pcDiff = self.data.parent.data.height - self.data.height - 0.1;
         self.element.position.z = parentElement.position.z;
 

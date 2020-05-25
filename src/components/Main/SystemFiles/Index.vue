@@ -2,9 +2,9 @@
     <div style="margin-top: 3px;">
         <div @contextmenu.prevent="onContextMenu" class="route-item" @click="folderClick">
             <v-icon size="12">{{ showFolders ? 'folder_open' : 'folder' }}</v-icon>
-            <span class="ml-1">Reports</span>
+            <span style="font-size: 9px;" class="ml-1">Reports</span>
         </div>
-        <div style="margin-left: 15px;" v-if="showFolders">
+        <div style="margin-left: 5px;" v-if="showFolders">
             <SystemFiles :systemUserID="systemUserID" :items="folderFiles" />
             <div v-if="showAddFolder">
                 <v-form @submit.prevent="submitFolderFile">

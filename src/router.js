@@ -73,6 +73,7 @@ import PlanogramMaintenance from '@/components/Apps/DataPreparation/Types/Planog
 import ProductCatalogue from '@/components/Apps/DataPreparation/Types/ProductCatalogue/ProductCatalogue.vue';
 import CategoryCode from '@/components/Apps/DataPreparation/Types/CategoryCode/CategoryCode.vue';
 import TestRange from '@/components/Apps/DataPreparation/Types/Test_Range/Index.vue'
+import PlanogramRole from '@/components/Apps/DataPreparation/Types/Planogram_Role/Index.vue'
 
 
 //projectPlanning
@@ -591,6 +592,11 @@ export default new Router({
                 path: 'TestRange',
                 name: 'TestRange',
                 component: TestRange
+              },
+              {
+                path: 'PlanogramRole',
+                name: 'PlanogramRole',
+                component: PlanogramRole
               },
               {
                 path: 'Geographic_Location',

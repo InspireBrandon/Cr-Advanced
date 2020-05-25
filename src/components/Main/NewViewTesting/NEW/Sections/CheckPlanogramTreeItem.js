@@ -45,8 +45,11 @@ function buildCheckPlanogramItems(checkItems, router) {
     let checkPlanogramTreeItems = [];
 
     checkItems.forEach(checkItem => {
+        var tmpName = checkItem.systemFileName.replace('- XXX ', '').replace('- 6MMA ', '').split('Module')[0];
+        tmpName = tmpName.substring(0, tmpName.length - 4);
+
         let ai = new TreeItem({
-            name: checkItem.systemFileName,
+            name: tmpName,
             icon: 'insert_drive_file',
             showIcon: true,
             value: checkItem

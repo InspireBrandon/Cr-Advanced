@@ -80,7 +80,7 @@
                                 Send back to
                                 range</v-btn>
                             <v-btn color="red" outline @click="headOfficeApprove()"
-                                v-if="authorityType == 0 && $route.params.status != 13 && $route.params.status != 24 && $route.params.status != 26">
+                                v-if="authorityType == 0 && ($route.params.status == 20 || $route.params.status == 21)">
                                 Head office approve</v-btn>
                             <v-btn color="red" outline @click="sendCheckPlanogram"
                                 v-if="authorityType == 0 && $route.params.status != 13 && $route.params.status != 24 && $route.params.status != 26">
@@ -1406,7 +1406,7 @@
             sendBackToRange() {
                 let self = this;
 
-                self.$refs.notesModal.show("Notes", notes => {
+                self.$refs.notesModal.show("Reason for send back?", notes => {
                     let request = JSON.parse(JSON.stringify(self.tmpRequest));
 
                     let encoded_details = jwt.decode(sessionStorage.accessToken);

@@ -6,7 +6,7 @@
                     <v-progress-circular :size="12" v-if="item.loading" :width="2" indeterminate color="primary">
                     </v-progress-circular>
                     <v-icon size="12">{{ item.showChildren ? 'folder_open' : 'folder' }}</v-icon>
-                    <span class="ml-1" v-if="!item.showEdit">{{item.name}}</span>
+                    <span style="font-size: 9px;" class="ml-1" v-if="!item.showEdit">{{item.name}}</span>
                     <v-form @submit.prevent="submitFolderRename">
                         <input :ref="'edit' + item.id" v-if="item.showEdit" @blur="submitFolderRename"
                             v-model="item.name" class="ml-1" style="border: 1px solid lightgrey" type="text">
@@ -17,15 +17,15 @@
                     <v-progress-circular :size="12" v-if="item.loading" :width="2" indeterminate color="primary">
                     </v-progress-circular>
                     <v-icon size="12">insert_drive_file</v-icon>
-                    <span class="ml-1" v-if="!item.showEdit">{{item.name}}</span>
+                    <span style="font-size: 9px;" class="ml-1" v-if="!item.showEdit">{{item.name}}</span>
                     <v-form @submit.prevent="submitFolderRename">
                         <input :ref="'edit' + item.id" v-if="item.showEdit" @blur="submitFolderRename"
                             v-model="item.fileName" class="ml-1" style="border: 1px solid lightgrey" type="text">
                     </v-form>
                 </div>
-                <UserFiles :systemUserID="systemUserID" v-if="item.showChildren" style="margin-left: 15px;"
+                <UserFiles :systemUserID="systemUserID" v-if="item.showChildren" style="margin-left: 5px;"
                     :onContextMenu="onContextMenu" :items="item.children"></UserFiles>
-                <div v-if="showAddFolder" style="margin-left: 15px;">
+                <div v-if="showAddFolder" style="margin-left: 5px;">
                     <v-form @submit.prevent="submitFolder">
                         <v-icon size="12">folder</v-icon>
                         <input @blur="showAddFolder = false" :ref="'folderName' + item.id" v-model="folderName"
