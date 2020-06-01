@@ -54,7 +54,7 @@
                     :parentArr="fixtureGroup.children" class="ml-4" :fixtureGroup="fg" :editFixture="editFixture"
                     :deleteFixture="deleteFixture" :openMenuAdd="openMenuAdd" :type="type" :isEdit="isEdit"
                     :selectedItem="selectedItem" :selectLibraryItem="selectLibraryItem" :dragStart="dragStart"
-                    :dragMove="dragMove" :clearDrag="clearDrag" :selectFixture="selectFixture" />
+                    :dragMove="dragMove" :clearDrag="clearDrag" :selectFixture="selectFixture" :isFloorplan="isFloorplan" />
             </div>
             <div class="ml-4" v-for="(fixture, idx) in fixtureGroup.fixtures" :key="idx">
                 <v-card style="width: 50%; cursor: pointer;" tile flat
@@ -124,7 +124,8 @@
             "dragStart",
             "dragMove",
             "clearDrag",
-            "selectFixture"
+            "selectFixture",
+            "isFloorplan"
         ],
         data() {
             return {};
@@ -189,12 +190,27 @@
                         )
                         .then(r => {
                             self.fixtureGroup.children = [];
+                            console.log("getChildren", r.data.fixtureGroups);
 
                             r.data.fixtureGroups.forEach(fg => {
                                 self.fixtureGroup.children.push(new FixtureGroup(fg));
                             });
+                            console.log("fixtures", self.fixtureGroup.fixtures);
+                            console.log(self.isFloorplan);
+                            
+                            if (self.isFloorplan==true) {
+                                 self.fixtureGroup.fixtures=[]
+                                 r.data.fixtures.forEach(item=>{
+                                     if(item.isFloorplan)
+                                     {
+                                         self.fixtureGroup.fixtures.push(item)
+                                     }
+                                 })
+                            } else {
+                                self.fixtureGroup.fixtures = r.data.fixtures;
+                            }
 
-                            self.fixtureGroup.fixtures = r.data.fixtures;
+
                             self.fixtureGroup.systemFiles = r.data.systemFiles;
                             self.fixtureGroup.showChildren = true;
                         })

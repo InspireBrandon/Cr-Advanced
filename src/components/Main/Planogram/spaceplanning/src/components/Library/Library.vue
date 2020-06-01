@@ -7,7 +7,7 @@
     </v-chip>
     <v-divider vertical></v-divider>
     <v-menu v-model="menu" :close-on-content-click="false" :nudge-width="100" offset-y>
-      <v-btn small slot="activator">Library</v-btn>
+      <v-btn small slot="activator" @click="log">Library</v-btn>
       <v-card width="1000">
         <v-tabs centered color="primary" dark icons-and-text>
           <v-tabs-slider color="white"></v-tabs-slider>
@@ -50,7 +50,7 @@
               <FixtureRecursive :addGroup="''" :editGroup="''" :deleteGroup="''" v-for="(fg, idx) in fixtureGroups"
                 :key="idx" :fixtureGroup="fg" :parentArr="fixtureGroups" :editFixture="''" :deleteFixture="''" :type="1"
                 :openMenuAdd="''" :isEdit="false" :selectedItem="selectedItem" :selectLibraryItem="selectLibraryItem"
-                :dragStart="dragStart" :dragMove="dragMove" :clearDrag="clearDrag">
+                :dragStart="dragStart" :dragMove="dragMove" :clearDrag="clearDrag" :isFloorplan="isFloorplan">
               </FixtureRecursive>
             </v-card>
           </v-tab-item>
@@ -365,6 +365,10 @@
       }
     },
     methods: {
+      log(){
+        let self = this
+        console.log("isFloorplan",self.isFloorplan);
+      },
       getFixtureGroups() {
         let self = this;
 
