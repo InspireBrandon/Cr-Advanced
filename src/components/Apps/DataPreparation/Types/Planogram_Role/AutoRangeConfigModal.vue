@@ -257,16 +257,52 @@
                         <table class="mt-1">
                             <tbody>
                                 <tr>
-                                    <td>Default Minimum Units</td>
-                                    <td style="text-align: center;">=</td>
-                                    <td style="padding: 0px!important; width: 100px">
+                                    <td style="width: 200px;">Default Minimum Units</td>
+                                    <td style="text-align: center; width: 50px;">=</td>
+                                    <td style="padding: 0px!important; width: 100px;">
                                         <input v-model="data.default_Minimum" style="width: 100%; text-align: right;"
                                             type="number" />
                                     </td>
                                     <td>Then Max Units</td>
-                                    <td style="text-align: center;">=</td>
+                                    <td style="text-align: center; width: 50px;">=</td>
                                     <td style="padding: 0px!important; width: 100px">
                                         <input v-model="data.default_Minimum_Max"
+                                            style="width: 100%; text-align: right;" type="number" />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="mt-1">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 200px;">Default Minimum Units</td>
+                                    <td style="text-align: center; width: 50px;">>=</td>
+                                    <td style="padding: 0px!important; width: 100px">
+                                        <input v-model="data.default_Minimum_Greater"
+                                            style="width: 100%; text-align: right;" type="number" />
+                                    </td>
+                                    <td>Then Max Units</td>
+                                    <td style="text-align: center; width: 50px;">=</td>
+                                    <td style="padding: 0px!important; width: 100px">
+                                        <input v-model="data.default_Minimum_Greater_Max"
+                                            style="width: 100%; text-align: right;" type="number" />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="mt-1">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 200px;">Default New Item</td>
+                                    <td style="text-align: center; width: 50px;">Min</td>
+                                    <td style="padding: 0px!important; width: 100px">
+                                        <input v-model="data.default_New_Item_Min"
+                                            style="width: 100%; text-align: right;" type="number" />
+                                    </td>
+                                    <td>Max</td>
+                                    <td style="text-align: center; width: 50px;">=</td>
+                                    <td style="padding: 0px!important; width: 100px">
+                                        <input v-model="data.default_New_Item_Max"
                                             style="width: 100%; text-align: right;" type="number" />
                                     </td>
                                 </tr>
@@ -416,6 +452,10 @@
                     maximum_Stock: 6,
                     default_Minimum: 2,
                     default_Minimum_Max: 0,
+                    default_Minimum_Greater: 3,
+                    default_Minimum_Greater_Max: 3,
+                    default_New_Item_Min: 3,
+                    default_New_Item_Max: 5,
                     default_Price_Minimum: 100,
                     default_Price_Minimum_Min: 3,
                     default_Price_Minimum_Max: 5,
@@ -466,6 +506,10 @@
                 self.data.maximum_Stock = 6;
                 self.data.default_Minimum = 2;
                 self.data.default_Minimum_Max = 0;
+                self.data.default_Minimum_Greater = 3;
+                self.data.default_Minimum_Greater_Max = 5;
+                self.data.default_New_Item_Min = 3;
+                self.data.default_New_Item_Max = 5;
                 self.data.default_Price_Minimum = 100;
                 self.data.default_Price_Minimum_Min = 3;
                 self.data.default_Price_Minimum_Max = 5;

@@ -14,7 +14,8 @@ let seasonalData = {
   averageLow: 0,
   rangeVolume: 0,
   currentOverSeasonalAverage: 0,
-  seasonalPercent: 0
+  seasonalPercent: 0,
+  inSeason: true,
 }
 
 class RangingController {
@@ -138,8 +139,6 @@ class RangingController {
         `SeasonalityReport?planogramID=${self.planogramID}&periodFromID=${(self.dateFrom - 6)}&periodToID=${self.dateTo}`
       )
       .then(r => {
-        console.log('seasonality', r.data)
-
         let data = r.data;
         let rangeVolume = 0;
 
@@ -202,6 +201,8 @@ class RangingController {
 
         let seasonalDiff = seasonalData.rangeVolume - seasonalData.average;
         seasonalData.seasonalPercent = (seasonalDiff / seasonalData.average) * 100;
+
+        seasonalData.inSeason = seasonalData.rangeVolume > seasonalData.average;
 
         console.log('seasonalData', seasonalData);
 
@@ -1425,15 +1426,57 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
 
     let oneWeekStock = sales_units / 4;
 
-    // console.log('seasonalPercent', seasonalData.seasonalPercent);
-
-    let unitPercent = (seasonalData.seasonalPercent / 100) * oneWeekStock;
-
     let minimum_Stock = oneWeekStock * autoRangeData.minumum_stock;
     let maximum_Stock = oneWeekStock * autoRangeData.maximum_stock;
-    let seasonal_Minimum = (oneWeekStock + unitPercent) * autoRangeData.minumum_stock;
-    let seasonal_Maximum = (oneWeekStock + unitPercent) * autoRangeData.maximum_stock;
-    let surplus_Stock = new_Stock_Units - sales_units;
+
+    let inSeasonRatio = ((seasonalData.averageHigh - seasonalData.rangeVolume) / seasonalData.averageHigh);
+    let outSeasonRatio = ((seasonalData.rangeVolume - seasonalData.averageLow) / seasonalData.rangeVolume);
+
+    let seasonal_Minimum = (oneWeekStock + (inSeasonRatio * oneWeekStock)) * autoRangeData.minumum_stock;
+    let seasonal_Maximum = (oneWeekStock + (inSeasonRatio * oneWeekStock)) * autoRangeData.maximum_stock;
+
+    let seasonal_Minimum_Out = (oneWeekStock - (outSeasonRatio * oneWeekStock)) * autoRangeData.minumum_stock;
+    let seasonal_Maximum_Out = (oneWeekStock - (outSeasonRatio * oneWeekStock)) * autoRangeData.maximum_stock;
+
+    let surplusRequired = oneWeekStock * parseFloat(autoRangeData.surplus_stock);
+    let surplus_Stock = new_Stock_Units - surplusRequired;
+
+    let casePackFix = (product.case_Pack_Qty == undefined || product.case_Pack_Qty == null || parseFloat(product.case_Pack_Qty) < 1) ? 1 : parseFloat(product.case_Pack_Qty);
+
+    let isNewItem = product.active_Shop_Code_ID == '1';
+
+    let _minMax = calculateConstraints(Math.round(minimum_Stock), Math.round(maximum_Stock), autoRangeData, average_price, isNewItem);
+    let _minMaxIn = calculateConstraints(Math.round(seasonal_Minimum), Math.round(seasonal_Maximum), autoRangeData, average_price, isNewItem);
+    let _minMaxOut = calculateConstraints(Math.round(seasonal_Minimum_Out), Math.round(seasonal_Maximum_Out), autoRangeData, average_price, isNewItem);
+
+    if (product.barcode == '6001385000092') {
+      console.log("_minMax", _minMax)
+      console.log("_minMaxIn", _minMaxIn)
+      console.log("_minMaxOut", _minMaxOut)
+      console.log("min max", seasonal_Minimum_Out, seasonal_Maximum_Out)
+    }
+
+    let case_Pack_Qty_Exceeded = 0;
+
+    if (casePackFix > 1) {
+      let min = autoRangeData.use_seasonal_index ? seasonal_Minimum_Out : minimum_Stock;
+      let max = autoRangeData.use_seasonal_index ? seasonal_Minimum : maximum_Stock;
+
+      if (max > 0) {
+        let minMaxDiff = min - 1;
+
+        let casePackExceeds = minMaxDiff + casePackFix;
+
+        if (casePackExceeds > max) {
+          let exceedsByDiff = casePackExceeds - max;
+          case_Pack_Qty_Exceeded = exceedsByDiff;
+        }
+      }
+    }
+
+    if (surplus_Stock < 0) {
+      surplus_Stock = 0;
+    }
 
     let sales_potential = 0;
     let volume_potential = 0;
@@ -1497,11 +1540,17 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
       sales_contribution: parseFloat(sales_contribution.toFixed(0)),
       units_contribution: parseFloat(units_contribution.toFixed(0)),
       profit_contribution: parseFloat(profit_contribution.toFixed(0)),
-      minimum_Stock: parseFloat(minimum_Stock.toFixed(1)),
-      maximum_Stock: parseFloat(maximum_Stock.toFixed(1)),
-      seasonal_Minimum: parseFloat(seasonal_Minimum.toFixed(1)),
-      seasonal_Maximum: parseFloat(seasonal_Maximum.toFixed(1)),
-      surplus_Stock: parseFloat(surplus_Stock.toFixed(1)),
+      minimum_Stock: parseFloat(minimum_Stock.toFixed(0)),
+      maximum_Stock: parseFloat(maximum_Stock.toFixed(0)),
+      seasonal_Minimum: parseFloat(seasonal_Minimum.toFixed(0)),
+      seasonal_Maximum: parseFloat(seasonal_Maximum.toFixed(0)),
+      seasonal_Minimum_Out: parseFloat(seasonal_Minimum_Out.toFixed(0)),
+      seasonal_Maximum_Out: parseFloat(seasonal_Maximum_Out.toFixed(0)),
+      surplus_Stock: parseFloat(surplus_Stock.toFixed(0)),
+      case_Pack_Qty_Exceeded: parseFloat(case_Pack_Qty_Exceeded.toFixed(0)),
+      constraintMinMax: _minMax,
+      constraintMinMaxIn: _minMaxIn,
+      constraintMinMaxOut: _minMaxOut,
     }, getProductIndicator(product.productID, storeSales, stores), getTestProductIndicator(product.productID, storeSales, stores)))
   }
 
@@ -1601,15 +1650,52 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
 
     let oneWeekStock = sales_units / 4;
 
-    // console.log('seasonalPercent', seasonalData.seasonalPercent);
-
-    let unitPercent = (seasonalData.seasonalPercent / 100) * oneWeekStock;
-
     let minimum_Stock = oneWeekStock * autoRangeData.minumum_stock;
     let maximum_Stock = oneWeekStock * autoRangeData.maximum_stock;
-    let seasonal_Minimum = (oneWeekStock + unitPercent) * autoRangeData.minumum_stock;
-    let seasonal_Maximum = (oneWeekStock + unitPercent) * autoRangeData.maximum_stock;
-    let surplus_Stock = new_Stock_Units - sales_units;
+
+    let inSeasonRatio = ((seasonalData.averageHigh - seasonalData.rangeVolume) / seasonalData.averageHigh);
+    let outSeasonRatio = ((seasonalData.rangeVolume - seasonalData.averageLow) / seasonalData.rangeVolume);
+
+    let seasonal_Minimum = (oneWeekStock + (inSeasonRatio * oneWeekStock)) * autoRangeData.minumum_stock;
+    let seasonal_Maximum = (oneWeekStock + (inSeasonRatio * oneWeekStock)) * autoRangeData.maximum_stock;
+
+    let seasonal_Minimum_Out = (oneWeekStock - (outSeasonRatio * oneWeekStock)) * autoRangeData.minumum_stock;
+    let seasonal_Maximum_Out = (oneWeekStock - (outSeasonRatio * oneWeekStock)) * autoRangeData.maximum_stock;
+
+    // Do min max calcs
+    let min = autoRangeData.use_seasonal_index ? seasonal_Minimum_Out : minimum_Stock;
+    let max = autoRangeData.use_seasonal_index ? seasonal_Minimum : maximum_Stock;
+
+    let isNewItem = product.active_Shop_Code_ID == '1';
+
+    let _minMax = calculateConstraints(Math.round(minimum_Stock), Math.round(maximum_Stock), autoRangeData, average_price, isNewItem);
+    let _minMaxIn = calculateConstraints(Math.round(seasonal_Minimum), Math.round(seasonal_Maximum), autoRangeData, average_price, isNewItem);
+    let _minMaxOut = calculateConstraints(Math.round(seasonal_Minimum_Out), Math.round(seasonal_Maximum_Out), autoRangeData, average_price, isNewItem);
+
+    let surplusRequired = oneWeekStock * parseFloat(autoRangeData.surplus_stock);
+    let surplus_Stock = new_Stock_Units - surplusRequired;
+
+    let casePackFix = (product.case_Pack_Qty == undefined || product.case_Pack_Qty == null || parseFloat(product.case_Pack_Qty) < 1) ? 1 : parseFloat(product.case_Pack_Qty);
+
+    let case_Pack_Qty_Exceeded = 0;
+
+    if (casePackFix > 1) {
+
+      if (max > 0) {
+        let minMaxDiff = min - 1;
+
+        let casePackExceeds = minMaxDiff + casePackFix;
+
+        if (casePackExceeds > max) {
+          let exceedsByDiff = casePackExceeds - max;
+          case_Pack_Qty_Exceeded = exceedsByDiff;
+        }
+      }
+    }
+
+    if (surplus_Stock < 0) {
+      surplus_Stock = 0;
+    }
 
     let sales_potential = 0;
     let volume_potential = 0;
@@ -1683,7 +1769,13 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
       maximum_Stock: parseFloat(maximum_Stock.toFixed(0)),
       seasonal_Minimum: parseFloat(seasonal_Minimum.toFixed(0)),
       seasonal_Maximum: parseFloat(seasonal_Maximum.toFixed(0)),
+      seasonal_Minimum_Out: parseFloat(seasonal_Minimum_Out.toFixed(0)),
+      seasonal_Maximum_Out: parseFloat(seasonal_Maximum_Out.toFixed(0)),
       surplus_Stock: parseFloat(surplus_Stock.toFixed(0)),
+      case_Pack_Qty_Exceeded: parseFloat(case_Pack_Qty_Exceeded.toFixed(0)),
+      constraintMinMax: _minMax,
+      constraintMinMaxIn: _minMaxIn,
+      constraintMinMaxOut: _minMaxOut,
     }, getProductIndicator(product.productID, storeSales, stores), getTestProductIndicator(product.productID, storeSales, stores)))
   }
 
@@ -1706,6 +1798,53 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
   }
 
   return productSales;
+}
+
+function calculateConstraints(min, max, autoRangeData, average_price, isNewItem) {
+  let retval = {
+    min: min,
+    max: max,
+    minUpdated: false,
+    maxUpdated: false,
+  }
+
+  // DEFAULT MINIMUM UNITS
+  if (min <= autoRangeData.default_minimum) {
+    retval.minUpdated = retval.min < autoRangeData.default_minimum ? true : false;
+    retval.min = retval.min < autoRangeData.default_minimum ? autoRangeData.default_minimum : retval.min;
+
+    retval.maxUpdated = retval.max < autoRangeData.default_minimum_max ? true : false;
+    retval.max = retval.max < autoRangeData.default_minimum_max ? autoRangeData.default_minimum_max : retval.max;
+
+    if (average_price < autoRangeData.default_price_minimum) {
+      retval.minUpdated = retval.min >= autoRangeData.default_price_minimum_min ? false : true;
+      retval.maxUpdated = retval.max >= autoRangeData.default_price_minimum_max ? false : true;
+      retval.min = retval.min > autoRangeData.default_price_minimum_min ? retval.min : autoRangeData.default_price_minimum_min;
+      retval.max = retval.max > autoRangeData.default_price_minimum_max ? retval.max : autoRangeData.default_price_minimum_max;
+    }
+  } else {
+    // DEFAULT MINIMUM UNITS GREATER
+    if (min >= autoRangeData.default_minimum_greater && min <= autoRangeData.default_minimum_greater_max) {
+      retval.maxUpdated = retval.max > autoRangeData.default_minimum_greater_max ? false : true;
+      retval.max = retval.max > autoRangeData.default_minimum_greater_max ? retval.max : autoRangeData.default_minimum_greater_max;
+    } else {
+      // DEFAULT NEW ITEM
+
+      if (isNewItem && min <= autoRangeData.default_new_item_max) {
+        retval.maxUpdated = true;
+      }
+
+      // DEFAULT PRICE MINIMUM
+      if (average_price < autoRangeData.default_price_minimum) {
+        retval.minUpdated = retval.min >= autoRangeData.default_price_minimum_min ? false : true;
+        retval.maxUpdated = retval.max >= autoRangeData.default_price_minimum_max ? false : true;
+        retval.min = retval.min > autoRangeData.default_price_minimum_min ? retval.min : autoRangeData.default_price_minimum_min;
+        retval.max = retval.max > autoRangeData.default_price_minimum_max ? retval.max : autoRangeData.default_price_minimum_max;
+      }
+    }
+  }
+
+  return retval;
 }
 
 function setStoreIndicatorByProductID(stores, storeSales, productID) {
@@ -1855,8 +1994,6 @@ function numberifySales(string) {
 function RangeProduct(productData, salesData, indicator, testIndicator) {
   let self = this;
 
-  console.log('testIndicator', testIndicator)
-
   for (var prop in productData) {
     self[prop] = productData[prop]
   }
@@ -1906,7 +2043,13 @@ function RangeProduct(productData, salesData, indicator, testIndicator) {
   self.maximum_Stock = salesData.maximum_Stock;
   self.seasonal_Minimum = salesData.seasonal_Minimum;
   self.seasonal_Maximum = salesData.seasonal_Maximum;
+  self.seasonal_Minimum_Out = salesData.seasonal_Minimum_Out;
+  self.seasonal_Maximum_Out = salesData.seasonal_Maximum_Out;
   self.surplus_Stock = salesData.surplus_Stock;
+  self.case_Pack_Qty_Exceeded = salesData.case_Pack_Qty_Exceeded;
+  self.constraintMinMax = salesData.constraintMinMax;
+  self.constraintMinMaxIn = salesData.constraintMinMaxIn;
+  self.constraintMinMaxOut = salesData.constraintMinMaxOut;
 }
 
 function storeStocksProduct(storeSales, storeID, productID) {

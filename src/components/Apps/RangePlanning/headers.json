@@ -358,7 +358,7 @@
         }
     },
     {
-        "headerName": "Seasonal Minimum",
+        "headerName": "(IN) Seasonal Minimum",
         "field": "seasonal_Minimum",
         "hide": true,
         "filterParams": {
@@ -366,8 +366,24 @@
         }
     },
     {
-        "headerName": "Seasonal Maximum",
+        "headerName": "(IN) Seasonal Maximum",
         "field": "seasonal_Maximum",
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
+        "headerName": "(OUT) Seasonal Minimum",
+        "field": "seasonal_Minimum_Out",
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
+        "headerName": "(OUT) Seasonal Maximum",
+        "field": "seasonal_Maximum_Out",
         "hide": true,
         "filterParams": {
             "newRowsAction": "keep"
@@ -376,6 +392,14 @@
     {
         "headerName": "Surplus Stock",
         "field": "surplus_Stock",
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
+        "headerName": "Case Pack Qty Exceeded",
+        "field": "case_Pack_Qty_Exceeded",
         "hide": true,
         "filterParams": {
             "newRowsAction": "keep"

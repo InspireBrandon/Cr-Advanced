@@ -80,6 +80,9 @@
             <v-list-tile @click="showSeasonalityReport">
               <v-list-tile-title>Seasonality</v-list-tile-title>
             </v-list-tile>
+            <v-list-tile @click="showLegend">
+              <v-list-tile-title>Legend</v-list-tile-title>
+            </v-list-tile>
           </v-list>
         </v-menu>
         <v-menu v-if="rowData.length > 0 && !$route.path.includes('RangePlanningView')" dark offset-y
@@ -105,7 +108,7 @@
               <v-list-tile-title>CSV</v-list-tile-title>
             </v-list-tile>
             <v-list-tile @click="exportStockOrder">
-              <v-list-tile-title>Stock Orders</v-list-tile-title>
+              <v-list-tile-title>Product Supply</v-list-tile-title>
             </v-list-tile>
           </v-list>
         </v-menu>
@@ -231,6 +234,52 @@
           </v-card-text>
         </v-card>
       </v-dialog>
+
+      <div id="range-legend" v-if="rowData.length > 0 && legend">
+        <table style="width: 100%;">
+          <tr>
+            <td>
+              <h4>Highlight Legend</h4>
+            </td>
+            <td style="text-align: right;">
+              <label>constraints</label>
+              <input class="mr-3" type="checkbox" v-model="showWithConstraints" @change="toggleConstraints">
+              <v-icon @click="showLegend" :size="20">close</v-icon>
+            </td>
+          </tr>
+        </table>
+        <v-divider class="mb-2"></v-divider>
+        <div style="display: flex;">
+          <v-icon color="#8ef58e">fiber_manual_record</v-icon>
+          <div style="padding-top: 2px">
+            Indicator
+          </div>
+        </div>
+        <div style="display: flex;">
+          <v-icon color="#96bbde">fiber_manual_record</v-icon>
+          <div style="padding-top: 2px">
+            Test Indicator
+          </div>
+        </div>
+        <div style="display: flex;">
+          <v-icon color="#ffa3bc">fiber_manual_record</v-icon>
+          <div style="padding-top: 2px">
+            Safety stock &lt; {{ autoRangeData.safety_stock_highlight }} Weeks
+          </div>
+        </div>
+        <div style="display: flex;">
+          <v-icon color="#f4c086">fiber_manual_record</v-icon>
+          <div style="padding-top: 2px">
+            Casepack Qty Exceeded > {{ autoRangeData.casepack_qty }} Weeks
+          </div>
+        </div>
+        <div style="display: flex;">
+          <v-icon color="#b88ef5">fiber_manual_record</v-icon>
+          <div style="padding-top: 2px">
+            Stock > {{ autoRangeData.surplus_stock }} Weeks
+          </div>
+        </div>
+      </div>
     </div>
     <PlanogramSelector ref="planogramSelector"></PlanogramSelector>
     <Spinner ref="spinner"></Spinner>
@@ -368,6 +417,8 @@
     },
     data() {
       return {
+        showWithConstraints: true,
+        legend: true,
         testMode: false,
         systemFileID: null,
         showNote: false,
@@ -416,6 +467,10 @@
           maximum_stock: 6,
           default_minimum: 2,
           default_minimum_max: 0,
+          default_minimum_greater: 3,
+          default_minimum_greater_max: 3,
+          default_new_item_min: 3,
+          default_new_item_max: 5,
           default_price_minimum: 100,
           default_price_minimum_min: 3,
           default_price_minimum_max: 5,
@@ -555,6 +610,17 @@
       self.getStores();
     },
     methods: {
+      toggleConstraints() {
+        let self = this;
+
+        self.$nextTick(() => {
+          self.gridApi.redrawRows();
+        })
+      },
+      showLegend() {
+        let self = this;
+        self.legend = !self.legend;
+      },
       showSeasonalityReport() {
         let self = this;
 
@@ -720,8 +786,10 @@
         // END Sales Analysis
         // Volume Analysis
         case 'sales_Units': {
+          let includeStockLevels = options.stockLevels == headerOptions.yes || options.stockLevels == headerOptions.all;
+
           retval = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis == headerOptions.all || options
-            .stockAnalysis == headerOptions.yes || options.stockAnalysis == headerOptions.all;
+            .stockAnalysis == headerOptions.yes || options.stockAnalysis == headerOptions.all || includeStockLevels;
         }
         break;
         case 'item_volume_rank': {
@@ -778,20 +846,57 @@
           retval = options.stockAnalysis == headerOptions.yes || options.stockAnalysis == headerOptions.all;
         }
         break;
+        case 'case_Pack_Qty': {
+          retval = options.stockLevels == headerOptions.all || options.stockLevels == headerOptions.all;
+        }
+        break
         case 'days_of_supply': {
-          retval = options.stockAnalysis == headerOptions.all;
+          retval = options.stockAnalysis == headerOptions.all || options.stockLevels == headerOptions.all;
         }
         break;
         case 'stock_Turns': {
-          retval = options.stockAnalysis == headerOptions.all;
+          retval = options.stockAnalysis == headerOptions.all || options.stockLevels == headerOptions.all;;
         }
         break;
         case 'stock_Cost': {
-          retval = options.stockAnalysis == headerOptions.all;
+          retval = options.stockAnalysis == headerOptions.all || options.stockLevels == headerOptions.all;;
         }
         break;
         case 'stock_Units': {
-          retval = options.stockAnalysis == headerOptions.all;
+          let includeStockLevels = options.stockLevels == headerOptions.yes || options.stockLevels == headerOptions.all;
+          retval = options.stockAnalysis == headerOptions.all || includeStockLevels;
+        }
+        break;
+        case 'minimum_Stock': {
+          retval = options.stockLevels == headerOptions.yes || options.stockLevels == headerOptions.all;
+        }
+        break;
+        case 'maximum_Stock': {
+          retval = options.stockLevels == headerOptions.yes || options.stockLevels == headerOptions.all;
+        }
+        break;
+        case 'seasonal_Minimum': {
+          retval = options.stockLevels == headerOptions.all;
+        }
+        break;
+        case 'seasonal_Maximum': {
+          retval = options.stockLevels == headerOptions.all;
+        }
+        break;
+        case 'seasonal_Minimum_Out': {
+          retval = options.stockLevels == headerOptions.all;
+        }
+        break;
+        case 'seasonal_Maximum_Out': {
+          retval = options.stockLevels == headerOptions.all;
+        }
+        break;
+        case 'surplus_Stock': {
+          retval = options.stockLevels == headerOptions.all;
+        }
+        break;
+        case 'case_Pack_Qty_Exceeded': {
+          retval = options.stockLevels == headerOptions.all;
         }
         break;
         case 'lost_Sales': {
@@ -889,7 +994,10 @@
         }
         break;
         case 'average_price': {
-          retval = options.priceAndMargin == headerOptions.yes || options.priceAndMargin == headerOptions.all;
+          let includeStockLevels = options.stockLevels == headerOptions.yes || options.stockLevels == headerOptions.all;
+
+          retval = options.priceAndMargin == headerOptions.yes || options.priceAndMargin == headerOptions.all ||
+            includeStockLevels;
         }
         break;
         case 'gross_profit': {
@@ -2233,6 +2341,162 @@
           })
         });
       },
+      updateStockColumns() {
+        let self = this;
+
+        // MAIN
+        self.columnDefs[38] = {
+          headerName: "Minimum Stock",
+          field: "minimum_Stock",
+          hide: true,
+          valueFormatter(params) {
+            if (self.showWithConstraints) {
+              if (params.data.store_Range_Indicator == 'NO') {
+                return params.value
+              }
+              return params.data.constraintMinMax.min;
+            }
+
+            return params.value;
+          },
+          cellStyle(params) {
+            if (self.showWithConstraints) {
+              if (params.data.constraintMinMax.minUpdated && params.data.store_Range_Indicator != 'NO') {
+                return {
+                  color: 'red'
+                }
+              }
+            }
+          }
+        }
+
+        self.columnDefs[39] = {
+          headerName: "Maximum Stock",
+          field: "maximum_Stock",
+          hide: true,
+          valueFormatter(params) {
+            if (self.showWithConstraints) {
+              if (params.data.store_Range_Indicator == 'NO') {
+                return params.value
+              }
+              return params.data.constraintMinMax.max;
+            }
+
+            return params.value;
+          },
+          cellStyle(params) {
+            if (self.showWithConstraints) {
+              if (params.data.constraintMinMax.maxUpdated && params.data.store_Range_Indicator != 'NO') {
+                return {
+                  color: 'red'
+                }
+              }
+            }
+          }
+        }
+
+        // SEASONAL IN
+        self.columnDefs[40] = {
+          headerName: "(IN) Seasonal Minimum",
+          field: "seasonal_Minimum",
+          hide: true,
+          valueFormatter(params) {
+            if (self.showWithConstraints) {
+              if (params.data.store_Range_Indicator == 'NO') {
+                return params.value
+              }
+              return params.data.constraintMinMaxIn.min;
+            }
+
+            return params.value;
+          },
+          cellStyle(params) {
+            if (self.showWithConstraints) {
+              if (params.data.constraintMinMaxIn.minUpdated && params.data.store_Range_Indicator != 'NO') {
+                return {
+                  color: 'red'
+                }
+              }
+            }
+          }
+        }
+
+        self.columnDefs[41] = {
+          headerName: "(IN) Seasonal Maximum",
+          field: "seasonal_Maximum",
+          hide: true,
+          valueFormatter(params) {
+            if (self.showWithConstraints) {
+              if (params.data.store_Range_Indicator == 'NO') {
+                return params.value
+              }
+              return params.data.constraintMinMaxIn.max;
+            }
+
+            return params.value;
+          },
+          cellStyle(params) {
+            if (self.showWithConstraints) {
+              if (params.data.constraintMinMaxIn.maxUpdated && params.data.store_Range_Indicator != 'NO') {
+                return {
+                  color: 'red'
+                }
+              }
+            }
+          }
+        }
+
+        // SEASONAL OUT
+        self.columnDefs[42] = {
+          headerName: "(OUT) Seasonal Minimum",
+          field: "seasonal_Minimum_Out",
+          hide: true,
+          valueFormatter(params) {
+            if (self.showWithConstraints) {
+              if (params.data.store_Range_Indicator == 'NO') {
+                return params.value
+              }
+              return params.data.constraintMinMaxOut.min;
+            }
+
+            return params.value;
+          },
+          cellStyle(params) {
+            if (self.showWithConstraints) {
+              if (params.data.constraintMinMaxOut.minUpdated && params.data.store_Range_Indicator != 'NO') {
+                return {
+                  color: 'red'
+                }
+              }
+            }
+          }
+        }
+
+        self.columnDefs[43] = {
+          headerName: "(OUT) Seasonal Maximum",
+          field: "seasonal_Maximum_Out",
+          hide: true,
+          valueFormatter(params) {
+            if (self.showWithConstraints) {
+              if (params.data.store_Range_Indicator == 'NO') {
+                return params.value
+              }
+              return params.data.constraintMinMaxOut.max;
+            }
+
+            return params.value;
+          },
+          cellStyle(params) {
+            if (self.showWithConstraints) {
+              if (params.data.constraintMinMaxOut.maxUpdated && params.data.store_Range_Indicator != 'NO') {
+                return {
+                  color: 'red'
+                }
+              }
+            }
+          }
+        }
+      },
       getColumnDefenitions() {
         let self = this;
         return new Promise((resolve, reject) => {
@@ -2320,52 +2584,49 @@
               }
             };
 
-            self.columnDefs[32] = {
-              headerName: "Case Pack Qty",
-              field: "case_Pack_Qty",
+            // self.columnDefs[32] = {
+            //   headerName: "Case Pack Qty",
+            //   field: "case_Pack_Qty",
+            //   hide: true,
+            //   cellStyle: function (params) {
+            //     let checkValue = (parseFloat(params.data.case_Pack_Qty) > 0 ? 1 : parseFloat(params.data.case_Pack_Qty)) + parseFloat(params.data.minimum_Stock);
+
+            //     let oneWeekVolume = params.data.sales_Units / 4;
+            //     let casePackQtyVolume = oneWeekVolume * self.autoRangeData.casepack_qty;
+
+            //     if (checkValue > casePackQtyVolume && params.data.sales_Units != 0) {
+            //       return {
+            //         backgroundColor: "#f4c086"
+            //       };
+            //     }
+
+            //     // let leadTimeDays = self.autoRangeData.lead_time;
+            //     // let safety_stock_highlightDays = self.autoRangeData.safety_stock_highlight * 7;
+
+            //     // let totalDays = leadTimeDays + safety_stock_highlightDays;
+            //     // let totalWeeks = totalDays / 7;
+
+            //     // let oneWeekVolume = params.data.sales_Units / 4;
+            //     // let safetyVolume = oneWeekVolume * totalWeeks;
+
+            //     // if (params.data.stock_Units < safetyVolume) {
+            //     //   return {
+            //     //     backgroundColor: "#ffa3bc"
+            //     //   };
+            //     // }
+            //   }
+            // };
+
+            self.columnDefs[37] = {
+              headerName: "Stock Units",
+              field: "stock_Units",
               hide: true,
               cellStyle: function (params) {
-                let checkValue = parseFloat(params.data.case_Pack_Qty) + parseFloat(params.data.minimum_Stock);
+                // volume / weeks
+                let safety_stock_highlight = self.autoRangeData.safety_stock_highlight;
 
                 let oneWeekVolume = params.data.sales_Units / 4;
-                let casePackQtyVolume = oneWeekVolume * self.autoRangeData.casepack_qty;
-
-                if (checkValue > casePackQtyVolume && params.data.sales_Units != 0) {
-                  return {
-                    backgroundColor: "#ffa3bc"
-                  };
-                }
-
-                // let leadTimeDays = self.autoRangeData.lead_time;
-                // let safety_stock_highlightDays = self.autoRangeData.safety_stock_highlight * 7;
-
-                // let totalDays = leadTimeDays + safety_stock_highlightDays;
-                // let totalWeeks = totalDays / 7;
-
-                // let oneWeekVolume = params.data.sales_Units / 4;
-                // let safetyVolume = oneWeekVolume * totalWeeks;
-
-                // if (params.data.stock_Units < safetyVolume) {
-                //   return {
-                //     backgroundColor: "#ffa3bc"
-                //   };
-                // }
-              }
-            };
-
-            self.columnDefs[38] = {
-              headerName: "Minimum Stock",
-              field: "minimum_Stock",
-              hide: true,
-              cellStyle: function (params) {
-                let leadTimeDays = self.autoRangeData.lead_time;
-                let safety_stock_highlightDays = self.autoRangeData.safety_stock_highlight * 7;
-
-                let totalDays = leadTimeDays + safety_stock_highlightDays;
-                let totalWeeks = totalDays / 7;
-
-                let oneWeekVolume = params.data.sales_Units / 4;
-                let safetyVolume = oneWeekVolume * totalWeeks;
+                let safetyVolume = oneWeekVolume * safety_stock_highlight;
 
                 if (params.data.stock_Units < safetyVolume) {
                   return {
@@ -2375,7 +2636,29 @@
               }
             };
 
-            self.columnDefs[42] = {
+            self.updateStockColumns();
+
+            // self.columnDefs[38] = {
+            //   headerName: "Minimum Stock",
+            //   field: "surplus_Stock",
+            //   hide: true,
+            //   valueFormatter(params) {
+            //     if (self.showWithConstraints) {
+            //       return 'MEOWWWW';
+            //     }
+
+            //     return 'WOOOF'
+            //   },
+            //   cellStyle(params) {
+            //     if (self.showWithConstraints) {
+            //       return {
+            //         color: 'red'
+            //       }
+            //     }
+            //   }
+            // }
+
+            self.columnDefs[44] = {
               headerName: "Surplus Stock",
               field: "surplus_Stock",
               hide: true,
@@ -2383,9 +2666,26 @@
                 let oneWeekVolume = params.data.sales_Units / 4;
                 let surplusStockVolume = oneWeekVolume * self.autoRangeData.surplus_stock;
 
-                if (params.data.stock_Units > surplusStockVolume) {
+                if (params.data.surplus_Stock > surplusStockVolume) {
                   return {
-                    backgroundColor: "#ffa3bc"
+                    backgroundColor: "#b88ef5"
+                  };
+                }
+              }
+            };
+
+            self.columnDefs[45] = {
+              headerName: "Case Pack Qty Exceeded",
+              field: "case_Pack_Qty_Exceeded",
+              hide: true,
+              cellStyle: function (params) {
+                let oneWeekVolume = params.data.sales_Units / 4;
+                let casepackExceededWeeks = self.autoRangeData.casepack_qty;
+                let totalWeeksVolume = oneWeekVolume * casepackExceededWeeks;
+
+                if (params.value > totalWeeksVolume) {
+                  return {
+                    backgroundColor: "#f4c086"
                   };
                 }
               }
@@ -3972,4 +4272,19 @@
   /* .indicator-select {
     background-color: rgba(148, 148, 148, 0.609) !important;
   } */
+
+  #range-legend {
+    padding: 5px;
+    padding-bottom: 10px;
+    background: white;
+    width: 280px;
+    border: 1px solid lightgrey;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    box-shadow: 3px 3px 10px black;
+    font-size: 12px;
+  }
 </style>

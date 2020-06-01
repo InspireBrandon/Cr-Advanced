@@ -208,27 +208,53 @@
           <table>
             <tbody>
               <tr>
-                <td>Minumum Stock</td>
+                <td>Supplier Lead Time</td>
                 <td style="text-align: center; width: 60px;">=</td>
                 <td style="padding: 0px!important; width: 100px">
-                  <input v-model="data.minumum_stock" style="width: 100%; text-align: right;" type="number" />
+                  <input v-model="data.lead_time" style="width: 100%; text-align: right;" type="number" />
+                </td>
+                <td style="width: 60px;">
+                  Days
+                </td>
+              </tr>
+              <tr>
+                <td>Safety Stock</td>
+                <td style="text-align: center; width: 60px;">=</td>
+                <td style="padding: 0px!important; width: 100px">
+                  <input v-model="data.safety_stock_value" style="width: 100%; text-align: right;" type="number" />
                 </td>
                 <td style="width: 60px;">
                   Weeks
                 </td>
               </tr>
+            </tbody>
+          </table>
+          <table class="mt-1">
+            <tbody>
               <tr>
-                <td>Maximum Stock</td>
-                <td style="text-align: center;">=</td>
-                <td style="padding: 0px!important; width: 100px">
+                <td :class="getMinStockClass()">Minumum Stock</td>
+                <td :class="getMinStockClass()" style="text-align: center; width: 60px;">=</td>
+                <td :class="getMinStockClass()" style="padding: 0px!important; width: 100px">
+                  <input v-model="data.minumum_stock" style="width: 100%; text-align: right;" type="number" />
+                </td>
+                <td :class="getMinStockClass()" style="width: 60px;">
+                  Weeks
+                </td>
+              </tr>
+              <tr>
+                <td :class="getMaxStockClass()">Maximum Stock</td>
+                <td :class="getMaxStockClass()" style="text-align: center;">=</td>
+                <td :class="getMaxStockClass()" style="padding: 0px!important; width: 100px">
                   <input v-model="data.maximum_stock" style="width: 100%; text-align: right;" type="number" />
                 </td>
-                <td>
+                <td :class="getMaxStockClass()">
                   Weeks
                 </td>
               </tr>
             </tbody>
           </table>
+          <div v-if="exceedsMin && ! exceedsMax" style="color: red">Safety stock exceeds Minimum Stock</div>
+          <div v-if="exceedsMax" style="color: red">Safety stock exceeds Minimum Stock and Maximum Stock</div>
           <table class="mt-1">
             <tbody>
               <tr>
@@ -241,6 +267,39 @@
                 <td style="text-align: center;">=</td>
                 <td style="padding: 0px!important; width: 100px">
                   <input v-model="data.default_minimum_max" style="width: 100%; text-align: right;" type="number" />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="mt-1">
+            <tbody>
+              <tr>
+                <td style="width: 200px;">Default Minimum Units</td>
+                <td style="text-align: center; width: 50px;">>=</td>
+                <td style="padding: 0px!important; width: 100px">
+                  <input v-model="data.default_minimum_greater" style="width: 100%; text-align: right;" type="number" />
+                </td>
+                <td>Then Max Units</td>
+                <td style="text-align: center; width: 50px;">=</td>
+                <td style="padding: 0px!important; width: 100px">
+                  <input v-model="data.default_minimum_greater_max" style="width: 100%; text-align: right;"
+                    type="number" />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="mt-1">
+            <tbody>
+              <tr>
+                <td style="width: 200px;">Default New Item</td>
+                <td style="text-align: center; width: 50px;">Min</td>
+                <td style="padding: 0px!important; width: 100px">
+                  <input v-model="data.default_new_item_min" style="width: 100%; text-align: right;" type="number" />
+                </td>
+                <td>Max</td>
+                <td style="text-align: center; width: 50px;">=</td>
+                <td style="padding: 0px!important; width: 100px">
+                  <input v-model="data.default_new_item_max" style="width: 100%; text-align: right;" type="number" />
                 </td>
               </tr>
             </tbody>
@@ -273,26 +332,6 @@
           </table>
           <table class="mt-1">
             <tbody>
-              <tr>
-                <td>Supplier Lead Time</td>
-                <td style="text-align: center; width: 60px;">=</td>
-                <td style="padding: 0px!important; width: 100px">
-                  <input v-model="data.lead_time" style="width: 100%; text-align: right;" type="number" />
-                </td>
-                <td style="width: 60px;">
-                  Days
-                </td>
-              </tr>
-              <tr>
-                <td>Safety Stock</td>
-                <td style="text-align: center; width: 60px;">=</td>
-                <td style="padding: 0px!important; width: 100px">
-                  <input v-model="data.safety_stock_value" style="width: 100%; text-align: right;" type="number" />
-                </td>
-                <td style="width: 60px;">
-                  Weeks
-                </td>
-              </tr>
               <tr>
                 <td>Use Seasonal Index</td>
                 <td style="text-align: center;">On/Off</td>
@@ -345,6 +384,8 @@
     data() {
       return {
         dialog: false,
+        exceedsMin: false,
+        exceedsMax: false,
         planogramID: null,
         planogramRole: "",
         planogramRoleID: null,
@@ -383,6 +424,10 @@
           maximum_stock: 6,
           default_minimum: 2,
           default_minimum_max: 0,
+          default_minimum_greater: 3,
+          default_minimum_greater_max: 3,
+          default_new_item_min: 3,
+          default_new_item_max: 5,
           default_price_minimum: 100,
           default_price_minimum_min: 3,
           default_price_minimum_max: 5,
@@ -399,6 +444,38 @@
         let self = this;
 
         self.getRoleDefaults();
+      },
+      getMinStockClass() {
+        let self = this;
+
+        let stockLeadWeeks = parseFloat(self.data.lead_time) / 7;
+        let safetyStock = parseFloat(self.data.safety_stock_value);
+        let totalWeeks = parseFloat(stockLeadWeeks + safetyStock);
+
+        if(totalWeeks > parseFloat(self.data.minumum_stock)) {
+          self.exceedsMin = true;
+          return 'auto-range-error';
+        }
+
+        self.exceedsMin = false;
+
+        return '';
+      },
+      getMaxStockClass() {
+        let self = this;
+
+        let stockLeadWeeks = parseFloat(self.data.lead_time) / 7;
+        let safetyStock = parseFloat(self.data.safety_stock_value);
+        let totalWeeks = parseFloat(stockLeadWeeks + safetyStock);
+
+        if(totalWeeks > parseFloat(self.data.maximum_stock)) {
+          self.exceedsMax = true;
+          return 'auto-range-error';
+        }
+
+        self.exceedsMax = false;
+
+        return '';
       },
       show(config, planogramID, afterComplete) {
         let self = this;
@@ -494,5 +571,9 @@
     color: white;
     padding: 2px;
     border: 1px solid gray;
+  }
+
+  .auto-range-error {
+    background: #ff9595;
   }
 </style>
