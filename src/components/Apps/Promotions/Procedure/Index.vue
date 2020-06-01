@@ -69,14 +69,9 @@
             addNewStep(item, step) {
                 let self = this
                 axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                console.log("item", item);
-                console.log("step", step);
                 step.promotion_Procedure_ID = item.id
                 axios.post(process.env.VUE_APP_API + `PromotionProcedureStep`, step).then(r => {
-                    console.log("addNewStep",r);
-                    
                 })
-                // PromotionProcedureStep
             },
             renameItem(item) {
                 let self = this
@@ -97,7 +92,6 @@
                 axios.get(process.env.VUE_APP_API + `PromotionProcedure?promotionID=${self.$route.params.promotionID}`)
                     .then(r => {
                         self.procedures = r.data
-                        console.log("getProcedures", r);
                     })
             },
             createNewProcedure() {
@@ -108,12 +102,8 @@
                     IsTemplate: false,
                     Description: "new procedure"
                 }
-                console.log(self.$route.params.promotionID);
-
                 axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-
                 axios.post(process.env.VUE_APP_API + `PromotionProcedure`, req).then(r => {
-                    console.log(r);
                     self.getProcedures()
                 })
             },
@@ -122,7 +112,7 @@
                 self.$refs.YesNoModal.show("are you sure you want to delete this?", value => {
                     if (value) {
                         axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                        axios.delete(process.env.VUE_APP_API + `PromotionProcedure`, item).then(r => {
+                        axios.delete(process.env.VUE_APP_API + `PromotionProcedure?id=${item.id}`).then(r => {
                             self.getProcedures()
                         })
                     }

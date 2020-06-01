@@ -159,6 +159,9 @@
                   <v-flex lg8 md12 v-if="form.type==0&&!form.rendering">
                     <v-select label="floor plan shape" :items="shapes" v-model="form.shape"></v-select>
                   </v-flex>
+                  <v-flex lg8 md12 v-if="!form.rendering">
+                    <v-checkbox hide-details label="Use in Floorplanning" v-model="form.isFloorplan"></v-checkbox>
+                  </v-flex>
 
                 </v-layout>
               </v-container>
@@ -670,7 +673,8 @@
           bottomTransparent: false,
           topTransparent: false,
           xOffset: null,
-          yOffset: null
+          yOffset: null,
+          isFloorplan: false
         },
         showModal: false,
         hideImages: false
