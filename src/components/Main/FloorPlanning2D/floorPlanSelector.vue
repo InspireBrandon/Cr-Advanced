@@ -22,15 +22,32 @@
                             <v-list-tile-content>
                                 <v-list-tile-title v-text="File.name"></v-list-tile-title>
                             </v-list-tile-content>
+                            <v-spacer></v-spacer>
+                            <v-list-tile-action>
+                                <v-menu offset-y>
+                                    <v-btn @click="getversion(File)" slot="activator" icon>
+                                        V {{File.version}}
+                                    </v-btn>
+                                    <v-list dense class="px-2">
+                                        <div v-for="(item,idx) in versions" :key="idx">
+                                            <v-list-tile @click="setVersion(File,item)">
+                                                <v-list-tile-title>{{item.version}}</v-list-tile-title>
+                                                  <v-list-avatar>
+                                                    <v-icon v-if="item.isCurrent">
+                                                        check
+                                                    </v-icon>
+                                                </v-list-avatar>
+                                            </v-list-tile>
+                                            <v-divider></v-divider>
+                                        </div>
+                                    </v-list>
+                                </v-menu>
+                            </v-list-tile-action>
                         </v-list-tile>
                     </v-list>
                 </v-card-text>
-
                 <v-card-actions>
-
-
                     <v-spacer></v-spacer>
-
                     <v-btn color="primary" @click="returnFileFile">Continue</v-btn>
                     <!-- <v-btn flat @click="dialog = false">Cancel</v-btn> -->
 
@@ -58,6 +75,7 @@
                 selectedFile: null,
                 searchText: '',
                 folder: null,
+                versions: [],
             }
         },
         computed: {
@@ -70,6 +88,22 @@
         },
 
         methods: {
+            setVersion(File, item) {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.post(process.env.VUE_APP_API + `Floorplan/Versions?HeaderID=${File.id}&VersionID=${item.id}`)
+                    .then(r => {
+                        File.version = item.version
+                    })
+            },
+            getversion(File) {
+                let self = this
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                Axios.get(process.env.VUE_APP_API + `Floorplan/Versions?HeaderID=${File.id}`).then(r => {
+                    console.log(r);
+                    self.versions = r.data
+                })
+            },
             getFile(callback) {
                 let self = this;
 
@@ -78,6 +112,8 @@
 
                 Axios.get(process.env.VUE_APP_API + "GetFloorPlanHeaders")
                     .then(r => {
+                        console.log("get floorplan headers", r.data);
+
                         self.FileData = r.data;
 
                         callback();
@@ -86,9 +122,9 @@
                         alert("Failed to get data...");
                     })
             },
-            show( afterComplete) {
+            show(afterComplete) {
                 let self = this;
-               
+
                 self.getFile(() => {
                     self.dialog = true;
                     self.afterComplete = afterComplete;
@@ -100,8 +136,8 @@
                     alert("Please Select A File");
                 } else {
                     self.dialog = false;
-                     console.log("selectedFile",self.selectedFile.id);
-                        
+                    console.log("selectedFile", self.selectedFile.id);
+
                     self.afterComplete(self.selectedFile);
                 }
             },

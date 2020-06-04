@@ -49,132 +49,143 @@ class ClickTapHelper {
                 selectedLayerTreeItem = null
                 return;
             } else {
-                clickselect(e, callback => {
-                    e = callback
-                    console.log("[CLICK SELECT CALLBACK]: ", callback);
+                console.log(e.attrs.name + "-----" + e.attrs.locked);
 
-                    e.draggable(true)
-                    if (e.attrs.name == "group" || e.attrs.name == "Duplication Group") {
+                if (e.attrs.name == "image" && e.attrs.locked == false) {
+                    console.log("inside locked");
+                    clicktapcallback({
+                        selectedLayerTreeItem: selectedLayerTreeItem,
+                        selectedItem: selectedItem,
+                    })
+
+                } else {
+                    clickselect(e, callback => {
+                        e = callback
+                        console.log("[CLICK SELECT CALLBACK]: ", callback);
+
                         e.draggable(true)
-                        e.children.forEach(child => {
-                            child.draggable(false)
-                        })
-                        stage.batchDraw()
-                    }
-                    if (ctrlDown && e.attrs.draggable) {
-                        stage.find('Transformer').destroy()
-                        if (selectedItem != null && selectedItem != undefined) {
-                            console.log("before multi select", e, selectedItem);
-                            
-                            handleMultiSelect(selectedItem, cb => {
-                                console.log("----------------------------------[MULTISELECT] SELECTED ITEM", cb);
+                        if (e.attrs.name == "group" || e.attrs.name == "Duplication Group") {
+                            e.draggable(true)
+                            e.children.forEach(child => {
+                                child.draggable(false)
+                            })
+                            stage.batchDraw()
+                        }
+                        if (ctrlDown && e.attrs.draggable) {
+                            stage.find('Transformer').destroy()
+                            if (selectedItem != null && selectedItem != undefined) {
+                                console.log("before multi select", e, selectedItem);
 
-                                handleMultiSelect(e, ce => {
-                                    console.log("------------------------------------[MULTISELECT] 2ND ITEM", ce);
+                                handleMultiSelect(selectedItem, cb => {
+                                    console.log("----------------------------------[MULTISELECT] SELECTED ITEM", cb);
+
+                                    handleMultiSelect(e, ce => {
+                                        console.log("------------------------------------[MULTISELECT] 2ND ITEM", ce);
+
+                                    })
+                                })
+                            } else {
+                                handleMultiSelect(e, cb => {
 
                                 })
-                            })
+                            }
+
                         } else {
-                            handleMultiSelect(e, cb => {
+                            if (e.attrs.name == "Tape") {
+                                e.draggable(true)
+                            }
 
-                            })
-                        }
+                            if (e.attrs.draggable && e != stage) {
+                                self.setSelectedItem(e, findLayerItem, selectedLayerTreeItem, selectedItem, selectedLayer, layerTree, cb => {
+                                    selectedLayerTreeItem = cb
+                                    selectedItem = e;
+                                    if (e.attrs.name == "Duplication Group" || e.attrs.name == "group") {
+                                        e.draggable(true)
+                                        e.children.forEach(element => {
+                                            element.attrs.draggable = false
+                                            element.draggable(false)
+                                        })
+                                    }
+                                    stage.batchDraw()
+                                    properties.name = selectedItem.attrs.name;
+                                    properties.height = (selectedItem.attrs.height / (floorConfig
+                                        .blockRatio * meterRatio)).toFixed(2);
+                                    properties.width = (selectedItem.attrs.width / (floorConfig
+                                        .blockRatio * meterRatio)).toFixed(2);
+                                    properties.fill = selectedItem.attrs.fill;
+                                    properties.radius = (selectedItem.attrs.radius / (floorConfig
+                                        .blockRatio * meterRatio)).toFixed(2);
+                                    properties.rotation = selectedItem.attrs.rotation;
+                                    properties.depth = selectedItem.attrs.depth / ((floorConfig
+                                        .blockRatio * meterRatio)).toFixed(2);
 
-                    } else {
-                        if (e.attrs.name == "Tape") {
-                            e.draggable(true)
-                        }
-
-                        if (e.attrs.draggable && e != stage) {
-                            self.setSelectedItem(e, findLayerItem, selectedLayerTreeItem, selectedItem, selectedLayer, layerTree, cb => {
-                                selectedLayerTreeItem = cb
-                                selectedItem = e;
-                                if (e.attrs.name == "Duplication Group" || e.attrs.name == "group") {
-                                    e.draggable(true)
-                                    e.children.forEach(element => {
-                                        element.attrs.draggable = false
-                                        element.draggable(false)
-                                    })
-                                }
-                                stage.batchDraw()
-                                properties.name = selectedItem.attrs.name;
-                                properties.height = (selectedItem.attrs.height / (floorConfig
-                                    .blockRatio * meterRatio)).toFixed(2);
-                                properties.width = (selectedItem.attrs.width / (floorConfig
-                                    .blockRatio * meterRatio)).toFixed(2);
-                                properties.fill = selectedItem.attrs.fill;
-                                properties.radius = (selectedItem.attrs.radius / (floorConfig
-                                    .blockRatio * meterRatio)).toFixed(2);
-                                properties.rotation = selectedItem.attrs.rotation;
-                                properties.depth = selectedItem.attrs.depth / ((floorConfig
-                                    .blockRatio * meterRatio)).toFixed(2);
-
-                                if (selectedItem.attrs.name == "image") {
-                                    keepAspectRatio = selectedItem.attrs.keepAspectRatio
-                                }
-                                // start transform region
-                                var tr
-                                if (selectedItem.attrs.name == "image") {
-                                    if (selectedItem.attrs.keepAspectRatio != true) {
-                                        tr = new Konva.Transformer({
-                                            enabledAnchors: ["top-left", "top-center", "top-right",
-                                                "middle-right", "middle-left", "bottom-left",
-                                                "bottom-center", "bottom-right"
-                                            ],
-                                        });
+                                    if (selectedItem.attrs.name == "image") {
+                                        keepAspectRatio = selectedItem.attrs.keepAspectRatio
+                                    }
+                                    // start transform region
+                                    var tr
+                                    if (selectedItem.attrs.name == "image") {
+                                        if (selectedItem.attrs.keepAspectRatio != true) {
+                                            tr = new Konva.Transformer({
+                                                enabledAnchors: ["top-left", "top-center", "top-right",
+                                                    "middle-right", "middle-left", "bottom-left",
+                                                    "bottom-center", "bottom-right"
+                                                ],
+                                            });
+                                        } else {
+                                            tr = new Konva.Transformer({
+                                                enabledAnchors: ['top-left', 'top-right', 'bottom-left',
+                                                    'bottom-right'
+                                                ],
+                                            });
+                                        }
                                     } else {
                                         tr = new Konva.Transformer({
-                                            enabledAnchors: ['top-left', 'top-right', 'bottom-left',
-                                                'bottom-right'
-                                            ],
+                                            enabledAnchors: selectedItem.attrs.enabledAnchors,
                                         });
                                     }
-                                } else {
-                                    tr = new Konva.Transformer({
-                                        enabledAnchors: selectedItem.attrs.enabledAnchors,
-                                    });
-                                }
 
-                                if (selectedItem.attrs.name == "Tape" || selectedItem.attrs.name == "group" || selectedItem.attrs.name == "Duplication Group" || selectedItem.attrs.isPlanogram) {
-                                    tr = new Konva.Transformer({
-                                        enabledAnchors: [],
-                                    });
-                                }
-                                if (selectedItem.attrs.name == "Gondola-Rect" || selectedItem.attrs.name ==
-                                    "image" || selectedItem.attrs
-                                    .name == "Tape" || selectedItem.attrs.name == "group" || selectedItem.attrs.name == "Duplication Group" || selectedItem.attrs.isPlanogram) {
-                                    tr.rotateEnabled(true);
+                                    if (selectedItem.attrs.name == "Tape" || selectedItem.attrs.name == "group" || selectedItem.attrs.name == "Duplication Group" || selectedItem.attrs.isPlanogram) {
+                                        tr = new Konva.Transformer({
+                                            enabledAnchors: [],
+                                        });
+                                    }
+                                    if (selectedItem.attrs.name == "Gondola-Rect" || selectedItem.attrs.name ==
+                                        "image" || selectedItem.attrs
+                                        .name == "Tape" || selectedItem.attrs.name == "group" || selectedItem.attrs.name == "Duplication Group" || selectedItem.attrs.isPlanogram) {
+                                        tr.rotateEnabled(true);
 
-                                } else {
-                                    tr.rotateEnabled(false);
-                                }
+                                    } else {
+                                        tr.rotateEnabled(false);
+                                    }
 
-                                e.parent.add(tr);
+                                    e.parent.add(tr);
 
-                                tr.attachTo(e);
-                                stage.batchDraw();
-                                tr.on('transform', function (z) {
-                                    transFormerHelper.handleTransform(e, z, handleSnapping, self
-                                        .stage,
-                                        lastPosition, ctrlDown, selectedItem,
-                                        '', transformProperties, self
-                                        .propertiesLabelHorizontal, '')
-                                });
-                                tr.on('transformend', function () {
-                                    transFormerHelper.handleTransformEnd(selectedItem, properties,
-                                        (floorConfig.blockRatio * meterRatio))
+                                    tr.attachTo(e);
                                     stage.batchDraw();
-                                });
-                                clicktapcallback({
-                                    selectedLayerTreeItem: selectedLayerTreeItem,
-                                    selectedItem: selectedItem,
+                                    tr.on('transform', function (z) {
+                                        transFormerHelper.handleTransform(e, z, handleSnapping, self
+                                            .stage,
+                                            lastPosition, ctrlDown, selectedItem,
+                                            '', transformProperties, self
+                                            .propertiesLabelHorizontal, '')
+                                    });
+                                    tr.on('transformend', function () {
+                                        transFormerHelper.handleTransformEnd(selectedItem, properties,
+                                            (floorConfig.blockRatio * meterRatio))
+                                        stage.batchDraw();
+                                    });
+                                    clicktapcallback({
+                                        selectedLayerTreeItem: selectedLayerTreeItem,
+                                        selectedItem: selectedItem,
+                                    })
                                 })
-                            })
-                        }
-                        // End transform region
+                            }
+                            // End transform region
 
-                    }
-                })
+                        }
+                    })
+                }
             }
 
         }

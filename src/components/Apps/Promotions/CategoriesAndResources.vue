@@ -1,6 +1,11 @@
 <template>
     <v-card height="100vh">
-        <v-toolbar color="primary" dark>
+        <v-toolbar  dark dense>
+             <v-btn flat @click="$router.back()">
+                <v-icon>arrow_left</v-icon>
+                <span>Back</span>
+            </v-btn>
+            <v-spacer></v-spacer>
             <v-toolbar-title>
                 Categories and Resources
             </v-toolbar-title>

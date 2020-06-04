@@ -22,6 +22,7 @@
 
                 <v-icon v-if="layer.drawType=='group'" :size="22" @click="togglelocked(layer)" color="grey darken-2">
                     {{ layer.locked ? 'lock_open' : 'lock' }}</v-icon>
+
                 <v-menu offset-y offset-x>
                     <template v-slot:activator="{ on }">
                         <v-icon v-on="on" :size="22" color="grey darken-2">more_vert</v-icon>
@@ -42,6 +43,8 @@
                 @drop="endgroupDrag(layer,layers,idx)" v-on:dragstart="dragStart(layer,idx,layers)"
                 v-if="(layer.drawType!='Layer'&&layer.drawType!='group')">
                 <div class="pa-1 grey lighten-3" style="display: flex;">
+                    <v-icon v-if="layer.name=='Image'" :size="22" @click="toggleImageItem(layer)" color="grey darken-2">
+                        {{ layer.locked ? 'lock_open' :  'lock'}}</v-icon>
                     <div :class="{ 'highlighted': selectedLayerTreeItem == layer  }" style="width: 80%">{{ layer.name }}
                     </div>
                     <v-icon :size="22" @click="setItemVisible(layer)" color="grey darken-2">
@@ -57,7 +60,8 @@
                 :layers="layer.children" :selectLayer="selectLayer" :selectedLayerTree="selectedLayerTree"
                 :setLayerVisible="setLayerVisible" :deleteLayer="deleteLayer" :showChild="layer.selected"
                 :endDrag="endDrag" :startDrag="startDrag" :swapIndex="swapIndex" :editLayerName="editLayerName"
-                :setItemVisible="setItemVisible" :selectItemFromSidePanel="selectItemFromSidePanel" />
+                :setItemVisible="setItemVisible" :selectItemFromSidePanel="selectItemFromSidePanel"
+                :toggleItem="toggleItem" />
         </div>
     </div>
 </template>
@@ -65,7 +69,7 @@
     export default {
         props: ["layers", "selectLayer", "setLayerVisible", "deleteLayer", "showChild", "startDrag", "endDrag",
             "selectedLayer", "editLayerName", "selectedLayerTree", "selectedLayerTreeItem", "toggleLock",
-            "swapIndex", "selectItemFromSidePanel", "setItemVisible"
+            "swapIndex", "selectItemFromSidePanel", "setItemVisible", "toggleItem"
         ],
         name: "RecursiveLayer",
         data() {
@@ -137,6 +141,12 @@
                 layer.locked = !layer.locked
                 self.toggleLock(layer)
 
+            },
+            toggleImageItem(item) {
+                let self = this
+                console.log("item.locked", item.locked);
+                item.locked = !item.locked
+                self.toggleItem(item)
             },
             toggleCollapsed(layer) {
                 let self = this

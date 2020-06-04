@@ -118,14 +118,14 @@
             }
         },
         methods: {
-            updateLine(line){
+            updateLine(line) {
                 let self = this
-                console.log("updateLine",line.data);
-                 axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
-                axios.post(process.env.VUE_APP_API + `Promotion/saveLine`, self.groupItem).then(r => {
+                console.log("updateLine", line.data);
+                axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+                axios.post(process.env.VUE_APP_API + `Promotion/saveLine`, line.data).then(r => {
                     self.getAdminUsers()
                 })
-                
+
             },
             open(callback) {
                 let self = this
@@ -148,7 +148,9 @@
                 let self = this
                 axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
                 axios.post(process.env.VUE_APP_API + `Promotion/SaveAdminUser`, self.userItem).then(r => {
-                    self.userGroupModal = false
+                    self.userModal = false
+                    console.log("submitUser", self.userItem);
+
                     for (var prop in self.userItem) {
                         self.userItem[prop] = null
                     }
