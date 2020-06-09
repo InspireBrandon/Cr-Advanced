@@ -48,6 +48,9 @@
                         </v-list-tile>
                     </v-list>
                 </v-menu>
+                <v-btn @click="openSettings">
+                    settings
+                </v-btn>
                 <!-- <v-text-field label="block to meter ratio" v-model="meterRatio" style="width:200px">
                 </v-text-field> -->
             </v-toolbar-items>
@@ -101,6 +104,7 @@
                 </template>
                 <span>View 3D</span>
             </v-tooltip>
+            <v-btn @click="logMutli"> log</v-btn>
             <div v-show="multiSelectGroup !=null">
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
@@ -170,7 +174,7 @@
                         </v-card>
                     </v-flex>
                     <v-flex sm2 class="pa-0">
-                        <v-card>
+                        <!-- <v-card>
                             <v-container grid-list-md class="pa-0">
                                 <v-layout row wrap>
                                     <v-flex md12 style="padding: 2px;" class="px-2">
@@ -188,7 +192,7 @@
                                     </v-flex>
                                 </v-layout>
                             </v-container>
-                        </v-card>
+                        </v-card> -->
                         <v-card tile flat id="panel_container" class="fill-height">
                             <v-toolbar v-if="selectedTool == 'open_with'" dark dense flat color="grey darken-3">
                                 <v-toolbar-title>
@@ -196,7 +200,7 @@
                                 </v-toolbar-title>
                             </v-toolbar>
                             <v-card-text v-if="selectedTool == 'open_with' &&selectedItem==null" class="pt-0"
-                                style="height: 30%; overflow-y: scroll;">
+                                style="height: 40%; overflow-y: scroll;">
                                 <v-text-field type="number" v-model="floorConfig.blockRatio" label="Block Width (m)"
                                     @change="applyFloorProperties">
                                 </v-text-field>
@@ -208,7 +212,7 @@
                                 </v-text-field>
                             </v-card-text>
                             <v-card-text v-if="selectedTool == 'open_with' && selectedItem!=null&&makingChanges==false"
-                                class="pt-0" style="height: 30%; overflow-y: scroll;">
+                                class="pt-0" style="height: 40%; overflow-y: scroll;">
                                 <v-text-field @change="applyProperties" v-if="properties.name!=null" label="Name"
                                     v-model="properties.name" hide-details> </v-text-field>
                                 <v-text-field
@@ -246,7 +250,7 @@
                                 </v-toolbar-title>
                             </v-toolbar>
                             <v-card-text v-if="selectedTool != 'open_with'" class="pt-3"
-                                style="height: 30%; overflow-y: scroll;">
+                                style="height: 40%; overflow-y: scroll;">
                                 <v-text-field v-if="selectedTool=='crop_square'||selectedTool=='show_chart'"
                                     label="Height" v-model="brush.height" hide-details>
                                 </v-text-field>
@@ -280,7 +284,7 @@
                                     </v-list>
                                 </v-menu>
                             </v-toolbar>
-                            <v-card-text class="pa-0 pt-0" style="height: 40%; overflow-y: scroll;">
+                            <v-card-text class="pa-0 pt-0" style="height: 47%; overflow-y: scroll;">
                                 <!-- <div @dragover.prevent draggable="true" @drop="MoveLayerTopTop($event)">
                                     <div class="pa-1 grey lighten-3" style="display: flex;">
                                         <div>
@@ -295,7 +299,7 @@
                                     :showChild="true" :layers="layerTree" :selectLayer="selectLayer"
                                     :setLayerVisible="setLayerVisible" :deleteLayer="deleteLayer" :endDrag="endDrag"
                                     :swapIndex="swapIndex" :startDrag="startDrag" :selectedLayerTree="selectedLayerTree"
-                                    :selectedLayer="selectedLayer" :toggleLock="toggleLock" />
+                                    :selectedLayer="selectedLayer" :toggleLock="toggleLock" :toggleItem="toggleItem" />
 
                             </v-card-text>
                         </v-card>
@@ -311,6 +315,7 @@
             <Spinner ref="spinner"></Spinner>
             <FloorConfigModal ref="FloorConfigModal" />
             <FloorPlanMediaModal ref="FloorPlanMediaModal" />
+            <Settings ref="settings" />
 
         </v-container>
         <v-snackbar v-model="snackbar" color="primary" :timeout="3000">
@@ -588,6 +593,28 @@
             }
         },
         methods: {
+            openSettings() {
+                let self = this
+                let settings = {
+                    selectedClusterOption: self.selectedClusterOption,
+                    selectedClusterType: self.selectedClusterType,
+                }
+                self.$refs.settings.open(settings, callback => {
+                    self.selectedClusterOption = callback.selectedClusterOption
+                    self.selectedClusterType = callback.selectedClusterType
+                })
+            },
+            toggleItem(item) {
+                let self = this
+                self.$nextTick(() => {
+                    self.findKonvaItem(self.stage.children, item.KonvaID, e => {
+                        e.draggable(item.locked)
+                        e.attrs.locked = item.locked
+                        self.stage.batchDraw()
+                        console.log("toggleItem", e.attrs.draggable);
+                    })
+                })
+            },
             setLibraryFilter(options, selectedOption) {
                 let self = this
                 options.forEach(option => {
@@ -613,6 +640,7 @@
             },
             logMutli() {
                 let self = this
+                console.log("layer", self.layerTree)
             },
             addItemToGroup() {
                 let self = this
@@ -1247,7 +1275,7 @@
                 self.stage.find('Transformer').destroy()
                 self.saveArr = []
                 if (self.selectedClusterOption == null) {
-                    alert("Please fill in cluster options")
+                    self.openSettings()
                     return
                 }
                 // self.$refs.Prompt.show("", " Save FloorPlan", "Please enter floorplan name", Name => {
@@ -1914,13 +1942,19 @@
             },
             selectItemFromSidePanel(item) {
                 let self = this
+                console.log("selectItemFromSidePanel", item);
+                if (item.name == "Image" && item.locked == false) {
+                    console.log("return");
 
+                    return
+                }
                 self.findKonvaItem(self.stage.children, item.KonvaID, e => {
                     if (e.attrs.drawType == "Layer") {
                         return
                     }
                     clickTapHelper.destroyTransformer(self.stage, cb => {
                         self.clickselect(e, callback => {
+                            console.log("clickselect [selectItemFromSidePanel]", callback);
 
                         })
                         // clickTapHelper.setSelectedItem(e, self.findLayerItem, self
@@ -2267,6 +2301,7 @@
                     selected: true,
                     showChildren: false,
                     draggable: true,
+                    locked: true,
                     name: "Image",
                     children: [],
                     parent: self.selectedLayerTree
@@ -2616,6 +2651,13 @@
             clickselect(item, callback) {
                 let self = this
                 self.showRotation = true;
+                console.log("clickselect [LOCKED] ", item.attrs.locked);
+
+                if (item.attrs.name == "Image" && item.attrs.locked == false) {
+                    console.log("inside locked");
+
+                    callback(item)
+                }
                 switch (item.parent.attrs.name) {
                     case "Building": {
                         self.selectLayer(self.buildingLayerTree, self.layerTree, layerCB => {
@@ -2705,6 +2747,8 @@
                 }
                 break;
                 case "image": {
+                    console.log("clickselect [IMAGE]");
+
                     self.selectLayer(self.backgroundTree, self.layerTree, layerCB => {
                         callback(item)
                     })
@@ -2924,8 +2968,9 @@
                             if (haveIntersection(group.getClientRect(), targetRect)) {
                                 if (target.children.length > 0) {
                                     target.children.each(function (item) {
-                                            // targetRect));
-                                        if (haveIntersection(item.getClientRect(), targetRect)) {
+                                        // targetRect));
+                                        if (haveIntersection(item.getClientRect(),
+                                                targetRect)) {
                                             self.attachGondolaInsideGroup(item, target, group)
                                         }
                                     })

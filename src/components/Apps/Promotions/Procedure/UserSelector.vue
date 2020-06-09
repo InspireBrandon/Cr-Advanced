@@ -1,8 +1,8 @@
 <template>
-    <v-menu offset-y :close-on-content-click="false">
+    <v-menu offset-y v-model="menu" :close-on-content-click="false">
         <template v-slot:activator="{ on }">
             <div v-on="on" style="cursor: pointer;" @click="checkSelectedUser(step)" v-if="step.users.length>0">
-                {{step.users.length}} users selected
+                {{step.users.length}} users selected 
             </div>
             <div v-on="on" style="cursor: pointer;" v-else>Click to select...</div>
         </template>
@@ -27,7 +27,7 @@
                 <v-card-actions class="px-0 pb-0">
                     <v-btn small flat color="secondary" @click="stage = 0">back</v-btn>
                     <v-spacer></v-spacer>
-                    <v-btn small flat color="primary" @click="submitUsers(selected,step)">Continue</v-btn>
+                    <v-btn small flat color="primary" @click="submit(selected,step)">Continue</v-btn>
                 </v-card-actions>
             </v-card-text>
             <v-card-text v-if="stage == 2" class="pa-2">
@@ -46,7 +46,7 @@
                 <v-card-actions class="px-0 pb-0">
                     <v-btn small flat color="secondary" @click="stage = 0">back</v-btn>
                     <v-spacer></v-spacer>
-                    <v-btn small flat color="primary" @click="submitUsers(selected,step)">Continue</v-btn>
+                    <v-btn small flat color="primary" @click="submit(selected,step)">Continue</v-btn>
                 </v-card-actions>
             </v-card-text>
         </v-card>
@@ -59,6 +59,7 @@
         props: ["submitUsers", "users", "groups", "step"],
         data() {
             return {
+                menu: false,
                 stage: 0,
                 selected: {
                     adminGroup: [],
@@ -68,6 +69,12 @@
             };
         },
         methods: {
+            submit(selected, step) {
+                let self = this
+                self.submitUsers(selected, step)
+                self.menu = false
+
+            },
             checkSelectedUser(step) {
                 let self = this
                 console.log("checkSelectedUser", step);

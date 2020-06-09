@@ -90,7 +90,37 @@
         name: 'DataImport',
         data: () => {
             return {
+                product: [
+                    new navItem({
+                        name: 'Product Catalogue',
+                        route: 'ProductCatalogue'
+                    }),
+                    new navItem({
+                        name: 'Data Import Structure',
+                        route: 'CategoryCode'
+                    }),
+                    new navItem({
+                        name: 'Item Status',
+                        route: 'Item_Status'
+                    }),
+                    new navItem({
+                        name: 'Planogram Maintenance',
+                        route: 'PlanogramMaintenance'
+                    }),
+                ],
                 item_fields: [
+                    new navItem({
+                        name: 'Supergroup_A',
+                        route: 'Supergroup_A'
+                    }),
+                    new navItem({
+                        name: 'Supergroup_B',
+                        route: 'Supergroup_B'
+                    }),
+                     new navItem({
+                        name: 'Department',
+                        route: 'Department'
+                    }),
                     new navItem({
                         name: 'Segment',
                         route: 'Segment'
@@ -103,36 +133,10 @@
                         name: 'Supplier',
                         route: 'Supplier'
                     }),
-                    new navItem({
-                        name: 'Department',
-                        route: 'Department'
-                    }),
+                   
                     new navItem({
                         name: 'Brand',
                         route: 'Brand'
-                    }),
-                ],
-                product: [
-                    new navItem({
-                        name: 'Product Catalogue',
-                        route: 'ProductCatalogue'
-                    }),
-                    new navItem({
-                        name: 'Category Code',
-                        route: 'CategoryCode'
-                    }),
-                    new navItem({
-                        name: 'Supergroup_A',
-                        route: 'Supergroup_A'
-                    }),
-                    new navItem({
-                        name: 'Supergroup_B',
-                        route: 'Supergroup_B'
-                    }),
-
-                    new navItem({
-                        name: 'Item Status',
-                        route: 'Item_Status'
                     }),
 
                     // new navItem({
@@ -145,6 +149,7 @@
                     //     route: 'PackingList'
                     // }),
                 ],
+                
                 market: [
                     new navItem({
                         name: 'Store',
@@ -172,10 +177,7 @@
                     }),
                 ],
                 fact: [
-                    new navItem({
-                        name: 'Planogram Maintenance',
-                        route: 'PlanogramMaintenance'
-                    }),
+
                     new navItem({
                         name: 'Test Range',
                         route: 'TestRange'
